@@ -6,6 +6,8 @@ File summary
 - Core points:
   - `MAESTROSettings` carries the chat and vision model plus a secret API key.
   - The API key is never emitted in logs, exceptions, or `repr`.
+  - Process environment variables take precedence over `.env`, including for the
+    required-setting check; `MAESTRO_LOG_DIRECTORY` optionally relocates run records.
 - Interfaces: `MAESTROSettings`, `from_workspace`, `ConfigurationError`
 - Depends on: (standard library only)
 """
@@ -70,13 +72,18 @@ class MAESTROSettings:
             "DEEPSEEK_MODEL",
             "DEEPSEEK_VISION_MODEL",
         )
-        missing = [name for name in required if not environment.get(name)]
+
+        # The process environment wins over the dotenv file, for the presence
+        # check as well as the value: a deployment that exports its settings and
+        # ships no .env is fully configured, not missing four settings.
+        def setting(name: str) -> str:
+            return (os.environ.get(name) or environment.get(name) or "").strip()
+
+        missing = [name for name in required if not setting(name)]
         if missing:
             raise ConfigurationError(
                 "Missing required MAESTRO provider settings: " + ", ".join(missing)
             )
-        def setting(name: str) -> str:
-            return os.environ.get(name) or environment[name]
         model = setting("DEEPSEEK_MODEL").strip()
         aliases = {"deepseek-4.1flash", "deepseek-v4.1-flash", "deepseek-v4-flash"}
         if model.lower() in aliases:
@@ -89,5 +96,18 @@ class MAESTROSettings:
             base_url=setting("DEEPSEEK_BASE_URL").rstrip("/"),
             chat_model=model,
             vision_model=vision,
-            log_directory=workspace / "log" / "20260910",
+            log_directory=_log_directory(workspace, setting("MAESTRO_LOG_DIRECTORY")),
         )
+
+
+def _log_directory(workspace: Path, configured: str) -> Path:
+    """The run-record directory: ``MAESTRO_LOG_DIRECTORY`` if set, else the dated default.
+
+    A relative setting is read against the workspace, so the same dotenv file
+    means the same directory whichever directory the command is started from.
+    """
+
+    if not configured:
+        return workspace / "log" / "20260910"
+    path = Path(configured).expanduser()
+    return path if path.is_absolute() else workspace / path

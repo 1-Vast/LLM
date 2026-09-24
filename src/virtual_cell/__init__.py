@@ -12,13 +12,14 @@ File summary
   `SupportRegistry`, `CalibrationReport`, `PerturbationTable`,
   `LinearPerturbationBaseline`, `HierarchicalDoseResponseModel`,
   `CompositeWorldModel`, `SimulationCostLedger`, `StateCapabilityAdapter`.
-  `ConditionPanel`, `run_panel`, `score_panel_gene_sets`, `rank_conditions`,
+  `PredictionCache`, `ConditionPanel`, `run_panel`, `score_panel_gene_sets`, `rank_conditions`,
   `score_panel_against_observations`, `build_backend`.
 - Depends on: maestro.models
 """
 
 from .applicability import ApplicabilityVerdict, SupportLevel, SupportRecord, SupportRegistry
 from .backends import BACKEND_CHOICES, build_backend
+from .cache import PredictionCache
 from .biology import (
     BackendDescription,
     BridgeModel,
@@ -146,6 +147,7 @@ __all__ = [
     "PanelRow",
     "PanelRun",
     "PerturbationTable",
+    "PredictionCache",
     "PredictionRequest",
     "QueryAssessment",
     "QuerySupport",

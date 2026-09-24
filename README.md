@@ -62,6 +62,8 @@ Each turn creates a `TaskIntent`: question, supplied evidence, targets, interven
 
 The planner returns exactly two hypotheses and selects from the caller-provided evidence menu. The controller checks executability, measured prerequisites, discriminability of the two hypotheses, and differing development actions. A failure yields one named repair or explicit deferral. A model prediction, retrieved memory, or visual interpretation never becomes measured evidence by appearing in context.
 
+A planner reply that breaks its declared shape (not exactly two hypotheses, unregistered hypothesis identifiers, a repair editing a field other than `plan.action_identifier`) is named back to the model once, with the reply echoed, and judged again by the same parser; a second violation raises exactly as before, so an evaluation still records it as a lost case. Every corrected violation is logged as `planner_contract_violation`, and a repair draft naming an unregistered action is logged as `llm_repair_not_applicable` rather than dropped silently. `MechanismContrastPlanner(client, contract_retries=0)` restores single-shot behaviour.
+
 With `--dataset`, the LLM selects a bounded sequence of registered folder-scoped tools from `tools/`. The router validates declared tool, dataset id, suffix, and parameters before loading its local entry point. Dataset output is stored with file name, tool id, and tool-reported limitations. Bundled tools are schema profiling, numeric column summary, and declarative table filtering; they execute no expressions and assert no biological causality.
 
 ## Case Lifecycle and Evidence Lineage
@@ -100,6 +102,10 @@ On deterministic contrast-check failure, rule-based repair stays the baseline. T
 
 The interface separates `PredictionRequest`, `ModelCapabilities`, `QueryAssessment`, and `StatePrediction`. A mechanism-contrast id is tracking metadata, not a State input that makes a mechanism true. The State capability adapter requires explicit model version, registered perturbation, and matched control data, and rejects unknown perturbations to prevent fallback-to-control output being misread as a null drug response. A `VirtualCellQueryTemplate` holds caller-registered perturbation and dataset fields; the controller may bind them to the current case, contrast, plan version, and parsed targets. A supported prediction with finite numeric output may rank otherwise equal-coverage, equal-cost actions declaring a matching prediction readout and relevance; it cannot satisfy a prerequisite, make an action discriminating, or replace a measured result.
 
+The virtual cell also reaches the agent's own reasoning, not only the tie-break. Each round, `agent/world_model_briefing.py` renders one row per queried action - readout, predicted value, band and whether it claims coverage, distribution membership, validation status and the reliability ledger's current weight, or the abstention and its reason - and the LLM repair planner receives it under a heading that states it is planning-only model output. The same rows are kept on `MAESTROTurn.world_model_rows`, written to the experiment log, and summarised in the turn response. The briefing can inform which registered action is proposed; the deterministic re-check still decides adoption, and a prediction still cannot satisfy a prerequisite or eliminate a hypothesis.
+
+A multi-round case re-plans every round and would re-run identical inference each time. `virtual_cell/cache.py` keys a supported, contract-valid prediction on its model inputs (intervention, context, readouts, model version, backend) and excludes tracking metadata (request, case, contrast, plan version). A reuse is rebound to the new request id, carries zero compute cost and names the request whose inference it reuses; abstentions are never cached. `reuse_predictions=False` disables it.
+
 A supplied PNG, JPEG, GIF, or WebP result goes to the configured vision model with the current research question; it records visible observations, quality concerns, decision relevance, and limitations. It can refine the next question but cannot establish causal mechanism or target engagement.
 
 `python -m virtual_cell panel` runs a declared panel of registered conditions behind any registered backend, so the weights can be used analytically without going through the agent loop. A panel row is planning-only and labelled `model_prediction`; it keeps the artifact reference, verifies that artifact against its own digest, reports a gene-set endpoint as refused when the output coordinates cannot express it, and can issue a validation receipt only against a criterion, split and holdout status the caller declared in advance. `src/virtual_cell/panel.py` holds the surface and `tests/test_virtual_cell_panel.py` pins its boundaries.
@@ -108,7 +114,7 @@ Three further primitives keep the layer's claims structural rather than narrativ
 
 ## Runtime and Logs
 
-Local provider config is read from `.env`; values are never printed or logged. Run records live in a dated directory under `log/` (see [`log/INDEX.md`](log/INDEX.md)): an append-only event stream, an experiment stream, and the local memory, evidence and case stores. Each dated directory's `README.md` is the consolidated record of that day's design work and its measured results.
+Local provider config is read from the process environment, falling back to `.env`; values are never printed or logged. `MAESTRO_LOG_DIRECTORY` optionally relocates run records (a relative path is read against the workspace). The CLI exits with status 2 and a one-line reason on a configuration, provider or planner-contract failure; rate-limited provider calls honour a `Retry-After` of up to 60 seconds. Run records live in a dated directory under `log/` (see [`log/INDEX.md`](log/INDEX.md)): an append-only event stream, an experiment stream, and the local memory, evidence and case stores. Each dated directory's `README.md` is the consolidated record of that day's design work and its measured results.
 
 ## Retrospective Replay Evaluation
 
@@ -181,6 +187,8 @@ python -m agent "Resolve the genetic-pharmacology discrepancy" \
   --case-id example-case --budget 5 --max-rounds 3 \
   --results sourced_results.json --state-template state_template.json
 ```
+
+`--hypotheses hypotheses.json` (a list of exactly two objects with `identifier`, `description`, `proposed_action`, optional `causal_factor`) registers the explanations for every round, so a reworded model answer keeps the registered meaning instead of stopping the loop as `hypothesis_definition_changed`.
 
 Each result object must contain `statement`, `source_id`, `quality_passed`, and matched conditions. `interpretation_fields` is optional, but only an explicit field such as `functional:target_activity:sufficient` can update that exact functional prerequisite next round. `prediction_readout` and nonnegative `prediction_relevance` on an action opt it into the limited State-assisted tie-break.
 

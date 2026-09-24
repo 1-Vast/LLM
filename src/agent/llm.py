@@ -13,6 +13,7 @@ File summary
 from __future__ import annotations
 
 import json
+import math
 import re
 from dataclasses import dataclass
 from time import sleep
@@ -42,6 +43,21 @@ class LLMTransportError(LLMError):
 _RETRY_STATUS = frozenset({408, 409, 425, 429, 500, 502, 503, 504})
 _MAX_ATTEMPTS = 4
 _BACKOFF_SECONDS = 1.5
+# A provider's Retry-After is honoured up to this bound; a longer wait is the
+# provider saying "not now", and the caller should see the failure instead.
+_MAX_RETRY_AFTER_SECONDS = 60.0
+
+
+def _retry_after_seconds(error: HTTPError) -> float | None:
+    """The delay a rate-limited response asks for, when it states one in seconds."""
+
+    headers = getattr(error, "headers", None)
+    value = headers.get("Retry-After") if headers is not None else None
+    try:
+        seconds = float(value)
+    except (TypeError, ValueError):
+        return None
+    return seconds if math.isfinite(seconds) and seconds >= 0 else None
 
 
 _FENCE = re.compile(r"\A\s*```(?:json)?\s*|\s*```\s*\Z", re.IGNORECASE)
@@ -184,6 +200,7 @@ class DeepSeekChatClient:
 
         last: LLMError | None = None
         for attempt in range(1, _MAX_ATTEMPTS + 1):
+            requested_delay: float | None = None
             try:
                 with urlopen(request, timeout=self._settings.timeout_seconds) as response:
                     return json.loads(response.read().decode("utf-8"))
@@ -191,6 +208,7 @@ class DeepSeekChatClient:
                 if error.code not in _RETRY_STATUS:
                     raise LLMError(f"LLM request failed with HTTP status {error.code}.") from error
                 last = LLMTransportError(f"LLM request failed with retryable HTTP status {error.code}.")
+                requested_delay = _retry_after_seconds(error)
             except URLError as error:
                 last = LLMTransportError("LLM request could not reach the configured endpoint.")
             except TimeoutError as error:
@@ -198,7 +216,10 @@ class DeepSeekChatClient:
             except json.JSONDecodeError as error:
                 raise LLMError("LLM request returned an unreadable response.") from error
             if attempt < _MAX_ATTEMPTS:
-                sleep(_BACKOFF_SECONDS * (2 ** (attempt - 1)))
+                delay = _BACKOFF_SECONDS * (2 ** (attempt - 1))
+                if requested_delay is not None:
+                    delay = min(max(delay, requested_delay), _MAX_RETRY_AFTER_SECONDS)
+                sleep(delay)
         raise last or LLMTransportError("LLM request failed for an unrecorded transport reason.")
 
     def complete_json(

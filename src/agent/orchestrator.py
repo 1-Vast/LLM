@@ -7,8 +7,10 @@ File summary
   - `run` executes one bounded cycle; `run_case_loop` stops before any unsupplied measurement.
   - A real measurement never becomes a model prediction or a fabricated biological result.
   - Adopted repairs are scored against later real results via `gap_resolved`.
+  - Each round's virtual-cell answers are shown to the LLM repair planner as a labelled
+    planning-only briefing, and an identical query is answered once per run, not per round.
 - Interfaces: `MAESTROOrchestrator`, `run`, `run_case_loop`, `import_measurement`, `MAESTROTurn`, `MAESTROCaseLoop`
-- Depends on: maestro.contrast, maestro.decision, maestro.outcome, maestro.repair, maestro.reliability, maestro.provenance, agent.audit, agent.cases, agent.configuration, agent.context, agent.knowledge, agent.llm, agent.memory, agent.planner, agent.reflection, agent.tool_runtime, agent.vision, virtual_cell
+- Depends on: maestro.contrast, maestro.decision, maestro.outcome, maestro.repair, maestro.reliability, maestro.provenance, agent.audit, agent.cases, agent.configuration, agent.context, agent.knowledge, agent.llm, agent.memory, agent.planner, agent.reflection, agent.tool_runtime, agent.vision, agent.world_model_briefing, virtual_cell
 """
 from __future__ import annotations
 
@@ -72,8 +74,15 @@ from .planner import LLMRepairDraft, MechanismContrastPlanner
 from .reflection import ReflectionRecord, reflect_on_result
 from .tool_runtime import ToolExecution, ToolRouter, ToolRuntimeError
 from .vision import VisualInspection, VisualInspector
+from .world_model_briefing import (
+    WorldModelRow,
+    render_world_model_briefing,
+    summarize_world_model,
+    world_model_rows,
+)
 from virtual_cell.interface import safe_predict
 from virtual_cell import (
+    PredictionCache,
     PredictionRequest,
     QueryAssessment,
     QuerySupport,
@@ -114,6 +123,8 @@ class MAESTROTurn:
     action_predictions: Mapping[str, StatePrediction] = field(default_factory=dict)
     action_prediction_assessments: Mapping[str, QueryAssessment] = field(default_factory=dict)
     action_prediction_requests: Mapping[str, PredictionRequest] = field(default_factory=dict)
+    # What the repair planner was shown about this round's virtual-cell queries.
+    world_model_rows: tuple[WorldModelRow, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -132,6 +143,10 @@ class MAESTROCaseLoop:
 
 class MAESTROOrchestrator:
     """Single-controller agent that keeps planning, observations, and evidence distinct."""
+
+    # A partially constructed controller (tests build one without __init__) must
+    # still answer "is prediction reuse enabled?" rather than raise.
+    _prediction_cache: PredictionCache | None = None
 
     def __init__(
         self,
@@ -154,6 +169,8 @@ class MAESTROOrchestrator:
         source_clusters: SourceClusterIndex | None = None,
         max_repair_attempts: int = 3,
         power_aware_selection: bool = False,
+        prediction_cache: PredictionCache | None = None,
+        reuse_predictions: bool = True,
     ):
         self._interpreter = interpreter
         self._context_builder = context_builder
@@ -177,6 +194,15 @@ class MAESTROOrchestrator:
         self._evidence_states: dict[str, EvidenceState] = {}
         self._round_records: dict[str, RoundRecord] = {}
         self._power_aware_selection = power_aware_selection
+        # A multi-round case re-queries every action every round with unchanged
+        # model inputs. Reuse is keyed on those inputs only; see virtual_cell.cache.
+        self._prediction_cache = (
+            prediction_cache if prediction_cache is not None else PredictionCache() if reuse_predictions else None
+        )
+
+    @property
+    def prediction_cache(self) -> PredictionCache | None:
+        return self._prediction_cache
 
     def repair_ledger(self, case_id: str) -> RepairLedger:
         return self._repair_ledgers.setdefault(case_id, RepairLedger())
@@ -325,12 +351,18 @@ class MAESTROOrchestrator:
 
         if prediction_request is not None and virtual_cell_template is not None:
             raise ValueError("Provide either prediction_request or virtual_cell_template, not both.")
-        proposal = self._planner.propose(
-            context,
-            available_actions,
-            required_hypothesis_identifiers=expected_hypothesis_identifiers,
-            expected_hypotheses=expected_hypotheses,
-        )
+        violations_before = len(getattr(self._planner, "contract_violations", ()))
+        try:
+            proposal = self._planner.propose(
+                context,
+                available_actions,
+                required_hypothesis_identifiers=expected_hypothesis_identifiers,
+                expected_hypotheses=expected_hypotheses,
+            )
+        finally:
+            # Logged whether or not the correction succeeded; a failure still
+            # propagates, because an evaluation records it as a lost case.
+            self._log_contract_corrections(violations_before, "contrast_planner", session_id)
         contrast = proposal.to_contrast(available_actions)
         action_requests = self._build_action_prediction_requests(
             virtual_cell_template, intent, contrast, case_id, case, session_id, available_actions
@@ -362,6 +394,9 @@ class MAESTROOrchestrator:
             # neighbour's, so a check that needs a model output reads the right one.
             prediction = action_predictions.get(contrast.plan.identifier)
             prediction_assessment = action_assessments.get(contrast.plan.identifier)
+        briefing_rows = world_model_rows(
+            available_actions, action_requests, action_assessments, action_predictions, self._reliability
+        )
         selection = self._select_budgeted_actions(
             contrast, available_actions, intervention_profile, case, budget, session_id,
             prediction=prediction, prediction_request=effective_request,
@@ -394,6 +429,7 @@ class MAESTROOrchestrator:
         accepted_repair = self._propose_llm_repair(
             context, contrast, check, available_actions, intervention_profile, prediction, session_id,
             action_predictions=action_predictions,
+            world_model_briefing=render_world_model_briefing(briefing_rows),
         )
         llm_repair = accepted_repair.draft if accepted_repair else None
         if accepted_repair is not None:
@@ -446,6 +482,7 @@ class MAESTROOrchestrator:
                 "prediction_assessment": asdict(prediction_assessment) if prediction_assessment else None,
                 "action_predictions": {key: asdict(value) for key, value in action_predictions.items()},
                 "action_prediction_assessments": {key: asdict(value) for key, value in action_assessments.items()},
+                "world_model_rows": [row.as_payload() for row in briefing_rows],
                 "selected_action_ids": [action.identifier for action in execution_actions],
                 "visual_inspection_count": len(visual_inspections),
                 "tool_execution_count": len(tool_executions),
@@ -462,7 +499,8 @@ class MAESTROOrchestrator:
         turn = MAESTROTurn(
             session_id=session_id,
             intent=intent,
-            response=self._decision_response(contrast, check, repair, visual_inspections, tool_executions),
+            response=self._decision_response(contrast, check, repair, visual_inspections, tool_executions)
+            + summarize_world_model(briefing_rows),
             contrast=contrast,
             check=check,
             repair=repair,
@@ -478,6 +516,7 @@ class MAESTROOrchestrator:
             action_predictions=action_predictions,
             action_prediction_assessments=action_assessments,
             action_prediction_requests=action_requests,
+            world_model_rows=briefing_rows,
         )
         self._write_plan_round(
             turn,
@@ -755,12 +794,19 @@ class MAESTROOrchestrator:
         prediction_request: PredictionRequest | None = None,
         virtual_cell_template: VirtualCellQueryTemplate | None = None,
         expected_hypothesis_identifiers: Sequence[str] = (),
+        expected_hypotheses: Sequence[MechanismHypothesis] = (),
     ) -> MAESTROCaseLoop:
         """Run plan-observe-reflect cycles, stopping before any unsupplied measurement.
 
         ``result_provider`` is an explicit boundary: it may return a real result
         for a selected action or ``None`` to leave the case awaiting that result.
+        ``expected_hypotheses`` registers the explanations' definitions once for
+        every round, so a reworded model answer keeps the registered meaning
+        instead of ending the loop as a changed definition.
         """
+
+        if expected_hypotheses and not expected_hypothesis_identifiers:
+            expected_hypothesis_identifiers = tuple(item.identifier for item in expected_hypotheses)
 
         if max_rounds < 1:
             raise ValueError("max_rounds must be positive.")
@@ -791,6 +837,7 @@ class MAESTROOrchestrator:
                 prediction_request=prediction_request,
                 virtual_cell_template=virtual_cell_template,
                 expected_hypothesis_identifiers=expected_hypothesis_identifiers,
+                expected_hypotheses=expected_hypotheses,
                 session_id=f"{loop_token}-round-{round_index}",
             )
             turns.append(turn)
@@ -1238,7 +1285,25 @@ class MAESTROOrchestrator:
     ) -> tuple[QueryAssessment | None, StatePrediction | None]:
         if request is None or self._virtual_cell is None:
             return None, None
+        backend = getattr(self._virtual_cell, "name", None) or type(self._virtual_cell).__name__
+        cached = self._prediction_cache.lookup(request, backend) if self._prediction_cache is not None else None
+        if cached is not None:
+            assessment, prediction, origin = cached
+            self._logger.experiment(
+                "virtual_cell_prediction_reused",
+                {
+                    "request_id": request.request_id,
+                    "reused_from_request_id": origin,
+                    "backend": backend,
+                    "artifact_ref": prediction.artifact_ref,
+                    "cache": self._prediction_cache.stats(),
+                },
+                session_id=session_id,
+            )
+            return assessment, prediction
         assessment, prediction = safe_predict(self._virtual_cell, request)
+        if self._prediction_cache is not None:
+            self._prediction_cache.store(request, backend, assessment, prediction)
         self._logger.event(
             "virtual_cell_query_assessed",
             {
@@ -1505,11 +1570,15 @@ class MAESTROOrchestrator:
         session_id: str,
         *,
         action_predictions: Mapping[str, StatePrediction] | None = None,
+        world_model_briefing: str = "",
     ) -> AcceptedLLMRepair | None:
         if not self._enable_llm_repair or check.ready_for_mechanism_update:
             return None
+        violations_before = len(getattr(self._planner, "contract_violations", ()))
         try:
-            draft = self._planner.propose_repair(context, contrast, check, available_actions)
+            draft = self._planner.propose_repair(
+                context, contrast, check, available_actions, world_model_briefing=world_model_briefing
+            )
         except (LLMError, ValueError) as error:
             self._logger.event(
                 "llm_repair_rejected",
@@ -1517,8 +1586,20 @@ class MAESTROOrchestrator:
                 session_id=session_id,
             )
             return None
+        finally:
+            self._log_contract_corrections(violations_before, "repair_planner", session_id)
         repaired = draft.apply(contrast, available_actions)
         if repaired is None:
+            # Either no repair was offered or it named an unregistered action;
+            # the ruled repair stays the baseline and the refusal is on record.
+            self._logger.event(
+                "llm_repair_not_applicable",
+                {
+                    "action_identifier": draft.action_identifier,
+                    "reason": "no_action_proposed" if draft.action_identifier is None else "unregistered_action",
+                },
+                session_id=session_id,
+            )
             return None
         repaired_prediction = (
             action_predictions.get(repaired.plan.identifier) if repaired.plan is not None else None
@@ -1572,6 +1653,18 @@ class MAESTROOrchestrator:
         is_prerequisite_measurement = action.kind.value == "protein_abundance_measurement"
         resolves_a_missing_premise = (missing_function and is_functional) or (missing_other and is_prerequisite_measurement)
         return resolves_a_missing_premise and recheck.executable
+
+    def _log_contract_corrections(self, before: int, component: str, session_id: str) -> None:
+        """Record every contract violation the planner asked the model to correct."""
+
+        violations = getattr(self._planner, "contract_violations", None)
+        if not violations or len(violations) <= before:
+            return
+        self._logger.event(
+            "planner_contract_violation",
+            {"component": component, "violations": list(violations[before:])},
+            session_id=session_id,
+        )
 
     def import_measurement(self, case_id: str, result: MeasurementResult) -> ResultImport:
         """Accept one planned real result; the next run retrieves it as measured evidence."""

@@ -8,6 +8,8 @@ File summary
   - `--planner-template` answers every structured agent call from a reviewed template, so the loop runs without a language model and without paid calls.
   - `--virtual-cell` selects the State checkpoint, the computed development-mean backend, or both behind one composite; predictions stay planning-only.
   - `main` runs one turn or a multi-round loop over sourced real measurement results and can write the full record as JSON.
+  - `--hypotheses` registers the two explanations' definitions for every round, so a reworded model answer cannot end a loop.
+  - A configuration, provider or planner-contract failure exits with status 2 and a one-line reason instead of a traceback.
 - Interfaces: `main`
 - Depends on: maestro.models, maestro.outcome, virtual_cell, agent.cases, agent.orchestrator, agent.template_client
 """
@@ -17,16 +19,19 @@ import argparse
 import dataclasses
 import enum
 import json
+import sys
 from pathlib import Path
 from typing import Any
 
 from maestro.models import (
     BiologicalQuantity,
+    DevelopmentAction,
     EvidenceAction,
     EvidenceActionKind,
     EvidenceKind,
     EvidenceScope,
     FunctionalInterventionProfile,
+    MechanismHypothesis,
     MeasurementStatus,
     PremiseRequirement,
 )
@@ -39,8 +44,11 @@ from virtual_cell import (
     build_backend,
 )
 from .cases import MeasurementResult
+from .configuration import ConfigurationError
+from .llm import LLMError
 from .orchestrator import MAESTROOrchestrator
-from .template_client import TemplateCompleter
+from .planner import PlannerContractError
+from .template_client import TemplateCompleter, TemplateCompleterError
 
 
 def main() -> int:
@@ -90,8 +98,21 @@ def main() -> int:
     parser.add_argument("--state-directory", type=Path, help="Directory for this run's memory, evidence, cases and event logs.")
     parser.add_argument("--artifact-directory", type=Path, help="Directory for virtual-cell prediction artifacts.")
     parser.add_argument("--trace", type=Path, help="Write the full turn or case-loop record as JSON.")
+    parser.add_argument(
+        "--hypotheses",
+        type=Path,
+        help="JSON list of exactly two registered hypotheses (identifier, description, proposed_action, causal_factor).",
+    )
     arguments = parser.parse_args()
+    try:
+        return _run(arguments, parser)
+    except (ConfigurationError, LLMError, PlannerContractError, TemplateCompleterError) as error:
+        # An operational failure, not a defect: say what failed, without a traceback.
+        print(f"maestro: {type(error).__name__}: {error}", file=sys.stderr)
+        return 2
 
+
+def _run(arguments: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
     actions_data = _read_json(arguments.actions)
     profile_data = _read_json(arguments.profile)
     if not isinstance(actions_data, list) or not isinstance(profile_data, dict):
@@ -107,6 +128,7 @@ def main() -> int:
         parser.error("Use only one of --state-request and --state-template.")
     if arguments.virtual_cell in ("development_mean", "composite") and not arguments.development_partition:
         parser.error("--virtual-cell development_mean and composite require --development-partition.")
+    hypotheses = _hypotheses(_read_json(arguments.hypotheses)) if arguments.hypotheses else ()
     profile = FunctionalInterventionProfile(
         mode=str(profile_data.get("mode", "")),
         nominal_dose=profile_data.get("nominal_dose"),
@@ -144,6 +166,8 @@ def main() -> int:
             budget=arguments.budget,
             prediction_request=prediction_request,
             virtual_cell_template=template,
+            expected_hypothesis_identifiers=tuple(item.identifier for item in hypotheses),
+            expected_hypotheses=hypotheses,
         )
         print(turn.response)
         print(f"session_id={turn.session_id}")
@@ -163,6 +187,7 @@ def main() -> int:
         dataset_paths=tuple(arguments.dataset),
         prediction_request=prediction_request,
         virtual_cell_template=template,
+        expected_hypotheses=hypotheses,
     )
     for index, turn in enumerate(loop.turns, start=1):
         print(f"round={index} session_id={turn.session_id}")
@@ -240,6 +265,29 @@ def _action(data: Any) -> EvidenceAction:
         site=data.get("site"),
         units=data.get("units"),
     )
+
+
+def _hypotheses(data: Any) -> tuple[MechanismHypothesis, ...]:
+    """Two registered explanations; their identifiers and meanings then hold for every round."""
+
+    if not isinstance(data, list) or len(data) != 2:
+        raise ValueError("--hypotheses must be a JSON list of exactly two hypothesis objects.")
+    hypotheses = []
+    for item in data:
+        if not isinstance(item, dict):
+            raise ValueError("Each hypothesis must be an object.")
+        action = item.get("proposed_action")
+        hypotheses.append(
+            MechanismHypothesis(
+                identifier=str(item["identifier"]),
+                description=str(item["description"]),
+                proposed_action=DevelopmentAction(action) if action is not None else None,
+                causal_factor=str(item["causal_factor"]) if item.get("causal_factor") is not None else None,
+            )
+        )
+    if hypotheses[0].identifier == hypotheses[1].identifier:
+        raise ValueError("--hypotheses must name two distinct identifiers.")
+    return tuple(hypotheses)
 
 
 def _rules(data: Any) -> tuple[OutcomeRule, ...]:
