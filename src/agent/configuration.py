@@ -77,10 +77,17 @@ class MAESTROSettings:
             )
         def setting(name: str) -> str:
             return os.environ.get(name) or environment[name]
+        model = setting("DEEPSEEK_MODEL").strip()
+        aliases = {"deepseek-4.1flash", "deepseek-v4.1-flash", "deepseek-v4-flash"}
+        if model.lower() in aliases:
+            model = "deepseek-flash"
+        vision = setting("DEEPSEEK_VISION_MODEL").strip()
+        if vision.lower() in aliases or vision.lower() == "deepseek-v4-flash-vision-exp":
+            vision = "deepseek-flash"
         return cls(
             api_key=setting("DEEPSEEK_API_KEY"),
             base_url=setting("DEEPSEEK_BASE_URL").rstrip("/"),
-            chat_model=setting("DEEPSEEK_MODEL"),
-            vision_model=setting("DEEPSEEK_VISION_MODEL"),
+            chat_model=model,
+            vision_model=vision,
             log_directory=workspace / "log" / "20260910",
         )

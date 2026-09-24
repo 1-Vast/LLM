@@ -210,8 +210,19 @@ class DeepSeekChatClient:
     ) -> tuple[dict[str, Any], LLMResponse]:
         """Request and validate one JSON-object response."""
 
+        selected_model = model or self._settings.chat_model
+        # DeepSeek V4.1 Flash is exposed as ``deepseek-flash``. Its compatible
+        # Chat Completions surface rejects OpenAI's response_format=json_object;
+        # use a strict prompt and validate locally instead. Thinking is disabled
+        # so a small routing budget cannot be consumed without answer content.
+        deepseek_flash = selected_model.lower() in {"deepseek-flash", "deepseek-4.1flash", "deepseek-v4.1-flash", "deepseek-v4-flash"}
+        request_messages = list(messages)
+        if deepseek_flash:
+            request_messages.append({"role": "system", "content": "Return exactly one JSON object and no prose. Do not use markdown fences."})
         response = self.complete(
-            messages, model=model, max_tokens=max_tokens, json_output=True
+            request_messages, model="deepseek-flash" if deepseek_flash else selected_model,
+            max_tokens=max_tokens, json_output=not deepseek_flash,
+            thinking_enabled=False if deepseek_flash else None,
         )
         try:
             result = json_object_from_text(response.content)
