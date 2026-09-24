@@ -12,6 +12,7 @@ File summary
 from __future__ import annotations
 
 from dataclasses import dataclass
+import os
 from pathlib import Path
 
 
@@ -52,6 +53,12 @@ class MAESTROSettings:
     timeout_seconds: float = 90.0
     max_tokens: int = 4_000
 
+    def __repr__(self) -> str:
+        return ("MAESTROSettings(api_key='<redacted>', base_url={!r}, chat_model={!r}, "
+                "vision_model={!r}, log_directory={!r}, timeout_seconds={!r}, max_tokens={!r})").format(
+                    self.base_url, self.chat_model, self.vision_model, self.log_directory,
+                    self.timeout_seconds, self.max_tokens)
+
     @classmethod
     def from_workspace(cls, workspace: Path) -> "MAESTROSettings":
         """Load the existing DeepSeek configuration from the workspace dotenv file."""
@@ -68,10 +75,12 @@ class MAESTROSettings:
             raise ConfigurationError(
                 "Missing required MAESTRO provider settings: " + ", ".join(missing)
             )
+        def setting(name: str) -> str:
+            return os.environ.get(name) or environment[name]
         return cls(
-            api_key=environment["DEEPSEEK_API_KEY"],
-            base_url=environment["DEEPSEEK_BASE_URL"].rstrip("/"),
-            chat_model=environment["DEEPSEEK_MODEL"],
-            vision_model=environment["DEEPSEEK_VISION_MODEL"],
+            api_key=setting("DEEPSEEK_API_KEY"),
+            base_url=setting("DEEPSEEK_BASE_URL").rstrip("/"),
+            chat_model=setting("DEEPSEEK_MODEL"),
+            vision_model=setting("DEEPSEEK_VISION_MODEL"),
             log_directory=workspace / "log" / "20260910",
         )

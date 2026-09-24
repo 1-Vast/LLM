@@ -21,6 +21,7 @@ File summary
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -43,7 +44,9 @@ def price_usage(usage: Mapping[str, object]) -> float:
 
     def value(name: str, fallback: int = 0) -> int:
         raw = usage.get(name, fallback)
-        return int(raw) if isinstance(raw, (int, float)) else fallback
+        if isinstance(raw, bool) or not isinstance(raw, (int, float)) or not math.isfinite(float(raw)) or raw < 0:
+            return fallback
+        return int(raw)
 
     miss = value("prompt_cache_miss_tokens", value("prompt_tokens"))
     hit = value("prompt_cache_hit_tokens")
