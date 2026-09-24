@@ -1,0 +1,20 @@
+{
+  "id": "virtual_cell_query",
+  "name": "State virtual-cell query",
+  "description": "Query the locally registered State checkpoint using a supplied PredictionRequest JSON. Checks applicability and endpoint support before inference. Returns typed predictions or named refusals, never measurements. Paper: https://www.cell.com/cell/fulltext/S0092-8674(26)00921-9; consult data/knowledge/research_sources.json for version and access limitations.",
+  "evidence_kind": "model_prediction",
+  "entrypoint": "tool.py",
+  "source_files": ["src/virtual_cell/interface.py", "src/virtual_cell/state_adapter.py", "src/virtual_cell/state_runner.py"],
+  "schema_version": "1.0",
+  "required_parameters": ["dataset_path"],
+  "optional_parameters": [],
+  "parameter_schema": {
+    "type": "object", "properties": {"dataset_path": {"type": "string", "minLength": 1}},
+    "required": ["dataset_path"], "additionalProperties": false
+  },
+  "supported_task_types": ["analysis_planning", "evidence_review", "mechanism_diagnosis"],
+  "estimated_cost": 0.0,
+  "supported_suffixes": [".json"],
+  "use_when": ["A complete registered prediction request is supplied and planning needs a supported transcriptional readout."],
+  "do_not_use_when": ["A measured phenotype, target occupancy, causal mechanism, unregistered perturbation or unvalidated cross-endpoint bridge is required."]
+}

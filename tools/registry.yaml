@@ -1,0 +1,27 @@
+version: 3
+discovery:
+  manifest_pattern: "tools/*/manifest.json"
+  execution_contract: "run(parameters) 返回严格 JSON 对象：schema_version=1.0 与结构化 payload；observations、limitations、artifacts 仅作展示兼容。"
+selection:
+  controller: "agent.tool_runtime.ToolRouter"
+  policy: "单步接口兼容；select_and_execute_many 每步由 LLM 查看结构化回执后选择，受0至32步、含声明默认值的重复调用和共享有限总预算约束。默认0仅是声明工具成本，不代表LLM/token免费。"
+  boundary: "拒绝未批准路径、未注册工具、未知参数/schema、非有限数及不支持的类型或任务；自然语言适用边界交给模型判断，不冒充确定性校验。可信入口在当前进程执行，不是进程沙箱。"
+tools:
+  - id: data_profile
+    directory: data_profile
+    purpose: Profile CSV, TSV, or JSON structure before task-specific analysis.
+  - id: column_summary
+    directory: column_summary
+    purpose: Produce descriptive statistics for one explicitly named numeric column.
+  - id: table_filter
+    directory: table_filter
+    purpose: Apply one declarative, bounded table filter without arbitrary expressions.
+  - id: evidence_bundle_optimize
+    directory: evidence_bundle_optimize
+    purpose: 使用现有精确选择器优化显式预算下的声明式证据覆盖，不虚构测量或效用。
+  - id: multimodal_alignment
+    directory: multimodal_alignment
+    purpose: 对显式配对模态记录做对齐QC，仅输出待复核不一致候选，不生成embedding或活性预测。
+  - id: virtual_cell_query
+    directory: virtual_cell_query
+    purpose: 在推理前检查适用域与端点可表达性，返回规划专用预测或具名拒绝，绝不返回实测证据。

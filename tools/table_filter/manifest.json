@@ -1,0 +1,81 @@
+{
+ "id": "table_filter",
+ "name": "Declarative table filter",
+ "description": "Filter a CSV or TSV table by one named column and an explicit equals, contains, greater_than, or less_than condition; return a bounded row sample and count.",
+ "evidence_kind": "derived_analysis",
+ "entrypoint": "tool.py",
+ "source_files": [
+  "src/maestro/tool_analysis.py",
+  "src/maestro/tool_contracts.py",
+  "src/maestro/models.py",
+  "src/maestro/selection.py",
+  "src/maestro/composition.py",
+  "src/maestro/acquisition.py"
+ ],
+ "schema_version": "1.0",
+ "parameter_schema": {
+  "type": "object",
+  "properties": {
+   "dataset_path": {
+    "type": "string",
+    "minLength": 1
+   },
+   "column": {
+    "type": "string",
+    "minLength": 1
+   },
+   "operator": {
+    "type": "string",
+    "enum": [
+     "equals",
+     "contains",
+     "greater_than",
+     "less_than"
+    ]
+   },
+   "value": {
+    "type": [
+     "string",
+     "number"
+    ]
+   },
+   "max_rows": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 100,
+    "default": 10
+   }
+  },
+  "required": [
+   "dataset_path",
+   "column",
+   "operator",
+   "value"
+  ],
+  "additionalProperties": false
+ },
+ "required_parameters": [
+  "dataset_path",
+  "column",
+  "operator",
+  "value"
+ ],
+ "optional_parameters": [
+  "max_rows"
+ ],
+ "supported_task_types": [
+  "analysis_planning",
+  "evidence_review"
+ ],
+ "estimated_cost": 0.0,
+ "supported_suffixes": [
+  ".csv",
+  ".tsv"
+ ],
+ "use_when": [
+  "A bounded row subset is needed for one explicit column condition."
+ ],
+ "do_not_use_when": [
+  "The filter requires compound expressions, joins, or aggregation across columns."
+ ]
+}

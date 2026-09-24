@@ -1,0 +1,54 @@
+{
+ "id": "column_summary",
+ "name": "Numeric column summary",
+ "description": "Calculate count, missingness, minimum, maximum, mean, median, and sample standard deviation for one named numeric CSV or TSV column after its schema is known.",
+ "evidence_kind": "derived_analysis",
+ "entrypoint": "tool.py",
+ "source_files": [
+  "src/maestro/tool_analysis.py",
+  "src/maestro/tool_contracts.py",
+  "src/maestro/models.py",
+  "src/maestro/selection.py",
+  "src/maestro/composition.py",
+  "src/maestro/acquisition.py"
+ ],
+ "schema_version": "1.0",
+ "parameter_schema": {
+  "type": "object",
+  "properties": {
+   "dataset_path": {
+    "type": "string",
+    "minLength": 1
+   },
+   "column": {
+    "type": "string",
+    "minLength": 1
+   }
+  },
+  "required": [
+   "dataset_path",
+   "column"
+  ],
+  "additionalProperties": false
+ },
+ "required_parameters": [
+  "dataset_path",
+  "column"
+ ],
+ "optional_parameters": [],
+ "supported_task_types": [
+  "analysis_planning"
+ ],
+ "estimated_cost": 0.0,
+ "supported_suffixes": [
+  ".csv",
+  ".tsv"
+ ],
+ "use_when": [
+  "The dataset schema is already known and one numeric column needs descriptive statistics."
+ ],
+ "do_not_use_when": [
+  "The dataset has not been profiled yet.",
+  "The question concerns more than one column or non-numeric fields."
+ ]
+}

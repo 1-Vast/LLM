@@ -1,0 +1,48 @@
+{
+ "id": "multimodal_alignment",
+ "name": "配对模态记录对齐 QC",
+ "description": "读取批准 JSON：schema_version=1.0、sources数组(id/independence_group)、records数组(1至128项)。记录必填id/pair_id/modality/source_id/context/time_hours/independent_unit/replicate/quantity/entity/contrast_id/feature/unit/value/reference_value，未知值写null。模态与量为transcript:rna_abundance、protein:protein_abundance、occupancy:target_occupancy、activity:proximal_activity、morphology:morphology_feature。严格按上下文、时间、独立单元、replicate、entity与contrast配对。占有及形态仅参与QC；其余相反方向只产生保留各量标签的待复核候选，不假定不同量应同向。拒绝额外字段和不匹配量，不生成embedding、活性预测或实测证据。 Optional visibility={stage,available_record_ids,acquisition_cost,cost_unit}: stage is pre_experiment, post_acquisition or retrospective. Only explicitly available records enter analysis and output. Omitted visibility means retrospective QC only, acquisition cost unknown. Availability and costs are caller declarations, not verified measurements.",
+ "evidence_kind": "derived_analysis",
+ "entrypoint": "tool.py",
+ "source_files": [
+  "src/maestro/tool_analysis.py",
+  "src/maestro/tool_contracts.py",
+  "src/maestro/models.py",
+  "src/maestro/selection.py",
+  "src/maestro/composition.py",
+  "src/maestro/acquisition.py"
+ ],
+ "schema_version": "1.0",
+ "required_parameters": [
+  "dataset_path"
+ ],
+ "optional_parameters": [],
+ "parameter_schema": {
+  "type": "object",
+  "properties": {
+   "dataset_path": {
+    "type": "string",
+    "minLength": 1
+   }
+  },
+  "required": [
+   "dataset_path"
+  ],
+  "additionalProperties": false
+ },
+ "supported_task_types": [
+  "analysis_planning",
+  "evidence_review",
+  "mechanism_diagnosis"
+ ],
+ "estimated_cost": 0.0,
+ "supported_suffixes": [
+  ".json"
+ ],
+ "use_when": [
+  "已有配对transcript/protein/activity/morphology标量记录，且来源、上下文、时间和独立单元显式声明，需要对齐质量检查或不一致候选。"
+ ],
+ "do_not_use_when": [
+  "需要读取原始图像、预测embedding、跨上下文合并、补全缺失模态、把形态解释为活性，或把同一独立单元的多模态当独立复现。"
+ ]
+}

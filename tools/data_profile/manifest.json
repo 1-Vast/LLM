@@ -1,0 +1,58 @@
+{
+ "id": "data_profile",
+ "name": "Dataset profile",
+ "description": "Inspect a CSV, TSV, or JSON dataset to report shape, fields, sample values, missingness, and parsing limitations before selecting a more specific analysis.",
+ "evidence_kind": "derived_analysis",
+ "entrypoint": "tool.py",
+ "source_files": [
+  "src/maestro/tool_analysis.py",
+  "src/maestro/tool_contracts.py",
+  "src/maestro/models.py",
+  "src/maestro/selection.py",
+  "src/maestro/composition.py",
+  "src/maestro/acquisition.py"
+ ],
+ "schema_version": "1.0",
+ "parameter_schema": {
+  "type": "object",
+  "properties": {
+   "dataset_path": {
+    "type": "string",
+    "minLength": 1
+   },
+   "sample_rows": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 25,
+    "default": 5
+   }
+  },
+  "required": [
+   "dataset_path"
+  ],
+  "additionalProperties": false
+ },
+ "required_parameters": [
+  "dataset_path"
+ ],
+ "optional_parameters": [
+  "sample_rows"
+ ],
+ "supported_task_types": [
+  "analysis_planning",
+  "evidence_review",
+  "mechanism_diagnosis"
+ ],
+ "estimated_cost": 0.0,
+ "supported_suffixes": [
+  ".csv",
+  ".tsv",
+  ".json"
+ ],
+ "use_when": [
+  "A supplied dataset has not been profiled yet and its schema, fields, and missingness are unknown."
+ ],
+ "do_not_use_when": [
+  "The dataset schema is already known and a targeted statistic or filter is the actual need."
+ ]
+}

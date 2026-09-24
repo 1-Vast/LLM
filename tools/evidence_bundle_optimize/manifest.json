@@ -1,0 +1,48 @@
+{
+ "id": "evidence_bundle_optimize",
+ "name": "声明式证据组合优化",
+ "description": "对批准 JSON 中至多16项固定声明式候选调用 BudgetedEvidenceSelector。必填：schema_version=1.0、budget、cost_unit、context、time_hours、required字符串数组、sources数组(id/independence_group)、actions数组(id/cost/cost_unit/distinguishes/source_ids/context/time_hours/independent_unit/quantity)。行动可选prerequisites/description/supplies/interpretation_gate/expected_outcomes，顶层可选weights。精确目标依次为声明加权覆盖最大、成本最小、行动数最少、标识符顺序；未知前置条件和解释门不计入可解释单步覆盖。可选composition(id/shared_control_saving)对恰好两个required假设调用PlanComposer/rank_plans，单独报告条件计划排名及预算；不与set-cover联合求解、不认证任何测量。 Uses select_expected_coverage with declared detection_power. Shared source independence_group components use max(p); conditional independence is assumed only between components. Outputs dependence_groups and assumptions. This is a conservative coverage objective, not information gain.",
+ "evidence_kind": "derived_analysis",
+ "entrypoint": "tool.py",
+ "source_files": [
+  "src/maestro/tool_analysis.py",
+  "src/maestro/tool_contracts.py",
+  "src/maestro/models.py",
+  "src/maestro/selection.py",
+  "src/maestro/composition.py",
+  "src/maestro/acquisition.py"
+ ],
+ "schema_version": "1.0",
+ "required_parameters": [
+  "dataset_path"
+ ],
+ "optional_parameters": [],
+ "parameter_schema": {
+  "type": "object",
+  "properties": {
+   "dataset_path": {
+    "type": "string",
+    "minLength": 1
+   }
+  },
+  "required": [
+   "dataset_path"
+  ],
+  "additionalProperties": false
+ },
+ "supported_task_types": [
+  "analysis_planning",
+  "evidence_review",
+  "mechanism_diagnosis"
+ ],
+ "estimated_cost": 0.0,
+ "supported_suffixes": [
+  ".json"
+ ],
+ "use_when": [
+  "批准数据中已明确列出候选行动、预算及成本单位、来源、独立单元、上下文、时间和已命名的生物量，需要精确小规模覆盖方案。"
+ ],
+ "do_not_use_when": [
+  "成本或来源未声明，候选数超过16，或需要推测前置条件已测量、全局研究效用、未声明组合折扣或实验结果；不支持set-cover与组合的联合最优。"
+ ]
+}
