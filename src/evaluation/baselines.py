@@ -208,7 +208,7 @@ class MAESTROCorePolicy(ExpertWorkflowPolicy):
             # and naming the readout first once the premise is measured keeps a
             # satisfied plan from re-buying its own gate.
             premise = composed.readout.interpretation_gate
-            unmet = premise is not None and profile.measurement_status(premise).value != "measured"
+            unmet = premise is not None and not profile.is_measured(premise)
             candidates = (composed.gate, composed.readout) if unmet else (composed.readout, composed.gate)
         else:
             candidates = (
@@ -338,10 +338,7 @@ class RepairDisabledPolicy(MAESTROCorePolicy):
         for candidate in candidates:
             if candidate is None:
                 continue
-            if all(
-                profile.measurement_status(name).value == "measured"
-                for name in candidate.prerequisites
-            ):
+            if not profile.unmeasured(candidate.prerequisites):
                 return candidate
         return None
 

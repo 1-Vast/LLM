@@ -15,7 +15,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Mapping
+from typing import Iterable, Mapping
 
 
 class MeasurementStatus(str, Enum):
@@ -193,6 +193,16 @@ class FunctionalInterventionProfile:
             return self.functional_states[name]
         return self.measured_fields.get(name, MeasurementStatus.UNKNOWN)
 
+    def is_measured(self, name: str) -> bool:
+        """Whether a named field has a measured value; an estimate or an unknown does not."""
+
+        return self.measurement_status(name) == MeasurementStatus.MEASURED
+
+    def unmeasured(self, names: Iterable[str]) -> tuple[str, ...]:
+        """The named fields that still lack a measurement, in the order given."""
+
+        return tuple(name for name in names if not self.is_measured(name))
+
     def has_measured_function(self) -> bool:
         return any(
             status is MeasurementStatus.MEASURED
@@ -280,6 +290,18 @@ class EvidenceAction:
                 "A field cannot be both a prerequisite and an interpretation gate: the first "
                 "makes the action illegal, the second leaves it legal and uninterpretable."
             )
+
+    @property
+    def required_premises(self) -> tuple[str, ...]:
+        """Every field that must be measured before this action's result can be read.
+
+        A prerequisite makes the action illegal until measured; an interpretation
+        gate leaves it legal but uninterpretable. Both are obstacles a registered
+        supplier resolves, so checks and supplier chains read them together.
+        """
+
+        gate = (self.interpretation_gate,) if self.interpretation_gate is not None else ()
+        return tuple(self.prerequisites) + gate
 
     def satisfies_direct_requirement(self, required: BiologicalQuantity) -> bool:
         """Whether this action can satisfy a requirement for a *measured* quantity.

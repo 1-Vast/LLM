@@ -7,19 +7,20 @@ File summary
   - `MemoryStore` retrieves experience without upgrading it to a real measurement result.
   - Each entry keeps its `EpistemicStatus` so proposals are not mistaken for evidence.
 - Interfaces: `MemoryStore`, `remember`, `search`, `MemoryEntry`, `MemoryKind`, `EpistemicStatus`
-- Depends on: (standard library only)
+- Depends on: agent.storage
 """
 from __future__ import annotations
 
 import re
 import json
-import sqlite3
 import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
 from typing import Iterable, Mapping
+
+from .storage import connect
 
 
 class MemoryKind(str, Enum):
@@ -196,8 +197,8 @@ class MemoryStore:
                 if name not in columns:
                     connection.execute(f"ALTER TABLE memories ADD COLUMN {name} {definition}")
 
-    def _connection(self) -> sqlite3.Connection:
-        return sqlite3.connect(self.path)
+    def _connection(self):
+        return connect(self.path, rows=False)
 
 
 def _terms(text: str) -> tuple[str, ...]:

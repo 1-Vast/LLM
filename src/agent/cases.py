@@ -7,7 +7,7 @@ File summary
   - `CaseStore` versions plans and enforces result idempotency and budget limits.
   - `MeasurementResult` is a real measurement result gated by condition and replicate checks.
 - Interfaces: `CaseStore`, `open_case`, `record_plan`, `record_decision`, `import_measurement`, `snapshot`, `CaseSnapshot`, `MeasurementResult`, `ResultImport`, `CaseState`
-- Depends on: maestro.models
+- Depends on: maestro.models, agent.storage
 """
 from __future__ import annotations
 
@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Mapping, Sequence
 
 from maestro.models import DecisionStatus, EvidenceAction, EvidenceKind
+from .storage import connect
 
 
 def _refusal(code: str, message: str) -> ValueError:
@@ -422,10 +423,8 @@ class CaseStore:
             stop_reason=row["stop_reason"],
         )
 
-    def _connection(self) -> sqlite3.Connection:
-        connection = sqlite3.connect(self.path)
-        connection.row_factory = sqlite3.Row
-        return connection
+    def _connection(self):
+        return connect(self.path)
 
 
 def _now() -> str:

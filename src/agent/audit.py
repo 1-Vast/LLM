@@ -17,7 +17,8 @@ import re
 from dataclasses import asdict, is_dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 
 _SECRET_PATTERN = re.compile(

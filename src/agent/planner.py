@@ -8,10 +8,16 @@ File summary
   - `propose_repair` returns one catalog-bounded candidate; deterministic code decides acceptance.
   - A reply that breaks the declared contract is named back to the model and asked once
     more (bounded by `contract_retries`); a second violation still raises.
+  - A reply that parses but fails a deterministic critic only the planner can satisfy (an
+    unregistered action, explanations that do not separate a decision) is back-prompted
+    within the same budget, LLM-Modulo style; after the budget it is returned unchanged
+    and the controller's own check reports the failure as before.
+  - Catalogues are rendered compactly: undeclared (null or empty) fields are omitted and
+    a contrast names its plan by identifier instead of repeating the action.
   - `propose_repair` may receive a planning-only virtual-cell briefing; it is labelled as
     model output and never enters the catalogue, the contrast or the evidence ledger.
   - The planner may not invent assays, measurements, sources, results, or capabilities.
-- Interfaces: `MechanismContrastPlanner`, `propose`, `propose_repair`, `contract_violations`, `ContrastProposal`, `LLMRepairDraft`, `PlannerCompleter`, `PlannerContractError`
+- Interfaces: `MechanismContrastPlanner`, `propose`, `propose_repair`, `contract_violations`, `critic_findings`, `render_catalogue`, `ContrastProposal`, `LLMRepairDraft`, `PlannerCompleter`, `PlannerContractError`
 - Depends on: agent.context, maestro.models
 """
 from __future__ import annotations
@@ -99,45 +105,56 @@ class MechanismContrastPlanner:
             raise ValueError("contract_retries must be a non-negative integer.")
         self._client = client
         self._contract_retries = contract_retries
-        # Every violation the model was asked to correct, in order, so a run can
-        # report how often a turn needed a second answer rather than hiding it.
+        # Every violation and critic finding the model was asked to correct, in
+        # order, so a run reports how often a turn needed a second answer.
         self.contract_violations: list[str] = []
+        self.critic_findings: list[str] = []
 
     def _complete_within_contract(
         self,
         messages: list[dict[str, Any]],
         parse: Callable[[dict[str, Any]], _Parsed],
+        critique: Callable[[_Parsed], tuple[str, ...]] | None = None,
     ) -> _Parsed:
-        """Ask once, and name a contract violation back to the model a bounded number of times.
+        """Generate, test, and back-prompt a bounded number of times.
 
-        Only a violation of the declared *shape* is returned for correction: the
-        reply is echoed as the assistant turn and the parser's own message says
-        what broke. Nothing else about the request changes, so a corrected answer
-        is judged by exactly the same parser and a second violation raises as a
-        single bad reply always did. Transport failures are not retried here; the
-        client owns that.
+        The parser is the hard critic: a violation of the declared shape is
+        echoed back with the parser's own message, and one still present when
+        the budget is spent raises, as a single bad reply always did. ``critique``
+        is the soft critic: it names failures the deterministic check would
+        report and that only the planner can fix. They are fed back the same way,
+        but a reply that still has them after the budget is returned, so the
+        controller's check and repair handle it exactly as before. Transport
+        failures are not retried here; the client owns that.
         """
 
         conversation = list(messages)
         for attempt in range(self._contract_retries + 1):
             data, _ = self._client.complete_json(conversation)
+            last = attempt >= self._contract_retries
             try:
-                return parse(data)
+                result = parse(data)
             except PlannerContractError as error:
                 self.contract_violations.append(str(error))
-                if attempt >= self._contract_retries:
+                if last:
                     raise
-                conversation = conversation + [
-                    {"role": "assistant", "content": json.dumps(data, ensure_ascii=False, default=str)},
-                    {
-                        "role": "user",
-                        "content": (
-                            "CONTRACT_VIOLATION\n" + str(error)
-                            + "\nReturn one corrected JSON object with the same schema. Correct only what the "
-                            "violation names; do not add facts, actions, hypotheses or capabilities."
-                        ),
-                    },
-                ]
+                heading, feedback = "CONTRACT_VIOLATION", str(error)
+            else:
+                findings = critique(result) if critique is not None else ()
+                if not findings or last:
+                    return result
+                self.critic_findings.extend(findings)
+                heading, feedback = "CRITIC_FEEDBACK", "\n".join(findings)
+            conversation = conversation + [
+                {"role": "assistant", "content": json.dumps(data, ensure_ascii=False, default=str)},
+                {
+                    "role": "user",
+                    "content": (
+                        f"{heading}\n{feedback}\nReturn one corrected JSON object with the same schema. Correct "
+                        "only what is named; do not add facts, actions, hypotheses or capabilities."
+                    ),
+                },
+            ]
         raise AssertionError("unreachable: the loop returns or raises")  # pragma: no cover
 
     def propose(
@@ -148,7 +165,6 @@ class MechanismContrastPlanner:
         required_hypothesis_identifiers: Sequence[str] = (),
         expected_hypotheses: Sequence[MechanismHypothesis] = (),
     ) -> ContrastProposal:
-        catalogue = [asdict(action) for action in actions]
         fixed_hypotheses = tuple(required_hypothesis_identifiers)
         registered = {item.identifier: item for item in expected_hypotheses}
         if registered and set(registered) != set(fixed_hypotheses):
@@ -161,7 +177,7 @@ class MechanismContrastPlanner:
         )
         prompt = """You are MAESTRO's mechanism-contrast planner. Return JSON only.
 Construct exactly two condition-specific, competing explanations that would lead to
-        different development actions. Use only an action_identifier from AVAILABLE_ACTIONS;
+different development actions. Use only an action_identifier from AVAILABLE_ACTIONS;
 do not invent assays, measurements, sources, results, or capabilities. Include at least
 one interpretation boundary stating what the planned result cannot establish.
 Name each hypothesis's causal factor explicitly: a plan preference is not a causal claim,
@@ -201,6 +217,18 @@ Return {
                 interpretation_boundaries=_texts(data.get("interpretation_boundaries")),
             )
 
+        def critique(proposal: ContrastProposal) -> tuple[str, ...]:
+            findings = list(_unregistered_action(proposal.action_identifier, actions, required=True))
+            if not registered:
+                # Registered definitions are the caller's; only model-authored ones are critiqued.
+                decisions = [item.proposed_action for item in proposal.hypotheses]
+                if None in decisions or decisions[0] == decisions[1]:
+                    findings.append(
+                        "The two hypotheses must propose two distinct development actions from the enum; "
+                        f"received {[item.value if item else None for item in decisions]}."
+                    )
+            return tuple(findings)
+
         return self._complete_within_contract(
             [
                 {"role": "system", "content": prompt},
@@ -209,11 +237,12 @@ Return {
                     "content": (
                         "CONTEXT\n" + context.rendered
                         + "\n\nHYPOTHESIS IDENTIFIER CONSTRAINT\n" + constraint
-                        + "\n\nAVAILABLE_ACTIONS\n" + json.dumps(catalogue, allow_nan=False)
+                        + "\n\nAVAILABLE_ACTIONS\n" + render_catalogue(actions)
                     ),
                 },
             ],
             parse,
+            critique,
         )
 
     def propose_repair(
@@ -233,7 +262,6 @@ Return {
         cannot supply a prerequisite, an observation or a new action.
         """
 
-        catalogue = [asdict(action) for action in actions]
         prompt = """You are MAESTRO's directed contrast-repair planner. Return JSON only.
 The contrast failed deterministic checks. Propose at most one replacement action from
 AVAILABLE_ACTIONS that addresses one or more listed failures. Do not invent evidence,
@@ -264,15 +292,67 @@ Return {"action_identifier": string or null, "modified_fields": ["plan.action_id
                 {
                     "role": "user",
                     "content": (
-                        "CONTEXT\n" + context.rendered + "\n\nCONTRAST\n" + json.dumps(asdict(contrast), allow_nan=False)
+                        "CONTEXT\n" + context.rendered + "\n\nCONTRAST\n" + render_contrast(contrast)
                         + "\n\nCHECK_FAILURES\n" + json.dumps([reason.value for reason in check.reasons])
-                        + "\n\nAVAILABLE_ACTIONS\n" + json.dumps(catalogue, allow_nan=False)
+                        + "\n\nAVAILABLE_ACTIONS\n" + render_catalogue(actions)
                         + ("\n\n" + briefing if briefing else "")
                     ),
                 },
             ],
             parse,
+            lambda draft: _unregistered_action(draft.action_identifier, actions, required=False),
         )
+
+
+def _declared(payload: dict[str, Any]) -> dict[str, Any]:
+    """Omit fields that declare nothing: null, or an empty string, list or mapping.
+
+    Booleans and numbers are kept even when they equal a default, because a
+    ``False`` or a ``0.0`` can be a declaration (``context_bound`` defaults to
+    true, so its false value is the informative one).
+    """
+
+    return {
+        key: value
+        for key, value in payload.items()
+        if value is not None and not (isinstance(value, (str, list, tuple, dict)) and not value)
+    }
+
+
+def render_catalogue(actions: Sequence[EvidenceAction]) -> str:
+    """The registered menu as compact JSON; an omitted field means "not declared"."""
+
+    return json.dumps(
+        [_declared(asdict(action)) for action in actions], allow_nan=False, separators=(",", ":")
+    )
+
+
+def render_contrast(contrast: MechanismContrast) -> str:
+    """A contrast as compact JSON that names its plan instead of repeating the catalogue entry."""
+
+    payload = _declared(asdict(contrast))
+    payload["hypotheses"] = [_declared(item) for item in payload.get("hypotheses", ())]
+    payload["plan"] = contrast.plan.identifier if contrast.plan is not None else None
+    if contrast.additional_plans:
+        payload["additional_plans"] = [action.identifier for action in contrast.additional_plans]
+    return json.dumps(payload, allow_nan=False, separators=(",", ":"))
+
+
+def _unregistered_action(
+    identifier: str | None, actions: Sequence[EvidenceAction], *, required: bool
+) -> tuple[str, ...]:
+    """Name an action identifier that is absent from the registered menu."""
+
+    if not actions:
+        return ()
+    registered = [action.identifier for action in actions]
+    if identifier is None:
+        if not required:
+            return ()
+        return (f"action_identifier is missing; choose one of {registered[:40]}.",)
+    if identifier in registered:
+        return ()
+    return (f"action_identifier '{identifier}' is not in AVAILABLE_ACTIONS; choose one of {registered[:40]}.",)
 
 
 def _hypothesis(value: Any) -> MechanismHypothesis:

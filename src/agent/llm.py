@@ -209,9 +209,9 @@ class DeepSeekChatClient:
                     raise LLMError(f"LLM request failed with HTTP status {error.code}.") from error
                 last = LLMTransportError(f"LLM request failed with retryable HTTP status {error.code}.")
                 requested_delay = _retry_after_seconds(error)
-            except URLError as error:
+            except URLError:
                 last = LLMTransportError("LLM request could not reach the configured endpoint.")
-            except TimeoutError as error:
+            except TimeoutError:
                 last = LLMTransportError("LLM request timed out.")
             except json.JSONDecodeError as error:
                 raise LLMError("LLM request returned an unreadable response.") from error

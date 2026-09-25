@@ -99,6 +99,12 @@ def main() -> int:
     parser.add_argument("--artifact-directory", type=Path, help="Directory for virtual-cell prediction artifacts.")
     parser.add_argument("--trace", type=Path, help="Write the full turn or case-loop record as JSON.")
     parser.add_argument(
+        "--parallel-predictions",
+        type=int,
+        default=1,
+        help="Run up to N distinct per-action virtual-cell queries concurrently (backend must be thread-safe).",
+    )
+    parser.add_argument(
         "--hypotheses",
         type=Path,
         help="JSON list of exactly two registered hypotheses (identifier, description, proposed_action, causal_factor).",
@@ -122,6 +128,8 @@ def _run(arguments: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
     template = _query_template(_read_json(arguments.state_template)) if arguments.state_template else None
     if arguments.max_rounds < 1:
         parser.error("--max-rounds must be positive.")
+    if arguments.parallel_predictions < 1:
+        parser.error("--parallel-predictions must be positive.")
     if arguments.max_rounds > 1 and not arguments.case_id:
         parser.error("--max-rounds requires --case-id so the loop can resume safely.")
     if prediction_request and template:
@@ -154,6 +162,7 @@ def _run(arguments: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
         client=client,
         virtual_cell=_virtual_cell(arguments),
         interpretation_table=InterpretationTable(_rules(_read_json(arguments.rules))) if arguments.rules else None,
+        max_parallel_predictions=arguments.parallel_predictions,
     )
     if arguments.max_rounds == 1:
         turn = controller.run(
@@ -396,16 +405,20 @@ def _prediction_request(data: Any) -> PredictionRequest:
             dose_unit=intervention.get("dose_unit"),
             time_hours=intervention.get("time_hours"),
         ),
-        context=SystemContext(
-            identifier=str(context["identifier"]),
-            description=str(context["description"]),
-            dataset_id=context.get("dataset_id"),
-            control_dataset_id=context.get("control_dataset_id"),
-            species=context.get("species"),
-            replicate_unit=context.get("replicate_unit"),
-        ),
+        context=_system_context(context),
         readouts=tuple(str(item) for item in data.get("readouts", ())),
         model_version=str(data["model_version"]),
+    )
+
+
+def _system_context(context: dict[str, Any]) -> SystemContext:
+    return SystemContext(
+        identifier=str(context["identifier"]),
+        description=str(context["description"]),
+        dataset_id=context.get("dataset_id"),
+        control_dataset_id=context.get("control_dataset_id"),
+        species=context.get("species"),
+        replicate_unit=context.get("replicate_unit"),
     )
 
 
@@ -416,14 +429,7 @@ def _query_template(data: Any) -> VirtualCellQueryTemplate:
     return VirtualCellQueryTemplate(
         intervention_identifier=str(data["intervention_identifier"]),
         intervention_mode=str(data["intervention_mode"]),
-        context=SystemContext(
-            identifier=str(context["identifier"]),
-            description=str(context["description"]),
-            dataset_id=context.get("dataset_id"),
-            control_dataset_id=context.get("control_dataset_id"),
-            species=context.get("species"),
-            replicate_unit=context.get("replicate_unit"),
-        ),
+        context=_system_context(context),
         readouts=tuple(str(item) for item in data.get("readouts", ())),
         model_version=str(data["model_version"]),
         action_interventions={str(key): str(value) for key, value in dict(data.get("action_interventions", {})).items()},

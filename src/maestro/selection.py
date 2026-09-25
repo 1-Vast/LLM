@@ -18,7 +18,7 @@ from dataclasses import dataclass, field
 from itertools import combinations
 from typing import Mapping, Sequence
 
-from .models import EvidenceAction, FunctionalInterventionProfile, MeasurementStatus
+from .models import EvidenceAction, FunctionalInterventionProfile
 
 
 @dataclass(frozen=True)
@@ -88,11 +88,7 @@ class BudgetedEvidenceSelector:
         for action in actions:
             if action.cost < 0:
                 continue
-            missing = [
-                prerequisite
-                for prerequisite in action.prerequisites
-                if profile.measurement_status(prerequisite) is not MeasurementStatus.MEASURED
-            ]
+            missing = profile.unmeasured(action.prerequisites)
             if missing:
                 waiting.append(f"{action.identifier}: {', '.join(missing)}")
             else:

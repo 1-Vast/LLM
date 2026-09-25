@@ -13,6 +13,7 @@ from typing import Any, Mapping
 
 from maestro.models import EvidenceKind
 from .memory import MemoryScope, _lexical_score, _terms
+from .storage import connect
 
 
 class EvidenceStatus(str, Enum):
@@ -560,10 +561,8 @@ class EvidenceLedger:
                 connection.execute("UPDATE evidence SET status = ? WHERE evidence_kind = ? AND status != ?",
                                    (status_for_kind(kind).value, kind.value, status_for_kind(kind).value))
 
-    def _connection(self) -> sqlite3.Connection:
-        connection = sqlite3.connect(self.path)
-        connection.row_factory = sqlite3.Row
-        return connection
+    def _connection(self):
+        return connect(self.path)
 
 
 KnowledgeBase = EvidenceLedger

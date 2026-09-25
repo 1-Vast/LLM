@@ -18,12 +18,10 @@ from typing import Iterable, Mapping, Sequence
 
 from .models import (
     CompositionRule,
-    ContrastCheck,
     EvidenceAction,
     FunctionalInterventionProfile,
     GatedEvidencePlan,
     MechanismContrast,
-    MeasurementStatus,
 )
 
 
@@ -97,11 +95,7 @@ def unmet_prerequisites(
     """
 
     return {
-        action.identifier: tuple(
-            name
-            for name in action.prerequisites
-            if profile.measurement_status(name) is not MeasurementStatus.MEASURED
-        )
+        action.identifier: profile.unmeasured(action.prerequisites)
         for action in actions
     }
 

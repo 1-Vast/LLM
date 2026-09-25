@@ -28,7 +28,7 @@ from math import isfinite
 from typing import Mapping, Sequence
 
 from .handoff import RejectedCandidate
-from .models import EvidenceAction, FunctionalInterventionProfile, MeasurementStatus
+from .models import EvidenceAction, FunctionalInterventionProfile
 from .selection import BudgetedEvidencePlan
 
 MAXIMUM_CANDIDATES = 16
@@ -144,11 +144,7 @@ def select_expected_coverage(
     for action in sorted(actions, key=lambda item: item.identifier):
         if action.cost < 0:
             continue
-        missing = [
-            name
-            for name in action.prerequisites
-            if profile.measurement_status(name) is not MeasurementStatus.MEASURED
-        ]
+        missing = profile.unmeasured(action.prerequisites)
         if missing:
             waiting.append(f"{action.identifier}: {', '.join(missing)}")
         else:
@@ -261,11 +257,7 @@ def _rejections(
     for action in actions:
         if action.identifier in selected:
             continue
-        missing = [
-            name
-            for name in action.prerequisites
-            if profile.measurement_status(name) is not MeasurementStatus.MEASURED
-        ]
+        missing = profile.unmeasured(action.prerequisites)
         widened = _coverage_probabilities((*chosen, action), frozenset(probabilities),
                                           {**groups, action.identifier: groups.get(action.identifier, action.identifier)})
         gain = sum(widened.values()) - sum(probabilities.values())

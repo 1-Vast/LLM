@@ -381,14 +381,18 @@ def test_an_unregistered_llm_repair_is_logged_rather_than_silently_dropped(tmp_p
     )
     invented = {"action_identifier": "invented_assay", "modified_fields": ["plan.action_identifier"],
                 "rationale": "Invented.", "remaining_limitations": []}
-    client = StubClient([TASK, _plan("viability"), invented])
+    client = StubClient([TASK, _plan("viability"), invented, invented])
     controller = _controller(tmp_path, client, repair=True)
     turn = controller.run("Resolve.", available_actions=(blocked, functional),
                           intervention_profile=FunctionalInterventionProfile(mode="inhibition"))
     assert turn.llm_repair is None
+    # The critic named the unregistered action once; the repeated answer is then refused by name.
+    assert client.calls[3][0][-1]["content"].startswith("CRITIC_FEEDBACK")
+    assert "'invented_assay' is not in AVAILABLE_ACTIONS" in client.calls[3][0][-1]["content"]
     assert _events(tmp_path, "llm_repair_not_applicable") == [
         {"action_identifier": "invented_assay", "reason": "unregistered_action"}
     ]
+    assert _events(tmp_path, "planner_critic_feedback")[0]["component"] == "repair_planner"
 
 
 def test_a_corrected_contract_violation_is_on_the_run_record(tmp_path: Path):
@@ -510,3 +514,141 @@ def test_a_rate_limited_request_waits_as_long_as_the_provider_asks(tmp_path: Pat
     client = DeepSeekChatClient(MAESTROSettings("k", "https://example.org", "model", "vision", tmp_path))
     assert client.complete([]).content == "{}"
     assert delays == [7.0]
+
+
+# --------------------------------------------------------------------------------------
+# Critic back-prompting and compact rendering
+# --------------------------------------------------------------------------------------
+
+SAME_DECISION = [dict(HYPOTHESES[0]), dict(HYPOTHESES[1], proposed_action="continue")]
+
+
+def test_the_critic_back_prompts_a_plan_that_cannot_separate_a_decision():
+    client = StubClient([_plan("assay", SAME_DECISION), _plan("assay")])
+    planner = MechanismContrastPlanner(client)
+    proposal = planner.propose(_packet(), (EvidenceAction("assay", "Assay", 1.0, ("a", "b")),))
+    assert {item.proposed_action for item in proposal.hypotheses} == {
+        DevelopmentAction.CONTINUE, DevelopmentAction.REVISE_INTERVENTION
+    }
+    feedback = client.calls[1][0][-1]["content"]
+    assert feedback.startswith("CRITIC_FEEDBACK") and "distinct development actions" in feedback
+    assert planner.critic_findings and not planner.contract_violations
+
+
+def test_a_critic_finding_left_after_the_budget_is_returned_for_the_controller_to_judge():
+    client = StubClient([_plan("invented", SAME_DECISION), _plan("invented", SAME_DECISION)])
+    proposal = MechanismContrastPlanner(client).propose(
+        _packet(), (EvidenceAction("assay", "Assay", 1.0, ("a", "b")),)
+    )
+    # Soft: no exception, and the deterministic check still sees exactly what the model said.
+    assert proposal.action_identifier == "invented"
+    assert len(client.calls) == 2
+    assert "'invented' is not in AVAILABLE_ACTIONS" in client.calls[1][0][-1]["content"]
+    single = StubClient([_plan("invented", SAME_DECISION)])
+    MechanismContrastPlanner(single, contract_retries=0).propose(_packet(), (EvidenceAction("assay", "A", 1.0, ("a",)),))
+    assert len(single.calls) == 1
+
+
+def test_registered_definitions_are_never_critiqued():
+    registered = (MechanismHypothesis("a", "A", DevelopmentAction.DEFER), MechanismHypothesis("b", "B", DevelopmentAction.DEFER))
+    client = StubClient([_plan("assay", SAME_DECISION)])
+    proposal = MechanismContrastPlanner(client).propose(
+        _packet(), (EvidenceAction("assay", "Assay", 1.0, ("a", "b")),),
+        required_hypothesis_identifiers=("a", "b"), expected_hypotheses=registered,
+    )
+    assert proposal.hypotheses == registered and len(client.calls) == 1
+
+
+def test_the_catalogue_omits_undeclared_fields_but_keeps_every_declaration():
+    from dataclasses import asdict
+
+    from agent.planner import render_catalogue, render_contrast
+    from tools.shared.biological_fixture import contract
+
+    actions, _, _ = contract()
+    unbound = replace(actions[0], context_bound=False, prediction_relevance=0.0)
+    rendered = json.loads(render_catalogue((unbound,) + actions[1:]))
+    assert rendered[0]["context_bound"] is False and rendered[0]["prediction_relevance"] == 0.0
+    assert "readout" not in rendered[0] and "interpretation_gate" not in rendered[0]
+    assert rendered[2]["prerequisites"] == list(actions[2].prerequisites)
+    full = json.dumps([asdict(action) for action in actions], allow_nan=False)
+    assert len(render_catalogue(actions)) < 0.8 * len(full)
+
+    contrast = MechanismContrast(
+        "c", (MechanismHypothesis("a", "A"), MechanismHypothesis("b", "B")), (), actions[2],
+        additional_plans=actions[:1],
+    )
+    payload = json.loads(render_contrast(contrast))
+    assert payload["plan"] == "comparator" and payload["additional_plans"] == ["engagement"]
+    assert payload["hypotheses"] == [{"identifier": "a", "description": "A"}, {"identifier": "b", "description": "B"}]
+
+
+# --------------------------------------------------------------------------------------
+# Parallel, deduplicated dispatch
+# --------------------------------------------------------------------------------------
+
+
+class SlowWorldModel(CountingWorldModel):
+    """Every inference takes a fixed wall time; the counter is thread-safe."""
+
+    name = "slow"
+
+    def __init__(self, delay: float):
+        super().__init__(supported=("drug-1", "drug-2", "drug-3"))
+        import threading
+
+        self._lock = threading.Lock()
+        self._delay = delay
+        self.labels: list[str] = []
+
+    def predict(self, request):
+        import time
+
+        time.sleep(self._delay)
+        with self._lock:
+            self.labels.append(request.intervention.identifier)
+        return super().predict(request)
+
+
+def _parallel_case(root: Path, workers: int):
+    import time
+
+    labels = {"a1": "drug-1", "a2": "drug-2", "a3": "drug-3", "a4": "drug-1"}
+    actions = tuple(
+        EvidenceAction(name, "Assay.", 1.0, ("a", "b"), prediction_readout="embedding_delta_l2",
+                       prediction_relevance=1.0, expected_outcomes={"a": "x", "b": "y"})
+        for name in labels
+    )
+    template = replace(_template(), action_interventions=labels)
+    model = SlowWorldModel(0.15)
+    controller = _controller(root, StubClient([TASK, _plan("a1")]), world_model=model,
+                             max_parallel_predictions=workers)
+    started = time.perf_counter()
+    turn = controller.run("Resolve.", available_actions=actions,
+                          intervention_profile=FunctionalInterventionProfile(mode="inhibition"),
+                          case_id="case", virtual_cell_template=template, session_id="s")
+    return turn, model, time.perf_counter() - started
+
+
+def test_distinct_queries_run_concurrently_once_each_and_log_in_request_order(tmp_path: Path):
+    turn, model, elapsed = _parallel_case(tmp_path / "parallel", 3)
+    sequential_turn, sequential_model, sequential_elapsed = _parallel_case(tmp_path / "sequential", 1)
+
+    # a4 asks exactly what a1 asked: one inference, answered for both.
+    assert sorted(model.labels) == ["drug-1", "drug-2", "drug-3"]
+    assert sorted(sequential_model.labels) == ["drug-1", "drug-2", "drug-3"]
+    assert turn.action_predictions["a4"].limitations[-1].startswith(REUSE_NOTE_PREFIX + "s.a1")
+    assert elapsed < sequential_elapsed
+    # Same answers and the same run record, whichever way inference was dispatched.
+    assert turn.action_predictions.keys() == sequential_turn.action_predictions.keys()
+    assert [row.as_payload() for row in turn.world_model_rows] == [
+        row.as_payload() for row in sequential_turn.world_model_rows
+    ]
+    completed = [
+        json.loads(line)["payload"]["request_id"]
+        for line in (tmp_path / "parallel" / "experiments.jsonl").read_text().splitlines()
+        if json.loads(line)["kind"] == "virtual_cell_prediction_completed"
+    ]
+    assert completed == ["s.a1", "s.a2", "s.a3"]
+    with pytest.raises(ValueError):
+        _controller(tmp_path / "bad", StubClient([]), max_parallel_predictions=0)

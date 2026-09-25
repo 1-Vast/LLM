@@ -64,6 +64,8 @@ The planner returns exactly two hypotheses and selects from the caller-provided 
 
 A planner reply that breaks its declared shape (not exactly two hypotheses, unregistered hypothesis identifiers, a repair editing a field other than `plan.action_identifier`) is named back to the model once, with the reply echoed, and judged again by the same parser; a second violation raises exactly as before, so an evaluation still records it as a lost case. Every corrected violation is logged as `planner_contract_violation`, and a repair draft naming an unregistered action is logged as `llm_repair_not_applicable` rather than dropped silently. `MechanismContrastPlanner(client, contract_retries=0)` restores single-shot behaviour.
 
+The same budget also serves a soft critic, following the LLM-Modulo generate-test-critique pattern. A reply that parses but names an action outside the menu, or proposes two model-authored explanations that do not lead to distinct development actions, gets one `CRITIC_FEEDBACK` back-prompt. If the second reply still has the problem, it is returned unchanged for the deterministic check to report, and nothing raises. Registered hypothesis definitions are never critiqued. Catalogues reach the planner as compact JSON (null and empty fields omitted, booleans and numbers kept), and the repair prompt names the plan by identifier. Sources and measured effects are in [the agent optimization update](AGENT_OPTIMIZATION_UPDATE.md).
+
 With `--dataset`, the LLM selects a bounded sequence of registered folder-scoped tools from `tools/`. The router validates declared tool, dataset id, suffix, and parameters before loading its local entry point. Dataset output is stored with file name, tool id, and tool-reported limitations. Bundled tools are schema profiling, numeric column summary, and declarative table filtering; they execute no expressions and assert no biological causality.
 
 ## Case Lifecycle and Evidence Lineage
@@ -104,7 +106,7 @@ The interface separates `PredictionRequest`, `ModelCapabilities`, `QueryAssessme
 
 The virtual cell also reaches the agent's own reasoning, not only the tie-break. Each round, `agent/world_model_briefing.py` renders one row per queried action - readout, predicted value, band and whether it claims coverage, distribution membership, validation status and the reliability ledger's current weight, or the abstention and its reason - and the LLM repair planner receives it under a heading that states it is planning-only model output. The same rows are kept on `MAESTROTurn.world_model_rows`, written to the experiment log, and summarised in the turn response. The briefing can inform which registered action is proposed; the deterministic re-check still decides adoption, and a prediction still cannot satisfy a prerequisite or eliminate a hypothesis.
 
-A multi-round case re-plans every round and would re-run identical inference each time. `virtual_cell/cache.py` keys a supported, contract-valid prediction on its model inputs (intervention, context, readouts, model version, backend) and excludes tracking metadata (request, case, contrast, plan version). A reuse is rebound to the new request id, carries zero compute cost and names the request whose inference it reuses; abstentions are never cached. `reuse_predictions=False` disables it.
+A multi-round case re-plans every round and would re-run identical inference each time. `virtual_cell/cache.py` keys a supported, contract-valid prediction on its model inputs (intervention, context, readouts, model version, backend) and excludes tracking metadata (request, case, contrast, plan version). A reuse is rebound to the new request id, carries zero compute cost and names the request whose inference it reuses; abstentions are never cached. `reuse_predictions=False` disables it. Within a round, inference runs at most once per distinct query, and `max_parallel_predictions` (CLI `--parallel-predictions N`) dispatches distinct queries concurrently for a backend that is safe to call from several threads. Results are recorded and logged in request order either way.
 
 A supplied PNG, JPEG, GIF, or WebP result goes to the configured vision model with the current research question; it records visible observations, quality concerns, decision relevance, and limitations. It can refine the next question but cannot establish causal mechanism or target engagement.
 
@@ -199,6 +201,7 @@ The skeleton deliberately contains no validated biological model, target-engagem
 ## Records
 
 - [Active task](task.md)
+- [Agent optimization update: literature, changes and measurements](AGENT_OPTIMIZATION_UPDATE.md)
 - [Run-log index: how the dated record is organised](log/INDEX.md)
 - [Latest day record, 2026-09-14](log/20260914/README.md)
 - [Data-source boundary and inventory](data/README.md)

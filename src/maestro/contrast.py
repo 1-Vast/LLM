@@ -169,7 +169,6 @@ class MAESTROAgent:
         """Check execution, premise, and decision separation without inferring biology."""
 
         actions = contrast.actions()
-        action = contrast.plan
         reasons: list[NonDiscriminabilityReason] = []
         missing: list[str] = []
         executable = bool(actions) and all(candidate.cost >= 0 for candidate in actions)
@@ -188,16 +187,7 @@ class MAESTROAgent:
             # is the failure the gate field was added to make expressible. The
             # named field is the same one the typed premise admission compares, so
             # the repair that follows is directed at a field rather than a class.
-            missing = []
-            for candidate in actions:
-                required = tuple(candidate.prerequisites)
-                if candidate.interpretation_gate is not None:
-                    required = required + (candidate.interpretation_gate,)
-                missing.extend(
-                    name
-                    for name in required
-                    if profile.measurement_status(name).value != "measured"
-                )
+            missing = [name for candidate in actions for name in profile.unmeasured(candidate.required_premises)]
             if any(
                 candidate.kind is EvidenceActionKind.MODE_MATCHED_COMPARATOR for candidate in actions
             ) and not profile.mode:
@@ -314,12 +304,7 @@ class MAESTROAgent:
         # interpretation gate is the same obstacle a prerequisite is: without it
         # the step runs and decides nothing. Both are resolved by a registered
         # supplier, so both belong in the same backward chain.
-        required = tuple(action.prerequisites)
-        if action.interpretation_gate is not None:
-            required = required + (action.interpretation_gate,)
-        missing = [
-            name for name in required if profile.measurement_status(name).value != "measured"
-        ]
+        missing = profile.unmeasured(action.required_premises)
         if not missing:
             return (action,)
         if depth <= 1:
