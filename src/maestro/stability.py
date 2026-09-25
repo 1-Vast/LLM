@@ -172,6 +172,10 @@ class RepeatedJudgment:
             "context_identifier": self.context_identifier,
             "repeats": self.repeats,
             "distinct_values": sorted(self.counts),
+            # The empirical selection frequencies. These are not the distribution the model
+            # reports for itself: measured over 12 identical calls the two differed by half
+            # again, so the reported vector cannot stand in for reproducibility.
+            "value_counts": dict(sorted(self.counts.items())),
             "modal_value": self.modal_value,
             "agreement": self.agreement,
             "flip_rate": self.flip_rate,

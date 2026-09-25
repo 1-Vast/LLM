@@ -7,10 +7,31 @@ Labels: **implemented**, **partial**, **design**, **measured**.
 
 ## 1. The problem the live run exposed
 
-The typed decision model answers the same unchanged state differently each time. In the
-verification of 2026-09-25 a ranking question moved between two of five options across two
-identical calls, at 0.33 and 0.36, on a nearly flat reported distribution. **Measured**, on one
-pair — enough to establish that the source is not deterministic, not enough to estimate a rate.
+The typed decision model answers the same unchanged state differently each time. First seen on
+one pair, then measured properly: twelve identical calls to `jev-1.13.0` on one unchanged state,
+2026-09-25. **Measured.**
+
+| Question | Kind | Verdict | Agreement | Answers over 12 calls |
+|---|---|---|---:|---|
+| `decision_separation` | noul | stable | 1.00 | `True` twelve times, p from 0.88 to 0.90 |
+| `evidence_sufficiency` | score | stable | 1.00 | level 2 twelve times |
+| `best_separating_action` | choice | **unstable** | **0.41** | `orthogonal_rescue` 7, `proximal_activity` 4, `engagement_shift` 1 |
+
+Three things follow, and the third was not expected.
+
+**The instability is specific.** Two of three scopes reproduce perfectly. A gate that fired on
+everything would be useless; this one fires on the one question that can change which action is
+bought, and on nothing else.
+
+**The rate is far from the threshold.** Agreement 0.41 against a gate at 0.60, so 0.59 of
+decisions consulting this question would not reproduce. Not a borderline call.
+
+**The model's reported distribution is not its sampling distribution.** The captured call
+reported `{orthogonal_rescue 0.31, proximal_activity 0.30, engagement_shift 0.28, none 0.08,
+rna_low 0.03}`, whose collision probability is 0.27. The measured agreement over twelve calls
+was 0.41 — half again as concentrated. §5 listed this as an assumption that might not hold; it
+does not. **A source's own probability vector cannot stand in for reproducibility, and the only
+way to know how often an answer repeats is to ask again.**
 
 The architecture's answer to an unreliable source is the judgment ledger: score its probability
 forecasts by Brier against later measurements, down-weight, then revoke. That answer has a gap
@@ -128,9 +149,10 @@ Agreement measures reproducibility, not correctness. A source that returns the s
 every time scores 1.0 here and is caught only by the Brier ledger, which is why both run and the
 weaker governs. Neither measures whether the question was worth asking.
 
-The 0.73 flip rate implied by the reported distribution assumes that distribution is the
-sampling distribution. It may instead be the model's stated belief, which is a different object.
-One observed disagreement in one pair is consistent with it and does not establish it.
+The reported probability vector and the sampling distribution are different objects, now
+measured to differ by half again (§1). The reported vector still belongs in the record: it is
+what the Brier ledger grades, because Brier scores a stated belief against an outcome. It is the
+*stability* weight that must come from repetition and never from the model's own numbers.
 
 ## 6. Acceptance tests
 
@@ -144,11 +166,46 @@ One observed disagreement in one pair is consistent with it and does not establi
 
 All six: [`../tests/test_judgment_stability.py`](../tests/test_judgment_stability.py).
 
-## 7. What would falsify the construct
+## 7. The falsification test, run
 
-If repeated calls on real plan states agree at or above 0.95 across scopes, the gate never binds
-and its cost is not worth paying: report that and keep only the averaging. If the flip rate is
-high but decisions are unchanged because the deterministic layer overrides the ranking anyway,
-then the ranking question has no influence to earn and should be removed rather than gated.
-Both are cheap to run with `--decision-repeats 12` on a handful of frozen cases, and both are
-better outcomes than the construct surviving unexamined.
+Two ways this construct could have been worthless were written down before it was measured.
+
+**"The gate never binds."** If repeated calls agreed at or above 0.95 across scopes, the cost
+would buy nothing. **Refuted**: agreement 0.41 on the ranking scope, against 1.00 on the other
+two. The gate binds, and it binds selectively.
+
+**"The ranking has no influence to earn."** If the deterministic layer overrides the ranking
+anyway, the question should be removed rather than gated. **Open.** In the one measured critic
+run the selection was `rna_high` with the critic on and off, so on that case the ranking changed
+nothing — which is the boundary holding, not evidence that the ranking never matters. Settling
+it needs cases where the deterministic check leaves a genuine tie.
+
+A third possibility went unwritten and is now the more interesting one: §8.
+
+## 8. What the unstable arm actually chose
+
+Over twelve calls the model selected `orthogonal_rescue` seven times, `proximal_activity` four
+and `engagement_shift` once. In the fixture menu those are, respectively, the action whose
+premise **nothing supplies**, and actions three and two supplier steps from executable. The one
+executable decisive action, `rna_low`, drew a reported probability of 0.03 and was never chosen
+— **0 of 12 selections were executable.**
+
+The state the probe sends does not carry the supplier topology. The state the critic sends does,
+and the same question there returned `rna_low`. Two different states, one draw each, so nothing
+is established: this is a hypothesis with an obvious confound, not a result.
+
+`local_verification/topology_ablation.py` runs it properly — one contrast, one menu, one
+question set, repeated in both arms, with the topology block as the only difference. It reports
+the share of selections the agent could execute and the agreement in each arm, because *what* is
+recommended changing and *how stably* it is recommended are different findings. Predictions
+worth recording before it runs:
+
+- If the executable share rises with the topology present, reachability in the state is doing
+  work, and the design claim that the model should see the action graph is supported.
+- If agreement also rises, the instability is partly a symptom of an underdetermined state
+  rather than of the model, and the cheaper fix is a better state, not more repeats.
+- If neither moves, the model is not reading the block, and putting it there is cost without
+  effect — which would be worth knowing before more is written into that state.
+
+An executable action is one the agent can run, not one worth running. This measures neither
+biological quality nor correctness.

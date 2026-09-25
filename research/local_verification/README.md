@@ -187,6 +187,20 @@ request. What matters is not whether it succeeds but what it does when it fails:
   by name, never silently mapped to the nearest one;
 - `provider_usage` in each trace: the tokens the provider charged that run, and `calls`.
 
+## Phase 5b — does reachability in the state change the recommendation?
+
+Twelve identical calls on a state without the supplier topology selected a non-executable action
+every time. The critic's state carries that block and answered differently. Two different states,
+so the comparison has to be run properly:
+
+```bash
+python research/local_verification/topology_ablation.py --repeats 12 \
+  --report outputs/local_verification/topology_ablation.json
+```
+
+One contrast, one menu, one question set; the topology block is the only difference between the
+arms. Report the executable share and the agreement in each arm. Both arms are paid: 24 calls.
+
 ## Phase 6 — the virtual cell on real assets
 
 Only if `data/virtual_cell/registry.json` exists locally. Add to the phase-5 command:
@@ -219,9 +233,9 @@ policy, the repair is not what produced the difference, and that is the result.
 
 ## What to send back
 
-A measured run from 2026-09-25 is recorded in
-[`2026-09-25-maestro.md`](2026-09-25-maestro.md). Its raw reports remain
-machine-local under `outputs/`.
+Measured runs are recorded in [`2026-09-25-maestro.md`](2026-09-25-maestro.md) and
+[`2026-09-26-maestro.md`](2026-09-26-maestro.md). Their raw reports remain machine-local
+under `outputs/`.
 
 The short version is three files plus the numbers:
 

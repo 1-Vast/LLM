@@ -11,6 +11,10 @@ File summary
   - Every judgment must read `evidence_kind: model_prediction`.
   - A changed selection is reported, not assumed wrong: it is legal only as a tie-break from a
     graded scope, and the verdict says so rather than deciding it.
+  - A trace that selected nothing is refused as a baseline instead of being differenced. A run
+    into a reused state directory replans nothing and selects nothing, and comparing against it
+    reports a selection that moved when nothing moved - which happened, and read as a boundary
+    failure until the baseline was regenerated.
 - Interfaces: `main()`
 - Depends on: (standard library only)
 """
@@ -40,6 +44,15 @@ def main() -> int:
     arguments = parser.parse_args()
 
     off, on = first_turn(arguments.without), first_turn(arguments.with_critic)
+
+    for label, turn, path in (("without", off, arguments.without), ("with", on, arguments.with_critic)):
+        if not selection(turn):
+            print(f"VERDICT  unusable: the '{label}' trace selected no action ({path}).")
+            print("         A run into a reused state directory replans nothing, so this cannot")
+            print("         serve as a comparison baseline. Regenerate it into a fresh directory")
+            print("         and compare again; differencing it would report a move that did not happen.")
+            return 2
+
     review = on.get("decision_review") or {}
     judgments = review.get("judgments") or []
     failures: list[str] = []

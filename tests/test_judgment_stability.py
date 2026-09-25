@@ -122,13 +122,42 @@ def test_agreement_is_judged_on_the_value_that_can_change_a_decision():
     assert same.averaging_gain(4) == pytest.approx(same.probability_variance * 0.75, abs=1e-6)
 
 
-def test_the_measured_flip_from_the_live_run_reads_as_unstable():
-    """The 2026-09-25 observation: one ranking question, two identical calls, two answers."""
+# The twelve answers `best_separating_action` gave to one unchanged state on 2026-09-26,
+# against jev-1.13.0. Kept verbatim so a change to the estimator has to face real data.
+MEASURED_12 = (
+    "orthogonal_rescue", "orthogonal_rescue", "orthogonal_rescue", "proximal_activity",
+    "orthogonal_rescue", "engagement_shift", "orthogonal_rescue", "proximal_activity",
+    "orthogonal_rescue", "proximal_activity", "proximal_activity", "orthogonal_rescue",
+)
 
-    observed = _repeat(("proximal_activity", "orthogonal_rescue"))
-    assert observed.agreement == pytest.approx(0.0)
-    assert observed.flip_rate == pytest.approx(1.0)
+
+def test_the_measured_live_run_reads_as_unstable():
+    """Seven, four and one: agreeing pairs 7*6 + 4*3 + 0 = 54 of the 12*11 = 132 available."""
+
+    observed = _repeat(MEASURED_12)
+    assert observed.agreement == pytest.approx(54 / 132)
+    assert observed.agreement == pytest.approx(0.4091, abs=1e-4)
+    assert observed.flip_rate == pytest.approx(0.5909, abs=1e-4)
     assert observed.verdict is StabilityVerdict.UNSTABLE
+    assert observed.modal_value == "orthogonal_rescue"
+    assert observed.as_payload()["value_counts"] == {
+        "engagement_shift": 1, "orthogonal_rescue": 7, "proximal_activity": 4,
+    }
+
+
+def test_a_reported_distribution_cannot_stand_in_for_measured_agreement():
+    """The two differ on real data, which is why the weight comes from repeats and not the model.
+
+    The same call reported {orthogonal_rescue .31, proximal_activity .30, engagement_shift .28,
+    none .08, rna_low .03}. If that were the sampling distribution, two calls would agree 0.27
+    of the time. They agreed 0.41 of the time.
+    """
+
+    reported = (0.31, 0.30, 0.28, 0.08, 0.03)
+    predicted = sum(p * p for p in reported)
+    measured = _repeat(MEASURED_12).agreement
+    assert predicted == pytest.approx(0.2718, abs=1e-4)
+    assert measured > predicted * 1.4
 
 
 def test_enough_agreeing_repeats_earn_the_right_to_decide():

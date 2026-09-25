@@ -23,6 +23,7 @@ import json
 import os
 import platform
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -183,8 +184,24 @@ def hermetic_workspace(output: Path) -> Path:
 
 
 def phase_offline_loop(output: Path) -> dict[str, Any]:
+    """Drive one full case from clean state, every time.
+
+    The loop is resumable by design: a case store remembers that
+    `local-verification-offline` already reached a decision, so a second run into the same
+    directory replans nothing, selects nothing and imports no result. That is the loop working
+    correctly and the acceptance checks failing for a reason that has nothing to do with the
+    code under test - and it happened, and the degenerate trace was then used as the baseline
+    of a critic comparison, which reported a moved selection that had not moved. This phase is
+    an acceptance test of a fresh case, so it starts from one: the state directory the driver
+    itself created is removed first, and nothing outside the output directory is touched.
+    """
+
     state = output / "state"
     trace = output / "trace.json"
+    if state.exists():
+        shutil.rmtree(state)
+    if trace.exists():
+        trace.unlink()
     workspace = hermetic_workspace(output)
     command = [
         sys.executable, "-m", "agent",
@@ -263,6 +280,9 @@ def phase_assertions(trace_path: Path) -> dict[str, Any]:
           f"cycles={topology.get('supply_cycles')}")
 
     selected = [action.get("identifier") for action in first.get("selected_actions") or []]
+    check("the_loop_selected_an_action", bool(selected),
+          "an empty selection here usually means the case store was reused: this phase must "
+          "start from a state directory it created itself")
     catalogue = {item["identifier"]: item for item in json.loads((FIXTURES / "actions.json").read_text("utf-8"))}
     spend = sum(float(catalogue[name]["cost"]) for name in selected if name in catalogue)
     check("selection_respects_the_budget", spend <= 1.0, f"selected={selected} spend={spend}")
