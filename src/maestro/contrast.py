@@ -7,8 +7,9 @@ File summary
   - `check_contrast` validates execution, premise, and decision separation without inferring biology.
   - `repair_contrast` returns a catalog-bounded repair, or an explicit deferral when none exists.
   - `observation_scope` limits an observation's update target when its interpretation premise failed.
+  - Supplier-chain search is pruned by the menu's topology (`maestro.topology`) without changing its result.
 - Interfaces: `MAESTROAgent`, `decide`, `construct_contrast`, `check_contrast`, `repair_contrast`, `next_executable_action`, `executable_chain`, `observation_scope`
-- Depends on: maestro.models, maestro.selection, virtual_cell.interface
+- Depends on: maestro.models, maestro.selection, maestro.topology, virtual_cell.interface (typing only)
 """
 from __future__ import annotations
 
@@ -32,6 +33,7 @@ from .models import (
 )
 from .composition import PlanComposer, rank_plans
 from .selection import BudgetedEvidencePlan, BudgetedEvidenceSelector
+from .topology import ActionTopology
 
 if TYPE_CHECKING:
     from virtual_cell.interface import StatePrediction
@@ -254,11 +256,13 @@ class MAESTROAgent:
         supplier is not immediately runnable.
         """
 
+        # One topological analysis serves every candidate: they share the menu and profile.
+        topology = ActionTopology.build(available_actions, profile)
         for candidate in candidates:
             if candidate is None:
                 continue
             chain = self.executable_chain(
-                candidate, profile, available_actions, max_depth=max_chain_depth
+                candidate, profile, available_actions, max_depth=max_chain_depth, topology=topology
             )
             if chain:
                 return chain[0]
@@ -271,6 +275,7 @@ class MAESTROAgent:
         available_actions: Sequence[EvidenceAction],
         *,
         max_depth: int = 4,
+        topology: ActionTopology | None = None,
     ) -> tuple[EvidenceAction, ...] | None:
         """Plan a bounded supplier chain that makes ``action`` runnable.
 
@@ -280,16 +285,24 @@ class MAESTROAgent:
         chain is never re-entered, so a cyclic ``supplies`` declaration cannot
         loop the planner. ``None`` means no chain within the depth bound, which
         is reported as unexecutable rather than silently truncated.
+
+        A supplier is skipped when the menu's topology shows that even an
+        unrestricted chain from it is longer than the remaining depth. That
+        bound can only be optimistic for the search, so the result is exactly
+        the one the unpruned search returns; only hopeless branches are cut.
+        ``topology`` must describe the same menu and profile when supplied.
         """
 
         if max_depth < 1:
             return None
+        actions = tuple(available_actions)
         return self._chain_for(
             action,
             profile,
-            tuple(available_actions),
+            actions,
             max_depth,
             frozenset({action.identifier}),
+            topology if topology is not None else ActionTopology.build(actions, profile),
         )
 
     def _chain_for(
@@ -299,6 +312,7 @@ class MAESTROAgent:
         available_actions: tuple[EvidenceAction, ...],
         depth: int,
         visited: frozenset[str],
+        topology: ActionTopology,
     ) -> tuple[EvidenceAction, ...] | None:
         # The chain exists to make a step runnable, and an unmeasured
         # interpretation gate is the same obstacle a prerequisite is: without it
@@ -317,6 +331,7 @@ class MAESTROAgent:
                 if candidate.cost >= 0
                 and candidate.identifier not in visited
                 and frozenset(candidate.supplies) & outstanding
+                and topology.within(candidate.identifier, depth - 1)
             ),
             key=lambda candidate: (candidate.cost, candidate.identifier),
         )
@@ -327,6 +342,7 @@ class MAESTROAgent:
                 available_actions,
                 depth - 1,
                 visited | {supplier.identifier},
+                topology,
             )
             if subchain is not None:
                 return subchain + (action,)

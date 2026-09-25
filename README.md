@@ -98,6 +98,8 @@ On deterministic contrast-check failure, rule-based repair stays the baseline. T
 
 `PredictionReliabilityLedger` in `src/maestro/reliability.py` scores declared prediction intervals against later real values, per model version and readout. A poorly calibrated readout is down-weighted; consecutive interval misses revoke it. `SourceClusterIndex` in `src/maestro/provenance.py` counts several write-ups of one original experiment as one source, so repeated citations do not shrink the compatible set twice.
 
+`src/maestro/topology.py` treats the registered menu as a dependency graph under the current profile. `ActionTopology` reports the executable frontier, each action's `steps_to_executable` (the shortest supplier chain, found by breadth-first search over reversed supply edges), capability gaps (open premises no registered action supplies), and supply cycles (Tarjan strongly connected components). The supplier-chain search uses the distances as an exact pruning bound, and the result is unchanged. Each round logs the analysis, keeps it on `MAESTROTurn.action_topology`, and shows it to the repair planner as `ACTION_TOPOLOGY`.
+
 `MAESTROAgent.select_budgeted_evidence` provides a small-pool exact selection baseline: highest declared coverage within budget, then minimal cost; unmet prerequisites stay visible. It is not a claim of globally optimal experiment design or biological value of information.
 
 ## Virtual Cell Boundary
@@ -201,7 +203,7 @@ The skeleton deliberately contains no validated biological model, target-engagem
 ## Records
 
 - [Active task](task.md)
-- [Agent optimization update: literature, changes and measurements](AGENT_OPTIMIZATION_UPDATE.md)
+- [Agent optimization update: topological analysis, literature, changes and measurements](AGENT_OPTIMIZATION_UPDATE.md)
 - [Run-log index: how the dated record is organised](log/INDEX.md)
 - [Latest day record, 2026-09-14](log/20260914/README.md)
 - [Data-source boundary and inventory](data/README.md)

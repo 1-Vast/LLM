@@ -9,6 +9,9 @@ File summary
   - Adopted repairs are scored against later real results via `gap_resolved`.
   - Each round's virtual-cell answers are shown to the LLM repair planner as a labelled
     planning-only briefing, and an identical query is answered once per run, not per round.
+  - Each round analyses the menu as a dependency graph (`maestro.topology`): what can run
+    now, how many supplier steps each action is away, and which premises no registered
+    action supplies. The analysis is logged, kept on the turn, and shown to the repair planner.
 - Interfaces: `MAESTROOrchestrator`, `run`, `run_case_loop`, `import_measurement`, `MAESTROTurn`, `MAESTROCaseLoop`
 - Depends on: maestro.contrast, maestro.decision, maestro.outcome, maestro.repair, maestro.reliability, maestro.provenance, agent.audit, agent.cases, agent.configuration, agent.context, agent.knowledge, agent.llm, agent.memory, agent.planner, agent.reflection, agent.tool_runtime, agent.vision, agent.world_model_briefing, virtual_cell
 """
@@ -46,6 +49,7 @@ from maestro.outcome import (
     scope_rank,
 )
 from maestro.provenance import SourceClusterIndex
+from maestro.topology import ActionTopology
 from maestro.reliability import PredictionReliabilityLedger
 from maestro.repair import RepairController, RepairLedger, RepairRecord
 from .audit import RunLogger
@@ -154,6 +158,8 @@ class MAESTROTurn:
     action_prediction_requests: Mapping[str, PredictionRequest] = field(default_factory=dict)
     # What the repair planner was shown about this round's virtual-cell queries.
     world_model_rows: tuple[WorldModelRow, ...] = ()
+    # The menu's dependency structure under this round's profile (ActionTopology.summary()).
+    action_topology: Mapping[str, object] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -417,6 +423,8 @@ class MAESTROOrchestrator:
         briefing_rows = world_model_rows(
             available_actions, action_requests, action_assessments, action_predictions, self._reliability
         )
+        topology = ActionTopology.build(available_actions, intervention_profile).summary()
+        self._logger.event("action_topology", topology, session_id=session_id)
         selection = self._select_budgeted_actions(
             contrast, available_actions, intervention_profile, case, budget, session_id,
             prediction=prediction, prediction_request=effective_request,
@@ -434,6 +442,7 @@ class MAESTROOrchestrator:
         outcome = self._check_and_repair(
             context, contrast, intervention_profile, available_actions, prediction, action_predictions,
             case_id=case_id, session_id=session_id, world_model_briefing=render_world_model_briefing(briefing_rows),
+            action_topology=topology,
         )
         contrast, check, repair, llm_repair = outcome.contrast, outcome.check, outcome.repair, outcome.llm_repair
         repair_records, repair_stop_reason = outcome.records, outcome.stop_reason
@@ -502,6 +511,7 @@ class MAESTROOrchestrator:
             action_prediction_assessments=action_assessments,
             action_prediction_requests=action_requests,
             world_model_rows=briefing_rows,
+            action_topology=topology,
         )
         self._write_plan_round(
             turn,
@@ -527,6 +537,7 @@ class MAESTROOrchestrator:
         case_id: str,
         session_id: str,
         world_model_briefing: str,
+        action_topology: Mapping[str, object] | None = None,
     ) -> RepairOutcome:
         """Check the contrast, run the ruled repair, then give the LLM one repair attempt.
 
@@ -555,6 +566,7 @@ class MAESTROOrchestrator:
             context, contrast, check, available_actions, profile, prediction, session_id,
             action_predictions=action_predictions,
             world_model_briefing=world_model_briefing,
+            action_topology=action_topology,
         )
         llm_repair = accepted_repair.draft if accepted_repair else None
         if accepted_repair is not None:
@@ -1720,13 +1732,15 @@ class MAESTROOrchestrator:
         *,
         action_predictions: Mapping[str, StatePrediction] | None = None,
         world_model_briefing: str = "",
+        action_topology: Mapping[str, object] | None = None,
     ) -> AcceptedLLMRepair | None:
         if not self._enable_llm_repair or check.ready_for_mechanism_update:
             return None
         feedback_marks = self._planner_feedback_marks()
         try:
             draft = self._planner.propose_repair(
-                context, contrast, check, available_actions, world_model_briefing=world_model_briefing
+                context, contrast, check, available_actions, world_model_briefing=world_model_briefing,
+                action_topology=action_topology,
             )
         except (LLMError, ValueError) as error:
             self._logger.event(

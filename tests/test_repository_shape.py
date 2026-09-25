@@ -4,9 +4,10 @@ File summary
 - Path: tests/test_repository_shape.py
 - Purpose: Package layout, tool scoping, and the English-only language rules.
 - Core points: assertions here are contract tests, not biological results; each test pins one boundary that must not silently move.
-- Interfaces: `test_source_is_separated_by_core_agent_and_virtual_cell_responsibility()`, `test_tools_are_folder_scoped_runtime_components()`, `test_log_is_one_dated_experiment_record_per_working_day()`, `test_log_index_declares_every_file_in_the_record()`, `test_project_markdown_has_no_chinese_prose()`, `test_python_sources_are_english_only()`
+- Interfaces: `test_source_is_separated_by_core_agent_and_virtual_cell_responsibility()`, `test_tools_are_folder_scoped_runtime_components()`, `test_log_is_one_dated_experiment_record_per_working_day()`, `test_log_index_declares_every_file_in_the_record()`, `test_project_markdown_has_no_chinese_prose()`, `test_python_sources_are_english_only()`, `test_package_imports_form_a_layered_acyclic_graph()`
 - Depends on: maestro
 """
+import ast
 import re
 from pathlib import Path
 
@@ -230,3 +231,62 @@ def test_no_test_module_imports_another_test_module():
             if re.match(r"^\s*(from|import)\s+test_\w+", line):
                 offenders.append(f"{path.name}:{number}: {line.strip()}")
     assert not offenders, "a test module imports another test module:\n" + "\n".join(offenders)
+
+
+# Which source packages each package may import when its module is loaded. The layers
+# run core -> world model -> agent -> evaluation, so the graph is acyclic by construction.
+ALLOWED_EAGER_IMPORTS = {
+    "maestro": set(),
+    "virtual_cell": {"maestro"},
+    "agent": {"maestro", "virtual_cell"},
+    "evaluation": {"agent", "maestro", "virtual_cell"},
+}
+# Upward edges tolerated only inside a function or a TYPE_CHECKING block. maestro types
+# a few values in the virtual cell's vocabulary and defers that import on purpose.
+ALLOWED_DEFERRED_IMPORTS = {"maestro": {"virtual_cell"}}
+
+
+def _package_imports() -> dict[str, dict[str, set[str]]]:
+    """Cross-package imports per package, split into eager and deferred edges with their sites."""
+
+    packages = set(ALLOWED_EAGER_IMPORTS)
+    found: dict[str, dict[str, set[str]]] = {name: {"eager": set(), "deferred": set()} for name in packages}
+    for path in sorted((ROOT / "src").rglob("*.py")):
+        package = path.relative_to(ROOT / "src").parts[0]
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        guarded = {
+            id(inner)
+            for node in ast.walk(tree)
+            if isinstance(node, ast.If) and "TYPE_CHECKING" in ast.unparse(node.test)
+            for inner in ast.walk(node)
+        }
+        top_level = {id(node) for node in tree.body}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom):
+                target = package if node.level else (node.module or "").split(".")[0]
+            elif isinstance(node, ast.Import):
+                target = node.names[0].name.split(".")[0]
+            else:
+                continue
+            if target in packages and target != package:
+                kind = "eager" if id(node) in top_level and id(node) not in guarded else "deferred"
+                found[package][kind].add(f"{target} <- {path.relative_to(ROOT).as_posix()}:{node.lineno}")
+    return found
+
+
+def test_package_imports_form_a_layered_acyclic_graph():
+    """A lower layer never imports a higher one when it loads.
+
+    `agent` once imported `evaluation` through an evaluation arm kept in the wrong
+    package, while `evaluation` imports `agent`: a cycle that made import order matter.
+    """
+
+    violations = []
+    for package, edges in _package_imports().items():
+        for kind, allowed in (("eager", ALLOWED_EAGER_IMPORTS[package]),
+                              ("deferred", ALLOWED_EAGER_IMPORTS[package] | ALLOWED_DEFERRED_IMPORTS.get(package, set()))):
+            violations.extend(
+                f"{package} ({kind}): {site}" for site in sorted(edges[kind])
+                if site.split(" <- ")[0] not in allowed
+            )
+    assert not violations, "package import layering violated:\n" + "\n".join(violations)

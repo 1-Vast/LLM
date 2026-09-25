@@ -14,7 +14,7 @@ File summary
     proposal, so the comparison is against what the shipped menu could already do.
   - A provider failure is recorded as a refused proposal, never raised into the runner.
 - Interfaces: pytest test functions
-- Depends on: agent.llm_proposal_arm, evaluation.licensing_gap
+- Depends on: evaluation.llm_proposal_arm, evaluation.licensing_gap
 """
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
-from agent.llm_proposal_arm import (  # noqa: E402
+from evaluation.llm_proposal_arm import (  # noqa: E402
     compile_proposal,
     missing_premises,
     render_problem,

@@ -652,3 +652,41 @@ def test_distinct_queries_run_concurrently_once_each_and_log_in_request_order(tm
     assert completed == ["s.a1", "s.a2", "s.a3"]
     with pytest.raises(ValueError):
         _controller(tmp_path / "bad", StubClient([]), max_parallel_predictions=0)
+
+
+# --------------------------------------------------------------------------------------
+# Menu topology in the agent loop
+# --------------------------------------------------------------------------------------
+
+
+def test_the_repair_planner_sees_the_menu_topology_including_capability_gaps(tmp_path: Path):
+    from agent.planner import TOPOLOGY_HEADING
+
+    readout = EvidenceAction(
+        "viability", "Viability.", 5.0, ("a", "b"), prerequisites=("functional:target_activity",),
+        expected_outcomes={"a": "x", "b": "y"},
+    )
+    activity = EvidenceAction(
+        "activity", "Activity.", 2.0, ("a",), kind=EvidenceActionKind.FUNCTIONAL_MEASUREMENT,
+        supplies=("functional:target_activity",),
+    )
+    engagement_gap = EvidenceAction("comparator", "Needs engagement.", 1.0, ("a", "b"),
+                                    prerequisites=("engagement:unregistered",))
+    repair = {"action_identifier": "activity", "modified_fields": ["plan.action_identifier"],
+              "rationale": "Measure function first.", "remaining_limitations": []}
+    client = StubClient([TASK, _plan("viability"), repair])
+    controller = _controller(tmp_path, client, repair=True)
+    turn = controller.run("Resolve.", available_actions=(readout, activity, engagement_gap),
+                          intervention_profile=FunctionalInterventionProfile(mode="inhibition"))
+
+    expected = {
+        "executable_now": ["activity"],
+        "steps_to_executable": {"viability": 2, "comparator": None},
+        "unsupplied_premises": {"comparator": ["engagement:unregistered"]},
+        "supply_cycles": [],
+    }
+    assert turn.action_topology == expected
+    content = client.calls[2][0][1]["content"]
+    section = content[content.index(TOPOLOGY_HEADING) + len(TOPOLOGY_HEADING) + 1:].split("\n", 1)[0]
+    assert json.loads(section) == expected
+    assert _events(tmp_path, "action_topology") == [expected]

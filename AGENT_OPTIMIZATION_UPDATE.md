@@ -1,10 +1,64 @@
-# Agent optimization update: literature-grounded streamlining
+# Agent optimization update: a topological analysis of the agent
 
-Updated: 2026-09-25. Branch: `claude/sharp-bardeen-q4yt0t`. This record covers two
-commits on top of `79e07c1`: the agent/virtual-cell integration commit (`4ffe7c4`) and
-the streamlining pass described here. The agent is the primary core and the
+Updated: 2026-09-25. Merged into `main` from `claude/sharp-bardeen-q4yt0t`. This record
+covers three commits on top of `79e07c1`: the agent/virtual-cell integration commit
+(`4ffe7c4`), the literature-grounded streamlining pass (`e5098f0`), and the topology pass
+that is the core of the change set (section 0). The agent is the primary core and the
 virtual cell is the secondary core. Nothing here is a biological result. Every
 number below is a software measurement on constructed fixtures.
+
+## 0. Topological analysis and optimization
+
+The agent reasons over two graphs, and both were analysed as graphs.
+
+**The evidence menu as a dependency graph** (`src/maestro/topology.py`). Nodes are the
+registered actions. For the current profile, an action's open premises are its
+unmeasured prerequisites and interpretation gate. There is an edge `a -> s` when `s`
+supplies one of `a`'s open premises. `ActionTopology.build` makes one pass over nodes and
+declared supply edges and derives:
+
+| Structure | Algorithm | Meaning for the agent |
+|---|---|---|
+| Executable frontier | Actions with no open premise | What can run now |
+| `steps_to_executable` | Multi-source BFS over reversed edges from the frontier | Length of the shortest supplier chain that makes an action runnable; `inf` means no registered chain exists |
+| Capability gaps (`unsupplied_premises`) | Open premises with no supplier | Premises only a new capability or a real result can supply. This is the "name the missing premise" gap the engagement package tests |
+| Supply cycles | Iterative Tarjan SCC (size above one, or a self-loop) | Declarations under which actions only supply each other |
+
+*Optimization.* `MAESTROAgent.executable_chain` is a depth-bounded backtracking search that
+forbids revisiting an action. `steps_to_executable` is a lower bound on any chain that
+search can return, so it now skips every supplier whose bound exceeds the remaining depth.
+Only branches that could not succeed are cut, so the result is unchanged. A property test
+compares the pruned search with a verbatim copy of the old search on 300 random menus,
+covering cycles, gates, negative costs and duplicated identifiers, at every depth from 0
+to 6, plus `next_executable_action`. Every result is identical.
+`next_executable_action` builds one analysis for all its candidates.
+
+| Adversarial menu (dead-end layers plus one runnable supplier) | Nodes expanded before | Time before | Time after (including the build) |
+|---|---|---|---|
+| width 8, 3 layers, depth 4 | 586 | 2.3 ms | 0.47 ms |
+| width 12, 3 layers, depth 4 | 1,886 | 4.4 ms | 0.33 ms |
+| width 8, 5 layers, depth 6 | 37,450 | 108 ms | 0.37 ms |
+| width 10, 5 layers, depth 6 | 111,112 | 311 ms | 0.50 ms |
+
+The old search grows as width^(depth-1) on such menus, while the pruned search stays linear in the
+menu size. Shipped menus are small, so on them the gain is small. The guarantee matters
+as menus grow.
+
+*In the agent loop.* Each round logs the analysis as an `action_topology` event, stores
+it on `MAESTROTurn.action_topology`, and gives it to the LLM repair planner as a
+deterministic `ACTION_TOPOLOGY` section. The model then sees which actions can run, how
+far away the others are, and which premises nothing on the menu can supply, before it
+proposes a repair.
+
+**The package import graph** (`tests/test_repository_shape.py`). Import edges were
+extracted with `ast` and split into edges taken when a module loads and edges deferred
+into a function or a `TYPE_CHECKING` block. The analysis found a real cycle:
+`agent -> evaluation` (through `agent/llm_proposal_arm.py`) and `evaluation -> agent`. That
+module is an evaluation arm that measures the agent, so it moved to
+`src/evaluation/llm_proposal_arm.py`. The eager graph is now the layered DAG
+`maestro <- virtual_cell <- agent <- evaluation`. The only upward edge is the documented,
+deferred `maestro -> virtual_cell` vocabulary import. A new test pins this layering and
+names the offending import site if it is broken.
 
 ## 1. Literature consulted and what each one changed
 
@@ -90,7 +144,7 @@ or explains why a technique was not adopted.
 | Wall time for those 3 inferences at 0.15 s each | 0.46 s sequential | 0.16 s with 3 workers | Same fixture, sequential vs parallel |
 | Virtual-cell inferences over R rounds x A actions with unchanged inputs | R x A | A (from the first commit) | `test_a_second_round_reuses_the_first_rounds_inference` |
 | `MAESTROOrchestrator.run` length | 266 lines | 209 lines | Line count |
-| Test suite (`--ignore=tests/test_learned_response.py`) | 787 passed | 813 passed | Same 53 failures before and after; see section 5 |
+| Test suite (`--ignore=tests/test_learned_response.py`) | 787 passed | 1,118 passed | Same 53 failures before and after; see section 5 (303 of the new tests are the topology property test) |
 
 Local compute for a three-round constructed loop is about 75 ms, and about half of
 it is SQLite commits. In a real run, provider latency and State inference dominate.
@@ -118,7 +172,7 @@ ms per commit against 1.12 ms for the default journal on this filesystem.
 
 ## 5. Verification status
 
-- Offline test suite: 813 passed, 19 skipped. The same 53 tests fail before and
+- Offline test suite: 1,118 passed, 19 skipped. The same 53 tests fail before and
   after, because they need `data/evaluation/...`, `data/raw/...` and `log/` files
   that are not in this repository. `tests/test_learned_response.py` needs `torch`
   and was not run.

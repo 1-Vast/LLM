@@ -1,7 +1,7 @@
 """The LLM repair-proposal arm, compiled and scored under the admissible objective.
 
 File summary
-- Path: src/agent/llm_proposal_arm.py
+- Path: src/evaluation/llm_proposal_arm.py
 - Purpose: measure what the agent contributes. A model is shown the public
   declarations of a decision problem -- the two explanations, the prior, the loss, the
   budget and the menu -- and asked for one repair from a two-operator language. The
@@ -20,6 +20,8 @@ File summary
     boundary forbids -- and `predicts_licensed` records whether it knew.
 - Interfaces: `render_problem`, `compile_proposal`, `ProposalOutcome`, `run_family`,
   `run_arm`, `main`
+- Location: an evaluation arm, so it lives with the evaluation package; keeping it under
+  `agent/` made `agent` import `evaluation` while `evaluation` imports `agent`.
 - Depends on: agent.configuration, agent.llm, evaluation.adaptive_reference,
   evaluation.admissible, evaluation.contingent, evaluation.licensing_gap
 """

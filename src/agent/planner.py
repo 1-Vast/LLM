@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, replace
 import json
-from typing import Any, Callable, Protocol, Sequence, TypeVar
+from typing import Any, Callable, Mapping, Protocol, Sequence, TypeVar
 
 from .context import ContextPacket
 from maestro.models import (
@@ -253,6 +253,7 @@ Return {
         actions: Sequence[EvidenceAction],
         *,
         world_model_briefing: str = "",
+        action_topology: Mapping[str, Any] | None = None,
     ) -> LLMRepairDraft:
         """Ask for one catalog-bounded scientific repair; deterministic code decides acceptance.
 
@@ -260,6 +261,11 @@ Return {
         virtual-cell queries. It is shown under its own heading as planning-only
         model output: it may inform which registered action to propose, and it
         cannot supply a prerequisite, an observation or a new action.
+
+        ``action_topology`` is the controller's deterministic dependency analysis of
+        the menu (`ActionTopology.summary()`): which actions run now, how many
+        supplier steps the others need, and which premises nothing registered
+        supplies. It is structure computed from declarations, not model output.
         """
 
         prompt = """You are MAESTRO's directed contrast-repair planner. Return JSON only.
@@ -295,6 +301,7 @@ Return {"action_identifier": string or null, "modified_fields": ["plan.action_id
                         "CONTEXT\n" + context.rendered + "\n\nCONTRAST\n" + render_contrast(contrast)
                         + "\n\nCHECK_FAILURES\n" + json.dumps([reason.value for reason in check.reasons])
                         + "\n\nAVAILABLE_ACTIONS\n" + render_catalogue(actions)
+                        + (_topology_section(action_topology) if action_topology else "")
                         + ("\n\n" + briefing if briefing else "")
                     ),
                 },
@@ -336,6 +343,17 @@ def render_contrast(contrast: MechanismContrast) -> str:
     if contrast.additional_plans:
         payload["additional_plans"] = [action.identifier for action in contrast.additional_plans]
     return json.dumps(payload, allow_nan=False, separators=(",", ":"))
+
+
+TOPOLOGY_HEADING = (
+    "ACTION_TOPOLOGY (deterministic analysis of the registered menu under the current profile; "
+    "steps_to_executable counts the actions in the shortest supplier chain, null means no registered "
+    "chain exists; unsupplied_premises are premises no registered action supplies)"
+)
+
+
+def _topology_section(summary: Mapping[str, Any]) -> str:
+    return "\n\n" + TOPOLOGY_HEADING + "\n" + json.dumps(dict(summary), allow_nan=False, separators=(",", ":"))
 
 
 def _unregistered_action(
