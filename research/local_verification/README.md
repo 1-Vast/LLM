@@ -174,6 +174,10 @@ policy, the repair is not what produced the difference, and that is the result.
 
 ## What to send back
 
+A measured run from 2026-09-25 is recorded in
+[`2026-09-25-maestro.md`](2026-09-25-maestro.md). Its raw reports remain
+machine-local under `outputs/`.
+
 The short version is three files plus the numbers:
 
 ```

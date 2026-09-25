@@ -130,9 +130,9 @@ The first local probe reached the endpoint but received HTTP 422 because the cli
 `options` and `scale` instead of the two required `criteria` fields. After correcting the
 request and parser, a live three-question evaluation returned three usable answers, no
 refusals, and token usage. The critic loop then recorded five `model_prediction` judgments;
-its deterministic check and selected action matched the critic-off trace. The results are
-in `outputs/local_verification/jev_recheck.txt` and
-`outputs/local_verification/jev_fixed/critic-comparison.txt` on the verifying machine.
+its deterministic check and selected action matched the critic-off trace. The
+[measured run](local_verification/2026-09-25-maestro.md) records the result;
+the raw artifacts remain git-ignored under `outputs/` on the verifying machine.
 
 Parsing still fails closed on unrecognised fields or out-of-range values, naming the keys
 the provider returned. A refusal never becomes a finding. Provider outages still leave the
