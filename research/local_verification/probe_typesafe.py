@@ -9,11 +9,20 @@ File summary
 - Core points:
   - The key is read exactly as the application reads it and is never printed. Every line of output
     passes through a redactor that replaces the key, so even an echoing provider cannot leak it.
-  - It calls the real client, then reaches past `evaluate()` for the unparsed body, because
-    `evaluate()` deliberately converts failures into refusals and discards the payload.
+  - It sends exactly one request and reads that one response twice: once as structure, once
+    through the production per-answer parser. An earlier version called `evaluate()` as a second
+    request, and because the provider is not deterministic the two sections described different
+    evaluations - the raw body said one thing and the parsed section another.
+  - It reaches past `evaluate()` for the unparsed body, because `evaluate()` deliberately turns
+    failures into refusals and keeps no payload.
   - An HTTP error body is captured too: that body usually names the field the provider rejected.
   - `--discover` is opt-in and asks the configured host which paths exist, for the case where the
     default evaluate path is wrong and everything returns 404.
+  - `--repeat N` sends the same state N times and reports how far the answers move. The provider
+    is not deterministic: a first run saw a choice flip between two of five options across two
+    identical calls at p = 0.33 and p = 0.36. A question whose top answer is not stable under
+    repetition is uninformative however confident each single answer looks, so this measures it
+    rather than leaving it to be noticed by accident.
 - Interfaces: `main()`
 - Depends on: agent.typesafe (standard library only otherwise)
 """
@@ -23,7 +32,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -123,11 +132,62 @@ def raw_request(url: str, key: str, body: Mapping[str, Any] | None, timeout: flo
         return {"status": None, "body": f"transport: {type(error).__name__}"}
 
 
+def first(payload: Any, names: Sequence[str]) -> Any:
+    """Look a field up through the module's own aliases.
+
+    This mirrors the six lines of `evaluate()` that walk the response envelope. The per-answer
+    parsing below is the production parser itself, so what a change to the aliases or to
+    `TypedAnswer.parse` does is exactly what this reports.
+    """
+
+    if not isinstance(payload, Mapping):
+        return None
+    for name in names:
+        if name in payload:
+            return payload[name]
+    return None
+
+
+def read_as_the_agent_would(
+    raw: Any, model: str, digest: str, findings: Mapping[str, Any]
+) -> JevEvaluation:
+    """Parse the one captured response the way the agent does, without sending a second one."""
+
+    if findings.get("transport") != "ok":
+        # `evaluate()` turns exactly this failure into exactly this refusal by construction,
+        # and a second request would only repeat the retries and the spend.
+        return JevEvaluation(model, digest, {}, refusal=str(findings.get("transport")))
+    raw_answers = first(raw, RESPONSE_ALIASES["answers"])
+    if not isinstance(raw_answers, Mapping):
+        keys = ",".join(sorted(str(key) for key in raw)) if isinstance(raw, Mapping) else ""
+        return JevEvaluation(model, digest, {}, refusal=f"response_without_answers;keys={keys}")
+    answers = {
+        question.identifier: (
+            TypedAnswer.parse(question, raw_answers[question.identifier])
+            if question.identifier in raw_answers
+            else TypedAnswer.refused(question, "answer_missing_from_response")
+        )
+        for question in QUESTIONS
+    }
+    raw_usage = first(raw, RESPONSE_ALIASES["usage"])
+    usage = (
+        {str(k): int(v) for k, v in raw_usage.items() if isinstance(v, int) and not isinstance(v, bool)}
+        if isinstance(raw_usage, Mapping)
+        else {}
+    )
+    served = raw.get("model") if isinstance(raw, Mapping) else None
+    return JevEvaluation(str(served or model), digest, answers, usage)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Report the live Jev response shape without printing the key.")
     parser.add_argument("--workspace", type=Path, default=ROOT, help="Directory holding .env; defaults to the repository root.")
     parser.add_argument("--discover", action="store_true", help="On failure, ask the host which paths and schema exist.")
     parser.add_argument("--report", type=Path, help="Write the findings as JSON.")
+    parser.add_argument(
+        "--repeat", type=int, default=1, metavar="N",
+        help="Send the same state N times and report answer stability. Each repeat is a paid call.",
+    )
     arguments = parser.parse_args()
 
     settings = TypeSafeSettings.from_workspace(arguments.workspace)
@@ -185,14 +245,7 @@ def main() -> int:
         if detail:
             print("  body        " + redact(detail))
 
-    if findings.get("transport") == "ok":
-        evaluation = client.evaluate(STATE, QUESTIONS)
-    else:
-        # A second identical request would repeat the same retries and the same spend, and
-        # `evaluate()` turns exactly this failure into exactly this refusal by construction.
-        evaluation = JevEvaluation(
-            settings.model, state_digest(STATE), {}, refusal=str(findings.get("transport"))
-        )
+    evaluation = read_as_the_agent_would(raw, settings.model, state_digest(STATE), findings)
     findings["evaluation"] = {
         "model_served": evaluation.model,
         "refusal": redact(evaluation.refusal) if evaluation.refusal else None,
@@ -202,7 +255,7 @@ def main() -> int:
         "refusals": [redact(item) for item in evaluation.refusals()],
     }
     print()
-    print("=== as the agent would read it ===")
+    print("=== as the agent would read it (the same single response) ===")
     print(f"model served  {evaluation.model!r}")
     if evaluation.refusal:
         print(f"refused       {redact(evaluation.refusal)}")
@@ -227,6 +280,55 @@ def main() -> int:
             probes[f"POST {path}"] = {"status": outcome["status"], "body": redact(outcome["body"])[:300]}
             print(f"  POST {path:<28} {outcome['status']}  {redact(outcome['body'])[:120]!r}")
         findings["discovery"] = probes
+
+    if arguments.repeat > 1 and findings.get("transport") == "ok":
+        print()
+        print(f"=== stability over {arguments.repeat} identical requests ===")
+        seen: dict[str, list[Any]] = {question.identifier: [] for question in QUESTIONS}
+        for answer in evaluation.answers.values():
+            seen[answer.identifier].append((answer.value, answer.probability, answer.refusal))
+        for _ in range(arguments.repeat - 1):
+            try:
+                repeated = client._send(body)  # noqa: SLF001 - same deliberate reason as above.
+            except Exception as error:  # noqa: BLE001 - a failed repeat is itself a finding.
+                print(f"  repeat failed: {redact(f'{type(error).__name__}: {error}')}")
+                break
+            again = read_as_the_agent_would(repeated, settings.model, state_digest(STATE), findings)
+            for answer in again.answers.values():
+                seen[answer.identifier].append((answer.value, answer.probability, answer.refusal))
+        stability: dict[str, Any] = {}
+        for identifier, observations in seen.items():
+            usable = [(value, p) for value, p, refusal in observations if refusal is None]
+            refusals = sorted({refusal for _, _, refusal in observations if refusal})
+            values = [value for value, _ in usable]
+            probabilities = [p for _, p in usable if p is not None]
+            # A question that was refused every time is not stable; it is absent. Reporting it as
+            # stable would read as agreement where there is no answer at all.
+            verdict = (
+                "refused" if not usable
+                else "stable" if len(set(map(str, values))) == 1
+                else "UNSTABLE"
+            )
+            stability[identifier] = {
+                "calls": len(observations),
+                "usable_calls": len(usable),
+                "verdict": verdict,
+                "values": [str(value) for value in values],
+                "refusals": refusals,
+                "probability_min": min(probabilities) if probabilities else None,
+                "probability_max": max(probabilities) if probabilities else None,
+            }
+            spread = (
+                f"p {min(probabilities):.2f}-{max(probabilities):.2f}" if probabilities else "p n/a"
+            )
+            detail = refusals if verdict == "refused" else values
+            print(f"  {identifier:<24} {verdict:<9} {spread}  {detail}")
+        findings["stability"] = stability
+        unstable = sorted(name for name, item in stability.items() if item["verdict"] == "UNSTABLE")
+        if unstable:
+            print()
+            print(f"  Unstable under repetition: {unstable}. Treat these as uninformative for now,")
+            print("  whatever confidence a single call reports, until the ledger has graded them.")
 
     if arguments.report:
         arguments.report.parent.mkdir(parents=True, exist_ok=True)

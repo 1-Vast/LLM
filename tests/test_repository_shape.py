@@ -9,6 +9,7 @@ File summary
 """
 import ast
 import re
+import subprocess
 from pathlib import Path
 
 
@@ -67,6 +68,26 @@ THIRD_PARTY = ("reference/paper/", "data/external/", ".pytest_cache/", "__pycach
 
 
 def _project_markdown():
+    """Markdown this project owns, which is the markdown git tracks.
+
+    Walking the working tree instead swept in whatever a local checkout happened to hold: a
+    verification run failed this rule on an empty README inside a downloaded dataset under
+    `dataset/`, which `.gitignore` excludes and which the project does not write. The English-only
+    rule is about the project's own prose, so tracked files are exactly the right set, and the
+    rule can no longer be broken by a third party's file landing in a local directory.
+    """
+
+    listed = subprocess.run(
+        ["git", "ls-files", "-z", "--", "*.md"],
+        cwd=ROOT, capture_output=True, text=True, check=False,
+    )
+    if listed.returncode == 0:
+        return sorted(
+            ROOT / name
+            for name in listed.stdout.split("\0")
+            if name and (ROOT / name).is_file()
+        )
+    # Without git, fall back to the working tree minus the directories a checkout does not own.
     excluded = THIRD_PARTY
     return sorted(
         path
@@ -86,7 +107,8 @@ def test_project_markdown_has_no_chinese_prose():
     offenders = []
     for path in _project_markdown():
         text = path.read_text(encoding="utf-8")
-        assert text.strip(), path
+        if not text.strip():
+            continue  # An empty file has no prose to judge; emptiness is its own test below.
         scrubbed = INLINE_CODE.sub("", text)
         scrubbed = MARKDOWN_LINK_DESTINATION.sub("", scrubbed)
         scrubbed = PATH_LIKE_GROUP.sub("", scrubbed)
@@ -94,6 +116,21 @@ def test_project_markdown_has_no_chinese_prose():
             if CJK_PATTERN.search(line):
                 offenders.append(f"{path.relative_to(ROOT).as_posix()}:{line_number}: {line.strip()[:90]}")
     assert not offenders, "Chinese prose found outside paths:\n" + "\n".join(offenders)
+
+
+def test_tracked_markdown_is_never_empty():
+    """An empty tracked markdown file is a defect, and is reported as that rather than as prose.
+
+    This was previously asserted inside the Chinese-prose test, where an empty file produced a
+    failure whose name said the opposite of what had happened.
+    """
+
+    empty = [
+        path.relative_to(ROOT).as_posix()
+        for path in _project_markdown()
+        if not path.read_text(encoding="utf-8").strip()
+    ]
+    assert not empty, f"tracked markdown files are empty: {empty}"
 
 
 def test_python_sources_are_english_only():

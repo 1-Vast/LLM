@@ -131,16 +131,40 @@ written into the trace, so the trace is checked for their *consequences*, as abo
 
 ## Phase 5 — the live planner
 
-Drop `--planner-template` from the phase-4 command and keep everything else. Run it **three times**
-with the same inputs and a different `--case-id` each time. What matters is not whether it
-succeeds but what it does when it fails:
+Drop `--planner-template` **and replace the request string**. The short request used above works
+only because the reviewed template hard-codes a well-formed triage; a real interpreter reads it,
+finds no target, intervention, context, endpoint or existing observation, and stops at
+`no_executable_action` before the planner is ever reached. That is the interpreter working
+correctly, and it tests nothing about the plan contract. Use a request that carries what the
+fixtures describe:
+
+```bash
+python -m agent "In NCI-H596 at 24 h, compound_A at 0.5 uM reduces viability while knockout of \
+TARGET_A does not. Decide whether the transcriptional response to compound_A is realised at this \
+exposure, and choose the next measurement. Endpoint: transcriptome shift against a matched \
+vehicle control." \
+  --actions research/local_verification/fixtures/actions.json \
+  --profile research/local_verification/fixtures/profile.json \
+  --hypotheses research/local_verification/fixtures/hypotheses.json \
+  --rules research/local_verification/fixtures/rules.json \
+  --results research/local_verification/fixtures/results.json \
+  --virtual-cell none --decision-critic auto \
+  --case-id lv-planner-1 --budget 1 --max-rounds 2 \
+  --state-directory outputs/local_verification/planner-1 \
+  --trace outputs/local_verification/planner-1.json
+```
+
+Run it **three times** with a different `--case-id` and `--trace` each time. If a run still stops at
+`no_executable_action`, report the interpreter's `missing_information` list verbatim — that is a
+finding about the interpreter's admission rule, not a failure to work around by padding the
+request. What matters is not whether it succeeds but what it does when it fails:
 
 - how many of the three produced a contract violation, and whether the single back-prompt recovered
   it (`CONTRACT_VIOLATION` and `CRITIC_FEEDBACK` appear in the trace's planner events);
 - whether the three runs selected the same action, and if not, whether the difference is a tie;
 - whether any run invented an action identifier that is not in the catalogue — it must be refused
   by name, never silently mapped to the nearest one;
-- reported token usage per run.
+- `provider_usage` in each trace: the tokens the provider charged that run, and `calls`.
 
 ## Phase 6 — the virtual cell on real assets
 

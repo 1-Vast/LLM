@@ -191,6 +191,7 @@ class MAESTROOrchestrator:
     _prediction_cache: PredictionCache | None = None
     _max_parallel_predictions: int = 1
     _decision_critic: TypedDecisionCritic | None = None
+    _runtime_client: object | None = None
 
     def __init__(
         self,
@@ -307,7 +308,7 @@ class MAESTROOrchestrator:
         knowledge_package = workspace / "data" / "knowledge" / "biological_constraints.json"
         if knowledge_package.is_file():
             evidence.load_knowledge_package(knowledge_package)
-        return cls(
+        controller = cls(
             interpreter=TaskInterpreter(runtime_client),
             context_builder=ContextBuilder(evidence, memory),
             planner=MechanismContrastPlanner(runtime_client),
@@ -332,6 +333,20 @@ class MAESTROOrchestrator:
                 TypedDecisionCritic(TypeSafeJevClient(typesafe)) if typesafe is not None else None
             ),
         )
+        # Keep the client the components share, so a run can report what it was charged. The
+        # per-response usage is otherwise parsed and dropped at every call site.
+        controller._runtime_client = runtime_client
+        return controller
+
+    @property
+    def provider_usage(self) -> dict[str, int]:
+        """What the language-model provider has charged this controller so far, if it knows.
+
+        Empty when the runtime is a reviewed template or a stub, which report no usage by
+        construction, so an empty mapping means "nothing metered", not "nothing spent".
+        """
+
+        return dict(getattr(self._runtime_client, "provider_usage", {}) or {})
 
     def run(
         self,

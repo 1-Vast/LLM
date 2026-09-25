@@ -188,7 +188,7 @@ def _run(arguments: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
         )
         print(turn.response)
         print(f"session_id={turn.session_id}")
-        _write_trace(arguments.trace, turn, client)
+        _write_trace(arguments.trace, turn, client, controller)
         return 0
 
     results = _results(_read_json(arguments.results)) if arguments.results else {}
@@ -210,7 +210,7 @@ def _run(arguments: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
         print(f"round={index} session_id={turn.session_id}")
         print(turn.response)
     print(f"case_id={loop.case_id} stop_reason={loop.stop_reason} reflections={len(loop.reflections)}")
-    _write_trace(arguments.trace, loop, client)
+    _write_trace(arguments.trace, loop, client, controller)
     return 0
 
 
@@ -238,7 +238,12 @@ def _json_default(value: Any) -> Any:
     return str(value)
 
 
-def _write_trace(path: Path | None, record: Any, client: TemplateCompleter | None) -> None:
+def _write_trace(
+    path: Path | None,
+    record: Any,
+    client: TemplateCompleter | None,
+    controller: MAESTROOrchestrator | None = None,
+) -> None:
     if path is None:
         return
     payload = {
@@ -246,6 +251,9 @@ def _write_trace(path: Path | None, record: Any, client: TemplateCompleter | Non
         "planner": "reviewed_template" if client is not None else "configured_language_model",
         "template_sha256": getattr(client, "source_sha256", None),
         "template_calls": list(client.calls) if client is not None else None,
+        # What the provider charged this run. A reviewed template meters nothing, so {} here
+        # means "nothing metered", not "nothing spent".
+        "provider_usage": controller.provider_usage if controller is not None else {},
     }
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=1, default=_json_default) + "\n", encoding="utf-8")

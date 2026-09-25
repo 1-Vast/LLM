@@ -55,6 +55,21 @@ def git(*arguments: str) -> str:
     return outcome.stdout.strip() if outcome.returncode == 0 else f"unavailable: {outcome.stderr.strip()[:120]}"
 
 
+def dirty_paths() -> list[str]:
+    """Uncommitted paths, read without stripping the status columns off the first one.
+
+    Porcelain v1 puts two status columns and a space before each path, and an unstaged edit
+    leaves the first column blank. Stripping the whole output removed that leading blank from
+    the first line only, so slicing three characters ate the first character of its path and
+    `research/README.md` was reported as `esearch/README.md`.
+    """
+
+    outcome = run(["git", "status", "--porcelain=v1"])
+    if outcome.returncode != 0:
+        return [f"unavailable: {outcome.stderr.strip()[:120]}"]
+    return [line[3:] for line in outcome.stdout.splitlines() if line.strip()]
+
+
 def variable_report() -> dict[str, str]:
     """Report configuration by name and shape only. No value is ever recorded."""
 
@@ -95,7 +110,7 @@ def phase_environment() -> dict[str, Any]:
         "git_head": git("rev-parse", "HEAD"),
         "git_tree": git("rev-parse", "HEAD^{tree}"),
         "git_branch": git("rev-parse", "--abbrev-ref", "HEAD"),
-        "git_dirty_paths": [line[3:] for line in git("status", "--porcelain=v1").splitlines() if line][:20],
+        "git_dirty_paths": dirty_paths()[:20],
         "local_directories": {
             name: "present" if (ROOT / name).is_dir() else "absent"
             for name in ("data", "dataset", "log", "outputs", "reference", "tools")

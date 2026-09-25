@@ -122,10 +122,23 @@ class DeepSeekChatClient:
 
     def __init__(self, settings: MAESTROSettings):
         self._settings = settings
+        self._usage_total: dict[str, int] = {}
+        self._call_count = 0
 
     @property
     def settings(self) -> MAESTROSettings:
         return self._settings
+
+    @property
+    def provider_usage(self) -> dict[str, int]:
+        """Tokens this client has been charged for, summed over every call it has made.
+
+        Each call site destructures `complete_json` as `data, _`, so the per-response usage was
+        parsed and then dropped and no run could say what it had spent. The client is the one
+        object every call passes through, so it is where the tally belongs.
+        """
+
+        return dict(self._usage_total, calls=self._call_count)
 
     def complete(
         self,
@@ -188,11 +201,15 @@ class DeepSeekChatClient:
             )
             raise failure from error
         usage = body.get("usage") or {}
+        counted = {key: int(value) for key, value in usage.items() if isinstance(value, int)}
+        for key, value in counted.items():
+            self._usage_total[key] = self._usage_total.get(key, 0) + value
+        self._call_count += 1
         return LLMResponse(
             content=content,
             model=str(body.get("model") or payload["model"]),
             finish_reason=choice.get("finish_reason"),
-            usage={key: int(value) for key, value in usage.items() if isinstance(value, int)},
+            usage=counted,
         )
 
     def _send(self, request: Request) -> dict[str, Any]:
