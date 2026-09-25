@@ -302,8 +302,39 @@ integration follows the architecture's own rule:
 - Confident answers become **advisory findings** to the repair planner. The deterministic check
   remains the authority.
 
-Design, the exact contract implemented, and what remains unverified: see
-[`research/typed_decision_model.md`](research/typed_decision_model.md).
+### 6.1 Reproducibility is tested before calibration
+
+A live run found the model answering one unchanged state differently: a ranking question moved
+between two of five options across two identical calls. Brier grading cannot catch this in time,
+because it waits for measured outcomes — the scarcest thing in the system — and grants full
+influence until it has five of them.
+
+Reproducibility needs no outcome. Writing `mu` and `sigma^2` for the mean and variance of the
+probability a source returns for a fixed state, and `q` for the outcome's true probability,
+
+```
+E[(P - Y)^2] = q(1-q) + (mu - q)^2 + sigma^2
+```
+
+separates irreducible uncertainty, miscalibration and **instability**, and only the third is a
+property of the source alone. Answering with the mean of `n` calls removes exactly
+`sigma^2 (1 - 1/n)` of it. For a ranking the operative quantity is the chance that two identical
+calls select the same action, which has an unbiased estimator from repeats and is itself the
+weight: a source that reproduces 0.7 of the time counts 0.7.
+
+Three consequences, all implemented:
+
+- A scope that can change **which action is bought** must show agreement before it may break a
+  tie. A scope that only comments may speak while unmeasured, carrying that label.
+- Calibration and reproducibility fail independently — a source can be well calibrated on
+  average while answering differently each time, or repeatably wrong — so the effective weight
+  is the **smaller** of the two.
+- Not having asked twice is not a finding. An unchecked preference is still forwarded and named
+  as unchecked; only a **measured** disagreement withholds it.
+
+Design, exact contract and what remains unverified:
+[`research/typed_decision_model.md`](research/typed_decision_model.md). Derivation, thresholds
+and cost: [`research/judgment_stability.md`](research/judgment_stability.md).
 
 ## 7. Coupling to biology
 

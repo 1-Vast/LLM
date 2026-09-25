@@ -61,6 +61,8 @@ deferral, never a fabricated plan.
   with a reason; a task that cannot fit refuses rather than truncating.
 - **Influence is earned and revocable.** Prediction intervals and typed judgments are scored
   against later measurements; a source that stops calibrating is down-weighted, then revoked.
+  Reproducibility is tested first, because it needs no measurement: a source that answers one
+  unchanged state differently cannot move a selection, whatever its stated confidence.
 - **Adopted is not the same as worked.** The repair ledger records both separately.
 
 ## Quick start
@@ -95,7 +97,8 @@ model answer cannot end the loop. `--planner-template` answers every structured 
 reviewed template, running the whole loop with no language model and no paid calls.
 `--virtual-cell {state,development_mean,composite,none}` selects the prediction backend.
 `--parallel-predictions N` dispatches distinct per-action queries concurrently.
-`--decision-critic off` disables the typed second opinion.
+`--decision-critic off` disables the typed second opinion, and `--decision-repeats N` asks it
+the same state N times so a ranking can earn the right to move a selection.
 
 Input files: `actions.json` is a list of `EvidenceAction` records; `intervention_profile.json`
 records mode, functional-state provenance, abundance status, time, context, spectrum and

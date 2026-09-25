@@ -106,6 +106,17 @@ def main() -> int:
         help="Typed decision-model review of each plan: 'auto' uses the TypeSafe block from the environment or .env when present; 'off' disables it.",
     )
     parser.add_argument(
+        "--decision-repeats",
+        type=int,
+        default=1,
+        metavar="N",
+        help=(
+            "Ask the typed decision model the same unchanged state N times. The provider is not "
+            "deterministic, so repeats are what establish whether an answer reproduces; a ranking "
+            "may only move a selection once it has. Each repeat is a paid call."
+        ),
+    )
+    parser.add_argument(
         "--parallel-predictions",
         type=int,
         default=1,
@@ -171,6 +182,7 @@ def _run(arguments: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
         interpretation_table=InterpretationTable(_rules(_read_json(arguments.rules))) if arguments.rules else None,
         max_parallel_predictions=arguments.parallel_predictions,
         enable_decision_critic=arguments.decision_critic == "auto",
+        decision_repeats=arguments.decision_repeats,
     )
     if arguments.max_rounds == 1:
         turn = controller.run(

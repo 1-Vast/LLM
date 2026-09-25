@@ -189,6 +189,29 @@ Both are `model_prediction`. Neither can satisfy a premise, eliminate an explana
 a measurement. A revoked source still produces records; it produces no influence.
 **Implemented** for both.
 
+### 4.1 Grading is not the only test, and it is not the first one
+
+Brier grading needs measured outcomes, which are the scarcest thing here, and below
+`minimum_records` the ledger returns `weight = 1.0, provisional`. That is influence granted
+rather than earned, and it cannot see the failure the live run actually found: a source that
+answers the same state differently each time.
+
+Reproducibility is measurable with no outcome at all. For a source returning probability `P`
+against an outcome with `P(Y=1) = q`,
+
+```
+E[(P - Y)^2] = q(1-q) + (mu - q)^2 + sigma^2
+```
+
+so instability is a separate error term, charged to the source, and answering with the mean of
+`n` calls removes exactly `sigma^2 (1 - 1/n)` of it. For a ranking the operative quantity is
+the chance two identical calls select the same action, estimated without bias by
+`sum_v c_v (c_v - 1) / (n(n-1))`. A scope that can move which action is bought must show that
+agreement before it may break a tie; a scope that only comments may speak while unmeasured,
+labelled as unchecked. Calibration and reproducibility fail independently, so the effective
+weight is the smaller of the two. **Implemented** (`maestro/stability.py`); derivation,
+thresholds and cost: [`judgment_stability.md`](judgment_stability.md).
+
 ---
 
 ## 5. Error accumulation
@@ -232,3 +255,5 @@ an unresolved item can propagate **silently**.
 5. A bundle of individually useless but complementary actions is selectable within budget.
 6. Always-deferring does not win the scoring contract.
 7. A revoked calibrated source changes no decision, while its records remain readable.
+8. A source that answers one unchanged state differently twice is revoked for ranking with
+   no outcome recorded, while the Brier ledger still reports `provisional`.

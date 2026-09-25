@@ -192,6 +192,7 @@ class MAESTROOrchestrator:
     _max_parallel_predictions: int = 1
     _decision_critic: TypedDecisionCritic | None = None
     _runtime_client: object | None = None
+    _decision_repeats: int = 1
 
     def __init__(
         self,
@@ -288,6 +289,7 @@ class MAESTROOrchestrator:
         decision_engine: DecisionEngine | None = None,
         max_parallel_predictions: int = 1,
         enable_decision_critic: bool = True,
+        decision_repeats: int = 1,
     ) -> "MAESTROOrchestrator":
         """Create a controller; evaluations may supply an isolated state directory.
 
@@ -336,6 +338,9 @@ class MAESTROOrchestrator:
         # Keep the client the components share, so a run can report what it was charged. The
         # per-response usage is otherwise parsed and dropped at every call site.
         controller._runtime_client = runtime_client
+        # Repetition is what lets a ranking earn the right to move a selection; each repeat
+        # is a paid call, so the default asks once and says so rather than charging for it.
+        controller._decision_repeats = max(1, int(decision_repeats))
         return controller
 
     @property
@@ -1895,6 +1900,7 @@ class MAESTROOrchestrator:
             topology=topology,
             world_model_rows=[row.as_payload() for row in briefing_rows],
             context_identifier=profile.context_identifier,
+            repeats=self._decision_repeats,
         )
         self._logger.event("typed_decision_review", outcome.payload(), session_id=session_id)
         return outcome

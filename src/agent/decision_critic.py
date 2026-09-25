@@ -29,6 +29,16 @@ from dataclasses import dataclass
 from typing import Mapping, Sequence
 
 from maestro.judgment import JudgmentLedger, JudgmentScope, TypedJudgment
+from maestro.stability import (
+    DECIDING_SCOPES,
+    RELIABLE_REPEATS,
+    RepeatedJudgment,
+    StabilityLedger,
+    StabilitySummary,
+    StabilityVerdict,
+    canonical_value,
+    effective_weight,
+)
 from maestro.models import ContrastCheck, EvidenceAction, MechanismContrast
 
 from .planner import render_catalogue, render_contrast
@@ -94,6 +104,8 @@ class CritiqueOutcome:
     model_version: str | None = None
     state_digest: str | None = None
     suppressed_by_revocation: bool = False
+    repeats: int = 1
+    stability: tuple[Mapping[str, object], ...] = ()
 
     def payload(self) -> dict[str, object]:
         return {
@@ -103,6 +115,8 @@ class CritiqueOutcome:
             "judgments": [item.as_payload() for item in self.judgments],
             "refusals": list(self.refusals),
             "suppressed_by_revocation": self.suppressed_by_revocation,
+            "repeats": self.repeats,
+            "stability": [dict(item) for item in self.stability],
         }
 
 
@@ -186,6 +200,66 @@ def regulator_question(candidates: Sequence[str]) -> TypedQuestion | None:
     )
 
 
+def _reproducibility_note(scope: JudgmentScope, summary: StabilitySummary) -> str:
+    """What repetition has established about a finding that could move a selection.
+
+    Only scopes that can change which action is bought carry the note. A commentary scope that
+    says the same thing twice has told a reader nothing extra, and the sentence would be noise.
+    """
+
+    if scope not in DECIDING_SCOPES:
+        return ""
+    if summary.verdict is StabilityVerdict.UNMEASURED:
+        return " Reproducibility unchecked: this preference was asked once, and the source is not deterministic."
+    share = f"{summary.agreement:.0%}" if summary.agreement is not None else "unknown"
+    if summary.verdict is StabilityVerdict.INSUFFICIENT:
+        return (
+            f" Reproducibility {share} over {summary.repeats} repeats, too few to rely on"
+            f" (at least {RELIABLE_REPEATS} are needed to tell a stable source from an unstable one)."
+        )
+    return f" Reproducibility {share} over {summary.repeats} repeats."
+
+
+def _mean(values: Sequence[float]) -> float | None:
+    numbers = [float(value) for value in values if value is not None]
+    return sum(numbers) / len(numbers) if numbers else None
+
+
+def _aggregate(
+    question: TypedQuestion, answers: Sequence[TypedAnswer], repeated: RepeatedJudgment
+) -> TypedAnswer:
+    """One answer standing for several evaluations of the same unchanged state.
+
+    A yes/no question is averaged, because with independent calls the mean has the same
+    calibration as a single draw and `sigma^2 (1 - 1/n)` less expected Brier - the whole of
+    the instability penalty that repetition can remove. A choice or a score is not a quantity
+    to average: the mean of option three and option five is not an opinion, so those take the
+    answer the source gave most often. With one evaluation every branch returns it unchanged.
+    """
+
+    if len(answers) == 1:
+        return answers[0]
+    confidence = _mean([a.confidence for a in answers if a.confidence is not None])
+    if question.kind is QuestionKind.NOUL:
+        probability = _mean([a.probability for a in answers if a.probability is not None])
+        decided = answers[0].value if probability is None else probability >= 0.5
+        return TypedAnswer(
+            question.identifier, question.kind, decided, probability, confidence,
+        )
+    modal = repeated.modal_value
+    matching = [a for a in answers if canonical_value(question.kind.value, a.value) == modal]
+    chosen = matching[0] if matching else answers[0]
+    probability = _mean([a.probability for a in matching if a.probability is not None])
+    distribution: dict[str, float] = {}
+    for option in {name for answer in answers for name in (answer.distribution or {})}:
+        averaged = _mean([(a.distribution or {}).get(option) for a in answers])
+        if averaged is not None:
+            distribution[option] = averaged
+    return TypedAnswer(
+        question.identifier, question.kind, chosen.value, probability, confidence, distribution,
+    )
+
+
 class TypedDecisionCritic:
     """Runs one typed review per planning round and reports advisory findings."""
 
@@ -194,15 +268,21 @@ class TypedDecisionCritic:
         client: TypeSafeJevClient,
         *,
         ledger: JudgmentLedger | None = None,
+        stability: StabilityLedger | None = None,
         thresholds: CriticThresholds | None = None,
     ):
         self._client = client
         self._ledger = ledger or JudgmentLedger()
+        self._stability = stability or StabilityLedger()
         self._thresholds = thresholds or CriticThresholds()
 
     @property
     def ledger(self) -> JudgmentLedger:
         return self._ledger
+
+    @property
+    def stability(self) -> StabilityLedger:
+        return self._stability
 
     @property
     def model_version(self) -> str:
@@ -219,9 +299,19 @@ class TypedDecisionCritic:
         evidence_summary: str = "",
         context_identifier: str | None = None,
         regulator_candidates: Sequence[str] = (),
+        repeats: int = 1,
     ) -> CritiqueOutcome:
-        """Review one plan; a provider failure produces refusals, never an exception."""
+        """Review one plan; a provider failure produces refusals, never an exception.
 
+        `repeats` asks the same unchanged state more than once. The provider is not
+        deterministic, so a single answer says nothing about whether the same answer would come
+        back; repeating is the only way to find out, and it is what lets a ranking earn the
+        right to move a selection. Each repeat is a paid call, so the default is one and the
+        cost is the caller's to choose.
+        """
+
+        if repeats < 1:
+            raise ValueError("invalid_repeats:at_least_one_evaluation_is_required")
         questions, notes = contrast_questions(contrast, actions)
         extra = [
             question
@@ -231,13 +321,12 @@ class TypedDecisionCritic:
             )
             if question is not None
         ]
+        asked = tuple(questions) + tuple(extra)
         state = self._state(
             contrast, actions, check, topology, world_model_rows, evidence_summary, regulator_candidates
         )
-        evaluation = self._client.evaluate(state, tuple(questions) + tuple(extra))
-        return self._interpret(
-            evaluation, contrast, tuple(questions) + tuple(extra), context_identifier, notes
-        )
+        evaluations = [self._client.evaluate(state, asked) for _ in range(repeats)]
+        return self._interpret(evaluations, contrast, asked, context_identifier, notes)
 
     def _state(
         self,
@@ -291,49 +380,111 @@ class TypedDecisionCritic:
 
     def _interpret(
         self,
-        evaluation: JevEvaluation,
+        evaluations: Sequence[JevEvaluation],
         contrast: MechanismContrast,
         questions: Sequence[TypedQuestion],
         context_identifier: str | None,
         notes: Sequence[str],
     ) -> CritiqueOutcome:
+        """Turn one or more evaluations of the same state into judgments, findings and verdicts.
+
+        With several evaluations the answer reported is the aggregate, not the last one: the
+        mean probability for a yes/no question, because averaging n independent calls removes
+        `sigma^2 (1 - 1/n)` of expected Brier, and the modal answer for a choice or a score,
+        because those decide by their value rather than by a number that can be averaged.
+        """
+
         by_identifier = {question.identifier: question for question in questions}
+        usable = [item for item in evaluations if item.answers]
+        primary = usable[0] if usable else (evaluations[0] if evaluations else None)
+        if primary is None:
+            return CritiqueOutcome(refusals=tuple(notes))
+
         judgments: list[TypedJudgment] = []
         findings: list[str] = []
+        stability_rows: list[Mapping[str, object]] = []
         suppressed = False
 
-        for identifier, answer in evaluation.answers.items():
-            question = by_identifier.get(identifier)
-            if question is None or not answer.usable:
+        for identifier, question in by_identifier.items():
+            answers = [
+                item.answers[identifier]
+                for item in usable
+                if identifier in item.answers and item.answers[identifier].usable
+            ]
+            if not answers:
                 continue
             scope = _scope_for(identifier)
+            repeated = RepeatedJudgment(
+                question_id=identifier,
+                scope=scope,
+                kind=question.kind.value,
+                model_version=primary.model,
+                state_digest=primary.state_digest,
+                values=tuple(canonical_value(question.kind.value, a.value) for a in answers),
+                probabilities=tuple(a.probability for a in answers if a.probability is not None),
+                context_identifier=context_identifier,
+            )
+            if repeated.repeats > 1:
+                self._stability.record(repeated)
+                stability_rows.append(repeated.as_payload())
+
+            answer = _aggregate(question, answers, repeated)
             judgment = TypedJudgment(
                 question_id=identifier,
                 scope=scope,
                 kind=question.kind.value,
                 value=answer.value,  # type: ignore[arg-type]
-                model_version=evaluation.model,
-                state_digest=evaluation.state_digest,
+                model_version=primary.model,
+                state_digest=primary.state_digest,
                 probability=answer.probability,
                 confidence=answer.confidence,
                 limitations=ADVISORY_LIMITS,
                 context_identifier=context_identifier,
             )
             judgments.append(judgment)
-            if self._ledger.is_revoked(scope, evaluation.model, context_identifier):
+
+            if self._ledger.is_revoked(scope, primary.model, context_identifier):
+                suppressed = True
+                continue
+            summary = self._stability.summarize(scope, primary.model, context_identifier)
+            if summary.revoked:
+                # Measured irreproducibility. This needs no biological outcome to establish,
+                # which is the point: it can revoke a source the Brier ledger cannot yet judge.
                 suppressed = True
                 continue
             finding = self._finding(identifier, question, answer, contrast)
             if finding is not None:
-                findings.append(finding)
+                # Not having asked twice is not the same as having asked twice and disagreed.
+                # An unchecked preference is still said, and said as unchecked, because this
+                # architecture names what it does not know rather than dropping it.
+                findings.append(finding + _reproducibility_note(scope, summary))
+
+        summaries = tuple(
+            dict(
+                summary.as_payload(),
+                calibration_weight=self._ledger.weight(scope, primary.model, context_identifier),
+                effective_weight=effective_weight(
+                    self._ledger.weight(scope, primary.model, context_identifier),
+                    summary.weight,
+                ),
+            )
+            for scope, summary in (
+                (scope, self._stability.summarize(scope, primary.model, context_identifier))
+                for scope in sorted({_scope_for(name) for name in by_identifier}, key=lambda s: s.value)
+            )
+        )
 
         return CritiqueOutcome(
             findings=tuple(findings),
             judgments=tuple(judgments),
-            refusals=tuple(evaluation.refusals()) + tuple(notes),
-            model_version=evaluation.model,
-            state_digest=evaluation.state_digest,
+            refusals=tuple(
+                reason for item in evaluations for reason in item.refusals()
+            ) + tuple(notes),
+            model_version=primary.model,
+            state_digest=primary.state_digest,
             suppressed_by_revocation=suppressed,
+            repeats=len(evaluations),
+            stability=tuple(stability_rows) + summaries,
         )
 
     def _finding(

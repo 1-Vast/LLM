@@ -116,6 +116,27 @@ python research/local_verification/compare_critic_trace.py \
   --with outputs/local_verification/critic-trace.json
 ```
 
+**Reproducibility.** The typed model is not deterministic, so also run the review with repeats
+and report what agreement it shows. This is the measurement that decides whether a ranking may
+influence anything, and it needs no biological outcome:
+
+```bash
+python -m agent "Resolve the genetic-pharmacological discrepancy" \
+  --actions research/local_verification/fixtures/actions.json \
+  --profile research/local_verification/fixtures/profile.json \
+  --hypotheses research/local_verification/fixtures/hypotheses.json \
+  --planner-template research/local_verification/fixtures/planner_template.json \
+  --virtual-cell none --decision-critic auto --decision-repeats 12 \
+  --case-id lv-repeats --budget 1 \
+  --state-directory outputs/local_verification/repeats-state \
+  --trace outputs/local_verification/repeats-trace.json
+```
+
+Twelve repeats is the point at which a three-way-random source is caught 0.946 of the time while
+a 0.95-stable source is never falsely revoked; below eight the gate has no power. The cost is
+twelve evaluations, about 6,200 input tokens at the rate the probe measured. Report each scope's
+`agreement`, `flip_rate` and `verdict` from `decision_review.stability` in the trace.
+
 Three things must hold, and each is a boundary defect if it does not:
 
 - **The check block is identical.** The critic may not change `prerequisites_satisfied`,
