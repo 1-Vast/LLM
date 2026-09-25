@@ -7,7 +7,7 @@ File summary
   - `DeepSeekChatClient` calls text, JSON, and vision models through Chat Completions.
   - It owns no tool execution; model tool requests need an explicit MAESTRO adapter.
   - Errors retain no request secrets; only safe metadata is kept locally.
-- Interfaces: `DeepSeekChatClient`, `complete`, `complete_json`, `LLMResponse`, `LLMError`, `LLMProtocolError`, `LLMTransportError`
+- Interfaces: `DeepSeekChatClient`, `complete`, `complete_json`, `LLMResponse`, `LLMError`, `LLMProtocolError`, `LLMTransportError`, `retry_after_seconds`
 - Depends on: agent.configuration
 """
 from __future__ import annotations
@@ -48,7 +48,7 @@ _BACKOFF_SECONDS = 1.5
 _MAX_RETRY_AFTER_SECONDS = 60.0
 
 
-def _retry_after_seconds(error: HTTPError) -> float | None:
+def retry_after_seconds(error: HTTPError) -> float | None:
     """The delay a rate-limited response asks for, when it states one in seconds."""
 
     headers = getattr(error, "headers", None)
@@ -208,7 +208,7 @@ class DeepSeekChatClient:
                 if error.code not in _RETRY_STATUS:
                     raise LLMError(f"LLM request failed with HTTP status {error.code}.") from error
                 last = LLMTransportError(f"LLM request failed with retryable HTTP status {error.code}.")
-                requested_delay = _retry_after_seconds(error)
+                requested_delay = retry_after_seconds(error)
             except URLError:
                 last = LLMTransportError("LLM request could not reach the configured endpoint.")
             except TimeoutError:

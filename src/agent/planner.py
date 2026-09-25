@@ -14,10 +14,14 @@ File summary
     and the controller's own check reports the failure as before.
   - Catalogues are rendered compactly: undeclared (null or empty) fields are omitted and
     a contrast names its plan by identifier instead of repeating the action.
+  - `propose` accepts an `extra_critique` hook so a caller's own critic (for example a typed
+    decision model) can add findings to the same bounded back-prompt loop.
+  - `propose_repair` accepts `advisory_findings`, rendered under their own heading as advice to
+    weigh, never as facts and never as new actions.
   - `propose_repair` may receive a planning-only virtual-cell briefing; it is labelled as
     model output and never enters the catalogue, the contrast or the evidence ledger.
   - The planner may not invent assays, measurements, sources, results, or capabilities.
-- Interfaces: `MechanismContrastPlanner`, `propose`, `propose_repair`, `contract_violations`, `critic_findings`, `render_catalogue`, `ContrastProposal`, `LLMRepairDraft`, `PlannerCompleter`, `PlannerContractError`
+- Interfaces: `MechanismContrastPlanner`, `propose`, `propose_repair`, `contract_violations`, `critic_findings`, `render_catalogue`, `render_contrast`, `ContrastProposal`, `LLMRepairDraft`, `PlannerCompleter`, `PlannerContractError`
 - Depends on: agent.context, maestro.models
 """
 from __future__ import annotations
@@ -164,6 +168,7 @@ class MechanismContrastPlanner:
         *,
         required_hypothesis_identifiers: Sequence[str] = (),
         expected_hypotheses: Sequence[MechanismHypothesis] = (),
+        extra_critique: Callable[["ContrastProposal"], Sequence[str]] | None = None,
     ) -> ContrastProposal:
         fixed_hypotheses = tuple(required_hypothesis_identifiers)
         registered = {item.identifier: item for item in expected_hypotheses}
@@ -227,6 +232,10 @@ Return {
                         "The two hypotheses must propose two distinct development actions from the enum; "
                         f"received {[item.value if item else None for item in decisions]}."
                     )
+            if extra_critique is not None:
+                # A caller's critic sees a parsed proposal, so it can only add findings about
+                # what the model actually returned; it cannot rewrite the proposal itself.
+                findings.extend(str(item) for item in extra_critique(proposal) if str(item).strip())
             return tuple(findings)
 
         return self._complete_within_contract(
@@ -254,6 +263,7 @@ Return {
         *,
         world_model_briefing: str = "",
         action_topology: Mapping[str, Any] | None = None,
+        advisory_findings: Sequence[str] = (),
     ) -> LLMRepairDraft:
         """Ask for one catalog-bounded scientific repair; deterministic code decides acceptance.
 
@@ -261,6 +271,10 @@ Return {
         virtual-cell queries. It is shown under its own heading as planning-only
         model output: it may inform which registered action to propose, and it
         cannot supply a prerequisite, an observation or a new action.
+
+        ``advisory_findings`` are a second opinion from a typed decision model. They are shown
+        as advice to weigh against the catalogue, never as measurements, and they can never add
+        an action: the contract still admits only a registered `action_identifier`.
 
         ``action_topology`` is the controller's deterministic dependency analysis of
         the menu (`ActionTopology.summary()`): which actions run now, how many
@@ -302,6 +316,7 @@ Return {"action_identifier": string or null, "modified_fields": ["plan.action_id
                         + "\n\nCHECK_FAILURES\n" + json.dumps([reason.value for reason in check.reasons])
                         + "\n\nAVAILABLE_ACTIONS\n" + render_catalogue(actions)
                         + (_topology_section(action_topology) if action_topology else "")
+                        + _advisory_section(advisory_findings)
                         + ("\n\n" + briefing if briefing else "")
                     ),
                 },
@@ -350,6 +365,19 @@ TOPOLOGY_HEADING = (
     "steps_to_executable counts the actions in the shortest supplier chain, null means no registered "
     "chain exists; unsupplied_premises are premises no registered action supplies)"
 )
+
+
+ADVISORY_HEADING = (
+    "TYPED_DECISION_ADVISORY (a separate calibrated model's judgement about this plan; advice to "
+    "weigh, not measurement, and never a licence to name an action outside AVAILABLE_ACTIONS)"
+)
+
+
+def _advisory_section(findings: Sequence[str]) -> str:
+    named = [str(item).strip() for item in findings if str(item).strip()]
+    if not named:
+        return ""
+    return "\n\n" + ADVISORY_HEADING + "\n" + "\n".join(f"- {item}" for item in named)
 
 
 def _topology_section(summary: Mapping[str, Any]) -> str:

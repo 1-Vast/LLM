@@ -8,7 +8,7 @@ File summary
   - The API key is never emitted in logs, exceptions, or `repr`.
   - Process environment variables take precedence over `.env`, including for the
     required-setting check; `MAESTRO_LOG_DIRECTORY` optionally relocates run records.
-- Interfaces: `MAESTROSettings`, `from_workspace`, `ConfigurationError`
+- Interfaces: `MAESTROSettings`, `from_workspace`, `ConfigurationError`, `read_dotenv`
 - Depends on: (standard library only)
 """
 from __future__ import annotations
@@ -22,7 +22,7 @@ class ConfigurationError(RuntimeError):
     """Raised when a required runtime setting is unavailable."""
 
 
-def _read_dotenv(path: Path) -> dict[str, str]:
+def read_dotenv(path: Path) -> dict[str, str]:
     """Read simple dotenv assignments without exporting or logging secret values."""
 
     values: dict[str, str] = {}
@@ -65,7 +65,7 @@ class MAESTROSettings:
     def from_workspace(cls, workspace: Path) -> "MAESTROSettings":
         """Load the existing DeepSeek configuration from the workspace dotenv file."""
 
-        environment = _read_dotenv(workspace / ".env")
+        environment = read_dotenv(workspace / ".env")
         required = (
             "DEEPSEEK_API_KEY",
             "DEEPSEEK_BASE_URL",

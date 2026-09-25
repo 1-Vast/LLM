@@ -19,6 +19,8 @@ from .orchestrator import MAESTROCaseLoop, MAESTROOrchestrator, MAESTROTurn
 from .planner import LLMRepairDraft, MechanismContrastPlanner
 from .reflection import ReflectionRecord
 from .tool_runtime import FailureTrace, LocalToolCatalog, ToolBudget, ToolExecution, ToolReceipt, ToolRouter, ToolRuntimeError
+from .decision_critic import CritiqueOutcome, TypedDecisionCritic
+from .typesafe import JevEvaluation, TypeSafeJevClient, TypeSafeSettings, TypedAnswer, TypedQuestion
 from .vision import VisualInspection, VisualInspector
 
 __all__ = [
@@ -54,4 +56,11 @@ __all__ = [
     "ToolRuntimeError",
     "VisualInspection",
     "VisualInspector",
+    "CritiqueOutcome",
+    "TypedDecisionCritic",
+    "TypeSafeJevClient",
+    "TypeSafeSettings",
+    "TypedAnswer",
+    "TypedQuestion",
+    "JevEvaluation",
 ]

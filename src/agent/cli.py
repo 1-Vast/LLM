@@ -6,6 +6,7 @@ File summary
 - Core points:
   - Builds the action catalogue and intervention profile from JSON inputs, including each action's typed quantity.
   - `--planner-template` answers every structured agent call from a reviewed template, so the loop runs without a language model and without paid calls.
+  - `--decision-critic` adds one typed, calibrated second opinion per plan when a TypeSafe block is configured; its findings are advice and never evidence.
   - `--virtual-cell` selects the State checkpoint, the computed development-mean backend, or both behind one composite; predictions stay planning-only.
   - `main` runs one turn or a multi-round loop over sourced real measurement results and can write the full record as JSON.
   - `--hypotheses` registers the two explanations' definitions for every round, so a reworded model answer cannot end a loop.
@@ -99,6 +100,12 @@ def main() -> int:
     parser.add_argument("--artifact-directory", type=Path, help="Directory for virtual-cell prediction artifacts.")
     parser.add_argument("--trace", type=Path, help="Write the full turn or case-loop record as JSON.")
     parser.add_argument(
+        "--decision-critic",
+        choices=("auto", "off"),
+        default="auto",
+        help="Typed decision-model review of each plan: 'auto' uses the TypeSafe block from the environment or .env when present; 'off' disables it.",
+    )
+    parser.add_argument(
         "--parallel-predictions",
         type=int,
         default=1,
@@ -163,6 +170,7 @@ def _run(arguments: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
         virtual_cell=_virtual_cell(arguments),
         interpretation_table=InterpretationTable(_rules(_read_json(arguments.rules))) if arguments.rules else None,
         max_parallel_predictions=arguments.parallel_predictions,
+        enable_decision_critic=arguments.decision_critic == "auto",
     )
     if arguments.max_rounds == 1:
         turn = controller.run(

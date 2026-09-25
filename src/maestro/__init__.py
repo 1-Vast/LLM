@@ -66,6 +66,7 @@ from .pharmacology import (
     engagement_profile,
     occupancy_from_kd,
 )
+from .judgment import JudgmentLedger, JudgmentScope, JudgmentSummary, ScoredJudgment, TypedJudgment
 from .provenance import SourceCluster, SourceClusterIndex, build_index
 from .reliability import PredictionReliabilityLedger, ReliabilitySummary, ScoredPrediction
 from .repair import (
@@ -110,6 +111,9 @@ __all__ = [
     "OutcomeClass",
     "OutcomeInterpretation",
     "OutcomeRule",
+    "JudgmentLedger",
+    "JudgmentScope",
+    "JudgmentSummary",
     "PredictionReliabilityLedger",
     "ReliabilitySummary",
     "RepairController",

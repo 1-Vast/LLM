@@ -9,6 +9,9 @@ File summary
   - Adopted repairs are scored against later real results via `gap_resolved`.
   - Each round's virtual-cell answers are shown to the LLM repair planner as a labelled
     planning-only briefing, and an identical query is answered once per run, not per round.
+  - When a typed decision model is configured, each round also gets one calibrated second
+    opinion; its findings reach the repair planner as advice and its judgments are recorded,
+    but a judgment can never satisfy a premise or eliminate an explanation.
   - Each round analyses the menu as a dependency graph (`maestro.topology`): what can run
     now, how many supplier steps each action is away, and which premises no registered
     action supplies. The analysis is logged, kept on the turn, and shown to the repair planner.
@@ -55,6 +58,7 @@ from maestro.repair import RepairController, RepairLedger, RepairRecord
 from .audit import RunLogger
 from .cases import CaseSnapshot, CaseStore, MeasurementResult, ResultImport
 from .configuration import MAESTROSettings
+from .decision_critic import CritiqueOutcome, TypedDecisionCritic
 from .context import ContextBuilder, TaskIntent, TaskInterpreter
 from .knowledge import EvidenceLedger
 from .llm import DeepSeekChatClient, LLMError
@@ -78,6 +82,7 @@ from maestro.models import (
 from .planner import LLMRepairDraft, MechanismContrastPlanner
 from .reflection import ReflectionRecord, reflect_on_result
 from .tool_runtime import ToolExecution, ToolRouter, ToolRuntimeError
+from .typesafe import TypeSafeJevClient, TypeSafeSettings
 from .vision import VisualInspection, VisualInspector
 from .world_model_briefing import (
     WorldModelRow,
@@ -160,6 +165,8 @@ class MAESTROTurn:
     world_model_rows: tuple[WorldModelRow, ...] = ()
     # The menu's dependency structure under this round's profile (ActionTopology.summary()).
     action_topology: Mapping[str, object] = field(default_factory=dict)
+    # One typed decision model's advisory review of this round, when one is configured.
+    decision_review: Mapping[str, object] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -183,6 +190,7 @@ class MAESTROOrchestrator:
     # still answer "is prediction reuse enabled?" rather than raise.
     _prediction_cache: PredictionCache | None = None
     _max_parallel_predictions: int = 1
+    _decision_critic: TypedDecisionCritic | None = None
 
     def __init__(
         self,
@@ -208,6 +216,7 @@ class MAESTROOrchestrator:
         prediction_cache: PredictionCache | None = None,
         reuse_predictions: bool = True,
         max_parallel_predictions: int = 1,
+        decision_critic: TypedDecisionCritic | None = None,
     ):
         if (
             isinstance(max_parallel_predictions, bool)
@@ -245,10 +254,15 @@ class MAESTROOrchestrator:
         # Independent per-action queries may run concurrently, but only when the
         # caller declares the backend safe to call from several threads.
         self._max_parallel_predictions = max_parallel_predictions
+        self._decision_critic = decision_critic
 
     @property
     def prediction_cache(self) -> PredictionCache | None:
         return self._prediction_cache
+
+    @property
+    def decision_critic(self) -> TypedDecisionCritic | None:
+        return self._decision_critic
 
     def repair_ledger(self, case_id: str) -> RepairLedger:
         return self._repair_ledgers.setdefault(case_id, RepairLedger())
@@ -272,6 +286,7 @@ class MAESTROOrchestrator:
         interpretation_table: InterpretationTable | None = None,
         decision_engine: DecisionEngine | None = None,
         max_parallel_predictions: int = 1,
+        enable_decision_critic: bool = True,
     ) -> "MAESTROOrchestrator":
         """Create a controller; evaluations may supply an isolated state directory.
 
@@ -281,6 +296,9 @@ class MAESTROOrchestrator:
         """
 
         settings = MAESTROSettings.from_workspace(workspace)
+        # The typed decision model is optional: with no TypeSafe block in the environment or
+        # .env the critic is simply absent, and the loop behaves exactly as before.
+        typesafe = TypeSafeSettings.from_workspace(workspace) if enable_decision_critic else None
         runtime_client = client or DeepSeekChatClient(settings)
         runtime_directory = state_directory or settings.log_directory
         logger = RunLogger(runtime_directory)
@@ -310,6 +328,9 @@ class MAESTROOrchestrator:
             source_clusters=source_clusters,
             max_repair_attempts=max_repair_attempts,
             max_parallel_predictions=max_parallel_predictions,
+            decision_critic=(
+                TypedDecisionCritic(TypeSafeJevClient(typesafe)) if typesafe is not None else None
+            ),
         )
 
     def run(
@@ -425,6 +446,9 @@ class MAESTROOrchestrator:
         )
         topology = ActionTopology.build(available_actions, intervention_profile).summary()
         self._logger.event("action_topology", topology, session_id=session_id)
+        review = self._review_plan(
+            contrast, available_actions, intervention_profile, briefing_rows, topology, session_id,
+        )
         selection = self._select_budgeted_actions(
             contrast, available_actions, intervention_profile, case, budget, session_id,
             prediction=prediction, prediction_request=effective_request,
@@ -442,7 +466,7 @@ class MAESTROOrchestrator:
         outcome = self._check_and_repair(
             context, contrast, intervention_profile, available_actions, prediction, action_predictions,
             case_id=case_id, session_id=session_id, world_model_briefing=render_world_model_briefing(briefing_rows),
-            action_topology=topology,
+            action_topology=topology, advisory_findings=review.findings,
         )
         contrast, check, repair, llm_repair = outcome.contrast, outcome.check, outcome.repair, outcome.llm_repair
         repair_records, repair_stop_reason = outcome.records, outcome.stop_reason
@@ -512,6 +536,7 @@ class MAESTROOrchestrator:
             action_prediction_requests=action_requests,
             world_model_rows=briefing_rows,
             action_topology=topology,
+            decision_review=review.payload() if review.model_version else {},
         )
         self._write_plan_round(
             turn,
@@ -538,6 +563,7 @@ class MAESTROOrchestrator:
         session_id: str,
         world_model_briefing: str,
         action_topology: Mapping[str, object] | None = None,
+        advisory_findings: Sequence[str] = (),
     ) -> RepairOutcome:
         """Check the contrast, run the ruled repair, then give the LLM one repair attempt.
 
@@ -567,6 +593,7 @@ class MAESTROOrchestrator:
             action_predictions=action_predictions,
             world_model_briefing=world_model_briefing,
             action_topology=action_topology,
+            advisory_findings=advisory_findings,
         )
         llm_repair = accepted_repair.draft if accepted_repair else None
         if accepted_repair is not None:
@@ -1733,6 +1760,7 @@ class MAESTROOrchestrator:
         action_predictions: Mapping[str, StatePrediction] | None = None,
         world_model_briefing: str = "",
         action_topology: Mapping[str, object] | None = None,
+        advisory_findings: Sequence[str] = (),
     ) -> AcceptedLLMRepair | None:
         if not self._enable_llm_repair or check.ready_for_mechanism_update:
             return None
@@ -1740,7 +1768,7 @@ class MAESTROOrchestrator:
         try:
             draft = self._planner.propose_repair(
                 context, contrast, check, available_actions, world_model_briefing=world_model_briefing,
-                action_topology=action_topology,
+                action_topology=action_topology, advisory_findings=advisory_findings,
             )
         except (LLMError, ValueError) as error:
             self._logger.event(
@@ -1825,6 +1853,36 @@ class MAESTROOrchestrator:
 
     def _planner_feedback_marks(self) -> tuple[int, ...]:
         return tuple(len(getattr(self._planner, name, ())) for name, _ in self._PLANNER_FEEDBACK)
+
+    def _review_plan(
+        self,
+        contrast: MechanismContrast,
+        available_actions: Sequence[EvidenceAction],
+        profile: FunctionalInterventionProfile,
+        briefing_rows,
+        topology: Mapping[str, object],
+        session_id: str,
+    ) -> CritiqueOutcome:
+        """Take one typed second opinion on this round's plan, if a decision model is configured.
+
+        The review is advisory by construction: its findings are shown to the repair planner and
+        its judgments are recorded, and neither can mark a premise measured or remove an
+        explanation. A provider failure returns refusals, so the round continues unchanged.
+        """
+
+        critic = self._decision_critic
+        if critic is None or contrast.plan is None:
+            return CritiqueOutcome()
+        outcome = critic.review_plan(
+            contrast,
+            available_actions,
+            check=self._controller.check_contrast(contrast, profile),
+            topology=topology,
+            world_model_rows=[row.as_payload() for row in briefing_rows],
+            context_identifier=profile.context_identifier,
+        )
+        self._logger.event("typed_decision_review", outcome.payload(), session_id=session_id)
+        return outcome
 
     def _log_planner_feedback(self, marks: tuple[int, ...], component: str, session_id: str) -> None:
         """Record every violation and critic finding the planner fed back to the model."""
