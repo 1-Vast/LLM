@@ -1,0 +1,49 @@
+{
+  "repeat_last": true,
+  "responses": {
+    "task_triage": {
+      "task_type": "mechanism_diagnosis",
+      "research_question": "Is the transcriptional response of the low exposure realised in NCI-H596 at 24 h?",
+      "target_or_targets": ["TARGET_A"],
+      "interventions": ["compound_A"],
+      "biological_context": "NCI-H596",
+      "phenotype_endpoint": "transcriptome shift",
+      "supplied_evidence": [],
+      "constraints": ["one unit of budget"],
+      "missing_information": ["proximal target activity"],
+      "evidence_gaps": ["target engagement", "rescue-allele control"],
+      "needs_visual_review": false
+    },
+    "contrast_planner": {
+      "identifier": "realisation-contrast",
+      "hypotheses": [
+        {
+          "identifier": "response_realised",
+          "description": "The exposure perturbs the transcriptome in this context at this time.",
+          "proposed_action": "continue",
+          "causal_factor": "unresolved"
+        },
+        {
+          "identifier": "response_not_realised",
+          "description": "The exposure does not perturb the transcriptome in this context at this time.",
+          "proposed_action": "revise_intervention",
+          "causal_factor": "incomplete_perturbation"
+        }
+      ],
+      "differing_assumptions": ["whether the exposure changes RNA abundance at 24 h"],
+      "action_identifier": "rna_low",
+      "outcome_categories": ["response_detected", "no_detectable_response"],
+      "interpretation_boundaries": [
+        "An RNA-level response does not establish target engagement, pathway activity or viability."
+      ]
+    },
+    "repair_planner": {
+      "action_identifier": null,
+      "modified_fields": [],
+      "rationale": "The catalogue already contains a decisive, executable action; no repair is needed.",
+      "remaining_limitations": [
+        "Engagement and viability stay unmeasured; the rescue control has no supplier."
+      ]
+    }
+  }
+}

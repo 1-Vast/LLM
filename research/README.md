@@ -15,6 +15,7 @@ formal decision layer are in [`../Innovation.md`](../Innovation.md); the runnabl
 | [`engineering_record.md`](engineering_record.md) | Literature-grounded optimization pass and the topological analysis of the action and package graphs, with measurements | Implemented and measured |
 | [`asrg/`](asrg/00_index.md) | Action-Supported Repair Geometry: audit, data and cost matrix, frozen protocol, decision memo | Research design; go/no-go gates open |
 | [`analysis/`](analysis/) | Executable checks: residual non-identifiability, gain identity, reachability bound, synthetic selection | Runs offline |
+| [`local_verification/`](local_verification/README.md) | Protocol, fixtures and scripts for the checks that need a machine with credentials and local assets | Protocol; offline half runs anywhere |
 
 ## Evidence labels
 

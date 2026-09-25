@@ -1,0 +1,94 @@
+[
+  {
+    "identifier": "rna_low",
+    "description": "Measure the transcriptome shift at the low exposure against a matched vehicle control.",
+    "cost": 1.0,
+    "kind": "rna_abundance_measurement",
+    "quantity": "rna_abundance",
+    "entity": "transcriptome_hvg_8",
+    "units": "log1p_normalized_counts",
+    "time_hours": 24.0,
+    "distinguishes": ["response_realised", "response_not_realised"],
+    "supplies": ["realization:transcript_response"],
+    "prediction_readout": "embedding_delta_l2",
+    "prediction_relevance": 1.0,
+    "expected_outcomes": {
+      "response_realised": "response_detected",
+      "response_not_realised": "no_detectable_response"
+    },
+    "source_ids": ["fixture:rna_panel"]
+  },
+  {
+    "identifier": "rna_high",
+    "description": "Measure the transcriptome shift at the high exposure against the same vehicle control.",
+    "cost": 1.0,
+    "kind": "rna_abundance_measurement",
+    "quantity": "rna_abundance",
+    "entity": "transcriptome_hvg_8",
+    "units": "log1p_normalized_counts",
+    "time_hours": 24.0,
+    "distinguishes": ["response_realised", "response_not_realised"],
+    "supplies": ["realization:transcript_response"],
+    "prediction_readout": "embedding_delta_l2",
+    "prediction_relevance": 1.0,
+    "expected_outcomes": {
+      "response_realised": "response_detected",
+      "response_not_realised": "no_detectable_response"
+    },
+    "source_ids": ["fixture:rna_panel"]
+  },
+  {
+    "identifier": "engagement_shift",
+    "description": "Thermal-stability shift in cells; legal only once a transcriptional response is established.",
+    "cost": 2.0,
+    "kind": "functional_measurement",
+    "quantity": "engagement_shift",
+    "entity": "TARGET_A",
+    "units": "delta_tm_celsius",
+    "time_hours": 6.0,
+    "distinguishes": ["response_realised", "response_not_realised"],
+    "prerequisites": ["realization:transcript_response"],
+    "supplies": ["functional:target_engagement"],
+    "source_ids": ["fixture:cetsa"]
+  },
+  {
+    "identifier": "proximal_activity",
+    "description": "Proximal pathway activity, interpretable only once engagement is measured.",
+    "cost": 2.0,
+    "kind": "functional_measurement",
+    "quantity": "proximal_activity",
+    "entity": "TARGET_A_pathway",
+    "units": "normalized_signal",
+    "time_hours": 6.0,
+    "distinguishes": ["response_realised", "response_not_realised"],
+    "prerequisites": ["functional:target_engagement"],
+    "supplies": ["functional:target_activity:sufficient"],
+    "source_ids": ["fixture:pathway_panel"]
+  },
+  {
+    "identifier": "viability_readout",
+    "description": "Distal viability readout; a phenotype, not a stronger version of the measurements above.",
+    "cost": 3.0,
+    "kind": "readout_measurement",
+    "quantity": "viability",
+    "entity": "NCI-H596",
+    "units": "fraction_of_control",
+    "time_hours": 72.0,
+    "distinguishes": ["response_realised", "response_not_realised"],
+    "prerequisites": ["functional:target_activity:sufficient"],
+    "source_ids": ["fixture:viability_panel"]
+  },
+  {
+    "identifier": "orthogonal_rescue",
+    "description": "Rescue-allele control. Its premise is deliberately unsupplied: this action must be reported as a capability gap, never silently replaced.",
+    "cost": 4.0,
+    "kind": "orthogonal_control",
+    "quantity": "selectivity",
+    "entity": "TARGET_A_rescue_allele",
+    "units": "fraction_of_control",
+    "time_hours": 96.0,
+    "distinguishes": ["response_realised", "response_not_realised"],
+    "prerequisites": ["genetic:rescue_allele_available"],
+    "source_ids": ["fixture:rescue_panel"]
+  }
+]

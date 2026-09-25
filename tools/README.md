@@ -23,7 +23,9 @@ Available tools:
 - `virtual_cell_query/`: the State adapter behind applicability and endpoint gates; returns prediction or named refusal.
 
 Structured payloads and receipts enter planning without being converted into measurements.
-See [field contracts](../research/CONTRACTS.md) for constraints, exceptions and claim boundaries.
+Manifest requirements and qualification states are in [`task.md`](../task.md) section 6; the
+negative-condition contract a tool description must carry is in
+[`research/agent_architecture.md`](../research/agent_architecture.md) section 2.3.
 
 The initial tools use only the Python standard library. New tools must be placed in their own folder with `manifest.json`, `tool.py`, and a concise `README.md`; they must not accept shell commands, arbitrary code, arbitrary file paths, or infer causal biological claims. All tool output is validated as observation, not evidence of a mechanism contrast.
 
