@@ -45,7 +45,14 @@ from .typesafe import (
 )
 
 NOT_LISTED = "none_of_the_listed_options"
-SUFFICIENCY_SCALE = 5
+SUFFICIENCY_LEVELS = (
+    "No measured evidence supports choosing between the explanations.",
+    "Measured evidence provides very limited support for a choice.",
+    "Measured evidence provides partial support but leaves a consequential gap.",
+    "Measured evidence strongly supports a choice with some uncertainty.",
+    "Measured evidence fully supports choosing between the explanations.",
+)
+SUFFICIENCY_SCALE = len(SUFFICIENCY_LEVELS)
 
 STATE_HEADER = (
     "MAESTRO plan review. You are judging a research plan that is already restricted to a "
@@ -136,6 +143,7 @@ def contrast_questions(
             "How well does the evidence listed in the state support choosing between the two "
             "explanations right now? 1 means not at all, 5 means fully.",
             SUFFICIENCY_SCALE,
+            levels=SUFFICIENCY_LEVELS,
         ),
     ]
     if len(options) > 1:

@@ -87,13 +87,20 @@ class RecordedJevClient:
 
 def test_the_three_question_kinds_validate_their_own_limits():
     assert noul("q", "Yes or no?").payload() == {"type": "noul", "instructions": "Yes or no?"}
-    assert choice("q", "Pick.", ("x", "y")).payload()["options"] == ["x", "y"]
-    assert score("q", "Rate.", 5).payload()["scale"] == 5
+    assert choice("q", "Pick.", ("x", "y")).payload() == {
+        "type": "choice", "instructions": "Pick.", "criteria": {"x": None, "y": None},
+    }
+    assert score("q", "Rate.", 5, levels=("none", "low", "some", "strong", "full")).payload() == {
+        "type": "score", "instructions": "Rate.",
+        "criteria": ["none", "low", "some", "strong", "full"],
+    }
     for bad in (
         lambda: choice("q", "Pick.", ("only",)),
         lambda: choice("q", "Pick.", ("x", "x")),
         lambda: score("q", "Rate.", 11),
         lambda: score("q", "Rate.", 1),
+        lambda: score("q", "Rate.", 3, levels=("none", "some")),
+        lambda: score("q", "Rate.", 3, levels=("none", "", "full")),
         lambda: TypedQuestion("q", QuestionKind.NOUL, "Yes?", options=("x", "y")),
         lambda: TypedQuestion("", QuestionKind.NOUL, "Yes?"),
     ):
@@ -132,6 +139,7 @@ def test_a_regulator_question_is_offered_only_with_candidates():
 
 def test_answers_parse_or_refuse_by_name_and_never_guess():
     yes_no = noul("q", "Yes?")
+    assert TypedAnswer.parse(yes_no, {"type": "noul", "noul": 0.8}).value is True
     assert TypedAnswer.parse(yes_no, {"probability": 0.8}).value is True
     assert TypedAnswer.parse(yes_no, {"probability": 0.2}).value is False
     assert TypedAnswer.parse(yes_no, {"value": True}).value is True
@@ -150,9 +158,37 @@ def test_answers_parse_or_refuse_by_name_and_never_guess():
 
     rating = score("q", "Rate.", 5)
     assert TypedAnswer.parse(rating, {"value": 4}).value == 4
+    assert TypedAnswer.parse(rating, {"type": "score", "score": 0.0}).value == 1
+    assert TypedAnswer.parse(rating, {"type": "score", "score": 4.0}).value == 5
+    assert TypedAnswer.parse(rating, {"type": "score", "score": 2.6}).value == 4
+    assert "score_outside_0_to_4" in TypedAnswer.parse(rating, {"score": 5}).refusal
     assert "score_outside_1_to_5" in TypedAnswer.parse(rating, {"value": 9}).refusal
     assert "score_without_a_number" in TypedAnswer.parse(rating, {"value": "high"}).refusal
     assert "answer_not_an_object" in TypedAnswer.parse(rating, [4]).refusal
+
+
+def test_the_documented_response_shape_produces_three_usable_answers(monkeypatch):
+    client = TypeSafeJevClient(TypeSafeSettings("secret-key", "https://api.typesafe.ai", "jev-latest"))
+    monkeypatch.setattr(TypeSafeJevClient, "_send", lambda self, body: {
+        "model": "jev-1.13.0",
+        "answers": {
+            "yes": {"type": "noul", "noul": 0.95},
+            "pick": {"type": "choice", "choice": "x", "probabilities": {"x": 0.88, "y": 0.12}, "confidence": 0.81},
+            "rate": {"type": "score", "score": 1.05,
+                     "legend": {"0": "none", "1": "low", "2": "some"},
+                     "probabilities": {"0": 0.0, "1": 0.95, "2": 0.05}, "confidence": 0.92},
+        },
+        "usage": {"input_tokens": 318, "output_tokens": 34},
+    })
+    result = client.evaluate("state", (
+        noul("yes", "Yes?"), choice("pick", "Pick.", ("x", "y")),
+        score("rate", "Rate.", 3),
+    ))
+    assert {key: answer.value for key, answer in result.usable_answers.items()} == {
+        "yes": True, "pick": "x", "rate": 2,
+    }
+    assert result.refusals() == ()
+    assert result.usage == {"input_tokens": 318, "output_tokens": 34}
 
 
 def test_an_evaluation_refuses_malformed_envelopes_without_raising(monkeypatch, tmp_path):

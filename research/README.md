@@ -11,7 +11,7 @@ formal decision layer are in [`../Innovation.md`](../Innovation.md); the runnabl
 | [`agent_architecture.md`](agent_architecture.md) | Knowledge base, memory registers and star topology, context compression, sub-agents, collaboration protocol, deep reasoning, judgment accuracy | Design; implemented parts marked |
 | [`decision_layer.md`](decision_layer.md) | Belief state, action space, value of information, error accumulation, acceptance tests | Design; implemented parts marked |
 | [`dynamic_networks.md`](dynamic_networks.md) | Conditional regulatory structure, complementarity, structural redundancy, multimodal and multiscale use | Design |
-| [`typed_decision_model.md`](typed_decision_model.md) | TypeSafe Jev integration, its boundary, and the unverified parts of its contract | Implemented |
+| [`typed_decision_model.md`](typed_decision_model.md) | TypeSafe Jev integration, its boundary, and the live-verified HTTP contract | Implemented and verified |
 | [`engineering_record.md`](engineering_record.md) | Literature-grounded optimization pass and the topological analysis of the action and package graphs, with measurements | Implemented and measured |
 | [`asrg/`](asrg/00_index.md) | Action-Supported Repair Geometry: audit, data and cost matrix, frozen protocol, decision memo | Research design; go/no-go gates open |
 | [`analysis/`](analysis/) | Executable checks: residual non-identifiability, gain identity, reachability bound, synthetic selection | Runs offline |

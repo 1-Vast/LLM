@@ -1,8 +1,7 @@
 # Typed decision model (TypeSafe Jev) in MAESTRO
 
 Added 2026-09-25. This describes what was integrated, what the integration is allowed to do,
-and — importantly — which parts of the provider contract could not be verified from the
-container this was written in.
+and the provider contract verified against a live Jev response.
 
 ## 1. What Jev is
 
@@ -20,7 +19,7 @@ It is described as trained with reinforcement learning against outcomes rather t
 preference, so its probabilities are intended to be calibrated in aggregate. Published pricing
 is $0.042 per 1M input tokens with no output charge.
 
-Sources (all secondary; see section 5):
+Sources (the TypeSafe API reference is primary; see section 5):
 [LiteLLM pass-through](https://docs.litellm.ai/docs/pass_through/typesafe) ·
 [TypeSafe API reference](https://docs.typesafe.ai/api) ·
 [TypeSafe introduction](https://typesafe.ai/blog/introducing-system-one-models-and-jev) ·
@@ -117,50 +116,27 @@ block counts as absent, so a half-enabled critic cannot fail on the first call.
 `--decision-critic off` disables it explicitly. The key is never written to a log, an
 exception or a `repr`, and never appears in the request body.
 
-## 5. What is not verified, and how to fix it in one place
+## 5. Live HTTP contract
 
-**No live call was made from the development container.** Its network policy blocked
-`typesafe.ai`, `docs.typesafe.ai`, `docs.litellm.ai`, `openrouter.ai`, `pydantic.dev` and
-`marktechpost.com`, so the wire format below was reconstructed from three independent search
-summaries that agree with each other, not from the provider's own page.
+The [TypeSafe HTTP API reference](https://docs.typesafe.ai/api) specifies
+`POST https://api.typesafe.ai/v1/systemone` with a bearer key. Choice questions require
+`criteria` as an option-to-description map (null descriptions are allowed). Score questions
+require `criteria` as an ordered list of level descriptions. Noul answers use the `noul`
+field; Choice answers use `choice`, `probabilities` and `confidence`; Score answers use a
+zero-indexed, potentially fractional `score`, `probabilities` and `confidence`. MAESTRO
+converts that score to its existing rounded 1–5 advisory scale.
 
-Implemented contract:
+The first local probe reached the endpoint but received HTTP 422 because the client sent
+`options` and `scale` instead of the two required `criteria` fields. After correcting the
+request and parser, a live three-question evaluation returned three usable answers, no
+refusals, and token usage. The critic loop then recorded five `model_prediction` judgments;
+its deterministic check and selected action matched the critic-off trace. The results are
+in `outputs/local_verification/jev_recheck.txt` and
+`outputs/local_verification/jev_fixed/critic-comparison.txt` on the verifying machine.
 
-```
-POST {TYPESAFE_ENDPOINT}/v1/systemone
-Authorization: Bearer {TYPESAFE_API_KEY}
-
-{"model": "...", "state": "...",
- "questions": {"<id>": {"type": "noul|choice|score",
-                        "instructions": "...",
-                        "options": [...],   // choice only
-                        "scale": 5}}}       // score only
-
--> {"model": "...", "answers": {"<id>": {...}}, "usage": {...}}
-```
-
-Because answer field names were the least certain part, parsing accepts a small set of
-documented aliases (`RESPONSE_ALIASES` in `src/agent/typesafe.py`) and **refuses anything
-else by name**, reporting the keys the provider actually returned. So a naming difference
-shows up as, for example:
-
-```
-q:noul_without_probability_or_boolean;keys=certainty,verdict
-```
-
-and is corrected by adding the real name to that one mapping. It never becomes a wrong value,
-and a refusal never becomes a finding.
-
-**First local run checklist**
-
-1. `python -m agent "..." --actions actions.json --profile intervention_profile.json`
-2. Read the `typed_decision_review` event in the run log.
-3. If `refusals` names missing fields, add the real field names to `RESPONSE_ALIASES`.
-4. If `refusals` shows `JevError: request failed with HTTP status 404`, the evaluate path
-   differs; set `TYPESAFE_ENDPOINT` to the full URL and it is used verbatim.
-
-Everything else degrades safely: a provider outage, a malformed response or an unparsable
-answer produces refusals on the record, and the round continues unchanged.
+Parsing still fails closed on unrecognised fields or out-of-range values, naming the keys
+the provider returned. A refusal never becomes a finding. Provider outages still leave the
+round runnable without a critic judgment.
 
 ## 6. Limits
 

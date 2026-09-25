@@ -13,8 +13,7 @@ File summary
     this process.
   - Parsing fails closed. A missing or out-of-range field becomes a named refusal on that one
     answer, listing the keys the provider actually returned; it never becomes a guessed value.
-    Field aliases are accepted because the wire format was taken from secondary documentation
-    (see `RESPONSE_ALIASES`); an unrecognised shape is reported, not inferred.
+    The documented Jev fields and earlier aliases are accepted; an unrecognised shape is refused.
   - The API key is read from the environment or `.env` and is never placed in a log, an
     exception or a `repr`.
   - Every evaluation carries a digest of the exact state that was judged, so a later record
@@ -139,6 +138,7 @@ class TypedQuestion:
     instructions: str
     options: tuple[str, ...] = ()
     scale: int | None = None
+    levels: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.identifier.strip() or not self.instructions.strip():
@@ -152,8 +152,8 @@ class TypedQuestion:
                 )
             if len(set(self.options)) != len(self.options) or any(not str(o).strip() for o in self.options):
                 raise ValueError("invalid_question:choice_options_must_be_unique_and_named")
-            if self.scale is not None:
-                raise ValueError("invalid_question:choice_has_no_scale")
+            if self.scale is not None or self.levels:
+                raise ValueError("invalid_question:choice_has_no_scale_or_levels")
         elif self.kind is QuestionKind.SCORE:
             if self.options:
                 raise ValueError("invalid_question:score_has_no_options")
@@ -161,15 +161,19 @@ class TypedQuestion:
                 raise ValueError("invalid_question:score_needs_an_integer_scale")
             if not MIN_SCORE_SCALE <= self.scale <= MAX_SCORE_SCALE:
                 raise ValueError(f"invalid_question:score_scale_{MIN_SCORE_SCALE}_to_{MAX_SCORE_SCALE}")
-        elif self.options or self.scale is not None:
-            raise ValueError("invalid_question:noul_takes_no_options_or_scale")
+            if self.levels and (len(self.levels) != self.scale or any(not level.strip() for level in self.levels)):
+                raise ValueError("invalid_question:score_levels_must_match_scale")
+        elif self.options or self.scale is not None or self.levels:
+            raise ValueError("invalid_question:noul_takes_no_options_scale_or_levels")
 
     def payload(self) -> dict[str, Any]:
         body: dict[str, Any] = {"type": self.kind.value, "instructions": self.instructions}
         if self.kind is QuestionKind.CHOICE:
-            body["options"] = list(self.options)
+            body["criteria"] = dict.fromkeys(self.options)
         if self.kind is QuestionKind.SCORE:
-            body["scale"] = self.scale
+            body["criteria"] = list(self.levels or (
+                f"Level {index} of {self.scale}" for index in range(1, (self.scale or 0) + 1)
+            ))
         return body
 
 
@@ -185,19 +189,16 @@ def choice(identifier: str, instructions: str, options: Sequence[str]) -> TypedQ
     return TypedQuestion(identifier, QuestionKind.CHOICE, instructions, options=tuple(options))
 
 
-def score(identifier: str, instructions: str, scale: int) -> TypedQuestion:
+def score(identifier: str, instructions: str, scale: int, *, levels: Sequence[str] = ()) -> TypedQuestion:
     """A position on an ordered scale from 1 to ``scale``."""
 
-    return TypedQuestion(identifier, QuestionKind.SCORE, instructions, scale=scale)
+    return TypedQuestion(identifier, QuestionKind.SCORE, instructions, scale=scale, levels=tuple(levels))
 
 
-# The wire format was read from secondary documentation, because the provider's own pages were
-# unreachable when this module was written. Accepting a small set of documented aliases keeps a
-# naming difference from silently becoming a wrong value; anything outside the list is refused
-# by name so one configuration line can correct it.
+# The documented fields are accepted alongside earlier aliases; unknown shapes still fail closed.
 RESPONSE_ALIASES: Mapping[str, tuple[str, ...]] = {
     "value": ("value", "answer", "selected", "choice", "score", "result"),
-    "probability": ("probability", "p", "yes_probability", "confidence_probability"),
+    "probability": ("noul", "probability", "p", "yes_probability", "confidence_probability"),
     "confidence": ("confidence", "certainty"),
     "distribution": ("probabilities", "distribution", "option_probabilities", "scores"),
     "answers": ("answers", "results", "outputs"),
@@ -283,12 +284,18 @@ class TypedAnswer:
                 probability = distribution.get(selected)
             return cls(question.identifier, question.kind, selected, probability, confidence, distribution)
 
+        documented_score = "score" in payload
+        raw_value = payload["score"] if documented_score else raw_value
         if not isinstance(raw_value, (int, float)) or isinstance(raw_value, bool):
             return cls.refused(question, f"score_without_a_number;keys={keys}")
         number = float(raw_value)
-        if not math.isfinite(number) or not 1 <= number <= float(question.scale or 0):
-            return cls.refused(question, f"score_outside_1_to_{question.scale}:{raw_value}")
-        return cls(question.identifier, question.kind, int(round(number)), probability, confidence)
+        lower, upper = (0, (question.scale or 0) - 1) if documented_score else (1, question.scale or 0)
+        if not math.isfinite(number) or not lower <= number <= upper:
+            return cls.refused(question, f"score_outside_{lower}_to_{upper}:{raw_value}")
+        return cls(
+            question.identifier, question.kind,
+            int(round(number + (1 if documented_score else 0))), probability, confidence,
+        )
 
 
 @dataclass(frozen=True)
