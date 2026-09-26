@@ -460,6 +460,22 @@ well calibrated (ECE 0.058 and 0.085).
 Wiring magnitude into the power-aware path raised tier-B utility by +0.298, but failed its keep
 rule in tier A and raised tier-B wrong eliminations by 0.044, so it is not enabled.
 
+**Sequence stopping gap and independent validation 2026-09-26** (pre-registered;
+`research/sequence_audit/`, `log/20260926/README.md`, block 4).
+
+A contingent two-step policy (research code from the same day's follow-up) lost to the fixed
+24 h then 72 h sequence on SciPlex3 because it bought fewer measurements. Its stops were mostly
+uninformed (no paired references, or too few), not a code defect. The arms' different
+QC-failure rules explained only 0.015 of the 0.274 gap.
+
+One revision was frozen before any L1000 reading: a fixed-sequence fallback for uninformed stops.
+On L1000 (four lines, 6 h and 24 h) it gained +0.0013 utility [+0.0002, +0.0026] and did not
+beat the fixed sequence. The frozen verdict is SHADOW: opt-in, negligible, not promoted.
+
+On L1000, with more references per class, most stops were informed. The fixed sequence beat the
+planner only in the A549-only tier, where a 24 h first measurement leaves no legal
+continuation.
+
 Not yet demonstrated:
 
 - improved decision regret on independent biological cases;
@@ -469,6 +485,8 @@ Not yet demonstrated:
 - a time-point selection rule confirmed on data it was not discovered on;
 - a decision benefit from reading per-hypothesis forecasts through the registered rules
   (`select_discriminating_action`), or from letting magnitude break ties on the power-aware path;
+- a contingent two-measurement policy, or its fixed-sequence fallback, that beats the fixed
+  early-to-late sequence on independent data (`research/sequence_audit/`: SHADOW, negligible);
 - a virtual-cell predictor with biological depth for unseen compounds: the V-JEPA-style latent model
   was built and tested (section 13.6) and neither beat PCA nor structure retrieval;
 - causal mechanism, target engagement, clinical safety, or generalization to unsupported contexts.
@@ -632,6 +650,14 @@ options that decided the slow-acting classes. See `research/dynamic_world_model/
   conditions.
 
 See `research/acquisition_link/`.
+
+**Update the same day (block 4):**
+- On independent L1000 data, a two-step planner fed these reference branches was not
+  distinguishable from the fixed sequence across four lines (utility +0.012 [-0.013, +0.039]).
+- It was worse than the fixed sequence in A549 alone (utility -0.021 [-0.044, -0.001]).
+- A fallback for uninformed stops changed almost nothing.
+
+See `research/sequence_audit/`.
 
 ### 13.4 Closed-Loop Experimental Evidence From Co-Scientist And Robin
 

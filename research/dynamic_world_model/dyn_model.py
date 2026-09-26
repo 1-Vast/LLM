@@ -5,15 +5,17 @@ File summary
 - Purpose: when the first measurement was detected but ambiguous, forecast the compound's own
   profile at every remaining menu condition with the best transition arm (gene-space ridge, the
   best learned arm in every transfer family), and estimate how likely the validator is to
-  eliminate a hypothesis there; otherwise behave as `dyn_ref`.
+  eliminate each hypothesis there. Use `dyn_ref` for measurement choice until conditional
+  forecasts can distinguish correct eliminations from wrong ones.
 - Core points:
-  - The forecast is read by the validator only inside the planner. It is a model prediction:
-    it chooses which real measurement to buy and is never itself imported as evidence.
+  - The forecast is read by the validator only as a planner diagnostic. It is a model prediction
+    and is never itself imported as evidence.
   - Pseudo-measurements add a model residual (closed-form leave-one-out residuals of the ridge on
     training compounds) and two replicate-noise draws from training replicate differences at the
     target line and time, so detection is simulated the way the validator detects.
-  - The chosen action still goes through `select_expected_coverage`, with the forecast
-    decisiveness as detection power.
+  - A transition forecast estimates which hypothesis the validator would eliminate, not whether
+    that elimination is correct. Without hypothesis-conditional forecasts it is retained only as
+    a diagnostic; measurement choice falls back explicitly to `dyn_ref`'s measured references.
 - Run: python research/dynamic_world_model/dyn_model.py
 - Depends on: common.py, episodes.py, transition.py
 """
@@ -72,16 +74,21 @@ def forecast_card(ctx: E.FoldContext, compound, key1, key2, h1, h2, threshold: f
     y1 = data.shift[data.index[key1][compound]].astype(np.float64)
     forecast = model.predict("gene_ridge", y1)
     noise = replicate_noise(data, fold, (key2[0], key2[1]))
-    counts = {"eliminate": 0, "ambiguous": 0, "undetected": 0}
+    counts = {"eliminate_a": 0, "eliminate_b": 0, "ambiguous": 0, "undetected": 0}
     for _ in range(DRAWS):
         base = forecast + residuals[rng.integers(len(residuals))]
         r1 = base + noise[rng.integers(len(noise))]
         r2 = base + noise[rng.integers(len(noise))]
         detected = C._pearson(r1, r2) >= threshold
         outcome = C.read_profile(ctx.ft, key2, 0.5 * (r1 + r2), detected, h1, h2, ctx.params)["outcome"]
-        counts["eliminate" if outcome.startswith("eliminate") else outcome] += 1
-    p = counts["eliminate"] / DRAWS
-    return {"served": True, "p_correct": p, "p_wrong": None, "forecast": "gene_ridge",
+        counts[outcome] += 1
+    # The same elimination is correct under one hypothesis and wrong under the other. The
+    # compound's pooled predictive distribution supplies neither conditional branch.
+    return {"served": False, "reason": "hypothesis_conditional_forecast_unavailable",
+            "p_elimination": (counts["eliminate_a"] + counts["eliminate_b"]) / DRAWS,
+            "p_eliminate_h1": counts["eliminate_a"] / DRAWS,
+            "p_eliminate_h2": counts["eliminate_b"] / DRAWS,
+            "hypotheses": [h1, h2], "forecast": "gene_ridge",
             "draws": DRAWS, "counts": counts, "evidence_kind": "model_prediction"}
 
 
@@ -97,7 +104,10 @@ def make_policy(null: dict):
         for key in menu:
             threshold = null[f"{key[0]}|{key[1]:g}"]["threshold"]
             cards[key] = forecast_card(ctx, compound, first["key"], key, h1, h2, threshold, rng)
-        return E.select_by_cards(menu, cards, h1, h2)
+        key, note = E.choose("dyn_ref", ctx, compound, h1, h2, executed, None)
+        return key, {**note, "forecast_fallback": "dyn_ref",
+                     "forecast_refusal": "hypothesis_conditional_forecast_unavailable",
+                     "dynamic_forecasts": {C.action_id(k): cards[k] for k in menu}}
     return policy
 
 

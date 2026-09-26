@@ -1,8 +1,8 @@
 # Experiment record, 2026-09-26
 
 > - **Path**: `log/20260926/README.md`
-> - **Purpose**: Record three pre-registered blocks and what they changed. Block 1 tested whether MAESTRO's virtual cell and agent carry perturbation-specific biology (with the SciPlex3 label defect it uncovered, the components promoted to `src/` and `tools/`, and the merge of the two data directories). Block 2 tested whether a virtual cell helps the agent choose the measurement that separates two competing mechanisms, including "the perturbation failed" against "the mechanism is wrong", using the SciPlex3 24 h and 72 h cohorts. Block 3 audited and repaired the link from world-model prediction to measurement choice, then evaluated the repair on block 2's episodes under a protocol frozen beforehand.
-> - **Core points**: Block 1: SciPlex3 contains the biology (7 of 10 literature anchors hold), but no virtual-cell arm reproduces more than 3 of the 7 for unseen compounds, the JEPA latent upgrade adds nothing over PCA or retrieval and is not promoted, and retrieval over measured profiles became a tool. Block 2: no world-model planner beat the current magnitude tie-break (separation cards -0.044 correct decisions [-0.083, -0.004]; time-aware cards +0.054, interval including zero), a learned 24 h to 72 h transition beat persistence on the profile (+0.283 cosine) without improving any decision, multi-branch outcome predictions beat a single class mean (log loss -0.599), and cards did not help the language-model planner (+0.006). Nothing from block 2's world model is promoted; a transport defect in both provider clients was fixed with tests. The decisive variable was time: slow-acting mechanisms become separable only at 72 h, which the static rule never chooses. Block 3: the production (power-aware) selector logged but never used the virtual cell's predictions, a per-action query lent a 72 h action the 24 h answer, and per-hypothesis forecasts reached the selector only as one detection probability; the repaired distribution-aware selector (opt-in) decided neither better nor worse than magnitude (-0.019 [-0.053, +0.017] tier B, +0.033 [-0.030, +0.089] tier A: INCONCLUSIVE), its forecasts are well calibrated (ECE 0.058 and 0.085), and wiring magnitude into the power-aware path failed its keep rule and is not enabled.
+> - **Purpose**: Record four pre-registered blocks and what they changed. Block 1 tested whether MAESTRO's virtual cell and agent carry perturbation-specific biology (with the SciPlex3 label defect it uncovered, the components promoted to `src/` and `tools/`, and the merge of the two data directories). Block 2 tested whether a virtual cell helps the agent choose the measurement that separates two competing mechanisms, including "the perturbation failed" against "the mechanism is wrong", using the SciPlex3 24 h and 72 h cohorts. Block 3 audited and repaired the link from world-model prediction to measurement choice, then evaluated the repair on block 2's episodes under a protocol frozen beforehand. Block 4 diagnosed why a contingent two-step measurement policy stops early, replayed every comparator under identical sequence rules, and tested one pre-registered revision on independent L1000 data.
+> - **Core points**: Block 1: SciPlex3 contains the biology (7 of 10 literature anchors hold), but no virtual-cell arm reproduces more than 3 of the 7 for unseen compounds, the JEPA latent upgrade adds nothing over PCA or retrieval and is not promoted, and retrieval over measured profiles became a tool. Block 2: no world-model planner beat the current magnitude tie-break (separation cards -0.044 correct decisions [-0.083, -0.004]; time-aware cards +0.054, interval including zero), a learned 24 h to 72 h transition beat persistence on the profile (+0.283 cosine) without improving any decision, multi-branch outcome predictions beat a single class mean (log loss -0.599), and cards did not help the language-model planner (+0.006). Nothing from block 2's world model is promoted; a transport defect in both provider clients was fixed with tests. The decisive variable was time: slow-acting mechanisms become separable only at 72 h, which the static rule never chooses. Block 3: the production (power-aware) selector logged but never used the virtual cell's predictions, a per-action query lent a 72 h action the 24 h answer, and per-hypothesis forecasts reached the selector only as one detection probability; the repaired distribution-aware selector (opt-in) decided neither better nor worse than magnitude (-0.019 [-0.053, +0.017] tier B, +0.033 [-0.030, +0.089] tier A: INCONCLUSIVE), its forecasts are well calibrated (ECE 0.058 and 0.085), and wiring magnitude into the power-aware path failed its keep rule and is not enabled. Block 4: the two-step policy lost to the fixed early-to-late sequence on SciPlex3 because it bought fewer measurements (its stops were mostly uninformed: 89 of 106 in tier A), not because of QC (matched gap -0.259 against -0.274); a fixed-sequence fallback for uninformed stops, frozen before any L1000 reading, gained +0.0013 utility [+0.0002, +0.0026] on L1000 (SHADOW by the frozen rule, negligible, not promoted) and did not beat the fixed sequence, because L1000's larger reference sets make most stops informed.
 
 ## 1. Record control
 
@@ -62,6 +62,33 @@ repaired selector or the one-reference forecasts:
 Every number below comes from `log/20260926/0926/acquisition_link_report.md`, generated by
 `research/acquisition_link/analyze.py`; the timeline is in `log/20260926/0926/run-notes.md`.
 
+### Block 4: stopping gap and independent sequence validation
+
+Working tree at `97c8e28` (block 3, committed by the user at 19:37), plus the uncommitted
+follow-up of a Codex session that ended at 21:01. The follow-up touched:
+- `research/acquisition_followup/`, `research/dynamic_world_model/` and
+  `research/acquisition_link/`;
+- `src/agent/orchestrator.py`, `src/maestro/outcome.py` and
+  `tests/test_discriminating_acquisition.py`;
+- `research/README.md`.
+
+Its author has not recorded it in this log. It was kept as found: none of its files were edited,
+and its claims were checked (section 2 of `research/sequence_audit/README.md`). A Codex session
+active at 21:52 worked on a remote server, not this tree. The follow-up records 1,326 passing
+tests; the same 1,326 pass after this block, which changed nothing under `src/` or `tests/`.
+
+Pre-registration frozen at 2026-09-26 22:23:12 +0800, before any L1000 validator reading, forecast
+or policy decision, and before the revised policy had run on any data:
+
+| File | SHA-256 |
+|---|---|
+| `research/sequence_audit/PROTOCOL.md` | `b1c12c0e44fe667de35df397fc6a6b4a34e47155e494e10e68145ab0c2f8ed42` |
+| `research/sequence_audit/protocol.json` | `b30d1159b7bd2915f2dcf52ea6a47146e78ebfa148f082bcd086922002ebd612` |
+
+`research/sequence_audit/freeze.json` also binds the implementation and the prepared L1000 data.
+Every number below comes from `log/20260926/0926/sequence_audit_*`, generated by the scripts in
+`research/sequence_audit/`; the timeline is in `log/20260926/0926/run-notes.md`.
+
 ## 2. Research questions and hypotheses
 
 ### Block 1: biological depth
@@ -107,6 +134,18 @@ The repaired selector was then tested under a frozen protocol:
 - **S1:** the magnitude tie-break wired into the power-aware path, minus the path as it was.
 - **Isolations:** the selector and support effects, a permuted-label control, a
   step-1-conditioned variant, and the fixed time course.
+
+### Block 4: stopping gap and independent sequence validation
+
+The follow-up's contingent two-step policy decided 0.366 correct against 0.640 for the fixed
+early-to-late sequence in SciPlex3 tier A. This block asks why, and whether the smallest revision
+the diagnosis justifies improves real mechanism decisions on data it was not designed on.
+
+Hypotheses:
+- **H1:** stops after a neutral first reading carry the gap.
+- **H2:** the QC asymmetry between arms inflates the gap.
+- **H3:** on L1000, a fallback to the fixed sequence when the planner is uninformed raises utility
+  over the two-step policy without adding more than 0.02 wrong eliminations.
 
 ## 3. Materials, data and computational environment
 
@@ -154,6 +193,20 @@ No new data. The block-2 SciPlex3 preparation (`outputs/dynamic_world_model_2026
 with its frozen detection null, validator, per-fold calibration, tiers, folds and episode list;
 the block-2 code is imported unchanged. No provider or API call was made; laboratory cost 0; one
 evaluation takes about 90 s on 10 of 28 CPU cores.
+
+### Block 4: stopping gap and independent sequence validation
+
+- **SciPlex3:** block 2's prepared data, folds and validator, and the follow-up's 12,480
+  recorded sequence episodes (`outputs/acquisition_followup/sequences/`; source hashes checked).
+- **L1000:** GSE92742, local.
+  - The metadata files were verified against GEO's published SHA-512 sums.
+  - Expression comes from the derived `subset48` condition cache (condition means over 978
+    landmark genes). Its preprocessing runner is not in the repository, and no Level 3 to 5 GCTX is
+    local.
+  - Detection uses Broad's `distil_cc_q75`, against DMSO signatures as the null.
+  - Mechanism labels are Repurposing Hub records (`data/raw/sciplex3/repurposing_*_20200324.txt`),
+    joined exactly only.
+- **Environment:** conda `maestro`, Python 3.11.16, the environment the follow-up used.
 
 ## 4. Experimental design and controls
 
@@ -233,6 +286,33 @@ signatures, 17 classes, arms with and without a retrieval card.
   - `fixed` and `oracle`.
 - **Consistency checks.** Before reading any result, seven code-path equalities were checked
   against the within-run arms and block 2's records.
+
+### Block 4: stopping gap and independent sequence validation
+
+- **Phase 1, attribution (`diagnose.py`).**
+  - Every recorded stop after a neutral first reading gets one reason, in a fixed order:
+    legality, budget, no paired references, implementation defect, thin support, wrong risk, no
+    gain.
+  - Facts (the records, and the compound's own later readings) are kept apart from forecast-based
+    explanations.
+  - Every recorded plan was recomputed and matched.
+- **Phase 2, matched replay (`policies.run_matched`, `replay.py`).**
+  - One runner fixes, for every arm: the menu, time order, two measurements, 16 assay-days, the QC
+    rule, the stops and the utility.
+  - QC rules: `continue` is primary and `stop` is the sensitivity.
+  - Every record is audited.
+- **Phase 3, one revision (`two_step_fallback`).** When the planner's stop or deferral is
+  uninformed, it takes the fixed sequence's next legal action; informed stops are kept. The
+  SciPlex3 result is exploratory only.
+- **Phase 4, independent validation on L1000.**
+  - Tiers: LT (primary; A549, MCF7, PC3, VCAP x 6 h, 24 h at 10 uM) and T (A549, 6 h and 24 h).
+  - The SciPlex3 validator and its calibration are used unchanged.
+  - Five folds of scaffold-or-identity components.
+  - Eight arms, including the permuted-label planner.
+  - Gate: at least three folds whose validator can eliminate.
+- **Intervals.** 95% paired cluster bootstrap with 2,000 draws.
+  - Unit: the skeleton in SciPlex3, the fold component in L1000.
+  - Sensitivity units: compound, scaffold, plate cohort, identity and batch cohort.
 
 ## 5. Experiment register and results
 
@@ -411,6 +491,72 @@ In tier A the repaired selector chose 72 h first in 60 of 276 episodes, against 
 the repair. Full suite: 1320 passed (1301 + 19). `research/acquisition_link/test_acquisition_link.py`:
 4 of 4, including a one-fold rerun that reproduces the recorded episodes and menu rows.
 
+### Block 4: stopping gap and independent sequence validation
+
+**Phase 1: the gap is measurements not bought.**
+- **Tier A:** 106 of 147 neutral first readings ended the episode.
+  - 52 stops: continuation positive on raw reference counts but not after shrinkage (thin
+    support).
+  - 37 stops: no paired references.
+  - 8 stops: wrong risk.
+  - 9 stops: no gain.
+  - None was legality, budget or a code defect.
+- **Tier B:** 767 of 970 ended the episode: 386 no paired references, 224 thin support, 23 wrong
+  risk, 134 no gain.
+- **What the fixed sequence's next measurement read on the same compounds (tier A):** 27 correct,
+  5 wrong, 58 neutral.
+- **The fixed sequence's tier-A advantage (+0.274 correct):**
+  - +0.140 from stops after a neutral reading;
+  - +0.074 from deferrals;
+  - +0.018 from stops after a QC failure;
+  - +0.042 from different measurement choices.
+
+**Phase 2: the QC asymmetry was small.**
+- Matched rules reproduce the original records wherever those rules already matched: 2,496 of
+  2,496 for each of five arm-rule pairs.
+- Two-step minus fixed, tier A, correct decisions:
+  - QC `continue`: -0.259 [-0.360, -0.161];
+  - QC `stop`: -0.250.
+  - Utility under `continue`: -0.217 [-0.354, -0.077].
+- Two-step minus one-step stays null: +0.003 [-0.006, +0.012].
+
+**Phase 3, SciPlex3 (exploratory, the design data).** Fallback minus two-step utility was
++0.057 [+0.006, +0.107] in tier A and +0.050 [+0.025, +0.074] in tier B. Fallback minus fixed
+was -0.161 [-0.286, -0.045] in tier A.
+
+**Phase 4, L1000.** The gate passed in 5 of 5 folds in both tiers. Tier LT: 6,880 episodes.
+
+| Arm | Correct | Wrong | Utility | Measurements |
+|---|---:|---:|---:|---:|
+| two_step_fallback | 0.118 | 0.005 | 0.109 | 0.97 |
+| two_step | 0.117 | 0.005 | 0.107 | 0.88 |
+| da | 0.116 | 0.004 | 0.107 | 0.88 |
+| fixed | 0.106 | 0.006 | 0.095 | 1.93 |
+| production | 0.070 | 0.004 | 0.063 | 1.93 |
+| two_step_permuted | 0.033 | 0.002 | 0.030 | 0.68 |
+
+- **Fallback minus two-step (primary):**
+  - utility +0.0013 [+0.0002, +0.0026];
+  - wrong eliminations +0.0001 [0.0000, +0.0005];
+  - in counts: 11 more correct and 1 more wrong decision, for 581 extra measurements.
+- **Fallback minus fixed:** +0.014 [-0.012, +0.041].
+- **Tier T:**
+  - Fallback minus two-step: +0.0007 [-0.0032, +0.0043].
+  - Fallback minus fixed: -0.020 [-0.043, -0.001].
+- **Forecast signal:** two-step minus the permuted-label planner is +0.077 [+0.053, +0.106] in LT.
+- **Neutral-first stops are mostly informed on L1000.**
+  - LT: 1,827 of 2,239 are "no gain"; only 348 are uninformed.
+  - T: 1,042 of 1,664 follow a 24 h first measurement, after which 6 h is not legal.
+- **Forecast calibration:** ECE 0.034 in LT and 0.071 in T.
+- **Plate diagnostic:** the winning class's nearest template shares the held-out batch in 0.44 of
+  wrong eliminations, against a base share of 0.31.
+
+**Verdict under the frozen rule: SHADOW.** The rule stays opt-in and logged, and it is not
+promoted. The gain is negligible. Under batch-cohort clustering, the lower bound is exactly 0.
+
+**Tests.** `research/sequence_audit/test_sequence_audit.py` passes 21 of 21. The related research
+tests pass 43 of 43, and the full suite 1,326.
+
 ## 6. Deviations, failures and corrections
 
 ### Block 1: biological depth
@@ -483,6 +629,23 @@ the repair. Full suite: 1320 passed (1301 + 19). `research/acquisition_link/test
   `src/virtual_cell/interface.py`) were normalised to the LF that `.gitattributes` declares, and
   `log/INDEX.md`, briefly rewritten with CRLF by this block, was restored to LF. Content was
   unchanged.
+
+### Block 4: stopping gap and independent sequence validation
+
+- **Stopped preparation run.** The first `lincs_prepare.py` run stopped on perturbagens absent
+  from `pert_info` (combinations and CMAP controls) before writing anything. They are now treated
+  as unlabelled. This happened before the freeze.
+- **Refactor with identical outputs.** `diagnose.py` was refactored to import the shared audit
+  functions. Its outputs were byte-identical before and after.
+- **Rewritten test.** A synthetic test of the post-run limitation first built the wrong scenario
+  (the planner found a plan) and failed. It was rewritten as a direct check of the post-fallback
+  continuation.
+- **Post-run finding, not changed.** After a fallback first measurement, the plan has no
+  continuation, and the frozen rule stopped although the audit found a supported positive one.
+  This happened in 32 of 6,880 LT episodes (label `implementation_defect`). A test pins the
+  behaviour.
+- **No minimum effect size.** The frozen PROMOTE and SHADOW rules set none, so SHADOW here rests on
+  a lower bound of +0.0002.
 
 ## 7. Interpretation and claim boundaries
 
@@ -558,6 +721,29 @@ it: the design was informed by block 2.
 - **Safety invariants, tested again:** absence never eliminates, prediction-derived records never
   eliminate, and QC failure is a named non-success.
 
+### Block 4: stopping gap and independent sequence validation
+
+**The SciPlex3 stopping gap is a reference-sparsity effect, not a planning defect.** The
+planner refused to value continuations its paired references could not support. That refusal was
+honest, and it cost decisions because the fixed sequence's late measurement was often decisive.
+
+On L1000, with more references per class:
+- the planner's stops are mostly informed, and the revision changes almost nothing;
+- the fixed sequence does not beat the planner in LT;
+- it does beat the planner in T, where the time-order rule makes a 24 h first measurement
+  terminal, and a 6 h reading resolves some compounds that 24 h does not.
+
+**What the evidence supports:**
+- SHADOW certifies only a non-negative, non-harmful change.
+- The fixed sequence is not a universal answer.
+- Absence, prediction-derived records and QC failure still never eliminate; this was tested again.
+
+**Boundaries:**
+- two time points, 10 uM, and four lines;
+- mechanism labels are external annotations;
+- the cache's normalisation cannot be checked against Broad's Level 4 or 5 locally;
+- batch similarity contributes to the validator's eliminations, wrong ones in particular.
+
 ## 8. Reproduction and artifact ledger
 
 ### Block 1: biological depth
@@ -609,6 +795,33 @@ Result records in `log/20260926/0926/`: `acquisition_link_report.md`,
 `acquisition_link_summary.json`, `acquisition_link_manifest.json`,
 `acquisition_link_falsification_before.json`, `acquisition_link_falsification_after.json`.
 
+### Block 4: stopping gap and independent sequence validation
+
+**Code:** `research/sequence_audit/`, whose README lists the commands in order.
+- `diagnose.py`
+- `policies.py`
+- `replay.py`
+- `analyze.py`
+- `lincs_prepare.py`
+- `lincs_evaluate.py`
+- `lincs_analyze.py`
+- `test_sequence_audit.py`
+- `PROTOCOL.md`, `protocol.json` and `freeze.json`
+
+Nothing in `src/` changed. The follow-up's files are unedited.
+
+**Runs:** under `outputs/sequence_audit_20260926/`: `diagnosis/`, `phase2_matched_replay/`,
+`phase3_sciplex3_exploratory/` and `l1000/`.
+
+**Result records in `log/20260926/0926/`:**
+- `sequence_audit_diagnosis_summary.json`
+- `sequence_audit_phase2_report.md` and `sequence_audit_phase2_summary.json`
+- `sequence_audit_phase3_sciplex3_report.md` and `sequence_audit_phase3_sciplex3_summary.json`
+- `sequence_audit_l1000_report.md` and `sequence_audit_l1000_summary.json`
+- `sequence_audit_l1000_feasibility.json` and `sequence_audit_l1000_gate.json`
+- `sequence_audit_l1000_manifest.json`
+- `sequence_audit_freeze.json`
+
 ## 9. Open items and next experiments
 
 ### Block 1: biological depth
@@ -653,6 +866,22 @@ Result records in `log/20260926/0926/`: `acquisition_link_report.md`,
 - Re-test the power-aware magnitude tie-break only under a new registration that states its
   wrong-elimination tolerance.
 
+### Block 4: stopping gap and independent sequence validation
+
+- **Time-order rule.** It makes a late first measurement terminal. Pre-register a rule that allows
+  an earlier-time second measurement from a fresh culture, with its assay cost, and test it on
+  L1000 tier T.
+- **Post-fallback continuation.** Decide the 32 LT cases on data not yet analysed.
+- **Batch-disjoint templates.** Give the L1000 validator batch-disjoint templates, or a batch term,
+  before any L1000 result is used for promotion.
+- **Cache provenance.** Re-derive the condition cache from GSE92742 Level 4 (checked against
+  GEO's SHA-512) to close the provenance gap.
+- **More time points.** Find a dataset with more than two time points before any time rule
+  becomes a default.
+- **Housekeeping before committing the follow-up.** `research/acquisition_followup/README.md` is
+  written in Chinese (51 lines), so `test_project_markdown_has_no_chinese_prose` will fail once it
+  is tracked.
+
 ## 10. Curation provenance
 
 ### Block 1: biological depth
@@ -671,3 +900,9 @@ spend reconstruction are in `log/20260926/0926/run-notes.md`.
 Written by the session that ran the block, from the files named in section 8; its tables are
 generated by `research/acquisition_link/analyze.py`, and the protocol freeze, the probes before
 and after, and every rerun are in `log/20260926/0926/run-notes.md`.
+
+### Block 4: stopping gap and independent sequence validation
+
+Written by the session that ran the block, from the files named in section 8. Its tables are
+generated by `research/sequence_audit/analyze.py` and `lincs_analyze.py`; the freeze, the stopped
+run and the checks are in `log/20260926/0926/run-notes.md`.

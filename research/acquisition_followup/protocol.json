@@ -1,0 +1,18 @@
+{
+  "version": "acquisition-followup-1",
+  "status": "exploratory on previously analysed SciPlex3; no promotion claim",
+  "data": "existing dynamic_world_model prepared SciPlex3, original scaffold folds and frozen validator",
+  "tiers": ["B", "A"],
+  "arms": ["da", "fixed", "one_step_utility", "two_step", "two_step_permuted"],
+  "horizon": 2,
+  "budget_days": 16,
+  "order": "nondecreasing exposure time; distinct actions; independent assay wells",
+  "utility": {"correct": 1, "wrong": -2, "unresolved": 0},
+  "probabilities": "Jeffreys 0.5 per registered label, uniform initial hypothesis prior; branch likelihoods retained in planning only",
+  "continuation": "only after unresolved/undetected, using same training compounds measured at both conditions and matching first reading; no unconditioned fallback",
+  "selection": "positive terminal expected utility, then expected assay days, then action identifier; one_step_utility ranks first action by immediate utility then uses the same conditional continuation after the real result (two measurements for every arm)",
+  "constraints": "at least one measured reference per hypothesis per conditioned branch; no forecast updates EvidenceState",
+  "comparisons": ["two_step - da", "two_step - one_step_utility", "two_step - fixed", "two_step - two_step_permuted"],
+  "intervals": "2000 paired compound bootstrap draws, seed 20260926; report correct, wrong, utility and days",
+  "stop_rule": "one frozen run; no tuning on test results"
+}

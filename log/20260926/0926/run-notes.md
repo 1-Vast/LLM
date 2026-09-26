@@ -289,3 +289,47 @@ with the vendor annotation, with compound-bootstrap 95% intervals:
 - Final checks: full suite 1320 passed (1301 + 19); `research/acquisition_link/test_acquisition_link.py`
   4 of 4 (including a one-fold rerun); `tests/test_repository_shape.py` passes with the
   three-block day record. No provider or API call was made in this block.
+
+## Block 4 (21:52 onward): stopping gap and independent sequence validation
+
+- 21:52 Orientation. The HEAD is `97c8e28`. The Codex follow-up (20:31-21:01) is uncommitted in
+  `research/acquisition_followup/` and in seven modified files, and was kept as found. A Codex
+  session active at 21:52 was working on a remote server, not this tree. The follow-up's recorded
+  source hashes match the current files.
+- 21:58-22:01 `diagnose.py`: all 2,496 recorded plans per arm were recomputed with the follow-up's
+  own `plan_two_step`, with 0 mismatches. Every stop after a neutral first reading was
+  attributed. In tier A, 106 of 147 stops broke down as 52 thin support, 37 no paired references,
+  8 wrong risk and 9 no gain. By two-step path, the fixed sequence's +0.274 was +0.140 from
+  neutral stops, +0.074 from deferrals and +0.018 from QC stops.
+- 22:10 `diagnose.py` now imports the audit functions from `policies.py`. Its outputs are
+  byte-identical, with the same SHA-256 before and after.
+- 22:11-22:14 Phase 2 matched replay, 39,936 records. The five arm-rule pairs whose original
+  rules already matched reproduce the original records, 2,496 of 2,496 each. Two-step minus fixed
+  in tier A was -0.259 [-0.360, -0.161] under `continue` and -0.250 under `stop`.
+- 22:15-22:17 `lincs_prepare.py` (metadata and cache only). The first run stopped on perturbagens
+  absent from `pert_info` and wrote nothing. The rerun found 21 LT classes, 344 compounds and
+  6,880 episodes, and 15 T classes, 218 compounds and 3,052 episodes. Cache-versus-official
+  signature strength: Spearman 0.595. The six GEO metadata files match GEO's SHA-512 sums.
+- 22:19-22:21 `test_sequence_audit.py`: 18 tests pass, including the ported planner against the
+  original on every contrast of two SciPlex3 folds.
+- 22:23:12 Protocol frozen (`freeze.json`). No L1000 validator reading, forecast or decision had
+  been computed, and the revision had not run anywhere.
+- 22:24-22:27 `lincs_evaluate.py`: the gate passed in 5 of 5 folds in both tiers. It wrote 79,456
+  records and 61,144 menu rows, and every record passed `audit_record`.
+- 22:26-22:28 SciPlex3 exploratory replay with the revision: 44,928 records.
+- 22:28 `lincs_analyze.py`: fallback minus two-step utility in LT was +0.0013 [+0.0002, +0.0026],
+  and wrong eliminations +0.0001 [0.0000, +0.0005]. Fallback minus fixed was +0.014
+  [-0.012, +0.041]. Frozen verdict: SHADOW.
+- 22:31-22:36 Post-run review.
+  - 32 LT episodes stopped after a fallback first measurement although the audit found a
+    supported positive continuation. A new test pins this behaviour; the rule was not changed.
+  - The first version of that test built the wrong scenario, failed, and was rewritten.
+  - Added: a one-fold L1000 rerun (identical records) and the record audit over every L1000
+    record.
+- 22:37 Final checks.
+  - `test_sequence_audit.py`: 21 of 21.
+  - Related research tests: 43 of 43.
+  - Full suite: 1,326 passed, in the `maestro` env.
+  - The follow-up's README is Chinese (51 lines); it would fail
+    `test_project_markdown_has_no_chinese_prose` once tracked. Recorded, not changed.
+- No provider or API call was made in this block, and laboratory cost is 0.

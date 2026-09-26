@@ -115,8 +115,21 @@ def test_a_rerun_of_one_fold_reproduces_the_recorded_episodes_and_menu_rows():
     recorded = [json.loads(line) for line in (V.OUT / "episodes" / "episodes.jsonl").read_text(encoding="utf-8").splitlines()]
     recorded = [r for r in recorded if r["tier"] == "A" and r["fold"] == 1]
     rerun, audit, _ = V.run_fold(("A", 1))
-    strip = lambda r: json.dumps(C.clean(r), default=C._default, sort_keys=True)  # noqa: E731
-    assert [strip(r) for r in rerun] == [strip(r) for r in recorded]
+    # TV is a diagnostic sum whose last bit differs across Python runtimes;
+    # decisions, forecast scores and every other field must still match exactly.
+    def strip(record):
+        cleaned = C.clean(record)
+        values = []
+        for step in cleaned["steps"]:
+            chosen = step.get("note", {}).get("chosen")
+            if chosen is not None:
+                values.append(chosen.pop("total_variation", None))
+        return json.dumps(cleaned, default=C._default, sort_keys=True), values
+
+    actual, expected = [strip(r) for r in rerun], [strip(r) for r in recorded]
+    for (record, tv), (reference, reference_tv) in zip(actual, expected, strict=True):
+        assert record == reference
+        assert tv == pytest.approx(reference_tv, rel=0, abs=1e-14)
     menu = pd.read_csv(V.OUT / "episodes" / "menu_audit.csv")
     menu = menu[(menu.tier == "A") & (menu.fold == 1)].reset_index(drop=True)
     again = pd.DataFrame(audit)

@@ -471,6 +471,12 @@ intervention-design quality, biological credibility, and final decision quality.
   had been logging, not using, every virtual-cell prediction, and a 72 h action was being ranked
   by a 24 h answer. A comparison of planners had assumed a link that was not there
   ([`research/acquisition_link/`](research/acquisition_link/README.md)).
+- **Compare sequence policies under identical sequence rules.** On 2026-09-26 the arms of a
+  sequence comparison followed different QC-continuation rules. Matched in one runner, the rules
+  changed the gap by only 0.015. What had looked like a planning defect was the planner honestly
+  refusing to value continuations its sparse references could not support, and on independent
+  L1000 data the matching fix changed almost nothing
+  ([`research/sequence_audit/`](research/sequence_audit/README.md)).
 
 Protocol in full: [`research/asrg/03_experiment_protocol.md`](research/asrg/03_experiment_protocol.md).
 

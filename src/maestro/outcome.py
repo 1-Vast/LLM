@@ -271,6 +271,8 @@ class UpdateRecord:
     scope: EvidenceScope
     eliminated: tuple[str, ...]
     note: str
+    outcome_label: str = ""
+    candidate_hypotheses: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -320,6 +322,8 @@ class EvidenceState:
             scope=interpretation.scope,
             eliminated=tuple(sorted(eliminated_now)),
             note=note,
+            outcome_label=interpretation.outcome_label,
+            candidate_hypotheses=tuple(sorted(self.candidates)),
         )
         return EvidenceState(
             candidates=self.candidates - eliminated_now,

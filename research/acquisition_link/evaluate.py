@@ -43,6 +43,7 @@ from maestro.acquisition import (  # noqa: E402
 )
 from maestro.models import EvidenceScope  # noqa: E402
 from maestro.outcome import OutcomeRule  # noqa: E402
+from maestro.outcome import OutcomeClass  # noqa: E402
 
 OUT = ROOT / "outputs" / "acquisition_link_20260926"
 MATCH = {True: "profile_matches_h1", False: "profile_matches_h2"}
@@ -125,7 +126,19 @@ class ReferenceCardForecaster:
 
         h1, h2 = (hypothesis.identifier for hypothesis in contrast.hypotheses)
         keys = {C.action_id(key): key for key in self.ft.tables}
-        return {action.identifier: (self.forecast_key(keys[action.identifier], h1, h2) if action.identifier in keys else
+        forecaster = self
+        if self.step1 is None and evidence is not None:
+            categories = {ABSENT: "undetected", UNRESOLVED: "detected_unresolved"}
+            for update in reversed(evidence.updates):
+                if (update.outcome_class is OutcomeClass.PREDICTED
+                        and frozenset(update.candidate_hypotheses) == contrast.identifiers()
+                        and update.outcome_label in categories and update.action_identifier in keys):
+                    forecaster = ReferenceCardForecaster(
+                        self.ft, self.params, minimum_references=self.minimum,
+                        step1=(keys[update.action_identifier], categories[update.outcome_label]), label=self.label,
+                    )
+                    break
+        return {action.identifier: (forecaster.forecast_key(keys[action.identifier], h1, h2) if action.identifier in keys else
                                     OutcomeForecast(action.identifier, (), "", refusal="condition_not_in_reference_data"))
                 for action in actions}
 

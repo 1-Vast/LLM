@@ -8,7 +8,7 @@ The day records are the entry points. Existing machine-local artifacts under
 |---|---|
 | `20260915/README.md` | Earlier local biological closure and log audit artifacts |
 | `20260925/README.md` | Jev verification, tool fixes and topology ablation |
-| `20260926/README.md` | Data directory merge; pre-registered biological-depth test of the virtual cell and agent; pre-registered test of virtual-cell-assisted measurement choice for mechanism discrimination (24 h and 72 h), provider transport repair; audit and repair of the link from world-model prediction to measurement choice, with its pre-registered evaluation |
+| `20260926/README.md` | Data directory merge; pre-registered biological-depth test of the virtual cell and agent; pre-registered test of virtual-cell-assisted measurement choice for mechanism discrimination (24 h and 72 h), provider transport repair; audit and repair of the link from world-model prediction to measurement choice, with its pre-registered evaluation; stopping-gap diagnosis of the contingent two-step policy, a behaviour-matched replay, and a pre-registered independent validation on L1000 |
 
 ## Files
 
@@ -67,3 +67,14 @@ The day records are the entry points. Existing machine-local artifacts under
 - `20260926/0926/acquisition_link_manifest.json`
 - `20260926/0926/acquisition_link_falsification_before.json`
 - `20260926/0926/acquisition_link_falsification_after.json`
+- `20260926/0926/sequence_audit_diagnosis_summary.json`
+- `20260926/0926/sequence_audit_phase2_report.md`
+- `20260926/0926/sequence_audit_phase2_summary.json`
+- `20260926/0926/sequence_audit_phase3_sciplex3_report.md`
+- `20260926/0926/sequence_audit_phase3_sciplex3_summary.json`
+- `20260926/0926/sequence_audit_l1000_report.md`
+- `20260926/0926/sequence_audit_l1000_summary.json`
+- `20260926/0926/sequence_audit_l1000_feasibility.json`
+- `20260926/0926/sequence_audit_l1000_gate.json`
+- `20260926/0926/sequence_audit_l1000_manifest.json`
+- `20260926/0926/sequence_audit_freeze.json`

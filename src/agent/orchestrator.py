@@ -511,7 +511,7 @@ class MAESTROOrchestrator:
             action_predictions=action_predictions, action_requests=action_requests, case_id=case_id,
         )
         acquisition_stop = self._acquisition_stop_reason(session_id)
-        if selection is not None and selection.actions and not selection.uncovered:
+        if selection is not None and selection.actions and (self._discrimination_selection or not selection.uncovered):
             contrast = replace(
                 contrast,
                 plan=selection.actions[0],
@@ -532,7 +532,7 @@ class MAESTROOrchestrator:
         execution_actions = self._execution_actions(
             contrast, check, repair, intervention_profile, available_actions
         )
-        if self._power_aware_selection and selection is not None:
+        if (self._power_aware_selection or self._discrimination_selection) and selection is not None:
             allowed = {action.identifier for action in selection.actions}
             execution_actions = tuple(action for action in execution_actions if action.identifier in allowed)
         if self._case_store:

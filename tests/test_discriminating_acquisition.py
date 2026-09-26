@@ -26,6 +26,7 @@ File summary
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -454,7 +455,7 @@ def _orchestrator(tmp_path: Path, world_model, **options) -> MAESTROOrchestrator
         logger=RunLogger(root),
         controller=MAESTROAgent(),
         virtual_cell=world_model,
-        power_aware_selection=True,
+        power_aware_selection=options.pop("power_aware_selection", True),
         interpretation_table=InterpretationTable(_runtime_rules()),
         case_store=CaseStore(root / "cases.sqlite"),
         **options,
@@ -529,13 +530,15 @@ def _flat(identifier: str) -> OutcomeForecast:
 
 
 @pytest.mark.parametrize("separating, expected", [("measure_low", "measure_low"), ("measure_high", "measure_high")])
-def test_power_aware_selection_follows_outcome_forecasts_when_enabled(tmp_path, separating, expected):
+@pytest.mark.parametrize("power_aware", [False, True])
+def test_power_aware_selection_follows_outcome_forecasts_when_enabled(tmp_path, separating, expected, power_aware):
     other = "measure_high" if separating == "measure_low" else "measure_low"
     forecaster = _StubForecaster({separating: _separating(separating), other: _flat(other)})
     profile = FunctionalInterventionProfile(mode="inhibition", context_identifier="NCI-H596", time_hours=24.0)
     # Equal magnitudes: only the forecasts differ between the two parametrisations.
     orchestrator = _orchestrator(tmp_path, _LabelWorldModel({CONTROL_LOW: 2.0, CONTROL_HIGH: 2.0}),
-                                 outcome_forecaster=forecaster, discrimination_selection=True)
+                                 outcome_forecaster=forecaster, discrimination_selection=True,
+                                 power_aware_selection=power_aware)
     turn = orchestrator.run(
         "Which exposure should be measured first?", available_actions=_runtime_actions(), intervention_profile=profile,
         case_id="forecast", budget=1.0, virtual_cell_template=_template(),
@@ -547,6 +550,47 @@ def test_power_aware_selection_follows_outcome_forecasts_when_enabled(tmp_path, 
     # Nothing but the plan moved: no hypothesis was removed and the case waits for a real result.
     assert orchestrator.evidence_state("forecast") is None or orchestrator.evidence_state("forecast").eliminated == frozenset()
     assert turn.case is not None and turn.case.state is CaseState.AWAITING_RESULT
+
+
+@pytest.mark.parametrize("power_aware", [False, True])
+def test_discrimination_deferral_blocks_execution_in_both_coverage_modes(tmp_path, power_aware):
+    forecaster = _StubForecaster({identifier: _flat(identifier) for identifier in ("measure_low", "measure_high")})
+    profile = FunctionalInterventionProfile(mode="inhibition", context_identifier="NCI-H596", time_hours=24.0)
+    orchestrator = _orchestrator(tmp_path, _LabelWorldModel({CONTROL_LOW: 2.0, CONTROL_HIGH: 2.0}),
+                                 outcome_forecaster=forecaster, discrimination_selection=True,
+                                 power_aware_selection=power_aware)
+    turn = orchestrator.run(
+        "Which exposure should be measured first?", available_actions=_runtime_actions(), intervention_profile=profile,
+        case_id="deferred", budget=1.0, virtual_cell_template=_template(),
+    )
+    assert turn.selected_actions == ()
+    assert turn.case is not None and turn.case.state is CaseState.DEFERRED
+    assert turn.case.stop_reason.startswith("acquisition_no_admissible_action:")
+    computed = _events(tmp_path, "discrimination_selection_computed")[-1]["payload"]
+    assert computed["status"] == "no_admissible_action" and computed["chosen"] is None
+    assert orchestrator.evidence_state("deferred") is None or not orchestrator.evidence_state("deferred").eliminated
+
+
+@pytest.mark.parametrize("power_aware", [False, True])
+def test_partial_discrimination_choice_reaches_the_agent_check(tmp_path, power_aware):
+    forecaster = _StubForecaster({"measure_low": _flat("measure_low"), "measure_high": _separating("measure_high")})
+    profile = FunctionalInterventionProfile(mode="inhibition", context_identifier="NCI-H596", time_hours=24.0)
+    actions = tuple(replace(action, distinguishes=(REALISED,)) for action in _runtime_actions())
+    orchestrator = _orchestrator(tmp_path, _LabelWorldModel({CONTROL_LOW: 2.0, CONTROL_HIGH: 2.0}),
+                                 outcome_forecaster=forecaster, discrimination_selection=True,
+                                 power_aware_selection=power_aware)
+    turn = orchestrator.run(
+        "Which exposure should be measured first?", available_actions=actions, intervention_profile=profile,
+        case_id="partial", budget=1.0, virtual_cell_template=_template(),
+    )
+    assert turn.contrast.plan.identifier == "measure_high"
+    # The agent still checks the action's declared coverage before authorising execution.
+    assert not turn.check.discriminable
+    assert turn.selected_actions == ()
+    assert turn.case.state is CaseState.DEFERRED
+    completed = _events(tmp_path, "budget_selection_completed")[-1]["payload"]
+    assert completed["selected_action_ids"] == ["measure_high"]
+    assert completed["uncovered"] == [NOT_REALISED]
 
 
 def test_outcome_forecasts_are_shadowed_unless_selection_is_enabled(tmp_path):

@@ -1,0 +1,37 @@
+{
+  "version": "sparse-value-1",
+  "status": "retrospective held-out replay on previously inspected datasets; no fresh independent confirmation",
+  "question": "Can measured same-condition reference information estimate the value of sparse conditional branches, accounting for wrong elimination and acquisition cost?",
+  "model": {
+    "initial": "per-hypothesis grouped target-condition reference counts plus Jeffreys 0.5 per registered label",
+    "conditional": "matching paired-reference group counts plus 2.0 times parent probabilities; parent uses same target condition/hypothesis/decoy, excludes whole groups in local counts, and has Jeffreys 0.5 per label",
+    "groups": "SciPlex3 skeleton; L1000 connected identity/scaffold component; one unit of weight per group",
+    "no_local": "explicit marginal backoff, assumes within-hypothesis conditional exchangeability; never claims paired support",
+    "no_parent": "local counts plus Jeffreys 0.5; no duplication of measured counts",
+    "no_target": "unknown with named refusal; never a zero-value estimate",
+    "hyperparameters": "fixed before new replay; no parameter or price tuning on held-out outcomes",
+    "uncertainty": "Dirichlet branch utility variance and beta wrong-risk upper bounds; borrowed mass kept separate from measured support; diagnostic intervals are model-conditional, not validated frequentist coverage"
+  },
+  "policy": {
+    "utility": {"correct": 1, "wrong": -2, "neutral": 0},
+    "objective": "expected terminal utility minus price per expected measurement, including both first and contingent second measurement",
+    "cost_per_measurement": [0.0, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2],
+    "cost_interpretation": "user economic sensitivity in units of a correct decision; no price declared optimal",
+    "first": "bounded two-step lookahead using first-reading probabilities under both hypotheses; forecasts conditional on passing QC, assay failure probabilities are not modelled",
+    "after_real_result": "replan from actually measured action and observed label; QC failure uses unconditional forecasts and consumes budget",
+    "stop": "no legal action; expected net value non-positive; or all forecasts unknown (distinct reason)",
+    "evidence": "forecasts and planning weights never update EvidenceState; only registered interpretation of executed real results",
+    "risk": "wrong elimination charged 2 units; report posterior wrong probability and uncertainty, no unvalidated chance constraint"
+  },
+  "validation": {
+    "datasets": {"sciplex3": ["A", "B"], "l1000": ["LT", "T"]},
+    "split": "existing five grouped folds; reference estimator receives only fold training tables; no held-out identity or profile input",
+    "shared_rules": "sequence_audit.run_matched; two assays; nondecreasing exposure; no repetition; QC continue for all; 16 assay-days SciPlex3 and 12 L1000",
+    "comparators": ["legacy_fallback", "fixed_fallback", "two_step", "fixed", "da_unconditioned"],
+    "ablations_at_price_0.02": ["marginal_only (retains first-reading planning weights, removes conditional response distributions)", "paired_only", "permuted_training_labels"],
+    "endpoints": ["correct", "wrong", "utility", "measurements", "days", "net_value_at_each_price", "yield_of_extra_measurements", "selected_action_forecast_calibration", "unknown_vs_net_non_positive_stop_counts"],
+    "primary_comparisons": "new policy vs repaired fallback and da_unconditioned, using the SAME measurement price for every arm",
+    "interval": "2000 paired component/skeleton bootstrap draws, seed 20260926; L1000 batch sensitivity where feasible",
+    "decision": "report all prices and all tiers, no search for a favorable price; no global default promotion from previously inspected data"
+  }
+}

@@ -1,0 +1,77 @@
+{
+ "schema": "maestro-sequence-audit-protocol",
+ "version": "sequence-audit-1",
+ "question": "Does a revision of the contingent two-step policy, chosen from the stopping-gap diagnosis, improve real mechanism decisions without unacceptable wrong-elimination risk?",
+ "seen_before_freeze": {
+  "sciplex3": "everything: blocks 2 and 3, the follow-up's recorded sequences, the Phase 1 attribution and the Phase 2 matched replay",
+  "l1000": "metadata only: condition counts, vehicle-null thresholds, detection counts per line and time, class pools and sizes, batch shares and the cache-versus-official signature-strength concordance",
+  "l1000_not_seen": "no validator calibration, leave-one-out outcome, held-out reading, forecast or policy decision"
+ },
+ "intervention": {
+  "name": "two_step_fallback",
+  "implementation": "research/sequence_audit/policies.py, contingent(..., fallback=True)",
+  "base": "the follow-up's contingent two-step planner (plan_two_step), unchanged",
+  "rule": "When the base planner would defer before the first measurement, or stop after a neutral or QC-failed result, classify why. If the cause is uninformed (no_references, no_paired_references, or inadequate_support_or_uncertainty: positive on raw reference frequencies, not after the planner's Jeffreys shrinkage), take the fixed early-to-late sequence's next legal action. If the references it has forecast no correct elimination or a wrong-elimination risk above the 2:1 break-even, stop as before, with the named reason.",
+  "reason_hierarchy": ["time_order_or_action_legality", "insufficient_budget", "no_paired_references / no_references", "implementation_defect", "inadequate_support_or_uncertainty", "wrong_elimination_risk", "predicted_non_positive_utility"],
+  "never": ["forecasts or simulated branches update EvidenceState", "an unsupported branch is given a probability", "production defaults change"],
+  "justification": "Phase 1: 89 of 106 tier-A stops after a neutral first reading (610 of 767 in tier B) were uninformed; stops and deferrals, not measurement choice, carried about 85% of the fixed sequence's tier-A advantage."
+ },
+ "rules_shared_by_every_arm": {
+  "runner": "policies.run_matched",
+  "measurements": 2,
+  "order": "distinct actions; exposure time never earlier than any executed action, failed assays included",
+  "qc": "primary 'continue': a failed assay is charged, updates nothing, every arm chooses again; sensitivity 'stop' (SciPlex3 only; L1000 episode compounds are measured at every menu condition, so no QC failure can occur there)",
+  "stops": "after any elimination, after two measurements, when no legal action remains, or when the arm names a stop",
+  "utility": {"correct": 1, "wrong": -2, "exhausted": -2, "undetermined": 0, "deferred": 0},
+  "evidence": "common.evidence_update on real executed results only (registered OutcomeRules)"
+ },
+ "sciplex3_exploratory": {
+  "status": "diagnosis-informed; reported, never used for the verdict",
+  "run": "replay.py --arms production,magnitude,da,da_unconditioned,fixed,one_step_utility,two_step,two_step_permuted,two_step_fallback --label phase3_sciplex3_exploratory",
+  "budget_days": 16.0
+ },
+ "l1000": {
+  "status": "independent decision validation; primary",
+  "data": "GSE92742 local metadata and the derived subset48 condition cache, prepared by lincs_prepare.py (hashes in freeze.json)",
+  "profile": "cache condition mean over 978 measured landmark genes",
+  "qc": ">=2 wells on >=2 plates, finite values, and a matched official signature (same compound, line, time, 10 uM, batch) with >=2 replicates",
+  "detection": "median distil_cc_q75 of matched signatures >= max(0.10, 0.99 quantile of DMSO ctl_vehicle signatures with >=2 replicates at the same line and time)",
+  "labels": "exact Repurposing Hub join by Broad compound ID, else full InChIKey; single-mechanism records only",
+  "pool": "per tier, classes with >=6 InChIKey identity groups among compounds measured at every tier condition, of which >=2 are detected at some tier condition",
+  "folds": "5; connected components of shared InChIKey connectivity block or Bemis-Murcko scaffold, round-robin in SHA256 order within class strata",
+  "tiers": {
+   "LT": {"role": "primary", "menu": "A549, MCF7, PC3, VCAP x 6 h, 24 h at 10 uM", "fixed": ["A549 6 h", "A549 24 h"]},
+   "T": {"role": "secondary", "menu": "A549 x 6 h, 24 h at 10 uM", "fixed": ["A549 6 h", "A549 24 h"]}
+  },
+  "episodes": "every eligible held-out compound against every other pool class; hypothesis order by the SciPlex3 seeded coin (episodes.episode_list)",
+  "validator": "the SciPlex3 validator unchanged (shared-axis projected cosine, detected templates, floor and margin) with its calibration grid and 5% maximum wrong-elimination rate, per fold on training compounds only",
+  "assay_days": "exposure days + 5 (6 h: 5.25, 24 h: 6.0)",
+  "budget_days": 12.0,
+  "arms": ["production", "da", "da_unconditioned", "fixed", "one_step_utility", "two_step", "two_step_permuted", "two_step_fallback"],
+  "gate": "a tier is evaluated only if its calibrated validator can eliminate in >=3 of 5 folds; a failed gate gives no verdict from that tier"
+ },
+ "endpoints": {
+  "primary": ["utility", "wrong-elimination rate (wrong or exhausted)"],
+  "primary_contrasts": ["two_step_fallback - two_step", "two_step_fallback - fixed"],
+  "secondary": ["correct, undetermined and deferral rates", "measurements", "assay days", "fallback count", "contrasts against da, da_unconditioned, production, one_step_utility", "two_step - two_step_permuted (forecast signal)", "step-1 forecast calibration: ECE and Brier of the truth-branch correct-elimination probability, all menu actions, 10 equal-width bins", "support-stratified rates: contrast support = the smaller number of training compounds of the two hypotheses at the fixed first condition, strata <=3, 4-7, >=8", "plate diagnostic: share of eliminating readings whose nearest winning-class template shares the held-out batch, against the class's template batch share"]
+ },
+ "inference": {
+  "interval": "95% percentile, 2000 paired cluster-bootstrap draws, seed 20260926",
+  "unit_l1000": "the held-out compound's fold component (shared identity block or scaffold)",
+  "unit_sciplex3": "skeleton group (InChIKey connectivity block)",
+  "sensitivity": ["L1000: identity group; batch cohort (batch of the A549 6 h measurement) with leave-one-batch-out range", "SciPlex3: compound; Bemis-Murcko scaffold; plate cohort with leave-one-cohort-out range"]
+ },
+ "decision": {
+  "tolerance_wrong": 0.02,
+  "applies_to": "L1000 tier LT; tier T only as the consistency condition of PROMOTE",
+  "order": [
+   "INCONCLUSIVE if the LT gate fails",
+   "REJECT if the fallback-minus-two_step utility interval lies wholly below 0, or its wrong-elimination interval lies wholly above +0.02",
+   "PROMOTE if fallback-minus-two_step utility lower bound > 0 and wrong upper bound <= 0.02, and fallback-minus-fixed utility lower bound > 0 and wrong upper bound <= 0.02, and in tier T both utility point estimates are >= 0",
+   "SHADOW if fallback-minus-two_step utility lower bound > 0 and wrong upper bound <= 0.02",
+   "INCONCLUSIVE otherwise"
+  ],
+  "meaning": {"PROMOTE": "eligible for an implementation review as the default two-measurement sequencing rule; nothing is switched automatically", "SHADOW": "keep opt-in and logged; better than the policy it revises, not better than the fixed sequence", "REJECT": "do not use", "INCONCLUSIVE": "keep opt-in; no claim"},
+  "not_evidence": ["profile cosine", "forecast calibration alone", "SciPlex3 results"]
+ }
+}
