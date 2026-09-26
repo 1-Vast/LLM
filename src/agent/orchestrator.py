@@ -15,6 +15,11 @@ File summary
   - Each round analyses the menu as a dependency graph (`maestro.topology`): what can run
     now, how many supplier steps each action is away, and which premises no registered
     action supplies. The analysis is logged, kept on the turn, and shown to the repair planner.
+  - Measurement choice: on the power-aware path the world model's magnitudes are logged, not
+    used. An optional outcome forecaster's per-hypothesis readings are scored every round by
+    `maestro.acquisition.select_discriminating_action` and logged; they choose the round's
+    measurement only with `discrimination_selection`. A per-action query states the action's own
+    exposure time, and a prediction for another time or context ranks nothing.
 - Interfaces: `MAESTROOrchestrator`, `run`, `run_case_loop`, `import_measurement`, `MAESTROTurn`, `MAESTROCaseLoop`
 - Depends on: maestro.contrast, maestro.decision, maestro.outcome, maestro.repair, maestro.reliability, maestro.provenance, agent.audit, agent.cases, agent.configuration, agent.context, agent.knowledge, agent.llm, agent.memory, agent.planner, agent.reflection, agent.tool_runtime, agent.vision, agent.world_model_briefing, virtual_cell
 """
@@ -29,7 +34,13 @@ from pathlib import Path
 from typing import Callable, Mapping, Sequence
 
 from maestro.contrast import MAESTROAgent
-from maestro.acquisition import select_expected_coverage
+from maestro.acquisition import (
+    DiscriminationPlan,
+    OutcomeForecaster,
+    outcome_consequences,
+    select_discriminating_action,
+    select_expected_coverage,
+)
 from maestro.decision import DecisionEngine, DevelopmentDecision
 from maestro.handoff import (
     ComparabilityStatus,
@@ -46,6 +57,7 @@ from maestro.outcome import (
     EvidenceState,
     InterpretationTable,
     MeasuredPremise,
+    OutcomeRule,
     ValidatedEvidenceUpdate,
     admit_evidence,
     default_rules_for,
@@ -193,6 +205,8 @@ class MAESTROOrchestrator:
     _decision_critic: TypedDecisionCritic | None = None
     _runtime_client: object | None = None
     _decision_repeats: int = 1
+    _outcome_forecaster: OutcomeForecaster | None = None
+    _discrimination_selection: bool = False
 
     def __init__(
         self,
@@ -219,6 +233,8 @@ class MAESTROOrchestrator:
         reuse_predictions: bool = True,
         max_parallel_predictions: int = 1,
         decision_critic: TypedDecisionCritic | None = None,
+        outcome_forecaster: OutcomeForecaster | None = None,
+        discrimination_selection: bool = False,
     ):
         if (
             isinstance(max_parallel_predictions, bool)
@@ -226,6 +242,8 @@ class MAESTROOrchestrator:
             or max_parallel_predictions < 1
         ):
             raise ValueError("max_parallel_predictions must be a positive integer.")
+        if discrimination_selection and outcome_forecaster is None:
+            raise ValueError("discrimination_selection requires an outcome_forecaster.")
         self._interpreter = interpreter
         self._context_builder = context_builder
         self._planner = planner
@@ -257,6 +275,10 @@ class MAESTROOrchestrator:
         # caller declares the backend safe to call from several threads.
         self._max_parallel_predictions = max_parallel_predictions
         self._decision_critic = decision_critic
+        # Forecasts of each action's reading under each hypothesis. Without the flag they are
+        # computed and logged beside the coverage choice (shadow); with it they choose the action.
+        self._outcome_forecaster = outcome_forecaster
+        self._discrimination_selection = discrimination_selection
 
     @property
     def prediction_cache(self) -> PredictionCache | None:
@@ -486,8 +508,9 @@ class MAESTROOrchestrator:
         selection = self._select_budgeted_actions(
             contrast, available_actions, intervention_profile, case, budget, session_id,
             prediction=prediction, prediction_request=effective_request,
-            action_predictions=action_predictions, action_requests=action_requests,
+            action_predictions=action_predictions, action_requests=action_requests, case_id=case_id,
         )
+        acquisition_stop = self._acquisition_stop_reason(session_id)
         if selection is not None and selection.actions and not selection.uncovered:
             contrast = replace(
                 contrast,
@@ -513,12 +536,15 @@ class MAESTROOrchestrator:
             allowed = {action.identifier for action in selection.actions}
             execution_actions = tuple(action for action in execution_actions if action.identifier in allowed)
         if self._case_store:
+            stop_reason = None if repair is None or repair.replacement_action else repair.interpretation_boundary
+            if acquisition_stop is not None and not execution_actions:
+                stop_reason = acquisition_stop
             case = self._case_store.record_plan(
                 case_id,
                 execution_actions,
                 ready_to_measure=bool(execution_actions),
                 context_identifier=intervention_profile.context_identifier,
-                stop_reason=None if repair is None or repair.replacement_action else repair.interpretation_boundary,
+                stop_reason=stop_reason,
             )
         self._logger.event("contrast_proposed", asdict(proposal), session_id=session_id)
         self._logger.experiment(
@@ -1421,6 +1447,14 @@ class MAESTROOrchestrator:
         action_requests = self._build_action_prediction_requests(
             template, intent, contrast, case_id, case, session_id, available_actions
         )
+        not_built = {
+            action.identifier: f"execution_context_differs_from_template:{action.execution_context}"
+            for action in available_actions
+            if template is not None and action.identifier in template.action_interventions
+            and action.identifier not in action_requests
+        }
+        if not_built:
+            self._logger.event("virtual_cell_query_not_built", {"reasons": not_built}, session_id=session_id)
         if action_requests:
             answered = self._predict_many(action_requests, session_id)
             assessments = {key: pair[0] for key, pair in answered.items() if pair[0] is not None}
@@ -1573,23 +1607,41 @@ class MAESTROOrchestrator:
         session_id: str,
         available_actions: Sequence[EvidenceAction],
     ) -> dict[str, PredictionRequest]:
-        """One request per registered action that names its own exact condition."""
+        """One request per registered action that names its own exact condition.
+
+        A template that states exposure time as a model input states it per action: the action's
+        declared ``time_hours`` replaces the template's, so a 72 h action is asked about 72 h and a
+        24 h-only model refuses it by name instead of lending it the 24 h answer. A template that
+        leaves time to the perturbation label is unchanged. An action declared in another context
+        than the template's is not queried at all, because the request could only describe the
+        template's context.
+        """
 
         if template is None or not template.action_interventions:
             return {}
-        registered = {action.identifier for action in available_actions}
-        return {
-            action_identifier: template.build(
+        registered = {action.identifier: action for action in available_actions}
+        requests: dict[str, PredictionRequest] = {}
+        for action_identifier, label in template.action_interventions.items():
+            action = registered.get(action_identifier)
+            if action is None:
+                continue
+            if action.execution_context is not None and action.execution_context != template.context.identifier:
+                continue
+            time_hours = (
+                action.time_hours
+                if template.time_hours is not None and action.time_hours is not None
+                else template.time_hours
+            )
+            requests[action_identifier] = template.build(
                 request_id=f"{session_id}.{action_identifier}",
                 case_id=case_id,
                 contrast_id=contrast.identifier,
                 plan_version=(case.plan_version + 1) if case else 1,
                 intended_targets=intent.target_or_targets,
                 intervention_identifier=label,
+                time_hours=time_hours,
             )
-            for action_identifier, label in template.action_interventions.items()
-            if action_identifier in registered
-        }
+        return requests
 
     @staticmethod
     def _build_prediction_request(
@@ -1623,6 +1675,7 @@ class MAESTROOrchestrator:
         prediction_request: PredictionRequest | None = None,
         action_predictions: Mapping[str, StatePrediction] | None = None,
         action_requests: Mapping[str, PredictionRequest] | None = None,
+        case_id: str | None = None,
     ):
         remaining = case.remaining_budget if case and case.remaining_budget is not None else budget
         if remaining is None:
@@ -1632,7 +1685,21 @@ class MAESTROOrchestrator:
                 prediction, prediction_request, available_actions,
                 action_predictions=action_predictions, action_requests=action_requests,
             )
-            if self._power_aware_selection:
+            discriminating = self._discriminating_selection(
+                contrast, available_actions, profile, remaining, priorities, case_id, session_id,
+            )
+            path = "budgeted"
+            if discriminating is not None and self._discrimination_selection:
+                # The forecast-driven choice replaces the coverage choice only when a caller asked
+                # for it; the coverage path below is then not consulted.
+                selection = discriminating.plan
+                path = "discrimination"
+            elif self._power_aware_selection:
+                path = "expected_coverage"
+                # Magnitude priorities are logged, not used, on this path: letting them break ties
+                # here failed its pre-registered keep rule on 2026-09-26 (tier A utility interval
+                # included zero; tier B wrong eliminations rose by 0.044). A world model reaches
+                # this path through outcome forecasts, where magnitude is only the last tie-break.
                 expected = select_expected_coverage(
                     contrast.identifiers(), available_actions, profile, remaining,
                     source_groups=self._context_builder.source_groups(
@@ -1678,10 +1745,76 @@ class MAESTROOrchestrator:
                 "total_cost": selection.total_cost,
                 "waiting_for_prerequisites": selection.waiting_for_prerequisites,
                 "prediction_action_priorities": priorities,
+                # Which selector chose, and whether the priorities could move its choice: never on
+                # the power-aware coverage path; as the last tie-break of the other two.
+                "selection_path": path,
+                "prediction_priorities_used": bool(priorities) and path != "expected_coverage",
             },
             session_id=session_id,
         )
         return selection
+
+    def _interpretation_rules(self, contrast: MechanismContrast) -> tuple[OutcomeRule, ...]:
+        """The rules that will read this contrast's results; acquisition values readings by them too."""
+
+        return tuple(self._interpretation_table.rules) or default_rules_for(contrast)
+
+    def _discriminating_selection(
+        self,
+        contrast: MechanismContrast,
+        available_actions: Sequence[EvidenceAction],
+        profile: FunctionalInterventionProfile,
+        remaining: float,
+        priorities: Mapping[str, float],
+        case_id: str | None,
+        session_id: str,
+    ) -> DiscriminationPlan | None:
+        """Ask the forecaster how each action would read under each hypothesis, and choose by it.
+
+        The plan is always logged; it drives the round only with ``discrimination_selection``.
+        A forecaster failure is recorded by type and leaves the coverage choice in charge.
+        """
+
+        forecaster = self._outcome_forecaster
+        plans = self.__dict__.setdefault("_discrimination_plans", {})
+        plans.pop(session_id, None)
+        if forecaster is None:
+            return None
+        evidence = self._evidence_states.get(case_id) if case_id and hasattr(self, "_evidence_states") else None
+        candidates = contrast.identifiers() & evidence.candidates if evidence is not None else contrast.identifiers()
+        try:
+            forecasts = dict(forecaster.forecast(contrast, available_actions, evidence))
+        except Exception as error:  # a model component failing must not stop the round
+            self._logger.event(
+                "outcome_forecast_failed",
+                {"forecaster": getattr(forecaster, "name", type(forecaster).__name__), "error": type(error).__name__},
+                session_id=session_id,
+            )
+            return None
+        plan = select_discriminating_action(
+            frozenset(candidates), available_actions, profile, remaining, forecasts,
+            outcome_consequences(self._interpretation_rules(contrast)), action_priorities=priorities,
+        )
+        plans[session_id] = plan
+        self._logger.event(
+            "discrimination_selection_computed",
+            {
+                "forecaster": getattr(forecaster, "name", type(forecaster).__name__),
+                "drives_selection": self._discrimination_selection,
+                "forecast_bases": {key: value.basis for key, value in sorted(forecasts.items())},
+                **plan.payload(),
+            },
+            session_id=session_id,
+        )
+        return plan
+
+    def _acquisition_stop_reason(self, session_id: str) -> str | None:
+        """A named reason to defer when forecast-driven selection found nothing admissible."""
+
+        plan = self.__dict__.get("_discrimination_plans", {}).pop(session_id, None)
+        if plan is None or not self._discrimination_selection or plan.status == "selected":
+            return None
+        return f"acquisition_{plan.status}: {plan.reason}"
 
     def _prediction_action_priorities(
         self,
@@ -1701,6 +1834,8 @@ class MAESTROOrchestrator:
         actions' priorities.  The score is an exploratory magnitude for one
         declared readout, and the selector only consults it after coverage, cost,
         and set size are equal, so it can never buy an extra or costlier action.
+        A prediction whose request states another exposure time or context than the
+        action declares answers a different condition and ranks nothing.
         """
 
         per_action = dict(action_predictions or {})
@@ -1723,6 +1858,7 @@ class MAESTROOrchestrator:
                 or source.in_distribution is not True
                 or not _answers(source, source_request)
                 or readout not in source_request.readouts
+                or not _states_action_condition(source_request, action)
             ):
                 continue
             model_version = source.model_version or (source_request.model_version if source_request else "")
@@ -2073,6 +2209,19 @@ def _answers(prediction: StatePrediction, request: PredictionRequest) -> bool:
     """Whether a prediction is the serving model's answer to exactly this request."""
 
     return prediction.request_id == request.request_id and prediction.model_version == request.model_version
+
+
+def _states_action_condition(request: PredictionRequest, action: EvidenceAction) -> bool:
+    """Whether a request states no exposure time or context that contradicts the action's own.
+
+    A request that leaves time to its perturbation label states nothing to contradict; one that
+    states 24 h cannot rank an action declared at 72 h, whatever it predicted.
+    """
+
+    stated = request.intervention.time_hours
+    if action.time_hours is not None and stated is not None and abs(stated - action.time_hours) > 1.0:
+        return False
+    return action.execution_context is None or request.context.identifier == action.execution_context
 
 
 def _stronger_scope(

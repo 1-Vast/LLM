@@ -1,8 +1,8 @@
 # Experiment record, 2026-09-26
 
 > - **Path**: `log/20260926/README.md`
-> - **Purpose**: Record two pre-registered blocks and what they changed. Block 1 tested whether MAESTRO's virtual cell and agent carry perturbation-specific biology (with the SciPlex3 label defect it uncovered, the components promoted to `src/` and `tools/`, and the merge of the two data directories). Block 2 tested whether a virtual cell helps the agent choose the measurement that separates two competing mechanisms, including "the perturbation failed" against "the mechanism is wrong", using the SciPlex3 24 h and 72 h cohorts.
-> - **Core points**: Block 1: SciPlex3 contains the biology (7 of 10 literature anchors hold), but no virtual-cell arm reproduces more than 3 of the 7 for unseen compounds, the JEPA latent upgrade adds nothing over PCA or retrieval and is not promoted, and retrieval over measured profiles became a tool. Block 2: no world-model planner beat the current magnitude tie-break (separation cards -0.044 correct decisions [-0.083, -0.004]; time-aware cards +0.054, interval including zero), a learned 24 h to 72 h transition beat persistence on the profile (+0.283 cosine) without improving any decision, multi-branch outcome predictions beat a single class mean (log loss -0.599), and cards did not help the language-model planner (+0.006). Nothing from block 2's world model is promoted; a transport defect in both provider clients was fixed with tests. The decisive variable was time: slow-acting mechanisms become separable only at 72 h, which the static rule never chooses.
+> - **Purpose**: Record three pre-registered blocks and what they changed. Block 1 tested whether MAESTRO's virtual cell and agent carry perturbation-specific biology (with the SciPlex3 label defect it uncovered, the components promoted to `src/` and `tools/`, and the merge of the two data directories). Block 2 tested whether a virtual cell helps the agent choose the measurement that separates two competing mechanisms, including "the perturbation failed" against "the mechanism is wrong", using the SciPlex3 24 h and 72 h cohorts. Block 3 audited and repaired the link from world-model prediction to measurement choice, then evaluated the repair on block 2's episodes under a protocol frozen beforehand.
+> - **Core points**: Block 1: SciPlex3 contains the biology (7 of 10 literature anchors hold), but no virtual-cell arm reproduces more than 3 of the 7 for unseen compounds, the JEPA latent upgrade adds nothing over PCA or retrieval and is not promoted, and retrieval over measured profiles became a tool. Block 2: no world-model planner beat the current magnitude tie-break (separation cards -0.044 correct decisions [-0.083, -0.004]; time-aware cards +0.054, interval including zero), a learned 24 h to 72 h transition beat persistence on the profile (+0.283 cosine) without improving any decision, multi-branch outcome predictions beat a single class mean (log loss -0.599), and cards did not help the language-model planner (+0.006). Nothing from block 2's world model is promoted; a transport defect in both provider clients was fixed with tests. The decisive variable was time: slow-acting mechanisms become separable only at 72 h, which the static rule never chooses. Block 3: the production (power-aware) selector logged but never used the virtual cell's predictions, a per-action query lent a 72 h action the 24 h answer, and per-hypothesis forecasts reached the selector only as one detection probability; the repaired distribution-aware selector (opt-in) decided neither better nor worse than magnitude (-0.019 [-0.053, +0.017] tier B, +0.033 [-0.030, +0.089] tier A: INCONCLUSIVE), its forecasts are well calibrated (ECE 0.058 and 0.085), and wiring magnitude into the power-aware path failed its keep rule and is not enabled.
 
 ## 1. Record control
 
@@ -43,6 +43,25 @@ Every number below comes from `log/20260926/0926/measurement_choice_report.md`, 
 `research/dynamic_world_model/report.py`; the timeline, including every stopped run, is in
 `log/20260926/0926/run-notes.md`.
 
+### Block 3: prediction-to-measurement link
+
+Working tree at `2b4b17c` (block 2, committed and pushed by the user at 18:13 through a Codex
+session that also drafted this block's brief and wrote nothing after 18:22), plus the untracked
+`reference/`. Before any change the full suite collected 1301 tests and passed (exit 0), and the
+subsystem tests for acquisition, selection, orchestration, world-model integration, outcome and
+cases passed 113 of 113.
+
+Pre-registration frozen at 2026-09-26 18:59:44 +0800, before any episode was run with the
+repaired selector or the one-reference forecasts:
+
+| File | SHA-256 |
+|---|---|
+| `research/acquisition_link/PROTOCOL.md` | `69303c075b0efd0f3fc12e181c9fdb9cea8317a1b2a1b2720d215a58528a0c95` |
+| `research/acquisition_link/protocol.json` | `d858370810984ce700755e50c08ed82bee5e54f71a14323d4c44bdeb9e4f0fda` |
+
+Every number below comes from `log/20260926/0926/acquisition_link_report.md`, generated by
+`research/acquisition_link/analyze.py`; the timeline is in `log/20260926/0926/run-notes.md`.
+
 ## 2. Research questions and hypotheses
 
 ### Block 1: biological depth
@@ -70,6 +89,24 @@ of two measurements chosen one at a time from a registered menu of line x dose (
 4. P4: do the cards help a language-model planner under identical evidence and budget?
 5. P5: are validator outcomes better predicted by multi-branch references than by a single class
    mean, that is, do the data support heterogeneous outcomes within a mechanism?
+
+### Block 3: prediction-to-measurement link
+
+Does anything the world model produces change which measurement MAESTRO buys, in a way that
+separates the competing hypotheses better while controlling wrong eliminations, uncertainty and
+cost? Six suspicions from the brief were treated as hypotheses to falsify:
+- the pipeline ranks by magnitude, not discrimination;
+- scenario cards carry full outcome distributions;
+- the selector reduces them to one number;
+- the power-aware path ignores the world model;
+- supported 72 h measurements are rejected before selection;
+- a minimum-reference rule deletes informative low-support actions.
+
+The repaired selector was then tested under a frozen protocol:
+- **P-A:** its correct-decision rate minus magnitude's, per tier.
+- **S1:** the magnitude tie-break wired into the power-aware path, minus the path as it was.
+- **Isolations:** the selector and support effects, a permuted-label control, a
+  step-1-conditioned variant, and the fixed time course.
 
 ## 3. Materials, data and computational environment
 
@@ -110,6 +147,13 @@ of two measurements chosen one at a time from a registered menu of line x dose (
   `jev-1.13.0` (cap 1.00): 13,665,111 input tokens, $0.5739. Laboratory cost: 0 wells, 0 days; the
   episodes replay released measurements.
 - Python 3.14 with numpy, scipy, scikit-learn 1.8 and RDKit on 28 CPU cores.
+
+### Block 3: prediction-to-measurement link
+
+No new data. The block-2 SciPlex3 preparation (`outputs/dynamic_world_model_20260926/prepared`)
+with its frozen detection null, validator, per-fold calibration, tiers, folds and episode list;
+the block-2 code is imported unchanged. No provider or API call was made; laboratory cost 0; one
+evaluation takes about 90 s on 10 of 28 CPU cores.
 
 ## 4. Experimental design and controls
 
@@ -157,6 +201,38 @@ signatures, 17 classes, arms with and without a retrieval card.
 - **Transition arms**: zero, persistence, scaled persistence, ridge on a training-only 20-component
   PCA latent, gene-space ridge, a one-hidden-layer MLP and measured-profile retrieval, for time,
   dose and context transfer on held-out compounds.
+
+### Block 3: prediction-to-measurement link
+
+- **Phase A, trace.** The information flow was traced through
+  `agent/orchestrator.py` (`_select_budgeted_actions`, `_prediction_action_priorities`,
+  `_build_action_prediction_requests`), `maestro/acquisition.py`, `maestro/selection.py`,
+  `maestro/outcome.py`, `agent/cases.py`, `virtual_cell/interface.py` and `response_rung.py`, and
+  the block-2 card code.
+- **Phase B, falsification.** Each suspicion was falsified with `research/acquisition_link/falsify.py`.
+  It uses only the old API and synthetic inputs, and reads no SciPlex3 outcome. The regression
+  tests were written before the repair.
+- **Phase C, borrowed methods.** Methods were taken from other fields only after the failure was
+  located:
+  - model-discrimination design;
+  - query by committee;
+  - chance-constrained planning;
+  - lower-confidence-bound pessimism with Jeffreys intervals;
+  - selective prediction;
+  - next-best-view replanning.
+- **Arms**, all on the same validator, evidence path, budget of two measurements, stop at the
+  first elimination, and utility (+1, 0, -2):
+  - `cost_only`, the zero arm;
+  - `production_before` and `production_after`, the power-aware path without and with magnitude;
+  - `magnitude`;
+  - `ec_cards_2ref`, block 2's `separation`, and `ec_cards_1ref`: the expected-coverage selector
+    with two- and one-reference cards;
+  - `da_2ref` and `da`: the repaired selector with the same two forecast versions;
+  - `da_permuted`, the non-biological control;
+  - `da_dynamic`, with step-2 forecasts conditioned on the step-1 reading;
+  - `fixed` and `oracle`.
+- **Consistency checks.** Before reading any result, seven code-path equalities were checked
+  against the within-run arms and block 2's records.
 
 ## 5. Experiment register and results
 
@@ -268,6 +344,73 @@ compound-lines).
   0.260 of measurements (validator 0.013), and reading an absent response as "the perturbation
   failed" would be wrong on 0.292.
 
+### Block 3: prediction-to-measurement link
+
+**Audit.** Two links were broken and one was missing.
+- **Priorities logged, never used.** The production controller (`from_workspace`, the CLI and the
+  public loop) selects on the power-aware path. It computed every per-action world-model
+  priority and only logged it: swapping two actions' predictions left the choice unchanged.
+- **Borrowed exposure time.** A per-action query stated the template's exposure time, so a 72 h
+  action was ranked by a 24 h prediction.
+- **Forecasts reduced to one number.** No runtime object could carry the reading under each
+  hypothesis. Block 2's cards had it, but the selector received only pooled p_correct as
+  detection power: a card with p_wrong 0.3 was chosen over one with p_wrong 0, by label.
+- **Thin support deleted.** A refused card left the objective entirely.
+- **Decisiveness counted as correctness.** `dyn_model`'s card stored P(any elimination) as
+  `p_correct`. Post hoc, the 234 step-2 choices it drove had a wrong share of 0.26 among
+  eliminations, against 0.09 for `dyn_ref`.
+
+**Repair.** A distribution-aware selector, `maestro.acquisition.select_discriminating_action`.
+- It scores rule-conditioned discrimination: correct minus wrong elimination probability, with
+  consequences taken from the registered rules.
+- It applies a wrong-risk gate at the break-even of the declared utility.
+- It ranks by the one-sided 95% lower bound under a Jeffreys Dirichlet posterior, then support,
+  cost, time, magnitude and label.
+- Zero references are refused by name; one reference is served, flagged and shrunk.
+- Wiring: an optional `outcome_forecaster`, logged in shadow every round and driving selection
+  only with `discrimination_selection=True`, which defers by name when nothing is admissible.
+- Per-action queries now state the action's own exposure time when the template states time, and
+  skip an action declared in another context.
+
+**Registered evaluation.** 2,496 episodes. All seven consistency checks passed.
+
+| Contrast | Tier B | Tier A |
+|---|---|---|
+| **P-A**, `da` - `magnitude`, correct decisions | -0.019 [-0.053, +0.017] | +0.033 [-0.030, +0.089] |
+| P-A, wrong eliminations | -0.012 | +0.018 |
+| P-A, utility | +0.006 [-0.041, +0.054] | -0.003 [-0.098, +0.080] |
+| **S1**, `production_after` - `production_before`, correct decisions | +0.386 [+0.309, +0.463] | +0.095 [-0.033, +0.220] |
+| S1, utility | +0.298 [+0.205, +0.388] | +0.060 [-0.086, +0.199] |
+| S1, wrong eliminations | +0.044 | +0.018 |
+| Selector effect, `da` - `ec_cards_1ref` | -0.009 [-0.019, +0.002] | -0.071 [-0.131, -0.021] |
+| Support effect, `da` - `da_2ref` | +0.035 [+0.023, +0.048] | +0.033 [+0.012, +0.057] |
+| `da` - `fixed` | - | -0.211 [-0.321, -0.110] |
+| `da_permuted` - `magnitude` | -0.244 | -0.071 |
+| `da_dynamic` - `da` | -0.011 | 0.000 |
+
+Served v2 forecasts:
+
+| | Tier B | Tier A |
+|---|---|---|
+| ECE | 0.058 | 0.085 |
+| ECE, block 2's served cards | 0.101 | 0.154 |
+| Mean total variation | 0.378 | 0.354 |
+| Mean rule-conditioned discrimination | 0.158 | 0.159 |
+
+The one-sided bound held on average in every support stratum.
+
+In tier A the repaired selector chose 72 h first in 60 of 276 episodes, against 182 of 281 for
+`ec_cards_1ref`.
+
+**Verdicts under the frozen rules:**
+- **INCONCLUSIVE:** P-A excludes zero in neither tier. The selector stays opt-in.
+- **Wiring repair not kept:** its tier-A utility interval includes zero. Magnitude stays logged
+  and unused on the power-aware path.
+
+**Tests.** `tests/test_discriminating_acquisition.py` adds 19 tests; it failed at import before
+the repair. Full suite: 1320 passed (1301 + 19). `research/acquisition_link/test_acquisition_link.py`:
+4 of 4, including a one-fold rerun that reproduces the recorded episodes and menu rows.
+
 ## 6. Deviations, failures and corrections
 
 ### Block 1: biological depth
@@ -321,6 +464,26 @@ compound-lines).
 - The card refusal (two references per hypothesis) removed exactly the 72 h options that decided
   the DNA methyltransferase and BET contrasts, because those classes have two compounds at 72 h.
 
+### Block 3: prediction-to-measurement link
+
+- **Wiring removed after the verdict.** The magnitude tie-break was first wired into the
+  power-aware path by default, before the evaluation. When the frozen keep rule failed in tier A,
+  that wiring was removed again, and a test now pins its absence. The protocol was not edited.
+- **Shell quoting slip.** A shell heredoc append to `src/maestro/acquisition.py` failed on quoting
+  and wrote nothing; the code was added with the editor instead.
+- **CRLF report, then a syntax error.** The analysis report was first written with CRLF endings.
+  Correcting that introduced a quoting slip and a syntax error, which failed the analysis run
+  before it wrote anything. After the fix, the regenerated report is byte-identical to the log
+  copy.
+- **Logging-only change after the run.** After the registered run, `DiscriminationPlan.payload`
+  gained the rejection reasons, which changes logging only. The evaluation was rerun; episodes and
+  menu audit were byte-identical, and the first run's files are kept under
+  `outputs/acquisition_link_20260926/run1_before_payload_change/`.
+- **Line endings normalised.** Four working copies found with CRLF endings (among them
+  `src/virtual_cell/interface.py`) were normalised to the LF that `.gitattributes` declares, and
+  `log/INDEX.md`, briefly rewritten with CRLF by this block, was restored to LF. Content was
+  unchanged.
+
 ## 7. Interpretation and claim boundaries
 
 ### Block 1: biological depth
@@ -366,6 +529,35 @@ line; a class is a vendor annotation, not a verified mechanism; episodes replay 
 rather than new experiments; the language-model results are for one provider, one prompt and 177
 contrasts.
 
+### Block 3: prediction-to-measurement link
+
+**The audit establishes code facts**, each reproduced by a probe and pinned by a test:
+- the production path used no world-model information to choose a measurement;
+- the discrimination information existed only in research code and was flattened before
+  selection;
+- a 72 h action could borrow a 24 h answer.
+
+**The repair establishes a capability, not an improvement.** The selector can consume
+per-hypothesis forecasts. It values readings by the same rules that read results, refuses
+thin or missing support by name, and never touches `EvidenceState`. On the block-2 episodes it
+decided neither better nor worse than the magnitude tie-break, and this dataset cannot promote
+it: the design was informed by block 2.
+
+**Two findings are registered but not independent:**
+- One-reference support beats the two-reference refusal under both selectors. Block 2's audit
+  anticipated this.
+- The lower-bound ranking costs decisions in tier A (-0.071), because the informative 72 h
+  conditions are the thinly measured ones (mean support 2.3 against 4.8 at 24 h; post hoc).
+
+**Other findings:**
+- The magnitude tie-break triples correct decisions over the current power-aware path in tier B,
+  but it adds wrong eliminations and is unproven in tier A. It is therefore not enabled.
+- The fixed 24 h then 72 h sequence remains the best tier-A policy.
+- **Held-out unit:** compounds in lines seen in training. Nothing here speaks to unseen contexts
+  or times.
+- **Safety invariants, tested again:** absence never eliminates, prediction-derived records never
+  eliminate, and QC failure is a named non-success.
+
 ## 8. Reproduction and artifact ledger
 
 ### Block 1: biological depth
@@ -400,6 +592,23 @@ Result records in `log/20260926/0926/`: `measurement_choice_report.md`,
 `measurement_choice_prepare_manifest.json`, and the closed-loop round records in
 `measurement_choice_rounds/`.
 
+### Block 3: prediction-to-measurement link
+
+Code: `research/acquisition_link/` (`falsify.py`, `evaluate.py`, `analyze.py`,
+`test_acquisition_link.py`, protocol, README with the commands). Changed in `src/`:
+`maestro/acquisition.py` (`OutcomeBranch`, `OutcomeForecast`, `OutcomeForecaster`,
+`ActionDiscrimination`, `DiscriminationPlan`, `outcome_consequences`,
+`select_discriminating_action`, and an optional last tie-break `action_priorities` on
+`select_expected_coverage`), `agent/orchestrator.py` (`outcome_forecaster` and
+`discrimination_selection` options, the shadow log, the named deferral, the condition guard on
+priorities, per-action exposure time, the skipped foreign-context query, and
+`selection_path`/`prediction_priorities_used` in the selection log), and
+`virtual_cell/interface.py` (`VirtualCellQueryTemplate.build(time_hours=...)`). Tests:
+`tests/test_discriminating_acquisition.py`. Runs under `outputs/acquisition_link_20260926/`.
+Result records in `log/20260926/0926/`: `acquisition_link_report.md`,
+`acquisition_link_summary.json`, `acquisition_link_manifest.json`,
+`acquisition_link_falsification_before.json`, `acquisition_link_falsification_after.json`.
+
 ## 9. Open items and next experiments
 
 ### Block 1: biological depth
@@ -430,6 +639,20 @@ Result records in `log/20260926/0926/`: `measurement_choice_report.md`,
 - Replace the vendor class with an engagement readout where one exists, so "the perturbation
   failed" can be measured rather than inferred from absence.
 
+### Block 3: prediction-to-measurement link
+
+- **Highest value:** an independent dataset with several time points, mechanism labels and
+  enough references per class and time. Candidates are L1000 `subset48` 6 h / 24 h after the
+  Repurposing Hub join, or a new time-course screen. On it, test a two-step discrimination
+  policy and bias-corrected forecasts against the fixed time course, before any selector
+  becomes a default.
+- Correct the leave-one-out template bias in the forecasts; they still under-predict (0.243
+  against 0.282 realised in tier B).
+- Make the support penalty time-aware or replace it with a hierarchical prior across
+  conditions, so thin but informative late conditions are not systematically avoided.
+- Re-test the power-aware magnitude tie-break only under a new registration that states its
+  wrong-elimination tolerance.
+
 ## 10. Curation provenance
 
 ### Block 1: biological depth
@@ -442,3 +665,9 @@ in `log/20260926/0926/scorecard.md` are generated by `research/biological_depth/
 Written by the session that ran the block, from the files named in section 8; its tables are
 generated by `research/dynamic_world_model/report.py`, and the protocol freeze, stopped runs and
 spend reconstruction are in `log/20260926/0926/run-notes.md`.
+
+### Block 3: prediction-to-measurement link
+
+Written by the session that ran the block, from the files named in section 8; its tables are
+generated by `research/acquisition_link/analyze.py`, and the protocol freeze, the probes before
+and after, and every rerun are in `log/20260926/0926/run-notes.md`.

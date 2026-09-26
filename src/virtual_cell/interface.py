@@ -303,7 +303,10 @@ class VirtualCellQueryTemplate:
         plan_version: int,
         intended_targets: tuple[str, ...],
         intervention_identifier: str | None = None,
+        time_hours: float | None = None,
     ) -> PredictionRequest:
+        """Bind the template to one case; ``time_hours`` states a planned action's own exposure."""
+
         return PredictionRequest(
             request_id=request_id,
             case_id=case_id,
@@ -315,7 +318,7 @@ class VirtualCellQueryTemplate:
                 intended_targets=intended_targets,
                 dose=self.dose,
                 dose_unit=self.dose_unit,
-                time_hours=self.time_hours,
+                time_hours=self.time_hours if time_hours is None else time_hours,
             ),
             context=self.context,
             readouts=self.readouts,

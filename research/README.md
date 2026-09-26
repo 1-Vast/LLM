@@ -21,6 +21,7 @@ formal decision layer are in [`../Innovation.md`](../Innovation.md); the runnabl
 | [`local_verification/`](local_verification/README.md) | Protocol, fixtures and scripts for the checks that need a machine with credentials and local assets | Protocol; offline half runs anywhere |
 | [`biological_depth/`](biological_depth/README.md) | Pre-registered test of whether the virtual cell and the agent carry perturbation-specific biology: literature anchors, systematic-shift-centered metrics, JEPA-style latent world models, an agent probe, and the SciPlex3 label-offset finding | Measured 2026-09-26; see its README |
 | [`dynamic_world_model/`](dynamic_world_model/README.md) | Pre-registered test of whether scenario cards, a time-aware policy, a learned population transition model or language-model planners choose measurements that separate mechanisms better than the current magnitude tie-break; SciPlex3 24 h and 72 h, validator, case study and closed-loop replay | Measured 2026-09-26; negative for promotion, see its README |
+| [`acquisition_link/`](acquisition_link/README.md) | Audit of the link from world-model prediction to measurement choice (priorities dropped on the power-aware path, per-hypothesis forecasts reduced to one number, borrowed exposure times, deleted low-support actions), the distribution-aware selector that repairs it, and its pre-registered evaluation on the block-2 episodes | Implemented (opt-in) and measured 2026-09-26; INCONCLUSIVE, not promoted |
 
 ## Evidence labels
 

@@ -433,6 +433,33 @@ methyltransferase, BET and Aurora inhibitors become separable in A549 only at 72
 then 72 h protocol beat magnitude by +0.244, and DeepSeek without cards chose 72 h after every
 undetected 24 h result; this is a hypothesis for an independent test, not a result.
 
+**Prediction-to-measurement link, audited and repaired 2026-09-26** (pre-registered;
+`research/acquisition_link/`, `log/20260926/README.md`, block 3).
+
+Correction to the paragraph above, recorded the same day: "the current magnitude tie-break" is
+the non-default budgeted path. The production controller (`from_workspace`, the CLI and the public
+loop) selects on the power-aware path, which computed the virtual cell's priorities and only
+logged them. On those menus it therefore chose exactly as the no-world-model arm: 0.172 correct
+decisions in tier B, against 0.558 for magnitude.
+
+The audit also found two further breaks:
+- per-action queries stated the template's exposure time, so a 72 h action was ranked by a 24 h
+  prediction;
+- per-hypothesis outcome forecasts reached the selector only as one detection probability.
+
+The repair is `maestro.acquisition.select_discriminating_action`. It is opt-in through
+`discrimination_selection` and otherwise logged in shadow. It values a measurement by how the
+registered rules would read it under each hypothesis, gates on wrong-elimination risk at the
+utility's break-even, discounts thin support without deleting it, and ranks by a one-sided lower
+bound.
+
+On block 2's episodes it decided neither better nor worse than magnitude: tier B -0.019
+[-0.053, +0.017], tier A +0.033 [-0.030, +0.089]. The verdict is INCONCLUSIVE. Its forecasts are
+well calibrated (ECE 0.058 and 0.085).
+
+Wiring magnitude into the power-aware path raised tier-B utility by +0.298, but failed its keep
+rule in tier A and raised tier-B wrong eliminations by 0.044, so it is not enabled.
+
 Not yet demonstrated:
 
 - improved decision regret on independent biological cases;
@@ -440,6 +467,8 @@ Not yet demonstrated:
 - better measurement choice from a virtual-cell planner (reference cards, a time-aware policy or a
   learned 24 h to 72 h transition) than from the current magnitude tie-break;
 - a time-point selection rule confirmed on data it was not discovered on;
+- a decision benefit from reading per-hypothesis forecasts through the registered rules
+  (`select_discriminating_action`), or from letting magnitude break ties on the power-aware path;
 - a virtual-cell predictor with biological depth for unseen compounds: the V-JEPA-style latent model
   was built and tested (section 13.6) and neither beat PCA nor structure retrieval;
 - causal mechanism, target engagement, clinical safety, or generalization to unsupported contexts.
@@ -594,6 +623,15 @@ learned population transition forecast the compound's own next profile. None bea
 magnitude tie-break or a fixed 24 h then 72 h protocol on held-out SciPlex3 compounds; the cards also
 under-predicted success (ECE 0.101 and 0.154) and their two-reference refusal removed the 72 h
 options that decided the slow-acting classes. See `research/dynamic_world_model/`.
+**Update the same day (block 3):**
+- The branches now reach a selector whole (`select_discriminating_action`, opt-in).
+- One-reference branches are served and discounted rather than refused. This added 0.03 to 0.05
+  correct decisions under both selectors.
+- The result against magnitude is inconclusive.
+- Post hoc: the selector's lower-bound ranking steered away from the thinly measured 72 h
+  conditions.
+
+See `research/acquisition_link/`.
 
 ### 13.4 Closed-Loop Experimental Evidence From Co-Scientist And Robin
 

@@ -1,0 +1,53 @@
+{
+ "schema": "maestro.acquisition_link.protocol",
+ "version": 1,
+ "question": "Does the repaired prediction-to-measurement link choose measurements that lead to better mechanism decisions than the magnitude tie-break, under the same validator, budget and costs?",
+ "source": {
+  "prepared": "outputs/dynamic_world_model_20260926/prepared",
+  "block2_protocol": "research/dynamic_world_model/protocol.json",
+  "reused_code": ["research/dynamic_world_model/common.py", "research/dynamic_world_model/episodes.py", "research/dynamic_world_model/analyze.py"]
+ },
+ "held_out": "compounds by the frozen five-fold skeleton split, in cell lines seen in training; not unseen cell contexts",
+ "forecasts": {
+  "labels": {"eliminate_b": "profile_matches_h1 if the reference's own class is h1, else profile_matches_h2",
+             "eliminate_a": "the other class's match label",
+             "ambiguous": "profile_unresolved",
+             "undetected": "no_detectable_response"},
+  "v2_minimum_references": 1,
+  "v1_minimum_references": 2,
+  "zero_reference_refusal": "no_reference_for_hypothesis",
+  "consequences": "from the registered OutcomeRule objects of the episode evidence path",
+  "dynamic": "step-2 references restricted to those whose own leave-one-out reading category at the step-1 condition equals the held-out compound's step-1 category; fewer than the minimum falls back to unconditioned references"
+ },
+ "selector": {
+  "function": "maestro.acquisition.select_discriminating_action",
+  "prior": "Dirichlet(1/2) over every registered label",
+  "gate": "pooled shrunk P(correct) > 2 x pooled shrunk P(wrong)",
+  "rank": "one-sided 95% lower bound of P(correct) - P(wrong), then support, cost, exposure time, magnitude priority, identifier",
+  "per_step_budget_days": 8.0
+ },
+ "arms": ["cost_only", "production_before", "production_after", "magnitude", "ec_cards_2ref", "ec_cards_1ref", "da_2ref", "da", "da_permuted", "da_dynamic", "fixed", "oracle"],
+ "utility": {"correct_elimination": 1, "undetermined": 0, "deferred": 0, "wrong_elimination": -2},
+ "costs": {"treated_wells_per_measurement": 2, "vehicle_wells_per_new_line_and_time": 4, "days": {"24": 6, "72": 8}},
+ "inference": {"unit": "skeleton unit (compound)", "bootstrap_draws": 2000, "seed": 20260926, "interval": 0.95, "pairing": "same episodes"},
+ "primary": {"P-A": "correct-decision rate at budget 2, da minus magnitude, tier B and tier A separately"},
+ "secondary": {
+  "S1": "production_after minus production_before: correct-decision rate and utility, per tier",
+  "S2": "da minus ec_cards_1ref (selector effect); da minus da_2ref (support effect)",
+  "S3": "da minus ec_cards_2ref",
+  "S4": "da minus fixed, tier A",
+  "S5": "da_permuted minus magnitude; da minus da_permuted",
+  "S6": "da_dynamic minus da",
+  "all_arms": ["wrong-elimination rate", "utility", "regret against the oracle", "deferral rate", "measurements", "days", "wells", "days to first elimination", "action distribution by time, dose and line at steps 1 and 2", "per-class correct-rate differences of da against magnitude"],
+  "calibration": "served v2 step-1 menu forecasts: pooled shrunk P(correct) against the realised correct elimination; ECE with 10 bins and Brier, pooled and on the true hypothesis's branch; by support stratum (1, 2-3, 4-8, >8) with the realised mean discrimination against the mean one-sided lower bound"
+ },
+ "consistency_checks": ["production_before equals cost_only", "production_after equals magnitude", "ec_cards_2ref equals block-2 separation", "fixed equals block-2 fixed", "oracle equals block-2 oracle"],
+ "classification": {
+  "PROMOTE": "unavailable: the episodes were analysed in block 2 and informed the design",
+  "SHADOW": "P-A positive with the interval excluding zero in at least one tier and the other tier's lower bound above -0.02; da wrong-elimination rate no more than 0.02 above magnitude in each tier; no tier with the utility difference's interval entirely below zero; da_permuted short of da's gain over magnitude in each tier where da gains; served-forecast ECE at most 0.10 in each tier",
+  "REJECT": "P-A negative with the interval excluding zero in either tier, or da wrong-elimination rate more than 0.02 above magnitude in either tier",
+  "INCONCLUSIVE": "otherwise"
+ },
+ "wiring_repair_rule": "keep the power-aware tie-break if production_after utility exceeds production_before with the interval excluding zero in both tiers; report the wrong-elimination change",
+ "seen_before_freeze": "all block-2 outputs and the block-2 card audit; Phase-B counts from block-2 records; no episode with the new selector or v2 forecasts"
+}

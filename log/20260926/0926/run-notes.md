@@ -235,3 +235,57 @@ with the vendor annotation, with compound-bootstrap 95% intervals:
 - Full suite after the block: 1301 passed (the four added tests are
   `tests/test_provider_transport_failures.py`); `tests/test_repository_shape.py` passes with the
   two-block day record and the 21 new index entries.
+
+## Block 3 (18:22 onward): prediction-to-measurement link
+
+- 18:27 Working tree clean except `reference/` (untracked); block 2 was committed by the user as
+  2b4b17c at 18:13. The latest Codex session on this repository (18:05-18:22) committed and
+  pushed that block and drafted this task brief; it wrote nothing after 18:22.
+- Baseline before any change: full suite 1301 collected, exit 0; subsystem tests (acquisition,
+  selection, orchestration, world-model integration, outcome, cases, response rung) 113 passed;
+  `research/dynamic_world_model/test_validator.py` 9 passed.
+- Phase B, `research/acquisition_link/falsify.py --label before` (old code, synthetic inputs,
+  no SciPlex3 outcome): power-aware selection ignored swapped predictions; a card reduced to
+  detection power chose a p_wrong 0.3 action over a p_wrong 0 one; the magnitude tie-break chose
+  the loud non-separating action; cost order kept a 72 h action out even with a large priority;
+  a 72 h action's query stated 24 h and took its priority; a one-reference card left the
+  objective. The new regression tests failed at import (the interface did not exist).
+- Post hoc, from block-2 records only: step-2 wrong shares among eliminations were magnitude
+  0.19, separation 0.12, dyn_ref 0.09, and 0.26 for the 234 step-2 choices driven by the
+  `dyn_model` forecast, whose `p_correct` counted any elimination, wrong ones included.
+- After the repair: the new file's 16 tests pass; full suite 1317 passed (1301 + 16).
+- 18:59:44 Protocol frozen before any episode with the repaired selector or one-reference
+  forecasts: `research/acquisition_link/PROTOCOL.md`
+  sha256 69303c075b0efd0f3fc12e181c9fdb9cea8317a1b2a1b2720d215a58528a0c95,
+  `research/acquisition_link/protocol.json`
+  sha256 d858370810984ce700755e50c08ed82bee5e54f71a14323d4c44bdeb9e4f0fda.
+- 19:02-19:03 Registered run, `research/acquisition_link/evaluate.py`: 29,952 episode records
+  (12 arms including the oracle, 2,496 episodes) and 28,608 step-1 menu rows in 85 s. All seven
+  consistency checks passed before any result was read (`production_before` = `cost_only`,
+  `production_after` = `magnitude`, and `ec_cards_2ref`, `fixed`, `oracle`, `magnitude`,
+  `cost_only` equal to block 2 episode for episode).
+- Results: P-A (`da` minus `magnitude`, correct decisions) tier B -0.019 [-0.053, +0.017],
+  tier A +0.033 [-0.030, +0.089]; wrong eliminations -0.012 and +0.018; served v2 forecast ECE
+  0.058 and 0.085. Frozen verdict: INCONCLUSIVE. S1 (magnitude wired into the power-aware path):
+  utility tier B +0.298 [+0.205, +0.388], tier A +0.060 [-0.086, +0.199], wrong eliminations tier B
+  +0.044: the keep rule (both tiers excluding zero) is not met.
+- 19:05 Following that rule, the orchestrator again leaves magnitude out of the power-aware path
+  (it had been wired in by default before the run) and now logs `selection_path` and
+  `prediction_priorities_used`; `DiscriminationPlan.payload` gained the rejection reasons. The
+  wiring test was rewritten to pin the decision (18 tests in the file).
+- 19:06 `falsify.py --label after`: the 72 h action is now queried at 72 h and gets no borrowed
+  priority; power-aware magnitude stays unused by design.
+- 19:07-19:09 Evaluation rerun on the final code: episodes and menu audit byte-identical to the
+  registered run (kept under `outputs/acquisition_link_20260926/run1_before_payload_change/`);
+  report and summary identical.
+- 19:11-19:13 Result records copied to `log/20260926/0926/acquisition_link_*` and declared in the
+  index. Four working copies found with CRLF endings were normalised to the LF `.gitattributes`
+  declares, and `log/INDEX.md`, briefly rewritten with CRLF by this block, was restored to LF.
+  The report writer now writes LF; a quoting slip in that edit broke `analyze.py` once (syntax
+  error, nothing written), and the regenerated report equals the log copy byte for byte.
+- 19:20 Review of the runtime diff: a skipped foreign-context query is now logged by name
+  (`virtual_cell_query_not_built`), the per-session discrimination plan is consumed once read, and
+  the orchestrator summary names the option; one test added (19 in the file).
+- Final checks: full suite 1320 passed (1301 + 19); `research/acquisition_link/test_acquisition_link.py`
+  4 of 4 (including a one-fold rerun); `tests/test_repository_shape.py` passes with the
+  three-block day record. No provider or API call was made in this block.

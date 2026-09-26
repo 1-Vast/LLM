@@ -309,6 +309,20 @@ compounds was tested as this selector's input and chose worse measurements than 
 magnitude tie-break (`research/dynamic_world_model/`), so a power estimate is not better than a
 declaration merely because it is computed.
 
+Beside this selector, `select_discriminating_action` (opt-in, 2026-09-26) chooses one next
+measurement from per-hypothesis outcome forecasts. What a predicted reading would eliminate comes
+from the registered interpretation rules, so the objective is rule-conditioned discrimination:
+the correct minus the wrong elimination probability. It is bounded above by the total variation
+between the hypotheses' predicted readings. The gap is the part no lawful elimination can use,
+including every difference in absence.
+
+A wrong-risk gate at the declared utility's break-even comes first; a Jeffreys lower bound then
+ranks, so thin support is discounted rather than deleted. Its registered evaluation on seen
+SciPlex3 episodes was inconclusive
+([`research/acquisition_link/`](research/acquisition_link/README.md)). The same audit found that
+the power-aware path, which production uses, had been logging and never using the virtual cell's
+priorities.
+
 ## 6. The typed decision model
 
 A text model can name an action that does not exist, assert a mechanism, or describe a result
@@ -453,6 +467,10 @@ intervention-design quality, biological credibility, and final decision quality.
   measurements, a fixed protocol beat every model-based policy in the time tier, and a validator
   that refuses to eliminate on an undetected response kept wrong eliminations near 1-2% where an
   ungated reading reached 26% ([`research/dynamic_world_model/`](research/dynamic_world_model/README.md)).
+- **Check that the model's output reaches the decision.** On 2026-09-26 the production selector
+  had been logging, not using, every virtual-cell prediction, and a 72 h action was being ranked
+  by a 24 h answer. A comparison of planners had assumed a link that was not there
+  ([`research/acquisition_link/`](research/acquisition_link/README.md)).
 
 Protocol in full: [`research/asrg/03_experiment_protocol.md`](research/asrg/03_experiment_protocol.md).
 
@@ -480,6 +498,9 @@ stereotyped programs; a V-JEPA-style latent model did not improve on PCA or stru
 Virtual-cell-assisted measurement choice was tested the same day and did not beat the current
 magnitude tie-break; a learned 24 h to 72 h population transition predicts profiles better than
 persistence but improved no decision.
+A distribution-aware selector that reads per-hypothesis forecasts through the registered rules
+was added the same day (opt-in). Its decisions were not distinguishable from magnitude's on the
+episodes it was designed after.
 A prediction is never the outcome of an unmeasured experiment. A typed judgment is a statement about a model's own accuracy, not about biology. A
 solver optimum is optimal only for the declared finite problem. An agent that passes every test
 here has been shown to make better-supported decisions under a frozen protocol — which is not

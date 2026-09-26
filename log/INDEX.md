@@ -8,7 +8,7 @@ The day records are the entry points. Existing machine-local artifacts under
 |---|---|
 | `20260915/README.md` | Earlier local biological closure and log audit artifacts |
 | `20260925/README.md` | Jev verification, tool fixes and topology ablation |
-| `20260926/README.md` | Data directory merge; pre-registered biological-depth test of the virtual cell and agent; pre-registered test of virtual-cell-assisted measurement choice for mechanism discrimination (24 h and 72 h), provider transport repair |
+| `20260926/README.md` | Data directory merge; pre-registered biological-depth test of the virtual cell and agent; pre-registered test of virtual-cell-assisted measurement choice for mechanism discrimination (24 h and 72 h), provider transport repair; audit and repair of the link from world-model prediction to measurement choice, with its pre-registered evaluation |
 
 ## Files
 
@@ -62,3 +62,8 @@ The day records are the entry points. Existing machine-local artifacts under
 - `20260926/0926/measurement_choice_rounds/magnitude__Azacitidine__round1.json`
 - `20260926/0926/measurement_choice_rounds/magnitude__Decitabine__round0.json`
 - `20260926/0926/measurement_choice_rounds/magnitude__Decitabine__round1.json`
+- `20260926/0926/acquisition_link_report.md`
+- `20260926/0926/acquisition_link_summary.json`
+- `20260926/0926/acquisition_link_manifest.json`
+- `20260926/0926/acquisition_link_falsification_before.json`
+- `20260926/0926/acquisition_link_falsification_after.json`
