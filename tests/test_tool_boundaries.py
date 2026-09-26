@@ -47,7 +47,8 @@ def test_the_catalog_discovers_only_manifested_tools():
     """
 
     identifiers = {descriptor.identifier for descriptor in LocalToolCatalog(ROOT / "tools").discover()}
-    assert identifiers == {"column_summary", "data_profile", "table_filter", "evidence_bundle_optimize", "multimodal_alignment", "virtual_cell_query"}
+    assert identifiers == {"column_summary", "data_profile", "table_filter", "evidence_bundle_optimize", "multimodal_alignment", "typed_decision_review", "virtual_cell_query",
+                           "signature_retrieval"}
     assert (ROOT / "tools" / "shared").is_dir()
     assert not (ROOT / "tools" / "shared" / "manifest.json").exists()
 

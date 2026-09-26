@@ -44,6 +44,34 @@ def compound_key(name):
     return re.sub(r"[^a-z0-9]", "", re.sub(r"\([^)]*\)", "", name).lower())
 
 
+HGNC_TABLE = "data/external/hgnc/hgnc_complete_set.txt"
+
+
+def verified_feature_labels(workspace, published, vehicle_sum, columns):
+    """Realign a published label table to the matrix columns, or refuse by name.
+
+    Vehicle means per cell line decide the alignment through identity markers; the published
+    table is never trusted as printed. Returns the per-column Ensembl labels ('' when a column
+    has no label row) and the marker evidence for the audit record.
+    """
+
+    from virtual_cell.identity_markers import resolve_label_offset, shift_labels
+
+    table = Path(workspace) / HGNC_TABLE
+    if not table.is_file():
+        raise ValueError(f"gene_identity_table_missing:{HGNC_TABLE}")
+    hgnc = pd.read_csv(table, sep="\t", dtype=str, usecols=["symbol", "ensembl_gene_id"]).dropna()
+    symbol = dict(zip(hgnc.ensembl_gene_id, hgnc.symbol))
+    offset, checks, refusal = resolve_label_offset(
+        {line: np.asarray(values, dtype=float) for line, values in vehicle_sum.items()},
+        [symbol.get(str(label)) for label in published])
+    if refusal:
+        raise ValueError(f"{refusal}:{[check.payload() for check in checks]}")
+    labels = [label if label is not None else "" for label in shift_labels([str(x) for x in published], offset, columns)]
+    return {"labels": labels, "offset": offset, "first_published_label": str(published[0]),
+            "checks": [check.payload() for check in checks]}
+
+
 def molecular_split(smiles):
     unique = sorted(set(smiles), key=lambda s: hashlib.sha256(("maestro-validation-v1|" + s).encode()).hexdigest())
     n = len(unique)
@@ -94,10 +122,7 @@ def prepare(workspace, output, protocol):
                     "metadata_only_structure_source": "existing SciPlex3 chemistry metadata; aliases matched uniquely; expression never read",
                     "time_hours": protocol["time_hours"]}
         write(output / "split_manifest.json", manifest)
-        # Human-reference features only; drop repeated ENSG IDs rather than silently double count.
-        genes = column(f["var"], "ensembl_id")
-        unique = pd.Series(genes).duplicated(keep=False).to_numpy()
-        human = np.array([g.startswith("ENSG") for g in genes]) & ~unique
+        published = column(f["var"], "ensembl_id")
         matrix = f["X"]
         ptr = matrix["indptr"][:]
         shape = tuple(matrix.attrs["shape"])
@@ -109,9 +134,24 @@ def prepare(workspace, output, protocol):
                                        ptr[start:stop + 1] - a), shape=(stop - start, shape[1]))
                 yield start, stop, x
         train_sum = np.zeros(shape[1])
+        lines = sorted(set(meta.cell_line.dropna()))
+        vehicle_sum = {line: np.zeros(shape[1]) for line in lines}
         for start, stop, x in blocks():
             train = selected.iloc[start:stop].to_numpy() & (meta.split.iloc[start:stop].to_numpy() == "train")
             train_sum += np.asarray(x[train].sum(axis=0)).ravel()
+            vehicle = (selected & control).iloc[start:stop].to_numpy()
+            for line in lines:
+                rows = vehicle & (meta.cell_line.iloc[start:stop].to_numpy() == line)
+                if rows.any():
+                    vehicle_sum[line] += np.asarray(x[rows].sum(axis=0)).ravel()
+        # This release's feature table opens with a stray header row, so the published label of
+        # row j names the gene in column j - 1. Labels are realigned only where cell-identity
+        # markers confirm the alignment; an unconfirmed table is refused, never used as printed.
+        label_check = verified_feature_labels(workspace, published, vehicle_sum, shape[1])
+        genes = np.array(label_check.pop("labels"), dtype=object)
+        # Human-reference features only; drop repeated ENSG IDs rather than silently double count.
+        unique = pd.Series(genes).duplicated(keep=False).to_numpy() & (genes != "")
+        human = np.array([g.startswith("ENSG") for g in genes]) & ~unique
         candidates = np.flatnonzero(human & (train_sum > 0))
         features = np.sort(candidates[np.argsort(train_sum[candidates], kind="stable")[-2000:]])
         if len(features) != 2000:
@@ -153,7 +193,9 @@ def prepare(workspace, output, protocol):
           "low_cell_or_excluded_groups": int((~viable).sum()),
           "statistical_unit": "molecular identity, not individual cells; source replicates not independently audited",
           "gene_selection": "top training-cell count sum; no held-out counts in ranking",
-          "gene_symbol_issue": "Published symbols are missing; use explicit ENSG identifiers only"})
+          "feature_label_check": label_check,
+          "gene_symbol_issue": ("Published symbols are missing and the published Ensembl table is offset by a "
+                                "stray header row; labels are realigned by identity markers and recorded above")})
     return table, y.astype("float32"), baseline.astype("float32"), genes[features].astype(str)
 
 

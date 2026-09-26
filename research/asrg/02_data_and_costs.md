@@ -22,7 +22,7 @@ checksum below was verified here**. Sizes marked (index) come from search indexe
 | Doses and time | Reported as four doses in a single treatment window; the repository protocol pins one `time_hours` | **unverified here** — confirm from the rebuilt table, not from memory |
 | Harmonised copy | [scPerturb](https://doi.org/10.1038/s41592-023-02144-y) (Peidli et al., Nature Methods 21:531–540, 2024), Zenodo record 13350497, v1.4, CC-BY; v1.4 "corrects errors in SrivatsanTrapnell2020_sciplex3" | verified via index; record page blocked |
 | Size | A mirrored copy is listed at 799,317 observations / 12.2 GB (index) | **unverified** |
-| Alternative copy | Figshare file 43381398 / article 24681285, with MD5 `d1f51b9f8de35ca07638132539da9a99` recorded in `dataset/README.md` | document-only |
+| Alternative copy | Figshare file 43381398 / article 24681285, with MD5 `d1f51b9f8de35ca07638132539da9a99` recorded in `data/README.md` | document-only |
 
 **C1** One `.h5ad` download in the ~10 GB class, plus a pseudobulk rebuild. The repository's
 existing `prepare` step already streams the matrix in 4,096-row blocks, selects the top 2,000

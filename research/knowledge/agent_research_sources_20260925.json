@@ -1,0 +1,166 @@
+{
+  "access_date": "2026-09-25",
+  "scope": "Targeted design review; not a systematic review or biological relation package.",
+  "sources": [
+    {
+      "id": "one_hot",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13005728/fullTextXML",
+      "final_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13005728/fullTextXML",
+      "sha256": "4c0787bfeaacb18fad31be8093063cbbf5574bf010904b2c215f498a823b68d4",
+      "characters": 55926,
+      "excerpts": [
+        {
+          "line_index_zero_based": 27,
+          "text": "Our objective is not to benchmark models on a uniform dataset and determine the best-performing one, but to test within each model whether performance depends on its intended biological features. To this end, we deliberately keep each method\u2019s original published pipeline (splits, hyperparameters, training) fixed (except for MatchMaker, which we explain below), and change only the input representation (original features vs. one-hot). Below, we provide the details of each model\u2019s dataset. Synergy datasets comprise triplets: a drug pair and the cell lines, along with a synergy score derived from an experimental grid of measurements made at different drug dosages."
+        },
+        {
+          "line_index_zero_based": 31,
+          "text": "Table 2 summarizes these datasets used in our experiments for each model, including the synergy score metrics, as well as the number of drug combinations, drugs, and cell lines. For the one-hot encoded models, the union of drugs in the train and test is used to form the dictionary of drugs, and the one-hot encoding vectors are created. The same is repeated for the cell lines."
+        },
+        {
+          "line_index_zero_based": 55,
+          "text": "Leave-Drug-Out (LDO): If a drug is seen in the training data, this drug and all of its drug interactions are excluded from the test set. As a result, the model does not see any of the test drugs during training. Implementing this split requires first splitting the drugs and then adding their associated triplet; this reduces the number of training examples (Fig. 1). There is no restriction on cell lines; the test set can include cell lines in the training data. LDO evaluates how well it can predict interactions involving drugs it has never seen in the training."
+        }
+      ]
+    },
+    {
+      "id": "synverse",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12753315/fullTextXML",
+      "final_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12753315/fullTextXML",
+      "sha256": "ca7fb9782e363fdc09a7a562c08118f8f2380fb39472382408c373929aad9f1d",
+      "characters": 52909,
+      "excerpts": [
+        {
+          "line_index_zero_based": 16,
+          "text": "SynVerse enables the user to build a synergy prediction model by specifying features, preprocessing methods, and encoders in a configuration file. In this work, we systematically evaluated sixteen synergy prediction models through a judicious combination of eight drugs and cell line features, five preprocessing techniques, and two DL-based encoders (Fig. 1C). Our findings were unexpected and illuminating. When tested on triplets containing unseen drug pairs, all the models achieved good performance in terms of PCC (between 0.78 and 0.94). However, none of them outperformed a baseline that employed one-hot encoding for both drugs and cell lines and a simple MLP-based architecture. Next, models with shuffled drug and cell line features performed comparably with those using original representations, suggesting that model performance was not primarily driven by biologically, chemically, or cell line-specific informative features. Moreover, our network-based ablation study indicated that models may not be learning patterns in the molecular features of synergistic drugs that were part of the training data. Instead, they learned shortcuts based on the aggregated statistics of synergy values themselves, i.e., how synergistic each drug was with other drugs. Finally, we assessed predictive performance of the models in triplets containing previously unseen drugs and cell lines. All models exhibited poor performance in this setting, highlighting their lack of generalizability."
+        }
+      ]
+    },
+    {
+      "id": "unbiasnet",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13358880/fullTextXML",
+      "final_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13358880/fullTextXML",
+      "sha256": "6402afa7f8a5d8429e5ff6f230098c592855959e6696aa2ec85dbaed9a87e933",
+      "characters": 54089,
+      "excerpts": [
+        {
+          "line_index_zero_based": 14,
+          "text": "To tackle these problems, we propose a sampling algorithm for constructing entity-balanced o.o.d. datasets (Fig. 1C and D). The process begins with iterative sampling guided by the degree ratio distribution, which increases the likelihood of selecting candidate negative edges that reduce entity-balance polarity. Next, we apply simulated annealing using an entropy-based score function to further mitigate polarity bias. The probabilistic nature of this procedure enables the generation of diverse entity-balanced datasets. We then assess model performance across multiple such datasets and aggregate the results (see Methods). As we will show, this framework discourages reliance on shortcuts, ensures fair evaluation even when entities overlap between training and test sets, removes the need for explicit similarity controls due to degree-ratio bias, and generalizes naturally to multi-input prediction tasks."
+        }
+      ]
+    },
+    {
+      "id": "knowledge_agent",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13449190/fullTextXML",
+      "error_type": "HTTPError",
+      "http_status": 500
+    },
+    {
+      "id": "biodiscoveryagent",
+      "url": "https://arxiv.org/html/2405.17631",
+      "final_url": "https://arxiv.org/html/2405.17631",
+      "sha256": "4c792f7fc3651b904e228bb24cf82923ae00e45e9c25fb4a4d825b89a899b889",
+      "characters": 134020,
+      "excerpts": [
+        {
+          "line_index_zero_based": 577,
+          "text": "The performance of BioDiscoveryAgent can be augmented with tool-use, but the improvement varies by choice of LLM : We evaluated the impact of integrating three different tools\u2014literature search, gene search, and AI critic into BioDiscoveryAgent (Table 3 , Appendix Table 9 ). For the agent using Claude 3.5 Sonnet, tools applied individually or in combination did not lead to significant changes in performance and in some cases hurt performance. In contrast, for Claude 3 Haiku, incorporating all tools consistently enhanced performance."
+        },
+        {
+          "line_index_zero_based": 578,
+          "text": "The effects of different tools varied. In the case of Claude 3 Haiku, using only the literature search tool often resulted in fixation on a few simple keywords and irrelevant papers, leading to less effective searches. However, the literature search still provided verifiable citations for the gene prediction process, which is beneficial for scientists. Performance significantly improved with the use of a gene search based on shared biological pathways. This improvement likely stems from the gene search relying on tabular datasets not fully represented in text-based sources used for language model training, which the No-Tools agent cannot access. Using only the AI critic tool slightly improved performance over the No-Tools model by diversifying predictions or focusing on specific gene sets."
+        },
+        {
+          "line_index_zero_based": 593,
+          "text": "While BioDiscoveryAgent shows strong capabilities in enhancing experiment design, it still has room for improvement. It tends to perform better with certain cell types over others, likely due to variations in scientific literature coverage. Most performance benefits are observed in the early stages of experimentation rather than in prolonged rounds. Additionally, there is a need to develop better tools or fine-tuning methods to improve information extraction from non-text-based sources."
+        }
+      ]
+    },
+    {
+      "id": "scienceagentbench",
+      "url": "https://arxiv.org/html/2410.05080",
+      "final_url": "https://arxiv.org/html/2410.05080",
+      "sha256": "9c1f3e1e8e9ee35acbddcd1d7781984e95af70e0534947416c89f06ab85bb609",
+      "characters": 194402,
+      "excerpts": [
+        {
+          "line_index_zero_based": 101,
+          "text": "To ensure the scientific authenticity and real-world relevance of our benchmark, we extract 102 tasks from 44 peer-reviewed publications in four disciplines and engage nine subject matter experts to validate them."
+        },
+        {
+          "line_index_zero_based": 137,
+          "text": "Surprisingly, without expert-provided knowledge, Claude-3.5-Sonnet using self-debug can successfully solve 10.8% more tasks than using OpenHands CodeAct while costing 17 times less API fees."
+        },
+        {
+          "line_index_zero_based": 188,
+          "text": "(2) For tasks involving model development, we re-split the dataset, keep the test set labels only for evaluation, and replace them with dummy values, such as -1 for classification tasks."
+        },
+        {
+          "line_index_zero_based": 254,
+          "text": "(1) Valid Execution Rate (VER) checks if the program can execute without errors and save its output with the correct file name."
+        },
+        {
+          "line_index_zero_based": 255,
+          "text": "(2) Success Rate (SR) examines whether a program output meets the success criteria for each task goal (Table 1 ), such as test set performance, prediction-answer matches, and visualization quality."
+        },
+        {
+          "line_index_zero_based": 264,
+          "text": "If the task output is a figure, we follow existing work ( Wu et al., 2024 ; Yang et al., 2024b ) to evaluate its quality using GPT-4o as a judge, which is shown to correlate reasonably well with human raters."
+        }
+      ]
+    },
+    {
+      "id": "co_scientist",
+      "url": "https://arxiv.org/html/2502.18864",
+      "error_type": "HTTPError",
+      "http_status": 404
+    },
+    {
+      "id": "ddi_search",
+      "url": "https://export.arxiv.org/api/query?search_query=all:DDIAgents&max_results=3",
+      "error_type": "HTTPError",
+      "http_status": 406
+    },
+    {
+      "id": "mo_search",
+      "url": "https://export.arxiv.org/api/query?search_query=all:MoAgent&max_results=3",
+      "error_type": "HTTPError",
+      "http_status": 406
+    },
+    {
+      "id": "drugagent_search",
+      "url": "https://export.arxiv.org/api/query?search_query=ti:DrugAgent&max_results=3",
+      "error_type": "HTTPError",
+      "http_status": 406
+    },
+    {
+      "id": "biomni",
+      "access_level": "metadata_and_abstract_only",
+      "search_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=Biomni&format=json&resultType=core&pageSize=5",
+      "retrieved_utc": "2026-09-25T10:17:46.819205+00:00",
+      "search_response_sha256": "821a3f6e2cc01986818da9c9d43c6691381c80ee37498ddcefb2da9fb80115e4",
+      "hash_scope": "Full search response; raw search bytes not retained, only selected metadata.",
+      "metadata": {
+        "id": "42424436",
+        "source": "MED",
+        "doi": "10.1126/science.adz4351",
+        "title": "Autonomous biomedical research with an artificial intelligence agent.",
+        "authorString": "Huang K, Zhang S, Wang H, Qu Y, Lu Y, Li R, Roohani Y, Qiu L, Cao S, Li G, Zhang J, Yin D, Wierenga R, Kavi D, Liu S, She T, Marwaha S, Carter JN, Zhou X, Wheeler MT, Bernstein JA, Wang M, He P, Zhou J, Snyder MP, Cong L, Regev A, Leskovec J.",
+        "abstractText": "Biomedical research is increasingly constrained by repetitive, fragmented workflows that slow discovery. We introduce Biomni, a general-purpose biomedical artificial intelligence agent that autonomously executes diverse research tasks. To map the biomedical action space, Biomni's action-discovery agent mines tools, databases, and protocols from thousands of publications across 25 domains, building a unified agentic environment. Its general-purpose architecture integrates large language model reasoning with retrieval-augmented planning and code-based execution, dynamically composing workflows without predefined templates. Systematic benchmarking shows strong generalization across heterogeneous tasks-causal gene prioritization, drug repurposing, rare-disease diagnosis, microbiome analysis, and molecular cloning-without task-specific tuning. Real-world case studies demonstrate Biomni interpreting multimodal datasets, optimizing protein stability, orchestrating wet-lab instruments, and generating experimentally testable protocols. Biomni envisions artificial intelligence augmenting human scientists and accelerating discovery.",
+        "fullTextUrlList": {
+          "fullTextUrl": [
+            {
+              "availability": "Subscription required",
+              "availabilityCode": "S",
+              "documentStyle": "doi",
+              "site": "DOI",
+              "url": "https://doi.org/10.1126/science.adz4351"
+            }
+          ]
+        },
+        "isOpenAccess": "N",
+        "firstPublicationDate": "2026-08-20"
+      }
+    }
+  ]
+}

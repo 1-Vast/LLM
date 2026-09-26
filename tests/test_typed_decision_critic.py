@@ -408,17 +408,24 @@ def test_findings_reach_the_repair_planner_and_the_run_record(tmp_path: Path):
     blocked = EvidenceAction("viability", "Viability.", 5.0, ("a", "b"),
                              prerequisites=("functional:target_activity",))
     functional = EvidenceAction("activity", "Activity.", 2.0, ("a",), supplies=("functional:target_activity",))
-    client = StubClient([TASK, PLAN, REPAIR])
-    critic = TypedDecisionCritic(RecordedJevClient({
+    constraint = "Use existing public data only; no new wet-lab measurements."
+    gap = "Target engagement has not been measured."
+    client = StubClient([dict(TASK, constraints=[constraint], evidence_gaps=[gap]), PLAN, REPAIR])
+    jev = RecordedJevClient({
         "best_separating_action": {"value": "activity", "probabilities": {"activity": 0.9}},
         "evidence_sufficiency": {"value": 1},
-    }))
+    })
+    critic = TypedDecisionCritic(jev)
     controller = _controller(tmp_path, client, critic=critic, enable_llm_repair=True)
 
     turn = controller.run("Resolve.", available_actions=(blocked, functional),
                           intervention_profile=FunctionalInterventionProfile(mode="inhibition"))
 
+    assert "EVIDENCE\nTASK\nResolve discrepancy." in jev.calls[0][0]
+    assert constraint in jev.calls[0][0] and gap in jev.calls[0][0]
+
     repair_prompt = client.calls[2][0][1]["content"]
+    assert constraint in repair_prompt and gap in repair_prompt
     assert ADVISORY_HEADING in repair_prompt
     assert "prefers the registered action 'activity'" in repair_prompt
     assert "never a licence to name an action outside AVAILABLE_ACTIONS" in repair_prompt

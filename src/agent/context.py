@@ -12,11 +12,12 @@ File summary
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 import json
 from typing import TYPE_CHECKING, Any, Protocol, Sequence
 
 from .knowledge import EvidenceLedger, EvidenceRecord, status_for_kind
+from .biology import BiologicalConditions
 from .memory import MemoryEntry, MemoryKind, MemoryScope, MemoryStore
 
 if TYPE_CHECKING:
@@ -131,7 +132,8 @@ class ContextBuilder:
         self._memory = memory
         self._max_characters = max_characters
 
-    def build(self, intent: TaskIntent, *, memory_scope: MemoryScope | None = None) -> ContextPacket:
+    def build(self, intent: TaskIntent, *, memory_scope: MemoryScope | None = None,
+              biological_conditions: BiologicalConditions | None = None) -> ContextPacket:
         query = " ".join(
             part
             for part in (
@@ -143,7 +145,9 @@ class ContextBuilder:
             if part
         )
         entities = _intent_entities(intent)
-        evidence = self._evidence.retrieve(query, entities=entities, scope=memory_scope)
+        conditions = biological_conditions or BiologicalConditions(context=intent.biological_context)
+        evidence = self._evidence.retrieve(query, entities=entities, scope=memory_scope,
+                                          biological_conditions=conditions)
         memories = self._memory.search(
             query, kinds=(MemoryKind.EPISODIC, MemoryKind.SEMANTIC), scope=memory_scope
         )
@@ -235,6 +239,11 @@ class ContextBuilder:
         required_sections = [
             "TASK\n" + intent.research_question,
             "SUPPLIED EVIDENCE\n" + "\n".join(intent.supplied_evidence or ("None supplied.",)),
+            "TASK DETAILS (requested state; not measured evidence)\n" + json.dumps(
+                {key: value for key, value in asdict(intent).items()
+                 if key not in {"research_question", "supplied_evidence"}},
+                ensure_ascii=False, separators=(",", ":"),
+            ),
         ]
         mandatory = "\n\n".join(required_sections)
         if len(mandatory) > self._max_characters:

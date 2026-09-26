@@ -1,0 +1,131 @@
+{
+  "schema": "maestro.research.dynamic_world_model.protocol.v1",
+  "version": 1,
+  "question": "Does a population-level virtual-cell transition model help the agent choose measurements that separate competing mechanism hypotheses, compared with the current magnitude-ranked world model, with no world model, and with fixed and random policies?",
+  "source": {
+    "h5ad": "data/raw/sciplex3/SrivatsanTrapnell2020_sciplex3.h5ad",
+    "sha256_prefix": "bde2420c",
+    "prepared": "outputs/dynamic_world_model_20260926/prepared",
+    "frozen_24h_preparation": "outputs/biological_depth_20260926/prepared",
+    "folds": "compounds.csv fold column of the frozen 24 h preparation (five skeleton-grouped folds)"
+  },
+  "state": {
+    "unit": "population of one well (line x time x compound x dose x replicate); never a cell trajectory",
+    "variables": {
+      "rna_shift": "measured: pseudobulk log1p(CP10K) shift against the pooled vehicle of the same line, time and replicate, 2473 frozen genes",
+      "hallmark_activity": "inferred from rna_shift (mean shift over MSigDB Hallmark members present)",
+      "cell_cycle": "inferred: Tirosh S and G2M module means per cell, summarised per well",
+      "population_size": "measured proxy: log2(cells recovered in the well / mean vehicle-well cells on the same plate)",
+      "protein": "missing", "morphology": "missing", "chromatin": "missing", "metabolism": "missing"
+    }
+  },
+  "classes": {
+    "rule": "first matching rule wins; skeleton units; a class enters a tier's hypothesis pool only above the tier's minimum",
+    "rules": [
+      ["HDAC inhibition", "pathway_level_2 == 'Histone deacetylation' and 'HDAC' in target"],
+      ["Sirtuin modulation", "pathway_level_2 == 'Histone deacetylation' and 'Sirtuin' in target"],
+      ["Aurora kinase inhibition", "pathway_level_2 == 'Aurora kinase activity'"],
+      ["JAK inhibition", "pathway_level_2 == 'JAK kinase activity'"],
+      ["PARP inhibition", "target == 'PARP'"],
+      ["Histone methyltransferase inhibition", "pathway_level_2 == 'Histone methylation'"],
+      ["DNA methyltransferase inhibition", "pathway_level_2 == 'DNA methylation' and target == 'DNA Methyltransferase'"],
+      ["Nucleotide analog", "pathway_level_2 == 'Nucleotide analog'"],
+      ["Receptor tyrosine kinase inhibition", "pathway_level_2 == 'RTK activity'"],
+      ["HSP90 inhibition", "pathway_level_2 == 'HSP90 activity'"],
+      ["MEK/MAPK inhibition", "pathway_level_2 == 'MAPK activity'"],
+      ["Abl/Src inhibition", "pathway_level_2 == 'Abl/Src activity'"],
+      ["BCL-2 family inhibition", "'Bcl-2' in target"],
+      ["Glucocorticoid receptor agonism", "'Glucocorticoid' in target"],
+      ["DNA alkylation", "pathway_level_2 == 'Alkylating agent'"],
+      ["CDK inhibition", "pathway_level_2 == 'CDK activity'"],
+      ["BET bromodomain inhibition", "pathway_level_2 == 'Bromodomain'"],
+      ["HIF stabilisation or inhibition", "target == 'HIF'"]
+    ]
+  },
+  "tiers": {
+    "B_line_dose": {"time_hours": [24], "lines": ["A549", "K562", "MCF7"], "doses_nM": [10, 100, 1000, 10000],
+                     "minimum_units_per_class": 3},
+    "A_time_dose": {"time_hours": [24, 72], "lines": ["A549"], "doses_nM": [10, 100, 1000, 10000],
+                     "minimum_compounds_per_class_at_72h": 2}
+  },
+  "episode": {
+    "held_out": "every compound of a pool class, predicted from its own fold's training compounds only",
+    "contrast": "the compound's class against every other pool class of the tier; the two hypotheses are presented in a seeded random order",
+    "budget_measurements": 2,
+    "stop": "after the first mechanism elimination or when the budget is spent",
+    "missing_or_failed_measurement": "charged, returns quality_failed, never updates a mechanism belief"
+  },
+  "validator": {
+    "minimum_cells_per_replicate": 20,
+    "detection": {"statistic": "Pearson correlation of the rep1 and rep2 shift vectors over the 2473 genes",
+                   "null": "vehicle-well pseudo-conditions: one rep1 vehicle well and one rep2 vehicle well of the same line and time, each shifted against the pooled vehicle of the other wells of its replicate",
+                   "threshold": "max(0.10, 0.99 quantile of the null for the same line and time)"},
+    "shared_axis": "unit vector of the mean shift of all training compounds at the same line, time and dose",
+    "similarity": "cosine after projecting the shared axis out of both vectors; a class's score is the maximum over its training compounds whose own response is detected at that condition (templates)",
+    "elimination": "eliminate B in favour of A only if the profile is detected, A has a template and s_A >= floor, and either s_A - s_B >= margin or B has no template while at least two B training compounds were measured there and none was detected",
+    "absence": "an undetected response eliminates nothing; it is recorded as no_detectable_response at intervention-implementation scope, because a failed perturbation and a mechanism that is inert at that condition predict the same observation",
+    "calibration": {"procedure": "per fold, inner leave-one-compound-out over training compounds, all pool-class pairs",
+                     "floor_grid": [0.1, 0.2, 0.3], "margin_grid": [0.0, 0.05, 0.1, 0.15, 0.2, 0.3],
+                     "maximum_wrong_elimination_rate": 0.05,
+                     "choice": "the grid point with the most correct eliminations whose wrong-elimination rate is at most the maximum; ties go to the larger margin, then the larger floor; if none qualifies the fold never eliminates"}
+  },
+  "costs": {"basis": "laboratory units; model and API spend excluded",
+             "treated_wells_per_measurement": 2, "vehicle_wells_per_new_line_and_time": 4,
+             "exposure_days": {"24": 1, "72": 3}, "readout_days": 5,
+             "selector_scalar": "turnaround days (exposure + readout); wells reported beside it"},
+  "utility": {"correct_elimination": 1, "undetermined": 0, "wrong_elimination": -2},
+  "policies": {
+    "random": "uniform over unexecuted menu actions; 20 seeds averaged",
+    "fixed": "tier B: 10 uM in A549, then 10 uM in MCF7; tier A: 24 h 10 uM, then 72 h 10 uM",
+    "cost_only": "the repository selector without a world model: every action declares both hypotheses, so ties go to cost then identifier; identifiers are <line>|<hours, three digits>h|<dose, five digits>nM, so the tie-break starts at the lowest dose and the earliest time",
+    "magnitude": "current MAESTRO: the same selector with the virtual-cell tie-break |predicted transcript_shift_norm| from five nearest training structures (Tanimoto, log-dose interpolation); a 72 h query is refused as in the served rung",
+    "separation": "scenario cards from measured training references: per action and hypothesis, the leave-one-out outcome frequencies of that class's training compounds under the validator; detection_power = mean probability of a correct elimination; chosen by maestro.acquisition.select_expected_coverage with a per-step budget of 8 days (exactly one action); an action whose correct-elimination probability is zero distinguishes nothing, and if no action distinguishes anything the policy defers",
+    "separation_permuted": "control: separation with class labels permuted among training compounds (seeded)",
+    "dyn_ref": "separation for step 1; step 2 conditions each hypothesis's outcome frequencies on reference compounds whose step-1 outcome category (detected or not) matches the held-out compound's",
+    "dyn_model": "dyn_ref, except that when step 1 was detected but ambiguous the held-out compound's own step-2 profile is forecast by the best transition arm and the validator is applied to forecast plus resampled cross-validated residuals",
+    "oracle": "hindsight best sequence under the budget (utility, then cost)"
+  },
+  "llm_arms": {
+    "episodes": "one seeded decoy per held-out compound in each tier",
+    "deepseek_base": "task, hypotheses, menu with costs and line descriptions, results so far; no cards",
+    "deepseek_cards": "the same plus scenario cards",
+    "deepseek_cards_permuted": "the same with cards from permuted-label references (non-biological control)",
+    "jev_cards": "Jev choice over action identifiers with cards, 8 repeats; a stable modal choice (agreement >= 0.6) is executed, otherwise the separation action",
+    "jev_base": "the same without cards",
+    "authority": "every arm's chosen action is executed and read by the same deterministic validator; no model output is evidence",
+    "repeatability": "30 first-step deepseek_cards decisions repeated three more times",
+    "spend_caps_usd": {"deepseek": 3.0, "jev": 1.0}
+  },
+  "transition_tasks": {
+    "T2_time": {"what": "A549 72 h shift from the same compound and dose at 24 h", "arms": ["zero", "persistence", "scaled_persistence", "latent_ridge_residual", "gene_ridge", "mlp_latent_residual", "retrieval_k3", "retrieval_residual_k3"]},
+    "T3_dose": {"what": "a dose's shift from the same compound's measured neighbouring doses, same line and time; 10 uM from lower doses is extrapolation and is reported separately", "arms": ["zero", "nearest_dose", "log_dose_interpolation", "ridge_neighbours"]},
+    "T4_context": {"what": "a line's 24 h shift from the same compound and dose in another line", "arms": ["zero", "identity", "ridge_map", "retrieval_k3"]},
+    "T5_branches": {"what": "validator-outcome probabilities for a held-out compound at a condition, per hypothesis", "arms": ["multi_branch_references", "single_mean_centroid_plus_replicate_noise", "pooled_marginal"], "metric": "log loss and Brier score of the realised outcome under the true class"},
+    "metrics": "cosine and gene-wise R^2 against zero on held-out conditions whose target response is detected; replicate ceiling; class of the nearest template from the forecast versus from the observation",
+    "latent": "PCA with 20 components fitted on training conditions only; MLP one hidden layer of 64 units, early stopping on an inner validation split"
+  },
+  "primary": {
+    "P1": "tier B, correct-decision rate at budget 2: separation minus magnitude",
+    "P2": "tier A, correct-decision rate at budget 2: dyn_ref minus magnitude, and dyn_ref minus fixed",
+    "P3": "T2: best learned arm minus persistence, mean cosine on held-out detected conditions",
+    "P4": "LLM episodes: deepseek_cards minus deepseek_base, correct-decision rate",
+    "P5": "T5: multi_branch minus single_mean log loss"
+  },
+  "secondary": ["wrong-elimination rate (unsupported belief updates)", "utility and regret against the oracle", "lab cost and days to the first mechanism elimination", "calibration of predicted correct-elimination probability (ECE, 10 bins)", "rate of 72 h choices after an undetected 24 h result", "applicability refusals and the served-versus-refused error", "deepseek repeatability and Jev stability"],
+  "inference": {"unit": "skeleton unit (compound)", "bootstrap_draws": 2000, "seed": 20260926, "interval": 0.95},
+  "promotion": {
+    "scenario_cards": "P1 interval excludes zero in favour of separation; separation's wrong-elimination rate no more than 0.02 above magnitude's; the permuted control does not reproduce the gain (its difference from magnitude has an interval containing zero or is smaller than separation's); predicted correct-elimination probability has ECE <= 0.10 where served",
+    "time_component": "P2 interval excludes zero in favour of dyn_ref",
+    "learned_transition": "P3 interval excludes zero in favour of the learned arm, and dyn_model beats dyn_ref on tier A utility",
+    "otherwise": "record the negative result and keep the simpler method"
+  },
+  "case_study": {
+    "question": "Slow-acting epigenetic writer inhibitors (DNA methyltransferase: azacitidine, decitabine; PRC2/EZH2: tazemetostat, UNC1999, EED226) against 'the perturbation failed' in A549",
+    "anchors": [
+      "At 24 h their A549 responses are weaker than HDAC inhibitors' at matched dose (replicate agreement and shift norm).",
+      "From 24 h to 72 h their response grows more than HDAC inhibitors' does (ratio of 72 h to 24 h shift norm, same dose).",
+      "DNA methyltransferase inhibitors at 72 h raise HALLMARK_INTERFERON_ALPHA_RESPONSE relative to 24 h (viral-mimicry programme, Chiappinelli 2015; Roulois 2015)."
+    ],
+    "reading": "anchors are literature expectations checked against the data; a failed anchor is reported as failed"
+  }
+}

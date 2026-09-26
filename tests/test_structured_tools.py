@@ -66,13 +66,19 @@ def custom_tool(tmp_path, *, cost=0, body=None, evidence_kind="derived_analysis"
 def test_adapters_are_registered_typed_and_source_versioned():
     descriptors = LocalToolCatalog(TOOLS).discover()
     assert {item.identifier for item in descriptors} == {
-        "data_profile", "column_summary", "table_filter", "evidence_bundle_optimize", "multimodal_alignment", "virtual_cell_query",
+        "data_profile", "column_summary", "table_filter", "evidence_bundle_optimize", "multimodal_alignment", "typed_decision_review", "virtual_cell_query",
+        "signature_retrieval",
     }
     for item in descriptors:
         assert item.parameter_schema and item.schema_version == TOOL_SCHEMA_VERSION
         if item.identifier == "virtual_cell_query":
             assert item.evidence_kind is EvidenceKind.MODEL_PREDICTION
             assert ROOT / "src/virtual_cell/interface.py" in item.source_files
+        elif item.identifier == "signature_retrieval":
+            # A measured-signature comparison lives beside the data semantics it depends on.
+            assert item.evidence_kind is EvidenceKind.DERIVED_ANALYSIS
+            assert ROOT / "src/virtual_cell/signature_retrieval.py" in item.source_files
+            assert len(item.entrypoint.read_text(encoding="utf-8").splitlines()) <= 12
         else:
             assert item.evidence_kind is EvidenceKind.DERIVED_ANALYSIS
             assert ROOT / "src/maestro/tool_analysis.py" in item.source_files

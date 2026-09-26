@@ -20,7 +20,12 @@ Available tools:
 - `table_filter/`: one declarative filter with a bounded matching-row sample.
 - `evidence_bundle_optimize/`: exact declared coverage with source-dependence bounds and explicit costs.
 - `multimodal_alignment/`: paired scalar QC with explicit information visibility and acquisition cost.
+- `typed_decision_review/`: validates recorded Typed Jev judgments as advisory model predictions,
+  reports stability suppression, and preserves deterministic decision authority.
 - `virtual_cell_query/`: the State adapter behind applicability and endpoint gates; returns prediction or named refusal.
+- `signature_retrieval/`: compares a measured signature with a digest-bound library of measured
+  SciPlex3 responses and ranks the annotated classes it resembles, against a permutation null and
+  beside its recorded held-out agreement (0.500 on 40 compounds; chance 0.059).
 
 Structured payloads and receipts enter planning without being converted into measurements.
 Manifest requirements and qualification states are in [`task.md`](../task.md) section 6; the

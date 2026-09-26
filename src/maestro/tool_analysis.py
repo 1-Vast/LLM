@@ -31,6 +31,98 @@ def _source(path: Path) -> dict[str, Any]:
     return {"dataset": path.name, "provenance_verified": False}
 
 
+_TYPED_REVIEW_SCOPES = {
+    "plan_critique", "action_ranking", "applicability_advisory", "hypothesis_advisory",
+}
+
+
+def typed_decision_review(parameters: Mapping[str, Any]) -> dict[str, Any]:
+    """Validate a recorded Typed Jev review without granting it decision authority.
+
+    The input is an artifact produced by the agent's critic, not a prompt for a provider call.
+    This keeps the local tool useful for audit/replay while making the advisory boundary explicit:
+    a review can be inspected, ranked and suppressed, but it cannot satisfy a premise or update
+    a mechanism belief.
+    """
+    parameters = json_value(parameters)
+    path = Path(parameters["dataset_path"])
+    data = json_loads(path.read_text(encoding="utf-8-sig"))
+    if not isinstance(data, dict):
+        raise ValueError("Typed review artifact must be an object.")
+    allowed = {"schema_version", "state_digest", "judgments", "stability", "refusals", "suppressed_by_revocation"}
+    if set(data) - allowed:
+        raise ValueError("Typed review artifact contains undeclared fields.")
+    if data.get("schema_version", TOOL_SCHEMA_VERSION) != TOOL_SCHEMA_VERSION:
+        raise ValueError("Unknown typed review schema_version.")
+    state_digest = data.get("state_digest")
+    if not isinstance(state_digest, str) or not state_digest.strip():
+        raise ValueError("Typed review requires a nonempty state_digest.")
+    judgments = data.get("judgments", [])
+    if not isinstance(judgments, list) or len(judgments) > 64:
+        raise ValueError("Typed review judgments must be a list of at most 64 items.")
+    required = {"question_id", "scope", "kind", "value", "evidence_kind"}
+    optional = {"probability", "confidence", "satisfies_premise", "eliminates_hypothesis", "is_measurement"}
+    seen: set[str] = set()
+    normalized: list[dict[str, Any]] = []
+    for item in judgments:
+        if not isinstance(item, dict) or not required <= set(item) or set(item) - required - optional:
+            raise ValueError("Typed review judgment has an invalid shape.")
+        identifier = item["question_id"]
+        if not isinstance(identifier, str) or not identifier.strip() or identifier in seen:
+            raise ValueError("Typed review question_id values must be unique and nonempty.")
+        seen.add(identifier)
+        if item["scope"] not in _TYPED_REVIEW_SCOPES:
+            raise ValueError("Typed review has an unknown scope.")
+        if item["kind"] not in {"noul", "choice", "score"}:
+            raise ValueError("Typed review has an unknown question kind.")
+        if item["evidence_kind"] != "model_prediction":
+            raise ValueError("Typed Jev judgments must remain model_prediction.")
+        for field in ("satisfies_premise", "eliminates_hypothesis", "is_measurement"):
+            if item.get(field, False) is not False:
+                raise ValueError(f"Typed Jev judgment cannot set {field}.")
+        for field in ("probability", "confidence"):
+            value = item.get(field)
+            if value is not None and (isinstance(value, bool) or not isinstance(value, (int, float))
+                                      or not math.isfinite(value) or not 0.0 <= value <= 1.0):
+                raise ValueError(f"Typed review {field} must be a probability or null.")
+        normalized.append({key: item[key] for key in sorted(item)})
+
+    stability = data.get("stability", [])
+    if not isinstance(stability, list):
+        raise ValueError("Typed review stability must be a list.")
+    revoked_scopes = sorted({str(row.get("scope")) for row in stability
+                             if isinstance(row, dict) and (row.get("revoked") is True
+                                                           or row.get("verdict") == "unstable")})
+    if data.get("suppressed_by_revocation") is True:
+        revoked_scopes = sorted(set(revoked_scopes) | {
+            item["scope"] for item in normalized if item["scope"] == "action_ranking"
+        })
+    advisory_actions = [item["value"] for item in normalized
+                        if item["question_id"] == "best_separating_action"
+                        and item["scope"] == "action_ranking"
+                        and item["scope"] not in revoked_scopes
+                        and isinstance(item["value"], str)]
+    payload = {
+        "analysis": "typed_decision_review",
+        "source": _source(path),
+        "state_digest": state_digest,
+        "judgments": normalized,
+        "advisory_action_ids": advisory_actions,
+        "suppressed_scopes": revoked_scopes,
+        "advisory_only": True,
+        "belief_update_allowed": False,
+        "premise_satisfaction_allowed": False,
+        "action_selection_authority": "deterministic_validator",
+        "refusals": list(data.get("refusals", [])) if isinstance(data.get("refusals", []), list) else [],
+    }
+    return _result(
+        payload,
+        [f"Validated {len(normalized)} Typed Jev judgments as advisory model predictions."],
+        ["This review cannot satisfy a premise, eliminate a hypothesis, or update belief state.",
+         "Action suggestions are suppressed for revoked or unstable scopes."],
+    )
+
+
 def _table(path: Path):
     """Yield validated rows without accepting duplicate headers or ragged records."""
     if path.suffix.lower() not in {".csv", ".tsv"}:
@@ -240,12 +332,25 @@ def evidence_bundle_optimize(parameters: Mapping[str, Any]) -> dict[str, Any]:
     for item in records:
         object_fields(item, {"id", "cost", "cost_unit", "distinguishes", "source_ids", "context", "time_hours",
                              "independent_unit", "quantity"},
-                      {"prerequisites", "description", "supplies", "interpretation_gate", "expected_outcomes", "detection_power"}, "action")
+                      {"prerequisites", "description", "supplies", "interpretation_gate", "expected_outcomes", "detection_power",
+                       "cost_breakdown", "data_origin"}, "action")
         identifier = nonempty_string(item["id"], "action.id")
         if identifier in seen:
             raise ValueError("Duplicate action id.")
         seen.add(identifier)
         cost = nonnegative_number(item["cost"], "action.cost")
+        origin = item.get("data_origin")
+        if origin is not None and origin not in {"existing_public", "existing_local", "new_experiment"}:
+            raise ValueError("Unknown action.data_origin.")
+        if "cost_breakdown" in item:
+            parts = object_fields(item["cost_breakdown"],
+                                  {"access", "preprocessing", "compute", "new_measurement"}, set(), "cost_breakdown")
+            total = sum(nonnegative_number(value, f"cost_breakdown.{key}") for key, value in parts.items())
+            nonnegative_number(total, "total component cost")
+            if not math.isclose(cost, total, rel_tol=1e-9, abs_tol=1e-9):
+                raise ValueError("Action cost must equal its cost_breakdown in the declared cost_unit.")
+            if origin in {"existing_public", "existing_local"} and parts["new_measurement"] != 0:
+                raise ValueError("Existing data reuse cannot declare new measurement cost.")
         if item["cost_unit"] != cost_unit:
             raise ValueError("Action cost_unit mismatch; no implicit cost conversion.")
         if item["context"] != context or nonnegative_number(item["time_hours"], "action.time_hours") != time:
@@ -289,6 +394,15 @@ def evidence_bundle_optimize(parameters: Mapping[str, Any]) -> dict[str, Any]:
                                        source_groups={key: value["independence_group"] for key, value in sources.items()})
     plan = expected.plan
     selected = [action.identifier for action in plan.actions]
+    contributions = []
+    for quantity in sorted({action.quantity.value for action in plan.actions}):
+        retained = [action for action in plan.actions if action.quantity.value != quantity]
+        without = select_expected_coverage(frozenset(required), retained, profile, budget, weights=weights,
+                                          source_groups={key: value["independence_group"] for key, value in sources.items()})
+        contributions.append({"quantity": quantity,
+                              "action_ids": [a.identifier for a in plan.actions if a.quantity.value == quantity],
+                              "conditional_coverage_gain": expected.expected_coverage - without.expected_coverage,
+                              "lost_requirements": sorted(plan.covered - without.plan.covered)})
     payload = {
         "analysis": "evidence_bundle_optimize", "solver": "select_expected_coverage", "exact": True,
         "exact_scope": "fixed_ungated_executable_menu_only", "source": _source(path),
@@ -298,6 +412,9 @@ def evidence_bundle_optimize(parameters: Mapping[str, Any]) -> dict[str, Any]:
         "assumptions": list(expected.assumptions), "dependence_groups": dict(expected.dependence_groups),
         "rejected": [asdict(item) for item in expected.rejected],
         "selected_action_ids": selected, "selected_declarations": [item for item in records if item["id"] in selected],
+        "quantity_contributions": contributions,
+        "contribution_basis": "leave_one_quantity_out_of_selected_bundle_without_replacement; declared_coverage_not_empirical_information",
+        "cost_breakdowns": {item["id"]: item.get("cost_breakdown") for item in records},
         "covered": sorted(plan.covered), "uncovered": sorted(plan.uncovered),
         "coverage_score": sum(weights.get(key, 1.0) for key in sorted(plan.covered)),
         "total_cost": plan.total_cost, "budget": budget, "cost_unit": cost_unit, "context": context, "time_hours": time,
@@ -311,6 +428,8 @@ def evidence_bundle_optimize(parameters: Mapping[str, Any]) -> dict[str, Any]:
     return _result(payload, [f"Selected {len(selected)} declared actions covering {len(plan.covered)}/{len(required)} requirements at cost {plan.total_cost:g}."], [
         "Exact only for the supplied executable ungated menu of at most 16 candidates and declared additive costs/coverage; not global research utility.",
         "Costs, quantity capabilities, coverage and provenance are declarations, not verified purchases or experimental results.",
+        "Public access cost is distinct from preprocessing, computation and new measurement; missing cost breakdowns remain unknown.",
+        "Conditional coverage gains are planning ablations under supplied detection powers, not measured modality utility or causal effects.",
         "Prerequisites and interpretation gates remain unknown; selection never certifies measured premises or independent replication.",
         "Shared sources or independent units do not earn extra coverage; overlapping requirements are counted once.",
         "Exact refers to exhaustive subset enumeration with Python floating-point comparisons, not exact rational arithmetic.",
@@ -376,7 +495,8 @@ def _composition_report(spec, required, actions, records, profile, budget) -> di
 
 
 _QUANTITIES = {"transcript": "rna_abundance", "protein": "protein_abundance", "occupancy": "target_occupancy",
-               "activity": "proximal_activity", "morphology": "morphology_feature"}
+               "activity": "proximal_activity", "morphology": "morphology_feature",
+               "chromatin": "chromatin_accessibility"}
 _SCOPE = ("pair_id", "context", "time_hours", "independent_unit", "replicate", "entity", "contrast_id")
 
 
@@ -398,12 +518,14 @@ class ModalityRecord:
     unit: str | None
     value: float | None
     reference_value: float | None
+    batch_id: str | None = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> ModalityRecord:
         """Reject untyped substitutions, non-finite values and undeclared fields."""
         fields = set(cls.__dataclass_fields__)
-        object_fields(data, fields, set(), "modality record")
+        object_fields(data, fields - {"batch_id"}, {"batch_id"}, "modality record")
+        data = {"batch_id": None, **data}
         nonempty_string(data["id"], "record.id")
         modality = nonempty_string(data["modality"], "record.modality")
         if modality not in _QUANTITIES:
@@ -464,7 +586,7 @@ def multimodal_alignment(parameters: Mapping[str, Any]) -> dict[str, Any]:
         seen.add(identifier)
         if source_id is not None and source_id not in sources:
             raise ValueError("Unknown record source_id.")
-        missing_fields = sorted(key for key, value in record.items() if value is None)
+        missing_fields = sorted(key for key, value in record.items() if value is None and key != "batch_id")
         if source_id in sources and sources[source_id]["independence_group"] is None:
             missing_fields.append("source_independence_group")
         if missing_fields:
@@ -481,6 +603,7 @@ def multimodal_alignment(parameters: Mapping[str, Any]) -> dict[str, Any]:
             if differences:
                 mismatches.append({"record_ids": [left["id"], right["id"]], "fields": differences})
     aligned, ambiguous, unpaired, candidates = [], [], [], []
+    batch_reviews = []
     for key, group in groups.items():
         modalities = [item["modality"] for item in group]
         scope = dict(zip(_SCOPE, key))
@@ -496,10 +619,17 @@ def multimodal_alignment(parameters: Mapping[str, Any]) -> dict[str, Any]:
             unpaired.extend(item["id"] for item in group)
             continue
         aligned.append(info)
+        batches = {item["batch_id"] for item in group}
+        if None in batches or len(batches) > 1:
+            batch_reviews.append({"record_ids": info["record_ids"],
+                                  "reason": "batch_unknown" if None in batches else "batch_mismatch",
+                                  "correction_applied": False})
         for left, right in combinations(group, 2):
             if {left["modality"], right["modality"]} & {"morphology", "occupancy"}:
                 continue
             directions = [_direction(item) for item in (left, right)]
+            if left["batch_id"] is not None and right["batch_id"] is not None and left["batch_id"] != right["batch_id"]:
+                continue
             if None not in directions and set(directions) == {"increase", "decrease"}:
                 candidates.append({
                     **scope, "record_ids": [left["id"], right["id"]], "directions": directions,
@@ -511,6 +641,7 @@ def multimodal_alignment(parameters: Mapping[str, Any]) -> dict[str, Any]:
     return _result({
         "analysis": "multimodal_alignment", "source": _source(path), "visibility": visibility,
         "alignment_qc": {"record_count": len(records), "aligned_groups": aligned, "mismatches": mismatches,
+                         "batch_reviews": batch_reviews,
                          "missing": missing, "ambiguous_groups": ambiguous, "unpaired_record_ids": unpaired,
                          "excluded_record_ids": [item["id"] for item in records if item not in eligible],
                          "declared_independent_unit_count": len({item["independent_unit"] for item in eligible}),
@@ -524,6 +655,7 @@ def multimodal_alignment(parameters: Mapping[str, Any]) -> dict[str, Any]:
         "Source identities, references, replicates and independent units are declarations, not verified provenance; multiple modalities or technical replicates on one unit are not independent replications.",
         "Exact context, time, replicate, entity, contrast and independent-unit matching is required; missing quantities stay missing and no imputation is performed.",
         "Visibility and acquisition costs are caller declarations, not verified receipts; retrospective QC is not a pre-experiment risk predictor.",
+        "Batch identity is optional and unknown when absent; known cross-batch pairs produce no direction-discordance candidate. No batch correction is fitted or assumed.",
     ])
 
 

@@ -40,7 +40,9 @@ def test_tools_are_folder_scoped_runtime_components():
         "table_filter",
         "evidence_bundle_optimize",
         "multimodal_alignment",
+        "typed_decision_review",
         "virtual_cell_query",
+        "signature_retrieval",
     }
     assert all((path.parent / "tool.py").is_file() for path in manifests)
     assert not (ROOT / "tools" / "tool.py").exists()
@@ -72,7 +74,7 @@ def _project_markdown():
 
     Walking the working tree instead swept in whatever a local checkout happened to hold: a
     verification run failed this rule on an empty README inside a downloaded dataset under
-    `dataset/`, which `.gitignore` excludes and which the project does not write. The English-only
+    `data/`, which `.gitignore` excludes and which the project does not write. The English-only
     rule is about the project's own prose, so tracked files are exactly the right set, and the
     rule can no longer be broken by a third party's file landing in a local directory.
     """

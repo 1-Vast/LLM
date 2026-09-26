@@ -1,0 +1,124 @@
+{
+ "schema": "maestro.biological_depth.anchors.v1",
+ "frozen": "2026-09-26, before any SciPlex3 expression response or model output was computed in this workspace",
+ "note": "Each anchor is a pharmacodynamic expectation taken from the literature or from an independent release (DepMap), never from SciPlex3. Direction anchors are scored on the centered shift (condition shift minus the mean shift of the training compounds at the same cell line and dose), so an arm that only predicts the average drug response cannot pass them. Gene sets name HGNC symbols; genes absent from the modelled universe are dropped and the retained count is reported.",
+ "anchors": [
+  {
+   "id": "A1_hsp90_hsf1",
+   "kind": "gene_set_direction",
+   "primary_compounds": ["Alvespimycin (17-DMAG) HCl", "Luminespib (AUY-922, NVP-AUY922)", "Tanespimycin (17-AAG)"],
+   "exploratory_compounds": [],
+   "cell_lines": ["A549", "K562", "MCF7"],
+   "dose_nM": 10000,
+   "genes": ["HSPA1A", "HSPA1B", "DNAJB1", "HSPH1", "HSPA6", "BAG3", "HSPB1", "DNAJA1"],
+   "expected": "up",
+   "pass_rule": "centered gene-set score above the 95th percentile of size-matched random gene sets in at least 2 of 3 lines for at least 2 of 3 compounds",
+   "basis": "HSP90 inhibition releases HSF1 and induces HSP70-family chaperones; HSP70 induction is the clinical pharmacodynamic marker of HSP90 inhibitors (Banerji et al., J Clin Oncol 2005)."
+  },
+  {
+   "id": "A2_glucocorticoid_gr",
+   "kind": "gene_set_direction",
+   "primary_compounds": ["Triamcinolone Acetonide"],
+   "exploratory_compounds": ["Prednisone", "Meprednisone"],
+   "cell_lines": ["A549"],
+   "dose_nM": 10000,
+   "genes": ["FKBP5", "TSC22D3", "ZBTB16", "PER1", "KLF9", "DUSP1", "SGK1", "ERRFI1"],
+   "expected": "up",
+   "pass_rule": "centered gene-set score above the 95th percentile of size-matched random gene sets in A549 for the primary compound",
+   "basis": "A549 is the standard glucocorticoid-responsive line; FKBP5, TSC22D3, PER1, ZBTB16 and KLF9 are among the most strongly induced glucocorticoid-receptor targets there (Reddy et al., Genome Res 2009). Prednisone and meprednisone are prodrugs that need 11-beta-HSD1 activation, so they are exploratory."
+  },
+  {
+   "id": "A3_estrogen_receptor_mcf7",
+   "kind": "gene_set_context",
+   "primary_compounds": ["Fulvestrant", "Toremifene Citrate"],
+   "exploratory_compounds": [],
+   "cell_lines": ["A549", "K562", "MCF7"],
+   "dose_nM": 10000,
+   "gene_set": "HALLMARK_ESTROGEN_RESPONSE_EARLY",
+   "expected": "down_in_MCF7_only",
+   "pass_rule": "for at least 1 of 2 compounds: the MCF7 centered score is below the 5th percentile of random gene sets and is lower than the centered scores in both A549 and K562",
+   "basis": "MCF7 is estrogen-receptor positive and ESR1 is a dependency only there (DepMap CRISPRGeneEffect: MCF7 -1.33, A549 0.12, K562 -0.04). Fulvestrant degrades and toremifene antagonises ER, lowering early estrogen-response genes (Hallmark set, Liberzon et al., Cell Syst 2015)."
+  },
+  {
+   "id": "A4_mek_mpas",
+   "kind": "gene_set_direction",
+   "primary_compounds": ["Trametinib (GSK1120212)"],
+   "exploratory_compounds": ["PD98059", "SL-327"],
+   "cell_lines": ["A549"],
+   "dose_nM": 10000,
+   "genes": ["PHLDA1", "SPRY2", "SPRY4", "DUSP4", "DUSP6", "CCND1", "EPHA2", "EPHA4", "ETV4", "ETV5"],
+   "expected": "down",
+   "pass_rule": "centered gene-set score below the 5th percentile of size-matched random gene sets in A549 for the primary compound",
+   "basis": "The ten-gene MEK pathway activity score falls with MEK inhibition (Wagle et al., npj Precis Oncol 2018). A549 carries a KRAS hotspot mutation and depends on KRAS (DepMap -1.20). PD98059 and SL-327 are weak micromolar MEK inhibitors, so they are exploratory."
+  },
+  {
+   "id": "A5_phd_hypoxia",
+   "kind": "gene_set_direction",
+   "primary_compounds": ["Roxadustat (FG-4592)", "IOX2"],
+   "exploratory_compounds": [],
+   "cell_lines": ["A549", "K562", "MCF7"],
+   "dose_nM": 10000,
+   "gene_set": "HALLMARK_HYPOXIA",
+   "expected": "up",
+   "pass_rule": "centered gene-set score above the 95th percentile of random gene sets in at least 2 of 3 lines for at least 1 of 2 compounds",
+   "basis": "Prolyl-hydroxylase inhibitors stabilise HIF-alpha in normoxia and induce hypoxia-response genes."
+  },
+  {
+   "id": "A6_bet_hexim1",
+   "kind": "gene_set_direction",
+   "primary_compounds": ["(+)-JQ1", "PFI-1 (PF-6405761)"],
+   "exploratory_compounds": [],
+   "cell_lines": ["A549", "K562", "MCF7"],
+   "dose_nM": 10000,
+   "genes": ["HEXIM1"],
+   "expected": "up",
+   "pass_rule": "centered HEXIM1 shift above the 95th percentile of random single genes in at least 2 of 3 lines for at least 1 of 2 compounds",
+   "basis": "HEXIM1 induction is a robust pharmacodynamic marker of BET bromodomain inhibition across cell types (Lin et al., PLoS One 2017)."
+  },
+  {
+   "id": "A7_p53_context",
+   "kind": "gene_set_context",
+   "primary_compounds": ["Pirarubicin"],
+   "exploratory_compounds": ["JNJ-26854165 (Serdemetan)", "Fluorouracil (5-Fluoracil, 5-FU)", "Raltitrexed"],
+   "cell_lines": ["A549", "K562", "MCF7"],
+   "dose_nM": 1000,
+   "gene_set": "HALLMARK_P53_PATHWAY",
+   "expected": "higher_in_A549_and_MCF7_than_K562",
+   "pass_rule": "centered score in A549 and in MCF7 each exceeds the centered score in K562 for the primary compound",
+   "basis": "K562 lacks functional p53 while A549 and MCF7 are TP53 wild type; DepMap agrees independently: TP53 knockout raises fitness in A549 (+1.40) and MCF7 (+0.34) but not K562 (+0.16), and MDM2 is a dependency in A549 (-1.38) and MCF7 (-1.29) but not K562 (-0.26). Anthracyclines activate p53 through DNA damage. The 1 uM dose limits the nonspecific toxicity expected at 10 uM."
+  },
+  {
+   "id": "A8_bcr_abl_k562",
+   "kind": "magnitude_context",
+   "primary_compounds": ["Nilotinib (AMN-107)", "Dasatinib", "Bosutinib (SKI-606)"],
+   "exploratory_compounds": [],
+   "cell_lines": ["A549", "K562", "MCF7"],
+   "dose_nM": "mean over 10, 100, 1000 and 10000",
+   "expected": "relative_magnitude_highest_in_K562",
+   "pass_rule": "for at least 2 of 3 compounds, the dose-averaged shift norm divided by the line's median compound norm is larger in K562 than in both A549 and MCF7",
+   "basis": "K562 is driven by BCR-ABL1; ABL1 and BCR are dependencies only in K562 (DepMap ABL1 -1.64, BCR -1.30; both near zero in A549 and MCF7)."
+  },
+  {
+   "id": "A9_hdac_magnitude",
+   "kind": "magnitude_class",
+   "primary_compounds": "pathway_level_2 == 'Histone deacetylation' and target mentions HDAC",
+   "exploratory_compounds": [],
+   "cell_lines": ["A549", "K562", "MCF7"],
+   "dose_nM": "mean over 10, 100, 1000 and 10000",
+   "expected": "class_median_above_others",
+   "pass_rule": "in all 3 lines the median dose-averaged shift norm of the HDAC class exceeds the median of all other compounds",
+   "basis": "Histone deacetylase inhibitors produced the dominant transcriptional responses in the original screen (Srivatsan et al., Science 2020)."
+  },
+  {
+   "id": "A10_no_functional_target",
+   "kind": "magnitude_negative",
+   "primary_compounds": ["Ivosidenib (AG-120)", "Aminoglutethimide"],
+   "exploratory_compounds": [],
+   "cell_lines": ["A549", "K562", "MCF7"],
+   "dose_nM": 10000,
+   "expected": "within_vehicle_null",
+   "pass_rule": "at least 5 of the 6 compound-line shift norms fall below the 95th percentile of the size-matched vehicle null",
+   "basis": "Ivosidenib inhibits mutant IDH1 and none of the three lines carries an IDH1 hotspot; aminoglutethimide inhibits aromatase, which has no androgen substrate in this culture. Neither should have a functional target here. This is the specificity counterpart of A1-A9: an arm that passes it only by predicting nothing will fail the positive anchors."
+  }
+ ]
+}

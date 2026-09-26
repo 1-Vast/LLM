@@ -16,6 +16,7 @@ import json
 import math
 import re
 from dataclasses import dataclass
+from http.client import HTTPException
 from time import sleep
 from typing import Any, Mapping, Sequence
 from urllib.error import HTTPError, URLError
@@ -230,6 +231,10 @@ class DeepSeekChatClient:
                 last = LLMTransportError("LLM request could not reach the configured endpoint.")
             except TimeoutError:
                 last = LLMTransportError("LLM request timed out.")
+            except (HTTPException, ConnectionError) as error:
+                # A dropped or reset connection is neither an HTTPError nor a URLError; it is a
+                # transport failure a retry may resolve, and after the retries it is an LLMError.
+                last = LLMTransportError(f"LLM request lost its connection: {type(error).__name__}.")
             except json.JSONDecodeError as error:
                 raise LLMError("LLM request returned an unreadable response.") from error
             if attempt < _MAX_ATTEMPTS:

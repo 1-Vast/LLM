@@ -57,7 +57,8 @@ Two architectural cores, unequal in authority:
   domain, and abstains outside it. It never certifies engagement, mechanism or efficacy.
 
 A third model class now sits beside them: a **typed decision model** (Section 6) that returns
-calibrated answers to typed questions and cannot emit prose.
+probabilistic answers to typed questions and cannot emit prose. Its calibration and
+reproducibility are assessed separately; an ungraded answer is provisional.
 
 | Layer | Directory | Responsibility |
 |---|---|---|
@@ -66,8 +67,17 @@ calibrated answers to typed questions and cannot emit prose.
 | World model | `src/virtual_cell/` | Applicability-bounded prediction, calibration, artifact lineage |
 | Evaluation | `src/evaluation/` | Replay environment, policy arms, hidden outcomes, cost ledgers |
 | Tools | `tools/` | Manifest-scoped adapters the agent may invoke on supplied datasets |
-| Data | `dataset/` | Local datasets, staged and digest-verified |
+| Data | `data/` | Local datasets, staged and digest-verified |
 | Research | `research/` | Designs, protocols and analysis, synchronized as work proceeds |
+
+**Implementation boundary.** The contrast checker, bounded repair, evidence ledger, action
+topology, exact finite-menu coverage selector, virtual-cell adapter and typed critic have code
+and tests. `tools/typed_decision_review/` validates recorded Jev reviews as advisory artifacts
+for replay and audit. `tools/signature_retrieval/` compares a measured signature with measured
+reference responses, and the `sciplex_response` rung serves the one readout that beat the
+average drug response, with coverage-checked intervals (Section 8). General-purpose research sub-agents, automatic promotion into a conclusion memory
+register, and outcome-based evidence that the policy improves biological decisions remain
+design or evaluation work. Sections below distinguish those states where they matter.
 
 **One invariant governs all of it.** Origin never strengthens through downstream use. A
 retrieved claim, a model prediction, a visual reading and a typed judgment are all
@@ -78,14 +88,19 @@ memory, a prompt or a conclusion.
 
 ### 4.1 Biological knowledge base
 
-The knowledge base supplies **constraints**, not more text. Every claim carries source,
-condition, evidence kind and provenance; retrieval is condition-aware, so a claim about one
-cell context does not answer a question about another.
+The knowledge base supplies **constraints**, not more text. Structured biological assertions
+carry source lineage, evidence kind, claim level, method and explicit conditions
+(`agent/biology.py`). Retrieval excludes known condition mismatches and labels missing
+conditions as unknown; an unknown match may inform planning but cannot extend the matched
+relation graph. Legacy free-text records do not acquire structured condition matches.
 
 Three rules do most of the work:
 
-1. **Context-specific contradictions coexist.** An edge asserted in one context and denied in
-   another is stored as two conditioned edges, never merged into one universally true edge.
+1. **Context-specific contradictions coexist.** Opposite-sign assertions stay separate.
+   Overlapping conditions produce review candidates, while known disjoint conditions do not;
+   neither is automatically adjudicated. Coexpression, attention and feature importance cannot
+   be registered as causal regulation; a declared causal effect requires a perturbation method
+   and controls. This validates the assertion schema, not the underlying experiment.
 2. **Source clusters count once.** Several write-ups of one original experiment are one source
    (`maestro/provenance.py`), so repeated citation cannot shrink the compatible hypothesis set
    twice. This is the structural-redundancy control (Section 7.3).
@@ -93,27 +108,31 @@ Three rules do most of the work:
    measured prerequisite only after its underlying data, conditions, quality control and
    lineage are checked.
 
+The ledger can trace declared ancestors and descendants while respecting case visibility and
+retraction. It cannot reconstruct undeclared training-data lineage for an external model.
+
 ### 4.2 Memory: three registers, star topology
 
 | Register | Holds | Lifetime | Promotion rule |
 |---|---|---|---|
-| **Working** | The current turn's task, intent and scratch state | The turn | Never promoted directly |
-| **Episodic** | What happened in a round: plan, selected action, result reference, reflection | Append-only, retained | Promoted only by an explicit outcome rule |
-| **Conclusion** | Distilled, reusable findings with their scope | Retained, **revocable** | Requires a qualified result and a named rule |
+| **Working** | The current turn's task, intent and scratch state | Stored per turn | No automatic promotion |
+| **Episodic** | Round reflections and result references | Retained, revocable | No automatic promotion |
+| **Conclusion (design)** | Distilled, reusable findings with their scope | Proposed | Would require a qualified result and a named rule |
 
-**Star topology, not full connectivity.** Records attach to a hub — the case — through typed
-spokes (case → round → record), and do not cross-link freely. Three reasons:
+**Star topology is the intended organization, not a fully enforced storage shape.** Current
+memory entries have case scope and optional parent identifiers; retraction follows those
+identifiers. A strict case → round → record graph and conclusion promotion gate remain design.
+The proposed topology has three motivations:
 
 - *Retraction is local.* Revoking a conclusion means invalidating one spoke, not walking an
   arbitrary graph. Under full connectivity, a retracted record leaves live edges behind it.
 - *Retrieval fan-out is bounded.* A hub with `n` records has `n` edges instead of up to
   `n(n-1)/2`, so context assembly cost stays linear in what the round actually touched.
-- *Provenance is a single path.* Every record has exactly one route back to its case and its
-  parent result, which is what makes an audit answer "why is this believed" in one step.
+- *Provenance is inspectable.* Declared parent identifiers allow an audit to follow lineage;
+  records without declared lineage do not gain a parent result by inference.
 
-Cross-references that genuinely exist (a result supporting a premise) are recorded as **typed
-parent identifiers on the record**, not as free edges: a directed, labelled pointer that the
-retraction rule understands.
+Cross-references that are declared (for example, a reflection's result identifier) are kept
+as parent identifiers, which the retraction rule understands.
 
 **Tool descriptions carry negative conditions.** Every manifest declares both `use_when` and
 `do_not_use_when`. A capability description that only says what a tool is for invites use
@@ -124,54 +143,57 @@ contract for every adapter in `tools/`.
 
 Context is assembled under a fixed budget with a strict order:
 
-1. **Mandatory core** — the task and the supplied evidence. If this alone exceeds the budget,
+1. **Mandatory core** — the task, all structured task details and the supplied evidence. If
+   this alone exceeds the budget,
    the turn **refuses** with `mandatory_task_state_exceeds_context_budget` rather than
    truncating. A silently truncated task is a wrong task.
 2. **Structured compaction** — records render compactly: undeclared fields are omitted, a
    contrast names its plan by identifier instead of repeating the catalogue entry. Measured
    reduction on the shipped fixture: catalogue −23%, contrast −66%, combined repair payload
    −39%.
-3. **Conditioned summary** — a retrieved source may be summarized, but its condition fields,
-   evidence kind and source identifier are never dropped; they are what make it usable or not.
-4. **Named omission** — anything that does not fit is listed by identifier with a reason
-   (`omitted_record_ids`, `omission_reasons`). Omission is reported, never silent, and an
-   omitted record keeps its identifier so it can be re-expanded on request.
+3. **Atomic evidence cards** — included records retain their statement, origin, source,
+   conditions and limitations. Condition-preserving summarization of oversized cards is still
+   design; the current builder includes or omits a whole card.
+4. **Named omission** — anything that does not fit is listed in packet metadata by identifier
+   with a reason (`omitted_record_ids`, `omission_reasons`) and logged by the orchestrator.
+   The omission list is not currently guaranteed to appear in the model-visible prompt, and
+   automatic re-expansion is not implemented.
 
 The invariant: **compression may remove redundancy; it may not remove the fact that something
 was removed.**
 
 ### 4.4 Sub-agents and parallel research
 
-Sub-agents perform bounded tasks — retrieval, dataset analysis, prediction, verification — and
-return typed outputs. They never write global state, authorize a decision, or promote a
-prediction. Only the main agent and the deterministic validator update belief.
+Bounded research sub-agents for retrieval, dataset analysis and verification are a proposed
+extension; the runtime does not yet dispatch those roles. Current tool adapters and prediction
+calls return structured outputs, while the orchestrator and deterministic validator control
+admission and decisions.
 
-Parallelism is governed by the **action topology** (`maestro/topology.py`), which reads the
-menu as a dependency graph: an action points to the actions that can supply one of its
-unmeasured premises. From that graph the runtime derives what can run now (the executable
-frontier), how many supplier steps everything else needs, and which premises nothing on the
-menu can supply. Independent work fans out; dependent work waits for its supplier.
+The **action topology** (`maestro/topology.py`) reads the menu as a dependency graph: an action
+points to actions that can supply one of its unmeasured premises. It derives the executable
+frontier, supplier distance and capability gaps. This informs action planning; it does not
+schedule general research sub-agents.
 
 The same discipline is already applied to model queries: identical queries run once per round,
 distinct ones may run concurrently, and recording stays in request order so the run record does
 not depend on the dispatch mode.
 
-**Agreement is not evidence.** Two sub-agents concurring is not independent confirmation,
-particularly when they read the same source cluster. Disagreement triggers a source and
-assumption check, never a majority vote.
+**Agreement is not evidence.** If research roles are added, concurrence from roles reading the
+same source cluster must not count as independent confirmation. Current repeated typed-model
+answers measure reproducibility, not biological replication.
 
 ### 4.5 Protocols and collaboration failure
 
-Coordination failures are their own category of error, distinct from being wrong about biology.
-The protocol targets five named ones:
+Coordination failures are distinct from being wrong about biology. Existing boundaries and
+planned multi-role controls address five named ones:
 
 | Failure | Mechanism that prevents it |
 |---|---|
 | Contradictory writes | Single writer: only the main agent plus the deterministic validator update global state |
-| Silent dropping of a sub-result | Round records have mandatory fields and **refuse to write** when incomplete, rather than writing a record whose gap reads later as an answer |
+| Silent dropping of a sub-result | Structured hand-off records validate mandatory fields; generic sub-agent hand-offs remain design |
 | Deadlock on a missing artifact | Supplier chains are bounded in depth and report `no registered supplier` as a named capability gap instead of waiting |
 | Duplicated work | Query and prediction reuse is keyed on the inputs, so an identical request is answered once per run |
-| Consensus mistaken for evidence | Agreement is recorded as agreement; only a qualified result updates belief |
+| Consensus mistaken for evidence | Repeated model agreement affects critic reliability only; qualified results control belief updates |
 
 Every hand-off is a structured record with its layers stated (evidence, world model, decision,
 execution) and mandatory fields including distribution membership, what was rejected, and a
@@ -184,8 +206,9 @@ Three mechanisms carry unresolved material forward instead of letting it evapora
 - **Open premises are named, not summarized.** The check returns the exact missing prerequisite
   fields; the topology returns the premises no registered action can supply. Both survive into
   the next round as identifiers.
-- **A conclusion must have a path back.** Promotion to the conclusion register requires parent
-  identifiers reaching a qualified result; a conclusion with no path is not writable.
+- **Declared lineage can be traced.** Evidence records and reflections can name parent
+  identifiers, and retraction follows descendants. A qualified-result gate for writing
+  conclusion memory is still design.
 - **Adopted is separated from worked.** The repair ledger records the triggering failure, the
   changed field, the promised discriminating power, whether re-checking adopted the edit, and
   whether a later real result closed the promised gap. "A repair was adopted" and "a repair
@@ -256,18 +279,20 @@ A = A_evidence ∪ A_repair ∪ A_terminal
 exists that makes it runnable. An action whose open premises nothing on the menu supplies is a
 **capability gap**: the honest response is to name it, not to substitute a weaker action.
 
-### 5.3 Value of information
+### 5.3 Declared expected coverage (not biological value of information)
 
-For budget `b`, choose the bundle `X ⊆ A_evidence` maximizing expected coverage of the open
-question, minus cost:
+For budget `b`, the implemented finite-menu selector chooses the bundle `X ⊆ A_evidence`
+maximizing declared weighted expected coverage, then minimizes cost and action count:
 
 ```
-maximize   Σ_h P(X answers h)  −  λ · cost(X)
+maximize   Σ_h w_h · P(X answers h)
 subject to cost(X) ≤ b,  Feasible(x | B) for all x ∈ X
 ```
 
 with `P(X answers h)` derived from each action's **declared** detection power, and actions
-sharing a source cluster contributing once. Three rules keep this honest:
+sharing a source component using a conservative maximum rather than pretending to be independent.
+This is an auditable coverage heuristic for a declared menu, not a biological utility estimate
+or a posterior value of information. Three rules keep it honest:
 
 - **No self-reported probabilities.** A language model's stated confidence is not an input.
   Calibrated probabilities may enter only from a source the judgment ledger has graded against
@@ -275,11 +300,14 @@ sharing a source cluster contributing once. Three rules keep this honest:
 - **No assumed submodularity.** Complementary evidence can have zero individual value and high
   bundle value, so greedy information-per-cost ranking is not valid by default; small pools are
   solved exactly.
-- **Deferral is not free and not licensable.** It costs its own loss, so always deferring cannot
-  be the cheapest policy, and it is never recorded as a supported decision.
+- **The selector does not price terminal deferral.** Deferral and stopping are handled by the
+  decision layer, not treated as evidence actions in this coverage objective.
 
 A solver optimum is optimal for the declared finite problem only. It is not a claim about
-biological value of information.
+biological value of information. On 2026-09-26 detection power estimated from measured reference
+compounds was tested as this selector's input and chose worse measurements than the current
+magnitude tie-break (`research/dynamic_world_model/`), so a power estimate is not better than a
+declaration merely because it is computed.
 
 ## 6. The typed decision model
 
@@ -352,16 +380,16 @@ A regulatory network is not a static object the agent can consult once. Edges ar
 cell context, time and perturbation state, and the same pair of genes can be coupled in one
 context and independent in another. The design consequences:
 
-- **Every edge carries its conditions.** Context, time window and the perturbation under which
-  it was observed are part of the edge, not metadata attached later.
+- **Every structured assertion carries its conditions.** Context, time window and the
+  perturbation under which it was observed are part of the relation, not metadata attached later.
 - **An edge is a hypothesis.** An inferred regulatory relation motivates a measurement; it never
   satisfies a premise and never licenses a mechanism claim. A typed judgment that ranks
   candidate regulators is labelled as a hypothesis in the state text and in the finding itself.
 - **The reasoning graph and any predictor's graph stay separate.** A graph used to constrain a
   prediction cannot also serve as independent ground truth for that prediction.
-- **Dynamics change what is reachable.** Because the supplier topology is recomputed per round
-  against the current profile, what the agent can do next is a function of what it has already
-  measured — the action graph is itself dynamic.
+- **Dynamics change what is reachable.** The supplier topology is recomputed per round against
+  the current profile, so the available action frontier depends on what has already been
+  measured. This is planning reachability, not a simulated dynamic GRN.
 
 ### 7.3 Complementarity and structural redundancy
 
@@ -371,10 +399,11 @@ distinction is enforced, not assumed:
 
 - Source clusters collapse repeated reports of one experiment to one source, so redundancy
   cannot masquerade as replication.
-- Bundle value is computed over coverage of distinct premises, which is why complementary items
-  with zero individual value can be selected together.
-- Modality benefit is separated from case-count and spend benefit: adding a modality is only
-  credited when the comparison holds eligible cases and budget fixed.
+- The exact selector reports expected coverage and a leave-one-quantity-out diagnostic over the
+  selected bundle. These are declared-coverage diagnostics; they are not empirical modality
+  gains until evaluated on held-out outcomes.
+- Cost is split into access, preprocessing, compute and new measurement where supplied. Missing
+  components remain invalid or unknown rather than being silently treated as free.
 
 ### 7.4 Multimodal, multiscale and inexpensive data
 
@@ -383,7 +412,9 @@ process, and deployable from inputs available *before* the candidate is measured
 dose, time, cell background, and a matched control. A cross-scale bridge requires units,
 parameter identity, calibration data, uncertainty and a scope; an unvalidated bridge is
 presented as exploratory and paired with a measurement that could test it. Repeated use of one
-dataset does not create independent confirmation at three scales.
+dataset does not create independent confirmation at three scales. The multimodal adapter keeps
+RNA, protein, activity, occupancy, morphology and chromatin as distinct quantities, and reports
+known batch mismatches without inferring directional disagreement across them.
 
 ## 8. Evaluation
 
@@ -407,6 +438,21 @@ intervention-design quality, biological credibility, and final decision quality.
   available actions with the initial error fixed; propose an unsupported subgoal; permute batch
   labels. If scrambling direction does not collapse the measured gain, the metric is
   magnitude-driven and the result is an artifact.
+- **Biological anchors and the zero arm.** Score pharmacology known from the literature on the
+  measured data first and on out-of-fold predictions second, and always include an arm that
+  predicts no change. On 2026-09-26 SciPlex3 carried seven of ten anchors while no predictor
+  reproduced more than three, and the zero arm scored 0.130 on a centered specificity metric
+  that the registered rule had treated as evidence of specificity: most drugs respond less than
+  the average drug, so centering alone rewards predicting "less". Direction must be measured
+  with the shared-response axis projected out
+  ([`research/biological_depth/`](research/biological_depth/README.md)).
+- **Verify feature identity biologically.** Cell-line identity markers found that the SciPlex3
+  Figshare release names every gene one column off; no contract test could have caught it.
+- **Score a measurement by the decision it enables, and never read absence as failure.** On
+  2026-09-26 a model that predicted the next profile better than persistence did not choose better
+  measurements, a fixed protocol beat every model-based policy in the time tier, and a validator
+  that refuses to eliminate on an undetected response kept wrong eliminations near 1-2% where an
+  ungated reading reached 26% ([`research/dynamic_world_model/`](research/dynamic_world_model/README.md)).
 
 Protocol in full: [`research/asrg/03_experiment_protocol.md`](research/asrg/03_experiment_protocol.md).
 
@@ -428,8 +474,13 @@ general-purpose discovery system.
 ## 10. Limits
 
 The repository contains no validated biological model, no target-engagement claim, no clinical
-recommendation, and no experimental result. A prediction is never the outcome of an unmeasured
-experiment. A typed judgment is a statement about a model's own accuracy, not about biology. A
+recommendation, and no experimental result. The virtual cell was tested for biological depth on
+2026-09-26 and did not show it for unseen compounds beyond response magnitude and a few strongly
+stereotyped programs; a V-JEPA-style latent model did not improve on PCA or structure retrieval.
+Virtual-cell-assisted measurement choice was tested the same day and did not beat the current
+magnitude tie-break; a learned 24 h to 72 h population transition predicts profiles better than
+persistence but improved no decision.
+A prediction is never the outcome of an unmeasured experiment. A typed judgment is a statement about a model's own accuracy, not about biology. A
 solver optimum is optimal only for the declared finite problem. An agent that passes every test
 here has been shown to make better-supported decisions under a frozen protocol — which is not
 the same as being right about a cell.

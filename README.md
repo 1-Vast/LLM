@@ -26,7 +26,7 @@ and analyses are in [`research/`](research/README.md).
 | `src/virtual_cell/` | World model: applicability, calibration, State adapter, panels, artifact lineage |
 | `src/evaluation/` | Replay environment, policy arms, hidden outcomes, cost and spend ledgers |
 | `tools/` | Manifest-scoped adapters the agent invokes on supplied datasets |
-| `dataset/` | Local datasets, staged and digest-verified (contents are git-ignored) |
+| `data/` | Local datasets, staged and digest-verified (contents are git-ignored; see [`data/README.md`](data/README.md)) |
 | `research/` | Designs, experiment protocols and analysis code, synchronized as work proceeds |
 | `tests/` | Contract tests; each pins one boundary that must not silently move |
 | `log/`, `outputs/` | Dated run records and run outputs, written locally |
@@ -95,7 +95,9 @@ python -m agent "Resolve the genetic-pharmacological discrepancy" \
 Useful flags: `--hypotheses` registers the two explanations for every round, so a reworded
 model answer cannot end the loop. `--planner-template` answers every structured call from a
 reviewed template, running the whole loop with no language model and no paid calls.
-`--virtual-cell {state,development_mean,composite,none}` selects the prediction backend.
+`--virtual-cell {state,development_mean,composite,sciplex_response,none}` selects the prediction
+backend; `sciplex_response` also needs `--structures` (intervention identifier to SMILES) and serves
+only readouts that beat the average drug response, with coverage-checked intervals.
 `--parallel-predictions N` dispatches distinct per-action queries concurrently.
 `--decision-critic off` disables the typed second opinion, and `--decision-repeats N` asks it
 the same state N times so a ranking can earn the right to move a selection.
@@ -114,6 +116,17 @@ python -m virtual_cell panel --spec panel.json
 
 A panel row is planning-only, verifies its artifact against its own digest, and refuses a
 gene-set endpoint its output coordinates cannot express.
+
+Add `--knowledge-package research/knowledge/framework_constraints.json` to load the retained,
+hash-checked abstracts for the 2026 State paper and the GRN multi-omics review. Repeat the
+flag for further reviewed packages. Structured biological relations in a package use the
+optional `biology` field described in [the framework implementation record](research/framework_optimization.md).
+The planner and Jev receive the same bounded evidence context; neither can turn its contents
+into a case measurement.
+
+Local assets are staged in one directory, `data/`, which every registry, runner and test names
+by `data/...` paths. It replaced an earlier `dataset/` directory and a `data` junction pointing
+at it; [`data/README.md`](data/README.md) records the merge and where the duplicates went.
 
 ## Configuration
 

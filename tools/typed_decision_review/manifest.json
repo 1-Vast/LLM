@@ -1,0 +1,32 @@
+{
+  "id": "typed_decision_review",
+  "name": "Typed decision review",
+  "description": "Validate a recorded Typed Jev review, expose advisory findings and stability suppression, and preserve the deterministic validator as decision authority.",
+  "evidence_kind": "derived_analysis",
+  "entrypoint": "tool.py",
+  "source_files": [
+    "src/maestro/tool_analysis.py",
+    "src/maestro/judgment.py",
+    "src/agent/decision_critic.py"
+  ],
+  "schema_version": "1.0",
+  "parameter_schema": {
+    "type": "object",
+    "properties": {
+      "dataset_path": {"type": "string", "minLength": 1}
+    },
+    "required": ["dataset_path"],
+    "additionalProperties": false
+  },
+  "required_parameters": ["dataset_path"],
+  "optional_parameters": [],
+  "supported_task_types": ["analysis_planning", "evidence_review", "mechanism_diagnosis"],
+  "estimated_cost": 0.0,
+  "supported_suffixes": [".json"],
+  "use_when": [
+    "A recorded Typed Jev review needs deterministic contract validation or replay inspection."
+  ],
+  "do_not_use_when": [
+    "A provider call, a biological measurement, a mechanism verdict, or an action outside the registered menu is required."
+  ]
+}

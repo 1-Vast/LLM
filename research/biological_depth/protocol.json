@@ -1,0 +1,104 @@
+{
+ "schema": "maestro.biological_depth.protocol.v1",
+ "frozen": "2026-09-26",
+ "source": {
+  "h5ad": "data/raw/sciplex3/SrivatsanTrapnell2020_sciplex3.h5ad",
+  "sha256": "bde2420ce24c8aad00d4b0fcbeb0351334e7cd6945d06030ce47be6bcc63b35f",
+  "structures": ["data/raw/sciplex3/sciplex_complete_middle_subset.h5ad (obs SMILES)", "data/raw/sciplex3/repurposing_samples_20200324.txt", "PubChem CID 167551 for Anacardic Acid"],
+  "gene_identity": "data/external/hgnc/hgnc_complete_set.txt",
+  "gene_sets": "data/external/msigdb/h.all.v2024.1.Hs.symbols.gmt",
+  "targets": "data/raw/sciplex3/repurposing_drugs_20200324.txt"
+ },
+ "selection": {
+  "time_hours": 24,
+  "cell_lines": ["A549", "K562", "MCF7"],
+  "doses_nM": [10, 100, 1000, 10000],
+  "minimum_cells_per_group": 20,
+  "control_matching": "same cell line and replicate",
+  "normalisation": "counts per 10,000 over all human ENSG features, then log1p, averaged over cells in a group",
+  "genes": "top 2000 human genes by mean normalised expression in 24 h vehicle cells pooled over the three lines, excluding MT- genes, plus every anchor gene present in the feature table; HGNC symbol required",
+  "chunks_per_group": 8,
+  "chunk_rule": "cells of each group are assigned to 8 disjoint chunks by a seeded permutation; a chunk mean is a minibulk view"
+ },
+ "split": {
+  "unit": "skeleton group: first block of the InChIKey of the largest fragment, so salts and stereoisomers of one molecule share a fold",
+  "folds": 5,
+  "stratify": "pathway_level_1; within a stratum, groups are ordered by sha256('maestro-biodepth-v1|' + skeleton) and dealt round-robin",
+  "inner_validation": "within each training fold, skeleton groups with sha256('maestro-biodepth-inner|' + skeleton) in the lowest 15 percent are used for early stopping and ridge alpha only",
+  "held_out_together": "all doses and all three lines of a compound"
+ },
+ "arms": {
+  "zero": "predicts no change",
+  "systematic": "mean training-fold shift at the same cell line and dose",
+  "ridge_chem": "ridge on Morgan r2 2048-bit fingerprint crossed with cell-line one-hot, plus cell-line one-hot, times the gate log1p(dose)/log1p(10000); alpha from {1,10,100,1000} by inner validation",
+  "knn_chem": "Tanimoto-weighted mean of the 5 most similar training compounds' observed shifts at the same line and dose",
+  "mlp_existing": "virtual_cell.learned_response.fit_response on Morgan r2 512-bit fingerprint, line one-hot and dose gate, target = 64 SVD components of training shifts; the repository's current learned rung",
+  "latent_pca": "PCA encoder (D=128) fitted on training minibulks + the shared transition head",
+  "latent_mae": "masked-reconstruction encoder (same architecture, masking and views as JEPA, loss in gene space) + the shared transition head",
+  "latent_jepa": "JEPA encoder (context encoder on a masked minibulk, EMA target encoder on a different-cell minibulk of the same group, latent predictor) + the shared transition head",
+  "latent_jepa_moa": "latent_jepa plus a pathway_level_2 embedding in the transition head (annotation-conditioned family)",
+  "latent_jepa_moa_shuffled": "latent_jepa_moa with pathway_level_2 permuted across skeleton groups (seed 20260926)",
+  "replicate_ceiling": "replicate 1 shift scored against replicate 2 shift; a noise ceiling, not a model"
+ },
+ "latent": {
+  "latent_dim": 128,
+  "hidden": 512,
+  "gene_modules": 64,
+  "module_rule": "k-means (k=64, seed 0) on standardised training minibulk profiles transposed (genes as points)",
+  "mask_module_fraction": 0.4,
+  "ema_momentum": 0.996,
+  "pretrain_epochs": 80,
+  "batch_size": 256,
+  "learning_rate": 0.001,
+  "weight_decay": 0.0001,
+  "variance_hinge_weight": 1.0,
+  "predictor_hidden": 256,
+  "decoder": "ridge (alpha 1.0) from frozen latent to standardised gene profile, fitted on training minibulks",
+  "transition": {
+   "inputs": "Morgan r2 2048-bit fingerprint -> 256 (GELU, dropout 0.2); line embedding 16; optional pathway_level_2 embedding 16",
+   "form": "delta_z = sum_{k=1,2} g_k(dose) * v_k(compound, line); g_k = dose/(dose + EC50_k); log10 EC50_k = 1 + 4*sigmoid(.) (10 nM to 100 uM); g_k(0) = 0 exactly",
+   "loss": "mse(z_control + delta_z, z_treated) + mse(decoder(delta_z), standardised shift)",
+   "max_epochs": 400,
+   "patience": 30,
+   "learning_rate": 0.001,
+   "weight_decay": 0.001
+  },
+  "seeds": [11, 22, 33],
+  "standardisation": "gene-wise centering on training vehicle minibulks; scale sqrt(var_g + median(var))"
+ },
+ "responsive": "shift norm above the 95th percentile of a vehicle null built from control cells split into pseudo-groups, rescaled by sqrt(n0 / n) to the group's cell count",
+ "metrics": {
+  "B1_specificity": "Pearson(prediction - systematic, observed - systematic) over genes, per condition; mean within compound, then over compounds; 95% CI by 2000 compound bootstrap resamples",
+  "B2_scramble": "B1 and uncentered MSE skill recomputed after permuting the gene order of the centered prediction; a metric that survives is magnitude-driven",
+  "B3_moa_retrieval": "concatenated three-line centered 10 uM prediction vs observed training-fold profiles; top-1 pathway_level_2 match; compared with the observed-profile ceiling, chemistry nearest-neighbour label transfer and a label-permutation null; arms that take the annotation as input are excluded",
+  "B4_potency": "Spearman over compounds between predicted and observed shift norm at 10 uM, per line",
+  "B5_context": "Pearson over genes and lines of (prediction - three-line mean) vs (observed - three-line mean) at 10 uM, per compound; and most-responsive-line accuracy",
+  "B6_anchors": "research/biological_depth/anchors.json, scored identically on observed shifts and on out-of-fold predictions",
+  "B7_uncertainty": "Spearman between per-condition ensemble spread and per-condition error; B1 among the most-confident half versus all",
+  "B8_cross_assay": "exploratory: Spearman between observed or predicted 10 uM shift norm and PRISM secondary AUC for A549 and MCF7"
+ },
+ "primary_comparisons": [
+  "P1: latent_jepa minus knn_chem on B1 over responsive conditions (paired by compound)",
+  "P2: latent_jepa minus latent_pca on B1 over responsive conditions (does learned representation help?)",
+  "P3: anchors reproduced by latent_jepa versus mlp_existing, among anchors that hold in the observed data"
+ ],
+ "verdict_rules": {
+  "data_carries_biology": "at least 7 of the 10 anchors hold in the observed data",
+  "specific_signal": "B1 over responsive conditions has a 95% CI lower bound above 0",
+  "beyond_retrieval": "paired B1 difference versus knn_chem has a 95% CI lower bound above 0",
+  "near_ceiling": "B1 at least half of the replicate ceiling on the same conditions",
+  "anchor_depth": "reproduces at least half of the anchors that hold in the observed data, out of fold",
+  "knows_what_it_does_not_know": "B7 Spearman above 0 with a 95% CI lower bound above 0",
+  "sufficient_for_advisory_ranking": "specific_signal and anchor_depth and knows_what_it_does_not_know",
+  "note": "A verdict applies to 24 h SciPlex3 transcriptional responses in three lines. It licenses no claim about viability, engagement, other contexts or mechanism."
+ },
+ "agent_probe": {
+  "population": "compounds responsive at 10 uM in at least one line whose pathway_level_2 class holds at least 2 skeleton groups; up to 40 compounds in sha256('maestro-biodepth-agent|' + skeleton) order",
+  "input": "per responsive line, the 20 most increased and 20 most decreased genes of the centered observed shift, and the shift-norm percentile; no compound name, structure or annotation",
+  "options": "the pathway_level_2 classes present in the population",
+  "arms": ["prior: most frequent class", "tool: nearest-class retrieval over other compounds' observed profiles", "deepseek_signature", "deepseek_signature_plus_tool_card", "jev_signature", "jev_signature_plus_tool_card"],
+  "tool_card": "top 3 classes by cosine similarity of the query's observed profile to other skeleton groups' observed profiles, labelled as a retrieved analysis of measured data",
+  "metrics": "top-1 accuracy with compound-bootstrap 95% CI; primary: deepseek_signature_plus_tool_card minus deepseek_signature (paired); Jev agreement over 3 repeats on 10 compounds",
+  "budget_usd": {"deepseek": 3.0, "jev": 0.5}
+ }
+}

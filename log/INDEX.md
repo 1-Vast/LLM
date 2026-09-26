@@ -8,6 +8,7 @@ The day records are the entry points. Existing machine-local artifacts under
 |---|---|
 | `20260915/README.md` | Earlier local biological closure and log audit artifacts |
 | `20260925/README.md` | Jev verification, tool fixes and topology ablation |
+| `20260926/README.md` | Data directory merge; pre-registered biological-depth test of the virtual cell and agent; pre-registered test of virtual-cell-assisted measurement choice for mechanism discrimination (24 h and 72 h), provider transport repair |
 
 ## Files
 
@@ -28,3 +29,36 @@ The day records are the entry points. Existing machine-local artifacts under
 - `20260925/README.md`
 - `20260925/0925/verification-summary.md`
 - `20260925/0925/topology-ablation.json`
+- `20260926/README.md`
+- `20260926/0926/run-notes.md`
+- `20260926/0926/scorecard.md`
+- `20260926/0926/audit.json`
+- `20260926/0926/posthoc.json`
+- `20260926/0926/calibration_knn_chem.json`
+- `20260926/0926/calibration_systematic.json`
+- `20260926/0926/agent_probe_summary.json`
+- `20260926/0926/agent_probe_records.json`
+- `20260926/0926/deepseek_spend.json`
+- `20260926/0926/prepare_manifest.json`
+- `20260926/0926/cv_run_identity.json`
+- `20260926/0926/measurement_choice_report.md`
+- `20260926/0926/measurement_choice_episode_summary.json`
+- `20260926/0926/measurement_choice_transition_summary.json`
+- `20260926/0926/measurement_choice_transition_posthoc_perp.json`
+- `20260926/0926/measurement_choice_card_audit.json`
+- `20260926/0926/measurement_choice_case_study.json`
+- `20260926/0926/measurement_choice_validator_calibration.json`
+- `20260926/0926/measurement_choice_naive_reader_posthoc.json`
+- `20260926/0926/measurement_choice_deepseek_spend.json`
+- `20260926/0926/measurement_choice_jev_usage.json`
+- `20260926/0926/measurement_choice_deepseek_repeatability.json`
+- `20260926/0926/measurement_choice_prepare_manifest.json`
+- `20260926/0926/measurement_choice_rounds/dyn_ref__Decitabine__round0.json`
+- `20260926/0926/measurement_choice_rounds/fixed__Azacitidine__round0.json`
+- `20260926/0926/measurement_choice_rounds/fixed__Azacitidine__round1.json`
+- `20260926/0926/measurement_choice_rounds/fixed__Decitabine__round0.json`
+- `20260926/0926/measurement_choice_rounds/fixed__Decitabine__round1.json`
+- `20260926/0926/measurement_choice_rounds/magnitude__Azacitidine__round0.json`
+- `20260926/0926/measurement_choice_rounds/magnitude__Azacitidine__round1.json`
+- `20260926/0926/measurement_choice_rounds/magnitude__Decitabine__round0.json`
+- `20260926/0926/measurement_choice_rounds/magnitude__Decitabine__round1.json`

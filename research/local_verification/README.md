@@ -8,9 +8,9 @@ carry the most unverified risk:
    a diagnostic. Whether those aliases match the live API is **unverified**.
 2. **The live planner.** How often a real model violates the plan contract, and whether the single
    bounded back-prompt recovers it, is a property of the model, not of the code.
-3. **The suite with local assets present.** `data/`, `log/` and `dataset/` are git-ignored, and
-   `anndata`, `h5py`, `sklearn`, `torch` and `rdkit` are optional. A machine that has them runs
-   tests no clean checkout can.
+3. **The suite with local assets present.** Everything under `data/` except its README is
+   git-ignored, and `anndata`, `h5py`, `sklearn`, `torch` and `rdkit` are optional. A machine
+   that has them runs tests no clean checkout can.
 
 This protocol runs those three, in cost order, and produces a report in a fixed shape so two runs
 can be diffed. Phases 0–3 cost nothing and cannot reach a provider. Phases 4–7 spend money.

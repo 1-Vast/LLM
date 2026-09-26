@@ -191,6 +191,11 @@ The hypotheses' proposed_action fields are development decisions from the enum b
 not evidence-tool identifiers. Never copy action_identifier into proposed_action.
 Use distinct development decisions for the competing explanations. A withheld observation
 must remain hypothetical; dataset availability is not an observed response value.
+Conditioned biological relations are planning assertions, never case measurements.
+Distinguish correlation, regulatory association and causal effects. Attention weights and
+feature importance establish neither regulatory edges nor causal mechanisms. Preserve
+unknown conditions and conflicting evidence; propose a discriminating measurement rather
+than resolving conflicts by confidence. An RNA change does not establish protein activity.
 Return {
   \"identifier\":\"...\",
   \"hypotheses\":[{\"identifier\":\"...\",\"description\":\"...\",\"proposed_action\":\"continue|revise_intervention|change_intervention_mode|preserve_multi_target_activity|remove_multi_target_activity|revise_attribution|defer|stop\",\"causal_factor\":\"incomplete_perturbation|mode_non_equivalence|multi_target_activity|pathway_compensation|context_dependence|unresolved\"},{...}],

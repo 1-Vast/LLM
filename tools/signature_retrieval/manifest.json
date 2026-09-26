@@ -1,0 +1,31 @@
+{
+  "id": "signature_retrieval",
+  "name": "Measured signature retrieval",
+  "description": "Read an approved JSON file: schema_version=1.0 and signatures, a list of one to three per-line objects with context (A549, K562 or MCF7), dose_nM and genes (HGNC symbol to log-expression shift against matched vehicle), optionally centered=true when the caller already subtracted the shared response. Optional exclude_reference_compounds (names or skeleton keys) and top_k (1-20). Compares the signature with a digest-bound library of measured SciPlex3 24 h responses, centered on the library's mean response at the same line and dose, and returns the most similar reference classes and compounds, a gene-permutation null for the best similarity, and the procedure's recorded held-out agreement with the vendor annotation. Unsupported lines, too few matched genes (fewer than 200) and a missing library are refused by name.",
+  "evidence_kind": "derived_analysis",
+  "entrypoint": "tool.py",
+  "source_files": [
+    "src/virtual_cell/signature_retrieval.py",
+    "src/maestro/tool_contracts.py"
+  ],
+  "schema_version": "1.0",
+  "parameter_schema": {
+    "type": "object",
+    "properties": {
+      "dataset_path": {"type": "string", "minLength": 1}
+    },
+    "required": ["dataset_path"],
+    "additionalProperties": false
+  },
+  "required_parameters": ["dataset_path"],
+  "optional_parameters": [],
+  "supported_task_types": ["evidence_review", "mechanism_diagnosis"],
+  "estimated_cost": 0.0,
+  "supported_suffixes": [".json"],
+  "use_when": [
+    "A measured transcriptional response of a compound in A549, K562 or MCF7 is available and the question is which annotated compound classes it resembles, for example whether a response looks like its declared target class or like another class."
+  ],
+  "do_not_use_when": [
+    "The signature is a model prediction rather than a measurement, comes from another cell line, time point or assay, or the question needs a mechanism verdict, target engagement, viability or a measured premise; resemblance to a class never establishes any of these."
+  ]
+}

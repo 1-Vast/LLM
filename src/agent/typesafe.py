@@ -31,6 +31,7 @@ import math
 import os
 from dataclasses import dataclass, field
 from enum import Enum
+from http.client import HTTPException
 from pathlib import Path
 from time import sleep
 from typing import Any, Mapping, Sequence
@@ -411,6 +412,11 @@ class TypeSafeJevClient:
                 last = JevTransportError("the configured endpoint could not be reached")
             except TimeoutError:
                 last = JevTransportError("the request timed out")
+            except (HTTPException, ConnectionError) as error:
+                # A dropped or reset connection (http.client.RemoteDisconnected, ConnectionResetError)
+                # is neither an HTTPError nor a URLError; without this branch it escaped evaluate()
+                # as a raw exception and ended a 2026-09-26 run, against this client's contract.
+                last = JevTransportError(f"the connection failed: {type(error).__name__}")
             except json.JSONDecodeError as error:
                 raise JevProtocolError("the response was not readable JSON") from error
             if attempt < _MAX_ATTEMPTS:

@@ -1,0 +1,19 @@
+{
+ "schema": "maestro.biological_depth.calibration_spec.v1",
+ "written": "2026-09-26, while the cross-validation ran and before any out-of-fold prediction or audit metric was read",
+ "status": "addendum to the frozen protocol; it adds an engineering check for serving intervals and changes nothing registered there",
+ "purpose": "decide whether a served rung may label its intervals CALIBRATED (virtual_cell.interface.IntervalKind) and at what level",
+ "readouts": {
+  "transcript_shift_norm": "L2 norm of the predicted shift over the modelled genes, log-expression units",
+  "hallmark:<NAME>": "mean predicted shift over the Hallmark set's genes present in the modelled universe; only sets with at least 15 such genes"
+ },
+ "level": 0.8,
+ "method": "cross-conformal by compound fold: for held-out fold k, the absolute residuals of out-of-fold predictions on the other four folds give the finite-sample quantile ceil((n+1)*0.8)/n; Mondrian strata are cell line x dose x structural novelty",
+ "novelty": "in distribution when the maximum Tanimoto similarity (Morgan radius 2, 2048 bits) to the reference compounds is at least 0.4, the conventional ECFP4 similarity threshold; set here before any result was read",
+ "pass": {
+  "mean_coverage": "empirical coverage over all readouts and held-out folds within 0.75 to 0.90",
+  "per_readout": "at least 90 percent of readouts reach an empirical coverage of 0.70",
+  "if_failed": "the rung keeps DESCRIPTIVE intervals and the failure is recorded"
+ },
+ "arm_to_serve": "the arm the frozen verdict rules favour; if none passes specific_signal, the simplest arm that does, else none is served"
+}

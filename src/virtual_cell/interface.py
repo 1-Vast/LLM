@@ -288,6 +288,11 @@ class VirtualCellQueryTemplate:
     # the model once per registered action, so each action is ranked by the
     # prediction for its own condition rather than by one shared number.
     action_interventions: Mapping[str, str] = field(default_factory=dict)
+    # The declared dose and exposure of the planned condition. A backend that
+    # needs them refuses by name when they are absent; none is inferred.
+    dose: float | None = None
+    dose_unit: str | None = None
+    time_hours: float | None = None
 
     def build(
         self,
@@ -308,6 +313,9 @@ class VirtualCellQueryTemplate:
                 identifier=intervention_identifier or self.intervention_identifier,
                 mode=self.intervention_mode,
                 intended_targets=intended_targets,
+                dose=self.dose,
+                dose_unit=self.dose_unit,
+                time_hours=self.time_hours,
             ),
             context=self.context,
             readouts=self.readouts,

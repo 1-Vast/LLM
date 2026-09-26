@@ -29,7 +29,7 @@ edge( source, target, relation, sign?,
       evidence_kind, source_cluster, limitations )
 ```
 
-Rules (**design**, on top of the implemented claim record):
+Rules (**partial**, with structured retrieval now implemented):
 
 - Every edge carries context, time window and the perturbation state under which it was
   observed. These are part of the edge, not metadata attached later.
@@ -43,6 +43,17 @@ Rules (**design**, on top of the implemented claim record):
 **Where this already bites.** The typed decision model may rank caller-supplied candidate
 regulators. Its answer is labelled a hypothesis in the state text and in the finding itself,
 and carries "no network edge is evidence". **Implemented.**
+
+**Implemented retrieval contract (2026-09-25).** `agent.biology.BiologicalRelation` stores
+species, tissue, cell type, context, perturbation and time separately, alongside evidence
+type, claim level, method, database version, publication and entity scales. The existing
+evidence ledger stores these assertions with registered source lineage; package imports
+remain atomic. Known condition mismatches are excluded, unknown conditions are exposed,
+and only matching relations expand structural retrieval. Opposite signs in overlapping
+conditions are review candidates, never automatically adjudicated conflicts. Source
+retraction removes their influence. `trace_evidence` follows declared ancestors and
+descendants within the current case scope. Automatic discovery of biological mechanisms
+and validation of caller-declared experimental support remain outside this contract.
 
 ## 3. The action graph is dynamic too
 
@@ -77,6 +88,14 @@ the same observation arriving by several routes.
 | Coverage over distinct premises | Bundle value counts premises covered, not items bought | implemented |
 | Dependence groups in selection | Actions sharing a cluster do not multiply expected coverage | implemented |
 | Modality attribution | Adding a modality is credited only with eligible cases and budget held fixed | design |
+
+The registered bundle tool now reports leave-one-quantity-out coverage contributions for
+the selected bundle, without replacement. This is an **implemented planning diagnostic**
+under declared powers and dependence groups, not the empirical attribution experiment
+above. Optional costs separate access, preprocessing, computation and new measurements
+within one explicit unit. Public reuse cannot carry a new-measurement charge. The alignment
+tool exposes unknown batches and suppresses directional comparisons across known unequal
+batches; it does not fit batch correction or impute missing modalities.
 
 ### 4.3 The failure this prevents
 

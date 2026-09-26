@@ -1,0 +1,237 @@
+# Run notes, 2026-09-26
+
+Chronological notes for the day record `log/20260926/README.md`. Times are local (+0800).
+
+## 11:58 Orientation
+
+- A Codex session edited this repository until 11:50 and then finished; the Codex processes
+  still running at 11:59 were working on `D:\SASG`. Its uncommitted changes were kept as found.
+- Full suite on the working tree as found: 1266 passed, exit 0.
+
+## 12:05-12:14 Data directory merge
+
+- `data` was a directory junction to `dataset`; every asset was reachable under two names.
+  Code named `data/...` 64 times and `dataset/...` in no executable path.
+- The junction was removed with `rmdir` (link only), `dataset` was renamed `data`, and seven
+  junctions in the ignored verification clone `outputs/local_verification/upstream/dataset/`
+  were retargeted to the new paths.
+- Four byte-identical duplicates were moved (not deleted) to
+  `D:/MAESTRO_data_archive_20260926/` with `_ARCHIVE_MANIFEST.json`: a second copy of the
+  2.29 GiB SciPlex3 h5ad and its provenance file (SHA-256 of both copies equals the recorded
+  `bde2420c...`), and two stray copies of chemCPA's own downloader scripts.
+- The chemCPA source checkout moved to `data/external/chemCPA/`.
+- Inventory check: 1224 files after the merge equals 1228 before minus the four archived files,
+  sizes identical. Suite after the merge: 1266 passed.
+
+## 12:15-12:28 Data exploration and pre-registration
+
+- Downloaded the HGNC complete set and MSigDB Hallmark v2024.1 with provenance files under
+  `data/external/`.
+- Structures resolved for 188 of 188 compounds; three duplicate skeletons merged into one split
+  unit each (185 units).
+- Protocol frozen at 12:28:14; hashes in the day record.
+
+## 12:31-12:46 First preparation and a fold-0 timing run (both later invalidated)
+
+- The first preparation stopped by name (`unresolved_structure`) on a salt suffix the shared
+  name folding missed; fixed in `common.py` and rerun (12:38, 2250 conditions).
+- Fold 0 of the cross-validation stopped twice before finishing: once because `mlp_existing`
+  projected all rows through its SVD while held-out responses are set to NaN (the leakage guard
+  working as designed; fixed to project training rows only), once on a float64 weight array.
+  The third attempt finished in 242 s; no metric was computed from it.
+
+## 12:42-12:50 The SciPlex3 release's gene labels are offset by one row
+
+- A dry run of the agent probe printed one compound's signature: olfactory receptors,
+  pseudogenes and lncRNAs, which is not what a drug response looks like. The 30 genes with the
+  highest vehicle expression were likewise implausible (SACM1L, GRIN3A, LRIG2, ...).
+- Each of those Ensembl identifiers sits one row before a gene that should top the list:
+  GRIN3A (ENSG00000198785) before MT-ND5 (...198786), LRIG2 before MT-CO1, SACM1L before MT-RNR1,
+  MIR9-2HG before NEAT1. The feature table's first entry is a stray header row,
+  `id gene_short_name`, so the gene in column j is the label in row j + 1.
+- Confirmed with cell-identity markers under both alignments (vehicle cells, 24 h):
+  as published, no marker is line-specific and MALAT1 reads 0.00; realigned, HBG1/HBG2/HBZ/GATA1
+  peak only in K562, TFF1/KRT19/GATA3/ESR1 only in MCF7, AKR1C1/AKR1B10/NQO1/ALDH3A1 only in A549,
+  and MALAT1 and NEAT1 are high everywhere. The chemCPA subset used by the existing tests is
+  correctly aligned (9 of 9 markers at offset 0).
+- Consequences: the 12:38 preparation and the fold-0 run used wrong gene identities (the MT-
+  exclusion and every anchor gene pointed at the wrong column), so both were renamed
+  `INVALID_label_offset_*` and are not used. `src/evaluation/model_validation.py` read the same
+  labels; its predictive metrics are label-independent, but the gene identifiers it recorded
+  were wrong.
+- Added `src/virtual_cell/identity_markers.py` (the markers choose the alignment or the reader
+  refuses by name) with `tests/test_identity_markers.py` (7 tests, one against the real file),
+  and routed both `research/biological_depth/prepare.py` and `model_validation.py` through it.
+- Pre-registration status: the protocol's gene rule is unchanged; only which column carries
+  which gene was corrected. Seen before the correction: one observed signature and the
+  vehicle-expression ranking, both under wrong labels. No model output was scored.
+
+## 12:48-12:57 Corrected preparation, cross-validation and agent probe started
+
+- Preparation with the marker gate (434 s): offset +1 chosen with 12 of 12 markers in their
+  line (offset 0: 5 of 11; offset -1: 3 of 11). 2473 genes, 2250 conditions, 31 replicate
+  groups excluded below 20 cells. Most expressed vehicle genes are now MALAT1, KRT8, NEAT1,
+  GAPDH, KRT18 and long intron-rich genes, as expected for sci-RNA-seq3 nuclear reads.
+- One implementation clarification made before any outcome existed: each encoder view averages
+  1, 2 or 4 disjoint chunks, so pseudobulk inputs (about 130 cells) stay within the depth range
+  the encoder was trained on (a single chunk averages about 16 cells).
+- Five-fold cross-validation started 12:55 in the background.
+- Agent probe dry run with corrected labels: the first item's MCF7 decrease list is the estrogen
+  receptor program (GREB1, ESR1, GFRA1, CCND1, TFF1, XBP1) and its A549 list the NRF2 program.
+  Live probe started 12:56.
+- 12:57 `research/biological_depth/calibration_spec.json` written before any out-of-fold
+  prediction or metric was read; SHA-256
+  `2c92bd17b502c7d8d03f066ada716617125f92de9a59844b2ae400a1f307f90d`. It is an addendum for
+  deciding whether a served rung may claim calibrated intervals, not part of the frozen protocol.
+
+## 12:56-12:59 Agent probe (live DeepSeek and Jev)
+
+40 compounds, 17 pathway classes, chance 0.059, frequency prior 0.150. Accuracy is agreement
+with the vendor annotation, with compound-bootstrap 95% intervals:
+
+| Arm | Accuracy |
+|---|---|
+| retrieval tool alone (measured profiles of other compounds) | 0.500 [0.350, 0.650] |
+| DeepSeek, signature only | 0.100 [0.025, 0.200] |
+| DeepSeek, signature plus retrieval card | 0.425 [0.275, 0.575] |
+| Jev, signature only | 0.075 [0.000, 0.175] |
+| Jev, signature plus retrieval card | 0.475 [0.325, 0.625] |
+
+- Primary (registered): the card adds +0.325 [0.175, 0.500] to DeepSeek; it adds +0.400
+  [0.250, 0.575] to Jev. DeepSeek with the card minus the tool alone: -0.075 [-0.175, 0.000].
+- Jev answered the same unchanged state identically in 0.933 of repeat pairs (first 10 items).
+- Unaided, DeepSeek recognised textbook programs (HSP induction for luminespib, FKBP5 for
+  triamcinolone acetonide, a p53/CDKN1A reading for a CDK inhibitor) but over-attributed any
+  movement of the MCF7 estrogen program to nuclear-receptor drugs, and was right about
+  meprednisone for the wrong reason (it cited estrogen-receptor targets, not glucocorticoid ones).
+- No failures or refusals. Spend: DeepSeek $0.0227 over 80 calls (provider ledger
+  `outputs/biological_depth_20260926/agent_probe/deepseek_spend.json`); Jev 127,093 input tokens,
+  about $0.0053 at $0.042 per million.
+- Reading: neither language model reads mechanism from an anonymised 24 h signature; the
+  mechanism information in this task sits in the measured reference library, and the models'
+  contribution is to follow it, slightly less accurately than the tool itself.
+
+## 13:00-13:16 Retrieval tool built while the cross-validation ran
+
+- `src/virtual_cell/signature_retrieval.py`, `tools/signature_retrieval/` and 7 tests; the three
+  tests that pin the tool set were updated deliberately.
+
+## 13:16-13:22 Audit (first reading of any model result)
+
+- First run stopped on a division by zero in the BCR-ABL anchor for the zero arm (guarded; a
+  zero-magnitude arm fails that anchor). Results are in the day record and `scorecard.md`.
+- The zero arm scored 0.130 on B1, which exposed that centering alone rewards predicting a
+  smaller-than-average response. Post-hoc direction metric added (`posthoc.py`), labelled.
+- Anchor details showed SciPlex3 names with trailing whitespace; aminoglutethimide (A10) and
+  prednisone (exploratory) had been skipped. Identity folded, an unmatched anchor compound now
+  stops the audit by name, audit rerun; no conclusion changed.
+
+## 13:22-13:28 Calibration and serving
+
+- Cross-conformal coverage passed for every arm (0.803 to 0.805 at 0.80), but no Hallmark
+  readout was narrower than the average-response arm's; only the response magnitude was
+  (`knn_chem` width ratio 0.730). The rung serves that readout alone and refuses the rest by name.
+- Library (`data/virtual_cell/sciplex3_signature_library/`, arrays SHA-256 `9378b050...`) and
+  calibration built; end-to-end check: luminespib's own profile, excluded, retrieves HSP90 at
+  cosine 0.70 (null 95th percentile 0.065); vorinostat, absent from SciPlex3, receives a
+  calibrated magnitude prediction; panobinostat and a Hallmark readout are refused.
+- Backend `sciplex_response` and CLI `--structures` added; `VirtualCellQueryTemplate` gained
+  optional dose, dose unit and time.
+- Full suite: 1297 passed (the 31 new tests are this session's: 7 identity markers, 7 retrieval,
+  17 rung).
+
+## 15:03-15:20 Second block: measurement choice for mechanism discrimination (orientation and freeze)
+
+- A Codex session in this repository was used from 14:34 to 14:51 to draft the two task briefs of
+  this block; it wrote nothing under `src/`, `tests/`, `tools/` or `research/` after 13:31.
+  Full suite on the tree as found at 15:03: exit 0 (no failures).
+- Audit finding that sets the block's scope: the Figshare SciPlex3 release also holds a **72 h**
+  A549 cohort (47 compounds and vehicle, four doses, two replicates on plates 49 to 52, vehicle
+  wells on each plate; 82,110 cells). Every 72 h condition also exists at 24 h. Cells are never
+  observed twice, so the pairing is by condition, not by cell.
+- Other local resources checked: `data/external/lincs_l1000_phase1/subset48/` (51,293 matched
+  6 h / 24 h L1000 condition pairs, 978 genes, no mechanism annotation joined) and
+  `data/raw/combination_sources/combo_sciplex.h5ad` (A549 drug pairs); neither is used here.
+- 15:17 first preparation run finished its streaming pass and then stopped on a tuple key while
+  writing its manifest; its output was renamed `FAILED_manifest_*` and the run repeated. No
+  expression value was printed or read from it.
+- **15:19:45 protocol frozen** (`research/dynamic_world_model/`), before any 72 h expression value,
+  detection statistic, validator outcome or transition-model output was computed:
+  - `PROTOCOL.md` SHA-256 `21590b1f2094de4991aa77253e9089d55c462c4dc19884ef90f0e6fe7edb05b0`
+  - `protocol.json` SHA-256 `9cc1d331880f98ab5f3c60235566bae12351862bd342164743eb67cb455eb422`
+
+## 15:20-15:28 Preparation and the registered episodes
+
+- `prepare_time.py` (215 s): the 2250 frozen 24 h conditions reproduced to a maximum absolute
+  difference of 2.8e-7; 182 A549 72 h conditions; identity guard 12 of 12 markers under the
+  corrected labels; 45 wells below 20 cells excluded by name (14 at 72 h, all high-dose
+  cytotoxicity: bisindolylmaleimide IX, dacinostat, mocetinostat, panobinostat).
+- Detection thresholds from the vehicle-well null (frozen rule): A549 24 h 0.157, K562 0.107,
+  MCF7 0.187, A549 72 h 0.297. The 72 h null has only 16 well pairs, so its 0.99 quantile is its
+  maximum and 72 h detection is conservative.
+- Implementation clarification made before any episode ran: the protocol's "wrong-elimination
+  rate of at most 0.05" for calibrating the floor and margin is computed **among eliminations**
+  (wrong / (correct + wrong)), the stricter of the two readings.
+- A smoke test on three tier-A episodes printed only that it ran. The first full launch stopped
+  on a syntax error from a string escape in a patch; nothing had run. The relaunch finished
+  67,392 policy runs in 54 s (tier B 2160 contrasts, tier A 336; random averaged over 20 seeds).
+
+## 16:01-16:12 Registered results, transitions and dyn_model
+
+- P1 (tier B, separation minus magnitude): -0.044 [-0.083, -0.004], the opposite of the
+  registered direction. P2 (tier A, dyn_ref minus magnitude): +0.054 [-0.039, 0.152]; dyn_ref
+  minus fixed -0.190 [-0.292, -0.092].
+- Post-hoc diagnostics, labelled: on episodes where separation did not defer it ties magnitude
+  (tier B +0.004); its deferrals (13% of tier B, 22% of tier A) are where the loss comes from; a
+  fixed 24 h then 72 h protocol beats magnitude in tier A by +0.244 [0.128, 0.372]; per class,
+  DNA methyltransferase and BET inhibitors are never decisive at 24 h and mostly decisive at 72 h.
+- `transition.py` (238 s): P3 met (gene ridge minus persistence, 72 h cosine +0.283
+  [0.227, 0.336]); the forecast's nearest-template class is no better than persistence's.
+- `dyn_model.py` (186 s): dyn_model minus dyn_ref +0.003 [-0.009, 0.018] in tier A.
+
+## 16:07-16:30 Provider arms, and two defects they exposed
+
+- Smoke run: DeepSeek 2 calls ($0.0014), Jev 16 calls (47,840 input tokens).
+- The first full launch stopped in `deepseek_base` on a missing similarity score in the prompt
+  formatter (a fold whose validator never eliminates carries none); 51 DeepSeek calls were
+  logged. The relaunch was stopped at 16:14 because `agent_arms.py` never called
+  `SpendLedger.write()`. The carry-in was reconstructed with
+  `evaluation.provider_spend.price_usage` from the logged usage ($0.016066 over 53 calls) plus 12
+  possibly in-flight calls at their $0.004 reservation, and the ledger is now written after
+  every call. Aborted responses are kept as `responses_aborted_runs_1614.jsonl`.
+- 16:17 relaunch: the three DeepSeek arms finished by 16:19. `jev_cards` then stopped on
+  `http.client.RemoteDisconnected` raised out of `TypeSafeJevClient.evaluate`, whose contract says
+  a transport failure is a refusal. Neither provider client caught connection-level errors.
+  Fixed in `src/agent/typesafe.py` and `src/agent/llm.py` (retried, then refused or raised as the
+  client's own transport error) with `tests/test_provider_transport_failures.py` (4 tests). The
+  Jev arms were rerun with a carry-in of every logged Jev call (5,530,754 input tokens) plus one
+  failed call's allowance (4,000); the results of the stopped launch were lost with its exception.
+- P4 (both tiers, deepseek_cards minus deepseek_base): +0.006 [-0.058, 0.069]. DeepSeek without
+  cards chose 72 h after an undetected 24 h result in 19 of 19 tier-A episodes and beat magnitude
+  there by +0.190 [0.048, 0.333]; with cards it followed their refusals away from 72 h. Jev with
+  cards chose the separation action sequence in 166 of 177 episodes and reached its outcome in
+  all 177 (242 of 251 states stable); Jev without cards deferred in 63% of tier-B episodes.
+- Repeatability: DeepSeek agreement 0.978 over 30 states asked four times.
+- Spend for this block: DeepSeek $0.3955 in total (ledger, carry-in included), Jev 13,665,111
+  input tokens ($0.5739). Laboratory cost: none; everything is retrospective.
+
+## 16:18-16:33 Card audit, case study and report
+
+- `card_audit.py` (about 20 min): served cards under-predict (tier B 0.231 predicted against
+  0.303 realised, ECE 0.101; tier A ECE 0.154); refused actions were scored with a one-reference
+  shadow estimate that is better calibrated (ECE 0.053), so the refusal protected nothing. P5 met:
+  multi-branch minus single-mean log loss -0.599 [-0.774, -0.422] (tier B).
+- `case_study.py`: anchor 1 held, anchors 2 and 3 failed as registered. In the closed-loop replay
+  both DNA methyltransferase inhibitors were undetected at 24 h (retained at implementation
+  scope, nothing eliminated) and matched each other's 72 h template (HDAC eliminated) under the
+  fixed planner; the magnitude planner ended undetermined and dyn_ref deferred. Raw counts were
+  re-extracted from the release for every executed assay and reproduced the prepared shifts
+  (maximum difference 1.4e-7). Panobinostat at 72 h, 10 uM, lost both wells: `result_qc_failed`.
+- Post hoc: a nearest-class reader with no gates would eliminate the true hypothesis on 26% of
+  measurements (validator 1.3%); reading absence as "the perturbation failed" would be wrong on
+  29% of measurements.
+- `report.py` generated `measurement_choice_report.md`; `test_validator.py` 9 of 9 pass,
+  including a rerun of one fold that reproduces its recorded episodes exactly.
+- Full suite after the block: 1301 passed (the four added tests are
+  `tests/test_provider_transport_failures.py`); `tests/test_repository_shape.py` passes with the
+  two-block day record and the 21 new index entries.

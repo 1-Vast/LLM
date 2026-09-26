@@ -15,7 +15,7 @@ here), **NA** not available in this checkout or blocked by network policy, **PR*
 |---|---|---|
 | `src/{agent,maestro,virtual_cell,evaluation}` | SV | Four packages, layered import graph pinned by a test |
 | `tests/` 70 modules | LR | `test_asrg.py` + `test_e0_dir.py` = 7 passed |
-| `data/`, `log/`, `evaluations/`, `reference/`, `research/` | NA | Absent. `dataset/` holds only `README.md` |
+| `data/`, `log/`, `evaluations/`, `reference/`, `research/` | NA | Absent. `dataset/` holds only `README.md` (on 2026-09-26 `dataset/` was merged into `data/`; the tracked placeholder is now `data/README.md`) |
 | SciPlex3 `.h5ad`, State checkpoint, prediction artifacts | NA | Referenced by code and by `ASSET_INVENTORY.json` (DO) |
 | `state` Python package | NA | `import state` → ModuleNotFoundError; State cannot run here |
 

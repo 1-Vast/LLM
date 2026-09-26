@@ -7,7 +7,7 @@ File summary
   - Builds the action catalogue and intervention profile from JSON inputs, including each action's typed quantity.
   - `--planner-template` answers every structured agent call from a reviewed template, so the loop runs without a language model and without paid calls.
   - `--decision-critic` adds one typed, calibrated second opinion per plan when a TypeSafe block is configured; its findings are advice and never evidence.
-  - `--virtual-cell` selects the State checkpoint, the computed development-mean backend, or both behind one composite; predictions stay planning-only.
+  - `--virtual-cell` selects the State checkpoint, the computed development-mean backend, both behind one composite, or the SciPlex3 response rung (`sciplex_response`, which needs `--structures`); predictions stay planning-only.
   - `main` runs one turn or a multi-round loop over sourced real measurement results and can write the full record as JSON.
   - `--hypotheses` registers the two explanations' definitions for every round, so a reworded model answer cannot end a loop.
   - A configuration, provider or planner-contract failure exits with status 2 and a one-line reason instead of a traceback.
@@ -89,9 +89,15 @@ def main() -> int:
     )
     parser.add_argument(
         "--virtual-cell",
-        choices=("state", "development_mean", "composite", "none"),
+        choices=("state", "development_mean", "composite", "sciplex_response", "none"),
         default="state",
-        help="Prediction backend: the State checkpoint, the computed development-mean baseline, both, or none.",
+        help="Prediction backend: the State checkpoint, the computed development-mean baseline, both, "
+             "the SciPlex3 response rung, or none.",
+    )
+    parser.add_argument(
+        "--structures",
+        type=Path,
+        help="JSON object mapping intervention identifiers to SMILES; required by --virtual-cell sciplex_response.",
     )
     parser.add_argument("--development-partition", type=Path, help="Declared development partition for the computed baseline.")
     parser.add_argument("--dataset-id", default="tahoe_c39", help="Registered dataset the computed baseline is fitted on.")
@@ -99,6 +105,8 @@ def main() -> int:
     parser.add_argument("--state-directory", type=Path, help="Directory for this run's memory, evidence, cases and event logs.")
     parser.add_argument("--artifact-directory", type=Path, help="Directory for virtual-cell prediction artifacts.")
     parser.add_argument("--trace", type=Path, help="Write the full turn or case-loop record as JSON.")
+    parser.add_argument("--knowledge-package", type=Path, action="append", default=[],
+                        help="Load an additional versioned knowledge package; repeat for multiple packages.")
     parser.add_argument(
         "--decision-critic",
         choices=("auto", "off"),
@@ -154,6 +162,8 @@ def _run(arguments: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
         parser.error("Use only one of --state-request and --state-template.")
     if arguments.virtual_cell in ("development_mean", "composite") and not arguments.development_partition:
         parser.error("--virtual-cell development_mean and composite require --development-partition.")
+    if arguments.virtual_cell == "sciplex_response" and not arguments.structures:
+        parser.error("--virtual-cell sciplex_response requires --structures.")
     hypotheses = _hypotheses(_read_json(arguments.hypotheses)) if arguments.hypotheses else ()
     profile = FunctionalInterventionProfile(
         mode=str(profile_data.get("mode", "")),
@@ -183,6 +193,7 @@ def _run(arguments: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
         max_parallel_predictions=arguments.parallel_predictions,
         enable_decision_critic=arguments.decision_critic == "auto",
         decision_repeats=arguments.decision_repeats,
+        knowledge_packages=arguments.knowledge_package,
     )
     if arguments.max_rounds == 1:
         turn = controller.run(
@@ -229,12 +240,15 @@ def _run(arguments: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
 def _virtual_cell(arguments: argparse.Namespace):
     """Build the requested backend from the workspace registry, or ``None``."""
 
+    structures = getattr(arguments, "structures", None)
     return build_backend(
         arguments.virtual_cell,
         workspace=arguments.workspace,
         dataset_id=arguments.dataset_id,
         development_partition=arguments.development_partition,
-        artifact_directory=arguments.artifact_directory,
+        artifact_directory=arguments.artifact_directory or (
+            arguments.state_directory / "artifacts" if arguments.state_directory else None),
+        structures=_read_json(structures) if structures else None,
     )
 
 
@@ -461,6 +475,9 @@ def _query_template(data: Any) -> VirtualCellQueryTemplate:
         readouts=tuple(str(item) for item in data.get("readouts", ())),
         model_version=str(data["model_version"]),
         action_interventions={str(key): str(value) for key, value in dict(data.get("action_interventions", {})).items()},
+        dose=data.get("dose"),
+        dose_unit=data.get("dose_unit"),
+        time_hours=data.get("time_hours"),
     )
 
 

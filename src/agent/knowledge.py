@@ -5,7 +5,7 @@ import hashlib
 import json
 import sqlite3
 import uuid
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
@@ -14,6 +14,7 @@ from typing import Any, Mapping
 from maestro.models import EvidenceKind
 from .memory import MemoryScope, _lexical_score, _terms
 from .storage import connect
+from .biology import BiologicalConditions, BiologicalRelation, relation_conflicts
 
 
 class EvidenceStatus(str, Enum):
@@ -248,6 +249,15 @@ class EvidenceLedger:
     def _insert_evidence(self, connection: sqlite3.Connection, record: EvidenceRecord) -> EvidenceRecord:
         if not record.statement or not record.source:
             raise ValueError("Evidence records require a statement and source identifier.")
+        if "biology" in record.payload:
+            relation = BiologicalRelation.from_dict(record.payload["biology"])
+            if not record.source_lineage_ids:
+                raise ValueError("Biological relations require registered source lineage.")
+            if record.evidence_kind is EvidenceKind.REAL_MEASUREMENT:
+                raise ValueError("A biological relation is an assertion, not a case measurement.")
+            if relation.evidence_type == "experimental" and record.status is not EvidenceStatus.RETRIEVED:
+                raise ValueError("Experimental relations require retrieved experimental support.")
+            record = replace(record, entities=tuple(dict.fromkeys((*record.entities, relation.subject, relation.object))))
         existing = connection.execute("SELECT * FROM evidence WHERE id = ?", (record.identifier,)).fetchone()
         if existing:
             old = _evidence(existing)
@@ -259,6 +269,12 @@ class EvidenceLedger:
             if row is None or row["retracted"]:
                 raise ValueError(f"Unknown or retracted evidence lineage: {parent_id}")
             self._check_parent(record, row)
+            if "biology" in record.payload and relation.evidence_type == "experimental":
+                parent_biology = json.loads(row["payload_json"]).get("biology", {})
+                if row["status"] not in {EvidenceStatus.RETRIEVED.value, EvidenceStatus.MEASURED.value} or (
+                    parent_biology and parent_biology["evidence_type"] != "experimental"
+                ):
+                    raise ValueError("Prediction or unverified lineage cannot support an experimental relation.")
             if record.evidence_kind is EvidenceKind.REAL_MEASUREMENT and row["evidence_kind"] != EvidenceKind.REAL_MEASUREMENT.value:
                 raise ValueError("Non-measured lineage cannot become a real measurement.")
             if record.evidence_kind is EvidenceKind.DERIVED_ANALYSIS and status_for_kind(EvidenceKind(row["evidence_kind"])) is EvidenceStatus.PREDICTED:
@@ -336,7 +352,8 @@ class EvidenceLedger:
                     EvidenceStatus.RETRIEVED, datetime.now(timezone.utc).isoformat(), EvidenceKind.RETRIEVED_SOURCE,
                     entities=tuple(item.get("entities", ())), partition="knowledge", source_lineage_ids=refs,
                     payload={"package_id": package["package_id"], "constraint": item,
-                             "sources": [source_details[ref] for ref in refs]},
+                             "sources": [source_details[ref] for ref in refs],
+                             **({"biology": item["biology"]} if "biology" in item else {})},
                 )
                 records.append(self._insert_evidence(connection, record))
             connection.execute("INSERT OR IGNORE INTO knowledge_packages(id, hash) VALUES (?, ?)", (package["package_id"], digest))
@@ -371,24 +388,92 @@ class EvidenceLedger:
     def retrieve(
         self, query: str, *, entities: tuple[str, ...] = (), structural_weight: float = 1.0,
         limit: int = 8, scope: MemoryScope | None = None,
+        biological_conditions: BiologicalConditions | None = None,
     ) -> tuple[EvidenceRecord, ...]:
         with self._connection() as connection:
-            records = self._visible_evidence(connection, scope).values()
+            records = list(self._visible_evidence(connection, scope).values())
             edges = self._visible_relations(connection, scope)
+            sources = {row["id"]: asdict(_source(row)) for row in connection.execute("SELECT * FROM sources")}
+        relations = {r.identifier: BiologicalRelation.from_dict(r.payload["biology"])
+                     for r in records if "biology" in r.payload}
+        conflicts = relation_conflicts(relations)
+        conditions_requested = biological_conditions is not None and any(
+            value is not None for value in asdict(biological_conditions).values())
         neighbours: dict[str, set[str]] = {}
         for edge in edges:
+            # Free-text legacy context cannot establish a structured condition match.
+            if biological_conditions is not None:
+                continue
             neighbours.setdefault(edge["subject"], set()).add(edge["object"])
             neighbours.setdefault(edge["object"], set()).add(edge["subject"])
+        for relation in relations.values():
+            mismatches, unknown = relation.conditions.compare(biological_conditions or BiologicalConditions())
+            if not mismatches and not unknown:
+                neighbours.setdefault(relation.subject, set()).add(relation.object)
+                neighbours.setdefault(relation.object, set()).add(relation.subject)
         terms = set(_terms(query))
         query_entities = {entity.strip() for entity in entities if entity.strip()}
         scored = []
         for record in records:
+            if record.identifier in relations:
+                relation = relations[record.identifier]
+                mismatches, unknown = relation.conditions.compare(biological_conditions or BiologicalConditions())
+                if mismatches:
+                    continue
+                record = replace(record, payload=dict(record.payload) | {
+                    "condition_match": "unknown" if unknown else ("matched" if conditions_requested else "not_requested"),
+                    "unknown_conditions": list(unknown),
+                    "conflict_candidates": conflicts.get(record.identifier, []),
+                    "sources": [sources[ref] for ref in record.source_lineage_ids],
+                    "decision_use": "hypothesis_and_measurement_planning_only",
+                })
             score = _lexical_score(terms, record.statement + " " + record.context)
             score += structural_weight * _structural_score(query_entities, set(record.entities), neighbours)
             if score > 0:
                 scored.append((score, record))
         scored.sort(key=lambda item: (item[0], item[1].created_at, item[1].identifier), reverse=True)
         return tuple(record for _, record in scored[:max(0, limit)])
+
+    def add_biological_relation(
+        self, relation: BiologicalRelation, *, source_ids: tuple[str, ...],
+        statement: str, case_id: str | None = None, partition: str | None = None,
+        evidence_kind: EvidenceKind = EvidenceKind.RETRIEVED_SOURCE,
+        lineage_ids: tuple[str, ...] = (), identifier: str | None = None,
+    ) -> EvidenceRecord:
+        """Retain a sourced assertion; even a published causal effect is not a case result."""
+        if not source_ids:
+            raise ValueError("Biological relations require registered source lineage.")
+        return self.add_evidence(
+            statement, source=source_ids[0], source_lineage_ids=source_ids,
+            context="Conditioned biological assertion; not a measurement of this case.",
+            status=status_for_kind(evidence_kind), evidence_kind=evidence_kind,
+            payload={"biology": asdict(relation)}, lineage_ids=lineage_ids,
+            case_id=case_id, partition=partition, identifier=identifier,
+        )
+
+    def trace_evidence(self, identifier: str, *, scope: MemoryScope | None = None) -> dict[str, Any]:
+        """Walk active ancestors and descendants without crossing visibility boundaries."""
+        with self._connection() as connection:
+            records = self._visible_evidence(connection, scope)
+            if identifier not in records:
+                return {}
+            ancestors, descendants = {identifier}, {identifier}
+            while True:
+                parents = {ref for key in ancestors for ref in records[key].lineage_ids}
+                children = {key for key, record in records.items() if set(record.lineage_ids) & descendants}
+                if parents <= ancestors and children <= descendants:
+                    break
+                ancestors |= parents
+                descendants |= children
+            selected = ancestors | descendants
+            refs = {ref for key in selected for ref in (records[key].source, *records[key].source_lineage_ids)}
+            sources = [_source(row) for row in connection.execute("SELECT * FROM sources")
+                       if row["id"] in refs and not row["retracted"] and row["access_level"] != "private"
+                       and _visible(row["case_id"], row["partition"], scope)]
+        return {"root": identifier, "ancestor_ids": sorted(ancestors - {identifier}),
+                "descendant_ids": sorted(descendants - {identifier}),
+                "evidence": [asdict(records[key]) for key in sorted(selected)],
+                "sources": [asdict(source) for source in sources]}
 
     def retract_evidence(self, identifier: str) -> tuple[str, ...]:
         with self._connection() as connection:

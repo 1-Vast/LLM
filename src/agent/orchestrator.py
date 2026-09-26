@@ -290,6 +290,7 @@ class MAESTROOrchestrator:
         max_parallel_predictions: int = 1,
         enable_decision_critic: bool = True,
         decision_repeats: int = 1,
+        knowledge_packages: Sequence[Path] = (),
     ) -> "MAESTROOrchestrator":
         """Create a controller; evaluations may supply an isolated state directory.
 
@@ -310,6 +311,8 @@ class MAESTROOrchestrator:
         knowledge_package = workspace / "data" / "knowledge" / "biological_constraints.json"
         if knowledge_package.is_file():
             evidence.load_knowledge_package(knowledge_package)
+        for package in knowledge_packages:
+            evidence.load_knowledge_package(package if package.is_absolute() else workspace / package)
         controller = cls(
             interpreter=TaskInterpreter(runtime_client),
             context_builder=ContextBuilder(evidence, memory),
@@ -324,7 +327,9 @@ class MAESTROOrchestrator:
             virtual_cell=(
                 virtual_cell
                 if virtual_cell is not None
-                else StateCapabilityAdapter(StateAdapterConfig.from_workspace(workspace)) if enable_virtual_cell else None
+                else (StateCapabilityAdapter(replace(StateAdapterConfig.from_workspace(workspace),
+                                                      output_directory=runtime_directory / "artifacts" / "state"))
+                      if enable_virtual_cell else None)
             ),
             interpretation_table=interpretation_table,
             decision_engine=decision_engine,
@@ -393,9 +398,17 @@ class MAESTROOrchestrator:
             session_id=session_id,
             scope=MemoryScope(case_id=case_id, task_type=intent.task_type, biological_context=intent.biological_context),
         )
+        from .biology import BiologicalConditions
+
         context = self._context_builder.build(
             intent,
             memory_scope=MemoryScope(case_id=case_id, task_type=intent.task_type, biological_context=intent.biological_context),
+            biological_conditions=BiologicalConditions(
+                context=intervention_profile.context_identifier or intent.biological_context,
+                time_hours=intervention_profile.time_hours,
+                species=(prediction_request.context.species if prediction_request else
+                         virtual_cell_template.context.species if virtual_cell_template else None),
+            ),
         )
         self._logger.event(
             "context_built",
@@ -468,6 +481,7 @@ class MAESTROOrchestrator:
         self._logger.event("action_topology", topology, session_id=session_id)
         review = self._review_plan(
             contrast, available_actions, intervention_profile, briefing_rows, topology, session_id,
+            evidence_summary=context.rendered,
         )
         selection = self._select_budgeted_actions(
             contrast, available_actions, intervention_profile, case, budget, session_id,
@@ -1882,6 +1896,7 @@ class MAESTROOrchestrator:
         briefing_rows,
         topology: Mapping[str, object],
         session_id: str,
+        *, evidence_summary: str = "",
     ) -> CritiqueOutcome:
         """Take one typed second opinion on this round's plan, if a decision model is configured.
 
@@ -1899,6 +1914,7 @@ class MAESTROOrchestrator:
             check=self._controller.check_contrast(contrast, profile),
             topology=topology,
             world_model_rows=[row.as_payload() for row in briefing_rows],
+            evidence_summary=evidence_summary,
             context_identifier=profile.context_identifier,
             repeats=self._decision_repeats,
         )

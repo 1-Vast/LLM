@@ -10,7 +10,9 @@ File summary
   - ``composite`` orders the rungs as they are assembled and leaves eligibility to the
     composite, which asks each rung about the actual request.
 - Interfaces: `BACKEND_CHOICES`, `build_backend`
-- Depends on: state_adapter.py, ladder.py, transcript_baselines.py, world_model.py
+  - ``sciplex_response`` is the SciPlex3 response rung; it stands alone, needs declared
+    structures and its library, and serves only readouts that beat the average response.
+- Depends on: state_adapter.py, ladder.py, transcript_baselines.py, world_model.py, response_rung.py
 """
 from __future__ import annotations
 
@@ -20,7 +22,8 @@ from pathlib import Path
 from .state_adapter import DEFAULT_MODEL_VERSION, StateAdapterConfig, StateCapabilityAdapter
 from .world_model import CompositeWorldModel
 
-BACKEND_CHOICES = ("none", "state", "development_mean", "composite")
+BACKEND_CHOICES = ("none", "state", "development_mean", "composite", "sciplex_response")
+SCIPLEX_LIBRARY = Path("data/virtual_cell/sciplex3_signature_library")
 
 
 def build_backend(
@@ -31,6 +34,7 @@ def build_backend(
     development_partition: Path | None = None,
     artifact_directory: Path | None = None,
     model_version: str = DEFAULT_MODEL_VERSION,
+    structures: dict[str, str] | None = None,
 ):
     """Return the requested backend, or ``None`` for the declared ``none`` choice."""
 
@@ -38,6 +42,16 @@ def build_backend(
         raise ValueError(f"Unknown backend '{choice}'; choose one of {', '.join(BACKEND_CHOICES)}.")
     if choice == "none":
         return None
+    if choice == "sciplex_response":
+        if not structures:
+            raise ValueError("The sciplex_response backend requires declared structures (identifier to SMILES).")
+        from .response_rung import ResponseRungConfig, SciPlexResponseRung
+
+        directory = Path(workspace) / SCIPLEX_LIBRARY
+        if not (directory / "calibration.json").is_file():
+            raise ValueError(f"The sciplex_response backend needs its library and calibration under {SCIPLEX_LIBRARY}.")
+        return SciPlexResponseRung(ResponseRungConfig(directory, directory / "calibration.json",
+                                                      {str(k): str(v) for k, v in structures.items()}))
     backends = []
     if choice in ("state", "composite"):
         config = StateAdapterConfig.from_workspace(workspace, model_version=model_version)
