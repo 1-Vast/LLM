@@ -1,8 +1,8 @@
 # Experiment record, 2026-09-27
 
 > - **Path**: `log/20260927/README.md`
-> - **Purpose**: Record three blocks. Block 1 (00:00-00:47) is the external-validation block: an audit of the evidence behind MAESTRO's decision claims, a firewall against outcome leakage (sealed policy view, one-time vault, manifests), a frozen 14-rung baseline ladder replayed on development data, masked and permuted virtual-cell controls, and a local candidate audit. Block 2 (03:00-05:40) is belief-space planning with a virtual-cell world model and its first external test: an audit of the repository after a Codex session, a new planner and world model, a new frozen protocol, and one locked run on GSE70138 (LINCS L1000 Phase II), downloaded under the owner's authorisation in the brief. Block 3 (11:30-13:30) is protocol external-validation-2: a code-level audit of eight review reports, an archive of both protocol-v1 experiments, clean-tree registration, fail-closed truth semantics with a whitelisted policy view, task headroom and power gates, a baseline-safe planner, cross-study calibration, virtual-cell and feedback decision gates, and a development screen.
-> - **Core points**: No local study is both unseen and compatible, so external validation is blocked; the candidate is L1000 Phase II (GSE70138), whose download needs the owner's approval. On development data (12,428 episodes, 360,412 records, no rule violations) the runtime selector with the virtual-cell channel (`maestro_vc`) was REJECTED under the frozen gates. It decided fewer correctly than the strongest simple baseline in SciPlex3 B (-0.054 [-0.095, -0.013]) and L1000 T (-0.031 [-0.050, -0.014]) and was inconclusive in SciPlex3 A and L1000 LT. It was cheaper in every tier (0.20 to 1.03 fewer measurements) and had fewer wrong eliminations except in SciPlex3 A. It sits on the same correct-versus-cost curve as a one-step expected-value rule. The virtual-cell channel had zero acquisition value in every tier (its one gain over masking was reproduced by another compound's predictions), and the selector's wrong-reading forecasts were 2 to 19 times too low. Production defaults and `src/` are unchanged. **Block 2:** on GSE70138 (38 new compounds, 380 episodes, run once behind the vault), the belief-planning agent was INCONCLUSIVE against the fixed expert order: -0.024 [-0.074, +0.011] correct decisions, with the pre-registered minimum improvement of +0.02 outside the interval. The virtual cell and real feedback changed actions but not decisions, and both contributions were REJECTED as practically meaningful. On development data the agent lost in SciPlex3 A (-0.134, REJECTED) and was inconclusive elsewhere (L1000 LT +0.024 [0.000, +0.050] with 0.57 fewer measurements). The audit found that a Codex session (00:59-02:56) had rewritten block 1's freeze and one replay fold, left an incoherent decision-value function, and changed a loader so that it emits truth-less episodes. Production defaults are unchanged; `src/` gained an opt-in planner and a coherence fix. **Block 3:** no MAESTRO policy meets the protocol-v2 success criteria, and the binding constraint is the task. The fixed order reaches 63-99.6% of the oracle's correct decisions, 76-82% of L1000 episodes cannot be decided from the menu, and a +0.02 effect needs 345-813 units against 38-256 available. The baseline-safe planner removes every development loss (SciPlex3 A -0.131 becomes 0.000) but departs from the fixed order in at most 0.24% of decisions, so it gains nothing. Wrong-risk forecasts are 2-5 times too low, and no recalibration transfers across studies. The virtual cell and feedback are not promoted. External-validation-1's freeze and one fold were rewritten; belief-planning-1's artefacts are intact. Production and `src/` are unchanged.
+> - **Purpose**: Record four blocks. Block 1 (00:00-00:47) is the external-validation block: an audit of the evidence behind MAESTRO's decision claims, a firewall against outcome leakage (sealed policy view, one-time vault, manifests), a frozen 14-rung baseline ladder replayed on development data, masked and permuted virtual-cell controls, and a local candidate audit. Block 2 (03:00-05:40) is belief-space planning with a virtual-cell world model and its first external test: an audit of the repository after a Codex session, a new planner and world model, a new frozen protocol, and one locked run on GSE70138 (LINCS L1000 Phase II), downloaded under the owner's authorisation in the brief. Block 3 (11:30-13:30) is protocol external-validation-2: a code-level audit of eight review reports, an archive of both protocol-v1 experiments, clean-tree registration, fail-closed truth semantics with a whitelisted policy view, task headroom and power gates, a baseline-safe planner, cross-study calibration, virtual-cell and feedback decision gates, and a development screen. Block 4 (13:32-15:00) is an audit-and-plan pass over the owner's "MAESTRO v2" brief and its two-core addendum: a requirement matrix checked by executing the code, qualified historical claims, an execution-path wiring table, contribution cards for the agent, the world model and their combination, a deterministic replay of the engagement package, and a preregistration-ready experiment registry.
+> - **Core points**: No local study is both unseen and compatible, so external validation is blocked; the candidate is L1000 Phase II (GSE70138), whose download needs the owner's approval. On development data (12,428 episodes, 360,412 records, no rule violations) the runtime selector with the virtual-cell channel (`maestro_vc`) was REJECTED under the frozen gates. It decided fewer correctly than the strongest simple baseline in SciPlex3 B (-0.054 [-0.095, -0.013]) and L1000 T (-0.031 [-0.050, -0.014]) and was inconclusive in SciPlex3 A and L1000 LT. It was cheaper in every tier (0.20 to 1.03 fewer measurements) and had fewer wrong eliminations except in SciPlex3 A. It sits on the same correct-versus-cost curve as a one-step expected-value rule. The virtual-cell channel had zero acquisition value in every tier (its one gain over masking was reproduced by another compound's predictions), and the selector's wrong-reading forecasts were 2 to 19 times too low. Production defaults and `src/` are unchanged. **Block 2:** on GSE70138 (38 new compounds, 380 episodes, run once behind the vault), the belief-planning agent was INCONCLUSIVE against the fixed expert order: -0.024 [-0.074, +0.011] correct decisions, with the pre-registered minimum improvement of +0.02 outside the interval. The virtual cell and real feedback changed actions but not decisions, and both contributions were REJECTED as practically meaningful. On development data the agent lost in SciPlex3 A (-0.134, REJECTED) and was inconclusive elsewhere (L1000 LT +0.024 [0.000, +0.050] with 0.57 fewer measurements). The audit found that a Codex session (00:59-02:56) had rewritten block 1's freeze and one replay fold, left an incoherent decision-value function, and changed a loader so that it emits truth-less episodes. Production defaults are unchanged; `src/` gained an opt-in planner and a coherence fix. **Block 3:** no MAESTRO policy meets the protocol-v2 success criteria, and the binding constraint is the task. The fixed order reaches 63-99.6% of the oracle's correct decisions, 76-82% of L1000 episodes cannot be decided from the menu, and a +0.02 effect needs 345-813 units against 38-256 available. The baseline-safe planner removes every development loss (SciPlex3 A -0.131 becomes 0.000) but departs from the fixed order in at most 0.24% of decisions, so it gains nothing. Wrong-risk forecasts are 2-5 times too low, and no recalibration transfers across studies. The virtual cell and feedback are not promoted. External-validation-1's freeze and one fold were rewritten; belief-planning-1's artefacts are intact. Production and `src/` are unchanged. **Block 4:** audit and plan only; nothing registered, promoted or committed. The historical numbers describe the transcriptomic MoA proxy task, not the agent's prerequisite-repair claim. On the engagement package (6 real cases) a selector given the same capability registry matched directed repair's decision and cost in every case the repair decided, so no additional algorithmic contribution was identified. The production repair path and the research belief planner are not connected. Protocol v2's legal menu moves with an outcome: 12 SciPlex3 conditions were profiled but dropped for low cell counts and are not offered. The fixed order reaches 63.3-99.4% of the oracle's correct decisions (block 3's "99.6%" does not reproduce). Go: boundary fixes, E-DATA1, E-CAL1 and the agent census; no-go: superiority tests, world-model promotion, external confirmation.
 
 ## 1. Record control
 
@@ -67,6 +67,17 @@ The chronological notes, including the one failed smoke run, are in `log/2026092
   dirty tree) holds its digest, the code and data digests, and the environment lock.
 - **Archive.** `research/experiments/*/EVIDENCE.json` was written at 12:04.
 
+**Block 4 record control.**
+- **Tree as found at 13:32.** `e5ad68f` on `main`: the owner committed block 3 at 12:55.
+- **Untracked, not ours.**
+  - `inspect/` and `reference_0927/`: the Codex slides session, 12:00-13:49.
+  - `research/prompt_review_20260927/`: a Codex session, 13:25-13:32, that revised the owner's prompt into this block's
+    brief.
+- **Another session.** A Codex session from 13:31 assessed novelty read-only.
+- **Mode.** AUDIT_AND_PLAN, the brief's default. MINIMAL_IMPLEMENTATION was not selected.
+- **Addendum.** The owner's addendum on two-core attribution arrived during the block; it changed no authorisation.
+- **Scope of changes.** Nothing was registered, because the tree is dirty. Nothing was committed. No file under `src/`
+  or `tests/`, no protocol and no registered record was changed.
 
 ## 2. Research questions and hypotheses
 
@@ -100,6 +111,15 @@ with masked and permuted controls?
 - **Q10.** Are wrong-risk forecasts calibrated across studies?
 - **Q11.** Do the virtual cell and feedback pass a decision-level gate?
 
+**Block 4 questions** (the owner's brief and addendum):
+- **Q12.** Which requirements of the brief hold on the executed code? (SATISFIED, PARTIAL, MISSING, CONTRADICTED or
+  UNVERIFIED.)
+- **Q13.** Do the six supplied historical claims reproduce, and what are their population, denominator, uncertainty and
+  exposure?
+- **Q14.** Is the execution path wired as the architecture describes?
+- **Q15.** Does prerequisite-directed repair (AG) add decision value over same-information planning? Does the world
+  model (WM) add information beyond simple predictors? Does their combination (JOINT)?
+- **Q16.** Which experiments are ready to register, and which are blocked by what?
 
 ## 3. Materials, data and computational environment
 
@@ -140,6 +160,14 @@ thread each. No provider call was made.
   locked in `0927/protocol_v2_dev_run_record.json`.
 - No download, no provider call ($0), no laboratory work (0 wells).
 
+**Block 4 materials:**
+- The registered protocol-v2 analyses in `0927/protocol_v2_*`.
+- The SciPlex3 raw release, read for `obs` metadata only.
+- The prepared SciPlex3 and L1000 caches.
+- GSE92742 and GSE70138 metadata (`external_phase2.manifest`, which reads no measurement).
+- The engagement_v1 case package and capability registry, whose outcomes were already opened on 2026-09-14.
+- Python 3.14 (`C:\Python314`) for probes and the replay.
+- No download, no provider call ($0), no laboratory work (0 wells).
 
 ## 4. Experimental design and controls
 
@@ -235,6 +263,21 @@ The cost margins are 0.10 measurements and 0.5 assay-days. The gates run in orde
   - a gain > 1.645 standard errors;
   - no increase in wrong risk.
 
+**Block 4 design** (`research/gated_plan/`):
+- **Audit, not experiment.** Every statement code can decide was decided by `research/gated_plan/probes.py`, a
+  read-only probe script, or by a test.
+- **One deterministic replay.** The engagement package's six offline arms were replayed:
+  - fixed expert;
+  - outcome-aware selection;
+  - `maestro_core`;
+  - `registry_repair_rule`;
+  - `registry_expanded_selection`, the same-information control;
+  - random proposal.
+
+  The replay reproduces the 2026-09-14 attribution finding and supplies a real repair trajectory. It is not a
+  registered or claim-bearing run.
+- **New specifications, not run:** E-DATA1, E-CAL1, E-WM1, E-AG1, E-JOINT1 (2 x 2 agent by world model) and EXT-1,
+  with the WM-G0-G4 and AG-G0-G3 gates.
 
 ## 5. Experiment register and results
 
@@ -369,6 +412,48 @@ The worst strata are L1000 batches (forecast 0.4–0.6, observed 0.00–0.04).
   - Feedback: action change 3.3-32%, decision change 0.1-4.2%.
   - Every correct-difference upper bound is below +0.02.
 
+**Block 4 results** (`research/gated_plan/README.md`, `AUDIT.md`):
+- **Historical claims, recomputed:**
+  - The fixed order reaches 63.3% (L1000 LT), 87.1% (SciPlex3 B), 95.6% (SciPlex3 A) and 99.4% (L1000 T) of the
+    oracle's correct decisions, and 87.0% on GSE70138.
+  - Unidentifiable episodes: 81.6% (LT) and 75.9% (T).
+  - Units needed for +0.02 depend on the current planner's variance: 13 to 1,386.
+  - GSE70138: 686 new compounds; 673 metadata-eligible in 613 units; 38 label-compatible.
+  - Forecasts were 1.98x, 2.27x and 4.98x too low.
+- **Leaks found by execution:**
+  - 12 SciPlex3 conditions were profiled (6-18 cells per replicate) and dropped by the 20-cell rule. The protocol-v2
+    menu does not offer them, so an outcome shapes the initial menu.
+  - L1000 development pools count detected identities before the split.
+  - Unregistered duplicate citations count as independent sources in production.
+  - A lysate engagement grant satisfies an engagement premise that names no site.
+  - SciPlex3 folds are identity-disjoint (0 of 180 skeletons cross folds) but not scaffold-disjoint (12 scaffolds,
+    30 compounds).
+- **Wiring:**
+  - The production default selects on declared detection power and does not use virtual-cell output.
+  - `plan_measurement` and `ReferenceWorld` run only as research arms.
+  - Plan composition and licence certificates are not called by any runtime path.
+  - No path uses a forecast to value a prerequisite measurement.
+- **Engagement replay** (6 cases):
+  - Registry access turns 4 menu-only deferrals into licensed decisions.
+  - `registry_expanded_selection` matches `registry_repair_rule`'s decision and cost in all 4.
+  - They differ on ABL1/dasatinib, a different licensed decision; the control's decision is the one the independent
+    kinobeads test marks consistent.
+  - On MCF7/AZD2014 the repair spends 2.0 against 0, and both defer.
+  - Zero wrong development actions in any arm.
+- **Gates:**
+
+  | Gate | Status |
+  |---|---|
+  | AG-G0 | PASS for existence (6 cases); NOT_READY for population |
+  | AG-G1 | PASS (implementation correctness) |
+  | AG-G2 | INCONCLUSIVE: no additional algorithmic contribution identified |
+  | WM-G0 | NOT_READY |
+  | WM-G1, WM-G2 | FAIL |
+  | WM-G3 | FAIL on development; INCONCLUSIVE on GSE70138 |
+  | E-JOINT1 | NOT_READY: nothing connects forecasts to repair, and no task qualifies |
+
+- **Tests:** `research/protocol_v2` 24 passed; five invariant files in `tests/` 123 passed;
+  `tests/test_repository_shape.py` 9 passed.
 
 ## 6. Deviations, failures and corrections
 
@@ -460,6 +545,17 @@ historical path instead.
   `build_metadata_tiers`, the `policy_input` and `policy_view` aliases, and
   `truth_free_episode_list`. None had a caller; all are recoverable from `83b9aa9`.
 
+**Block 4 deviations and corrections:**
+- **"99.6%" corrected.** Block 3 recorded the fixed order at "99.6%" of the oracle in L1000 T. The registered file gives
+  99.4%. Block 3's documents are left as written; the correction is recorded here and in `research/gated_plan/AUDIT.md`
+  section 2.
+- **Block 3's measurement-state adoption was partly wrong.** Its item 7 treated a condition with no row as "not
+  planned". Execution shows those 12 conditions were planned and measured, then dropped for too few cells. Protocol
+  v1's handling (charged as a QC failure) was closer to correct. Recorded, not edited.
+- **Replay invocation.** The first attempt lacked `PYTHONPATH`. The second passed a costing overlay that belongs to
+  another package (`costing_entry_matches_no_action`). The recorded run omits the overlay.
+- **Citations.** The contribution-card citations outside `research/protocol_v2/LITERATURE.md` were not re-resolved
+  online; `VALIDATION.md` lists them.
 
 ## 7. Interpretation and claim boundaries
 
@@ -508,6 +604,17 @@ historical path instead.
   - GSE70138 is consumed;
   - the production default is unchanged, and `src/` is untouched.
 
+**Block 4 interpretation.**
+- **Scope of the historical numbers.** They bound planning on a proxy task: choosing transcriptomic conditions to
+  separate annotated MoA classes. They say nothing about prerequisite-directed repair.
+- **Agent.** Its demonstrated contribution is engineering: named prerequisites, typed admission, scope-limited
+  updates. On the only real prerequisite task, its decision value belongs to the added capability (the action space),
+  not to the repair operation.
+- **World model.** It adds no decision-relevant information beyond its class-conditional simple layer on development
+  data.
+- **Combination.** Neither measured nor measurable yet.
+- **Biology.** No statement here is a biological mechanism claim. `not_engaged` has no measured sensitivity, and the
+  engagement exposure is not matched to the viability phenotype.
 
 ## 8. Reproduction and artifact ledger
 
@@ -559,6 +666,15 @@ The external replay refuses a second run.
 `python -m pytest research/protocol_v2 -q -p no:cacheprovider` (24 pass). Full-suite counts are
 in `0927/protocol_v2_run_notes.md`.
 
+**Block 4 artifacts:**
+- `research/gated_plan/`: README, AUDIT, DATAFLOW, PLAN, REGISTRY, `registry.json`, VALIDATION and `probes.py`.
+- `outputs/gated_plan_20260927/probes.json`, copied as `0927/gated_plan_probes.json`.
+- `outputs/gated_plan_20260927/engagement_replay/`: run record and per-arm ledgers. The run record is copied as
+  `0927/gated_plan_engagement_replay.json`.
+- `0927/gated_plan_run_notes.md`.
+- Reproduce with:
+  - `python -m research.gated_plan.probes --out FILE`, with `PYTHONPATH` set to the repository and `src`;
+  - the replay command in `research/gated_plan/VALIDATION.md` step 6.
 
 ## 9. Open items and next experiments
 
@@ -599,6 +715,18 @@ in `0927/protocol_v2_run_notes.md`.
 - **Latent defect.** `src/virtual_cell/state_adapter.py` treats an existing path named like the
   runner verb as a file.
 
+**Block 4 open items** (owner decisions first):
+- **Commit.** Commit `research/gated_plan/` and decide on the other sessions' untracked folders
+  (`inspect/`, `reference_0927/`, `research/prompt_review_20260927/`). Registration needs a clean tree.
+- **Implementation.** Authorise MINIMAL_IMPLEMENTATION for P0-1 (design-based availability and lifecycle states),
+  P0-2 (per-fold pools) and P0-3 (registered weighting), or not.
+- **Downloads.** Approve, or refuse, a metadata-only census of CPJUMP1 and LINCS 2020. CPJUMP1 is the only candidate with
+  measured pairing of genetic and chemical perturbations of the same genes in the same cells.
+- **Next runnable steps.**
+  - E-AG1 stage 0: a premise-only local census. With fewer than 30 target-gene clusters, biological AG validation
+    stays NOT_READY.
+  - E-DATA1 after P0.
+  - E-CAL1: ready now, but register it first.
 
 ## 10. Curation provenance
 
@@ -615,3 +743,10 @@ Block 3 was written by the Claude session that ran it (11:30-13:30), from:
 - the outputs in `outputs/protocol_v2_20260927/`;
 - the eight review reports, read from the owner's Codex attachments. Their claims were
   re-checked, not copied.
+
+Block 4 was written by the Claude session that ran it (13:32-15:00), from:
+- the executed probes and the engagement replay (`outputs/gated_plan_20260927/`);
+- the registered protocol-v2 analyses;
+- the code paths named in `research/gated_plan/AUDIT.md`.
+
+The brief and its addendum were the owner's pasted prompts; their historical claims were re-checked, not copied.

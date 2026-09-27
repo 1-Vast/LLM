@@ -1,0 +1,93 @@
+{
+ "registry_version": "gated-plan-1",
+ "status": "specification; nothing registered or run under this registry",
+ "written_on": "2026-09-27",
+ "checkout": {"head": "e5ad68fe9582ba5ff063cac01ac7c5a7cc209899", "branch": "main", "clean": false,
+              "untracked": ["inspect/", "reference_0927/", "research/gated_plan/", "research/prompt_review_20260927/"]},
+ "inherits": "research/protocol_v2/protocol.json (utility, thresholds, estimand, interval)",
+ "common": {
+  "utility": {"correct": 1, "wrong": -2, "exhausted": -2, "deferred": 0, "undetermined": 0, "price_per_measurement": 0.02},
+  "interval": "95% unit-cluster bootstrap, 2,000 draws, seed fixed at registration",
+  "weighting": "primary estimate is the unit mean; the episode mean is reported beside it",
+  "verdicts": ["PASS", "FAIL", "INCONCLUSIVE", "NOT_READY"],
+  "cost": "wells and turnaround days; compute and provider spend reported separately",
+  "registration": "research/protocol_v2/registry.py register from a clean commit"
+ },
+ "experiments": {
+  "E-DATA1": {
+   "question": "does any development task and measured-condition menu have enough headroom and units for planner work",
+   "task": "transcriptomic MoA-class discrimination (proxy; does not test prerequisite repair)",
+   "exposure": "development, exposed",
+   "units": "SciPlex3 skeleton units; L1000 components; identical across menus",
+   "arms": ["fixed", "fixed_star_training_fold_search", "random_legal", "myopic_edv", "oracle_hindsight_bound"],
+   "thresholds": {"primary_eligible": "headroom_correct >= 0.04 and lower bound >= 0.02",
+                  "powered": "units required (belief-like variance) <= units available",
+                  "menu_expansion_qualifies": "delta oracle ceiling >= 0.02 with lower bound > 0, or fixed* -0.1 measurements with correct >= -0.01 and wrong <= +0.005"},
+   "failure_rule": "stop planner-superiority work on these data; keep tasks as regression tests; next step is a data census",
+   "budget": {"cpu_hours": 2, "downloads": 0, "usd": 0},
+   "requires": ["P0-1 design-based availability", "P0-2 per-fold pools", "clean-commit registration"],
+   "status": "READY_AFTER_PREREQUISITES"
+  },
+  "E-CAL1": {
+   "question": "do wrong-elimination forecasts or a registered bound cover observed rates on selected actions, per step and per episode, across studies",
+   "exposure": "development; GSE70138 post hoc (consumed)",
+   "items": ["executed QC-passed steps of belief, safe, myopic_edv", "episode-level cumulative false elimination among decided episodes", "deferral and coverage"],
+   "methods_in_order": ["raw", "planner_jeffreys_upper", "platt", "hierarchical_kappa20", "discounted_lambda0.5"],
+   "stop_gate": "covers overall and >= 95% of strata (n >= 20) on both LOSO targets, no stratum significantly above, and mean bound <= 3 x observed",
+   "failure_rule": "no forecast-driven stop and no risk claim",
+   "status": "READY"
+  },
+  "E-WM1": {
+   "a_time_only": {"models": ["M0 per-condition empirical", "M1 pooled over dose within time", "M2 dose + time smoothing"],
+                   "data": ["L1000 LT 6 h / 24 h", "SciPlex3 A549 24 h / 72 h"],
+                   "endpoints": ["held-out log loss and Brier of registered labels", "one-step action regret"],
+                   "status": "READY_AFTER_E-DATA1"},
+   "b_deployable_realisation": {"status": "NOT_READY", "missing": "engagement or proximal function measured at the task dose, time and cell line before the candidate action, >= 50 units"},
+   "c_privileged_measured_realisation": {"status": "NOT_READY", "role": "upper-bound diagnostic only"}
+  },
+  "E-AG1": {
+   "task": "engagement-gap genetic-pharmacological discordance",
+   "stage0_census": {"inputs": "premise releases and capability coverage only; no engagement value", "current": "865 screened -> 6 cases (5 K562, 1 MCF7; 5 genes)", "status": "READY"},
+   "stage1_arms": {"F": "fixed expert (menu)", "S": "outcome-aware one-shot (menu)",
+                   "A0a": "registry-expanded one-shot selection (same capabilities admitted in advance)",
+                   "A0b": "exact contingent optimum over the closed legal space (same declarations)",
+                   "A1": "registry_repair_rule", "R": "random proposal"},
+   "shared": "typed admission, licensing rules, budget, capability registry",
+   "endpoints": {"primary": ["wrong development action rate", "over-deferral rate", "cost units"],
+                 "construction": "capability evaluations per licensed decision on a registry with >= 100 offers",
+                 "scoring": ["licensing verdict", "kinobeads final test where a partition exists", "registered blind adjudication"]},
+   "pass": "A1 over-deferral <= A0a - 0.10 (95% cluster CI > 0) with wrong actions no worse than +0.02 and no higher cost; or identical decisions with <= 50% of A0a's capability evaluations",
+   "note": "A1 cannot beat A0b in a small enumerable space under matched information; matching A0b is efficiency, not superiority",
+   "current_evidence": "replay gated-plan-engagement-20260927: A1 = A0a on 4 of 4 decisive cases (same decision, same cost); differs on ABL1/dasatinib (different licensed decision) and MCF7/AZD2014 (A1 cost 2.0 vs 0, both defer)",
+   "minimum_units": {"exploratory_target_gene_clusters": 30, "confirmatory": "from stage-1 variance"},
+   "status": {"stage0": "READY", "stage1": "NOT_READY"}
+  },
+  "E-JOINT1": {
+   "arms": ["A0W0", "A1W0", "A0W1", "A1W1", "F_prediction_free"],
+   "W0": "class-conditional empirical frequencies of registered reading labels behind OutcomeForecaster",
+   "W1": "candidate conditional predictor (ReferenceWorld structural kernel or a future engagement predictor)",
+   "permutation": "swap forecasts between compounds within the same condition and support bin; applicability, menu and validator unchanged",
+   "endpoint_J": "per-unit utility (+1 licensed correct, -2 wrong development action, 0 deferral) - 0.02 x cost units; higher is better",
+   "interaction": "I = (J_A1W1 - J_A1W0) - (J_A0W1 - J_A0W0); exploratory unless power for I >= 0.8",
+   "order": ["agent simple effect at W0", "world-model simple effect at A0", "interaction"],
+   "missing": ["a code path that feeds OutcomeForecast to repair selection", "a task whose prerequisite result or downstream readout is forecastable with >= 20 references per branch"],
+   "status": "NOT_READY"
+  },
+  "EXT-1": {
+   "trigger": "a frozen candidate passes WM-G3 or AG-G2 on development",
+   "cohort": "unopened study with >= max(500, units required) label-compatible units, or new discordance cases with condition-matched engagement",
+   "status": "NOT_READY"
+  }
+ },
+ "gates": {
+  "WM-G0": {"rule": "simple baselines reproduce within +/-0.005 on leakage-controlled splits", "status": "NOT_READY"},
+  "WM-G1": {"rule": "log loss >= 0.02 nats/step better than best simple baseline (CI > 0); observed/forecast wrong ratio in [0.67, 1.5] on both LOSO targets; competence flag separates error rates", "status": "FAIL"},
+  "WM-G2": {"rule": "one-step regret >= 0.01 lower than best simple baseline (CI > 0) at <= +0.1 measurements", "status": "FAIL"},
+  "WM-G3": {"rule": "paired correct vs fixed >= 0.02 with CI lower > 0; wrong <= +0.005; measurements <= +0.1; days <= +0.6; confirmatory units; sensitivity", "status": "FAIL (development); INCONCLUSIVE (GSE70138)"},
+  "WM-G4": {"rule": "frozen G3 result reproduces on an unopened cohort", "status": "NOT_READY"},
+  "AG-G0": {"rule": "genuine interpretation-prerequisite gap on development observations; a feasible measurement changes an evidence-supported decision", "status": "PASS (existence, 6 cases); NOT_READY (population)"},
+  "AG-G1": {"rule": "trace shows identification, repair, verification against real results and scope-limited update", "status": "PASS (implementation correctness only)"},
+  "AG-G2": {"rule": "E-AG1 stage-1 pass rule against A0a and A0b", "status": "INCONCLUSIVE: no additional algorithmic contribution identified"},
+  "AG-G3": {"rule": "frozen AG-G2 result reproduces on unopened units", "status": "NOT_READY"}
+ }
+}
