@@ -236,7 +236,16 @@ def run_episode(policy: str, ctx: FoldContext, compound, truth, h1, h2, rng, bud
     return finish(policy, compound, truth, h1, h2, state, executed, status)
 
 
+def require_truth(truth, h1, h2) -> None:
+    """Scoring fails closed: a missing truth, or one outside the pair, is refused by name."""
+    if truth is None or (isinstance(truth, float) and truth != truth) or (isinstance(truth, str) and not truth):
+        raise ValueError(f"scoring_truth_missing: refusing to score {h1!r} vs {h2!r} without a truth")
+    if truth not in (h1, h2):
+        raise ValueError(f"scoring_truth_outside_contrast: {truth!r} is neither {h1!r} nor {h2!r}")
+
+
 def finish(policy, compound, truth, h1, h2, state, executed, status=None) -> dict:
+    require_truth(truth, h1, h2)
     other = h2 if truth == h1 else h1
     remaining = state.candidates
     if status == "deferred":
@@ -377,6 +386,12 @@ def episode_list(ctx: FoldContext, fold: int):
         # is used for the final scoring label and for the registered contrast
         # only; it does not define the menu or its candidate universe.
         truth = comp.klass[compound]
+        if not isinstance(truth, str) or truth not in ctx.tier.pool:
+            # A forced-choice contrast needs the compound's own class in the pool. An unlabelled
+            # or out-of-pool compound is metadata-eligible but not scorable here; it used to
+            # yield episodes whose truth was None (2026-09-27 audit). Protocol v2 runs such
+            # compounds on the truth-free acquisition endpoint instead.
+            continue
         for decoy in ctx.tier.pool:
             if decoy == truth:
                 continue
@@ -384,29 +399,6 @@ def episode_list(ctx: FoldContext, fold: int):
             h1, h2 = (truth, decoy) if rng.random() < 0.5 else (decoy, truth)
             out.append((compound, truth, decoy, h1, h2))
     return out
-
-
-def truth_free_episode_list(ctx: FoldContext, fold: int, ontology=None):
-    """Return external episode candidates before any evaluator label is read.
-
-    Unlike :func:`episode_list`, each frozen ontology contrast is offered for
-    every metadata-eligible compound.  The returned records intentionally do
-    not contain ``truth``; an evaluator may join that label only after policy
-    execution.  This is the entry point for external manifests and should not
-    be used to choose the development default arm.
-    """
-
-    from research.external_validation.ontology import build_truth_free_episodes, load
-
-    ontology = load() if ontology is None else ontology
-    eligibility_keys = (
-        tuple(key for key in ctx.tier.keys if key[1] == 72.0)
-        if ctx.tier.name == "A" else ctx.tier.keys
-    )
-    menu = C.metadata_episode_menu(ctx.data, ctx.tier.keys, eligibility_keys=eligibility_keys,
-                                   compounds=ctx.tier.compounds)
-    return build_truth_free_episodes(dataset="sciplex3", tier=ctx.tier.name, fold=fold,
-                                     compounds=menu.eligible, ontology=ontology)
 
 
 def run_fold(task) -> tuple[list, dict]:

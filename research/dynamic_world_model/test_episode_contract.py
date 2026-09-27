@@ -35,7 +35,7 @@ def test_metadata_episode_menu_ignores_truth_columns():
 
 def test_metadata_menu_accepts_a_manifest_universe_without_labels():
     data, key_a, key_b = _data()
-    menu = C.build_metadata_episode_menu(data, (key_a, key_b), compounds=("heldout",))
+    menu = C.metadata_episode_menu(data, (key_a, key_b), compounds=("heldout",))
     assert menu.keys == (key_a, key_b)
     assert menu.compounds == ("heldout",)
 

@@ -1,8 +1,8 @@
 # Experiment record, 2026-09-27
 
 > - **Path**: `log/20260927/README.md`
-> - **Purpose**: Record two blocks. Block 1 (00:00-00:47) is the external-validation block: an audit of the evidence behind MAESTRO's decision claims, a firewall against outcome leakage (sealed policy view, one-time vault, manifests), a frozen 14-rung baseline ladder replayed on development data, masked and permuted virtual-cell controls, and a local candidate audit. Block 2 (03:00-05:40) is belief-space planning with a virtual-cell world model and its first external test: an audit of the repository after a Codex session, a new planner and world model, a new frozen protocol, and one locked run on GSE70138 (LINCS L1000 Phase II), downloaded under the owner's authorisation in the brief.
-> - **Core points**: No local study is both unseen and compatible, so external validation is blocked; the candidate is L1000 Phase II (GSE70138), whose download needs the owner's approval. On development data (12,428 episodes, 360,412 records, no rule violations) the runtime selector with the virtual-cell channel (`maestro_vc`) was REJECTED under the frozen gates. It decided fewer correctly than the strongest simple baseline in SciPlex3 B (-0.054 [-0.095, -0.013]) and L1000 T (-0.031 [-0.050, -0.014]) and was inconclusive in SciPlex3 A and L1000 LT. It was cheaper in every tier (0.20 to 1.03 fewer measurements) and had fewer wrong eliminations except in SciPlex3 A. It sits on the same correct-versus-cost curve as a one-step expected-value rule. The virtual-cell channel had zero acquisition value in every tier (its one gain over masking was reproduced by another compound's predictions), and the selector's wrong-reading forecasts were 2 to 19 times too low. Production defaults and `src/` are unchanged. **Block 2:** on GSE70138 (38 new compounds, 380 episodes, run once behind the vault), the belief-planning agent was INCONCLUSIVE against the fixed expert order: -0.024 [-0.074, +0.011] correct decisions, with the pre-registered minimum improvement of +0.02 outside the interval. The virtual cell and real feedback changed actions but not decisions, and both contributions were REJECTED as practically meaningful. On development data the agent lost in SciPlex3 A (-0.134, REJECTED) and was inconclusive elsewhere (L1000 LT +0.024 [0.000, +0.050] with 0.57 fewer measurements). The audit found that a Codex session (00:59-02:56) had rewritten block 1's freeze and one replay fold, left an incoherent decision-value function, and changed a loader so that it emits truth-less episodes. Production defaults are unchanged; `src/` gained an opt-in planner and a coherence fix.
+> - **Purpose**: Record three blocks. Block 1 (00:00-00:47) is the external-validation block: an audit of the evidence behind MAESTRO's decision claims, a firewall against outcome leakage (sealed policy view, one-time vault, manifests), a frozen 14-rung baseline ladder replayed on development data, masked and permuted virtual-cell controls, and a local candidate audit. Block 2 (03:00-05:40) is belief-space planning with a virtual-cell world model and its first external test: an audit of the repository after a Codex session, a new planner and world model, a new frozen protocol, and one locked run on GSE70138 (LINCS L1000 Phase II), downloaded under the owner's authorisation in the brief. Block 3 (11:30-13:30) is protocol external-validation-2: a code-level audit of eight review reports, an archive of both protocol-v1 experiments, clean-tree registration, fail-closed truth semantics with a whitelisted policy view, task headroom and power gates, a baseline-safe planner, cross-study calibration, virtual-cell and feedback decision gates, and a development screen.
+> - **Core points**: No local study is both unseen and compatible, so external validation is blocked; the candidate is L1000 Phase II (GSE70138), whose download needs the owner's approval. On development data (12,428 episodes, 360,412 records, no rule violations) the runtime selector with the virtual-cell channel (`maestro_vc`) was REJECTED under the frozen gates. It decided fewer correctly than the strongest simple baseline in SciPlex3 B (-0.054 [-0.095, -0.013]) and L1000 T (-0.031 [-0.050, -0.014]) and was inconclusive in SciPlex3 A and L1000 LT. It was cheaper in every tier (0.20 to 1.03 fewer measurements) and had fewer wrong eliminations except in SciPlex3 A. It sits on the same correct-versus-cost curve as a one-step expected-value rule. The virtual-cell channel had zero acquisition value in every tier (its one gain over masking was reproduced by another compound's predictions), and the selector's wrong-reading forecasts were 2 to 19 times too low. Production defaults and `src/` are unchanged. **Block 2:** on GSE70138 (38 new compounds, 380 episodes, run once behind the vault), the belief-planning agent was INCONCLUSIVE against the fixed expert order: -0.024 [-0.074, +0.011] correct decisions, with the pre-registered minimum improvement of +0.02 outside the interval. The virtual cell and real feedback changed actions but not decisions, and both contributions were REJECTED as practically meaningful. On development data the agent lost in SciPlex3 A (-0.134, REJECTED) and was inconclusive elsewhere (L1000 LT +0.024 [0.000, +0.050] with 0.57 fewer measurements). The audit found that a Codex session (00:59-02:56) had rewritten block 1's freeze and one replay fold, left an incoherent decision-value function, and changed a loader so that it emits truth-less episodes. Production defaults are unchanged; `src/` gained an opt-in planner and a coherence fix. **Block 3:** no MAESTRO policy meets the protocol-v2 success criteria, and the binding constraint is the task. The fixed order reaches 63-99.6% of the oracle's correct decisions, 76-82% of L1000 episodes cannot be decided from the menu, and a +0.02 effect needs 345-813 units against 38-256 available. The baseline-safe planner removes every development loss (SciPlex3 A -0.131 becomes 0.000) but departs from the fixed order in at most 0.24% of decisions, so it gains nothing. Wrong-risk forecasts are 2-5 times too low, and no recalibration transfers across studies. The virtual cell and feedback are not promoted. External-validation-1's freeze and one fold were rewritten; belief-planning-1's artefacts are intact. Production and `src/` are unchanged.
 
 ## 1. Record control
 
@@ -49,6 +49,25 @@ The chronological notes, including the one failed smoke run, are in `log/2026092
   protocol, the development caches, the GSE70138 metadata, the Level 5 gctx and the external
   manifest (`77b355659b8603afa5fa71a8931575987018c0715ed33c26190d6c0b8c390e1f`).
 
+**Block 3 record control.**
+- **Tree as found at 11:33.** `83b9aa9` on `main`, clean.
+  - Every belief-planning-1 digest (54) matched the disk.
+  - 78 of 79 regenerated external-validation-1 digests matched; `src/maestro/acquisition.py`
+    did not.
+  - This is the session-start witness in `research/experiments/*/EVIDENCE.json`.
+- **The brief.** The owner pasted eight review reports into a Codex session (rollout `01a0dea8`,
+  00:59-11:31) and had it draft this block's brief. That session wrote nothing to the tree.
+- **Another session.** A Codex session started at 12:00 (rollout `01a0e105`) is building the
+  owner's group-meeting slides in this repository. It created `inspect/` at 12:01 and
+  `reference_0927/` at 12:25 in the repository root, and writes under `outputs/`. None of its files
+  was touched.
+- **Pre-registration.** `research/protocol_v2/protocol.json` (12:05:59) registers the
+  development screen, the gates and the success criteria. The run record
+  `outputs/protocol_v2_20260927/dev/run_record.json` (12:07:35, `development_unregistered`,
+  dirty tree) holds its digest, the code and data digests, and the environment lock.
+- **Archive.** `research/experiments/*/EVIDENCE.json` was written at 12:04.
+
+
 ## 2. Research questions and hypotheses
 
 **Q1.** On data it has not seen, does MAESTRO's measurement choice beat simple baselines on
@@ -70,6 +89,17 @@ with masked and permuted controls?
   predictions.
 - **Q6.** Does the agent use observed feedback beneficially? Test it against withheld and permuted
   feedback.
+
+**Block 3 questions** (the owner's brief, 11:30):
+- **Q7.** Which claims of the eight review reports on `83b9aa9` hold when checked against the code,
+  the manifests, the replays and a rerun?
+- **Q8.** Can a clean, versioned protocol decide whether MAESTRO adds decision value over the
+  fixed order?
+- **Q9.** Does a baseline-safe planner remove the current planner's losses, and does it keep any
+  gain?
+- **Q10.** Are wrong-risk forecasts calibrated across studies?
+- **Q11.** Do the virtual cell and feedback pass a decision-level gate?
+
 
 ## 3. Materials, data and computational environment
 
@@ -101,6 +131,15 @@ thread each. No provider call was made.
   `episodes.contexts` path, which reproduces every registered manifest.
 - **Environment:** the same `maestro` env for the registered runs (12 workers). The determinism
   check also ran in Python 3.14.4. No provider call was made; laboratory cost was 0 wells.
+
+**Block 3 materials:**
+- The registered belief-planning-1 records: 298,272 development and 9,120 external, read only.
+- The external-validation-1 folds.
+- The prepared SciPlex3 and L1000 development caches.
+- The same environment: Python 3.11.16 (`maestro` conda env). Every installed distribution is
+  locked in `0927/protocol_v2_dev_run_record.json`.
+- No download, no provider call ($0), no laboratory work (0 wells).
+
 
 ## 4. Experimental design and controls
 
@@ -165,6 +204,37 @@ The cost margins are 0.10 measurements and 0.5 assay-days. The gates run in orde
   - G4: measurement difference at most +0.10;
   - G5: virtual cell; G6: feedback.
 - **Inference:** 2,000-draw unit-cluster bootstrap.
+
+**Block 3 design** (`research/protocol_v2/PROTOCOL.md`, `protocol.json`):
+- **Evidence audit.** Every report claim is checked in code or by a run; the evidence table is
+  in DIAGNOSIS.md section 2.
+- **Archive.** Both protocol-v1 experiments are digested once (`research/experiments/`). Each
+  freeze is verified at `83b9aa9` with line-ending equivalence. Untracked originals are set
+  read-only.
+- **Contracts.**
+  - A whitelisted public view replaces the sealed context for v2 arms.
+  - Menus hold only planned conditions.
+  - Five measurement states.
+  - Truth is joined after execution, and scoring fails closed.
+  - Pools come from reference compounds, with all-pairs truth-free contrasts for external use.
+- **Gates.**
+  - Task headroom >= 2 x MPIE with lower bound >= MPIE, plus a power gate.
+  - A leave-one-study-out stop gate for model-driven stopping.
+  - `KEEP` for the virtual cell or feedback only through the full chain: action, decision,
+    correct, then no extra wrong or cost.
+- **Development screen**, registered in `protocol.json` before it ran:
+  - arms `fixed`, `random_legal`, `myopic_edv`, `belief`, `anchored`, `safe` (primary),
+    `safe_class`, `belief_robust` and `oracle`, on the 20 registered development tasks;
+  - one runner, menu, budget, executor, validator and seed policy for all of them.
+  - Disclosure: every tier had been analysed before, and `safe` was designed after seeing
+    belief-planning-1's results. The screen can rule arms out, not in.
+- **Support rule for `safe`.** It uses existing constants only:
+  - >= 6 independent reference units and history-weighted support per hypothesis;
+  - >= 2 templates;
+  - nearest-training Tanimoto >= 0.40;
+  - a gain > 1.645 standard errors;
+  - no increase in wrong risk.
+
 
 ## 5. Experiment register and results
 
@@ -265,6 +335,41 @@ The worst strata are L1000 batches (forecast 0.4–0.6, observed 0.00–0.04).
 - **Detail:** `research/belief_planning/README.md`; slim summaries in
   `0927/belief_planning_*_summary.json`.
 
+**Block 3 results** (`research/protocol_v2/README.md`):
+- **Headroom (oracle minus fixed, correct):**
+  - SciPlex3 A +0.030 [0.000, 0.083] and L1000 T +0.001: both fail the gate.
+  - SciPlex3 B +0.086 [0.053, 0.123] and L1000 LT +0.062 [0.037, 0.091]: eligible, but they need
+    464 and 813 units (132 and 256 available).
+  - GSE70138 +0.071 [0.003, 0.153] fails the lower-bound rule. It had 38 units and would need 345.
+- **Identifiability.** No planned condition eliminates either hypothesis in 81.6% (LT), 75.9%
+  (T), 28.6% (A) and 28.2% (B) of episodes. The fixed order reaches 63-99.6% of the oracle's
+  correct decisions.
+- **Development screen**: 12,428 episodes, 111,852 records, 0 integrity problems.
+  - Replay check: the shared arms reproduced belief-planning-1's registered decisions exactly,
+    apart from 12 mismatches on SciPlex3 A compounds with an unplanned condition.
+  - `safe` minus fixed, correct: 0.000 in every tier (B [-0.002, +0.002]). It departs in 0-0.24%
+    of decisions. Verdict: SAFE_ON_DEVELOPMENT, NO_DEVELOPMENT_SIGNAL.
+  - `belief` minus fixed: A -0.131 [-0.214, -0.054]; B +0.008 [-0.018, +0.035]; LT +0.024
+    [0.000, +0.050] with 0.57 fewer measurements and 20% of episodes deferred; T -0.006
+    [-0.010, -0.002]. Verdict: UNSAFE on development (A, B).
+  - `belief_robust` gave essentially the same results as `belief`. `anchored` matched fixed.
+- **Second-step ceiling** after fixed's first non-terminal reading: 0.149 (B), 0.066 (LT),
+  0.024 (A), 0.000 (T).
+- **Calibration** (wrong eliminations, forecast against observed, leave-one-study-out):
+  - L1000 0.0023 against 0.0045; SciPlex3 0.0114 against 0.0258; GSE70138 (post hoc) 0.0053
+    against 0.0265.
+  - Platt and hierarchical recalibration do not transfer. The hierarchical 95% bound covers 48%
+    of SciPlex3 strata and 54% of GSE70138 strata.
+  - The stop gate passes only on the planner's own bound, which is 10-35 times too high.
+  - A contamination-mixture update (eps = 0.3) removes the 0.3-0.5% posterior collapse and
+    changes almost no decision.
+- **Virtual cell and feedback**, recomputed from the registered records: REJECT_AS_DEFAULT in
+  every setting.
+  - Virtual cell: action change 0-4.5%, decision change 0-0.6%.
+  - Feedback: action change 3.3-32%, decision change 0.1-4.2%.
+  - Every correct-difference upper bound is below +0.02.
+
+
 ## 6. Deviations, failures and corrections
 
 - **Smoke check failure.** The first smoke check failed on L1000 because `episodes.lab_cost`
@@ -323,6 +428,39 @@ These are the 2 failures among 119 research tests. The production suite passes: 
 SciPlex3 episodes whose truth is `None`: 18 in A fold 0 and 153 in B fold 0. Block 2 used the
 historical path instead.
 
+**Block 3 deviations and corrections:**
+- **Scoring accepted a missing truth.** `policies.finish` and `episodes.finish` scored a missing
+  truth as a decision. Both now refuse by name. `episode_list` skips compounds whose label is
+  missing or outside the pool; the historical path never produced such compounds. Before this,
+  the external-validation SciPlex3 replay crashed at HEAD (`TypeError`, fold 1) on the Codex
+  metadata path.
+- **Two historical tests pointed at rewritten artefacts.** One compared a moving tree with a
+  regenerated freeze; the other compared a rerun with the rewritten `l1000_T_1`. They now:
+  - check the regenerated freeze at the archive commit against its archived record;
+  - rerun the original `l1000_T_0`, where every registered arm's records are reproduced.
+- **Line endings.** 58 CRLF and 12 mixed-ending tracked files meant protocol-v1 digests depended
+  on the checkout. Registration now hashes LF-normalised content for tracked files.
+- **Post-witness edits.** The two frozen mixed-ending files this block edited
+  (`dynamic_world_model/common.py`, `episodes.py`) no longer re-derive their v1 digests from disk.
+  Their tie to `83b9aa9` rests on the 11:33 witness (clean status, all digests matching), recorded
+  in `EVIDENCE.json` and `archive.EDITED_AFTER_WITNESS`.
+- **A wrong timestamp.** `protocol.json` carries `written_at` 12:10, but the file was written at
+  12:05:59 and hashed by the run record at 12:07:35. The field was an estimate. It is left
+  unchanged, so the recorded digest still matches.
+- **Code edited after the development screen.** Alias removals in `common.py` and `firewall.py`,
+  the removal of `truth_free_episode_list`, and new functions in `contracts.py` came after the
+  run. A rerun of seven tasks with the final code reproduced the screen's decisions (section 8).
+- **Concurrent actor.** The Codex slide session created `inspect/` in the repository root at
+  12:01. Five production tests resolve the runner verb `inspect` as a path relative to the
+  working directory, so they fail while that folder exists. Run from another working directory,
+  they pass. The folder is the other session's and was left in place. The path resolution in
+  `src/virtual_cell/state_adapter.py` (`_argument_identity`) is a latent defect, reported, not
+  changed here.
+- **Removed after a reference search.** Four aliases of `metadata_episode_menu`,
+  `build_metadata_tiers`, the `policy_input` and `policy_view` aliases, and
+  `truth_free_episode_list`. None had a caller; all are recoverable from `83b9aa9`.
+
+
 ## 7. Interpretation and claim boundaries
 
 **What the replay shows:**
@@ -356,6 +494,20 @@ historical path instead.
   - one external study, 38 units, the forced-choice design;
   - no claim about mechanism, target engagement, safety or other contexts;
   - no policy promoted.
+
+**Block 3 interpretation.**
+- **The binding constraint is the task.** Most L1000 episodes are undecidable from the menu. The
+  fixed order already captures most identifiable decisions, and the tiers have a third to a fifth
+  of the units a +0.02 effect needs.
+- **The planner's losses are an estimation problem, and are fixable.** A support-gated safe
+  planner removes them.
+- **Its only gain is a cost trade.** The LT advantage comes from deferring on thin support.
+- **Claim boundaries:**
+  - no MAESTRO improvement over fixed is established;
+  - development results rule arms out, never in;
+  - GSE70138 is consumed;
+  - the production default is unchanged, and `src/` is untouched.
+
 
 ## 8. Reproduction and artifact ledger
 
@@ -392,6 +544,22 @@ historical path instead.
 
 The external replay refuses a second run.
 
+**Block 3 artifacts:**
+
+| Artifact | Location |
+|---|---|
+| Protocol v2 code, protocol, tests, README, PROTOCOL, DIAGNOSIS, LITERATURE | `research/protocol_v2/` |
+| Protocol-v1 evidence archive | `research/experiments/{external-validation-1,belief-planning-1}/EVIDENCE.json` |
+| Screen traces, scored records, outcome tables, manifest, run record | `outputs/protocol_v2_20260927/dev/` |
+| Headroom, calibration, attribution, screen analysis | `log/20260927/0927/protocol_v2_*.json` |
+| Run record (environment lock) and screen manifest | `log/20260927/0927/protocol_v2_dev_run_record.json`, `protocol_v2_dev_manifest.json` |
+| Run notes, test results | `log/20260927/0927/protocol_v2_run_notes.md` |
+
+**Commands.** Listed in `research/protocol_v2/README.md`. Tests:
+`python -m pytest research/protocol_v2 -q -p no:cacheprovider` (24 pass). Full-suite counts are
+in `0927/protocol_v2_run_notes.md`.
+
+
 ## 9. Open items and next experiments
 
 - **External study.** Download GSE70138 on the owner's approval. Then:
@@ -417,6 +585,21 @@ The external replay refuses a second run.
   truth-less episodes.
 - **Commits.** Nothing is committed.
 
+**Block 3 open items:**
+- **Confirmatory external study.** An unopened study with 345-813 label-compatible units, and a
+  task that passes the headroom gate, is needed. The first step is a metadata-only unit count on
+  LINCS 2020 Level 5 compounds absent from GSE92742 and GSE70138. It needs the owner's approval
+  to download.
+- **Registration.** Commit this block (the owner decides) and register the next experiment from
+  a clean tree with `registry.register`. Tag `belief-planning-1` at `83b9aa9` if wanted.
+- **Confirmation-step task.** Needs replicate-level readings, so that a repeated measurement is a
+  new realisation.
+- **Second-step ceiling.** SciPlex3 B's 0.149 is the one place feedback has measurable room.
+  A discriminating second-step model is the parallel research arm to try there first.
+- **Latent defect.** `src/virtual_cell/state_adapter.py` treats an existing path named like the
+  runner verb as a file.
+
+
 ## 10. Curation provenance
 
 Written by the Claude session that ran the block, from the frozen files, the replay manifest and
@@ -425,3 +608,10 @@ earlier independent runs, which they reproduce exactly.
 
 Block 2 was written by the Claude session that ran it, from the frozen files, the vault log, the
 registered manifests and the analysis summaries in `outputs/belief_planning_20260927/`.
+
+Block 3 was written by the Claude session that ran it (11:30-13:30), from:
+- `research/protocol_v2/`;
+- the archived evidence;
+- the outputs in `outputs/protocol_v2_20260927/`;
+- the eight review reports, read from the owner's Codex attachments. Their claims were
+  re-checked, not copied.

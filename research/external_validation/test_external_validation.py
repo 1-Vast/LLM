@@ -421,11 +421,26 @@ def test_calibration_metrics_recover_known_miscalibration():
 
 # ------------------------------------------------------------------------------ freeze and reproduction
 def test_freeze_verifies_and_detects_a_change(tmp_path):
+    """This freeze is historical: it is checked at the archive commit against the archived record.
+
+    It was regenerated post hoc at 02:53 on 2026-09-27 and verified against no commit even then
+    (research/experiments/external-validation-1/EVIDENCE.json). Comparing it with the moving
+    working tree, as this test used to, tested later edits instead of the registration.
+    """
+    from research.protocol_v2 import registry as G
     freeze_path = HERE / "freeze.json"
-    if not freeze_path.is_file():
-        pytest.skip("freeze.json is written by freeze.py before the registered run")
+    evidence_path = ROOT / "research/experiments/external-validation-1/EVIDENCE.json"
+    if not freeze_path.is_file() or not evidence_path.is_file():
+        pytest.skip("freeze.json and its archive record are required")
     freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
-    assert F.verify_freeze(freeze) == []
+    archived = json.loads(evidence_path.read_text(encoding="utf-8"))["freezes"]["regenerated_02_53"]
+    assert F.sha256_file(freeze_path) == archived["sha256"]
+    check = G.verify_at_commit(freeze["sha256"], archived["verification_at_archive_commit"]["commit"], ROOT)
+    if check["problems"] and all(s == "missing" for s in check["status"].values()):
+        pytest.skip("the archive commit is not in this clone")
+    from research.protocol_v2.archive import EDITED_AFTER_WITNESS
+    allowed = set(archived["verification_at_archive_commit"]["problems"]) | {f"changed:{p}" for p in EDITED_AFTER_WITNESS}
+    assert set(check["problems"]) <= allowed
     relative = "research/external_validation/protocol.json"
     copy_root = tmp_path / "root"
     target = copy_root / relative
@@ -445,13 +460,22 @@ def test_replay_float_canonicalisation_collapses_last_bit_only():
 
 
 def test_replay_reproduces_a_saved_fold():
-    saved = R.OUT / "replay" / "l1000_T_1.jsonl.gz"
-    if not saved.is_file():
+    """Rerun an original registered fold and compare every registered arm's records.
+
+    `l1000_T_1` was rewritten post hoc with an added arm, so comparing against it was circular.
+    `l1000_T_0` is original (record count and time match the registered run), and only the arms
+    the original run registered are compared.
+    """
+    saved = R.OUT / "replay" / "l1000_T_0.jsonl.gz"
+    manifest = ROOT / "log/20260927/0927/external_validation_replay_manifest.json"
+    if not saved.is_file() or not manifest.is_file():
         pytest.skip("the registered replay has not been run")
-    result = R.run_task(("l1000", "T", 1), R.units("l1000"))
+    registered_arms = set(json.loads(manifest.read_text(encoding="utf-8"))["arms"])
+    result = R.run_task(("l1000", "T", 0), R.units("l1000"))
     with gzip.open(saved, "rt", encoding="utf-8") as stream:
         old = [json.loads(line) for line in stream]
-    new = [R.canonical_replay_value(r) for r in result["records"]]
-    old = [R.canonical_replay_value(r) for r in old]
-    strip = lambda rows: [{k: v for k, v in r.items() if k != "compute_seconds"} for r in rows]  # noqa: E731
-    assert strip(new) == strip(old)
+    assert len(old) == json.loads(manifest.read_text(encoding="utf-8"))["files"]["l1000_T_0"]
+    keep = lambda rows: sorted((json.dumps({k: v for k, v in R.canonical_replay_value(r).items()  # noqa: E731
+                                            if k != "compute_seconds"}, sort_keys=True)
+                                for r in rows if r["arm"].split("@")[0] in registered_arms))
+    assert keep(result["records"]) == keep(old)

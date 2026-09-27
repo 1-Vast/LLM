@@ -1,5 +1,11 @@
 # External-validation firewall, baseline ladder and decision-focused evaluation
 
+> **Status (2026-09-27, block 3):** this experiment is archived as `external-validation-1` in
+> [`../experiments/external-validation-1/EVIDENCE.json`](../experiments/external-validation-1/EVIDENCE.json).
+> Its original freeze no longer verifies (nine files were edited before the first commit),
+> `freeze.json` here is the post-hoc regeneration, and replay fold `l1000_T_1` was rewritten. Cite
+> the other 19 folds only. Its successor is [protocol external-validation-2](../protocol_v2/README.md).
+
 **Date:** 2026-09-27, 00:00 to 00:47 (+0800). Code, protocol and tests are in this directory. The
 run outputs are in `outputs/external_validation_20260927/`, and the day record is
 `log/20260927/README.md`.

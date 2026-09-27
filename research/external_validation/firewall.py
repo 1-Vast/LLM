@@ -153,12 +153,6 @@ def project_policy_input(*, visible_evidence=(), legal_actions=(), budget: float
     return projected
 
 
-# Short aliases make the boundary discoverable without coupling callers to a
-# particular verb.  They all retain the same explicit, typed implementation.
-policy_input = project_policy_input
-policy_view = project_policy_input
-
-
 def project_policy_view(view, *, legal_actions=(), budget: float,
                         calibrated_action_distributions=None, provenance=None):
     """Project only already-revealed evidence from a sealed view.

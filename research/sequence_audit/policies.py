@@ -141,7 +141,21 @@ def run_matched(arm_name: str, arm, ctx, compound, truth, h1, h2, setting: Setti
     return finish(arm_name, compound, truth, h1, h2, state, executed, stop, setting, qc_rule)
 
 
+def require_truth(truth, h1, h2) -> None:
+    """Scoring fails closed: an episode is scored only against a truth that is one of its pair.
+
+    A missing truth (None, NaN, empty) or one outside the contrast used to fall through to
+    ``other = h1`` and be scored as a wrong or correct decision. Refuse by name instead.
+    """
+    missing = truth is None or (isinstance(truth, float) and math.isnan(truth)) or (isinstance(truth, str) and not truth)
+    if missing:
+        raise ValueError(f"scoring_truth_missing: refusing to score {h1!r} vs {h2!r} without a truth")
+    if truth not in (h1, h2):
+        raise ValueError(f"scoring_truth_outside_contrast: {truth!r} is neither {h1!r} nor {h2!r}")
+
+
 def finish(arm_name, compound, truth, h1, h2, state, executed, stop, setting: Setting, qc_rule: str) -> dict:
+    require_truth(truth, h1, h2)
     other = h2 if truth == h1 else h1
     remaining = state.candidates
     if not executed:

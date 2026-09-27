@@ -22,7 +22,7 @@ File summary
   - Notes record the chosen plan's forecast `p_correct` / `p_wrong` / conservative `p_wrong_upper`,
     the belief, the contingent next action for each reading, and whether the virtual cell
     reached the forecast (`used_vc`).
-- Interfaces: `belief_arm`, `world_for`, `PRICE`
+- Interfaces: `belief_arm`, `belief_state`, `world_for`, `PRICE`
 - Depends on: research/belief_planning/world.py, research/sequence_audit/policies.py, maestro.planning
 """
 from __future__ import annotations
@@ -96,46 +96,76 @@ DEVIATION_Z = 1.6448536269514722
 """One-sided 95% normal quantile: the anchored agent leaves the expert order only on this much evidence."""
 
 
+def _contaminated(forecast, eps: float):
+    """The forecast mixed with a uniform reading distribution: P_eps(y|h) = (1 - eps) P(y|h) + eps / |labels|."""
+    from maestro.acquisition import OutcomeBranch, OutcomeForecast
+    if forecast.refusal or eps <= 0:
+        return forecast
+    branches = []
+    for b in forecast.branches:
+        labels = tuple(b.probabilities)
+        branches.append(OutcomeBranch(b.hypothesis, {k: (1 - eps) * float(v) + eps / len(labels)
+                                                      for k, v in b.probabilities.items()}, b.support))
+    return OutcomeForecast(forecast.action_identifier, tuple(branches), basis=f"{forecast.basis}|contaminated:{eps:g}",
+                           model_version=forecast.model_version)
+
+
+def belief_state(ctx, compound, h1, h2, executed, menu, setting, *, vc: str = "on", feedback: str = "true",
+                 overrides=None, contamination: float = 0.0):
+    """Everything the planner needs at one decision point, rebuilt from the runner's real steps.
+
+    Returns ``(world, real, belief, legal, forecast, by_id)``. Shared by `belief_arm` and the
+    protocol-v2 arms so every planner arm plans from the identical state. ``contamination`` > 0
+    bounds the likelihood ratio of each *real* reading in the belief update (a contamination
+    mixture; protocol v2's robustness arm). It does not change the forecasts used for planning.
+    """
+    world = world_for(ctx, vc, feedback, overrides)
+    real = tuple((tuple(s["key"]), W.label_of(s["outcome"])) for s in executed)
+    if feedback == "permuted":
+        other = ctx.extra["feedback_partner_reading"]
+        real = tuple((k, lab if lab == W.QC_FAILED else other(compound, k, h1, h2)) for k, lab in real)
+    belief = {h1: 0.5, h2: 0.5}
+    for i, (key, label) in enumerate(real):
+        forecast = world.forecast(key, h1, h2, compound, real[:i])
+        if feedback == "withheld" and label != W.QC_FAILED:
+            keep = (W.UNRESOLVED, W.ABSENT)
+            like = {h: sum(forecast.branch_for(h).probabilities.get(x, 0.0) for x in keep) for h in belief}
+            total = sum(belief[h] * like[h] for h in belief)
+            belief = {h: belief[h] * like[h] / total for h in belief} if total > 0 else belief
+        else:
+            belief = update_belief(belief, _contaminated(forecast, contamination) if contamination else forecast, label)
+    by_id = {C.action_id(k): k for k in setting.keys}
+    done = [tuple(s["key"]) for s in executed]
+
+    def legal(hyp):
+        keys = done + [by_id[a] for a, _ in hyp]
+        if len(keys) >= setting.max_measurements:
+            return ()
+        left = setting.budget_days - sum(setting.days(k) for k in keys)
+        steps = [{"key": list(k)} for k in keys]
+        return tuple(P.make_action(k, h1, h2, setting) for k in P.legal_menu(setting, steps, left))
+
+    if [a.identifier for a in legal(())] != [C.action_id(k) for k in menu]:
+        raise AssertionError("planner legality differs from the runner's menu")
+
+    def forecast(action, hyp):
+        return world.forecast(by_id[action.identifier], h1, h2, compound,
+                              real + tuple((by_id[a], lab) for a, lab in hyp))
+
+    return world, real, belief, legal, forecast, by_id
+
+
 def belief_arm(*, vc: str = "on", feedback: str = "true", price: float = PRICE, cap: float | None = None,
-               horizon: int | None = None, overrides=None, anchor: bool = False, z: float = DEVIATION_Z):
+               horizon: int | None = None, overrides=None, anchor: bool = False, z: float = DEVIATION_Z,
+               contamination: float = 0.0):
     """The agent: plan over the remaining measurements, act, and replan from each real reading."""
 
     def arm(ctx, compound, h1, h2, executed, menu, remaining, setting, state):
         if not ctx.params.get("eliminates"):
             return _stop("registered_validator_cannot_eliminate")
-        world = world_for(ctx, vc, feedback, overrides)
-        real = tuple((tuple(s["key"]), W.label_of(s["outcome"])) for s in executed)
-        if feedback == "permuted":
-            other = ctx.extra["feedback_partner_reading"]
-            real = tuple((k, lab if lab == W.QC_FAILED else other(compound, k, h1, h2)) for k, lab in real)
-        belief = {h1: 0.5, h2: 0.5}
-        for i, (key, label) in enumerate(real):
-            forecast = world.forecast(key, h1, h2, compound, real[:i])
-            if feedback == "withheld" and label != W.QC_FAILED:
-                keep = (W.UNRESOLVED, W.ABSENT)
-                like = {h: sum(forecast.branch_for(h).probabilities.get(x, 0.0) for x in keep) for h in belief}
-                total = sum(belief[h] * like[h] for h in belief)
-                belief = {h: belief[h] * like[h] / total for h in belief} if total > 0 else belief
-            else:
-                belief = update_belief(belief, forecast, label)
-        by_id = {C.action_id(k): k for k in setting.keys}
-        done = [tuple(s["key"]) for s in executed]
-
-        def legal(hyp):
-            keys = done + [by_id[a] for a, _ in hyp]
-            if len(keys) >= setting.max_measurements:
-                return ()
-            left = setting.budget_days - sum(setting.days(k) for k in keys)
-            steps = [{"key": list(k)} for k in keys]
-            return tuple(P.make_action(k, h1, h2, setting) for k in P.legal_menu(setting, steps, left))
-
-        if [a.identifier for a in legal(())] != [C.action_id(k) for k in menu]:
-            raise AssertionError("planner legality differs from the runner's menu")
-
-        def forecast(action, hyp):
-            return world.forecast(by_id[action.identifier], h1, h2, compound,
-                                  real + tuple((by_id[a], lab) for a, lab in hyp))
-
+        world, real, belief, legal, forecast, by_id = belief_state(ctx, compound, h1, h2, executed, menu, setting,
+                                                                   vc=vc, feedback=feedback, overrides=overrides,
+                                                                   contamination=contamination)
         consequences = outcome_consequences(V.registered_rules(h1, h2))
         depth = setting.max_measurements - len(executed) if horizon is None else min(horizon, setting.max_measurements - len(executed))
         baseline = None

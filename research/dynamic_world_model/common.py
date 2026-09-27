@@ -255,15 +255,6 @@ def metadata_episode_menu(data: Data, keys, *, eligibility_keys=None,
     return MetadataEpisodeMenu(menu_keys, tuple(sorted(eligible)))
 
 
-# Descriptive aliases make the no-label boundary explicit to callers that are
-# preparing an external manifest.  Keep one implementation so the contract
-# cannot drift between internal and external runners.
-build_metadata_episode_menu = metadata_episode_menu
-metadata_only_episode_menu = metadata_episode_menu
-build_episode_menu = metadata_episode_menu
-episode_menu = metadata_episode_menu
-
-
 def action_id(key) -> str:
     line, t, dose = key
     return f"{line}|{int(t):03d}h|{int(dose):05d}nM"
@@ -339,9 +330,6 @@ def metadata_tiers(data: Data, protocol: dict, *, reference_compounds=(), hypoth
             raise ValueError(f"frozen hypothesis pool for tier {name!r} must contain unique identifiers")
         out[name] = Tier(tier.name, tier.keys, pool, tier.compounds)
     return out
-
-
-build_metadata_tiers = metadata_tiers
 
 
 # ---------------------------------------------------------------------------------- fold tables

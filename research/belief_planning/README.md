@@ -1,5 +1,12 @@
 # Belief-space planning with a virtual-cell world model, and the first external test
 
+> **Status (2026-09-27, block 3):** this experiment is archived as `belief-planning-1` in
+> [`../experiments/belief-planning-1/EVIDENCE.json`](../experiments/belief-planning-1/EVIDENCE.json).
+> Its freeze verifies at `83b9aa9` and its records are intact. Its successor is
+> [protocol external-validation-2](../protocol_v2/README.md). The two research-test failures noted
+> below were historical tests pointed at rewritten artefacts; they now test the original evidence
+> and pass.
+
 **Date:** 2026-09-27, 03:00 to 05:40 (+0800).
 
 **Protocol:** `belief-planning-1` ([PROTOCOL.md](PROTOCOL.md), [protocol.json](protocol.json)),
