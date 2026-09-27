@@ -302,11 +302,39 @@ def oracle(ctx: FoldContext, compound, truth, h1, h2, budget: int = 2) -> dict:
 
 # ------------------------------------------------------------------------------ driver
 def contexts(data, protocol, detected, magnitude, tier_names=("B", "A"), folds=None):
+    # Keep the historical development/replay context unchanged.  External
+    # callers that need a label-independent tier can opt into
+    # ``metadata_contexts`` below; the production defaults and saved replays
+    # remain byte-for-byte compatible.
     all_tiers = C.tiers(data, protocol)
     comp = data.compounds.drop_duplicates("compound").set_index("compound")
     for name in tier_names:
-        tier = all_tiers[name]
         for fold in (folds if folds is not None else sorted(data.compounds.fold.unique())):
+            tier = all_tiers[name]
+            ft = C.build_fold_tables(data, tier, int(fold), detected)
+            params = C.calibrate(ft, protocol)
+            rng = np.random.default_rng([C.SEED, int(fold), ord(name)])
+            train = [c for c in comp.index if comp.fold[c] != fold and comp.klass.get(c) in tier.pool]
+            labels = [comp.klass[c] for c in train]
+            permuted = dict(zip(train, rng.permutation(labels)))
+            ft_perm = C.build_fold_tables(data, tier, int(fold), detected, label_map=permuted)
+            yield FoldContext(data, tier, ft, ft_perm, params, detected, magnitude, {}, {}), int(fold)
+
+
+def metadata_contexts(data, protocol, detected, magnitude, tier_names=("B", "A"), folds=None,
+                      hypothesis_pools=None):
+    """Yield fold contexts whose tier support is built from non-held-out metadata.
+
+    This is the external-validation entry point.  It keeps the historical
+    ``contexts`` path stable while making the stricter label-independent
+    construction explicit for new manifests and studies.
+    """
+    comp = data.compounds.drop_duplicates("compound").set_index("compound")
+    for name in tier_names:
+        for fold in (folds if folds is not None else sorted(data.compounds.fold.unique())):
+            reference = {c for c in comp.index if comp.fold[c] != fold}
+            tier = C.metadata_tiers(data, protocol, reference_compounds=reference,
+                                    hypothesis_pools=hypothesis_pools)[name]
             ft = C.build_fold_tables(data, tier, int(fold), detected)
             params = C.calibrate(ft, protocol)
             rng = np.random.default_rng([C.SEED, int(fold), ord(name)])
@@ -327,10 +355,27 @@ POLICIES = ("fixed", "cost_only", "magnitude", "separation", "separation_permute
 
 def episode_list(ctx: FoldContext, fold: int):
     comp = ctx.data.compounds.drop_duplicates("compound").set_index("compound")
+    # This is the only menu used to select candidate compounds.  It reads the
+    # prepared condition index, never ``klass``/truth, so changing held-out
+    # labels cannot change the candidates presented to a policy.
+    eligibility_keys = (
+        tuple(key for key in ctx.tier.keys if key[1] == 72.0)
+        if ctx.tier.name == "A" else ctx.tier.keys
+    )
+    menu = C.metadata_episode_menu(ctx.data, ctx.tier.keys, eligibility_keys=eligibility_keys,
+                                   compounds=ctx.tier.compounds)
     out = []
-    for compound in ctx.tier.compounds:
+    for compound in menu.eligible:
+        if compound not in comp.index:
+            # A true external metadata manifest may intentionally omit the
+            # outcome table.  Such compounds remain valid menu entries but
+            # cannot be scored by this internal replay runner.
+            continue
         if comp.fold[compound] != fold:
             continue
+        # A mechanism truth is attached after eligibility has been fixed.  It
+        # is used for the final scoring label and for the registered contrast
+        # only; it does not define the menu or its candidate universe.
         truth = comp.klass[compound]
         for decoy in ctx.tier.pool:
             if decoy == truth:
@@ -339,6 +384,29 @@ def episode_list(ctx: FoldContext, fold: int):
             h1, h2 = (truth, decoy) if rng.random() < 0.5 else (decoy, truth)
             out.append((compound, truth, decoy, h1, h2))
     return out
+
+
+def truth_free_episode_list(ctx: FoldContext, fold: int, ontology=None):
+    """Return external episode candidates before any evaluator label is read.
+
+    Unlike :func:`episode_list`, each frozen ontology contrast is offered for
+    every metadata-eligible compound.  The returned records intentionally do
+    not contain ``truth``; an evaluator may join that label only after policy
+    execution.  This is the entry point for external manifests and should not
+    be used to choose the development default arm.
+    """
+
+    from research.external_validation.ontology import build_truth_free_episodes, load
+
+    ontology = load() if ontology is None else ontology
+    eligibility_keys = (
+        tuple(key for key in ctx.tier.keys if key[1] == 72.0)
+        if ctx.tier.name == "A" else ctx.tier.keys
+    )
+    menu = C.metadata_episode_menu(ctx.data, ctx.tier.keys, eligibility_keys=eligibility_keys,
+                                   compounds=ctx.tier.compounds)
+    return build_truth_free_episodes(dataset="sciplex3", tier=ctx.tier.name, fold=fold,
+                                     compounds=menu.eligible, ontology=ontology)
 
 
 def run_fold(task) -> tuple[list, dict]:

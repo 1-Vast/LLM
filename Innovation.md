@@ -477,6 +477,23 @@ intervention-design quality, biological credibility, and final decision quality.
   refusing to value continuations its sparse references could not support, and on independent
   L1000 data the matching fix changed almost nothing
   ([`research/sequence_audit/`](research/sequence_audit/README.md)).
+- **Seal the policy view and rank against a ladder, not one baseline.** On 2026-09-27 every
+  research arm could technically read the held-out compound's results, and each block had chosen
+  its own comparator.
+  - Sealed, and run against fourteen registered rungs, MAESTRO's selector sat on the same
+    correct-versus-cost curve as a one-step expected-value rule. It beat none of the strongest
+    baselines.
+  - The virtual cell's apparent tie-break gain was reproduced by another compound's predictions
+    ([`research/external_validation/`](research/external_validation/README.md)).
+- **Give both cores a real decision channel, then test them where nobody tuned.** On 2026-09-27
+  MAESTRO's agent was rebuilt as an exact belief-space planner, and its virtual cell as an
+  empirical-Bayes structural kernel inside the reading forecasts. Masked and permuted controls
+  test the world model, and withheld and permuted controls test feedback.
+  - Frozen, and run once on an untouched study (GSE70138, 38 new compounds), the agent did not
+    beat the fixed expert order (-0.024 [-0.074, +0.011]).
+  - The virtual cell and the feedback loop changed actions but not decisions.
+  - The agent's value is honest accounting of what a measurement can change, not superiority
+    ([`research/belief_planning/`](research/belief_planning/README.md)).
 
 Protocol in full: [`research/asrg/03_experiment_protocol.md`](research/asrg/03_experiment_protocol.md).
 

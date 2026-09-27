@@ -68,6 +68,7 @@ from .pharmacology import (
 )
 from .judgment import JudgmentLedger, JudgmentScope, JudgmentSummary, ScoredJudgment, TypedJudgment
 from .provenance import SourceCluster, SourceClusterIndex, build_index
+from .policy import PolicyInput, make_policy_input
 from .reliability import PredictionReliabilityLedger, ReliabilitySummary, ScoredPrediction
 from .repair import (
     EXPECTED_GAIN,
@@ -77,12 +78,28 @@ from .repair import (
     RepairRecord,
 )
 from .selection import BudgetedEvidencePlan, BudgetedEvidenceSelector
+from .acquisition import (
+    DecisionValue,
+    DecisionValuePlan,
+    decision_sensitivity,
+    expected_decision_value,
+    expected_terminal_decision_value,
+    select_expected_decision_action,
+    select_decision_sensitive_action,
+)
 
 __all__ = [
     "CompositionRule",
     "ContrastCheck",
     "BudgetedEvidencePlan",
     "BudgetedEvidenceSelector",
+    "DecisionValue",
+    "DecisionValuePlan",
+    "decision_sensitivity",
+    "expected_decision_value",
+    "expected_terminal_decision_value",
+    "select_expected_decision_action",
+    "select_decision_sensitive_action",
     "DecisionStatus",
     "DEFAULT_REQUIREMENTS",
     "DecisionEngine",
@@ -129,6 +146,8 @@ __all__ = [
     "ValidatedEvidenceUpdate",
     "admit_evidence",
     "build_index",
+    "PolicyInput",
+    "make_policy_input",
     "composition_is_legal",
     "default_rules_for",
     "rank_plans",

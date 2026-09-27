@@ -1,0 +1,112 @@
+{
+  "version": "external-validation-1",
+  "status": "pre-registered before any arm new to this block was executed on real data; SciPlex3 and L1000 are development data, so every result on them is an internal replay, never external validation",
+  "central_claim": "On a completely unseen study, with frozen policies, thresholds, prompts, retrieval libraries, calibration and baselines, MAESTRO achieves higher terminal decision quality at equal or lower experimental cost while respecting a pre-registered wrong-elimination risk limit.",
+  "primary_endpoint_family": "terminal decision quality (correct decisions, wrong eliminations) and experimental cost (measurements, assay-days); prediction metrics are secondary diagnostics only",
+  "datasets": {
+    "sciplex3": {"role": "development", "tiers": ["A", "B"], "why": "every acquisition policy since block 2 of 2026-09-26 was diagnosed or designed on it"},
+    "l1000": {"role": "development", "tiers": ["LT", "T"], "why": "validated the block-4 fallback, then informed the sparse-value design (2026-09-26)"},
+    "external_test": {"role": "external_test", "registered": null, "blocker": "no local study is compatible and unseen; see manifests/external_candidates.json"}
+  },
+  "shared_rules": {
+    "runner": "research/sequence_audit/policies.py run_matched: at most two measurements, exposure time never earlier than any executed action (failed ones included), no repeated action, affordable within the assay-day budget, QC failure charged and read as no evidence, stop on elimination",
+    "qc_rule": "continue",
+    "budget_days": {"sciplex3": 16.0, "l1000": 12.0},
+    "evidence": "only a real executed measurement read by the registered validator updates EvidenceState; forecasts, priorities and planning weights never do",
+    "policy_view": "every arm except the oracle receives a sealed context: the held-out fold's profiles, QC fields, detection flags and mechanism annotations are removed; it sees the menu, its own executed readings, and the executed profiles through the visible-evidence store",
+    "oracle": "reads the executor's hidden results; an upper bound only, excluded from every comparison and from baseline selection"
+  },
+  "price": {"lambda": 0.02, "unit": "one correct decision", "sweep_arms": ["myopic_edv", "sparse_two_step"], "sweep": [0.0, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2], "source": "research/sparse_value/protocol.json grid and its frozen ablation point; not chosen on results"},
+  "arms": [
+    {"id": "defer_floor", "rung": 1, "definition": "never measures; the zero arm"},
+    {"id": "random_legal", "rung": 2, "definition": "uniform choice among the legal menu, seeded per episode and step (seed 20260927); never stops voluntarily"},
+    {"id": "fixed", "rung": 3, "definition": "the registered early-to-late sequence (SciPlex3 A: A549 24 h then 72 h at 10 uM; B: A549 then MCF7 24 h at 10 uM; L1000: A549 6 h then 24 h at 10 uM), then stop", "disclosure": "the SciPlex3 tier-A sequence was chosen after block 2 found 72 h decisive, so this baseline is data-informed"},
+    {"id": "cost_only", "rung": 4, "definition": "BudgetedEvidenceSelector without priorities (coverage, cost, size, identifier); never stops voluntarily"},
+    {"id": "marginal_only", "rung": 5, "definition": "research/sparse_value policy with marginal_only=True at lambda 0.02 (two-step lookahead, no conditional response distributions)"},
+    {"id": "retrieval", "rung": 6, "definition": "measured-profile retrieval: after a QC-passed neutral reading, the five training references per hypothesis with the highest positive cosine to the query's measured profile at that condition give Jeffreys-smoothed, similarity-weighted reading distributions at each candidate; one-step expected decision value at lambda 0.02. Before any valid profile, and when no reference has positive similarity, it uses the unconditional forecast (named)"},
+    {"id": "magnitude", "rung": 7, "definition": "BudgetedEvidenceSelector with the structure-kNN virtual cell's predicted response magnitude as priority (the non-default budgeted path)", "vc_channel": "magnitude priority"},
+    {"id": "magnitude_permuted", "rung": 7, "definition": "magnitude with priorities taken from another held-out compound of the same fold (seeded permutation)", "vc_channel": "permuted", "role": "ablation control"},
+    {"id": "ridge", "rung": 8, "definition": "linear predictor: RidgeCV (alphas 0.1, 1, 10, 100, 1000; efficient leave-one-out on training compounds only) from Morgan radius-2 2048-bit fingerprints to the measured profile at each action; the predicted profile is read by the registered validator as detected; choose the legal action whose predicted reading eliminates with the largest score gap, else stop (named)"},
+    {"id": "info_gain", "rung": 9, "definition": "mutual information between hypothesis and registered reading under the sparse-value reference forecasts and planning weights; choose the maximum; stop only when every forecast is refused or no action carries information"},
+    {"id": "myopic_edv", "rung": 10, "definition": "one-step expected decision value P(correct) - 2 P(wrong) - lambda under the sparse-value reference model, re-planned after each real result with conditional forecasts; stop when no action has positive value", "mandatory": true},
+    {"id": "decision_sensitive_edv", "rung": 10.1, "definition": "one-step expected terminal-decision value under the registered outcome rules, with assay-days used for legality and the frozen utility price used for measurement cost; re-planned after each real result", "role": "new opt-in research candidate"},
+    {"id": "maestro_masked", "rung": 11, "definition": "the runtime opt-in selector maestro.acquisition.select_discriminating_action fed the conditioned reference forecaster (minimum one reference), with the virtual-cell channel masked (no priorities)", "vc_channel": "masked"},
+    {"id": "maestro_vc", "rung": 12, "definition": "maestro_masked with the structure-kNN virtual cell's magnitude priorities, as the orchestrator passes them", "vc_channel": "magnitude priority", "primary_candidate": true},
+    {"id": "maestro_vc_permuted", "rung": 12, "definition": "maestro_vc with priorities from another held-out compound of the same fold (seeded permutation)", "vc_channel": "permuted", "role": "ablation control"},
+    {"id": "maestro_vc_jev", "rung": 13, "definition": "maestro_vc with Jev choosing among the admissible actions (block-2 agent_arms prompt, zero-shot, identity withheld)", "status": "registered_not_executed", "reason": "provider_arm_reserved_for_external_study", "why": "block 2 already measured Jev's choice behaviour on these SciPlex3 episodes (it follows the top card, and defers without cards); a full development replay needs about 10^4 calls. On an external study it runs on a pre-registered random sample of 200 episodes under the provider ceiling"},
+    {"id": "oracle", "rung": 14, "definition": "reads every hidden result and takes the sequence with the best terminal utility, then fewest assay-days, then fewest measurements; defers when no sequence ends correctly", "reads_hidden_outcomes": true},
+    {"id": "production_default", "rung": "R", "definition": "the shipped default: power-aware select_expected_coverage, no world-model input"},
+    {"id": "sparse_two_step", "rung": "R", "definition": "research/sparse_value policy at lambda 0.02 (two-step lookahead with partially pooled conditional forecasts)", "role": "latest research candidate"}
+  ],
+  "virtual_cell": {
+    "rule": "research/dynamic_world_model/episodes.py Magnitude, unchanged: five nearest training compounds (other folds) by Morgan-fingerprint Tanimoto, similarity-weighted mean of their QC-passed measured profiles at the queried condition; the norm is the magnitude priority",
+    "domain": "24 h conditions only (the served rung refuses other times); on L1000 the same rule and domain apply, so 6 h actions carry no priority",
+    "l1000_structures": "canonical SMILES joined from GSE92742 pert_info by pert_id; a compound without a parsable structure gets no prediction"
+  },
+  "endpoints": {
+    "primary": {"effectiveness": "correct-decision rate per episode", "safety": "wrong-risk: wrong elimination (or exhausted) rate per episode", "cost": ["measurements per episode", "assay-days per episode"]},
+    "secondary": ["coverage (decided episodes)", "selective risk (wrong among decided)", "deferral rate", "wells per episode", "compute seconds per episode", "provider USD", "terminal utility +1/-2 (internal objective only)", "risk-coverage, correct-cost and wrong-cost curves", "Pareto frontier"],
+    "diagnostic_only": ["profile cosine and magnitude correlation of the virtual cell and ridge against the training-target mean", "forecast calibration: intercept, slope, Brier, log loss, reliability, ECE"]
+  },
+  "thresholds": {
+    "wrong_risk_cap": 0.05,
+    "wrong_risk_noninferiority_margin": 0.005,
+    "correct_mpie": 0.02,
+    "correct_noninferiority_margin": 0.01,
+    "cost_noninferiority_margin": {"measurements": 0.10, "assay_days": 0.5},
+    "cost_mpie": {"measurements": 0.10},
+    "derivation": "MPIE 0.02 correct decisions per episode; a wrong-risk margin of a quarter of that keeps the worst admissible net gain at 0.02 - 2 x 0.005 = 0.01 utility. The 0.05 cap is just below the highest wrong rate of any accepted development arm (SciPlex3 tier-A fixed, 0.057), set on development data as the protocol allows; cost margins are about 5% of the fixed sequence's mean cost"
+  },
+  "strongest_baseline_rule": {
+    "pool": ["defer_floor", "random_legal", "fixed", "cost_only", "marginal_only", "retrieval", "magnitude", "ridge", "info_gain", "myopic_edv"],
+    "rule": "highest correct-decision rate among pool arms whose wrong-risk point estimate is at or below the cap; if none qualifies, highest correct - 2 x wrong; ties by fewer measurements, then name",
+    "internal": "selected per tier on the same development data (optimistic for the baseline, so conservative for MAESTRO)",
+    "external": "frozen before the external study: the arm selected in most development tiers, ties by pooled correct rate; recorded in baseline_selection.json"
+  },
+  "inference": {
+    "bootstrap": {"draws": 2000, "seed": 20260927, "interval": "percentile 95%, paired, resampling independent units with replacement"},
+    "units": {"sciplex3": "skeleton (InChIKey connectivity block; the unit of the grouped folds)", "l1000": "component (connected identity/scaffold groups; the unit of the grouped folds)"},
+    "sensitivity_clusters": {"sciplex3": ["compound", "murcko_scaffold", "plate_cohort"], "l1000": ["identity", "batch_cohort"]},
+    "wrong_risk_bound": "upper end of the cluster-bootstrap 95% interval of the arm's wrong rate"
+  },
+  "multiplicity": {
+    "primary": "one candidate (maestro_vc) against one comparator (the strongest baseline) per tier; the gates are tested in a fixed hierarchical order, each at two-sided 95%, which controls the familywise error of the gate sequence",
+    "secondary_candidates": ["decision_sensitive_edv", "production_default", "maestro_masked", "sparse_two_step"],
+    "secondary": "each secondary candidate against the strongest baseline with Bonferroni 98.75% intervals (four candidates), exploratory",
+    "ladder": "every arm against maestro_vc and against the strongest baseline with unadjusted 95% intervals, descriptive only"
+  },
+  "gates": [
+    {"id": "G1_integrity", "pass": "freeze digests verified; zero shared-rule violations; every arm offered identical menus; sealed policy view verified; no compound, scaffold or batch crosses the external boundary (internal folds: compound and group disjoint; batch crossing reported)"},
+    {"id": "G2_safety", "pass": "candidate wrong-risk upper bound <= cap AND upper bound of (candidate - strongest baseline) wrong-risk <= 0.005", "reject": "candidate wrong-risk lower bound > cap OR lower bound of the wrong-risk difference > 0.005"},
+    {"id": "G3_effectiveness", "pass": "lower bound of the correct-rate difference > -0.01 (non-inferior); superior when the lower bound > 0 and the point estimate >= 0.02", "reject": "upper bound of the correct-rate difference < -0.01"},
+    {"id": "G4_benefit", "pass": "(superior effectiveness AND measurement-difference upper bound <= 0.10 AND assay-day-difference upper bound <= 0.5) OR (measurement-difference upper bound < 0 AND point <= -0.10 AND effectiveness non-inferior)"},
+    {"id": "G5_external_replication", "pass": "G1-G4 pass on a dataset whose role is external_test, under a verified freeze and a vault opened once"},
+    {"id": "G6_virtual_cell", "pass": "maestro_vc beats maestro_masked AND maestro_vc_permuted on correct rate (lower bound > 0) with wrong-risk difference upper bound <= 0.005; otherwise the virtual cell's acquisition value is classified as zero"},
+    {"id": "G7_prospective", "pass": "a prospective run on new measurements confirms G2-G4; only then may the policy become a default candidate"}
+  ],
+  "status_rule": {
+    "REJECTED": "G1 fails, or a G2 or G3 reject condition holds",
+    "INCONCLUSIVE": "no reject condition holds but G2, G3 or G4 does not pass",
+    "SHADOW": "G1-G4 pass on development data only (G5 unavailable or failed without a reject condition): opt-in, logged, not default",
+    "DEFAULT_CANDIDATE": "G1-G6 pass including external replication; still requires G7 before any default change",
+    "overall": "the worst status across the four development tiers; 'consistently outperforms' requires every tier",
+    "never": "no status is ever raised by a secondary metric, a prediction metric, or calibration alone"
+  },
+  "ablation": {
+    "pairs": [["maestro_vc", "maestro_masked"], ["maestro_vc", "maestro_vc_permuted"], ["magnitude", "cost_only"], ["magnitude", "magnitude_permuted"]],
+    "report": ["first-choice switch rate", "any-step switch rate", "correct, wrong, measurement and assay-day differences on switched episodes", "overall differences", "wrong-risk difference", "cost difference"],
+    "rule": "if the virtual-cell channel does not change actions, or changes them without a terminal-decision gain, its acquisition value is zero, whatever its prediction metrics"
+  },
+  "calibration": {
+    "forecasts": ["sparse-value reference model at the chosen action (myopic_edv, sparse_two_step)", "reference-card forecaster at the chosen action (maestro_vc)"],
+    "targets": ["P(correct reading | true hypothesis, action)", "P(wrong reading | true hypothesis, action)"],
+    "strata": ["cell context", "action (time, dose)", "support count", "scaffold novelty (max Tanimoto to training compounds: <0.3, 0.3-0.5, 0.5-0.7, >=0.7)", "batch or plate cohort", "response magnitude (tercile of the measured profile norm, evaluation side)", "conditional-reference availability (forecast basis)"],
+    "metrics": ["calibration intercept (logistic, slope fixed at 1)", "calibration slope", "Brier", "log loss", "ECE (10 bins)", "reliability bins", "realized wrong-rate with a Wilson 95% upper bound"],
+    "role": "diagnostic; no threshold is chosen from these on external data"
+  },
+  "disclosure": [
+    "Outcomes already seen in earlier blocks: fixed, cost_only, magnitude and production_default on SciPlex3; fixed and production_default on L1000; marginal_only and sparse_two_step on both; maestro_vc on SciPlex3 (block 4's conditioned da arm carried the magnitude priorities there); maestro_masked on L1000 (block 4's da arm had no virtual cell there). Not run on real data before this registration: random_legal, retrieval, ridge, info_gain, myopic_edv as defined here, maestro_masked on SciPlex3, maestro_vc and magnitude on L1000, both permuted controls, and the oracle",
+    "Before registration only metadata of the local Tahoe subset was read (drug, dose, plate and well counts, and name joins), never its expression; that inspection found it incompatible",
+    "Integrity smoke checks after registration print violation counts only, never outcome rates; any exception is disclosed in PROTOCOL.md"
+  ]
+}

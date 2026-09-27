@@ -1,0 +1,29 @@
+{
+  "$comment": "The episodes one run plays. No episode carries its truth; scoring reads truth from the prepared data or the vault after the run.",
+  "type": "object",
+  "required": ["manifest_version", "dataset", "tier", "fold", "setting", "episodes"],
+  "additionalProperties": false,
+  "properties": {
+    "manifest_version": {"const": "1"},
+    "dataset": {"type": "string"},
+    "tier": {"type": "string"},
+    "fold": {"type": "integer", "minimum": 0},
+    "setting": {
+      "type": "object",
+      "required": ["menu", "budget_days", "max_measurements", "qc_rule", "fixed_order"],
+      "additionalProperties": false,
+      "properties": {
+        "menu": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "budget_days": {"type": "number", "minimum": 0},
+        "max_measurements": {"type": "integer", "minimum": 1},
+        "qc_rule": {"enum": ["continue", "stop"]},
+        "fixed_order": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "episodes": {"type": "array", "minItems": 1, "items": {
+      "type": "object", "required": ["episode_id", "compound", "h1", "h2", "unit"], "additionalProperties": false,
+      "properties": {"episode_id": {"type": "string"}, "compound": {"type": "string"}, "h1": {"type": "string"},
+                     "h2": {"type": "string"}, "unit": {"type": "string"}}
+    }}
+  }
+}

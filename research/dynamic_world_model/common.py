@@ -209,28 +209,139 @@ class Tier:
     compounds: tuple                 # compounds eligible as held-out episode compounds
 
 
+@dataclass(frozen=True)
+class MetadataEpisodeMenu:
+    """The public part of an episode definition.
+
+    ``eligible`` is derived only from condition metadata (compound identity and
+    the requested condition keys).  In particular, this object deliberately
+    has no truth or mechanism-class field.  A caller may attach a held-out
+    label later for scoring, but it cannot influence the menu construction.
+    """
+
+    keys: tuple
+    eligible: tuple
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "keys", tuple(tuple(key) for key in self.keys))
+        object.__setattr__(self, "eligible", tuple(str(compound) for compound in self.eligible))
+
+    @property
+    def compounds(self) -> tuple:
+        """Compatibility alias used by manifest writers."""
+
+        return self.eligible
+
+
+def metadata_episode_menu(data: Data, keys, *, eligibility_keys=None,
+                          compounds=None) -> MetadataEpisodeMenu:
+    """Build an episode menu from metadata without consulting mechanism labels.
+
+    ``data.index`` is the prepared condition index and contains only public
+    condition metadata.  ``compounds`` is an optional metadata-side universe
+    (for example, a manifest's compound list); it is never interpreted as a
+    label map.  This function must remain usable on an external dataset whose
+    outcome/truth table is not present at all.
+    """
+
+    menu_keys = tuple(tuple(key) for key in keys)
+    eligible_keys = menu_keys if eligibility_keys is None else tuple(tuple(key) for key in eligibility_keys)
+    eligible = set()
+    for key in eligible_keys:
+        eligible.update(str(compound) for compound in data.index.get(key, {}))
+    if compounds is not None:
+        allowed = {str(compound) for compound in compounds}
+        eligible &= allowed
+    return MetadataEpisodeMenu(menu_keys, tuple(sorted(eligible)))
+
+
+# Descriptive aliases make the no-label boundary explicit to callers that are
+# preparing an external manifest.  Keep one implementation so the contract
+# cannot drift between internal and external runners.
+build_metadata_episode_menu = metadata_episode_menu
+metadata_only_episode_menu = metadata_episode_menu
+build_episode_menu = metadata_episode_menu
+episode_menu = metadata_episode_menu
+
+
 def action_id(key) -> str:
     line, t, dose = key
     return f"{line}|{int(t):03d}h|{int(dose):05d}nM"
 
 
-def tiers(data: Data, protocol: dict) -> dict[str, Tier]:
+def tiers(data: Data, protocol: dict, *, reference_compounds=None) -> dict[str, Tier]:
+    """Build tier menus, with labels restricted to an explicit reference set.
+
+    ``reference_compounds`` is the training/reference universe used to define
+    which mechanism classes have enough support.  Eligibility itself is built
+    by :func:`metadata_episode_menu`, so changing a held-out compound's
+    ``klass`` can never change the returned episode menu.  The default keeps
+    the historical development behavior (all labelled compounds as the
+    reference universe); fold-aware runners pass their non-held-out set.
+    """
     spec = protocol["tiers"]
     comp = data.compounds.drop_duplicates("compound").set_index("compound")
+    reference = set(comp.index) if reference_compounds is None else {str(c) for c in reference_compounds}
+    klass = comp["klass"] if "klass" in comp.columns else pd.Series(index=comp.index, dtype=object)
     out = {}
     b = spec["B_line_dose"]
     keys_b = tuple((line, 24.0, float(d)) for line in b["lines"] for d in b["doses_nM"])
-    units = data.compounds.dropna(subset=["klass"]).drop_duplicates("skeleton").klass.value_counts()
+    labelled = data.compounds[data.compounds.compound.isin(reference)]
+    if "klass" in labelled.columns:
+        labelled = labelled.dropna(subset=["klass"])
+    else:
+        labelled = labelled.assign(klass=pd.Series(index=labelled.index, dtype=object))
+    if len(labelled) and "skeleton" in labelled.columns:
+        units = labelled.drop_duplicates("skeleton").klass.value_counts()
+    else:
+        units = labelled.klass.value_counts() if len(labelled) else pd.Series(dtype=int)
     pool_b = tuple(sorted(units[units >= b["minimum_units_per_class"]].index))
-    measured_b = {c for k in keys_b for c in data.index.get(k, {})}
-    out["B"] = Tier("B", keys_b, pool_b, tuple(sorted(c for c in measured_b if comp.klass.get(c) in pool_b)))
+    menu_b = metadata_episode_menu(data, keys_b)
+    eligible_b = menu_b.eligible if reference_compounds is not None else tuple(
+        sorted(c for c in menu_b.eligible if klass.get(c) in pool_b)
+    )
+    out["B"] = Tier("B", menu_b.keys, pool_b, eligible_b)
     a = spec["A_time_dose"]
     keys_a = tuple((line, float(t), float(d)) for line in a["lines"] for t in a["time_hours"] for d in a["doses_nM"])
-    at72 = {c for k in keys_a if k[1] == 72.0 for c in data.index.get(k, {})}
-    counts = pd.Series([comp.klass.get(c) for c in at72]).value_counts()
+    menu_a = metadata_episode_menu(data, keys_a, eligibility_keys=[k for k in keys_a if k[1] == 72.0])
+    at72_reference = {c for k in keys_a if k[1] == 72.0 for c in data.index.get(k, {}) if c in reference}
+    counts = pd.Series([klass.get(c) for c in at72_reference]).value_counts()
     pool_a = tuple(sorted(counts[counts >= a["minimum_compounds_per_class_at_72h"]].index))
-    out["A"] = Tier("A", keys_a, pool_a, tuple(sorted(c for c in at72 if comp.klass.get(c) in pool_a)))
+    eligible_a = menu_a.eligible if reference_compounds is not None else tuple(
+        sorted(c for c in menu_a.eligible if klass.get(c) in pool_a)
+    )
+    out["A"] = Tier("A", menu_a.keys, pool_a, eligible_a)
     return out
+
+
+def metadata_tiers(data: Data, protocol: dict, *, reference_compounds=(), hypothesis_pools=None) -> dict[str, Tier]:
+    """Construct tiers whose eligibility never reads outcome labels.
+
+    Class support is optional and must be supplied explicitly as a reference
+    universe.  The empty default is intentional: callers preparing a public
+    external menu get metadata eligibility but no inferred hypothesis pool
+    until a separately frozen training manifest is provided.
+    """
+
+    built = tiers(data, protocol, reference_compounds=reference_compounds)
+    if hypothesis_pools is None:
+        return built
+    # A frozen development ontology is the only permitted source of external
+    # hypothesis identifiers.  It is deliberately applied after metadata
+    # eligibility is built, so external labels cannot alter either menu or pool.
+    out = {}
+    for name, tier in built.items():
+        try:
+            pool = tuple(sorted(str(value) for value in hypothesis_pools[name]))
+        except (KeyError, TypeError) as exc:
+            raise ValueError(f"missing frozen hypothesis pool for tier {name!r}") from exc
+        if len(pool) < 2 or len(set(pool)) != len(pool):
+            raise ValueError(f"frozen hypothesis pool for tier {name!r} must contain unique identifiers")
+        out[name] = Tier(tier.name, tier.keys, pool, tier.compounds)
+    return out
+
+
+build_metadata_tiers = metadata_tiers
 
 
 # ---------------------------------------------------------------------------------- fold tables

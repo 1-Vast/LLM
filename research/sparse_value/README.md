@@ -1,83 +1,83 @@
-# 稀疏参考下的测量价值、成本与错误风险
+# Measurement Value, Cost, and Error Risk with Sparse References
 
-本轮针对两个已定位的问题做局部修改：回退首测后的后续动作没有重算，以及配对参考不足时无法估计条件测量价值。智能体仍负责实验选择和真实结果解释；世界模型只提供条件读数分布。没有重构生产架构，也没有把研究模型提升为默认。
+This round makes local changes for two identified problems: fallback follow-up actions were not recomputed after the first measurement, and conditional measurement value could not be estimated when paired references were insufficient. Agents still select experiments and interpret real results; the world model supplies conditional readout distributions. The production architecture was not refactored, and the research model has not been promoted to the default.
 
-## 实现错误已修复
+## Fixed implementation errors
 
-`research/sequence_audit/policies.py` 现在依据**实际执行的首测**及其真实结果、当前合法菜单和剩余预算重新比较后续动作，不再依赖原计划中不存在的 continuation。不会借用另一首测的条件分支。
+`research/sequence_audit/policies.py` now re-compares follow-up actions using the actually executed first measurement, its real result, the current legal menu, and the remaining budget. It no longer relies on a continuation that was absent from the original plan, and it never borrows a conditional branch from a different first measurement.
 
-历史 L1000 LT 的 32 个 `implementation_defect` 案例逐一重放：旧行为 **32/32 精确复现**，修复后 **32/32 继续测量**，首测保持一致；全部仍未确定，增加 32 次测量、192 assay-days，效用变化为 0。工程缺陷修复成功，但没有借此声称生物决策收益。
+The 32 historical L1000 LT `implementation_defect` cases were replayed individually: the old behavior was reproduced exactly in **32/32** cases; after the fix, **32/32** continued measuring, with the same first measurement. All remained unresolved, adding 32 measurements and 192 assay-days, with no utility change. The engineering defect is fixed, but this is not a claim of biological decision benefit.
 
-`P.arms(..., frozen_replay=True)` 只用于旧冻结实验的复现。旧的 `lincs_evaluate.py` 和 `replay.py` 显式选择此模式；新调用默认使用修复后的行为。旧实验结果没有被覆盖。[逐例证明](../../outputs/sparse_value/fallback/summary.json)
+`P.arms(..., frozen_replay=True)` is used only to reproduce the old frozen experiment. The old `lincs_evaluate.py` and `replay.py` explicitly select this mode; new calls use the fixed behavior by default. Old experiment results were not overwritten. [Per-case proof](../../outputs/sparse_value/fallback/summary.json)
 
-## 用实测参考估计稀疏条件分支
+## Estimating sparse conditional branches from measured references
 
-新增模型 `model.py` 使用现有训练折的实测参考和注册解释器，预测四种结果：匹配 H1、匹配 H2、未解决、未检出。错误排除始终与正确排除分开。
+The new `model.py` uses measured references from the existing training fold and the registered interpreter to predict four outcomes: H1 match, H2 match, unresolved, and not detected. Wrong exclusions are always kept separate from correct exclusions.
 
-对某个假设、已观测首测结果和目标动作：
+For a hypothesis, an observed first-measurement result, and a target action:
 
-1. **局部参考**是同一参考化合物在源与目标条件都有测量，且首测结果匹配的样本。
-2. **父级参考**是同一目标条件、同一假设/对比的其他样本。整个局部化学身份/骨架组会从父级排除，避免重复计算。
-3. 每个身份/骨架组总权重为 1。SciPlex3 用 skeleton，L1000 用已有的身份/骨架连通分量。
-4. 有父级参考时，使用 `alpha = 局部计数 + 2 × 父级概率`。父级概率由分组计数加每标签 0.5 平滑得到。固定的 2 是模型权重，不算两次真实测量，也不用于夸大支持度。
-5. 没有配对局部样本，但有目标参考时，返回显式 `marginal_backoff`；没有目标参考时返回 `value_unknown`，不填零概率。
+1. **Local references** are samples from the same reference compound measured under both the source and target conditions, with a first result that matches.
+2. **Parent references** are other samples under the same target condition and the same hypothesis/contrast. The entire local chemical identity/scaffold group is excluded from the parent set to avoid duplicate counting.
+3. Each identity/scaffold group has total weight 1. SciPlex3 uses scaffolds; L1000 uses the existing connected components of identity/scaffold groups.
+4. When parent references exist, use `alpha = local count + 2 × parent probability`. Parent probabilities use grouped counts with 0.5 smoothing for each label. The fixed 2 is a model weight; it does not count two real measurements or inflate support.
+5. When no paired local sample exists but a target reference does, return an explicit `marginal_backoff`; when no target reference exists, return `value_unknown` rather than zero probabilities.
 
-无父级参考但有局部参考时只使用局部计数加 Jeffreys 平滑；首测无条件分布使用全部目标参考计数加同样平滑。另有 `pooling=False` 消融，复现只有配对样本才能服务的限制。
+With no parent reference but a local reference, use only the local count with Jeffreys smoothing. The unconditional first-measurement distribution uses all target-reference counts with the same smoothing. A `pooling=False` ablation reproduces the limitation that only paired samples can provide service.
 
-这依赖一个明确的迁移假设：同一假设和目标条件的未条件化参考，可以给稀疏条件分支提供有限信息。**这不是从缺失数据中恢复了真实条件分布。** 输出保留局部/父级参考身份、组数、概率、模型方差和错误概率上界，便于发现该假设何时失效。
+This depends on a specific transfer assumption: an unconditioned reference under the same hypothesis and target condition can provide limited information for a sparse conditional branch. **This does not recover the true conditional distribution from missing data.** Outputs retain local/parent reference identities, group counts, probabilities, model variance, and an upper bound on error probability so that failures of this assumption can be detected.
 
-模型从不接收留出化合物身份、真实机制标签或尚未购买的目标测量。父级和局部参考均来自训练折。底层解释器的训练参考读数仍采用 leave-one-compound-out，因此同一骨架的其他参考可能影响训练内相似度；外层分组留出保持隔离，训练内概率的乐观偏差仍需通过留出校准评估。
+The model never receives held-out compound identities, true mechanism labels, or target measurements that have not been purchased. Both parent and local references come from the training fold. The interpreter's underlying training reference readouts still use leave-one-compound-out, so other references from the same scaffold may affect within-training similarity; outer grouped holdout preserves isolation, but optimistic bias in within-training probabilities still needs evaluation through held-out calibration.
 
-## 智能体按净价值决策
+## Agent decisions by net value
 
-新增 `policy.py` 使用明确目标：
+The new `policy.py` uses an explicit objective:
 
-`净价值 = P(正确决策) − 2 × P(错误决策) − λ × 预期测量次数`。
+`Net value = P(correct decision) − 2 × P(wrong decision) − λ × expected number of measurements`.
 
-首测时枚举最多两个测量的条件计划，费用按每个分支发生的概率计算。例如两个互斥中性分支概率为 0.3 和 0.4，都需要第二次测量时，预期测量数为 **1.7**，不是 2 或 3。费用进入目标本身，不再只是收益相同时的排序项。实验天数仍是硬预算，并单独报告。
+For the first measurement, it enumerates conditional plans of at most two measurements and charges each branch according to its probability. For example, if two mutually exclusive neutral branches have probabilities 0.3 and 0.4 and both require a second measurement, the expected measurement count is **1.7**, not 2 or 3. Cost is part of the objective itself rather than merely a tie-breaker when returns are equal. Experimental days remain a hard budget and are reported separately.
 
-收到真实未解决/未检出结果后，智能体根据实际动作和结果重算剩余动作价值；读数似然只调整**规划权重**，不把假设集合改成概率后验。QC 失败消耗预算，使用无条件预测重新选择。只有真实测量经过注册解释规则后才更新证据。
+After a real unresolved/not-detected result, the agent recomputes the value of remaining actions from the actual action and result; readout likelihood changes only **planning weights**, and does not turn the hypothesis set into a probabilistic posterior. QC failure consumes budget and triggers reselection using the unconditional prediction. Only a real measurement interpreted through registered rules updates evidence.
 
-停止原因明确区分：没有合法动作、估计净价值非正、存在未估计动作的价值未知。即使菜单中同时有已知非正收益动作和未知动作，也不宣称全部动作都没有价值。验证器本身无法排除假设时，不允许先验平滑创造虚假实验价值。
+Stop reasons distinguish: no legal action; estimated net value is non-positive; or value is unknown for an action that has not been estimated. Even if the menu contains known non-positive actions and unknown actions at the same time, the policy does not claim that every action lacks value. When the validator itself cannot eliminate a hypothesis, prior smoothing cannot create fictitious experimental value.
 
-用户选择先看成本—收益曲线，因此本轮固定报告 λ = **0、0.005、0.01、0.02、0.05、0.1、0.2** 的全部结果。λ 的单位是一次正确决策的价值，不是货币，也没有被认定为用户的实际成本。所有基线在比较时使用相同的 λ。
+The user chose to see the full cost-benefit curve, so this round reports all results for λ = **0, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2**. λ is the value of one correct decision, not a currency amount, and is not treated as the user's actual cost. All baselines use the same λ for comparison.
 
-## 冻结验证方案
+## Frozen validation protocol
 
-[protocol.json](protocol.json) 和 [freeze.json](freeze.json) 在新重放前固定模型、策略、成本网格、比较对象、统计方法及代码哈希。未根据本轮留出结果调整参数。SciPlex3 和 L1000 的旧结果已用于问题诊断，所以本轮只能称为**既有数据上的分组留出重放**，不能重新称为独立新数据验证。
+[protocol.json](protocol.json) and [freeze.json](freeze.json) froze the model, policy, cost grid, comparators, statistical method, and code hashes before the new replay. Parameters were not tuned from this round's holdout results. The old SciPlex3 and L1000 results were already used for problem diagnosis, so this round can only be called a **grouped holdout replay on existing data**, not independent new-data validation.
 
-四个 tier：SciPlex3 A/B、L1000 LT/T，均运行五折；通过同一个 `run_matched` 执行至多两次测量、时间非递减、不重复动作、统一 QC continue、统一预算。比较包括旧回退、修复后回退、原两步策略、固定序列和无条件 discrimination selector。
+There are four tiers: SciPlex3 A/B and L1000 LT/T, each run with five folds. A single `run_matched` executes at most two measurements, non-decreasing time, no repeated actions, a shared QC-continue rule, and a shared budget. Comparisons include the old fallback, fixed fallback, original two-step policy, fixed sequence, and the unconditional discrimination selector.
 
-λ=0.02 额外比较三项消融：完全移除条件响应分布但保留首测规划权重的 marginal-only、仅配对参考、打乱训练机制标签。λ=0.02 是冻结的消融展示点，不是经结果挑选出的成本。
+At λ=0.02, three additional ablations are compared: `marginal-only`, which removes the conditional response distribution but keeps first-measurement planning weights; paired references only; and shuffled training mechanism labels. λ=0.02 is a frozen ablation display point, not a cost selected from the results.
 
-报告正确率、错误率、原效用、测量数、天数、同成本净价值、每次额外测量的收益、停止原因和已选测量的预测校准。区间由 2,000 次配对 component/skeleton bootstrap 得到；L1000 另报告 batch-cohort 敏感性。预测不确定性只是在当前模型假设下的诊断，未涵盖父分布估计、条件迁移和批次偏差，不能宣称已验证的 95% 风险保证。
+The report covers correct rate, wrong rate, original utility, measurement count, days, same-cost net value, gain per additional measurement, stop reason, and predictive calibration of selected measurements. Intervals use 2,000 paired component/scaffold bootstraps; L1000 additionally reports batch-cohort sensitivity. Predictive uncertainty is diagnostic under the current model assumptions and does not cover parent-distribution estimation, conditional transfer, or batch bias; it cannot be called a validated 95% risk guarantee.
 
-预测分布来自通过 QC 的参考样本，尚未估计未来 assay 失败概率；实际重放仍计入失败的测量成本。因此成本曲线是这个数据集和执行规则下的实测比较，不是可跨实验室套用的经济最优结论。
+Prediction distributions come from QC-passing reference samples; future assay-failure probability has not been estimated, while the actual replay still charges the cost of failed measurements. The cost curve is therefore an empirical comparison under this dataset and execution rule, not an economically optimal conclusion transferable across laboratories.
 
-## 实际结果与可支持的结论
+## Observed results and supported claims
 
-已完成 **186,420 条真实数据重放记录**，20 个数据集/tier/折组合、15 个策略/成本设置，全部通过统一执行约束检查。所有模型和分析代码哈希仍匹配冻结值。
+A total of **186,420 real-data replay records** were completed across 20 dataset/tier/fold combinations and 15 strategy/cost settings, all passing the shared execution-constraint checks. All model and analysis code hashes still match the frozen values.
 
-**L1000 LT：新方法解决了旧回退在这一数据集上“多测、低收益”的部分问题。** 在预设消融展示点 λ=0.02 的 6,880 个 episode 中：
+**L1000 LT: the new method fixes part of the old fallback's “more measurements, low return” problem on this dataset.** At the prespecified ablation point λ=0.02, across 6,880 episodes:
 
-| 策略 | 正确决策 | 错误决策 | 实际测量总数 |
+| Strategy | Correct decisions | Wrong decisions | Total actual measurements |
 |---|---:|---:|---:|
-| 原回退，保留提前停止缺陷 | 815 | 34 | 6,666 |
-| 修复后的回退 | 815 | 34 | 6,698 |
-| 新稀疏条件价值策略 | **851** | **27** | **6,357** |
-| 简单 marginal-only 对照 | 836 | 22 | 6,274 |
-| 无条件 discrimination selector | 832 | 30 | 6,702 |
-| 固定序列 | 732 | 39 | 13,312 |
+| Original fallback, retaining the early-stop defect | 815 | 34 | 6,666 |
+| Fixed fallback | 815 | 34 | 6,698 |
+| New sparse conditional-value policy | **851** | **27** | **6,357** |
+| Simple marginal-only control | 836 | 22 | 6,274 |
+| Unconditional discrimination selector | 832 | 30 | 6,702 |
+| Fixed sequence | 732 | 39 | 13,312 |
 
-相对修复后的回退，新方法**少测 341 次，多 36 个正确、少 7 个错误**；平均原效用增加 0.00727 [0.00062, 0.01454]，扣除相同成本后的净价值增加 **0.00826 [0.00157, 0.01540]**。按实验批次聚类的净价值区间为 **[0.00032, 0.01597]**。单独正确率增量的区间 **[−0.00134, 0.01233]** 仍跨零，不能把正确数的点估计差说成已证明的正确率提升。
+Compared with the fixed fallback, the new method makes **341 fewer measurements, 36 more correct decisions, and 7 fewer wrong decisions**; mean original utility increases by 0.00727 [0.00062, 0.01454], and same-cost net value increases by **0.00826 [0.00157, 0.01540]**. The batch-clustered net-value interval is **[0.00032, 0.01597]**. The interval for the correct-rate increment alone, **[−0.00134, 0.01233]**, still crosses zero, so the point-estimate difference in correct counts is not a proven correct-rate improvement.
 
-相对更简单的 marginal-only，新方法净价值只增加 **0.00049 [−0.00547, 0.00599]**；相对无条件 discrimination 为 **0.00464 [−0.00187, 0.01104]**。因此可以说它优于此处的旧回退，但尚不能证明复杂条件模型比简单参考方法更实用。
+Compared with the simpler marginal-only method, net value increases by only **0.00049 [−0.00547, 0.00599]**; compared with the unconditional discrimination selector, by **0.00464 [−0.00187, 0.01104]**. Thus it is better than the old fallback here, but the complex conditional model has not been shown to be more practical than the simple reference method.
 
-**稀疏参考借用的直接消融：** λ=0.02 时 SciPlex3 A 的正确决策从 paired-only 的 **128/336** 增至 **152/336**，错误均为 **12/336**，多测 71 次；净价值差 **+0.0672 [0.0167, 0.1210]**。B 层净价值差为 **+0.0387 [0.0177, 0.0586]**。这支持“缺少精确配对时，其他实测参考能帮助估计价值”的修复方向。但 A 层固定序列仍有 **215/336** 个正确决策，新方法尚未弥补整个差距。
+**Direct ablation of sparse-reference borrowing:** at λ=0.02, correct decisions in SciPlex3 A increase from **128/336** with paired-only to **152/336**, while wrong decisions remain **12/336** and 71 additional measurements are used; the net-value difference is **+0.0672 [0.0167, 0.1210]**. The tier B net-value difference is **+0.0387 [0.0177, 0.0586]**. This supports the repair direction that measured references can help estimate value when exact pairs are missing. However, the fixed sequence still has **215/336** correct decisions in tier A, so the new method does not close the full gap.
 
-以下列出**完整成本网格**上新方法减修复后回退的平均净价值，避免只展示一个有利成本：
+The complete cost grid below reports the new method minus fixed fallback mean net value, avoiding display of only a favorable price:
 
-| 每次测量成本 λ | SciPlex3 A | SciPlex3 B | L1000 LT | L1000 T |
+| Measurement cost λ | SciPlex3 A | SciPlex3 B | L1000 LT | L1000 T |
 |---:|---:|---:|---:|---:|
 | 0 | +0.0268 | −0.0079 | +0.0081 | +0.0075 |
 | 0.005 | +0.0238 | −0.0113 | +0.0081 | +0.0067 |
@@ -87,28 +87,28 @@
 | 0.1 | +0.0045 | −0.0163 | +0.0259 | +0.0021 |
 | 0.2 | +0.0274 | +0.0075 | +0.0806 | +0.0294 |
 
-SciPlex3 A/B 相对回退的净价值区间在所有这些价格上均跨零。L1000 LT 的 component 区间在全部价格上为正；T 的证据随价格变化，不能称全面获益。高价格的相对收益可能仅表示避免昂贵测量：**LT λ=0.2 时新方法本身净价值为 −0.00552**，仍低于完全不测量的零净收益。不能把“损失较少”写成“值得实施”。所有价格与每个基线的区间见 [完整结果](../../outputs/sparse_value/evaluation/report.md)。
+The SciPlex3 A/B net-value intervals relative to the fallback cross zero at every listed price. The L1000 LT component interval is positive at every price; the T evidence changes with price, so universal benefit cannot be claimed. A high-price relative gain may only mean that fewer expensive measurements are taken: **at LT λ=0.2, the new method's own net value is −0.00552**, still below the zero net value of measuring nothing. “Smaller loss” cannot be described as “worth implementing.” Intervals against every baseline and every price are in the [full results](../../outputs/sparse_value/evaluation/report.md).
 
-![完整成本—净价值曲线](../../outputs/sparse_value/evaluation/cost_curves.png)
+![Complete cost-to-net-value curves](../../outputs/sparse_value/evaluation/cost_curves.png)
 
-[测量数—正确率曲线](../../outputs/sparse_value/evaluation/decision_frontier.png) · [错误率曲线](../../outputs/sparse_value/evaluation/wrong_risk.png) · [全部统计及批次敏感性](../../outputs/sparse_value/evaluation/summary.json)
+[Measurement-count/correct-rate curve](../../outputs/sparse_value/evaluation/decision_frontier.png) · [wrong-rate curve](../../outputs/sparse_value/evaluation/wrong_risk.png) · [all statistics and batch sensitivity](../../outputs/sparse_value/evaluation/summary.json)
 
-**概率校准仍有不足。** λ=0.02 的实际已选测量上，正确概率 ECE 为 SciPlex3 A **0.139**、B **0.051**、L1000 LT **0.040**、T **0.057**；A 层明显过度预期成功。LT 的错误概率均值预测 0.036、实测 0.00425，仍偏保守。部分汇聚没有解决所有条件迁移与解释器偏差，不能将输出概率当成精确风险保证。
+**Probability calibration remains insufficient.** On actually selected measurements at λ=0.02, correct-probability ECE is SciPlex3 A **0.139**, B **0.051**, L1000 LT **0.040**, and T **0.057**; tier A clearly overestimates success. LT's mean predicted wrong probability is 0.036 versus an observed 0.00425, so it remains conservative. Partial pooling does not remove all conditional-transfer and interpreter bias; output probabilities cannot be treated as exact risk guarantees.
 
-结论是：**提前停止缺陷已修复；“稀疏条件预测＋显式成本与错误损失”的策略已实现并验证，在 L1000 LT 对现有回退获得更好的净价值，在 SciPlex3 上证据仍不足，且没有证明优于简单 marginal-only。** 本轮按用户要求交付完整成本—收益曲线，不替用户选择价格，也不自动切换默认策略。
+The conclusion is: **the early-stop defect is fixed; the “sparse conditional prediction + explicit cost and error loss” policy is implemented and validated, with better net value than the existing fallback on L1000 LT, while evidence remains insufficient on SciPlex3 and superiority to simple marginal-only has not been shown.** This round delivers the complete cost-benefit curve as requested; it does not choose a price for the user or automatically switch the default policy.
 
-## 测试与可复现性
+## Tests and reproducibility
 
-- `maestro` 环境，Python 3.11.16：运行时测试 **1,326 项通过**；相关研究测试 **68 项通过**。
-- 32 个历史缺陷的修复前后逐例证明，首测相同、后续执行正确。
-- SciPlex3 185 个 skeleton 组、L1000 335 个连通分量均未跨外层训练/测试折。
-- 独立复跑 SciPlex3 A fold 1 的 **720 条**、L1000 T fold 1 的 **8,820 条**新记录，全部字段精确一致。
-- 186,420 条记录的预算、时间顺序、重复动作、QC 和证据更新约束零违规；代码哈希匹配冻结记录。
-- 本轮数值分析与重放不需要 API；没有发起新的付费 API 请求。
+- In the `maestro` environment, Python 3.11.16: **1,326 runtime tests passed**; **68 related research tests passed**.
+- Per-case before/after proof for 32 historical defects: the first measurement is unchanged and the follow-up executes correctly.
+- The 185 SciPlex3 scaffold groups and 335 L1000 connected components do not cross outer training/test folds.
+- Independent reruns of SciPlex3 A fold 1 (**720 records**) and L1000 T fold 1 (**8,820 records**) match exactly in every field.
+- The 186,420 records have zero violations of budget, time ordering, duplicate-action, QC, or evidence-update constraints; code hashes match the frozen record.
+- This round's numerical analysis and replay need no API; no new paid API request was made.
 
-[验证记录](../../outputs/sparse_value/evaluation/verification.json)
+[Verification record](../../outputs/sparse_value/evaluation/verification.json)
 
-## 复现命令
+## Reproduction commands
 
 ```powershell
 & 'D:\anaconda\envs\maestro\python.exe' -m pytest research/sparse_value research/sequence_audit/test_sequence_audit.py -p no:cacheprovider
@@ -119,9 +119,9 @@ SciPlex3 A/B 相对回退的净价值区间在所有这些价格上均跨零。L
 & 'D:\anaconda\envs\maestro\python.exe' research/sparse_value/verify_replay.py
 ```
 
-`evaluate.py` 核对冻结代码哈希。新记录写入 `outputs/sparse_value/`，不会覆盖 `sequence_audit_20260926` 的旧结果。
+`evaluate.py` checks frozen code hashes. New records are written under `outputs/sparse_value/`; they do not overwrite the old `sequence_audit_20260926` results.
 
-直接调用新策略时由调用者给出测量成本：
+To call the new policy directly, the caller supplies measurement cost:
 
 ```python
 from policy import make_policy
@@ -129,4 +129,4 @@ arm = make_policy(cost_per_measurement=chosen_price)
 record = P.run_matched("sparse", arm, ctx, compound, truth, h1, h2, setting, qc_rule="continue")
 ```
 
-这里 `truth` 只供真实数据重放评分，策略及模型不接收它。真实部署仍应由智能体的测量接口提供结果。
+Here `truth` is used only to score real-data replay; the policy and model do not receive it. In a real deployment, the agent's measurement interface must provide the result.

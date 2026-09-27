@@ -9,6 +9,7 @@ The day records are the entry points. Existing machine-local artifacts under
 | `20260915/README.md` | Earlier local biological closure and log audit artifacts |
 | `20260925/README.md` | Jev verification, tool fixes and topology ablation |
 | `20260926/README.md` | Data directory merge; pre-registered biological-depth test of the virtual cell and agent; pre-registered test of virtual-cell-assisted measurement choice for mechanism discrimination (24 h and 72 h), provider transport repair; audit and repair of the link from world-model prediction to measurement choice, with its pre-registered evaluation; stopping-gap diagnosis of the contingent two-step policy, a behaviour-matched replay, and a pre-registered independent validation on L1000 |
+| `20260927/README.md` | Evidence audit, external-validation firewall and frozen 14-rung baseline ladder; locked development replay with decision-, risk- and virtual-cell ablation endpoints; audit of local candidates for an unseen study. Block 2: repository audit after a Codex session, belief-space planner with a virtual-cell world model, and the first locked external test on GSE70138 (INCONCLUSIVE vs the fixed order; virtual-cell and feedback contributions rejected) |
 
 ## Files
 
@@ -78,3 +79,20 @@ The day records are the entry points. Existing machine-local artifacts under
 - `20260926/0926/sequence_audit_l1000_gate.json`
 - `20260926/0926/sequence_audit_l1000_manifest.json`
 - `20260926/0926/sequence_audit_freeze.json`
+- `20260927/README.md`
+- `20260927/0927/run-notes.md`
+- `20260927/0927/external_validation_report.md`
+- `20260927/0927/external_validation_gates.json`
+- `20260927/0927/external_validation_replay_manifest.json`
+- `20260927/0927/external_validation_freeze.json`
+- `20260927/0927/external_validation_baseline_selection.json`
+- `20260927/0927/external_validation_correct_cost.png`
+- `20260927/0927/belief_planning_freeze.json`
+- `20260927/0927/belief_planning_vault_access.jsonl`
+- `20260927/0927/belief_planning_external_study_summary.json`
+- `20260927/0927/belief_planning_external_replay_manifest.json`
+- `20260927/0927/belief_planning_external_summary.json`
+- `20260927/0927/belief_planning_dev_replay_manifest.json`
+- `20260927/0927/belief_planning_dev_summary.json`
+- `20260927/0927/belief_planning_phase1_feasibility.json`
+- `20260927/0927/belief_planning_overview.png`

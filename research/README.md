@@ -1,6 +1,8 @@
 # Research record
 
-Latest targeted follow-up: [sparse-reference measurement value, cost curves and regression proof](sparse_value/README.md).
+Latest: [belief-space planning with a virtual-cell world model, and the first locked external test on GSE70138](belief_planning/README.md). The agent did not beat the fixed expert order on 38 new compounds (INCONCLUSIVE; a +0.02 gain is excluded), and the virtual-cell and feedback contributions were rejected.
+
+Previous targeted follow-up: [sparse-reference measurement value, cost curves and regression proof](sparse_value/README.md).
 The fallback continuation defect is repaired; 186,420 real-data records compare the new conditional
 reference policy at seven acquisition prices. Results support a local L1000 benefit, not general promotion.
 
@@ -27,6 +29,8 @@ formal decision layer are in [`../Innovation.md`](../Innovation.md); the runnabl
 | [`dynamic_world_model/`](dynamic_world_model/README.md) | Pre-registered test of whether scenario cards, a time-aware policy, a learned population transition model or language-model planners choose measurements that separate mechanisms better than the current magnitude tie-break; SciPlex3 24 h and 72 h, validator, case study and closed-loop replay | Measured 2026-09-26; negative for promotion, see its README |
 | [`acquisition_link/`](acquisition_link/README.md) | Audit of the link from world-model prediction to measurement choice (priorities dropped on the power-aware path, per-hypothesis forecasts reduced to one number, borrowed exposure times, deleted low-support actions), the distribution-aware selector that repairs it, and its pre-registered evaluation on the block-2 episodes | Implemented (opt-in) and measured 2026-09-26; INCONCLUSIVE, not promoted |
 | [`sequence_audit/`](sequence_audit/README.md) | Why the follow-up's contingent two-step policy stops early, a behaviour-matched replay of every comparator, one pre-registered revision (fixed-sequence fallback when the planner is uninformed), and its independent validation on L1000 6 h / 24 h in four lines | Measured 2026-09-26; SHADOW by the frozen rule with a negligible effect, opt-in, not promoted |
+| [`external_validation/`](external_validation/README.md) | Evidence audit, external-validation firewall (sealed policy view, one-time vault, manifests), a frozen 14-rung baseline ladder, decision- and risk-focused evaluation, virtual-cell masked and permuted ablation, and the external-study candidate audit | Measured 2026-09-27 on development data: `maestro_vc` REJECTED under frozen gates; external test blocked by missing data |
+| [`belief_planning/`](belief_planning/README.md) | Repository audit after a Codex session; belief-space planner (`src/maestro/planning.py`) with an empirical-Bayes virtual-cell world model; attribution controls (virtual cell masked or permuted, feedback withheld or permuted); GSE70138 external study behind a one-time vault | Measured 2026-09-27: external INCONCLUSIVE vs fixed order (-0.024 [-0.074, +0.011]); virtual-cell and feedback contributions REJECTED; development REJECTED in SciPlex3 A, INCONCLUSIVE elsewhere |
 
 2026-09-26 follow-up: [targeted acquisition fixes and real-data dynamics](acquisition_followup/README.md)
 records execution-gate and observed-history repairs, corrected elimination probabilities, a LINCS

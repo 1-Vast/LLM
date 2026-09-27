@@ -1,0 +1,28 @@
+{
+  "$comment": "How a study is partitioned. The external boundary must be disjoint in compounds, groups, scaffolds and batches; internal folds in compounds and groups.",
+  "type": "object",
+  "required": ["manifest_version", "dataset", "tier", "unit", "partitions", "boundaries"],
+  "additionalProperties": false,
+  "properties": {
+    "manifest_version": {"const": "1"},
+    "dataset": {"type": "string"},
+    "tier": {"type": "string"},
+    "unit": {"type": "string"},
+    "partitions": {"type": "array", "minItems": 2, "items": {
+      "type": "object", "required": ["name", "role", "compounds", "groups", "batches"],
+      "properties": {
+        "name": {"type": "string"},
+        "role": {"enum": ["reference", "heldout_fold", "calibration", "external_test"]},
+        "fold": {"type": ["integer", "null"]},
+        "compounds": {"type": "array", "items": {"type": "string"}},
+        "groups": {"type": "array", "items": {"type": "string"}},
+        "batches": {"type": "array", "items": {"type": "string"}}
+      }
+    }},
+    "boundaries": {"type": "array", "items": {
+      "type": "object", "required": ["train", "test", "kind", "report", "problems"],
+      "properties": {"train": {"type": "string"}, "test": {"type": "string"}, "kind": {"enum": ["internal", "external"]},
+                     "report": {"type": "object"}, "problems": {"type": "array", "items": {"type": "string"}}}
+    }}
+  }
+}

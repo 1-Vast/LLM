@@ -476,6 +476,63 @@ On L1000, with more references per class, most stops were informed. The fixed se
 planner only in the A549-only tier, where a 24 h first measurement leaves no legal
 continuation.
 
+**Baseline ladder and external-validation firewall 2026-09-27** (pre-registered;
+`research/external_validation/`, `log/20260927/README.md`).
+
+**What was built.**
+- The research arms now receive a sealed view of the data that holds no held-out result.
+- A vault opens an external study once, and only under a verified freeze.
+- Fourteen registered rungs, from deferral to an outcome-aware oracle, run under identical menus,
+  budgets and QC rules, together with the shipped default and the sparse-value planner.
+
+**What the replay found.** It ran on development data only: 12,428 episodes, 360,412 records, no
+rule violations.
+- **REJECTED overall:** the runtime selector with the virtual-cell channel (`maestro_vc`) did not
+  beat the strongest simple baseline in any tier.
+  - It decided fewer correctly than the fixed sequence in SciPlex3 B (-0.054 [-0.095, -0.013]),
+    and than measuring both time points in L1000 T (-0.031 [-0.050, -0.014]).
+  - It was inconclusive in the other two tiers.
+- **It trades correctness for cost** on the same curve as simpler value-based arms, with 0.2 to
+  1.0 fewer measurements per episode.
+- **The virtual-cell channel had zero acquisition value.** It changed at most 19% of choices. Its
+  one gain over masking was reproduced by another compound's predictions.
+- **The selector's wrong-reading forecasts were 2 to 19 times too low.**
+- **No unseen compatible study exists locally.** The external test is blocked. L1000 Phase II
+  (GSE70138) is the candidate, pending the owner's approval to download it. It was downloaded and
+  tested later the same day (below).
+
+**Production defaults are unchanged.**
+
+**Belief-space planning and the first external test 2026-09-27** (pre-registered;
+`research/belief_planning/`, `log/20260927/README.md` block 2).
+
+**What was built.**
+- `src/maestro/planning.py`, an opt-in planner. It runs an exact two-step expectimax over the
+  legal menu, forms its belief from real readings only, scores each registered elimination by the
+  posterior mass it removes, and replans after every reading.
+- A world model with three layers: pooled, class, and a virtual-cell structural kernel. It
+  conditions on feedback, and its strengths are fitted per fold by leave-one-out likelihood.
+- `expected_terminal_decision_value` double-counted evidence (wrong-decision probability 0). It
+  was fixed.
+
+**What was run.**
+- GSE70138 (LINCS L1000 Phase II), downloaded under the brief's authorisation. The task is 3 lines
+  by 4 doses at 24 h, the tested compounds are new to all development data, and the reference arm
+  is compounds already known to development.
+- The run was frozen, then executed once behind a vault.
+
+**What it found.**
+- **External: INCONCLUSIVE.** The agent against the fixed expert order: -0.024 [-0.074, +0.011]
+  correct decisions on 38 units. A +0.02 gain is excluded.
+- **Development:** REJECTED in SciPlex3 A (-0.134), and inconclusive in B (+0.008), L1000 LT
+  (+0.024 [0.000, +0.050] at 0.57 fewer measurements) and L1000 T (-0.006).
+- **Model-based baselines:** the agent beats myopic EDV, retrieval and marginal on correct
+  decisions in every setting, but at higher cost and wrong rate.
+- **Virtual cell:** it changes at most 5% of sequences, with no effect. On L1000 it abstains.
+  REJECTED.
+- **Feedback:** it changes actions, not decisions. REJECTED.
+- **Calibration:** the world model's wrong-elimination forecasts are 1.2 to 5 times too low.
+
 Not yet demonstrated:
 
 - improved decision regret on independent biological cases;
@@ -487,6 +544,14 @@ Not yet demonstrated:
   (`select_discriminating_action`), or from letting magnitude break ties on the power-aware path;
 - a contingent two-measurement policy, or its fixed-sequence fallback, that beats the fixed
   early-to-late sequence on independent data (`research/sequence_audit/`: SHADOW, negligible);
+- a MAESTRO measurement policy that beats the strongest simple baseline on development data or
+  on an unseen study (`research/external_validation/`: REJECTED under frozen gates;
+  `research/belief_planning/`: INCONCLUSIVE on GSE70138, with a practically meaningful gain over
+  the fixed order excluded);
+- acquisition value from the virtual-cell channel over masked and permuted controls (zero in all
+  four development tiers and on GSE70138);
+- a decision benefit from conditioning the next measurement on real feedback (withheld- and
+  permuted-feedback controls, `research/belief_planning/`);
 - a virtual-cell predictor with biological depth for unseen compounds: the V-JEPA-style latent model
   was built and tested (section 13.6) and neither beat PCA nor structure retrieval;
 - causal mechanism, target engagement, clinical safety, or generalization to unsupported contexts.
@@ -658,6 +723,16 @@ See `research/acquisition_link/`.
 - A fallback for uninformed stops changed almost nothing.
 
 See `research/sequence_audit/`.
+
+**Update 2026-09-27:**
+- Under one sealed runner, these reference branches, read by the runtime selector, did not beat
+  the strongest simple baseline.
+- The selector's wrong-reading forecasts were 2 to 19 times too low.
+- The sparse-value model's were conservative.
+
+See `research/external_validation/`. A belief-space planner with an empirical-Bayes world model
+then matched or beat these branches on correct decisions. It still did not beat the fixed order
+on GSE70138 (`research/belief_planning/`).
 
 ### 13.4 Closed-Loop Experimental Evidence From Co-Scientist And Robin
 

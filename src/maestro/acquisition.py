@@ -444,6 +444,249 @@ def outcome_consequences(rules: Iterable[OutcomeRule]) -> dict[str, frozenset[st
     return consequences
 
 
+# ---------------------------------------------------------------------------------------------
+# Decision-sensitive value of information
+@dataclass(frozen=True)
+class DecisionValue:
+    """Expected terminal-decision value of one legal action.
+
+    The forecast only supplies a distribution for the *reading*. The terminal
+    decision is recomputed from the surviving hypotheses for every reading, so
+    predictive uncertainty that cannot change a decision receives zero value.
+    """
+
+    action_identifier: str
+    expected_value: float
+    expected_loss_before: float
+    expected_loss_after: float
+    decision_sensitivity: float
+    expected_wrong_decision: float
+    cost: float
+    admissible: bool = True
+    reason: str = "admissible"
+
+    @property
+    def net_value(self) -> float:
+        return self.expected_value - self.cost
+
+    def payload(self) -> dict[str, object]:
+        return {
+            "action_identifier": self.action_identifier,
+            "expected_value": self.expected_value,
+            "net_value": self.net_value,
+            "expected_loss_before": self.expected_loss_before,
+            "expected_loss_after": self.expected_loss_after,
+            "decision_sensitivity": self.decision_sensitivity,
+            "expected_wrong_decision": self.expected_wrong_decision,
+            "cost": self.cost,
+            "admissible": self.admissible,
+            "reason": self.reason,
+        }
+
+
+@dataclass(frozen=True)
+class DecisionValuePlan:
+    """The decision-sensitive choice and the audit record for every candidate."""
+
+    chosen: DecisionValue | None
+    evaluations: tuple[DecisionValue, ...]
+    status: str
+    reason: str | None = None
+
+    def payload(self) -> dict[str, object]:
+        return {
+            "status": self.status,
+            "reason": self.reason,
+            "chosen": self.chosen.action_identifier if self.chosen else None,
+            "evaluations": {item.action_identifier: item.payload() for item in self.evaluations},
+        }
+
+
+def _posterior_decision(
+    posterior: Mapping[str, float],
+    candidates: Sequence[str],
+    *,
+    wrong_decision_loss: float,
+    defer_loss: float,
+) -> tuple[str, float, float]:
+    """Return the Bayes action, its risk and its wrong-decision probability."""
+
+    ordered = tuple(sorted(candidates))
+    options = [("defer", float(defer_loss), 0.0)]
+    options.extend(
+        (candidate, float(wrong_decision_loss) * (1.0 - float(posterior.get(candidate, 0.0))),
+         1.0 - float(posterior.get(candidate, 0.0)))
+        for candidate in ordered
+    )
+    # Keep deferral as the deterministic tie-break. It is safer at a boundary
+    # and makes sensitivity independent of dictionary insertion order.
+    return min(options, key=lambda item: (item[1], 0 if item[0] == "defer" else 1, item[0]))
+
+
+def expected_terminal_decision_value(
+    candidates: frozenset[str] | Sequence[str],
+    forecast: OutcomeForecast,
+    consequences: Mapping[str, frozenset[str]],
+    *,
+    prior: Mapping[str, float] | None = None,
+    wrong_decision_loss: float = REGISTERED_WRONG_ELIMINATION_COST,
+    defer_loss: float = 1.0,
+    measurement_cost: float = 0.0,
+) -> DecisionValue:
+    """Compute myopic expected value from terminal decision loss.
+
+    ``consequences`` is the registered observation-to-elimination map. A
+    forecast that changes magnitude while leaving the surviving decision the
+    same therefore has zero decision sensitivity and zero expected value.
+    """
+
+    ordered = tuple(sorted(set(candidates)))
+    if len(ordered) < 2:
+        raise ValueError("at least two candidate hypotheses are required")
+    if (not isfinite(float(wrong_decision_loss)) or not isfinite(float(defer_loss))
+            or not isfinite(float(measurement_cost))
+            or wrong_decision_loss <= 0 or defer_loss < 0 or measurement_cost < 0):
+        raise ValueError("decision losses and measurement cost must be nonnegative")
+    weights = {name: 1.0 / len(ordered) for name in ordered}
+    if prior is not None:
+        raw = {name: float(prior.get(name, 0.0)) for name in ordered}
+        total = sum(raw.values())
+        if total <= 0:
+            raise ValueError("prior must assign positive mass to a candidate")
+        weights = {name: value / total for name, value in raw.items()}
+    before_decision, before_loss, _ = _posterior_decision(
+        weights, ordered, wrong_decision_loss=wrong_decision_loss, defer_loss=defer_loss
+    )
+    labels = sorted({label for branch in forecast.branches for label in branch.probabilities} | set(consequences))
+    if not labels:
+        raise ValueError("forecast has no outcome labels")
+    if forecast.refusal:
+        raise ValueError(f"forecast_refused:{forecast.refusal}")
+    likelihood = {}
+    for hypothesis in ordered:
+        branch = forecast.branch_for(hypothesis)
+        if branch is None:
+            raise ValueError(f"forecast_missing_hypothesis:{hypothesis}")
+        values = {label: float(branch.probabilities.get(label, 0.0)) for label in labels}
+        if any(not isfinite(value) or value < 0 for value in values.values()):
+            raise ValueError(f"invalid_probability:{hypothesis}")
+        total = sum(values.values())
+        if total <= 0:
+            raise ValueError(f"empty_probability:{hypothesis}")
+        likelihood[hypothesis] = {label: value / total for label, value in values.items()}
+    masses = {label: sum(weights[h] * likelihood[h][label] for h in ordered) for label in labels}
+    after_loss = 0.0
+    wrong_probability = 0.0
+    sensitivity = 0.0
+    for label, mass in masses.items():
+        if mass <= 0:
+            continue
+        removed = set(consequences.get(label, frozenset())) & set(ordered)
+        # Bayes' rule over every candidate. The registered rule then restricts which decisions
+        # are available, but the removed hypotheses keep their posterior mass. That mass is the
+        # probability that the rule removed the truth. Zeroing it before scoring (the first
+        # version) counted the reading twice and reported a wrong-decision probability of zero
+        # for every single-survivor reading.
+        posterior = {h: weights[h] * likelihood[h][label] / mass for h in ordered}
+        decision, loss, wrong = _posterior_decision(
+            posterior, tuple(h for h in ordered if h not in removed),
+            wrong_decision_loss=wrong_decision_loss, defer_loss=defer_loss,
+        )
+        after_loss += mass * loss
+        wrong_probability += mass * wrong if decision != "defer" else 0.0
+        sensitivity += mass * (decision != before_decision)
+    expected_value = max(0.0, float(before_loss - after_loss))
+    return DecisionValue(
+        action_identifier=forecast.action_identifier,
+        expected_value=expected_value,
+        expected_loss_before=float(before_loss),
+        expected_loss_after=float(after_loss),
+        decision_sensitivity=float(sensitivity),
+        expected_wrong_decision=float(wrong_probability),
+        cost=float(measurement_cost),
+        admissible=expected_value > measurement_cost + _TOLERANCE,
+        reason="admissible" if expected_value > measurement_cost + _TOLERANCE else "non_positive_net_value",
+    )
+
+
+def decision_sensitivity(
+    candidates: frozenset[str] | Sequence[str],
+    forecast: OutcomeForecast,
+    consequences: Mapping[str, frozenset[str]],
+    **kwargs,
+) -> float:
+    """Return the probability that observing an action changes the terminal decision."""
+
+    return expected_terminal_decision_value(candidates, forecast, consequences, **kwargs).decision_sensitivity
+
+
+def select_decision_sensitive_action(
+    candidates: frozenset[str],
+    actions: Sequence[EvidenceAction],
+    profile: FunctionalInterventionProfile,
+    budget: float,
+    forecasts: Mapping[str, OutcomeForecast],
+    consequences: Mapping[str, frozenset[str]],
+    *,
+    prior: Mapping[str, float] | None = None,
+    wrong_decision_loss: float = REGISTERED_WRONG_ELIMINATION_COST,
+    defer_loss: float = 1.0,
+    measurement_costs: Mapping[str, float] | None = None,
+) -> DecisionValuePlan:
+    """Select the legal action with the highest positive expected terminal value.
+
+    ``EvidenceAction.cost`` remains the hard budget cost (for example assay-days).
+    ``measurement_costs`` optionally supplies a separate utility-scale price for
+    the value calculation, which keeps experimental cost units from being mixed
+    with the terminal-loss units.
+    """
+
+    if isinstance(budget, bool) or not isfinite(budget) or budget < 0:
+        raise ValueError("Budget must be nonnegative.")
+    utility_costs = dict(measurement_costs or {})
+    if any(isinstance(value, bool) or not isfinite(float(value)) or float(value) < 0
+           for value in utility_costs.values()):
+        raise ValueError("measurement costs must be finite and nonnegative")
+    evaluations: list[DecisionValue] = []
+    for action in sorted(actions, key=lambda item: item.identifier):
+        reason = None
+        if action.cost < 0:
+            reason = "invalid_action_cost"
+        elif action.cost > budget + _TOLERANCE:
+            reason = "exceeds_budget"
+        elif profile.unmeasured(action.prerequisites):
+            reason = "waiting_for_prerequisite:" + ",".join(profile.unmeasured(action.prerequisites))
+        elif action.identifier not in forecasts:
+            reason = "no_outcome_forecast"
+        if reason is not None:
+            evaluations.append(DecisionValue(action.identifier, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                             float(utility_costs.get(action.identifier, action.cost)), False, reason))
+            continue
+        try:
+            item = expected_terminal_decision_value(
+                candidates, forecasts[action.identifier], consequences, prior=prior,
+                wrong_decision_loss=wrong_decision_loss, defer_loss=defer_loss,
+                measurement_cost=float(utility_costs.get(action.identifier, action.cost)),
+            )
+        except (TypeError, ValueError) as error:
+            item = DecisionValue(action.identifier, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                 float(utility_costs.get(action.identifier, action.cost)), False,
+                                 f"invalid_forecast:{error}")
+        evaluations.append(item)
+    admissible = [item for item in evaluations if item.admissible]
+    if not admissible:
+        return DecisionValuePlan(None, tuple(evaluations), "no_admissible_action", "no action can improve the terminal decision after cost")
+    chosen = max(admissible, key=lambda item: (item.net_value, item.decision_sensitivity, -item.cost, item.action_identifier))
+    return DecisionValuePlan(chosen, tuple(evaluations), "selected")
+
+
+# Short names used by research code and reports.
+myopic_expected_decision_value = expected_terminal_decision_value
+select_myopic_edv = select_decision_sensitive_action
+expected_decision_value = expected_terminal_decision_value
+select_expected_decision_action = select_decision_sensitive_action
+
+
 def _forecast_problem(forecast: OutcomeForecast, identifier: str, candidates: frozenset[str]) -> str | None:
     if forecast.refusal:
         return str(forecast.refusal)

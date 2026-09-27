@@ -1,0 +1,46 @@
+{
+  "$comment": "A study entering the harness. Mechanism labels are outcomes and never appear here; they stay in the vault (external) or the prepared data (development).",
+  "type": "object",
+  "required": ["manifest_version", "dataset", "role", "study", "source", "compounds", "contexts", "clusters", "sha256"],
+  "additionalProperties": false,
+  "properties": {
+    "manifest_version": {"const": "1"},
+    "dataset": {"type": "string"},
+    "role": {"enum": ["development", "internal_validation", "external_test"]},
+    "study": {
+      "type": "object",
+      "required": ["name", "accession", "version", "download_date", "license", "platform"],
+      "properties": {
+        "name": {"type": "string"}, "accession": {"type": ["string", "null"]}, "version": {"type": ["string", "null"]},
+        "download_date": {"type": ["string", "null"]}, "license": {"type": ["string", "null"]}, "platform": {"type": "string"}
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["files"],
+      "properties": {
+        "files": {"type": "array", "minItems": 1, "items": {
+          "type": "object", "required": ["path", "sha256", "bytes"],
+          "properties": {"path": {"type": "string"}, "sha256": {"type": "string", "pattern": "[0-9a-f]{64}"}, "bytes": {"type": "integer", "minimum": 0}}
+        }}
+      }
+    },
+    "compounds": {"type": "array", "minItems": 1, "items": {
+      "type": "object", "required": ["compound", "identity", "canonical_smiles", "group", "scaffold"],
+      "properties": {
+        "compound": {"type": "string"}, "identity": {"type": ["string", "null"]},
+        "canonical_smiles": {"type": ["string", "null"]}, "group": {"type": "string"}, "scaffold": {"type": ["string", "null"]}
+      }
+    }},
+    "contexts": {"type": "array", "minItems": 1, "items": {
+      "type": "object", "required": ["action", "cell_line", "time_hours", "dose_nM"],
+      "properties": {"action": {"type": "string"}, "cell_line": {"type": "string"}, "time_hours": {"type": "number", "minimum": 0}, "dose_nM": {"type": "number", "minimum": 0}}
+    }},
+    "clusters": {"type": "array", "items": {
+      "type": "object", "required": ["action", "compound", "batch", "plates", "replicates"],
+      "properties": {"action": {"type": "string"}, "compound": {"type": "string"}, "batch": {"type": ["string", "null"]},
+                     "plates": {"type": "array", "items": {"type": "string"}}, "replicates": {"type": "integer", "minimum": 0}}
+    }},
+    "sha256": {"type": "string", "pattern": "[0-9a-f]{64}"}
+  }
+}
