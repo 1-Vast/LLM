@@ -1,14 +1,13 @@
-"""Put the package and the tools directory on the import path for every test module.
+"""Put the source packages and checkout root on the import path for test modules.
 
 File summary
 - Path: tests/conftest.py
 - Purpose: one place decides the import path, instead of each module repeating a
-  `sys.path.insert` line and tools/shared being unreachable.
+  `sys.path.insert` line.
 - Core points:
   - `src/` holds the packages under test (`maestro`, `agent`, `evaluation`,
     `virtual_cell`).
-  - the repository root is added so `tools.shared...` imports resolve; `tools/shared`
-    carries no manifest, so the tool router still discovers only registered tools.
+  - the repository root is added so tests can import `tests.fixtures` and checkout-local tools.
 - Interfaces: pytest plugin hooks only
 - Depends on: (standard library only)
 """

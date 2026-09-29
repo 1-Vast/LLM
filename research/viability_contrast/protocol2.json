@@ -1,0 +1,36 @@
+{
+  "protocol": "viability-contrast-2",
+  "written_at": "2026-09-28",
+  "status": "registered before any v2 episode is scored; freeze2.json holds the digests of this file and qualify2.py before the v2 run",
+  "supersedes": "viability-contrast-1, whose qualification gate FAILED (see README section 3.1). v1 artifacts are preserved unchanged; this protocol changes only the validator and decision rule, and says why",
+  "inherits_from_v1": [
+    "data, units, folds, classes, menu pool, per-episode menu, charged-QC rule, budget (16; sensitivity 8 and 32)",
+    "templates: per (class, line) median and scaled MAD s = max(1.4826 * MAD, 0.05), >= 5 training readings",
+    "arms (oracle, fixed_informative, random, both shuffled controls), metrics, unit-cluster bootstrap, qualification-gate structure",
+    "the honesty contract"
+  ],
+  "diagnosis_carried_from_v1": [
+    "hard elimination killed the true class in 65% of decided oracle episodes (median step 1): one out-of-band reading falsifies a hypothesis, so atypical members of well-estimated classes are decided against",
+    "survival was driven by template coverage, not evidence: classes without a template at a line could not be falsified there and won by default"
+  ],
+  "validator_v2": {
+    "principle": "symmetric falsifiability: every hypothesis is scored against every purchased reading; absence of a class template is never an advantage",
+    "score": "S_c = sum over purchased lines L of t_c(L), where t_c(L) = winsorized Gaussian log-density term: z = (a_L - m_c(L)) / s_c(L); t = -0.5 * min(z^2, 9) - log(s_c(L)) - 0.5 * log(2 * pi)",
+    "fallback_template": "when class c has no template at L, the pooled template over all training compounds at L is used (m_pool, s_pool with the same >= 5 rule and scale floor); a line lacking even a pooled template cannot be purchased (it is outside the registered menu pool by construction)",
+    "winsorization": "|z| capped at 3: no single reading can contribute less than the 3-sigma penalty; a wild reading discounts every class roughly equally instead of killing one",
+    "decision_rule": "let S_(1) >= S_(2) be the two highest class scores and margin = S_(1) - S_(2); the episode decides class (1) at the first step where margin >= tau_arm, and abstains when the budget ends with margin < tau_arm (reason: undecided)",
+    "tau_calibration": "per arm, per fold: training units are split into two halves (A templates score B's episodes and vice versa, halves assigned by SHA256('viability-contrast-2|calib|unit') parity); each calibration episode runs its arm's policy under the half-templates with budget 16 and records the margin trajectory after each purchased reading; for tau in {0, 1, 2, 3, 5, 8, 13, 21}, decided = episodes whose trajectory reaches margin >= tau (decision at first crossing), correct = argmax at crossing is the annotated class; a tau qualifies only when at least 20 calibration episodes decide at it AND its wrong-among-decided rate is <= 0.05; among qualifying tau the smallest is chosen (ties: larger tau); if none qualifies, tau_arm = +inf (the arm abstains everywhere and says so)",
+    "calibration_limitation": "calibration episodes use half-templates (about half the training units per class), so scales are wider than the full-training templates used on held-out episodes; the transfer is registered as approximate, not exact",
+    "oracle_v2": "diagnostic clairvoyant: each step buys the menu line maximising the actual post-reading margin of the true class over the best wrong class, S_truth - max_{c != truth} S_c (ties: larger truth score increase, then SHA256 order)",
+    "shuffled_tau": "shuffled arms reuse the tau of their unshuffled base arm"
+  },
+  "qualification_gate_v2": [
+    "oracle - fixed_informative >= +0.05 correct decisions (unit mean)",
+    "fixed_informative - random >= +0.02",
+    "oracle conditional wrong risk <= 0.10",
+    "oracle coverage >= 0.30 (the task must not be vacuous)",
+    "shuffled oracle coverage <= 0.10 (noise cannot force decisions)",
+    "shuffled oracle correct <= half of the unshuffled oracle's correct (artifact check)",
+    ">= 400 episodes and >= 20 classes with >= 8 units"
+  ]
+}

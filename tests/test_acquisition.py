@@ -19,14 +19,15 @@ from pathlib import Path
 
 import pytest
 
-from agent.audit import RunLogger
+from agent.memory import RunLogger
 from agent.context import ContextBuilder, TaskInterpreter
 from agent.knowledge import EvidenceLedger
 from agent.memory import MemoryStore
 from agent.orchestrator import MAESTROOrchestrator
 from agent.planner import MechanismContrastPlanner
-from agent.vision import VisualInspector
-from maestro import EvidenceAction, FunctionalInterventionProfile, MeasurementStatus
+from agent.llm import VisualInspector
+from maestro import EvidenceAction, FunctionalInterventionProfile
+from maestro.models import MeasurementStatus
 from maestro import MAESTROAgent
 from maestro.acquisition import MAXIMUM_CANDIDATES, select_expected_coverage
 

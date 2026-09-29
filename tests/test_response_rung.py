@@ -2,13 +2,13 @@
 
 File summary
 - Path: tests/test_response_rung.py
-- Purpose: pin the contract of `virtual_cell.response_rung` on a synthetic, digest-bound library
+- Purpose: pin the contract of `virtual_cell.signature_retrieval` on a synthetic, digest-bound library
   of real small-molecule structures, so no local asset is needed.
 - Core points: a supported query yields a contract-valid planning-only prediction; each unsupported
   input is refused by name; a compound already in the library is refused so its measurement is used;
   intervals are CALIBRATED only when their coverage receipt passed; novelty flips in_distribution.
 - Interfaces: `test_*` functions only.
-- Depends on: virtual_cell.response_rung, virtual_cell.interface
+- Depends on: virtual_cell.signature_retrieval, virtual_cell.interface
 """
 import hashlib
 import json
@@ -23,7 +23,7 @@ from virtual_cell.applicability import SupportLevel
 from virtual_cell.interface import (
     IntervalKind, Intervention, PredictionRequest, QuerySupport, SystemContext, safe_predict,
 )
-from virtual_cell.response_rung import NORM_READOUT, ResponseRungConfig, SciPlexResponseRung
+from virtual_cell.signature_retrieval import NORM_READOUT, ResponseRungConfig, SciPlexResponseRung
 from virtual_cell.signature_retrieval import LIBRARY_SCHEMA
 
 GENES = [f"G{i}" for i in range(60)]
@@ -60,7 +60,7 @@ def _build(tmp_path: Path, *, overall_passed=True, coverage=0.8, informative_set
     np.savez(lib / "library.npz", profiles=profiles, entry_compound=np.asarray(ec), entry_line=np.asarray(el),
              entry_dose=np.asarray(ed), systematic=systematic)
     compounds = [{"name": n, "skeleton": "", "class": "c", "smiles": s} for n, s in LIBRARY.items()]
-    from virtual_cell.response_rung import _skeleton
+    from virtual_cell.signature_retrieval import _skeleton
     for item in compounds:
         item["skeleton"] = _skeleton(item["smiles"])
     meta = {"schema": LIBRARY_SCHEMA, "genes": GENES, "lines": LINES, "doses": DOSES, "compounds": compounds,
@@ -148,7 +148,7 @@ def test_a_structurally_novel_compound_is_out_of_distribution(tmp_path):
 
 
 def test_the_backend_choice_refuses_without_structures_or_library(tmp_path):
-    from virtual_cell.backends import BACKEND_CHOICES, build_backend
+    from virtual_cell.world_model import BACKEND_CHOICES, build_backend
 
     assert "sciplex_response" in BACKEND_CHOICES
     with pytest.raises(ValueError, match="requires declared structures"):
@@ -177,7 +177,7 @@ LIBRARY_DIR = ROOT / "data/virtual_cell/sciplex3_signature_library"
 def test_the_built_library_serves_magnitude_and_refuses_pathways_and_known_compounds():
     """Pins the 2026-09-26 artifacts: only the response magnitude beat the average response."""
 
-    from virtual_cell.backends import build_backend
+    from virtual_cell.world_model import build_backend
 
     library = json.loads((LIBRARY_DIR / "library.json").read_text(encoding="utf-8"))
     panobinostat = next(c["smiles"] for c in library["compounds"] if c["name"].startswith("Panobinostat"))

@@ -2,7 +2,7 @@
 
 File summary
 - Path: tests/test_action_topology.py
-- Purpose: pin `maestro.topology.ActionTopology` (frontier, steps to executable, capability
+- Purpose: pin `maestro.composition.ActionTopology` (frontier, steps to executable, capability
   gaps, supply cycles) and prove that pruning the supplier-chain search with it returns
   exactly what the unpruned search returned, on randomly generated menus.
 - Core points: assertions here are contract tests, not biological results; each test pins
@@ -20,7 +20,7 @@ import pytest
 
 from maestro import MAESTROAgent
 from maestro.models import EvidenceAction, FunctionalInterventionProfile, MeasurementStatus
-from maestro.topology import ActionTopology
+from maestro.composition import ActionTopology
 
 
 def _action(name, *, requires=(), supplies=(), cost=1.0, gate=None):

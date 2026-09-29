@@ -5,7 +5,7 @@ File summary
 - Purpose: Pin the terminal-information, quantity-typing, split, reachability, cost and provenance contracts.
 - Core points: each test reproduces one independently verified defect; they are written to fail on the pre-fix code and must not be weakened to make a run pass.
 - Interfaces: `test_public_contract_survives_budget_exhaustion()`, `test_rna_record_cannot_satisfy_a_protein_prerequisite()`, `test_split_assignment_is_global_over_groups()`, `test_scorer_reachability_agrees_with_executable_search()`, `test_sole_valid_alternative_route_is_not_all_waste()`, `test_planner_enumeration_is_non_anticipative()`
-- Depends on: evaluation.cases, evaluation.scoring, evaluation.baselines, evaluation.feasibility, evaluation.case_builder, evaluation.evidence_base, maestro.models
+- Depends on: evaluation.cases, evaluation.scoring, evaluation.policies, evaluation.planning, evaluation.construction, evaluation.construction, maestro.models
 """
 from __future__ import annotations
 
@@ -15,9 +15,9 @@ from pathlib import Path
 
 import pytest
 
-from evaluation.baselines import _public_prompt
-from evaluation.case_builder import assign_split
-from evaluation.cases import (
+from tools.evaluation.policies import _public_prompt
+from tools.evaluation.construction import assign_split
+from tools.evaluation.cases import (
     EvidenceMenuItem,
     PublicCase,
     ReplayCase,
@@ -26,9 +26,9 @@ from evaluation.cases import (
     ScoringSpec,
     DecisionRule,
 )
-from evaluation.evidence_base import SourceRelease
-from evaluation.feasibility import legal_actions, enumerate_executed_sequences, enumerate_public_plans
-from evaluation.scoring import reachable_decisions, score_submission
+from tools.evaluation.construction import SourceRelease
+from tools.evaluation.planning import legal_actions, enumerate_executed_sequences, enumerate_public_plans
+from tools.evaluation.scoring import reachable_decisions, score_submission
 from maestro.models import (
     BiologicalQuantity,
     DevelopmentAction,
@@ -189,8 +189,8 @@ def test_split_assignment_is_global_over_groups():
 def test_comparator_selection_is_blind_to_hidden_response():
     """The offered comparator must not be ranked by the response the agent buys."""
 
-    from evaluation.case_builder import select_comparator
-    from evaluation.evidence_base import ExposureRecord
+    from tools.evaluation.construction import select_comparator
+    from tools.evaluation.construction import ExposureRecord
 
     def record(compound: str, auc: float) -> ExposureRecord:
         return ExposureRecord(
@@ -272,7 +272,7 @@ def test_prerequisite_cost_is_retained_in_the_minimum_certificate():
 def test_provider_failure_preserves_accrued_cost_and_acquisitions():
     """A failed run reports what was already paid for, not a zeroed ledger."""
 
-    from evaluation.runner import _provider_failure
+    from tools.evaluation.runner import _provider_failure
 
     class _Policy:
         name = "stub"

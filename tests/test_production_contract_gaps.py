@@ -22,7 +22,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
-from evaluation.cases import EvidenceMenuItem, PublicCase, ReplayView, RevealedEvidence
+from tools.evaluation.cases import EvidenceMenuItem, PublicCase, ReplayView, RevealedEvidence
 from maestro.models import (
     BiologicalQuantity as Q,
     EvidenceAction,
@@ -30,20 +30,10 @@ from maestro.models import (
     PremiseGrant,
     PremiseRequirement,
 )
-from virtual_cell import (
-    CompositeWorldModel,
-    Intervention,
-    IntervalKind,
-    LinearPerturbationBaseline,
-    PerturbationTable,
-    PredictionRequest,
-    QuerySupport,
-    StateAdapterConfig,
-    StateCapabilityAdapter,
-    SystemContext,
-    UnavailableVirtualCellWorldModel,
-    shuffled,
-)
+from virtual_cell.world_model import CompositeWorldModel
+from virtual_cell.interface import Intervention, IntervalKind, QuerySupport, SystemContext, UnavailableVirtualCellWorldModel
+from virtual_cell import PredictionRequest
+from virtual_cell.state_adapter import StateAdapterConfig, StateCapabilityAdapter
 from virtual_cell.applicability import SupportLevel, SupportRecord, SupportRegistry
 from virtual_cell.biology import (
     BridgeModel,
@@ -55,9 +45,9 @@ from virtual_cell.biology import (
     UNIT_CONVERSIONS,
 )
 from virtual_cell.ladder import DevelopmentMeanShiftBaseline
-from virtual_cell.receipts import ValidationReceipt
+from virtual_cell.applicability import ValidationReceipt
 
-from tools.shared.state_fixture import (  # noqa: E402
+from tests.fixtures.state import (  # noqa: E402
     CONTROL,
     DEFAULT_BASIS,
     DRUG_A,
@@ -256,10 +246,7 @@ def test_a_composite_refuses_a_rung_without_a_name_at_construction():
         CompositeWorldModel([Nameless()])
 
 
-def test_wrapped_and_unavailable_models_have_names():
-    table = PerturbationTable(("A549",) * 4, ("p",) * 4, ("drug",) * 4, (0.0, 1.0, 10.0, 100.0), (24.0,) * 4,
-                              ("viability",), {"viability": (1.0, 0.9, 0.7, 0.5)})
-    assert shuffled(LinearPerturbationBaseline(table)).name.endswith(":shuffled")
+def test_unavailable_model_has_a_name():
     assert UnavailableVirtualCellWorldModel().name == "unavailable"
 
 
@@ -392,17 +379,6 @@ def test_a_receipt_validates_only_when_it_is_identifiable_accepted_and_held_out(
         assert problem in verdict.receipt_problems
 
 
-def test_a_ladder_rung_does_not_claim_coverage_from_its_training_residuals():
-    table = PerturbationTable(("A549",) * 4, ("drug_p",) * 4, ("drug",) * 4, (0.0, 1.0, 10.0, 100.0), (24.0,) * 4,
-                              ("viability",), {"viability": (1.0, 0.95, 0.8, 0.6)})
-    model = LinearPerturbationBaseline(table)
-    prediction = model.predict(PredictionRequest(
-        "ladder", "case", "contrast", 1, Intervention("drug_p", "drug", (), dose=10.0, time_hours=24.0),
-        SystemContext("A549", "test", dataset_id="d", control_dataset_id="d"), ("viability",), model.model_version,
-    ))
-    interval = prediction.intervals["viability"]
-    assert interval.kind is IntervalKind.DESCRIPTIVE
-    assert not interval.claims_coverage
 
 
 # --------------------------------------------------------------------------

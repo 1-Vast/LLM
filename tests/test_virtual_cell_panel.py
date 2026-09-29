@@ -21,32 +21,12 @@ from pathlib import Path
 
 import pytest
 
-from virtual_cell import (
-    BackgroundPool,
-    ConditionPanel,
-    GeneSet,
-    Interval,
-    IntervalKind,
-    KnowledgeAnnotation,
-    ModelCapabilities,
-    PanelCondition,
-    PanelCriterion,
-    PanelRow,
-    PanelRun,
-    QueryAssessment,
-    QuerySupport,
-    SimulationCostLedger,
-    StatePrediction,
-    SupportLevel,
-    SystemContext,
-    execute_spec,
-    load_panel_spec,
-    rank_conditions,
-    read_artifact_values,
-    run_panel,
-    score_panel_against_observations,
-    score_panel_gene_sets,
-)
+from virtual_cell.biology import BackgroundPool, GeneSet
+from virtual_cell.panel import ConditionPanel, KnowledgeAnnotation, PanelCondition, PanelCriterion, PanelRow, PanelRun, execute_spec, load_panel_spec, rank_conditions, read_artifact_values, run_panel, score_panel_against_observations, score_panel_gene_sets
+from virtual_cell.interface import Interval, IntervalKind, ModelCapabilities, QueryAssessment, QuerySupport, SystemContext
+from virtual_cell.world_model import SimulationCostLedger
+from virtual_cell import StatePrediction
+from virtual_cell.applicability import SupportLevel
 from virtual_cell.artifacts import write_shift_artifact
 
 READOUT = "embedding_delta_l2"

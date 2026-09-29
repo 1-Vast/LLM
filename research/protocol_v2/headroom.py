@@ -20,8 +20,11 @@ File summary
   - Gate (pre-registered in `protocol.json`): a task is `eligible_primary` if the headroom
     estimate is at least 2 x MPIE and the lower 95% bound at least MPIE. It is `powered` if the
     units required for the MPIE do not exceed the units available.
+  - Weighting (protocol v2.1, P0-3). `unit_paired` gives the unit mean: each independent unit
+    weighs 1 and its episodes are averaged first. `_paired` (protocol v2) is the episode mean.
+    Both resample units in the bootstrap.
 - Run: python -m research.protocol_v2.headroom --records DIR_OR_FILE [--records ...] --out FILE
-- Interfaces: `task_headroom`, `headroom_table`, `gate`
+- Interfaces: `task_headroom`, `headroom_table`, `gate`, `unit_paired`
 - Depends on: records.py, research/external_validation/statistics.py
 """
 from __future__ import annotations
@@ -31,6 +34,7 @@ import json
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 
 from research.external_validation import statistics as S
 
@@ -46,6 +50,30 @@ def _paired(frame, left, right, metric):
     sub["policy"] = sub.arm
     sub["compound"] = sub.fold.astype(str) + ":" + sub.compound
     return S.paired(sub, left, right, metric, "unit")
+
+
+def unit_paired(frame, left: str, right: str, metric: str, *, unit: str = "unit", seed: int = S.SEED,
+                level: float = 0.95) -> dict:
+    """Unit-mean paired difference left - right on identical episodes, with a unit-cluster bootstrap.
+
+    Each unit's episodes are averaged first, so a unit with many contrasts weighs no more than a unit
+    with one. `episode_mean` reports the protocol-v2 (episode-weighted) estimate on the same data.
+    """
+    a = frame[frame.arm == left].set_index("episode")
+    b = frame[frame.arm == right].set_index("episode")
+    if len(a) != len(b) or not a.index.sort_values().equals(b.index.sort_values()):
+        raise ValueError(f"{left} and {right} were not run on the same episodes")
+    delta = pd.DataFrame({"delta": a[metric] - b[metric].reindex(a.index), "unit": a[unit].astype(str)})
+    per_unit = delta.groupby("unit").delta.mean().sort_index()
+    values = per_unit.to_numpy(float)
+    index = S.draws(len(values), seed=seed)
+    boot = values[index].mean(axis=1)
+    tail = (1 - level) / 2
+    return {"left": left, "right": right, "metric": metric, "weighting": "unit_mean",
+            "difference": float(values.mean()) if len(values) else float("nan"),
+            "ci": np.quantile(boot, [tail, 1 - tail]).tolist() if len(values) else [float("nan")] * 2,
+            "episode_mean": float(delta.delta.mean()) if len(delta) else float("nan"),
+            "units": int(len(values)), "episodes": int(len(delta)), "level": level}
 
 
 def gate(headroom: dict, power: dict | None, *, mpie: float = MPIE) -> dict:

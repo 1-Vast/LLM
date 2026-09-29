@@ -9,13 +9,16 @@ File summary
   - Stratifies by mode, dose and time, where extrapolation failures hide.
   - Implements the pre-registered exit conditions for withdrawing a model.
 - Interfaces: `CalibrationPair`, `CalibrationReport`, `score`, `stratify`,
-  `compare_models`, `evaluate_exit_conditions`.
+  `compare_models`, `evaluate_exit_conditions`, `conformal_quantile`,
+  `ResidualPair`, `IntervalCalibration`, `fit_interval`.
 - Depends on: src/virtual_cell/interface.py
 """
 from __future__ import annotations
 
+import hashlib
+import json
 from dataclasses import dataclass, field
-from math import isfinite, log
+from math import ceil, isfinite, log
 from typing import Callable, Mapping, Sequence
 
 
@@ -290,6 +293,250 @@ class ScaleCalibration:
                 f"'{endpoint}' in context '{context_identifier}': {', '.join(problems)}."
             )
         return tuple(self.scale * float(value) for value in values)
+
+
+def conformal_quantile(values: Sequence[float], level: float) -> float:
+    """The order-statistic residual a split-conformal interval uses at ``level``.
+
+    With ``n`` calibration residuals the index is ``ceil((n + 1) * level)``, so
+    the fitted quantile carries a *marginal* guarantee of at least ``level``
+    coverage -- not exactly ``level``, and not per prediction. The guarantee
+    holds when calibration units and target units are exchangeable; ties,
+    dependence, or an adaptive selection made on the predictions can only
+    weaken it further.
+
+    When ``ceil((n + 1) * level) > n`` the required order statistic lies beyond
+    the sample: the only conformal interval at ``level`` is the infinite one.
+    This function refuses rather than clamp -- returning the largest residual
+    would silently claim a coverage the sample cannot support. The smallest
+    supported sample size is the smallest ``n`` with ``ceil((n + 1) * level)
+    <= n`` (9 for a nominal 0.90).
+    """
+
+    ordered = sorted(float(value) for value in values)
+    if not ordered:
+        raise ValueError("A conformal quantile needs at least one residual.")
+    if not 0.0 < level < 1.0:
+        raise ValueError("A nominal level must lie strictly between 0 and 1.")
+    nonfinite = next((value for value in ordered if not isfinite(value)), None)
+    if nonfinite is not None:
+        raise ValueError(f"A conformal quantile needs finite residuals; got {nonfinite!r}.")
+    rank = ceil((len(ordered) + 1) * level)
+    if rank > len(ordered):
+        # The smallest sample size whose order statistic still lies inside the
+        # sample; derived from the same rank rule rather than a closed form, so
+        # the message cannot disagree with the refusal.
+        minimum = 1
+        while ceil((minimum + 1) * level) > minimum:
+            minimum += 1
+        raise ValueError(
+            f"A nominal {level:g} interval needs at least {minimum} calibration "
+            f"residuals; with {len(ordered)} the conformal order statistic lies beyond the sample, "
+            "and no finite interval can claim this coverage."
+        )
+    return ordered[rank - 1]
+
+
+@dataclass(frozen=True)
+class ResidualPair:
+    """One predicted scalar for one readout, paired with the value that arrived."""
+
+    readout: str
+    predicted: float
+    observed: float
+
+    @property
+    def absolute_residual(self) -> float:
+        return abs(float(self.predicted) - float(self.observed))
+
+
+@dataclass(frozen=True)
+class IntervalCalibration:
+    """Half-widths for prediction intervals, with the partition they came from.
+
+    A scale says how big a prediction should be; it says nothing about how far
+    one prediction may land from the truth. This is that second number, and the
+    same rule applies to it: an interval fitted on one endpoint, context,
+    checkpoint and partition says nothing about another.
+
+    ``quantiles`` maps a readout to an absolute-residual half-width at
+    ``level``. The stratification is global and stated as such in ``fitted_on``:
+    a stratum whose support is too thin to justify its own quantile must be
+    declared, not silently pooled.
+
+    The coverage claim is marginal, conditional on exchangeability between the
+    calibration units and the units the interval will be served to; it is a
+    lower bound, not an equality, and it says nothing about coverage after any
+    adaptive action selection made on the predictions. A readout whose residual
+    count cannot support ``level`` cannot be fitted at all: ``fit_interval``
+    refuses rather than emit a quantile that clamps.
+
+    A calibrated interval is a planning statement. It is not a measurement, and
+    it does not make the prediction it surrounds one.
+    """
+
+    level: float
+    quantiles: Mapping[str, float]
+    endpoint: str
+    context_identifier: str | None
+    fitted_on: str
+    independent_units: int
+    # Residual count behind each readout's quantile. A quantile is only as
+    # stable as the sample under it, so the count travels with the number.
+    support: Mapping[str, int] = field(default_factory=dict)
+    model_version: str | None = None
+    input_schema: str | None = None
+    control_protocol: str | None = None
+    development_partition_sha256: str | None = None
+    limitations: tuple[str, ...] = ()
+
+    @property
+    def readouts(self) -> tuple[str, ...]:
+        return tuple(sorted(self.quantiles))
+
+    def content_sha256(self) -> str:
+        """Stable digest of everything that identifies this calibration.
+
+        A coverage receipt binds to the calibration it evaluated through this
+        digest, so a receipt written for one fit cannot qualify another: change
+        one quantile, the level, the partition or any declared binding and the
+        digest moves with it.
+        """
+
+        payload = json.dumps(
+            {
+                "level": self.level,
+                "quantiles": dict(self.quantiles),
+                "endpoint": self.endpoint,
+                "context_identifier": self.context_identifier,
+                "fitted_on": self.fitted_on,
+                "independent_units": self.independent_units,
+                "support": dict(self.support),
+                "model_version": self.model_version,
+                "input_schema": self.input_schema,
+                "control_protocol": self.control_protocol,
+                "development_partition_sha256": self.development_partition_sha256,
+            },
+            sort_keys=True,
+            ensure_ascii=True,
+        )
+        return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+    def half_width(self, readout: str) -> float | None:
+        """The half-width for a readout, or ``None`` when it has no quantile."""
+
+        return self.quantiles.get(readout)
+
+    def binding_mismatches(
+        self,
+        *,
+        endpoint: str,
+        context_identifier: str | None,
+        model_version: str | None = None,
+        input_schema: str | None = None,
+        control_protocol: str | None = None,
+        development_partition_sha256: str | None = None,
+    ) -> tuple[str, ...]:
+        """Every binding the query fails, named; a declared binding left unstated fails."""
+
+        problems: list[str] = []
+        if endpoint != self.endpoint:
+            problems.append("endpoint_mismatch")
+        if self.context_identifier is not None and context_identifier != self.context_identifier:
+            problems.append("context_mismatch")
+        for name, declared, offered in (
+            ("model_version", self.model_version, model_version),
+            ("input_schema", self.input_schema, input_schema),
+            ("control_protocol", self.control_protocol, control_protocol),
+            ("development_partition_sha256", self.development_partition_sha256, development_partition_sha256),
+        ):
+            if declared is None:
+                continue
+            if offered is None:
+                problems.append(f"{name}_unstated")
+            elif offered != declared:
+                problems.append(f"{name}_mismatch")
+        return tuple(problems)
+
+    def applies_to(
+        self,
+        *,
+        endpoint: str,
+        context_identifier: str | None,
+        model_version: str | None = None,
+        input_schema: str | None = None,
+        control_protocol: str | None = None,
+        development_partition_sha256: str | None = None,
+    ) -> bool:
+        """Whether this calibration may be used for the requested query at all."""
+
+        return not self.binding_mismatches(
+            endpoint=endpoint,
+            context_identifier=context_identifier,
+            model_version=model_version,
+            input_schema=input_schema,
+            control_protocol=control_protocol,
+            development_partition_sha256=development_partition_sha256,
+        )
+
+
+def fit_interval(
+    pairs: Sequence[ResidualPair],
+    *,
+    endpoint: str,
+    context_identifier: str | None,
+    fitted_on: str,
+    independent_units: int,
+    level: float = DEFAULT_NOMINAL_LEVEL,
+    model_version: str | None = None,
+    input_schema: str | None = None,
+    control_protocol: str | None = None,
+    development_partition_sha256: str | None = None,
+) -> IntervalCalibration:
+    """Absolute-residual quantiles per readout, from declared calibration pairs.
+
+    The caller is responsible for passing calibration-partition data only. This
+    function cannot tell a fitted partition from a held-out one, so
+    ``fitted_on`` and ``development_partition_sha256`` are required: an interval
+    whose provenance is not stated cannot be audited, and coverage must be
+    measured on a split the quantile never saw.
+    """
+
+    if not 0.0 < level < 1.0:
+        raise ValueError("A nominal level must lie strictly between 0 and 1.")
+    if not pairs:
+        raise ValueError("An interval calibration needs at least one paired observation.")
+    residuals: dict[str, list[float]] = {}
+    for pair in pairs:
+        residuals.setdefault(pair.readout, []).append(pair.absolute_residual)
+    quantiles: dict[str, float] = {}
+    for readout, values in sorted(residuals.items()):
+        # Support is checked per readout: one thick readout never lends its
+        # sample to a thin one, and a readout whose sample cannot reach the
+        # nominal level refuses the whole fit instead of clamping.
+        try:
+            quantiles[readout] = conformal_quantile(values, level)
+        except ValueError as error:
+            raise ValueError(f"Readout '{readout}' cannot support a nominal {level:g} interval: {error}") from error
+    return IntervalCalibration(
+        level=level,
+        quantiles=quantiles,
+        endpoint=endpoint,
+        context_identifier=context_identifier,
+        fitted_on=fitted_on,
+        independent_units=independent_units,
+        support={readout: len(values) for readout, values in sorted(residuals.items())},
+        model_version=model_version,
+        input_schema=input_schema,
+        control_protocol=control_protocol,
+        development_partition_sha256=development_partition_sha256,
+        limitations=(
+            "A calibrated interval is a planning-only coverage statement about one readout; "
+            "it is not a measurement and it does not make the prediction it surrounds one.",
+            "Global quantile: no stratum had enough declared support to justify its own half-width. "
+            "Support per readout is recorded in `support`.",
+        ),
+    )
 
 
 def fit_scale(

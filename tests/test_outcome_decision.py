@@ -7,36 +7,16 @@ File summary
   - Asserts only a real measurement can constrain a mechanism contrast.
   - A condition-matched rule, not budget exhaustion, licenses a development decision.
 - Interfaces: `test_*` functions
-- Depends on: agent.cases, maestro
+- Depends on: agent.memory, maestro
 """
 from dataclasses import replace
 
-from agent.cases import MeasurementResult
+from agent.memory import MeasurementResult
 from maestro.models import BiologicalQuantity
-from maestro import (
-    DEFAULT_REQUIREMENTS,
-    INCOMPLETE_PERTURBATION_FACTOR,
-    MODE_COMPARATOR_FIELD,
-    MODE_DIFFERENCE_FIELD,
-    REALISATION_FIELD,
-    SUFFICIENT_FUNCTION_FIELD,
-    DecisionEngine,
-    DecisionStatus,
-    DevelopmentAction,
-    EvidenceAction,
-    EvidenceActionKind,
-    EvidenceKind,
-    EvidenceRequirement,
-    EvidenceScope,
-    FunctionalInterventionProfile,
-    InterpretationTable,
-    MeasurementStatus,
-    MechanismContrast,
-    MechanismHypothesis,
-    OutcomeClass,
-    OutcomeRule,
-    default_rules_for,
-)
+from maestro.decision import DEFAULT_REQUIREMENTS, DecisionEngine, EvidenceRequirement
+from maestro.outcome import INCOMPLETE_PERTURBATION_FACTOR, MODE_COMPARATOR_FIELD, MODE_DIFFERENCE_FIELD, REALISATION_FIELD, SUFFICIENT_FUNCTION_FIELD, InterpretationTable, OutcomeClass, OutcomeRule, default_rules_for
+from maestro.models import DecisionStatus, DevelopmentAction, EvidenceActionKind, EvidenceKind, EvidenceScope, MeasurementStatus, MechanismContrast
+from maestro import EvidenceAction, FunctionalInterventionProfile, MechanismHypothesis
 from maestro.outcome import EvidenceState, admit_evidence
 
 

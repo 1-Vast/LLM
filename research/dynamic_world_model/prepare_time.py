@@ -15,7 +15,7 @@ File summary
   - Printed output is structural only (counts, exclusions, identity check). No response
     magnitude is printed before the protocol is frozen.
 - Run: python research/dynamic_world_model/prepare_time.py --output outputs/dynamic_world_model_20260926/prepared
-- Depends on: research/biological_depth/prepare.py (readers), virtual_cell.identity_markers, h5py, numpy, pandas, scipy
+- Depends on: research/biological_depth/prepare.py (readers), virtual_cell.artifacts, h5py, numpy, pandas, scipy
 """
 from __future__ import annotations
 
@@ -36,7 +36,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "research" / "biological_depth"))
 
 from prepare import obs_column, row_blocks, sha256_file  # noqa: E402
-from virtual_cell.identity_markers import resolve_label_offset, shift_labels  # noqa: E402
+from virtual_cell.artifacts import resolve_label_offset, shift_labels  # noqa: E402
 
 SOURCE = ROOT / "data/raw/sciplex3/SrivatsanTrapnell2020_sciplex3.h5ad"
 SOURCE_SHA256 = "bde2420c"  # prefix recorded in data/README.md; the full digest is written to the manifest

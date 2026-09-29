@@ -1,44 +1,4 @@
-"""Measurement choice from declared detection power, or from predicted readings under each hypothesis.
-
-File summary
-- Path: src/maestro/acquisition.py
-- Purpose: choose an evidence bundle by the *probability that it answers* rather than by the
-  labels it mentions, using the ``detection_power`` every action may already declare; and, when a
-  forecaster predicts how each action would read under each hypothesis, choose the single next
-  measurement by how well the registered interpretation rules would separate the hypotheses.
-- Core points:
-  - Plain set cover reads a bundle as covering a hypothesis whenever one selected action claims
-    it. An assay that returns an uninterpretable result half the time covers it half the time, so
-    the bundle's coverage is ``1 - prod(1 - p_a)`` per hypothesis: a stochastic set-cover
-    objective, solved exactly here over the small pools the framework actually has.
-  - The objective is expected coverage, not information value and not experimental utility; the
-    cost, size, prediction-priority and identifier tie-breaks keep the choice auditable and
-    deterministic. A prediction priority is consulted only after coverage, cost and size, so it
-    can break a tie but never buy an extra or costlier action.
-  - An action that declares no ``detection_power`` is treated as certain and *named* in the
-    returned assumptions, because assuming a value and hiding the assumption is how a declared
-    field stops being a declaration.
-  - A pool above the exhaustive cap returns ``too_large`` rather than a heuristic answer, for the
-    same reason ``selection.py`` refuses: an exact method that silently becomes approximate is a
-    claim the code cannot keep.
-  - ``select_discriminating_action`` reads an ``OutcomeForecast``: per hypothesis, the predicted
-    distribution over registered outcome labels and the number of independent measured units it
-    rests on. What a reading would eliminate comes from the registered rules, never from the
-    forecast, so absence and unresolved readings earn no credit however differently the
-    hypotheses predict them. The choice is lexicographic: legality and budget; a wrong-risk gate
-    at the break-even of the declared utility; the one-sided 95% lower bound of rule-conditioned
-    discrimination (correct minus wrong elimination probability); support; cost; exposure time;
-    predicted magnitude; identifier. Zero support refuses by name; thin support is served,
-    flagged and discounted by the Jeffreys prior, never deleted.
-  - A forecast is a planning prediction. It chooses which real measurement to buy and never
-    reaches ``EvidenceState``; one measurement is chosen per round because forecasts of different
-    actions on the same system are not independent, and the loop replans on the real result.
-- Interfaces: `ExpectedCoveragePlan`, `select_expected_coverage`, `OutcomeBranch`,
-  `OutcomeForecast`, `OutcomeForecaster`, `ActionDiscrimination`, `DiscriminationPlan`,
-  `outcome_consequences`, `select_discriminating_action`
-- Depends on: maestro.models, maestro.outcome (registered rules and the evidence state),
-  maestro.handoff (rejection reasons), maestro.selection (the plan type)
-"""
+"""Measurement choice from declared detection power, or from predicted readings under each hypothesis."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -49,7 +9,7 @@ from typing import Iterable, Mapping, Protocol, Sequence
 from .handoff import RejectedCandidate
 from .models import EvidenceAction, EvidenceKind, EvidenceScope, FunctionalInterventionProfile, MechanismContrast
 from .outcome import EvidenceState, OutcomeRule
-from .selection import BudgetedEvidencePlan
+from .composition import BudgetedEvidencePlan
 
 MAXIMUM_CANDIDATES = 16
 _TOLERANCE = 1e-12
@@ -331,13 +291,26 @@ class OutcomeBranch:
 
     ``probabilities`` maps outcome labels (the ``outcome_label`` of registered rules) to forecast
     probabilities that sum to one. ``support`` counts the independent measured units (reference
-    compounds, not simulation draws) the forecast rests on; it sets how hard the forecast is
-    shrunk and how wide its interval is.
+    compounds, not simulation draws) the forecast rests on. Empirical branches receive the
+    planner's Jeffreys prior. An already regularised Dirichlet prediction instead supplies
+    ``posterior_concentration``: its total posterior mass, including prior mass. The planner
+    preserves that prediction's mean and uses the concentration only for uncertainty. The
+    concentration is not an independent measured-unit count. A concentration based on Kish
+    effective support is a weighted-frequency approximation, not an exact conjugate posterior.
     """
 
     hypothesis: str
     probabilities: Mapping[str, float]
     support: int
+    posterior_concentration: float | None = None
+
+    def __post_init__(self) -> None:
+        concentration = self.posterior_concentration
+        if concentration is not None and (
+            isinstance(concentration, bool) or not isinstance(concentration, (int, float))
+            or not isfinite(concentration) or concentration <= 0
+        ):
+            raise ValueError("invalid_posterior_concentration")
 
 
 @dataclass(frozen=True)
@@ -355,6 +328,8 @@ class OutcomeForecast:
     refusal: str | None = None
     model_version: str | None = None
     evidence_kind: EvidenceKind = EvidenceKind.MODEL_PREDICTION
+    outcome_mode: str = "attempted_experiment"
+    """valid_readout is conditional on successful measurement, not a complete planning forecast."""
 
     def branch_for(self, hypothesis: str) -> OutcomeBranch | None:
         return next((branch for branch in self.branches if branch.hypothesis == hypothesis), None)
@@ -540,6 +515,8 @@ def expected_terminal_decision_value(
     same therefore has zero decision sensitivity and zero expected value.
     """
 
+    if forecast.outcome_mode != "attempted_experiment":
+        raise ValueError("experiment_validity_probability_required")
     ordered = tuple(sorted(set(candidates)))
     if len(ordered) < 2:
         raise ValueError("at least two candidate hypotheses are required")
@@ -688,6 +665,8 @@ select_expected_decision_action = select_decision_sensitive_action
 
 
 def _forecast_problem(forecast: OutcomeForecast, identifier: str, candidates: frozenset[str]) -> str | None:
+    if forecast.outcome_mode != "attempted_experiment":
+        return "experiment_validity_probability_required"
     if forecast.refusal:
         return str(forecast.refusal)
     if forecast.action_identifier != identifier:
@@ -724,11 +703,15 @@ def _score(
 ) -> tuple[float, float, float, float | None, int, float]:
     """Pooled correct and wrong elimination probabilities, discrimination variance, TV and support.
 
-    Each branch is a Dirichlet posterior with the Jeffreys prior over every registered label plus
-    any label the forecast adds. A correct reading removes a candidate other than the branch's
+    Empirical branches receive a Jeffreys prior over the registered and forecast labels.
+    Branches declaring posterior concentration already include their prior: no extra probability
+    mass is added, including for labels present only in the registered rules. A correct reading
+    removes a candidate other than the branch's
     hypothesis and not that hypothesis; a wrong reading removes it. The pooled values average the
     branches (a uniform prior over the candidates), and the variance of the pooled discrimination
-    is the weighted sum of the independent branch variances.
+    is the weighted sum of the independent branch variances. Shared training artifacts can
+    correlate branches; this approximation does not model that covariance, fitted-parameter
+    uncertainty or domain shift. Its normal lower bound is not a calibrated coverage guarantee.
     """
 
     labels = sorted(set(consequences) | {label for branch in forecast.branches for label in branch.probabilities})
@@ -741,7 +724,12 @@ def _score(
         branch = forecast.branch_for(hypothesis)
         if branch is None:
             raise ValueError(f"forecast_missing_hypothesis:{hypothesis}")
-        alpha = {label: branch.probabilities.get(label, 0.0) * branch.support + JEFFREYS_PSEUDOCOUNT for label in labels}
+        if branch.posterior_concentration is None:
+            alpha = {label: branch.probabilities.get(label, 0.0) * branch.support
+                     + JEFFREYS_PSEUDOCOUNT for label in labels}
+        else:
+            alpha = {label: branch.probabilities.get(label, 0.0)
+                     * branch.posterior_concentration for label in labels}
         total = sum(alpha.values())
         removes = {label: consequences.get(label, frozenset()) & candidates for label in labels}
         correct = [label for label in labels if removes[label] and hypothesis not in removes[label]]
@@ -779,7 +767,8 @@ def select_discriminating_action(
 
     1. the action is executable now, affordable, names a candidate, and has a usable forecast;
     2. its expected wrong-elimination risk is below the break-even of the declared utility
-       (correct probability > ``wrong_elimination_cost`` x wrong probability, both Jeffreys-shrunk);
+       (correct probability > ``wrong_elimination_cost`` x wrong probability, with each branch
+       regularised once by either its forecaster or the legacy Jeffreys prior);
     3. the one-sided 95% lower bound of discrimination (correct minus wrong probability) is highest;
     4. then more support, lower cost, earlier exposure, larger predicted magnitude, smaller label.
 

@@ -209,7 +209,7 @@ $py = 'D:\anaconda\envs\maestro\python.exe'
 & $py -m research.external_validation.report
 & $py -m pytest research/external_validation -p no:cacheprovider
 # opt-in contract suite (the default pytest target remains tests/)
-& $py -m maestro.research_tests
+& $py -m tools.research_validation
 ```
 
 **Development data required:**

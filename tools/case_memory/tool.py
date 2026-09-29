@@ -28,7 +28,7 @@ if str(ROOT / "src") not in sys.path:
 
 from maestro import case_memory as CM  # noqa: E402
 from maestro import case_update as CU  # noqa: E402
-from maestro import directional as DR  # noqa: E402
+from maestro import adaptive_retrieval as DR  # noqa: E402
 from maestro import hypothesis_forecast as HF  # noqa: E402
 from maestro.models import EvidenceAction, MechanismContrast, MechanismHypothesis  # noqa: E402
 
@@ -53,6 +53,12 @@ def _user_state(payload: dict) -> HF.UserStateContext:
         assay=payload.get("assay", ""),
         hypothesis_graph=payload.get("hypothesis_graph", {}),
         evidence_history=tuple(payload.get("evidence_history", ())),
+        biological_system=payload.get("biological_system", ""),
+        intervention_type=payload.get("intervention_type", ""),
+        measurement_type=payload.get("measurement_type", ""),
+        control_design=payload.get("control_design", ""),
+        laboratory=payload.get("laboratory", ""),
+        outcome_mode=payload.get("outcome_mode", "valid_readout"),
     )
 
 
@@ -90,7 +96,7 @@ def run(parameters: dict) -> dict:
     store_ref = payload.get("episode_store")
     store = CM.EpisodeStore(ROOT / store_ref) if store_ref else CM.EpisodeStore()
     user_state = _user_state(payload)
-    h1, h2 = sorted(hypotheses)
+    h1, h2 = hypotheses
     contrast = MechanismContrast("case-memory-query",
                                  (MechanismHypothesis(h1, h1), MechanismHypothesis(h2, h2)), (), None)
     action_payloads = payload.get("actions") or [{
@@ -101,9 +107,11 @@ def run(parameters: dict) -> dict:
     actions = tuple(
         EvidenceAction(str(a["action_id"]), str(a.get("description", a["action_id"])),
                        float(a.get("cost_wells", 1.0)), (h1, h2),
-                       readout=str(a.get("readout", "")), time_hours=a.get("time_h"))
+                       readout=str(a.get("readout", "")), time_hours=a.get("time_h"),
+                       execution_context=a.get("cell_line"),
+                       expected_outcomes=a.get("expected_outcomes", {h1: "match_h1", h2: "match_h2"}))
         for a in action_payloads)
-    forecaster = HF.CaseMemoryOutcomeForecaster(store, feature_arm=arm, research_mode=True)
+    forecaster = HF.CaseMemoryOutcomeForecaster(store, feature_arm=arm, research_mode=research_mode)
     detailed = {a.identifier: forecaster.forecast_detailed(contrast, a, None, user_state)
                 for a in actions}
     usable = {h: d["applicable"] for h, d in ((a.identifier, d) for a, d in
@@ -120,7 +128,7 @@ def run(parameters: dict) -> dict:
                 "artifacts": []}
     # Retrieval explanations come from the forecaster's retriever on the same problem.
     from maestro.adaptive_retrieval import RetrievalProblem
-    from maestro.directional import ContextFeatures
+    from maestro.adaptive_retrieval import ContextFeatures
 
     problem = RetrievalProblem(
         problem_id=payload.get("problem_id", "unnamed"),
@@ -161,6 +169,10 @@ def run(parameters: dict) -> dict:
             "calibration_status": d["calibration_status"],
             "calibration_dataset": d["calibration_dataset"],
             "model_version": d["model_version"],
+            "outcome_mode": d["outcome_mode"],
+            "decision_applicable": d["decision_applicable"],
+            "calibration_fit": d["calibration_fit"],
+            "regularisation": d["regularisation"],
             "provenance": d["provenance"],
         })
     retrieval_view = {

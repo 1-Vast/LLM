@@ -9,7 +9,7 @@ File summary
     semantics, so the same defect cannot return silently.
   - No test asserts a biological conclusion, and none calls an LLM or a virtual-cell model.
 - Interfaces: `test_*` functions
-- Depends on: agent.orchestrator, agent.cases, maestro, tests.test_case_decision_loop (helpers)
+- Depends on: agent.orchestrator, agent.memory, maestro, tests.test_case_decision_loop (helpers)
 """
 from pathlib import Path
 
@@ -18,33 +18,15 @@ import pytest
 import runpy
 
 from agent.orchestrator import MAESTROOrchestrator
-from maestro import (
-    MODE_COMPARATOR_FIELD,
-    REALISATION_FIELD,
-    SUFFICIENT_FUNCTION_FIELD,
-    DecisionStatus,
-    EvidenceAction,
-    EvidenceKind,
-    EvidenceScope,
-    FunctionalInterventionProfile,
-    InterpretationTable,
-    MechanismContrast,
-    MechanismHypothesis,
-    OutcomeClass,
-    OutcomeRule,
-    BudgetedEvidenceSelector,
-)
+from maestro.outcome import MODE_COMPARATOR_FIELD, REALISATION_FIELD, SUFFICIENT_FUNCTION_FIELD, InterpretationTable, OutcomeClass, OutcomeRule
+from maestro.models import DecisionStatus, EvidenceKind, EvidenceScope, MechanismContrast
+from maestro import EvidenceAction, FunctionalInterventionProfile, MechanismHypothesis
+from maestro.composition import BudgetedEvidenceSelector
 from maestro.outcome import admit_evidence
 from maestro.repair import RepairLedger, RepairRecord
 from maestro.models import RepairKind
-from virtual_cell import (
-    Interval,
-    IntervalKind,
-    Intervention,
-    PredictionRequest,
-    StatePrediction,
-    SystemContext,
-)
+from virtual_cell.interface import Interval, IntervalKind, Intervention, SystemContext
+from virtual_cell import PredictionRequest, StatePrediction
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -339,7 +321,7 @@ def test_f05_a_bundle_result_is_read_against_its_own_action(tmp_path: Path):
 
 def test_f06_prediction_priority_follows_each_action_own_readout():
     controller = object.__new__(MAESTROOrchestrator)
-    from maestro.reliability import PredictionReliabilityLedger
+    from maestro.judgment import PredictionReliabilityLedger
 
     controller._reliability = PredictionReliabilityLedger()
     actions = (

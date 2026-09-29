@@ -11,13 +11,24 @@
 **Outputs:** `outputs/protocol_v2_20260927/` (not tracked). Small copies are in
 `log/20260927/0927/`.
 
+**Protocol v2.1 (block 5, 18:00-19:00).** [protocol_v2_1.json](protocol_v2_1.json) fixes three evaluation
+boundaries found by the block-4 audit, for new runs only; the v2 records and this page's v2 results are unchanged.
+- `design.py` builds the legal menu from the study design, so the 12 SciPlex3 conditions dropped for low cell
+  counts are offered and charged as QC failures.
+- `tasks_v21.py` rebuilds hypothesis pools from each fold's training compounds.
+- `headroom.unit_paired` makes the unit mean primary.
+- Tests: `test_protocol_v2_1.py`.
+- Results, in [../premise_forecast/README.md](../premise_forecast/README.md) section 2:
+  - `e_data1.py`: SciPlex3 B and L1000 LT remain eligible but underpowered.
+  - `e_cal1.py`: the gate fails; forecasts on selected steps are about 2x too low.
+
 ## Answer
 
 **Not yet, and not with the data in this repository.** No MAESTRO policy meets any protocol-v2
 success criterion. The binding constraints are the tasks, not the planner:
 
 1. **The fixed order already makes most of the decisions any policy could make.** It reaches
-   63% (L1000 LT) to 99.6% (L1000 T) of the oracle's correct decisions. SciPlex3 A and L1000 T
+   63% (L1000 LT) to 99.4% (L1000 T) of the oracle's correct decisions. SciPlex3 A and L1000 T
    fail the headroom gate, so a +0.02 gain there is impossible by construction.
 2. **Most L1000 episodes cannot be decided at all.** In 76-82% of them no planned condition
    eliminates either hypothesis.

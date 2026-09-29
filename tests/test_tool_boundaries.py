@@ -38,18 +38,12 @@ def test_registered_manifests_expose_their_applicability_boundaries():
 
 
 def test_the_catalog_discovers_only_manifested_tools():
-    """Discovery globs `tools/*/manifest.json`, so support code is never offered.
-
-    `tools/shared/` holds the fixture and client stand-ins the tests and offline
-    runners use. It carries no manifest on purpose: if it did, the router would
-    offer it to the selecting model as a dataset tool, and a fixture builder is not
-    one. This pins both halves of that statement.
-    """
+    """Grouped manifests expose only registered runtime capabilities."""
 
     identifiers = {descriptor.identifier for descriptor in LocalToolCatalog(ROOT / "tools").discover()}
     assert identifiers == {"column_summary", "data_profile", "table_filter", "evidence_bundle_optimize", "multimodal_alignment", "typed_decision_review", "virtual_cell_query",
                            "signature_retrieval", "case_memory"}
-    assert (ROOT / "tools" / "shared").is_dir()
+    assert not (ROOT / "tools" / "shared").exists()
     assert not (ROOT / "tools" / "shared" / "manifest.json").exists()
 
 

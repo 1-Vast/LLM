@@ -15,7 +15,7 @@ File summary
 - Run: python research/dynamic_world_model/case_study.py
   - Planners replayed: the current magnitude rule, the time-aware card policy (`dyn_ref`) and the
     registered fixed time course (24 h then 72 h at 10 uM).
-- Depends on: common.py, episodes.py, agent.cases, maestro.handoff, h5py
+- Depends on: common.py, episodes.py, agent.memory, maestro.handoff, h5py
 """
 from __future__ import annotations
 
@@ -106,7 +106,7 @@ class Source:
         self.meta["perturbation"] = self.meta.perturbation.astype(str).str.strip()
         manifest = json.loads((C.PREPARED / "prepare_manifest.json").read_text(encoding="utf-8"))
         self.sha256 = manifest["audit"]["source_sha256"]
-        from virtual_cell.identity_markers import shift_labels
+        from virtual_cell.artifacts import shift_labels
         with h5py.File(self.path, "r") as f:
             published = obs_column(f["var"], "ensembl_id").astype(str)
         labels = np.array([x if x is not None else "" for x in shift_labels(list(published), manifest["audit"]["label_offset"], self.shape[1])])
@@ -193,7 +193,7 @@ def execute_assay(source: Source, data: C.Data, assay_id: str, compound: str, ke
 
 # ------------------------------------------------------------------------------ closed loop
 def closed_loop(data, detected, null, protocol, source, compound, planner: str, store_path: Path, raw_dir: Path) -> dict:
-    from agent.cases import CaseStore, CaseState, MeasurementResult
+    from agent.memory import CaseStore, CaseState, MeasurementResult
     from maestro.handoff import (ComparabilityStatus, DecisionLayer, EvidenceLayer, ExecutionLayer, RejectedCandidate,
                                  RoundRecord, WorldModelLayer, write_round)
     from maestro.models import DecisionStatus, EvidenceKind
@@ -294,7 +294,7 @@ def main() -> None:
             result["loops"].append(closed_loop(data, detected, null, protocol, source, compound, planner,
                                                OUT / "cases.sqlite3", OUT / "raw"))
     # explicit non-success: a planned 72 h 10 uM measurement whose wells did not survive
-    from agent.cases import CaseStore, MeasurementResult
+    from agent.memory import CaseStore, MeasurementResult
     from maestro.models import EvidenceKind
     store = CaseStore(OUT / "cases.sqlite3")
     key = ("A549", 72.0, 10000.0)

@@ -9,28 +9,18 @@ File summary
 """
 from pathlib import Path
 
-from agent.audit import RunLogger
+from agent.memory import RunLogger
 from agent.context import ContextBuilder, TaskInterpreter
 from agent.knowledge import EvidenceLedger
 from agent.memory import MemoryStore
 from agent.orchestrator import MAESTROOrchestrator
 from agent.planner import MechanismContrastPlanner
-from agent.vision import VisualInspector
+from agent.llm import VisualInspector
 from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent
-from virtual_cell import (
-    Intervention,
-    Interval,
-    IntervalKind,
-    ModelCapabilities,
-    PredictionRequest,
-    QueryAssessment,
-    QuerySupport,
-    StatePrediction,
-    SystemContext,
-    VirtualCellQueryTemplate,
-)
+from virtual_cell.interface import Intervention, Interval, IntervalKind, ModelCapabilities, QueryAssessment, QuerySupport, SystemContext, VirtualCellQueryTemplate
+from virtual_cell import PredictionRequest, StatePrediction
 
-from tools.shared.stub_client import StubClient  # noqa: E402
+from tests.fixtures.stub_client import StubClient  # noqa: E402
 class ApplicableWorldModel:
     def __init__(self):
         self.requests = []

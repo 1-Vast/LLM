@@ -1,55 +1,65 @@
-> **File summary**
-> - **Path**: `tools/README.md`
-> - **Purpose**: describes the manifest-scoped local dataset tool convention.
-> - **Core points**:
->   - Each manifest-carrying subdir is one executable, manifest-scoped tool.
->   - The agent selects a bounded sequence of registered tools and sees prior receipts.
->   - `shared/` is support code with no manifest, so discovery never offers it.
->   - Tool output is observation, never a mechanism conclusion.
-> - **Interfaces / data**: `*/manifest.json`, `*/tool.py`, `data_profile/`, `column_summary/`, `table_filter/`, `shared/`
-> - **Depends on**: `src/agent/tool_runtime.py`
+# Tools
 
-# MAESTRO Local Tools
+Tools are grouped by responsibility. Each capability keeps its own ID, schema, applicability
+boundary and source hashes. The router discovers `*/manifest.json` and `*/*.manifest.json`;
+each manifest selects a public function in the group's `tool.py`. The exact manifest and source
+bytes are verified again before invocation. Receipts retain their declared evidence type.
 
-Each subdirectory is one executable, manifest-scoped local data tool. The agent discovers `*/manifest.json`, asks the configured LLM to choose successive applicable registered tools for datasets supplied by the user, validates that selection, and executes only that folder's `tool.py`. Results enter the context as dataset-derived observations with their source and limitations; they never become a mechanism conclusion by themselves.
+| Directory | Registered Capability IDs |
+|---|---|
+| `data/` | `data_profile`, `column_summary`, `table_filter` |
+| `evidence/` | `evidence_bundle_optimize`, `multimodal_alignment`, `typed_decision_review` |
+| `prediction/` | `signature_retrieval`, `virtual_cell_query` |
+| `case_memory/` | `case_memory`; case construction, audit and replay commands |
+| `datasets/` | Discovery, hash-pinned acquisition, data construction and QA (no runtime manifest) |
+| `evaluation/` | Case replay, costs and scoring (no runtime manifest) |
 
-Available tools:
+The larger case-memory workflow is grouped under `case_memory/`: its builders and validation
+commands share the reference-vector index and byte-hash helpers instead of rescanning the same
+arrays or duplicating checksum loops.
+The two validation modes use one entry point: `python -m tools.case_memory.validate forecasts` and
+`python -m tools.case_memory.validate calibration`.
+The external evaluation workflow also uses one entry point:
 
-- `data_profile/`: CSV, TSV, and JSON schema, sample, and missingness inspection.
-- `column_summary/`: bounded descriptive statistics for one named numeric column.
-- `table_filter/`: one declarative filter with a bounded matching-row sample.
-- `evidence_bundle_optimize/`: exact declared coverage with source-dependence bounds and explicit costs.
-- `multimodal_alignment/`: paired scalar QC with explicit information visibility and acquisition cost.
-- `typed_decision_review/`: validates recorded Typed Jev judgments as advisory model predictions,
-  reports stability suppression, and preserves deterministic decision authority.
-- `virtual_cell_query/`: the State adapter behind applicability and endpoint gates; returns prediction or named refusal.
-- `signature_retrieval/`: compares a measured signature with a digest-bound library of measured
-  SciPlex3 responses and ranks the annotated classes it resembles, against a permutation null and
-  beside its recorded held-out agreement (0.500 on 40 compounds; chance 0.059).
+```bash
+python -m tools.case_memory.workflow sources
+python -m tools.case_memory.workflow pack
+python -m tools.case_memory.workflow graphs
+python -m tools.case_memory.workflow replay
+python -m tools.case_memory.workflow evaluate
+python -m tools.case_memory.audit quality
+python -m tools.case_memory.audit figures
+```
 
-Structured payloads and receipts enter planning without being converted into measurements.
-Manifest requirements and qualification states are in [`task.md`](../task.md) section 6; the
-negative-condition contract a tool description must carry is in
-[`research/agent_architecture.md`](../research/agent_architecture.md) section 2.3.
+These replace the former `download_sources`, `build_hypothesis_graph`, `preprocess`,
+`replay` and `evaluate` modules. Run
+`python -m tools.case_memory.workflow --help` for the available steps.
 
-The initial tools use only the Python standard library. New tools must be placed in their own folder with `manifest.json`, `tool.py`, and a concise `README.md`; they must not accept shell commands, arbitrary code, arbitrary file paths, or infer causal biological claims. All tool output is validated as observation, not evidence of a mechanism contrast.
+## Model Benchmark
 
-## Shared support code: `shared/`
+```bash
+python -m tools.datasets.benchmark
+```
 
-`tools/shared/` carries the machinery that tools, offline runners and tests all need,
-and it deliberately has **no** `manifest.json`. Discovery globs `tools/*/manifest.json`,
-so the package is never offered to the selecting model and can never be executed as a
-tool; `tests/test_repository_shape.py` pins that.
+This replaces `tools.model_experiment.build_benchmark`. It reads the existing protocol-v2.1
+tables and writes `data/processed/model_experiment_v1/`: `public_episodes.jsonl.gz`,
+`hidden_outcomes.jsonl.gz` and a hashed `manifest.json`. There are 6,601 episodes and 49,304
+measured action records across SciPlex3 A/B and L1000 LT/T. Fold 0 is evaluation; folds 1-4
+are development. The source-unit field is retained for clustered reporting.
 
-- `stub_client.py` -- `StubClient`, a deterministic stand-in for the language-model
-  client. It returns a declared response and records what the caller sent, so an
-  offline test exercises the caller without a provider, a key or a paid request. It
-  replaces eleven near-identical copies that used to live in the test modules.
-- `state_fixture.py` -- builds the smallest virtual-cell fixture the real entry point
-  accepts: a synthetic AnnData asset, its registration, a checkpoint placeholder with
-  a perturbation map, and a query bound to them. A caller that wants to test a
-  *refusal* passes the field that should be refused. Nothing it builds is a
-  measurement, and the registration says so in its `source` field.
+Public episodes contain legal menus and budgets, with no truth, outcome, readout, lifecycle or
+score fields. `tools.evaluation.scoring.score_sequence` validates the submitted sequence before
+joining hidden outcomes by `episode_id`. These previously exposed records support replay and
+leakage checks and development comparisons, not independent validation or deployment calibration.
 
-Neither module asserts anything about biology: a fixture can make the entry point
-accept a query, and it can never make a claim true.
+The sciPlex-v2 builder and QA are in `datasets`; superseded v1 scripts and duplicate
+archives are removed. Historical findings remain in the dataset-discovery reports.
+
+Run evaluation through `python -m tools.evaluation.cli` and
+`python -m tools.evaluation.construction build|screen`. Only `maestro` is an installed command.
+The checkout-local research test
+runner is `python -m tools.research_validation` from the repository root; it checks code under
+`research/` and does not imply that a research claim is validated.
+
+Synthetic biological, virtual-cell, and provider-client fixtures are test-only and live in
+`tests/fixtures/`.

@@ -7,12 +7,8 @@ File summary
 - Interfaces: `test_unavailable_world_model_does_not_invent_a_state_prediction()`
 - Depends on: virtual_cell
 """
-from virtual_cell import (
-    Intervention,
-    PredictionRequest,
-    SystemContext,
-    UnavailableVirtualCellWorldModel,
-)
+from virtual_cell.interface import Intervention, SystemContext, UnavailableVirtualCellWorldModel
+from virtual_cell import PredictionRequest
 
 
 def test_unavailable_world_model_does_not_invent_a_state_prediction():

@@ -15,7 +15,7 @@ File summary
     deterministic separation choice is, and the fallback is recorded.
   - Spend goes through `SpendLedger` with the protocol's caps; the API key never leaves the clients.
 - Run: python research/dynamic_world_model/agent_arms.py [--arms ...] [--dry-run]
-- Depends on: common.py, episodes.py, agent.llm, agent.typesafe, evaluation.provider_spend, maestro.stability
+- Depends on: common.py, episodes.py, agent.llm, agent.decision_critic, evaluation.costs, maestro.judgment
 """
 from __future__ import annotations
 
@@ -115,12 +115,12 @@ def state_text(ctx, h1, h2, menu, executed, remaining, null, cards=None) -> str:
 
 class Providers:
     def __init__(self, out: Path, protocol: dict):
-        from agent.configuration import MAESTROSettings
+        from agent.llm import MAESTROSettings
         from agent.llm import DeepSeekChatClient
-        from agent.typesafe import TypeSafeJevClient, TypeSafeSettings
-        from evaluation.provider_spend import SpendLedger
+        from agent.decision_critic import TypeSafeJevClient, TypeSafeSettings
+        from tools.evaluation.costs import SpendLedger
         caps = protocol["llm_arms"]["spend_caps_usd"]
-        # Carry-in, reconstructed with evaluation.provider_spend.price_usage from the logged usage of the smoke
+        # Carry-in, reconstructed with evaluation.costs.price_usage from the logged usage of the smoke
         # run and of two aborted launches (2 + 51 calls, $0.016066), plus 12 possibly in-flight calls at the
         # stop charged at their $0.004 reservation because they may be billed without a usage record.
         self.ledger = SpendLedger.load(out / "deepseek_spend.json", ceiling_usd=caps["deepseek"],
@@ -169,9 +169,9 @@ class Providers:
         return {"choice": None, "failure": "answer_outside_menu_after_one_correction"}
 
     def jev_choice(self, label: str, text: str, options: list[str]) -> dict:
-        from agent.typesafe import choice
+        from agent.decision_critic import choice
         from maestro.judgment import JudgmentScope
-        from maestro.stability import RepeatedJudgment, StabilityVerdict
+        from maestro.judgment import RepeatedJudgment, StabilityVerdict
         if self.jev is None:
             return {"choice": None, "failure": "jev_not_configured"}
         values, probabilities, refusals, model = [], [], [], ""

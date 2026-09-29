@@ -16,7 +16,7 @@ from .models import (
     MechanismContrast, MechanismHypothesis,
 )
 from .acquisition import select_expected_coverage
-from .tool_contracts import (
+from .handoff import (
     TOOL_SCHEMA_VERSION, json_dumps, json_loads, json_value, nonempty_string,
     nonnegative_number, object_fields, string_list,
 )

@@ -11,15 +11,15 @@ File summary
   - A measured unstable scope is suppressed; an unmeasured one speaks, labelled.
   - Repeated answers aggregate by mean for a yes/no question and by mode for a choice.
 - Interfaces: pytest test functions
-- Depends on: maestro.stability, agent.decision_critic
+- Depends on: maestro.judgment, agent.decision_critic
 """
 from __future__ import annotations
 
 import pytest
 
-from agent import typesafe as typesafe_module
+from agent import decision_critic as typesafe_module
 from agent.decision_critic import TypedDecisionCritic
-from agent.typesafe import JevEvaluation, TypedAnswer, TypedQuestion
+from agent.decision_critic import JevEvaluation, TypedAnswer, TypedQuestion
 from maestro.judgment import JudgmentLedger, JudgmentScope
 from maestro.models import (
     DevelopmentAction,
@@ -27,7 +27,7 @@ from maestro.models import (
     MechanismContrast,
     MechanismHypothesis,
 )
-from maestro.stability import (
+from maestro.judgment import (
     RELIABLE_REPEATS,
     RepeatedJudgment,
     StabilityLedger,

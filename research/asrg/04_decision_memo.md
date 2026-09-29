@@ -8,8 +8,8 @@
 | 2 | **(b) Action-supported geometry** — measured anchor with out-of-fold shrinkage, reachability certificate, shared-error-aware query planning | Potentially real but unproven. It is the only part of the original ASRG that is not an algebraic identity, and it targets the repair setting MAESTRO actually has | Moderate. One new module; no new training objective beyond κ̂ | Low incremental over (a); the anchor measurement already exists in a repair case | G4: κ̂ interval excluding zero **and** regret separation from the best arm in (a) |
 | 3 | **(c) Learned repair policy** — operation-value model over predicted residual, uncertainty, support and remaining budget | Low for now. It can only be attributed once (b) is established, and out-of-fold training data at this scale is thin | High. New model, new training set, new leakage surface | Moderate | G5, after G4. Reject if it does not separate from (b) at equal real cost |
 
-**Recommendation.** Ship (a) as the baseline and the reported result. Test (b) once, under the
-frozen protocol, with the rejection criteria already written. Do not start (c) until (b) has
+**Recommendation.** Ship (a) as the baseline and the reported result. Test (b) once, after the
+proposed protocol is registered, with the rejection criteria already written. Do not start (c) until (b) has
 passed. If (b) fails, say so and keep (a) as the contribution — a clean negative result about
 measurement anchoring in perturbation selection is publishable and useful.
 

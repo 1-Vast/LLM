@@ -93,8 +93,8 @@ def main() -> None:
 
     # ---- gene identity ----------------------------------------------------------------------
     # The published label table is not trusted: which label row names which column is decided
-    # below by cell-identity markers (virtual_cell.identity_markers), for each candidate offset.
-    from virtual_cell.identity_markers import resolve_label_offset, shift_labels
+    # below by cell-identity markers (virtual_cell.artifacts), for each candidate offset.
+    from virtual_cell.artifacts import resolve_label_offset, shift_labels
 
     hgnc = pd.read_csv(common.ROOT / protocol["source"]["gene_identity"], sep="\t", dtype=str,
                        usecols=["symbol", "entrez_id", "ensembl_gene_id", "status"])

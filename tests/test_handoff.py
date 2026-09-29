@@ -19,13 +19,13 @@ from pathlib import Path
 
 import pytest
 
-from agent.audit import RunLogger
+from agent.memory import RunLogger
 from agent.context import ContextBuilder, TaskInterpreter
 from agent.knowledge import EvidenceLedger
 from agent.memory import MemoryStore
 from agent.orchestrator import MAESTROOrchestrator
 from agent.planner import MechanismContrastPlanner
-from agent.vision import VisualInspector
+from agent.llm import VisualInspector
 from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent
 from maestro.handoff import (
     ComparabilityStatus,
@@ -40,7 +40,7 @@ from maestro.handoff import (
     write_round,
 )
 
-from tools.shared.stub_client import StubClient  # noqa: E402
+from tests.fixtures.stub_client import StubClient  # noqa: E402
 def _round(
     *,
     world_model: WorldModelLayer | None = None,

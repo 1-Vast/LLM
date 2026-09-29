@@ -9,13 +9,13 @@ identical to `origin/main`, clean tree). **No repository file was changed.**
 |---|---|
 | `01_repository_audit.md` | 4 — repository gap audit, evidence-labelled, minimal integration surface |
 | `02_data_and_costs.md` | 3 — data and three-cost matrix, primary pilot plus one external branch |
-| `03_experiment_protocol.md` | 5 — frozen protocol: splits, arms, budgets, metrics, leakage guards, ablations, rejection criteria |
+| `03_experiment_protocol.md` | 5 — proposed, unregistered protocol: splits, arms, budgets, metrics, leakage guards, ablations, rejection criteria |
 | `04_decision_memo.md` | 6 — ranking of the three options, go/no-go gates, milestones, unavailable assets, unresolved assumptions |
 
 ## Executable specification of the model and its algebra
 
 The formal content of assignment section 2 exists as runnable code rather than prose, in
-`../asrg_analysis/`. These scripts are the authoritative statement of the claims and were all
+`../analysis/`. These scripts are the authoritative statement of the algebraic checks and were all
 executed on 2026-09-25.
 
 | Script | What it establishes |

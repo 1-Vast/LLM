@@ -2,7 +2,7 @@
 
 File summary
 - Path: research/belief_planning/arms.py
-- Purpose: wrap `maestro.planning.plan_measurement` and the `world.ReferenceWorld` forecaster as an
+- Purpose: wrap `research.belief_planning.planner.plan_measurement` and the `world.ReferenceWorld` forecaster as an
   arm for `sequence_audit.policies.run_matched`. The runner still owns the menu, budget, QC rule,
   evidence update and stopping on elimination.
 - Core points:
@@ -23,7 +23,7 @@ File summary
     the belief, the contingent next action for each reading, and whether the virtual cell
     reached the forecast (`used_vc`).
 - Interfaces: `belief_arm`, `belief_state`, `world_for`, `PRICE`
-- Depends on: research/belief_planning/world.py, research/sequence_audit/policies.py, maestro.planning
+- Depends on: research/belief_planning/world.py, research/sequence_audit/policies.py, research/belief_planning/planner.py
 """
 from __future__ import annotations
 
@@ -40,7 +40,7 @@ for sub in ("sequence_audit", "acquisition_link", "dynamic_world_model"):
 import policies as P  # noqa: E402
 
 from maestro.acquisition import outcome_consequences  # noqa: E402
-from maestro.planning import plan_measurement, update_belief  # noqa: E402
+from .planner import plan_measurement, update_belief  # noqa: E402
 
 from . import world as W  # noqa: E402
 

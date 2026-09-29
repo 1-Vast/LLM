@@ -4,18 +4,9 @@ import pytest
 import torch
 
 from virtual_cell.learned_response import DoseAnchoredNetwork, fit_response
-from evaluation.model_validation import molecular_split, paired_interval
 from dataclasses import replace
 from virtual_cell.learned_response import LearnedTranscriptWorldModel
 from virtual_cell.interface import Intervention, PredictionRequest, SystemContext, safe_predict
-
-
-def test_molecular_aliases_never_cross_partitions():
-    molecules = [f"molecule-{i}" for i in range(100)]
-    split = molecular_split(molecules + molecules[:20])
-    assert split == molecular_split(molecules[::-1])
-    assert {s: list(split.values()).count(s) for s in set(split.values())} == {
-        "train": 60, "validation": 15, "calibration": 10, "test": 15}
 
 
 def test_zero_dose_boundary_is_exact_for_any_weights():
@@ -33,12 +24,6 @@ def test_small_response_fit_learns_and_restores_selected_epoch():
     assert fit.selected_epoch == min(fit.history, key=lambda h: h["validation_mse"])["epoch"]
     with pytest.raises(ValueError, match="invalid_response_input"):
         fit.predict(np.full((1, 3), np.nan), np.ones(1))
-
-
-def test_cluster_interval_counts_molecules_not_cells():
-    result = paired_interval(np.array([1., 1., -1.]), np.array(["a", "a", "b"]))
-    assert result["clusters"] == 2
-    assert result["mean"] == 0
 
 
 def test_training_refuses_nonfinite_values():

@@ -13,10 +13,10 @@ from http.client import RemoteDisconnected
 import pytest
 
 from agent import llm as llm_module
-from agent import typesafe as typesafe_module
-from agent.configuration import MAESTROSettings
+from agent import decision_critic as typesafe_module
+from agent.llm import MAESTROSettings
 from agent.llm import DeepSeekChatClient, LLMTransportError
-from agent.typesafe import TypeSafeJevClient, TypeSafeSettings, choice
+from agent.decision_critic import TypeSafeJevClient, TypeSafeSettings, choice
 
 FAILURES = (RemoteDisconnected("Remote end closed connection without response"),
             ConnectionResetError(10054, "An existing connection was forcibly closed"))

@@ -8,7 +8,7 @@ File summary
   - Contract tests are software tests: they establish admission and search behaviour, never biological validity.
   - Valid legacy behaviour is asserted alongside each new restriction, so a fix cannot pass by forbidding everything.
 - Interfaces: pytest test functions
-- Depends on: evaluation.feasibility, evaluation.planning, evaluation.cases, virtual_cell.applicability, virtual_cell.world_model, virtual_cell.biology
+- Depends on: evaluation.planning, evaluation.planning, evaluation.cases, virtual_cell.applicability, virtual_cell.world_model, virtual_cell.biology
 """
 from __future__ import annotations
 
@@ -19,15 +19,15 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
-from evaluation.cases import EvidenceMenuItem, PublicCase, RevealedEvidence
-from evaluation.feasibility import (
+from tools.evaluation.cases import EvidenceMenuItem, PublicCase, RevealedEvidence
+from tools.evaluation.planning import (
     effective_fields,
     enumerate_public_plans,
     granted_premises,
     legal_actions,
     plan_enumeration,
 )
-from evaluation.planning import (
+from tools.evaluation.planning import (
     CompatibilityStatus,
     PlanConstraints,
     decision_ambiguity,
@@ -143,8 +143,8 @@ def test_small_instance_still_proves_optimality():
 def test_enumerator_and_solver_limits_are_consistent():
     """The solver's own escalation threshold must be reachable by the enumerator."""
 
-    from evaluation import planning as planning_module
-    from evaluation import feasibility as feasibility_module
+    from tools.evaluation import planning as planning_module
+    from tools.evaluation import planning as feasibility_module
 
     assert planning_module.EXACT_ENUMERATION_LIMIT <= feasibility_module.DEFAULT_PLAN_LIMIT
 
@@ -909,7 +909,7 @@ def test_an_intervention_separates_intent_from_realised_effect():
 
 
 def test_the_view_reports_readiness_menu_state_and_missing_premises_separately():
-    from evaluation.cases import ReplayView
+    from tools.evaluation.cases import ReplayView
 
     """Revised 2026-09-13 (follow-up review, finding F).
 
@@ -935,7 +935,7 @@ def test_the_view_reports_readiness_menu_state_and_missing_premises_separately()
 
 
 def test_a_blocked_action_names_the_premise_that_blocks_it():
-    from evaluation.cases import ReplayView
+    from tools.evaluation.cases import ReplayView
 
     public = _typed_case()
     record = _record("bulk_viability", "positive", ("target_engagement_confirmed",))

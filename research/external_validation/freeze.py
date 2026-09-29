@@ -37,8 +37,8 @@ HARNESS = ["research/external_validation/__init__.py", "research/external_valida
            "research/external_validation/manifests/hypothesis_ontology.json"]
 POLICY = ["research/external_validation/arms.py", "research/sequence_audit/policies.py",
           "research/sparse_value/policy.py", "research/acquisition_link/evaluate.py",
-          "research/acquisition_followup/two_step.py", "src/maestro/acquisition.py", "src/maestro/selection.py",
-          "src/maestro/outcome.py", "src/maestro/models.py", "src/maestro/policy.py"]
+          "research/acquisition_followup/two_step.py", "src/maestro/acquisition.py", "src/maestro/composition.py",
+          "src/maestro/outcome.py", "src/maestro/models.py", "src/maestro/handoff.py"]
 MODEL = ["research/sparse_value/model.py", "research/dynamic_world_model/episodes.py"]
 CALIBRATION = ["research/dynamic_world_model/common.py", "research/dynamic_world_model/protocol.json"]
 DATA_CODE = ["research/sequence_audit/lincs_prepare.py", "research/sequence_audit/lincs_evaluate.py",

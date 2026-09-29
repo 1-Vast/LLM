@@ -8,7 +8,7 @@ File summary
 - Core points: assertions here are contract tests, not biological results; each test pins one
   boundary that must not silently move. No test makes a provider request.
 - Interfaces: pytest tests only
-- Depends on: agent, maestro, tools.shared
+- Depends on: agent, maestro, tests.fixtures
 """
 from __future__ import annotations
 
@@ -17,8 +17,8 @@ from pathlib import Path
 
 import pytest
 
-from agent import typesafe as typesafe_module
-from agent.audit import RunLogger
+from agent import decision_critic as typesafe_module
+from agent.memory import RunLogger
 from agent.context import ContextBuilder, TaskInterpreter
 from agent.decision_critic import (
     NOT_LISTED,
@@ -31,7 +31,7 @@ from agent.knowledge import EvidenceLedger
 from agent.memory import MemoryStore
 from agent.orchestrator import MAESTROOrchestrator
 from agent.planner import ADVISORY_HEADING, MechanismContrastPlanner
-from agent.typesafe import (
+from agent.decision_critic import (
     JevEvaluation,
     QuestionKind,
     TypeSafeJevClient,
@@ -42,12 +42,12 @@ from agent.typesafe import (
     noul,
     score,
 )
-from agent.vision import VisualInspector
+from agent.llm import VisualInspector
 from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent
 from maestro.judgment import JudgmentLedger, JudgmentScope, TypedJudgment
 from maestro.models import ContrastCheck, MechanismContrast, MechanismHypothesis, NonDiscriminabilityReason
 
-from tools.shared.stub_client import StubClient  # noqa: E402
+from tests.fixtures.stub_client import StubClient  # noqa: E402
 
 ACTIONS = (
     EvidenceAction("viability", "Viability readout.", 5.0, ("a", "b"),

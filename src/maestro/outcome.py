@@ -1,16 +1,4 @@
-"""Executable outcome-interpretation rules (rho) and bounded, set-based evidence updates.
-
-File summary
-- Path: src/maestro/outcome.py
-- Purpose: Apply registered `rho` rules to a real result under explicit conditions and scope.
-- Core points:
-  - `rho` names which real result may constrain which mechanism variable and when.
-  - Only a real measurement can constrain a mechanism contrast.
-  - A result shrinks the compatible set; it never produces a probability nobody measured.
-  - Failed results are retained with a narrower scope, not discarded.
-- Interfaces: `InterpretationTable`, `interpret`, `OutcomeRule`, `OutcomeInterpretation`, `EvidenceState`, `default_rules_for`, `OutcomeClass`
-- Depends on: maestro.models
-"""
+"""Executable outcome-interpretation rules (rho) and bounded, set-based evidence updates."""
 from __future__ import annotations
 
 import math
@@ -363,6 +351,8 @@ class InterpretationTable:
         if not _finite_number(time_tolerance_hours) or time_tolerance_hours < 0:
             raise ValueError("time_tolerance_hours must be finite and nonnegative.")
         self._rules = tuple(rules)
+        if len({rule.identifier for rule in self._rules}) != len(self._rules):
+            raise ValueError("Registered outcome rule identifiers must be unique.")
         self._time_tolerance = time_tolerance_hours
         self._require_context_match = require_context_match
 
@@ -406,7 +396,21 @@ class InterpretationTable:
                 boundary="A derived or predicted record keeps its declared limitations and cannot update the contrast.",
             )
 
-        rule = self._matching_rule(observation)
+        matching = tuple(rule for rule in self._rules if rule.matches(observation))
+        if len(matching) > 1:
+            return OutcomeInterpretation(
+                outcome_class=OutcomeClass.AMBIGUOUS,
+                scope=EvidenceScope.PLAN_LIMITATION,
+                rule_identifier=None,
+                outcome_label="ambiguous_registered_rules",
+                eliminates=frozenset(),
+                conditions_matched=False,
+                unmatched_conditions=("overlapping_rules:" + ",".join(sorted(rule.identifier for rule in matching)),),
+                rationale="Multiple registered rules match the supplied fields; registration order cannot select an interpretation.",
+                boundary="Resolve the rule overlap explicitly before admitting fields or eliminating a hypothesis.",
+                refused_fields=tuple(observation.interpretation_fields),
+            )
+        rule = matching[0] if matching else None
         if rule is None:
             fields = tuple(observation.interpretation_fields)
             unresolved = bool(fields)
@@ -551,12 +555,6 @@ class InterpretationTable:
                 detail = ",".join(min(failures, key=len)) if failures else "not_measured"
                 problems.append(f"evidence:{requirement.field}:{detail}")
         return tuple(selected), tuple(problems)
-
-    def _matching_rule(self, observation: ObservationRecord) -> OutcomeRule | None:
-        for rule in self._rules:
-            if rule.matches(observation):
-                return rule
-        return None
 
     def _unmatched_conditions(
         self,

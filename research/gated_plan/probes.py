@@ -166,7 +166,7 @@ def evidence() -> dict:
     from maestro.models import (BiologicalQuantity, EvidenceAction, EvidenceKind, FunctionalInterventionProfile,
                                 MechanismContrast, MechanismHypothesis, PremiseGrant, PremiseRequirement)
     from maestro.outcome import EvidenceState, InterpretationTable, OutcomeRule
-    from maestro.provenance import SourceCluster, SourceClusterIndex
+    from maestro.handoff import SourceCluster, SourceClusterIndex
     h1, h2 = MechanismHypothesis("H1", "a"), MechanismHypothesis("H2", "b")
     action = EvidenceAction("assay", "registered readout", 1.0, ("H1", "H2"), time_hours=24.0,
                             expected_conditions={"dose": "1uM"})

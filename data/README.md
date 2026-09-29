@@ -1,7 +1,8 @@
 # Local data
 
-`data/` holds MAESTRO's local datasets and third-party assets. Only this README is tracked;
-everything else is git-ignored and staged per machine. Code, tests, tools and registries name
+`data/` holds MAESTRO's local datasets and third-party assets. This README and four small
+legacy provenance/pack records are tracked; bulk assets are git-ignored and staged per machine.
+Code, tests, tools and registries name
 assets by `data/...` paths relative to the repository root.
 
 Until 2026-09-26 this directory was named `dataset/`, and `data` was a directory junction to it,
@@ -30,7 +31,7 @@ with its SHA-256 and the path of the twin kept here, in `_ARCHIVE_MANIFEST.json`
   - **Its feature labels are offset by one row.** The first entry of `var/ensembl_id` is a
     stray header, `id gene_short_name`, so the gene in column j is the label in row j + 1, and
     the `gene_symbol` column is unusable. Read labels through
-    `virtual_cell.identity_markers.resolve_label_offset`, which confirms the alignment with
+    `virtual_cell.artifacts.resolve_label_offset`, which confirms the alignment with
     cell-line markers (12 of 12 at offset +1, 5 of 11 as published) or refuses. The chemCPA
     subset `raw/sciplex3/sciplex_complete_middle_subset.h5ad` is correctly aligned.
 - `external/chemCPA/` is a pinned source checkout at commit

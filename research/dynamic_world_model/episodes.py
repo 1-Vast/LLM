@@ -16,7 +16,7 @@ File summary
   - `dyn_model` is added by `transition.py` once the transition arms are evaluated; this module
     exposes the hooks it needs.
 - Run: python research/dynamic_world_model/episodes.py
-- Depends on: common.py, maestro.selection, maestro.acquisition, maestro.models, maestro.outcome, rdkit
+- Depends on: common.py, maestro.composition, maestro.acquisition, maestro.models, maestro.outcome, rdkit
 """
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ from maestro.acquisition import select_expected_coverage  # noqa: E402
 from maestro.models import (DevelopmentAction, EvidenceAction, EvidenceActionKind, BiologicalQuantity,  # noqa: E402
                             FunctionalInterventionProfile, MechanismContrast, MechanismHypothesis)
 from maestro.outcome import EvidenceState  # noqa: E402
-from maestro.selection import BudgetedEvidenceSelector  # noqa: E402
+from maestro.composition import BudgetedEvidenceSelector  # noqa: E402
 
 STEP_BUDGET_DAYS = 8.0
 PROFILE = FunctionalInterventionProfile(mode="small_molecule")

@@ -1,0 +1,71 @@
+{
+ "name": "incontext-world-1",
+ "written_at": "2026-09-27T19:51:43+08:00",
+ "written_before": "any code of this package existed and before any E-WM1 or E-WM2 score was computed",
+ "status": "development screen on data already exposed in earlier blocks (SciPlex3, GSE92742 L1000); not an external or confirmatory test",
+ "question": "Do recent virtual-cell ideas (in-context prompting on measured responses, learned context transitions, knowledge-source attention, mean-delta baselines with a noise ceiling) improve MAESTRO's virtual-cell world model as a predictor of profiles and of the registered validator's readings on held-out compounds?",
+ "sources": {
+  "Stack (Dong et al. 2026, doi:10.64898/2026.01.09.698608)": "measured cells of the same condition act as an in-context prompt at inference; the prompt must be available at query time and never be the target itself",
+  "State (Adduri et al. 2025, doi:10.1101/2025.06.26.661135)": "a learned state transition across contexts; Cell-Eval metrics: Pearson delta, perturbation discrimination score",
+  "Tahoe-x1 (Gandhi et al. 2025, doi:10.1101/2025.10.23.683759)": "null, global-mean, context-mean and perturbation-mean delta baselines; split-half noise ceiling",
+  "PRESAGE (Littman et al. 2025, doi:10.1101/2025.06.03.657653)": "attention over knowledge sources with global weights; knowledge-source choice matters more than architecture; two-stage evaluation: effect size (AUROC of predicted norm) and direction (cosine centred at the mean response); phenocopy retrieval",
+  "SCALE (Chen et al. 2026, doi:10.64898/2026.03.17.712536)": "endpoint supervision; evaluation must be protocol-aligned and biologically meaningful rather than reconstruction-only",
+  "MultiFlow (Wang et al. 2026, doi:10.64898/2026.08.20.746112)": "condition on a control- or context-derived state; coupled prediction across layers. Not implemented: no paired second modality exists in these data"
+ },
+ "data": {
+  "sciplex3": "prepared pseudobulk shifts (2,473 genes) with split-half replicates; the 16 conditions of tiers A and B",
+  "l1000": "GSE92742 Level 5 landmark shifts (978 genes); the 8 conditions of tier LT; no split halves, so no noise ceiling",
+  "folds": "the registered compound folds 1-5; references are other-fold compounds only",
+  "units": "SciPlex3 skeleton, L1000 identity/scaffold component (belief_planning.tasks.units)"
+ },
+ "E-WM1": {
+  "title": "Profile prediction from an in-context prompt (virtual-cell observation model)",
+  "item": "held-out compound x, prompt condition p, target condition c != p, both QC-passed for x; prediction of x's shift at c from x's shift at p and other-fold compounds measured at both p and c",
+  "arms": {
+   "null": "0 (Tahoe-x1 null delta)",
+   "global_mean": "mean shift over all other-fold (compound, condition) rows of the dataset's conditions",
+   "context_mean": "mean other-fold shift at c",
+   "perturbation_mean": "x's own shift at p, contexts treated as replicates (Tahoe-x1 perturbation mean with one context)",
+   "additive": "x at p plus (context mean at c - context mean at p) (Stack PerturbMean, additive perturbation + context)",
+   "scaled": "context mean at c + beta (x at p - context mean at p), beta by least squares over other-fold pairs (secondary)",
+   "ridge_st": "PRIMARY CANDIDATE. context mean at c + ridge regression from the top-k principal components of centred prompt shifts to centred target shifts; k in {1,2,4,8,16,32} (below n-1) and lambda in {0.01,0.1,1,10} x mean retained eigenvalue, chosen per (p, c) by closed-form leave-one-out error on other-fold pairs"
+  },
+  "metrics": {
+   "primary": "centred cosine (PRESAGE direction): cos(pred - context_mean_c, truth - context_mean_c), a zero vector scoring 0, on items whose target is detected",
+   "secondary": ["Pearson delta (Tahoe-x1/State), 0 for a constant prediction", "mean squared error", "perturbation discrimination (State Cell-Eval, Manhattan distance, 1 - 2 x normalised rank, ties counted half) among held-out compounds of the fold measured at c", "effect-size AUROC (PRESAGE): Euclidean norm of the prediction against detection at c", "phenocopy@5: overlap of the 5 nearest other-fold compounds at c (projected cosine) of prediction and truth", "all metrics stratified by whether the prompt was detected"],
+   "noise_ceiling": "SciPlex3 only: split-half Pearson (rep1 vs rep2, Tahoe-x1 definition) and split-half centred cosine at the target"
+  },
+  "aggregation": "each unit's items are averaged first; 95% unit-cluster bootstrap, 10,000 draws, seed 20260927, per dataset",
+  "gate": "ridge_st passes on a dataset when its unit-mean primary metric exceeds each of null, global_mean, context_mean, perturbation_mean and additive with the 95% interval of every paired difference above 0",
+  "consequence": "a pass qualifies ridge_st as the transfer source of E-WM2; it does not promote anything to src/"
+ },
+ "E-WM2": {
+  "title": "Reading forecasts of the in-context world model (planning-facing)",
+  "tasks": "the 20 protocol-v2.1 development tasks: SciPlex3 A and B, L1000 LT and T, folds 1-5, built by research/protocol_v2/tasks_v21.load; references from the public view only",
+  "item": "one protocol-v2.1 episode (held-out compound, truth, decoy, seeded h1/h2) x one design-planned target condition c x one history; the real reading at c under the episode's contrast from the registered executor",
+  "histories": {"H0": "none", "H1": "each other planned condition p of the compound, with its real label and, when QC passed, its measured shift", "H2": "up to 6 ordered pairs of other planned conditions per (episode, target), seeded by (20260927, compound, decoy, target)"},
+  "arms": {
+   "pooled": "pooled reading frequencies at c (context-mean analogue)",
+   "class": "belief_planning.world.ReferenceWorld with vc masked and no history",
+   "reference": "CURRENT MODEL: ReferenceWorld with vc on and label feedback, hyperparameters fitted as in block 2",
+   "incontext": "PRIMARY CANDIDATE. reference plus one in-context layer shrunk to it with unit strength: weight kappa x label-history weight x prod over prompts exp(tau (sim - 1)) on each reference of the hypothesis; source (prompt: projected cosine at p between the compound's measured shift and the reference's; transfer: projected cosine at c between the ridge_st prediction from the compound's prompts and the reference's shift at c), kappa in {0,0.5,1,2,4,8,16} and tau in {1,2,4,8,16,32} chosen per fold by leave-one-unit-out predictive log-likelihood of training references' own readings under single-prompt histories. kappa = 0 is exactly reference",
+   "incontext_prompt": "ablation: source fixed to prompt",
+   "incontext_transfer": "ablation: source fixed to transfer",
+   "incontext_permuted": "control: each prompt shift replaced by a fixed partner held-out compound's shift at the same condition (seeded derangement within the fold); labels stay the compound's own"
+  },
+  "metrics": {
+   "primary": "negative log-likelihood (natural log) of the observed label under the true hypothesis's branch, labels {profile_matches_h1, profile_matches_h2, profile_unresolved, no_detectable_response, quality_failed}",
+   "secondary": ["Brier score over the five labels", "wrong-elimination calibration: observed / forecast among items", "the same on H2 items", "per-task results", "fitted source, kappa and tau per fold"]
+  },
+  "aggregation": "per dataset, items of all its tasks pooled; each unit's items averaged first; 95% unit-cluster bootstrap, 10,000 draws, seed 20260927",
+  "gate": "incontext passes on a dataset when, on H1 items, the unit-mean NLL difference incontext - reference has a 95% interval entirely below 0, H0 forecasts are identical to reference, and incontext_permuted - reference is not below 0 (interval upper bound >= 0)",
+  "consequence": "a pass makes the in-context world model a research candidate for a selected-step calibration test (E-CAL1 on the actions it selects); it is not connected to the planner, the agent or any production default in this block"
+ },
+ "claims_not_allowed": [
+  "any claim on held-out or external data beyond these development folds",
+  "any mechanism, efficacy or target-engagement claim",
+  "that a forecast or predicted profile is an observed result",
+  "planner superiority (the registered E-DATA1 failure rule stops that work on these data)"
+ ],
+ "seeds": {"bootstrap": 20260927, "histories": 20260927, "permutation": 20260927}
+}

@@ -9,17 +9,18 @@ File summary
 """
 from pathlib import Path
 
-from agent.audit import RunLogger
-from agent.cases import CaseState, CaseStore
+from agent.memory import RunLogger
+from agent.memory import CaseState, CaseStore
 from agent.context import ContextBuilder, TaskInterpreter
 from agent.knowledge import EvidenceLedger
 from agent.memory import MemoryStore
 from agent.orchestrator import MAESTROOrchestrator
 from agent.planner import MechanismContrastPlanner
-from agent.vision import VisualInspector
-from maestro import EvidenceAction, EvidenceActionKind, FunctionalInterventionProfile, MAESTROAgent
+from agent.llm import VisualInspector
+from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent
+from maestro.models import EvidenceActionKind
 
-from tools.shared.stub_client import StubClient  # noqa: E402
+from tests.fixtures.stub_client import StubClient  # noqa: E402
 def test_rule_repair_submits_an_executable_functional_measurement(tmp_path: Path):
     client = StubClient(
         [

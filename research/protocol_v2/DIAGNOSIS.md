@@ -31,11 +31,11 @@ Status key: CONFIRMED, PARTLY (confirmed with a material qualification), REJECTE
 
 | # | Claim | Source | Code path | Data dependency | Status | Confidence | Verification |
 |---|---|---|---|---|---|---|---|
-| 1 | The fixed strategy is strong and some tasks have very low oracle headroom | reports 1, 3, 8 | `headroom.py`; `external_validation/arms.py oracle_plan` | registered dev and external records | CONFIRMED | high | Oracle-minus-fixed correct: SciPlex3 A +0.030 [0.000, 0.083], L1000 T +0.001 [0.000, 0.003], SciPlex3 B +0.086 [0.053, 0.123], L1000 LT +0.062 [0.037, 0.091], GSE70138 +0.071 [0.003, 0.153]. The fixed order reaches 63% (LT), 87% (B), 96% (A) and 99.6% (T) of the oracle's correct decisions. A and T fail the task gate. |
+| 1 | The fixed strategy is strong and some tasks have very low oracle headroom | reports 1, 3, 8 | `headroom.py`; `external_validation/arms.py oracle_plan` | registered dev and external records | CONFIRMED | high | Oracle-minus-fixed correct: SciPlex3 A +0.030 [0.000, 0.083], L1000 T +0.001 [0.000, 0.003], SciPlex3 B +0.086 [0.053, 0.123], L1000 LT +0.062 [0.037, 0.091], GSE70138 +0.071 [0.003, 0.153]. The fixed order reaches 63% (LT), 87% (B), 96% (A) and **99.4% (T)** of the oracle's correct decisions. A and T fail the task gate. |
 | 2 | GSE70138 has about 38 independent units after filtering | reports 1, 3, 8 | `belief_planning/external_phase2.py open_study` | vault study summary | CONFIRMED | high | 673 metadata-eligible new compounds; 516 carry a single-MoA label; 38 (38 components) fall in the 11-class reference pool. Minimum detectable effect 0.060; 345 units needed for +0.02. |
 | 3 | Pool and external evaluable subset are affected by held-out labels | reports 3, 8 | `common.tiers` (historical path), `lincs_prepare.main`, `episodes.episode_list`, `external_phase2.open_study` | labels, detection outcomes | CONFIRMED (evaluation contamination, not policy leakage) | high | Development pools count held-out labels. L1000 pools also use held-out detection outcomes, before folds are assigned. Eligibility requires the compound's own label to be in the pool. Every forced-choice contrast contains the truth. Externally the pool comes from reference compounds only (correct), but inclusion requires the test label to be in the pool (38 of 673). No policy receives a label: the seal and vault were checked, and the v2 public view is a whitelist. **New:** in the forced-choice design the true class is the only class common to all of a compound's contrasts. No arm stores state across episodes, so none exploits it, but v2 removes the leak (all-pairs contrasts). |
 | 4 | The external test overlaps development in cell background and partly in scaffolds | report 8 | `external_phase2.manifest` audit | GSE70138 metadata | PARTLY | high | Lines MCF7, HT29, PC3 (MCF7 and PC3 are in the L1000 development tiers; HT29 is not). 152 of 673 test compounds share a Murcko scaffold with GSE92742, and 112 with the reference arm. Batches are disjoint, and there is no identity overlap. **Qualification:** the world model and validator were fitted on GSE70138's own known compounds. For the model the external test is therefore a new-compound, same-study test, not a study shift. |
-| 5a | The planner treats refusal as a stop | report 4 | `src/maestro/planning.py plan_measurement` | none | CONFIRMED in code; rare in practice | high | An all-refused menu returns `stopped/world_model_refused`. In the registered belief-planning-1 replay no episode stopped that way. The world model backs off instead of refusing. Earlier planners stopped on refusal in 7-35% of episodes (belief-planning-1 DIAGNOSIS). |
+| 5a | The planner treats refusal as a stop | report 4 | `research/belief_planning/planner.py plan_measurement` | none | CONFIRMED in code; rare in practice | high | An all-refused menu returns `stopped/world_model_refused`. In the registered belief-planning-1 replay no episode stopped that way. The world model backs off instead of refusing. Earlier planners stopped on refusal in 7-35% of episodes (belief-planning-1 DIAGNOSIS). |
 | 5b | Stopping is valued inconsistently across planners | report 4 | `planning.py` (stop = 0), `acquisition.expected_terminal_decision_value` (`defer_loss` = 1) | none | CONFIRMED | high | The two conventions differ. Protocol v2 registers one utility (+1 / -2 / 0 with 0.02 per measurement) for scoring every arm. |
 | 5c | The planner overvalues noisy actions (optimizer's curse) | reports 4, 5 | `plan_measurement` maximises point values; the SE enters only the anchor | registered records, v2 screen | CONFIRMED | medium-high | The unconstrained planner loses 0.131 in SciPlex3 A. Under the v2 support rule, the fixed action's value lacks support in 49% (A), 58% (B), 79% (LT) and 8% (T) of decisions. |
 | 5d | The planner fails to condition on previous measurements | reports 4, 7 | `world.py _history_weights`, `arms.belief_state` | registered records | REJECTED for the current planner | high | The belief planner conditions on the real history. Withholding it changes 3-32% of sequences. The older card and sparse variants conditioned on a single step-1 category. |
@@ -62,7 +62,7 @@ what any policy can gain:
 
    Some condition would eliminate correctly in 17% (LT), 23% (T) and 61-62% (SciPlex3). No
    model, virtual cell or feedback channel can decide an unidentifiable episode (`screen.py`).
-2. **The fixed order already captures most of what is identifiable:** 63-99.6% of the oracle's
+2. **The fixed order already captures most of what is identifiable:** 63-99.4% of the oracle's
    correct decisions.
 3. **Independent units are too few** for the practical effect. The minimum detectable effect is:
    - 0.037 (B, 132 units) and 0.036 (LT, 256);
@@ -132,7 +132,7 @@ run that checks the change.
 | 27 | Mutual-information diagnostics (1) | MODIFY | - | replaced by the exact decision-relevant bounds: identifiability and second-step headroom | clearer ceiling | none | `screen.identifiability`, `second_step_headroom` |
 | 28 | Decision-level replay integrity with numeric tolerance (8) | ADOPT | v1 byte-equality tests were circular | decisions exact, numbers within 1e-8 | real determinism check | none | `registry.compare_decisions`; `test_v2_runner_reproduces_registered_decisions`; the screen replay check |
 | 29 | Threshold-sensitivity perturbation of validator scores (8) | DEFER | - | v2 traces now store validator scores and templates, so it can be run later | - | - | - |
-| 30 | Pytest and research tests in explicit CI (1) | DEFER | no CI configuration in the repository | the owner decides where CI runs | - | - | `maestro-test-research` exists |
+| 30 | Pytest and research tests in explicit CI (1) | DEFER | no CI configuration in the repository | the owner decides where CI runs | - | - | `python -m tools.research_validation` runs from the checkout root |
 | 31 | Log provider, model, prompt, seed, temperature, cost and result hash for API calls (3, brief) | ADOPT as a rule | - | - | - | - | no API call was needed in this block ($0) |
 | 32 | Keep the production default unchanged (all) | ADOPT | `src/` untouched | - | - | - | no protocol-v2 import in `src/` (`git diff --stat src` empty) |
 | 33 | Replace planner, validator, virtual cell or feedback wholesale | REJECT | section 3 | the ceiling is the task, not the architecture | - | - | - |
@@ -177,7 +177,7 @@ run that checks the change.
 ## 6. Status of conclusions
 
 **Established** (measured, integrity checked):
-- The fixed expert order captures 63-99.6% of the correct decisions any policy could reach in
+- The fixed expert order captures 63-99.4% of the correct decisions any policy could reach in
   these tasks. SciPlex3 A and L1000 T cannot show a +0.02 gain by construction.
 - 76-82% of L1000 episodes cannot be decided by any policy from the planned menu.
 - Protocol v1's task construction reads held-out labels; the external evaluable subset is

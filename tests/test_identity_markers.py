@@ -7,14 +7,14 @@ File summary
 - Core points: a shifted label table is detected and its offset recovered; an unsupported or
   ambiguous alignment is refused by name; an out-of-range column is unlabelled, never borrowed.
 - Interfaces: `test_*` functions only.
-- Depends on: virtual_cell.identity_markers
+- Depends on: virtual_cell.artifacts
 """
 from pathlib import Path
 
 import numpy as np
 import pytest
 
-from virtual_cell.identity_markers import (
+from virtual_cell.artifacts import (
     IDENTITY_MARKERS,
     check_markers,
     resolve_label_offset,
@@ -97,7 +97,6 @@ def test_the_sciplex3_release_labels_are_offset_by_its_stray_header_row():
     """The published table names column j's gene at row j + 1; the realignment must say so."""
 
     h5py = pytest.importorskip("h5py")
-    from evaluation.model_validation import verified_feature_labels
 
     with h5py.File(SCIPLEX, "r") as f:
         table = f["var"]["ensembl_id"]
@@ -117,9 +116,13 @@ def test_the_sciplex3_release_labels_are_offset_by_its_stray_header_row():
         member = (lines == line) & valid
         keep = member[row]
         sums[line] = np.bincount(index[keep], weights=data[keep], minlength=columns) / max(member.sum(), 1)
-    check = verified_feature_labels(ROOT, published, sums, columns)
-    assert check["first_published_label"] == "id gene_short_name"
-    assert check["offset"] == 1
+    import csv
+    with (ROOT / "data/external/hgnc/hgnc_complete_set.txt").open(encoding="utf-8") as handle:
+        symbols = {row["ensembl_gene_id"]: row["symbol"] for row in csv.DictReader(handle, delimiter="\t")}
+    offset, checks, refusal = resolve_label_offset(sums, [symbols.get(label) for label in published])
+    assert published[0] == "id gene_short_name"
+    assert (offset, refusal) == (1, None)
+    labels = shift_labels(published, offset, columns)
     hbg2 = "ENSG00000196565"  # HGNC:4832 HBG2
-    column = check["labels"].index(hbg2)
+    column = labels.index(hbg2)
     assert max(sums, key=lambda line: sums[line][column]) == "K562"

@@ -1,6 +1,6 @@
-# ASRG frozen experiment protocol
+# ASRG proposed experiment protocol
 
-Everything below is **proposed**. Nothing here has been run. The protocol is written so that
+Everything below is **proposed and unregistered**. Nothing here has been run. The protocol is written so that
 it can be frozen, digested and registered before any hidden outcome is revealed, in the same
 style the repository already uses for replay cases.
 

@@ -11,6 +11,17 @@ Status labels:
 - **design** — specified here but not implemented;
 - **unverified** — dependent on an external asset or service not verified in this workspace.
 
+Current evidence status: engineering tests verify named interpretation gaps, typed evidence
+admission, and scope-limited updates. The repair operator has not shown additional decision value
+over a selector with the same information in the six-case engagement replay. The research
+forecaster can produce hypothesis-conditional outcome forecasts, but the virtual-cell model has
+not shown independent decision benefit on development data and its wrong-risk forecasts are
+under-calibrated. The production repair path and research belief planner are not connected; their
+combined benefit is untested. Historical performance numbers mainly concern a transcriptomic
+mechanism-class proxy task. GSE70138 was opened; it is not unopened confirmation. The corrected
+fixed-order/oracle maximum is 99.4%. A research plan or registry specification is not a completed
+or registered experiment. See the current summary in [`README.md`](README.md).
+
 ---
 
 ## 1. Objective
@@ -507,7 +518,7 @@ rule violations.
 `research/belief_planning/`, `log/20260927/README.md` block 2).
 
 **What was built.**
-- `src/maestro/planning.py`, an opt-in planner. It runs an exact two-step expectimax over the
+- `research/belief_planning/planner.py`, an opt-in research planner. It runs an exact two-step expectimax over the
   legal menu, forms its belief from real readings only, scores each registered elimination by the
   posterior mass it removes, and replans after every reading.
 - A world model with three layers: pooled, class, and a virtual-cell structural kernel. It
@@ -560,14 +571,14 @@ Not yet demonstrated:
 
 The research index is [`research/README.md`](research/README.md). Important records include:
 
-- [`research/framework_optimization.md`](research/framework_optimization.md) — conditioned biology,
+- [`research/framework_optimization.md`](research/topics/engineering_records/framework_optimization.md) — conditioned biology,
   Jev evidence context, modality costs, and verification;
-- [`research/typed_decision_model.md`](research/typed_decision_model.md) — TypeSafe Jev contract;
-- [`research/judgment_stability.md`](research/judgment_stability.md) — reproducibility and calibration;
-- [`research/dynamic_networks.md`](research/dynamic_networks.md) — conditions and multimodal limits;
-- [`research/asrg/03_experiment_protocol.md`](research/asrg/03_experiment_protocol.md) — frozen
-  agent-policy evaluation protocol;
-- [`research/agent_research_20260925.md`](research/agent_research_20260925.md) — literature review
+- [`research/typed_decision_model.md`](research/topics/agent_decision_core/typed_decision_model.md) — TypeSafe Jev contract;
+- [`research/judgment_stability.md`](research/topics/evaluation_methodology/judgment_stability.md) — reproducibility and calibration;
+- [`research/dynamic_networks.md`](research/topics/virtual_cell_world_models/dynamic_networks.md) — conditions and multimodal limits;
+- [`research/asrg/03_experiment_protocol.md`](research/asrg/03_experiment_protocol.md) — proposed,
+  unregistered agent-policy evaluation protocol;
+- [`research/agent_research_20260925.md`](research/topics/literature_design_sources/agent_research_20260925.md) — literature review
   and task-state repair record;
 - [`research/biological_depth/`](research/biological_depth/README.md) — pre-registered biological-depth
   test of the virtual cell and agent, the SciPlex3 label-offset finding, and the latent-model result.
@@ -576,9 +587,9 @@ External model references are design provenance. V-JEPA 2 is cited at
 [arXiv:2506.09985](https://arxiv.org/abs/2506.09985); its reported video and robot results do not
 validate the biological claims in this repository.
 
-The final claim remains narrow: under a frozen protocol and equal resources, MAESTRO may demonstrate
-better-supported decisions or lower cost-to-admissible-action on tested cases. No passing software
-test licenses a claim about a target, mechanism, efficacy, clinical safety, or an untested biological
+Software checks show that MAESTRO enforces declared evidence boundaries. Whether it improves
+decisions or lowers cost-to-admissible-action remains a research question. No passing software test
+licenses a claim about a target, mechanism, efficacy, clinical safety, or an untested biological
 context.
 
 ## 13. Paper-Derived Extensions For Biological World Models

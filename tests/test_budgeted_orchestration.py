@@ -7,21 +7,21 @@ File summary
   - Exercises `MAESTROOrchestrator.run` and `run_case_loop` with stubbed LLM clients.
   - Confirms budget, prerequisite, and mechanism-contrast scoping hold end to end.
 - Interfaces: `test_*` functions, `StubClient`
-- Depends on: agent.audit, agent.cases, agent.context, agent.knowledge, agent.memory, agent.orchestrator, agent.planner, agent.vision, maestro
+- Depends on: agent.memory, agent.memory, agent.context, agent.knowledge, agent.memory, agent.orchestrator, agent.planner, agent.llm, maestro
 """
 from pathlib import Path
 
-from agent.audit import RunLogger
-from agent.cases import CaseState, CaseStore
+from agent.memory import RunLogger
+from agent.memory import CaseState, CaseStore
 from agent.context import ContextBuilder, TaskInterpreter
 from agent.knowledge import EvidenceLedger
 from agent.memory import MemoryStore
 from agent.orchestrator import MAESTROOrchestrator
 from agent.planner import MechanismContrastPlanner
-from agent.vision import VisualInspector
+from agent.llm import VisualInspector
 from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent
 
-from tools.shared.stub_client import StubClient  # noqa: E402
+from tests.fixtures.stub_client import StubClient  # noqa: E402
 def test_orchestrator_adopts_a_budget_feasible_action_bundle(tmp_path: Path):
     client = StubClient(
         [

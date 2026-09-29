@@ -1,0 +1,58 @@
+{
+ "version": "external-validation-2.1",
+ "written_at": "2026-09-27T18:07:05+08:00",
+ "supersedes_for_new_runs": "external-validation-2",
+ "historical_records": "unchanged: protocol-v2 records in outputs/protocol_v2_20260927/ and log/20260927/0927/protocol_v2_* are not rewritten; v2.1 writes to outputs/protocol_v2_1_20260927/",
+ "status": "specification written before any v2.1 run; E-DATA1 and E-CAL1 thresholds are the ones committed in research/gated_plan/registry.json at c3d2345 before this block",
+ "registration": "development record only (registry.development_record, registered: false). The working tree holds another session's uncommitted repository reorganisation, so registry.register refuses it. This is disclosed, not a registration.",
+ "production_default": "unchanged; nothing under src/ changes",
+ "changes": {
+  "P0-1_design_menu": {
+   "audit": "research/gated_plan/AUDIT.md D8, D9, D10",
+   "rule": "the legal menu of a compound is the set of tier conditions the study design planned for it (research/protocol_v2/design.py); a planned condition without a usable prepared row is a measurement that ran and failed QC: offered, charged, recorded as measured_qc_failed, never read as biology",
+   "lifecycle_states": ["not_planned", "planned_not_measured", "measured_valid", "measured_qc_failed", "missing_or_unknown"],
+   "readouts": ["undetected", "ambiguous", "eliminating"],
+   "v2_mapping": "contracts.v2_state is lossless: measured_valid + readout -> measured_<readout>; measured_qc_failed -> quality_failed; every other lifecycle -> not_measured",
+   "eligibility": "SciPlex3 tier B: any planned tier condition; tier A: a planned 72 h condition; L1000: every tier condition planned (v2 required every condition to have passed QC)"
+  },
+  "P0-2_fold_pools": {
+   "audit": "research/gated_plan/AUDIT.md D7",
+   "rule": "hypothesis pools from each fold's training compounds only: SciPlex3 B >= 3 training skeleton units per class; SciPlex3 A >= 2 training compounds planned at 72 h per class; L1000 >= 6 training identities planned at every tier condition, of which >= 2 detected at a tier condition (contracts.fold_pools)",
+   "consequence_known_before_running": "classes that qualified only because a held-out compound was counted leave that fold's pool; their held-out compounds become unscorable on the mechanism endpoint. Pools shrink in 18 of 20 tasks (a construction check run before this file was written; no outcome was read)."
+  },
+  "P0-3_weighting": {
+   "audit": "research/gated_plan/AUDIT.md D3, V2",
+   "rule": "primary estimate: the unit mean (each independent unit weighs 1; its episodes are averaged first); the episode mean is reported beside it. Intervals: 95% unit-cluster percentile bootstrap, 2,000 draws, seed 20260927, resampling units for both estimates (headroom.unit_paired)",
+   "source": "research/gated_plan/registry.json common.weighting (c3d2345)"
+  }
+ },
+ "experiments": {
+  "E-DATA1": {
+   "question": "does any development task and measured-condition menu have enough headroom and independent units for planner work, once the menu and pools no longer read held-out outcomes",
+   "tasks": "SciPlex3 A and B, L1000 LT and T, 5 folds each, forced-choice episodes of tasks_v21.episode_list",
+   "arms_run": ["fixed", "random_legal", "myopic_edv", "belief", "safe", "oracle"],
+   "arms_derived": {
+    "fixed_star": "cross-fitted best fixed sequence: for fold f, every legal sequence of at most max_measurements tier conditions (time order and day budget of the runner setting) is scored on the exact outcome tables of the other four folds' episodes; the sequence with the highest unit-mean correct rate is applied to fold f; ties by fewer measurements, then lexicographic action order",
+    "table_oracle": "best legal sequence per episode from the exact outcome tables (correct over undetermined or deferred over wrong; ties by fewer measurements); must equal the oracle arm's terminal decisions on the full menu"
+   },
+   "estimands": ["headroom_correct = oracle - fixed_star (primary) and oracle - fixed, unit mean and episode mean", "decision-changeable unit share", "units required for +0.02 from the belief arm's paired SE against fixed (2.80 SE)", "menu expansion: oracle ceiling of SciPlex3 A (24 h and 72 h) against its 24 h conditions only; oracle ceiling of L1000 LT (four lines) against its A549 conditions only, on identical episodes", "QC-failed steps created by the design menu"],
+   "thresholds": {
+    "primary_eligible": "headroom_correct (oracle - fixed_star, unit mean) >= 0.04 and lower 95% bound >= 0.02",
+    "powered": "units required (belief-like variance) <= units available",
+    "menu_expansion_qualifies": "delta oracle ceiling >= 0.02 with lower bound > 0, or fixed_star uses >= 0.1 fewer measurements with correct >= -0.01 and wrong <= +0.005"
+   },
+   "failure_rule": "if no task and menu qualifies: stop planner-superiority work on these data; keep the tasks as regression and safety tests; the next step is a data census",
+   "exposure": "all development data are fully exposed; results are qualification statements, not performance claims"
+  },
+  "E-CAL1": {
+   "question": "do wrong-elimination forecasts, or a registered bound on them, cover observed rates on the actions each arm actually selected, per step and per episode, across studies",
+   "items": "executed measured_valid steps of belief, safe and myopic_edv in the E-DATA1 v2.1 records (per step), and decided episodes (per episode: forecast = 1 - product over executed steps of (1 - step forecast))",
+   "methods": ["raw", "planner_jeffreys_upper", "platt", "hierarchical_kappa20", "discounted_lambda0.5"],
+   "fitting": "leave-one-study-out: fitted on SciPlex3, tested on L1000 GSE92742, and the reverse",
+   "stop_gate": "a bound covers the observed wrong rate overall and in >= 95% of strata with >= 20 items on both targets, no stratum significantly above it, and its mean is <= 3 x the observed rate (informativeness clause, new in the gated plan)",
+   "failure_rule": "no forecast-driven stop and no risk claim"
+  }
+ },
+ "seeds": {"bootstrap": 20260927, "arms": "protocol v2 seeds unchanged"},
+ "claims_not_allowed": ["superiority of any arm", "a biological mechanism claim", "external validity; GSE70138 is consumed and is not used here"]
+}

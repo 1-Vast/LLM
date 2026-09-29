@@ -9,19 +9,9 @@ File summary
 - Interfaces: `test_*` functions
 - Depends on: maestro
 """
-from maestro import (
-    ContrastCheck,
-    EvidenceAction,
-    EvidenceActionKind,
-    FunctionalInterventionProfile,
-    MAESTROAgent,
-    MechanismContrast,
-    MechanismHypothesis,
-    NonDiscriminabilityReason,
-    RepairController,
-    RepairKind,
-    RepairLedger,
-)
+from maestro.models import ContrastCheck, EvidenceActionKind, MechanismContrast, NonDiscriminabilityReason, RepairKind
+from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent, MechanismHypothesis
+from maestro.repair import RepairController, RepairLedger
 
 
 def _contrast(plan: EvidenceAction | None) -> MechanismContrast:
@@ -79,7 +69,7 @@ def test_repair_adopts_the_edit_that_removes_a_failure_and_records_its_expected_
 
 def test_repair_stops_without_progress_rather_than_repeating_the_same_edit():
     class StuckAgent(MAESTROAgent):
-        def check_contrast(self, contrast, profile, prediction=None):  # noqa: D102
+        def check_contrast(self, contrast, profile, prediction=None, reliability=None):  # noqa: D102
             return ContrastCheck(
                 executable=True,
                 prerequisites_satisfied=False,
@@ -110,7 +100,7 @@ def test_repair_detects_a_cycle_between_two_edits():
         def __init__(self):
             self.calls = 0
 
-        def check_contrast(self, contrast, profile, prediction=None):  # noqa: D102
+        def check_contrast(self, contrast, profile, prediction=None, reliability=None):  # noqa: D102
             self.calls += 1
             if self.calls % 2 == 1:
                 return ContrastCheck(True, False, True, True, (NonDiscriminabilityReason.MISSING_FUNCTIONAL_MEASUREMENT,))
@@ -165,7 +155,7 @@ def test_ledger_distinguishes_adopted_from_resolved():
     ledger = RepairLedger()
     class NoRepairAgent(MAESTROAgent):
         def repair_contrast(self, contrast, check, available_actions):  # noqa: D102
-            from maestro import RepairProposal, RepairKind
+            from maestro.models import RepairProposal, RepairKind
 
             return RepairProposal(
                 kind=RepairKind.DEFER,

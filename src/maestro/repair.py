@@ -1,15 +1,4 @@
-"""A bounded repair loop and an auditable repair ledger.
-
-File summary
-- Path: src/maestro/repair.py
-- Purpose: Directed repair with a ledger that separates adoption from an actually closed gap.
-- Core points:
-  - `RepairController` re-checks after each edit and stops on repetition or no progress.
-  - `RepairLedger` records every edit; adoption is not the same as the gap closing.
-  - `gap_resolved` is set only by a real, qualified result, scored apart from adoption.
-- Interfaces: `RepairController`, `run`, `RepairLedger`, `repair`, `RepairRecord`, `RepairOutcome`, `EXPECTED_GAIN`
-- Depends on: maestro.models, virtual_cell.interface
-"""
+"""A bounded repair loop and an auditable repair ledger."""
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
@@ -28,6 +17,8 @@ from .models import (
 
 if TYPE_CHECKING:
     from virtual_cell.interface import StatePrediction
+
+    from .judgment import PredictionReliabilityLedger
 
 
 EXPECTED_GAIN: Mapping[RepairKind, str] = {
@@ -204,6 +195,7 @@ class RepairController:
         *,
         ledger: RepairLedger | None = None,
         action_predictions: Mapping[str, "StatePrediction"] | None = None,
+        reliability: "PredictionReliabilityLedger | None" = None,
     ) -> RepairOutcome:
         ledger = ledger or RepairLedger()
         initial_action = contrast.plan.identifier if contrast.plan is not None else None
@@ -260,7 +252,7 @@ class RepairController:
                 # result — so the record is adopted with no resolved reason and the
                 # promise ledger scores it later.
                 repaired = replace(current_contrast, plan=proposal.composed_plan.readout)
-                recheck = self._agent.check_contrast(repaired, profile, prediction_for(repaired))
+                recheck = self._agent.check_contrast(repaired, profile, prediction_for(repaired), reliability)
                 records.append(
                     ledger.register(
                         RepairRecord(
@@ -308,7 +300,7 @@ class RepairController:
                 break
 
             repaired = replace(current_contrast, plan=proposal.replacement_action)
-            recheck = self._agent.check_contrast(repaired, profile, prediction_for(repaired))
+            recheck = self._agent.check_contrast(repaired, profile, prediction_for(repaired), reliability)
             resolved = tuple(
                 reason for reason in current_check.reasons if reason not in recheck.reasons
             )

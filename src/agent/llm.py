@@ -1,28 +1,119 @@
-"""Minimal, dependency-free client for the configured OpenAI-compatible endpoint.
-
-File summary
-- Path: src/agent/llm.py
-- Purpose: Call the configured chat/JSON/vision model through Chat Completions.
-- Core points:
-  - `DeepSeekChatClient` calls text, JSON, and vision models through Chat Completions.
-  - It owns no tool execution; model tool requests need an explicit MAESTRO adapter.
-  - Errors retain no request secrets; only safe metadata is kept locally.
-- Interfaces: `DeepSeekChatClient`, `complete`, `complete_json`, `LLMResponse`, `LLMError`, `LLMProtocolError`, `LLMTransportError`, `retry_after_seconds`
-- Depends on: agent.configuration
-"""
+"""Configured chat providers, reviewed replay responses, and bounded figure inspection."""
 from __future__ import annotations
 
+from dataclasses import dataclass, field
+import os
+from pathlib import Path
 import json
 import math
 import re
-from dataclasses import dataclass
 from http.client import HTTPException
 from time import sleep
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping, Protocol, Sequence
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+import copy
+import hashlib
+import base64
 
-from .configuration import MAESTROSettings
+
+class JsonCompleter(Protocol):
+    def complete_json(self, messages: list[dict[str, Any]], **kwargs: Any) -> tuple[dict[str, Any], Any]: ...
+
+
+class ConfigurationError(RuntimeError):
+    """Raised when a required runtime setting is unavailable."""
+
+
+def read_dotenv(path: Path) -> dict[str, str]:
+    """Read simple dotenv assignments without exporting or logging secret values."""
+
+    values: dict[str, str] = {}
+    if not path.is_file():
+        return values
+    for line in path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
+            continue
+        key, value = stripped.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key:
+            values[key] = value
+    return values
+
+
+@dataclass(frozen=True)
+class MAESTROSettings:
+    """Settings required by the text and vision clients.
+
+    The key is intentionally not represented in logs, exceptions, or ``repr``.
+    """
+
+    api_key: str
+    base_url: str
+    chat_model: str
+    vision_model: str
+    log_directory: Path
+    timeout_seconds: float = 90.0
+    max_tokens: int = 4_000
+
+    def __repr__(self) -> str:
+        return ("MAESTROSettings(api_key='<redacted>', base_url={!r}, chat_model={!r}, "
+                "vision_model={!r}, log_directory={!r}, timeout_seconds={!r}, max_tokens={!r})").format(
+                    self.base_url, self.chat_model, self.vision_model, self.log_directory,
+                    self.timeout_seconds, self.max_tokens)
+
+    @classmethod
+    def from_workspace(cls, workspace: Path) -> "MAESTROSettings":
+        """Load the existing DeepSeek configuration from the workspace dotenv file."""
+
+        environment = read_dotenv(workspace / ".env")
+        required = (
+            "DEEPSEEK_API_KEY",
+            "DEEPSEEK_BASE_URL",
+            "DEEPSEEK_MODEL",
+            "DEEPSEEK_VISION_MODEL",
+        )
+
+        # The process environment wins over the dotenv file, for the presence
+        # check as well as the value: a deployment that exports its settings and
+        # ships no .env is fully configured, not missing four settings.
+        def setting(name: str) -> str:
+            return (os.environ.get(name) or environment.get(name) or "").strip()
+
+        missing = [name for name in required if not setting(name)]
+        if missing:
+            raise ConfigurationError(
+                "Missing required MAESTRO provider settings: " + ", ".join(missing)
+            )
+        model = setting("DEEPSEEK_MODEL").strip()
+        aliases = {"deepseek-4.1flash", "deepseek-v4.1-flash", "deepseek-v4-flash"}
+        if model.lower() in aliases:
+            model = "deepseek-flash"
+        vision = setting("DEEPSEEK_VISION_MODEL").strip()
+        if vision.lower() in aliases or vision.lower() == "deepseek-v4-flash-vision-exp":
+            vision = "deepseek-flash"
+        return cls(
+            api_key=setting("DEEPSEEK_API_KEY"),
+            base_url=setting("DEEPSEEK_BASE_URL").rstrip("/"),
+            chat_model=model,
+            vision_model=vision,
+            log_directory=_log_directory(workspace, setting("MAESTRO_LOG_DIRECTORY")),
+        )
+
+
+def _log_directory(workspace: Path, configured: str) -> Path:
+    """The run-record directory: ``MAESTRO_LOG_DIRECTORY`` if set, else the dated default.
+
+    A relative setting is read against the workspace, so the same dotenv file
+    means the same directory whichever directory the command is started from.
+    """
+
+    if not configured:
+        return workspace / "log" / "20260910"
+    path = Path(configured).expanduser()
+    return path if path.is_absolute() else workspace / path
 
 
 class LLMError(RuntimeError):
@@ -80,27 +171,8 @@ def json_object_from_text(text: str) -> object:
         pass
     start = stripped.find("{")
     if start >= 0:
-        depth = 0
-        in_string = False
-        escaped = False
-        for index in range(start, len(stripped)):
-            character = stripped[index]
-            if in_string:
-                if escaped:
-                    escaped = False
-                elif character == "\\":
-                    escaped = True
-                elif character == '"':
-                    in_string = False
-                continue
-            if character == '"':
-                in_string = True
-            elif character == "{":
-                depth += 1
-            elif character == "}":
-                depth -= 1
-                if depth == 0:
-                    return json.loads(stripped[start : index + 1])
+        result, _ = json.JSONDecoder().raw_decode(stripped, start)
+        return result
     raise json.JSONDecodeError("no JSON object found in the reply", stripped or text, 0)
 
 
@@ -293,3 +365,158 @@ class DeepSeekChatClient:
         if base.endswith("/chat/completions"):
             return base
         return base + "/chat/completions"
+
+
+# The phrase each agent component uses to introduce itself in its system prompt.
+COMPONENTS: Mapping[str, str] = {
+    "task_triage": "scientific task triage component",
+    "contrast_planner": "mechanism-contrast planner",
+    "repair_planner": "directed contrast-repair planner",
+    "tool_router": "local dataset-tool router",
+    "figure_inspection": "scientific figure-inspection component",
+}
+
+
+class TemplateCompleterError(RuntimeError):
+    """The agent asked for something the reviewed template does not answer."""
+
+
+@dataclass(frozen=True)
+class TemplateResponse:
+    """The response metadata a metered completer expects, with zero usage."""
+
+    model: str = "reviewed-template"
+    finish_reason: str = "template"
+    usage: Mapping[str, int] = field(
+        default_factory=lambda: {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+    )
+
+
+class TemplateCompleter:
+    """Serve reviewed JSON answers, in order, per agent component."""
+
+    def __init__(self, responses: Mapping[str, Sequence[Mapping[str, Any]] | Mapping[str, Any]], *, repeat_last: bool = True):
+        unknown = set(responses) - set(COMPONENTS)
+        if unknown:
+            raise TemplateCompleterError(f"Template names unknown components: {sorted(unknown)}")
+        self._queues: dict[str, list[Mapping[str, Any]]] = {}
+        for component, answers in responses.items():
+            queue = [answers] if isinstance(answers, Mapping) else list(answers)
+            if not queue:
+                raise TemplateCompleterError(f"Template for '{component}' is empty.")
+            self._queues[component] = queue
+        self._positions = {component: 0 for component in self._queues}
+        self._repeat_last = repeat_last
+        self.calls: list[dict[str, Any]] = []
+
+    @classmethod
+    def from_file(cls, path: Path) -> "TemplateCompleter":
+        payload = json.loads(Path(path).read_text(encoding="utf-8"))
+        if not isinstance(payload, Mapping) or not isinstance(payload.get("responses"), Mapping):
+            raise TemplateCompleterError("A template file must be an object with a 'responses' object.")
+        completer = cls(payload["responses"], repeat_last=bool(payload.get("repeat_last", True)))
+        completer.source_sha256 = hashlib.sha256(Path(path).read_bytes()).hexdigest()
+        return completer
+
+    source_sha256: str | None = None
+
+    def complete_json(self, messages: list[dict[str, Any]], **kwargs: Any) -> tuple[dict[str, Any], TemplateResponse]:
+        del kwargs
+        system = next((str(item.get("content", "")) for item in messages if item.get("role") == "system"), "")
+        component = next((name for name, phrase in COMPONENTS.items() if phrase in system), None)
+        if component is None:
+            raise TemplateCompleterError("The calling component is not one the template recognises.")
+        if component not in self._queues:
+            raise TemplateCompleterError(f"The reviewed template has no answer for '{component}'.")
+        queue = self._queues[component]
+        position = self._positions[component]
+        if position >= len(queue):
+            if not self._repeat_last:
+                raise TemplateCompleterError(f"The reviewed template has no further answer for '{component}'.")
+            position = len(queue) - 1
+        answer = copy.deepcopy(dict(queue[position]))
+        self._positions[component] = self._positions[component] + 1
+        digest = hashlib.sha256(json.dumps(answer, sort_keys=True).encode("utf-8")).hexdigest()
+        self.calls.append({"component": component, "answer_index": position, "answer_sha256": digest})
+        return answer, TemplateResponse()
+
+
+_MIME_TYPES = {
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".webp": "image/webp",
+}
+_MAX_INLINE_BYTES = 32 * 1024 * 1024
+
+
+
+
+@dataclass(frozen=True)
+class VisualInspection:
+    """A vision-model reading of one image, kept distinct from measured evidence."""
+
+    path: Path
+    observations: tuple[str, ...]
+    quality_concerns: tuple[str, ...]
+    decision_relevance: str
+    limitations: tuple[str, ...]
+
+
+class VisualInspector:
+    """Reads figures only when supplied, and never converts a plot into biological truth."""
+
+    def __init__(self, client: JsonCompleter, vision_model: str):
+        self._client = client
+        self._vision_model = vision_model
+
+    def inspect(self, paths: tuple[Path, ...], *, question: str) -> tuple[VisualInspection, ...]:
+        return tuple(self._inspect_one(path, question=question) for path in paths)
+
+    def _inspect_one(self, path: Path, *, question: str) -> VisualInspection:
+        mime_type = _MIME_TYPES.get(path.suffix.lower())
+        if mime_type is None:
+            raise ValueError(f"Unsupported visual asset type: {path.suffix}")
+        if not path.is_file():
+            raise FileNotFoundError(path)
+        if path.stat().st_size > _MAX_INLINE_BYTES:
+            raise ValueError("Visual asset exceeds the inline vision request size limit.")
+        encoded = base64.b64encode(path.read_bytes()).decode("ascii")
+        prompt = """You are MAESTRO's scientific figure-inspection component. Return JSON only.
+Describe only what is visible in the image: axes, labels, groups, annotations, visible
+patterns, and image-quality concerns. Do not claim causality, target engagement, or
+mechanistic truth from an image alone. State how the figure can inform the next evidence
+question and what source data or controls are still needed.
+Return {\"observations\":[\"...\"],\"quality_concerns\":[\"...\"],
+\"decision_relevance\":\"...\",\"limitations\":[\"...\"]}."""
+        data, _ = self._client.complete_json(
+            [
+                {"role": "system", "content": prompt},
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": "Research question: " + question},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:{mime_type};base64,{encoded}",
+                                "detail": "high",
+                            },
+                        },
+                    ],
+                },
+            ],
+            model=self._vision_model,
+        )
+        return VisualInspection(
+            path=path,
+            observations=_text_items(data.get("observations")),
+            quality_concerns=_text_items(data.get("quality_concerns")),
+            decision_relevance=str(data.get("decision_relevance") or "No relevance stated."),
+            limitations=_text_items(data.get("limitations")),
+        )
+
+
+def _text_items(value: Any) -> tuple[str, ...]:
+    return tuple(item.strip() for item in value if isinstance(item, str) and item.strip()) if isinstance(value, list) else ()

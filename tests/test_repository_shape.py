@@ -8,12 +8,55 @@ File summary
 - Depends on: maestro
 """
 import ast
+import os
 import re
 import subprocess
+import sys
 from pathlib import Path
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+@pytest.mark.parametrize("package,expected", [
+    ("agent", {"MAESTROOrchestrator", "MAESTROCaseLoop"}),
+    ("maestro", {"MAESTROAgent", "EvidenceAction", "FunctionalInterventionProfile", "MechanismHypothesis"}),
+    ("virtual_cell", {"PredictionRequest", "StatePrediction", "safe_predict"}),
+    ("tools.evaluation", {"CaseRepository", "EvaluationRunner"}),
+])
+def test_package_roots_expose_only_entry_points(package, expected):
+    import importlib
+    import inspect
+
+    module = importlib.import_module(package)
+    assert set(module.__all__) == expected
+    symbols = {
+        name for name, value in vars(module).items()
+        if not name.startswith("_") and (inspect.isclass(value) or inspect.isfunction(value))
+    }
+    assert symbols == expected
+    assert not hasattr(module, "__getattr__")
+
+
+@pytest.mark.parametrize("module,arguments,expected", [
+    ("tools.evaluation.engagement_cases", [], "--require-selective-dependency"),
+    ("tools.evaluation.construction", ["build"], "--per-archetype"),
+    ("tools.evaluation.construction", ["screen"], "--registry"),
+    ("tools.evaluation.scoring", ["adjudicate"], "--public-cases"),
+    ("tools.evaluation.scoring", ["table"], "--evaluation"),
+    ("tools.case_memory.workflow", [], "sources,pack,graphs,replay,evaluate"),
+])
+def test_consolidated_command_entrypoints_run(module, arguments, expected):
+    result = subprocess.run(
+        [sys.executable, "-B", "-m", module, *arguments, "--help"],
+        cwd=ROOT, capture_output=True, text=True, timeout=30,
+        env={**os.environ, "PYTHONPATH": str(ROOT / "src"), "PYTHONDONTWRITEBYTECODE": "1"},
+    )
+    assert result.returncode == 0, result.stderr
+    assert "usage:" in result.stdout
+    assert expected in result.stdout
 
 
 def test_source_is_separated_by_core_agent_and_virtual_cell_responsibility():
@@ -22,7 +65,8 @@ def test_source_is_separated_by_core_agent_and_virtual_cell_responsibility():
         for path in (ROOT / "src").iterdir()
         if path.is_dir() and (path / "__init__.py").is_file()
     )
-    assert source_packages == ["agent", "evaluation", "maestro", "virtual_cell"]
+    assert source_packages == ["agent", "maestro", "virtual_cell"]
+    assert (ROOT / "tools" / "evaluation" / "__init__.py").is_file()
     assert (ROOT / "src" / "maestro" / "contrast.py").is_file()
     assert not (ROOT / "src" / "maestro" / "planning.py").exists()
     assert (ROOT / "research" / "belief_planning" / "planner.py").is_file()
@@ -33,7 +77,7 @@ def test_source_is_separated_by_core_agent_and_virtual_cell_responsibility():
     assert not (ROOT / "results").exists()
 
 
-def test_source_packages_do_not_import_research():
+def test_source_packages_do_not_import_research_or_tools():
     offenders = []
     for path in sorted((ROOT / "src").rglob("*.py")):
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
@@ -44,28 +88,25 @@ def test_source_packages_do_not_import_research():
                 names = [node.module]
             else:
                 continue
-            if any(name == "research" or name.startswith("research.") for name in names):
+            if any(name.split(".")[0] in {"research", "tools", "evaluation"} for name in names):
                 offenders.append(f"{path.relative_to(ROOT)}:{node.lineno}")
-    assert not offenders, "source packages import research code: " + ", ".join(offenders)
+    assert not offenders, "source packages import research or tool code: " + ", ".join(offenders)
 
 
 def test_tools_are_folder_scoped_runtime_components():
     assert (ROOT / "tools" / "registry.yaml").is_file()
-    manifests = sorted((ROOT / "tools").glob("*/manifest.json"))
+    manifests = sorted(set((ROOT / "tools").glob("*/manifest.json"))
+                       | set((ROOT / "tools").glob("*/*.manifest.json")))
     assert {path.parent.name for path in manifests} == {
-        "column_summary",
-        "data_profile",
-        "table_filter",
-        "evidence_bundle_optimize",
-        "multimodal_alignment",
-        "typed_decision_review",
-        "virtual_cell_query",
-        "signature_retrieval",
+        "data",
+        "evidence",
+        "prediction",
         "case_memory",
     }
     assert all((path.parent / "tool.py").is_file() for path in manifests)
     assert not (ROOT / "tools" / "tool.py").exists()
     shared = ROOT / "tools" / "shared"
+    assert not shared.exists()
     assert not list(shared.glob("*.py"))
     assert (ROOT / "tests" / "fixtures" / "stub_client.py").is_file()
     assert (ROOT / "tests" / "fixtures" / "state.py").is_file()
@@ -288,12 +329,11 @@ def test_no_test_module_imports_another_test_module():
 
 
 # Which source packages each package may import when its module is loaded. The layers
-# run core -> world model -> agent -> evaluation, so the graph is acyclic by construction.
+# run core -> world model -> agent, so the graph is acyclic by construction.
 ALLOWED_EAGER_IMPORTS = {
     "maestro": set(),
     "virtual_cell": {"maestro"},
     "agent": {"maestro", "virtual_cell"},
-    "evaluation": {"agent", "maestro", "virtual_cell"},
 }
 # Upward edges tolerated only inside a function or a TYPE_CHECKING block. maestro types
 # a few values in the virtual cell's vocabulary and defers that import on purpose.

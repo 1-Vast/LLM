@@ -1,26 +1,4 @@
-"""A licence certificate for a repair-produced measurement, and the rates it makes reportable.
-
-File summary
-- Path: src/maestro/licence.py
-- Purpose: turn the update rules the framework already enforces into one auditable object, so
-  "this result may update the mechanism contrast" is a certificate a reader can check rather
-  than an implicit consequence of field overlap.
-- Core points:
-  - Four gates, named and recorded per certificate: input validity (does the record carry the
-    typed quantity the premise declares), outcome support (does a licensed result exist for the
-    declared outcome classes and is the observed value one of them), identifiability (is the
-    comparison inside one context and time window) and incremental utility (does the repair
-    beat the exact optimum over the visible menu).
-  - Two decisions, deliberately separate. `updates_licensed` is governed by the first three
-    gates, because a qualified result may update the contrast whether or not the repair that
-    produced it was worth buying. `repair_credited` needs all four, which is the gate that
-    would have caught the recorded tie between directed repair and reactive selection.
-  - Nothing here is a probability model and nothing here is biological evidence. The rates are
-    counts over recorded events, so a better predictor cannot inflate them.
-- Interfaces: `GateVerdict`, `LicenceCertificate`, `LicenceAudit`, `GATES`, `input_validity`,
-  `outcome_support`, `identifiability`, `incremental_utility`, `issue_licence`, `audit_licences`
-- Depends on: maestro.models
-"""
+"""A licence certificate for a repair-produced measurement, and the rates it makes reportable."""
 from __future__ import annotations
 
 from dataclasses import dataclass

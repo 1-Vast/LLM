@@ -9,14 +9,9 @@ File summary
 """
 from pathlib import Path
 
-from virtual_cell import (
-    Intervention,
-    PredictionRequest,
-    QuerySupport,
-    StateAdapterConfig,
-    StateCapabilityAdapter,
-    SystemContext,
-)
+from virtual_cell.interface import Intervention, QuerySupport, SystemContext
+from virtual_cell import PredictionRequest
+from virtual_cell.state_adapter import StateAdapterConfig, StateCapabilityAdapter
 
 
 def test_state_adapter_rejects_unknown_perturbation_before_any_control_fallback(tmp_path: Path):

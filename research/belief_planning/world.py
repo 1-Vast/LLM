@@ -4,7 +4,7 @@ File summary
 - Path: research/belief_planning/world.py
 - Purpose: for a (compound, contrast, measurement, observed history), forecast how the registered
   validator would read the measurement under each hypothesis. The forecast is an
-  `maestro.acquisition.OutcomeForecast`, so the agent's planner (`maestro.planning`) consumes it
+  `maestro.acquisition.OutcomeForecast`, so the opt-in research planner (`research.belief_planning.planner`) consumes it
   like any other forecaster.
 - Core points:
   - References. Under hypothesis h, the references are training compounds annotated h that were

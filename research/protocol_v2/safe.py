@@ -7,7 +7,7 @@ File summary
   data do not support an estimate, the arm takes the baseline's action. It departs only to an
   action whose value estimate is supported, clearly better than the baseline's, and no riskier.
 - Core points:
-  - The value estimates are the belief planner's (`maestro.planning.plan_measurement` with the
+  - The value estimates are the belief planner's (`research.belief_planning.planner.plan_measurement` with the
     `research/belief_planning` world model), computed from the same state (`arms.belief_state`).
     The arm changes which action is taken, never the estimates or the evidence rules.
   - Effective support of an action, per hypothesis (`effective_support`):
@@ -35,7 +35,7 @@ File summary
   - Approximation, disclosed: the value of a first action assumes the planner's unconstrained
     continuation; the gate is re-applied at every real step.
 - Interfaces: `safe_arm`, `effective_support`, `SUPPORT_RULE`
-- Depends on: research/belief_planning (arms, world), maestro.planning, maestro.acquisition
+- Depends on: research/belief_planning (arms, world, planner), maestro.acquisition
 """
 from __future__ import annotations
 
@@ -44,9 +44,9 @@ import math
 import numpy as np
 
 from maestro.acquisition import outcome_consequences
-from maestro.planning import plan_measurement
 from research.belief_planning import arms as BA
 from research.belief_planning import world as W
+from research.belief_planning.planner import plan_measurement
 
 from . import contracts as K
 

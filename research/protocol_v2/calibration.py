@@ -35,7 +35,7 @@ File summary
     (posterior on the truth below 0.1), chosen on the source and reported on the target.
 - Run: python -m research.protocol_v2.calibration --out FILE
 - Interfaces: `items`, `evaluate`, `stop_gate`, `belief_items`, `belief_update_table`, `main`
-- Depends on: records.py, maestro.planning, research/external_validation/statistics.py, scipy
+- Depends on: records.py, research/belief_planning/planner.py, research/external_validation/statistics.py, scipy
 """
 from __future__ import annotations
 
@@ -47,7 +47,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import beta as beta_dist
 
-from maestro.planning import _upper as planner_upper
+from research.belief_planning.planner import _upper as planner_upper
 from research.external_validation import statistics as S
 
 from . import records as RC

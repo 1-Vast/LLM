@@ -14,6 +14,9 @@ File summary
   - The arm sees each executed step as (key, action, registered outcome, QC flag, eliminated,
     its own note). The validator's scores and template counts stay in the evaluation record.
   - No truth enters `run_episode`. `contracts.score` joins it afterwards.
+  - Protocol v2.1 (`design_menu=True`, with a view built from the study design): a planned
+    condition without a prepared row ran and failed QC. It is offered, charged and recorded as
+    `measured_qc_failed`, never as a reading. Each step also carries its `lifecycle` and `readout`.
 - Interfaces: `run_episode`, `local_setting`, `audit_trace`
 - Depends on: contracts.py, research/sequence_audit/policies.py, research/dynamic_world_model
 """
@@ -35,7 +38,8 @@ def _public_step(step: dict) -> dict:
     return {k: step[k] for k in ("key", "action", "outcome", "qc", "eliminated", "note")}
 
 
-def run_episode(arm_name: str, arm, view, real_ctx, compound, h1, h2, setting, *, execute=None) -> dict:
+def run_episode(arm_name: str, arm, view, real_ctx, compound, h1, h2, setting, *, execute=None,
+                design_menu: bool = False) -> dict:
     """One episode; the trace carries no truth. `real_ctx` is used only by the executor."""
     execute = execute or E.execute
     available = view.data.availability.get(compound)
@@ -69,14 +73,19 @@ def run_episode(arm_name: str, arm, view, real_ctx, compound, h1, h2, setting, *
                 raise K.NotMeasured(f"{arm_name} chose {key} for {compound}, which the design did not run")
             raise ValueError(f"{arm_name} chose {key}, which is not in the legal menu")
         result = execute(real_ctx, compound, key, h1, h2)
-        measured = K.measurement_state(result)
+        lifecycle = K.lifecycle_state(True, result)
+        reading = K.readout(result)
+        measured = K.v2_state(lifecycle, reading) if design_menu else K.measurement_state(result)
         if measured is K.MeasurementState.NOT_MEASURED:
             raise K.NotMeasured(f"availability metadata says {key} ran for {compound}, but no row exists")
+        if lifecycle is K.Lifecycle.MEASURED_QC_FAILED:
+            result = {**result, "qc": False}
         state, interpretation, outcome = C.evidence_update(
             state, contrast, actions[key], key, result, h1, h2, qc=result["qc"], agreement=result["agreement"],
             source=f"{setting.name}:{compound}")
         step = {"key": list(key), "action": C.action_id(key), "outcome": outcome, "qc": bool(result["qc"]),
-                "state": measured.value, "outcome_class": interpretation.outcome_class.value,
+                "state": measured.value, "lifecycle": lifecycle.value, "readout": reading,
+                "outcome_class": interpretation.outcome_class.value,
                 "eliminated": sorted(state.eliminated), "note": note or {},
                 "validator": {k: result.get(k) for k in ("score_a", "score_b", "templates_a", "templates_b")
                               if k in result},

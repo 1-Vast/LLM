@@ -9,7 +9,7 @@ File summary
 - Core points: assertions here are contract tests, not biological results. Values read from a
   release are checked for structure and identity, never asserted to mean anything.
 - Interfaces: one test per contract, named for the contract it pins.
-- Depends on: evaluation.xlsx, evaluation.engagement_sources, evaluation.capabilities,
+- Depends on: evaluation.engagement_sources, evaluation.engagement_sources, evaluation.capabilities,
   evaluation.cases
 """
 from __future__ import annotations
@@ -21,7 +21,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
-from evaluation.capabilities import (  # noqa: E402
+from tools.evaluation.capabilities import (  # noqa: E402
     CAPABILITY_SCHEMA,
     CapabilityOffer,
     CapabilityRegistry,
@@ -30,10 +30,10 @@ from evaluation.capabilities import (  # noqa: E402
     compile_proposal,
     load_capability_registry,
 )
-from evaluation.cases import CaseRepository, ReplayCase, ReplayEnvironment, RevealRefusal  # noqa: E402
-from evaluation.engagement_sources import clopper_pearson_upper, normalise_compound  # noqa: E402
-from evaluation.lab_cost import LabCost, CostBasis  # noqa: E402
-from evaluation.xlsx import Workbook, column_index  # noqa: E402
+from tools.evaluation.cases import CaseRepository, ReplayCase, ReplayEnvironment, RevealRefusal  # noqa: E402
+from tools.evaluation.engagement_sources import clopper_pearson_upper, normalise_compound  # noqa: E402
+from tools.evaluation.costs import LabCost, CostBasis  # noqa: E402
+from tools.evaluation.engagement_sources import Workbook, column_index  # noqa: E402
 from maestro.models import BiologicalQuantity, EvidenceActionKind  # noqa: E402
 
 PISA_ZIP = ROOT / "data" / "external" / "pisa_living_cells" / "PMC11554310_supplementary.zip"
@@ -396,7 +396,7 @@ def test_an_admitted_repair_becomes_queryable_and_only_then(tmp_path):
             "entity": "ABL1",
         },
     )
-    from evaluation.cases import EvidenceMenuItem
+    from tools.evaluation.cases import EvidenceMenuItem
 
     environment.admit(EvidenceMenuItem(action=compiled.action, lab_cost=compiled.lab_cost))
     assert environment.admitted_repairs == (repair_id,)
@@ -427,7 +427,7 @@ def test_a_ledger_refusal_names_the_condition_that_disagreed(tmp_path):
     cross-release disagreement that matters here.
     """
 
-    from agent.cases import CaseStore, MeasurementResult
+    from agent.memory import CaseStore, MeasurementResult
     from maestro.models import EvidenceAction, EvidenceKind
 
     store = CaseStore(tmp_path / "cases.sqlite")
@@ -513,7 +513,7 @@ def _gated_case(tmp_path):
 def test_the_rule_arm_proposes_the_premise_whose_measurement_could_decide(tmp_path):
     """Directed means directed by the declaration: the separating premise comes first."""
 
-    from evaluation.proposal_arms import RegistryRepairRulePolicy
+    from tools.evaluation.policies import RegistryRepairRulePolicy
 
     case, outcomes = _gated_case(tmp_path)
     registry = _registry(
@@ -533,7 +533,7 @@ def test_the_rule_arm_proposes_the_premise_whose_measurement_could_decide(tmp_pa
 
 
 def test_the_proposal_round_admits_what_compiles_and_names_what_does_not(tmp_path):
-    from evaluation.repair_replay import run_proposal_round
+    from tools.evaluation.runner import run_proposal_round
 
     case, outcomes = _gated_case(tmp_path)
     registry = _registry(_offer(identifier="index_offer", supplies="engagement:index_on_target"))
@@ -580,7 +580,7 @@ def test_the_proposal_round_admits_what_compiles_and_names_what_does_not(tmp_pat
 
 
 def test_without_a_registry_no_proposal_round_happens(tmp_path):
-    from evaluation.repair_replay import run_proposal_round
+    from tools.evaluation.runner import run_proposal_round
 
     case, outcomes = _gated_case(tmp_path)
     environment = ReplayEnvironment(case, outcomes)
@@ -595,7 +595,7 @@ def test_without_a_registry_no_proposal_round_happens(tmp_path):
 
 
 def test_registry_extended_case_only_adds_repairs_with_a_registered_result(tmp_path):
-    from evaluation.repair_replay import registry_extended_case
+    from tools.evaluation.runner import registry_extended_case
 
     case, outcomes = _gated_case(tmp_path)
     registry = _registry(

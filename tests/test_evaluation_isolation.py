@@ -7,23 +7,26 @@ File summary
   - Runs baseline and MAESTRO policies over frozen cases in isolated run trees.
   - Asserts scoring answers stay hidden from the policy-facing replay view.
 - Interfaces: `test_*` functions
-- Depends on: agent.audit, agent.cases, agent.context, agent.knowledge, agent.memory, agent.orchestrator, agent.planner, evaluation, maestro
+- Depends on: agent.memory, agent.memory, agent.context, agent.knowledge, agent.memory, agent.orchestrator, agent.planner, evaluation, maestro
 """
 from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
-from agent.cases import CaseStore, MeasurementResult
+from agent.memory import CaseStore, MeasurementResult
 from agent.context import ContextBuilder, ContextPacket, TaskIntent, TaskInterpreter
 from agent.knowledge import EvidenceLedger, EvidenceStatus
 from agent.memory import MemoryStore
-from agent.audit import RunLogger
+from agent.memory import RunLogger
 from agent.orchestrator import MAESTROOrchestrator
 from agent.planner import MechanismContrastPlanner
-from evaluation import CaseRepository, EvaluationRunner, ExpertWorkflowPolicy, MAESTROCorePolicy, ReplayEnvironment
-from evaluation.baselines import DecisionSubmission
-from maestro import DevelopmentAction, EvidenceAction, EvidenceKind, MAESTROAgent, MechanismHypothesis
+from tools.evaluation import CaseRepository, EvaluationRunner
+from tools.evaluation.policies import ExpertWorkflowPolicy, MAESTROCorePolicy
+from tools.evaluation.cases import ReplayEnvironment
+from tools.evaluation.policies import DecisionSubmission
+from maestro.models import DevelopmentAction, EvidenceKind
+from maestro import EvidenceAction, MAESTROAgent, MechanismHypothesis
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -197,7 +200,7 @@ def test_production_planner_context_cannot_read_production_or_other_run_private_
             enable_llm_repair=False,
         )
 
-    from evaluation.baselines import MAESTROOrchestratorPolicy
+    from tools.evaluation.policies import MAESTROOrchestratorPolicy
     result = EvaluationRunner(run_id="isolated", state_root=tmp_path / "runs").run_case(
         MAESTROOrchestratorPolicy(runtime_factory=factory), case, outcomes
     )

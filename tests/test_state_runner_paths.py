@@ -21,9 +21,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-from virtual_cell import QuerySupport  # noqa: E402
+from virtual_cell.interface import QuerySupport  # noqa: E402
 
-from tools.shared.state_fixture import (  # noqa: E402
+from tests.fixtures.state import (  # noqa: E402
     DEFAULT_BASIS,
     adapter as _adapter,
     asset_sha256 as _sha256,
@@ -48,6 +48,20 @@ def _registration_with_basis(directory: Path, asset: Path, names, *, features: i
         encoding="utf-8",
     )
     return replace(_registration("tiny", asset, features=features), feature_names_path=identity)
+
+
+@requires_runtime
+def test_an_unrelated_inspect_directory_is_not_treated_as_a_command_file(tmp_path, monkeypatch):
+    """A command verb that names a directory must not be hashed as a file argument."""
+
+    (tmp_path / "inspect").mkdir()
+    run_directory = tmp_path / "run"
+    run_directory.mkdir()
+    monkeypatch.chdir(tmp_path)
+
+    assessment = _adapter(run_directory).assess_query(_request())
+
+    assert assessment.support is QuerySupport.SUPPORTED, _joined(assessment)
 
 
 @requires_runtime

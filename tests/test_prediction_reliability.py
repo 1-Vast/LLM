@@ -13,13 +13,9 @@ from dataclasses import replace
 
 import pytest
 
-from maestro import (
-    PredictionReliabilityLedger,
-    SourceCluster,
-    SourceClusterIndex,
-    build_index,
-)
-from maestro.reliability import ScoredPrediction
+from maestro.judgment import PredictionReliabilityLedger
+from maestro.handoff import SourceCluster, SourceClusterIndex, build_index
+from maestro.judgment import ScoredPrediction
 
 
 def test_a_small_sample_stays_provisional_and_keeps_full_weight():

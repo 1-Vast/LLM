@@ -1,32 +1,12 @@
-"""Closing the loop: decision-value action selection and append-only case updates.
-
-File summary
-- Path: src/maestro/case_update.py
-- Purpose: connect the case memory to action selection and to the append-only update that follows
-  a real result, reusing the existing MAESTRO decision-value machinery rather than duplicating it.
-- Core points:
-  - Actions are ranked by expected terminal decision value with hypothesis discrimination, cost,
-    detection power, prerequisite cost, ambiguity risk and model/adaptation uncertainty as named
-    terms - never by predicted magnitude, embedding similarity or case count alone.
-  - The recommendation is branching: each possible reading maps to its evidence update, hypothesis
-    update and next action; an ambiguous reading routes to an orthogonal assay or QC action; an
-    invalid experiment updates no biological hypothesis.
-  - Result qualification keeps `reliable_but_inconclusive`, `unreliable`, `not_measured`,
-    `negative` and `qualified` apart. Only a qualified real measurement updates hypotheses, through
-    the registered rules; a QC failure updates nothing.
-  - `ingest_result` supersedes the episode (never edits it), records the hypothesis update and
-    grades the forecast the system gave the realised reading as a calibration entry.
-- Interfaces: `OutcomeQualification`, `qualify_result`, `rank_actions_by_decision_value`,
-  `ActionRanking`, `branching_interpretation_plan`, `ingest_result`, `IngestResult`
-- Depends on: maestro.case_memory, maestro.acquisition (decision-value helpers), maestro.directional
-"""
+"""Gated case-memory planning, decision-value ranking, and append-only measured updates."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
-from typing import Mapping, Sequence
+from typing import Any, Mapping, Sequence
 
 from .acquisition import OutcomeForecast, expected_terminal_decision_value
+from .adaptive_retrieval import ContextFeatures, FeatureArm, RetrievalProblem
 from .case_memory import (
     BranchingPlan,
     CalibrationEntry,
@@ -36,7 +16,18 @@ from .case_memory import (
     RealMeasurement,
     ScientificEpisode,
     ScientificMeasurementStatus,
+    case_memory_enabled,
 )
+from .hypothesis_forecast import (
+    CALIBRATION_DATASET,
+    CALIBRATION_STATUS,
+    MODEL_VERSION,
+    CaseMemoryOutcomeForecaster,
+    UserStateContext,
+)
+from .models import EvidenceAction, MechanismContrast
+from .outcome import EvidenceState
+from .problem_compiler import CompiledProblem
 
 
 class OutcomeQualification(str, Enum):
@@ -53,6 +44,8 @@ def qualify_result(measurement: RealMeasurement, *, qc_passed: bool, detected: b
                    eliminated: Sequence[str] = ()) -> OutcomeQualification:
     """The qualification of one real result from its status, QC and what it eliminated."""
 
+    if measurement.label_kind != "measured_outcome":
+        raise ValueError("proxy_label_is_not_experimental_evidence")
     if measurement.status in (ScientificMeasurementStatus.NOT_PLANNED,
                               ScientificMeasurementStatus.PLANNED_MISSING):
         return OutcomeQualification.NOT_MEASURED
@@ -82,19 +75,21 @@ class ActionRanking:
 
 
 def _discrimination(forecast: OutcomeForecast) -> float:
-    """Log-likelihood spread between hypothesis branches of one forecast (nats)."""
+    """Equal-weight Jensen-Shannon divergence (nats), a report-only separation metric."""
 
     import math
 
     if forecast.refusal is not None or len(forecast.branches) < 2:
         return 0.0
-    best = []
-    for branch in forecast.branches:
-        if branch.probabilities:
-            best.append(max(branch.probabilities.values()))
-    if len(best) < 2 or min(best) <= 0:
+    distributions = [branch.probabilities for branch in forecast.branches]
+    if any(not probabilities for probabilities in distributions):
         return 0.0
-    return abs(math.log(best[0]) - math.log(best[1]))
+    labels = set().union(*(probabilities.keys() for probabilities in distributions))
+    mixture = {label: sum(p.get(label, 0.0) for p in distributions) / len(distributions)
+               for label in labels}
+    return sum(probability * math.log(probability / mixture[label])
+               for probabilities in distributions
+               for label, probability in probabilities.items() if probability > 0) / len(distributions)
 
 
 def rank_actions_by_decision_value(
@@ -114,6 +109,9 @@ def rank_actions_by_decision_value(
 
     Uses `maestro.acquisition.expected_terminal_decision_value` for the value term; every other
     term is reported, not folded away, so the ranking can be audited term by term.
+    Already regularised posterior predictions do not receive the legacy low-support loss a
+    second time. ``adaptation_uncertainties`` is an optional additional decision-risk allowance;
+    callers must not use it to repeat domain uncertainty already represented in the forecast.
     """
 
     prerequisite_costs = prerequisite_costs or {}
@@ -121,6 +119,11 @@ def rank_actions_by_decision_value(
     rankings: list[ActionRanking] = []
     for action in actions:
         forecast = forecasts.get(action.action_id)
+        if forecast is not None and forecast.outcome_mode != "attempted_experiment":
+            rankings.append(ActionRanking(action.action_id, 0.0, 0.0, action.cost_wells * price_per_well,
+                action.detection_power, 0.0, 1.0, 1.0, 0.0, -1e9, False,
+                "experiment_validity_probability_required"))
+            continue
         if forecast is None or forecast.refusal is not None:
             rankings.append(ActionRanking(
                 action.action_id, 0.0, 0.0, action.cost_wells * price_per_well,
@@ -139,13 +142,17 @@ def rank_actions_by_decision_value(
             if forecast.branches else 1.0
         low_support = min((b.support for b in forecast.branches), default=0)
         model_uncertainty = 1.0 if low_support < 6 else 0.0
+        already_regularised = bool(forecast.branches) and all(
+            b.posterior_concentration is not None for b in forecast.branches)
+        support_penalty = 0.0 if already_regularised else 0.5 * model_uncertainty
         pre_cost = float(prerequisite_costs.get(action.action_id, 0.0))
         adapt_unc = float(adaptation_uncertainties.get(action.action_id, 0.0))
-        net = value.net_value - pre_cost - 0.5 * model_uncertainty - 0.5 * adapt_unc
+        net = value.net_value - pre_cost - support_penalty - 0.5 * adapt_unc
         rankings.append(ActionRanking(
             action.action_id, value.expected_value, discrimination,
             action.cost_wells * price_per_well, action.detection_power, pre_cost,
-            ambiguity_risk, model_uncertainty, adapt_unc, net, True, ""))
+            ambiguity_risk, model_uncertainty, adapt_unc, net, net > 1e-12,
+            "" if net > 1e-12 else "non_positive_net_value"))
     rankings.sort(key=lambda r: (-r.net_value, r.action_id))
     return tuple(rankings)
 
@@ -224,3 +231,149 @@ def ingest_result(
     changes["real_measurements"] = tuple(measurements.values())
     new_episode = store.supersede(episode, **changes)
     return IngestResult(new_episode, qualification, eliminated_tuple, calibration)
+
+
+SUPPORTED_FORECAST_MODES = ("state", "hypothesis_conditional", "history_aware",
+                            "hypothesis_conditional_history")
+
+
+@dataclass(frozen=True)
+class PathGateFailure:
+    gate: str
+    detail: str
+
+
+@dataclass(frozen=True)
+class CaseMemoryPathResult:
+    """What the gated path produced, or the named gate that stopped it."""
+
+    activated: bool
+    gate_failures: tuple[PathGateFailure, ...]
+    retrieval: Mapping[str, Any] = field(default_factory=dict)
+    forecasts: Mapping[str, Any] = field(default_factory=dict)
+    rankings: tuple[ActionRanking, ...] = ()
+    branching_plans: tuple[BranchingPlan, ...] = ()
+    calibration_status: str = CALIBRATION_STATUS
+    calibration_dataset: str | None = CALIBRATION_DATASET
+    model_version: str = ""
+    refusal: str | None = None
+
+
+def user_state_from_compiled(compiled: CompiledProblem) -> UserStateContext:
+    """Bridge the compiler output into the forecaster's state context (no truth field)."""
+
+    context = compiled.context
+    cell_lines = context.get("cell_lines") or []
+    graph = compiled.hypothesis_graph
+    return UserStateContext(
+        directional_state=compiled.directional_state,
+        cell_state_summaries=dict(compiled.directional_state.cell_state_proportion),
+        intervention_identity=str(context.get("intervention") or ""),
+        cell_context=cell_lines[0] if cell_lines else None,
+        time_h=compiled.time_h,
+        dose_nM=compiled.dose_nM,
+        assay=compiled.assay or "",
+        hypothesis_graph={"hypotheses": dict(graph.hypotheses), "advisory": graph.advisory} if graph else {},
+        evidence_history=(),
+        biological_system=str(context.get("biological_system") or ""),
+        intervention_type=str(context.get("intervention_type") or ""),
+        measurement_type=str(context.get("measurement_type") or ""),
+        control_design=compiled.control_design or "",
+        laboratory=str(context.get("laboratory") or ""),
+        outcome_mode=str(context.get("outcome_mode") or "valid_readout"),
+    )
+
+
+def _gates(store: EpisodeStore, forecast_mode: str, support: Mapping[str, Mapping[str, float]],
+           abstaining: bool) -> tuple[PathGateFailure, ...]:
+    """The registered activation gates; every failure is named."""
+
+    failures: list[PathGateFailure] = []
+    if not case_memory_enabled():
+        failures.append(PathGateFailure("feature_flag", "MAESTRO_CASE_MEMORY_ENABLED is unset or false"))
+    if forecast_mode not in SUPPORTED_FORECAST_MODES:
+        failures.append(PathGateFailure("forecast_mode", f"unsupported:{forecast_mode}"))
+    if not len(store):
+        failures.append(PathGateFailure("support", "the episode store is empty"))
+    low = [h for h, s in support.items() if s.get("low_support")]
+    if low:
+        failures.append(PathGateFailure("support", f"below minimum independent support: {sorted(low)}"))
+    if abstaining:
+        failures.append(PathGateFailure("abstention", "the forecast is abstaining"))
+    return tuple(failures)
+
+
+def run_case_memory_path(
+    compiled: CompiledProblem,
+    store: EpisodeStore,
+    contrast: MechanismContrast,
+    actions: Sequence[EvidenceAction],
+    evidence: EvidenceState | None,
+    *,
+    candidate_actions: Sequence[CandidateAction] = (),
+    consequences: Mapping[str, frozenset] | None = None,
+    feature_arm: FeatureArm = FeatureArm.COMBINED,
+    forecast_mode: str = "hypothesis_conditional",
+    research_mode: bool = False,
+) -> CaseMemoryPathResult:
+    """Run the gated path. Research evaluation passes `research_mode=True` explicitly.
+
+    The evidence state is compared before and after forecasting; any mutation is itself a gate
+    failure (`evidence_mutation`), so a forecast can never smuggle an update into the state.
+    """
+
+    if not research_mode and not case_memory_enabled():
+        return CaseMemoryPathResult(False, (PathGateFailure(
+            "feature_flag", "MAESTRO_CASE_MEMORY_ENABLED is unset or false"),),
+            refusal="case_memory_disabled")
+    if not compiled.usable:
+        fatal = [d for d in compiled.diagnostics if d.severity == "fatal"]
+        return CaseMemoryPathResult(False, tuple(PathGateFailure("compiler", d.code) for d in fatal),
+                                    refusal="compiled_problem_not_usable")
+    user_state = user_state_from_compiled(compiled)
+    forecaster = CaseMemoryOutcomeForecaster(store, feature_arm=feature_arm, research_mode=research_mode)
+    state_before = repr(evidence) if evidence is not None else None
+    detailed = {a.identifier: forecaster.forecast_detailed(contrast, a, evidence, user_state)
+                for a in actions}
+    support = {f"{a}:{h}": s for a, d in detailed.items() for h, s in d["support"].items()}
+    state_after = repr(evidence) if evidence is not None else None
+    abstaining = all(d["abstain_reason"] is not None or not d["applicable"] for d in detailed.values())
+    failures = list(_gates(store, forecast_mode, support, abstaining))
+    if research_mode and not case_memory_enabled():
+        failures = [f for f in failures if f.gate != "feature_flag"]
+    if user_state.outcome_mode != "attempted_experiment":
+        failures.append(PathGateFailure("outcome_mode", "experiment_validity_probability_required"))
+    if state_before != state_after:
+        failures.append(PathGateFailure("evidence_mutation", "the forecast mutated the evidence state"))
+    for d in detailed.values():
+        if d["provenance"].get("evidence_kind") != "model_prediction":
+            failures.append(PathGateFailure("evidence_kind", "forecast is not marked model_prediction"))
+    retrieval_payload: dict[str, Any] = {}
+    if actions:
+        problem = RetrievalProblem(
+            problem_id=compiled.problem_id, biological_system="",
+            assay=compiled.assay or "", intervention_type="", measurement_type="",
+            control_design=compiled.control_design or "",
+            context=ContextFeatures(cell_line=user_state.cell_context, time_h=user_state.time_h,
+                                    dose_nM=user_state.dose_nM),
+            hypotheses=tuple(sorted(contrast.identifiers())),
+            state=user_state.directional_state, feature_arm=feature_arm)
+        retrieval = forecaster.retriever.retrieve(problem, research_mode=True)
+        retrieval_payload = {
+            "stage1": {"eligible": list(retrieval.stage1.eligible),
+                       "excluded": dict(retrieval.stage1.excluded)},
+            "kish": dict(retrieval.kish), "usable": dict(retrieval.usable),
+        }
+    rankings: tuple[ActionRanking, ...] = ()
+    plans: tuple[BranchingPlan, ...] = ()
+    if not failures and candidate_actions and consequences is not None:
+        forecasts = forecaster.forecast(contrast, actions, evidence, user_state)
+        rankings = rank_actions_by_decision_value(
+            tuple(sorted(contrast.identifiers())), candidate_actions, forecasts, consequences)
+        plans = tuple(branching_interpretation_plan(a, sorted(consequences))
+                      for a in candidate_actions)
+    return CaseMemoryPathResult(
+        activated=not failures, gate_failures=tuple(failures), retrieval=retrieval_payload,
+        forecasts=detailed, rankings=rankings, branching_plans=plans,
+        model_version=MODEL_VERSION,
+        refusal=None if not failures else "gates_failed:" + ",".join(f.gate for f in failures))

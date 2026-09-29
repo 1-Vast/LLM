@@ -1,0 +1,65 @@
+{
+ "name": "E-AG1 stage 0: premise-only census of genetic-pharmacological discordance cases",
+ "written_at": "2026-09-27T18:15:27+08:00",
+ "status": "specification written before the census code ran and before any download; decision rules below are the registered AG-G0 rule (research/gated_plan/registry.json, c3d2345) plus two reporting rules stated here",
+ "question": "how many independent target-gene clusters have a real discordance case with a feasible, context-matched measurement of the missing interpretation premise",
+ "reads": {
+  "case_premises": [
+   "DepMap 24Q2 CRISPRGeneEffect.csv (gene effect)",
+   "DepMap 24Q2 OmicsExpressionProteinCodingGenesTPMLogp1.csv (log2 TPM+1)",
+   "DepMap 24Q2 Model.csv (identifiers and names)",
+   "PRISM Repurposing 19Q4 secondary-screen-dose-response-curve-parameters.csv (broad_id, depmap_id, screen_id, name, target, ic50, auc, r2)"
+  ],
+  "capability_metadata_only": [
+   "PISA living-cell release (eLife 2024, DOI 10.7554/eLife.95595): compound labels from the cell-arm header and quantified protein identifiers from its first column; annotation sheet in_cells flag and curated targets",
+   "GSE92742 and GSE70138 sig_info: pert_id, pert_iname, pert_type, cell_id, pert_idose, pert_itime",
+   "LINCS 2020 siginfo_beta and compoundinfo_beta (downloaded for this question): pert_id, cmap_name, pert_type, cell_iname, pert_dose, pert_dose_unit, pert_time, pert_time_unit, and compound target",
+   "JUMP-Target-1 compound and CRISPR metadata (downloaded for this question): compound, InChIKey, target_list, gene"
+  ],
+  "never_read": [
+   "any engagement value (PISA log2 fold changes)",
+   "any L1000 or LINCS 2020 signature value or signature-quality metric (distil_cc_q75, tas, cc_q75, pct_self_rank_q25, is_hiq, sig_metrics)",
+   "any Cell Painting feature",
+   "any kinobeads value"
+  ]
+ },
+ "case_rule": {
+  "source": "the engagement_v1 archetype rule (src/evaluation/engagement_cases.py screen_mcf7, ARCHETYPE_THRESHOLDS in src/evaluation/case_builder.py), applied to every DepMap model with PRISM secondary curves",
+  "engagement_gap_or_mode": "single-target PRISM annotation; curve r2 >= 0.50; target gene effect <= -0.7 in the model; dependent fraction (share of models with effect <= -0.5) <= 0.30; target log2 TPM+1 >= 2.0; fitted IC50 absent or above the 10 uM top dose",
+  "screen_preference": "one curve per (model, compound): MTS010, then MTS006, MTS005, HTS002",
+  "reported_separately": "the same rule without the selectivity clause (pan-dependent targets)"
+ },
+ "capabilities": {
+  "engagement_in_context": {
+   "quantity": "engagement_shift (BiologicalQuantity.ENGAGEMENT_SHIFT), intact cells",
+   "source": "PISA living-cell arm; context K562 only; exposure undeclared",
+   "rule": "the case's model is K562, the release assayed the compound in cells, and a protein of the target gene is quantified"
+  },
+  "proximal_activity_in_context": {
+   "quantity": "proximal_activity",
+   "source": "no local or downloaded release measures target-proximal activity across these compounds and contexts",
+   "rule": "counted as zero unless a release is found; candidates are listed, not downloaded"
+  },
+  "phenocopy_same_cell": {
+   "quantity": "transcriptional or morphological phenocopy of target loss; a pathway-level functional readout that the typed rules do not accept as engagement or proximal activity (BiologicalQuantity has no such member)",
+   "sources": ["GSE92742 trt_sh.cgs + trt_cp", "GSE70138 trt_xpr + trt_cp", "LINCS 2020 trt_sh.cgs / trt_xpr + trt_cp", "CPJUMP1 CRISPR + compound (A549 and U2OS; design from Chandrasekaran et al. 2024)"],
+   "rule": "the compound (13-character Broad identifier, else InChIKey for CPJUMP1) has a compound signature at <= 10 uM in the case's cell line, and the target gene has a knockdown or knockout signature in the same cell line",
+   "declared_mismatches": "time (compound 6-48 h against knockdown 96-144 h and viability 120 h) and perturbation mode (catalytic inhibition against loss of the protein) are recorded per case, not used to exclude"
+  },
+  "lysate_binding": {
+   "source": "kinobeads (Klaeger et al. 2017)",
+   "rule": "never context-matched; excluded as a premise supplier, as in engagement_v1"
+  }
+ },
+ "counting": {
+  "unit": "target gene (independent cluster); cases, contexts and compounds are reported beside it",
+  "per_capability": true
+ },
+ "decision_rules": {
+  "AG-G0_population": "biological validation of the agent is READY_FOR_STAGE1_PREREGISTRATION only if >= 30 target-gene clusters have an engagement_in_context or proximal_activity_in_context capability; otherwise NOT_READY (registered)",
+  "phenocopy_track": "if >= 30 target-gene clusters have a phenocopy_same_cell capability, report a candidate task for a different premise (functional perturbation of the target's pathway). It needs its own premise type, rule and validation before any decision uses it; it does not satisfy an engagement premise",
+  "joint_task": "E-JOINT1 needs one task with a genuine premise gap and a forecastable premise result or downstream readout with >= 20 reference cases per hypothesis branch (registered). References must carry an independent branch label; the census counts, per capability, reference pairs whose branch is fixed by a source other than the measurement itself"
+ },
+ "outputs": "outputs/premise_forecast_20260927/census/",
+ "cost": "no provider call; downloads recorded with source, version, licence, size and time; 0 wells"
+}

@@ -20,25 +20,15 @@ from pathlib import Path
 
 import pytest
 
-from evaluation import (
-    CaseRepository,
-    CostBasis,
-    CostingProfile,
-    EvaluationRunner,
-    ExpertWorkflowPolicy,
-    LabCost,
-    MAESTROCorePolicy,
-    ReplayEnvironment,
-    RevealRefusal,
-    SharedControl,
-    build_score_table,
-    exit_verdict,
-    load_costing_profile,
-)
-from evaluation import cli
-from evaluation.lab_cost import sequence_lab_cost
-from evaluation.prediction_controls import is_identity, shuffled_assignment, with_prediction_values
-from evaluation.score_table import SECTION_37_ROWS, cluster_bootstrap_interval, row_metrics, wilson_interval
+from tools.evaluation import CaseRepository, EvaluationRunner
+from tools.evaluation.costs import CostBasis, CostingProfile, LabCost, SharedControl, load_costing_profile
+from tools.evaluation.policies import ExpertWorkflowPolicy, MAESTROCorePolicy
+from tools.evaluation.cases import ReplayEnvironment, RevealRefusal
+from tools.evaluation.scoring import build_score_table, exit_verdict
+from tools.evaluation import cli
+from tools.evaluation.costs import sequence_lab_cost
+from tools.evaluation.policies import is_identity, shuffled_assignment, with_prediction_values
+from tools.evaluation.scoring import SECTION_37_ROWS, cluster_bootstrap_interval, row_metrics, wilson_interval
 
 ROOT = Path(__file__).resolve().parents[1]
 CASES = ROOT / "data" / "evaluation" / "cases"

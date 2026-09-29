@@ -1,20 +1,7 @@
-"""Virtual-cell contracts with explicit applicability and prediction lineage.
-
-File summary
-- Path: src/virtual_cell/interface.py
-- Purpose: declare the world-model contract between MAESTRO's controller and a
-  swappable virtual-cell predictor.
-- Core points:
-  - A prediction is planning-only; it never becomes measured evidence.
-  - Three contract fields are mandatory: ``confidence``, ``in_distribution``,
-    ``abstain_reason``.
-  - Predictions carry intervals, not point estimates, so they can enter costs.
-- Interfaces: `PredictionRequest`, `QueryAssessment`, `StatePrediction`,
-  `Interval`, `VirtualCellWorldModel`, `UnavailableVirtualCellWorldModel`.
-- Depends on: maestro.models
-"""
+"""Prediction contracts, conditional forecasts and per-run prediction reuse."""
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from dataclasses import asdict, dataclass, field, fields, replace
@@ -25,6 +12,7 @@ from typing import Mapping, Protocol
 from maestro.models import FunctionalInterventionProfile, MeasurementStatus
 
 from .applicability import SupportLevel
+
 
 FORECAST_MODES = ("state", "hypothesis_conditional", "history_aware", "hypothesis_conditional_history")
 """Registered forecast modes. `state` is the default and the pre-extension behaviour."""
@@ -115,7 +103,7 @@ class PredictionRequest:
     hypothesis-conditional forecast, `history` for a history-aware one, `observation_context`
     binds problem context the backend may need, and `forecast_mode` names the requested mode.
     A backend that cannot honour any of them abstains by name instead of fabricating a branch
-    forecast; all four enter the conditional cache identity (see `conditional_forecast.py`).
+    forecast; all four enter the conditional cache identity.
     """
 
     request_id: str
@@ -756,3 +744,196 @@ class UnavailableVirtualCellWorldModel:
             abstain_reason="model_unavailable",
             compute_cost=0.0,
         )
+
+
+
+
+CALIBRATION_STATUSES = ("uncalibrated", "calibrated", "not_applicable")
+
+
+@dataclass(frozen=True)
+class HypothesisBranch:
+    """The forecast for one hypothesis of one action."""
+
+    hypothesis_id: str
+    predicted_readouts: Mapping[str, float] = field(default_factory=dict)
+    directional_effects: Mapping[str, int] = field(default_factory=dict)
+    """readout -> expected direction (-1, 0, +1); absent when the model does not forecast direction."""
+    intervals: Mapping[str, Interval] = field(default_factory=dict)
+    support: int = 0
+    abstain_reason: str | None = None
+
+
+@dataclass(frozen=True)
+class ConditionalStatePrediction:
+    """A hypothesis-conditional forecast, or a typed abstention from one."""
+
+    action_identifier: str
+    applicable: bool
+    branches: tuple[HypothesisBranch, ...] = ()
+    calibration_status: str = "uncalibrated"
+    model_version: str = ""
+    provenance: Mapping[str, str] = field(default_factory=dict)
+    abstain_reason: str | None = None
+    request_id: str | None = None
+    compute_cost: float = 1.0
+
+
+def validate_conditional(prediction: ConditionalStatePrediction) -> tuple[str, ...]:
+    """Named contract violations of a conditional forecast; empty means valid."""
+
+    errors: list[str] = []
+    if not _text(prediction.action_identifier):
+        errors.append("invalid_action_identifier")
+    if type(prediction.applicable) is not bool:
+        errors.append("invalid_applicable")
+    if prediction.calibration_status not in CALIBRATION_STATUSES:
+        errors.append("invalid_calibration_status")
+    if not _text(prediction.model_version):
+        errors.append("invalid_model_version")
+    if not (isfinite(prediction.compute_cost) and prediction.compute_cost >= 0):
+        errors.append("invalid_compute_cost")
+    if not isinstance(prediction.provenance, Mapping) or not all(
+            _text(k) and _text(v) for k, v in prediction.provenance.items()):
+        errors.append("invalid_provenance")
+    branch_ids = [b.hypothesis_id for b in prediction.branches]
+    if len(set(branch_ids)) != len(branch_ids):
+        errors.append("duplicate_branch_hypothesis")
+    if prediction.applicable:
+        if prediction.abstain_reason is not None:
+            errors.append("applicable_with_abstain_reason")
+        if not prediction.branches:
+            errors.append("applicable_without_branches")
+    else:
+        if not _text(prediction.abstain_reason):
+            errors.append("abstain_reason_missing")
+        if prediction.branches:
+            errors.append("abstention_contains_prediction")
+    for branch in prediction.branches:
+        if not _text(branch.hypothesis_id):
+            errors.append("invalid_branch_hypothesis_id")
+        if branch.abstain_reason is not None and (branch.predicted_readouts or branch.intervals):
+            errors.append(f"branch_abstention_contains_prediction:{branch.hypothesis_id}")
+        if type(branch.support) is not int or branch.support < 0:
+            errors.append(f"invalid_branch_support:{branch.hypothesis_id}")
+        for name, value in branch.predicted_readouts.items():
+            if not _text(name) or not isfinite(value):
+                errors.append(f"invalid_branch_readout:{branch.hypothesis_id}:{name}")
+        for name, direction in branch.directional_effects.items():
+            if direction not in (-1, 0, 1):
+                errors.append(f"invalid_branch_direction:{branch.hypothesis_id}:{name}")
+        for name, interval in branch.intervals.items():
+            if not isinstance(interval, Interval):
+                errors.append(f"invalid_branch_interval:{branch.hypothesis_id}:{name}")
+                continue
+            if not isfinite(interval.low) or not isfinite(interval.high) or interval.low > interval.high:
+                errors.append(f"invalid_branch_interval:{branch.hypothesis_id}:{name}")
+            if interval.kind is IntervalKind.CALIBRATED:
+                if interval.level is None or not 0.0 < interval.level < 1.0 or not _text(interval.basis):
+                    errors.append(f"invalid_calibrated_interval:{branch.hypothesis_id}:{name}")
+            elif interval.level is not None:
+                errors.append(f"descriptive_interval_claims_a_level:{branch.hypothesis_id}:{name}")
+    return tuple(dict.fromkeys(errors))
+
+
+def conditional_cache_key(request: PredictionRequest, backend: str) -> str | None:
+    """Cache identity of a conditional forecast.
+
+    Everything the plain prediction cache uses plus the four conditional inputs - hypotheses,
+    history, observation context and forecast mode - because the forecast changes when any of
+    them changes. Returns None for an invalid request; abstentions are never cached by callers,
+    following the `PredictionCache` precedent.
+    """
+
+    if not isinstance(request, PredictionRequest) or request.validation_errors():
+        return None
+    identity = request.to_dict()
+    for tracking in ("request_id", "case_id", "contrast_id", "plan_version"):
+        identity.pop(tracking, None)
+    identity["backend"] = backend
+    text = json.dumps(identity, sort_keys=True, allow_nan=False)
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+
+
+# Fields of a request that identify *why* it was asked, not *what* was asked.
+TRACKING_FIELDS = frozenset({"request_id", "case_id", "contrast_id", "plan_version"})
+REUSE_NOTE_PREFIX = "reused_prediction_from_request:"
+
+
+@dataclass(frozen=True)
+class _Entry:
+    assessment: QueryAssessment
+    prediction: StatePrediction
+    origin_request_id: str
+
+
+class PredictionCache:
+    """In-memory, per-controller store of supported predictions keyed by model inputs."""
+
+    def __init__(self, *, max_entries: int = 512):
+        if isinstance(max_entries, bool) or not isinstance(max_entries, int) or max_entries < 1:
+            raise ValueError("max_entries must be a positive integer.")
+        self._max_entries = max_entries
+        self._entries: dict[str, _Entry] = {}
+        self.hits = 0
+        self.misses = 0
+
+    @staticmethod
+    def key_for(request: PredictionRequest, backend: str) -> str | None:
+        """A stable key over the query's model inputs, or ``None`` for an invalid request."""
+
+        if not isinstance(request, PredictionRequest) or request.validation_errors():
+            return None
+        payload = {name: value for name, value in request.to_dict().items() if name not in TRACKING_FIELDS}
+        payload["backend"] = backend
+        return json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False)
+
+    def lookup(
+        self, request: PredictionRequest, backend: str
+    ) -> tuple[QueryAssessment, StatePrediction, str] | None:
+        """Return ``(assessment, rebound prediction, origin request id)`` or ``None``."""
+
+        key = self.key_for(request, backend)
+        entry = self._entries.get(key) if key is not None else None
+        if entry is None:
+            self.misses += 1
+            return None
+        self.hits += 1
+        note = (
+            f"{REUSE_NOTE_PREFIX}{entry.origin_request_id}; the identical query was already answered "
+            "by this backend in this run, so no new inference was run."
+        )
+        prediction = replace(
+            entry.prediction,
+            request_id=request.request_id,
+            compute_cost=0.0,
+            limitations=tuple(entry.prediction.limitations) + (note,),
+        )
+        return entry.assessment, prediction, entry.origin_request_id
+
+    def store(
+        self,
+        request: PredictionRequest,
+        backend: str,
+        assessment: QueryAssessment,
+        prediction: StatePrediction,
+    ) -> bool:
+        """Keep a supported prediction for reuse; report whether it was stored."""
+
+        if not prediction.applicable or not prediction.contract_valid:
+            return False
+        if prediction.request_id != getattr(request, "request_id", None):
+            return False
+        key = self.key_for(request, backend)
+        if key is None:
+            return False
+        if key not in self._entries and len(self._entries) >= self._max_entries:
+            # Oldest first: a long run keeps its recent queries, not its first ones.
+            self._entries.pop(next(iter(self._entries)))
+        self._entries[key] = _Entry(assessment, prediction, request.request_id)
+        return True
+
+    def stats(self) -> dict[str, int]:
+        return {"entries": len(self._entries), "hits": self.hits, "misses": self.misses}

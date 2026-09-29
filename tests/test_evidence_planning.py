@@ -5,7 +5,7 @@ File summary
 - Purpose: Pin the evidence-selection optimizer to exhaustive ground truth and to the public-information boundary.
 - Core points: the solver must report an honest status; constraints must be named rather than folded into a penalty; the planner must not see a hidden outcome.
 - Interfaces: `test_exact_solver_matches_brute_force()`, `test_constraints_are_reported_individually()`, `test_planner_is_invariant_to_hidden_outcomes()`, `test_prerequisite_selection_does_not_guarantee_the_premise()`
-- Depends on: evaluation.planning, evaluation.feasibility, evaluation.cases
+- Depends on: evaluation.planning, evaluation.planning, evaluation.cases
 """
 from __future__ import annotations
 
@@ -13,9 +13,9 @@ from itertools import combinations
 
 import pytest
 
-from evaluation.cases import EvidenceMenuItem, PublicCase, ReplayEnvironment, ReplayCase, ScoringSpec
-from evaluation.feasibility import enumerate_public_plans, sequence_cost
-from evaluation.planning import (
+from tools.evaluation.cases import EvidenceMenuItem, PublicCase, ReplayEnvironment, ReplayCase, ScoringSpec
+from tools.evaluation.planning import enumerate_public_plans, sequence_cost
+from tools.evaluation.planning import (
     PlanConstraints,
     decision_ambiguity,
     declared_scenarios,
@@ -126,7 +126,7 @@ def test_prerequisite_selection_does_not_guarantee_the_premise():
     # In a world where the supplier's record does not qualify, that plan does
     # not execute. The planner still proposed it, which is the point: a
     # selected prerequisite assay is a bet on its result, not a guarantee.
-    from evaluation.cases import RevealedEvidence
+    from tools.evaluation.cases import RevealedEvidence
     from maestro.models import EvidenceKind
 
     unqualified = RevealedEvidence(

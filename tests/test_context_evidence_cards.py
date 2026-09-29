@@ -9,7 +9,7 @@ from agent.knowledge import EvidenceLedger, EvidenceStatus
 from agent.memory import MemoryStore
 from agent.planner import MechanismContrastPlanner
 from agent.tool_runtime import ToolRouter
-from agent.vision import VisualInspection
+from agent.llm import VisualInspection
 
 
 def _intent() -> TaskIntent:

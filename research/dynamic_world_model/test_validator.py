@@ -110,7 +110,7 @@ def test_failed_measurement_is_a_named_non_success_and_eliminates_nothing():
 
 
 def test_a_prediction_routed_through_the_evidence_path_cannot_eliminate():
-    from agent.cases import MeasurementResult
+    from agent.memory import MeasurementResult
     from maestro.models import FunctionalInterventionProfile
     from maestro.outcome import InterpretationTable, OutcomeRule
     key, action, contrast = _contrast()

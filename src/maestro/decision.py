@@ -1,15 +1,4 @@
-"""The development-decision layer of a mechanism contrast.
-
-File summary
-- Path: src/maestro/decision.py
-- Purpose: Map an evidence state and contrast to one bounded development action.
-- Core points:
-  - A decision is emitted only when the compatible explanation set supports it.
-  - Exhausting the budget is never evidence; deferral must not be the cheapest policy.
-  - No registered explanation surviving routes to CONTRADICTED, not a new mechanism label.
-- Interfaces: `DecisionEngine`, `decide`, `EvidenceRequirement`, `DevelopmentDecision`, `DEFAULT_REQUIREMENTS`
-- Depends on: maestro.models, maestro.outcome
-"""
+"""The development-decision layer of a mechanism contrast."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field

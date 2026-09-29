@@ -11,7 +11,7 @@ from maestro.acquisition import (
     select_decision_sensitive_action,
 )
 from maestro.models import EvidenceAction, FunctionalInterventionProfile
-from maestro.policy import PolicyInput
+from maestro.handoff import PolicyInput
 
 
 def _forecast(identifier: str, h1: dict[str, float], h2: dict[str, float]) -> OutcomeForecast:

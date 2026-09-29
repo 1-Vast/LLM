@@ -5,7 +5,7 @@ import pytest
 
 from maestro.acquisition import OutcomeBranch, OutcomeForecast, expected_terminal_decision_value
 from maestro.models import EvidenceAction
-from maestro.planning import plan_measurement, update_belief
+from research.belief_planning.planner import plan_measurement, update_belief
 
 M1, M2, U, A = "matches_h1", "matches_h2", "unresolved", "absent"
 RULES = {M1: frozenset({"H2"}), M2: frozenset({"H1"}), U: frozenset(), A: frozenset()}

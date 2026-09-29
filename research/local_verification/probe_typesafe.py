@@ -24,7 +24,7 @@ File summary
     repetition is uninformative however confident each single answer looks, so this measures it
     rather than leaving it to be noticed by accident.
 - Interfaces: `main()`
-- Depends on: agent.typesafe (standard library only otherwise)
+- Depends on: agent.decision_critic (standard library only otherwise)
 """
 from __future__ import annotations
 
@@ -39,7 +39,7 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
-from agent.typesafe import (  # noqa: E402
+from agent.decision_critic import (  # noqa: E402
     RESPONSE_ALIASES,
     JevEvaluation,
     TypeSafeJevClient,

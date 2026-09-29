@@ -8,7 +8,7 @@ File summary
   - Per-action queries rank each action by the prediction for its own condition, only as a tie-break, and never discharge a premise.
   - The CLI run uses a registered asset, a declared development partition and a computed backend; its trace carries artifact digests, the imported measurement and the decision.
 - Interfaces: pytest test functions
-- Depends on: agent.cli, agent.orchestrator, agent.template_client, virtual_cell
+- Depends on: agent.cli, agent.orchestrator, agent.llm, virtual_cell
 """
 from __future__ import annotations
 
@@ -23,24 +23,18 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
-from agent.audit import RunLogger
+from agent.memory import RunLogger
 from agent.context import ContextBuilder, TaskInterpreter
 from agent.knowledge import EvidenceLedger
 from agent.memory import MemoryStore
 from agent.orchestrator import MAESTROOrchestrator
 from agent.planner import MechanismContrastPlanner
-from agent.template_client import TemplateCompleter, TemplateCompleterError
-from agent.vision import VisualInspector
+from agent.llm import TemplateCompleter, TemplateCompleterError
+from agent.llm import VisualInspector
 from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent
 from maestro.models import MeasurementStatus
-from virtual_cell import (
-    ModelCapabilities,
-    QueryAssessment,
-    QuerySupport,
-    StatePrediction,
-    SystemContext,
-    VirtualCellQueryTemplate,
-)
+from virtual_cell.interface import ModelCapabilities, QueryAssessment, QuerySupport, SystemContext, VirtualCellQueryTemplate
+from virtual_cell import StatePrediction
 
 CONTROL = "[('DMSO_TF', 0.0, 'uM')]"
 LOW = "[('drugA', 0.5, 'uM')]"

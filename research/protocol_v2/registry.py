@@ -137,8 +137,8 @@ def _digests(root: Path, paths) -> dict:
 
 
 def _record(experiment, *, protocol_files, manifest_files, code_files, data_files, command, seed, root, git,
-            registered: bool) -> dict:
-    return {"protocol_version": PROTOCOL_VERSION, "experiment": experiment, "registered": registered,
+            registered: bool, protocol_version: str = PROTOCOL_VERSION) -> dict:
+    return {"protocol_version": protocol_version, "experiment": experiment, "registered": registered,
             "status": "registered" if registered else "development_unregistered",
             "recorded_at": datetime.now(TIMEZONE).isoformat(timespec="seconds"),
             "git_commit": git["commit"], "git_dirty": git["dirty"], "git_changes": git["changes"],
@@ -161,7 +161,7 @@ def _write_once(path: Path, record: dict) -> dict:
 
 
 def register(path, experiment: str, *, protocol_files, manifest_files=(), code_files=(), data_files=(),
-             command=None, seed=None, root: Path = ROOT) -> dict:
+             command=None, seed=None, root: Path = ROOT, protocol_version: str = PROTOCOL_VERSION) -> dict:
     """Register an experiment: a clean tree, a new record, every digest, then read-only."""
     git = git_state(root)
     if git["dirty"]:
@@ -169,17 +169,17 @@ def register(path, experiment: str, *, protocol_files, manifest_files=(), code_f
                         f"{git['changes'][:10]}")
     record = _record(experiment, protocol_files=protocol_files, manifest_files=manifest_files, code_files=code_files,
                      data_files=data_files, command=command or sys.argv, seed=seed, root=root, git=git,
-                     registered=True)
+                     registered=True, protocol_version=protocol_version)
     return _write_once(path, record)
 
 
 def development_record(path, experiment: str, *, protocol_files, manifest_files=(), code_files=(), data_files=(),
-                       command=None, seed=None, root: Path = ROOT) -> dict:
+                       command=None, seed=None, root: Path = ROOT, protocol_version: str = PROTOCOL_VERSION) -> dict:
     """The same record for a development run; allowed on a dirty tree and marked unregistered."""
     git = git_state(root)
     record = _record(experiment, protocol_files=protocol_files, manifest_files=manifest_files, code_files=code_files,
                      data_files=data_files, command=command or sys.argv, seed=seed, root=root, git=git,
-                     registered=False)
+                     registered=False, protocol_version=protocol_version)
     return _write_once(path, record)
 
 

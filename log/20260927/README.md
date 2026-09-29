@@ -1,8 +1,8 @@
 # Experiment record, 2026-09-27
 
 > - **Path**: `log/20260927/README.md`
-> - **Purpose**: Record four blocks. Block 1 (00:00-00:47) is the external-validation block: an audit of the evidence behind MAESTRO's decision claims, a firewall against outcome leakage (sealed policy view, one-time vault, manifests), a frozen 14-rung baseline ladder replayed on development data, masked and permuted virtual-cell controls, and a local candidate audit. Block 2 (03:00-05:40) is belief-space planning with a virtual-cell world model and its first external test: an audit of the repository after a Codex session, a new planner and world model, a new frozen protocol, and one locked run on GSE70138 (LINCS L1000 Phase II), downloaded under the owner's authorisation in the brief. Block 3 (11:30-13:30) is protocol external-validation-2: a code-level audit of eight review reports, an archive of both protocol-v1 experiments, clean-tree registration, fail-closed truth semantics with a whitelisted policy view, task headroom and power gates, a baseline-safe planner, cross-study calibration, virtual-cell and feedback decision gates, and a development screen. Block 4 (13:32-15:00) is an audit-and-plan pass over the owner's "MAESTRO v2" brief and its two-core addendum: a requirement matrix checked by executing the code, qualified historical claims, an execution-path wiring table, contribution cards for the agent, the world model and their combination, a deterministic replay of the engagement package, and a preregistration-ready experiment registry.
-> - **Core points**: No local study is both unseen and compatible, so external validation is blocked; the candidate is L1000 Phase II (GSE70138), whose download needs the owner's approval. On development data (12,428 episodes, 360,412 records, no rule violations) the runtime selector with the virtual-cell channel (`maestro_vc`) was REJECTED under the frozen gates. It decided fewer correctly than the strongest simple baseline in SciPlex3 B (-0.054 [-0.095, -0.013]) and L1000 T (-0.031 [-0.050, -0.014]) and was inconclusive in SciPlex3 A and L1000 LT. It was cheaper in every tier (0.20 to 1.03 fewer measurements) and had fewer wrong eliminations except in SciPlex3 A. It sits on the same correct-versus-cost curve as a one-step expected-value rule. The virtual-cell channel had zero acquisition value in every tier (its one gain over masking was reproduced by another compound's predictions), and the selector's wrong-reading forecasts were 2 to 19 times too low. Production defaults and `src/` are unchanged. **Block 2:** on GSE70138 (38 new compounds, 380 episodes, run once behind the vault), the belief-planning agent was INCONCLUSIVE against the fixed expert order: -0.024 [-0.074, +0.011] correct decisions, with the pre-registered minimum improvement of +0.02 outside the interval. The virtual cell and real feedback changed actions but not decisions, and both contributions were REJECTED as practically meaningful. On development data the agent lost in SciPlex3 A (-0.134, REJECTED) and was inconclusive elsewhere (L1000 LT +0.024 [0.000, +0.050] with 0.57 fewer measurements). The audit found that a Codex session (00:59-02:56) had rewritten block 1's freeze and one replay fold, left an incoherent decision-value function, and changed a loader so that it emits truth-less episodes. Production defaults are unchanged; `src/` gained an opt-in planner and a coherence fix. **Block 3:** no MAESTRO policy meets the protocol-v2 success criteria, and the binding constraint is the task. The fixed order reaches 63-99.6% of the oracle's correct decisions, 76-82% of L1000 episodes cannot be decided from the menu, and a +0.02 effect needs 345-813 units against 38-256 available. The baseline-safe planner removes every development loss (SciPlex3 A -0.131 becomes 0.000) but departs from the fixed order in at most 0.24% of decisions, so it gains nothing. Wrong-risk forecasts are 2-5 times too low, and no recalibration transfers across studies. The virtual cell and feedback are not promoted. External-validation-1's freeze and one fold were rewritten; belief-planning-1's artefacts are intact. Production and `src/` are unchanged. **Block 4:** audit and plan only; nothing registered, promoted or committed. The historical numbers describe the transcriptomic MoA proxy task, not the agent's prerequisite-repair claim. On the engagement package (6 real cases) a selector given the same capability registry matched directed repair's decision and cost in every case the repair decided, so no additional algorithmic contribution was identified. The production repair path and the research belief planner are not connected. Protocol v2's legal menu moves with an outcome: 12 SciPlex3 conditions were profiled but dropped for low cell counts and are not offered. The fixed order reaches 63.3-99.4% of the oracle's correct decisions (block 3's "99.6%" does not reproduce). Go: boundary fixes, E-DATA1, E-CAL1 and the agent census; no-go: superiority tests, world-model promotion, external confirmation.
+> - **Purpose**: Record seven blocks. Block 1 (00:00-00:47) is the external-validation block: an audit of the evidence behind MAESTRO's decision claims, a firewall against outcome leakage (sealed policy view, one-time vault, manifests), a frozen 14-rung baseline ladder replayed on development data, masked and permuted virtual-cell controls, and a local candidate audit. Block 2 (03:00-05:40) is belief-space planning with a virtual-cell world model and its first external test: an audit of the repository after a Codex session, a new planner and world model, a new frozen protocol, and one locked run on GSE70138 (LINCS L1000 Phase II), downloaded under the owner's authorisation in the brief. Block 3 (11:30-13:30) is protocol external-validation-2: a code-level audit of eight review reports, an archive of both protocol-v1 experiments, clean-tree registration, fail-closed truth semantics with a whitelisted policy view, task headroom and power gates, a baseline-safe planner, cross-study calibration, virtual-cell and feedback decision gates, and a development screen. Block 4 (13:32-15:00) is an audit-and-plan pass over the owner's "MAESTRO v2" brief and its two-core addendum: a requirement matrix checked by executing the code, qualified historical claims, an execution-path wiring table, contribution cards for the agent, the world model and their combination, a deterministic replay of the engagement package, and a preregistration-ready experiment registry. Block 5 (17:51-19:30) asks whether a hypothesis-conditional forecast can improve the agent's choice of a missing-premise measurement. It traces the premise-to-decision path, fixes three evaluation boundaries (protocol v2.1), runs E-DATA1 and E-CAL1, and runs a premise-only census of discordance cases with downloaded LINCS 2020 and CPJUMP1 metadata. Block 6 (19:41-20:45) optimises the virtual-cell world model with ideas from six recent virtual-cell papers (PRESAGE, State, Tahoe-x1, Stack, SCALE, MultiFlow). It builds an in-context observation model and an in-context planning world model, and tests both against the current model on held-out compounds (E-WM1, E-WM2). Block 7 (21:55-23:10) is a dual-core iteration under a literature-grounded brief: verify the six papers' identifiers, repair the evaluation weaknesses first (registered folds, strict nested fitting, split integrity, frozen protocols with hashes), then test a quality-weighted in-context transfer model (E1) and, for the agent, calibration and risk control on the actions a planner actually selects (E2).
+> - **Core points**: No local study is both unseen and compatible, so external validation is blocked; the candidate is L1000 Phase II (GSE70138), whose download needs the owner's approval. On development data (12,428 episodes, 360,412 records, no rule violations) the runtime selector with the virtual-cell channel (`maestro_vc`) was REJECTED under the frozen gates. It decided fewer correctly than the strongest simple baseline in SciPlex3 B (-0.054 [-0.095, -0.013]) and L1000 T (-0.031 [-0.050, -0.014]) and was inconclusive in SciPlex3 A and L1000 LT. It was cheaper in every tier (0.20 to 1.03 fewer measurements) and had fewer wrong eliminations except in SciPlex3 A. It sits on the same correct-versus-cost curve as a one-step expected-value rule. The virtual-cell channel had zero acquisition value in every tier (its one gain over masking was reproduced by another compound's predictions), and the selector's wrong-reading forecasts were 2 to 19 times too low. Production defaults and `src/` are unchanged. **Block 2:** on GSE70138 (38 new compounds, 380 episodes, run once behind the vault), the belief-planning agent was INCONCLUSIVE against the fixed expert order: -0.024 [-0.074, +0.011] correct decisions, with the pre-registered minimum improvement of +0.02 outside the interval. The virtual cell and real feedback changed actions but not decisions, and both contributions were REJECTED as practically meaningful. On development data the agent lost in SciPlex3 A (-0.134, REJECTED) and was inconclusive elsewhere (L1000 LT +0.024 [0.000, +0.050] with 0.57 fewer measurements). The audit found that a Codex session (00:59-02:56) had rewritten block 1's freeze and one replay fold, left an incoherent decision-value function, and changed a loader so that it emits truth-less episodes. Production defaults are unchanged; `src/` gained an opt-in planner and a coherence fix. **Block 3:** no MAESTRO policy meets the protocol-v2 success criteria, and the binding constraint is the task. The fixed order reaches 63-99.6% of the oracle's correct decisions, 76-82% of L1000 episodes cannot be decided from the menu, and a +0.02 effect needs 345-813 units against 38-256 available. The baseline-safe planner removes every development loss (SciPlex3 A -0.131 becomes 0.000) but departs from the fixed order in at most 0.24% of decisions, so it gains nothing. Wrong-risk forecasts are 2-5 times too low, and no recalibration transfers across studies. The virtual cell and feedback are not promoted. External-validation-1's freeze and one fold were rewritten; belief-planning-1's artefacts are intact. Production and `src/` are unchanged. **Block 4:** audit and plan only; nothing registered, promoted or committed. The historical numbers describe the transcriptomic MoA proxy task, not the agent's prerequisite-repair claim. On the engagement package (6 real cases) a selector given the same capability registry matched directed repair's decision and cost in every case the repair decided, so no additional algorithmic contribution was identified. The production repair path and the research belief planner are not connected. Protocol v2's legal menu moves with an outcome: 12 SciPlex3 conditions were profiled but dropped for low cell counts and are not offered. The fixed order reaches 63.3-99.4% of the oracle's correct decisions (block 3's "99.6%" does not reproduce). Go: boundary fixes, E-DATA1, E-CAL1 and the agent census; no-go: superiority tests, world-model promotion, external confirmation. **Block 5:** the research question cannot be answered with current data (NOT_READY). Under the registered rule 0 target genes have a discordance case with a context-matched engagement or proximal-activity measurement (30 needed); every relaxation stays at 4 or fewer, and no context has independently labelled premise references (joint support 0). Protocol v2.1 builds the menu from the study design, pools from training folds and weights by unit; the MoA proxy task stays eligible but underpowered (SciPlex3 B +0.070 with 105 of 314 units, L1000 LT +0.047 with 205 of 714). E-CAL1 fails: wrong-elimination forecasts are about 2x too low on the steps the planner selected and close on the fixed order's steps. The forecaster, audit ablation and forecast-ranked repair arm were not built. Two audit gaps (unregistered sources, unsited engagement premises) are now reported without changing a default. $0, 0 wells, nothing committed. **Block 6:** a learned in-context transition predicts a held-out compound's profile at an unmeasured condition from its measured one. It roughly doubles the direction accuracy of the best Tahoe-x1 baseline (centred cosine 0.372 against 0.199 on SciPlex3, 0.361 against 0.187 on L1000; E-WM1 PASS), but it does not identify individual compounds better than their own prompt. Used as an attention kernel in the planning world model, it lowers reading-forecast log loss on SciPlex3 by 0.018 [0.002, 0.036] nats per item. On L1000 the gain is 0.008 [0.0004, 0.017], from tier T only and not robust to item weighting. Both pass the registered E-WM2 gate; a shuffled-prompt control gains nothing, and calibration is unchanged. Nothing is connected to the planner, the agent or `src/`. $0, 0 wells, nothing committed. **Block 7:** the evaluation repairs came first: a programmatic split checker (which rejects block 6's folds 1-5), strictly nested inner-group fitting of every outcome-dependent component, and two protocols frozen with code, data and split hashes. **E1:** a quality-weighted compound-specific residual (`rrt_q`) beats block 6's `ridge_st` on compound discrimination (+0.007 SciPlex3, +0.020 L1000) and on direction, passing its keep rule on both datasets, but plain additive transfer still discriminates better on L1000 (-0.071 [-0.113, -0.031]), so the identity gap is not closed. **E2 is the central negative result:** wrong-elimination forecasts are 1.6-2.0x too low on selected actions (E-CAL1 reproduced with new code); cross-fitted Platt fixes the aggregate ratio (0.94-1.07) but improves log loss only on L1000 and worsens it on SciPlex3; the in-context world model adds nothing on selected steps (all intervals contain 0), which qualifies block 6; and no abstention threshold transfers across folds, with Learn-then-Test certifying only the vacuous always-abstain. Certification would need about 2,700-3,400 units on SciPlex3 (105 exist) and about 1.5 million on L1000 (229 exist). The one positive interaction contrast is a threshold-selection artefact, so no synergy is claimed. The reference arm reproduced E-DATA1's belief traces in 6,601 of 6,601 episodes. Nothing promoted; $0, 0 wells, nothing committed.
 
 ## 1. Record control
 
@@ -79,6 +79,45 @@ The chronological notes, including the one failed smoke run, are in `log/2026092
 - **Scope of changes.** Nothing was registered, because the tree is dirty. Nothing was committed. No file under `src/`
   or `tests/`, no protocol and no registered record was changed.
 
+**Block 5 record control.**
+- **Tree as found at 17:51.** `c3d2345` on `main` (the owner's commit of block 4), plus another session's
+  uncommitted repository reorganisation (Codex, 15:11-16:07; `research/repository_cleanup_20260927.md`). It moved
+  `src/maestro/planning.py` to `research/belief_planning/planner.py`, moved fixtures to `tests/fixtures/` and
+  deleted unused evaluation modules. That session also changed "99.6%" to "99.4%" in block 3's
+  `research/protocol_v2/DIAGNOSIS.md`; recorded here, not reverted.
+- **Brief.** The owner's pasted "research and implementation agent" brief, designed in a Codex prompt session. It
+  allowed public downloads for a specific data-qualification question.
+- **Registration.** `registry.register` refuses the dirty tree, so every run is a development record
+  (`registered: false`). Thresholds come from files committed at `c3d2345` or written before the runs.
+- **Scope of changes.** Research code under `research/protocol_v2/` and `research/premise_forecast/`. Two
+  report-only functions in `src/` (`maestro/provenance.py`, `evaluation/cases.py`). No production default
+  changed; nothing committed.
+
+**Block 6 record control.**
+- **Tree as found at 19:41.** Block 5's uncommitted work, plus a Codex session (13:25-19:36; rollout
+  `01a0e152`) that had just added `src/virtual_cell/population_flow.py` (an experimental single-cell population
+  flow, not wired into any path), signed RNA readouts in `src/virtual_cell/learned_response.py`, fixes in
+  `src/agent/planner.py` and `src/maestro/outcome.py`, and `research/scientific_optimization/` (README in
+  Chinese). None of it was changed here.
+- **Brief.** The owner's request to optimise the virtual-cell world model with six attached preprints, the
+  implementation left to judgement.
+- **Registration.** A development screen. `research/incontext_world/spec.json` (arms, metrics, gates, seeds) was
+  written at 19:51:43, before any code of the package existed.
+- **Scope of changes.** A new research package, `research/incontext_world/`. No change to `src/`, `tools/`,
+  production defaults or earlier records; nothing committed.
+
+**Block 7 record control.**
+- **Tree as found at 21:55.** Blocks 5 and 6 uncommitted, plus the Codex session of 13:25-19:36 (rollout
+  `01a0e152`), which had also written the brief this block executes. That session made no repository change after
+  block 6, and none of its files were modified here.
+- **Brief.** The owner's pasted "research and implementation agent for MAESTRO" brief, with six DOIs and an
+  explicit instruction to repair evaluation weaknesses before making stronger claims.
+- **Registration.** A development screen. `research/dual_core/protocol.json` (22:17:22) governs E1;
+  `protocol_e2.json` (22:30:12) governs E2 and was written after E1's analysis was read, because E1's keep rules
+  choose E2's world model. Both precede the scores they govern.
+- **Scope of changes.** A new research package, `research/dual_core/`. No change to `src/`, `tools/`, production
+  defaults or earlier records; nothing committed.
+
 ## 2. Research questions and hypotheses
 
 **Q1.** On data it has not seen, does MAESTRO's measurement choice beat simple baselines on
@@ -120,6 +159,31 @@ with masked and permuted controls?
 - **Q15.** Does prerequisite-directed repair (AG) add decision value over same-information planning? Does the world
   model (WM) add information beyond simple predictors? Does their combination (JOINT)?
 - **Q16.** Which experiments are ready to register, and which are blocked by what?
+
+**Block 5 questions:**
+- **Q17.** Where exactly is the link from a world-model forecast to the agent's premise repair missing, and which
+  outside methods address it?
+- **Q18.** Once the menu comes from the study design, pools from training folds and weights from units, does any
+  MoA proxy task have the headroom and units for planner work (E-DATA1)?
+- **Q19.** Are wrong-elimination forecasts, or a registered bound, calibrated on the actions each arm selected, per
+  step and per episode, across studies (E-CAL1)?
+- **Q20.** How many independent target genes have a real discordance case with a feasible, context-matched
+  measurement of the missing premise (E-AG1 stage 0)?
+
+**Block 6 questions:**
+- **Q21 (E-WM1).** Does a learned in-context transition predict a held-out compound's shift at an unmeasured
+  condition better than Tahoe-x1's mean-delta baselines and Stack's additive baseline?
+- **Q22 (E-WM2).** Does conditioning the world model's reading forecasts on the compound's own measured prompt
+  shifts improve on the current world model's forecasts, which use only the prompts' labels?
+
+**Block 7 questions:**
+- **Q23 (E1).** Under strict nested group validation, does a quality-weighted compound-specific residual on top of
+  the low-rank transition improve compound discrimination without losing response direction, and does
+  inverse-error aggregation of several purchased prompts beat equal weighting?
+- **Q24 (E2).** Are wrong-elimination forecasts calibrated on the actions a planner actually selects; can a
+  cross-fitted recalibration and an abstention threshold control that risk on held-out units; and does the
+  in-context world model help on selected actions?
+- **Q25.** Is there an interaction between the improved world model and the improved decision policy?
 
 ## 3. Materials, data and computational environment
 
@@ -168,6 +232,36 @@ thread each. No provider call was made.
 - The engagement_v1 case package and capability registry, whose outcomes were already opened on 2026-09-14.
 - Python 3.14 (`C:\Python314`) for probes and the replay.
 - No download, no provider call ($0), no laboratory work (0 wells).
+
+**Block 5 materials:**
+- Prepared SciPlex3 and L1000 caches.
+- The SciPlex3 raw release, `obs` metadata only.
+- GSE92742 `subset48/conditions.json`, and the GSE92742 and GSE70138 `sig_info` design columns.
+- DepMap 24Q2, PRISM 19Q4 secondary, GDSC2 8.5, and the PISA release (header and first column only).
+- **Downloaded** (provenance sidecars in `data/external/lincs2020/` and `data/external/jump_target/`):
+  - LINCS 2020 metadata tables, 471 MB;
+  - JUMP-Target-1 compound and CRISPR lists and the CPJUMP1 plate design, under 0.3 MB.
+- No signature value, engagement value or Cell Painting feature was read.
+- Python 3.14; 5 worker processes (16 GB host, about 2 GB free).
+
+**Block 6 materials:**
+- The prepared SciPlex3 shifts (2,473 genes, split-half replicates) and GSE92742 L1000 Level 5 shifts (978 genes),
+  through the protocol-v2.1 loaders.
+- The six PDFs in `D:/论文/paper/`: bioRxiv 2025.06.03.657653 (PRESAGE), 2025.06.26.661135 (State),
+  2025.10.23.683759 (Tahoe-x1), 2026.01.09.698608 (Stack), 2026.03.17.712536 (SCALE), 2026.08.20.746112
+  (MultiFlow). Read as extracted text with PyMuPDF; the Read tool cannot render PDFs here.
+- No downloads. Python 3.14, 4 worker processes.
+
+**Block 7 materials:**
+- The prepared SciPlex3 shifts (2,473 genes, 16 conditions, split-half replicates) and GSE92742 L1000 Level 5
+  shifts (978 genes, 8 conditions), through the protocol-v2.1 loaders. MSigDB Hallmark v2024.1 for gene-set
+  endpoints. No new dataset; no downloads. GSE70138 was not used.
+- **Literature verified by API** (bioRxiv, Crossref, DataCite, GitHub): State is now peer-reviewed
+  (Cell 189(19):5914-5931.e20, doi:10.1016/j.cell.2026.07.052); the attached Stack PDF is v2; SCALE has a v2
+  (2026-09-03) that was not inspected; PRESAGE, Tahoe-x1 and MultiFlow remain v1 preprints. Closest prior art for
+  the transfer task is Hodos et al., PSB 2018 (doi:10.1142/9789813235533_0004).
+- **Compute:** 20 cores / 28 threads, 15.8 GB RAM, RTX 4060 present but the installed PyTorch is CPU-only, so
+  every experiment ran on CPU. E1 about 9 minutes with 4 workers; E2 about 11 minutes with 4 workers.
 
 ## 4. Experimental design and controls
 
@@ -278,6 +372,57 @@ The cost margins are 0.10 measurements and 0.5 assay-days. The gates run in orde
   registered or claim-bearing run.
 - **New specifications, not run:** E-DATA1, E-CAL1, E-WM1, E-AG1, E-JOINT1 (2 x 2 agent by world model) and EXT-1,
   with the WM-G0-G4 and AG-G0-G3 gates.
+
+**Block 5 design** (`research/protocol_v2/protocol_v2_1.json`, `research/premise_forecast/census_spec.json`):
+- **Protocol v2.1.** Three fixes, for new runs only:
+  - a design-based menu, where a planned condition without a usable row is a charged QC failure;
+  - per-fold pools from training compounds;
+  - unit-mean primary estimates.
+
+  Each has a test that also asserts the v2 defect.
+- **E-DATA1.** Arms fixed, random_legal, myopic_edv, belief, safe and oracle on the 20 development tasks, plus two
+  table-derived policies: cross-fitted fixed* and a table oracle that must match the oracle arm.
+- **E-CAL1.** Leave-one-study-out calibration on belief- and myopic-selected steps and on fixed-order steps
+  (forecasts computed after the fact), per step and per decided episode.
+- **Census.** Premise-only, engagement_v1's archetype rule, typed capabilities: engagement in context; proximal
+  activity; same-cell phenocopy (a pathway readout, not engagement). Sensitivity populations were added after
+  the specification and are labelled as such.
+
+**Block 6 design** (`research/incontext_world/spec.json`):
+- **E-WM1.**
+  - Items: a held-out compound, a prompt condition and a different target condition, both QC-passed; transitions
+    fitted on other-fold compounds only.
+  - Arms: null, global mean, context mean, perturbation mean (the prompt), additive, scaled and `ridge_st`
+    (primary).
+  - Primary metric: the centred cosine (PRESAGE direction) on detected targets.
+  - Gate: `ridge_st` above every baseline with every 95% unit-bootstrap interval above 0.
+- **E-WM2.**
+  - Items: 20 protocol-v2.1 development tasks, each episode x design-planned target x history (none, one or two
+    non-eliminating prompts).
+  - Arms: pooled, class, reference (the current world model), incontext (primary, source and weights fitted per
+    fold by leave-one-unit-out empirical Bayes), prompt-only and transfer-only ablations, and a shuffled-prompt
+    control.
+  - Primary metric: the NLL of the observed label under the true hypothesis on one-prompt items.
+  - Gate: the incontext - reference interval below 0, forecasts without a prompt identical to the reference's,
+    and the shuffled control not better than the reference.
+
+**Block 7 design** (`research/dual_core/protocol.json`, `protocol_e2.json`):
+- **Evaluation repairs, before any new claim.**
+  - `splits.py` checks fold identifiers (0-4), that no declared unit spans folds, that each eligible compound is
+    held out exactly once, that no intended task is empty, that no evaluation record is duplicated, and that
+    calibration folds are disjoint from the test fold. It writes a manifest with fold-assignment and prepared-data
+    hashes.
+  - `world2.StrictInContextWorld` refits, per inner group fold, the transitions, projected geometry, pooled
+    reading frequencies and the class and structural layers. Block 6 left a reference in the transition's means and
+    principal components.
+  - Units are named: SciPlex3 InChIKey connectivity block, L1000 identity/scaffold component. The 10 Murcko
+    scaffolds spanning SciPlex3 folds are a sensitivity stratum, not the unit.
+- **E1.** Three information regimes evaluated separately (A0 no measured response, A1 one purchased prompt, A2
+  several), with 5 to 9 arms each, shuffled-prompt and wrong-target controls, and co-primary discrimination and
+  direction endpoints with a 0.02 non-inferiority margin.
+- **E2.** Both planners through one ledger executor on all 20 tasks; policies P0 (none), P1 (naive threshold),
+  P2 (plug-in on calibration folds), P3 (Learn-then-Test, Hoeffding-Bentkus); cross-fitted Platt recalibration;
+  a 2x2 world-model-by-policy interaction; E3 declared blocked by the registered E-DATA1 failure rule.
 
 ## 5. Experiment register and results
 
@@ -455,6 +600,98 @@ The worst strata are L1000 batches (forecast 0.4–0.6, observed 0.00–0.04).
 - **Tests:** `research/protocol_v2` 24 passed; five invariant files in `tests/` 123 passed;
   `tests/test_repository_shape.py` 9 passed.
 
+**Block 5 results** (`research/premise_forecast/README.md`):
+- **E-DATA1: INCONCLUSIVE**; the registered failure rule applies.
+
+  | Task | Oracle - fixed* (unit mean) | Units available / needed |
+  |---|---|---|
+  | SciPlex3 B | +0.070 [+0.041, +0.106] | 105 / 314 |
+  | L1000 LT | +0.047 [+0.023, +0.078] | 205 / 714 |
+  | SciPlex3 A | +0.033 [0.000, +0.096] (ineligible) | 34 |
+  | L1000 T | +0.004 (ineligible) | 128 |
+
+  - Fixed* never beats the expert order.
+  - Menu expansion: 72 h adds +0.132 to SciPlex3 A's ceiling; three more lines add +0.044 to L1000's.
+  - The table oracle reproduces the oracle arm everywhere; 0 audit problems.
+- **E-CAL1: FAIL** for every arm and bound.
+  - Raw observed/forecast on belief-selected steps: 1.98 (L1000) and 2.10 (SciPlex3); on fixed-order steps 0.96
+    and 1.23.
+  - Decided-episode risk under belief: 2.65x and 3.31x the forecast.
+  - Bounds either cover at 10-119x the observed rate or miss 11-42% of SciPlex3 strata.
+- **Census: NOT_READY.**
+
+  | Population | Cases | Genes | In-context engagement | Same-cell phenocopy | Joint |
+  |---|---|---|---|---|---|
+  | Registered (PRISM single target, selective) | 23 | 6 | 0 | 1 | 0 |
+  | Most permissive (PRISM multi-target + GDSC2, any dependency) | 11,831 | 130 | 4 | 29 | 0 |
+
+- **Tests:**
+  - full production suite 1,348 passed (the five `inspect/` failures are fixed by the other session);
+  - research suites 44 passed;
+  - new: 7 (v2.1), 3 (census), 3 (audit prerequisites).
+
+**Block 6 results** (`research/incontext_world/README.md`):
+- **E-WM1: PASS on both datasets.**
+
+  | Dataset | Units | ridge_st centred cosine | Best baseline | Difference |
+  |---|---|---|---|---|
+  | SciPlex3 | 153 | 0.372 | 0.199 (prompt) | +0.173 [+0.149, +0.197] |
+  | L1000 | 109 | 0.361 | 0.187 (additive) | +0.174 [+0.149, +0.198] |
+
+  - **Other metrics.** Pearson delta, phenocopy@5, MSE and effect AUROC also favour `ridge_st`.
+  - **Discrimination (State).** It does not beat the prompt on SciPlex3 and is worse than additive on both
+    datasets.
+  - **SciPlex3 noise ceiling.** The split-half ceiling is 0.403. The Spearman-Brown-corrected ceiling is 0.723
+    (post hoc), and `ridge_st` reaches 59% of it.
+- **E-WM2: PASS on both datasets as registered.** 6,601 episodes and 634,809 items, 0 problems.
+
+  | Dataset | Reference NLL | Incontext NLL | Difference (unit mean) | Item-weighted (post hoc) | Shuffled - reference |
+  |---|---|---|---|---|---|
+  | SciPlex3 H1 | 0.826 | 0.807 | -0.018 [-0.036, -0.002] | -0.005 [-0.016, +0.006] | +0.004 [-0.009, +0.016] |
+  | SciPlex3 H2 | 0.812 | 0.793 | -0.019 [-0.032, -0.007] | -0.012 [-0.023, -0.002] | - |
+  | L1000 H1 | 0.234 | 0.226 | -0.008 [-0.017, -0.0004] | +0.001 [-0.001, +0.004] | +0.000 [-0.003, +0.003] |
+  | L1000 H2 | 0.172 | 0.172 | +0.001 [-0.000, +0.002] | +0.001 [-0.000, +0.002] | - |
+
+  - **What carries the gain.** On SciPlex3 the transfer source (the observation model) was chosen in 9 of 10
+    folds and carries all of it.
+  - **L1000.** The gain comes from tier T (-0.024) and not LT (-0.000). The gain is concentrated in units with few
+    non-eliminating readings.
+  - **Calibration on unselected items is unchanged:** SciPlex3 1.04 and 1.04; L1000 0.79 and 0.78.
+- **Tests.** `research/incontext_world` 6 passed. With `protocol_v2`, `premise_forecast`, `belief_planning` and
+  `tests/test_repository_shape.py`, 60 passed. `src/` was not changed, so the production suite was not rerun.
+
+**Block 7 results** (`research/dual_core/README.md`):
+- **E1: both keep rules pass on both datasets, with small effects.**
+
+  | Regime | Endpoint | SciPlex3 | L1000 |
+  |---|---|---|---|
+  | A1 | discrimination, rrt_q - ridge_st | +0.007 [+0.005, +0.009] | +0.020 [+0.014, +0.027] |
+  | A1 | direction, rrt_q - ridge_st | +0.003 [+0.002, +0.005] | +0.007 [+0.005, +0.009] |
+  | A2 | direction, precision - equal | +0.003 [+0.003, +0.004] | +0.0002 [0.000, +0.0005] |
+  | A1 | discrimination, rrt_q - additive | -0.027 [-0.066, +0.016] | **-0.071 [-0.113, -0.031]** |
+
+  - Controls behave: a shuffled prompt is worse by 0.29-0.37 discrimination, a wrong-target transition by
+    0.22-0.24.
+  - A0 has no compound identity at all (best discrimination -0.073 and -0.514).
+  - Fitted residual weights are small (median gamma0 0.12 and 0.19); inner MSE falls 0.2-0.8%.
+- **E2: the agent endpoint fails, and the world-model gain does not reach selected actions.**
+  - Raw observed/forecast on selected steps: 1.70 and 1.57 (SciPlex3 reference, incontext), 1.96 and 1.95
+    (L1000). Cross-fitted Platt gives 0.94-1.07 but log loss improves only on L1000 (-0.008 [-0.015, -0.002]) and
+    worsens on SciPlex3 (+0.007 [+0.001, +0.013]).
+  - Incontext minus reference NLL on identical selected steps: every interval contains 0, including steps with a
+    purchased prompt. Block 6's gain was over all design-planned targets, not selected ones.
+  - No P2 - P0 interval is below 0; on L1000 P2's held-out rate rises to 0.059. P3 certifies only always-abstain.
+  - The trade-off exists but is not certifiable: abstaining at 0.01 halves the SciPlex3 wrong rate (0.026 at
+    coverage 0.33). Post hoc, certification needs about 3,369 units (105 exist) and about 1.5 million on L1000
+    (229 exist).
+  - The positive SciPlex3 coverage interaction (+0.031 [+0.020, +0.045]) is a threshold-selection artefact; no
+    synergy claimed.
+  - Integrity: the reference arm reproduced E-DATA1's belief action sequences in 6,601 of 6,601 episodes; 0 audit
+    problems; 480 of 480 live abstention replays matched exact truncation.
+- **Tests:** `research/dual_core` 10 passed; with `incontext_world`, `protocol_v2`, `premise_forecast`,
+  `belief_planning` and `tests/test_repository_shape.py`, 70 passed. `src/` unchanged, so the production suite was
+  not rerun.
+
 ## 6. Deviations, failures and corrections
 
 - **Smoke check failure.** The first smoke check failed on L1000 because `episodes.lab_cost`
@@ -557,6 +794,46 @@ historical path instead.
 - **Citations.** The contribution-card citations outside `research/protocol_v2/LITERATURE.md` were not re-resolved
   online; `VALIDATION.md` lists them.
 
+**Block 5 deviations and corrections:**
+- **Sensitivity populations** (multi-target annotations, GDSC2, any dependency) were added after
+  `census_spec.json`. They cannot change the decision: the registered population gives 0, every relaxation
+  stays below 30.
+- **Two reader bugs** were fixed before the reported census run: a missing LINCS 2020 name, and CPJUMP1 name keys.
+  CPJUMP1 stays at 0 after the fix.
+- **`written_at` in both specification files** was corrected after the runs, from estimated times to the file times
+  (18:07 and 18:15). No rule changed, but the E-DATA1 run record's protocol digest refers to the earlier bytes.
+- **The E-CAL1 episode forecast.** The protocol text gave 1 - prod(1 - p) for "decided episodes". The matching
+  conditional forecast P(wrong)/P(any elimination) was used, and the text's form is reported beside it.
+- **The v2.1 test fixture** first assumed Panobinostat in fold 2; it is in fold 3.
+
+**Block 6 deviations and corrections:**
+- **Folds.** `spec.json` said "folds 1-5"; the registered folds are 0-4.
+  - The first runs therefore had an empty fold 5 and never held out fold 0.
+  - Fold 0 was run afterwards with identical code and added as separate records. The first records were kept.
+  - E-WM1 figures quoted mid-session came from folds 1-4. E-WM2 metrics were not read before fold 0 was added.
+    The verdicts are the same.
+- **Histories.** E-WM2 histories use only non-eliminating, QC-passed prompts. An eliminating reading ends a real
+  episode, and the reference world has no likelihood for it.
+- **Post hoc.** Item-weighted means, per-tier splits, unit-size bands and the Spearman-Brown ceiling were written
+  after the registered analyses were read.
+- **`written_at`.** Corrected in `spec.json` from an estimate (19:53) to the file time (19:51:43); no rule changed.
+- **Pandas.** An analysis-only reader bug read the arm named "null" as missing; the records were unaffected.
+
+**Block 7 deviations and corrections:**
+- **Execution-only smoke runs** preceded each freeze (E1: L1000 fold 0; E2: L1000 T fold 1 and SciPlex3 A fold 2).
+  They printed counts, problem counts, live-check matches and timing. No metric was computed or read.
+- **`protocol_e2.json` was written after E1's analysis was read**, because E1's keep rules select E2's world model.
+  It was written before any E2 score, and says so.
+- **Post hoc, in separate labelled files:** item-weighted sensitivities, the binding-alpha repeat with a coverage
+  floor, the power calculation, and the fitted-gamma summary.
+- **The A2 keep rule passed on L1000 by +0.0002**, statistically above 0 and practically nil; reported as such.
+- **Scope reduction, disclosed:** the population backend (`src/virtual_cell/population_flow.py`, the Codex pilot
+  of the same day) was planned for re-evaluation and dropped for time. Its own limits stand unchanged; no code
+  here depends on it. One partially written module was deleted rather than left in the tree.
+- **A synthetic test assertion was relaxed** from strictly-greater to not-worse where both arms saturate at
+  perfect discrimination in 400 dimensions; the MSE assertion carries the discrimination there.
+- **P3's guarantee assumes exchangeable units**, so every estimate is unit-level.
+
 ## 7. Interpretation and claim boundaries
 
 **What the replay shows:**
@@ -615,6 +892,43 @@ historical path instead.
 - **Combination.** Neither measured nor measurable yet.
 - **Biology.** No statement here is a biological mechanism claim. `not_engaged` has no measured sensitivity, and the
   engagement exposure is not matched to the viability phenotype.
+
+**Block 5 interpretation.**
+- **The binding limit is the population, not the planner.** Selective genetic-pharmacological discordance is rare
+  in PRISM's single-target annotations (6 genes). Context-matched engagement exists only in K562, which PRISM does
+  not screen.
+- **Phenocopy.** A same-cell compound signature beside a knockdown of the target is a pathway readout; the typed
+  rules correctly refuse it as engagement.
+- **Calibration.** The E-CAL1 pattern (calibrated where the forecast did not choose, optimistic where it did) fits
+  the optimizer's curse. Any future forecast-ranked repair must be calibrated on selected actions.
+- **Biology.** No statement here is a biological mechanism claim.
+
+**Block 6 interpretation.**
+- **The observation model.** The world model now has a virtual-cell observation model that uses a compound's own
+  measured response as a prompt. It predicts the direction of the response at an unmeasured condition far better
+  than mean-delta baselines. It is still no substitute for measuring that compound: compound identity is not
+  better recovered.
+- **The planning gain is small and dataset-dependent:** about 2% lower log loss on SciPlex3, fragile on L1000.
+  It is a sharpening of forecasts that were already roughly calibrated on unselected items. It says nothing about
+  the planner's selected actions, where E-CAL1 found forecasts 2x too low.
+- **Claim boundary.** No statement here is a biological mechanism claim, a decision-benefit claim or a claim
+  beyond these development folds.
+
+**Block 7 interpretation.**
+- **The binding limitation is now measured, not guessed.** Certifying a wrong-elimination risk threshold on these
+  tasks needs 25-30x more independent units carrying elimination events than exist. This is a power statement
+  about the decision task, not about the world model, and no additional expression dataset supplies it.
+- **Forecast quality and decision utility come apart.** A world model can sharpen forecasts over all candidate
+  actions (block 6) and add nothing on the few actions a planner buys (this block). Future world-model claims
+  should be scored on selected actions.
+- **Aggregate calibration is not calibration.** A recalibrated ratio near 1 coexisted with worse log loss on
+  SciPlex3 and wide intervals on both datasets.
+- **Risk control without a coverage floor is vacuous:** always abstaining satisfies it.
+- **Originality boundary.** Predicting a drug's profile in an unmeasured context from its measured ones is the
+  task family of Hodos et al. 2018. This block's defensible contribution is the evaluation and agent construction
+  (regime separation with a purchased-measurement ledger, risk scored on selected actions with an exact truncation
+  equivalence, and the power requirement), plus a negative result.
+- No statement here is a biological mechanism, efficacy or decision-benefit claim.
 
 ## 8. Reproduction and artifact ledger
 
@@ -676,6 +990,33 @@ in `0927/protocol_v2_run_notes.md`.
   - `python -m research.gated_plan.probes --out FILE`, with `PYTHONPATH` set to the repository and `src`;
   - the replay command in `research/gated_plan/VALIDATION.md` step 6.
 
+**Block 5 artifacts:**
+- `research/premise_forecast/`: README (report), TRACE, `census.py`, `census_spec.json`, `test_census.py`.
+- `research/protocol_v2/`: `design.py`, `tasks_v21.py`, `e_data1.py`, `e_cal1.py`, `protocol_v2_1.json`,
+  `test_protocol_v2_1.py`; `contracts.py`, `runner.py`, `headroom.py` and `registry.py` extended with defaults
+  unchanged.
+- `src/maestro/provenance.py`, `src/evaluation/cases.py`; `tests/test_evidence_audit_prerequisites.py`.
+- Outputs: `outputs/protocol_v2_1_20260927/` (design, e_data1, e_cal1) and `outputs/premise_forecast_20260927/census/`.
+- Copies in `0927/`: `protocol_v2_1_e_data1_analysis.json`, `protocol_v2_1_e_cal1_analysis.json`,
+  `premise_forecast_census.json`, `premise_forecast_run_notes.md`.
+
+**Block 6 artifacts:**
+- `research/incontext_world/`: README (report), `spec.json`, `transition.py`, `metrics.py`, `world.py`,
+  `e_wm1.py`, `e_wm2.py`, `test_incontext_world.py`.
+- Outputs: `outputs/incontext_world_20260927/e_wm1/` (item files, `analysis.json`, `ceiling_posthoc.json`) and
+  `e_wm2/` (per-task parquet and json, `analysis.json`, `robustness_posthoc.json`).
+- Copies in `0927/`: `incontext_world_run_notes.md`, `incontext_world_e_wm1_analysis.json`,
+  `incontext_world_e_wm2_analysis.json`, `incontext_world_e_wm2_robustness_posthoc.json`.
+
+**Block 7 artifacts:**
+- `research/dual_core/`: README (report), `protocol.json`, `protocol_e2.json`, `splits.py`, `transfer.py`,
+  `world2.py`, `ledger.py`, `agent.py`, `e1.py`, `e2.py`, `test_dual_core.py`.
+- Outputs: `outputs/dual_core_20260927/split_manifest.json`; `e1/` (per-fold parquet records, fits,
+  `analysis.json`); `e2/` (per-task traces and cross-scoring, `analysis.json`, `reference_reproduction.json`,
+  `posthoc_binding_alpha.json`, `posthoc_power.json`).
+- Copies in `0927/`: `dual_core_run_notes.md`, `dual_core_split_manifest.json`, `dual_core_e1_analysis.json`,
+  `dual_core_e2_analysis.json`, `dual_core_e2_posthoc_power.json`.
+
 ## 9. Open items and next experiments
 
 - **External study.** Download GSE70138 on the owner's approval. Then:
@@ -728,6 +1069,41 @@ in `0927/protocol_v2_run_notes.md`.
   - E-DATA1 after P0.
   - E-CAL1: ready now, but register it first.
 
+**Block 5 open items** (owner decisions first):
+- **Commit.** Commit the reorganisation and this block so E-DATA1, E-CAL1 and the census can be registered from a
+  clean tree.
+- **Measurement.** Commission, or not, a context-matched engagement assay for at least 30 discordance cases: about
+  720 wells at the package's declared price of 24 wells and 4 days per case. Add positive controls for sensitivity:
+  about 960 wells for 40 concordant pairs.
+- **Premise type.** Decide whether pathway phenocopy should become its own registered premise type. It needs its
+  own validation and must never satisfy engagement.
+- **Not to do.** Build the forecaster, the audit ablation or the forecast-ranked repair arm before a qualified task
+  exists.
+
+**Block 6 open items** (owner decisions first):
+- **Commit.** Commit blocks 5 and 6 with the Codex reorganisation, so these screens can be registered from a clean
+  tree.
+- **Next test.** E-CAL1 on the actions a planner using `InContextWorld` selects. The protocol-v2.1 runner would
+  pass bought shifts to arms as opt-in public-step fields. This is the spec's precondition for any planner use.
+- **Promotion.** Promoting `ridge_st` as a `src/virtual_cell/` ladder rung, serving only when a same-compound
+  prompt exists, is an owner decision. It needs its own contract tests.
+- **Codex's population flow.** `src/virtual_cell/population_flow.py` is an unvalidated experimental backend placed
+  in `src/`. Under the owner's rule (unverified code in `research/`), moving it is the owner's call.
+
+**Block 7 open items** (owner decisions first):
+- **Commit.** Commit blocks 5, 6 and 7 with the Codex reorganisation, so these screens can be registered from a
+  clean tree.
+- **The power decision.** Certifying a risk threshold needs 25-30x more independent units with elimination events.
+  Either identify a decision task with that many units, or set a target error rate loose enough to certify, or
+  accept the descriptive risk-coverage curve instead of a certified gate. This is the owner's call.
+- **Promotion.** `rrt_q` passes its predictive keep rule but not the selected-action risk criterion, so it stays
+  research. Promoting it as a `src/virtual_cell/` rung would need its own contract tests and a decision-level
+  result.
+- **Population backend.** Its re-evaluation is still open (planned and dropped here). It also still sits in `src/`
+  although unvalidated, which is the owner's call under the rule that unverified code lives in `research/`.
+- **Not to do.** Do not treat block 6's forecast gain as a selected-action gain; do not use an uncertified
+  threshold as a risk gate.
+
 ## 10. Curation provenance
 
 Written by the Claude session that ran the block, from the frozen files, the replay manifest and
@@ -750,3 +1126,25 @@ Block 4 was written by the Claude session that ran it (13:32-15:00), from:
 - the code paths named in `research/gated_plan/AUDIT.md`.
 
 The brief and its addendum were the owner's pasted prompts; their historical claims were re-checked, not copied.
+
+Block 5 was written by the Claude session that ran it (17:51-19:30), from:
+- the executed runs in `outputs/protocol_v2_1_20260927/` and `outputs/premise_forecast_20260927/`;
+- the specification files written before them;
+- the code paths named in `research/premise_forecast/TRACE.md`.
+
+The brief was the owner's pasted prompt; its starting facts were re-checked, not copied.
+
+Block 6 was written by the Claude session that ran it (19:41-20:45), from:
+- the executed runs in `outputs/incontext_world_20260927/`;
+- `research/incontext_world/spec.json`, written before the code;
+- the six preprints' extracted text.
+
+Paper details were checked against the PDFs, not taken from summaries.
+
+Block 7 was written by the Claude session that ran it (21:55-23:10), from:
+- the executed runs in `outputs/dual_core_20260927/`;
+- `research/dual_core/protocol.json` and `protocol_e2.json`, written before the scores they govern;
+- DOI, version and licence metadata resolved from the bioRxiv, Crossref, DataCite and GitHub APIs.
+
+The brief was the owner's pasted prompt, drafted in the Codex session of 13:25-19:36; its starting facts were
+re-checked against the saved artifacts and the current code, not copied.

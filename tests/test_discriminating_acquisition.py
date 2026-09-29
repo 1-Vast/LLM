@@ -20,8 +20,8 @@ File summary
   - The legacy selectors are characterised in the same tests, so each counterexample shows what
     the old path chose.
 - Interfaces: pytest test functions
-- Depends on: maestro.acquisition, maestro.outcome, maestro.selection, agent.orchestrator,
-  agent.cases, virtual_cell
+- Depends on: maestro.acquisition, maestro.outcome, maestro.composition, agent.orchestrator,
+  agent.memory, virtual_cell
 """
 from __future__ import annotations
 
@@ -31,15 +31,15 @@ from pathlib import Path
 
 import pytest
 
-from agent.audit import RunLogger
-from agent.cases import CaseState, CaseStore, MeasurementResult
+from agent.memory import RunLogger
+from agent.memory import CaseState, CaseStore, MeasurementResult
 from agent.context import ContextBuilder, TaskInterpreter
 from agent.knowledge import EvidenceLedger
 from agent.memory import MemoryStore
 from agent.orchestrator import MAESTROOrchestrator
 from agent.planner import MechanismContrastPlanner
-from agent.template_client import TemplateCompleter
-from agent.vision import VisualInspector
+from agent.llm import TemplateCompleter
+from agent.llm import VisualInspector
 from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent
 from maestro.acquisition import (
     OutcomeBranch,
@@ -50,15 +50,9 @@ from maestro.acquisition import (
 )
 from maestro.models import EvidenceKind, EvidenceScope, MechanismContrast, MechanismHypothesis, DevelopmentAction
 from maestro.outcome import EvidenceState, InterpretationTable, OutcomeClass, OutcomeRule
-from maestro.selection import BudgetedEvidenceSelector
-from virtual_cell import (
-    ModelCapabilities,
-    QueryAssessment,
-    QuerySupport,
-    StatePrediction,
-    SystemContext,
-    VirtualCellQueryTemplate,
-)
+from maestro.composition import BudgetedEvidenceSelector
+from virtual_cell.interface import ModelCapabilities, QueryAssessment, QuerySupport, SystemContext, VirtualCellQueryTemplate
+from virtual_cell import StatePrediction
 
 H1, H2 = "h1", "h2"
 MATCH_H1, MATCH_H2 = "profile_matches_h1", "profile_matches_h2"

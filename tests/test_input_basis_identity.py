@@ -23,9 +23,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-from virtual_cell import QuerySupport  # noqa: E402
+from virtual_cell.interface import QuerySupport  # noqa: E402
 
-from tools.shared.state_fixture import (  # noqa: E402
+from tests.fixtures.state import (  # noqa: E402
     adapter as _adapter,
     asset_sha256 as _sha256,
     joined as _joined,

@@ -1,31 +1,13 @@
-"""Exposure-matched target engagement derived from measured competition binding.
+"""Exposure-matched binding estimates and measured proximal-function records.
 
-File summary
-- Path: src/maestro/pharmacology.py
-- Purpose: state what a measured affinity implies about target engagement at the
-  exposure an experiment actually used, and keep that statement inside its
-  measured scope.
-- Core points:
-  - Occupancy is arithmetic on a measured affinity, not an observation of the
-    treated cells: the estimate carries the lysate it came from and stays an
-    estimate, so it cannot discharge a premise for engagement in the query
-    context while it can satisfy a premise written for a scoped estimate.
-  - Selectivity is a property of the exposure, not of the compound: the same
-    inhibitor can occupy one target at a low dose and several at a high one, and
-    the profile reports which targets those are.
-  - A missing affinity is reported by name and never imputed; an exposure
-    outside the measured dose range is flagged as extrapolation.
-- Interfaces: `BindingMeasurement`, `ExposureCondition`, `EngagementEstimate`,
-  `EngagementProfile`, `engagement_profile`, `occupancy_from_kd`
-- Depends on: maestro.models (the observable vocabulary is imported lazily, so
-  this package keeps no module-level dependency on virtual_cell)
-"""
+Lysate occupancy estimates retain their measured context and cannot grant cellular engagement."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Mapping, Sequence
 
 from .models import BiologicalQuantity, PremiseGrant
+
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from virtual_cell.biology import Observable
@@ -311,4 +293,98 @@ def engagement_profile(
             "A one-site equilibrium relation is an approximation; the measured dose points are retained for audit.",
             "Binding is not inhibition of function, and neither is evidence that a downstream pathway moved.",
         ),
+    )
+
+
+FOREIGN_LYSATE_REFUSAL = "foreign_lysate_estimate_cannot_discharge_an_engagement_premise"
+
+
+@dataclass(frozen=True)
+class ProximalFunctionRecord:
+    """One measured proximal-function observation, in one context, at one window."""
+
+    cell_line: str
+    readout: str
+    entity: str
+    site: str | None
+    time_hours: float
+    effect_log2: float
+    vehicle_null_threshold_log2: float
+    engaged: bool
+    source: str
+    source_sha256: str
+    units: str = "log2_ratio_to_vehicle"
+
+    def problems(self) -> tuple[str, ...]:
+        """Named reasons this record cannot be used as a measured engagement record."""
+
+        issues: list[str] = []
+        if not self.cell_line.strip():
+            issues.append("context_undeclared")
+        if not self.readout.strip() or not self.entity.strip():
+            issues.append("readout_undeclared")
+        if not self.source.strip() or not self.source_sha256.strip():
+            issues.append("source_undeclared")
+        if self.time_hours <= 0.0:
+            issues.append("time_undeclared")
+        expected = self.effect_log2 < self.vehicle_null_threshold_log2
+        if self.engaged != expected:
+            issues.append(
+                "engagement_claim_contradicts_its_own_numbers:"
+                f"claimed_{self.engaged}_effect_{self.effect_log2}_threshold_{self.vehicle_null_threshold_log2}"
+            )
+        return tuple(issues)
+
+    def grant(self, *, field: str = "functional:pathway_activity") -> PremiseGrant:
+        """The typed grant this measurement offers, refused if it contradicts itself."""
+
+        issues = self.problems()
+        if issues:
+            raise ValueError(f"proximal_function_record_not_usable: {', '.join(issues)}")
+        return PremiseGrant(
+            field=field,
+            source_action="measured_proximal_function",
+            quantity=BiologicalQuantity.PROXIMAL_ACTIVITY,
+            is_estimate=False,
+            entity=self.entity,
+            site=self.site,
+            units=self.units,
+            context_identifier=self.cell_line,
+            time_hours=self.time_hours,
+            quality=(
+                "measured_effect_crosses_the_same_plate_vehicle_null"
+                if self.engaged
+                else "measured_effect_does_not_cross_the_same_plate_vehicle_null"
+            ),
+            quality_passed=True,
+            provenance=f"{self.readout} in {self.cell_line} at {self.time_hours}h from {self.source}",
+        )
+
+
+def lysate_estimate_grant(
+    *,
+    field: str,
+    context_identifier: str | None,
+    time_hours: float | None,
+    provenance: str = "",
+) -> PremiseGrant:
+    """An engagement grant backed by a foreign-lysate binding estimate.
+
+    It is returned typed as an estimate so that any direct-measurement requirement refuses
+    it by name (`estimate_offered_for_direct_measurement`), and it carries a named reason in
+    its quality field so a reader never has to infer why it was not admitted.
+    """
+
+    return PremiseGrant(
+        field=field,
+        source_action="foreign_lysate_competition_binding",
+        quantity=BiologicalQuantity.TARGET_OCCUPANCY,
+        is_estimate=True,
+        entity=None,
+        units=None,
+        context_identifier=context_identifier,
+        time_hours=time_hours,
+        quality=FOREIGN_LYSATE_REFUSAL,
+        quality_passed=False,
+        provenance=provenance or "competition-binding estimate in a foreign lysate",
     )

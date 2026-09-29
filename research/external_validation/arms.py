@@ -16,7 +16,7 @@ File summary
     says whether virtual-cell output reached the choice.
   - Forecasts only choose actions. No arm touches `EvidenceState`.
 - Depends on: research/sequence_audit/policies.py, research/sparse_value/{policy,model}.py,
-  maestro.acquisition, maestro.selection, rdkit, scikit-learn
+  maestro.acquisition, maestro.composition, rdkit, scikit-learn
 """
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ from maestro.acquisition import (  # noqa: E402
     select_decision_sensitive_action,
     select_discriminating_action,
 )
-from maestro.selection import BudgetedEvidenceSelector  # noqa: E402
+from maestro.composition import BudgetedEvidenceSelector  # noqa: E402
 
 C, E, V = P.C, P.E, P.V
 PRICE = 0.02

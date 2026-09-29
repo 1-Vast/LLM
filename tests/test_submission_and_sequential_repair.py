@@ -9,20 +9,21 @@ File summary
 """
 from pathlib import Path
 
-from agent.audit import RunLogger
+from agent.memory import RunLogger
 from agent.context import ContextBuilder, TaskInterpreter
 from agent.knowledge import EvidenceLedger
 from agent.memory import MemoryStore
 from agent.orchestrator import MAESTROOrchestrator
 from agent.planner import MechanismContrastPlanner
-from agent.vision import VisualInspector
-from evaluation.baselines import LLMActionPolicy, _parse_submission
-from evaluation.cases import ReplayEnvironment
-from maestro import EvidenceAction, EvidenceActionKind, FunctionalInterventionProfile, MAESTROAgent
+from agent.llm import VisualInspector
+from tools.evaluation.policies import LLMActionPolicy, _parse_submission
+from tools.evaluation.cases import ReplayEnvironment
+from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent
+from maestro.models import EvidenceActionKind
 
-from tools.shared.stub_client import StubClient  # noqa: E402
+from tests.fixtures.stub_client import StubClient  # noqa: E402
 def _synthetic_view():
-    from evaluation import CaseRepository
+    from tools.evaluation import CaseRepository
 
     root = Path(__file__).resolve().parents[1]
     case, outcomes = next(

@@ -4,24 +4,59 @@
   "description": "Retrieve precedent scientific episodes for a supplied open-problem JSON and return the four-stage retrieval report with per-case reasons, adaptation requirements and a hypothesis-conditional forecast. Planning-only model predictions; never measurements. Disabled by default (feature flag MAESTRO_CASE_MEMORY_ENABLED); pass research_mode for evaluation.",
   "evidence_kind": "model_prediction",
   "entrypoint": "tool.py",
-  "source_files": ["src/maestro/case_memory.py", "src/maestro/adaptive_retrieval.py", "src/maestro/hypothesis_forecast.py", "src/maestro/directional.py"],
+  "source_files": [
+    "src/maestro/case_memory.py",
+    "src/maestro/adaptive_retrieval.py",
+    "src/maestro/hypothesis_forecast.py"
+  ],
   "schema_version": "1.0",
-  "required_parameters": ["dataset_path"],
-  "optional_parameters": ["research_mode", "feature_arm", "top_k"],
+  "required_parameters": [
+    "dataset_path"
+  ],
+  "optional_parameters": [
+    "research_mode",
+    "feature_arm",
+    "top_k"
+  ],
   "parameter_schema": {
     "type": "object",
     "properties": {
-      "dataset_path": {"type": "string", "minLength": 1},
-      "research_mode": {"type": "boolean"},
-      "feature_arm": {"type": "string", "enum": ["scalar", "signed_direction", "pathway_direction", "combined"]},
-      "top_k": {"type": "integer", "minimum": 1, "maximum": 50}
+      "dataset_path": {
+        "type": "string",
+        "minLength": 1
+      },
+      "research_mode": {
+        "type": "boolean"
+      },
+      "feature_arm": {
+        "type": "string",
+        "enum": [
+          "scalar",
+          "signed_direction",
+          "pathway_direction",
+          "combined"
+        ]
+      },
+      "top_k": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      }
     },
-    "required": ["dataset_path"],
+    "required": [
+      "dataset_path"
+    ],
     "additionalProperties": false
   },
-  "supported_task_types": ["analysis_planning", "evidence_review", "mechanism_diagnosis"],
+  "supported_task_types": [
+    "analysis_planning",
+    "evidence_review",
+    "mechanism_diagnosis"
+  ],
   "estimated_cost": 0.0,
-  "supported_suffixes": [".json"],
+  "supported_suffixes": [
+    ".json"
+  ],
   "use_when": [
     "A typed open problem (assay, context, two competing hypotheses) is supplied and planning needs precedent cases with explicit adaptation requirements."
   ],

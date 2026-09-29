@@ -7,22 +7,23 @@ File summary
   - Checks `CaseStore` plan-versioning, budget, and result idempotency boundaries.
   - A real measurement result must pass condition and replicate checks.
 - Interfaces: `test_*` functions, `StubClient`
-- Depends on: agent.audit, agent.cases, agent.context, agent.knowledge, agent.memory, agent.orchestrator, agent.planner, agent.vision, maestro
+- Depends on: agent.memory, agent.memory, agent.context, agent.knowledge, agent.memory, agent.orchestrator, agent.planner, agent.llm, maestro
 """
 from pathlib import Path
 import sqlite3
 
-from agent.audit import RunLogger
-from agent.cases import CaseState, CaseStore, MeasurementResult
+from agent.memory import RunLogger
+from agent.memory import CaseState, CaseStore, MeasurementResult
 from agent.context import ContextBuilder, TaskInterpreter
 from agent.knowledge import EvidenceLedger
 from agent.memory import MemoryStore
 from agent.orchestrator import MAESTROOrchestrator
 from agent.planner import MechanismContrastPlanner
-from agent.vision import VisualInspector
-from maestro import EvidenceAction, EvidenceKind, FunctionalInterventionProfile, MAESTROAgent
+from agent.llm import VisualInspector
+from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent
+from maestro.models import EvidenceKind
 
-from tools.shared.stub_client import StubClient  # noqa: E402
+from tests.fixtures.stub_client import StubClient  # noqa: E402
 def _controller(tmp_path: Path) -> tuple[MAESTROOrchestrator, EvidenceLedger]:
     client = StubClient(
         [

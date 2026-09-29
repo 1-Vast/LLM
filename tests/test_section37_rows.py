@@ -9,8 +9,8 @@ File summary
 - Core points: assertions here are contract tests, not biological results, and no test makes a
   provider call.
 - Interfaces: one test per contract, named for the contract it pins.
-- Depends on: evaluation.voi_arm, evaluation.llm_rows, evaluation.adjudication,
-  evaluation.provider_spend, evaluation.cases, agent.llm
+- Depends on: evaluation.policies, evaluation.policies, evaluation.scoring,
+  evaluation.costs, evaluation.cases, agent.llm
 """
 from __future__ import annotations
 
@@ -24,11 +24,11 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
-from evaluation.adjudication import adjudication_packet, agreement, mechanical_verdict  # noqa: E402
-from evaluation.cases import CaseRepository, ReplayEnvironment  # noqa: E402
-from evaluation.llm_rows import ExplicitHypothesesLLMPolicy  # noqa: E402
-from evaluation.provider_spend import RATES, SpendLedger, price_usage  # noqa: E402
-from evaluation.voi_arm import (  # noqa: E402
+from tools.evaluation.scoring import adjudication_packet, agreement, mechanical_verdict  # noqa: E402
+from tools.evaluation.cases import CaseRepository, ReplayEnvironment  # noqa: E402
+from tools.evaluation.policies import ExplicitHypothesesLLMPolicy  # noqa: E402
+from tools.evaluation.costs import RATES, SpendLedger, price_usage  # noqa: E402
+from tools.evaluation.policies import (  # noqa: E402
     SimpleModelVOIPolicy,
     expected_value_of_information,
     fit_action_reliability,
@@ -281,7 +281,7 @@ def test_the_mechanical_verdict_is_the_frozen_rules_with_every_record_revealed(t
 def test_a_long_adjudication_leaves_its_finished_cases_behind(tmp_path):
     """A run that stops half way must still be evidence, so each case is written as it lands."""
 
-    from evaluation.adjudication import adjudicate_package
+    from tools.evaluation.scoring import adjudicate_package
 
     _package(tmp_path)
 
@@ -317,7 +317,7 @@ def test_a_long_adjudication_leaves_its_finished_cases_behind(tmp_path):
 def test_resuming_re_reviews_only_the_cases_that_failed(tmp_path):
     """A provider failure must cost one case, not the whole package, on the next attempt."""
 
-    from evaluation.adjudication import adjudicate_package
+    from tools.evaluation.scoring import adjudicate_package
 
     _package(tmp_path)
     calls: list[int] = []
@@ -421,7 +421,7 @@ def test_a_fenced_or_padded_reply_is_still_one_decision(tmp_path):
 
 
 def test_agreement_reports_kappa_and_every_disagreement(tmp_path):
-    from evaluation.adjudication import ReviewerVerdict
+    from tools.evaluation.scoring import ReviewerVerdict
 
     mechanical = {"a": ("revise_intervention",), "b": ("change_intervention_mode",), "c": ("defer",)}
     reviewer = {

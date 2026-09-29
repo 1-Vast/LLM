@@ -24,7 +24,7 @@ File summary
   - Forecasts only choose actions. Evidence changes only through `common.evidence_update` on a
     real, executed result.
 - Depends on: research/acquisition_followup/two_step.py, research/acquisition_link/evaluate.py,
-  research/dynamic_world_model (common, episodes), maestro.acquisition, maestro.selection
+  research/dynamic_world_model (common, episodes), maestro.acquisition, maestro.composition
 """
 from __future__ import annotations
 
@@ -49,7 +49,7 @@ from maestro.acquisition import (  # noqa: E402
 )
 from maestro.models import BiologicalQuantity, EvidenceAction, EvidenceActionKind  # noqa: E402
 from maestro.outcome import EvidenceState  # noqa: E402
-from maestro.selection import BudgetedEvidenceSelector  # noqa: E402
+from maestro.composition import BudgetedEvidenceSelector  # noqa: E402
 
 LABELS = S.LABELS
 NEUTRAL = {"ambiguous": V.UNRESOLVED, "undetected": V.ABSENT}

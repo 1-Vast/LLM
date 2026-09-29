@@ -5,7 +5,7 @@ File summary
 - Purpose: Verify that each biological link has its own assay, conditions and measured lineage.
 - Core points: all values below are constructed fixtures; passing them is not biological validation.
 - Interfaces: test_* functions
-- Depends on: maestro.outcome, agent.orchestrator, tools.shared.biological_fixture
+- Depends on: maestro.outcome, agent.orchestrator, tests.fixtures.biological
 """
 from dataclasses import replace
 from types import SimpleNamespace
@@ -13,18 +13,16 @@ from types import SimpleNamespace
 import pytest
 
 from agent.orchestrator import MAESTROOrchestrator
-from maestro import (
-    DecisionStatus, DevelopmentAction, EvidenceKind, EvidenceScope, EvidenceState,
-    FunctionalInterventionProfile, InterpretationTable, MeasurementStatus, MechanismContrast,
-    MechanismHypothesis, MODE_COMPARATOR_FIELD, MODE_DIFFERENCE_FIELD, OutcomeClass, OutcomeRule,
-    SUFFICIENT_FUNCTION_FIELD, admit_evidence,
-)
+from maestro.models import DecisionStatus, DevelopmentAction, EvidenceKind, EvidenceScope, MeasurementStatus, MechanismContrast
+from maestro.outcome import EvidenceState, InterpretationTable, MODE_COMPARATOR_FIELD, MODE_DIFFERENCE_FIELD, OutcomeClass, OutcomeRule, SUFFICIENT_FUNCTION_FIELD, admit_evidence
+from maestro import FunctionalInterventionProfile, MechanismHypothesis
 from maestro.models import BiologicalQuantity, PremiseRequirement
-from maestro.reliability import PredictionReliabilityLedger
+from maestro.judgment import PredictionReliabilityLedger
 from maestro.repair import RepairLedger, RepairRecord
 from maestro.models import RepairKind
-from virtual_cell import Interval, IntervalKind, StatePrediction
-from tools.shared.biological_fixture import contract, results, run_chain, ENGAGEMENT, CONDITIONS
+from virtual_cell.interface import Interval, IntervalKind
+from virtual_cell import StatePrediction
+from tests.fixtures.biological import contract, results, run_chain, ENGAGEMENT, CONDITIONS
 
 
 def _contrast(actions):
@@ -260,7 +258,7 @@ def test_unobserved_repair_remains_unscored(tmp_path):
 
 
 def test_changed_hypothesis_description_cannot_resurrect_a_refuted_candidate(tmp_path):
-    from tools.shared.biological_fixture import PLAN, orchestrator
+    from tests.fixtures.biological import PLAN, orchestrator
     actions, table, profile = contract()
     first_rule = replace(table.rules[0], scope=EvidenceScope.MECHANISM_CONTRAST,
                          eliminates=frozenset({"incomplete"}))
@@ -305,7 +303,8 @@ def test_a_repair_cannot_borrow_the_old_actions_calibrated_prediction():
 
 @pytest.mark.parametrize("change", ["context", "time", "request_id", "model_version"])
 def test_prediction_request_coordinates_must_match_the_calibration_pair(change):
-    from virtual_cell import PredictionRequest, Intervention, SystemContext
+    from virtual_cell import PredictionRequest
+    from virtual_cell.interface import Intervention, SystemContext
     controller, turn, action, observed = _scoring_fixture()
     request = PredictionRequest(
         request_id="q", case_id="case", contrast_id="contrast", plan_version=1,

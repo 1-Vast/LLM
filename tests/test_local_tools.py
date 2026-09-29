@@ -13,9 +13,9 @@ from pathlib import Path
 
 from agent.context import ContextPacket, TaskIntent
 from agent.tool_runtime import ToolRouter
-from maestro import EvidenceKind
+from maestro.models import EvidenceKind
 
-from tools.shared.stub_client import StubClient  # noqa: E402
+from tests.fixtures.stub_client import StubClient  # noqa: E402
 
 
 ROOT = Path(__file__).resolve().parents[1]

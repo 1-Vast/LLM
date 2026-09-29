@@ -1,4 +1,4 @@
-"""Assemble the calibration file virtual_cell.response_rung reads, from recorded results only.
+"""Assemble the calibration file virtual_cell.signature_retrieval reads, from recorded results only.
 
 File summary
 - Path: research/biological_depth/build_rung_calibration.py

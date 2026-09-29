@@ -10,9 +10,9 @@ File summary
 """
 from __future__ import annotations
 
-from virtual_cell import conditional_forecast as CF
+from virtual_cell import interface as CF
 from virtual_cell import interface as VC
-from virtual_cell.cache import PredictionCache
+from virtual_cell.interface import PredictionCache
 
 
 def _state_request(**kwargs) -> VC.PredictionRequest:

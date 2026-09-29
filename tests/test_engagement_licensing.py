@@ -10,7 +10,7 @@ File summary
   `test_proximal_function_does_not_discharge_an_occupancy_requirement()`,
   `test_a_foreign_lysate_estimate_is_refused_for_a_direct_engagement_premise()`,
   `test_a_record_that_contradicts_its_own_numbers_is_refused()`
-- Depends on: maestro.engagement, maestro.models, maestro.licence
+- Depends on: maestro.pharmacology, maestro.models, maestro.licence
 """
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
-from maestro.engagement import (
+from maestro.pharmacology import (
     FOREIGN_LYSATE_REFUSAL,
     ProximalFunctionRecord,
     lysate_estimate_grant,

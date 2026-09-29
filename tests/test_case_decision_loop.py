@@ -7,36 +7,25 @@ File summary
   - Exercises `run_case_loop` with stubbed clients and asserts evidence-state transitions.
   - A qualified, condition-matched result, not budget exhaustion, licenses a decision.
 - Interfaces: `test_*` functions
-- Depends on: agent.audit, agent.cases, agent.context, agent.knowledge, agent.memory, agent.orchestrator, agent.planner, agent.vision, maestro
+- Depends on: agent.memory, agent.memory, agent.context, agent.knowledge, agent.memory, agent.orchestrator, agent.planner, agent.llm, maestro
 """
 from pathlib import Path
 
 from maestro.models import BiologicalQuantity
 
-from agent.audit import RunLogger
-from agent.cases import CaseState, CaseStore, MeasurementResult
+from agent.memory import RunLogger
+from agent.memory import CaseState, CaseStore, MeasurementResult
 from agent.context import ContextBuilder, TaskInterpreter
 from agent.knowledge import EvidenceLedger
 from agent.memory import MemoryStore
 from agent.orchestrator import MAESTROOrchestrator
 from agent.planner import MechanismContrastPlanner
-from agent.vision import VisualInspector
-from maestro import (
-    MODE_COMPARATOR_FIELD,
-    MODE_DIFFERENCE_FIELD,
-    SUFFICIENT_FUNCTION_FIELD,
-    DecisionStatus,
-    DevelopmentAction,
-    EvidenceAction,
-    EvidenceActionKind,
-    EvidenceKind,
-    EvidenceScope,
-    FunctionalInterventionProfile,
-    MAESTROAgent,
-    RepairKind,
-)
+from agent.llm import VisualInspector
+from maestro.outcome import MODE_COMPARATOR_FIELD, MODE_DIFFERENCE_FIELD, SUFFICIENT_FUNCTION_FIELD
+from maestro.models import DecisionStatus, DevelopmentAction, EvidenceActionKind, EvidenceKind, EvidenceScope, RepairKind
+from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent
 
-from tools.shared.stub_client import StubClient  # noqa: E402
+from tests.fixtures.stub_client import StubClient  # noqa: E402
 
 TASK = {
     "task_type": "mechanism_diagnosis",

@@ -1,37 +1,376 @@
-"""The four-layer round: structured handoffs instead of prose between layers.
-
-File summary
-- Path: src/maestro/handoff.py
-- Purpose: make report section 30 executable — evidence, world model, decision and
-  execution exchange structured records, three fields are mandatory
-  (``in_distribution``, ``rejected[]``, ``contradiction_flag``), and a round that
-  omits one is refused rather than written.
-- Core points:
-  - A round is a file, not a function call: every layer's output is a record with
-    named fields, so a later reader can audit it and a run can be re-scored offline.
-  - ``rejected[]`` carries a reason per rejected candidate. Without it, an improvement
-    cannot be attributed to new information, to the model, or to the selection rule.
-  - ``contradiction_flag`` records whether a result removed a hypothesis the round
-    entered with. A run in which it is never set has never revised a judgement, and
-    ``review_run`` reports that as a finding rather than as a healthy trace.
-  - Nothing here is evidence: a world-model record is a prediction, and its mandatory
-    fields exist so that a decision layer cannot read it as a measurement.
-- Interfaces: `ComparabilityStatus`, `EvidenceLayer`, `WorldModelLayer`, `DecisionLayer`,
-  `ExecutionLayer`, `RejectedCandidate`, `RoundRecord`, `write_round`, `read_round`,
-  `review_run`
-- Depends on: (standard library only)
-"""
+"""Evidence provenance, immutable public policy inputs, JSON contracts, and round records."""
 from __future__ import annotations
 
 import hashlib
 import json
+import math
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from enum import Enum
 from math import isfinite
 from pathlib import Path
-from typing import Iterable, Mapping, Sequence
+from types import MappingProxyType
+from typing import Any
 
-from .tool_contracts import json_loads
+from .models import EvidenceAction
+
+
+TOOL_SCHEMA_VERSION = "1.0"
+
+
+def json_value(value: Any, *, depth: int = 0) -> Any:
+    """Copy strict JSON values without non-finite numbers, non-string keys or coercion."""
+    if depth > 64:
+        raise ValueError("JSON nesting exceeds 64 levels.")
+    if value is None or type(value) in (str, bool, int):
+        return value
+    if type(value) is float and math.isfinite(value):
+        return value
+    if isinstance(value, Mapping):
+        if any(type(key) is not str for key in value):
+            raise ValueError("JSON object keys must be strings.")
+        return {key: json_value(item, depth=depth + 1) for key, item in value.items()}
+    if type(value) is list:
+        return [json_value(item, depth=depth + 1) for item in value]
+    raise ValueError("Expected strict JSON; non-finite numbers and non-JSON objects are forbidden.")
+
+
+def json_dumps(value: Any) -> str:
+    return json.dumps(json_value(value), ensure_ascii=True, sort_keys=True, allow_nan=False, separators=(",", ":"))
+
+
+def json_loads(text: str) -> Any:
+    def pairs(items: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in items:
+            if key in result:
+                raise ValueError(f"Duplicate JSON key: {key}")
+            result[key] = value
+        return result
+
+    def constant(value: str) -> None:
+        raise ValueError(f"Non-finite JSON number: {value}")
+
+    return json_value(json.loads(text, object_pairs_hook=pairs, parse_constant=constant))
+
+
+def nonnegative_number(value: Any, field: str) -> float:
+    try:
+        if type(value) not in (int, float) or not math.isfinite(value) or value < 0:
+            raise ValueError
+        return float(value)
+    except (ValueError, OverflowError):
+        raise ValueError(f"{field} must be a finite non-negative number, not bool.") from None
+
+
+def string_list(value: Any, field: str) -> list[str]:
+    if not isinstance(value, list) or any(type(item) is not str or not item.strip() for item in value):
+        raise ValueError(f"{field} must be an array of nonempty strings.")
+    return list(value)
+
+
+def object_fields(value: Any, required: set[str], optional: set[str], field: str) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise ValueError(f"{field} must be an object.")
+    if required - value.keys():
+        raise ValueError(f"{field} missing fields: {sorted(required - value.keys())}")
+    if value.keys() - required - optional:
+        raise ValueError(f"{field} unknown fields: {sorted(value.keys() - required - optional)}")
+    return value
+
+
+def nonempty_string(value: Any, field: str) -> str:
+    if type(value) is not str or not value.strip():
+        raise ValueError(f"{field} must be a nonempty string.")
+    return value
+
+
+_TYPES = {"object", "array", "string", "number", "integer", "boolean", "null"}
+_KEYWORDS = {"type", "properties", "required", "additionalProperties", "items", "enum", "minimum", "maximum",
+             "minItems", "maxItems", "minLength", "maxLength", "description", "default"}
+
+
+def check_schema(schema: Any) -> None:
+    """Validate the supported schema subset, rejecting unknown keywords and references."""
+    schema = json_value(schema)
+    if not isinstance(schema, dict) or set(schema) - _KEYWORDS:
+        raise ValueError("Unknown schema keyword or invalid schema object.")
+    types = schema.get("type")
+    types = [types] if isinstance(types, str) else types
+    if not isinstance(types, list) or not types or any(type(item) is not str or item not in _TYPES for item in types):
+        raise ValueError("Unknown schema type.")
+    if len(types) != len(set(types)):
+        raise ValueError("Duplicate schema type.")
+    if "description" in schema:
+        nonempty_string(schema["description"], "schema.description")
+    if "enum" in schema and (not isinstance(schema["enum"], list) or not schema["enum"]):
+        raise ValueError("Schema enum must be a nonempty array.")
+    if set(schema) & {"properties", "required", "additionalProperties"}:
+        if "object" not in types or schema.get("additionalProperties", False) is not False:
+            raise ValueError("Object schemas must reject additional properties.")
+        properties = schema.get("properties", {})
+        if not isinstance(properties, dict):
+            raise ValueError("Schema properties must be an object.")
+        required = string_list(schema.get("required", []), "schema.required")
+        if len(required) != len(set(required)) or set(required) - properties.keys():
+            raise ValueError("Invalid schema required fields.")
+        for child in properties.values():
+            check_schema(child)
+    if "array" in types:
+        if "items" not in schema:
+            raise ValueError("Array schema requires items.")
+        check_schema(schema["items"])
+    elif "items" in schema:
+        raise ValueError("items requires array type.")
+    for low, high, applicable in (("minimum", "maximum", {"number", "integer"}),
+                                  ("minItems", "maxItems", {"array"}),
+                                  ("minLength", "maxLength", {"string"})):
+        for key in (low, high):
+            if key not in schema:
+                continue
+            value = schema[key]
+            if not set(types) & applicable or type(value) not in (int, float):
+                raise ValueError(f"Invalid schema bound: {key}")
+            try:
+                finite = math.isfinite(value)
+            except OverflowError:
+                finite = False
+            if not finite:
+                raise ValueError(f"Non-finite schema bound: {key}")
+            if low != "minimum" and (type(value) is not int or value < 0):
+                raise ValueError(f"Invalid schema length: {key}")
+        if low in schema and high in schema and schema[low] > schema[high]:
+            raise ValueError("Schema lower bound exceeds upper bound.")
+    if "default" in schema:
+        validate_schema(schema["default"], schema, "schema.default")
+
+
+def validate_schema(value: Any, schema: Mapping[str, Any], field: str = "arguments") -> None:
+    """Validate strict JSON against a checked schema; booleans are not numeric values."""
+    value = json_value(value)
+    types = schema["type"]
+    types = [types] if isinstance(types, str) else types
+    matches = {"object": isinstance(value, dict), "array": type(value) is list, "string": type(value) is str,
+               "number": type(value) in (int, float), "integer": type(value) is int,
+               "boolean": type(value) is bool, "null": value is None}
+    if not any(matches[kind] for kind in types):
+        raise ValueError(f"{field} does not match schema type {types}.")
+    if "enum" in schema and json_dumps(value) not in {json_dumps(item) for item in schema["enum"]}:
+        raise ValueError(f"{field} does not match schema enum.")
+    if isinstance(value, dict):
+        properties = schema.get("properties", {})
+        object_fields(value, set(schema.get("required", [])), set(properties), field)
+        for key, item in value.items():
+            validate_schema(item, properties[key], f"{field}.{key}")
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            validate_schema(item, schema["items"], f"{field}[{index}]")
+    for key, actual, is_lower in (("minimum", value, True), ("maximum", value, False),
+                                  ("minItems", len(value) if isinstance(value, list) else None, True),
+                                  ("maxItems", len(value) if isinstance(value, list) else None, False),
+                                  ("minLength", len(value) if isinstance(value, str) else None, True),
+                                  ("maxLength", len(value) if isinstance(value, str) else None, False)):
+        if key not in schema or actual is None:
+            continue
+        if key in ("minimum", "maximum") and type(value) not in (int, float):
+            continue
+        if (is_lower and actual < schema[key]) or (not is_lower and actual > schema[key]):
+            raise ValueError(f"{field} violates schema {key}.")
+
+
+@dataclass(frozen=True)
+class SourceCluster:
+    """One original experiment and the identifiers that refer to it."""
+
+    cluster_id: str
+    source_ids: frozenset[str]
+    note: str = ""
+
+
+class SourceClusterIndex:
+    """Map any source identifier to the cluster that counts as one unit of evidence."""
+
+    def __init__(self, clusters: Iterable[SourceCluster] = ()):
+        self._clusters: dict[str, SourceCluster] = {}
+        self._lookup: dict[str, str] = {}
+        for cluster in clusters:
+            self.register(cluster)
+
+    def register(self, cluster: SourceCluster) -> SourceCluster:
+        if not cluster.cluster_id.strip():
+            raise ValueError("cluster_id is required.")
+        self._clusters[cluster.cluster_id] = cluster
+        for source_id in cluster.source_ids:
+            self._lookup[source_id] = cluster.cluster_id
+        self._lookup.setdefault(cluster.cluster_id, cluster.cluster_id)
+        return cluster
+
+    def cluster_of(self, source_id: str) -> str:
+        return self._lookup.get(source_id, source_id)
+
+    def independent(self, source_ids: Iterable[str]) -> frozenset[str]:
+        return frozenset(self.cluster_of(item) for item in source_ids if item)
+
+    def count_independent(self, source_ids: Iterable[str]) -> int:
+        return len(self.independent(source_ids))
+
+    def is_registered(self, source_id: str) -> bool:
+        """Whether a registered cluster names this source (or is this source)."""
+
+        return source_id in self._lookup
+
+    def independence(self, source_ids: Iterable[str]) -> dict[str, frozenset[str]]:
+        """Registered clusters and sources whose dependence is unknown, kept apart.
+
+        Two citations of one experiment that nobody registered are two unknown-dependence
+        sources, not two independent clusters; only registered clusters count as independent.
+        """
+
+        ids = [item for item in source_ids if item]
+        return {"independent_clusters": frozenset(self.cluster_of(item) for item in ids if self.is_registered(item)),
+                "dependence_unknown": frozenset(item for item in ids if not self.is_registered(item))}
+
+    @property
+    def clusters(self) -> tuple[SourceCluster, ...]:
+        return tuple(self._clusters.values())
+
+    def cluster_members(self, cluster_id: str) -> frozenset[str]:
+        cluster = self._clusters.get(cluster_id)
+        return cluster.source_ids if cluster else frozenset()
+
+
+def build_index(clusters: Sequence[Mapping[str, object]]) -> SourceClusterIndex:
+    """Build an index from plain mappings such as parsed JSON or a manifest."""
+
+    index = SourceClusterIndex()
+    for entry in clusters:
+        identifier = entry.get("cluster_id")
+        sources = entry.get("source_ids") or ()
+        if not isinstance(identifier, str) or not identifier.strip():
+            raise ValueError("Each cluster mapping requires a non-empty cluster_id.")
+        index.register(
+            SourceCluster(
+                cluster_id=identifier.strip(),
+                source_ids=frozenset(str(item) for item in sources if str(item)),
+                note=str(entry.get("note", "")),
+            )
+        )
+    return index
+
+
+_HIDDEN_FIELDS = frozenset({
+    "truth", "hidden_truth", "ground_truth", "groundtruth", "heldout", "held_out",
+    "klass", "mechanism", "annotation", "annotations", "mechanism_annotation",
+    "mechanism_class", "mechanism_label", "evaluator", "future_outcome",
+    "future_action_outcome", "outcome_truth", "truth_label", "heldout_profile",
+    "data", "conditions", "shift", "compounds", "index", "outcomes",
+})
+
+
+def _forbidden_fields(value, path: str = "$") -> list[str]:
+    """Reject evaluator-only keys even when callers construct PolicyInput directly."""
+
+    problems: list[str] = []
+    if isinstance(value, Mapping):
+        for key, nested in value.items():
+            name = str(key).strip().lower()
+            if name in _HIDDEN_FIELDS:
+                problems.append(f"{path}.{key}: evaluator-only field")
+            problems.extend(_forbidden_fields(nested, f"{path}.{key}"))
+    elif isinstance(value, (tuple, list)):
+        for index, nested in enumerate(value):
+            problems.extend(_forbidden_fields(nested, f"{path}[{index}]"))
+    elif hasattr(value, "__dict__"):
+        for key, nested in vars(value).items():
+            if str(key).strip().lower() in _HIDDEN_FIELDS:
+                problems.append(f"{path}.{key}: evaluator-only field")
+            if isinstance(nested, (Mapping, tuple, list)):
+                problems.extend(_forbidden_fields(nested, f"{path}.{key}"))
+    return problems
+
+
+def _freeze_value(value):
+    if isinstance(value, Mapping):
+        return MappingProxyType({key: _freeze_value(nested) for key, nested in value.items()})
+    if isinstance(value, (tuple, list)):
+        return tuple(_freeze_value(item) for item in value)
+    if isinstance(value, set):
+        return frozenset(_freeze_value(item) for item in value)
+    return value
+
+
+def _freeze_mapping(value: Mapping[str, Any]) -> Mapping[str, Any]:
+    return MappingProxyType({key: _freeze_value(nested) for key, nested in value.items()})
+
+
+@dataclass(frozen=True)
+class PolicyInput:
+    """The complete public state an acquisition policy is allowed to inspect."""
+
+    visible_evidence: tuple[Any, ...] = ()
+    legal_actions: tuple[EvidenceAction, ...] = ()
+    budget: float = 0.0
+    calibrated_action_distributions: Mapping[str, Mapping[str, float]] = field(default_factory=dict)
+    provenance: Mapping[str, str] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        evidence = ((self.visible_evidence,) if isinstance(self.visible_evidence, Mapping)
+                    else tuple(self.visible_evidence))
+        problems = _forbidden_fields(evidence, "$.visible_evidence")
+        problems.extend(_forbidden_fields(self.calibrated_action_distributions, "$.calibrated"))
+        problems.extend(_forbidden_fields(self.provenance, "$.provenance"))
+        if problems:
+            raise ValueError("; ".join(problems))
+        if (isinstance(self.budget, bool) or not isinstance(self.budget, (int, float))
+                or not math.isfinite(float(self.budget)) or self.budget < 0):
+            raise ValueError("policy budget must be a finite nonnegative number")
+        if not all(isinstance(action, EvidenceAction) for action in self.legal_actions):
+            raise TypeError("legal_actions must contain EvidenceAction values")
+        identifiers = {action.identifier for action in self.legal_actions}
+        distributions = {
+            str(identifier): _freeze_mapping(values)
+            for identifier, values in self.calibrated_action_distributions.items()
+        }
+        unknown = set(distributions) - identifiers
+        if unknown:
+            raise ValueError(f"predictions supplied for non-legal actions: {sorted(unknown)}")
+        for action_identifier, distribution in distributions.items():
+            if any(isinstance(value, bool) or not isinstance(value, (int, float))
+                   or not math.isfinite(float(value)) or float(value) < 0
+                   for value in distribution.values()):
+                raise ValueError(f"invalid calibrated distribution: {action_identifier}")
+        if any(not isinstance(key, str) or not key.strip() for key in self.provenance):
+            raise ValueError("policy provenance keys must be nonempty strings")
+        object.__setattr__(self, "visible_evidence", tuple(_freeze_value(item) for item in evidence))
+        object.__setattr__(self, "legal_actions", tuple(self.legal_actions))
+        object.__setattr__(self, "calibrated_action_distributions", MappingProxyType(distributions))
+        object.__setattr__(self, "provenance", MappingProxyType(dict(self.provenance)))
+
+    @property
+    def action_ids(self) -> tuple[str, ...]:
+        return tuple(action.identifier for action in self.legal_actions)
+
+    def distribution_for(self, action_identifier: str) -> Mapping[str, float] | None:
+        return self.calibrated_action_distributions.get(action_identifier)
+
+
+def make_policy_input(
+    *,
+    visible_evidence: Sequence[Any] = (),
+    legal_actions: Sequence[EvidenceAction] = (),
+    budget: float,
+    calibrated_action_distributions: Mapping[str, Mapping[str, float]] | None = None,
+    provenance: Mapping[str, str] | None = None,
+) -> PolicyInput:
+    """Build a policy input without accepting an evaluator or raw-data object."""
+
+    return PolicyInput(
+        visible_evidence=tuple(visible_evidence),
+        legal_actions=tuple(legal_actions),
+        budget=budget,
+        calibrated_action_distributions=calibrated_action_distributions or {},
+        provenance=provenance or {},
+    )
 
 
 def _finite(value: object) -> bool:

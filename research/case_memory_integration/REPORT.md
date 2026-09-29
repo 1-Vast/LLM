@@ -1,5 +1,9 @@
 # Report: case-memory production integration and the untouched-source evaluation
 
+Historical integration/evaluation record. For the current production candidate and subsequent
+development experiment, see [SCIENTIFIC_REPAIR_V3.md](SCIENTIFIC_REPAIR_V3.md). The frozen
+external measurements below are not measurements of the version-3 estimator.
+
 > **File summary**
 > - **Path**: `research/case_memory_integration/REPORT.md`
 > - **Purpose**: the final report of the case-memory integration task: what was built, what the
@@ -79,9 +83,10 @@ shows most test units' best reference cosine below 0.3, and the norm panel confi
 - **Proxy task.** Mechanism classes are **curated annotations** (LINCS 2020 `moa` strings); no
   conclusion here is about biological ground truth. No wet-lab result exists; nothing here is
   **qualified evidence**.
-- **The heuristic forecast is uncalibrated by declaration.** It carries
-  `calibration_status: uncalibrated`, no calibration dataset, and stays out of default production
-  action selection.
+- **The production estimator remains uncalibrated by declaration.** It now prefers realised
+  multi-state case measurements and applies support-aware shrinkage using Kish support and domain
+  shift, but it carries `calibration_status: uncalibrated`, no calibration dataset, and stays out
+  of default production action selection until a held-out development calibration is fitted.
 - **The case memory changes nothing by default.** The feature flag is off; the orchestrator's
   default path is unchanged and tested so.
 
@@ -100,8 +105,9 @@ refusals. Not enabled by default; the heuristic planner is not part of default a
    (confirmatory) label-compatible independent units. LINCS 2020 at wider scope or a second
    untouched study (the protocol-v2 candidate list also names a Tahoe-100M subset after a
    training-overlap audit) are the registered directions.
-2. Calibration of similarity-weighted forecasts at low support; a registered recalibration step
-   (support-aware shrinkage fitted on the development side only) is the next experiment.
+2. Calibration of the new support-aware forecasts at low support; its constants are explicit but
+   still require a development-only fit and a second untouched evaluation. The frozen replay
+   numbers above are the pre-fix baseline and are not post-fix performance claims.
 3. Decision-level value: needs a task where episodes offer more than one condition and the oracle
    has positive headroom.
 4. Real user episodes: the schema and compiler are tested, but no qualified real user episode has
@@ -110,13 +116,22 @@ refusals. Not enabled by default; the heuristic planner is not part of default a
 ## 7. Reproduction
 
 ```bash
-python -m tools.case_memory.download_sources   # verify sources, write external_source_manifest.json
-python -m tools.case_memory.preprocess         # build the hashed data pack
-python -m tools.case_memory.replay             # frozen replay -> results.json + forecast_items.jsonl
-python -m tools.case_memory.quality_audit      # 6 integrity checks
-python -m tools.case_memory.build_cases        # reference episodes (scm-2)
-python -m tools.case_memory.build_hypothesis_graph
-python -m tools.case_memory.evaluate           # evaluation_summary.json + activation verdict
-python -m tools.case_memory.visual_verify      # 7 figures + figures_manifest.json
+python -m tools.case_memory.workflow sources   # verify sources, write external_source_manifest.json
+python -m tools.case_memory.workflow pack      # build the hashed data pack
+python -m tools.case_memory.workflow replay    # frozen replay -> results.json + forecast_items.jsonl
+python -m tools.case_memory.audit quality      # 6 integrity checks
+python -m tools.case_memory.build_cases        # reference episodes (scm-2, with typed outcomes)
+python -m tools.case_memory.workflow graphs
+python -m tools.case_memory.workflow evaluate  # evaluation_summary.json + activation verdict
+python -m tools.case_memory.audit figures      # 7 figures + figures_manifest.json
 python -m pytest research/case_memory_integration -q
 ```
+
+## 8. Post-integration scientific correction
+
+See `SCIENTIFIC_FIX_AND_DATA_PLAN.md`. The production candidate now refuses unlabelled branches,
+requires explicit conditioning and contrast, uses independent-unit effective support, and prevents
+proxy labels from entering production evidence. The new development-only grouped holdout uses 54
+training and 11 held-out reference compounds (156 items): candidate NLL 1.372004 vs Jeffreys
+frequency baseline 1.353464. This is not an improvement claim and is not comparable to the frozen
+external experiment above. The external test set was not reused. Default activation remains off.

@@ -13,7 +13,7 @@ from agent.context import ContextPacket, TaskIntent
 from agent.tool_runtime import LocalToolCatalog, ToolBudget, ToolExecutionState, ToolRouter, ToolRuntimeError
 from maestro.models import EvidenceKind
 from maestro.tool_analysis import ModalityRecord, evidence_bundle_optimize, multimodal_alignment
-from maestro.tool_contracts import TOOL_SCHEMA_VERSION, check_schema, json_dumps, json_loads, json_value, validate_schema
+from maestro.handoff import TOOL_SCHEMA_VERSION, check_schema, json_dumps, json_loads, json_value, validate_schema
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -82,11 +82,31 @@ def test_adapters_are_registered_typed_and_source_versioned():
             # A measured-signature comparison lives beside the data semantics it depends on.
             assert item.evidence_kind is EvidenceKind.DERIVED_ANALYSIS
             assert ROOT / "src/virtual_cell/signature_retrieval.py" in item.source_files
-            assert len(item.entrypoint.read_text(encoding="utf-8").splitlines()) <= 12
+            assert item.function == "signature_retrieval"
         else:
             assert item.evidence_kind is EvidenceKind.DERIVED_ANALYSIS
             assert ROOT / "src/maestro/tool_analysis.py" in item.source_files
             assert len(item.entrypoint.read_text(encoding="utf-8").splitlines()) <= 12
+
+
+def test_grouped_manifests_share_code_but_keep_separate_contracts(tmp_path):
+    descriptors = {item.identifier: item for item in LocalToolCatalog(TOOLS).discover()}
+    profile, summary = descriptors["data_profile"], descriptors["column_summary"]
+    assert profile.entrypoint == summary.entrypoint
+    assert profile.manifest_path != summary.manifest_path
+    assert profile.tool_version_sha256 != summary.tool_version_sha256
+    assert profile.function == "data_profile" and summary.function == "column_summary"
+
+
+def test_named_manifest_changes_are_detected_before_invocation(tmp_path):
+    root, directory = custom_tool(tmp_path)
+    manifest = directory / "manifest.json"
+    named = directory / "custom.manifest.json"
+    manifest.rename(named)
+    descriptor, = LocalToolCatalog(root).discover()
+    named.write_text(named.read_text() + "\n", encoding="utf-8")
+    with pytest.raises(ToolRuntimeError, match="version changed"):
+        ToolRouter._invoke(descriptor, {"dataset_path": "unused"})
 
 
 def test_multistep_feeds_structured_payload_receipts_and_stops_on_null(tmp_path):

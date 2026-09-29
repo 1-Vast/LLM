@@ -18,7 +18,7 @@ File summary
     the agreement in each arm. A change in *what* is recommended and a change in *how stably*
     are different findings and are reported separately.
 - Interfaces: `main()`
-- Depends on: agent.decision_critic, agent.typesafe, maestro
+- Depends on: agent.decision_critic, agent.decision_critic, maestro
 
 Every call is paid. `--repeats 12` in two arms is 24 evaluations.
 """
@@ -34,10 +34,10 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
 from agent.decision_critic import TypedDecisionCritic  # noqa: E402
-from agent.typesafe import TypeSafeJevClient, TypeSafeSettings  # noqa: E402
+from agent.decision_critic import TypeSafeJevClient, TypeSafeSettings  # noqa: E402
 from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent  # noqa: E402
 from maestro.models import DevelopmentAction, MechanismContrast, MechanismHypothesis  # noqa: E402
-from maestro.topology import ActionTopology  # noqa: E402
+from maestro.composition import ActionTopology  # noqa: E402
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 EXECUTABLE = {"rna_low", "rna_high"}

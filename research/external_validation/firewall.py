@@ -138,9 +138,9 @@ def project_policy_input(*, visible_evidence=(), legal_actions=(), budget: float
     if problems:
         raise PolicyInputViolation("; ".join(problems))
     try:
-        from maestro.policy import PolicyInput, make_policy_input
+        from maestro.handoff import PolicyInput, make_policy_input
     except ImportError as exc:  # pragma: no cover - only for malformed standalone imports
-        raise RuntimeError("maestro.policy is required for the policy firewall") from exc
+        raise RuntimeError("maestro.handoff is required for the policy firewall") from exc
     projected = make_policy_input(
         visible_evidence=tuple(_freeze_policy_value(item) for item in evidence_items),
         legal_actions=tuple(legal_actions),
@@ -186,11 +186,11 @@ def policy_input_problems(value) -> list[str]:
     """Return contract violations for a value received by a policy."""
 
     try:
-        from maestro.policy import PolicyInput
+        from maestro.handoff import PolicyInput
     except ImportError:
-        return ["maestro.policy unavailable"]
+        return ["maestro.handoff unavailable"]
     if not isinstance(value, PolicyInput):
-        return ["expected maestro.policy.PolicyInput"]
+        return ["expected maestro.handoff.PolicyInput"]
     problems = _forbidden_policy_fields(value.visible_evidence, "$.visible_evidence")
     problems.extend(_forbidden_policy_fields(value.calibrated_action_distributions, "$.calibrated"))
     problems.extend(_forbidden_policy_fields(value.provenance, "$.provenance"))

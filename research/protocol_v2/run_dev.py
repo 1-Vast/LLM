@@ -70,7 +70,7 @@ CODE = ["research/protocol_v2/__init__.py", "research/protocol_v2/contracts.py",
         "research/belief_planning/tasks.py", "research/external_validation/arms.py",
         "research/external_validation/firewall.py", "research/sequence_audit/policies.py",
         "research/dynamic_world_model/common.py", "research/dynamic_world_model/episodes.py",
-        "src/maestro/planning.py", "src/maestro/acquisition.py", "src/maestro/outcome.py"]
+        "research/belief_planning/planner.py", "src/maestro/acquisition.py", "src/maestro/outcome.py"]
 DATA = ["outputs/dynamic_world_model_20260926/prepared/conditions.csv",
         "outputs/dynamic_world_model_20260926/prepared/shifts.npz",
         "outputs/sequence_audit_20260926/l1000/prepared/compounds.csv",

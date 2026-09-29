@@ -9,18 +9,8 @@ File summary
 - Interfaces: `test_*` functions
 - Depends on: maestro, virtual_cell
 """
-from maestro import (
-    DevelopmentAction,
-    EvidenceAction,
-    EvidenceActionKind,
-    EvidenceScope,
-    FunctionalInterventionProfile,
-    MAESTROAgent,
-    MeasurementStatus,
-    MechanismHypothesis,
-    NonDiscriminabilityReason,
-    RepairKind,
-)
+from maestro.models import DevelopmentAction, EvidenceActionKind, EvidenceScope, MeasurementStatus, NonDiscriminabilityReason, RepairKind
+from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent, MechanismHypothesis
 from virtual_cell import StatePrediction
 
 

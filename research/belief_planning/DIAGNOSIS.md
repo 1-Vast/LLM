@@ -119,7 +119,7 @@ The chain behind them:
 
 ## 4. What the chosen method addresses
 
-`maestro.planning` plus `research/belief_planning/world.py`:
+`research.belief_planning.planner` plus `research/belief_planning/world.py`:
 
 - **Refusal read as zero value (1):** the world model backs off in layers (hypothesis class to
   pooled condition) instead of refusing.

@@ -21,7 +21,7 @@ File summary
   `score_panel_against_observations`, `PanelCriterion`, `KnowledgeAnnotation`,
   `load_panel_spec`, `execute_spec`.
 - Depends on: interface.py, applicability.py, artifacts.py, calibration.py,
-  pathway_readout.py, receipts.py, world_model.py
+  biology.py, applicability.py, world_model.py
 """
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
-from .artifacts import vector_sha256
+from .artifacts import file_sha256, vector_sha256
 from .calibration import CalibrationPair, score as score_pairs
 from .interface import (
     Interval,
@@ -43,7 +43,7 @@ from .interface import (
     SystemContext,
     VirtualCellWorldModel,
 )
-from .pathway_readout import (
+from .biology import (
     BackgroundPool,
     ExpressivityAudit,
     GeneSet,
@@ -51,7 +51,7 @@ from .pathway_readout import (
     score_gene_set,
     standardised_score,
 )
-from .receipts import ValidationReceipt
+from .applicability import ValidationReceipt
 from .world_model import SimulationCostLedger
 
 
@@ -253,7 +253,7 @@ def run_panel(
         if prediction.artifact_ref and Path(prediction.artifact_ref).is_file():
             verified = (
                 prediction.artifact_sha256 is not None
-                and _file_sha256(Path(prediction.artifact_ref)) == prediction.artifact_sha256
+                and file_sha256(Path(prediction.artifact_ref)) == prediction.artifact_sha256
             )
         rows.append(
             PanelRow(
@@ -274,14 +274,6 @@ def run_panel(
             )
         )
     return PanelRun(panel=panel, rows=tuple(rows), ledger=books)
-
-
-def _file_sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with Path(path).open("rb") as handle:
-        for block in iter(lambda: handle.read(1 << 22), b""):
-            digest.update(block)
-    return digest.hexdigest()
 
 
 def read_artifact_values(path: Path | str) -> tuple[Mapping[str, float], Mapping[str, object]]:

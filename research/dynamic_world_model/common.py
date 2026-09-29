@@ -17,7 +17,7 @@ File summary
     same code a real result would meet.
 - Interfaces: `load`, `detection_null`, `Tier`, `FoldTables`, `build_fold_tables`, `calibrate`,
   `read_profile`, `card`, `evidence_update`, `mechanism_class`, `TIERS`
-- Depends on: numpy, pandas, maestro.models, maestro.outcome, agent.cases
+- Depends on: numpy, pandas, maestro.models, maestro.outcome, agent.memory
 """
 from __future__ import annotations
 
@@ -576,7 +576,7 @@ def _jeffreys(k: float, n: int, level: float = 0.9) -> tuple[float, float]:
 def evidence_update(state, contrast, action, key: tuple, reading: dict, h1: str, h2: str, *, qc: bool, agreement: float,
                     source: str):
     """Route one executed measurement through InterpretationTable and EvidenceState."""
-    from agent.cases import MeasurementResult
+    from agent.memory import MeasurementResult
     from maestro.models import EvidenceKind, EvidenceScope, FunctionalInterventionProfile
     from maestro.outcome import InterpretationTable, OutcomeRule
 

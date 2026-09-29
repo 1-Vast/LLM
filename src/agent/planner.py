@@ -1,43 +1,16 @@
-"""LLM-assisted proposal of a constrained mechanism contrast for validation.
-
-File summary
-- Path: src/agent/planner.py
-- Purpose: Let an LLM compose a scientific question while a deterministic layer enforces scope.
-- Core points:
-  - The LLM proposes hypotheses and a plan; the catalogue bounds what it may reference.
-  - `propose_repair` returns one catalog-bounded candidate; deterministic code decides acceptance.
-  - A reply that breaks the declared contract is named back to the model and asked once
-    more (bounded by `contract_retries`); a second violation still raises.
-  - A reply that parses but fails a deterministic critic only the planner can satisfy (an
-    unregistered action, explanations that do not separate a decision) is back-prompted
-    within the same budget, LLM-Modulo style; after the budget it is returned unchanged
-    and the controller's own check reports the failure as before.
-  - Catalogues are rendered compactly: undeclared (null or empty) fields are omitted and
-    a contrast names its plan by identifier instead of repeating the action.
-  - `propose` accepts an `extra_critique` hook so a caller's own critic (for example a typed
-    decision model) can add findings to the same bounded back-prompt loop.
-  - `propose_repair` accepts `advisory_findings`, rendered under their own heading as advice to
-    weigh, never as facts and never as new actions.
-  - `propose_repair` may receive a planning-only virtual-cell briefing; it is labelled as
-    model output and never enters the catalogue, the contrast or the evidence ledger.
-  - The planner may not invent assays, measurements, sources, results, or capabilities.
-- Interfaces: `MechanismContrastPlanner`, `propose`, `propose_repair`, `contract_violations`, `critic_findings`, `render_catalogue`, `render_contrast`, `ContrastProposal`, `LLMRepairDraft`, `PlannerCompleter`, `PlannerContractError`
-- Depends on: agent.context, maestro.models
-"""
+"""Catalogue-bounded contrast proposals, repairs, and optional outcome-forecaster wiring."""
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, replace
 import json
-from typing import Any, Callable, Mapping, Protocol, Sequence, TypeVar
-
+from typing import Any, Callable, Mapping, Sequence, TypeVar
 from .context import ContextPacket
-from maestro.models import (
-    ContrastCheck,
-    DevelopmentAction,
-    EvidenceAction,
-    MechanismContrast,
-    MechanismHypothesis,
-)
+from maestro.models import ContrastCheck, DevelopmentAction, EvidenceAction, MechanismContrast, MechanismHypothesis
+from pathlib import Path
+from maestro.case_memory import EpisodeStore, case_memory_enabled
+from maestro.adaptive_retrieval import FeatureArm
+from maestro.hypothesis_forecast import CaseMemoryOutcomeForecaster
+from .llm import JsonCompleter
 
 
 _Parsed = TypeVar("_Parsed")
@@ -50,12 +23,6 @@ class PlannerContractError(ValueError):
     failed turn without also swallowing a genuine defect in the surrounding
     code, which a bare ``ValueError`` guard would do.
     """
-
-
-class PlannerCompleter(Protocol):
-    def complete_json(self, messages: list[dict[str, Any]], **kwargs: Any) -> tuple[dict[str, Any], Any]: ...
-
-
 @dataclass(frozen=True)
 class ContrastProposal:
     """A parsed, catalog-bounded contrast draft before it becomes a MechanismContrast."""
@@ -104,7 +71,7 @@ class LLMRepairDraft:
 class MechanismContrastPlanner:
     """Lets an LLM compose a scientific question while a deterministic layer enforces scope."""
 
-    def __init__(self, client: PlannerCompleter, *, contract_retries: int = 1):
+    def __init__(self, client: JsonCompleter, *, contract_retries: int = 1):
         if isinstance(contract_retries, bool) or not isinstance(contract_retries, int) or contract_retries < 0:
             raise ValueError("contract_retries must be a non-negative integer.")
         self._client = client
@@ -211,6 +178,8 @@ Return {
                 )
             parsed_hypotheses = (_hypothesis(hypotheses[0]), _hypothesis(hypotheses[1]))
             returned = frozenset(item.identifier for item in parsed_hypotheses)
+            if len(returned) != 2:
+                raise PlannerContractError("The two hypotheses must have distinct identifiers.")
             if fixed_hypotheses and returned != frozenset(fixed_hypotheses):
                 raise PlannerContractError(
                     "Mechanism planner did not preserve the registered hypothesis identifiers; "
@@ -409,10 +378,13 @@ def _unregistered_action(
 def _hypothesis(value: Any) -> MechanismHypothesis:
     if not isinstance(value, dict):
         raise PlannerContractError(f"Each hypothesis must be an object; received {type(value).__name__}.")
+    for name in ("identifier", "description"):
+        if not _optional_text(value.get(name)):
+            raise PlannerContractError(f"Each hypothesis requires a non-empty {name}; no scientific definition is inferred.")
     action = _development_action(value.get("proposed_action"))
     return MechanismHypothesis(
-        identifier=_text(value.get("identifier"), "hypothesis"),
-        description=_text(value.get("description"), "No description supplied."),
+        identifier=value["identifier"].strip(),
+        description=value["description"].strip(),
         proposed_action=action,
         causal_factor=_optional_text(value.get("causal_factor")),
     )
@@ -449,3 +421,21 @@ def _text(value: Any, fallback: str) -> str:
 
 def _optional_text(value: Any) -> str | None:
     return value.strip() if isinstance(value, str) and value.strip() else None
+
+
+def forecaster_from_environment(
+    store_path: str | Path | None = None,
+    *,
+    feature_arm: FeatureArm = FeatureArm.COMBINED,
+) -> CaseMemoryOutcomeForecaster | None:
+    """The case-memory forecaster when the flag is on; None when it is off.
+
+    A caller that passes the result straight into `MAESTROOrchestrator(outcome_forecaster=...)`
+    therefore keeps the registered default: flag unset or false means no case-memory forecaster,
+    no discrimination selection change, no behaviour change.
+    """
+
+    if not case_memory_enabled():
+        return None
+    store = EpisodeStore(store_path) if store_path else EpisodeStore()
+    return CaseMemoryOutcomeForecaster(store, feature_arm=feature_arm)

@@ -1,19 +1,10 @@
-"""Close a registered evidence menu under gated, shared-control composition.
-
-File summary
-- Path: src/maestro/composition.py
-- Purpose: give the repair step something the menu does not contain — a *plan* — without letting it invent capability.
-- Core points:
-  - A composed plan is a new registered object, not a sequence of the parts: only a new object can carry the shared-control saving that makes a plan affordable inside a binding budget.
-  - Composition requires an interpretation gate. The gate measures the premise without which the readout is uninterpretable, and the readout is bought only after the gate passes.
-  - The planner reads only public declarations, ranks plans by worst-declared-case residual plus weighted cost, and reports every plan it rejected with the reason.
-  - Nothing here claims a probability. A declared comparison is not a measured one, and a composed plan is confirmed only by a real qualified result from both stages.
-- Interfaces: `PlanComposer`, `PlanEvaluation`, `rank_plans`, `composition_is_legal`, `unmet_prerequisites`
-- Depends on: maestro.models
-"""
+"""Executable action topology, exact budgeted selection, and gated plan composition."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+import math
+from collections import deque
+from dataclasses import dataclass, field
+from itertools import combinations
 from typing import Iterable, Mapping, Sequence
 
 from .models import (
@@ -23,6 +14,266 @@ from .models import (
     GatedEvidencePlan,
     MechanismContrast,
 )
+
+
+@dataclass(frozen=True)
+class BudgetedEvidencePlan:
+    """Current executable actions only; unmet prerequisites remain explicit."""
+
+    actions: tuple[EvidenceAction, ...]
+    covered: frozenset[str]
+    uncovered: frozenset[str]
+    total_cost: float
+    waiting_for_prerequisites: tuple[str, ...]
+    rejection_reasons: Mapping[str, str] = field(default_factory=dict)
+
+
+class BudgetedEvidenceSelector:
+    """Choose an exact small-set cover without claiming global research utility."""
+
+    def __init__(self, *, maximum_candidates: int = 16):
+        self._maximum_candidates = maximum_candidates
+
+    def select(
+        self,
+        required: frozenset[str],
+        actions: Sequence[EvidenceAction],
+        profile: FunctionalInterventionProfile,
+        budget: float,
+        *,
+        weights: Mapping[str, float] | None = None,
+        action_priorities: Mapping[str, float] | None = None,
+    ) -> BudgetedEvidencePlan:
+        if budget < 0:
+            raise ValueError("Budget must be nonnegative.")
+        if not required:
+            return BudgetedEvidencePlan((), frozenset(), frozenset(), 0.0, ())
+        executable, waiting = self._partition(actions, profile)
+        if len(executable) > self._maximum_candidates:
+            raise ValueError(
+                f"Candidate pool has {len(executable)} actions; maximum is {self._maximum_candidates}."
+            )
+        weighted = weights or {}
+        priorities = action_priorities or {}
+        best: tuple[EvidenceAction, ...] = ()
+        best_covered: frozenset[str] = frozenset()
+        best_cost = 0.0
+        for size in range(1, len(executable) + 1):
+            for candidate in combinations(executable, size):
+                cost = sum(action.cost for action in candidate)
+                if cost > budget:
+                    continue
+                covered = frozenset().union(*(set(action.distinguishes) for action in candidate)) & required
+                if self._is_better(candidate, covered, cost, best, best_covered, best_cost, weighted, priorities):
+                    best, best_covered, best_cost = candidate, covered, cost
+        return BudgetedEvidencePlan(
+            actions=best,
+            covered=best_covered,
+            uncovered=required - best_covered,
+            total_cost=best_cost,
+            waiting_for_prerequisites=waiting,
+        )
+
+    @staticmethod
+    def _partition(
+        actions: Sequence[EvidenceAction], profile: FunctionalInterventionProfile
+    ) -> tuple[tuple[EvidenceAction, ...], tuple[str, ...]]:
+        executable: list[EvidenceAction] = []
+        waiting: list[str] = []
+        for action in actions:
+            if action.cost < 0:
+                continue
+            missing = profile.unmeasured(action.prerequisites)
+            if missing:
+                waiting.append(f"{action.identifier}: {', '.join(missing)}")
+            else:
+                executable.append(action)
+        return tuple(executable), tuple(waiting)
+
+    @staticmethod
+    def _is_better(
+        candidate: tuple[EvidenceAction, ...],
+        covered: frozenset[str],
+        cost: float,
+        best: tuple[EvidenceAction, ...],
+        best_covered: frozenset[str],
+        best_cost: float,
+        weights: Mapping[str, float],
+        action_priorities: Mapping[str, float],
+    ) -> bool:
+        score = sum(weights.get(identifier, 1.0) for identifier in covered)
+        best_score = sum(weights.get(identifier, 1.0) for identifier in best_covered)
+        if score != best_score:
+            return score > best_score
+        if cost != best_cost:
+            return cost < best_cost
+        # A bigger set is never preferred at equal coverage and equal cost: extra
+        # arms buy redundancy, not information, and must not be rewarded.
+        if len(candidate) != len(best):
+            return len(candidate) < len(best)
+        priority = sum(action_priorities.get(action.identifier, 0.0) for action in candidate)
+        best_priority = sum(action_priorities.get(action.identifier, 0.0) for action in best)
+        if priority != best_priority:
+            return priority > best_priority
+        return tuple(action.identifier for action in candidate) < tuple(action.identifier for action in best)
+
+
+@dataclass(frozen=True)
+class ActionTopology:
+    """Supplier graph of one menu under one profile, with its derived structure."""
+
+    open_premises: Mapping[str, tuple[str, ...]]
+    suppliers: Mapping[str, tuple[str, ...]]
+    steps_to_executable: Mapping[str, float]
+    unsupplied_premises: Mapping[str, tuple[str, ...]]
+    supply_cycles: tuple[tuple[str, ...], ...]
+    order: tuple[str, ...] = field(default=())
+
+    @classmethod
+    def build(
+        cls, actions: Sequence[EvidenceAction], profile: FunctionalInterventionProfile
+    ) -> "ActionTopology":
+        """Analyse the menu in O(actions + declared supply edges)."""
+
+        nodes = [action for action in actions if action.cost >= 0]
+        order = tuple(dict.fromkeys(action.identifier for action in nodes))
+        by_field: dict[str, list[str]] = {}
+        for action in nodes:
+            for name in action.supplies:
+                by_field.setdefault(name, [])
+                if action.identifier not in by_field[name]:
+                    by_field[name].append(action.identifier)
+        open_premises: dict[str, tuple[str, ...]] = {}
+        suppliers: dict[str, tuple[str, ...]] = {}
+        unsupplied: dict[str, tuple[str, ...]] = {}
+        for action in nodes:
+            if action.identifier in open_premises:
+                continue  # a duplicated identifier is analysed once, as the search sees it
+            missing = profile.unmeasured(action.required_premises)
+            open_premises[action.identifier] = missing
+            suppliers[action.identifier] = tuple(
+                dict.fromkeys(supplier for name in missing for supplier in by_field.get(name, ()))
+            )
+            gaps = tuple(name for name in missing if not by_field.get(name))
+            if gaps:
+                unsupplied[action.identifier] = gaps
+        return cls(
+            open_premises=open_premises,
+            suppliers=suppliers,
+            steps_to_executable=_steps(order, open_premises, suppliers),
+            unsupplied_premises=unsupplied,
+            supply_cycles=_cycles(order, suppliers),
+            order=order,
+        )
+
+    @property
+    def executable_now(self) -> tuple[str, ...]:
+        return tuple(name for name in self.order if self.steps_to_executable[name] == 1)
+
+    @property
+    def ungrounded(self) -> tuple[str, ...]:
+        """Actions no chain of registered suppliers can make runnable under this profile."""
+
+        return tuple(name for name in self.order if math.isinf(self.steps_to_executable[name]))
+
+    def within(self, identifier: str, depth: int) -> bool:
+        """Whether a supplier chain of at most ``depth`` actions could end at this action.
+
+        Unknown identifiers answer ``True``: the bound only prunes what it has analysed.
+        """
+
+        steps = self.steps_to_executable.get(identifier)
+        return steps is None or steps <= depth
+
+    def summary(self) -> dict[str, object]:
+        """A compact, JSON-ready view for the run log and the repair planner."""
+
+        blocked = {
+            name: (int(steps) if math.isfinite(steps) else None)
+            for name, steps in self.steps_to_executable.items()
+            if steps != 1
+        }
+        return {
+            "executable_now": list(self.executable_now),
+            "steps_to_executable": {name: blocked[name] for name in self.order if name in blocked},
+            "unsupplied_premises": {name: list(fields) for name, fields in self.unsupplied_premises.items()},
+            "supply_cycles": [list(component) for component in self.supply_cycles],
+        }
+
+
+def _steps(
+    order: Sequence[str],
+    open_premises: Mapping[str, tuple[str, ...]],
+    suppliers: Mapping[str, tuple[str, ...]],
+) -> dict[str, float]:
+    """Shortest supplier-chain length to each action, by BFS from the runnable frontier."""
+
+    dependents: dict[str, list[str]] = {name: [] for name in order}
+    for name in order:
+        for supplier in suppliers[name]:
+            dependents[supplier].append(name)
+    steps: dict[str, float] = {name: math.inf for name in order}
+    queue: deque[str] = deque()
+    for name in order:
+        if not open_premises[name]:
+            steps[name] = 1
+            queue.append(name)
+    while queue:
+        current = queue.popleft()
+        for dependent in dependents[current]:
+            if math.isinf(steps[dependent]):
+                steps[dependent] = steps[current] + 1
+                queue.append(dependent)
+    return steps
+
+
+def _cycles(order: Sequence[str], suppliers: Mapping[str, tuple[str, ...]]) -> tuple[tuple[str, ...], ...]:
+    """Strongly connected components that loop: size above one, or a self-supplying action.
+
+    Iterative Tarjan, so a long declared chain cannot exhaust the recursion limit.
+    """
+
+    index: dict[str, int] = {}
+    low: dict[str, int] = {}
+    on_stack: set[str] = set()
+    stack: list[str] = []
+    components: list[tuple[str, ...]] = []
+    rank = {name: position for position, name in enumerate(order)}
+    counter = 0
+    for root in order:
+        if root in index:
+            continue
+        work: list[tuple[str, int]] = [(root, 0)]
+        while work:
+            node, position = work.pop()
+            if position == 0:
+                index[node] = low[node] = counter
+                counter += 1
+                stack.append(node)
+                on_stack.add(node)
+            successors = suppliers[node]
+            if position < len(successors):
+                work.append((node, position + 1))
+                successor = successors[position]
+                if successor not in index:
+                    work.append((successor, 0))
+                elif successor in on_stack:
+                    low[node] = min(low[node], index[successor])
+                continue
+            if low[node] == index[node]:
+                component: list[str] = []
+                while True:
+                    member = stack.pop()
+                    on_stack.discard(member)
+                    component.append(member)
+                    if member == node:
+                        break
+                if len(component) > 1 or node in suppliers[node]:
+                    components.append(tuple(sorted(component, key=rank.__getitem__)))
+            if work:
+                parent = work[-1][0]
+                low[parent] = min(low[parent], low[node])
+    return tuple(components)
 
 
 @dataclass(frozen=True)
@@ -230,4 +481,3 @@ def rank_plans(
             ),
         )
     )
-

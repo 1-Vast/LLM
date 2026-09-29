@@ -9,8 +9,10 @@ File summary
 """
 from pathlib import Path
 
-from evaluation import CaseRepository, EvaluationRunner, MAESTROCorePolicy, ReplayEnvironment
-from maestro import DevelopmentAction
+from tools.evaluation import CaseRepository, EvaluationRunner
+from tools.evaluation.policies import MAESTROCorePolicy
+from tools.evaluation.cases import ReplayEnvironment
+from maestro.models import DevelopmentAction
 
 
 ROOT = Path(__file__).resolve().parents[1]

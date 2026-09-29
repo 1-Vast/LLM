@@ -8,7 +8,7 @@ File summary
 - Core points: assertions here are contract tests, not biological results; each test pins
   one boundary that must not silently move.
 - Interfaces: pytest tests only
-- Depends on: agent, maestro, virtual_cell, tools.shared
+- Depends on: agent, maestro, virtual_cell, tests.fixtures
 """
 from __future__ import annotations
 
@@ -22,19 +22,19 @@ from urllib.error import HTTPError
 import pytest
 
 from agent import llm as llm_module
-from agent.audit import RunLogger
-from agent.cases import CaseStore
+from agent.memory import RunLogger
+from agent.memory import CaseStore
 from agent.cli import _hypotheses, main
-from agent.configuration import ConfigurationError, MAESTROSettings
+from agent.llm import ConfigurationError, MAESTROSettings
 from agent.context import ContextBuilder, ContextPacket, TaskIntent, TaskInterpreter
 from agent.knowledge import EvidenceLedger
 from agent.llm import DeepSeekChatClient
 from agent.memory import MemoryStore
 from agent.orchestrator import MAESTROOrchestrator
 from agent.planner import MechanismContrastPlanner, PlannerContractError
-from agent.template_client import TemplateCompleter
-from agent.vision import VisualInspector
-from agent.world_model_briefing import BRIEFING_HEADING, render_world_model_briefing, world_model_rows
+from agent.llm import TemplateCompleter
+from agent.llm import VisualInspector
+from agent.context import BRIEFING_HEADING, render_world_model_briefing, world_model_rows
 from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent
 from maestro.models import (
     ContrastCheck,
@@ -44,23 +44,12 @@ from maestro.models import (
     MechanismHypothesis,
     NonDiscriminabilityReason,
 )
-from maestro.reliability import PredictionReliabilityLedger
-from virtual_cell import (
-    Intervention,
-    Interval,
-    IntervalKind,
-    ModelCapabilities,
-    PredictionCache,
-    PredictionRequest,
-    QueryAssessment,
-    QuerySupport,
-    StatePrediction,
-    SystemContext,
-    VirtualCellQueryTemplate,
-)
-from virtual_cell.cache import REUSE_NOTE_PREFIX
+from maestro.judgment import PredictionReliabilityLedger
+from virtual_cell.interface import Intervention, Interval, IntervalKind, ModelCapabilities, PredictionCache, QueryAssessment, QuerySupport, SystemContext, VirtualCellQueryTemplate
+from virtual_cell import PredictionRequest, StatePrediction
+from virtual_cell.interface import REUSE_NOTE_PREFIX
 
-from tools.shared.stub_client import StubClient  # noqa: E402
+from tests.fixtures.stub_client import StubClient  # noqa: E402
 
 TASK = {
     "task_type": "mechanism_diagnosis", "research_question": "Resolve discrepancy.",
@@ -412,7 +401,7 @@ def test_a_corrected_contract_violation_is_on_the_run_record(tmp_path: Path):
 
 
 def test_registered_hypotheses_keep_a_reworded_plan_from_ending_the_loop(tmp_path: Path):
-    from tools.shared.biological_fixture import PLAN, contract, orchestrator, results
+    from tests.fixtures.biological import PLAN, contract, orchestrator, results
 
     actions, table, profile = contract()
     changed = {**PLAN, "hypotheses": [{**item, "description": item["description"] + " Reworded."}
@@ -563,7 +552,7 @@ def test_the_catalogue_omits_undeclared_fields_but_keeps_every_declaration():
     from dataclasses import asdict
 
     from agent.planner import render_catalogue, render_contrast
-    from tools.shared.biological_fixture import contract
+    from tests.fixtures.biological import contract
 
     actions, _, _ = contract()
     unbound = replace(actions[0], context_bound=False, prediction_relevance=0.0)

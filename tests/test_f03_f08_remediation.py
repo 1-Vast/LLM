@@ -9,7 +9,7 @@ File summary
   - Label coverage is not distinguishability; identical or undeclared declared outcomes are rejected.
   - A descriptive model spread cannot certify discrimination; complementary plans are assessed jointly.
 - Interfaces: `test_*` functions
-- Depends on: agent.cases, evaluation, maestro, virtual_cell
+- Depends on: agent.memory, evaluation, maestro, virtual_cell
 """
 from dataclasses import replace
 from pathlib import Path
@@ -17,25 +17,18 @@ from types import SimpleNamespace
 
 import pytest
 
-from agent.cases import CaseStore, MeasurementResult
+from agent.memory import CaseStore, MeasurementResult
 from agent.orchestrator import MAESTROOrchestrator
-from evaluation import CaseRepository, ReplayEnvironment
-from evaluation.cases import measurement_result_from_reveal
-from maestro import (
-    DevelopmentAction,
-    EvidenceAction,
-    EvidenceKind,
-    EvidenceScope,
-    FunctionalInterventionProfile,
-    InterpretationTable,
-    MAESTROAgent,
-    MechanismHypothesis,
-    NonDiscriminabilityReason,
-    OutcomeRule,
-)
+from tools.evaluation import CaseRepository
+from tools.evaluation.cases import ReplayEnvironment
+from tools.evaluation.cases import measurement_result_from_reveal
+from maestro.models import DevelopmentAction, EvidenceKind, EvidenceScope, NonDiscriminabilityReason
+from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent, MechanismHypothesis
+from maestro.outcome import InterpretationTable, OutcomeRule
 from maestro.outcome import admit_evidence
-from maestro.reliability import PredictionReliabilityLedger
-from virtual_cell import Interval, IntervalKind, StatePrediction
+from maestro.judgment import PredictionReliabilityLedger
+from virtual_cell.interface import Interval, IntervalKind
+from virtual_cell import StatePrediction
 
 
 ROOT = Path(__file__).resolve().parents[1]

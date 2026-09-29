@@ -14,7 +14,7 @@ File summary
   - Expressivity is a property of the coordinate space, answerable before any
     prediction is made and independent of accuracy.
 - Interfaces: pytest test functions
-- Depends on: virtual_cell.pathway_readout, virtual_cell.biology, maestro.models
+- Depends on: virtual_cell.biology, virtual_cell.biology, maestro.models
 """
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 from maestro.models import BiologicalQuantity, PremiseRequirement
 from virtual_cell.biology import MeasurementModel, Observable
-from virtual_cell.pathway_readout import (
+from virtual_cell.biology import (
     BackgroundPool,
     GeneSet,
     expressivity_audit,

@@ -22,7 +22,7 @@ File summary
     calibration is applied at runtime and the raw values are kept beside it.
 - Interfaces: `DatasetRegistration`, `VirtualCellRegistry`, `load_registry`,
   `StateAdapterConfig`, `StateCapabilityAdapter`, `file_sha256`.
-- Depends on: src/virtual_cell/interface.py, applicability.py, receipts.py,
+- Depends on: src/virtual_cell/interface.py, applicability.py,
   calibration.py, artifacts.py, state_runner.py
 """
 from __future__ import annotations
@@ -32,6 +32,7 @@ import importlib.util
 import json
 import os
 import re
+import stat
 import subprocess
 import sys
 import time
@@ -42,40 +43,25 @@ from typing import Any, Mapping, Sequence
 import numpy as np
 
 from .applicability import SupportLevel, SupportRegistry, receipt_level
-from .artifacts import load_feature_names, write_shift_artifact
-from .calibration import ScaleCalibration
+from .artifacts import cached_file_sha256 as file_sha256, load_feature_names, write_shift_artifact
+from .calibration import IntervalCalibration, ScaleCalibration
 from .interface import (
+    Interval,
+    IntervalKind,
     ModelCapabilities,
     PredictionRequest,
     QueryAssessment,
     QuerySupport,
     StatePrediction,
 )
-from .receipts import ValidationReceipt
+from .applicability import ValidationReceipt
 
 SHIFT_ENDPOINT = "x_hvg_perturbation_shift"
 SHIFT_SUMMARIES = ("embedding_delta_l2", "mean_absolute_embedding_delta")
 DEFAULT_MODEL_VERSION = "state_generalization_zeroshot_X_hvg"
-_DIGESTS: dict[tuple[str, int, int], str] = {}
 _INSPECTIONS: dict[tuple[str, ...], dict[str, object]] = {}
 _INSPECTION_LIMIT = 256
 _IDENTITY_HASH_LIMIT = 8 * 1024 * 1024
-
-
-def file_sha256(path: Path) -> str:
-    """SHA-256 of a file, cached per (path, size, modification time)."""
-
-    stat = path.stat()
-    key = (str(path.resolve()), stat.st_size, stat.st_mtime_ns)
-    cached = _DIGESTS.get(key)
-    if cached is None:
-        digest = hashlib.sha256()
-        with path.open("rb") as handle:
-            for block in iter(lambda: handle.read(1 << 22), b""):
-                digest.update(block)
-        cached = digest.hexdigest()
-        _DIGESTS[key] = cached
-    return cached
 
 
 def _argument_identity(argument: str) -> str:
@@ -89,12 +75,14 @@ def _argument_identity(argument: str) -> str:
 
     path = Path(argument)
     try:
-        stat = path.stat()
+        metadata = path.stat()
     except OSError:
         return argument
-    if stat.st_size <= _IDENTITY_HASH_LIMIT:
-        return f"{path.name}:{stat.st_size}:{file_sha256(path)}"
-    return f"{path.name}:{stat.st_size}:{stat.st_mtime_ns}"
+    if not stat.S_ISREG(metadata.st_mode):
+        return f"{argument}:not-a-file"
+    if metadata.st_size <= _IDENTITY_HASH_LIMIT:
+        return f"{path.name}:{metadata.st_size}:{file_sha256(path)}"
+    return f"{path.name}:{metadata.st_size}:{metadata.st_mtime_ns}"
 
 
 def _inspection_key(command: Sequence[str]) -> tuple[str, ...]:
@@ -105,17 +93,21 @@ def _inspection_key(command: Sequence[str]) -> tuple[str, ...]:
     part of the key, so editing it invalidates every entry.
     """
 
-    parts: list[str] = []
-    skip_next = False
-    for argument in command:
-        if skip_next:
-            skip_next = False
-            continue
+    if len(command) < 3:
+        return tuple(command)
+    parts = [_argument_identity(command[0]), _argument_identity(command[1]), command[2]]
+    file_options = {"--input", "--perturbation-map"}
+    index = 3
+    while index < len(command):
+        argument = command[index]
         if argument == "--summary":
+            index += 2
+        elif argument in file_options and index + 1 < len(command):
+            parts.extend((argument, _argument_identity(command[index + 1])))
+            index += 2
+        else:
             parts.append(argument)
-            skip_next = True
-            continue
-        parts.append(_argument_identity(argument))
+            index += 1
     return tuple(parts)
 
 
@@ -192,6 +184,7 @@ class VirtualCellRegistry:
     models: Mapping[str, Mapping[str, Any]]
     receipts: tuple[ValidationReceipt, ...] = ()
     scale_calibrations: tuple[ScaleCalibration, ...] = ()
+    interval_calibrations: tuple[IntervalCalibration, ...] = ()
     source_path: Path | None = None
     source_sha256: str | None = None
 
@@ -200,6 +193,9 @@ class VirtualCellRegistry:
 
     def calibration_for(self, model_version: str) -> ScaleCalibration | None:
         return next((item for item in self.scale_calibrations if item.model_version == model_version), None)
+
+    def interval_calibration_for(self, model_version: str) -> IntervalCalibration | None:
+        return next((item for item in self.interval_calibrations if item.model_version == model_version), None)
 
 
 def load_registry(workspace: Path, path: Path | None = None) -> VirtualCellRegistry:
@@ -242,11 +238,21 @@ def load_registry(workspace: Path, path: Path | None = None) -> VirtualCellRegis
         ScaleCalibration(**{key: tuple(value) if key == "limitations" else value for key, value in dict(item).items()})
         for item in data.get("scale_calibrations", ())
     )
+    interval_calibrations = tuple(
+        IntervalCalibration(
+            **{
+                key: tuple(value) if key in ("limitations",) else value
+                for key, value in dict(item).items()
+            }
+        )
+        for item in data.get("interval_calibrations", ())
+    )
     return VirtualCellRegistry(
         datasets=datasets,
         models={str(key): dict(value) for key, value in dict(data.get("models", {})).items()},
         receipts=receipts,
         scale_calibrations=calibrations,
+        interval_calibrations=interval_calibrations,
         source_path=registry_path,
         source_sha256=hashlib.sha256(raw).hexdigest(),
     )
@@ -279,6 +285,10 @@ class StateAdapterConfig:
     served_readouts: tuple[str, ...] = (SHIFT_ENDPOINT, *SHIFT_SUMMARIES)
     validation_receipts: tuple[ValidationReceipt, ...] = ()
     scale_calibration: ScaleCalibration | None = None
+    # Optional half-widths for the served summaries. Bound by the same identity
+    # fields as the scale; nothing is emitted until a calibration is fitted on a
+    # declared partition and its coverage receipt is registered.
+    interval_calibration: IntervalCalibration | None = None
     verify_asset_digests: bool = True
     # How the input/output validation runner is executed. "auto" runs it in this
     # interpreter when that interpreter is the configured State one -- same code,
@@ -331,6 +341,7 @@ class StateAdapterConfig:
             input_dim=model.get("input_dim"),
             validation_receipts=registry.receipts_for(model_version),
             scale_calibration=registry.calibration_for(model_version),
+            interval_calibration=registry.interval_calibration_for(model_version),
             provenance={key: value for key, value in model.items() if key != "directory"},
         )
 
@@ -550,6 +561,14 @@ class StateCapabilityAdapter:
             else ("no_scale_calibration_registered",)
         )
         calibrated = calibration.scale * raw if calibration is not None and not binding else None
+        summary = calibrated if calibrated is not None else raw
+        summaries = {
+            "embedding_delta_l2": float(np.linalg.norm(summary)),
+            "mean_absolute_embedding_delta": float(np.abs(summary).mean()),
+        }
+        interval_binding, intervals = self._intervals(
+            summaries, context_identifier=request.context.identifier, protocol=protocol
+        )
         limitations = [
             "Planning-only State prediction of the transcript shift in X_hvg coordinates; it is not a measurement, "
             "not viability, not target engagement and not a mechanism verdict.",
@@ -589,6 +608,16 @@ class StateCapabilityAdapter:
                 "binding_mismatches": list(binding),
                 "applied": calibrated is not None,
             },
+            "interval_calibration": None
+            if config.interval_calibration is None
+            else {
+                "level": config.interval_calibration.level,
+                "fitted_on": config.interval_calibration.fitted_on,
+                "development_partition_sha256": config.interval_calibration.development_partition_sha256,
+                "support": dict(config.interval_calibration.support),
+                "binding_mismatches": list(interval_binding),
+                "served_readouts": sorted(intervals),
+            },
         }
         artifact_sha = write_shift_artifact(
             paths["artifact"],
@@ -606,12 +635,10 @@ class StateCapabilityAdapter:
             provenance=provenance,
             limitations=limitations,
         )
-        summary = calibrated if calibrated is not None else raw
         return StatePrediction(
             applicable=True,
             state_change={
-                "embedding_delta_l2": float(np.linalg.norm(summary)),
-                "mean_absolute_embedding_delta": float(np.abs(summary).mean()),
+                **summaries,
                 "raw_embedding_delta_l2": float(np.linalg.norm(raw)),
                 "raw_mean_absolute_embedding_delta": float(np.abs(raw).mean()),
             },
@@ -622,7 +649,7 @@ class StateCapabilityAdapter:
             request_id=request.request_id,
             model_version=config.model_version,
             artifact_ref=str(paths["artifact"]),
-            intervals={},
+            intervals=intervals,
             confidence=None,
             in_distribution=None,
             compute_cost=elapsed,
@@ -636,6 +663,87 @@ class StateCapabilityAdapter:
                 "training_overlap": "unknown for this context and perturbation; see the provenance receipt",
             },
         )
+
+    def _intervals(
+        self,
+        values: Mapping[str, float],
+        *,
+        context_identifier: str | None,
+        protocol: str,
+    ) -> tuple[tuple[str, ...], dict[str, Interval]]:
+        """Binding problems and intervals for the served summaries.
+
+        Mirrors the response rung: a half-width exists only for a readout that
+        has a quantile, and it is served as CALIBRATED only when a registered
+        receipt *qualifies coverage* for that readout against this exact
+        calibration -- same content digest, level, checkpoint and context. A
+        receipt for another context, another calibration, another level, or a
+        metric that is not coverage leaves the readout DESCRIPTIVE; an
+        unbound or mismatched calibration serves nothing at all, which is what
+        this adapter did before intervals existed.
+        """
+
+        calibration = self._config.interval_calibration
+        if calibration is None:
+            return ("no_interval_calibration_registered",), {}
+        # The partition a query is served from is not a property of the query; it
+        # is the development partition this endpoint's calibration lineage names.
+        # An interval fitted on another split therefore refuses here, and one that
+        # cannot name the split it came from cannot be served at all.
+        lineage = self._config.scale_calibration
+        binding = calibration.binding_mismatches(
+            endpoint=SHIFT_ENDPOINT,
+            context_identifier=context_identifier,
+            model_version=self._config.model_version,
+            input_schema=self.input_schema(),
+            control_protocol=protocol,
+            development_partition_sha256=(
+                lineage.development_partition_sha256 if lineage is not None else None
+            ),
+        )
+        if binding:
+            return binding, {}
+        digest = calibration.content_sha256()
+        served: dict[str, Interval] = {}
+        for readout, value in values.items():
+            half = calibration.half_width(readout)
+            if half is None:
+                continue
+            receipt = None
+            problems: tuple[str, ...] | None = None
+            for candidate in self._config.validation_receipts:
+                if candidate.endpoint != readout:
+                    continue
+                issues = candidate.qualifies_coverage(
+                    calibration_sha256=digest,
+                    nominal_level=calibration.level,
+                    endpoint=readout,
+                    model_version=self._config.model_version,
+                    context_identifier=calibration.context_identifier,
+                )
+                if not issues:
+                    receipt = candidate
+                    break
+                problems = issues
+            if receipt is None:
+                detail = "" if problems is None else f" ({'; '.join(problems)})"
+                served[readout] = Interval(
+                    value - half,
+                    value + half,
+                    kind=IntervalKind.DESCRIPTIVE,
+                    basis="conformal absolute-residual quantile; no registered coverage receipt "
+                          f"qualifies this readout for this checkpoint{detail}",
+                )
+                continue
+            served[readout] = Interval(
+                value - half,
+                value + half,
+                kind=IntervalKind.CALIBRATED,
+                level=calibration.level,
+                basis=f"split-conformal absolute residuals at level {calibration.level:.2f}, "
+                      f"partition {calibration.development_partition_sha256 or 'unstated'}; receipt {receipt.receipt_id}",
+            )
+        return (), served
 
     def _static_issues(self, request: PredictionRequest) -> tuple[list[str], list[str]]:
         missing: list[str] = []

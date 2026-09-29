@@ -27,7 +27,7 @@ FREEZE = HERE / "freeze.json"
 MANIFEST = HERE / "manifests" / "gse70138_p2ld.json"
 CODE = [
     "src/maestro/planning.py", "src/maestro/acquisition.py", "src/maestro/models.py", "src/maestro/outcome.py",
-    "src/maestro/policy.py", "src/maestro/selection.py",
+    "src/maestro/handoff.py", "src/maestro/composition.py",
     "research/belief_planning/__init__.py", "research/belief_planning/world.py", "research/belief_planning/arms.py",
     "research/belief_planning/tasks.py", "research/belief_planning/replay.py", "research/belief_planning/locked.py",
     "research/belief_planning/analysis.py", "research/belief_planning/external_phase2.py",

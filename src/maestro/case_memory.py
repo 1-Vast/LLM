@@ -1,35 +1,4 @@
-"""Versioned production schema for complete scientific episodes (case memory).
-
-File summary
-- Path: src/maestro/case_memory.py
-- Purpose: define what a complete scientific episode is in production: an immutable, append-only,
-  digestable record that links a user's raw data references, a data-quality diagnosis, competing
-  hypotheses, retrieved precedents with their adaptation differences, virtual-cell forecasts kept
-  apart from real measurements, qualified evidence, hypothesis updates, a branching interpretation
-  plan, a final decision, failure modes, a calibration history and provenance.
-- Core points:
-  - `ScientificMeasurementStatus` is the six-state measurement model (not planned, planned but
-    missing, QC failed, undetected, ambiguous, qualified). It is deliberately named apart from
-    `maestro.models.MeasurementStatus` (measured/estimated/unknown), which is a different contract;
-    a missing or failed measurement is never encoded as a zero value.
-  - `CaseKind` covers canonical, contrastive, failure, negative, adaptation, bridge and
-    real-user-episode records. A failure or negative case is stored, never silently discarded.
-  - `EvidenceClass` separates measured fact, qualified evidence, model prediction, historical
-    analogy, mechanistic inference, curated annotation and speculation. Only qualified experimental
-    evidence may update an evidence state; forecasts refuse measurement status by construction.
-  - Episodes are immutable: a new fact makes a new version whose `supersedes` names the previous
-    content digest. `EpisodeStore` enforces the append-only, digest-chained discipline and detects
-    tampering. Provenance declares `data_origin` (real, synthetic or mixed) explicitly.
-  - The feature flag `case_memory_enabled()` defaults to False; every production entry point of the
-    case memory checks it, so an unvalidated planner can never activate by default.
-- Interfaces: `ScientificMeasurementStatus`, `CaseKind`, `EvidenceClass`, `RawDataRef`,
-  `EpisodeObservation`, `HypothesisClaim`, `CandidateAction`, `ForecastRecord`, `RealMeasurement`,
-  `HypothesisUpdate`, `FailureMode`, `AdaptationLink`, `CalibrationEntry`, `BranchingPlan`,
-  `RetrievedPrecedent`, `ScientificEpisode`, `validate_episode`, `digest`, `episode_to_dict`,
-  `episode_from_dict`, `EpisodeStore`, `VersionConflict`, `StoreCorrupt`, `case_memory_enabled`,
-  `SCHEMA_VERSION`
-- Depends on: standard library only (no research imports; production layering rule)
-"""
+"""Versioned production schema for complete scientific episodes (case memory)."""
 from __future__ import annotations
 
 import gzip
@@ -129,6 +98,8 @@ class EpisodeObservation:
     detected: bool | None = None
     state_ref: RawDataRef | None = None
     note: str = ""
+    availability: str = "pre_action"
+    """Whether this observation was available before the queried action, or is outcome_only."""
 
 
 @dataclass(frozen=True)
@@ -182,6 +153,13 @@ class RealMeasurement:
     outcome_label: str | None
     independent_units: int | None = None
     source: str = ""
+    conditioning_hypothesis: str | None = None
+    """Independently established reference stratum, never inferred from the outcome being predicted."""
+    contrast: tuple[str, str] | None = None
+    label_kind: str = "measured_outcome"
+    """Derived proxy labels are usable only in explicitly requested research evaluation."""
+    sampling_frame: str = "unspecified"
+    """all_attempts or valid_only; unspecified cannot establish experiment failure frequency."""
 
 
 @dataclass(frozen=True)
@@ -333,7 +311,16 @@ def _clean(value: Any) -> Any:
     if isinstance(value, Enum):
         return value.value
     if is_dataclass(value) and not isinstance(value, type):
-        return {f.name: _clean(getattr(value, f.name)) for f in fields(value)}
+        result = {f.name: _clean(getattr(value, f.name)) for f in fields(value)}
+        if isinstance(value, EpisodeObservation) and value.availability == "pre_action":
+            result.pop("availability")
+        if isinstance(value, RealMeasurement):
+            # Preserve pre-extension content identities and append-only digest chains.
+            for name, default in (("conditioning_hypothesis", None), ("contrast", None),
+                                  ("label_kind", "measured_outcome"), ("sampling_frame", "unspecified")):
+                if getattr(value, name) == default:
+                    result.pop(name)
+        return result
     if isinstance(value, Mapping):
         return {str(k): _clean(v) for k, v in sorted(value.items(), key=lambda kv: str(kv[0]))}
     if isinstance(value, (list, tuple, set, frozenset)):
@@ -439,6 +426,8 @@ def validate_episode(case: ScientificEpisode) -> tuple[str, ...]:
         errors.append("missing:two_registered_hypotheses")
     known_actions = set(action_ids)
     for obs in case.initial_observations:
+        if obs.availability not in ("pre_action", "outcome_only"):
+            errors.append(f"invalid:observation_availability:{obs.condition_id}")
         if not isinstance(obs.status, ScientificMeasurementStatus):
             errors.append(f"invalid:observation_status:{obs.condition_id}")
             continue
@@ -447,10 +436,16 @@ def validate_episode(case: ScientificEpisode) -> tuple[str, ...]:
         if obs.direction is not None and obs.direction not in (-1, 0, 1):
             errors.append(f"invalid:observation_direction:{obs.condition_id}")
     for m in case.real_measurements:
+        if m.sampling_frame not in ("unspecified", "all_attempts", "valid_only"):
+            errors.append(f"invalid:measurement_sampling_frame:{m.action_id}")
         if m.action_id not in known_actions:
             errors.append(f"measurement_for_unknown_action:{m.action_id}")
         if not isinstance(m.status, ScientificMeasurementStatus):
             errors.append(f"invalid:measurement_status:{m.action_id}")
+        if m.label_kind not in ("measured_outcome", "derived_annotation_proxy"):
+            errors.append(f"invalid:measurement_label_kind:{m.action_id}")
+        if m.contrast is not None and (len(m.contrast) != 2 or len(set(m.contrast)) != 2):
+            errors.append(f"invalid:measurement_contrast:{m.action_id}")
     for f in (*case.virtual_cell_forecasts, *case.predicted_outcome_branches):
         if f.evidence_class is not EvidenceClass.MODEL_PREDICTION:
             errors.append(f"forecast_claims_status:{f.action_id}:{f.evidence_class.value}")
@@ -458,7 +453,8 @@ def validate_episode(case: ScientificEpisode) -> tuple[str, ...]:
         if f.refusal is None and f.branches and abs(total - 1.0) > 1e-6:
             errors.append(f"forecast_not_normalised:{f.action_id}:{f.hypothesis_id}")
     qualified_actions = {m.action_id for m in case.real_measurements
-                         if m.status is ScientificMeasurementStatus.QUALIFIED}
+                         if m.status is ScientificMeasurementStatus.QUALIFIED
+                         and m.label_kind == "measured_outcome"}
     for card in case.qualified_evidence:
         if card.get("action_id") not in qualified_actions:
             errors.append(f"qualified_without_qualified_measurement:{card.get('action_id')}")
@@ -519,12 +515,16 @@ class EpisodeStore:
     def __init__(self, path: str | Path | None = None):
         self.path = Path(path) if path else None
         self._records: list[dict] = []
+        self._by_case: dict[str, list[dict]] = {}
+        self._snapshot_cache: dict[bool, str] = {}
         if self.path and self.path.exists():
             with _open_text(self.path, "r") as fh:
                 for line in fh:
                     line = line.strip()
                     if line:
-                        self._records.append(json.loads(line))
+                        record = json.loads(line)
+                        self._records.append(record)
+                        self._by_case.setdefault(record["case_id"], []).append(record)
         self.verify()
 
     def __len__(self) -> int:
@@ -539,7 +539,7 @@ class EpisodeStore:
                 fh.write(json.dumps(record, sort_keys=True, allow_nan=False) + "\n")
 
     def get(self, case_id: str, version: int | None = None) -> ScientificEpisode | None:
-        versions = [r for r in self._records if r["case_id"] == case_id]
+        versions = self._by_case.get(case_id, ())
         if not versions:
             return None
         if version is None:
@@ -550,29 +550,50 @@ class EpisodeStore:
         return None
 
     def versions(self, case_id: str) -> tuple[int, ...]:
-        return tuple(r["version"] for r in self._records if r["case_id"] == case_id)
+        return tuple(r["version"] for r in self._by_case.get(case_id, ()))
 
     def latest(self) -> tuple[ScientificEpisode, ...]:
-        latest: dict[str, dict] = {}
-        for record in self._records:
-            latest[record["case_id"]] = record
-        return tuple(episode_from_dict(r["episode"]) for r in latest.values())
+        return tuple(episode_from_dict(records[-1]["episode"])
+                     for records in self._by_case.values())
 
-    def append(self, episode: ScientificEpisode) -> str:
+    def _record_for(self, episode: ScientificEpisode) -> dict:
         errors = validate_episode(episode)
         if errors:
             raise ValueError("invalid_episode:" + ",".join(errors))
         known = self.versions(episode.case_id)
-        if known and episode.case_version in known:
+        if episode.case_version in known:
             raise VersionConflict(f"version {episode.case_version} of {episode.case_id} already stored")
-        record = {"case_id": episode.case_id, "version": episode.case_version,
-                  "digest": episode.digest, "episode": episode_to_dict(episode)}
+        return {"case_id": episode.case_id, "version": episode.case_version,
+                "digest": episode.digest, "episode": episode_to_dict(episode)}
+
+    def _append_record(self, record: dict) -> None:
         self._records.append(record)
+        self._by_case.setdefault(record["case_id"], []).append(record)
+        self._snapshot_cache.clear()
+
+    def append(self, episode: ScientificEpisode) -> str:
+        record = self._record_for(episode)
+        self._append_record(record)
         self._flush()
         return record["digest"]
 
     def append_many(self, episodes: Iterable[ScientificEpisode]) -> tuple[str, ...]:
-        return tuple(self.append(e) for e in episodes)
+        """Validate and persist a batch with one index update and one file write."""
+
+        pending: list[dict] = []
+        pending_versions: dict[str, set[int]] = {}
+        for episode in episodes:
+            record = self._record_for(episode)
+            versions = pending_versions.setdefault(episode.case_id, set(self.versions(episode.case_id)))
+            if episode.case_version in versions:
+                raise VersionConflict(f"version {episode.case_version} of {episode.case_id} already stored")
+            versions.add(episode.case_version)
+            pending.append(record)
+        for record in pending:
+            self._append_record(record)
+        if pending:
+            self._flush()
+        return tuple(record["digest"] for record in pending)
 
     def supersede(self, previous: ScientificEpisode, **changes) -> ScientificEpisode:
         """A new version of `previous` with `changes`; the previous record is never touched."""
@@ -600,11 +621,14 @@ class EpisodeStore:
             seen[record["case_id"]] = record["digest"]
 
     def snapshot_digest(self, latest_only: bool = True) -> str:
+        cached = self._snapshot_cache.get(latest_only)
+        if cached is not None:
+            return cached
         records = self._records
         if latest_only:
-            latest: dict[str, dict] = {}
-            for record in records:
-                latest[record["case_id"]] = record
-            records = sorted(latest.values(), key=lambda r: r["case_id"])
+            records = sorted((items[-1] for items in self._by_case.values()),
+                             key=lambda r: r["case_id"])
         text = json.dumps([r["digest"] for r in records], separators=(",", ":"))
-        return hashlib.sha256(text.encode("utf-8")).hexdigest()
+        result = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        self._snapshot_cache[latest_only] = result
+        return result

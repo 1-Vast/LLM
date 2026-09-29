@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
-from evaluation.e0_dir_core import *
-from evaluation.e0_dir_controller import *
+from research.asrg.e0_dir_core import *
+from research.asrg.e0_dir_controller import *
 
 def _episode():
     p=PredictionPair((1.,-1.),(.5,-.25),(.25,-.5),"m","basis","controls","proj")

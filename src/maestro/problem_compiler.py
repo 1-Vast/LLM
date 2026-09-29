@@ -1,43 +1,173 @@
-"""User-problem compiler: uploaded data plus a question becomes a typed open problem.
-
-File summary
-- Path: src/maestro/problem_compiler.py
-- Purpose: transform user-provided measurements and a natural-language question into a typed
-  `CompiledProblem`, after validating what the data actually is. The compiler always returns a
-  structured diagnostic report first; biological recommendations are a separate, later step.
-- Core points:
-  - Validation: gene identifiers against an optional reference set, compound identifiers by name
-    and (when RDKit is available) by structure, time and dose units, assay identification, control
-    design, replicate inspection and QC failures.
-  - Missingness is one of the six registered states and is never encoded as zero: not planned,
-    planned but missing, QC failed, undetected, ambiguous, qualified.
-  - The compiler computes directional state summaries and pathway/cell-state summaries when the
-    data supports them, flags out-of-distribution risks, proposes competing hypotheses (registered
-    plus advisory) and lists the available actions with their prerequisites.
-  - The compiler measures and diagnoses; it never admits evidence and never updates a hypothesis.
-- Interfaces: `MeasurementRecord`, `CompilerDiagnostic`, `CompiledProblem`, `ProblemCompiler`,
-  `compile_problem`
-- Depends on: maestro.case_memory, maestro.directional, maestro.hypothesis_graph
-"""
+"""Compile user measurements into a scoped problem and an evidence-typed hypothesis graph."""
 from __future__ import annotations
 
 import math
 import re
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import Mapping, Sequence
 
-from .case_memory import CandidateAction, ScientificMeasurementStatus
-from .directional import DirectionalState, directional_state_from_shift
-from .hypothesis_graph import GraphNode, HypothesisGraph, NodeKind, validate_graph
+from .adaptive_retrieval import DirectionalState, directional_state_from_shift
+from .case_memory import CandidateAction, EvidenceClass, ScientificMeasurementStatus
+
+
+PROMOTABLE_CLASSES = (EvidenceClass.QUALIFIED_EVIDENCE,)
+"""Only qualified experimental evidence may update an `EvidenceState` (registered boundary)."""
+
+
+class NodeKind(str, Enum):
+    INTERVENTION = "intervention"
+    TARGET = "target"
+    ENGAGEMENT = "engagement"
+    PROXIMAL_FUNCTION = "proximal_function"
+    PATHWAY = "pathway"
+    CELL_STATE = "cell_state"
+    PHENOTYPE = "phenotype"
+    OBSERVABLE = "observable"
+    ASSAY = "assay"
+    CONTEXT = "context"
+    TIME = "time"
+    DOSE = "dose"
+
+
+@dataclass(frozen=True)
+class GraphNode:
+    node_id: str
+    kind: NodeKind
+    label: str
+    status: ScientificMeasurementStatus = ScientificMeasurementStatus.NOT_PLANNED
+
+
+@dataclass(frozen=True)
+class GraphEdge:
+    source: str
+    target: str
+    relation_type: str
+    direction: int = 0
+    """+1 activating, -1 suppressing, 0 unknown or unsigned."""
+    context: str | None = None
+    time_h: float | None = None
+    assay: str | None = None
+    evidence_class: EvidenceClass = EvidenceClass.SPECULATION
+    source_ref: str = ""
+    confidence: float | None = None
+    uncertainty: str = ""
+    contradictory_evidence: tuple[str, ...] = ()
+
+    @property
+    def promotable(self) -> bool:
+        """Whether this edge may update an evidence state. Only qualified experimental evidence."""
+
+        return self.evidence_class in PROMOTABLE_CLASSES
+
+
+@dataclass(frozen=True)
+class HyperEdge:
+    """A higher-order relation: named inputs jointly imply the target under `condition`.
+
+    Examples: a drug combination (two interventions jointly), a multi-biomarker rule (two markers
+    jointly), a dose-time interaction (dose and time jointly condition a pathway effect), a
+    prerequisite chain (engagement is a prerequisite of a functional claim).
+    """
+
+    inputs: tuple[str, ...]
+    target: str
+    relation_type: str
+    condition: str
+    evidence_class: EvidenceClass = EvidenceClass.SPECULATION
+    source_ref: str = ""
+    confidence: float | None = None
+    uncertainty: str = ""
+    contradictory_evidence: tuple[str, ...] = ()
+
+    @property
+    def promotable(self) -> bool:
+        return self.evidence_class in PROMOTABLE_CLASSES
+
+
+@dataclass(frozen=True)
+class HypothesisGraph:
+    """The typed graph of one problem. Immutable; a new fact makes a new graph value."""
+
+    nodes: tuple[GraphNode, ...]
+    edges: tuple[GraphEdge, ...] = ()
+    hyperedges: tuple[HyperEdge, ...] = ()
+    hypotheses: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
+    """hypothesis_id -> the node path the hypothesis claims; advisory ids are named separately."""
+    advisory: tuple[str, ...] = ()
+
+    def node(self, node_id: str) -> GraphNode | None:
+        for n in self.nodes:
+            if n.node_id == node_id:
+                return n
+        return None
+
+    def unmeasured_layers(self) -> tuple[str, ...]:
+        """Node kinds every node of which is in a non-biological measurement state."""
+
+        out = []
+        for kind in NodeKind:
+            nodes = [n for n in self.nodes if n.kind is kind]
+            if nodes and all(not n.status.biological for n in nodes):
+                out.append(kind.value)
+        return tuple(out)
+
+    def edges_from(self, node_id: str) -> tuple[GraphEdge, ...]:
+        return tuple(e for e in self.edges if e.source == node_id)
+
+    def promotable_edges(self) -> tuple[GraphEdge, ...]:
+        return tuple(e for e in self.edges if e.promotable)
+
+
+def validate_graph(graph: HypothesisGraph) -> tuple[str, ...]:
+    """Named structural errors of a hypothesis graph."""
+
+    errors: list[str] = []
+    ids = [n.node_id for n in graph.nodes]
+    if len(set(ids)) != len(ids):
+        errors.append("duplicate:node_id")
+    known = set(ids)
+    for e in graph.edges:
+        if e.source not in known or e.target not in known:
+            errors.append(f"edge_to_unknown_node:{e.source}->{e.target}")
+        if e.direction not in (-1, 0, 1):
+            errors.append(f"invalid:edge_direction:{e.source}->{e.target}")
+        if not isinstance(e.evidence_class, EvidenceClass):
+            errors.append(f"invalid:edge_evidence_class:{e.source}->{e.target}")
+        if e.confidence is not None and not 0.0 <= e.confidence <= 1.0:
+            errors.append(f"invalid:edge_confidence:{e.source}->{e.target}")
+    for h in graph.hyperedges:
+        if len(h.inputs) < 2:
+            errors.append(f"hyperedge_too_thin:{h.target}")
+        unknown = [i for i in h.inputs if i not in known]
+        if unknown or h.target not in known:
+            errors.append(f"hyperedge_to_unknown_node:{h.target}")
+    for hid, path in graph.hypotheses.items():
+        if len(path) < 2:
+            errors.append(f"hypothesis_path_too_short:{hid}")
+        unknown = [n for n in path if n not in known]
+        if unknown:
+            errors.append(f"hypothesis_path_unknown_node:{hid}")
+    registered = [h for h in graph.hypotheses if h not in graph.advisory]
+    if len(registered) < 2:
+        errors.append("missing:two_registered_hypotheses")
+    return tuple(dict.fromkeys(errors))
+
 
 _TIME_UNITS = {"h": 1.0, "hr": 1.0, "hour": 1.0, "hours": 1.0, "d": 24.0, "day": 24.0, "days": 24.0}
 _DOSE_UNITS = {"nm": 1.0, "um": 1e3, "µm": 1e3, "mm": 1e6, "ng/ml": None, "ug/ml": None}
 _GENE_PATTERN = re.compile(r"^[A-Z][A-Z0-9-]{1,19}$")
+_EFFECT_KINDS = {"signed_effect", "log_fold_change", "differential_z_score"}
 
 
 @dataclass(frozen=True)
 class MeasurementRecord:
-    """One user-supplied measurement row, typed before any interpretation."""
+    """One measurement row; legacy values are declared signed effects, not expression.
+
+    Raw counts/normalized expression require upstream control matching and differential
+    analysis. ``replicate_group`` groups related rows; only explicitly identified biological
+    replicates count as independent support. Technical replicates must be aggregated upstream.
+    """
 
     record_id: str
     feature: str
@@ -51,6 +181,8 @@ class MeasurementRecord:
     dose_unit: str | None = None
     replicate_group: str | None = None
     is_control: bool = False
+    value_kind: str = "signed_effect"
+    biological_replicate_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -111,19 +243,35 @@ class ProblemCompiler:
     def compile(self, problem_id: str, question: str,
                 records: Sequence[MeasurementRecord], *,
                 intervention: str = "", nominal_target: str | None = None,
-                assay_hint: str | None = None) -> CompiledProblem:
+                assay_hint: str | None = None,
+                condition: str | None = None) -> CompiledProblem:
         diagnostics: list[CompilerDiagnostic] = []
         if not question.strip():
             diagnostics.append(CompilerDiagnostic("missing:question", "fatal", "the user question is empty"))
         if not records:
             diagnostics.append(CompilerDiagnostic("missing:records", "fatal", "no measurement records supplied"))
+        supplied_conditions = {r.condition for r in records if not r.is_control}
+        if condition is not None:
+            if condition not in supplied_conditions:
+                diagnostics.append(CompilerDiagnostic(
+                    "invalid:condition", "fatal", f"no treated records for {condition!r}"))
+            records = tuple(r for r in records if r.is_control or r.condition == condition)
+        elif len(supplied_conditions) > 1:
+            diagnostics.append(CompilerDiagnostic(
+                "ambiguous:condition", "fatal", "select one treated condition explicitly; conditions cannot be pooled"))
         status_by_condition: dict[str, ScientificMeasurementStatus] = {}
-        genes: set[str] = set()
         delta: dict[str, float] = {}
         controls, treated = set(), set()
         times, doses = set(), set()
-        replicate_groups: dict[str, int] = {}
+        feature_values: dict[str, dict[str | None, float]] = {}
+        contexts: set[tuple] = set()
+        effect_kinds: set[str] = set()
+        record_ids: set[str] = set()
         for record in records:
+            if record.record_id in record_ids:
+                diagnostics.append(CompilerDiagnostic(
+                    "duplicate:record_id", "fatal", f"duplicate record ID {record.record_id!r}"))
+            record_ids.add(record.record_id)
             if not isinstance(record.status, ScientificMeasurementStatus):
                 diagnostics.append(CompilerDiagnostic(
                     "invalid:status", "fatal", f"{record.record_id}: status {record.status!r} is not registered"))
@@ -142,51 +290,88 @@ class ProblemCompiler:
             dose_nm = _normalise_dose(record.dose_value, record.dose_unit)
             if record.time_value is not None and time_h is None:
                 diagnostics.append(CompilerDiagnostic(
-                    "invalid:time_unit", "error", f"{record.record_id}: unsupported time unit {record.time_unit!r}"))
+                    "invalid:time_unit", "fatal", f"{record.record_id}: unsupported time unit {record.time_unit!r}"))
             if record.dose_value is not None and dose_nm is None:
                 diagnostics.append(CompilerDiagnostic(
-                    "invalid:dose_unit", "error", f"{record.record_id}: unsupported dose unit {record.dose_unit!r}"))
-            if time_h is not None:
+                    "invalid:dose_unit", "fatal", f"{record.record_id}: unsupported dose unit {record.dose_unit!r}"))
+            if any(v is not None and (not math.isfinite(v) or v < 0) for v in (time_h, dose_nm)):
+                diagnostics.append(CompilerDiagnostic(
+                    "invalid:condition_value", "fatal", f"{record.record_id}: time and dose must be finite and nonnegative"))
+                continue
+            if not record.is_control:
+                contexts.add((record.condition, record.cell_line, time_h, dose_nm))
+            if time_h is not None and not record.is_control:
                 times.add(time_h)
-            if dose_nm is not None:
+            if dose_nm is not None and not record.is_control:
                 doses.add(dose_nm)
             if record.status.biological and record.value is not None and not record.is_control:
+                if record.value_kind not in _EFFECT_KINDS:
+                    diagnostics.append(CompilerDiagnostic(
+                        "unsupported:value_kind", "fatal",
+                        f"{record.record_id}: {record.value_kind!r} is not a signed contrast; "
+                        "perform matched-control differential analysis upstream"))
+                    continue
+                effect_kinds.add(record.value_kind)
+                if not isinstance(record.value, (int, float)) or not math.isfinite(record.value):
+                    diagnostics.append(CompilerDiagnostic(
+                        "invalid:measurement_value", "fatal", f"{record.record_id}: effect must be finite numeric data"))
+                    continue
                 gene = record.feature.strip().upper()
                 if not _GENE_PATTERN.match(gene):
                     diagnostics.append(CompilerDiagnostic(
                         "invalid:gene_identifier", "error",
                         f"{record.record_id}: {record.feature!r} is not a valid gene symbol"))
                 else:
-                    genes.add(gene)
                     if self.reference_genes and gene not in self.reference_genes:
                         diagnostics.append(CompilerDiagnostic(
                             "ood:gene", "warning", f"{gene}: not in the reference feature space"))
-                    delta[gene] = float(record.value)
-            if record.replicate_group:
-                replicate_groups[record.replicate_group] = replicate_groups.get(record.replicate_group, 0) + 1
+                    values = feature_values.setdefault(gene, {})
+                    replicate = record.biological_replicate_id
+                    if replicate in values or (values and (replicate is None or None in values)):
+                        diagnostics.append(CompilerDiagnostic(
+                            "ambiguous:feature_replicate", "fatal",
+                            f"{gene}: repeated feature requires distinct biological replicate IDs"))
+                    else:
+                        values[replicate] = float(record.value)
+        if len(contexts) > 1:
+            diagnostics.append(CompilerDiagnostic(
+                "ambiguous:experimental_context", "fatal",
+                "one condition must have a single cell context, time and dose; split the upload"))
+        if len(effect_kinds) > 1:
+            diagnostics.append(CompilerDiagnostic(
+                "mixed:effect_scales", "fatal", "effect scales cannot be pooled into one state"))
+        for gene, values in feature_values.items():
+            delta[gene] = math.fsum(values.values()) / len(values)
         if treated and not controls:
             diagnostics.append(CompilerDiagnostic(
                 "missing:control", "error", "treated conditions have no control condition in the upload"))
         assay = assay_hint or self._identify_assay(records)
         if assay is None:
             diagnostics.append(CompilerDiagnostic("unidentified:assay", "error", "the assay could not be identified"))
-        replicates = max(replicate_groups.values()) if replicate_groups else None
+        replicate_counts = {gene: sum(key is not None for key in values)
+                            for gene, values in feature_values.items()}
+        replicates = min(replicate_counts.values()) if replicate_counts and all(replicate_counts.values()) else None
         if replicates is None or replicates < 2:
             diagnostics.append(CompilerDiagnostic(
                 "thin:replicates", "warning", "fewer than two replicates per condition were identified"))
-        state = directional_state_from_shift(delta, self.gene_sets) if delta else DirectionalState()
+        invalid = any(d.severity == "fatal" for d in diagnostics)
+        state = directional_state_from_shift(delta, self.gene_sets) if delta and not invalid else DirectionalState()
         ood = tuple(sorted({d.detail.split(":")[0] for d in diagnostics if d.code == "ood:gene"}))
         graph = self._hypothesis_graph(intervention, nominal_target, assay, state)
         actions = self._actions(assay, sorted(times) or [None], sorted(doses) or [None],
-                                sorted(status_by_condition))
+                                sorted(status_by_condition)) if not invalid else ()
         return CompiledProblem(
             problem_id=problem_id, user_question=question, diagnostics=tuple(diagnostics),
             assay=assay, control_design=("vehicle_control" if controls else "none_identified"),
-            time_h=sorted(times)[0] if times else None, dose_nM=sorted(doses)[0] if doses else None,
+            time_h=next(iter(times)) if len(times) == 1 else None,
+            dose_nM=next(iter(doses)) if len(doses) == 1 else None,
             replicates=replicates, measurement_status=status_by_condition, directional_state=state,
-            context={"cell_lines": sorted({r.cell_line for r in records if r.cell_line}),
+            context={"cell_lines": sorted({r.cell_line for r in records if r.cell_line and not r.is_control}),
                      "intervention": intervention, "nominal_target": nominal_target,
-                     "conditions": sorted(status_by_condition)},
+                     "conditions": sorted(status_by_condition),
+                     "effect_kind": next(iter(effect_kinds)) if len(effect_kinds) == 1 else None,
+                     "replicates_per_feature": replicate_counts,
+                     "replicate_aggregation": "unweighted_biological_mean"},
             ood_risks=ood, hypothesis_graph=graph, candidate_actions=actions)
 
     def _identify_assay(self, records: Sequence[MeasurementRecord]) -> str | None:

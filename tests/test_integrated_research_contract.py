@@ -10,15 +10,15 @@ from agent.tool_runtime import ToolRouter
 from maestro import EvidenceAction, FunctionalInterventionProfile
 from maestro.acquisition import select_expected_coverage
 from maestro.handoff import RoundRecord, read_round
-from maestro.reliability import PredictionReliabilityLedger
+from maestro.judgment import PredictionReliabilityLedger
 from virtual_cell.interface import Intervention, PredictionRequest, SystemContext
-from virtual_cell import CompositeWorldModel, StatePrediction
+from virtual_cell.world_model import CompositeWorldModel
+from virtual_cell import StatePrediction
 from pathlib import Path
 from agent.context import ContextPacket, TaskIntent
 from maestro.handoff import EvidenceLayer, WorldModelLayer, DecisionLayer, ExecutionLayer
 from maestro.tool_analysis import evidence_bundle_optimize
-from virtual_cell import ModelCapabilities, QueryAssessment, QuerySupport
-from evaluation.public_loop import run as run_public_loop
+from virtual_cell.interface import ModelCapabilities, QueryAssessment, QuerySupport
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -42,7 +42,7 @@ class ApplicableWorldModel:
 
 def _context():
     return ContextPacket(TaskIntent("analysis_planning", "Inspect", (), (), None, None, (), (), (), False), (), (), "Inspect")
-from tools.shared.stub_client import StubClient
+from tests.fixtures.stub_client import StubClient
 
 
 def request():
@@ -154,26 +154,3 @@ def test_self_combination_preserves_reparameterization_even_in_a_validated_windo
             residual = lambda d: math.exp(-exponent * d)
             assert residual(first + second) == pytest.approx(residual(first) * residual(second))
     assert math.exp(-1) != math.exp(-2)
-
-
-def test_public_data_loop_reaches_both_registered_stops(tmp_path):
-    summary = run_public_loop(ROOT, tmp_path / "public_loop")
-
-    missing = summary["arms"]["missing_result"]
-    imported = summary["arms"]["public_result_import"]
-    assert missing["stop_reason"] == "awaiting_result"
-    assert imported["stop_reason"] == "result_quality_failed"
-    assert missing["tools"] == ["data_profile", "virtual_cell_query"]
-    assert imported["tools"] == ["data_profile", "virtual_cell_query"]
-    assert missing["model_refusals"] == ["query_unsupported"]
-    assert imported["model_refusals"] == ["query_unsupported"]
-    assert missing["mechanism_updates"] == imported["mechanism_updates"] == 0
-    assert summary["new_experiment_wells"] == summary["turnaround_days"] == 0
-
-    plan_paths = list((tmp_path / "public_loop").glob("*/rounds/*.plan.json"))
-    assert len(plan_paths) == 2
-    for plan_path in plan_paths:
-        layers = json.loads(plan_path.read_text(encoding="utf-8"))["layers"]
-        assert "in_distribution" in layers["L2_world_model"]
-        assert isinstance(layers["L3_decision"]["rejected"], list)
-        assert isinstance(layers["L4_execution"]["contradiction_flag"], bool)

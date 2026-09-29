@@ -15,7 +15,7 @@ wrong-decision risk limit and the same experimental budget.
 - **State.** A belief over the two competing hypotheses, formed only from real readings: a
   uniform prior, then Bayes' rule under the world model. Alongside it, the history of measured
   conditions and their registered readings.
-- **Planner.** `maestro.planning.plan_measurement`, an exact expectimax over the remaining budget
+- **Planner.** `research.belief_planning.planner.plan_measurement`, an exact expectimax over the remaining budget
   (at most two measurements) within the runner's legal menu. A correct single-survivor decision
   is worth +1, a wrong one -2, and stopping 0; each measurement costs 0.02.
   - The probability that a registered elimination is wrong is the posterior mass of the

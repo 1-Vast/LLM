@@ -42,6 +42,15 @@ an admissible action, relative to (a) a fixed expert procedure, (b) reactive out
 selection, and (c) equal-budget random legal edits. If (b) or (c) matches it, the repair is not
 what produced the difference.
 
+**Evidence status (2026-09-27).** The claim above is the research hypothesis, not an established
+scientific result. Engineering tests verify that the Agent names interpretation gaps, admits
+typed evidence, and limits conclusion updates to declared scope. On the six-case engagement
+replay, its repair operator showed no additional decision value over a selector with the same
+information. Historical performance figures mainly measure a transcriptomic mechanism-class
+proxy task. The research outcome forecaster and belief planner have not shown independent
+decision benefit on development data; wrong-risk forecasts are under-calibrated. The production
+repair path and research planner are not connected, and their combined benefit is untested.
+
 **What is not claimed.** Generic replanning, task-graph repair, uncertainty routing,
 hierarchical delegation and value-of-information planning all have precedents. None is claimed
 as new. The claim is confined to the biological repair operation and its measured effect on
@@ -65,7 +74,7 @@ reproducibility are assessed separately; an ungraded answer is provisional.
 | Decision core | `src/maestro/` | Contrast, check, repair, belief state, decision rules, action topology, judgment boundary |
 | Agent runtime | `src/agent/` | Task interpretation, knowledge base, memory, context, planner, critics, orchestration |
 | World model | `src/virtual_cell/` | Applicability-bounded prediction, calibration, artifact lineage |
-| Evaluation | `src/evaluation/` | Replay environment, policy arms, hidden outcomes, cost ledgers |
+| Evaluation | `src/evaluation/` | Installed replay CLI, case/scoring contracts, and the policy arms it needs; some research-only analysis remains mixed in this package |
 | Tools | `tools/` | Manifest-scoped adapters the agent may invoke on supplied datasets |
 | Data | `data/` | Local datasets, staged and digest-verified |
 | Research | `research/` | Designs, protocols and analysis, synchronized as work proceeds |
@@ -375,8 +384,8 @@ Three consequences, all implemented:
   as unchecked; only a **measured** disagreement withholds it.
 
 Design, exact contract and what remains unverified:
-[`research/typed_decision_model.md`](research/typed_decision_model.md). Derivation, thresholds
-and cost: [`research/judgment_stability.md`](research/judgment_stability.md).
+[`research/typed_decision_model.md`](research/topics/agent_decision_core/typed_decision_model.md). Derivation, thresholds
+and cost: [`research/judgment_stability.md`](research/topics/evaluation_methodology/judgment_stability.md).
 
 ## 7. Coupling to biology
 
@@ -489,7 +498,7 @@ intervention-design quality, biological credibility, and final decision quality.
   MAESTRO's agent was rebuilt as an exact belief-space planner, and its virtual cell as an
   empirical-Bayes structural kernel inside the reading forecasts. Masked and permuted controls
   test the world model, and withheld and permuted controls test feedback.
-  - Frozen, and run once on an untouched study (GSE70138, 38 new compounds), the agent did not
+  - Run once on GSE70138 (38 new compounds; now consumed), the agent did not
     beat the fixed expert order (-0.024 [-0.074, +0.011]).
   - The virtual cell and the feedback loop changed actions but not decisions.
   - The agent's value is honest accounting of what a measurement can change, not superiority
@@ -514,8 +523,9 @@ general-purpose discovery system.
 
 ## 10. Limits
 
-The repository contains no validated biological model, no target-engagement claim, no clinical
-recommendation, and no experimental result. The virtual cell was tested for biological depth on
+The repository contains no validated biological model, no target-engagement claim, or clinical
+recommendation. It contains executed research replays, but none establishes biological superiority
+or missing-premise repair benefit. The virtual cell was tested for biological depth on
 2026-09-26 and did not show it for unseen compounds beyond response magnitude and a few strongly
 stereotyped programs; a V-JEPA-style latent model did not improve on PCA or structure retrieval.
 Virtual-cell-assisted measurement choice was tested the same day and did not beat the current

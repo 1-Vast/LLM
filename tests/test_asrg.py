@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from evaluation.asrg import action_gain, loss
+from research.asrg.pilot import action_gain, loss
 
 
 def test_direction_matters_at_equal_candidate_norm():

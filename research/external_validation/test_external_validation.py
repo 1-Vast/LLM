@@ -459,6 +459,35 @@ def test_replay_float_canonicalisation_collapses_last_bit_only():
     assert value == {"decision": "defer", "steps": [{"support": 2, "p": 0.319380888019384}]}
 
 
+def _assert_replay_record_matches(current, saved):
+    current, saved = R.canonical_replay_value(current), R.canonical_replay_value(saved)
+    current.pop("compute_seconds", None)
+    saved.pop("compute_seconds", None)
+    # RidgeCV/BLAS builds differ by up to 3e-15 in this diagnostic. Actions,
+    # outcomes, fitted alpha and all other fields must still match exactly.
+    if current["arm"] == saved["arm"] == "ridge":
+        for new_step, old_step in zip(current["steps"], saved["steps"]):
+            new_note, old_note = new_step.get("note") or {}, old_step.get("note") or {}
+            if "score_gap" in new_note and "score_gap" in old_note:
+                assert new_note.pop("score_gap") == pytest.approx(old_note.pop("score_gap"), rel=0, abs=1e-14)
+    assert current == saved
+
+
+def test_replay_comparison_preserves_decisions_and_meaningful_score_changes():
+    saved = {"arm": "ridge", "steps": [{"key": ["A549", 24, 10], "outcome": "eliminate_a",
+                                           "note": {"score_gap": 0.319380888019384}}]}
+    current = copy.deepcopy(saved)
+    current["steps"][0]["note"]["score_gap"] += 3e-15
+    _assert_replay_record_matches(current, saved)
+    current["steps"][0]["note"]["score_gap"] += 1e-10
+    with pytest.raises(AssertionError):
+        _assert_replay_record_matches(current, saved)
+    current = copy.deepcopy(saved)
+    current["steps"][0]["outcome"] = "eliminate_b"
+    with pytest.raises(AssertionError):
+        _assert_replay_record_matches(current, saved)
+
+
 def test_replay_reproduces_a_saved_fold():
     """Rerun an original registered fold and compare every registered arm's records.
 
@@ -475,7 +504,10 @@ def test_replay_reproduces_a_saved_fold():
     with gzip.open(saved, "rt", encoding="utf-8") as stream:
         old = [json.loads(line) for line in stream]
     assert len(old) == json.loads(manifest.read_text(encoding="utf-8"))["files"]["l1000_T_0"]
-    keep = lambda rows: sorted((json.dumps({k: v for k, v in R.canonical_replay_value(r).items()  # noqa: E731
-                                            if k != "compute_seconds"}, sort_keys=True)
-                                for r in rows if r["arm"].split("@")[0] in registered_arms))
-    assert keep(result["records"]) == keep(old)
+    def keep(rows):
+        selected = [r for r in rows if r["arm"].split("@")[0] in registered_arms]
+        return sorted(selected, key=lambda r: (r["arm"], r["compound"], r["h1"], r["h2"], str(r["price"])))
+    current, saved_rows = keep(result["records"]), keep(old)
+    assert len(current) == len(saved_rows)
+    for new_row, old_row in zip(current, saved_rows):
+        _assert_replay_record_matches(new_row, old_row)

@@ -10,7 +10,7 @@ from agent.memory import MemoryStore
 from maestro import EvidenceAction, FunctionalInterventionProfile
 from maestro.acquisition import select_expected_coverage
 from maestro.tool_analysis import evidence_bundle_optimize, multimodal_alignment
-from agent.configuration import MAESTROSettings
+from agent.llm import MAESTROSettings
 from agent.llm import DeepSeekChatClient
 from agent.planner import MechanismContrastPlanner
 
@@ -115,7 +115,9 @@ def test_planner_menu_is_complete_json(tmp_path):
             assert menu[0]["cost"] == 2 and menu[0]["detection_power"] == 0.6
             assert menu[0]["source_ids"] == ["study"]
             assert menu[0]["expected_outcomes"] == {"h1": "low", "h2": "high"}
-            return {"hypotheses": [{"identifier": "h1"}, {"identifier": "h2"}], "action_identifier": "a"}, None
+            return {"hypotheses": [{"identifier": "h1", "description": "Target-mediated response"},
+                                   {"identifier": "h2", "description": "Target-independent response"}],
+                    "action_identifier": "a"}, None
     builder = ContextBuilder(EvidenceLedger(tmp_path / "evidence.sqlite"), MemoryStore(tmp_path / "memory.sqlite"))
     intent = TaskIntent("mechanism_diagnosis", "Review EGFR", ("EGFR",), (), "cells", "viability", (), (), (), False)
     MechanismContrastPlanner(Client()).propose(builder.build(intent), (action,))

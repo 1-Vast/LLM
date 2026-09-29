@@ -1,37 +1,11 @@
-"""Composite virtual-cell world model and compute accounting.
-
-File summary
-- Path: src/virtual_cell/world_model.py
-- Purpose: present one world-model interface over a ladder of swappable rungs and
-  bill simulation as compute, never as experiment budget.
-- Core points:
-  - Eligibility is decided per rung against the actual request; `catalog`
-    exposes every backend, so a collection is never described by its first
-    member alone.
-  - A prediction that violates the contract is converted into an abstention.
-  - Simulation calls are counted separately from the experimental budget.
-- Interfaces: `SimulationCostLedger`, `CompositeWorldModel`, `table_from_anndata`;
-  `CompositeWorldModel.catalog`, `.eligible_backends`, `.routing_report`, `.predict_all`.
-- Depends on: src/virtual_cell/interface.py, applicability.py, ladder.py
-"""
+"""Backend construction, composite routing and compute accounting."""
 from __future__ import annotations
 
-import warnings
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Mapping, Protocol, Sequence
-
-import numpy as np
-
-from .interface import (
-    ModelCapabilities,
-    PredictionRequest,
-    QueryAssessment,
-    QuerySupport,
-    StatePrediction,
-    safe_predict,
-)
-from .ladder import PerturbationTable
+from .interface import ModelCapabilities, PredictionRequest, QueryAssessment, QuerySupport, StatePrediction, safe_predict
+from .state_adapter import DEFAULT_MODEL_VERSION, StateAdapterConfig, StateCapabilityAdapter
 
 
 class WorldModelRung(Protocol):
@@ -240,56 +214,58 @@ class CompositeWorldModel:
         )
 
 
-def table_from_anndata(
-    path: Path,
+
+
+BACKEND_CHOICES = ("none", "state", "development_mean", "composite", "sciplex_response")
+SCIPLEX_LIBRARY = Path("data/virtual_cell/sciplex3_signature_library")
+
+
+def build_backend(
+    choice: str,
     *,
-    context_column: str = "cell_type",
-    perturbation_column: str = "product_name",
-    dose_column: str = "dose",
-    time_column: str | None = None,
-    readout_columns: Sequence[str] = ("proliferation_index",),
-    mode: str = "drug",
-    max_cells: int = 200_000,
-    source: str | None = None,
-) -> PerturbationTable:
-    """Build a perturbation table by pseudo-bulking a real AnnData file.
+    workspace: Path,
+    dataset_id: str = "tahoe_c39",
+    development_partition: Path | None = None,
+    artifact_directory: Path | None = None,
+    model_version: str = DEFAULT_MODEL_VERSION,
+    structures: dict[str, str] | None = None,
+):
+    """Return the requested backend, or ``None`` for the declared ``none`` choice."""
 
-    Aggregation is per context x perturbation x dose. Groups are the unit of
-    observation because the statistical unit of the task is the case, not the
-    cell.  When no time column is available the time is recorded as "not
-    measured" rather than as a fabricated zero, so the applicability domain
-    cannot silently claim a time range it never observed.
-    """
+    if choice not in BACKEND_CHOICES:
+        raise ValueError(f"Unknown backend '{choice}'; choose one of {', '.join(BACKEND_CHOICES)}.")
+    if choice == "none":
+        return None
+    if choice == "sciplex_response":
+        if not structures:
+            raise ValueError("The sciplex_response backend requires declared structures (identifier to SMILES).")
+        from .signature_retrieval import ResponseRungConfig, SciPlexResponseRung
 
-    import anndata as ad
+        directory = Path(workspace) / SCIPLEX_LIBRARY
+        if not (directory / "calibration.json").is_file():
+            raise ValueError(f"The sciplex_response backend needs its library and calibration under {SCIPLEX_LIBRARY}.")
+        return SciPlexResponseRung(ResponseRungConfig(directory, directory / "calibration.json",
+                                                      {str(k): str(v) for k, v in structures.items()}))
+    backends = []
+    if choice in ("state", "composite"):
+        config = StateAdapterConfig.from_workspace(workspace, model_version=model_version)
+        if artifact_directory is not None:
+            config = replace(config, output_directory=artifact_directory)
+        backends.append(StateCapabilityAdapter(config))
+    if choice in ("development_mean", "composite"):
+        if development_partition is None:
+            raise ValueError("The development_mean backend requires a declared development partition.")
+        from .ladder import fit_development_mean_baseline, load_partition
+        from .state_adapter import load_registry
 
-    # The retained SciPlex3 release predates AnnData's encoding-metadata field, so
-    # reading it reports one OldFormatWarning per column. The message reads as if a
-    # write had gone wrong; it is a statement about how that third-party file was
-    # produced, and the read below is correct. Scope the suppression to this read
-    # rather than to the process, so a real encoding problem elsewhere still shows.
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", ad.OldFormatWarning)
-        adata = ad.read_h5ad(path, backed="r")
-    columns = [context_column, perturbation_column, dose_column, *readout_columns]
-    if time_column:
-        columns.append(time_column)
-    frame = adata.obs.loc[:, columns].copy()
-    if len(frame) > max_cells:
-        frame = frame.iloc[:max_cells]
-    frame[context_column] = frame[context_column].astype(str)
-    frame[perturbation_column] = frame[perturbation_column].astype(str)
-    grouping = [context_column, perturbation_column, dose_column] + ([time_column] if time_column else [])
-    grouped = frame.groupby(grouping, observed=True)[list(readout_columns)].mean().reset_index()
-    return PerturbationTable(
-        context_ids=tuple(grouped[context_column].astype(str)),
-        perturbations=tuple(grouped[perturbation_column].astype(str)),
-        modes=tuple([mode] * len(grouped)),
-        doses=tuple(float(value) for value in grouped[dose_column]),
-        times=tuple(
-            float(value) if time_column else float("nan") for value in (grouped[time_column] if time_column else grouped[dose_column])
-        ),
-        readouts=tuple(readout_columns),
-        values={name: tuple(float(value) for value in grouped[name]) for name in readout_columns},
-        source=source or str(path),
-    )
+        registration = load_registry(workspace).datasets.get(dataset_id)
+        if registration is None:
+            raise ValueError(f"Dataset '{dataset_id}' is not registered.")
+        backends.append(
+            fit_development_mean_baseline(
+                registration,
+                load_partition(development_partition),
+                artifact_directory=artifact_directory,
+            )
+        )
+    return backends[0] if len(backends) == 1 else CompositeWorldModel(backends)

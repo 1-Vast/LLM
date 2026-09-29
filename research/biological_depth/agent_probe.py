@@ -13,7 +13,7 @@ File summary
   - An answer outside the option list is named back once, then scored as a named failure.
   - The score is agreement with a vendor annotation, not mechanism accuracy.
 - Run: python research/biological_depth/agent_probe.py --prepared <dir> --output <dir> [--dry-run]
-- Depends on: common.py, src/agent/llm.py, src/agent/typesafe.py, src/evaluation/provider_spend.py
+- Depends on: common.py, src/agent/llm.py, src/agent/decision_critic.py, src/evaluation/costs.py
 """
 from __future__ import annotations
 
@@ -129,10 +129,10 @@ def main() -> None:
         print(prompt(items[0], options, True))
         return
 
-    from agent.configuration import MAESTROSettings
+    from agent.llm import MAESTROSettings
     from agent.llm import DeepSeekChatClient, LLMError
-    from agent.typesafe import TypeSafeJevClient, TypeSafeSettings, choice
-    from evaluation.provider_spend import SpendLedger
+    from agent.decision_critic import TypeSafeJevClient, TypeSafeSettings, choice
+    from tools.evaluation.costs import SpendLedger
 
     budget = protocol["agent_probe"]["budget_usd"]
     ledger = SpendLedger.load(args.output / "deepseek_spend.json", ceiling_usd=budget["deepseek"],

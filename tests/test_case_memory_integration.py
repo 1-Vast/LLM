@@ -19,11 +19,11 @@ import pytest
 from maestro import adaptive_retrieval as AR
 from maestro import case_memory as CM
 from maestro import case_update as CU
-from maestro import directional as DR
-from maestro import hypothesis_graph as HG
+from maestro import adaptive_retrieval as DR
+from maestro import problem_compiler as HG
 from maestro import problem_compiler as PC
 from maestro.acquisition import OutcomeBranch, OutcomeForecast
-from virtual_cell import conditional_forecast as CF
+from virtual_cell import interface as CF
 from virtual_cell import interface as VC
 
 Q = CM.ScientificMeasurementStatus.QUALIFIED
@@ -32,60 +32,7 @@ UC = CM.ScientificMeasurementStatus.QC_FAILED
 UD = CM.ScientificMeasurementStatus.UNDETECTED
 
 
-def _sha(seed: str) -> str:
-    import hashlib
-    return hashlib.sha256(seed.encode()).hexdigest()
-
-
-def _episode(case_id: str = "case-1", kind: CM.CaseKind = CM.CaseKind.CANONICAL,
-             hypothesis_updates=(), observations=None, failures=(), adaptation=()) -> CM.ScientificEpisode:
-    observations = observations if observations is not None else (
-        CM.EpisodeObservation("cond-1", Q, "l1000", cell_line="A549", time_h=24.0, dose_nM=10000.0,
-                              readout="gene:EGR1", value=2.1, direction=1, replicate_agreement=0.9),
-    )
-    return CM.ScientificEpisode(
-        case_id=case_id, case_version=1, case_kind=kind,
-        problem_type="mechanism_contrast_transcriptomic",
-        user_question="Does the compound act through the nominal target?",
-        raw_data_references=(CM.RawDataRef("file:///state.npz", _sha(case_id), "prepared_state_table"),),
-        data_quality_report={"replicate_agreement_median": 0.9},
-        context_fingerprint={"dataset": "l1000", "assay": "l1000", "context": "A549",
-                             "biological_system": "l1000", "measurement_type": "transcriptomic",
-                             "control_design": "vehicle", "intervention_type": "compound",
-                             "cell_line": "A549", "time_h": 24.0, "dose_nM": 10000.0},
-        initial_observations=observations,
-        initial_hypotheses=(
-            CM.HypothesisClaim("H_on", "on-target mechanism", predicted={"a1": "match_h1"}),
-            CM.HypothesisClaim("H_off", "off-target mechanism", predicted={"a1": "match_h2"}),
-            CM.HypothesisClaim("H_art", "assay artifact", advisory=True),
-        ),
-        hypothesis_graph={"nodes": 4, "edges": 3},
-        retrieved_cases=(),
-        adaptation_map=adaptation,
-        candidate_actions=(
-            CM.CandidateAction("a1", "transcriptomic repeat", "l1000", 8.0, 2.0, "signed_state_change"),
-            CM.CandidateAction("a2", "orthogonal phenotype", "phenotypic", 24.0, 4.0, "phenotype"),
-        ),
-        virtual_cell_forecasts=(
-            CM.ForecastRecord("a1", "H_on", {"match_h1": 0.7, "match_h2": 0.2, "unresolved": 0.1},
-                              12, "case-memory-production-1", "test"),
-        ),
-        predicted_outcome_branches=(),
-        real_measurements=(),
-        measurement_quality={},
-        qualified_evidence=(),
-        hypothesis_updates=hypothesis_updates,
-        next_action={},
-        branching_interpretation_plan=(
-            CM.BranchingPlan("a1", {"match_h1": "update:match_h1", "match_h2": "update:match_h2"},
-                             "orthogonal:a2", "invalid:no_biological_hypothesis_update"),
-        ),
-        final_decision={"status": "open", "basis": "no real measurement yet"},
-        failure_modes=failures,
-        calibration_history=(),
-        provenance={"builder": "test", "sources": "test", "created_at": "2026-09-29",
-                    "data_origin": "real"},
-    )
+from tests.fixtures.case_memory_integration import _episode
 
 
 # -------------------------------------------------------------------------------- schema / store
@@ -453,3 +400,27 @@ def test_feature_flag_gates_the_production_forecaster(monkeypatch):
     action = EvidenceAction("a1", "assay", 1.0, ("H1",), readout="x")
     forecast = forecaster.forecast(contrast, (action,), None)["a1"]
     assert forecast.refusal == "case_memory_disabled"
+
+
+@pytest.mark.parametrize("tampered", [False, True])
+def test_grouped_source_workflow_propagates_integrity_failures(tmp_path, monkeypatch, tampered):
+    import json
+    from tools.case_memory import sha256, workflow
+
+    source = tmp_path / "data/external/lincs2020"
+    matrix = source / "level5/level5_beta_trt_cp_n720216x12328.gctx"
+    matrix.parent.mkdir(parents=True)
+    matrix.write_bytes(b"matrix")
+    (matrix.parent / "sha256.json").write_text(json.dumps({"sha256": sha256(matrix)}))
+    metadata = source / "siginfo.txt"
+    metadata.write_bytes(b"registered metadata")
+    (source / "provenance.json").write_text(json.dumps({"files": {
+        metadata.name: {"sha256": sha256(metadata), "url": "https://example.test/siginfo"},
+    }}))
+    if tampered:
+        metadata.write_bytes(b"tampered metadata")
+    monkeypatch.setattr(workflow, "ROOT", tmp_path)
+    monkeypatch.setattr(workflow, "EXPECTED_LEVEL5_BYTES", matrix.stat().st_size)
+    assert workflow.main(["sources"]) == int(tampered)
+    manifest = json.loads((tmp_path / "outputs/case_memory_integration/external_source_manifest.json").read_text())
+    assert manifest["verification_ok"] is (not tampered)

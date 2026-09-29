@@ -23,19 +23,19 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from agent.audit import RunLogger
-from agent.cases import CaseStore
+from agent.memory import RunLogger
+from agent.memory import CaseStore
 from agent.context import ContextBuilder, TaskInterpreter
 from agent.knowledge import EvidenceLedger
 from agent.memory import MemoryStore
 from agent.orchestrator import MAESTROOrchestrator
 from agent.planner import MechanismContrastPlanner
-from agent.template_client import TemplateCompleter
-from agent.vision import VisualInspector
+from agent.llm import TemplateCompleter
+from agent.llm import VisualInspector
 from maestro import MAESTROAgent
 from maestro import case_memory as CM
-from maestro import case_memory_pipeline as MP
-from maestro import directional as DR
+from maestro import case_update as MP
+from maestro import adaptive_retrieval as DR
 from maestro import hypothesis_forecast as HF
 from maestro import problem_compiler as PC
 from maestro.acquisition import OutcomeBranch, outcome_consequences
@@ -43,72 +43,15 @@ from maestro.models import (
     EvidenceAction,
     EvidenceScope,
     FunctionalInterventionProfile,
-    MechanismContrast,
-    MechanismHypothesis,
 )
 from maestro.outcome import InterpretationTable, OutcomeRule
 
 _PROFILE = FunctionalInterventionProfile(mode="small_molecule", context_identifier="NCI-H596",
                                          time_hours=24.0)
 
-Q = CM.ScientificMeasurementStatus.QUALIFIED
-H1, H2 = "response_realised", "response_not_realised"
-
-
-def _sha(seed: str) -> str:
-    import hashlib
-    return hashlib.sha256(seed.encode()).hexdigest()
-
-
-def _episode(case_id: str, direction: int, eliminated: tuple[str, ...] = (H2,),
-             assay: str = "readout_measurement") -> CM.ScientificEpisode:
-    updates = ()
-    if eliminated:
-        updates = (CM.HypothesisUpdate("a1", (H1, H2), "measured", eliminated, True),)
-    return CM.ScientificEpisode(
-        case_id=case_id, case_version=1, case_kind=CM.CaseKind.CANONICAL,
-        problem_type="mechanism_contrast_transcriptomic", user_question="mechanism?",
-        raw_data_references=(CM.RawDataRef("file:///state.npz", _sha(case_id), "prepared_state_table"),),
-        data_quality_report={}, context_fingerprint={
-            "dataset": "fixture", "assay": assay, "context": "fixture",
-            "biological_system": "", "measurement_type": "", "control_design": "",
-            "intervention_type": "", "time_h": 24.0},
-        initial_observations=(CM.EpisodeObservation(
-            "c1", Q, assay, time_h=24.0, readout="EGR1", value=2.0, direction=direction),),
-        initial_hypotheses=(CM.HypothesisClaim(H1, "realised"), CM.HypothesisClaim(H2, "not realised")),
-        hypothesis_graph={}, retrieved_cases=(), adaptation_map=(),
-        candidate_actions=(CM.CandidateAction("a1", "assay", assay, 8.0, 2.0, "x"),),
-        virtual_cell_forecasts=(), predicted_outcome_branches=(), real_measurements=(),
-        measurement_quality={}, qualified_evidence=(), hypothesis_updates=updates, next_action={},
-        branching_interpretation_plan=(), final_decision={"status": "open", "basis": "fixture"},
-        failure_modes=(), calibration_history=(),
-        provenance={"builder": "test", "sources": "test", "created_at": "2026-09-29",
-                    "data_origin": "synthetic"},
-    )
-
-
-def _store(episodes) -> CM.EpisodeStore:
-    store = CM.EpisodeStore()
-    for episode in episodes:
-        store.append(episode)
-    return store
-
-
-def _contrast() -> MechanismContrast:
-    return MechanismContrast("k1", (MechanismHypothesis(H1, "realised"),
-                                    MechanismHypothesis(H2, "not realised")), (), None)
-
-
-def _actions() -> tuple[EvidenceAction, ...]:
-    return (EvidenceAction("measure_low", "low dose", 1.0, (H1, H2), time_hours=24.0),
-            EvidenceAction("measure_high", "high dose", 1.0, (H1, H2), time_hours=24.0))
-
-
-def _state(direction: int) -> HF.UserStateContext:
-    return HF.UserStateContext(
-        directional_state=DR.directional_state_from_shift({"EGR1": 2.0 * direction}),
-        intervention_identity="drugA", cell_context="NCI-H596", time_h=24.0, dose_nM=500.0,
-        assay="readout_measurement")
+from tests.fixtures.case_memory_forecasting import (
+    H1, H2, Q, _actions, _contrast, _episode, _state, _store,
+)
 
 
 # -------------------------------------------------------------------------------- user state
@@ -139,6 +82,27 @@ def test_scalar_arm_is_state_blind_where_the_combined_arm_is_not(monkeypatch):
     assert up == down
 
 
+def test_forecast_prefers_realised_case_measurements_over_heuristic_mapping(monkeypatch):
+    monkeypatch.setenv("MAESTRO_CASE_MEMORY_ENABLED", "1")
+    episodes = []
+    for i in range(6):
+        episode = _episode(f"measured-{i}", +1)
+        data = CM.episode_to_dict(episode)
+        data["real_measurements"] = [{
+            "action_id": "measure_low", "status": "qualified", "outcome_label": "match_h1",
+            "conditioning_hypothesis": H1, "contrast": [H1, H2],
+            "independent_units": 1, "source": "fixture-real-result",
+        }]
+        episodes.append(CM.episode_from_dict(data))
+    episodes.append(_episode("other-stratum", +1))
+    forecast = HF.CaseMemoryOutcomeForecaster(_store(episodes)).forecast(
+        _contrast(), (_actions()[0],), None)["measure_low"]
+    realised = forecast.branch_for(H1)
+    assert realised is not None
+    assert "observed_label_frequencies" in forecast.basis
+    assert realised.probabilities[f"match_{H1}"] > realised.probabilities[f"match_{H2}"]
+
+
 # -------------------------------------------------------------------------------- pipeline
 def _compiled_problem() -> PC.CompiledProblem:
     records = [
@@ -148,9 +112,11 @@ def _compiled_problem() -> PC.CompiledProblem:
                              time_value=24.0, time_unit="h", replicate_group="g1"),
         PC.MeasurementRecord("r3", "DMSO", 0.0, "control", Q, is_control=True),
     ]
-    return PC.compile_problem("user-1", "Is the response on-target?", records,
+    compiled = PC.compile_problem("user-1", "Is the response on-target?", records,
                               intervention="drugA", nominal_target="TARGET_A",
                               assay_hint="readout_measurement")
+    from dataclasses import replace
+    return replace(compiled, context={**compiled.context, "outcome_mode": "attempted_experiment"})
 
 
 def test_the_gated_pipeline_runs_end_to_end_in_research_mode():
@@ -220,11 +186,11 @@ class _UnavailableWorldModel:
     name = "unavailable_stub"
 
     def capabilities(self):
-        from virtual_cell import ModelCapabilities
+        from virtual_cell.interface import ModelCapabilities
         return ModelCapabilities("stub", "stub-1", "none", "none", (), True, False, False, None)
 
     def assess_query(self, request):
-        from virtual_cell import QueryAssessment, QuerySupport
+        from virtual_cell.interface import QueryAssessment, QuerySupport
         return QueryAssessment(QuerySupport.UNSUPPORTED, (), ("no model",), self.capabilities())
 
     def predict(self, request):
@@ -275,7 +241,7 @@ def test_orchestrator_default_behaviour_is_unchanged_with_the_flag_off(tmp_path,
     """With the flag unset, the environment wiring yields no forecaster and coverage stays in charge."""
 
     monkeypatch.delenv("MAESTRO_CASE_MEMORY_ENABLED", raising=False)
-    from agent.case_memory_wiring import forecaster_from_environment
+    from agent.planner import forecaster_from_environment
     assert forecaster_from_environment() is None
     turn = _orchestrator(tmp_path, outcome_forecaster=forecaster_from_environment()).run(
         "Which exposure should be measured first?", available_actions=_runtime_actions(),
@@ -291,7 +257,7 @@ def test_orchestrator_uses_the_case_memory_forecaster_with_the_flag_on(tmp_path,
 
     monkeypatch.setenv("MAESTRO_CASE_MEMORY_ENABLED", "1")
     store = _store([_episode(f"ep-{i}", +1) for i in range(6)])
-    forecaster = HF.CaseMemoryOutcomeForecaster(store)
+    forecaster = HF.CaseMemoryOutcomeForecaster(store, outcome_mode="attempted_experiment")
     turn = _orchestrator(tmp_path, outcome_forecaster=forecaster,
                          discrimination_selection=True).run(
         "Which exposure should be measured first?", available_actions=_runtime_actions(),
@@ -342,6 +308,7 @@ def test_tool_returns_the_full_contract_for_a_valid_problem(tmp_path):
     assert observation["applicable"] and observation["branches"]
     branch = observation["branches"][0]
     assert abs(sum(branch["probabilities"].values()) - 1.0) < 1e-6 and branch["support"] >= 1
+    assert set(branch["probabilities"]) == {"match_h1", "match_h2", "unresolved", "absent"}
     assert receipt["retrieval"][H1]["precedents"]
     assert receipt["action_ranking"] and receipt["branching_interpretation_plan"]
 
@@ -355,7 +322,7 @@ def test_tool_refuses_a_problem_without_a_control(tmp_path):
 def test_tool_abstains_with_insufficient_support(tmp_path):
     problem = _problem_file(tmp_path, CM.EpisodeStore())
     receipt = _tool().run({"dataset_path": str(problem), "research_mode": True})
-    assert receipt["status"] == "abstained" and receipt["reason"] == "insufficient_support"
+    assert receipt["status"] == "abstained" and receipt["reason"] == "insufficient_outcome_support"
     assert receipt["calibration_status"] == "uncalibrated"
 
 

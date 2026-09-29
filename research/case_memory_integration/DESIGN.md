@@ -44,9 +44,10 @@ forecast weighting and action ranking - verified by the ablation tests and the e
 `src/maestro/adaptive_retrieval.py`: four stages. Stage 1 hard compatibility (biological system,
 assay, measurement type, control design, intervention type, quality, cell line, time and dose
 scale) with named exclusion reasons. Stage 2 mechanism: a precedent supports the hypothesis its
-reading licensed. Stage 3 directional state similarity on the registered arm; a state-free
-problem (or the scalar arm) retrieves by presence of a measured state, never by a fabricated
-directional match. Stage 4 the nine-term adaptation-aware score with per-case component reports,
+reading licensed. Stage 3 directional state similarity uses only a single compatible condition
+whose observations are marked `pre_action`. Outcome-only signatures cannot become query features.
+A state-free problem (or the scalar arm) may retrieve outcome-only references for frequency
+estimation, with no claimed directional match. Stage 4 the nine-term adaptation-aware score with per-case component reports,
 adaptation operations and cost basis (transfer history or declared prior). A retrieved set with
 fewer than two Kish-effective precedents is reported as not usable. Production retrieval requires
 the feature flag; evaluation passes `research_mode=True` explicitly.
@@ -82,14 +83,22 @@ discrimination selection consumes memory forecasts with no change to evidence ad
 cell-state summaries, intervention identity, structure, cell context, time, dose, assay,
 hypothesis graph, evidence history) to retrieval and to the cache identity; the same action under
 two user states forecasts differently when the arm carries state (tested). Forecasts speak in the
-action's declared outcome vocabulary when it has one. The heuristic probability mapping is an
-**uncalibrated research baseline**: every forecast carries `calibration_status`, the calibration
-dataset (none), model version, per-branch support and provenance, and the full multi-label
-distribution (never a binary collapse). `src/maestro/case_update.py` ranks actions by expected
-terminal decision value (reusing `maestro.acquisition`) with named terms, builds branching
-interpretation plans (decisive / ambiguous / invalid readings), and ingests real results
-append-only, keeping qualified, reliable-but-inconclusive, negative, unreliable and not-measured
-apart.
+action's declared outcome vocabulary when it has one. Retrieved realised outcomes are preferred
+when a case contains explicitly conditioned `real_measurements`. Legacy cases without labelled
+outcomes return `insufficient_outcome_support`; no probability is fabricated. Version 3 uses one
+Dirichlet smoothing step over weighted frequencies with Kish effective support. A single
+pseudocount may be fitted on separate development compounds; there is no fixed temperature.
+The planner preserves the resulting mean and uses its concentration only for uncertainty.
+The profile binds to assay, readout, cell, laboratory, time, dose, outcome mode, feature arm and
+source snapshot. A development fit remains **uncalibrated** for external use; receipts distinguish
+`development_only` from `not_fitted` and report provenance and the full distribution.
+`valid_readout` predicts four conditional outcomes. Complete `attempted_experiment` forecasts
+include QC failure and require records explicitly declaring `sampling_frame=all_attempts`.
+Conditional forecasts cannot rank complete experiments without an experiment-validity model.
+`src/maestro/case_update.py` ranks actions by expected terminal decision value (reusing
+`maestro.acquisition`) with named terms, builds branching interpretation plans (decisive /
+ambiguous / invalid readings), and ingests real results append-only, keeping qualified,
+reliable-but-inconclusive, negative, unreliable and not-measured apart.
 
 ## 7. The gated production call path
 
@@ -108,5 +117,16 @@ and an explicitly separate research mode (honoured only for evaluation payloads,
 Per the frozen `PROTOCOL.md`: LINCS 2020 Level 5 (untouched source), study-level split by
 InChIKey connectivity block against GSE92742 + GSE70138, the four-code validator, the eight
 frozen arms, forecast-level and decision-level metrics, unit-cluster bootstrap of the primary
-endpoint. The heuristic forecast is evaluated but never activated by default; activation requires
-the registered gates, which the exploratory stratum cannot meet.
+endpoint. The frozen replay predates the support-aware production estimator, so its metrics remain
+the registered baseline and must not be reported as post-fix calibration. The support-aware
+estimator is evaluated separately before activation; the registered gates still remain required,
+and the exploratory stratum cannot meet them.
+
+## 9. Scientific correction
+
+See `SCIENTIFIC_REPAIR_V3.md` for the current estimator, preprocessing contract, regression checks
+and development calibration comparison. `SCIENTIFIC_FIX_AND_DATA_PLAN.md` and
+`SHRINKAGE_DIAGNOSIS.md` preserve the earlier version-2 measurements. The current proxy case file
+is `outputs/case_memory_integration/episodes/proxy_reference_cases_v3.jsonl.gz`; older archives and
+the frozen external replay remain unchanged. The new development result is encouraging but
+does not establish external generalisation, state information gain or action-selection value.

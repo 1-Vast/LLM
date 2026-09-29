@@ -7,7 +7,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from agent.biology import BiologicalConditions, BiologicalRelation
+from agent.knowledge import BiologicalConditions, BiologicalRelation
 from agent.context import ContextBuilder, TaskIntent
 from agent.knowledge import EvidenceLedger, EvidenceStatus
 from agent.memory import MemoryScope, MemoryStore

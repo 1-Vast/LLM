@@ -1,0 +1,148 @@
+{
+ "name": "dual-core-1",
+ "written_at": "2026-09-27T22:17:22+08:00",
+ "written_before": "any E1 score; one execution-only smoke run of L1000 fold 0 printed row counts and runtime only (no metric was computed or read)",
+ "exposure": "development screen. SciPlex3 and GSE92742 L1000 have been read in every block since 2026-09-26, including block 6's E-WM1/E-WM2 on the same folds; GSE70138 was opened in block 2 and is not used here. Nothing here is external or confirmatory.",
+ "primary_question": "When MAESTRO has bought one or more response profiles of a compound, can those purchased profiles be used as quality-aware in-context evidence to predict its response at unmeasured conditions while retaining compound-specific signal, and can the agent act on selection-calibrated risk?",
+ "hypotheses": {
+  "world_model": "A1: rrt_q (low-rank transition plus a quality-weighted compound-specific residual) discriminates held-out compounds better than block 6's ridge_st without losing direction; A2: inverse inner-CV-error aggregation of per-prompt predictions beats equal weighting on direction without losing discrimination.",
+  "agent": "Frozen separately in protocol_e2.json before any E2 score: a planner whose abstention threshold is chosen by Learn-then-Test on calibration folds' selected actions controls held-out wrong-elimination risk where the unmodified planner does not.",
+  "interaction": "Frozen with the agent hypothesis: the in-context world model and the risk-controlled policy together give a better risk-coverage trade-off than either alone (calibration and risk outcomes only; E-DATA1's failure rule blocks decision-value claims)."
+ },
+ "closest_prior_art": {
+  "Hodos et al. 2018, PSB, doi:10.1142/9789813235533_0004": "L1000 cross-cell-line prediction of a drug's profile from its profiles elsewhere by kNN and tensor completion; our A1/A2 regime is the same task family, so the transfer backbone is adaptation, not novelty",
+  "Szalata et al. 2024, NeurIPS Datasets and Benchmarks (OP3)": "predict held-out cell types' chemical responses from measured cell types",
+  "Adduri et al. 2026, Cell 189:5914, doi:10.1016/j.cell.2026.07.052 (State)": "learned state transition across contexts; ridge_st is a linear analogue",
+  "Dong et al. 2026, bioRxiv v2, doi:10.64898/2026.01.09.698608 (Stack)": "measured cells of a condition as an inference-time prompt",
+  "Vinas Torne et al. 2025, Nat Biotechnol, doi:10.1038/s41587-025-02777-8 (Systema)": "metrics must separate perturbation-specific effects from systematic variation; hence centred direction and discrimination as co-primary",
+  "Ahlmann-Eltze et al. 2025, Nat Methods, doi:10.1038/s41592-025-02772-6": "simple linear baselines are strong; hence strict baselines"
+ },
+ "data": {
+  "split_manifest": "outputs/dual_core_20260927/split_manifest.json",
+  "split_manifest_sha256": "277b7b79b037e139164b6f4745b3b3835e19c04494b0edf1c87485ae2d395d65",
+  "prepared_files_sha256": {
+   "outputs/dynamic_world_model_20260926/prepared/conditions.csv": "d0b7d2481fd87c4a1505e6485e6fad78567289485919f6419abb17e3d83b7599",
+   "outputs/dynamic_world_model_20260926/prepared/shifts.npz": "0378f1fcfd1909a8a6af7a28813a0bef4eef85188e96420b0144f0e60030334e",
+   "outputs/biological_depth_20260926/prepared/compounds.csv": "358d49dc943e3e2d0b1395dc2c85e4c58a201cb85329b0950e87b27e2e9c9d1c",
+   "outputs/biological_depth_20260926/prepared/gene_sets.json": "3434fa736ac0627a9e487833e4e0e83ee6acd8edea1bc8929962992d4ce930f4",
+   "outputs/sequence_audit_20260926/l1000/prepared/conditions.csv": "28b0aa68b0525be553bba902bf728d91b0e2107d9362a758cd0d6df49455413a",
+   "outputs/sequence_audit_20260926/l1000/prepared/compounds.csv": "06fb27444f93a2fddf30006dc94d5faa71327d72df07548d24c194060b3e9f31",
+   "outputs/sequence_audit_20260926/l1000/prepared/shifts.npz": "ef07c53a3dde3c2a73e2a8a8b374b39cfe514fc79c31c65d6fbef1d5c58ce8e4"
+  },
+  "fold_assignment_sha256": {
+   "sciplex3": "ec6dde3fabc8901af75fced2754e5bf579d3bf359e9b6f6659389f47c12d45be",
+   "l1000": "eb4b5ba5451d4c7868c885eb8d762c8a47cf14f6f7bf5c8589bed438bf37df8f"
+  },
+  "units": {
+   "sciplex3": "InChIKey connectivity block (stored as 'skeleton'); 10 Murcko scaffolds (26 compounds) span folds and form a sensitivity stratum",
+   "l1000": "identity/Murcko-scaffold connected component; no scaffold spans folds"
+  },
+  "feature_space": "fixed in advance, not learned from outcomes: SciPlex3 2,473 genes chosen from vehicle controls; L1000 978 landmarks",
+  "gene_sets": "MSigDB Hallmark: SciPlex3 frozen gene_sets.json; L1000 h.all.v2024.1 mapped through GSE92742 gene_info; sets with >= 5 members",
+  "prompt_quality": "SciPlex3 split-half replicate Pearson; L1000 cc_q75; clipped to [0, 1]"
+ },
+ "code_sha256": {
+  "research/dual_core/splits.py": "3f1eea5156bdc652f872ff0e16d6b446f4adfdff18609ae48be0cf4b9f838f70",
+  "research/dual_core/transfer.py": "3b08ba07412d5899ef0725ae5b9b0db29eadf8894ffb1ba2c4eb118d73555335",
+  "research/dual_core/e1.py": "a8118ebbc6aafee43af2dbfdf3235cbea162958ece6c09527d210e1a5e806043",
+  "research/incontext_world/metrics.py": "95b7b05e26b61cd054ce3d446587ca156cfcd6468a0c4d5356cd905f09d6094a",
+  "research/dual_core/test_dual_core.py": "ab5fe387c7bdc8502b89aeb5bcf3dc254731516349bd2a599e385445a81cb29b"
+ },
+ "E1": {
+  "outer_folds": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "inner": "4 group folds by independent unit (sha256-dealt), every outcome-dependent component refitted per inner split",
+  "grids": {
+   "k": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32
+   ],
+   "lambda_mult": [
+    0.01,
+    0.1,
+    1.0,
+    10.0
+   ],
+   "krr": [
+    0.01,
+    0.1,
+    1.0,
+    10.0
+   ],
+   "knn": [
+    1,
+    3,
+    5,
+    10
+   ]
+  },
+  "regimes": {
+   "A0": "no measured response of the query compound",
+   "A1": "one purchased prompt",
+   "A2": "two purchased prompts, up to 10 seeded pairs per (compound, target)"
+  },
+  "arms": {
+   "A0": [
+    "zero",
+    "global_mean",
+    "context_mean",
+    "chem_ridge",
+    "chem_knn"
+   ],
+   "A1": [
+    "prompt_copy",
+    "additive",
+    "ridge_st",
+    "rrt_const",
+    "rrt_q",
+    "chem_ridge",
+    "context_mean",
+    "rrt_q_shuffled",
+    "rrt_q_wrong_target"
+   ],
+   "A2": [
+    "prompt_mean",
+    "additive_mean",
+    "rrt_mean",
+    "rrt_best_single",
+    "rrt_precision",
+    "chem_ridge"
+   ]
+  },
+  "items_scored": "targets detected (a response distinguishable from vehicle) for direction, discrimination, Pearson delta, gene-set and phenocopy metrics; all items for MSE and the effect AUROC",
+  "primary": {
+   "A1": "rrt_q - ridge_st: discrimination (State, Manhattan, normalised rank among the fold's held-out truths at the target) with 95% unit-bootstrap interval above 0, AND centred cosine (direction) with interval lower bound above -margin",
+   "A2": "rrt_precision - rrt_mean: centred cosine with interval above 0, AND discrimination with interval lower bound above -margin"
+  },
+  "noninferiority_margin": 0.02,
+  "aggregation": "unit mean (each unit's items averaged first), 10,000-draw unit-cluster bootstrap, seed 20260927, per dataset; a component is kept only if its rule passes on both datasets",
+  "secondary": [
+   "item-weighted sensitivity of the primary comparisons",
+   "quality awareness: rrt_q - rrt_const",
+   "rrt_q versus additive and prompt copy",
+   "controls: shuffled prompt, wrong-target transition (expected worse than rrt_q)",
+   "A0: chemical ridge and kNN versus context mean",
+   "A2 precision versus best single prompt",
+   "strata: relation (dose, time, line), prompt detected, effect-size tertile of the truth, SciPlex3 compounds whose Murcko scaffold does not span folds",
+   "effect AUROC (predicted norm for detection)",
+   "gene-set Spearman, phenocopy@5, Pearson delta"
+  ],
+  "keep_rules": "rrt_q replaces ridge_st as the transfer source only if the A1 rule passes on both datasets; precision aggregation is kept only if the A2 rule passes on both; otherwise the component is rejected or reported as dataset-specific"
+ },
+ "E2": "frozen in research/dual_core/protocol_e2.json before any E2 score",
+ "claims_not_allowed": [
+  "external or confirmatory validity",
+  "mechanism, efficacy or target-engagement claims",
+  "decision value or planner superiority on these data (E-DATA1 failure rule)",
+  "that a predicted profile is an observed result"
+ ]
+}

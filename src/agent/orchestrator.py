@@ -1,28 +1,4 @@
-"""Single-controller loop that keeps planning, observations, and evidence distinct.
-
-File summary
-- Path: src/agent/orchestrator.py
-- Purpose: Drive one bounded MAESTRO cycle and the multi-round case loop.
-- Core points:
-  - `run` executes one bounded cycle; `run_case_loop` stops before any unsupplied measurement.
-  - A real measurement never becomes a model prediction or a fabricated biological result.
-  - Adopted repairs are scored against later real results via `gap_resolved`.
-  - Each round's virtual-cell answers are shown to the LLM repair planner as a labelled
-    planning-only briefing, and an identical query is answered once per run, not per round.
-  - When a typed decision model is configured, each round also gets one calibrated second
-    opinion; its findings reach the repair planner as advice and its judgments are recorded,
-    but a judgment can never satisfy a premise or eliminate an explanation.
-  - Each round analyses the menu as a dependency graph (`maestro.topology`): what can run
-    now, how many supplier steps each action is away, and which premises no registered
-    action supplies. The analysis is logged, kept on the turn, and shown to the repair planner.
-  - Measurement choice: on the power-aware path the world model's magnitudes are logged, not
-    used. An optional outcome forecaster's per-hypothesis readings are scored every round by
-    `maestro.acquisition.select_discriminating_action` and logged; they choose the round's
-    measurement only with `discrimination_selection`. A per-action query states the action's own
-    exposure time, and a prediction for another time or context ranks nothing.
-- Interfaces: `MAESTROOrchestrator`, `run`, `run_case_loop`, `import_measurement`, `MAESTROTurn`, `MAESTROCaseLoop`
-- Depends on: maestro.contrast, maestro.decision, maestro.outcome, maestro.repair, maestro.reliability, maestro.provenance, agent.audit, agent.cases, agent.configuration, agent.context, agent.knowledge, agent.llm, agent.memory, agent.planner, agent.reflection, agent.tool_runtime, agent.vision, agent.world_model_briefing, virtual_cell
-"""
+"""Bounded case orchestration, evidence acquisition, and deterministic decision checks."""
 from __future__ import annotations
 
 import uuid
@@ -32,87 +8,27 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from typing import Callable, Mapping, Sequence
-
 from maestro.contrast import MAESTROAgent
-from maestro.acquisition import (
-    DiscriminationPlan,
-    OutcomeForecaster,
-    outcome_consequences,
-    select_discriminating_action,
-    select_expected_coverage,
-)
+from maestro.acquisition import DiscriminationPlan, OutcomeForecaster, outcome_consequences, select_discriminating_action, select_expected_coverage
 from maestro.decision import DecisionEngine, DevelopmentDecision
-from maestro.handoff import (
-    ComparabilityStatus,
-    DecisionLayer,
-    EvidenceLayer,
-    ExecutionLayer,
-    RoundRecord,
-    WorldModelLayer,
-    rejected_from_selection,
-    review_run,
-    write_round,
-)
-from maestro.outcome import (
-    EvidenceState,
-    InterpretationTable,
-    MeasuredPremise,
-    OutcomeRule,
-    ValidatedEvidenceUpdate,
-    admit_evidence,
-    default_rules_for,
-    scope_rank,
-)
-from maestro.provenance import SourceClusterIndex
-from maestro.topology import ActionTopology
-from maestro.reliability import PredictionReliabilityLedger
+from maestro.handoff import ComparabilityStatus, DecisionLayer, EvidenceLayer, ExecutionLayer, RoundRecord, WorldModelLayer, rejected_from_selection, review_run, write_round
+from maestro.outcome import EvidenceState, InterpretationTable, MeasuredPremise, OutcomeRule, ValidatedEvidenceUpdate, admit_evidence, default_rules_for, scope_rank
+from maestro.handoff import SourceClusterIndex
+from maestro.composition import ActionTopology
+from maestro.judgment import PredictionReliabilityLedger
 from maestro.repair import RepairController, RepairLedger, RepairRecord
-from .audit import RunLogger
-from .cases import CaseSnapshot, CaseStore, MeasurementResult, ResultImport
-from .configuration import MAESTROSettings
-from .decision_critic import CritiqueOutcome, TypedDecisionCritic
-from .context import ContextBuilder, TaskIntent, TaskInterpreter
+from .memory import CaseSnapshot, CaseStore, EpistemicStatus, MeasurementResult, MemoryKind, MemoryScope, MemoryStore, ReflectionRecord, ResultImport, RunLogger, reflect_on_result
+from .llm import DeepSeekChatClient, LLMError, MAESTROSettings, VisualInspection, VisualInspector
+from .decision_critic import CritiqueOutcome, TypeSafeJevClient, TypeSafeSettings, TypedDecisionCritic
+from .context import ContextBuilder, TaskIntent, TaskInterpreter, WorldModelRow, render_world_model_briefing, summarize_world_model, world_model_rows
 from .knowledge import EvidenceLedger
-from .llm import DeepSeekChatClient, LLMError
-from .memory import EpistemicStatus, MemoryKind, MemoryScope, MemoryStore
-from maestro.models import (
-    ContrastCheck,
-    DecisionStatus,
-    DevelopmentAction,
-    EvidenceAction,
-    EvidenceActionKind,
-    EvidenceKind,
-    EvidenceScope,
-    FunctionalInterventionProfile,
-    MechanismContrast,
-    MechanismHypothesis,
-    MeasurementStatus,
-    NonDiscriminabilityReason,
-    RepairKind,
-    RepairProposal,
-)
+from maestro.models import ContrastCheck, DecisionStatus, DevelopmentAction, EvidenceAction, EvidenceActionKind, EvidenceKind, EvidenceScope, FunctionalInterventionProfile, MeasurementStatus, MechanismContrast, MechanismHypothesis, NonDiscriminabilityReason, RepairKind, RepairProposal
 from .planner import LLMRepairDraft, MechanismContrastPlanner
-from .reflection import ReflectionRecord, reflect_on_result
 from .tool_runtime import ToolExecution, ToolRouter, ToolRuntimeError
-from .typesafe import TypeSafeJevClient, TypeSafeSettings
-from .vision import VisualInspection, VisualInspector
-from .world_model_briefing import (
-    WorldModelRow,
-    render_world_model_briefing,
-    summarize_world_model,
-    world_model_rows,
-)
 from virtual_cell.interface import safe_predict
-from virtual_cell import (
-    PredictionCache,
-    PredictionRequest,
-    QueryAssessment,
-    StateAdapterConfig,
-    StateCapabilityAdapter,
-    StatePrediction,
-    VirtualCellQueryTemplate,
-    VirtualCellWorldModel,
-)
+from virtual_cell.interface import PredictionCache, QueryAssessment, VirtualCellQueryTemplate, VirtualCellWorldModel
+from virtual_cell import PredictionRequest, StatePrediction
+from virtual_cell.state_adapter import StateAdapterConfig, StateCapabilityAdapter
 
 
 @dataclass(frozen=True)
@@ -261,13 +177,24 @@ class MAESTROOrchestrator:
         self._interpretation_table = interpretation_table or InterpretationTable()
         self._decision_engine = decision_engine or DecisionEngine()
         self._reliability = reliability or PredictionReliabilityLedger()
+        # The ledger and the reconciliation registry below live in memory only.
+        # A restart loses the scored prediction record and every unresolved
+        # prediction-to-observation pair; no supported workflow persists them
+        # yet, so this is a stated limitation rather than a hidden one. A caller
+        # that needs the record to outlive the process passes its own ledger.
         self._source_clusters = source_clusters or SourceClusterIndex()
         self._repair_ledgers: dict[str, RepairLedger] = {}
         self._evidence_states: dict[str, EvidenceState] = {}
         self._round_records: dict[str, RoundRecord] = {}
+        # What a result that arrives outside the case loop can be scored against:
+        # the turn and the action of the plan that asked for it, recorded by run().
+        # Keyed by case where the case is known, and by action alone for a reveal,
+        # which carries no case and resolves to the most recent plan for it.
+        self._reconciliation: dict[tuple[str, str], tuple["MAESTROTurn", EvidenceAction]] = {}
+        self._reconciliation_by_action: dict[str, tuple["MAESTROTurn", EvidenceAction]] = {}
         self._power_aware_selection = power_aware_selection
         # A multi-round case re-queries every action every round with unchanged
-        # model inputs. Reuse is keyed on those inputs only; see virtual_cell.cache.
+        # model inputs. Reuse is keyed on those inputs only; see virtual_cell.interface.
         self._prediction_cache = (
             prediction_cache if prediction_cache is not None else PredictionCache() if reuse_predictions else None
         )
@@ -420,7 +347,7 @@ class MAESTROOrchestrator:
             session_id=session_id,
             scope=MemoryScope(case_id=case_id, task_type=intent.task_type, biological_context=intent.biological_context),
         )
-        from .biology import BiologicalConditions
+        from .knowledge import BiologicalConditions
 
         context = self._context_builder.build(
             intent,
@@ -598,6 +525,9 @@ class MAESTROOrchestrator:
             action_topology=topology,
             decision_review=review.payload() if review.model_version else {},
         )
+        for action in execution_actions:
+            self._reconciliation[(case_id, action.identifier)] = (turn, action)
+            self._reconciliation_by_action[action.identifier] = (turn, action)
         self._write_plan_round(
             turn,
             context=context,
@@ -633,7 +563,7 @@ class MAESTROOrchestrator:
         every failure it was triggered by.
         """
 
-        check = self._controller.check_contrast(contrast, profile, prediction)
+        check = self._controller.check_contrast(contrast, profile, prediction, self._reliability)
         ledger = self.repair_ledger(case_id)
         rule_outcome = self._repair_controller.run(
             contrast,
@@ -643,6 +573,7 @@ class MAESTROOrchestrator:
             prediction,
             ledger=ledger,
             action_predictions=action_predictions,
+            reliability=self._reliability,
         )
         repair = rule_outcome.proposal
         repair_records = rule_outcome.records
@@ -664,7 +595,7 @@ class MAESTROOrchestrator:
             else:
                 follow_up = self._repair_controller.run(
                     contrast, check, available_actions, profile, prediction, ledger=ledger,
-                    action_predictions=action_predictions,
+                    action_predictions=action_predictions, reliability=self._reliability,
                 )
                 repair = follow_up.proposal
                 repair_records = repair_records + follow_up.records
@@ -1057,7 +988,6 @@ class MAESTROOrchestrator:
                                 result.independent_units if result.independent_units is not None else 0,
                             )
                 self._score_repair_result(case_id, turn, action, result, admission)
-                self._score_prediction(turn, action, result, admission)
                 self._write_result_round(
                     turn, action, result, admission, state, result_id=imported.result_id
                 )
@@ -1967,7 +1897,9 @@ class MAESTROOrchestrator:
         ) if action_predictions is not None else (
             prediction if repaired.plan == contrast.plan else None
         )
-        recheck = self._controller.check_contrast(repaired, intervention_profile, repaired_prediction)
+        recheck = self._controller.check_contrast(
+            repaired, intervention_profile, repaired_prediction, self._reliability
+        )
         executable_premise_repair = self._is_executable_premise_repair(
             draft, repaired, check, recheck, intervention_profile
         )
@@ -2047,7 +1979,7 @@ class MAESTROOrchestrator:
         outcome = critic.review_plan(
             contrast,
             available_actions,
-            check=self._controller.check_contrast(contrast, profile),
+            check=self._controller.check_contrast(contrast, profile, None, self._reliability),
             topology=topology,
             world_model_rows=[row.as_payload() for row in briefing_rows],
             evidence_summary=evidence_summary,
@@ -2084,6 +2016,7 @@ class MAESTROOrchestrator:
                 {"case_id": case_id, "result_id": imported.result_id},
                 session_id=case_id,
             )
+        self._reconcile(case_id, result)
         return imported
 
     def record_revealed_result(self, result: MeasurementResult) -> None:
@@ -2097,6 +2030,29 @@ class MAESTROOrchestrator:
             {"result_id": result.result_id, "evidence_id": record.identifier, "kind": result.evidence_kind.value},
             session_id=result.result_id or "evaluation",
         )
+        self._reconcile(None, result)
+
+    def _reconcile(self, case_id: str | None, result: MeasurementResult) -> None:
+        """Score a result against the prediction this controller made for its action.
+
+        Reconciliation belongs to the arrival of a result, not to one code path
+        that happens to have a turn in hand. Scoring only inside the case loop
+        left every single-shot caller -- an imported measurement, an authorized
+        reveal -- permanently unreconciled, so a ledger fed only by those callers
+        stays empty and no readout can ever be revoked. A result whose action was
+        never planned has no prediction to be scored against and is left alone;
+        every other guard is `_score_prediction`'s, unchanged.
+        """
+
+        entry = (
+            self._reconciliation.get((case_id, result.action_identifier))
+            if case_id is not None
+            else self._reconciliation_by_action.get(result.action_identifier)
+        )
+        if entry is None:
+            return
+        turn, action = entry
+        self._score_prediction(turn, action, result)
 
     def _run_dataset_tool(
         self,

@@ -12,21 +12,14 @@ File summary
   - The executed step is the plan's own gate, not the cheapest registered supplier.
   - The gate's promise is recorded and can be closed by a real result.
 - Interfaces: pytest test functions
-- Depends on: evaluation.baselines, maestro.contrast, evaluation.cases
+- Depends on: evaluation.policies, maestro.contrast, evaluation.cases
 """
 import pytest
 
-from evaluation.baselines import MAESTROCorePolicy
-from evaluation.cases import EvidenceMenuItem, PublicCase, ReplayView
-from maestro import (
-    CompositionRule,
-    EvidenceAction,
-    FunctionalInterventionProfile,
-    MAESTROAgent,
-    MeasurementStatus,
-    MechanismHypothesis,
-    NonDiscriminabilityReason,
-)
+from tools.evaluation.policies import MAESTROCorePolicy
+from tools.evaluation.cases import EvidenceMenuItem, PublicCase, ReplayView
+from maestro.models import CompositionRule, MeasurementStatus, NonDiscriminabilityReason
+from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent, MechanismHypothesis
 
 PREMISE = "functional:target_activity"
 HYPOTHESES = (

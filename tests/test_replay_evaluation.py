@@ -9,27 +9,21 @@ File summary
 """
 from pathlib import Path
 
-from evaluation import (
-    CaseRepository,
-    EvaluationRunner,
-    ExpertWorkflowPolicy,
-    MAESTROCorePolicy,
-    MAESTROOrchestratorPolicy,
-    PredictionValuePolicy,
-    ReplayEnvironment,
-)
-from maestro import DevelopmentAction
-from agent.audit import RunLogger
-from agent.cases import CaseStore
+from tools.evaluation import CaseRepository, EvaluationRunner
+from tools.evaluation.policies import ExpertWorkflowPolicy, MAESTROCorePolicy, MAESTROOrchestratorPolicy, PredictionValuePolicy
+from tools.evaluation.cases import ReplayEnvironment
+from maestro.models import DevelopmentAction
+from agent.memory import RunLogger
+from agent.memory import CaseStore
 from agent.context import ContextBuilder, TaskInterpreter
 from agent.knowledge import EvidenceLedger
 from agent.memory import MemoryStore
 from agent.orchestrator import MAESTROOrchestrator
 from agent.planner import MechanismContrastPlanner
-from agent.vision import VisualInspector
+from agent.llm import VisualInspector
 from maestro import MAESTROAgent
 
-from tools.shared.stub_client import StubClient  # noqa: E402
+from tests.fixtures.stub_client import StubClient  # noqa: E402
 
 
 ROOT = Path(__file__).resolve().parents[1]

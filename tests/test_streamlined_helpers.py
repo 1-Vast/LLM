@@ -7,7 +7,7 @@ File summary
 - Core points: assertions here are contract tests, not biological results; each test pins
   one boundary that must not silently move.
 - Interfaces: pytest tests only
-- Depends on: agent.storage, agent.cases, maestro.models
+- Depends on: agent.memory, agent.memory, maestro.models
 """
 from __future__ import annotations
 
@@ -16,8 +16,8 @@ from pathlib import Path
 
 import pytest
 
-from agent.cases import CaseStore
-from agent.storage import connect
+from agent.memory import CaseStore
+from agent.memory import connect
 from maestro.models import EvidenceAction, FunctionalInterventionProfile, MeasurementStatus
 
 

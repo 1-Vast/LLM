@@ -1,15 +1,4 @@
-"""Frozen records for evidence-bounded mechanism-contrast reasoning.
-
-File summary
-- Path: src/maestro/models.py
-- Purpose: Typed records that describe evidence and its limits, never a biological truth label.
-- Core points:
-  - Enums bind every value and scope so a model prediction never becomes a measurement.
-  - `EvidenceKind` origin never becomes stronger through downstream analysis.
-  - `ContrastCheck.ready_for_mechanism_update` gates any mechanism-level update.
-- Interfaces: `MechanismHypothesis`, `FunctionalInterventionProfile`, `EvidenceAction`, `CompositionRule`, `GatedEvidencePlan`, `PremiseRequirement`, `PremiseGrant`, `MechanismContrast`, `ContrastCheck`, `RepairProposal`, `EvidenceObservation`, `MechanismDecision`, enums
-- Depends on: (standard library only)
-"""
+"""Frozen records for evidence-bounded mechanism-contrast reasoning."""
 from __future__ import annotations
 
 import math

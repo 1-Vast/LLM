@@ -7,11 +7,11 @@ File summary
   - Asserts blocking reasons for incomplete provenance, conditions, and review.
   - `assess_registry` flags ineligible candidates without reading hidden results.
 - Interfaces: `test_*` functions
-- Depends on: evaluation.screening
+- Depends on: evaluation.construction
 """
 from pathlib import Path
 
-from evaluation.screening import CandidateCase, assess_candidate, assess_registry
+from tools.evaluation.construction import CandidateCase, assess_candidate, assess_registry
 
 
 ROOT = Path(__file__).resolve().parents[1]

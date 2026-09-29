@@ -1,0 +1,117 @@
+{
+ "version": "maestro-vc-v1",
+ "written_at": "2026-09-29 (the exact time is the written_at of freeze.json, the record of when this text was hashed)",
+ "written_at_correction": "the first draft stamped 12:20 by mistake; the clock read 11:46 when it was first frozen; corrected here before that freeze was used or any full run started, and the freeze re-written",
+ "status": "development replay; pre-registered here before the full 20-task run; not a confirmation and not an external test",
+ "production_default": "unchanged; no arm or world model in this protocol is imported by src/",
+ "supersedes": [],
+ "inherits": {
+  "protocol": "research/protocol_v2/protocol_v2_1.json (menu from the study design, per-fold pools, unit mean primary)",
+  "thresholds": "research/protocol_v2/protocol.json (mpie_correct 0.02, correct_noninferiority_margin 0.01, wrong_noninferiority_margin 0.005, wrong_risk_cap 0.05, price_per_measurement 0.02, utility +1/-2/0)",
+  "bootstrap": "2,000 unit-cluster draws, seed 20260927 (research/external_validation/statistics.py)"
+ },
+ "exposure_disclosure": {
+  "development_tasks": "all 20 tasks (SciPlex3 A/B, L1000 LT/T, five folds each) have been analysed repeatedly since 2026-09-26; GSE70138 was opened by belief-planning-1; no untouched study exists locally, so this replay can rule arms out, not in",
+  "seen_before_this_file": [
+   "empirical-Bayes fits (training-only leave-one-unit-out likelihoods) of six tasks: SciPlex3 A fold 0, B folds 0 and 2, L1000 LT fold 0, T fold 1; they showed the structure kernel strength k is 0 under a unit-out fit in SciPlex3 A fold 0 and both L1000 tasks, and that the neighbourhood prior pseudo-count sits at the edge of its first grid (the grid was then extended, and a probability bound of 0.95 declared)",
+   "a smoke replay of two tasks (SciPlex3 A fold 0 and L1000 T fold 1) with all arms: decision counts, forecast-level NLL and calibration were printed. It showed that removing misleading and negative readings together collapses forecast calibration (NLL 4.4 against 0.85), which is why the ablation was then split into misleading-only and negative-only worlds",
+   "parity checks: the case-memory world reproduces the reference world exactly (maximum probability difference 0), and the case-memory belief arm reproduces the reference belief arm's decisions on 61 real SciPlex3 B episodes (0 mismatches)"
+  ],
+  "not_seen": "no decision-level or forecast-level result on the other 18 tasks, and no pooled or per-tier result on any tier"
+ },
+ "memory": {
+  "unit_of_case": "one reference compound per (dataset, tier); a snapshot per fold contains only compounds outside the fold",
+  "reading_codes": {"0": "matches its own class", "1": "matches the decoy (misleading)", "2": "unresolved", "3": "undetected (negative)", "-": "not scored"},
+  "case_typing": {
+   "failure": "undetected at every measured condition, or at least 25% of scored readings match the decoy",
+   "contrastive": "not a failure, and a structural neighbour of another class and another independent unit has Tanimoto >= 0.50",
+   "canonical": "everything else that was measured",
+   "adaptation": "representative source-target transfers, two per difference signature and outcome, seeded"
+  },
+  "constants": {"structure_floor": 0.40, "reliability_strength": 2.0, "near_fold": 4.0, "min_trials": 20, "prior_cost_per_difference": 0.25, "prior_grid": [0.01, 0.02, 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 8], "prior_bound": 0.95, "min_support": 6},
+  "score": "case_score = state_similarity + mechanism_compatibility + assay_compatibility + temporal_compatibility + evidence_quality + historical_reliability - adaptation_cost - domain_shift - measurement_mismatch, each term in [0, 1]; forecast weight = k x history x state_similarity x modifier (modifier = mean of the enabled non-state terms, assay and time always enabled, domain shift subtracted)",
+  "fit": "k by leave-one-unit-out predictive likelihood over the registered grid (0, 1, 2, 4, 8, 16) with same-unit analogues excluded and each neighbour's reliability recomputed without the pseudo-target; s and e as in the reference world"
+ },
+ "worlds": {
+  "class": "reference world without the structure kernel (no case memory)",
+  "similarity": "the current reference world (structure kernel, fit as registered in belief-planning-1)",
+  "similarity_unitout": "structure kernel with the unit-out fit (control for the fit change)",
+  "cm_full": "modifier terms mechanism, quality, reliability and domain shift, unit-out fit",
+  "cm_nofail": "cm_full with misleading (1) and undetected (3) readings not scored",
+  "cm_nomisleading": "cm_full with misleading (1) readings not scored",
+  "cm_nonegative": "cm_full with undetected (3) readings not scored",
+  "scalar": "the pooled reading distribution at the condition, identical under both hypotheses (magnitude-only prediction cannot say which hypothesis)"
+ },
+ "arms": {
+  "fixed": "primary comparator (expert order)",
+  "random_legal": "lower bound",
+  "coverage": "budgeted expected-coverage selector without virtual-cell priorities",
+  "scalar_vc": "same selector with the virtual cell's scalar predicted magnitude as priority",
+  "belief_class": "belief planner, no case memory",
+  "belief_similarity": "belief planner, similarity-only retrieval (the current research planner)",
+  "cm_similarity_unitout": "belief planner over similarity_unitout",
+  "cm_full": "belief planner over cm_full",
+  "cm_full_prior": "cm_full with the retrieved hypothesis prior as the initial planning belief (advisory, historical analogy; never enters EvidenceState)",
+  "cm_full_prior_anchored": "cm_full_prior that leaves the expert order only on a 1.645-standard-error advantage",
+  "cm_nofail": "belief planner over cm_nofail",
+  "prior_only": "class world with the retrieved prior",
+  "vc_incontext": "hypothesis-conditional virtual cell: block 7's strict in-context world with purchased prompts, transfer arm rrt_q",
+  "oracle": "upper bound; reads hidden outcomes; never a competitor"
+ },
+ "claims": {
+  "calibration": {
+   "metric": "forecast-level negative log-likelihood of the realised reading under the true hypothesis, and observed-to-forecast ratio of the wrong-elimination event",
+   "comparison": "cm_full against similarity and against class, paired over identical items, unit-cluster bootstrap",
+   "improves_if": "the pooled NLL difference has an upper 95% bound below 0 and no tier's lower bound is above 0",
+   "hurts_if": "the pooled NLL difference has a lower 95% bound above 0"
+  },
+  "hypothesis_discrimination": {
+   "metric": "mean log p(y | h_true) - log p(y | h_other)",
+   "comparison": "cm_full, similarity and vc-conditional forecasts against the scalar control, which is zero by construction"
+  },
+  "failure_and_negative_cases": {
+   "metric": "forecast NLL and wrong-elimination ratio",
+   "comparison": "cm_full against cm_nofail, cm_nomisleading, cm_nonegative",
+   "benefit_if": "removing the cases raises NLL with a lower 95% bound above 0"
+  },
+  "action_selection_and_terminal_decision": {
+   "metric": "paired correct, wrong, deferred, net utility, measurements, wells and days against fixed and against belief_similarity, per tier",
+   "safe": "in every tier the correct-difference lower bound >= -0.01 and the wrong-difference upper bound <= +0.005",
+   "signal": "in a tier that passes the oracle headroom gate (headroom >= 0.04 and its lower bound >= 0.02), correct difference >= 0.02 with lower bound > 0",
+   "verdicts": ["ADVANCES", "SIGNAL_BUT_UNSAFE", "NO_DEVELOPMENT_SIGNAL"]
+  },
+  "efficiency": {
+   "metric": "measurements, wells, assay days and net utility at price 0.02 per measurement",
+   "efficient_if": "fewer measurements with the correct-difference lower bound >= -0.01; fewer measurements with fewer correct decisions is a cost trade, not an improvement"
+  },
+  "abstention_quality": {
+   "metric": "precision and recall of not deciding against the licence that the oracle could not decide correctly either; wrong rate among decided",
+   "note": "delay is success when licensed (working standards, 2026-09-13)"
+  },
+  "robustness_to_unseen_contexts": {
+   "strata": "nearest training neighbour below the floor 0.40 (novel) against at or above it (familiar); scaffold-level results are reported only where at least 10 units exist",
+   "stress_test": "leave-one-condition-out memory: every reference reading at the condition to be forecast is removed, and the reading is forecast by adaptation from other conditions with a cost priced from the adaptation table (defined in stress.py, frozen in its own addendum before it runs)"
+  },
+  "resistance_to_misleading_similarity": {
+   "strata": "misled neighbour (nearest training neighbour at or above 0.40 with a class other than the truth) against aligned neighbour; the interaction (misled minus aligned) of each arm's correct difference to fixed and of each world's NLL difference to similarity",
+   "resists_if": "the interaction's 95% interval excludes a larger degradation than similarity's"
+  },
+  "closed_loop_update": {
+   "metric": "forecast NLL of successive held-out compounds as their revealed cases are appended to the memory (append-only, same-unit excluded), against a static memory",
+   "note": "defined in online_update.py, frozen in its own addendum before it runs"
+  }
+ },
+ "integrity_invalidates_conclusion": [
+  "an episode scored without a truth or with a truth outside its contrast",
+  "a policy that receives a held-out label, profile, QC field, detection flag or validator outcome (public_view_problems must be empty)",
+  "a snapshot containing a compound of its own held-out fold",
+  "a not-measured condition executed or scored as a reading",
+  "an arm whose case-memory variant differs from its parity control in anything but the switched extension"
+ ],
+ "what_this_cannot_show": [
+  "benefit on unseen studies or unseen classes: every task here has been analysed before",
+  "missing-premise repair benefit: the task is a transcriptomic mechanism-class proxy",
+  "biological accuracy of a mechanism class: labels are curated annotations, not ground truth",
+  "wet-lab value: no experiment is run; cost is priced in wells and days"
+ ]
+}

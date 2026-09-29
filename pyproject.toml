@@ -7,11 +7,6 @@ dependencies = []
 
 [project.scripts]
 maestro = "agent.cli:main"
-maestro-evaluate = "evaluation.cli:main"
-maestro-screen-cases = "evaluation.screening_cli:main"
-maestro-build-cases = "evaluation.build_cli:main"
-maestro-e0-dir = "evaluation.e0_dir:main"
-maestro-test-research = "maestro.research_tests:main"
 
 [project.optional-dependencies]
 test = ["pytest==9.1.1"]
@@ -27,5 +22,18 @@ pythonpath = ["src"]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.setuptools]
+packages = [
+    "agent", "maestro", "virtual_cell", "tools", "tools.case_memory",
+    "tools.data", "tools.evidence", "tools.prediction", "tools.evaluation", "tools.datasets",
+]
+
+[tool.setuptools.package-dir]
+agent = "src/agent"
+maestro = "src/maestro"
+virtual_cell = "src/virtual_cell"
+tools = "tools"
+
+[tool.setuptools.package-data]
+tools = ["registry.yaml", "*/*.json"]
+"tools.datasets" = ["sources.json", "candidates.json"]

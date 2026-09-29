@@ -146,7 +146,7 @@ def gate(tier_name) -> dict:
 def sources() -> dict:
     files = [HERE / "policies.py", HERE / "lincs_prepare.py", Path(__file__), HERE / "PROTOCOL.md", HERE / "protocol.json",
              Path(P.S.__file__), V.HERE / "evaluate.py", C.HERE / "common.py", C.HERE / "episodes.py",
-             P.ROOT / "src/maestro/acquisition.py", P.ROOT / "src/maestro/outcome.py", P.ROOT / "src/maestro/selection.py"]
+             P.ROOT / "src/maestro/acquisition.py", P.ROOT / "src/maestro/outcome.py", P.ROOT / "src/maestro/composition.py"]
     return {str(Path(f).resolve().relative_to(P.ROOT)).replace("\\", "/"): hashlib.sha256(Path(f).read_bytes()).hexdigest()
             for f in files}
 

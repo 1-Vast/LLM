@@ -6,6 +6,9 @@
 > [protocol external-validation-2](../protocol_v2/README.md). The two research-test failures noted
 > below were historical tests pointed at rewritten artefacts; they now test the original evidence
 > and pass.
+>
+> Current planner code lives in [`planner.py`](planner.py). Reproduce this registered replay only
+> from archive commit `83b9aa9`, as specified in [`../experiments/README.md`](../experiments/README.md).
 
 **Date:** 2026-09-27, 03:00 to 05:40 (+0800).
 
@@ -19,7 +22,7 @@ frozen at 04:35:20 in [freeze.json](freeze.json).
 
 ## Answer
 
-**No.** On an untouched public study (LINCS L1000 Phase II, GSE70138), a belief-space agent
+**No.** In the single-use LINCS L1000 Phase II (GSE70138) replay, a belief-space agent
 chose real measurements with a virtual-cell world model, under the frozen protocol. It did not
 reach more correct mechanism decisions than the fixed expert order. It was run once, behind a
 vault, with policies, thresholds and analysis frozen first.
@@ -68,7 +71,7 @@ The audit also found defects introduced after the 2026-09-27 registered run (DIA
 
 ## Method, and why this combination
 
-- **Planner** (`src/maestro/planning.py`). Exact finite-horizon expectimax over the runner's legal
+- **Planner** (`planner.py`). Exact finite-horizon expectimax over the runner's legal
   menu: belief-space planning in a POMDP (Kaelbling, Littman & Cassandra 1998) with at most two
   measurements.
   - The value is decision-theoretic: the expected value of sample information (Raiffa & Schlaifer
@@ -263,7 +266,7 @@ reading:
 | Evidence coherence (forecasts never become evidence; eliminations scored by the posterior mass removed) | **DEMONSTRATED** (engineering) | tests; 0 integrity problems in 307,392 registered records |
 | Deterministic replay across environments | **DEMONSTRATED** | identical decisions in Python 3.11.16 and 3.14.4; floating differences at most 3.1e-15 |
 | Calibrated wrong-decision forecasts | **REJECTED** for the world model (5x too low externally) | calibration audit |
-| External generalisation of any MAESTRO measurement policy | **NOT DEMONSTRATED**; no candidate passed on the one untouched study | this run |
+| External generalisation of any MAESTRO measurement policy | **NOT DEMONSTRATED**; no candidate passed on the one GSE70138 run, and the study is consumed | this run |
 
 ## Limitations and the next experiment
 
@@ -290,7 +293,7 @@ reading:
 
 | File | Role |
 |---|---|
-| `src/maestro/planning.py` | the agent's planner: expectimax, Bayes belief update, baseline anchor, risk cap |
+| `planner.py` | research planner: expectimax, Bayes belief update, baseline anchor, risk cap |
 | `src/maestro/acquisition.py` | `expected_terminal_decision_value` coherence fix (surgical) |
 | `world.py` | empirical-Bayes world model with virtual-cell kernel, feedback conditioning and controls |
 | `arms.py`, `replay.py`, `locked.py` | agent arm, sealed replay of ladder and agent, registered runs and vault |

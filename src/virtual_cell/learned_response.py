@@ -1,14 +1,55 @@
-"""Small dose-anchored response regressor; latent coordinates are not functional assays."""
+"""Dose-anchored transcript and population models with validation-only fitting."""
 from __future__ import annotations
 
 import copy
 import hashlib
-from dataclasses import dataclass
+import json
+from dataclasses import asdict, dataclass
 from pathlib import Path
-
 import numpy as np
 import torch
 from torch import nn
+from .interface import Interval
+from .biology import GeneSet, score_gene_set
+from scipy.optimize import linear_sum_assignment
+from scipy.spatial.distance import cdist
+
+
+def transcript_readouts(samples, genes, readouts, gene_sets=()):
+    """Project ensemble RNA shifts without converting model spread to confidence.
+
+    Each row is one model's gene-aligned response, not one independent cell.
+    Gene-set means retain their sign and use the existing strict membership rule.
+    The envelope includes the ensemble point estimate (important for nonlinear RMS).
+    """
+    samples = np.asarray(samples)
+    genes = tuple(str(gene) for gene in genes)
+    if (samples.ndim != 2 or samples.shape[0] == 0 or samples.shape[1] != len(genes)
+            or not genes or len(set(genes)) != len(genes) or not np.isfinite(samples).all()):
+        raise ValueError("invalid_transcript_ensemble")
+    sets = {"rna_set:" + item.identifier: item for item in gene_sets}
+    indices = {"rna_gene:" + gene: i for i, gene in enumerate(genes)}
+    point = samples.mean(axis=0)
+    values, intervals = {}, {}
+    for name in readouts:
+        if name == "transcript_shift_rms":
+            value = float(np.sqrt(np.mean(point ** 2)))
+            members = np.sqrt(np.mean(samples ** 2, axis=1))
+            basis = "Ensemble member RMS and RMS of mean response; descriptive envelope only."
+        elif name in indices:
+            members = samples[:, indices[name]]
+            value = float(point[indices[name]])
+            basis = "Ensemble member RNA shifts; no predictive coverage claim."
+        elif name in sets:
+            gene_set = sets[name]
+            members = np.array([score_gene_set(dict(zip(genes, row)), gene_set) for row in samples])
+            value = float(members.mean())
+            basis = f"Mean RNA shift; gene_set={gene_set.digest}; source={gene_set.source_sha256}; descriptive ensemble envelope."
+        else:
+            raise ValueError("readout_not_served:" + name)
+        values[name] = value
+        intervals[name] = Interval(float(min(members.min(), value)), float(max(members.max(), value)), basis=basis)
+    return values, intervals
 
 
 class DoseAnchoredNetwork(nn.Module):
@@ -93,15 +134,27 @@ class LearnedTranscriptWorldModel:
     exists, so the agent cannot silently promote this experiment into authority.
     """
 
-    def __init__(self, directory: Path, registrations: dict):
+    def __init__(self, directory: Path, registrations: dict, *, gene_sets: tuple[GeneSet, ...] = ()):
         self.directory = Path(directory)
         self.registrations = registrations
+        self.gene_sets = tuple(gene_sets)
+        if len({item.identifier for item in self.gene_sets}) != len(self.gene_sets):
+            raise ValueError("gene_set_identifiers_must_be_unique")
+        for item in self.gene_sets:
+            if (not item.identifier.strip() or not item.members or len(set(item.members)) != len(item.members)
+                    or not item.source.strip() or not item.rule.strip()
+                    or len(item.source_sha256) != 64
+                    or any(c not in "0123456789abcdefABCDEF" for c in item.source_sha256)):
+                raise ValueError("invalid_gene_set_registration")
         self.parameters = dict(np.load(self.directory / "model_parameters.npz", allow_pickle=False))
         self.models = []
         paths = sorted(self.directory.glob("multimodal_neural_*.pt"))
         if len(paths) != 3:
             raise ValueError("three_registered_seeds_required")
         digest = hashlib.sha256((self.directory / "model_parameters.npz").read_bytes())
+        digest.update(b"signed_transcript_readouts_v1")
+        digest.update(json.dumps([asdict(item) for item in sorted(self.gene_sets, key=lambda x: x.identifier)],
+                                 sort_keys=True).encode("utf-8"))
         for path in paths:
             digest.update(path.read_bytes())
             net = DoseAnchoredNetwork(len(self.parameters["multimodal_neural_feature_mean"]),
@@ -124,7 +177,17 @@ class LearnedTranscriptWorldModel:
             return QueryAssessment(QuerySupport.UNSUPPORTED, (), tuple(errors), self.capabilities())
         if request.model_version != self.model_version:
             errors.append("model_version_mismatch")
-        errors.extend("readout_not_served:" + name for name in request.readouts if name != "transcript_shift_rms")
+        genes = set(str(gene) for gene in self.parameters["genes"])
+        gene_readouts = {"rna_gene:" + gene for gene in genes}
+        sets = {"rna_set:" + item.identifier: item for item in self.gene_sets}
+        for name in request.readouts:
+            if name == "transcript_shift_rms" or name in gene_readouts:
+                continue
+            if name in sets:
+                if not set(sets[name].members).issubset(genes):
+                    errors.append("readout_missing_genes:" + name)
+            else:
+                errors.append("readout_not_served:" + name)
         record = self.registrations.get(request.context.dataset_id)
         if record is None:
             errors.append("baseline_unregistered")
@@ -166,11 +229,168 @@ class LearnedTranscriptWorldModel:
         dose = np.log1p(request.intervention.dose) / np.log1p(10000.)
         features = np.r_[fingerprint, latent, dose][None, :]
         features = (features - self.parameters["multimodal_neural_feature_mean"]) / self.parameters["multimodal_neural_feature_scale"]
-        shift = np.mean([model.predict(features, np.array([dose])) for model in self.models], axis=0) @ self.parameters["target_components"]
-        return StatePrediction(True, {"transcript_shift_rms": float(np.sqrt(np.mean(shift ** 2)))}, None,
+        samples = np.concatenate([model.predict(features, np.array([dose])) for model in self.models], axis=0) @ self.parameters["target_components"]
+        if not np.isfinite(samples).all():
+            return StatePrediction(False, None, None, ("A transcript ensemble member returned a nonfinite value.",),
+                                   request_id=request.request_id, model_version=self.model_version,
+                                   in_distribution=None, abstain_reason="nonfinite_transcript_prediction")
+        values, intervals = transcript_readouts(samples, self.parameters["genes"], request.readouts, self.gene_sets)
+        return StatePrediction(True, values, None,
                                ("RNA shift only; no functional assay or causal mechanism inferred.",
+                                "Gene-set scores are RNA proxies, not measured pathway or target activity.",
+                                "Ensemble envelopes describe model disagreement, not calibrated predictive intervals.",
                                 "This registration is executable; independent domain validation is absent."),
                                request_id=request.request_id, model_version=self.model_version,
-                               supported_variables=("transcript_shift_rms",), confidence=None, in_distribution=None,
+                               supported_variables=tuple(values), intervals=intervals, confidence=None, in_distribution=None,
                                uncertainty_components={"distribution": "Independent domain validation absent.",
+                                                       "ensemble": "Three fitted seeds; their spread excludes unmeasured assay noise and domain shift.",
                                                        "measurement": "Single-study pseudobulk and source replicate uncertainty."})
+
+
+
+
+def _population(value):
+    value = np.asarray(value, dtype=np.float32)
+    if value.ndim != 2 or min(value.shape) < 1 or not np.isfinite(value).all():
+        raise ValueError("invalid_cell_population")
+    return value
+
+
+def population_mmd(predicted, observed, bandwidth: float) -> float:
+    """Biased Gaussian MMD²; supports unequal set sizes and no cell pairing.
+
+    Bandwidth must be fixed from training data, not selected on test outcomes.
+    This descriptive distance is not an uncertainty or significance estimate.
+    """
+    x, y = _population(predicted), _population(observed)
+    if x.shape[1] != y.shape[1] or not np.isfinite(bandwidth) or bandwidth <= 0:
+        raise ValueError("invalid_distribution_coordinates_or_bandwidth")
+    kernel = lambda a, b: np.exp(-cdist(a, b, "sqeuclidean") / (2 * bandwidth ** 2))
+    return float(max(0., kernel(x, x).mean() + kernel(y, y).mean() - 2 * kernel(x, y).mean()))
+
+
+@dataclass(frozen=True)
+class PopulationPair:
+    """One matched experimental context, with independently sampled populations.
+
+    group is the outer split unit (e.g. chemical connectivity identity), not a
+    cell ID. condition contains only inference-available intervention/context
+    covariates. dose_gate is a dimensionless nonnegative dose transform.
+    """
+    control: np.ndarray
+    treated: np.ndarray
+    condition: np.ndarray
+    dose_gate: float
+    group: str
+
+    def validate(self):
+        x, y = _population(self.control), _population(self.treated)
+        c = np.asarray(self.condition)
+        if (x.shape[1] != y.shape[1] or c.ndim != 1 or not len(c)
+                or not np.isfinite(c).all() or not np.isfinite(self.dose_gate)
+                or self.dose_gate < 0 or not self.group.strip()):
+            raise ValueError("invalid_population_condition")
+
+
+class ConditionalPopulationFlow(nn.Module):
+    """Small control-set-conditioned vector field with a structural vehicle anchor.
+
+    Mean and standard deviation provide permutation-invariant population context.
+    This is a modest set encoder, not a reproduction of State/STACK attention.
+    """
+    def __init__(self, dimensions: int, condition_size: int):
+        super().__init__()
+        self.dimensions, self.condition_size = dimensions, condition_size
+        self.velocity = nn.Sequential(nn.Linear(3 * dimensions + condition_size + 1, 64),
+                                      nn.SiLU(), nn.Linear(64, 64), nn.SiLU(),
+                                      nn.Linear(64, dimensions))
+
+    def forward(self, cells, time, condition, context, dose_gate):
+        features = torch.cat((cells, time, condition.expand(len(cells), -1),
+                              context.expand(len(cells), -1)), dim=1)
+        return self.velocity(features) * dose_gate
+
+    def predict_population(self, control, condition, dose_gate: float, *, steps: int = 16):
+        control = _population(control)
+        condition = np.asarray(condition, dtype=np.float32)
+        if (control.shape[1] != self.dimensions or condition.shape != (self.condition_size,)
+                or not np.isfinite(condition).all() or not np.isfinite(dose_gate)
+                or dose_gate < 0 or not isinstance(steps, int) or steps < 1):
+            raise ValueError("invalid_population_query")
+        if dose_gate == 0:
+            return control.copy()
+        device = next(self.parameters()).device
+        x = torch.as_tensor(control, device=device)
+        context = torch.cat((x.mean(0), x.std(0, unbiased=False)))
+        c = torch.as_tensor(condition, device=device)
+        self.eval()
+        with torch.no_grad():
+            for i in range(steps):
+                # Midpoint integration in numerical flow time, not hours.
+                t = torch.full((len(x), 1), i / steps, device=device)
+                v = self(x, t, c, context, dose_gate)
+                x = x + self(x + v / (2 * steps), t + 0.5 / steps, c, context, dose_gate) / steps
+        result = x.cpu().numpy()
+        if not np.isfinite(result).all():
+            raise ValueError("nonfinite_population_prediction")
+        return result
+
+
+def fit_population_flow(training, validation, *, bandwidth: float, seed: int = 0,
+                        epochs: int = 80, batch_cells: int = 32):
+    """Equal-condition minibatch OT flow matching, selected by validation MMD.
+
+    No test population is accepted. Validate chemical/study split identities;
+    preprocessing, metadata provenance and pretraining overlap remain caller duties.
+    """
+    if not training or not validation or epochs < 1 or batch_cells < 2:
+        raise ValueError("invalid_population_training_config")
+    for pair in (*training, *validation):
+        pair.validate()
+    if {p.group for p in training} & {p.group for p in validation}:
+        raise ValueError("population_split_group_overlap")
+    d, c = training[0].control.shape[1], len(training[0].condition)
+    if any(p.control.shape[1] != d or len(p.condition) != c for p in (*training, *validation)):
+        raise ValueError("population_training_coordinates_mismatch")
+    if not np.isfinite(bandwidth) or bandwidth <= 0:
+        raise ValueError("invalid_population_bandwidth")
+    rng = np.random.default_rng(seed)
+    # Keep this experiment's seed from modifying the agent's torch RNG state.
+    with torch.random.fork_rng(devices=[]):
+        torch.manual_seed(seed)
+        model = ConditionalPopulationFlow(d, c)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    training_contexts = []
+    for pair in training:
+        control = torch.as_tensor(pair.control, dtype=torch.float32)
+        training_contexts.append((torch.cat((control.mean(0), control.std(0, unbiased=False))),
+                                  torch.as_tensor(pair.condition, dtype=torch.float32)))
+    best, state, history = float("inf"), None, []
+    for epoch in range(1, epochs + 1):
+        model.train()
+        losses = []
+        for index in rng.permutation(len(training)):
+            p = training[index]
+            x = p.control[rng.choice(len(p.control), batch_cells, replace=len(p.control) < batch_cells)]
+            y = p.treated[rng.choice(len(p.treated), batch_cells, replace=len(p.treated) < batch_cells)]
+            # Equal-mass minibatch OT; not inferred cell identity.
+            rows, cols = linear_sum_assignment(cdist(x, y, "sqeuclidean"))
+            x, y = torch.as_tensor(x[rows], dtype=torch.float32), torch.as_tensor(y[cols], dtype=torch.float32)
+            t = torch.as_tensor(rng.uniform(size=(batch_cells, 1)), dtype=torch.float32)
+            context, c_tensor = training_contexts[index]
+            prediction = model((1 - t) * x + t * y, t, c_tensor, context, p.dose_gate)
+            loss = (prediction - (y - x)).square().mean()
+            if not torch.isfinite(loss):
+                raise ValueError("nonfinite_population_training_loss")
+            optimizer.zero_grad(set_to_none=True)
+            loss.backward()
+            optimizer.step()
+            losses.append(float(loss.detach()))
+        score = float(np.mean([population_mmd(model.predict_population(p.control, p.condition, p.dose_gate),
+                                             p.treated, bandwidth) for p in validation]))
+        history.append({"epoch": epoch, "flow_loss": float(np.mean(losses)), "validation_mmd": score})
+        if score < best:
+            best, state = score, copy.deepcopy(model.state_dict())
+    model.load_state_dict(state)
+    model.eval()
+    return model, history

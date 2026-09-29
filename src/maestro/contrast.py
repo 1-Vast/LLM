@@ -1,16 +1,4 @@
-"""Deterministic control layer that constructs, checks, and repairs a decision-relevant mechanism contrast.
-
-File summary
-- Path: src/maestro/contrast.py
-- Purpose: Bounds LLM proposals by the registered action catalogue and explicit evidence fields.
-- Core points:
-  - `check_contrast` validates execution, premise, and decision separation without inferring biology.
-  - `repair_contrast` returns a catalog-bounded repair, or an explicit deferral when none exists.
-  - `observation_scope` limits an observation's update target when its interpretation premise failed.
-  - Supplier-chain search is pruned by the menu's topology (`maestro.topology`) without changing its result.
-- Interfaces: `MAESTROAgent`, `decide`, `construct_contrast`, `check_contrast`, `repair_contrast`, `next_executable_action`, `executable_chain`, `observation_scope`
-- Depends on: maestro.models, maestro.selection, maestro.topology, virtual_cell.interface (typing only)
-"""
+"""Deterministic control layer that constructs, checks, and repairs a decision-relevant mechanism contrast."""
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
@@ -31,12 +19,18 @@ from .models import (
     RepairKind,
     RepairProposal,
 )
-from .composition import PlanComposer, rank_plans
-from .selection import BudgetedEvidencePlan, BudgetedEvidenceSelector
-from .topology import ActionTopology
+from .composition import (
+    ActionTopology,
+    BudgetedEvidencePlan,
+    BudgetedEvidenceSelector,
+    PlanComposer,
+    rank_plans,
+)
 
 if TYPE_CHECKING:
     from virtual_cell.interface import StatePrediction
+
+    from .judgment import PredictionReliabilityLedger
 
 
 class MAESTROAgent:
@@ -167,8 +161,17 @@ class MAESTROAgent:
         contrast: MechanismContrast,
         profile: FunctionalInterventionProfile,
         prediction: "StatePrediction | None" = None,
+        reliability: "PredictionReliabilityLedger | None" = None,
     ) -> ContrastCheck:
-        """Check execution, premise, and decision separation without inferring biology."""
+        """Check execution, premise, and decision separation without inferring biology.
+
+        ``reliability`` is the scored record of how this model's intervals have
+        actually performed. Without it a coverage-claiming interval certifies
+        discrimination on the strength of its own claim; with it, a readout the
+        record has revoked certifies nothing, exactly as if the interval did not
+        exist. ``None`` keeps every caller that has no ledger on the behaviour it
+        had before this argument existed.
+        """
 
         actions = contrast.actions()
         reasons: list[NonDiscriminabilityReason] = []
@@ -209,7 +212,7 @@ class MAESTROAgent:
                 prediction is None or not prediction.applicable
             ):
                 reasons.append(NonDiscriminabilityReason.MODEL_UNSUPPORTED)
-            outcome_separated, outcome_reason = _outcome_separation(contrast, actions, prediction)
+            outcome_separated, outcome_reason = _outcome_separation(contrast, actions, prediction, reliability)
             if outcome_reason is not None:
                 reasons.append(outcome_reason)
 
@@ -654,6 +657,7 @@ def _outcome_separation(
     contrast: MechanismContrast,
     actions: tuple[EvidenceAction, ...],
     prediction: "StatePrediction | None",
+    reliability: "PredictionReliabilityLedger | None" = None,
 ) -> tuple[bool, NonDiscriminabilityReason | None]:
     """Check the declared observation-to-decision mapping, beyond label coverage.
 
@@ -663,9 +667,12 @@ def _outcome_separation(
     Labels from different actions are never pooled into a joint outcome: that
     would mistake two incomplete assays for one comparable observation. A
     future joint specification must model its shared observation coordinate
-    explicitly. A model-dependent action counts only with a
+    explicitly.     A model-dependent action counts only with a
     coverage-claiming interval for its readout: a descriptive spread cannot
-    certify discrimination (F03).
+    certify discrimination (F03). With a reliability ledger supplied, the
+    interval must also be one the ledger has not revoked: a readout whose
+    claimed coverage has already failed three consecutive times has no claim
+    left to certify with.
     """
 
     pair = {hypothesis.identifier for hypothesis in contrast.hypotheses}
@@ -676,7 +683,9 @@ def _outcome_separation(
         if len({candidate.expected_outcomes[identifier] for identifier in pair}) < 2:
             identical = True
             continue
-        if candidate.requires_virtual_prediction and not _calibrated_model_support(candidate, prediction):
+        if candidate.requires_virtual_prediction and not _calibrated_model_support(
+            candidate, prediction, reliability
+        ):
             uncalibrated = True
             continue
         return True, None
@@ -693,8 +702,19 @@ def _outcome_separation(
     return False, NonDiscriminabilityReason.OUTCOME_MAPPING_UNDECLARED
 
 
-def _calibrated_model_support(action: EvidenceAction, prediction: "StatePrediction | None") -> bool:
-    """A model-dependent separation needs a coverage-claiming interval for its readout."""
+def _calibrated_model_support(
+    action: EvidenceAction,
+    prediction: "StatePrediction | None",
+    reliability: "PredictionReliabilityLedger | None" = None,
+) -> bool:
+    """A model-dependent separation needs a coverage-claiming interval its record has not revoked.
+
+    The interval is the claim and the ledger is the record of that claim's
+    performance, so a band that claims coverage but has been revoked is treated
+    exactly like a band that claims nothing. The ledger is scoped by model
+    version and readout; the context is left unscoped here because a prediction
+    carries no context of its own, so a revocation in any context counts.
+    """
 
     if prediction is None or not prediction.applicable:
         return False
@@ -702,4 +722,9 @@ def _calibrated_model_support(action: EvidenceAction, prediction: "StatePredicti
     if not readout:
         return False
     band = prediction.interval_for(readout)
-    return band is not None and band.claims_coverage
+    if band is None or not band.claims_coverage:
+        return False
+    if reliability is None:
+        return True
+    summary = reliability.summarize(prediction.model_version or "", readout)
+    return not summary.revoked and summary.weight > 0.0

@@ -1,26 +1,34 @@
-"""Persistent working, episodic, and semantic memory with explicit epistemic status.
-
-File summary
-- Path: src/agent/memory.py
-- Purpose: Store and retrieve experience while keeping each entry's epistemic status.
-- Core points:
-  - `MemoryStore` retrieves experience without upgrading it to a real measurement result.
-  - Each entry keeps its `EpistemicStatus` so proposals are not mistaken for evidence.
-- Interfaces: `MemoryStore`, `remember`, `search`, `MemoryEntry`, `MemoryKind`, `EpistemicStatus`
-- Depends on: agent.storage
-"""
+"""Persistent case state, scoped memories, result reflection, and secret-safe run records."""
 from __future__ import annotations
 
-import re
+import sqlite3
+import hashlib
 import json
+import re
 import uuid
-from dataclasses import dataclass
+from collections.abc import Iterable, Iterator, Mapping
+from contextlib import contextmanager
+from dataclasses import asdict, dataclass, field, is_dataclass
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Iterable, Mapping
+from typing import Any, Sequence
 
-from .storage import connect
+from maestro.models import DecisionStatus, EvidenceAction, EvidenceKind
+
+
+@contextmanager
+def connect(path: Path, *, rows: bool = True) -> Iterator[sqlite3.Connection]:
+    """Yield a connection inside one transaction and close it afterwards."""
+
+    connection = sqlite3.connect(path)
+    if rows:
+        connection.row_factory = sqlite3.Row
+    try:
+        with connection:
+            yield connection
+    finally:
+        connection.close()
 
 
 class MemoryKind(str, Enum):
@@ -139,17 +147,15 @@ class MemoryStore:
         with self._connection() as connection:
             rows = connection.execute(sql, arguments).fetchall()
         query_terms = set(_terms(query))
-        ranked = sorted(
-            (
-                (_lexical_score(query_terms, row[2]), row)
-                for row in rows
-                if _scope_matches(_scope_from_json(row[7]), scope, row[4], row[6])
-                and _lexical_score(query_terms, row[2]) > 0
-            ),
-            key=lambda item: (item[0], item[1][6]),
-            reverse=True,
-        )[:limit]
-        return tuple(_row_to_entry(row) for _, row in ranked)
+        ranked = []
+        for row in rows:
+            if not _scope_matches(_scope_from_json(row[7]), scope, row[4], row[6]):
+                continue
+            score = _lexical_score(query_terms, row[2])
+            if score > 0:
+                ranked.append((score, row))
+        ranked.sort(key=lambda item: (item[0], item[1][6]), reverse=True)
+        return tuple(_row_to_entry(row) for _, row in ranked[:limit])
 
     def retract(self, identifier: str) -> tuple[str, ...]:
         """Mark a memory and its derived descendants inactive without deleting history."""
@@ -296,3 +302,546 @@ def _scope_matches(
     if requested.created_before and created_at > requested.created_before:
         return False
     return True
+
+
+def _refusal(code: str, message: str) -> ValueError:
+    """A refused import that carries a machine-readable reason beside its message.
+
+    The ledger has always raised ``ValueError`` and several callers match on the message text,
+    so the class and the wording stay exactly as they were; the code rides along as an
+    attribute, which is what the replay runner counts when it reports refusals by name instead
+    of as an unclassified ledger error.
+    """
+
+    error = ValueError(message)
+    error.code = code  # type: ignore[attr-defined]
+    return error
+
+
+class CaseState(str, Enum):
+    INTAKE = "intake"
+    NEEDS_REPAIR = "needs_repair"
+    AWAITING_RESULT = "awaiting_result"
+    RESULT_QC_FAILED = "result_qc_failed"
+    NEXT_ROUND = "next_round"
+    DEFERRED = "deferred"
+    COMPLETED = "completed"
+
+
+@dataclass(frozen=True)
+class CaseSnapshot:
+    """A point-in-time view of a case's state, plan version, and budget."""
+
+    case_id: str
+    state: CaseState
+    plan_version: int
+    budget: float | None
+    spent: float
+    remaining_budget: float | None
+    stop_reason: str | None
+
+
+@dataclass(frozen=True)
+class MeasurementResult:
+    """A real result linked to a planned action and its experimental conditions.
+
+    ``independent_units`` counts independent experimental units, not rows or
+    cells.  ``None`` means the count is unknown; it is never silently replaced
+    by a record count or a default, because duplicated rows would otherwise
+    masquerade as independent biological support (audit F08).
+    """
+
+    action_identifier: str
+    statement: str
+    source_id: str
+    context_identifier: str | None
+    time_hours: float | None
+    independent_units: int | None
+    quality_passed: bool
+    conditions: Mapping[str, str] = field(default_factory=dict)
+    metrics: Mapping[str, str] = field(default_factory=dict)
+    record_count: int = 1
+    biological_replicates: int | None = None
+    evidence_kind: EvidenceKind = EvidenceKind.REAL_MEASUREMENT
+    interpretation_fields: tuple[str, ...] = ()
+    limitations: tuple[str, ...] = ()
+    result_id: str | None = None
+
+
+@dataclass(frozen=True)
+class ResultImport:
+    """The outcome of importing one result: its snapshot and whether it was newly created."""
+
+    snapshot: CaseSnapshot
+    result_id: str
+    created: bool
+
+
+class CaseStore:
+    """SQLite-backed state transitions with plan-version and result idempotency checks."""
+
+    def __init__(self, path: Path):
+        self.path = path
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self._initialize()
+
+    def open_case(self, case_id: str, *, budget: float | None = None) -> CaseSnapshot:
+        if not case_id.strip():
+            raise ValueError("case_id is required.")
+        if budget is not None and budget < 0:
+            raise ValueError("Budget must be nonnegative.")
+        with self._connection() as connection:
+            connection.execute(
+                """INSERT OR IGNORE INTO cases(
+                    case_id, state, plan_version, budget, spent, stop_reason, updated_at
+                ) VALUES (?, ?, 0, ?, 0, NULL, ?)""",
+                (case_id, CaseState.INTAKE.value, budget, _now()),
+            )
+            row = connection.execute("SELECT * FROM cases WHERE case_id = ?", (case_id,)).fetchone()
+            if budget is not None and row["budget"] is not None and row["budget"] != budget:
+                raise ValueError("An existing case budget cannot be changed implicitly.")
+        return self._snapshot(row)
+
+    def snapshot(self, case_id: str) -> CaseSnapshot:
+        with self._connection() as connection:
+            return self._snapshot(self._case_row(connection, case_id))
+
+    def recorded_action_identifiers(self, case_id: str) -> tuple[str, ...]:
+        with self._connection() as connection:
+            rows = connection.execute(
+                "SELECT action_identifier FROM results WHERE case_id = ? ORDER BY created_at, action_identifier",
+                (case_id,),
+            ).fetchall()
+        return tuple(row["action_identifier"] for row in rows)
+
+    def record_plan(
+        self,
+        case_id: str,
+        actions: Sequence[EvidenceAction],
+        *,
+        ready_to_measure: bool,
+        context_identifier: str | None,
+        stop_reason: str | None = None,
+    ) -> CaseSnapshot:
+        """Version an action bundle once; an awaiting identical bundle is resumed instead of duplicated."""
+
+        with self._connection() as connection:
+            case = self._case_row(connection, case_id)
+            selected = tuple(actions)
+            if case["state"] == CaseState.AWAITING_RESULT.value:
+                existing = tuple(
+                    row["action_identifier"]
+                    for row in connection.execute(
+                        """SELECT action_identifier FROM planned_actions
+                        WHERE case_id = ? AND plan_version = ? AND status = 'planned'
+                        ORDER BY action_identifier""",
+                        (case_id, case["plan_version"]),
+                    ).fetchall()
+                )
+                if existing:
+                    return self._snapshot(case)
+            next_version = case["plan_version"] + 1
+            state = CaseState.AWAITING_RESULT if ready_to_measure and selected else CaseState.NEEDS_REPAIR
+            if (
+                selected
+                and case["budget"] is not None
+                and case["spent"] + sum(action.cost for action in selected) > case["budget"]
+            ):
+                state = CaseState.DEFERRED
+                stop_reason = "Planned action exceeds the remaining case budget."
+                selected = ()
+            if stop_reason:
+                state = CaseState.DEFERRED
+            connection.execute(
+                """UPDATE cases SET state = ?, plan_version = ?, stop_reason = ?, updated_at = ?
+                WHERE case_id = ?""",
+                (state.value, next_version, stop_reason, _now(), case_id),
+            )
+            for action in selected:
+                connection.execute(
+                    """INSERT INTO planned_actions(
+                        case_id, plan_version, action_identifier, cost, context_identifier, time_hours, status
+                        , expected_conditions_json
+                    ) VALUES (?, ?, ?, ?, ?, ?, 'planned', ?)""",
+                    (
+                        case_id,
+                        next_version,
+                        action.identifier,
+                        action.cost,
+                        context_identifier,
+                        action.time_hours,
+                        json.dumps(dict(action.expected_conditions), ensure_ascii=True, sort_keys=True),
+                    ),
+                )
+            updated = self._case_row(connection, case_id)
+        return self._snapshot(updated)
+
+    def record_decision(self, case_id: str, *, status: str) -> CaseSnapshot:
+        """Move a case to the terminal state its development decision implies.
+
+        Leaving a decided case in ``awaiting_result`` is what let the in-memory
+        trace and the persisted state disagree.  A decision that ends the loop
+        must also end the case's waiting state.
+        """
+
+        state = {
+            DecisionStatus.DECIDED.value: CaseState.COMPLETED,
+            DecisionStatus.DEFERRED.value: CaseState.DEFERRED,
+            DecisionStatus.CONTRADICTED.value: CaseState.NEEDS_REPAIR,
+        }.get(status, CaseState.NEXT_ROUND)
+        with self._connection() as connection:
+            connection.execute(
+                "UPDATE cases SET state = ?, stop_reason = ?, updated_at = ? WHERE case_id = ?",
+                (state.value, f"decision:{status}", _now(), case_id),
+            )
+            updated = self._case_row(connection, case_id)
+        return self._snapshot(updated)
+
+    def import_measurement(self, case_id: str, result: MeasurementResult) -> ResultImport:
+        """Record one result for the current plan after condition and replicate validation."""
+
+        if not result.source_id.strip() or not result.statement.strip():
+            raise ValueError("Measurement results require a source_id and statement.")
+        if not isinstance(result.quality_passed, bool):
+            raise ValueError("Measurement quality_passed must be a boolean.")
+        if result.independent_units is not None and (
+            not isinstance(result.independent_units, int) or isinstance(result.independent_units, bool)
+            or result.independent_units < 1
+        ):
+            raise ValueError("Independent experimental units must be positive integers when known.")
+        if not isinstance(result.record_count, int) or isinstance(result.record_count, bool) or result.record_count < 1:
+            raise ValueError("At least one source record is required as an integer count.")
+        if result.biological_replicates is not None and (
+            not isinstance(result.biological_replicates, int) or isinstance(result.biological_replicates, bool)
+            or result.biological_replicates < 1
+        ):
+            raise ValueError("Biological replicate count must be a positive integer when known.")
+        result_id = result.result_id or str(uuid.uuid4())
+        with self._connection() as connection:
+            case = self._case_row(connection, case_id)
+            existing = connection.execute(
+                "SELECT * FROM results WHERE result_id = ?", (result_id,)
+            ).fetchone()
+            if existing:
+                if not self._same_result(existing, result, case_id):
+                    raise ValueError("A result identifier already exists with different content.")
+                return ResultImport(self._snapshot(case), result_id, False)
+            if case["state"] != CaseState.AWAITING_RESULT.value:
+                raise ValueError("Case is not awaiting a planned measurement result.")
+            plan = connection.execute(
+                """SELECT * FROM planned_actions WHERE case_id = ? AND plan_version = ?
+                AND action_identifier = ? AND status = 'planned'""",
+                (case_id, case["plan_version"], result.action_identifier),
+            ).fetchone()
+            if plan is None:
+                raise ValueError("Result action is not part of the current planned case version.")
+            self._validate_conditions(plan, result)
+            budget = case["budget"]
+            spent = case["spent"] + plan["cost"]
+            if budget is not None and spent > budget:
+                raise ValueError("Importing this result would exceed the case budget.")
+            pending = connection.execute(
+                """SELECT COUNT(*) FROM planned_actions WHERE case_id = ? AND plan_version = ?
+                AND status = 'planned' AND action_identifier != ?""",
+                (case_id, case["plan_version"], result.action_identifier),
+            ).fetchone()[0]
+            next_state = (
+                CaseState.AWAITING_RESULT
+                if pending and result.quality_passed
+                else CaseState.NEXT_ROUND
+                if result.quality_passed
+                else CaseState.RESULT_QC_FAILED
+            )
+            connection.execute(
+                """INSERT INTO results(
+                    result_id, case_id, plan_version, action_identifier, statement, source_id,
+                    context_identifier, time_hours, independent_units, quality_passed, conditions_json,
+                    metrics_json, record_count, biological_replicates, evidence_kind, limitations, created_at
+                    , interpretation_fields_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    result_id,
+                    case_id,
+                    case["plan_version"],
+                    result.action_identifier,
+                    result.statement,
+                    result.source_id,
+                    result.context_identifier,
+                    result.time_hours,
+                    result.independent_units,
+                    int(result.quality_passed),
+                    json.dumps(dict(result.conditions), ensure_ascii=True, sort_keys=True),
+                    json.dumps(dict(result.metrics), ensure_ascii=True, sort_keys=True),
+                    result.record_count,
+                    result.biological_replicates,
+                    result.evidence_kind.value,
+                    json.dumps(result.limitations, ensure_ascii=True),
+                    _now(),
+                    json.dumps(result.interpretation_fields, ensure_ascii=True),
+                ),
+            )
+            connection.execute(
+                """UPDATE planned_actions SET status = 'result_recorded'
+                WHERE case_id = ? AND plan_version = ? AND action_identifier = ?""",
+                (case_id, case["plan_version"], result.action_identifier),
+            )
+            connection.execute(
+                """UPDATE cases SET state = ?, spent = ?, updated_at = ? WHERE case_id = ?""",
+                (next_state.value, spent, _now(), case_id),
+            )
+            updated = self._case_row(connection, case_id)
+        return ResultImport(self._snapshot(updated), result_id, True)
+
+    def _initialize(self) -> None:
+        with self._connection() as connection:
+            connection.execute(
+                """CREATE TABLE IF NOT EXISTS cases (
+                    case_id TEXT PRIMARY KEY, state TEXT NOT NULL, plan_version INTEGER NOT NULL,
+                    budget REAL, spent REAL NOT NULL, stop_reason TEXT, updated_at TEXT NOT NULL
+                )"""
+            )
+            connection.execute(
+                """CREATE TABLE IF NOT EXISTS planned_actions (
+                    case_id TEXT NOT NULL, plan_version INTEGER NOT NULL, action_identifier TEXT NOT NULL,
+                    cost REAL NOT NULL, context_identifier TEXT, time_hours REAL, status TEXT NOT NULL,
+                    expected_conditions_json TEXT NOT NULL DEFAULT '{}',
+                    PRIMARY KEY(case_id, plan_version, action_identifier)
+                )"""
+            )
+            connection.execute(
+                """CREATE TABLE IF NOT EXISTS results (
+                    result_id TEXT PRIMARY KEY, case_id TEXT NOT NULL, plan_version INTEGER NOT NULL,
+                    action_identifier TEXT NOT NULL, statement TEXT NOT NULL, source_id TEXT NOT NULL,
+                    context_identifier TEXT, time_hours REAL, independent_units INTEGER,
+                    quality_passed INTEGER NOT NULL, conditions_json TEXT NOT NULL DEFAULT '{}',
+                    metrics_json TEXT NOT NULL DEFAULT '{}', record_count INTEGER NOT NULL DEFAULT 1,
+                    biological_replicates INTEGER, evidence_kind TEXT NOT NULL DEFAULT 'real_measurement',
+                    limitations TEXT NOT NULL, created_at TEXT NOT NULL,
+                    interpretation_fields_json TEXT NOT NULL DEFAULT '[]'
+                )"""
+            )
+            plan_columns = {row["name"] for row in connection.execute("PRAGMA table_info(planned_actions)")}
+            if "expected_conditions_json" not in plan_columns:
+                connection.execute(
+                    "ALTER TABLE planned_actions ADD COLUMN expected_conditions_json TEXT NOT NULL DEFAULT '{}'"
+                )
+            columns = {row["name"] for row in connection.execute("PRAGMA table_info(results)")}
+            if "conditions_json" not in columns:
+                connection.execute(
+                    "ALTER TABLE results ADD COLUMN conditions_json TEXT NOT NULL DEFAULT '{}'"
+                )
+            for name, definition in (
+                ("metrics_json", "TEXT NOT NULL DEFAULT '{}" + "'"),
+                ("record_count", "INTEGER NOT NULL DEFAULT 1"),
+                ("biological_replicates", "INTEGER"),
+                ("evidence_kind", "TEXT NOT NULL DEFAULT 'real_measurement'"),
+                ("interpretation_fields_json", "TEXT NOT NULL DEFAULT '[]'"),
+            ):
+                if name not in columns:
+                    connection.execute(f"ALTER TABLE results ADD COLUMN {name} {definition}")
+
+    @staticmethod
+    def _validate_conditions(plan: sqlite3.Row, result: MeasurementResult) -> None:
+        """Refuse a result that does not match the action that was planned, by name.
+
+        The message text is unchanged; each refusal now also carries a machine-readable
+        ``code``, so a caller that counts refusals records *which* condition disagreed instead
+        of reporting an unclassified ledger error. A mismatch here is usually a record whose
+        release spells a condition differently from the plan, which is a real disagreement and
+        not something to resolve silently.
+        """
+
+        if plan["context_identifier"] and result.context_identifier != plan["context_identifier"]:
+            raise _refusal("result_context_mismatch", "Result context does not match the planned context.")
+        if plan["time_hours"] is not None and result.time_hours != plan["time_hours"]:
+            raise _refusal("result_time_mismatch", "Result time point does not match the planned action.")
+        expected = json.loads(plan["expected_conditions_json"])
+        for name, value in expected.items():
+            if result.conditions.get(name) != value:
+                raise _refusal(
+                    f"result_condition_mismatch:{name}",
+                    f"Result condition '{name}' does not match the planned action.",
+                )
+
+    @staticmethod
+    def _same_result(row: sqlite3.Row, result: MeasurementResult, case_id: str) -> bool:
+        return (
+            row["case_id"] == case_id
+            and row["action_identifier"] == result.action_identifier
+            and row["statement"] == result.statement
+            and row["source_id"] == result.source_id
+            and row["context_identifier"] == result.context_identifier
+            and row["time_hours"] == result.time_hours
+            and row["independent_units"] == result.independent_units
+            and bool(row["quality_passed"]) is result.quality_passed
+            and row["conditions_json"] == json.dumps(dict(result.conditions), ensure_ascii=True, sort_keys=True)
+            and row["metrics_json"] == json.dumps(dict(result.metrics), ensure_ascii=True, sort_keys=True)
+            and row["record_count"] == result.record_count
+            and row["biological_replicates"] == result.biological_replicates
+            and row["evidence_kind"] == result.evidence_kind.value
+            and row["limitations"] == json.dumps(result.limitations, ensure_ascii=True)
+            and row["interpretation_fields_json"] == json.dumps(result.interpretation_fields, ensure_ascii=True)
+        )
+
+    def _case_row(self, connection: sqlite3.Connection, case_id: str) -> sqlite3.Row:
+        row = connection.execute("SELECT * FROM cases WHERE case_id = ?", (case_id,)).fetchone()
+        if row is None:
+            raise ValueError(f"Unknown case: {case_id}")
+        return row
+
+    @staticmethod
+    def _snapshot(row: sqlite3.Row) -> CaseSnapshot:
+        budget = row["budget"]
+        spent = row["spent"]
+        return CaseSnapshot(
+            case_id=row["case_id"],
+            state=CaseState(row["state"]),
+            plan_version=row["plan_version"],
+            budget=budget,
+            spent=spent,
+            remaining_budget=None if budget is None else budget - spent,
+            stop_reason=row["stop_reason"],
+        )
+
+    def _connection(self):
+        return connect(self.path)
+
+
+def _now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+@dataclass(frozen=True)
+class ReflectionRecord:
+    """A post-observation reflection pairing an outcome class with a bounded next step."""
+
+    case_id: str
+    action_identifier: str
+    result_id: str
+    outcome_class: str
+    next_step: str
+    limitations: tuple[str, ...]
+
+    def render(self) -> str:
+        return (
+            f"Post-observation reflection for action '{self.action_identifier}': "
+            f"outcome_class={self.outcome_class}; next_step={self.next_step}; "
+            f"limitations={'; '.join(self.limitations) or 'none'}."
+        )
+
+
+def reflect_on_result(case_id: str, result_id: str, result: MeasurementResult) -> ReflectionRecord:
+    """Classify execution state without promoting a result to a mechanism verdict."""
+
+    if not result.quality_passed:
+        outcome_class = "record_quality_failed"
+        next_step = "Do not use this record to update the mechanism contrast; obtain a qualified replacement result."
+    elif result.evidence_kind.value != "real_measurement":
+        outcome_class = "non_measurement_record_received"
+        next_step = "Retain source limitations; use only the record's declared interpretation fields."
+    elif not result.interpretation_fields:
+        outcome_class = "measurement_without_interpretation_premise"
+        next_step = "Keep the result as evidence, but do not unlock a prerequisite or mechanism update."
+    else:
+        outcome_class = "qualified_result_received"
+        next_step = "Replan using only the explicit interpretation fields and remaining registered actions."
+    return ReflectionRecord(
+        case_id=case_id,
+        action_identifier=result.action_identifier,
+        result_id=result_id,
+        outcome_class=outcome_class,
+        next_step=next_step,
+        limitations=result.limitations,
+    )
+
+
+_SECRET_PATTERN = re.compile(
+    r"(?i)(api[_-]?key|authorization|bearer)\s*([:=])\s*[^\s,;]+"
+)
+_SECRET_FIELD = re.compile(r"(?i)(^|[_-])(api[_-]?key|authorization|token|secret|password)([_-]|$)")
+
+
+def _safe(value: Any) -> Any:
+    """Recursively redact credential-looking text before it reaches a log file."""
+
+    if is_dataclass(value):
+        value = asdict(value)
+    if isinstance(value, Mapping):
+        return {
+            str(key): "[REDACTED]" if _SECRET_FIELD.search(str(key)) else _safe(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, (list, tuple)):
+        return [_safe(item) for item in value]
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, str):
+        return _SECRET_PATTERN.sub(r"\1\2[REDACTED]", value)
+    return value
+
+
+class RunLogger:
+    """Maintains the requested dated experiment log directory and JSONL event stream."""
+
+    def __init__(self, root: Path):
+        self.root = root
+        self.root.mkdir(parents=True, exist_ok=True)
+        self.events_path = root / "events.jsonl"
+        self.experiments_path = root / "experiments.jsonl"
+
+    def event(self, kind: str, payload: Mapping[str, Any], *, session_id: str) -> None:
+        self._append(self.events_path, kind, payload, session_id)
+
+    def experiment(self, kind: str, payload: Mapping[str, Any], *, session_id: str) -> None:
+        self._append(self.experiments_path, kind, payload, session_id)
+
+    def explain_failure(self, session_id: str) -> Mapping[str, Any] | None:
+        """Return the first recorded tool failure for a session without inferring biology."""
+
+        if not self.events_path.is_file():
+            return None
+        for line in self.events_path.read_text(encoding="utf-8").splitlines():
+            try:
+                event = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if event.get("session_id") != session_id or event.get("kind") != "dataset_tool_failed":
+                continue
+            payload = event.get("payload")
+            if not isinstance(payload, Mapping):
+                continue
+            trace = payload.get("failure_trace")
+            if isinstance(trace, Mapping):
+                return {
+                    "first_invalid_transition": trace.get("first_invalid_transition"),
+                    "violated_contracts": trace.get("violated_contracts", ()),
+                    "affected_claims": trace.get("affected_claims", ()),
+                    "candidate_causes": trace.get("candidate_causes", ()),
+                    "recovery_actions": trace.get("recovery_actions", ()),
+                }
+            return {
+                "first_invalid_transition": "unknown",
+                "violated_contracts": (),
+                "affected_claims": (),
+                "candidate_causes": (str(payload.get("error", "unknown tool failure")),),
+                "recovery_actions": (),
+            }
+        return None
+
+    @staticmethod
+    def content_digest(text: str) -> str:
+        """Link reproducibility records without duplicating full prompts unnecessarily."""
+
+        return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+    def _append(
+        self, path: Path, kind: str, payload: Mapping[str, Any], session_id: str
+    ) -> None:
+        record = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "session_id": session_id,
+            "kind": kind,
+            "payload": _safe(dict(payload)),
+        }
+        with path.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")

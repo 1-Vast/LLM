@@ -5,9 +5,9 @@ File summary
 - Purpose: the registered reproducibility check for the language-model planner. The first 30
   first-step states of the deepseek_cards arm (in episode order) are re-sent unchanged three more
   times; agreement is the collision probability of the four answers per state
-  (`maestro.stability.RepeatedJudgment`), the same estimator the Jev gate uses.
+  (`maestro.judgment.RepeatedJudgment`), the same estimator the Jev gate uses.
 - Run: python research/dynamic_world_model/repeatability.py
-- Depends on: common.py, episodes.py, agent_arms.py, maestro.stability
+- Depends on: common.py, episodes.py, agent_arms.py, maestro.judgment
 """
 from __future__ import annotations
 
@@ -35,7 +35,7 @@ def main() -> None:
     contexts = list(E.contexts(data, protocol, detected, magnitude))
     jobs = [(ctx, fold, ep) for ctx, fold in contexts for ep in AA.selected_episodes(ctx, fold)]
     from maestro.judgment import JudgmentScope
-    from maestro.stability import RepeatedJudgment
+    from maestro.judgment import RepeatedJudgment
     records = []
     for ctx, fold, (compound, truth, decoy, h1, h2) in jobs:
         label = f"deepseek_cards:{ctx.tier.name}:{compound}:1"

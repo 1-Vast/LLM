@@ -9,14 +9,11 @@ import uuid
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Mapping, Protocol, Sequence
-
+from typing import Any, Mapping, Sequence
 from maestro.models import EvidenceKind
-from maestro.tool_contracts import (
-    TOOL_SCHEMA_VERSION, check_schema, json_dumps, json_loads, json_value,
-    nonnegative_number, object_fields, string_list, validate_schema,
-)
+from maestro.handoff import TOOL_SCHEMA_VERSION, check_schema, json_dumps, json_loads, json_value, nonnegative_number, object_fields, string_list, validate_schema
 from .context import ContextPacket
+from .llm import JsonCompleter
 
 
 _TOOL_ID = re.compile(r"^[a-z][a-z0-9_]{1,63}$")
@@ -86,12 +83,6 @@ class ToolBudget:
     def snapshot(self) -> dict[str, float]:
         with self._lock:
             return {"limit": self.limit, "spent": self.spent, "remaining": self.limit - self.spent}
-
-
-class JsonCompleter(Protocol):
-    def complete_json(self, messages: list[dict[str, Any]], **kwargs: Any) -> tuple[dict[str, Any], Any]: ...
-
-
 @dataclass(frozen=True)
 class ToolDescriptor:
     identifier: str
@@ -112,6 +103,8 @@ class ToolDescriptor:
     parameter_schema: Mapping[str, Any] | None = None
     schema_version: str = TOOL_SCHEMA_VERSION
     source_files: tuple[Path, ...] = ()
+    manifest_path: Path | None = None
+    function: str = "run"
 
 
 @dataclass(frozen=True)
@@ -157,7 +150,8 @@ class LocalToolCatalog:
     def discover(self) -> tuple[ToolDescriptor, ...]:
         if not self.root.is_dir():
             raise ToolRuntimeError(f"Tool root does not exist: {self.root}")
-        descriptors = tuple(self._descriptor(path) for path in sorted(self.root.glob("*/manifest.json")))
+        paths = sorted(set(self.root.glob("*/manifest.json")) | set(self.root.glob("*/*.manifest.json")))
+        descriptors = tuple(self._descriptor(path) for path in paths)
         identifiers = [descriptor.identifier for descriptor in descriptors]
         if len(identifiers) != len(set(identifiers)):
             raise ToolRuntimeError("Tool manifests contain duplicate identifiers.")
@@ -178,6 +172,9 @@ class LocalToolCatalog:
             entrypoint = (directory / _required_string(data, "entrypoint")).resolve()
             if entrypoint.parent != directory or entrypoint.suffix != ".py" or not entrypoint.is_file():
                 raise ValueError(f"Tool entrypoint must be a local Python file in {directory.name}.")
+            function = data.get("function", "run")
+            if not isinstance(function, str) or not function.isidentifier() or function.startswith("_"):
+                raise ValueError("Tool function must be a public Python identifier.")
             required = _strings(data.get("required_parameters", []))
             optional = _strings(data.get("optional_parameters", []))
             if len(set(required + optional)) != len(required + optional):
@@ -206,6 +203,7 @@ class LocalToolCatalog:
                 manifest_sha256=hashlib.sha256(manifest_bytes).hexdigest(),
                 tool_version_sha256=_version_hash(manifest_bytes, entrypoint.read_bytes(), source_files),
                 parameter_schema=schema, schema_version=version, source_files=source_files,
+                manifest_path=manifest_path, function=function,
             )
         except (ValueError, OSError, RecursionError) as error:
             raise ToolRuntimeError(f"Invalid tool manifest {manifest_path}: {error}") from error
@@ -440,7 +438,7 @@ Return {"tool_id": string or null, "dataset_id": string or null, "arguments": ob
         if descriptor.entrypoint.resolve() != descriptor.entrypoint:
             raise ToolRuntimeError("Tool entrypoint changed after discovery.")
         source = descriptor.entrypoint.read_bytes()
-        manifest = descriptor.directory / "manifest.json"
+        manifest = descriptor.manifest_path or descriptor.directory / "manifest.json"
         if manifest.resolve().parent != descriptor.directory:
             raise ToolRuntimeError("Tool manifest changed after discovery.")
         if _version_hash(manifest.read_bytes(), source, descriptor.source_files) != descriptor.tool_version_sha256:
@@ -449,9 +447,9 @@ Return {"tool_id": string or null, "dataset_id": string or null, "arguments": ob
         module = types.ModuleType(f"maestro_tool_{descriptor.identifier}")
         module.__file__ = str(descriptor.entrypoint)
         exec(compile(source, str(descriptor.entrypoint), "exec"), module.__dict__)
-        run = getattr(module, "run", None)
+        run = getattr(module, descriptor.function, None)
         if not callable(run):
-            raise ToolRuntimeError(f"Tool {descriptor.identifier} does not expose run(parameters).")
+            raise ToolRuntimeError(f"Tool {descriptor.identifier} does not expose {descriptor.function}(parameters).")
         return run(json_value(arguments))
 
 

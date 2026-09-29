@@ -1,31 +1,10 @@
-"""Applicability domain, support level and extrapolation rejection.
-
-File summary
-- Path: src/virtual_cell/applicability.py
-- Purpose: decide, before inference, whether a query lies inside the domain the
-  model was fitted on, and say separately what is known about how well it does
-  there.
-- Core points:
-  - Support is registered as *joint* condition slices; a domain derived from a
-    table never becomes the cross product of its marginal ranges.
-  - Four different facts are kept apart: can the model represent the query, was
-    the exact slice observed, was performance evaluated on it against a declared
-    acceptance criterion, and is its uncertainty calibrated.
-  - A table of observed or training rows yields observed support, never
-    validation: validation needs an identifiable receipt with an endpoint, a
-    split, an acceptance criterion and a verified holdout.
-- Interfaces: `SupportRecord`, `SupportRegistry`, `ApplicabilityVerdict`,
-  `SupportLevel`, `SupportRegistry.from_table`.
-- Depends on: virtual_cell/receipts.py
-"""
+"""Query applicability, registered support and validation receipts."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from math import isfinite
+from math import isfinite, isclose
 from typing import Iterable, Mapping, Sequence
-
-from .receipts import ValidationReceipt
 
 
 class SupportLevel(str, Enum):
@@ -380,3 +359,164 @@ class SupportRegistry:
                 )
             )
         return registry
+
+
+
+
+@dataclass(frozen=True)
+class ValidationReceipt:
+    """One evaluation, identified well enough to be checked by someone else.
+
+    ``passed`` is the verdict against ``acceptance_criterion``; ``None`` means
+    the criterion was never evaluated, which is a different state from failing
+    it. ``holdout_verified`` records whether the evaluated data were *verified*
+    to be outside the model's training, not merely held out by the evaluator: a
+    checkpoint whose training split cannot be inspected cannot support that
+    claim, however the evaluator split the data. ``holdout_basis`` states what
+    that verification actually covered -- which holdout boundary was checked,
+    and which were not -- so an unknown exposure stays unknown instead of
+    being absorbed into a bare ``True``.
+
+    ``calibration_sha256`` and ``nominal_level`` bind a *coverage* receipt to
+    the exact calibration artifact and level it evaluated; see
+    :meth:`qualifies_coverage`.
+    """
+
+    receipt_id: str
+    endpoint: str
+    split: str
+    acceptance_criterion: str
+    metric: str = ""
+    value: float | None = None
+    threshold: float | None = None
+    passed: bool | None = None
+    holdout_verified: bool = False
+    holdout_basis: str = ""
+    context_identifier: str | None = None
+    model_version: str | None = None
+    independent_units: int | None = None
+    artifact_sha256: str | None = None
+    calibration_sha256: str | None = None
+    nominal_level: float | None = None
+    caveats: tuple[str, ...] = ()
+
+    def problems(
+        self,
+        *,
+        endpoint: str | None = None,
+        endpoints: tuple[str, ...] | None = None,
+        context_identifier: str | None = None,
+        model_version: str | None = None,
+    ) -> tuple[str, ...]:
+        """Every reason this receipt cannot be cited for the requested use."""
+
+        issues: list[str] = []
+        if not self.receipt_id.strip():
+            issues.append("receipt_id_missing")
+        if not self.endpoint.strip():
+            issues.append("endpoint_missing")
+        if not self.split.strip():
+            issues.append("split_missing")
+        if not self.acceptance_criterion.strip():
+            issues.append("acceptance_criterion_missing")
+        if self.passed is None:
+            issues.append("acceptance_not_evaluated")
+        if self.value is not None and not isfinite(float(self.value)):
+            issues.append("metric_value_not_finite")
+        wanted = tuple(item for item in (endpoints or ()) if item) or ((endpoint,) if endpoint else ())
+        if wanted and self.endpoint not in wanted:
+            issues.append("receipt_endpoint_mismatch")
+        if (
+            context_identifier is not None
+            and self.context_identifier is not None
+            and self.context_identifier != context_identifier
+        ):
+            issues.append("receipt_context_mismatch")
+        if (
+            model_version is not None
+            and self.model_version is not None
+            and self.model_version != model_version
+        ):
+            issues.append("receipt_model_version_mismatch")
+        return tuple(dict.fromkeys(issues))
+
+    @property
+    def identifiable(self) -> bool:
+        """Whether the receipt names everything needed to check it."""
+
+        return not self.problems()
+
+    @property
+    def accepted(self) -> bool:
+        """Identifiable and meeting its own acceptance criterion."""
+
+        return self.identifiable and self.passed is True
+
+    def validates(
+        self,
+        *,
+        endpoint: str | None = None,
+        endpoints: tuple[str, ...] | None = None,
+        context_identifier: str | None = None,
+        model_version: str | None = None,
+    ) -> bool:
+        """Accepted, matched to this use, and on a verified holdout."""
+
+        matched = not self.problems(
+            endpoint=endpoint,
+            endpoints=endpoints,
+            context_identifier=context_identifier,
+            model_version=model_version,
+        )
+        return matched and self.passed is True and self.holdout_verified
+
+    def qualifies_coverage(
+        self,
+        *,
+        calibration_sha256: str,
+        nominal_level: float,
+        endpoint: str,
+        model_version: str,
+        context_identifier: str | None = None,
+    ) -> tuple[str, ...]:
+        """Reasons this receipt may not qualify an interval as CALIBRATED; empty means it may.
+
+        A coverage claim travels with the calibration it was measured on.
+        Matching the readout and model name is not enough: the receipt must be
+        an *interval-coverage* evaluation that passed on a verified holdout, at
+        the same nominal level, for this checkpoint and context, over the
+        calibration artifact identified by its content digest. A receipt for
+        another context, another calibration, another level, or a metric that
+        is not coverage cannot upgrade the interval, and neither can one whose
+        bindings are merely unstated. Anything missing or mismatched fails
+        closed: the interval stays descriptive.
+        """
+
+        issues = list(
+            self.problems(
+                endpoint=endpoint,
+                context_identifier=context_identifier,
+                model_version=model_version,
+            )
+        )
+        if self.metric.strip().lower() != "interval_coverage":
+            issues.append("receipt_metric_not_interval_coverage")
+        if self.passed is not True:
+            issues.append("receipt_acceptance_not_passed")
+        if not self.holdout_verified:
+            issues.append("receipt_holdout_unverified")
+        if self.holdout_verified and not self.holdout_basis.strip():
+            issues.append("receipt_holdout_basis_missing")
+        if self.nominal_level is None:
+            issues.append("receipt_nominal_level_missing")
+        elif not isclose(self.nominal_level, nominal_level, rel_tol=0.0, abs_tol=1e-9):
+            issues.append("receipt_nominal_level_mismatch")
+        if self.calibration_sha256 is None:
+            issues.append("receipt_calibration_digest_missing")
+        elif self.calibration_sha256 != calibration_sha256:
+            issues.append("receipt_calibration_digest_mismatch")
+        if self.model_version is None:
+            issues.append("receipt_model_version_missing")
+        if self.context_identifier is None and context_identifier is not None:
+            issues.append("receipt_context_missing")
+        return tuple(dict.fromkeys(issues))

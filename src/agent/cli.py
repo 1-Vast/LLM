@@ -1,19 +1,4 @@
-"""Argparse entry point for a bounded MAESTRO turn or real-result feedback loop.
-
-File summary
-- Path: src/agent/cli.py
-- Purpose: Parse inputs and run one auditable MAESTRO interaction from the command line.
-- Core points:
-  - Builds the action catalogue and intervention profile from JSON inputs, including each action's typed quantity.
-  - `--planner-template` answers every structured agent call from a reviewed template, so the loop runs without a language model and without paid calls.
-  - `--decision-critic` adds one typed, calibrated second opinion per plan when a TypeSafe block is configured; its findings are advice and never evidence.
-  - `--virtual-cell` selects the State checkpoint, the computed development-mean backend, both behind one composite, or the SciPlex3 response rung (`sciplex_response`, which needs `--structures`); predictions stay planning-only.
-  - `main` runs one turn or a multi-round loop over sourced real measurement results and can write the full record as JSON.
-  - `--hypotheses` registers the two explanations' definitions for every round, so a reworded model answer cannot end a loop.
-  - A configuration, provider or planner-contract failure exits with status 2 and a one-line reason instead of a traceback.
-- Interfaces: `main`
-- Depends on: maestro.models, maestro.outcome, virtual_cell, agent.cases, agent.orchestrator, agent.template_client
-"""
+"""Command-line configuration and execution of the MAESTRO case workflow."""
 from __future__ import annotations
 
 import argparse
@@ -23,33 +8,15 @@ import json
 import sys
 from pathlib import Path
 from typing import Any
-
-from maestro.models import (
-    BiologicalQuantity,
-    DevelopmentAction,
-    EvidenceAction,
-    EvidenceActionKind,
-    EvidenceKind,
-    EvidenceScope,
-    FunctionalInterventionProfile,
-    MechanismHypothesis,
-    MeasurementStatus,
-    PremiseRequirement,
-)
+from maestro.models import BiologicalQuantity, DevelopmentAction, EvidenceAction, EvidenceActionKind, EvidenceKind, EvidenceScope, FunctionalInterventionProfile, MeasurementStatus, MechanismHypothesis, PremiseRequirement
 from maestro.outcome import InterpretationTable, OutcomeRule
-from virtual_cell import (
-    Intervention,
-    PredictionRequest,
-    SystemContext,
-    VirtualCellQueryTemplate,
-    build_backend,
-)
-from .cases import MeasurementResult
-from .configuration import ConfigurationError
-from .llm import LLMError
+from virtual_cell.interface import Intervention, SystemContext, VirtualCellQueryTemplate
+from virtual_cell import PredictionRequest
+from virtual_cell.world_model import build_backend
+from .memory import MeasurementResult
+from .llm import ConfigurationError, LLMError, TemplateCompleter, TemplateCompleterError
 from .orchestrator import MAESTROOrchestrator
 from .planner import PlannerContractError
-from .template_client import TemplateCompleter, TemplateCompleterError
 
 
 def main() -> int:

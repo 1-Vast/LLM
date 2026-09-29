@@ -30,25 +30,19 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
-from agent.audit import RunLogger  # noqa: E402
+from agent.memory import RunLogger  # noqa: E402
 from agent.context import ContextBuilder, TaskInterpreter  # noqa: E402
 from agent.knowledge import EvidenceLedger  # noqa: E402
 from agent.memory import MemoryStore  # noqa: E402
 from agent.orchestrator import MAESTROOrchestrator  # noqa: E402
 from agent.planner import MechanismContrastPlanner  # noqa: E402
-from agent.template_client import TemplateCompleter  # noqa: E402
-from agent.vision import VisualInspector  # noqa: E402
+from agent.llm import TemplateCompleter  # noqa: E402
+from agent.llm import VisualInspector  # noqa: E402
 from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent  # noqa: E402
 from maestro.acquisition import select_expected_coverage  # noqa: E402
-from maestro.selection import BudgetedEvidenceSelector  # noqa: E402
-from virtual_cell import (  # noqa: E402
-    ModelCapabilities,
-    QueryAssessment,
-    QuerySupport,
-    StatePrediction,
-    SystemContext,
-    VirtualCellQueryTemplate,
-)
+from maestro.composition import BudgetedEvidenceSelector  # noqa: E402
+from virtual_cell.interface import ModelCapabilities, QueryAssessment, QuerySupport, SystemContext, VirtualCellQueryTemplate
+from virtual_cell import StatePrediction
 
 OUT = ROOT / "outputs" / "acquisition_link_20260926"
 LOW, HIGH = "[('drugA', 0.5, 'uM')]", "[('drugA', 5.0, 'uM')]"

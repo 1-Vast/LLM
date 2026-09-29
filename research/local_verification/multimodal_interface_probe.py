@@ -16,9 +16,9 @@ import time
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
-from agent.configuration import MAESTROSettings
+from agent.llm import MAESTROSettings
 from agent.llm import DeepSeekChatClient, LLMError
-from agent.typesafe import TypeSafeJevClient, TypeSafeSettings, choice, noul
+from agent.decision_critic import TypeSafeJevClient, TypeSafeSettings, choice, noul
 from maestro.tool_analysis import multimodal_alignment
 
 

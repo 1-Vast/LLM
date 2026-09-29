@@ -17,13 +17,13 @@ import time
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
-from agent.configuration import MAESTROSettings
+from agent.llm import MAESTROSettings
 from agent.context import ContextBuilder, TaskIntent
 from agent.knowledge import EvidenceLedger
 from agent.llm import DeepSeekChatClient, LLMError
 from agent.memory import MemoryStore
 from agent.planner import MechanismContrastPlanner
-from agent.typesafe import TypeSafeJevClient, TypeSafeSettings, choice
+from agent.decision_critic import TypeSafeJevClient, TypeSafeSettings, choice
 from maestro.models import EvidenceAction
 
 
