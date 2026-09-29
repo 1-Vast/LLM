@@ -67,13 +67,17 @@ def test_adapters_are_registered_typed_and_source_versioned():
     descriptors = LocalToolCatalog(TOOLS).discover()
     assert {item.identifier for item in descriptors} == {
         "data_profile", "column_summary", "table_filter", "evidence_bundle_optimize", "multimodal_alignment", "typed_decision_review", "virtual_cell_query",
-        "signature_retrieval",
+        "signature_retrieval", "case_memory",
     }
     for item in descriptors:
         assert item.parameter_schema and item.schema_version == TOOL_SCHEMA_VERSION
         if item.identifier == "virtual_cell_query":
             assert item.evidence_kind is EvidenceKind.MODEL_PREDICTION
             assert ROOT / "src/virtual_cell/interface.py" in item.source_files
+        elif item.identifier == "case_memory":
+            # Case-memory forecasts are planning-only model predictions served from production modules.
+            assert item.evidence_kind is EvidenceKind.MODEL_PREDICTION
+            assert ROOT / "src/maestro/case_memory.py" in item.source_files
         elif item.identifier == "signature_retrieval":
             # A measured-signature comparison lives beside the data semantics it depends on.
             assert item.evidence_kind is EvidenceKind.DERIVED_ANALYSIS

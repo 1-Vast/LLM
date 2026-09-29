@@ -24,11 +24,29 @@ def test_source_is_separated_by_core_agent_and_virtual_cell_responsibility():
     )
     assert source_packages == ["agent", "evaluation", "maestro", "virtual_cell"]
     assert (ROOT / "src" / "maestro" / "contrast.py").is_file()
+    assert not (ROOT / "src" / "maestro" / "planning.py").exists()
+    assert (ROOT / "research" / "belief_planning" / "planner.py").is_file()
     assert not (ROOT / "src" / "maestro" / "agent.py").exists()
     assert (ROOT / "src" / "agent" / "orchestrator.py").is_file()
     assert (ROOT / "src" / "virtual_cell" / "interface.py").is_file()
     assert not (ROOT / "scripts").exists()
     assert not (ROOT / "results").exists()
+
+
+def test_source_packages_do_not_import_research():
+    offenders = []
+    for path in sorted((ROOT / "src").rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                names = [item.name for item in node.names]
+            elif isinstance(node, ast.ImportFrom) and node.module:
+                names = [node.module]
+            else:
+                continue
+            if any(name == "research" or name.startswith("research.") for name in names):
+                offenders.append(f"{path.relative_to(ROOT)}:{node.lineno}")
+    assert not offenders, "source packages import research code: " + ", ".join(offenders)
 
 
 def test_tools_are_folder_scoped_runtime_components():
@@ -43,18 +61,15 @@ def test_tools_are_folder_scoped_runtime_components():
         "typed_decision_review",
         "virtual_cell_query",
         "signature_retrieval",
+        "case_memory",
     }
     assert all((path.parent / "tool.py").is_file() for path in manifests)
     assert not (ROOT / "tools" / "tool.py").exists()
-    # `tools/shared/` is support code for tools, offline runners and tests. It must
-    # carry no manifest, or the router would offer it to the selecting model as a
-    # dataset tool it is not.
     shared = ROOT / "tools" / "shared"
-    assert shared.is_dir(), shared
-    assert not (shared / "manifest.json").exists()
-    assert (shared / "stub_client.py").is_file()
-    assert (shared / "state_fixture.py").is_file()
-    assert not (shared / "tool.py").exists()
+    assert not list(shared.glob("*.py"))
+    assert (ROOT / "tests" / "fixtures" / "stub_client.py").is_file()
+    assert (ROOT / "tests" / "fixtures" / "state.py").is_file()
+    assert (ROOT / "tests" / "fixtures" / "biological.py").is_file()
     assert not (ROOT / "log" / "artifacts").exists()
     assert not (ROOT / "log" / "design").exists()
 
@@ -256,11 +271,11 @@ def test_log_index_declares_every_file_in_the_record():
 
 
 def test_no_test_module_imports_another_test_module():
-    """Shared machinery lives in `tools/shared/`, never in a test module.
+    """Test helpers live in `tests/fixtures/`, never in test modules.
 
     A test module that imports another one makes a test run depend on collection
     order and turns a fixture change into a cross-suite failure. Anything two test
-    modules need belongs to `tools/shared/`; this asserts the boundary holds.
+    modules need belongs to `tests/fixtures/`; this asserts the boundary holds.
     """
 
     offenders = []

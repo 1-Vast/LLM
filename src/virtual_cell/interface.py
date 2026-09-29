@@ -26,6 +26,9 @@ from maestro.models import FunctionalInterventionProfile, MeasurementStatus
 
 from .applicability import SupportLevel
 
+FORECAST_MODES = ("state", "hypothesis_conditional", "history_aware", "hypothesis_conditional_history")
+"""Registered forecast modes. `state` is the default and the pre-extension behaviour."""
+
 
 def _text(value: object) -> bool:
     return isinstance(value, str) and bool(value.strip())
@@ -105,7 +108,15 @@ class ModelCapabilities:
 
 @dataclass(frozen=True)
 class PredictionRequest:
-    """A traceable query whose model inputs are distinct from the mechanism narrative."""
+    """A traceable query whose model inputs are distinct from the mechanism narrative.
+
+    The four trailing fields are optional and default to the pre-extension behaviour, so every
+    caller written before they existed keeps working unchanged. `hypotheses` asks for a
+    hypothesis-conditional forecast, `history` for a history-aware one, `observation_context`
+    binds problem context the backend may need, and `forecast_mode` names the requested mode.
+    A backend that cannot honour any of them abstains by name instead of fabricating a branch
+    forecast; all four enter the conditional cache identity (see `conditional_forecast.py`).
+    """
 
     request_id: str
     case_id: str
@@ -115,6 +126,10 @@ class PredictionRequest:
     context: SystemContext
     readouts: tuple[str, ...]
     model_version: str
+    hypotheses: tuple[str, ...] = ()
+    history: tuple[Mapping[str, object], ...] = ()
+    observation_context: Mapping[str, str] | None = None
+    forecast_mode: str | None = None
 
     def validation_errors(self) -> tuple[str, ...]:
         """Return structural errors without coercing identities or numeric values."""
@@ -123,6 +138,29 @@ class PredictionRequest:
         for name in ("request_id", "case_id", "contrast_id", "model_version"):
             if not _text(getattr(self, name)):
                 errors.append(f"invalid_{name}")
+        if not _names(self.hypotheses):
+            errors.append("invalid_hypotheses")
+        if not isinstance(self.history, (tuple, list)) or not all(
+                isinstance(item, Mapping) for item in self.history):
+            errors.append("invalid_history")
+        if self.observation_context is not None and not _components(self.observation_context):
+            errors.append("invalid_observation_context")
+        if self.forecast_mode is not None and not _text(self.forecast_mode):
+            errors.append("invalid_forecast_mode")
+        # Conditional validation by forecast mode. `state` mode is the pre-extension behaviour:
+        # empty hypotheses and an empty history are allowed there and only there.
+        mode = self.forecast_mode or "state"
+        if _text(self.forecast_mode or "state") and mode not in FORECAST_MODES:
+            errors.append("invalid_forecast_mode")
+        elif mode in ("hypothesis_conditional", "hypothesis_conditional_history"):
+            if len(self.hypotheses) < 2:
+                errors.append("hypothesis_conditional_requires_two_hypotheses")
+        if mode in ("history_aware", "hypothesis_conditional_history"):
+            if not self.history:
+                errors.append("history_aware_requires_history")
+            elif not all(_text(item.get("action")) and _text(item.get("outcome"))
+                         for item in self.history if isinstance(item, Mapping)):
+                errors.append("invalid_history_entry")
         if _text(self.request_id) and (
             not re.fullmatch(r"[A-Za-z0-9_.-]+", self.request_id) or self.request_id in (".", "..")
         ):
@@ -245,6 +283,10 @@ class PredictionRequest:
             data["intervention"] = Intervention(**intervention)
             data["context"] = context
             data["readouts"] = sequence(data["readouts"])
+            if "hypotheses" in data:
+                data["hypotheses"] = sequence(data["hypotheses"])
+            if "history" in data:
+                data["history"] = tuple(dict(item) for item in sequence(data["history"]))
             result = cls(**data)
             result.validate()
             return result
