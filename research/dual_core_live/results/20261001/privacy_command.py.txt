@@ -1,0 +1,13 @@
+from pathlib import Path
+import os, sys, json, hashlib
+sys.path.insert(0,str(Path.cwd()/'src'))
+from agent.llm import read_dotenv
+root=Path.cwd();base=root/'outputs/dual_core_live_20261001'
+settings={**read_dotenv(root/'.env'),**os.environ}
+secrets=[v.encode() for k,v in settings.items() if v and len(v)>8 and (k.endswith('API_KEY') or k.endswith('ACCESS_TOKEN'))]
+files=[p for p in base.rglob('*') if p.is_file()]
+found=[str(p.relative_to(root)) for p in files if any(s in p.read_bytes() for s in secrets)]
+if found:raise RuntimeError('Secret content detected in publication input; affected file count='+str(len(found)))
+receipt={'passed':True,'checked_files':len(files),'credential_values_detected':False,'excluded_configuration':'.env and process environment are not archived','input_file_sha256':{str(p.relative_to(base)):hashlib.sha256(p.read_bytes()).hexdigest() for p in files}}
+with (base/'publication_privacy.json').open('x',encoding='utf-8') as f:json.dump(receipt,f,indent=2)
+print(json.dumps({'privacy_passed':True,'checked_files':len(files)}))

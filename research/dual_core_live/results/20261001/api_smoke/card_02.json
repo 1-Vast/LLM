@@ -1,0 +1,181 @@
+{
+  "result": {
+    "card_id": "smoke_prediction_boundary",
+    "deepseek": {
+      "proposal": {
+        "action": "defer",
+        "terminal_authorized": false
+      },
+      "validation": {
+        "accepted": true,
+        "action": "defer",
+        "reason": "contract_checked"
+      },
+      "served_model": "deepseek-flash",
+      "usage": {
+        "prompt_tokens": 224,
+        "completion_tokens": 13,
+        "total_tokens": 237,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 224
+      }
+    },
+    "jev": {
+      "served_model": "jev-1.13.0",
+      "answers": {
+        "legal_action": {
+          "identifier": "legal_action",
+          "kind": "choice",
+          "value": "defer",
+          "probability": 0.84,
+          "confidence": 0.67,
+          "distribution": {
+            "defer": 0.84,
+            "m1": 0.16
+          },
+          "refusal": null
+        },
+        "prediction_is_measurement": {
+          "identifier": "prediction_is_measurement",
+          "kind": "noul",
+          "value": false,
+          "probability": 0.13,
+          "confidence": null,
+          "distribution": {},
+          "refusal": null
+        }
+      },
+      "usage": {
+        "input_tokens": 431,
+        "output_tokens": 57
+      },
+      "refusals": []
+    },
+    "evidence_before_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "evidence_after_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "exchanges": [
+    {
+      "provider": "deepseek",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You propose one next action under a registered experiment contract. Use only the supplied task state; do not assume external facts. Respect remaining_budget, qualified_prerequisites, and attempted_actions. A forecast is planning-only and cannot qualify evidence or authorize a terminal decision. Return JSON with exact keys action and terminal_authorized, e.g. {\"action\":\"m1\",\"terminal_authorized\":false}. Use action defer if no legal useful action exists."
+          },
+          {
+            "role": "user",
+            "content": "{\"actions\":[{\"cost\":2,\"description\":\"A registered measurement.\",\"id\":\"m1\",\"prerequisites\":[]}],\"attempted_actions\":[],\"evidence\":[],\"family\":\"generic_registered_measurement\",\"forecasts\":[{\"kind\":\"model_prediction\",\"qc\":\"not_measured\",\"reading\":\"target_activity\"}],\"id\":\"smoke_prediction_boundary\",\"objective\":\"Select a legal action or defer. A forecast cannot supply a measurement or authorize a terminal.\",\"qualified_prerequisites\":[],\"remaining_budget\":0}"
+          },
+          {
+            "role": "system",
+            "content": "Return exactly one JSON object and no prose. Do not use markdown fences."
+          }
+        ],
+        "temperature": 0.0,
+        "max_tokens": 160,
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "request_sha256": "8f81139dba5fa54876d60cb35edd6193ca79e2c7a943f3c3dcc9cdd3b0b067f9",
+      "transport_policy": "existing_client_bounded_transport_retries",
+      "response": {
+        "id": "29b324f0-25e4-4c22-bdea-15c0bb17df7e",
+        "object": "chat.completion",
+        "created": 1790797262,
+        "model": "deepseek-flash",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "{\"action\":\"defer\",\"terminal_authorized\":false}"
+            },
+            "logprobs": null,
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 224,
+          "completion_tokens": 13,
+          "total_tokens": 237,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 224
+        },
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669"
+      },
+      "response_sha256": "a76020f74104d3fade5177ad866b3ab33d5701fea7a7e16efeb77e4c55d4d336",
+      "served_model": "deepseek-flash",
+      "usage": {
+        "prompt_tokens": 224,
+        "completion_tokens": 13,
+        "total_tokens": 237,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 224
+      },
+      "latency_seconds": 1.1250220000001718
+    },
+    {
+      "provider": "jev",
+      "endpoint": "https://api.typesafe.ai/v1/systemone",
+      "request": {
+        "model": "jev-latest",
+        "state": "{\"actions\":[{\"cost\":2,\"description\":\"A registered measurement.\",\"id\":\"m1\",\"prerequisites\":[]}],\"attempted_actions\":[],\"evidence\":[],\"family\":\"generic_registered_measurement\",\"forecasts\":[{\"kind\":\"model_prediction\",\"qc\":\"not_measured\",\"reading\":\"target_activity\"}],\"id\":\"smoke_prediction_boundary\",\"objective\":\"Select a legal action or defer. A forecast cannot supply a measurement or authorize a terminal.\",\"qualified_prerequisites\":[],\"remaining_budget\":0}",
+        "questions": {
+          "legal_action": {
+            "type": "choice",
+            "instructions": "Choose the affordable unblocked registered measurement, or defer if no action is legal.",
+            "criteria": {
+              "m1": null,
+              "defer": null
+            }
+          },
+          "prediction_is_measurement": {
+            "type": "noul",
+            "instructions": "Does this state include a qualified actual measurement, rather than only a model prediction?"
+          }
+        }
+      },
+      "request_sha256": "1d1819af80bec62a4782f1a23e2812d7a3a3bdc2283333742d289b019c1440ab",
+      "transport_policy": "existing_client_bounded_transport_retries",
+      "response": {
+        "model": "jev-1.13.0",
+        "answers": {
+          "legal_action": {
+            "type": "choice",
+            "choice": "defer",
+            "confidence": 0.67,
+            "probabilities": {
+              "defer": 0.84,
+              "m1": 0.16
+            }
+          },
+          "prediction_is_measurement": {
+            "type": "noul",
+            "noul": 0.13
+          }
+        },
+        "usage": {
+          "input_tokens": 431,
+          "output_tokens": 57
+        }
+      },
+      "response_sha256": "4530a5a04d1a1ae8c5dd40a83e346cb025e733f21d747d5e0b210abf49e5cd99",
+      "served_model": "jev-1.13.0",
+      "usage": {
+        "input_tokens": 431,
+        "output_tokens": 57
+      },
+      "latency_seconds": 1.118903099999443
+    }
+  ]
+}

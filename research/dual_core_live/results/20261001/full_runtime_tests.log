@@ -1,0 +1,320 @@
+........................................................................ [  4%]
+........................................................................ [  9%]
+........................................................................ [ 13%]
+........................................................................ [ 18%]
+........................................................................ [ 22%]
+........................................................................ [ 27%]
+........................................................................ [ 31%]
+........................................................................ [ 36%]
+........................................................................ [ 41%]
+........................................................................ [ 45%]
+........................................................................ [ 50%]
+........................................................................ [ 54%]
+........................................................................ [ 59%]
+........................................................................ [ 63%]
+........................................................................ [ 68%]
+........................................................................ [ 72%]
+........................................................................ [ 77%]
+........................................................................ [ 82%]
+........F............................................................... [ 86%]
+........................................................................ [ 91%]
+........................................................................ [ 95%]
+...................................................................      [100%]
+================================== FAILURES ===================================
+_________________ test_project_markdown_has_no_chinese_prose __________________
+
+    def test_project_markdown_has_no_chinese_prose():
+        """Project markdown is English-only; Chinese may survive only inside paths.
+    
+        No Chinese term glosses, headings, table cells, or prose are allowed. The
+        only tolerated CJK is inside an inline code span or a path-like
+        parenthetical, because a real identifier may carry a non-ASCII name.
+        """
+    
+        offenders = []
+        for path in _project_markdown():
+            text = path.read_text(encoding="utf-8")
+            if not text.strip():
+                continue  # An empty file has no prose to judge; emptiness is its own test below.
+            scrubbed = INLINE_CODE.sub("", text)
+            scrubbed = MARKDOWN_LINK_DESTINATION.sub("", scrubbed)
+            scrubbed = PATH_LIKE_GROUP.sub("", scrubbed)
+            for line_number, line in enumerate(scrubbed.split("\n"), start=1):
+                if CJK_PATTERN.search(line):
+                    offenders.append(f"{path.relative_to(ROOT).as_posix()}:{line_number}: {line.strip()[:90]}")
+>       assert not offenders, "Chinese prose found outside paths:\n" + "\n".join(offenders)
+E       AssertionError: Chinese prose found outside paths:
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:1: # 科学性修正与数据构造计划（2026-09-29）
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:6: ## 本轮结论与可复现结果
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:8: 本轮修复的是“一个预测分布究竟凭什么产生”的证据边界，并未证明模型预测精度提高。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:9: 生产候选估计器为 ，保持 ，默认开关关闭。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:10: 冻结的旧外部评估结果和旧案例文件保留；新的代理案例写入单独文件。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:12: 开发诊断只使用原 65 个参考化合物，按机制类分层，以固定种子留出 11 个，54 个用于建库。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:13: 每次分割后重新计算质心、检测阈值与参考标签，参考标签的自身化合物从自身质心剔除。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:14: 原 26 个外部测试化合物不参与。预测器只收到候选假设、实验条件和状态为空的查询，
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:15: 待预测的表达谱只在评分器中使用。这个实验评估条件代理读数分布，不评估机制发现能力。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:17: | 指标 | 结果 |
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:19: | 独立训练 / 留出化合物 | 54 / 11 |
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:20: | 可评分项 / 全部项 | 156 / 156 |
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:21: | 新估计器 NLL | 1.372004 |
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:22: | 相同数据、相同五种结局的 Jeffreys 频率平滑基线 NLL | 1.353464 |
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:23: | 每个化合物先取均值后的 NLL 差（新减基线） | +0.027286 |
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:25: 结果不支持新估计器优于简单基线。11 个独立单元太少，不做显著性或外部泛化主张；
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:26: 不根据这次结果继续搜索收缩常数。数值也不能和原外部评估直接比较：人群、标签空间、
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:27: 数据分割和预测实现均不同。较高 NLL 表示对实际结局给出的概率较差，单凭 NLL 不能把原因
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:28: 唯一归结为校准；它同时受分辨能力和校准影响。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:30: 代码：。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:31: 验证记录：全套  加  共 1,476 项通过；
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:32: 最后的动作上下文/标签词汇修正后，对应回归与外评测试共 70 项再次通过。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:33: 产物：、
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:34: 、。图已逐项核对：左图来自相同条目的均值；
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:35: 右图每柱一个化合物，不把同一化合物的多个细胞条件或机制对比当作独立样本。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:37: ## 已实施的修复
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:39: 1. 删除“检索到案例就生成 0.8/0.5 概率”的回退。没有具有明确条件假设、对比对和实际结局的
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:40: 参考记录时，返回 ；不从假设列表推断哪个假设成立。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:41: 2. 每个假设的结局分布只由该条件假设下的记录估计；另一假设缺少支持时，整体拒答，
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:42: 不把同一组记录改换标签后伪装成两个条件分布。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:43: 3. 实验匹配检查 assay、readout、cell、time、dose；同名 action 更换时间也不能复用旧结果。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:44: 生物系统、干预类型、测量类型、对照设计从用户上下文传入，不再用空字符串代替。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:45: 硬兼容规则没有放宽：缺少必要元数据可造成拒答，需要补元数据而非让所有数据兼容。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:46: 4. 支持量来自真正参与该动作估计的独立源单元，按  去重。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:47: Kish 有效支持由同一组实际权重计算，不把检索结果数或 hypothesis update 条数当作样本数。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:48: 5. 分布采用温度平滑和支持量/域偏移收缩；基准先验在动作结局上对称。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:49: 因而两个条件下观察到完全相同分布时，不会仅靠“自己的假设”先验制造判别力。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:50: 常数 8、1.5、0.75 是未拟合的候选设定，回执明确标为未校准，不是生物学经验概率。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:51: 6.  新增可选的 、、。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:52: 默认字段不进入旧记录的序列化，保留旧摘要与追加版本链的兼容性。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:53: 7. 代理标签只能在显式研究模式中使用，进入证据资格判定时被拒绝。正常工具调用不能
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:54: 在内部偷偷切换成研究模式。未计划/缺失不计为结果，QC 失败不会推断生物机制。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:55: 8. 缓存包含完整动作语义和开关状态；撤销开关、改变动作条件或结果词汇会使旧缓存失效。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:57: ## 新案例文件的含义
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:59: 含 65 个参考化合物，
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:60: 244 个化合物×细胞条件，针对其他机制类展开为 976 个派生对比读数。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:61: **独立化合物仍只有 65 个，976 不是独立样本数。**
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:63: 每条读数记录具体对比假设和来源，。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:64: 信号低于参考谱范数第 5 百分位的  是基准中的操作性低信号定义，
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:65: 不是经过实验验证的检测限，更不能解释为“靶点没有作用”。缺乏可用质心记为歧义，
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:66: 不伪装成实验 QC 失败。质心相似性和 MoA 注释都不产生 qualified experimental evidence。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:67: 新文件中不进行生物假设淘汰，也不填充 qualified evidence。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:69: 重建命令：
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:73: 同一输入重跑构建是幂等的。变更输入须指定新的 ，
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:74: 不得覆盖冻结案例或混入旧版本。此处修正案例生成，不改写已经注册的外部评估。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:76: ## 如何找数据：先定义要证明什么
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:78: 先把用户问题拆为可观测目标，例如“哪一个后续实验最能区分靶点作用和非特异应激”，
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:79: 再寻找同时覆盖初始状态、候选干预、实际结局与对照的数据。只搜索“virtual cell dataset”
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:80: 会得到大量表达矩阵，却未必能评估后续决策。优先下载元数据和清单，评估重叠与动作覆盖后
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:81: 再下载表达矩阵，避免下载几十 GB 后才发现每个化合物只有一个可用动作。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:83: | 资料入口 | 用途 | 必须检查的限制 |
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:85: | [CLUE 数据入口、GEO GSE92742 / GSE70138、LINCS 2020 | 化合物、细胞系、时间剂量条件与表达响应；做基础参照和化学外推 | 同一个化合物在
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:86: | [sci-Plex 原始研究及其 Data availability/GEO 记录 | 单细胞药物响应、细胞状态异质性、剂量反应 | 剂量系列不等于纵向时间轨迹；破坏性取样不是
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:87: | [Tahoe-100M 数据卡 | 扩展药物×细胞上下文；先抽取具有对照与多个候选条件的子集 | 数据量大不等于独立药物数多；先审计所用预训练模型是否已接触该数据 |
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:88: | [全基因组 Perturb-seq及其原始数据 | 遗传干预响应与候选机制的正交参照 | 基因敲低/敲除不等于药物结合或抑制；必须保留干预方式和效率 |
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:89: | [DepMap/PRISM | 存活、药敏及细胞背景，作为表型层桥接 | 活力与转录响应不可当同一真值；需要化合物、细胞、暴露和版本匹配 |
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:91: 本轮在线核对：CLUE、Tahoe 数据集 API、GEO 页面可访问；Europe PMC 返回 sci-Plex、
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:92: Perturb-seq 和 Tahoe 的文献记录。DepMap 下载入口在本环境返回 HTTP 403，未获取文件，
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:93: 应使用其正常访问流程/公开镜像并核对授权，不绕过访问限制。GEO 的具体附件和平台映射仍需
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:94: 逐项核对，不能仅凭 accession 页面可访问就声称下载、清洗或验证完成。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:96: 建议检索式：；
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:97: ；
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:98: 。以原论文的 Data availability
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:99: 追到 accession/DOI 和原始元数据，再查后续更新或撤回；不要把综述/模型生成摘要当数据来源。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:101: ## 如何构造数据：四种产品必须分开
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:103: 1. **观测表**：study、batch、donor/细胞系、compound connectivity block/基因干预、时间、
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:104: 剂量与单位、对照、replicate、assay、feature space、QC、原始文件哈希。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:105: 单细胞原始计数、归一化表达、logFC 与 L1000 z-score 必须显式区分。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:106: 2. **响应/转移表**：在同一批次和可比上下文中匹配对照，计算有符号变化、方差、通路响应和
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:107: 细胞群组成。没有真实前后配对时，标记 population response；不要造出单细胞轨迹。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:108: 3. **证据表**：靶点结合、近端功能、转录变化、表型分别建表；记录检测方法和证据等级。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:109: MoA 注释只能作分层信息/代理监督；不自动变成 target engagement 或因果真值。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:110: 4. **决策 episode**：用户当时已知的状态、竞争假设、合法候选实验、成本与前置条件、
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:111: 已执行实验的观测及 QC、预先注册的解释规则、之后采取的动作。失败和歧义也完整保留。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:113: 这四层的原因是：一个“完整漂亮的案例文本”无法判断信息何时可见，也无法防止把结论塞入
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:114: 模型输入。案例库更适合充当带来源和适用域的经验支持集；规划器提出并比较动作，虚拟细胞
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:115: 给出条件结局分布，只有真实新实验经过资格判定后更新证据。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:117: ## 预处理与分割的具体顺序
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:119: 1. 先建来源 manifest，记录版本、许可、URL、哈希、获取时间、测量粒度和单位；冻结独立
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:120: 单元分组与分割，再计算任何需要拟合的统计量。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:121: 2. 化合物按结构连接块/必要的立体化学层次对齐；基因统一稳定 ID 并保留原始 ID；
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:122: 不把别名无法映射或多对多匹配静默丢弃。跨研究同时检查文件、化合物、细胞和模型训练重叠。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:123: 3. 原始计数先做样本/细胞 QC，再按合适的生物重复构建 pseudobulk 或分布响应；同一孔中
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:124: 几千个细胞不是几千个实验重复。不同基因的多行记录也不是 replicate。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:125: 4. 控制批次、细胞类型、时间和剂量；不把所有处理条件混为一条状态。缺失保留缺失，
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:126: 只在确属已测量且为零时记录零。差异响应必须保留方向，不能只留下范数。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:127: 5. 训练集拟合基因筛选、归一化参考、质心、阈值和校准参数；开发/测试只应用。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:128: 质心派生标签的训练案例须 leave-one-unit-out；外层留出评估须重建所有训练统计，
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:129: 不仅是最后预测器中删掉该案例。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:130: 6. 拆分至少包括训练、开发校准和最终测试。按化合物/供体/研究分组，按用途补结构外推和
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:131: 跨实验室外推；用独立单元聚类的置信区间。不得随机拆单细胞/同一药物重复来冒充 OOD。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:132: 7. 除规范样例外必须纳入负响应、未检测、QC 失败和歧义，保留其比例和筛选过程。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:133: 人工/LLM 合成案例仅验证解析与规划流程，不进入生物性能主终点。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:134: 8. 图文双核对：每个标签追溯到原始行；检查样本量表、重复关联图、处理/对照分布、
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:135: 缺失热图、分割重叠、剂量时间覆盖、校准图。视觉合理性不能替代统计检验或文件校验。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:137: 现有  不是通用的原始 RNA-seq 分析流水线，不能把任意上传矩阵直接当成
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:138: 已匹配对照的有符号差异。下一轮接入原始数据时，应先给它经过上述处理的、明确条件和
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:139: 数值语义的 effect table，并单独验证 replicate 聚合与多条件处理。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:141: ## 下一步应如何证明价值
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:143: 第一步，以简单频率平滑为正式基线，在独立的开发校准集拟合少量收缩参数；不要同时搜索
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:144: 几十种相似度、池规则和终点。校准后锁定算法版本和数据清单，再运行第二次未触碰外评。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:145: 200 个独立单元可以是工程目标，但不是统计充分性的保证；应按最小有意义 NLL/决策效益差、
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:146: 聚类方差和失败率做功效/精度规划，避免以固定数量替代设计。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:148: 第二步，构建每个 episode 至少两个合法候选动作、可比较成本和不同结局信息量的决策集。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:149: oracle 与所有规划器必须共享相同效用、停止/拒答规则和预算；同时报告正确、错误、拒答、
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:150: 覆盖率与总成本。不能把保守 oracle 的正确率和强制作答基线的正确率直接相减。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:151: 若最优可行策略没有正的效用提升空间，先修任务设计，不应继续调规划器。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:153: 第三步，用户前瞻性闭环：初始数据只进入 policy view；未来结局只进入 evaluator view。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:154: 智能体输出“下一步实验、为什么能区分假设、预测结局分布、支持案例及不确定性、
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:155: 每种结果对应的下一步”，而非只输出一个最可能机制。完成实验后再更新 episode。
+E         research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:156: 这才是案例库、虚拟细胞与智能体可以形成科学闭环的检验对象。
+E         research/prompt_review_20260927/review_zh.md:1: # MAESTRO prompt 修改判断
+E         research/prompt_review_20260927/review_zh.md:3: 审阅日期：2026-09-27。对照本地提交  的相关文档与代码进行了静态核查。本次任务是修改 prompt，没有运行研究实验、重跑测试或修改系统实现。
+E         research/prompt_review_20260927/review_zh.md:5: ## 总体判断
+E         research/prompt_review_20260927/review_zh.md:7: 原 prompt 的研究方向应保留：先确认任务是否有可利用的信息，再讨论模型和 planner；模拟不能替代实测；最终贡献必须落在实验选择和决策上。
+E         research/prompt_review_20260927/review_zh.md:9: 主要问题不是内容不够，而是把研究愿景、现有缺口、实现要求和验收标准混在一起。直接执行容易重复建设、提前消耗测试集，或者因数据不支持而被迫做出名义上的完整系统。
+E         research/prompt_review_20260927/review_zh.md:11: 修订版将其改成“核实现状 → 最小补缺 → 数据与任务准入 → 有条件实验 → 冻结确认”的执行合同。默认交付审计和计划，与原文末尾 Expected Output 一致；明确选择
+E         research/prompt_review_20260927/review_zh.md:13: ## 必须调整的内容
+E         research/prompt_review_20260927/review_zh.md:15: | 原文问题 | 修改方式及原因 |
+E         research/prompt_review_20260927/review_zh.md:17: | 多处要求创建已有能力 | 先列 SATISFIED / PARTIAL / MISSING / CONTRADICTED / UNVERIFIED，复用现有代码。 已有状态、白
+E         research/prompt_review_20260927/review_zh.md:18: | “重建 Evidence Graph”容易扩大工程范围 |  已有 evidence kinds， 已有证据准入与更新， 已有 SourceClusterIndex。应补完整链
+E         research/prompt_review_20260927/review_zh.md:19: | 把历史结果写成普遍定论 | 保留数字，但要求绑定任务、分母、规则、时间、区间与暴露状态。345–813 是特定历史设定的功效估计；不能作为所有新任务固定样本量。 |
+E         research/prompt_review_20260927/review_zh.md:20: | 把所有 external 都等同 unseen study |  第 2 节第 4 项说明 GSE70138 的模型和验证器使用同研究内参考化合物拟合。应分别标注 unseen
+E         research/prompt_review_20260927/review_zh.md:21: | 新 MeasurementState 与已有枚举混在一起 | “是否计划/执行/QC 合格”与“undetected/ambiguous/eliminating”不是同一维度。
+E         research/prompt_review_20260927/review_zh.md:22: | 防泄漏只管标签字段 | 补上 QC 筛选、归一化、batch correction、PCA、reference pool、缓存、预训练模型和知识库答案泄漏。metadata 名
+E         research/prompt_review_20260927/review_zh.md:23: | 所有阶段都禁止 outcome-derived construction，过于绝对 | 禁止 held-out/sealed outcomes 影响构建；允许训练折内结果生成参
+E         research/prompt_review_20260927/review_zh.md:24: | RNA + morphology 默认可以合并 | 加配对与可比性准入：化合物一致仍不足，还要核对细胞、剂量、时间、对照和 assay。无真实配对不能拼成回放 episode；
+E         research/prompt_review_20260927/review_zh.md:25: | r(t) 被当作免费可用特征 | 明确 measured / estimated / unknown；新测 engagement 或 proximal function 要计成
+E         research/prompt_review_20260927/review_zh.md:26: | 确定性规则被误读为确定的机制真相 | 增加噪声、检出能力、假阴性、重复测量和 episode 级错误剔除风险。规则可重复不代表生物学上无误；阴性结果未必可以排除机制。 |
+E         research/prompt_review_20260927/review_zh.md:27: | H 的含义与监督来源未规定 | 要定义 H 是候选机制、类标签还是参数化假设，以及数据支持什么条件分布。给模型输入 H 不等于识别了因果干预分布。 |
+E         research/prompt_review_20260927/review_zh.md:28: | 只维护有限机制集合，未落实不完备性 | 增加 UNKNOWN/OTHER、非互斥/多靶点假设、空集矛盾处理、证据版本与修复。只剩一个候选不自动等于证实它。 |
+E         research/prompt_review_20260927/review_zh.md:29: | p_correct/p_wrong 容易需要隐藏真值 | 优先预测观测或注册的读数类别，再由假设和规则推导错误风险。不能在推理阶段借助测试真值定义模型输出。 |
+E         research/prompt_review_20260927/review_zh.md:30: | Robust score 看起来安全，但风险项也不可信 | 保留作待验证启发式，明确校准、权重、量纲和敏感性。set-valued state 或 risk penalty 本
+E         research/prompt_review_20260927/review_zh.md:31: | Calibration 被排到最后 | 现有 forecast 的 E-CAL1 应早做；新模型再重新校准。评价 frozen policy 实际选中的 action、覆盖率和
+E         research/prompt_review_20260927/review_zh.md:32: | Headroom gate 可能导致先打开最终测试集 | headroom 选任务只能用 development；sealed cohort 的 headroom 在最终揭盲后
+E         research/prompt_review_20260927/review_zh.md:33: | 模态只有提高 ceiling 才能保留 | 改为预注册的 discrimination / risk / cost / time 贡献。更便宜且不损害正确性的测量也有价值，即使
+E         research/prompt_review_20260927/review_zh.md:34: | KB 负责生成 action，却要求所有消融 menu 相同 | 拆成两个实验：固定 menu 测排序，允许 menu 变化且预算相同测生成。否则把 KB 的目标贡献人为屏蔽。
+E         research/prompt_review_20260927/review_zh.md:35: | G0–G4 名称可能覆盖旧协议定义 | 新命名 WM-G0–WM-G4，且必须注册数值门槛。区分 FAIL、INCONCLUSIVE、NOT_READY，不把无显著差异一律当模
+E         research/prompt_review_20260927/review_zh.md:36: | G3 “任意指标改善”允许事后挑成功指标 | 提前选一个主 estimand。正确率主张与成本优势主张分开注册，后者要求决策质量非劣；保留错误风险和资源约束。 |
+E         research/prompt_review_20260927/review_zh.md:38: ## 建议删减或降级
+E         research/prompt_review_20260927/review_zh.md:40: 1. 删掉强制“至少创建八个模块”的结构要求，保留八类职责和验证要求。
+E         research/prompt_review_20260927/review_zh.md:41: 2. 把“三个 head”改成三个可审计职责，不指定神经网络架构。
+E         research/prompt_review_20260927/review_zh.md:42: 3. 不要求首轮同时接入所有数据库、跑完所有 calibrator 和全部消融。按已修改组件和数据支持决定。
+E         research/prompt_review_20260927/review_zh.md:43: 4. 将大型 JEPA、通用 RL、多 agent、全量图像处理和 combination benchmark 留在后续候选，不进入首轮交付。
+E         research/prompt_review_20260927/review_zh.md:44: 5. 不把“任何弱 headroom 任务都不用”写成绝对禁令：它们仍可测安全、退化、成本和合理 defer。
+E         research/prompt_review_20260927/review_zh.md:45: 6. 合并重复的审计清单与交付表。中文材料开头称“10 个工作包”，正文实际列到 15 项，容易被当成新的独立工作范围。
+E         research/prompt_review_20260927/review_zh.md:46: 7. 将“最终测试数据在系统层面不可访问”改成 evaluator-only，并说明可执行的权限边界；哈希或 Python 属性封装不足以阻止同权限任意代码读取文件。
+E         research/prompt_review_20260927/review_zh.md:48: ## 首轮建议执行顺序
+E         research/prompt_review_20260927/review_zh.md:50: 1. 静态审计及必要的已有结果复现：确认实际缺口、现有默认路径和历史结果性质。
+E         research/prompt_review_20260927/review_zh.md:51: 2. 补最小数据/证据/评分边界：建立可验证的合同，而不是全仓重构。
+E         research/prompt_review_20260927/review_zh.md:52: 3. E-DATA1：先确认同一批真实可比数据是否支持更有信息量的 action menu。
+E         research/prompt_review_20260927/review_zh.md:53: 4. E-CAL1：利用已有预测检查跨研究与选择后风险，界定哪些风险承诺目前不能做。
+E         research/prompt_review_20260927/review_zh.md:54: 5. E-WM1：只有时间和干预强度数据、推理时可得性及样本量过关才进入。
+E         research/prompt_review_20260927/review_zh.md:55: 6. 一个最小的 second-measurement planner，完成对应消融后再考虑外部确认。
+E         research/prompt_review_20260927/review_zh.md:57: E-CAL1 的探索性分析可与数据资格核查并行；这不意味着必须启用多个 agent。外部样本可先做 metadata census，但不能提前用 outcome 检查它“好不好用”
+E         research/prompt_review_20260927/review_zh.md:59: ## 本次核查依据
+E         research/prompt_review_20260927/review_zh.md:61: - ：已有模块、headroom、校准与 attribution 结果。
+E         research/prompt_review_20260927/review_zh.md:62: - ：estimand、scoring subset、public view、现有 gate 定义与外部数据状态。
+E         research/prompt_review_20260927/review_zh.md:63: - ：历史污染、GSE70138 的 38/673 选择范围和同研究参考拟合限定。
+E         research/prompt_review_20260927/review_zh.md:64: - ：MeasurementState、PublicContext、reference_pool、truth_free_episodes、mechanism_endpoint。
+E         research/prompt_review_20260927/review_zh.md:65: - 、、：类型化证据、准入规则、状态更新和证据来源聚类。
+E         research/prompt_review_20260927/review_zh.md:66: - 、：现有预测/拒绝契约与规划路径。
+E         research/prompt_review_20260927/review_zh.md:68: 这些是用于修改 prompt 的重点核查，不构成对整个仓库“已无泄漏”或“所有测试通过”的保证。完整可复制的英文替代稿见同目录 。
+E         research/scientific_optimization/METHODS.md:1: # 技术选择与来源核查
+E         research/scientific_optimization/METHODS.md:3: 核查日期：2026-09-27。用户提供的论文介绍是设计参考，不作为已验证的性能证据。
+E         research/scientific_optimization/METHODS.md:4: 以下区分原方法、借鉴内容及本次没有实现的能力；没有堆叠所有流行模型。
+E         research/scientific_optimization/METHODS.md:6: | 技术 / 可访问来源 | 本次借鉴或判断 | 核查范围与边界 |
+E         research/scientific_optimization/METHODS.md:8: | [CellFlow, [2025 预印本 | 条件群体传输，局部 OT 配对及流匹配；本次实现小型 PyTorch 版本 | 已读官方 README，Europe PMC 核实
+E         research/scientific_optimization/METHODS.md:9: | [State | 群体层面的预测和分布评估；沿用仓库已有适配器 | 已读官方 README；论文页访问受限。新实现是均值/标准差集合摘要，不是 State Transforme
+E         research/scientific_optimization/METHODS.md:10: | [STACK | 条件群体能成为上下文；必须检查 prompt 在推理时是否可得 | 核实 Europe PMC 摘要：149M 细胞、tabular attention、群体
+E         research/scientific_optimization/METHODS.md:11: | [PRESAGE | 优先知识来源、效应和功能读数评估，不默认越大越好 | 已核实摘要；主要是遗传扰动。基因敲除先验不能直接当药物靶点结合证据 |
+E         research/scientific_optimization/METHODS.md:12: | [CPA / chemCPA | 药物结构、剂量、细胞背景的组合条件；保留化学简单基线 | 已读 PMC 全文；不会把药物 ID 的外推能力等同于化学编码器能力 |
+E         research/scientific_optimization/METHODS.md:13: | [CellOT | 未配对群体和传输假设；不能声称同细胞前后配对 | 已读 PMC 全文；传输图是建模假设，不是谱系数据 |
+E         research/scientific_optimization/METHODS.md:14: | [GEARS | 多基因组合预测可作合适任务的候选基线 | 已读摘要/正文内容；不能用 CRISPR 组合直接替代药物抑制机制 |
+E         research/scientific_optimization/METHODS.md:15: | [D-SPIN | 未来评估基因程序/调控生成模型，与群体结构相符 | 已核实 Crossref 元数据及 Europe PMC 摘要，全文访问失败；未实现，边不自动等于因果真
+E         research/scientific_optimization/METHODS.md:16: | [PrePR-CT | 小数据化学响应的细胞类型特异共表达先验 | 已读摘要/正文内容；未来须只用训练数据建图，并与随机图/无图对照，不把 attention 作为因果证据 |
+E         research/scientific_optimization/METHODS.md:17: | [泛化扰动预测基准 | 分场景和留出背景评估，不从单一表达相关性宣称通用优越 | 已核实 Crossref/Europe PMC 摘要；Nature 直接访问失败 |
+E         research/scientific_optimization/METHODS.md:19: 用户材料的 Tahoe-x1、SCALE、MultiFlow 细节本次没有充分核查，不以其参数数量、
+E         research/scientific_optimization/METHODS.md:20: 损失配置或宣传性能支撑实现选择。不能把本次小型群体模型称作“2026 最强模型”。
+E         research/scientific_optimization/METHODS.md:22: 智能体侧参考：[HEP 的假设-检验-证据轨迹，
+E         research/scientific_optimization/METHODS.md:23: [Biomni 的工具执行，
+E         research/scientific_optimization/METHODS.md:24: [Coscientist 的真实实验闭环，
+E         research/scientific_optimization/METHODS.md:25: [AI Scientist-v2 的自动研究工作流。
+E         research/scientific_optimization/METHODS.md:26: HEP 的材料科学应用、Biomni 摘要、Coscientist 正文及 AI Scientist-v2 摘要仅用于
+E         research/scientific_optimization/METHODS.md:27: 工程启发；这些论文没有替 MAESTRO 验证生物机制判断或选实验收益。
+E         research/scientific_optimization/METHODS.md:29: 本次选择修复已有生命周期中的身份和解释确定性，未重建另一套大型状态机。
+E         research/scientific_optimization/METHODS.md:30: 世界模型提供预测，真实实验和有来源证据才更新科学结论；Jev/LLM 不认证生物真值。
+E         research/scientific_optimization/README.md:1: # MAESTRO 双核心调整：2026-09-27
+E         research/scientific_optimization/README.md:3: 本次按“技术调研＋最小实现＋测试与实验”执行。新增可训练的条件群体流后端，
+E         research/scientific_optimization/README.md:4: 修复现有世界模型丢失 RNA 方向的问题，并修复智能体两处科学解释歧义。
+E         research/scientific_optimization/README.md:5: 没有替换默认 State checkpoint，也没有将开发集成绩写成机制发现或药物疗效提升。
+E         research/scientific_optimization/README.md:7: ## 世界模型的实际变化
+E         research/scientific_optimization/README.md:9: 1. ：原 RMS 汇总保留，同时支持
+E         research/scientific_optimization/README.md:10: 和显式注册的 。相反方向的响应不再
+E         research/scientific_optimization/README.md:11: 被同一个 RMS 数字混同。基因集成员、来源和来源哈希进入模型版本；缺失成员拒绝查询。
+E         research/scientific_optimization/README.md:12: 三个种子的范围仅表示模型分歧，不是预测置信区间，更不是细胞异质性。
+E         research/scientific_optimization/README.md:13: 2. ：新增实验性 **control population →
+E         research/scientific_optimization/README.md:14: conditional population** 后端。以单细胞状态、对照群体均值/标准差、药物指纹、
+E         research/scientific_optimization/README.md:15: 剂量及数值流时间作为输入；使用 minibatch 最优传输构造未配对群体间的训练路径，
+E         research/scientific_optimization/README.md:16: 训练条件速度场，以 midpoint 积分输出细胞群体。验证集 MMD 选择 epoch。
+E         research/scientific_optimization/README.md:17: 零剂量严格保留输入群体；预测随细胞排列等变。
+E         research/scientific_optimization/README.md:18: 3. 群体均值/标准差是最小的集合编码器。没有声称复现 STACK 的二维注意力、
+E         research/scientific_optimization/README.md:19: State 的 set Transformer，或完整 CellFlow。未实现蛋白/ATAC 解码器，
+E         research/scientific_optimization/README.md:20: 因为现有本试验没有这些模态的配对测量。流时间 0–1 不对应生物学小时；
+E         research/scientific_optimization/README.md:21: OT 配对不对应真实细胞谱系。模型保持输入细胞数，不预测增殖或死亡数量。
+E         research/scientific_optimization/README.md:23: 旧世界模型读数接口已经改动。新群体流目前使用  数组接口，
+E         research/scientific_optimization/README.md:24: **尚未接入智能体的默认  路由**；其 PCA 坐标输出也不冒充
+E         research/scientific_optimization/README.md:25: 有名称的 RNA、靶点占有率或功能活性。这是明确的实验后端边界。
+E         research/scientific_optimization/README.md:27: ## 两个真实数据实验
+E         research/scientific_optimization/README.md:29: ### 单细胞群体流：小规模筛查通过，未晋级默认
+E         research/scientific_optimization/README.md:31: 方案见 ，运行器为 。
+E         research/scientific_optimization/README.md:32: 实际读取 4,245 个独立行 ID 对应的真实细胞，24 个化学连接结构组，共 42 个条件群体。
+E         research/scientific_optimization/README.md:33: 16/4/4 个结构组用于训练/验证/测试；测试有 8 个群体。部分药物只有一个满足条件
+E         research/scientific_optimization/README.md:34: 的重复，因此条件群体数不是 48。每个群体采样 64 个细胞，同板、同重复匹配对照。
+E         research/scientific_optimization/README.md:35: 采用已审计基因标注偏移；128 基因筛选和 16 维 PCA 仅拟合训练对照细胞。
+E         research/scientific_optimization/README.md:37: | 方法 | 等药物权重 MMD² ↓ | 群体均值 MSE ↓ | 群体方差 MSE ↓ |
+E         research/scientific_optimization/README.md:39: | 保持对照不变 | 0.038351 | 0.379862 | 2.067822 |
+E         research/scientific_optimization/README.md:40: | 训练平均位移 | 0.038312 | 0.380179 | 2.067822 |
+E         research/scientific_optimization/README.md:41: | 化学近邻位移 | 0.077254 | 0.906975 | 2.067822 |
+E         research/scientific_optimization/README.md:42: | 条件群体流 | **0.035625** | **0.359014** | **2.038099** |
+E         research/scientific_optimization/README.md:44: 验证集选择第 7 个 epoch，未根据测试结果重新调参。相对平均位移，MMD² 下降
+E         research/scientific_optimization/README.md:45: 约 7.0%，方差误差下降约 1.4%；不能把有限的群体分布改善说成完整刻画了细胞异质性。
+E         research/scientific_optimization/README.md:46: 这里只有 A549、24 h、1000 nM；不证明跨组织、跨时间、跨剂量泛化。
+E         research/scientific_optimization/README.md:47: 不同药物可能共用对照细胞；4 个结构组不是充分的独立外部验证。历史 2473 基因
+E         research/scientific_optimization/README.md:48: 候选池曾利用全部对照，故不能宣称整个预处理都对本次测试全盲。
+E         research/scientific_optimization/README.md:50: 结果：。
+E         research/scientific_optimization/README.md:51: 同目录保存 checkpoint、坐标变换、行 ID、分割、学习曲线、预测和条件级指标。
+E         research/scientific_optimization/README.md:52: 第一次启动在元数据读取阶段因未选中行也含空标签而终止，未训练或评分；修正为
+E         research/scientific_optimization/README.md:53: 保留空值并在目标条件筛选中排除后得到 run2。原空目录保留，不覆盖任何既有结果。
+E         research/scientific_optimization/README.md:55: ### 定向 RNA 读数回归：筛查失败，未替换原模型
+E         research/scientific_optimization/README.md:57: 方案见 。2,250 条件、188 药物、185 连接结构组、50 个冻结 Hallmark
+E         research/scientific_optimization/README.md:58: RNA 读数，复用历史 5 折预测作比较。直接读数 ridge 的等结构组 MSE 为
+E         research/scientific_optimization/README.md:59: 0.00107017；现有化学 ridge 为 0.00106410。两者差异的描述性 95% 区间跨零，
+E         research/scientific_optimization/README.md:60: 相对近邻的区间同样跨零，因此候选不满足预设的全部基线优势门槛。
+E         research/scientific_optimization/README.md:61: 比零效应和均值基线好，不足以支持替换强基线。
+E         research/scientific_optimization/README.md:63: 结果：。
+E         research/scientific_optimization/README.md:64: 这也意味着“保留方向信息”是接口正确性改进，不能自动推出新训练目标更优。
+E         research/scientific_optimization/README.md:66: ## 智能体实际变化
+E         research/scientific_optimization/README.md:68: - ：两个假设必须有不同的非空 ID 和明确描述；不再为缺失
+E         research/scientific_optimization/README.md:69: 科学定义填入默认占位文字，违规返回进入现有有限重试流程。
+E         research/scientific_optimization/README.md:70: - ：重复规则 ID 拒绝注册；同一观测匹配多个规则时返回
+E         research/scientific_optimization/README.md:71: 歧义，不再根据注册顺序选第一条并淘汰假设。已有跨轮假设一致性和证据准入逻辑复用。
+E         research/scientific_optimization/README.md:73: 以上是实际生产解释路径的修复。没有运行新的真实干预实验，也没有证明前提修复
+E         research/scientific_optimization/README.md:74: 或动作选择收益；现有任务可识别性、所选动作风险校准问题仍需单独解决。
+E         research/scientific_optimization/README.md:76: ## 使用与复现
+E         research/scientific_optimization/README.md:78: 在仓库根目录、已安装 research 依赖的 Python 环境执行，输出目录必须不存在：
+E         research/scientific_optimization/README.md:82: 新后端最小推理 API：
+E         research/scientific_optimization/README.md:86: 必须使用保存的基因顺序、归一化和 PCA 变换；
+E         research/scientific_optimization/README.md:87: 为本试验 Morgan-128 加剂量坐标，不能把任意 embedding 填入同样长度的数组。
+E         research/scientific_optimization/README.md:88: 本后端不提供生物适用性认证、测量噪声或域外不确定性估计。
+E         research/scientific_optimization/README.md:90: ## 下一步优先级
+E         research/scientific_optimization/README.md:92: 先扩大群体基准并增加化学 ridge、标准 State/CellFlow 与训练均值对照，按化学结构、
+E         research/scientific_optimization/README.md:93: 研究/供者和细胞背景分别留出；分开测均值、方差、分布、RNA 方向和高效应条件。
+E         research/scientific_optimization/README.md:94: 再消融群体上下文、OT 配对与非线性流，判断收益来自哪里。
+E         research/scientific_optimization/README.md:95: 有足够证据后才注册到智能体推理路由，并对所选动作重新校准。
+E         research/scientific_optimization/README.md:96: STACK 式处理群体 prompt 需明确其在查询时可得，禁止拿待预测条件的目标细胞作 prompt。
+E         research/scientific_optimization/README.md:97: 多模态功能读数和 D-SPIN 调控程序需要相应测量及独立验证后再添加。
+E         research/scientific_optimization/README.md:99: 技术来源与核查范围见 ；测试收据见输出目录的 。
+E       assert not ['research/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:1: # 科学性修正与数据构造计划（2026-09-29）', 'research/case_memo...rch/case_memory_integration/SCIENTIFIC_FIX_AND_DATA_PLAN.md:12: 开发诊断只使用原 65 个参考化合物，按机制类分层，以固定种子留出 11 个，54 个用于建库。', ...]
+
+tests\test_repository_shape.py:176: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_repository_shape.py::test_project_markdown_has_no_chinese_prose
+1 failed, 1578 passed, 2 deselected in 104.23s (0:01:44)

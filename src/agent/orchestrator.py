@@ -1450,8 +1450,8 @@ class MAESTROOrchestrator:
     ) -> dict[str, tuple[QueryAssessment | None, StatePrediction | None]]:
         """Answer independent requests, dispatching distinct misses concurrently when allowed.
 
-        Inference runs at most once per distinct query in a round: a duplicate
-        is answered from the reuse store after its twin is recorded. Recording
+        Inference runs at most once per distinct query in a round, including when
+        reuse across rounds is disabled. A duplicate is rebound to its lineage. Recording
         and logging happen in request order on the calling thread, so the run
         record is identical whether or not inference ran in parallel.
         """
@@ -1464,12 +1464,13 @@ class MAESTROOrchestrator:
                 answered[identifier] = hit
             else:
                 pending[identifier] = request
-        computed: dict[str, tuple[QueryAssessment, StatePrediction]] = {}
-        if self._virtual_cell is not None and self._max_parallel_predictions > 1 and len(pending) > 1:
-            distinct: dict[str, str] = {}
-            for identifier, request in pending.items():
-                key = PredictionCache.key_for(request, self._backend_name()) or f"uncacheable:{identifier}"
-                distinct.setdefault(key, identifier)
+        distinct: dict[str, str] = {}
+        origins: dict[str, str] = {}
+        for identifier, request in pending.items():
+            key = PredictionCache.key_for(request, self._backend_name()) or f"uncacheable:{identifier}"
+            origins[identifier] = distinct.setdefault(key, identifier)
+        computed: dict[str, tuple[QueryAssessment | None, StatePrediction | None]] = {}
+        if self._virtual_cell is not None and self._max_parallel_predictions > 1 and len(distinct) > 1:
             workers = min(self._max_parallel_predictions, len(distinct))
             with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="virtual-cell") as pool:
                 futures = {
@@ -1478,12 +1479,29 @@ class MAESTROOrchestrator:
                 }
             computed = {identifier: future.result() for identifier, future in futures.items()}
         for identifier, request in pending.items():
-            if identifier in computed:
+            origin = origins[identifier]
+            if origin != identifier:
+                reused = self._reused_prediction(request, session_id)
+                if reused is not None:
+                    answered[identifier] = reused
+                    continue
+                assessment, prediction = computed[origin]
+                if prediction is not None:
+                    prediction = replace(
+                        prediction, request_id=request.request_id, compute_cost=0.0,
+                        limitations=tuple(prediction.limitations) + (
+                            f"reused_prediction_from_request:{pending[origin].request_id}; identical query in this round.",
+                        ),
+                    )
+                    self._record_prediction(request, assessment, prediction, session_id)
+                answered[identifier] = (assessment, prediction)
+            elif identifier in computed:
                 assessment, prediction = computed[identifier]
                 self._record_prediction(request, assessment, prediction, session_id)
                 answered[identifier] = (assessment, prediction)
             else:
                 answered[identifier] = self._predict_virtual_cell(request, session_id)
+                computed[identifier] = answered[identifier]
         return {identifier: answered[identifier] for identifier in requests}
 
     def _backend_name(self) -> str:

@@ -33,6 +33,7 @@ not a status report; verdict labels are the blocks' own registered words, cross-
 | [`sparse_value/`](sparse_value/README.md) | inconclusive | Sparse-reference value analysis. |
 | [`gated_plan/`](gated_plan/README.md) | design | Repository audit and gated research plan; not a registered experiment. |
 | [`local_verification/`](local_verification/README.md) | design | Offline and credential-dependent engineering probes. |
+| [`dual_core_live/`](dual_core_live/README.md) | inconclusive | Actual DeepSeek/Jev API validation, general contract benchmark, biological pilot and report-only defect review; no assumed biological superiority. |
 
 ## (b) Virtual cell and world models
 

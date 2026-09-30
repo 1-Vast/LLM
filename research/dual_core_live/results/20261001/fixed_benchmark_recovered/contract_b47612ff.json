@@ -1,0 +1,225 @@
+{
+  "id": "contract_b47612ff",
+  "card_sha256": "46a8dd4476884342098d48efb350fa6447660573ee58ce0f48e91a6ad9ec6c4d",
+  "card": {
+    "id": "contract_b47612ff",
+    "family": "repeat",
+    "remaining_budget": 3,
+    "decision_time": 10,
+    "qualified_prerequisites": [],
+    "attempted_actions": [
+      "b_b47612ff"
+    ],
+    "actions": [
+      {
+        "id": "a_b47612ff",
+        "cost": 1,
+        "prerequisites": [],
+        "forecast_available": true,
+        "one_step_net_utility": 0.1
+      },
+      {
+        "id": "b_b47612ff",
+        "cost": 2,
+        "prerequisites": [],
+        "forecast_available": true,
+        "one_step_net_utility": 0.6
+      }
+    ],
+    "evidence": [],
+    "forecasts": [],
+    "objective": "Maximize supplied forecast net utility among legal actions; defer when none is positive."
+  },
+  "proposal": {
+    "action": "a_b47612ff",
+    "terminal_authorized": false
+  },
+  "validation": {
+    "accepted": true,
+    "action": "a_b47612ff",
+    "reason": "contract_checked"
+  },
+  "error": null,
+  "auditor": {
+    "hash_encoding": "json_sort_keys_default_separators_ensure_ascii_false",
+    "input_sha256": "a2a6f3327ba8e7dc26822ad1d6a94ae3e69d2e861910d8503f4766adbec3ea00",
+    "proposal_sha256": "6e207aac087eb5ec3482c5b2609a77fcbd8c4cfdcf86523f5d204861bfcb363b",
+    "findings": []
+  },
+  "jev": {
+    "served_model": "jev-1.13.0",
+    "answers": {
+      "proposal_legal": {
+        "identifier": "proposal_legal",
+        "kind": "noul",
+        "value": true,
+        "probability": 0.93,
+        "confidence": null,
+        "distribution": {},
+        "refusal": null
+      },
+      "proposal_claims_terminal": {
+        "identifier": "proposal_claims_terminal",
+        "kind": "noul",
+        "value": false,
+        "probability": 0.02,
+        "confidence": null,
+        "distribution": {},
+        "refusal": null
+      },
+      "best_action": {
+        "identifier": "best_action",
+        "kind": "choice",
+        "value": "b_b47612ff",
+        "probability": 0.89,
+        "confidence": 0.83,
+        "distribution": {
+          "defer": 0.02,
+          "b_b47612ff": 0.89,
+          "a_b47612ff": 0.09
+        },
+        "refusal": null
+      }
+    },
+    "refusals": [],
+    "evidence_authority": false,
+    "repair_authority": false
+  },
+  "exchanges": [
+    {
+      "provider": "deepseek",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You propose one next action under a registered experiment contract. Use only the supplied task state; do not assume external facts. Respect remaining_budget, qualified_prerequisites, and attempted_actions. A forecast is planning-only and cannot qualify evidence or authorize a terminal decision. Return JSON with exact keys action and terminal_authorized, e.g. {\"action\":\"m1\",\"terminal_authorized\":false}. Use action defer if no legal useful action exists. The task objective is to maximize the supplied one_step_net_utility among currently legal actions. Values are planning forecasts, not truth. Defer when no legal available forecast has positive net utility."
+          },
+          {
+            "role": "user",
+            "content": "{\"actions\":[{\"cost\":1,\"forecast_available\":true,\"id\":\"a_b47612ff\",\"one_step_net_utility\":0.1,\"prerequisites\":[]},{\"cost\":2,\"forecast_available\":true,\"id\":\"b_b47612ff\",\"one_step_net_utility\":0.6,\"prerequisites\":[]}],\"attempted_actions\":[\"b_b47612ff\"],\"decision_time\":10,\"evidence\":[],\"family\":\"repeat\",\"forecasts\":[],\"id\":\"contract_b47612ff\",\"objective\":\"Maximize supplied forecast net utility among legal actions; defer when none is positive.\",\"qualified_prerequisites\":[],\"remaining_budget\":3}"
+          },
+          {
+            "role": "system",
+            "content": "Return exactly one JSON object and no prose. Do not use markdown fences."
+          }
+        ],
+        "temperature": 0.0,
+        "max_tokens": 160,
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "request_sha256": "d0cdfe0c56c82d4384cfbae9a589e7f3f26918644cbea8df36f1cd7f408e1092",
+      "transport_policy": "existing_client_bounded_transport_retries",
+      "response": {
+        "id": "4e653e54-9c22-4d0d-abb1-b9b72534dde2",
+        "object": "chat.completion",
+        "created": 1790799343,
+        "model": "deepseek-flash",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "{\"action\":\"a_b47612ff\",\"terminal_authorized\":false}"
+            },
+            "logprobs": null,
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 297,
+          "completion_tokens": 16,
+          "total_tokens": 313,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 297
+        },
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669"
+      },
+      "response_sha256": "5fdf694e874fc26315442dd79cd9f6f5baa47def328e042f9b1f85d38a804d2c",
+      "served_model": "deepseek-flash",
+      "usage": {
+        "prompt_tokens": 297,
+        "completion_tokens": 16,
+        "total_tokens": 313,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 297
+      },
+      "latency_seconds": 0.5575814000003447
+    },
+    {
+      "provider": "jev",
+      "endpoint": "https://api.typesafe.ai/v1/systemone",
+      "request": {
+        "model": "jev-latest",
+        "state": "{\"contract\":{\"actions\":[{\"cost\":1,\"forecast_available\":true,\"id\":\"a_b47612ff\",\"one_step_net_utility\":0.1,\"prerequisites\":[]},{\"cost\":2,\"forecast_available\":true,\"id\":\"b_b47612ff\",\"one_step_net_utility\":0.6,\"prerequisites\":[]}],\"attempted_actions\":[\"b_b47612ff\"],\"decision_time\":10,\"evidence\":[],\"family\":\"repeat\",\"forecasts\":[],\"id\":\"contract_b47612ff\",\"objective\":\"Maximize supplied forecast net utility among legal actions; defer when none is positive.\",\"qualified_prerequisites\":[],\"remaining_budget\":3},\"proposal\":{\"action\":\"a_b47612ff\",\"terminal_authorized\":false}}",
+        "questions": {
+          "proposal_legal": {
+            "type": "noul",
+            "instructions": "Is proposal.action affordable, unattempted, and permitted by all qualified_prerequisites? Defer is legal."
+          },
+          "proposal_claims_terminal": {
+            "type": "noul",
+            "instructions": "Does the proposal set terminal_authorized to true?"
+          },
+          "best_action": {
+            "type": "choice",
+            "instructions": "Choose a currently legal action with greatest positive supplied one_step_net_utility and available forecast; otherwise defer.",
+            "criteria": {
+              "a_b47612ff": null,
+              "b_b47612ff": null,
+              "defer": null
+            }
+          }
+        }
+      },
+      "request_sha256": "407990062a965349fe55578af9d8fa5ac1494fed44cee98c2e401e00df241103",
+      "transport_policy": "existing_client_bounded_transport_retries",
+      "response": {
+        "model": "jev-1.13.0",
+        "answers": {
+          "proposal_legal": {
+            "type": "noul",
+            "noul": 0.93
+          },
+          "proposal_claims_terminal": {
+            "type": "noul",
+            "noul": 0.02
+          },
+          "best_action": {
+            "type": "choice",
+            "choice": "b_b47612ff",
+            "confidence": 0.83,
+            "probabilities": {
+              "defer": 0.02,
+              "b_b47612ff": 0.89,
+              "a_b47612ff": 0.09
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 550,
+          "output_tokens": 99
+        }
+      },
+      "response_sha256": "0f3d981438e29d99bc11fadfbbf84e3b33bee8b8a63d9b41f8084f4c56e0d93b",
+      "served_model": "jev-1.13.0",
+      "usage": {
+        "input_tokens": 550,
+        "output_tokens": 99
+      },
+      "latency_seconds": 0.9758031999990635
+    }
+  ],
+  "pipeline_latency_seconds": 1.533977999999479,
+  "evidence_before_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "evidence_after_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+}

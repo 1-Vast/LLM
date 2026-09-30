@@ -1,0 +1,111 @@
+{
+  "schema": "maestro.read_only_defect_review.v1",
+  "date": "2026-10-01",
+  "baseline_commit": "8271e8a119138d0e9c60fd9938f0abe11e081a79",
+  "mode": "report_only",
+  "repairs_performed": false,
+  "live_api_calls": 0,
+  "model_fits": 0,
+  "reproduction_receipt": "outputs/dual_core_live_20261001/defect_review/reproduction_receipt.json",
+  "findings": [
+    {
+      "id": "D001",
+      "priority": "P2",
+      "status": "confirmed_offline_open",
+      "category": "provider_failure_boundary",
+      "title": "Malformed provider envelopes and invalid UTF-8 escape named failure boundaries",
+      "locations": [
+        {"file": "src/agent/llm.py", "line": 249},
+        {"file": "src/agent/llm.py", "line": 261},
+        {"file": "src/agent/llm.py", "line": 296},
+        {"file": "src/agent/decision_critic.py", "line": 346},
+        {"file": "src/agent/decision_critic.py", "line": 384}
+      ],
+      "receipt_cases": ["deepseek_null_envelope", "deepseek_invalid_utf8", "jev_null_envelope", "jev_invalid_utf8"],
+      "trigger": "Mock the existing URL transport with b'null' or b'\\xff'; do not contact a provider.",
+      "observed": "Raw AttributeError/TypeError/UnicodeDecodeError; Jev evaluate returns no refused evaluation.",
+      "expected": "DeepSeek names a provider protocol failure; Jev returns a refused advisory evaluation so the scientific turn continues.",
+      "suggested_minimal_change": "Validate mapping envelopes and wrap UnicodeDecodeError/JSON/envelope violations with provider-specific protocol errors; retain transport retry policy.",
+      "limits": "Synthetic malformed responses; no incidence estimate or actual live outage is claimed."
+    },
+    {
+      "id": "D002",
+      "priority": "P2",
+      "status": "confirmed_offline_open",
+      "category": "provider_usage_accounting",
+      "title": "Provider-reported usage is omitted when completion text is unusable",
+      "locations": [{"file": "src/agent/llm.py", "line": 252}, {"file": "src/agent/llm.py", "line": 276}],
+      "receipt_cases": ["deepseek_unusable_text_usage"],
+      "trigger": "A response has content=null, finish_reason=length and usage={prompt_tokens:7,completion_tokens:3,total_tokens:10}.",
+      "observed": "LLMProtocolError is raised, but provider_usage is {calls:0} with no token usage.",
+      "expected": "Received provider-reported usage remains available even when content cannot be used.",
+      "suggested_minimal_change": "Record validated provider usage before text interpretation; distinguish attempted, received and usable calls.",
+      "limits": "This establishes omitted reported tokens, not the monetary billing of a live request."
+    },
+    {
+      "id": "D003",
+      "priority": "P3",
+      "status": "confirmed_offline_open",
+      "category": "round_deduplication_efficiency",
+      "title": "Within-round duplicate suppression depends on persistent reuse",
+      "locations": [{"file": "src/agent/orchestrator.py", "line": 1448}, {"file": "src/agent/orchestrator.py", "line": 1472}, {"file": "src/agent/orchestrator.py", "line": 1486}],
+      "receipt_cases": ["round_dedup_reuse_True", "round_dedup_reuse_False"],
+      "trigger": "Dispatch two requests with identical model inputs, different tracking IDs, two workers and reuse_predictions=False.",
+      "observed": "Two backend predictions; the reuse-enabled control has one.",
+      "expected": "The dispatcher's documented once-per-distinct-input round property is independent of cross-round caching.",
+      "suggested_minimal_change": "Rebind completed results from a temporary per-round key map; preserve original provenance, abstentions and compute accounting.",
+      "limits": "Measured call counts use a synthetic counting backend; no production speedup or wall-time estimate is claimed."
+    },
+    {
+      "id": "D004",
+      "priority": "P2",
+      "status": "confirmed_offline_open",
+      "category": "judgment_model_identity",
+      "title": "Repeated typed judgments merge served versions under the first model",
+      "locations": [{"file": "src/agent/decision_critic.py", "line": 750}, {"file": "src/agent/decision_critic.py", "line": 761}, {"file": "src/agent/decision_critic.py", "line": 773}, {"file": "src/agent/decision_critic.py", "line": 789}],
+      "receipt_cases": ["jev_mixed_version_repeats"],
+      "trigger": "Two evaluations of the same state return models jev-version-1/jev-version-2 with p=0.1/0.9.",
+      "observed": "Aggregated p=0.5 is recorded only under jev-version-1, with no refusal.",
+      "expected": "Repetition/stability attribution preserves the served model identity; different versions are not one unchanged-model sample.",
+      "suggested_minimal_change": "Require consistent served-model/state identities before aggregation, or partition/refuse mixed-version evaluations with explicit receipts.",
+      "limits": "The served-version change is mocked; no claim that the current provider changed versions during a live run."
+    },
+    {
+      "id": "D005",
+      "priority": "P2",
+      "status": "confirmed_offline_open",
+      "category": "history_input_validation",
+      "title": "Nonfinite history metadata passes structural validation then fails cache serialization",
+      "locations": [{"file": "src/virtual_cell/interface.py", "line": 131}, {"file": "src/virtual_cell/interface.py", "line": 231}, {"file": "src/virtual_cell/interface.py", "line": 903}],
+      "receipt_cases": ["nonfinite_history_cache"],
+      "trigger": "A history_aware request includes {action:'a',outcome:'unresolved',extra:NaN}.",
+      "observed": "validation_errors() returns empty; PredictionCache.key_for raises ValueError.",
+      "expected": "Invalid non-JSON inputs are rejected by validation before cache lookup/prediction, with a named request failure.",
+      "suggested_minimal_change": "Recursively validate supported JSON history values before serialization; keep unsupported backend history modes refused.",
+      "limits": "Invalid input is not a scientific query; this does not establish history-conditioned model support."
+    },
+    {
+      "id": "D006",
+      "priority": "P3",
+      "status": "confirmed_offline_open",
+      "category": "default_log_provenance",
+      "title": "The dated default log directory is a fixed historical date",
+      "locations": [{"file": "src/agent/llm.py", "line": 114}],
+      "receipt_cases": ["default_log_date"],
+      "trigger": "Resolve _log_directory(workspace,'') on the execution date 2026-10-01.",
+      "observed": "Directory resolves to D:/MAESTRO/log/20260910.",
+      "expected": "A dated default follows an explicit local execution-date policy or is described as a fixed compatibility directory.",
+      "suggested_minimal_change": "Make the execution-date convention explicit and preserve existing frozen logs; do not rewrite historical artifacts.",
+      "limits": "Explicit MAESTRO_LOG_DIRECTORY configuration is unaffected."
+    }
+  ],
+  "regression": {"passed": 124, "failed": 0, "seconds": 15.38, "scope": "Existing focused contracts; uncovered defect cases remain open."},
+  "cleanup": {
+    "genuine_unused_runtime_imports_found": 0,
+    "false_positive_type_checking_imports": 7,
+    "do_not_delete": ["src/agent/context.py TYPE_CHECKING imports", "src/maestro/contrast.py TYPE_CHECKING imports", "src/maestro/repair.py TYPE_CHECKING imports", "frozen research artifacts"],
+    "candidate": "Small shared provider decoding/envelope normalization, because both existing transport loops duplicate the same failure; retain provider-specific retries/refusals/accounting."
+  },
+  "not_run": ["live-provider failure incidence", "external API load benchmarks", "new STATE accuracy/invariance inference", "model fitting", "proposed repairs"],
+  "evidence_boundary": "All judgments and predictions remain planning-only model_prediction; deterministic contracts retain measurement, premise and terminal authority."
+}

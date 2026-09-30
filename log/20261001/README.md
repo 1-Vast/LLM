@@ -156,3 +156,99 @@ Every rerun requires a new leaf directory and declared local assets. [Follow-up 
 All data, labels and development folds remain exposed. Chemical skeleton/component unit-mean bootstrap inference is separate by task; shared physical plate/batch dependence does not provide an independent physical interval. Reading quality is conditional proxy-label quality, averaged within episode then chemical unit. Fixed has no forecast ranking; later ranking comparisons can follow different measured histories. Common decided/acted coverage is descriptive and outcome-conditioned, not a calibrated pre-action risk guarantee.
 
 No new training, model grid, live biological/provider experiment, oracle policy, new STATE inference, WorldV2 fit/swap or true pre-action state gain is run. No general biological superiority, external calibration, full new World x Policy interaction, complete attempts denominator or utility point identification of unresolved reachable results is claimed. The registered engineering framework remains connected; the experimental findings determine whether a new research policy is retained or promoted.
+
+## 12. Live APIs, generic contracts and independent defect review
+
+This extension executes actual DeepSeek and TypeSafe Jev requests under the existing maestro environment, following the user's explicit provider instruction. The preceding section's no-live-experiment statement describes its own earlier protocol. The design/implementation, primary literature access, metrics and pre-experiment hypotheses are in [DESIGN_REVIEW.md](../../research/dual_core_live/DESIGN_REVIEW.md); provider documentation and role assignment are in [API_DESIGN.md](../../research/dual_core_live/API_DESIGN.md).
+
+### 12.1 Roles, frozen design and scientific scope
+
+DeepSeek proposes an action from public menu/budget/forecast/purchased-evidence cards. Jev supplies typed advisory judgments on that same information. The dedicated ModelAuditAgent returns immutable findings and hashes, with no repair/execution/evidence authority. A separate collaborating review agent inspects defects and fixes, but applies no changes. The registered executor/validator alone admits measurements and decides the terminal outcome.
+
+The formal population is fixed before API calls: six constructed contract families x four variants, 24 blinded bad proposals paired with 24 clean controls, and twelve hash-selected biological episodes (six each SciPlex3 B/L1000 LT, spanning all existing folds). Each biological policy has at most two registered measurements. The cap is 49 logical calls/provider, concurrency one. No training, model/prompt search or threshold tuning occurs. General task performance and selected biological proxy outcomes remain separate. All development-data/checkpoint exposure histories still apply; this is no external validation.
+
+The original runtime parent is 8271e8a, plus frozen exact working-tree source hashes. Four approved runtime files have explicit inherited-to-current hashes; every other inherited hash remains mandatory. Production STATE, research WorldV2, case-memory outcomes and ReferenceWorld remain distinct. The biological API pilot uses ReferenceWorld; its effects are not credited to another backend. No hidden-result oracle or real predecision-state gain strategy is deployed.
+
+### 12.2 Smoke, reproduced defects and repairs
+
+Two actual smoke calls per provider completed. DeepSeek selected the expected action/defer in both cases and reported 475 total tokens. Jev selected both expected actions and reported 872 input/122 output tokens, but answered that a prediction is a measurement on the first empty-evidence card (probability .51). The negative observation is retained; neither provider changes evidence or terminal permission.
+
+The report-only reviewer reproduced six offline defects: provider null/UTF-8 exceptions escaping the named error boundary, reported usage omitted for unusable text, within-round duplicate inference with persistent reuse disabled, mixed served-model Jev aggregation, nonfinite prediction history accepted before cache serialization, and the stale default log date. Root repairs those actual runtime defects, not a scientific score. The shared envelope decoder replaces duplicate decoding logic. Same-round exact queries now run once regardless of cross-round reuse; distinct inputs and request lineage remain separate. Reported usage is counted before text acceptance; lost-response billing remains unknown. Mixed model/state repeats refuse before ledger writes. Invalid history refuses before backend/cache use. Default log paths use the execution date, preserving explicit frozen-directory settings.
+
+The independently added auditor also required containment for malformed/nonfinite/non-JSON/extreme numeric/Unicode inputs. Those cases now produce exact findings and an explicitly null unavailable hash. Its original defect report and receipts remain frozen; the new post-fix review passes 161 focused checks and confirms no mutation/repair/execution authority.
+
+The final full regression has **1,582 passes, one inherited historical Chinese-Markdown failure, two fitting checks excluded**, no errors/skips/source drift. All 333 historical frozen files and 39 source-qualification records match. Strict overall validation remains failed for that inherited documentation rule. The four old Chinese reports are not rewritten to obtain a green check. The full receipt and exact source/package environment are archived with the experiment.
+
+### 12.3 Execution failures and preservation
+
+The first formal freeze stopped before API calls because the inherited input ledger also contained current Python source, including four authorized runtime changes. Data hashes matched. The fresh freeze retains all inherited hashes except that exact recorded allowlist and freezes current source separately.
+
+All formal API calls and twelve biological replays then completed, but saving biological_rows.json encountered a registered validator score of negative infinity. Preserve the original source, API receipts and failed/partial output. A serialization-only correction represents structural nonfinite values as explicit objects; it does not fill missing outcomes or change a policy. Recovery reconstructs biological cards/actions from the exact saved provider receipts in a new directory, checking hashes and forbidding network/fitting calls. Observed API answers are reused; no additional live requests are needed.
+
+### 12.4 Quantitative results and adjustments
+
+The formal run uses **40 logical calls/provider** (24 general proposals/reviews, one batch defect review, 15 biological decisions), plus the earlier two smoke calls/provider. Both serve one recorded model version, with no transport/protocol errors. Recovery matches all 15 biological card/gate records and performs zero new API calls.
+
+| Formal provider | Served model | Reported usage | Median / p95 request seconds |
+|---|---|---|---|
+| DeepSeek | deepseek-flash | 71,569 prompt + 1,296 completion = 72,865 tokens | .617 / 1.068 |
+| Jev | jev-1.13.0 | 113,712 input + 8,127 output tokens | .909 / 1.020 |
+
+Usage does not identify the account's monetary charge; no price/credit receipt is available. Request latency includes existing bounded transport retry handling. These are observed logical calls, not inferred transport-attempt counts.
+
+On the 24 constructed tasks, the public deterministic one-step optimizer follows the objective in 24/24 cases; fixed ordering, raw DeepSeek, gated DeepSeek and report-only Jev each succeed in 20/24. All their selected actions are legal. The four DeepSeek objective failures select a legal measurement when unavailable forecasts require defer under this declared task objective. Legality gating alone does not guarantee objective adherence. Jev has zero action effect by construction in its report-only arm. The blinded 48-card review gives DeepSeek and the dedicated deterministic auditor 48/48 correct; Jev gives TP23/FP1/FN1/TN23 (precision/recall .9583, false-positive rate .0417). These inserted defects test authority/action/schema checks, not arbitrary model defect detection.
+
+| Biological pilot arm | correct | wrong | undetermined | deferred | measurements | days | mean terminal utility | mean net utility |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| SciPlex3 B fixed | 5 | 0 | 1 | 0 | 8 | 48 | .8333 | .8067 |
+| SciPlex3 B one-step optimizer | 5 | 0 | 1 | 0 | 8 | 48 | .8333 | .8067 |
+| SciPlex3 B gated DeepSeek | 5 | 0 | 1 | 0 | 8 | 48 | .8333 | .8067 |
+| L1000 LT fixed | 1 | 0 | 5 | 0 | 12 | 67.5 | .1667 | .1267 |
+| L1000 LT one-step optimizer | 1 | 0 | 0 | 5 | 2 | 12 | .1667 | .1600 |
+| L1000 LT gated DeepSeek | 1 | 0 | 0 | 5 | 2 | 12 | .1667 | .1600 |
+
+Each task has six pilot episodes and six chemical units. All pilot-reachable results pass the source coverage checks; this does not resolve the broader four well/five plate discrepancies. Terminal utility is +1/-2/0; net subtracts .02 per measurement, while days consume the independent time budget. Paired terminal differences are zero in both tasks. Zero-variance bootstrap output on six selected units is not an equivalence proof or external uncertainty guarantee.
+
+SciPlex3 changes four of six action sequences; all four retain the same terminal category, locating a menu/validator limit. The same ReferenceWorld has lower loss on the newly selected actions (.95685 to .54549 unit-mean conditional proxy-label NLL), which cannot establish a backend accuracy improvement across different action/history distributions. L1000 changes all six sequences, but correct/wrong and terminal utility remain identical; five categories switch from undetermined to deferred. Its net difference is +.03333 [chemical-unit bootstrap .02, .04], wholly explained by measurements saved through refusal. On the single common-decided L1000 episode both are correct, use two measurements, and API costs 12 days versus fixed's 11.25. There is no matched-coverage correctness or risk improvement. Only one L1000 API chemical unit contributes selected readings, so no meaningful reading-quality confidence interval is asserted.
+
+Local warmed timing on the exact frozen general cards (three trials of 24,000 calls each) is .874 microseconds/card for fixed ordering, 1.955 for the one-step optimizer and 19.906 for the report-only auditor including optimizer/input hashing. This is local engineering timing, not STATE/GPU speed or independent biological evidence. Exact duplicate-query tests reduce two within-round backend inferences to one with persistent reuse disabled. Network/API latency dominates these local operations.
+
+Retain the actual runtime fixes and generic report-only audit contract. Keep API/forecast policies as research comparisons: no default policy promotion, general biological superiority or unique algorithmic novelty is established. Do not tune the prompt on these exposed cases to manufacture an improvement. The design report names the untouched external data, independent attempted-experiment units and repeated-call benchmarks required for stronger claims.
+
+### 12.5 Executed, unrun and unidentified analyses
+
+Executed: actual smoke and formal API calls, six-family task comparisons, blinded defect checks, twelve registered biological replays, zero-call exact-answer recovery, selected-action reading/proxy-label quality, grouped paired summaries, common-decided risk/cost, source coverage, local engineering timing, independent report-only defect review and full regression/frozen-integrity checks.
+
+Unrun: new training, large model/prompt search, new STATE inference, unavailable WorldV2 transitions, real predecision-state gain, external third-domain biological validation, AgentDojo/ToolEmu/tau-bench suites, provider repeated-call pass^k and real wet-lab deployment. Unidentified: broad biological/algorithmic superiority, monetary API charge, independent physical-cluster intervals, complete real attempted-experiment distributions and unresolved source-linked counterfactuals outside the covered pilot.
+
+Use fresh leaf directories for every replay. The live recovery command reuses recorded responses and forbids network/fitting:
+
+```powershell
+& 'D:\anaconda\envs\maestro\python.exe' -m research.dual_core_live.benchmark recover --from-run outputs/dual_core_live_20261001/fixed_benchmark_v1 --out outputs/dual_core_live_20261001/fixed_benchmark_recovered_new
+```
+
+The [live report](../../research/dual_core_live/API_RESULTS.md) gives the full grouped metrics and commands. The [publication manifest](../../research/dual_core_live/results/20261001/manifest.json) binds every archived receipt to original bytes and records source/input hashes, code version, run command and environment. Existing Round 1/2 and earlier follow-up freezes remain unchanged.
+
+## 13. Repairs prompted by negative results
+
+The user's follow-up asks for repairs, not only reporting a negative result. The optional generic research support contract now explicitly requires an available finite positive forecast for forecast-dependent measurements. A violation yields the declared defer fallback; it never substitutes an evaluator's preferred measurement. Absence of this contract preserves legal fixed/no-forecast planning. Dedicated ModelAuditAgent remains report-only, and production selection defaults are not modified for a research metric.
+
+Twenty-eight support contracts pass. Exact replay of the original saved 24 proposals changes four unsupported selections to defer: objective adherence changes from 20/24 to 24/24, with zero new API calls. This is exposed-case deterministic containment, not a live model improvement. The full command/source hashes and individual joins are retained in original_failure_replay/.
+
+A separate prospective check freezes eight new generated cards (four known contract mechanisms x two variants, seed20261002) before requests, retains the original proposer prompt and uses the same raw proposal for all gates. It calls DeepSeek and Jev eight times each. Raw/legal/support gates all score 8/8 legality and objective adherence, with two proposed measurements and six deferrals. The observed paired gate effect is zero. Jev has 8/8 support and evidence judgments, but 6/8 objective judgments: false negatives at .45 and .49 are retained. These advisory errors have no action/evidence/repair authority. Neither prompts nor thresholds are tuned to hide them. DeepSeek reports 2,879 tokens; Jev 4,712 input/488 output; actual account charges remain unidentified. Pipeline median/p95 is 1.580/1.796 seconds.
+
+Across smoke, formal and prospective phases, each provider has **50 observed logical calls**; no recovery or reanalysis calls a provider. This is 100 logical calls across both providers, not a monetary-charge estimate or a transport retry count.
+
+Statistical reanalysis removes four selected-reading bootstrap intervals supported by only one chemical unit. It writes corrected_summary.json and a correction receipt without changing means, terminal outcomes or the original summary. Zero observed delta variance on six pilot units remains conditional resampling, not equivalence. Physical-cluster inference remains unavailable.
+
+An independent report-only audit recomputes 2,936 original/recovered checks: 522 inherited input hashes, 134 executable source hashes, 80 formal exchanges, 24 general scenarios, 48 review rows, 36 biological traces and 15 exact cached card/gate joins. It confirms no hidden evaluator field or unpurchased reading in provider requests, unchanged evidence and no Jev repair/terminal authority. Original pre-serialization source bytes are checked against the preregistration.
+
+The post-fix full regression has **1,621 passes, one inherited historical Markdown-language failure, two fitting checks excluded**, no errors/skips/source drift. All 333 frozen historical files and 39 data-review source identities match. Strict validation still records the inherited failure. Twenty-eight support, nine prospective and two uncertainty tests are included in this scope; they are not independent scientific experiments.
+
+Current execution source bytes are additionally archived under execution_sources/ (296 files), so their SHA256 records survive Git line-ending normalization. Original pre-serialization source is separately archived. The [post-fix report](../../research/dual_core_live/POST_FIX_RESULTS.md), [design record](../../research/dual_core_live/DESIGN_REVIEW.md), episode/response tables and [publication manifest](../../research/dual_core_live/results/20261001/manifest.json) retain expected versus observed conclusions, commands, environments and hashes.
+
+Resolved: reproduced runtime defects, explicit support-rule violations under the optional contract, serializer failure and single-unit uncertainty reporting. Retained as scientific limitations: null biological terminal gain, costs saved mainly by refusal, external-provider judgment errors, exposed-data scope and unresolved source counterfactuals outside the pilot. The validator and evidence rules are not relaxed to change those conclusions.
+
+Publication review adds the completed 4,016-check original/recovery audit and 321-check prospective audit (overlapping engineering checks, not independent scientific experiments). The fresh cards add an explicit visible support contract; identical prompt alone does not identify a before/after model improvement. Within the fresh population all arms use identical information/proposals. No new superiority claim follows.
+
+The publication includes scientific/API receipts, failed original sources, corrections, complete path summaries and exact executable bytes. Generated test_temp fixtures, Python caches and configuration files are excluded from published copies with local-path/hash records; original local files remain preserved. Secrets are checked before publication. Only main is retained and the completed changes are uploaded there.

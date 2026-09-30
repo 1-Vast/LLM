@@ -1,0 +1,20 @@
+import sys, json, hashlib, platform
+from pathlib import Path
+sys.path.insert(0, str(Path.cwd()/'src'))
+from research.dual_core_live.benchmark import best_action
+from research.dual_core_live.support_contract import FORECAST_SUPPORT_CONTRACT, gate_supported_proposal
+base = Path('outputs/dual_core_live_20261001')
+original = base/'fixed_benchmark_v1'
+out = base/'original_failure_replay'
+out.mkdir(exist_ok=False)
+rows=[]
+for p in sorted(original.glob('contract_*.json')):
+    raw = p.read_bytes()
+    item = json.loads(raw)
+    card, proposal = item['card'], item['proposal']
+    gate = gate_supported_proposal(card, proposal, FORECAST_SUPPORT_CONTRACT)
+    target = best_action(card)
+    rows.append({'id':p.stem,'family':card['family'],'original_receipt_sha256':hashlib.sha256(raw).hexdigest(),'card_sha256':item['card_sha256'],'raw_action':proposal['action'],'expected_action':target,'support_gate':gate,'raw_adherent':proposal['action']==target,'gated_adherent':gate['action']==target})
+record={'scope':'Exact original API responses; deterministic optional-contract repair replay, no new model response or training.','command':'Read saved contract receipts and apply gate_supported_proposal with FORECAST_SUPPORT_CONTRACT','environment':{'python':sys.version,'interpreter':sys.executable,'platform':platform.platform()},'code_sha256':{str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in (Path('research/dual_core_live/support_contract.py'),Path('research/dual_core_live/live_api.py'),Path('research/dual_core_live/benchmark.py'))},'rows':rows,'raw_adherent':sum(r['raw_adherent'] for r in rows),'gated_adherent':sum(r['gated_adherent'] for r in rows),'changed':sum(r['raw_action']!=r['support_gate']['action'] for r in rows),'new_api_calls':0,'evidence_authority':False,'auditor_repair_authority':False}
+with (out/'repair_replay.json').open('x',encoding='utf-8') as f: json.dump(record,f,indent=2,allow_nan=False)
+print(json.dumps({k:record[k] for k in ('raw_adherent','gated_adherent','changed','new_api_calls')}))

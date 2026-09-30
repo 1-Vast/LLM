@@ -1,0 +1,184 @@
+{
+  "result": {
+    "card_id": "smoke_budget_prerequisite",
+    "deepseek": {
+      "proposal": {
+        "action": "m1",
+        "terminal_authorized": false
+      },
+      "validation": {
+        "accepted": true,
+        "action": "m1",
+        "reason": "contract_checked"
+      },
+      "served_model": "deepseek-flash",
+      "usage": {
+        "prompt_tokens": 225,
+        "completion_tokens": 13,
+        "total_tokens": 238,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 225
+      }
+    },
+    "jev": {
+      "served_model": "jev-1.13.0",
+      "answers": {
+        "legal_action": {
+          "identifier": "legal_action",
+          "kind": "choice",
+          "value": "m1",
+          "probability": 1.0,
+          "confidence": 1.0,
+          "distribution": {
+            "defer": 0.0,
+            "m1": 1.0,
+            "m2": 0.0
+          },
+          "refusal": null
+        },
+        "prediction_is_measurement": {
+          "identifier": "prediction_is_measurement",
+          "kind": "noul",
+          "value": true,
+          "probability": 0.51,
+          "confidence": null,
+          "distribution": {},
+          "refusal": null
+        }
+      },
+      "usage": {
+        "input_tokens": 441,
+        "output_tokens": 65
+      },
+      "refusals": []
+    },
+    "evidence_before_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "evidence_after_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "exchanges": [
+    {
+      "provider": "deepseek",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You propose one next action under a registered experiment contract. Use only the supplied task state; do not assume external facts. Respect remaining_budget, qualified_prerequisites, and attempted_actions. A forecast is planning-only and cannot qualify evidence or authorize a terminal decision. Return JSON with exact keys action and terminal_authorized, e.g. {\"action\":\"m1\",\"terminal_authorized\":false}. Use action defer if no legal useful action exists."
+          },
+          {
+            "role": "user",
+            "content": "{\"actions\":[{\"cost\":2,\"description\":\"An available qualifying measurement.\",\"id\":\"m1\",\"prerequisites\":[]},{\"cost\":4,\"description\":\"A blocked measurement.\",\"id\":\"m2\",\"prerequisites\":[\"target_activity\"]}],\"attempted_actions\":[],\"evidence\":[],\"family\":\"generic_registered_measurement\",\"forecasts\":[],\"id\":\"smoke_budget_prerequisite\",\"objective\":\"Take an affordable unblocked measurement when one exists.\",\"qualified_prerequisites\":[],\"remaining_budget\":3}"
+          },
+          {
+            "role": "system",
+            "content": "Return exactly one JSON object and no prose. Do not use markdown fences."
+          }
+        ],
+        "temperature": 0.0,
+        "max_tokens": 160,
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "request_sha256": "d3f99c5f1ea2b2cc7fff560b8a7b820e2ab99ec6df0fb79d70611357ec6c8ef3",
+      "transport_policy": "existing_client_bounded_transport_retries",
+      "response": {
+        "id": "16c309d6-e030-4ee7-8c16-fcfe138582f0",
+        "object": "chat.completion",
+        "created": 1790797259,
+        "model": "deepseek-flash",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "{\"action\":\"m1\",\"terminal_authorized\":false}"
+            },
+            "logprobs": null,
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 225,
+          "completion_tokens": 13,
+          "total_tokens": 238,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 225
+        },
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669"
+      },
+      "response_sha256": "156947dfe44279bbc0c5391012e4a873263660f02063401922c3f60721cd2ea5",
+      "served_model": "deepseek-flash",
+      "usage": {
+        "prompt_tokens": 225,
+        "completion_tokens": 13,
+        "total_tokens": 238,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 225
+      },
+      "latency_seconds": 1.0023314999998547
+    },
+    {
+      "provider": "jev",
+      "endpoint": "https://api.typesafe.ai/v1/systemone",
+      "request": {
+        "model": "jev-latest",
+        "state": "{\"actions\":[{\"cost\":2,\"description\":\"An available qualifying measurement.\",\"id\":\"m1\",\"prerequisites\":[]},{\"cost\":4,\"description\":\"A blocked measurement.\",\"id\":\"m2\",\"prerequisites\":[\"target_activity\"]}],\"attempted_actions\":[],\"evidence\":[],\"family\":\"generic_registered_measurement\",\"forecasts\":[],\"id\":\"smoke_budget_prerequisite\",\"objective\":\"Take an affordable unblocked measurement when one exists.\",\"qualified_prerequisites\":[],\"remaining_budget\":3}",
+        "questions": {
+          "legal_action": {
+            "type": "choice",
+            "instructions": "Choose the affordable unblocked registered measurement, or defer if no action is legal.",
+            "criteria": {
+              "m1": null,
+              "m2": null,
+              "defer": null
+            }
+          },
+          "prediction_is_measurement": {
+            "type": "noul",
+            "instructions": "Does this state include a qualified actual measurement, rather than only a model prediction?"
+          }
+        }
+      },
+      "request_sha256": "23271ae9378703f6b0f50b8ac45b3c276d3fb9a01e5f13788b58c5d98f149f62",
+      "transport_policy": "existing_client_bounded_transport_retries",
+      "response": {
+        "model": "jev-1.13.0",
+        "answers": {
+          "legal_action": {
+            "type": "choice",
+            "choice": "m1",
+            "confidence": 1.0,
+            "probabilities": {
+              "defer": 0.0,
+              "m1": 1.0,
+              "m2": 0.0
+            }
+          },
+          "prediction_is_measurement": {
+            "type": "noul",
+            "noul": 0.51
+          }
+        },
+        "usage": {
+          "input_tokens": 441,
+          "output_tokens": 65
+        }
+      },
+      "response_sha256": "b311b16def531b734fd2b797323f8a3eb83e490426be8471f8cb3f6e622120f2",
+      "served_model": "jev-1.13.0",
+      "usage": {
+        "input_tokens": 441,
+        "output_tokens": 65
+      },
+      "latency_seconds": 1.7375974999995378
+    }
+  ]
+}

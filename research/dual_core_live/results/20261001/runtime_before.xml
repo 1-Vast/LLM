@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="14" skipped="0" tests="16" time="1.435" timestamp="2026-10-01T03:54:29.406006+08:00" hostname="上善若水"><testcase classname="tests.test_model_runtime_defects" name="test_invalid_provider_envelopes_stay_inside_provider_contracts[null]" time="0.016"><failure message="AttributeError: 'NoneType' object has no attribute 'get'">self = &lt;agent.llm.DeepSeekChatClient object at 0x0000014BAD9AE290&gt;
+messages = [{'role': 'user', 'content': 'Return {}.'}], model = 'model'
+temperature = 0.0, max_tokens = None, json_output = True
+thinking_enabled = None
+
+    def complete(
+        self,
+        messages: Sequence[Mapping[str, Any]],
+        *,
+        model: str | None = None,
+        temperature: float = 0.0,
+        max_tokens: int | None = None,
+        json_output: bool = False,
+        thinking_enabled: bool | None = None,
+    ) -&gt; LLMResponse:
+        """Execute one completion while retaining only safe metadata locally."""
+    
+        payload: dict[str, Any] = {
+            "model": model or self._settings.chat_model,
+            "messages": list(messages),
+            "temperature": temperature,
+            "max_tokens": max_tokens or self._settings.max_tokens,
+        }
+        if json_output:
+            payload["response_format"] = {"type": "json_object"}
+        if thinking_enabled is not None:
+            if type(thinking_enabled) is not bool:
+                raise ValueError("thinking_enabled must be boolean or None")
+            payload["thinking"] = {"type": "enabled" if thinking_enabled else "disabled"}
+        request = Request(
+            self._chat_endpoint(),
+            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+            headers={
+                "Authorization": f"Bearer {self._settings.api_key}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        body = self._send(request)
+    
+        try:
+&gt;           choice = body["choices"][0]
+                     ^^^^^^^^^^^^^^^
+E           TypeError: 'NoneType' object is not subscriptable
+
+src\agent\llm.py:252: TypeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_invalid_provider_envelope0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000014BAD9ADD50&gt;
+raw = b'null'
+
+    @pytest.mark.parametrize("raw", [b"null", b"[]", b"\xff", b"not json"])
+    def test_invalid_provider_envelopes_stay_inside_provider_contracts(tmp_path, monkeypatch, raw):
+        for module in (llm, jev):
+            monkeypatch.setattr(module, "urlopen", lambda *a, **kw: Reply(raw))
+        client = llm.DeepSeekChatClient(llm.MAESTROSettings("secret", "https://invalid.example", "model", "vision", tmp_path))
+        with pytest.raises(llm.LLMProtocolError):
+&gt;           client.complete_json([{"role": "user", "content": "Return {}."}])
+
+tests\test_model_runtime_defects.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\agent\llm.py:337: in complete_json
+    response = self.complete(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;agent.llm.DeepSeekChatClient object at 0x0000014BAD9AE290&gt;
+messages = [{'role': 'user', 'content': 'Return {}.'}], model = 'model'
+temperature = 0.0, max_tokens = None, json_output = True
+thinking_enabled = None
+
+    def complete(
+        self,
+        messages: Sequence[Mapping[str, Any]],
+        *,
+        model: str | None = None,
+        temperature: float = 0.0,
+        max_tokens: int | None = None,
+        json_output: bool = False,
+        thinking_enabled: bool | None = None,
+    ) -&gt; LLMResponse:
+        """Execute one completion while retaining only safe metadata locally."""
+    
+        payload: dict[str, Any] = {
+            "model": model or self._settings.chat_model,
+            "messages": list(messages),
+            "temperature": temperature,
+            "max_tokens": max_tokens or self._settings.max_tokens,
+        }
+        if json_output:
+            payload["response_format"] = {"type": "json_object"}
+        if thinking_enabled is not None:
+            if type(thinking_enabled) is not bool:
+                raise ValueError("thinking_enabled must be boolean or None")
+            payload["thinking"] = {"type": "enabled" if thinking_enabled else "disabled"}
+        request = Request(
+            self._chat_endpoint(),
+            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+            headers={
+                "Authorization": f"Bearer {self._settings.api_key}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        body = self._send(request)
+    
+        try:
+            choice = body["choices"][0]
+            content = choice["message"]["content"]
+            if not isinstance(content, str):
+                raise TypeError("message content is not text")
+        except (KeyError, IndexError, TypeError) as error:
+            # A reply can lack usable text in several different ways - no choice at all, a
+            # choice with a null content, or a message carrying only a refusal or reasoning
+            # field - and they call for different responses. The sentence is unchanged; what
+            # follows it records which one happened, so a run's ledger says why it was charged.
+&gt;           choices = body.get("choices") or []
+                      ^^^^^^^^
+E           AttributeError: 'NoneType' object has no attribute 'get'
+
+src\agent\llm.py:261: AttributeError</failure></testcase><testcase classname="tests.test_model_runtime_defects" name="test_invalid_provider_envelopes_stay_inside_provider_contracts[[]]" time="0.004"><failure message="AttributeError: 'list' object has no attribute 'get'">self = &lt;agent.llm.DeepSeekChatClient object at 0x0000014BADA02090&gt;
+messages = [{'role': 'user', 'content': 'Return {}.'}], model = 'model'
+temperature = 0.0, max_tokens = None, json_output = True
+thinking_enabled = None
+
+    def complete(
+        self,
+        messages: Sequence[Mapping[str, Any]],
+        *,
+        model: str | None = None,
+        temperature: float = 0.0,
+        max_tokens: int | None = None,
+        json_output: bool = False,
+        thinking_enabled: bool | None = None,
+    ) -&gt; LLMResponse:
+        """Execute one completion while retaining only safe metadata locally."""
+    
+        payload: dict[str, Any] = {
+            "model": model or self._settings.chat_model,
+            "messages": list(messages),
+            "temperature": temperature,
+            "max_tokens": max_tokens or self._settings.max_tokens,
+        }
+        if json_output:
+            payload["response_format"] = {"type": "json_object"}
+        if thinking_enabled is not None:
+            if type(thinking_enabled) is not bool:
+                raise ValueError("thinking_enabled must be boolean or None")
+            payload["thinking"] = {"type": "enabled" if thinking_enabled else "disabled"}
+        request = Request(
+            self._chat_endpoint(),
+            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+            headers={
+                "Authorization": f"Bearer {self._settings.api_key}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        body = self._send(request)
+    
+        try:
+&gt;           choice = body["choices"][0]
+                     ^^^^^^^^^^^^^^^
+E           TypeError: list indices must be integers or slices, not str
+
+src\agent\llm.py:252: TypeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_invalid_provider_envelope1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000014BFFE48B10&gt;
+raw = b'[]'
+
+    @pytest.mark.parametrize("raw", [b"null", b"[]", b"\xff", b"not json"])
+    def test_invalid_provider_envelopes_stay_inside_provider_contracts(tmp_path, monkeypatch, raw):
+        for module in (llm, jev):
+            monkeypatch.setattr(module, "urlopen", lambda *a, **kw: Reply(raw))
+        client = llm.DeepSeekChatClient(llm.MAESTROSettings("secret", "https://invalid.example", "model", "vision", tmp_path))
+        with pytest.raises(llm.LLMProtocolError):
+&gt;           client.complete_json([{"role": "user", "content": "Return {}."}])
+
+tests\test_model_runtime_defects.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\agent\llm.py:337: in complete_json
+    response = self.complete(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;agent.llm.DeepSeekChatClient object at 0x0000014BADA02090&gt;
+messages = [{'role': 'user', 'content': 'Return {}.'}], model = 'model'
+temperature = 0.0, max_tokens = None, json_output = True
+thinking_enabled = None
+
+    def complete(
+        self,
+        messages: Sequence[Mapping[str, Any]],
+        *,
+        model: str | None = None,
+        temperature: float = 0.0,
+        max_tokens: int | None = None,
+        json_output: bool = False,
+        thinking_enabled: bool | None = None,
+    ) -&gt; LLMResponse:
+        """Execute one completion while retaining only safe metadata locally."""
+    
+        payload: dict[str, Any] = {
+            "model": model or self._settings.chat_model,
+            "messages": list(messages),
+            "temperature": temperature,
+            "max_tokens": max_tokens or self._settings.max_tokens,
+        }
+        if json_output:
+            payload["response_format"] = {"type": "json_object"}
+        if thinking_enabled is not None:
+            if type(thinking_enabled) is not bool:
+                raise ValueError("thinking_enabled must be boolean or None")
+            payload["thinking"] = {"type": "enabled" if thinking_enabled else "disabled"}
+        request = Request(
+            self._chat_endpoint(),
+            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+            headers={
+                "Authorization": f"Bearer {self._settings.api_key}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        body = self._send(request)
+    
+        try:
+            choice = body["choices"][0]
+            content = choice["message"]["content"]
+            if not isinstance(content, str):
+                raise TypeError("message content is not text")
+        except (KeyError, IndexError, TypeError) as error:
+            # A reply can lack usable text in several different ways - no choice at all, a
+            # choice with a null content, or a message carrying only a refusal or reasoning
+            # field - and they call for different responses. The sentence is unchanged; what
+            # follows it records which one happened, so a run's ledger says why it was charged.
+&gt;           choices = body.get("choices") or []
+                      ^^^^^^^^
+E           AttributeError: 'list' object has no attribute 'get'
+
+src\agent\llm.py:261: AttributeError</failure></testcase><testcase classname="tests.test_model_runtime_defects" name="test_invalid_provider_envelopes_stay_inside_provider_contracts[\xff]" time="0.004"><failure message="UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte">tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_invalid_provider_envelope2')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000014BAD9AFB10&gt;
+raw = b'\xff'
+
+    @pytest.mark.parametrize("raw", [b"null", b"[]", b"\xff", b"not json"])
+    def test_invalid_provider_envelopes_stay_inside_provider_contracts(tmp_path, monkeypatch, raw):
+        for module in (llm, jev):
+            monkeypatch.setattr(module, "urlopen", lambda *a, **kw: Reply(raw))
+        client = llm.DeepSeekChatClient(llm.MAESTROSettings("secret", "https://invalid.example", "model", "vision", tmp_path))
+        with pytest.raises(llm.LLMProtocolError):
+&gt;           client.complete_json([{"role": "user", "content": "Return {}."}])
+
+tests\test_model_runtime_defects.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\agent\llm.py:337: in complete_json
+    response = self.complete(
+src\agent\llm.py:249: in complete
+    body = self._send(request)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;agent.llm.DeepSeekChatClient object at 0x0000014BAD9AE510&gt;
+request = &lt;urllib.request.Request object at 0x0000014BAD9ADE90&gt;
+
+    def _send(self, request: Request) -&gt; dict[str, Any]:
+        """Execute one request, retrying only transport and rate-limit failures."""
+    
+        last: LLMError | None = None
+        for attempt in range(1, _MAX_ATTEMPTS + 1):
+            requested_delay: float | None = None
+            try:
+                with urlopen(request, timeout=self._settings.timeout_seconds) as response:
+&gt;                   return json.loads(response.read().decode("utf-8"))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+src\agent\llm.py:296: UnicodeDecodeError</failure></testcase><testcase classname="tests.test_model_runtime_defects" name="test_invalid_provider_envelopes_stay_inside_provider_contracts[not json]" time="0.004"><failure message="agent.llm.LLMError: LLM request returned an unreadable response.">self = &lt;agent.llm.DeepSeekChatClient object at 0x0000014BADB20D90&gt;
+request = &lt;urllib.request.Request object at 0x0000014BADB20E90&gt;
+
+    def _send(self, request: Request) -&gt; dict[str, Any]:
+        """Execute one request, retrying only transport and rate-limit failures."""
+    
+        last: LLMError | None = None
+        for attempt in range(1, _MAX_ATTEMPTS + 1):
+            requested_delay: float | None = None
+            try:
+                with urlopen(request, timeout=self._settings.timeout_seconds) as response:
+&gt;                   return json.loads(response.read().decode("utf-8"))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+src\agent\llm.py:296: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\anaconda\envs\maestro\Lib\json\__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;json.decoder.JSONDecoder object at 0x0000014BFB0C2090&gt;, s = 'not json'
+idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+&gt;           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+D:\anaconda\envs\maestro\Lib\json\decoder.py:355: JSONDecodeError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_invalid_provider_envelope3')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000014BADB20D10&gt;
+raw = b'not json'
+
+    @pytest.mark.parametrize("raw", [b"null", b"[]", b"\xff", b"not json"])
+    def test_invalid_provider_envelopes_stay_inside_provider_contracts(tmp_path, monkeypatch, raw):
+        for module in (llm, jev):
+            monkeypatch.setattr(module, "urlopen", lambda *a, **kw: Reply(raw))
+        client = llm.DeepSeekChatClient(llm.MAESTROSettings("secret", "https://invalid.example", "model", "vision", tmp_path))
+        with pytest.raises(llm.LLMProtocolError):
+&gt;           client.complete_json([{"role": "user", "content": "Return {}."}])
+
+tests\test_model_runtime_defects.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\agent\llm.py:337: in complete_json
+    response = self.complete(
+src\agent\llm.py:249: in complete
+    body = self._send(request)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;agent.llm.DeepSeekChatClient object at 0x0000014BADB20D90&gt;
+request = &lt;urllib.request.Request object at 0x0000014BADB20E90&gt;
+
+    def _send(self, request: Request) -&gt; dict[str, Any]:
+        """Execute one request, retrying only transport and rate-limit failures."""
+    
+        last: LLMError | None = None
+        for attempt in range(1, _MAX_ATTEMPTS + 1):
+            requested_delay: float | None = None
+            try:
+                with urlopen(request, timeout=self._settings.timeout_seconds) as response:
+                    return json.loads(response.read().decode("utf-8"))
+            except HTTPError as error:
+                if error.code not in _RETRY_STATUS:
+                    raise LLMError(f"LLM request failed with HTTP status {error.code}.") from error
+                last = LLMTransportError(f"LLM request failed with retryable HTTP status {error.code}.")
+                requested_delay = retry_after_seconds(error)
+            except URLError:
+                last = LLMTransportError("LLM request could not reach the configured endpoint.")
+            except TimeoutError:
+                last = LLMTransportError("LLM request timed out.")
+            except (HTTPException, ConnectionError) as error:
+                # A dropped or reset connection is neither an HTTPError nor a URLError; it is a
+                # transport failure a retry may resolve, and after the retries it is an LLMError.
+                last = LLMTransportError(f"LLM request lost its connection: {type(error).__name__}.")
+            except json.JSONDecodeError as error:
+&gt;               raise LLMError("LLM request returned an unreadable response.") from error
+E               agent.llm.LLMError: LLM request returned an unreadable response.
+
+src\agent\llm.py:311: LLMError</failure></testcase><testcase classname="tests.test_model_runtime_defects" name="test_reported_usage_is_retained_when_text_is_unusable[choices0]" time="0.005"><failure message="AssertionError: assert {'calls': 0} == {'prompt_toke...0, 'calls': 1}&#10;  &#10;  Differing items:&#10;  {'calls': 0} != {'calls': 1}&#10;  Right contains 3 more items:&#10;  {'completion_tokens': 3, 'prompt_tokens': 7, 'total_tokens': 10}&#10;  Use -v to get more diff">tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_reported_usage_is_retaine0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000014BADB51550&gt;
+choices = []
+
+    @pytest.mark.parametrize("choices", [[], [{"message": {"content": None}, "finish_reason": "length"}], "bad"])
+    def test_reported_usage_is_retained_when_text_is_unusable(tmp_path, monkeypatch, choices):
+        usage = {"prompt_tokens": 7, "completion_tokens": 3, "total_tokens": 10}
+        body = {"choices": choices, "usage": usage}
+        monkeypatch.setattr(llm, "urlopen", lambda *a, **kw: Reply(json.dumps(body).encode()))
+        client = llm.DeepSeekChatClient(llm.MAESTROSettings("secret", "https://invalid.example", "model", "vision", tmp_path))
+        with pytest.raises(llm.LLMProtocolError):
+            client.complete_json([{"role": "user", "content": "Return {}."}])
+&gt;       assert client.provider_usage == dict(usage, calls=1)
+E       AssertionError: assert {'calls': 0} == {'prompt_toke...0, 'calls': 1}
+E         
+E         Differing items:
+E         {'calls': 0} != {'calls': 1}
+E         Right contains 3 more items:
+E         {'completion_tokens': 3, 'prompt_tokens': 7, 'total_tokens': 10}
+E         Use -v to get more diff
+
+tests\test_model_runtime_defects.py:51: AssertionError</failure></testcase><testcase classname="tests.test_model_runtime_defects" name="test_reported_usage_is_retained_when_text_is_unusable[choices1]" time="0.006"><failure message="AssertionError: assert {'calls': 0} == {'prompt_toke...0, 'calls': 1}&#10;  &#10;  Differing items:&#10;  {'calls': 0} != {'calls': 1}&#10;  Right contains 3 more items:&#10;  {'completion_tokens': 3, 'prompt_tokens': 7, 'total_tokens': 10}&#10;  Use -v to get more diff">tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_reported_usage_is_retaine1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000014BAD5C2A90&gt;
+choices = [{'message': {'content': None}, 'finish_reason': 'length'}]
+
+    @pytest.mark.parametrize("choices", [[], [{"message": {"content": None}, "finish_reason": "length"}], "bad"])
+    def test_reported_usage_is_retained_when_text_is_unusable(tmp_path, monkeypatch, choices):
+        usage = {"prompt_tokens": 7, "completion_tokens": 3, "total_tokens": 10}
+        body = {"choices": choices, "usage": usage}
+        monkeypatch.setattr(llm, "urlopen", lambda *a, **kw: Reply(json.dumps(body).encode()))
+        client = llm.DeepSeekChatClient(llm.MAESTROSettings("secret", "https://invalid.example", "model", "vision", tmp_path))
+        with pytest.raises(llm.LLMProtocolError):
+            client.complete_json([{"role": "user", "content": "Return {}."}])
+&gt;       assert client.provider_usage == dict(usage, calls=1)
+E       AssertionError: assert {'calls': 0} == {'prompt_toke...0, 'calls': 1}
+E         
+E         Differing items:
+E         {'calls': 0} != {'calls': 1}
+E         Right contains 3 more items:
+E         {'completion_tokens': 3, 'prompt_tokens': 7, 'total_tokens': 10}
+E         Use -v to get more diff
+
+tests\test_model_runtime_defects.py:51: AssertionError</failure></testcase><testcase classname="tests.test_model_runtime_defects" name="test_reported_usage_is_retained_when_text_is_unusable[bad]" time="0.004"><failure message="AssertionError: assert {'calls': 0} == {'prompt_toke...0, 'calls': 1}&#10;  &#10;  Differing items:&#10;  {'calls': 0} != {'calls': 1}&#10;  Right contains 3 more items:&#10;  {'completion_tokens': 3, 'prompt_tokens': 7, 'total_tokens': 10}&#10;  Use -v to get more diff">tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_reported_usage_is_retaine2')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000014BAD581390&gt;
+choices = 'bad'
+
+    @pytest.mark.parametrize("choices", [[], [{"message": {"content": None}, "finish_reason": "length"}], "bad"])
+    def test_reported_usage_is_retained_when_text_is_unusable(tmp_path, monkeypatch, choices):
+        usage = {"prompt_tokens": 7, "completion_tokens": 3, "total_tokens": 10}
+        body = {"choices": choices, "usage": usage}
+        monkeypatch.setattr(llm, "urlopen", lambda *a, **kw: Reply(json.dumps(body).encode()))
+        client = llm.DeepSeekChatClient(llm.MAESTROSettings("secret", "https://invalid.example", "model", "vision", tmp_path))
+        with pytest.raises(llm.LLMProtocolError):
+            client.complete_json([{"role": "user", "content": "Return {}."}])
+&gt;       assert client.provider_usage == dict(usage, calls=1)
+E       AssertionError: assert {'calls': 0} == {'prompt_toke...0, 'calls': 1}
+E         
+E         Differing items:
+E         {'calls': 0} != {'calls': 1}
+E         Right contains 3 more items:
+E         {'completion_tokens': 3, 'prompt_tokens': 7, 'total_tokens': 10}
+E         Use -v to get more diff
+
+tests\test_model_runtime_defects.py:51: AssertionError</failure></testcase><testcase classname="tests.test_model_runtime_defects" name="test_round_deduplication_is_independent_of_cross_round_cache[False-1]" time="0.101"><failure message="AssertionError: assert 3.0 == 0&#10; +  where 3.0 = StatePrediction(applicable=True, state_change={'embedding_delta_l2': 1.25}, uncertainty=None, limitations=('fixture ou...eason=None, compute_cost=3.0, artifact_sha256=None, uncertainty_components={'fixture': 'not independently calibrated'}).compute_cost">tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_round_deduplication_is_in0')
+parallel = 1, reuse = False
+
+    @pytest.mark.parametrize("parallel", [1, 2])
+    @pytest.mark.parametrize("reuse", [False, True])
+    def test_round_deduplication_is_independent_of_cross_round_cache(tmp_path, parallel, reuse):
+        model = CountingWorldModel()
+        controller = _controller(tmp_path, StubClient([]), world_model=model,
+                                 max_parallel_predictions=parallel, reuse_predictions=reuse)
+        for run in ("first", "second"):
+            answers = controller._predict_many({"a": _request(run + "a"), "b": _request(run + "b")}, run)
+            assert [v[1].request_id for v in answers.values()] == [run + "a", run + "b"]
+&gt;           assert answers["b"][1].compute_cost == 0
+E           AssertionError: assert 3.0 == 0
+E            +  where 3.0 = StatePrediction(applicable=True, state_change={'embedding_delta_l2': 1.25}, uncertainty=None, limitations=('fixture ou...eason=None, compute_cost=3.0, artifact_sha256=None, uncertainty_components={'fixture': 'not independently calibrated'}).compute_cost
+
+tests\test_model_runtime_defects.py:63: AssertionError</failure></testcase><testcase classname="tests.test_model_runtime_defects" name="test_round_deduplication_is_independent_of_cross_round_cache[False-2]" time="0.090"><failure message="AssertionError: assert 3.0 == 0&#10; +  where 3.0 = StatePrediction(applicable=True, state_change={'embedding_delta_l2': 1.25}, uncertainty=None, limitations=('fixture ou...eason=None, compute_cost=3.0, artifact_sha256=None, uncertainty_components={'fixture': 'not independently calibrated'}).compute_cost">tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_round_deduplication_is_in1')
+parallel = 2, reuse = False
+
+    @pytest.mark.parametrize("parallel", [1, 2])
+    @pytest.mark.parametrize("reuse", [False, True])
+    def test_round_deduplication_is_independent_of_cross_round_cache(tmp_path, parallel, reuse):
+        model = CountingWorldModel()
+        controller = _controller(tmp_path, StubClient([]), world_model=model,
+                                 max_parallel_predictions=parallel, reuse_predictions=reuse)
+        for run in ("first", "second"):
+            answers = controller._predict_many({"a": _request(run + "a"), "b": _request(run + "b")}, run)
+            assert [v[1].request_id for v in answers.values()] == [run + "a", run + "b"]
+&gt;           assert answers["b"][1].compute_cost == 0
+E           AssertionError: assert 3.0 == 0
+E            +  where 3.0 = StatePrediction(applicable=True, state_change={'embedding_delta_l2': 1.25}, uncertainty=None, limitations=('fixture ou...eason=None, compute_cost=3.0, artifact_sha256=None, uncertainty_components={'fixture': 'not independently calibrated'}).compute_cost
+
+tests\test_model_runtime_defects.py:63: AssertionError</failure></testcase><testcase classname="tests.test_model_runtime_defects" name="test_round_deduplication_is_independent_of_cross_round_cache[True-1]" time="0.079" /><testcase classname="tests.test_model_runtime_defects" name="test_round_deduplication_is_independent_of_cross_round_cache[True-2]" time="0.082" /><testcase classname="tests.test_model_runtime_defects" name="test_mixed_served_versions_are_not_aggregated_or_written_to_judgment_ledgers" time="0.001"><failure message="assert (not (TypedJudgment(question_id='decision_separation', scope=&lt;JudgmentScope.PLAN_CRITIQUE: 'plan_critique'&gt;, kind='noul', v...calibrated probability is a statement about this model's own accuracy, not about biology.&quot;), context_identifier=None),))&#10; +  where (TypedJudgment(question_id='decision_separation', scope=&lt;JudgmentScope.PLAN_CRITIQUE: 'plan_critique'&gt;, kind='noul', v...calibrated probability is a statement about this model's own accuracy, not about biology.&quot;), context_identifier=None),) = CritiqueOutcome(findings=(), judgments=(TypedJudgment(question_id='decision_separation', scope=&lt;JudgmentScope.PLAN_CRI... 'unstable', 'weight': 0.0, 'revoked': True, 'may_decide': False, 'calibration_weight': 1.0, 'effective_weight': 0.0})).judgments">def test_mixed_served_versions_are_not_aggregated_or_written_to_judgment_ledgers():
+        class Mixed:
+            model = "jev-latest"
+            calls = 0
+    
+            def evaluate(self, state, questions):
+                self.calls += 1
+                question = next(q for q in questions if q.identifier == "decision_separation")
+                answer = jev.TypedAnswer.parse(question, {"probability": 0.1 if self.calls == 1 else 0.9})
+                return jev.JevEvaluation(f"v{self.calls}", jev.state_digest(state), {question.identifier: answer})
+    
+        critic = jev.TypedDecisionCritic(Mixed())
+        result = critic.review_plan(CONTRAST, ACTIONS, repeats=2)
+&gt;       assert not result.judgments and not result.findings and not result.stability
+E       assert (not (TypedJudgment(question_id='decision_separation', scope=&lt;JudgmentScope.PLAN_CRITIQUE: 'plan_critique'&gt;, kind='noul', v...calibrated probability is a statement about this model's own accuracy, not about biology."), context_identifier=None),))
+E        +  where (TypedJudgment(question_id='decision_separation', scope=&lt;JudgmentScope.PLAN_CRITIQUE: 'plan_critique'&gt;, kind='noul', v...calibrated probability is a statement about this model's own accuracy, not about biology."), context_identifier=None),) = CritiqueOutcome(findings=(), judgments=(TypedJudgment(question_id='decision_separation', scope=&lt;JudgmentScope.PLAN_CRI... 'unstable', 'weight': 0.0, 'revoked': True, 'may_decide': False, 'calibration_weight': 1.0, 'effective_weight': 0.0})).judgments
+
+tests\test_model_runtime_defects.py:83: AssertionError</failure></testcase><testcase classname="tests.test_model_runtime_defects" name="test_nonfinite_history_refuses_before_backend_or_cache[nan]" time="0.001"><failure message="AssertionError: assert 'invalid_history' in ()&#10; +  where () = validation_errors()&#10; +    where validation_errors = PredictionRequest(request_id='r1', case_id='case-1', contrast_id='contrast', plan_version=1, intervention=Intervention...ory=({'action': 'a', 'outcome': 'unresolved', 'extra': nan},), observation_context=None, forecast_mode='history_aware').validation_errors">value = nan
+
+    @pytest.mark.parametrize("value", [float("nan"), float("inf"), {"nested": [float("nan")]}])
+    def test_nonfinite_history_refuses_before_backend_or_cache(value):
+        request = replace(_request(), history=({"action": "a", "outcome": "unresolved", "extra": value},),
+                          forecast_mode="history_aware")
+&gt;       assert "invalid_history" in request.validation_errors()
+E       AssertionError: assert 'invalid_history' in ()
+E        +  where () = validation_errors()
+E        +    where validation_errors = PredictionRequest(request_id='r1', case_id='case-1', contrast_id='contrast', plan_version=1, intervention=Intervention...ory=({'action': 'a', 'outcome': 'unresolved', 'extra': nan},), observation_context=None, forecast_mode='history_aware').validation_errors
+
+tests\test_model_runtime_defects.py:92: AssertionError</failure></testcase><testcase classname="tests.test_model_runtime_defects" name="test_nonfinite_history_refuses_before_backend_or_cache[inf]" time="0.001"><failure message="AssertionError: assert 'invalid_history' in ()&#10; +  where () = validation_errors()&#10; +    where validation_errors = PredictionRequest(request_id='r1', case_id='case-1', contrast_id='contrast', plan_version=1, intervention=Intervention...ory=({'action': 'a', 'outcome': 'unresolved', 'extra': inf},), observation_context=None, forecast_mode='history_aware').validation_errors">value = inf
+
+    @pytest.mark.parametrize("value", [float("nan"), float("inf"), {"nested": [float("nan")]}])
+    def test_nonfinite_history_refuses_before_backend_or_cache(value):
+        request = replace(_request(), history=({"action": "a", "outcome": "unresolved", "extra": value},),
+                          forecast_mode="history_aware")
+&gt;       assert "invalid_history" in request.validation_errors()
+E       AssertionError: assert 'invalid_history' in ()
+E        +  where () = validation_errors()
+E        +    where validation_errors = PredictionRequest(request_id='r1', case_id='case-1', contrast_id='contrast', plan_version=1, intervention=Intervention...ory=({'action': 'a', 'outcome': 'unresolved', 'extra': inf},), observation_context=None, forecast_mode='history_aware').validation_errors
+
+tests\test_model_runtime_defects.py:92: AssertionError</failure></testcase><testcase classname="tests.test_model_runtime_defects" name="test_nonfinite_history_refuses_before_backend_or_cache[value2]" time="0.001"><failure message="AssertionError: assert 'invalid_history' in ()&#10; +  where () = validation_errors()&#10; +    where validation_errors = PredictionRequest(request_id='r1', case_id='case-1', contrast_id='contrast', plan_version=1, intervention=Intervention...: 'a', 'outcome': 'unresolved', 'extra': {'nested': [nan]}},), observation_context=None, forecast_mode='history_aware').validation_errors">value = {'nested': [nan]}
+
+    @pytest.mark.parametrize("value", [float("nan"), float("inf"), {"nested": [float("nan")]}])
+    def test_nonfinite_history_refuses_before_backend_or_cache(value):
+        request = replace(_request(), history=({"action": "a", "outcome": "unresolved", "extra": value},),
+                          forecast_mode="history_aware")
+&gt;       assert "invalid_history" in request.validation_errors()
+E       AssertionError: assert 'invalid_history' in ()
+E        +  where () = validation_errors()
+E        +    where validation_errors = PredictionRequest(request_id='r1', case_id='case-1', contrast_id='contrast', plan_version=1, intervention=Intervention...: 'a', 'outcome': 'unresolved', 'extra': {'nested': [nan]}},), observation_context=None, forecast_mode='history_aware').validation_errors
+
+tests\test_model_runtime_defects.py:92: AssertionError</failure></testcase><testcase classname="tests.test_model_runtime_defects" name="test_default_log_uses_execution_date_and_explicit_override_remains_supported" time="0.005"><failure message="AssertionError: assert WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_default_log_uses_executio0/log/20260910') == ((WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_default_log_uses_executio0') / 'log') / '20261001')&#10; +  where WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_default_log_uses_executio0/log/20260910') = &lt;function _log_directory at 0x0000014BAD7BBD80&gt;(WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_default_log_uses_executio0'), '')&#10; +    where &lt;function _log_directory at 0x0000014BAD7BBD80&gt; = llm._log_directory&#10; +  and   '20261001' = &lt;built-in method strftime of datetime.date object at 0x0000014BADAFD990&gt;('%Y%m%d')&#10; +    where &lt;built-in method strftime of datetime.date object at 0x0000014BADAFD990&gt; = datetime.date(2026, 10, 1).strftime&#10; +      where datetime.date(2026, 10, 1) = &lt;built-in method today of type object at 0x00007FFFE69C4000&gt;()&#10; +        where &lt;built-in method today of type object at 0x00007FFFE69C4000&gt; = date.today">tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_default_log_uses_executio0')
+
+    def test_default_log_uses_execution_date_and_explicit_override_remains_supported(tmp_path):
+&gt;       assert llm._log_directory(tmp_path, "") == tmp_path / "log" / date.today().strftime("%Y%m%d")
+E       AssertionError: assert WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_default_log_uses_executio0/log/20260910') == ((WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_default_log_uses_executio0') / 'log') / '20261001')
+E        +  where WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_default_log_uses_executio0/log/20260910') = &lt;function _log_directory at 0x0000014BAD7BBD80&gt;(WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2485/test_default_log_uses_executio0'), '')
+E        +    where &lt;function _log_directory at 0x0000014BAD7BBD80&gt; = llm._log_directory
+E        +  and   '20261001' = &lt;built-in method strftime of datetime.date object at 0x0000014BADAFD990&gt;('%Y%m%d')
+E        +    where &lt;built-in method strftime of datetime.date object at 0x0000014BADAFD990&gt; = datetime.date(2026, 10, 1).strftime
+E        +      where datetime.date(2026, 10, 1) = &lt;built-in method today of type object at 0x00007FFFE69C4000&gt;()
+E        +        where &lt;built-in method today of type object at 0x00007FFFE69C4000&gt; = date.today
+
+tests\test_model_runtime_defects.py:100: AssertionError</failure></testcase></testsuite></testsuites>

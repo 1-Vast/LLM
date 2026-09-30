@@ -13,7 +13,7 @@ from time import sleep
 from typing import Any, Mapping, Sequence
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
-from .llm import read_dotenv, retry_after_seconds
+from .llm import LLMProtocolError, decode_response_object, read_dotenv, retry_after_seconds
 from maestro.judgment import JudgmentLedger, JudgmentScope, TypedJudgment
 from maestro.judgment import DECIDING_SCOPES, RELIABLE_REPEATS, RepeatedJudgment, StabilityLedger, StabilitySummary, StabilityVerdict, canonical_value, effective_weight
 from maestro.models import ContrastCheck, EvidenceAction, MechanismContrast
@@ -342,6 +342,8 @@ class TypeSafeJevClient:
             payload = self._send(body)
         except JevError as error:
             return JevEvaluation(self.model, digest, {}, refusal=f"{type(error).__name__}:{error}")
+        if not isinstance(payload, Mapping):
+            return JevEvaluation(self.model, digest, {}, refusal="JevProtocolError:response_must_be_object")
 
         raw_answers = _first(payload, RESPONSE_ALIASES["answers"])
         if not isinstance(raw_answers, Mapping):
@@ -381,7 +383,7 @@ class TypeSafeJevClient:
             requested_delay: float | None = None
             try:
                 with urlopen(request, timeout=self._settings.timeout_seconds) as response:
-                    return json.loads(response.read().decode("utf-8"))
+                    return decode_response_object(response.read())
             except HTTPError as error:
                 if error.code not in _RETRY_STATUS:
                     raise JevError(f"request failed with HTTP status {error.code}") from error
@@ -396,8 +398,8 @@ class TypeSafeJevClient:
                 # is neither an HTTPError nor a URLError; without this branch it escaped evaluate()
                 # as a raw exception and ended a 2026-09-26 run, against this client's contract.
                 last = JevTransportError(f"the connection failed: {type(error).__name__}")
-            except json.JSONDecodeError as error:
-                raise JevProtocolError("the response was not readable JSON") from error
+            except LLMProtocolError as error:
+                raise JevProtocolError(str(error)) from error
             if attempt < _MAX_ATTEMPTS:
                 delay = _BACKOFF_SECONDS * (2 ** (attempt - 1))
                 if requested_delay is not None:
@@ -751,6 +753,15 @@ class TypedDecisionCritic:
         primary = usable[0] if usable else (evaluations[0] if evaluations else None)
         if primary is None:
             return CritiqueOutcome(refusals=tuple(notes))
+        versions = sorted({item.model for item in usable})
+        states = {item.state_digest for item in usable}
+        if len(versions) > 1 or len(states) > 1:
+            reasons = tuple(reason for item in evaluations for reason in item.refusals()) + tuple(notes)
+            if len(versions) > 1:
+                reasons += ("mixed_model_versions:" + ",".join(versions),)
+            if len(states) > 1:
+                reasons += ("mixed_state_digests",)
+            return CritiqueOutcome(refusals=reasons, repeats=len(evaluations))
 
         judgments: list[TypedJudgment] = []
         findings: list[str] = []

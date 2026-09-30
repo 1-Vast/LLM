@@ -1,0 +1,25 @@
+import hashlib, json, gzip, subprocess, io, re, sys, os
+from pathlib import Path
+sys.path.insert(0,str(Path.cwd()/'src'))
+from agent.llm import read_dotenv
+root=Path.cwd();pub=root/'research/dual_core_live/results/20261001';manifest=json.loads((pub/'manifest.json').read_text());records=manifest['files']
+paths=[str((pub/r['published_file']).relative_to(root)).replace('\\','/') for r in records if r['published_file']]
+proc=subprocess.run(['git','cat-file','--batch'],input=''.join(':'+p+'\n' for p in paths).encode(),stdout=subprocess.PIPE,check=True);stream=io.BytesIO(proc.stdout); blobs={}
+for p in paths:
+    header=stream.readline().split();size=int(header[-1]);blobs[p]=stream.read(size);assert stream.read(1)==b'\n'
+for r,p in zip([r for r in records if r['published_file']],paths):
+    raw=blobs[p];assert hashlib.sha256(raw).hexdigest()==r['published_sha256'],p
+    restored=gzip.decompress(raw) if r['encoding']=='gzip_of_original_bytes' else raw
+    assert hashlib.sha256(restored).hexdigest()==r['original_sha256'],p
+    assert hashlib.sha256((root/r['local_file']).read_bytes()).hexdigest()==r['original_sha256'],p
+settings={**read_dotenv(root/'.env'),**os.environ};secrets=[v.encode() for k,v in settings.items() if v and len(v)>8 and (k.endswith('API_KEY') or k.endswith('ACCESS_TOKEN'))]
+assert not any(s in b for s in secrets for b in blobs.values())
+docs=[root/p for p in ('README.md','log/20261001/README.md','research/dual_core_live/README.md','research/dual_core_live/API_RESULTS.md','research/dual_core_live/POST_FIX_RESULTS.md','research/dual_core_live/API_DESIGN.md','research/dual_core_live/DESIGN_REVIEW.md','research/dual_core_live/DEFECT_REVIEW.md')]
+links=[]
+for d in docs:
+    for link in re.findall(r'\]\(([^)]+)\)',d.read_text(encoding='utf-8')):
+        if '://' in link or link.startswith('#'):continue
+        target=(d.parent/link.split('#')[0]).resolve();assert target.exists(),str(d)+':'+link;links.append(str(target))
+receipt={'passed':True,'staged_artifacts_checked':len(paths),'original_source_bytes_match':True,'credentials_detected':False,'markdown_documents':len(docs),'local_links_checked':len(links),'manifest_sha256':hashlib.sha256((pub/'manifest.json').read_bytes()).hexdigest(),'command':'git cat-file --batch over exact publication manifest; SHA256 original/restored/staged comparison'}
+with (pub/'publication_validation.json').open('x',encoding='utf-8') as f:json.dump(receipt,f,indent=2)
+print(json.dumps(receipt))

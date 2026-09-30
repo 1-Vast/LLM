@@ -1,0 +1,14 @@
+from pathlib import Path
+import json, hashlib, shutil, sys
+root=Path.cwd();base=root/'outputs/dual_core_live_20261001'; target=base/'execution_sources';target.mkdir(exist_ok=False)
+original=json.loads((base/'fixed_benchmark_v1/predeclared.json').read_text());new=json.loads((base/'post_fix_prospective_v1/predeclared.json').read_text())
+paths={p for p in original['input_sha256'] if p.endswith('.py')}|set(original['source_sha256'])|set(new.get('source_sha256',{}))
+paths|={str(p.relative_to(root)).replace('\\','/') for p in (root/'research/dual_core_live').glob('*.py')}
+paths|={str(p.relative_to(root)).replace('\\','/') for p in (root/'tests').glob('test_*') if any(x in p.name for x in ('live_api','model_runtime','model_audit','forecast_support','prospective_api','live_uncertainty'))}
+records={}
+for rel in sorted(paths):
+    src=root/rel;dest=target/rel;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(src,dest)
+    records[rel]=hashlib.sha256(dest.read_bytes()).hexdigest()
+receipt={'scope':'Exact current execution source bytes, preserved across Git line-ending normalization. Original pre-serialization benchmark remains separately archived in fixed_benchmark_v1/failed_source.','command':[sys.executable,'-c','source snapshot command retained separately'],'files_sha256':records,'original_formal_sources':original['source_sha256'],'prospective_sources':new.get('source_sha256',{})}
+with (target/'source_manifest.json').open('x',encoding='utf-8') as f:json.dump(receipt,f,indent=2)
+print(json.dumps({'source_files':len(records)}))

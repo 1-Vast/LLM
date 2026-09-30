@@ -26,6 +26,8 @@ The supported architecture, reproduction entry point and dataset qualification a
 [research/dual_core_completion/README.md](research/dual_core_completion/README.md).
 The literature-guided frozen-data experiments, negative policy result and source limits are in
 [research/dual_core_followup/README.md](research/dual_core_followup/README.md).
+The live DeepSeek/Jev validation, report-only defect auditor and general contract evaluation are in
+[research/dual_core_live/README.md](research/dual_core_live/README.md).
 
 ## Run
 

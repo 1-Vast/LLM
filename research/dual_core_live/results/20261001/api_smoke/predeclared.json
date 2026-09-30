@@ -1,0 +1,90 @@
+{
+  "protocol": "dual-core-live-smoke-1",
+  "created_utc": "2026-09-30T19:40:57.640809+00:00",
+  "logical_calls_per_provider": 2,
+  "cards": [
+    {
+      "id": "smoke_budget_prerequisite",
+      "family": "generic_registered_measurement",
+      "remaining_budget": 3,
+      "qualified_prerequisites": [],
+      "attempted_actions": [],
+      "actions": [
+        {
+          "id": "m1",
+          "cost": 2,
+          "prerequisites": [],
+          "description": "An available qualifying measurement."
+        },
+        {
+          "id": "m2",
+          "cost": 4,
+          "prerequisites": [
+            "target_activity"
+          ],
+          "description": "A blocked measurement."
+        }
+      ],
+      "evidence": [],
+      "forecasts": [],
+      "objective": "Take an affordable unblocked measurement when one exists."
+    },
+    {
+      "id": "smoke_prediction_boundary",
+      "family": "generic_registered_measurement",
+      "remaining_budget": 0,
+      "qualified_prerequisites": [],
+      "attempted_actions": [],
+      "actions": [
+        {
+          "id": "m1",
+          "cost": 2,
+          "prerequisites": [],
+          "description": "A registered measurement."
+        }
+      ],
+      "evidence": [],
+      "forecasts": [
+        {
+          "reading": "target_activity",
+          "kind": "model_prediction",
+          "qc": "not_measured"
+        }
+      ],
+      "objective": "Select a legal action or defer. A forecast cannot supply a measurement or authorize a terminal."
+    }
+  ],
+  "cards_sha256": "f88797dfc0cc5261b9c3ad67ee5db122ea01e102d1fbc01cceda15e561287ec2",
+  "proposer_prompt": "You propose one next action under a registered experiment contract. Use only the supplied task state; do not assume external facts. Respect remaining_budget, qualified_prerequisites, and attempted_actions. A forecast is planning-only and cannot qualify evidence or authorize a terminal decision. Return JSON with exact keys action and terminal_authorized, e.g. {\"action\":\"m1\",\"terminal_authorized\":false}. Use action defer if no legal useful action exists.",
+  "expected_actions": [
+    "m1",
+    "defer"
+  ],
+  "expected_prediction_is_measurement": false,
+  "max_tokens": 160,
+  "command": [
+    "D:\\MAESTRO\\research\\dual_core_live\\live_api.py",
+    "--smoke",
+    "--out",
+    "outputs/dual_core_live_20261001/api_smoke"
+  ],
+  "python": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "git_head": "8271e8a119138d0e9c60fd9938f0abe11e081a79",
+  "source_hashes": {
+    "research/dual_core_live/live_api.py": "36308d4a243cd43f623ed8da54db70b00bb272e6c29ef4068fd41859cc2bb4c0",
+    "src/agent/llm.py": "b6913c328a09238096f619c77d455c34a33e52247e01c3ee2709a77b3313e7ec",
+    "src/agent/decision_critic.py": "82aefaeaa12aab4cdf91196b6d03a0ee053afaf9477a6fed25a226121c546a43"
+  },
+  "provider_settings": {
+    "deepseek": {
+      "endpoint": "https://api.deepseek.com",
+      "model": "deepseek-flash"
+    },
+    "jev": {
+      "endpoint": "https://api.typesafe.ai/v1/systemone",
+      "model": "jev-latest"
+    }
+  },
+  "limits": "Smoke only; no biological utility, calibration, or superiority claim. No training."
+}

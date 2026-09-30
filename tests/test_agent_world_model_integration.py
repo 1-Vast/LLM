@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import sys
 from dataclasses import replace
+from datetime import date
 from email.message import Message
 from pathlib import Path
 from urllib.error import HTTPError
@@ -447,7 +448,7 @@ def test_exported_settings_suffice_without_a_dotenv_file(tmp_path: Path, monkeyp
     assert "secret-key" not in repr(settings)
 
     monkeypatch.delenv("MAESTRO_LOG_DIRECTORY")
-    assert MAESTROSettings.from_workspace(tmp_path).log_directory == tmp_path / "log" / "20260910"
+    assert MAESTROSettings.from_workspace(tmp_path).log_directory == tmp_path / "log" / date.today().strftime("%Y%m%d")
     monkeypatch.delenv("DEEPSEEK_API_KEY")
     with pytest.raises(ConfigurationError, match="DEEPSEEK_API_KEY"):
         MAESTROSettings.from_workspace(tmp_path)
