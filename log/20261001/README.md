@@ -86,3 +86,73 @@ The next research dependencies are source resolution for the four L1000 well dif
 ## 10. Curation provenance
 
 This is a new execution record on the actual verification date. Reviews read local registered files; the source review labels fresh scans and inherited receipts explicitly. The main agent integrated the three module reviews, reproduced and fixed the replay connection uncovered by full regression, verified code integrity and prepared publication. Original audit freezes, input hashes, earlier failed validation receipts and the recovered Round 1 stash are retained.
+
+## 11. Literature-guided experiments and adjustment
+
+### 11.1 Questions, comparison and source review
+
+The follow-up starts from delivered commit `5d982070fe88e04a2fb1ee5212a8eed39e8df405`. Three delegated investigations cover the policy/forecast connection, case-memory data target, and acquisition/evidence objective. Primary-source literature is reviewed in [LITERATURE.md](../../research/dual_core_followup/LITERATURE.md), [DATA_LITERATURE.md](../../research/dual_core_followup/DATA_LITERATURE.md) and [DECISION_CONTRACT.md](../../research/dual_core_followup/DECISION_CONTRACT.md), with access limits and publication status in the [source ledger](../../research/dual_core_followup/literature_sources.json). A focused review is not claimed to be a systematic literature survey.
+
+The only new policy intervention sets the existing planner's legal fixed-action anchor and `deviation_z=1.645`. The four preregistered arms are fixed/no forecast, baseline/reference, anchored/reference and anchored/permuted on the frozen SciPlex3 B and L1000 LT episodes, five folds each. Predictor parameters, prior, menus, budgets, QC, endpoint and maximum measurements stay frozen. This heuristic carries no safe-policy-improvement guarantee; it is not an implementation of SPIBB. The test folds do not pick a parameter or winning model. All effects belong to ReferenceWorld and its policy, not STATE or WorldV2.
+
+The cost audit found a historical metadata discrepancy. Round 2 called the planner price per assay day and used that convention in a separate probe-ranking diagnostic. Actual `plan_measurement` subtracts .02 per measurement. Its terminal scorer reports gross +1/-2/0 utility with costs separately. The follow-up preserves actual execution for parity, ranks actual planner evaluations and explicitly distinguishes days, measurements, gross terminal utility and forecast-planning net value. Historical receipts are not rewritten.
+
+### 11.2 Real case-memory denominator experiment
+
+The predeclared LINCS2020 population contains 26 previously exposed test blocks, 28 block-cell expression vectors and 112 historical contrast queries; the saved reference has 65 disjoint blocks and 976 derived annotation labels, all `valid_only`. The same hypotheses, action, state-free public context and production selector are used for both arms; only `outcome_mode` changes. No historical calibration is loaded or refitted, and test vectors/labels remain evaluator-only receipts.
+
+All 112 `valid_readout` forecasts are available, but the production selector rejects all with `experiment_validity_probability_required`. All 112 `attempted_experiment` requests refuse with `insufficient_outcome_support`. Neither arm selects an action or mutates evidence. The data lacks a complete all-attempt denominator; no QC probability, terminal utility benefit or biological confidence interval is inferred. Thirteen frozen input hashes and actual source hashes match before and after the run.
+
+An initial reporter attempt referenced `BudgetedEvidencePlan.selected` instead of its existing `actions` field. Only the new research reporter was corrected. The failed predeclaration, error receipt and hash-matching reconstruction of its original script remain in `denominator_run_failed_01`; the successful run is separate. Five real-data contract checks pass, including actual calls to both forecast targets and the production selector.
+
+### 11.3 Frozen-query value-scope diagnostic
+
+The diagnostic streams the Round 2 bank, retains available empty-history reference probes and deduplicates input hashes. It verifies 15,336 SciPlex3 B and 29,184 L1000 LT query distributions. Bayes net value is positive while the registered one-step planner stops in 753 and 11,403 queries, respectively. These descriptive forecast-bank counts compare different objective scales and decision permissions; they are not errors, policy gains or independent biological trials.
+
+The clearest rule boundary is L1000's no-elimination folds 0/3: 5,066 of 9,696 queries have positive Bayes net value, while every registered attempt has gross utility 0 and net value -.02. Information can alter a Bayes action without permitting a validator terminal decision. The bank's `attempted_experiment` adapter does not certify its real-world sampling frame. Five new semantic/filter/hash contracts and 31 related existing tests pass.
+
+The sole production-file adjustment adds five docstring lines to `expected_terminal_decision_value`, clarifying its Bayes scope. Behavior and default selection remain unchanged; this finding does not establish a production runtime defect. Frozen bank, fold and path hashes match the committed audit ledger.
+
+### 11.4 Execution, interruptions and verification
+
+The first policy probe passes 100 paths, 50 exact fixed/baseline comparisons and three frozen fold/public-view checks, with zero fitting calls. Independent streaming review verifies its query/output/bundle hashes, forecast-use boundaries and actual probability differences in 240 true/permuted initial contexts. The initial legal menu is a conservative superset of downstream reachable measurements; unresolved well **or plate** links widen terminal utility bounds even when the observed paths match. This includes all five L1000 conditions, retaining the explained fifth well's unresolved plate link.
+
+The first complete policy run and regression were interrupted when execution sessions disappeared and no Python processes remained. This coincided with the tool context reset; the precise termination cause is not independently established. Partial files, their hashes and interruption receipts remain in `anchored_run/` and `verification/`. They are not scored as complete runs. The same code/protocol is re-frozen and probed in `anchored_recovery_root_01`, without tuning or overwriting; its recovery probe again passes 100 paths and 50 parity checks with zero fits.
+
+The completed recovery regression has **1,543 passes, one inherited historical Markdown-language failure, no errors or skips**, and two fitting checks deliberately deselected. All 17 new contract tests pass. All 333 historical frozen files and 39 data-readiness source hashes match, with no source drift during the run. The strict validation remains `passed: false` for the inherited failure. Its command, source hashes, environment and raw output are in `verification_recovery_01/`.
+
+The complete recovery policy run subsequently passes **19,704 paths, 9,852 exact historical comparisons, all ten frozen fold/public-view checks and zero fits**. Independent verification checks 525 frozen input hashes, 134 source hashes, all episode/metric joins, 39,408 attribution rows and 136 chemical-unit arm means. Probe banks receive full hash/reference/probability checks; full banks receive byte-hash checks only. Neither fixed nor structural refusal calls forecasts, and forecasts enter neither repair nor final evidence.
+
+### 11.4a Policy results and retention decision
+
+| Same-rule fixed versus new anchored/reference | Raw correct / wrong, fixed then anchored | Unit-mean utility difference and chemical 95% interval | Source-aware mean outer bounds |
+|---|---|---|---|
+| SciPlex3 B | 792/51 then 792/50 | 0.00156 [-0.00394, 0.00766] | Registered-replay point identified |
+| L1000 LT | 211/15 then 211/13 | 0.00159 [-0.00240, 0.00665] | [-0.05146, 0.05463] |
+
+Both intervals include zero. L1000's 67 potentially source-unresolved episodes per arm require conservative outer bounds even if observed paths match. Raw L1000 anchored/reference uses 4,783 measurements versus fixed's 7,209, with 1,212 deferred episodes. On the 220 common-decided episodes (18 chemical units), both policies have the same unit-mean correctness 75.96% and wrong rate 24.04%, with measurement means 1.57937 versus 1.58333. This outcome-selected comparison supplies no general accuracy or calibrated selective-risk gain. The full report separately records raw sums, unit estimates, matched acted/decided coverage and costs.
+
+The true/permuted forecast control changes anchored sequences in 3.93% of SciPlex3 and 16.08% of L1000 chemical-unit comparisons. Their terminal contrasts are 0.00759 [-0.00189, 0.01824] and 0.01862 [0.00616, 0.03440], but L1000's source-aware envelope [-0.03443, 0.07167] includes zero. Content can affect actions; these results do not establish source-resolved gain over fixed. Selected conditional-reading quality, rankings and terminal utility also favor different policies. The baseline's frequent action changes without terminal changes localize a menu/validator bottleneck; the conservative SciPlex3 anchor largely retains fixed actions despite forecast content differences.
+
+Retain the anchor as a tested research option; **do not promote it to production defaults**. The completed experiment does not establish a general dual-core decision benefit. New source qualification, interpretation and reproducible diagnostics are retained; no production metric-driven behavior change is made.
+
+Final focused publication validation passes 67 checks, excluding the inherited prose rule. All 59 copied/compressed scientific publication records match staged Git bytes; six oversized/incomplete banks stay local with declared hashes. All eight checked Markdown documents have valid local links. The [publication receipts](../../research/dual_core_followup/results/20261001/publication_checks/manifest.json) retain commands, source hashes and outputs. These checks overlap the full suite and are not additional biological experiments.
+
+### 11.5 Reproduction and limits
+
+Executed experiment commands use the existing maestro environment from `D:\MAESTRO`:
+
+```powershell
+& 'D:\anaconda\envs\maestro\python.exe' -m research.dual_core_followup.denominator --out outputs/dual_core_followup_20261001/denominator_run
+& 'D:\anaconda\envs\maestro\python.exe' research/dual_core_followup/decision_contract.py
+& 'D:\anaconda\envs\maestro\python.exe' -m research.dual_core_followup.anchored freeze --out outputs/dual_core_followup_20261001/anchored_recovery_root_01
+& 'D:\anaconda\envs\maestro\python.exe' -m research.dual_core_followup.anchored probe --out outputs/dual_core_followup_20261001/anchored_recovery_root_01
+& 'D:\anaconda\envs\maestro\python.exe' -m research.dual_core_followup.anchored full --out outputs/dual_core_followup_20261001/anchored_recovery_root_01
+& 'D:\anaconda\envs\maestro\python.exe' -m research.dual_core_completion.verify --out outputs/dual_core_followup_20261001/verification_recovery_01
+```
+
+Every rerun requires a new leaf directory and declared local assets. [Follow-up report](../../research/dual_core_followup/README.md) links commands, episode paths, task summaries and [publication hashes](../../research/dual_core_followup/results/20261001/manifest.json). Copied or gzipped published tables retain exact original bytes; oversized or incomplete compressed banks stay local with their hashes.
+
+All data, labels and development folds remain exposed. Chemical skeleton/component unit-mean bootstrap inference is separate by task; shared physical plate/batch dependence does not provide an independent physical interval. Reading quality is conditional proxy-label quality, averaged within episode then chemical unit. Fixed has no forecast ranking; later ranking comparisons can follow different measured histories. Common decided/acted coverage is descriptive and outcome-conditioned, not a calibrated pre-action risk guarantee.
+
+No new training, model grid, live biological/provider experiment, oracle policy, new STATE inference, WorldV2 fit/swap or true pre-action state gain is run. No general biological superiority, external calibration, full new World x Policy interaction, complete attempts denominator or utility point identification of unresolved reachable results is claimed. The registered engineering framework remains connected; the experimental findings determine whether a new research policy is retained or promoted.

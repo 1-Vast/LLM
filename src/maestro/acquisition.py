@@ -513,6 +513,11 @@ def expected_terminal_decision_value(
     ``consequences`` is the registered observation-to-elimination map. A
     forecast that changes magnitude while leaving the surviving decision the
     same therefore has zero decision sensitivity and zero expected value.
+
+    The decision here is a Bayes action under ``wrong_decision_loss`` and
+    ``defer_loss``; an informative reading may change that action even when no
+    hypothesis is eliminated. This value does not authorize an evidence update
+    or a validator terminal decision, and is not the registered replay utility.
     """
 
     if forecast.outcome_mode != "attempted_experiment":

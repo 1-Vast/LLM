@@ -84,6 +84,7 @@ not a status report; verdict labels are the blocks' own registered words, cross-
 | [`topics/engineering_records/framework_optimization.md`](topics/engineering_records/framework_optimization.md) | verified | Agent-first framework implementation record, including the first real STATE-checkpoint inference. |
 | [`topics/engineering_records/engineering_record.md`](topics/engineering_records/engineering_record.md) | design | Engineering record. |
 | [`dual_core_completion/`](dual_core_completion/README.md) | verified | Registered dual-core runtime contracts and offline closure; 21 dataset/version qualifications and source hashes. Final suite: 1,526 passes plus one inherited prose-policy failure; biological terminal benefit remains unestablished. |
+| [`dual_core_followup/`](dual_core_followup/README.md) | inconclusive | Primary literature and three no-training experiments: 19,704 paired policy paths, a real case-memory denominator audit and 44,520 frozen value-scope queries. Anchor benefit over fixed remains unestablished; source uncertainty and evidence boundaries retained. |
 | [`topics/engineering_records/repository_cleanup_20260927.md`](topics/engineering_records/repository_cleanup_20260927.md) | verified | Repository maintenance disposition of 2026-09-27. |
 | [`CONSOLIDATION_INVENTORY.md`](CONSOLIDATION_INVENTORY.md) | verified | Consolidation Phase A: per-block verdicts, freeze status, promotion evidence (zero promotions). |
 
