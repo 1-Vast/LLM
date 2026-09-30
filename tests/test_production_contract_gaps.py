@@ -44,10 +44,10 @@ from virtual_cell.biology import (
     Observable,
     UNIT_CONVERSIONS,
 )
-from virtual_cell.ladder import DevelopmentMeanShiftBaseline
 from virtual_cell.applicability import ValidationReceipt
 
 from tests.fixtures.state import (  # noqa: E402
+    development_mean_baseline as _baseline,
     CONTROL,
     DEFAULT_BASIS,
     DRUG_A,
@@ -207,15 +207,6 @@ def test_a_registered_receipt_without_a_verified_holdout_is_not_reported_as_vali
 # --------------------------------------------------------------------------
 
 
-def _baseline(context: str = "NCI-H596", dataset: str = "tiny") -> DevelopmentMeanShiftBaseline:
-    return DevelopmentMeanShiftBaseline.fit(
-        {DRUG_B: np.full(8, 0.2), "[('drugC', 0.5, 'uM')]": np.full(8, 0.4)},
-        development_conditions=(DRUG_B, "[('drugC', 0.5, 'uM')]"),
-        feature_names=tuple(f"gene{i}" for i in range(8)),
-        context_identifier=context,
-        dataset_id=dataset,
-        fitted_on="synthetic development conditions",
-    )
 
 
 def test_the_state_adapter_exposes_a_rung_name(tmp_path):

@@ -65,8 +65,8 @@ class MAESTROSettings:
                     self.timeout_seconds, self.max_tokens)
 
     @classmethod
-    def from_workspace(cls, workspace: Path) -> "MAESTROSettings":
-        """Load the existing DeepSeek configuration from the workspace dotenv file."""
+    def from_workspace(cls, workspace: Path, *, require_provider: bool = True) -> "MAESTROSettings":
+        """Load settings; an explicitly supplied offline client needs no provider credentials."""
 
         environment = read_dotenv(workspace / ".env")
         required = (
@@ -83,7 +83,7 @@ class MAESTROSettings:
             return (os.environ.get(name) or environment.get(name) or "").strip()
 
         missing = [name for name in required if not setting(name)]
-        if missing:
+        if missing and require_provider:
             raise ConfigurationError(
                 "Missing required MAESTRO provider settings: " + ", ".join(missing)
             )

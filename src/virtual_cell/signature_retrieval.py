@@ -10,7 +10,7 @@ from typing import Any, Mapping, Sequence
 import numpy as np
 from maestro.handoff import TOOL_SCHEMA_VERSION, json_loads, json_value, object_fields
 from .applicability import SupportLevel, receipt_level, ValidationReceipt
-from .interface import Interval, IntervalKind, ModelCapabilities, PredictionRequest, QueryAssessment, QuerySupport, StatePrediction
+from .interface import Interval, IntervalKind, ModelCapabilities, PredictionRequest, QueryAssessment, QuerySupport, StatePrediction, condition_response_limitations
 
 
 LIBRARY_SCHEMA = "maestro.virtual_cell.signature_library.v1"
@@ -325,7 +325,7 @@ class SciPlexResponseRung:
         )
 
     def _problems(self, request: PredictionRequest) -> tuple[list[str], list[str]]:
-        missing, limitations = [], []
+        missing, limitations = [], list(condition_response_limitations(request))
         if request.model_version != self.model_version:
             limitations.append("model_version_mismatch")
         intervention = request.intervention

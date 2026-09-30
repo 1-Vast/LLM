@@ -116,3 +116,9 @@ def test_production_orchestrator_replay_receives_results_only_after_query(tmp_pa
     assert result.selected_actions == ("functional_target_activity", "mode_matched_comparator")
     assert result.decision is DevelopmentAction.CHANGE_INTERVENTION_MODE
     assert result.decision_supported
+    snapshot = controller._case_store.snapshot("synthetic-functional-calibration-001")
+    assert snapshot.spent == 5.0
+    assert snapshot.plan_version == 2
+    assert controller._case_store.recorded_action_identifiers(snapshot.case_id) == (
+        "functional_target_activity", "mode_matched_comparator",
+    )

@@ -17,11 +17,11 @@ The day records are the entry points. Existing machine-local artifacts under
 | `20260928/CONSOLIDATION.md` | Consolidation per `PROMPT_consolidation.md`: Phase A inventory of 22 blocks plus 10 root reports (`research/CONSOLIDATION_INVENTORY.md`); Phase B zero promotions (dual_core_v2 repairs stay the research standard by their own registered section 14; incontext_world ridge_st deferred by owner decision and a later registered "do not promote"); Phase C report taxonomy (`research/README.md` as categorized portal; 10 root reports moved to `research/topics/<category>/`; inbound links updated in task.md, Innovation.md, decision_layer.md). Two pre-existing dual_core_v2 freeze mismatches listed, not resolved. Full suite 1367 passed plus the 2 documented environmental shape-test failures; vc freezes v1-v5b all_match; link checks green |
 
 | `20260930/README.md` | Round 1 source and identifiability audit; Round 2 forecast/policy interventions, source corrections, STATE interface recheck and partial-identification limits |
+| `20261001/README.md` | Collaborative dual-core module and data qualification; named mode refusals, affordable persisted execution, qualified prerequisite progression, offline closure and replay import regressions |
 
 ## Files
 
-The latest core/tool consolidation, dataset acquisition module, interface reduction and
-repository upload record are in `20260929/README.md` section 14.
+The latest dual-core workflow and verification record is in `20261001/README.md`.
 
 - `20260915/README.md`
 - `20260915/biological_closure/outputs/comparison.json`
@@ -144,4 +144,6 @@ repository upload record are in `20260929/README.md` section 14.
 - `20260928/0928/dual_core_v2_freeze.json`
 - `20260928/0928/dual_core_v2_freeze_population.json`
 - `20260929/README.md`
+- `20260930/README.md`
+- `20261001/README.md`
 - `20260928/CONSOLIDATION.md`

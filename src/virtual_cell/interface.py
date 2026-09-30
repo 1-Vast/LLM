@@ -301,6 +301,20 @@ class PredictionRequest:
         return cls.from_dict(json.loads(payload, parse_constant=reject_constant, object_pairs_hook=unique_object))
 
 
+def condition_response_limitations(request: PredictionRequest) -> tuple[str, ...]:
+    """Name conditional inputs a condition-response backend cannot honour."""
+
+    limitations: list[str] = []
+    mode = request.forecast_mode or "state"
+    if mode != "state":
+        limitations.append(f"forecast_mode_not_supported:{mode}")
+    if request.hypotheses:
+        limitations.append("hypothesis_conditioning_not_supported")
+    if request.history:
+        limitations.append("history_conditioning_not_supported")
+    return tuple(limitations)
+
+
 @dataclass(frozen=True)
 class VirtualCellQueryTemplate:
     """Registered model inputs from which the controller may construct a request.

@@ -5,8 +5,7 @@ import torch
 
 from virtual_cell.learned_response import DoseAnchoredNetwork, fit_response
 from dataclasses import replace
-from virtual_cell.learned_response import LearnedTranscriptWorldModel
-from virtual_cell.interface import Intervention, PredictionRequest, SystemContext, safe_predict
+from virtual_cell.interface import safe_predict
 
 
 def test_zero_dose_boundary_is_exact_for_any_weights():
@@ -33,20 +32,7 @@ def test_training_refuses_nonfinite_values():
         fit_response(x * np.nan, np.ones(5), y, x, np.ones(5), y, seed=11)
 
 
-@pytest.fixture
-def registered_model(tmp_path):
-    genes = np.array(["ENSG1", "ENSG2"])
-    np.savez(tmp_path / "model_parameters.npz", genes=genes,
-             target_components=np.ones((1, 2)), baseline_components=np.ones((16, 2)),
-             multimodal_neural_feature_mean=np.zeros(529), multimodal_neural_feature_scale=np.ones(529))
-    for seed in (11, 29, 47):
-        torch.save(DoseAnchoredNetwork(529, 1).state_dict(), tmp_path / f"multimodal_neural_{seed}.pt")
-    record = {"context": "A549", "compound": "example", "smiles": "CCO", "baseline": [1., 2.], "genes": genes}
-    model = LearnedTranscriptWorldModel(tmp_path, {"baseline": record})
-    request = PredictionRequest("query", "case", "contrast", 1, Intervention("example", "drug", (), 100, "nM", 24),
-                                SystemContext("A549", "constructed test", "baseline", "baseline", "Homo sapiens"),
-                                ("transcript_shift_rms",), model.model_version)
-    return model, request
+from tests.fixtures.learned_response import registered_model
 
 
 @pytest.mark.parametrize("changed", ["readout", "dose", "time", "context", "species", "control", "genes"])

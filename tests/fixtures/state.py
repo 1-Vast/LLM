@@ -199,3 +199,15 @@ def joined(assessment: QueryAssessment) -> str:
     """Every limitation and missing input in one line, for an assertion message."""
 
     return " | ".join((*assessment.limitations, *assessment.missing_inputs))
+
+
+def development_mean_baseline(context: str = "NCI-H596", dataset: str = "tiny"):
+    from virtual_cell.ladder import DevelopmentMeanShiftBaseline
+    return DevelopmentMeanShiftBaseline.fit(
+        {DRUG_B: np.full(8, 0.2), "[('drugC', 0.5, 'uM')]": np.full(8, 0.4)},
+        development_conditions=(DRUG_B, "[('drugC', 0.5, 'uM')]"),
+        feature_names=tuple(f"gene{i}" for i in range(8)),
+        context_identifier=context,
+        dataset_id=dataset,
+        fitted_on="synthetic development conditions",
+    )

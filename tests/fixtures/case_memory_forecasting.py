@@ -1,6 +1,7 @@
 """Shared condition-labelled synthetic cases for forecasting and orchestration tests."""
 from __future__ import annotations
 
+from maestro import problem_compiler as PC
 from maestro import case_memory as CM
 from maestro import adaptive_retrieval as DR
 from maestro import hypothesis_forecast as HF
@@ -80,3 +81,18 @@ def _state(direction: int) -> HF.UserStateContext:
         directional_state=DR.directional_state_from_shift({"EGR1": 2.0 * direction}),
         intervention_identity="drugA", cell_context="NCI-H596", time_h=24.0, dose_nM=500.0,
         assay="readout_measurement")
+
+
+def _compiled_problem() -> PC.CompiledProblem:
+    records = [
+        PC.MeasurementRecord("r1", "EGR1", 2.0, "treated", Q, cell_line="NCI-H596",
+                             time_value=24.0, time_unit="h", replicate_group="g1"),
+        PC.MeasurementRecord("r2", "FOS", -1.0, "treated", Q, cell_line="NCI-H596",
+                             time_value=24.0, time_unit="h", replicate_group="g1"),
+        PC.MeasurementRecord("r3", "DMSO", 0.0, "control", Q, is_control=True),
+    ]
+    compiled = PC.compile_problem("user-1", "Is the response on-target?", records,
+                              intervention="drugA", nominal_target="TARGET_A",
+                              assay_hint="readout_measurement")
+    from dataclasses import replace
+    return replace(compiled, context={**compiled.context, "outcome_mode": "attempted_experiment"})

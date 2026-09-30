@@ -17,12 +17,12 @@ from maestro.handoff import SourceClusterIndex
 from maestro.composition import ActionTopology
 from maestro.judgment import PredictionReliabilityLedger
 from maestro.repair import RepairController, RepairLedger, RepairRecord
-from .memory import CaseSnapshot, CaseStore, EpistemicStatus, MeasurementResult, MemoryKind, MemoryScope, MemoryStore, ReflectionRecord, ResultImport, RunLogger, reflect_on_result
+from .memory import CaseSnapshot, CaseState, CaseStore, EpistemicStatus, MeasurementResult, MemoryKind, MemoryScope, MemoryStore, ReflectionRecord, ResultImport, RunLogger, reflect_on_result
 from .llm import DeepSeekChatClient, LLMError, MAESTROSettings, VisualInspection, VisualInspector
 from .decision_critic import CritiqueOutcome, TypeSafeJevClient, TypeSafeSettings, TypedDecisionCritic
 from .context import ContextBuilder, TaskIntent, TaskInterpreter, WorldModelRow, render_world_model_briefing, summarize_world_model, world_model_rows
 from .knowledge import EvidenceLedger
-from maestro.models import ContrastCheck, DecisionStatus, DevelopmentAction, EvidenceAction, EvidenceActionKind, EvidenceKind, EvidenceScope, FunctionalInterventionProfile, MeasurementStatus, MechanismContrast, MechanismHypothesis, NonDiscriminabilityReason, RepairKind, RepairProposal
+from maestro.models import ContrastCheck, DecisionStatus, DevelopmentAction, EvidenceAction, EvidenceActionKind, EvidenceKind, EvidenceScope, FunctionalInterventionProfile, MeasurementStatus, MechanismContrast, MechanismHypothesis, NonDiscriminabilityReason, PremiseRequirement, RepairKind, RepairProposal
 from .planner import LLMRepairDraft, MechanismContrastPlanner
 from .tool_runtime import ToolExecution, ToolRouter, ToolRuntimeError
 from virtual_cell.interface import safe_predict
@@ -240,6 +240,8 @@ class MAESTROOrchestrator:
         enable_decision_critic: bool = True,
         decision_repeats: int = 1,
         knowledge_packages: Sequence[Path] = (),
+        outcome_forecaster: OutcomeForecaster | None = None,
+        discrimination_selection: bool = False,
     ) -> "MAESTROOrchestrator":
         """Create a controller; evaluations may supply an isolated state directory.
 
@@ -248,11 +250,11 @@ class MAESTROOrchestrator:
         with any backend that satisfies the world-model protocol.
         """
 
-        settings = MAESTROSettings.from_workspace(workspace)
+        settings = MAESTROSettings.from_workspace(workspace, require_provider=client is None)
         # The typed decision model is optional: with no TypeSafe block in the environment or
         # .env the critic is simply absent, and the loop behaves exactly as before.
         typesafe = TypeSafeSettings.from_workspace(workspace) if enable_decision_critic else None
-        runtime_client = client or DeepSeekChatClient(settings)
+        runtime_client = client if client is not None else DeepSeekChatClient(settings)
         runtime_directory = state_directory or settings.log_directory
         logger = RunLogger(runtime_directory)
         memory = MemoryStore(runtime_directory / "memory.sqlite")
@@ -288,6 +290,8 @@ class MAESTROOrchestrator:
             decision_critic=(
                 TypedDecisionCritic(TypeSafeJevClient(typesafe)) if typesafe is not None else None
             ),
+            outcome_forecaster=outcome_forecaster,
+            discrimination_selection=discrimination_selection,
         )
         # Keep the client the components share, so a run can report what it was charged. The
         # per-response usage is otherwise parsed and dropped at every call site.
@@ -321,13 +325,20 @@ class MAESTROOrchestrator:
         virtual_cell_template: VirtualCellQueryTemplate | None = None,
         expected_hypothesis_identifiers: Sequence[str] = (),
         expected_hypotheses: Sequence[MechanismHypothesis] = (),
+        prior_evidence: Sequence[MeasuredPremise] = (),
         session_id: str | None = None,
     ) -> MAESTROTurn:
         """Execute one bounded cycle without fabricating a biological result or tool capability."""
 
+        if budget is not None and (
+            isinstance(budget, bool) or not isinstance(budget, (int, float))
+            or not math.isfinite(budget) or budget < 0
+        ):
+            raise ValueError("Budget must be finite and nonnegative.")
         session_id = session_id or str(uuid.uuid4())
         case_id = case_id or session_id
         case = self._case_store.open_case(case_id, budget=budget) if self._case_store else None
+        awaiting_current_plan = case is not None and case.state is CaseState.AWAITING_RESULT
         self._logger.event(
             "task_received",
             {
@@ -436,6 +447,7 @@ class MAESTROOrchestrator:
             contrast, available_actions, intervention_profile, case, budget, session_id,
             prediction=prediction, prediction_request=effective_request,
             action_predictions=action_predictions, action_requests=action_requests, case_id=case_id,
+            prior_evidence=prior_evidence,
         )
         acquisition_stop = self._acquisition_stop_reason(session_id)
         if selection is not None and selection.actions and (self._discrimination_selection or not selection.uncovered):
@@ -462,8 +474,24 @@ class MAESTROOrchestrator:
         if (self._power_aware_selection or self._discrimination_selection) and selection is not None:
             allowed = {action.identifier for action in selection.actions}
             execution_actions = tuple(action for action in execution_actions if action.identifier in allowed)
-        if self._case_store:
-            stop_reason = None if repair is None or repair.replacement_action else repair.interpretation_boundary
+        execution_stop = None
+        remaining = case.remaining_budget if case and case.remaining_budget is not None else budget
+        if remaining is not None and sum(action.cost for action in execution_actions) > remaining:
+            execution_stop = "Planned action exceeds the remaining case budget."
+            self._logger.event(
+                "execution_budget_rejected",
+                {"selected_action_ids": [action.identifier for action in execution_actions], "remaining_budget": remaining},
+                session_id=session_id,
+            )
+            execution_actions = ()
+        if awaiting_current_plan:
+            execution_actions = ()
+            self._logger.event(
+                "case_awaiting_result", {"case_id": case_id, "plan_version": case.plan_version},
+                session_id=session_id,
+            )
+        elif self._case_store:
+            stop_reason = execution_stop or (None if repair is None or repair.replacement_action else repair.interpretation_boundary)
             if acquisition_stop is not None and not execution_actions:
                 stop_reason = acquisition_stop
             case = self._case_store.record_plan(
@@ -504,7 +532,11 @@ class MAESTROOrchestrator:
         turn = MAESTROTurn(
             session_id=session_id,
             intent=intent,
-            response=self._decision_response(contrast, check, repair, visual_inspections, tool_executions)
+            response=(
+                "This case is awaiting measurements for its current plan; import those results before submitting a new execution plan."
+                if awaiting_current_plan
+                else self._decision_response(contrast, check, repair, visual_inspections, tool_executions)
+            )
             + summarize_world_model(briefing_rows),
             contrast=contrast,
             check=check,
@@ -913,6 +945,7 @@ class MAESTROOrchestrator:
                 virtual_cell_template=virtual_cell_template,
                 expected_hypothesis_identifiers=expected_hypothesis_identifiers,
                 expected_hypotheses=expected_hypotheses,
+                prior_evidence=measured_premises,
                 session_id=f"{loop_token}-round-{round_index}",
             )
             turns.append(turn)
@@ -946,7 +979,10 @@ class MAESTROOrchestrator:
                 hypothesis_signature = signature
                 state = self._state_for_round(case_id, state, turn.contrast)
             if not turn.selected_actions:
-                stop_reason = "no_executable_action"
+                stop_reason = (
+                    "awaiting_result" if turn.case is not None and turn.case.state is CaseState.AWAITING_RESULT
+                    else "no_executable_action"
+                )
                 break
             awaiting = False
             for action in turn.selected_actions:
@@ -1606,10 +1642,22 @@ class MAESTROOrchestrator:
         action_predictions: Mapping[str, StatePrediction] | None = None,
         action_requests: Mapping[str, PredictionRequest] | None = None,
         case_id: str | None = None,
+        prior_evidence: Sequence[MeasuredPremise] = (),
     ):
         remaining = case.remaining_budget if case and case.remaining_budget is not None else budget
         if remaining is None:
             return None
+        needed = {name for action in available_actions for name in action.required_premises}
+        satisfied = {
+            action.identifier for action in available_actions
+            if action.supplies and set(action.supplies) <= needed
+            and self._premise_action_satisfied(action, contrast, profile, prior_evidence)
+        }
+        if satisfied:
+            self._logger.event(
+                "satisfied_premise_actions_excluded", {"action_ids": sorted(satisfied)}, session_id=session_id,
+            )
+        available_actions = tuple(action for action in available_actions if action.identifier not in satisfied)
         try:
             priorities = self._prediction_action_priorities(
                 prediction, prediction_request, available_actions,
@@ -1666,6 +1714,11 @@ class MAESTROOrchestrator:
         except ValueError as error:
             self._logger.event("budget_selection_rejected", {"error": str(error)}, session_id=session_id)
             return None
+        if satisfied:
+            selection = replace(selection, rejection_reasons={
+                **selection.rejection_reasons,
+                **{identifier: "premise_already_measured_under_same_conditions" for identifier in satisfied},
+            })
         self._logger.event(
             "budget_selection_completed",
             {
@@ -1683,6 +1736,42 @@ class MAESTROOrchestrator:
             session_id=session_id,
         )
         return selection
+
+    def _premise_action_satisfied(
+        self,
+        action: EvidenceAction,
+        contrast: MechanismContrast,
+        profile: FunctionalInterventionProfile,
+        evidence: Sequence[MeasuredPremise],
+    ) -> bool:
+        """An admitted, adequately replicated assay at the same coordinates need not be bought again."""
+
+        if not evidence or profile.unmeasured(action.supplies):
+            return False
+        rules = self._interpretation_rules(contrast)
+        for name in action.supplies:
+            minimum = max([1] + [
+                rule.minimum_independent_units for rule in rules
+                if name in rule.matched_fields or any(name.startswith(prefix) for prefix in rule.required_prefixes)
+                or any(requirement.field == name for requirement in rule.evidence_requirements)
+            ] + [requirement.minimum_units for requirement in self._decision_engine.requirements
+                 if name in requirement.satisfied_by])
+            requirement = PremiseRequirement(
+                name, action.quantity, entity=action.entity, site=action.site, units=action.units,
+                context_identifier=action.execution_context or (profile.context_identifier if action.context_bound else None),
+                time_hours=action.time_hours,
+            )
+            if not any(
+                item.grant.source_action == action.identifier
+                and isinstance(item.independent_units, int) and not isinstance(item.independent_units, bool)
+                and item.independent_units >= minimum
+                and scope_rank(item.scope) >= scope_rank(EvidenceScope.INTERVENTION_IMPLEMENTATION)
+                and not requirement.unmet_reasons(item.grant)
+                and all(item.conditions.get(key) == value for key, value in action.expected_conditions.items())
+                for item in evidence
+            ):
+                return False
+        return True
 
     def _interpretation_rules(self, contrast: MechanismContrast) -> tuple[OutcomeRule, ...]:
         """The rules that will read this contrast's results; acquisition values readings by them too."""
@@ -2019,9 +2108,12 @@ class MAESTROOrchestrator:
         self._reconcile(case_id, result)
         return imported
 
-    def record_revealed_result(self, result: MeasurementResult) -> None:
-        """Expose an evaluator-authorized result without changing the evaluator CaseStore."""
+    def record_revealed_result(self, result: MeasurementResult, *, case_id: str | None = None) -> None:
+        """Admit an authorized reveal and advance its plan when this runtime owns a case."""
 
+        if case_id is not None and self._case_store is not None:
+            self.import_measurement(case_id, result)
+            return
         if not result.quality_passed:
             return
         record = self._context_builder.record_result(result)

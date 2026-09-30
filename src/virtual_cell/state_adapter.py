@@ -53,6 +53,7 @@ from .interface import (
     QueryAssessment,
     QuerySupport,
     StatePrediction,
+    condition_response_limitations,
 )
 from .applicability import ValidationReceipt
 
@@ -747,7 +748,7 @@ class StateCapabilityAdapter:
 
     def _static_issues(self, request: PredictionRequest) -> tuple[list[str], list[str]]:
         missing: list[str] = []
-        limitations: list[str] = []
+        limitations = list(condition_response_limitations(request))
         config = self._config
         if request.model_version != config.model_version:
             missing.append("matching model_version")

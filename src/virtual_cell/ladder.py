@@ -9,7 +9,7 @@ from typing import Mapping, Sequence
 import numpy as np
 from .applicability import SupportLevel, receipt_level, ValidationReceipt
 from .artifacts import vector_sha256, write_shift_artifact, load_feature_names
-from .interface import ModelCapabilities, PredictionRequest, QueryAssessment, QuerySupport, StatePrediction
+from .interface import ModelCapabilities, PredictionRequest, QueryAssessment, QuerySupport, StatePrediction, condition_response_limitations
 from .state_adapter import DatasetRegistration, file_sha256
 
 
@@ -123,7 +123,7 @@ class DevelopmentMeanShiftBaseline:
 
     def assess_query(self, request: PredictionRequest) -> QueryAssessment:
         missing: list[str] = []
-        limitations: list[str] = []
+        limitations = list(condition_response_limitations(request))
         if request.model_version != self.model_version:
             missing.append("matching model_version")
         if request.intervention.mode != "drug":

@@ -466,7 +466,7 @@ class MAESTROOrchestratorPolicy:
         if self._active_view is None:
             raise RuntimeError("A replay result was delivered before MAESTRO selected an action.")
         result = measurement_result_from_reveal(outcome, result_id=None)
-        self._controller.record_revealed_result(result)
+        self._controller.record_revealed_result(result, case_id=self._active_view.case.identifier)
 
     def for_case(self, directory: Path) -> "MAESTROOrchestratorPolicy":
         if self._runtime_factory is None:

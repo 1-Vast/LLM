@@ -275,10 +275,11 @@ def _actions() -> tuple[EvidenceAction, ...]:
     return plain, model_guided
 
 
-def test_a_second_round_reuses_the_first_rounds_inference(tmp_path: Path):
+@pytest.mark.parametrize("case_store", [False, True])
+def test_a_second_round_reuses_the_first_rounds_inference(tmp_path: Path, case_store):
     client = StubClient([TASK, _plan("plain"), TASK, _plan("plain")])
     world_model = CountingWorldModel()
-    controller = _controller(tmp_path, client, world_model=world_model)
+    controller = _controller(tmp_path, client, world_model=world_model, case_store=case_store)
     profile = FunctionalInterventionProfile(mode="inhibition")
 
     first = controller.run("Resolve.", available_actions=_actions(), intervention_profile=profile,
@@ -294,6 +295,9 @@ def test_a_second_round_reuses_the_first_rounds_inference(tmp_path: Path):
     row = next(item for item in second.world_model_rows if item.action == "model-guided")
     assert row.reused_from_request == "round-1.model-guided"
     assert "1 reused from an identical earlier query" in second.response
+    if case_store:
+        assert second.selected_actions == ()
+        assert second.case.plan_version == first.case.plan_version
 
     fresh = _controller(tmp_path / "off", StubClient([TASK, _plan("plain"), TASK, _plan("plain")]),
                         world_model=(counted := CountingWorldModel()), reuse_predictions=False)

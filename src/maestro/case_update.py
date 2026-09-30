@@ -233,8 +233,9 @@ def ingest_result(
     return IngestResult(new_episode, qualification, eliminated_tuple, calibration)
 
 
-SUPPORTED_FORECAST_MODES = ("state", "hypothesis_conditional", "history_aware",
-                            "hypothesis_conditional_history")
+# The forecaster serves hypothesis-conditioned outcome distributions. History
+# in its cache identity does not establish history-conditioned predictions.
+SUPPORTED_FORECAST_MODES = ("hypothesis_conditional",)
 
 
 @dataclass(frozen=True)
@@ -330,6 +331,10 @@ def run_case_memory_path(
         fatal = [d for d in compiled.diagnostics if d.severity == "fatal"]
         return CaseMemoryPathResult(False, tuple(PathGateFailure("compiler", d.code) for d in fatal),
                                     refusal="compiled_problem_not_usable")
+    if forecast_mode not in SUPPORTED_FORECAST_MODES:
+        return CaseMemoryPathResult(False, (PathGateFailure(
+            "forecast_mode", f"unsupported:{forecast_mode}"),),
+            model_version=MODEL_VERSION, refusal=f"unsupported_forecast_mode:{forecast_mode}")
     user_state = user_state_from_compiled(compiled)
     forecaster = CaseMemoryOutcomeForecaster(store, feature_arm=feature_arm, research_mode=research_mode)
     state_before = repr(evidence) if evidence is not None else None

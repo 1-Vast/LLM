@@ -171,10 +171,11 @@ class LearnedTranscriptWorldModel:
                                  ("drug",), True, True, True, None)
 
     def assess_query(self, request):
-        from .interface import QueryAssessment, QuerySupport
+        from .interface import QueryAssessment, QuerySupport, condition_response_limitations
         errors = list(request.validation_errors())
         if errors:
             return QueryAssessment(QuerySupport.UNSUPPORTED, (), tuple(errors), self.capabilities())
+        errors.extend(condition_response_limitations(request))
         if request.model_version != self.model_version:
             errors.append("model_version_mismatch")
         genes = set(str(gene) for gene in self.parameters["genes"])

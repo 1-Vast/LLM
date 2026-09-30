@@ -37,7 +37,6 @@ from maestro import case_memory as CM
 from maestro import case_update as MP
 from maestro import adaptive_retrieval as DR
 from maestro import hypothesis_forecast as HF
-from maestro import problem_compiler as PC
 from maestro.acquisition import OutcomeBranch, outcome_consequences
 from maestro.models import (
     EvidenceAction,
@@ -50,7 +49,7 @@ _PROFILE = FunctionalInterventionProfile(mode="small_molecule", context_identifi
                                          time_hours=24.0)
 
 from tests.fixtures.case_memory_forecasting import (
-    H1, H2, Q, _actions, _contrast, _episode, _state, _store,
+    H1, H2, _actions, _compiled_problem, _contrast, _episode, _state, _store,
 )
 
 
@@ -104,19 +103,6 @@ def test_forecast_prefers_realised_case_measurements_over_heuristic_mapping(monk
 
 
 # -------------------------------------------------------------------------------- pipeline
-def _compiled_problem() -> PC.CompiledProblem:
-    records = [
-        PC.MeasurementRecord("r1", "EGR1", 2.0, "treated", Q, cell_line="NCI-H596",
-                             time_value=24.0, time_unit="h", replicate_group="g1"),
-        PC.MeasurementRecord("r2", "FOS", -1.0, "treated", Q, cell_line="NCI-H596",
-                             time_value=24.0, time_unit="h", replicate_group="g1"),
-        PC.MeasurementRecord("r3", "DMSO", 0.0, "control", Q, is_control=True),
-    ]
-    compiled = PC.compile_problem("user-1", "Is the response on-target?", records,
-                              intervention="drugA", nominal_target="TARGET_A",
-                              assay_hint="readout_measurement")
-    from dataclasses import replace
-    return replace(compiled, context={**compiled.context, "outcome_mode": "attempted_experiment"})
 
 
 def test_the_gated_pipeline_runs_end_to_end_in_research_mode():
