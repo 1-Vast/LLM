@@ -432,3 +432,116 @@ checks (`docs_followup.xml`); these overlap the 334 scoped tests and are not sum
 The supplied review is copied byte-for-byte with its own provenance receipt under
 `research/astra/evidence/20261002_zero_review*`. The existing daily-log prefix and
 unchanged production/tool counts are separately verified before publication.
+
+## 18. Eight-question cheap-input decision and mechanism review
+
+The user requests separate decision-value and mechanism-value chains, with evidence,
+uncertainty, a discriminating next experiment and continue/modify/stop criteria for
+all eight questions. Priority remains zero attribution, observed decision space and
+seed aggregation (questions 4, 2, 5). The full response is
+[`EIGHT_QUESTIONS.md`](../../research/astra/EIGHT_QUESTIONS.md).
+
+New `research/astra/decision_space.py` directly reads the pinned raw c39 metadata
+and EGR1 coordinate, retaining native observation IDs/source rows/sample/plate,
+formulation, pass_filter strata and source SHA in 732 derived traceable rows. These
+include 146 exact nonsolvate Trametinib treatment cells, six actual conditions and
+586 controls across 14 plates. Exact .05 doses occur on plates 1/10, .5 on 2/11,
+and 5 on 3/12. No plate supports even a pair of the three measured exact actions,
+and no full menu exists. Solvate treatment is separate and cannot repair coverage.
+Each treatment condition has one native sample ID; parents, random sister allocation,
+attempt denominators, event times and physical independence remain unauthenticated.
+
+Observed EGR1 is nonzero in only 5/146 treatment cells. Mean values span 0 to
+0.12199953, but dose and plate families are confounded. Same-plate control differences
+are descriptive RNA only: control centering cannot identify dose-by-batch effects.
+All published full/minimal filter strata remain visible; plate11 middle-dose mean
+is 0.122 overall and 0 among six full-only cells. No post-hoc filter changes create
+a ranking. Cell filter flags are not complete experiment QC or failure records.
+Observed RNA is not a viability endpoint or a verified intervention utility.
+
+The original 27 query-action combinations have nine same-plate/action observed
+matches and 18 missing matches. Two matched zero predictions face positive observed
+condition means; positive predictions also face observed zero means. These are
+development diagnostics, with unknown checkpoint exposure and no state-blind arm.
+Missing observed actions stay missing. No error CI, physical CI, causal dose
+advantage or state-conditioned ranking is inferred. Original 30-cell input subsets
+are distinguished from full-source control populations.
+
+The first descriptive run stays frozen in `20261002_decision_space_v1/`. The v2
+run adds exact nonzero and query-action unit names plus leave-one-seed-out numerical
+diagnostics. Omitting seed42 on plate1 or seed17 on plate10/11 restores an aggregate
+tie, so K=3 rankings are sensitive to a single numerical draw. This is previously
+inspected frozen-output description, not an interval or adaptive sampling design.
+No seeds are added. Current inference repeatability does not establish adequate
+numerical precision, biological uncertainty, domain generalization or actual gain.
+Final source snapshots, freezes, observed tables, coverage, predictions, conditions,
+sampling diagnostics and manifests are in `20261002_decision_space_v2/`.
+
+The three reviewers verify scientific evidence levels, actual cheap-input/runtime
+contracts and raw dose/plate/QC records. Current STATE legally consumes registered
+historical basal RNA and exact action encoding, not sparse marker panels or direct
+GO/target prose. Context/source/batch shortcuts remain possible. The word cheap in
+software tests does not certify cheap biology. Full RNA, small markers and context
+must be evaluated separately; sparse inputs must not be padded into STATE.
+
+The production code contains expected-coverage and terminal-value planning concepts
+and typed evidence nodes, but no verified four-way compute/measure/intervene/stop
+scheduler or actual state-gain advantage is deployed. Predictions, model seed draws
+and repeated agent analyses cannot become new measured evidence or independent
+physical repeats. RNA, phenotype, engagement/proximal function and mechanism claims
+require claim-specific qualified measurements and reviewed premise links. Planning
+Bayes updates do not authorize biological posterior updates; RNA significance lacks
+the competing-mechanism likelihood contract. EGR1 alone does not confirm MEK-mediated
+phenotype. Correct/false mechanism acceptance remains unmeasured without a defined
+truth standard and discriminatory experiments.
+
+The immediate next laboratory design is an outcome-only complete randomized sister
+action panel across independently initiated parent cultures, with actual phenotype,
+matched controls, complete attempted-experiment/QC/failure ledger and costs. Expensive
+RNA or STATE availability is not required merely to establish outcome headroom.
+Development-only variance/meaningful delta/QC precede confirmation. If headroom is
+established, add genuinely available affordable state and test action contrasts,
+identity/batch controls, matched-context permutation and held-out physical units.
+Do not force a confirmatory sample size from current cell counts.
+
+All eight items define continuation, task/readout modification and stopping criteria.
+Required controls include fixed action, same-checkpoint state-blind, state shuffle,
+simple predictor, strong single agent and collaborative workflow, with matched global
+menus/resource ceilings/refusal rules. Actual compute/state/assay/wait costs, concrete
+action utility, refusal contribution and false mechanism acceptance are separate.
+No unknown values become zero cost or invented utility. A gain interval crossing
+delta is inconclusive; stop for negligible headroom only with a valid upper bound.
+
+This round makes zero new STATE forward calls, zero external API calls and zero
+physical experiments; the prior native 36-forward audit is not repeated. No src,
+tools, dependency, checkpoint or frozen historical output changes. The initial six
+coverage/missingness tests pass; after the seed diagnostic test is added, the scoped
+maestro run passes 341 tests, including 142 ASTRA contracts, with zero failures,
+errors or skips. Receipt is `20261002_eight_questions_verification/receipt.json`.
+All four baseline snapshots, eleven frozen grid inputs and 96 grid output files
+match. The prior 1,861-test full run is not relabeled as a current full rerun.
+
+Reproduction uses new output directories:
+
+```powershell
+$py = 'D:/anaconda/envs/maestro/python.exe'
+& $py -m research.astra.decision_space --out research/astra/results/NEW_DECISION_SPACE_DIRECTORY
+& $py -m research.astra.verify --out research/astra/results/NEW_EIGHT_QUESTIONS_VERIFICATION
+```
+
+The user explicitly authorizes synchronizing progress to remote main. Publication
+checks retain the existing daily-log prefix and src/tools counts 44/913, verify
+new manifests/source snapshots and staged bytes, then compare remote/main to the
+published local commit and check the clean worktree. The actual commit is reported
+in the final response and a local transport receipt.
+The independent review corrects the draft's statistical implication direction:
+the mechanism null must imply the statistical null (or the test be valid for the
+entire mechanism-null model) for rejection to challenge that mechanism. An RNA
+change alone cannot reject a no-MEK-mediated-effect claim that allows off-target
+effects. Authenticated independent pilot cultures may support assumption-dependent
+physical intervals, though three labels do not prove independence or sufficient
+power. The outcome panel must also inspect reproducible parent-level differences;
+opposing state-dependent advantages can cancel in a marginal average.
+Final navigation/documentation checks pass 21 repository-shape tests and are not
+added to the overlapping 341 count. Source dtype is float32: read CSV EGR1 as that
+dtype before float64 aggregation to reproduce native means exactly.

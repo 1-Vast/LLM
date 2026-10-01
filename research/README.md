@@ -36,7 +36,7 @@ remains a historical record and is not rewritten by this iteration.
 | [`gated_plan/`](gated_plan/README.md) | design | Repository audit and gated research plan; not a registered experiment. |
 | [`local_verification/`](local_verification/README.md) | design | Offline and credential-dependent engineering probes. |
 | [`dual_core_live/`](dual_core_live/README.md) | inconclusive | Actual DeepSeek/Jev API validation, general contract benchmark, biological pilot and report-only defect review; no assumed biological superiority. |
-| [`astra/`](astra/README.md) | inconclusive | Review-guided decision path and categorical feedback; paired STATE diagnostics and [native EGR1 zero audit](astra/ZERO_AUDIT.md); no observed biological policy gain. |
+| [`astra/`](astra/README.md) | inconclusive | Decision/feedback contracts, [native EGR1 zero audit](astra/ZERO_AUDIT.md) and [eight-question observed-action review](astra/EIGHT_QUESTIONS.md); no observed biological policy gain. |
 
 ## (b) Virtual cell and world models
 

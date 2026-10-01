@@ -186,3 +186,9 @@ action means to strictly negative pre-ReLU values, with9 bitwise-identical real
 STATE replays. It separates numerical ranking, meaningful action advantage and
 measured benefit; Plate10's aggregate middle-dose rank remains an unvalidated
 hypothesis. No new production/tool policy is promoted.
+
+The [eight-question follow-up](EIGHT_QUESTIONS.md) adds a native observed-RNA action
+coverage audit:146 Trametinib cells,5 nonzero EGR1 values, six dose/plate conditions
+and no within-plate action pair. It defines separate decision-value and mechanism-
+value evidence chains and per-question continue/modify/stop criteria. Descriptive
+RNA differences and three-seed ranks do not identify intervention utility.

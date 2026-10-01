@@ -61,3 +61,6 @@ diagnostics are in [research/astra/README.md](research/astra/README.md) and
 [the October 2 record](log/20261002/README.md).
 The subsequent native zero attribution and bounded policy diagnostics are in
 [the ASTRA EGR1 audit](research/astra/ZERO_AUDIT.md).
+The cheap-input decision and mechanism research questions, native observed-action
+coverage and next experimental gates are in
+[the ASTRA eight-question review](research/astra/EIGHT_QUESTIONS.md).
