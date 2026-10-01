@@ -509,3 +509,281 @@ splits, same rules, metrics, missing-action bounds and failure criteria become a
 frozen efficacy protocol. No state benefit, general decision improvement or
 backend promotion is claimed by this round. Root README changes are navigation
 only. main remains the sole branch; complete receipts and code are uploaded there.
+
+
+## 15. Public-source search and relation construction after 3923541
+
+### 15.1 Objective, scope and record control
+
+This continuation starts from `3923541378cb415656b1fb5b5930c7f50b4660d2`
+with a clean checkout, using `D:\anaconda\envs\maestro\python.exe`.
+The objective was to acquire a genuinely qualifying task, not to rerun the
+previous twelve local/three public exclusions. `STATE_DATA_PLAN.md`,
+`STATE_IDENTIFIABILITY.md`, original public receipts and checkpoint review were
+read first. New inputs, failures, source code copies, mappings and verification
+are in separate directories. Sections 1-14 and the prior audit artifacts are
+preserved; no production `src` file changed.
+
+This round obtained new original materials for **four task families**. It also
+triaged other imaging/controller sources. The search is bounded, not an
+exhaustive assertion that no qualifying public dataset exists. The core question
+remains whether actual state available before a decision improves prediction,
+selection and terminal utility under identical actions, resources, QC, endpoint
+and refusal rules.
+
+The resulting classification is **0 comparable, 0 interval-only, 4 replay-only**.
+There is nevertheless new substantive evidence: a protocol-certified real-time
+state/control order, original binary intervention arrays, a verified next-frame
+index rule, joined drug-screen wells and controls, and two concrete retrospective
+processing/leakage risks. These are improvements to data readiness, not a claim
+of biological state gain.
+
+### 15.2 Acquisition and primary evidence
+
+The new [source receipts](../../tools/datasets/audit_results/20261001_state_search/evidence_index/sources.json)
+record **57 HTTP acquisitions: 54 successful responses and 3 failed routes**,
+with URLs, UTC start/finish, headers, saved bytes, SHA256 and failure status.
+The three failures are incorrect initially guessed repository branches/names;
+correct repository metadata was subsequently obtained without deleting failures.
+Downloader success never supplies scientific eligibility. XML, registry, JSON,
+MAT, CSV, code and ZIP identities were actually inspected.
+
+[Search coverage](../../tools/datasets/audit_results/20261001_state_search/evidence_index/search_coverage.json)
+records query families, acquisition depth, triage-only leads and downloads not
+performed. No author was contacted. FARO, the Hazel controller repository,
+p53Cinema and YODA are recorded as leads, not as scientifically excluded tasks.
+All interpretations below link to original bytes and the
+[field-by-field review](../../tools/datasets/audit_results/20261001_state_search_build_v4/review.json).
+Article, image/data and code licenses are separated; unknown rights stay unknown.
+
+| Candidate / original source | What was actually verified | Remaining qualification gaps |
+| --- | --- | --- |
+| [DeepCellControl](https://zenodo.org/records/8114649), [original study](https://doi.org/10.1038/s41467-024-46361-1) | Version 1.0.0, CC BY 4.0 data; actual 357,636,847-byte `datasets.zip`; registry MD5 independently matches; computed SHA256 in archive identity receipt. Seven experiments, 29,709 mother-row time series. `.npy` features, dimensions, stimulation values and literal `analysis_date`/`experiment` metadata verified. Code pinned to immutable GitLab revisions; deepcellcontrol code MIT. | Online state packet to deposited row/chamber mapping; physical culture/chip identity; actuation and full QC/failure/reference ledger; actual costs; comparable multi-action outcomes per question. Optical/bacterial state is unsupported by current STATE. |
+| [Gross/IDR0119](https://github.com/IDR/idr0119-gross-cellresponse), [original study](https://doi.org/10.1038/s41467-023-39122-z) | Original IDR study/plates/well annotation; Synapse entity; pinned model-repository CSV and concentrations. Full HC00701 mapping: HCC1143, 24 wells, four technical image fields per well, 17,567 records. IDR declares CC BY 4.0; model-repository CSV license scope remains separately unauthenticated. | Protocol explicitly starts imaging after drug addition. No legal predecision state. Native culture/randomization, complete failure/QC/cost ledger absent. Unresolved timing and concentration-unit interpretation retained. |
+| [Cycloop](https://github.com/dibbelab/Cycloop), [original study](https://doi.org/10.1038/s41467-021-22689-w), [image deposit](https://zenodo.org/records/4516319) | Immutable code revision; two original processed MAT files, feedback/open-loop cell traces, controller and reverse/combine tracking code. Zenodo images v2.0 CC BY 4.0; GitHub MAT/code license unknown. `inputLEVELS`, `vct_time`, online summaries, phase/coherence and `SingleCellTraces` fields inspected. | Historical published tracks can depend on future reverse tracking and eventual length selection. Controller-to-export identity unknown. One whole chamber receives one medium per cycle, not two observed alternatives. Independent repeated same-menu cultures, complete QC/cost/control ledger absent. Yeast/media inputs unsupported by STATE. |
+| [Microtrench MOLM-13](https://github.com/raharjaliu/microtrench-chemotherapeutic-vision), [original study](https://doi.org/10.1038/s41598-018-36508-8) | Original article and pinned repo tree, unsynchronized analysis notebook and Fiji processing code. Article CC BY 4.0; code/raw-track license unknown. Protocol imaging-before-drug interval and processing operations verified. | Unsynchronized images precede dosing by 20h, but processing availability does not. Full-stack average correction and concatenated before/after analysis can use future images. Original per-cell/action/attempt records for both drugs not acquired. Cost, native sample, complete QC and independent same-menu records missing. |
+
+The evidence index preserves original protocol paragraphs with XML locators and
+hashes. They establish partial orders/time bounds, not precise timestamps.
+For DeepCellControl, online features precede feedback selection and the selected
+next stimulation; for Cycloop, the controlled loop uses previous tracked cells
+before changing medium and acquiring the next image. Those protocol facts do not
+certify that a later published analysis array is the exact packet available then.
+No availability timestamp was fabricated.
+
+### 15.3 Original fields, mappings and closest candidate
+
+The closest operational candidate is **DeepCellControl GFP**. Its public arrays
+have 12 feature files per experiment and shape `(mother_rows, frames, 1)`;
+7 experiments contain **6,758,617 stimulation entries**, with 3,766,294 zeros
+and 2,992,323 ones. These are deposited stimulation values, not a complete
+hardware execution/attempt denominator. Arrays are called `raw_dataset` by their
+author metadata; that label does not authenticate their upstream raw images.
+The metadata's analysis dates are April 27-29, after April 13-24 acquisition.
+They establish archive processing dates, not absence of the separately described
+online feature stream. The author repo states the underlying >1TB images are
+not in the Zenodo archive.
+
+The independently inspected acquisition code maps 0 to red and 1 to green.
+For GFP training acquisitions the green LED background stays on, with a red DMD
+channel: the two actions are red DMD pulse/background green versus background
+green without that red pulse. This is not two symmetric equal-cost LED commands.
+The online code explicitly reads `mother[frame_nb+1, stim_ind]`; feedback writes
+the selected strategy at `frame_nb+1`. A decision after frame `j` must therefore
+join state history through `j` to `stims[j+1]` and the next response frame. This
+rule is recorded with source functions; no fabricated absolute clock is used.
+
+The [authoritative builder output](../../tools/datasets/audit_results/20261001_state_search_build_v4/summary.json)
+contains five source-located, compressed relation tables:
+
+- `questions.jsonl.gz`: 29,709 audited mother/frame windows at fixed index 72,
+  all seven experiments; every row is `audit_only_no_test_fold`.
+- `actions.jsonl.gz`: 59,418 binary menu rows, separating menu, deposited
+  assignment and unknown actuation confirmation.
+- `attempts.jsonl.gz`: 29,709 recorded assignments, exact source array coordinates,
+  unknown QC/failure/cost, and visible missing-ledger reasons.
+- `state_samples.jsonl.gz`: 29,709 state-history locators, current/past features
+  only, no claimed native chamber identity or availability event.
+- `response_samples.jsonl.gz`: 29,709 next-frame endpoint locators, no exported
+  fluorescence value and no falsely passed QC.
+
+Native array row indices and original experiment paths are retained. A derived
+array-row ID is explicitly not a certified live chamber/mother identity. Original
+ZIP and uncompressed member hashes, source axes and calculation rules are in
+`deep_inventory.json`. Earlier light exposure is explicit through a prior-action
+history locator; these states are not called treatment-naive. `neighbor_stims`
+is excluded from the candidate state view because next-action/neighborhood
+alignment needs separate certification. Predictor locator views never export
+response values, next actions or terminal utility. They are software visibility
+contracts, not an executed model ablation.
+
+Only one action has a recorded response locator per mother/window. Observing both
+action tokens across other mothers does not provide that mother's counterfactual.
+Population-level randomization could identify a different group estimand after
+native enrollment/reference/interference records are recovered, but no such
+estimand is silently substituted. Chips share medium, imaging and neighboring
+illumination; rows and chambers are not independent physical batches.
+
+Gross's `gross_image_relations.jsonl.gz` preserves all CSV source rows and joins
+native plate/well/field/time identifiers to the original IDR annotation rows and
+both source hashes. Untreated wells A1/B1/C1 are candidate same-plate controls;
+control matching is not marked verified. The 24x4x183 rectangular schedule would
+have 17,568 entries; one fewer deposited row is visible, with cause unknown.
+No failed attempt or missing well is manufactured to explain it. Raw concentration
+and IDR's literal microMolar annotation remain separate; no guessed conversion.
+The CSV's 183 time points span 300-5760 minutes in 30-minute steps, while the
+HCC1143 method paragraph describes 2-hour imaging. The
+[timing discrepancy receipt](../../tools/datasets/audit_results/20261001_state_search/evidence_index/timing_discrepancy.json)
+retains this conflict. Both sources place imaging after treatment.
+
+Cycloop's feedback/open-loop trace matrices are 193x500 and 570x500. Their
+processed files also contain online summaries; these are distinguished from the
+`SingleCellTraces` field. The combination code uses reverse tracking, filters
+tracks by at least 150 eventual frames and sorts starts. That future-dependent
+track membership cannot stand in for online enrollment. Whole-chip medium
+switches do not create independently executed per-cell action alternatives.
+
+### 15.4 Gate and checkpoint audit
+
+The new gate accepts **source-backed protocol partial orders** without demanding
+invented exact timestamps. It separately requires the archived state to correspond
+to that online observation, legal sample relation, at least two measured actions
+per question, trusted endpoint, controls, QC and identical declared rules. An
+unknown attempt/cost ledger supports interval-only classification only with
+predeclared valid bounds and all core evidence present. Here the core gaps occur
+first, so every candidate is replay-only and no utility bounds are scored.
+Data comparability and lawful checkpoint use are separate gates.
+
+The [fresh checkpoint receipt](../../tools/datasets/audit_results/20261001_state_search_checkpoint/checkpoint.json)
+rehashes seven actual local assets/source files and inspects serialized metadata
+strings without executing pickle or loading model tensors. Current STATE remains
+`state_generalization_zeroshot_X_hvg`, weights SHA256
+`2c9b2e74f59c2fdde73e77c3eec8a8ed26a00e5237d2b5bb3b02122475f623a3`.
+Map, feature-axis and other prior hashes agree. Its lawful route is ordered
+2000-gene log1p `X_hvg`, registered Tahoe c39/NCI-H596, exact mapped drug-condition
+labels and matched basal/control populations. Imaging features, bacteria/yeast,
+optical actions and medium switches have no certified input route.
+
+Actual configuration names `/data/tahoe_se/generalization_zeroshot.toml`.
+The differently named local paper TOML is not proof of this checkpoint's training
+membership. Exact training-condition/outcome exposure stays **unknown**, while
+known Tahoe/c39 development and calibration exposure is retained. Removing a
+mandatory basal input is unsupported; a lawful blinded baseline-population
+substitution remains unauthenticated. Author fluorescence models were not loaded,
+and ReferenceWorld, WorldV2 and case-memory were not substituted for STATE.
+
+### 15.5 What ran, failures, verification and reproduction
+
+Executed: new primary-source retrieval, original metadata and protocol/code
+inspection, archive registry-MD5/SHA256 verification, source axes/action values,
+source-located relation construction, separate checkpoint/exposure review,
+offline reconstruction and contract tests. The raw biological response archive
+was downloaded, and metadata/candidate CSV baseline rows were viewed during
+source review. No fluorescence outcome values were exported, selected, scored
+or used to tune thresholds. These are audit/development sources, not a fresh
+held-out efficacy set. No claim of never-accessed test outcomes is made.
+
+Not executed: efficacy preregistration or confirmation splits; STATE/other model
+forward inference; prediction error/calibration comparisons; real-state masking
+or permutation experiments; forecast-selected/fixed-action utility experiments;
+correct/wrong/undetermined/refusal terminal scoring; cost/deployment value;
+biological fitting; physical confidence intervals. Contract fixtures and
+metadata gate failures are not biological repetitions or agent refusals.
+
+An initial builder failed because NumPy 2.4.6 no longer exposes the private
+`_read_array_header` API. Its failure receipt, original source and incomplete
+freeze remain in `20261001_state_search_build_v1`. Public NPY header readers
+repaired it. v2 is the first completed build; its offline reproduction matched.
+v3 makes preceding treatment history explicit; v4 additionally refuses changed
+source hashes before construction. All versions and source copies remain.
+The final reproduction uses the final v4 implementation in a new directory.
+
+Final verification records command, JUnit, stdout, source hashes, original-source
+integrity, output parity and prior-audit preservation in
+[the final verification directory](../../tools/datasets/audit_results/20261001_state_search_final_verification/).
+**122 passed, zero failed/errors/skipped.** All 13 final reproducible output
+files match byte-for-byte (execution freezes/manifests have run-specific metadata),
+all 150 files in the prior published audit rehash unchanged, the prior log prefix
+is preserved, and production `src` has no diff.
+The related test scope is the new source/builder tests, existing state gate and
+public acquisition, STATE adapter/runner/input/mode contracts, and repository
+shape. It is not a new full-suite run. Unrelated tests and the two constructed
+fitting tests were not run. Actual results are in the execution/JUnit receipts.
+
+From `D:\MAESTRO`, the deterministic offline reconstruction is:
+
+```powershell
+& 'D:\anaconda\envs\maestro\python.exe' -m tools.datasets.state_search_build --review tools/datasets/audit_results/20261001_state_search --out outputs/state_search_rebuild_new
+& 'D:\anaconda\envs\maestro\python.exe' -m pytest -o addopts= -q tests/test_state_search_build.py tests/test_state_identifiability.py tests/test_state_public_review.py tests/test_state_adapter.py tests/test_state_runner_paths.py tests/test_condition_response_modes.py tests/test_input_basis_identity.py tests/test_repository_shape.py
+```
+
+The 357.6MB archive is preserved locally at
+`tools/datasets/audit_results/20261001_state_search/followup/deep_datasets.raw`
+and excluded from accidental Git publication by a narrow local `.gitignore`.
+Its URL, version, SHA256 and verified registry checksum are preserved in receipts.
+To acquire a missing archive, use the saved followup plan into a **new** directory;
+compare its hash to the original receipt before using it. No new bytes silently
+replace frozen inputs. Online acquisition commands, all plans and each downloader
+execution-source snapshot are saved. For example:
+
+```powershell
+& 'D:\anaconda\envs\maestro\python.exe' -m tools.datasets.state_search_acquire --plan tools/datasets/state_search_followup_20261001.json --out outputs/state_search_download_new
+```
+
+Fresh online metadata may differ and requires a new review. Acquisition never
+runs a model or upgrades a gate. Checkpoint and evidence-inspection commands are
+saved as `tools/datasets/state_search_checkpoint_command_20261001.py.txt` and
+`tools/datasets/state_search_evidence_command_20261001.py.txt`; choose fresh
+output names before rerunning their write-once scripts.
+
+### 15.6 Concrete collection delivery and conclusions
+
+[The collection specification](../../tools/datasets/state_collection_20261001/README.md)
+and five empty CSV schemas define native enrollment, raw/online-feature hashes,
+processed-state availability before randomized assignment, actual hardware
+acknowledgements, both actions, controls, track losses/QC, true culture/chip units
+and complete acquisition/processing/attempt costs. The closest-source fluorescence
+pilot has explicit known microscope/action settings and a group-level randomized
+question. It is a collectable experiment, not retrospective per-mother
+counterfactual replay and not a STATE experiment.
+
+The separately specified one-platform RNA pilot uses NCI-H596 and destructive
+parent aliquot state with randomized sister aliquots, two exact registered
+trametinib condition labels and a certified RNA axis. Its unresolved exposure,
+new-population input route, checkpoint exposure and lawful blind-basal
+construction are explicit prerequisites. The proposed EGR1 transcriptional
+endpoint is a surrogate, not viability or clinical efficacy. Numeric QC/utility/
+budget/refusal parameters must come from development pilot data and be frozen
+before confirmation; they are not invented from these unqualified sources.
+Physical pilot batches are for export/variance assessment, not a powered benefit
+claim. The specification is delivered; no wet-lab collection has been performed.
+
+| Required answer | Result and evidence boundary |
+| --- | --- |
+| Was a qualified task found? | No. Four new families have original evidence and replay classifications; DeepCellControl is closest to operational availability, but lacks archive-to-live identity/full ledger/per-question alternatives and has no lawful current STATE route. |
+| Does state improve prediction? | Undetermined. No qualifying matched prediction comparison ran. |
+| Do predictions change actions? | Undetermined. Observed optical action variation is not a visible-versus-blind selector comparison. |
+| Do changed actions improve terminal utility? | Undetermined. No terminal, refusal or deployment-cost benefit was scored. |
+| Scope of conclusion | These four acquired source versions and the locally hashed registered STATE checkpoint. No general claim of state ineffectiveness, no reclassification of unacquired leads, and no promotion of another backend. |
+
+
+### 15.7 Main-branch publication packaging
+
+Publication preserves raw evidence bytes with a local `* binary` Git attribute
+in each new artifact directory. This prevents checkout normalization from
+invalidating source/output hashes. The 357.6 MB archive remains local-only;
+its checksum test is now separate and explicitly skips when the optional
+download is absent. Every published small source and frozen builder output
+remains mandatory and hash-checked. This packaging change does not change
+scientific classifications, builder outputs, checkpoint or production code.
+The original 122-test verification remains historical; the test source before
+packaging is preserved in `20261001_state_search_publication`. The earlier
+delivery manifest describes its recorded snapshot, including the pre-publication
+test/document hashes; current publication hashes and validation are recorded
+separately in that new directory.
+
+Publication verification: **123 related tests passed locally**. A clean export
+of the staged checkout without the optional bulk archive has **28 passed and
+1 explicit bulk-download skip** in the source/builder contracts. Published
+small-source and frozen-output hashes pass in that clean export. No new
+scientific inference or efficacy comparison was run.

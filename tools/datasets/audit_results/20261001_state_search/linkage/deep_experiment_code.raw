@@ -1,0 +1,1241 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+This module contains the class definitions for the different types of
+experiments we might want to run. They do not directly implement acquisition
+routines like move to xy, snap image, change channel etc..., they use
+ the series module to do that. They are more to set up the acquisitions, save
+ results to disk etc...
+
+The classes follow the following inheritance hierarchy:
+
+                                Experiment
+                                    |
+                                    |
+                                    v
+
+                              MoMaExperiment
+                                    |
+                                    |
+       +----------------------------+----------------------------+
+       |                            |                            |
+       |                            |                            |
+       v                            v                            v
+
+MoMaOpenLoopExperiment    MoMaSelectionExperiment      MoMaFeedbackExperiment
+
+
+Created on Wed Feb  2 20:04:43 2022
+
+@author: jeanbaptiste
+"""
+
+DELTA_DEV_PATH = "C:/DeepLearning/DeLTA_dev"
+"Path to the delta dev repository"
+DCC_PATH = "C:/Users/System 6/Documents/deepcellcontrol"
+"Path to the deepcellcontrol repository"
+PMT_PATH = "C:/Users/System 6/Documents/pycromanager_tessie"
+"Path to pycromanager repository"
+
+import os
+import sys
+import time
+import json
+import copy
+import threading
+# Insert paths to delta-dev and deep cell control before import:
+sys.path.insert(0, DELTA_DEV_PATH)
+sys.path.insert(0, DCC_PATH)
+
+import numpy as np
+import pickle
+import matplotlib.pyplot as plt
+
+import deepcellcontrol as dcc
+import delta
+
+from . import processors
+
+class Experiment(threading.Thread):
+    """
+    Main Experiment class. Its main role is simply to call the series.acquire()
+    and series.stimulate() methods of the series in its self.series property,
+    adding a few functionalities to make the acquisition process more
+    flexible.
+
+    Once it has been initialized with series and preprocessed, an experiment
+    can be start in 1 of two ways:
+
+        1 - Blocking call: By calling the run() method. This will start the
+            acquisitions in a blocking manner, meaning that the console will be
+            blocked until the experiment is interrupted.
+        2 - Daemon call: By calling the start() method, which is inherited from
+            the threading.Thread parent class and basically just calls the
+            run method but in a non-blocking way, meaning that you can
+            run other commands, access properties etc... See also
+            the stop, pause, and resume methods.
+
+    """
+
+    def __init__(self, platform, save_folder):
+
+        self.save_folder = save_folder
+        "str: Folder to save data to"
+        if self.save_folder is None:
+            raise RuntimeError("You did not set the save folder path, set Experiment.save_folder = /path/to/wherever")
+        if os.path.exists(self.save_folder) and len(os.listdir(self.save_folder)) > 0:
+            raise RuntimeError(f"Save folder {self.save_folder} is not empty")
+        if self.save_folder[-1] != "/":
+            self.save_folder += "/"
+        os.makedirs(self.save_folder, exist_ok=True)
+        # self.logger = Logger(self.save_folder + "console_output.log")
+
+        super().__init__()
+
+        self.platform = platform
+        "Platform: Microscope platform"
+        self.series = []
+        "List[Series]: Series to run"
+        self.period = 300
+        "int: Period to acquire series"
+        self.daemon = True
+        "bool: Daemon flag for Thread parent"
+        self.total_timepoints = None
+        "int or None: Max number of timepoints for experiment"
+        self._stop_flag = False
+        "bool: flag to stop execution (for daemon run)"
+        self._pause_flag = False
+        "bool: flag to pause execution (for daemon run)"
+        self._running_timepoint = False
+        "Flag that timepoint acquisition is currently running"
+        self._acq_timepoints = []
+        "List[float]: Timepoints of acquisition starts (secs from UNIX epoch)"
+        self.stim_batches = None
+        "int or None: Number of stimulation images to run at once. Can improve speed"
+        self.experiment_info = {}
+        "Info about the experiment, for future reference"
+        self.slow_return = None
+        "Return to firt position slowly. Enter a value for dwell time in seconds for each 1000um intermediate step"
+        self.postprocess_alltimepoints = False
+        "Whether to run the postprocess() call after each timepoint"
+
+
+    def _serialize(self):
+        """
+        Serialize to save to JSON
+
+        Returns
+        -------
+        dict
+            serialized key value pairs
+
+        """
+
+        o = self.__dict__.copy()
+
+        # Non-serializable:
+        for k,v in o.items():
+            o[k] = jsonify(v)
+
+        o["series"] = []
+        for s in self.series:
+            o["series"].append(s._serialize())
+
+        return o
+
+    def check(self):
+        """
+        Check that the experiment is ready to run
+
+        Raises
+        ------
+        RuntimeError
+            If no series were set up.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        if len(self.series) == 0:
+            raise RuntimeError("You did not set up any series")
+
+        for series in self.series:
+            series.check()
+
+
+    def reset(self):
+        """
+        Reset experiment to re-start it
+
+        Returns
+        -------
+        None.
+
+        """
+        # TODO
+        pass
+
+    def save_settings(self):
+        """
+        Save experimental settings to save folder
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # TODO there is a lot more info to save here. JSON settings for series,
+        # ideally something reloadable, dmd calibration etc...
+
+        # Write all device properties to json file:
+        print("Writing device properties to JSON")
+        devprops = self.platform.get_all_properties()
+        with open(self.save_folder+"device_properties.json","w") as f:
+            json.dump(devprops, f, indent=4)
+
+        # Write XP settings to json file:
+        print("Writing experiment settings to JSON")
+        xp_settings = self._serialize()
+        with open(self.save_folder+"experiment_settings.json","w") as f:
+            json.dump(xp_settings, f, indent=4)
+
+        # Write DMD calibration to disk:
+        if self.platform.dmd is not None:
+            print("Writing DMD calibration to JSON")
+            np.save(
+                self.save_folder+"dmd_homography.npy",
+                self.platform.dmd.homography
+                )
+            np.save(
+                self.save_folder+"dmd_homography_inv.npy",
+                self.platform.dmd.homography_inverse
+                )
+
+        # Write series to txt file:
+        print("Writing series string to txt")
+        with open(self.save_folder+"series.txt","w") as f:
+            for series in self.series:
+                f.write(str(series))
+                f.write("\n"+"="*80+"\n\n\n\n")
+
+        # Write git commits to file:
+        print("Writing git repositories status to JSON")
+        repos = {
+            "delta": get_repo_info(DELTA_DEV_PATH),
+            "deepcellcontrol": get_repo_info(DCC_PATH),
+            "pycromanager_tessie": get_repo_info(PMT_PATH)
+            }
+        with open(self.save_folder+"repositories.json","w") as f:
+            json.dump(repos, f, indent=4)
+
+        # Write repo diffs:
+        print("Writing git diffs to txt")
+        with open(self.save_folder+"delta_diff.txt","w") as f:
+            f.write(get_repo_diff(DELTA_DEV_PATH))
+        with open(self.save_folder+"dcc_diff.txt","w") as f:
+            f.write(get_repo_diff(DCC_PATH))
+        with open(self.save_folder+"pmt_diff.txt","w") as f:
+            f.write(get_repo_diff(PMT_PATH))
+
+        # Write env list to file:
+        print("Writing environment libraries to txt")
+        import subprocess
+        envlist = subprocess.run(
+            "conda list", capture_output=True, shell=True, text=True
+            ).stdout
+        with open(self.save_folder+"environment.txt","w") as f:
+            f.write(envlist)
+
+        # Write DeLTA config values:
+        print("Writing delta config to JSON")
+        with open(self.save_folder+"delta_config.json","w") as f:
+            json.dump(get_config(delta.config), f, indent=4)
+
+        # Write dcc config values:
+        print("Writing dcc config to JSON")
+        with open(self.save_folder+"dcc_config.json","w") as f:
+            json.dump(get_config(dcc.config), f, indent=4)
+
+    def load_settings(self):
+        """
+        Load experimental settings from disk
+
+        Returns
+        -------
+        None.
+
+        """
+        #TODO
+        pass
+
+    def run(self):
+        """
+        Run experiment. You can call this manually, or it gets called by the
+        daemon after start().
+
+        Returns
+        -------
+        None.
+
+        """
+
+        if len(self._acq_timepoints)==0:
+            # Make sure the experiment can be run:
+            self.check()
+
+            # Create save folder:
+            if not os.path.exists(self.save_folder):
+                os.makedirs(self.save_folder)
+
+            # Save settings:
+            self.save_settings()
+
+        # Make sure live mode is turned off:
+        self.platform.studio.live().set_live_mode(False)
+
+        # While stop flag is False, run:
+        while not self._stop_flag:
+
+            # Monitor time:
+            current_time = time.time()
+
+            # If first timepoint or period has elapsed, and exp isn't paused:
+            if (
+                    (
+                        len(self._acq_timepoints)==0
+                        or
+                        current_time - self._acq_timepoints[-1] >= self.period
+                    )
+                    and
+                    not self._pause_flag
+                ):
+
+                # Append timepoints list:
+                self._acq_timepoints.append(current_time)
+
+                print("\n\n\n-------- Starting timepoint %d"%len(
+                    self._acq_timepoints
+                    ))
+
+                # Run timepoint:
+                self.run_timepoint()
+
+                if self.postprocess_alltimepoints:
+                    print("Saving post-processing data to disk...")
+                    self.postprocess()
+
+                # Display time info:
+                print("\n\n\n-------- End of timepoint %d"%len(
+                    self._acq_timepoints
+                    ))
+                elapsed = time.time() - current_time
+                print("Total acq time: %.1f secs"%elapsed)
+                print("Next acquisition: %.0f secs\n"%(self.period-elapsed))
+
+
+                if self.total_timepoints is not None and\
+                    len(self._acq_timepoints) >= self.total_timepoints:
+                    self._stop_flag = True
+
+            # Wait a little bit:
+            time.sleep(2)
+
+        print("End of experiment")
+        self._stop_flag = False
+
+    def stop(self):
+        """
+        Stop an experiment that is currently running in daemon mode.
+
+        Returns
+        -------
+        None.
+
+        """
+        if self._running_timepoint:
+            print("Experiment will end after current timepoint...")
+
+        self._stop_flag = True
+
+    def pause(self):
+        """
+        Pause timepoint acquisitions (if in daemon mode)
+
+        Returns
+        -------
+        None.
+
+        """
+        if self._running_timepoint:
+            print("Experiment will pause after current timepoint...")
+
+        self._pause_flag = True
+
+    def resume(self):
+        """
+        Resume acquisition. Works for paused daemon acquisitions.
+        Does NOT work for stopped daemon acquisitions.
+
+        Returns
+        -------
+        None.
+
+        """
+        self._pause_flag = False
+
+    def run_timepoint(self):
+        """
+        Run single time point acquisition
+
+        Returns
+        -------
+        None.
+
+        """
+
+        self._running_timepoint = True
+
+        # Run through series:
+        for series in self.series:
+
+            # Run acq for series:
+            series.acquire()
+
+
+        # # Run through series:
+        # for series in self.series:
+
+            # Run stimulations:
+            if self.stim_batches is not None:
+                # If batches, load and run stims in batches
+                for i in range(0,len(series.positions),self.stim_batches):
+                    j = min(i+self.stim_batches,len(series.positions))
+                    series.stimulate(positions = list(range(i,j)))
+
+            else:
+                series.stimulate()
+
+        # Return to start position:
+        if self.slow_return is not None:
+            self.return_to_start()
+
+        self._running_timepoint = False
+
+    def return_to_start(self, step_size = 1000):
+        """
+        Return to first position in first series in slow, intermediate steps.
+
+        The dwell time at each intermediate point is determined by the
+        `slow_return` attribute.
+
+        Parameters
+        ----------
+        step_size : float, optional
+            Maximum distance between intermediate steps, in microns. The
+            default is 1000.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        if self.slow_return is None:
+            print("Set slow_return to >=0")
+            return
+
+        print("Returning to start position", end="")
+
+        # Compute intermediate steps along 3D space:
+        curr_pos = self.platform.where()
+        curr_pos = np.array([curr_pos["xy"][0], curr_pos["xy"][1], curr_pos["z"]])
+        start_pos = np.array(
+            [
+                self.series[0].positions[0].xy[0],
+                self.series[0].positions[0].xy[1],
+                self.series[0].positions[0].z,
+                ]
+            )
+        direction =  start_pos - curr_pos
+        distance = np.linalg.norm(direction)
+        unit_direction = direction / distance
+        num_pos = np.ceil(distance/step_size)
+        intermediate_pos = [curr_pos + i * unit_direction * step_size for i in range(1, int(num_pos))]
+        intermediate_pos.append(start_pos)
+
+        # Run through intermediate positions:
+        for pos in intermediate_pos:
+            self.platform.move(list(pos[:2]), pos[2])
+            self.platform.focus()
+            time.sleep(self.slow_return)
+            print(".", end="")
+
+        print(" Done.")
+
+
+    def total_positions(self):
+        """
+        Get total number of positions in all series of experiment
+
+        Returns
+        -------
+        int
+            Total number of experiments.
+
+        """
+        total_positions = 0
+        for series in self.series:
+            total_positions+=len(series.positions)
+        return total_positions
+
+    def set_filesaver(self):
+        """
+        Add a filesaver processor for every position
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # Add filesaver processors:
+        total_pos = 0
+        for series in self.series:
+            for position in series.positions:
+                position.processors['filesaver'] = processors.SimpleImageSaver(
+                    self.save_folder, # General save folder
+                    position_nb = total_pos, # Global position index
+                    channels = [x.name for x in series.settings.channels], # All channels are sent to queue
+                    watch_channels = tuple(range(len(series.settings.channels))) # Watch all channels
+                    )
+                position.processors['filesaver'].start()
+                total_pos += 1
+
+    def preprocess(self):
+        """
+        Preprocess series
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # Set file saver processors:
+        self.set_filesaver()
+
+        # Preprocess series:
+        for series in self.series:
+            series.preprocess()
+
+    def postprocess(self):
+        """
+        post-processing / saving / cleanup
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # Close logger
+        # self.logger.log.close()
+        # sys.stdout = self.logger.terminal
+
+        # Init
+        z_history = []
+        os.makedirs(self.save_folder+"z_history",exist_ok=True)
+
+        # Run through series and postions:
+        for series in self.series:
+            z_history.append([])
+            for pos in series.positions:
+                # Append to z history lists
+                z_history[-1].append(pos.z_history)
+
+        # Save to z hist disk:
+        with open(self.save_folder+"/z_history.pkl","wb") as f:
+            pickle.dump(z_history,f)
+
+class MoMaExperiment(Experiment):
+
+    def __init__(self, *args, delta_config = None, features = ("fluo1","stims"), **kwargs):
+        """
+        Instantiate
+
+        Parameters
+        ----------
+        delta_config : str, optional
+            Path to JSON config file to use for delta. If None,
+            delta.config.load_config(presets="mothermachine") will be used.
+            See DeLTA's documentaion on config files for more information.
+            The default is None.
+        features : Tuple[str], optional
+            The features for DeLTA to extract.
+            The default is ("fluo1",).
+        *args : extra arguments for parent class
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        super().__init__(*args, **kwargs)
+
+
+        if delta_config is None:
+            delta.config.load_config(presets="mothermachine")
+        else:
+            delta.config.load_config(delta_config)
+
+        self.delta_models = delta.utilities.loadmodels()
+        "List[tf.Model]: delta pipeline models"
+        self.features = features
+        "Features to extract for DeLTA"
+
+    def save_settings(self):
+        """
+        Save experimental settings to save folder
+
+        Returns
+        -------
+        None.
+
+        """
+
+        super().save_settings()
+
+        # Save delta models:
+        for name, model in self.delta_models.items():
+            model.save(self.save_folder+"delta_"+name+".hdf5")
+
+    def total_chambers(self):
+        """
+        Get total number of chambers. Will raise an error if called before
+        .preprocess()
+
+        Returns
+        -------
+        total_chambers : int
+            Total number of chambers in experiment.
+
+        """
+
+        total_chambers = 0
+        for series in self.series:
+            for position in series.positions:
+                processor = position.processors['controller']
+                total_chambers += len(processor.mothers)
+
+        return total_chambers
+
+
+    def postprocess(self):
+        """
+        post-processing / saving / cleanup
+
+        Returns
+        -------
+        None.
+
+        """
+
+        super().postprocess()
+
+        # Init
+        mothers, rois, drift = [], [], []
+        os.makedirs(self.save_folder+"delta_positions",exist_ok=True)
+
+        # Go through series and pos:
+        for series in self.series:
+            mothers.append([]), rois.append([]), drift.append([])
+            for pos in series.positions:
+                mothers[-1].append([]), rois[-1].append([])
+
+                # Append drift values:
+                controller = pos.processors["controller"]
+                drift[-1].append(controller.drift)
+
+                # Append mothers values:
+                for mother in controller.mothers:
+                    mothers[-1][-1].append(mother)
+
+                # Append chamber rois:
+                for roi in controller.delta_position.rois:
+                    rois[-1][-1].append(dict(roi.box.items()))
+
+                # Save delta position pickle files:
+                controller.delta_position.save(
+                    self.save_folder+f"delta_positions/Pos{pos.number:06d}",
+                    save_format=("pickle",)
+                    )
+
+        # Save data to disk:
+        with open(self.save_folder+"mothers.pkl","wb") as f:
+            pickle.dump(mothers,f)
+        with open(self.save_folder+"roi_boxes.pkl","wb") as f:
+            pickle.dump(rois,f)
+        with open(self.save_folder+"drift.pkl","wb") as f:
+            pickle.dump(drift,f)
+
+    def get_reader(self):
+        """
+        Get delta xpreader object to read frames from disk
+
+        Returns
+        -------
+        reader : delta.utilities.reader
+            Reader object to read images from disk.
+
+        """
+
+        # Assuming all filesavers have the same format:
+        saver = self.series[0].positions[0].processors["filesaver"]
+
+        reader = delta.utilities.xpreader(
+            filename = saver.save_path,
+            prototype = saver.prototype,
+            fileorder = saver.fileorder,
+            filenamesindexing = saver.filenamesindexing,
+            )
+
+        return reader
+
+    def delta_pipeline(self, save_format = ("pickle",)):
+        """
+        Run the full delta pipeline on each position (after the experiment
+        has completed)
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # Init:
+        os.makedirs(self.save_folder + "/delta_results", exist_ok=True)
+        reader = self.get_reader()
+        frames = list(range(0,reader.timepoints))
+
+        for s, series in enumerate(self.series):
+            for p, pos in enumerate(series.positions):
+
+                # Re-set reader:
+                d_pos = pos.processors["controller"].delta_position
+                d_pos.reader = reader
+
+                # Make sure stacks are empty:
+                for roi in d_pos.rois:
+                    roi.img_stack = []
+                    roi.seg_stack = []
+                    roi.label_stack = []
+                    roi.lineage = delta.utilities.Lineage()
+
+                # Segmentation
+                d_pos.segment(frames = frames)
+
+                # Tracking
+                d_pos.track(frames = frames)
+
+                # Extract features:
+                features = ["length", "width", "area", "perimeter", "edges"]
+                features += [f"fluo{c}" for c in range(1,reader.channels)]
+                d_pos.features(frames = frames, features=features)
+
+                # Save to disk (only pickle, faster)
+                d_pos.save(
+                    self.save_folder + f"/delta_results/Pos{d_pos.position_nb:06d}",
+                    frames = frames,
+                    save_format = save_format
+                    )
+
+                d_pos.clear()
+
+
+class MoMaOpenLoopExperiment(MoMaExperiment):
+
+    def preprocess(self):
+        """
+        Set controller for all positions
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # Add control processors:
+        total_pos = 0
+        for series in self.series:
+            for position in series.positions:
+
+                # Add open-loop moma processor to each position:
+                position.processors['controller'] = processors.MotherOpenLoop(
+                    position_nb = total_pos,
+                    channels = [x.name for x in series.settings.channels],
+                    watch_channels = (0,), # Only watch first channel
+                    delta_models = self.delta_models,
+                    features = self.features, # Features to extract and feed into the controller
+                    )
+                # Add reference to dmd so projection inference can be done on the fly:
+                position.processors['controller'].dmd = self.platform.dmd
+                # Start processing daemon:
+                position.processors['controller'].start()
+
+                total_pos += 1
+
+        super().preprocess()
+
+    def assign_stimulations(self, stimulations):
+        """
+        Assign stimulations to all chambers
+
+        Parameters
+        ----------
+        stimulations : 2D array of int
+            Stimulations to apply over time. 0 for red, 1 for green, 2 for blue.
+            Dimensions are (total_chambers, time).
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # Check that we got as many stimulation seqs as there are identified
+        # chambers:
+        if not (stimulations.shape[0] == self.total_chambers()):
+            raise ValueError(
+                "You must provide as many stimulation sequences as there are "
+                + f"chambers. Here total_chambers = {self.total_chambers}, "
+                + f" while stimulations.shape[0] = {stimulations.shape[0]}"
+                )
+
+        # Go through all identified chambers/mothers:
+        total_chambers = 0
+        for series in self.series:
+            for position in series.positions:
+                processor = position.processors['controller']
+                processor.assign_stimulations(
+                    stimulations[total_chambers:total_chambers+len(processor.mothers)]
+                    )
+                total_chambers+=len(processor.mothers)
+
+
+class MoMaFluoSelectionExperiment(MoMaExperiment):
+
+    def preprocess(self, preprocessing_channel, threshold):
+        """
+        Set controller for all positions
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # Add control processors:
+        total_pos = 0
+        for series in self.series:
+
+            for position in series.positions:
+
+                # Add open-loop moma processor to each position:
+                position.processors['controller'] = processors.MotherSelection(
+                    position_nb = total_pos,
+                    channels = [x.name for x in series.settings.channels],
+                    watch_channels = (0,), # Only watch first channel
+                    delta_models = self.delta_models,
+                    features = self.features, # Features to extract and feed into the controller
+                    )
+                # Add reference to dmd so projection inference can be done on the fly:
+                position.processors['controller'].dmd = self.platform.dmd
+                # Selection parameters:
+                position.processors['controller'].selection_feature = f"fluo{len(series.settings.channels)}"
+                position.processors['controller'].selection_level = threshold
+                # Start daemon:
+                position.processors['controller'].start()
+
+                total_pos += 1
+
+        # Modify channels for preprocessing:
+        settings = []
+        for series in self.series:
+            settings += [copy.deepcopy(series.settings)]
+            # Add extra preprocessing channel:
+            series.settings.channels.append(preprocessing_channel)
+            # Ensure acquisition is in sequential mode:
+            series.settings.acquisition_mode = "sequential"
+            # Make sure trigger mode is Internal:
+            for channel in series.settings.channels:
+                channel.trigger = "Int"
+
+        # Run parent preprocess (Experiment class)
+        super().preprocess()
+
+        # Re-set acquisition settings:
+        for series, setts in zip(self.series, settings):
+            series.settings = setts
+
+
+class MoMaFeedbackExperiment(MoMaExperiment):
+
+    def __init__(self, *args, control_parameters, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self.control_parameters = control_parameters
+
+        # Instanciate bPSO:
+        bpso = dcc.control.BinaryParticleSwarmOptimizer(
+            horizon=control_parameters["horizon"],
+            iterations=control_parameters["bpso_iterations"],
+            particles=control_parameters["bpso_particles"]
+            )
+
+        # Now controller:
+        controller = dcc.control.SplitLSTMMPC(
+            model_file = control_parameters["model_file"],
+            strategy_optimizer=bpso
+            )
+
+        # Finally, instanciate server & start it:
+        fallback = dcc.server.Server(controller)
+
+        # Use distant server, with controller as fallback
+        self.control_server = dcc.server.DistantServer(
+            "localhost", fallback_server = fallback
+            )
+        self.control_server.start()
+
+        # Flag which features to pass to the controller:
+        if self.features != control_parameters["features"]:
+            self.control_features_ind = []
+            for feature in control_parameters["features"]:
+                if feature not in self.features:
+                    raise(f"You are trying to use feature {feature} for control but it is not in your list of features to extract")
+                self.control_features_ind.append(self.features.index(feature))
+        else:
+            self.control_features_ind = list(range(len(self.features)))
+        print("Features to pass to controller:")
+        print(", ".join([self.features[f_ind] for f_ind in self.control_features_ind]))
+
+        # Test control server:
+        print("Testing connection to server:")
+        self.test_server()
+
+
+    def save_settings(self):
+        """
+        Save experimental settings to save folder
+
+        Returns
+        -------
+        None.
+
+        """
+
+        super().save_settings()
+
+        # Save FALLBACK control server settings, model etc:
+        print("Writing controller settings to JSON")
+        with open(self.save_folder+"fallback_control_parameters.json","w") as f:
+            json.dump(self.control_parameters, f, indent=4)
+
+        self.control_server.fallback.controller.model.save(
+            self.save_folder+"fallback_controller_model.hdf5"
+            )
+
+
+    def preprocess(self):
+        """
+        Set controller for all positions
+
+        Parameters
+        ----------
+        control_server : dcc.server.Server
+            Control server to send control inputs to.
+        delta_config : str, optional
+            Path to delta config file. The default is None.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # Add control processors:
+        total_pos = 0
+        for series in self.series:
+            for position in series.positions:
+
+                position.processors['controller'] = processors.MotherFeedback(
+                    position_nb = total_pos,
+                    channels = [x.name for x in series.settings.channels],
+                    watch_channels = (0,), # Only watch first channel
+                    delta_models = self.delta_models,
+                    features = self.features, # Features to extract
+                    control_features_ind = self.control_features_ind, # Features to feed into the controller
+                    normalization = dcc.data.Normalization(), # make sure we use the same data normalization
+                    control_server = self.control_server, # Control server object
+                    device = '/device:GPU:0', # Device to run the delta analysis on
+                    )
+                position.processors['controller'].dmd = self.platform.dmd
+                # position.processors['controller'].past_steps = self.control_parameters["past_steps"]
+                position.processors['controller'].horizon = self.control_parameters["horizon"]
+                position.processors['controller'].start()
+                total_pos += 1
+
+        super().preprocess()
+
+
+    def assign_objectives(self, objectives):
+        """
+        Assign stimulations to all chambers
+
+        Parameters
+        ----------
+        objectives : 2D array of float32
+            Feedback control for fluorescence over time. Values must be in the
+            original fluorescence range, NOT normalized to 0-1 (ie they must be
+            in 0-4095 or 0-65535 range)
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # Check that we got as many stimulation seqs as there are identified
+        # chambers:
+        if not (objectives.shape[0] == self.total_chambers()):
+            raise ValueError(
+                "You must provide as many objective sequences as there are "
+                + f"chambers. Here total_chambers = {self.total_chambers}, "
+                + f" while objectives.shape[0] = {objectives.shape[0]}"
+                )
+
+        # Go through all identified chambers/mothers:
+        total_chambers = 0
+        for series in self.series:
+            for position in series.positions:
+                processor = position.processors['controller']
+                processor.assign_objectives(
+                    objectives[
+                        total_chambers:total_chambers+len(processor.mothers), :
+                        ]
+                    )
+                total_chambers+=len(processor.mothers)
+
+    def test_server(self):
+        """
+        Test connection to server with dummy data.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        _inputs = np.random.rand(27, 144, len(self.control_features_ind))
+        _objectives = np.random.rand(27, self.control_parameters["horizon"])
+        _dispatch = lambda s, m: print(f"{m}: {s}")
+        self.control_server.queue.put(
+            ((_inputs, _objectives), "Connection test successful", _dispatch)
+            )
+
+
+class TestExperiment(Experiment):
+
+    def __init__(self, *args, delta_config = None, features = ("fluo1",)):
+        """
+        Instantiate
+
+        Parameters
+        ----------
+        delta_config : str, optional
+            Path to JSON config file to use for delta. If None,
+            delta.config.load_config(presets="mothermachine") will be used.
+            See DeLTA's documentaion on config files for more information.
+            The default is None.
+        features : Tuple[str], optional
+            The features for DeLTA to extract.
+            The default is ("fluo1",).
+        *args : extra arguments for parent class
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        super().__init__(*args)
+
+
+        if delta_config is None:
+            delta.config.load_config(presets="mothermachine")
+        else:
+            delta.config.load_config(delta_config)
+
+        self.delta_models = delta.utilities.loadmodels()
+        "List[tf.Model]: delta pipeline models"
+        self.features = features
+        "Features to extract for DeLTA"
+        self._run_delta = False
+        "Flag to run delta on the fly (not necessary but can be useful"
+
+
+    def preprocess(self):
+        """
+        Set controller for all positions
+
+        Parameters
+        ----------
+        delta_config : str, optional
+            Path to delta config file. The default is None.
+        features : Tuple[str], optional
+            Features to use as control inputs (in order). 'stims' are
+            automatically appended.
+            The default is ('fluo1',).
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # In case this is just tested on
+        delta.config.whole_frame_drift = True
+
+        total_pos = 0
+        for series in self.series:
+            for position in series.positions:
+
+                position.processors['controller'] = processors.TestController(
+                    position_nb = total_pos,
+                    channels = [x.name for x in series.settings.channels],
+                    watch_channels = (0,), # Only watch first channel
+                    delta_models = self.delta_models,
+                    features = self.features, # Features to extract and feed into the controller
+                    )
+                position.processors['controller'].dmd = self.platform.dmd
+                position.processors['controller']._run_delta = self._run_delta
+                position.processors['controller'].start()
+                total_pos+=1
+
+        super().preprocess()
+
+#%% Utilities
+
+
+class Logger(object):
+    # https://stackoverflow.com/questions/14906764/how-to-redirect-stdout-to-both-file-and-console-with-scripting
+    def __init__(self, logfile):
+        self.terminal = sys.stdout
+        self.log = open(logfile, "w")
+        sys.stdout = self
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+
+    def flush(self):
+        # this flush method is needed for python 3 compatibility.
+        # this handles the flush command by doing nothing.
+        # you might want to specify some extra behavior here.
+        pass
+
+
+
+def get_repo_info(repo_path):
+    """
+    Get git repository stats
+
+    Parameters
+    ----------
+    repo_path : str
+        Path to git repository.
+
+    Returns
+    -------
+    dict
+        Information about the repository:
+            "commit","date","timestamp","author","email","subject","path"
+
+    """
+    import subprocess
+    got = subprocess.run(
+        'git log --pretty=format:"%H%n%ai%n%at%n%an%n%ae%n%s" -n 1',
+        capture_output=True,
+        shell=True,
+        text=True,
+        cwd=repo_path
+        ).stdout.split('\n')
+    return dict(
+        zip(
+            ["commit","date","timestamp","author","email","subject","path"],
+            got+[repo_path]
+            )
+        )
+
+
+def get_repo_diff(repo_path):
+    """
+    Get the git diff for the repository
+
+    Parameters
+    ----------
+    repo_path : str
+        Path to git repository.
+
+    Returns
+    -------
+    got : str
+        Text of the git-diff output.
+
+    """
+    import subprocess
+    got = subprocess.run(
+        'git diff',
+        capture_output=True,
+        shell=True,
+        text=True,
+        cwd=repo_path
+        ).stdout
+    return got
+
+def get_config(config_module):
+    """
+    Get config values of module
+
+    Parameters
+    ----------
+    config_module : module
+        The config module of the package.
+
+    Returns
+    -------
+    dict
+        dict config
+
+    """
+    keys = [item for item in dir(delta.config) if not item.startswith("_")]
+    delta_config = {}
+    for k in keys:
+        delta_config[k] = delta.config.__dict__[k]
+        delta_config[k] = jsonify(delta_config[k])
+
+    return delta_config
+
+def jsonify(x):
+    try:
+        json.dumps(x)
+        return x
+    except:
+        return str(x)

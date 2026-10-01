@@ -1,0 +1,269 @@
+"""Build source-located replay relations; never manufacture a qualified task."""
+from __future__ import annotations
+
+import argparse
+import csv
+import gzip
+import hashlib
+import io
+import json
+from pathlib import Path
+import sys
+import zipfile
+
+import numpy as np
+from scipy.io import loadmat
+
+from tools.datasets.state_search_acquire import digest
+
+
+ROOT = Path(__file__).resolve().parents[2]
+TABLES = ("questions", "actions", "attempts", "state_samples", "response_samples")
+STATE_FEATURES = ("fluo1", "area", "sharpness", "cell_count", "chamber_mean_fluo1", "chamber_std_fluo1")
+
+
+def write_json(path: Path, payload) -> None:
+    with path.open("x", encoding="utf-8") as stream:
+        json.dump(payload, stream, indent=2, allow_nan=False)
+        stream.write("\n")
+
+
+def assess(candidate: dict) -> dict:
+    """Scientific declarations must be source-backed; unknown is never true.
+
+    Protocol partial orders are admissible. Exact timestamps are not required
+    when a protocol proves processing/availability precedes decision and action.
+    Data eligibility and the chosen checkpoint's lawful input route are separate.
+    """
+    core = ("state_available_before_decision", "online_state_correspondence",
+            "sample_relation", "two_measured_actions_per_question", "trusted_endpoint",
+            "matched_controls", "known_qc", "same_rules")
+    gaps = [name for name in core if candidate.get(name) is not True]
+    evidence = candidate.get("evidence", {})
+    for name in core:
+        if candidate.get(name) is True and not evidence.get(name):
+            gaps.append(name + "_missing_evidence")
+    if gaps:
+        classification = "replay_only"
+    elif candidate.get("full_attempt_ledger") is not True or candidate.get("costs_known") is not True:
+        classification = "utility_interval_only" if candidate.get("predeclared_utility_bounds") else "replay_only"
+        gaps += [name for name in ("full_attempt_ledger", "costs_known") if candidate.get(name) is not True]
+    else:
+        classification = "comparable"
+    checkpoint_gaps = [name for name in ("checkpoint_input_supported", "checkpoint_exposure_authenticated",
+                                       "state_blind_input_supported") if candidate.get(name) is not True]
+    return {"candidate_id": candidate["candidate_id"], "classification": classification,
+            "data_gaps": gaps, "checkpoint_gaps": checkpoint_gaps,
+            "state_gain_gate_passed": classification == "comparable" and not checkpoint_gaps,
+            "efficacy_run": False}
+
+
+def predictor_locators(state: dict, *, visible: bool) -> dict:
+    """An audit view only: no future state, next action or response is exported."""
+    return {"sample_id": state["sample_id"], "state_index": state["state_index"],
+            "features": state["features"] if visible else [], "source_sha256": state["source_sha256"]}
+
+
+def relation_gaps(tables: dict) -> list[str]:
+    """Validate joins, menu coverage and explicit missingness, not eligibility."""
+    questions = {r["question_id"]: r for r in tables["questions"]}
+    states = {r["state_sample_id"]: r for r in tables["state_samples"]}
+    responses = {r["response_sample_id"]: r for r in tables["response_samples"]}
+    actions = {(r["question_id"], r["action_id"]) for r in tables["actions"]}
+    attempts = {r["attempt_id"]: r for r in tables["attempts"]}
+    gaps = []
+    for name, key in (("questions", "question_id"), ("state_samples", "state_sample_id"),
+                      ("response_samples", "response_sample_id"), ("attempts", "attempt_id")):
+        if len({r[key] for r in tables[name]}) != len(tables[name]):
+            gaps.append("duplicate_" + key)
+    if len(actions) != len(tables["actions"]):
+        gaps.append("duplicate_action")
+    for attempt in attempts.values():
+        q = questions.get(attempt["question_id"])
+        s = states.get(attempt["state_sample_id"])
+        r = responses.get(attempt["response_sample_id"])
+        if not q or not s or not r or (attempt["question_id"], attempt["action_id"]) not in actions:
+            gaps.append("missing_join")
+            continue
+        if s["sample_id"] != r["sample_id"] or s["question_id"] != q["question_id"] or r["question_id"] != q["question_id"]:
+            gaps.append("sample_mismatch")
+        if not s["state_index"] < attempt["action_index"] <= r["response_index"]:
+            gaps.append("index_order_leak")
+        if any(f in {"response", "terminal_utility", "next_stims", "future_fluo1", "neighbor_stims"} for f in s["features"]):
+            gaps.append("future_field_in_state")
+        if attempt["control_group"] != q["control_group"]:
+            gaps.append("control_mismatch")
+        if attempt["qc_status"] not in {"unknown", "passed", "failed"}:
+            gaps.append("invalid_qc")
+        if attempt["qc_status"] == "unknown" and not attempt["missing_reason"]:
+            gaps.append("hidden_missing_qc")
+        for record in (s, r, attempt):
+            if not record["source_row"] or len(record["source_sha256"]) != 64:
+                gaps.append("missing_source_locator")
+        if q["independent_physical_unit"] is not None:
+            gaps.append("unverified_physical_unit_promoted")
+    return sorted(set(gaps))
+
+
+def deep_tables(archive: Path, index: int = 72) -> tuple[dict, list]:
+    """One prespecified window per archived mother; all seven experiments.
+
+    No fluorescence values are inspected or exported. Original .npy source axes
+    replace absent native chamber IDs and are explicitly not certified live IDs.
+    """
+    tables = {name: [] for name in TABLES}
+    inventory = []
+    archive_hash = digest(archive)
+    with zipfile.ZipFile(archive) as zip_stream:
+        for metadata_name in sorted(n for n in zip_stream.namelist() if n.endswith("/metadata.json")):
+            prefix = metadata_name.rsplit("/", 1)[0]
+            metadata = json.loads(zip_stream.read(metadata_name))
+            stims_name = prefix + "/stims.npy"
+            stims_bytes = zip_stream.read(stims_name)
+            stims = np.load(io.BytesIO(stims_bytes), allow_pickle=False)
+            feature_inventory = {}
+            for feature in STATE_FEATURES:
+                name = prefix + "/" + feature + ".npy"
+                raw = zip_stream.read(name)
+                stream = io.BytesIO(raw)
+                version = np.lib.format.read_magic(stream)
+                shape, _, dtype = np.lib.format._read_array_header(stream, version)
+                if shape != stims.shape or dtype.hasobject:
+                    raise ValueError("feature axis mismatch")
+                feature_inventory[feature] = {"member": name, "sha256": hashlib.sha256(raw).hexdigest(),
+                                              "shape": list(shape), "dtype": str(dtype)}
+            if stims.ndim != 3 or stims.shape[2] != 1 or stims.shape[1] <= index + 1:
+                raise ValueError("unexpected stimulation axis")
+            if not np.isin(stims, (0, 1)).all():
+                raise ValueError("stimulation outside documented binary menu")
+            batch = prefix.split("/")[-1]
+            inventory.append({"experiment": batch, "metadata": metadata, "source_member": metadata_name,
+                              "cells": stims.shape[0], "frames": stims.shape[1], "features": feature_inventory,
+                              "stims_sha256": hashlib.sha256(stims_bytes).hexdigest(),
+                              "action_counts_all_frames": {str(a): int((stims == a).sum()) for a in (0, 1)},
+                              "independent_culture_verified": False})
+            for cell in range(stims.shape[0]):
+                sample = f"{batch}:array_row_{cell}"
+                qid = sample + f":frame_{index}"
+                sid, rid, aid = qid + ":state", qid + ":response", qid + ":assignment"
+                common = {"question_id": qid, "source_sha256": archive_hash, "sample_id": sample,
+                          "source_path": str(archive.relative_to(ROOT)).replace("\\", "/")}
+                tables["questions"].append({"question_id": qid, "context": "E.coli CcaSR GFP mother-machine",
+                    "recorded_experiment": metadata["experiment"], "batch_dependency": batch,
+                    "independent_physical_unit": None, "split": "audit_only_no_test_fold",
+                    "control_group": None, "sample_identity_status": "array_row_not_native_chamber",
+                    "availability_at": None, "decision_at": None, "relation_verified": False})
+                for action in (0, 1):
+                    tables["actions"].append({"question_id": qid, "action_id": str(action),
+                        "label": "red_DMD_60ms_background_green" if action == 0 else "background_green_no_red_DMD",
+                        "menu_basis": "MotherOpenLoop.control_colors; moma_training.py",
+                        "observed_assignment": int(stims[cell, index + 1, 0]) == action,
+                        "actuation_confirmed": None, "cost": None})
+                tables["state_samples"].append(dict(common, state_sample_id=sid, state_index=index,
+                    features=list(STATE_FEATURES), source_row=f"{prefix}/<feature>.npy[{cell},0:{index+1},0]",
+                    online_correspondence_verified=False, processing_available_at=None,
+                    relation="same_exported_array_row_only", destructive=False))
+                tables["response_samples"].append(dict(common, response_sample_id=rid, response_index=index+1,
+                    source_row=f"{prefix}/fluo1.npy[{cell},{index+1},0]", endpoint="next_frame_GFP_raw_units",
+                    outcome_value=None, value_status="locator_only_not_scored", qc_status="unknown"))
+                tables["attempts"].append(dict(common, attempt_id=aid, state_sample_id=sid,
+                    response_sample_id=rid, action_id=str(int(stims[cell,index+1,0])), action_index=index+1,
+                    source_row=f"{stims_name}[{cell},{index+1},0]", control_group=None,
+                    status="deposited_stimulation_assignment", actually_executed=None, qc_status="unknown",
+                    cost=None, failure_reason=None, skipped_reason=None,
+                    missing_reason="no_actuation_failure_QC_cost_ledger", action_started_at=None))
+    return tables, inventory
+
+
+def gross_relations(path: Path, annotations: Path) -> dict:
+    """Keep all 17,567 HC00701 image-field records and same-plate controls."""
+    rows = list(csv.DictReader(path.open(encoding="utf-8", newline="")))
+    annotation_rows = list(csv.DictReader(annotations.open(encoding="utf-8", newline="")))
+    amap = {(r["Plate"], r["Well"]): (i+2, r) for i, r in enumerate(annotation_rows)}
+    source_hash, annotation_hash = digest(path), digest(annotations)
+    mapped = []
+    controls = sorted({r["well"] for r in rows if r["Drug1"] == "Untreated"})
+    for source_row, row in enumerate(rows, 2):
+        annotation_row, annotation = amap[(row["plateID"], row["well"])]
+        if annotation["Characteristics [Cell Line]"] != "HCC1143":
+            raise ValueError("cell background mismatch")
+        drug = annotation["Compound 1 Name"] or "Untreated"
+        if drug != row["Drug1"]:
+            raise ValueError("raw/annotation drug mismatch")
+        mapped.append({"record_id": f"{row['plateID']}:{row['well']}:{row['field']}:{row['time_slice']}",
+            "question_id": row["plateID"], "action_id": f"{drug}:{row['Drug1Concentration']}:source_unit_unresolved",
+            "attempt_id": f"{row['plateID']}:{row['well']}", "response_sample_id": f"{row['plateID']}:{row['well']}:{row['field']}",
+            "state_sample_id": None, "parent_culture_id": None, "source_row": source_row,
+            "source_sha256": source_hash, "annotation_row": annotation_row,
+            "annotation_sha256": annotation_hash, "plate": row["plateID"], "well": row["well"],
+            "technical_field": row["field"], "elapsed_minutes": row["elapsed_minutes"],
+            "response_locator": f"CSV row {source_row}:n,G1_proportion",
+            "outcome_value": None, "qc_status": "unknown", "failure_reason": None, "cost": None,
+            "candidate_controls_same_plate": controls, "controls_matched_verified": False,
+            "raw_concentration": row["Drug1Concentration"],
+            "annotation_concentration_uM_literal": annotation["Compound 1 Concentration (microMolar)"],
+            "chronology": "protocol drug addition T0 precedes images; not predecision state"})
+    return {"columns": list(rows[0]), "rows": mapped, "source_rows": len(rows), "controls": controls,
+            "fields": sorted({r["field"] for r in rows}), "wells": len({r["well"] for r in rows}),
+            "first_elapsed_minutes": min(float(r["elapsed_minutes"]) for r in rows),
+            "last_elapsed_minutes": max(float(r["elapsed_minutes"]) for r in rows)}
+
+
+def jsonl(path: Path, rows) -> None:
+    with path.open("xb") as raw:
+        with gzip.GzipFile(fileobj=raw, mode="wb", filename="", mtime=0) as zipped:
+            for row in rows:
+                zipped.write((json.dumps(row, sort_keys=True, allow_nan=False) + "\n").encode())
+
+
+def run(review: Path, out: Path) -> dict:
+    out.mkdir(parents=True, exist_ok=False)
+    source_files = sorted(p for p in review.rglob("*") if p.is_file())
+    inputs = {p.relative_to(ROOT).as_posix(): digest(p) for p in source_files}
+    write_json(out / "audit_freeze.json", {"scope": "structural_audit_not_efficacy", "deep_window_index": 72,
+        "split": "all_sources_audit_only; no_heldout_outcomes", "inputs_sha256": inputs,
+        "builder_sha256": digest(Path(__file__)), "command": [sys.executable, *sys.argv],
+        "python": sys.version, "numpy": np.__version__, "model_calls": 0})
+    tables, inventory = deep_tables(review / "followup/deep_datasets.raw")
+    gaps = relation_gaps(tables)
+    if gaps:
+        write_json(out / "construction_failure.json", gaps)
+        raise ValueError(gaps)
+    for name, rows in tables.items():
+        jsonl(out / (name + ".jsonl.gz"), rows)
+    write_json(out / "deep_inventory.json", inventory)
+    gross = gross_relations(review / "records/gross_hc007.raw", review / "records/idr_annotation.raw")
+    jsonl(out / "gross_image_relations.jsonl.gz", gross.pop("rows"))
+    write_json(out / "gross_inventory.json", gross)
+    yeast = []
+    for name in ("yeast_processed_feedback", "yeast_processed_openloop"):
+        path = review / ("traces" if name.endswith("feedback") else "linkage") / (name + ".raw")
+        data = loadmat(path)
+        yeast.append({"source": path.relative_to(ROOT).as_posix(), "sha256": digest(path),
+            "fields": {k: {"shape": list(v.shape), "dtype": str(v.dtype)} for k,v in data.items() if not k.startswith("__")},
+            "actions_recorded": sorted(map(int, np.unique(data["inputLEVELS"]))),
+            "clock": "vct_time protocol-relative; no availability/decision/actuation event timestamps",
+            "native_live_cell_mapping": None, "online_offline_trace_correspondence": "unverified",
+            "same_menu_independent_batch": "unverified", "qc_failure_cost_ledger": None})
+    write_json(out / "yeast_inventory.json", yeast)
+    candidates = json.loads((ROOT / "tools/datasets/state_search_review_20261001.json").read_text())
+    assessments = [assess(c) for c in candidates]
+    write_json(out / "assessments.json", assessments)
+    write_json(out / "review.json", candidates)
+    summary = {"deep_counts": {name: len(rows) for name, rows in tables.items()},
+               "deep_cells": sum(i["cells"] for i in inventory), "deep_experiments": len(inventory),
+               "gross_records": gross["source_rows"], "candidate_count": len(candidates),
+               "qualified_count": sum(a["state_gain_gate_passed"] for a in assessments),
+               "relation_contract_gaps": gaps, "efficacy_executed": False,
+               "outcome_values_exported": False, "split": "audit_only_no_test_fold"}
+    write_json(out / "summary.json", summary)
+    write_json(out / "outputs_sha256.json", {p.name: digest(p) for p in sorted(out.iterdir()) if p.is_file()})
+    return summary
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--review", type=Path, required=True)
+    parser.add_argument("--out", type=Path, required=True)
+    args = parser.parse_args()
+    print(json.dumps(run(args.review.resolve(), args.out.resolve())))

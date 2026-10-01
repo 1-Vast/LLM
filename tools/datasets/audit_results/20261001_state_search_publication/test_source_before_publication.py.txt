@@ -1,0 +1,178 @@
+"""Source acquisition, index alignment and scientific gate regression contracts."""
+import hashlib
+import io
+import json
+from pathlib import Path
+import zipfile
+
+import numpy as np
+import pytest
+
+from tools.datasets.state_search_build import (
+    ROOT, STATE_FEATURES, assess, deep_tables, predictor_locators, relation_gaps, run as build,
+)
+from tools.datasets.state_search_acquire import acquire, run
+
+
+def source_archive(tmp_path):
+    path = tmp_path / "source.zip"
+    # Immutable source-like software fixture, not a biological observation.
+    with zipfile.ZipFile(path, "w") as z:
+        prefix = "datasets/fixture"
+        z.writestr(prefix + "/metadata.json", json.dumps({"analysis_date": "later", "experiment": "fixture"}))
+        for feature in (*STATE_FEATURES, "stims"):
+            array = np.zeros((2, 4, 1), dtype=np.float32)
+            if feature == "stims":
+                array[0, 2, 0] = 1
+            stream = io.BytesIO()
+            np.save(stream, array, allow_pickle=False)
+            z.writestr(prefix + "/" + feature + ".npy", stream.getvalue())
+    return path
+
+
+def relations(tmp_path):
+    # deep_tables preserves workspace-relative provenance.
+    path = source_archive(tmp_path)
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr("tools.datasets.state_search_build.ROOT", tmp_path)
+        return deep_tables(path, index=1)[0]
+
+
+def complete_declaration():
+    required = ("state_available_before_decision", "online_state_correspondence", "sample_relation",
+                "two_measured_actions_per_question", "trusted_endpoint", "matched_controls",
+                "known_qc", "same_rules", "full_attempt_ledger", "costs_known",
+                "checkpoint_input_supported", "checkpoint_exposure_authenticated", "state_blind_input_supported")
+    return {"candidate_id": "software_fixture_only", **{name: True for name in required},
+            "evidence": {name: "fixture_protocol_partial_order" for name in required}}
+
+
+def test_next_stimulation_is_not_same_index_action(tmp_path):
+    tables = relations(tmp_path)
+    first = tables["attempts"][0]
+    assert first["action_id"] == "1"  # stims[2], not stims[1] == 0
+    assert first["action_index"] == 2
+    assert tables["state_samples"][0]["state_index"] == 1
+    assert not relation_gaps(tables)
+    assert first["actually_executed"] is None
+    assert first["qc_status"] == "unknown"
+    assert first["cost"] is None
+    assert all(q["independent_physical_unit"] is None for q in tables["questions"])
+    assert all(q["prior_action_history_locator"] and q["state_is_treatment_naive"] is False
+               for q in tables["questions"])
+
+
+@pytest.mark.parametrize("table,key,value,gap", [
+    ("state_samples", "state_index", 2, "index_order_leak"),
+    ("response_samples", "response_index", 0, "index_order_leak"),
+    ("response_samples", "sample_id", "another_cell", "sample_mismatch"),
+    ("attempts", "action_id", "not_in_menu", "missing_join"),
+    ("attempts", "control_group", "unrelated_plate", "control_mismatch"),
+    ("attempts", "qc_status", "success_assumed", "invalid_qc"),
+    ("attempts", "missing_reason", None, "hidden_missing_qc"),
+    ("state_samples", "features", ["neighbor_stims"], "future_field_in_state"),
+    ("state_samples", "features", ["terminal_utility"], "future_field_in_state"),
+    ("state_samples", "source_row", "", "missing_source_locator"),
+    ("questions", "independent_physical_unit", "cell_is_batch", "unverified_physical_unit_promoted"),
+])
+def test_relation_mutations_are_detected(tmp_path, table, key, value, gap):
+    tables = relations(tmp_path)
+    tables[table][0][key] = value
+    assert gap in relation_gaps(tables)
+
+
+def test_views_never_contain_outcomes_or_next_actions(tmp_path):
+    state = relations(tmp_path)["state_samples"][0]
+    state.update(response="hidden", next_stims=1, terminal_utility=100)
+    visible, blind = predictor_locators(state, visible=True), predictor_locators(state, visible=False)
+    assert visible["features"] == list(STATE_FEATURES)
+    assert blind["features"] == []
+    assert set(visible) == set(blind) == {"sample_id", "state_index", "features", "source_sha256"}
+
+
+@pytest.mark.parametrize("field", ["online_state_correspondence", "sample_relation",
+    "two_measured_actions_per_question", "state_available_before_decision", "matched_controls", "known_qc", "trusted_endpoint"])
+def test_unknown_never_passes_scientific_gate(field):
+    candidate = complete_declaration()
+    candidate[field] = None
+    assert assess(candidate)["classification"] == "replay_only"
+    assert not assess(candidate)["state_gain_gate_passed"]
+
+
+def test_protocol_partial_order_can_qualify_without_invented_timestamps():
+    candidate = complete_declaration()
+    assert assess(candidate)["state_gain_gate_passed"]
+    candidate["evidence"].pop("state_available_before_decision")
+    assert not assess(candidate)["state_gain_gate_passed"]
+
+
+def test_data_gate_and_checkpoint_contract_are_separate():
+    candidate = complete_declaration()
+    candidate["checkpoint_input_supported"] = False
+    result = assess(candidate)
+    assert result["classification"] == "comparable"
+    assert not result["state_gain_gate_passed"]
+    assert result["checkpoint_gaps"] == ["checkpoint_input_supported"]
+
+
+def test_missing_ledger_requires_predeclared_bounds_not_model_imputation():
+    candidate = complete_declaration()
+    candidate["full_attempt_ledger"] = None
+    assert assess(candidate)["classification"] == "replay_only"
+    candidate["predeclared_utility_bounds"] = {"range": [-1, 1], "scope": "software_fixture_only"}
+    assert assess(candidate)["classification"] == "utility_interval_only"
+    assert not assess(candidate)["state_gain_gate_passed"]
+
+
+def test_real_new_candidates_remain_unqualified():
+    candidates = json.loads((ROOT / "tools/datasets/state_search_review_20261001.json").read_text())
+    assert len(candidates) == 4
+    assert {assess(c)["classification"] for c in candidates} == {"replay_only"}
+    assert all(not assess(c)["state_gain_gate_passed"] for c in candidates)
+
+
+def test_archived_acquisitions_and_builder_outputs_match_hashes():
+    from tools.datasets.state_search_acquire import digest
+    sources = ROOT / "tools/datasets/audit_results/20261001_state_search"
+    for receipts in sources.glob("*/receipts.json"):
+        for receipt in json.loads(receipts.read_text()):
+            if "sha256" in receipt:
+                assert digest(receipts.parent / receipt["path"]) == receipt["sha256"]
+    out = ROOT / "tools/datasets/audit_results/20261001_state_search_build_v4"
+    for name, expected in json.loads((out / "outputs_sha256.json").read_text()).items():
+        assert digest(out / name) == expected
+
+
+def test_changed_source_fails_before_construction(tmp_path, monkeypatch):
+    review = tmp_path / "sources"
+    acquisition = review / "download"
+    acquisition.mkdir(parents=True)
+    (acquisition / "source.raw").write_bytes(b"changed")
+    (acquisition / "receipts.json").write_text(json.dumps([{"path": "source.raw", "sha256": "a" * 64}]))
+    monkeypatch.setattr("tools.datasets.state_search_build.ROOT", tmp_path)
+    out = tmp_path / "failure"
+    with pytest.raises(ValueError, match="source_hash_changed"):
+        build(review, out)
+    assert json.loads((out / "construction_failure.json").read_text())["reason"] == "source_hash_changed"
+
+
+def test_acquisition_preserves_failed_http_body(tmp_path, monkeypatch):
+    import urllib.error
+    import urllib.request
+    def fail(*args, **kwargs):
+        raise urllib.error.HTTPError("https://example.invalid/missing", 404, "Not found", {}, io.BytesIO(b"missing"))
+    monkeypatch.setattr(urllib.request, "urlopen", fail)
+    receipt = acquire({"id": "failed", "url": "https://example.invalid/missing"}, tmp_path)
+    assert receipt["error"] == "http_status"
+    assert receipt["status"] == 404
+    assert receipt["sha256"] == hashlib.sha256(b"missing").hexdigest()
+    assert (tmp_path / "failed.raw").read_bytes() == b"missing"
+
+
+def test_acquisition_does_not_overwrite_freeze(tmp_path):
+    plan = tmp_path / "plan.json"
+    plan.write_text('{"sources": []}')
+    out = tmp_path / "frozen"
+    out.mkdir()
+    with pytest.raises(FileExistsError):
+        run(plan, out)

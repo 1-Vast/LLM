@@ -1,0 +1,1413 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Sep 13 16:06:38 2021
+
+@author: jeanbaptiste
+"""
+
+import time
+import warnings
+from typing import cast, Tuple, List, Optional, Union, Any, Dict
+import copy
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+from .. import config as cfg
+from .processors import AbstractController
+
+class ChannelSettings():
+    """
+    Dict-like class for acquisition channels settings
+    """
+
+    def __init__(
+            self,
+            name : str = 'Trans',
+            exposure : int = 10,
+            trigger : str = 'Int',
+            ):
+
+        self.name = name
+        "str, Channel name"
+        self.exposure = exposure
+        "int, Exposure time in ms"
+        self.trigger = trigger
+        """Hardware triggering mode: 'Int' for Internal / Computer, 'Ext' for
+        external / Arduino"""
+
+    def __str__(self):
+        return """
+        ChannelSettings object - Channel name = %s
+        exposure = %dms, trigger = %s
+        """%(self.name,self.exposure,self.trigger)
+
+    def check(self, platform):
+        """
+        Check if parameters are valid
+
+        Parameters
+        ----------
+        platform : Platform object
+            The platform that this will be run on.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        channels = platform.get_available_channels()
+        if self.name not in channels:
+            raise ValueError(
+                """%s not in available channels.
+                Available channels : %s"""%(self.name, str(channels))
+                )
+
+
+class StimulationsSettings():
+    """
+    Class for stimulation channels settings
+    """
+
+    def __init__(
+            self,
+            color : str = 'green',
+            exposure : int = 10,
+            time_unit : str = 'ms',
+            intensity : int = 5,
+            trigger : str = 'Int'
+            ):
+
+        self.color = color
+        "str, Stimulation color. The default is 'green'"
+        self.exposure = exposure
+        "int, Exposure time"
+        self.time_unit = time_unit
+        "str, Exposure time unit, can be ('s', 'ms', 'us')"
+        self.intensity = intensity
+        "Lamp intensity, in percent. Valid intensities are 0, 5-100"
+        self.trigger = trigger
+        """Hardware triggering mode: 'Int' for Internal / Computer, 'Ext' for
+        external / Arduino"""
+
+    def __str__(self):
+        return """
+        StimulationsSettings object - color = %s
+        exposure = %d%s, intensity = %d%%, trigger mode = %s
+        """%(
+        self.color, self.exposure, self.time_unit, self.intensity, self.trigger
+        )
+
+    def check(self, platform):
+        """
+        Check if parameters are valid
+
+        Parameters
+        ----------
+        platform : Platform object
+            The platform that this will be run on.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        colors = ('red','green','blue')
+        if self.color not in colors:
+            raise ValueError(
+                """%s not in available DMD colors.
+                Available colors : %s"""%(self.color, str(colors))
+                )
+
+        if not 0 <= self.exposure <= 65535:
+            raise ValueError("Invalid exposure: %d"%self.exposure)
+
+        units = ('us', 'ms', 's')
+        if not self.time_unit in units:
+            raise ValueError("Invalid time unit: %s. Available units %s"%(
+                    self.time_unit, str(units)
+                    )
+                )
+
+        if 0<self.intensity<5:
+            raise ValueError("Intensity values between (0%, 5%) are not possible")
+        if self.intensity>100:
+            raise ValueError("Intensity values >100% are not possible")
+        if self.intensity<0:
+            raise ValueError("Negative intensity values are not possible")
+
+class SeriesSettings():
+    """
+    Acquisition settings for Series
+    """
+
+    def __init__(
+            self,
+            acquisition_mode : str = 'simultaneous',
+            channels : List[ChannelSettings] = [],
+            stimulations : List[StimulationsSettings] = [],
+            neopixel_shutter = True
+            ):
+        self.acquisition_mode = acquisition_mode
+        """Acquistion mode. Options are:
+            'simultaneous' : run trans and fluorescent acquisitions simultaneously
+                Both channels are acquired through the fluorescent filter cube. Only
+                works with exactly one fluorescent channel and one trans channel.
+            'sequential' : go to position and run channels sequentially.
+                Filter cubes are switched at each position.
+            'channels_sequence' : set one channel, and go over all positions.
+                Filter cube is set for channel, then the platform goes over all
+                positions, and then moves on to the next channel.
+                """
+        self.channels = channels
+        "List of ChannelSettings to acquire and their exposures"
+        self.stimulations = stimulations
+        "List of StimulationSettings to apply"
+        self.neopixel_shutter = neopixel_shutter
+        "Flag to turn neopixel ring off/on during acquisitions"
+
+    def __str__(self):
+
+        channels_str = ""
+        for channel in self.channels:
+            channels_str += str(channel)
+
+        stims_str = ""
+        for stim in self.stimulations:
+            stims_str += str(stim)
+
+        return """
+        SeriesSettings object
+        Acquisition mode: %s, NeoPixel ring shutter = %s
+
+        #### Channels:
+        %s
+
+        #### Stimulations:
+        %s
+        """%(
+            self.acquisition_mode,
+            str(self.neopixel_shutter),
+            channels_str,
+            stims_str
+            )
+
+    def _serialize(self):
+        """
+        Serialize to save to JSON
+
+        Returns
+        -------
+        dict
+            serialized key value pairs
+
+        """
+
+        o = dict()
+
+        o["acquisition_mode"] = self.acquisition_mode
+
+        o["channels"] = []
+        for c in self.channels:
+            o["channels"].append(c.__dict__.copy())
+
+        o["stimulations"] = []
+        for s in self.stimulations:
+            o["stimulations"].append(s.__dict__.copy())
+
+        o["neopixel_shutter"] = self.neopixel_shutter
+
+        return o
+
+
+
+
+    def check(self, platform):
+        """
+        Check for incompatible or invalid settings
+
+        Parameters
+        ----------
+        platform : Platform object
+            The platform that this will be run on.
+
+        Raises
+        ------
+        ValueError
+            If settings are invalid or incompatible.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        if self.acquisition_mode == "simultaneous":
+            if (len(self.channels)!=2 or
+                self.channels[0].name not in cfg.VALID_TRANS_CHANNELS or
+                self.channels[1].name not in cfg.VALID_FLUO_CHANNELS):
+                raise ValueError(
+                    ("You need exactly 1 trans and 1 fluo channel"
+                    " to use simultaneous mode, in that order.")
+                    )
+
+        for channel in self.channels:
+            channel.check(platform)
+
+        hw_trig = []
+        for channel in self.channels:
+            hw_trig.append(channel.trigger=="Ext")
+        if len(hw_trig)> 0 and any(hw_trig) and not all(hw_trig):
+            raise ValueError(
+                ("It looks like you are using a mixture of hardware and "
+                 "software triggering for this series.")
+                )
+
+        for stimulation in self.stimulations:
+            stimulation.check(platform)
+
+        hw_trig = []
+        for stimulation in self.stimulations:
+            hw_trig.append(stimulation.trigger=="Ext")
+        if len(hw_trig)> 0 and any(hw_trig) and not all(hw_trig):
+            raise ValueError(
+                ("It looks like you are using a mixture of hardware and "
+                 "software triggering for this series.")
+                )
+
+class Series:
+    """Coordinates the acquisition/stimulation of multiple Positions"""
+
+    def __init__(self, series_number, platform, positions = None, settings = None):
+        """
+        Initialize object
+
+        Parameters
+        ----------
+        series_number : int
+            Series ID number.
+        platform : microscope.platform.Platform object
+            The microscope platform object that handles all the hardware.
+        positions : list of Position objects, optional
+            The positions to cycle over in this series. If None, an empty list
+            will be initialized.
+            The default is None.
+        settings : SeriesSettings, optional
+            Settings for this particular series. If None, the default
+            SeriesSettings() will be initialized.
+            The default is None.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        self.number = series_number
+        "Series ID number"
+        self.platform = platform
+        "The microscope platform object that handles all the hardware."
+        self.positions = copy.deepcopy(positions) or []
+        "The positions to cycle over in this series."
+        self.settings = copy.deepcopy(settings) or SeriesSettings()
+        "Settings for this particular series."
+        self._hooks = {"pre": lambda : None, "post": lambda : None}
+
+    def __str__(self):
+
+        positions_str = ""
+        for position in self.positions:
+            positions_str += str(position)
+
+        return """
+        Series object - number %d
+
+        ------------Settings-----------------
+        %s
+
+        ------------Positions----------------
+        %s
+
+        """%(self.number, str(self.settings), positions_str)
+
+    def _serialize(self):
+        """
+        Serialize to save to JSON
+
+        Returns
+        -------
+        dict
+            serialized key value pairs
+
+        """
+
+        o = dict()
+        o["number"] = self.number
+
+        o["positions"] = []
+        for p in self.positions:
+            o["positions"].append(p._serialize())
+
+        o["settings"] = self.settings._serialize()
+
+        return o
+
+    def interactive(self):
+
+
+        # Add channel?
+        channel_settings = []
+        while True:
+            prompt = "Add acquisition channel to series? "
+            channels = [x.lower() for x in self.platform.get_available_channels()]
+            for channel in channels:
+                prompt += channel + "/"
+            prompt += "/no: "
+            res = input(prompt).lower()
+            if res in channels:
+                channel = res
+            elif res == "no":
+                break
+            else:
+                continue
+
+            res = input("Exposure (ms)? ")
+            res = int(res)
+            if res <= 0:
+                raise ValueError("Exposure must be a positive integer")
+            exposure = res
+
+            # Append channel to list:
+            channel_settings.append(
+                ChannelSettings(name = channel, exposure = exposure)
+                )
+
+        # Acq mode:
+        while True:
+            res = input(
+                (
+                    "Acquisition mode? sequential/simultaneous/channels_sequence: ",
+                    "If you don't know, pick sequential\n"
+                    )
+                ).lower()
+            if res in ("sequential", "simultaneous", "channels_sequence"):
+                acq_mode = res
+            else:
+                print("Invalid selection: %s"%res)
+                continue
+
+        # Add stimulations:
+        stimulation_settings = []
+        while True:
+            res = input("Add stimulation to series? red/green/blue/no: ").lower()
+            if res == "no":
+                break
+            elif res in ("red", "green", "blue"):
+                color = res
+            else:
+                continue
+
+            res = input("Exposure? ")
+            res = int(res)
+            if res <= 0:
+                print("Exposure must be a positive integer")
+                continue
+            exposure = res
+
+            res = input("Time unit of exposure? S/mS/uS: ").lower()
+            if res in ("s", "ms", "us"):
+                time_unit = res
+            else:
+                print("Invalid time unit")
+                continue
+
+            res = input("Lamp intensity? 5-100: ")
+            res = int(res)
+            if 5<= res <= 100:
+                intensity = res
+            else:
+                print("Intensity must between 5 and 100")
+                continue
+
+            stimulation_settings.append(
+                StimulationsSettings(
+                    color = color,
+                    exposure = exposure,
+                    intensity = intensity,
+                    time_unit = time_unit
+                    )
+                )
+
+        # Compile settings:
+        self.settings = SeriesSettings(
+            acquisition_mode = acq_mode,
+            channels = channel_settings,
+            stimulations = stimulation_settings,
+            neopixel_shutter = True # Keeping this always true for now
+            )
+
+        # Add positions:
+        while True:
+            # Ask user how they want to add the positions:
+            res = input(
+                (
+                    "How do you want to give positions?\n",
+                    "1 - Line method\n",
+                    "2 - Grid method\n",
+                    "3 - Pull from micromanager\n",
+                    "0 - None"
+                    )
+                )
+            res = int(res)
+
+            if res == 0:
+                break
+
+            elif res == 1:
+                self.positions_line()
+
+            elif res == 2:
+                print("Sorry not implemented yet")
+                continue
+
+            elif res == 3:
+                print("Sorry not implemented yet")
+                continue
+
+            else:
+                print("Invalid selection: %d"%res)
+                continue
+
+
+    def _msg(self, msg, clock=True):
+
+        msg = "Series %d - "%self.number +msg
+        if clock:
+            msg = time.ctime() +", "+ msg
+
+        return msg
+
+    def positions_line(
+            self, positions = None, number_pos = None, index_offset = 0):
+        """
+        Generate a line of positions between two points and append them to the
+        positions list of the series
+
+        Parameters
+        ----------
+        positions : tuple(Position, Position), optional
+            First and last position. If None is given, an interactive prompt
+            will ask the user to pick the positions.
+            The default is None.
+        number_pos : int, optional
+            Number of positions to interpolate. If None, an interactive prompt
+            will ask the user for a integer.
+            The default is None.
+        index_offset : int, optional
+            Position numbers offset: Add this offset to positions numbers when
+            initializing them.
+            The default is 0.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        if positions is None:
+            # Get first position:
+            _ = input(self._msg("Go to 1st position and press enter "))
+            positions = [Position(self.platform)]
+
+            # Get second position:
+            _ = input(self._msg("Go to 2nd position and press enter "))
+            positions += [Position(self.platform)]
+
+        if number_pos is None:
+            number_pos = int(input("Number of positions in series? "))
+
+        # Get XYZ positions:
+        xyz = [
+            np.linspace(positions[0].xy[0],positions[1].xy[0],number_pos),
+            np.linspace(positions[0].xy[1],positions[1].xy[1],number_pos),
+            np.linspace(positions[0].z,positions[1].z,number_pos)
+            ]
+
+        # Create positions:
+        for p in range(number_pos):
+            self.positions += [
+                Position(
+                    self.platform,
+                    p + index_offset,
+                    xy=(xyz[0][p],xyz[1][p]),
+                    z=xyz[2][p],
+                    pfs_offset=positions[0].pfs_offset,
+                    )
+                ]
+
+    def positions_grid(self, position = None, rows=1, columns =1, dist = 100):
+        # TODO generate a grid of positions, around the center position
+        pass
+
+    def positions_MM(self):
+        # TODO retrieve positions list from MM
+        pass
+
+    def check(self):
+        """
+        Check that settings are valid
+
+        Returns
+        -------
+        None.
+
+        """
+        self.settings.check(self.platform)
+        if len(self.positions) == 0:
+            raise ValueError("You haven't set any position yet.")
+        for pos in self.positions:
+            pos.check()
+
+
+    def preprocess(self, channels = None):
+        """
+        Run through positions, acquire first image, and pass it to the
+        processors for pre-processing
+
+        Parameters
+        ----------
+        channel : ChannelSettings or None, optional
+            Settings to apply to run the preprocessing acquisitions. If None,
+            the first channel's settings for the series will be used instead.
+            The default is None
+
+        Returns
+        -------
+        None.
+
+        """
+
+
+        if channels is None:
+            channels = self.settings.channels
+
+        # Make sure live mode is off:
+        live = self.platform.studio.live()
+        live_on = live.is_live_mode_on()
+        if live_on:
+            self.platform.studio.live().set_live_mode(False)
+
+        # Record if continuous focus is on:
+        cont_focus = self.platform.mmc.is_continuous_focus_enabled()
+        self.platform.focus('off')
+
+
+        # Set / unset hardware sync:
+        if channels[0].trigger == "Ext":
+            self.platform.synchronizer.set_camera()
+            self.platform.synchronizer.set_fluo_lamp()
+        else:
+            self.platform.synchronizer.unset_camera()
+            self.platform.synchronizer.unset_fluo_lamp()
+
+        # Go through positions in specified order:
+        for pos in self.positions:
+
+            print(self._msg(pos._msg("Pre-processing")))
+
+            # Move to position:
+            self.platform.move(pos.xy, pos.z)
+            self.platform.focus()
+            time.sleep(.5) # Extra wait
+
+            # Turn on shutter if necessary:
+            self.platform.neopixel.shutter(self.settings.neopixel_shutter)
+
+            if self.settings.acquisition_mode == "simultaneous":
+                images = self._image_simultaneous(channels)
+            else:
+                images = self._image_sequential(channels)
+
+            # Turn off shutter (does not turn LEDs on if not previously set on):
+            self.platform.neopixel.shutter(False)
+
+            # Send image for pre-processing:
+            pos.preprocess(images)
+
+        # unset hardware sync:
+        self.platform.synchronizer.unset_camera()
+        self.platform.synchronizer.unset_fluo_lamp()
+
+        # If continuous focus was on, turn it back on:
+        if cont_focus:
+            print("Turning continuous focus back on")
+            self.platform.focus('continuous')
+
+    def acquire(self, order : int = 1):
+        """
+        Run series acquisition
+
+        Parameters
+        ----------
+        order : int, optional
+            Order to run through positions, can be +1 or -1. The default is +1.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        self._hooks["pre"]()
+
+        if self.settings.acquisition_mode == 'channels_sequence':
+            self._acquire_channelswise(order=order)
+
+        elif self.settings.acquisition_mode in ('simultaneous', 'sequential'):
+            self._acquire_sequence(order=order)
+
+        self._hooks["post"]()
+
+    def _acquire_channelswise(
+            self, channels : List[ChannelSettings] = None, order : int = 1
+            ):
+        """
+        Run channels-wise acquisition-wise sequence
+
+        Parameters
+        ----------
+        channels : List[ChannelSettings] or None, optional
+            List of channels to acquire. If None, all channels in the settings
+            will be acquired. The default is None.
+        order : int, optional
+            Order to run through positions, can be +1 or -1. The default is +1.
+
+        Returns
+        -------
+        None.
+
+        """
+
+
+        if channels is None:
+            channels = self.settings.channels
+
+        # Run through channels:
+        for channel in channels:
+
+            # Acquire sequence for only this channel:
+            self._acquire_sequence([channel], order = order)
+
+            # Invert acquisition order to restart from current position:
+            order = -order
+
+    def _acquire_sequence(
+            self, channels : List[ChannelSettings] = None, order : int = 1
+            ):
+        """
+        Run position-wise acquistion sequence
+
+        Parameters
+        ----------
+        channels : List[ChannelSettings] or None, optional
+            List of channels to acquire. If None, all channels in the settings
+            will be acquired. The default is None.
+        order : int, optional
+            Order to run through positions, can be +1 or -1. The default is +1.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        if channels is None:
+            channels = self.settings.channels
+
+        # Set / unset hardware sync:
+        if channels[0].trigger == "Ext":
+            self.platform.synchronizer.set_camera()
+            self.platform.synchronizer.set_fluo_lamp()
+        else:
+            self.platform.synchronizer.unset_camera()
+            self.platform.synchronizer.unset_fluo_lamp()
+
+        # Go through positions in specified order:
+        for p, pos in enumerate(self.positions[::order]):
+
+            # Move to position:
+            if p == 0:
+                self.platform.move(pos.xy, pos.z)
+                self.platform.focus('continuous')
+            else:
+                self.platform.move(pos.xy)
+                self.platform.focus()
+            pos.record_z()
+
+            # Turn on shutter if necessary:
+            self.platform.neopixel.shutter(self.settings.neopixel_shutter)
+
+            # Acquire image(s):
+            if self.settings.acquisition_mode=='simultaneous':
+                images = self._image_simultaneous(channels)
+            else:
+                images = self._image_sequential(channels)
+
+            # Turn off shutter (does not turn LEDs on if not previously set on):
+            self.platform.neopixel.shutter(False)
+
+            # Send images to processors:
+            pos.process_images(images, channels)
+
+    def _image_simultaneous(self, channels : List[ChannelSettings] = None):
+        """
+        Run simultaneous trans/fluo channels imaging
+
+        Parameters
+        ----------
+        channels : List[ChannelSettings] or None, optional
+            List of channels to acquire. If None, the two channels in the
+            settings are used. The default is None.
+
+        Returns
+        -------
+        images : list of 2D numpy arrays of uint16
+            Acquired images for each channel.
+
+        """
+
+        # Get channels:
+        if channels is None:
+            trans_channel = self.settings.channels[0]
+            fluo_channel = self.settings.channels[1]
+        else:
+            trans_channel = channels[0]
+            fluo_channel = channels[1]
+
+        # If no hardware triggering / synchronization:
+        if trans_channel.trigger=='Int':
+            # Slide in fluo cube:
+            self.platform.channel(fluo_channel.name)
+
+            # Set to trans exposure:
+            self.platform.exposure(trans_channel.exposure)
+
+            # Set trans shutter:
+            self.platform.set('Core','Shutter','DiaLamp')
+
+            # Acquire image:
+            self.platform.snap()
+
+            # Set fluo settings:
+            self.platform.exposure(fluo_channel.exposure)
+            self.platform.set('Core','Shutter','Spectra')
+
+            # Acquire image:
+            self.platform.snap()
+
+            # Retrieve images from camera:
+            trans_image = self.platform.retrieve()
+            fluo_image = self.platform.retrieve()
+
+        # hardware triggering / synchronization:
+        elif trans_channel.trigger=='Ext':
+            self.platform.channel(fluo_channel.name)
+            self.platform.synchronizer.set_fluo_lamp()
+            trans_image, fluo_image = self.platform.hw_acquire(
+                channels = [trans_channel.name, fluo_channel.name],
+                exposures = [trans_channel.exposure, fluo_channel.exposure]
+                )
+
+        return [trans_image, fluo_image]
+
+    def _image_sequential(self, channels : List[ChannelSettings]):
+        """
+        Image channels sequentially, swapping filter cubes if necessary
+
+        Parameters
+        ----------
+        channels : List[ChannelSettings]
+            List of channels to acquire.
+
+        Returns
+        -------
+        images : list of 2D numpy arrays of uint16
+            Acquired images for each channel.
+
+        """
+
+        # Init empty return images list
+        images = []
+
+        # Run through channels:
+        for channel in channels:
+
+            # If no hardware triggering / synchronization:
+            if channel.trigger=='Int':
+                # Set channel, exposure, acquire, append to images list:
+                self.platform.channel(channel.name)
+                self.platform.exposure(channel.exposure)
+                self.platform.snap()
+                images += [self.platform.retrieve()]
+
+            # hardware triggering / synchronization:
+            elif channel.trigger=='Ext':
+                self.platform.channel(channel.name)
+                images += self.platform.hw_acquire(
+                    [channel.name], [channel.exposure]
+                    )
+
+        return images
+
+    def stimulate(self, positions = None):
+        """
+        Run stimulation sequence.
+
+
+        Parameters
+        ----------
+        positions : list of int, optional
+            Indexes of positions to run IN THE SERIES. This does NOT refer
+            to Position.number! This is simply the list indexes of the
+            positions to run in the current series in self.positions, which are
+            two different things. If None, the whole series is run.
+            The main reason for passing a list of positions is to start
+            illuminating while waiting for the control outputs on the rest of
+            the series.
+            The default is None.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        if positions is None:
+            positions = self.positions
+        elif len(positions)==0:
+            return
+        else:
+            positions = [self.positions[i] for i in positions]
+
+        # Temporary fix until merge with Muzzy code:
+        leds_names = {
+            "red": "LED4_red", "green": "LED3_green", "blue": "LED1_blue"
+            }
+
+        print(self._msg("Starting stimulation on positions: ",clock=True), end="")
+        for pos in positions:
+            print(pos.number, end=" ")
+        print("")
+
+        # Set / unset hardware sync:
+        if self.settings.stimulations[0].trigger == "Ext":
+            self.platform.synchronizer.set_dmd()
+        else:
+            self.platform.synchronizer.unset_dmd()
+
+
+        # Move to first position and start continuous focus:
+        self.platform.move(positions[0].xy, positions[0].z)
+        self.platform.focus('continuous')
+
+        # Set up filter turret in advance:
+        self.platform.channel("DMD-RED")
+
+        # Retrieve stimulation images:
+        dmd_images = []
+        for pos in positions:
+            # Run through stimulation channels:
+            for stim_settings in self.settings.stimulations:
+                dmd_images.append(pos.stimulation_image(stim_settings.color))
+
+        # TODO: Add intensity and trigger settings for both channels
+        # Load images to DMD and start sequence:
+        self.platform.dmd.sequence(
+            dmd_images,
+            color=stim_settings.color,
+            exposure=stim_settings.exposure,
+            time_unit=stim_settings.time_unit,
+            intensity=stim_settings.intensity,
+            trigger=stim_settings.trigger
+            )
+        # TODO: Add intensity and trigger settings for both channels
+
+        # Trigger first frame:
+        if stim_settings.trigger=='Int':
+            self.platform.dmd.next_frame()
+        elif stim_settings.trigger=='Ext':
+            self.platform.dmd.hw_frame()
+
+        # Run through positions and shine light:
+        for pos in positions:
+
+            # Move to position:
+            self.platform.move(pos.xy)
+            self.platform.focus()
+            pos.record_z()
+
+            # If computer-controlled DMD sync:
+            if stim_settings.trigger=='Int':
+
+                for stim_settings in self.settings.stimulations:
+
+                    self.platform.set(
+                        "Core", "Shutter", leds_names[stim_settings.color]
+                        )
+
+                    # Shine light:
+                    self.platform.dmd.shine()
+
+                    # Trigger next frame:
+                    self.platform.dmd.next_frame()
+
+            # If Arduino-controlled sync:
+            elif stim_settings.trigger=='Ext':
+                for stim_settings in self.settings.stimulations:
+                    self.platform.set(
+                        "Core", "Shutter", leds_names[stim_settings.color]
+                        )
+                    self.platform.dmd.hw_shine_frame(
+                        color = stim_settings.color,
+                        exposure = stim_settings.exposure,
+                        )
+
+        # Stop sequence before moving on to next one:
+        self.platform.dmd.stop_sequence()
+
+    def oldstimulate(self, positions = None):
+        """
+        Run stimulation sequence.
+
+
+        Parameters
+        ----------
+        positions : list of int, optional
+            Indexes of positions to run IN THE SERIES. This does NOT refer
+            to Position.number! This is simply the list indexes of the
+            positions to run in the current series in self.positions, which are
+            two different things. If None, the whole series is run.
+            The main reason for passing a list of positions is to start
+            illuminating while waiting for the control outputs on the rest of
+            the series.
+            The default is None.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        if positions is None:
+            positions = self.positions
+        elif len(positions)==0:
+            return
+        else:
+            positions = [self.positions[i] for i in positions]
+
+        print(self._msg("Starting stimulation on positions: ",clock=True), end="")
+        for pos in positions:
+            print(pos.number, end=" ")
+        print("")
+
+        # Set / unset hardware sync:
+        if self.settings.stimulations[0].trigger == "Ext":
+            self.platform.synchronizer.set_dmd()
+        else:
+            self.platform.synchronizer.unset_dmd()
+
+        # Run through stimulation channels:
+        for stim_settings in self.settings.stimulations:
+
+            # Move to first position and start continuous focus:
+            self.platform.move(positions[0].xy, positions[0].z)
+            self.platform.focus('continuous')
+
+            # Set up filter turret in advance:
+            self.platform.channel("DMD-"+stim_settings.color.upper())
+
+            # Retrieve stimulation images:
+            dmd_images = []
+            for pos in positions:
+                dmd_images.append(pos.stimulation_image(stim_settings.color))
+
+            # Load images to DMD and start sequence:
+            self.platform.dmd.sequence(
+                dmd_images,
+                color=stim_settings.color,
+                exposure=stim_settings.exposure,
+                time_unit=stim_settings.time_unit,
+                intensity=stim_settings.intensity,
+                trigger=stim_settings.trigger
+                )
+
+
+            # Trigger first frame:
+            if stim_settings.trigger=='Int':
+                self.platform.dmd.next_frame()
+            elif stim_settings.trigger=='Ext':
+                self.platform.dmd.hw_frame()
+
+            # Run through positions and shine light:
+            for pos in positions:
+
+                # Move to position:
+                self.platform.move(pos.xy)
+                self.platform.focus()
+                pos.record_z()
+
+                # If computer-controlled DMD sync:
+                if stim_settings.trigger=='Int':
+
+                    # Shine light:
+                    self.platform.dmd.shine()
+
+                    # Trigger next frame:
+                    self.platform.dmd.next_frame()
+
+
+
+                # If Arduino-controlled sync:
+                elif stim_settings.trigger=='Ext':
+                    self.platform.dmd.hw_shine_frame(
+                        color = stim_settings.color,
+                        exposure = stim_settings.exposure,
+                        )
+
+            # Stop sequence before moving on to next one:
+            self.platform.dmd.stop_sequence()
+
+    def reset(self):
+        """
+        Reset series (for example to restart an acquisition)
+
+        Returns
+        -------
+        None.
+
+        """
+
+        for position in self.positions:
+            position.reset()
+
+
+
+class SequentialSeries(Series):
+
+    def acquire(self, order=1):
+
+        channels = self.settings.channels
+
+        # Go through positions in specified order:
+        for p, pos in enumerate(self.positions):
+
+            tpos0 = time.perf_counter()
+
+            # Move to position:
+            if p == 0:
+                self.platform.move(pos.xy, pos.z)
+                self.platform.focus('continuous')
+            else:
+                self.platform.move(pos.xy)
+                self.platform.focus()
+            pos.record_z()
+            t1 = time.perf_counter()
+            print(f"Pusition move: {t1-tpos0}")
+
+            # Turn on shutter if necessary:
+            self.platform.neopixel.shutter(self.settings.neopixel_shutter)
+
+            # Acquire image(s):
+            t0 = time.perf_counter()
+            if self.settings.acquisition_mode=='simultaneous':
+                images = self._image_simultaneous(channels)
+            else:
+                images = self._image_sequential(channels)
+            t1 = time.perf_counter()
+            print(f"Imaging time: {t1-t0}")
+
+            # Send images to processors:
+            t0 = time.perf_counter()
+            pos.process_images(images, channels)
+            t1 = time.perf_counter()
+            print(f"Images dispatch: {t1-t0}")
+
+            # Turn off shutter (does not turn LEDs on if not previously set on):
+            self.platform.neopixel.shutter(False)
+
+            # Set up filter turret in advance:
+            t0 = time.perf_counter()
+            self.platform.channel("DMD-RED")
+            t1 = time.perf_counter()
+            print(f"Filter cubes rotation: {t1-t0}")
+
+            # Retrieve stimulation images:
+            t0 = time.perf_counter()
+            dmd_images = []
+            # Run through stimulation channels:
+            for stim_settings in self.settings.stimulations:
+                dmd_images.append(pos.stimulation_image(stim_settings.color))
+            t1 = time.perf_counter()
+            print(f"Image retrieval time: {t1-t0}")
+
+            t0 = time.perf_counter()
+            self.platform.dmd.sequence(
+                dmd_images,
+                color=stim_settings.color,
+                exposure=stim_settings.exposure,
+                time_unit=stim_settings.time_unit,
+                intensity=stim_settings.intensity,
+                trigger=stim_settings.trigger
+                )
+            t1 = time.perf_counter()
+            print(f"DMD load time: {t1-t0}")
+            # TODO: Add intensity and trigger settings for both channels
+
+            # Trigger first frame:
+            self.platform.dmd.hw_frame()
+
+            # Shine and trigger next:
+            for stim_settings in self.settings.stimulations:
+                self.platform.dmd.hw_shine_frame(
+                    color = stim_settings.color,
+                    exposure = stim_settings.exposure,
+                    )
+
+            # Stop sequence before moving on to next position:
+            self.platform.dmd.stop_sequence()
+
+            tpos1 = time.perf_counter()
+            print(f"DMD stims time: {tpos1-t1}")
+            print(f"Total position time: {tpos1-tpos0}")
+
+
+    def stimulate(self, positions):
+        pass
+
+
+
+class Position():
+    """
+    For information/actions relative to each specific position
+    """
+
+    def __init__(self, platform, position_number=-1, xy=None, z=None, pfs_offset=None):
+        """
+        Initialize object
+
+        Parameters
+        ----------
+        platform : microscope.platform.Platform object
+            The microscope platform object that handles all the hardware.
+        position_number : int, optional
+            The position's index. Purely for reference purposes. The default is -1
+        xy : Tuple[float, float], optional
+            XY coordinates of the position. The default is None.
+        z : float, optional
+            Z coordinate of the position. The default is None.
+        pfs_offset : float, optional
+            PFS offset of the position. Nikon's Perfect Focus System works by
+            using a laser to find the glass/water, glass/air, or glass/pdms
+            interface, and then adds a constant offset to it.
+            The default is None.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # Position number:
+        self.number = position_number
+        "Position number / ID"
+        self.platform = platform
+        "Platform object"
+        # Position:
+        self.xy = xy or self.platform.where()['xy']
+        "XY coordinates"
+        self.z = z or self.platform.where()['z']
+        "Latest recorded Z coordinate"
+        self.z_history = dict(time=[time.time()], value=[self.z])
+        "History of recorded Z positions"
+        self.pfs_offset = pfs_offset or self.platform.where()['pfs']
+
+
+
+        # Image processor:
+        self.processors = dict()
+        """dict of processors to go over when processing images.
+        They can be named anything for reference"""
+
+    def __str__(self):
+        if self.pfs_offset is None:
+            pfs = "None"
+        else:
+            pfs = "%.2f"%self.pfs_offset
+        return """
+        Position object - number %d
+        x = %.2f, y = %.2f, z = %.2f, pfs offset = %s
+        """%(
+        self.number,self.xy[0],self.xy[1],self.z,pfs)
+
+    def _serialize(self):
+        """
+        Serialize to save to JSON
+
+        Returns
+        -------
+        dict
+            serialized key value pairs
+
+        """
+
+        o = self.__dict__.copy()
+
+        # Print non-serializable elements:
+        o["platform"] = str(self.platform)
+        o["processors"] = []
+        for p, processor in enumerate(self.processors):
+            o["processors"].append(str(processor))
+
+        return o
+
+    def _msg(self, msg, clock=True):
+
+        msg = "Position %d - "%self.number +msg
+        if clock:
+            msg = time.ctime() +", "+ msg
+
+        return msg
+
+    def check(self):
+        """
+        Check that settings are compatible
+
+        Returns
+        -------
+        None.
+
+        """
+
+
+        for name, processor in self.processors.items():
+            # Check processor:
+            processor.check()
+
+    def preprocess(self, first_images):
+        """
+        Preprocessing for image processors:
+
+        Parameters
+        ----------
+        first_images : 2D numpy array or List of 2D arrays
+            First image(s) for processors pre-processing.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # pre-process:
+        for name, processor in self.processors.items():
+            print(self._msg("Preprocessing %s"%name))
+            processor.preprocess(first_images)
+
+    def process_images(self, images : List,  channels : List[ChannelSettings]):
+        """
+        Send images to processors
+
+        Parameters
+        ----------
+        images : list of 2D numpy arrays
+            Images to dispatch to the processors.
+        channels : List[ChannelSettings]
+            List of channels corresponding to the images.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # Simply send to processor:
+        for name, processor in self.processors.items():
+            for image, channel in zip(images, channels):
+                processor.new_image(image, channel.name)
+
+    def stimulation_image(self, color):
+        """
+        Retrieve stimulation image for specified color
+
+        Parameters
+        ----------
+        color : str
+            Color of the DMD image to retrieve.
+
+        Returns
+        -------
+        image : 2D numpy array of uint8
+            Stimulation image.
+
+        """
+
+        stim = self.processors["controller"].stimulation(color)
+
+        if stim is None:
+            self._msg("Feeding zero image")
+            stim = np.zeros(shape = self.platform.dmd.shape, dtype = np.uint8)
+
+        return stim
+
+    def record_z(self):
+        """
+        Record Z position over time
+
+        Returns
+        -------
+        None.
+
+        """
+
+        self.z = self.platform.where()['z']
+        self.z_history["time"].append(time.time())
+        self.z_history["value"].append(self.z)
+
+    def reset(self):
+        """
+        Reset Position (for example to restart an acquisition)
+
+        Returns
+        -------
+        None.
+
+        """
+
+        # Resetting z_history (and maintain z to latest value):
+        self.z_history = dict(
+            time=[self.z_history['time'][-1]],
+            value=[self.z_history['value'][-1]]
+            )
+
+        # Reset processors:
+        for processor in self.processors.values():
+            processor.reset()
+
+    def plot_z(self):
+        """
+        Plot focus history
+
+        Returns
+        -------
+        None.
+
+        """
+        plt.plot(
+            (np.array(self.z_history["time"])-self.z_history["time"][1])/3600,
+            self.z_history["value"]
+            )
+        plt.xlabel("time (h)")
+        plt.ylabel("Z value (um)")
+        plt.title(f"Z Focus, position {self.number}")

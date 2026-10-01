@@ -1,0 +1,84 @@
+"""Save bounded original source bytes and failures; acquisition is not qualification."""
+from __future__ import annotations
+
+import argparse
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import sys
+import urllib.error
+import urllib.request
+
+
+def digest(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(4 << 20), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
+def acquire(source: dict, out: Path) -> dict:
+    name = source["id"]
+    if not name.replace("_", "").isalnum() or not source["url"].startswith("https://"):
+        raise ValueError("safe source ID and HTTPS required")
+    path = out / (name + ".raw")
+    receipt = dict(source, started_at_utc=datetime.now(timezone.utc).isoformat(), error=None)
+    try:
+        request = urllib.request.Request(source["url"], headers={"User-Agent": "MAESTRO-state-source-review/2.0"})
+        try:
+            response = urllib.request.urlopen(request, timeout=45)
+        except urllib.error.HTTPError as exc:
+            response = exc
+        with response, path.open("xb") as stream:
+            receipt.update(status=response.status, final_url=response.url,
+                           headers={k: v for k, v in response.headers.items()
+                                    if k.lower() in {"content-type", "content-length", "etag", "last-modified"}})
+            remaining = source.get("max_bytes", 8 << 20) + 1
+            while remaining:
+                block = response.read(min(1 << 20, remaining))
+                if not block:
+                    break
+                stream.write(block)
+                remaining -= len(block)
+        if path.stat().st_size > source.get("max_bytes", 8 << 20):
+            receipt["error"] = "byte_limit_exceeded_partial_source"
+        elif receipt["status"] != 200:
+            receipt["error"] = "http_status"
+    except (OSError, urllib.error.URLError) as exc:
+        receipt["error"] = type(exc).__name__ + ": " + str(exc)
+    receipt.update(finished_at_utc=datetime.now(timezone.utc).isoformat(), path=path.name)
+    if path.exists():
+        receipt.update(sha256=digest(path), bytes=path.stat().st_size)
+    return receipt
+
+
+def run(plan_path: Path, out: Path) -> list[dict]:
+    plan = json.loads(plan_path.read_text(encoding="utf-8"))
+    sources = plan["sources"]
+    if len({s["id"] for s in sources}) != len(sources):
+        raise ValueError("duplicate source IDs")
+    out.mkdir(parents=True, exist_ok=False)
+    (out / "plan.json").write_bytes(plan_path.read_bytes())
+    (out / "execution_source.py.txt").write_bytes(Path(__file__).read_bytes())
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        receipts = list(pool.map(lambda source: acquire(source, out), sources))
+    (out / "receipts.json").write_text(json.dumps(receipts, indent=2) + "\n", encoding="utf-8")
+    (out / "execution.json").write_text(json.dumps({
+        "command": [sys.executable, *sys.argv], "python": sys.version,
+        "source_sha256": digest(Path(__file__)), "plan_sha256": digest(plan_path),
+        "successful": sum(r["error"] is None for r in receipts), "sources": len(receipts),
+        "model_inference": False, "qualification": "not_assessed_by_downloader",
+    }, indent=2) + "\n", encoding="utf-8")
+    return receipts
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--plan", type=Path, required=True)
+    parser.add_argument("--out", type=Path, required=True)
+    args = parser.parse_args()
+    result = run(args.plan, args.out)
+    print(json.dumps({"sources": len(result), "failures": [r["id"] for r in result if r["error"]]}))

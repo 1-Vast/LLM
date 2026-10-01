@@ -30,6 +30,8 @@ The live DeepSeek/Jev validation, report-only defect auditor and general contrac
 [research/dual_core_live/README.md](research/dual_core_live/README.md).
 The next real predecision-state data audit and acquisition plan are indexed in
 [tools/datasets/STATE_IDENTIFIABILITY.md](tools/datasets/STATE_IDENTIFIABILITY.md).
+The subsequent public-source search, raw relation construction and collection specification are in
+[the October 1 continuation](log/20261001/README.md#15-public-source-search-and-relation-construction-after-3923541).
 
 ## Run
 
