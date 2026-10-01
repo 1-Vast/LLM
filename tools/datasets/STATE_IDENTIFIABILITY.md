@@ -1,5 +1,14 @@
 # Real predecision-state audit
 
+The [October 1 evidence addendum](../../log/20261001/README.md#16-independent-review-of-the-supplied-state-evidence-report)
+restores Cycloop original controller-log replay and corrects the Gross control
+wells. The older `two_measured_actions_per_question` contract applies to a
+matched sister-sample panel only. Randomized policy arms and randomized action
+logs have separate identification contracts in `state_evidence_followup.assess`.
+They require authenticated assignment/support, real endpoints and complete
+attempt denominators; an alternative action need not be observed on the same
+physical cell. This correction qualifies no current task for STATE efficacy.
+
 The 2026-10-01 audit stops at stage 1: **zero qualified state-gain tasks**.
 Twelve local task families and three new public candidates fail temporal
 availability and/or state-to-response matching. Reconstructed historical

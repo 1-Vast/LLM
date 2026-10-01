@@ -787,3 +787,152 @@ of the staged checkout without the optional bulk archive has **28 passed and
 1 explicit bulk-download skip** in the source/builder contracts. Published
 small-source and frozen-output hashes pass in that clean export. No new
 scientific inference or efficacy comparison was run.
+
+## 16. Independent review of the supplied STATE evidence report
+
+This addendum starts from published commit `e283beb97676c2c0d520bd092ba0100bfe412eb0`.
+The user supplied `research/STATE_evidence_research_20261001.html` and its ZIP.
+The package SHA256 is
+`7bf0e922d3aab39bdd5266539e71133c90e551e5fa43a314a5429b4b5e53784e`.
+All nine manifest-listed package members match their hashes. Four original MAT
+hashes and the replay/linkage summary counts agree with our independent downloads
+and implementation. The supplied script was inspected but not executed. Its
+64-passed/1-skipped receipt remains an attributed historical result, not our run.
+
+### 16.1 New evidence and the remaining identification gaps
+
+Eleven pinned original files were freshly acquired in
+`tools/datasets/audit_results/20261001_state_evidence_sources` and
+`20261001_state_evidence_protocol`: four Cycloop Output_data MAT files,
+controller, estimator, main loop, fake controller and cell updater, DeepCellControl
+utilities, and the pinned STATE infer source. All requests succeeded. Receipts
+retain original URLs, commit versions, start/completion times, sizes and SHA256.
+Cycloop files also match the original Git blob identities recorded in the earlier
+fixed repository tree. Third-party originals stay local and are reacquirable;
+their redistribution license is not inferred from article licensing. Deep code
+license is linked to the previously acquired MIT receipt. No data were converted
+into observed counterfactual outcomes.
+
+| Original experiment | Records | Replayed / matching actions | Wrong same-row-reference mismatches |
+| --- | ---: | ---: | ---: |
+| FIG4_fghij_RefOsc_I | 500 | 450 / 450 | 32 |
+| FIG4_pqrst_RefOscG | 500 | 250 / 250 | 28 |
+| SFIG8_abcde_RefOsc_II | 500 | 250 / 250 | 20 |
+| SFIG8_fghij_RefOsc_III | 500 | 250 / 250 | 23 |
+| Total | 2,000 | 1,200 / 1,200 | 103 |
+
+`ctrlRefOsc.m` computes `sum(sin(Theta-Theta_r)*(Theta<0.4*2*pi))`,
+chooses 0 for a nonnegative sum and 1 otherwise, then integrates and saves the
+updated reference. The main loop initializes the reference at zero, calls the
+controller before `mvSRNGS`, then acquires and tracks the next image. This proves
+a source-code partial order, not original runtime-code identity or an actuator
+acknowledgement. The estimator consumes history through MATLAB frame `ITR-1`.
+Decision rows use the preceding reference, preserve original one-based source
+row, raw file hash, native labels and null QC/cost/actuation/batch fields. Two
+minutes is a sampling setting, not a measured per-decision processing latency.
+The 200 calibration and 600 nonfinite/missing-reference or nonfeedback records
+remain explicit and unscored.
+
+All 245,657 postcalibration native-label mentions resolve to a deposited tracking
+object with the preceding frame. 239,793 have finite fluorescence at the current
+frame; 5,864 do not. These are repeated references to objects, not independent
+cells, physical repeats, biological deaths or assay failures. Parent fields in
+tracking objects do not certify independent culture batches. Binary action
+agreement does not prove equality of the continuous online state. Cycloop is
+now **partially recovered online replay**, still not an identified policy-value
+comparison: deterministic conditional action support, complete enrollment,
+execution, QC, cost, interference and independent culture relations remain gaps.
+
+DeepCellControl utilities confirm random +/-1 increments followed by recursive
+clipping and thresholding, several parameter groups and shuffled sequences.
+The training acquisition adds initial stimulation and reference-group handling.
+Final stimuli are not iid Bernoulli(1/2). Generator parameters, shuffled row/group
+allocation and native chamber mappings must be authenticated before estimating
+conditional propensities. Optical neighborhood interference and shared media
+remain unresolved. No IPW/DR estimator or modified-history trajectory was run.
+
+Gross control prose in the mutable review was wrong: **A1, A3, A5** are untreated;
+B1/C1 are BEZ235. We corrected that one string and recorded old/new review hashes
+in `20261001_state_evidence_certification/gross_erratum.json`. Frozen v2-v4 review
+copies remain unchanged. The earliest deposited time remains 300 minutes after
+treatment, so eligibility does not change. Microtrench gaps remain unchanged;
+this focused follow-up is not an exhaustive new literature search.
+
+### 16.2 Comparison contracts and STATE input certification
+
+The original `state_search_build.assess` is a historical **sister-panel** gate,
+not a general requirement to observe both potential outcomes on the same cell.
+`state_evidence_followup.assess` now separates randomized complete-policy arms,
+randomized action logs and randomized parent/sister panels. Each requires
+source-backed legal state, linkage, real endpoints, complete attempt denominator,
+QC, resource rules, interference treatment and physical-batch mapping. Each
+design adds its own assignment, coverage/support or matched-control requirements.
+Unknown or unsupported declarations fail. Credible predeclared cost bounds can
+yield only utility intervals after the other requirements pass; unknown failure
+denominators or unbounded costs still yield replay only. These software contracts
+require scientific source review; a boolean is not automated causal certification.
+No current source passes any applicable comparison branch. A data comparison
+also does not certify a particular checkpoint's input or exposure history.
+
+The local installed STATE `_infer.py` is byte-identical to upstream commit
+`9bbfe78a434a55205e4de834e1ea99f85f7a3add` and already has `--tsv`,
+`--all-perts`, and `--virtual-cells-per-pert`. Forward basal values are sampled
+from controls. However, the implementation can fall back to global controls or
+control perturbation encoding, and can leave rows unchanged without controls.
+A prospective wrapper must reject these cases explicitly. Virtual query rows
+are prediction requests, never measurements or failed/valid experimental results.
+
+The recorded checkpoint remains `state_generalization_zeroshot_X_hvg`, weights
+SHA256 `2c9b2e74f59c2fdde73e77c3eec8a8ed26a00e5237d2b5bb3b02122475f623a3`,
+ordered 2,000-gene log1p RNA, registered NCI-H596/Tahoe c39 context. This round
+reviews source statically; it does not reload or rehash the weights. Actual
+training condition/outcome exposure remains unknown. New baseline preprocessing,
+checkpoint compatibility with prospective samples and the frozen blind reference
+pool remain uncertified. Identical-baseline equality and query-expression/future-
+outcome replacement invariance tests have **not run**. No real-checkpoint forward,
+state-benefit calculation, calibration, selector comparison or wet-lab collection
+was performed. Fluorescence controllers and other world models were not substituted
+for STATE. These limitations are explicitly recorded in `state_input_review.json`.
+
+The executable minimal RNA collection specification remains
+`tools/datasets/state_collection_20261001`: independent parent culture, baseline
+aliquot, processing/readability completed before decision, randomized sister
+aliquots, full failures/QC/endpoints/time/cost and batch-level splits. Before
+confirmation, pilot development data must establish whether state changes action
+ranking; improved response prediction alone may leave a dominant action unchanged.
+Information comparisons pay the same state/waiting costs in both arms; deployment
+value also accounts for the blind strategy's avoided acquisition/processing cost.
+Three pilot batches establish feasibility, not confirmatory power or precision.
+
+### 16.3 Runs, failures and reproduction
+
+Independent saved results: `20261001_state_evidence_replay_v3/summary.json` and
+`decisions.jsonl`; provenance and outputs have separate hashes. The first run
+incorrectly selected controller text through a broad MAT glob; the second rejected
+nonfinite references saved by `fakeCTRL`. Both partial outputs and exact builder
+snapshots remain in fresh directories. The successful version explicitly excludes
+nonfinite-reference records from controller replay rather than imputing them.
+Failure receipts are in `20261001_state_evidence_certification/execution_failures.json`.
+
+Our maestro run: **132 related tests passed, zero failed or skipped**. This includes
+design-specific eligibility, missing source evidence, zero support, unknown attempt
+denominators, reference timing, saved reconstruction integrity, Gross correction
+and registered wrapper regression checks. `20261001_state_evidence_verification`
+contains command, XML, stdout and historical integrity receipts. All 150 originally
+frozen audit files remain hash-identical. The supplied optional bulk-archive skip
+does not apply to this local run, where that earlier archive is available.
+Production `src` was not edited.
+
+```powershell
+& 'D:\anaconda\envs\maestro\python.exe' tools/datasets/state_search_acquire.py --plan tools/datasets/state_evidence_sources_20261001.json --out tools/datasets/audit_results/evidence_sources_new
+& 'D:\anaconda\envs\maestro\python.exe' tools/datasets/state_search_acquire.py --plan tools/datasets/state_evidence_protocol_20261001.json --out tools/datasets/audit_results/evidence_protocol_new
+& 'D:\anaconda\envs\maestro\python.exe' tools/datasets/state_evidence_followup.py --raw tools/datasets/audit_results/evidence_sources_new --protocol tools/datasets/audit_results/evidence_protocol_new --out tools/datasets/audit_results/evidence_replay_new
+& 'D:\anaconda\envs\maestro\python.exe' tools/datasets/state_evidence_bundle_review.py --bundle research/STATE_evidence_research_20261001.zip --independent tools/datasets/audit_results/evidence_replay_new --receipts tools/datasets/audit_results/evidence_sources_new/receipts.json --out tools/datasets/audit_results/evidence_bundle_new
+& 'D:\anaconda\envs\maestro\python.exe' -m pytest -o addopts= -q tests/test_state_evidence_followup.py tests/test_state_search_build.py tests/test_state_identifiability.py tests/test_state_public_review.py tests/test_state_adapter.py tests/test_state_runner_paths.py tests/test_condition_response_modes.py tests/test_input_basis_identity.py tests/test_repository_shape.py
+```
+
+No qualified STATE task was found. Whether state improves prediction, changes
+selected actions or improves terminal utility remains **unidentified / untested**,
+not a measured zero or negative effect. Positive results here concern reproducible
+controller-log consistency for the four pinned yeast experiments and source/interface
+evidence only. They make no efficacy claim for those experiments or any STATE checkpoint.

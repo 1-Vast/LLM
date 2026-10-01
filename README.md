@@ -32,6 +32,9 @@ The next real predecision-state data audit and acquisition plan are indexed in
 [tools/datasets/STATE_IDENTIFIABILITY.md](tools/datasets/STATE_IDENTIFIABILITY.md).
 The subsequent public-source search, raw relation construction and collection specification are in
 [the October 1 continuation](log/20261001/README.md#15-public-source-search-and-relation-construction-after-3923541).
+The supplied evidence report and its independent replay, control-well erratum,
+and design-specific contracts are indexed in
+[the evidence addendum](log/20261001/README.md#16-independent-review-of-the-supplied-state-evidence-report).
 
 ## Run
 
