@@ -157,7 +157,7 @@ def _project_markdown():
 
 
 def test_project_markdown_has_no_chinese_prose():
-    """Current project markdown is English-only; four immutable reports are isolated.
+    """Current project markdown is English-only; nine immutable reports are isolated.
 
     No Chinese term glosses, headings, table cells, or prose are allowed. The
     Outside the content-bound historical manifest, tolerated CJK is inside an inline code span or a path-like
@@ -182,7 +182,7 @@ def test_project_markdown_has_no_chinese_prose():
 
 
 def _historical_markdown_exemptions():
-    """Preserve four immutable historical records; new prose remains English-only."""
+    """Preserve nine immutable historical records; new prose remains English-only."""
     manifest = json.loads((ROOT / "tests/fixtures/historical_markdown.json").read_text(encoding="utf-8"))
     for name, record in manifest["files"].items():
         path = ROOT / name
@@ -194,7 +194,7 @@ def _historical_markdown_exemptions():
 
 
 def test_historical_language_exemptions_are_content_bound():
-    assert len(_historical_markdown_exemptions()) == 4
+    assert len(_historical_markdown_exemptions()) == 9
 
 
 def test_tracked_markdown_is_never_empty():

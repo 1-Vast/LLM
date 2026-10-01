@@ -936,3 +936,181 @@ selected actions or improves terminal utility remains **unidentified / untested*
 not a measured zero or negative effect. Positive results here concern reproducible
 controller-log consistency for the four pinned yeast experiments and source/interface
 evidence only. They make no efficacy claim for those experiments or any STATE checkpoint.
+
+## 17. Real STATE input certification and autonomous public-knowledge prediction
+
+This continuation starts from clean HEAD `1d8c9440070b77f43094c9f5da81d3f88a3964f4`
+on `codex/state-prospective-certification-20261001`. The supplied AGENTS.md
+instructions govern the work; there is no on-disk root AGENTS.md. Sections 15/16
+remain historical records. The new Chinese report, raw-source receipts, failures,
+freezes, software and numerical results are indexed in
+[the prospective-input and knowledge report](../../tools/datasets/audit_results/20261001_state_prospective/REPORT.md).
+
+### 17.1 Environment and actual STATE forwards
+
+All core work ran with verified `D:\anaconda\envs\maestro\python.exe`, Python
+3.11.16, torch 2.7.0+cu126. Only `pyarrow==21.0.0` was added to read original
+Parquet metadata; before/after environment and installation receipt are saved.
+Actual STATE forwards ran on CPU. Production `src` was not changed.
+
+The registered `state_generalization_zeroshot_X_hvg` weight was freshly hashed:
+`2c9b2e74f59c2fdde73e77c3eec8a8ed26a00e5237d2b5bb3b02122475f623a3`.
+Configuration, exact perturbation mapping, input asset, axis and installed source
+hashes were checked. **Addendum to section 16.2:** the axis has 2,000 ordered
+coordinates, only 1,969 with authenticated gene names; 31 remain unresolved.
+The original feature registry already recorded nulls. No historical artifact was
+rewritten. New raw RNA preprocessing must still refuse incomplete identity or
+normalization provenance. Actual checkpoint training exposure remains unknown;
+its filename and an evaluator split do not establish zero-shot generalization.
+
+The strict research wrapper rejects unknown perturbations, missing controls,
+wrong context/feature order, global-control fallback and observed-response rows
+inside prediction requests. The fixture uses 30 existing NCI-H596 plate1 controls,
+two exact Trametinib dose codes and 16 virtual requests per dose. These are
+historically exposed development assets, without certified predecision availability.
+The identical blind input tests software symmetry, not an independent reference pool.
+
+Two preserved certification versions each made four successful inference requests
+and 12 real checkpoint forwards. The final version added a future-file read guard.
+The same-baseline, query-placeholder replacement and independent future-sentinel
+replacement comparisons all gave **bitwise equality, maximum difference 0**.
+Each version also made one actual missing-checkpoint request, correctly recorded
+as invalid prediction/invalid experiment. Total successful forwards: 24; physical
+experimental attempts: zero. Costs remain unknown. This is limited technical
+certification, not biological state-gain evidence.
+
+### 17.2 New original evidence and minimum collection
+
+The bounded public search made 83 requests: 70 full successes and 13 failed/partial
+requests, all retained. Fourteen successful Europe PMC queries were followed to
+original papers, GEO sample metadata, pinned code, official annotations and
+protocols. No external model API was called. Costs are unknown.
+
+Six new sources were reviewed: Live-seq, two ReSisTrace studies, Rewind,
+ClonMapper and NanopoReaTA. None supports an identified prospective state-value
+comparison under the required design. ReSisTrace is the closest RNA sister panel;
+processed-state availability, drug allocation, independent cultures, complete
+failures and costs remain gaps. Live-seq's public protocol puts just RT plus PCR
+extension at >=234 minutes, beyond its 30-90 minute biopsy-to-LPS window. Rewind
+uses future resistant barcodes to identify baseline cells retrospectively. These
+are specific evidence limitations, not a rule requiring both potential outcomes
+on one cell. Two additional search leads remain unreviewed, not falsely excluded.
+
+[Five relation templates and collection instructions](../../tools/datasets/audit_results/20261001_state_prospective/collection/README.md)
+cover independent parents, baseline RNA, completed/readable processing, decision,
+randomized sister aliquots, two actions plus vehicle, waiting drift, all failures,
+QC, endpoints and costs. Structural validation is explicitly insufficient for
+scientific qualification. Pilot acceptance and power-design parameters are given;
+no physical confidence interval or invented confirmatory sample size is reported.
+
+### 17.3 Autonomous knowledge became an actual retrospective model
+
+Following the user's expanded direction, the agent retrieved and versioned public
+Tahoe target/context annotations, TxPert's public GO graph, ChEMBL and UniProt
+mechanism evidence. The published TxPert checkpoint was not run: its K562 genetic
+perturbation route does not match these NCI-H596 drug-dose inputs. Private graph
+assets were not used. The separately named **PublicTargetGOKernel** uses numerical
+target and weighted GO-neighbor features in dose-interacted kernel ridge.
+Public access does not erase the TxPert assets' noncommercial EULA.
+
+A frozen retrospective evaluation covered 536 condition/plate groups, 160 drug
+names and 153 chemical identities on 14 assay plates, with 1,969 named genes.
+Five folds hold out whole plates and purge the same chemical identity from every
+training plate. The endpoint is equal-well mean RNA minus same-plate controls;
+held-out controls only define observed endpoints. All c39 data had historical
+exploration exposure. Plate independence is unknown. This is an A/C-like auxiliary
+knowledge comparison in delta space, not a full state-by-knowledge factorial.
+B/D state comparisons were not run.
+
+Chemical-macro MSE: dose-only 0.00955703; public targets 0.00996543;
+public targets plus GO 0.01000381; permuted GO 0.01019088; no-change 0.00848989.
+The primary GO model is **4.6749% worse than dose-only** on MSE; 66 chemical
+identities improve and 87 worsen. Calibration is poor. This is a negative point
+result for this retrospective implementation, not statistical evidence that
+knowledge, STATE or legal predecision state generally cannot help.
+
+An audited v1 permutation defect was fixed by shuffling only eligible drugs.
+Both versions are retained; cohort, hyperparameters and primary predictions are
+unchanged. Twenty held-out-outcome poisoning checks passed in the final run.
+No action-selection utility or deployment value was inferred from these predictions.
+
+### 17.4 Verification and scope
+
+The final unified maestro suite passed **162 tests, zero failures or skips**;
+command, XML, stdout, source hashes and syntax-check receipt are stored in the new
+audit directory. The 55 start-of-round historical files and the earlier 150-file
+frozen manifest remain hash-identical. Certification and knowledge-run manifests
+also verify. The log append is checked against HEAD as an unchanged byte prefix.
+
+Final review removed temporary signed CDN query parameters from three current-round
+receipt/summary JSON files; their before/after hashes are recorded separately.
+Raw downloads and all model outputs are unchanged. The downloader now omits
+redirect query/fragment, covered by an additional regression test. The earlier
+161-pass result and the initial failing delivery check are retained.
+
+Third-party originals and large matrices remain local with hashes and reacquisition
+plans; a scoped ignore file prevents default publication. No commit or push was
+made. Reproduction commands are in the report. The minimal collection still needs
+actual physical experiments and original event/lineage/cost records. Unknown
+checkpoint exposure, new RNA preprocessing and a legal independent blind baseline
+remain limitations. State predictive gain, action gain, terminal utility and net
+deployment value are **untested/unidentified**, not measured zero effects.
+
+
+## 18. STATE response research: raw reconstruction, state sensitivity and retrospective prediction
+
+This round continued from `1d8c9440070b77f43094c9f5da81d3f88a3964f4`, preserving existing work. The user-provided Karpathy guidelines were applied; no on-disk AGENTS.md was found. A/B/C/D hypotheses and verifiable conditions preceded input recovery, state sensitivity, retrospective prediction and knowledge-model diagnosis.
+
+The [complete report](../../tools/datasets/audit_results/20261001_state_response/REPORT.md) and [minimum collection addendum](../../tools/datasets/audit_results/20261001_state_response/collection_addendum.md) preserve original sources, freezes, failures and receipts in `20261001_state_response`. Earlier frozen results remain unchanged.
+
+### 18.1 Partial raw RNA reconstruction; full certification remains incomplete
+
+The correct official repository is `arcinstitute/ST-HVG-Tahoe`. Its pinned `generalization.toml` was obtained; failure to fetch the earlier incorrect `ST-Tahoe` name did not establish unavailability. Actual training exposure remains unknown; names and evaluator holdouts do not authenticate unseen data.
+
+Of 31 unresolved coordinates, 25 are zero throughout c39, each matching 26,097 zero genes. The other six each have only one nonzero cell and 2-5 exact candidates. Official code, notebooks, issues, PRs and another HVG checkpoint did not provide an authoritative ordered subaxis. No guessing, zero filling or coordinate deletion was used.
+
+A separate official checkpoint, `st-x-replogle-full/k562_0.99@48ad5f70215ab4c58caa5a68e77d837601d29d35`, has a complete 6,546-coordinate axis; weights SHA256 is `e616f13fc127d0c46ebfebfe21b2b1f12e7e1e63d65ed09230b41c5f96f6e15b`. Pinned HTTP Range reads and native barcodes linked 32 HepG2 raw UMI records to processed rows. CP10,000 over all 9,624 stored genes, log1p and the fixed axis reconstructed inputs with maximum error 4.7684e-7, passing the predefined input tolerance. Independent reacquisition reproduced arrays and axes exactly. Distinct Ensembl IDs for duplicated HSPA14 symbols were preserved.
+
+Two real loading failures exposed a modern transformers validator incompatible with the checkpoint's explicit head_dim64, hidden328 and 12-head geometry. A process-local adapter verified the eight layers' projections and preserved strict loading without modifying weights or dependencies. Two requests and six actual forwards succeeded.
+
+However, paired reconstructed/official-input predictions differed by up to 2.2650e-6 and failed predefined `atol=rtol=1e-6`. Dtype and operation-order diagnosis did not eliminate the difference; tolerance was not relaxed. A separate erratum corrects the overly broad v3 `technical_reconstruction: passed` label while preserving its original `paired_output_tolerance_pass:false`. The historical export recipe and full gene processing remain incomplete. The converter rejects general external RNA by default and permits only explicit research reconstruction. Partial input success is not complete prospective certification.
+
+### 18.2 STATE responds to state; selection changes mostly involve abstention
+
+The registered Tahoe weight SHA256 was rechecked as `2c9b2e74f59c2fdde73e77c3eec8a8ed26a00e5237d2b5bb3b02122475f623a3`. Metadata selected 30 NCI-H596 control cells from each of plate1/10/11. Three Trametinib doses, 16 queries per action and seeds 17/42/103 were fixed. The selector minimizes predicted mean EGR1 and abstains when the best two differ by at most 1e-6. Nine requests and 36 forwards succeeded. These are historical endpoint controls, not authenticated predecision states or independent cultures.
+
+Pool-pair RMS was 0.11723 versus within-pool seed RMS 0.10262, ratio 1.1423. Seven of nine pool comparisons changed selector output: one concrete action switch and six abstention changes. Within-pool seed comparisons also changed output in four of nine pairs. Every pool selected 5 uM after seed averaging. No stable state-specific ranking advantage was established. Same-context whole-pool permutation was evaluated. Biological accuracy, action correctness and physical utility were not measured; sensitivity is not predictive gain.
+
+### 18.3 Limited ReSisTrace retrospective prediction was executed
+
+Eight raw UMI files and eight metadata files, plus pinned author analysis, support queries for all deposited baseline groups. Pre-only `sisters` defines input; `prer_r_group` links measured descendants afterward. `drugSens` neither selects nor enters input. Missing descendants are not deaths. Destructive baseline aliquots and sister descendants are not same-cell longitudinal RNA.
+
+The independently named RidgeRNA model, not STATE or TxPert, trains on rep1 and uses rep2 as exploratory test. The 256 genes were selected using only rep1 pretreatment variance; alpha10 is fixed. The blind reference is the corresponding rep1 context baseline mean. Model family and budget match across visible/blind conditions. Permutation respects action and replicate; IDs, source rows, hashes, transforms, missingness and observed/predicted roles remain explicit.
+
+Carboplatin has 214/4,432 matched baseline groups (4.83%); growth control has 211/1,870 (11.28%). The 425 scoring units yield equal-context MSE: visible 0.466879, blind/context mean 0.261722, shuffled 0.637695 and no-change 0.520990. Visible error is approximately 78.39% higher than blind: a limited negative result for this auxiliary model. Outperforming shuffled inputs is not outperforming the strong baseline.
+
+The target is descendant RNA conditional on deposited, exactly matched follow-up, not all enrolled attempts. Culture independence and non-detection mechanisms are unknown. No physical CI, survival/death or causal drug-efficacy claim is made. Unknown decision-time readability does not prevent this limited retrospective task, but prevents prospective action-value claims. Action contexts were modeled separately, not treated as randomized alternatives for the same parent.
+
+### 18.4 Diagnose knowledge failure before nested development shrinkage
+
+Strong-baseline literature and existing public TxPert/control-matching evidence were reviewed; neither TxPert nor a larger graph was run. PublicTargetGOKernel lacks per-question state, pharmacological direction, potency and occupancy. Across 170 same-drug/dose plate pairs, response cosine median was 0.02195; GO/response similarity Spearman was 0.02787. These dependent pairs do not justify naive significance tests. Prediction magnitude cost exceeded useful alignment.
+
+The only improvement was a [0,1] shrinkage coefficient fitted on inner held-out predictions. Whole-plate outer folds and chemical-identity purging were preserved. The first three-inner-fold design had empty purged training support and failed; that freeze remains. Metadata-supported leave-one-plate-out inner folds then ran with equal budgets, 94 fits total. Outer outcomes did not select coefficients; because previous results informed diagnosis, this remains nested development validation.
+
+MSE: shrunk dose 0.00848447879, shrunk GO 0.00848443997, no-change 0.00848988964. GO minus dose differs by only 3.88e-8; MAE still loses to no-change. GO coefficients about 0.023-0.080 mainly remove prediction harm rather than demonstrate new knowledge contribution. No new confirmatory test, statistical claim, state input or action benefit was inferred.
+
+### 18.5 Environment, verification and remaining evidence
+
+Maestro used Python 3.11.16, torch2.7.0+cu126 and transformers5.17.0. No dependencies or production src were modified. Research code stays under tools/datasets. CPU execution is recorded despite available CUDA. This round recorded 15 local requests: 11 succeeded, four loading failures, 42 actual forwards. The original research verification passed 176 tests with zero failures or skips. It checks contracts and does not imply rerunning every earlier real-forward test. Preserved history includes 356 files/document prefixes and six run manifests.
+
+Public requests and Range blocks preserve bytes, failures, times, sizes and SHA. Fees are unknown; no external generative-model inference, researcher contact or purchases occurred. Public access does not automatically grant redistribution rights. No prospective action utility or deployment net value was identified. Minimum gaps are the RNA export/precision contract, independent development reference culture, real readable-state/decision/randomization/execution events, common endpoints and complete failure/QC/cost and culture mappings. Power-design inputs remain unknown.
+
+Coverage diagnosis retains all 1,296 condition/plate groups: 536 eligible and 760 excluded, including 743 without exact targets on the graph axis. Of 379 annotations, 264 have provider targets and 163 match graph genes. Egfr/ERBB2 annotations absent from the graph do not imply Afatinib has no known targets. Original coverage and negative results remain unchanged.
+
+### 18.6 Publication verification
+
+The navigation section above was translated into English for the repository language contract. Its complete original bytes are preserved in `20261001_state_publication/log_before_publication.md.txt`; original Chinese reports and frozen results are unchanged. Publication receipts retain the initial 175-pass/one-language-failure test run and subsequent repairs. Git attributes preserve frozen receipt bytes across checkout. This publication does not change scientific outcomes.
+
+Five frozen Chinese research documents are individually content-hash-pinned in the existing historical-language manifest; future prose remains subject to the English-only rule. No directory-wide exception or scientific threshold relaxation was introduced.
+
+Final publication regression: 176 tests passed, zero failures or skips. Frozen staged bytes match local originals; production src is unchanged. Publication validation receipts are in `20261001_state_publication`. Large original data and weights remain local and are reacquirable through pinned plans.

@@ -1,0 +1,70 @@
+{
+  "recorded_at_utc": "2026-10-01T13:43:43.626196+00:00",
+  "receipts": [
+    {
+      "stage": "paper_HTML_read",
+      "error_type": "ModuleNotFoundError",
+      "detail": "bs4 unavailable",
+      "repair": "Use standard-library HTMLParser; no package installation",
+      "timestamp": "unknown; reconstructed from execution transcript",
+      "original_trace_file": null
+    },
+    {
+      "stage": "official_Parquet_metadata_read",
+      "error_type": "ImportError",
+      "detail": "No available Parquet engine before minimal installation",
+      "repair": "Install pyarrow==21.0.0 in verified maestro; no other package changes",
+      "evidence": "dependency_receipt.json; pyarrow_install.txt",
+      "timestamp": "see dependency receipt; exact first failure time unknown"
+    },
+    {
+      "stage": "source_review_v2",
+      "error_type": "JSONDecodeError",
+      "detail": "A UniProt TSV query was mistakenly parsed as JSON literature-search output",
+      "repair": "Restrict JSON literature parsing to Europe PMC URLs; source_review_v3 completes",
+      "partial_outputs_retained": "source_review_v2",
+      "original_trace_file": null
+    },
+    {
+      "stage": "certification_v1/v2 missing_checkpoint",
+      "error_type": "nonzero actual STATE subprocess",
+      "detail": "Intentional nonexistent checkpoint; invalid prediction and invalid experiment",
+      "evidence": [
+        "certification_v1/missing_checkpoint/receipt.json",
+        "certification_v1/missing_checkpoint/stderr.txt",
+        "certification_v2/missing_checkpoint/receipt.json",
+        "certification_v2/missing_checkpoint/stderr.txt"
+      ],
+      "expected_failure": true
+    },
+    {
+      "stage": "knowledge_run_v1",
+      "error_type": "permutation control design defect",
+      "detail": "Permutation included uncovered drugs; zero graph features could weaken capacity comparator",
+      "repair": "Only permute the 160 eligible drug names. Cohort, primary fits and outputs unchanged.",
+      "evidence": "knowledge_control_correction.json",
+      "v1_retained": true
+    },
+    {
+      "stage": "public HTTP requests",
+      "error_type": "HTTP 500/401; TLS EOF; bounded partial downloads",
+      "detail": "13 failed/partial requests are in original timestamped receipts; no invented completion",
+      "evidence": "source_review_v3/api_summary.json"
+    },
+    {
+      "stage": "repository guidance file lookup",
+      "error_type": "FileNotFoundError-equivalent PowerShell path lookup",
+      "detail": "D:/MAESTRO/AGENTS.md absent on final recheck; supplied user AGENTS.md instructions apply",
+      "repair": "Use the instructions provided in conversation; do not invent an on-disk file"
+    },
+    {
+      "stage": "final delivery audit",
+      "error_type": "sensitive signed CDN URL query retained in public acquisition receipts",
+      "found_at_utc": "2026-10-01T13:44:44.295734+00:00",
+      "repair": "Strip redirect query/fragment in downloader; redact three receipt/summary files, retaining before/after hashes but no credential-bearing backup. Original public URLs, raw bytes and model outputs unchanged.",
+      "evidence": "receipt_url_redactions.json; final_integrity_before_url_redaction.json",
+      "regression": "tests/test_state_search_build.py::test_acquisition_does_not_save_signed_redirect_query"
+    }
+  ],
+  "note": "Entries without a saved original trace are retrospective execution notes, not fabricated timestamped raw receipts."
+}

@@ -1,0 +1,61 @@
+{
+  "module": "PublicTargetGOKernel",
+  "attribution": "Auxiliary research implementation using public Tahoe target annotations and the public GO graph supplied by TxPert. Not STATE, not a TxPert checkpoint replication.",
+  "automatic_identification": {
+    "context": "NCI-H596 from c39.obs.cell_name; official Tahoe metadata cross-links ACH-000628 and CVCL_1571",
+    "species": "human cell line, provider context annotation; not inferred from gene capitalization",
+    "genes": "1969 named coordinates frozen in the existing registered axis; 31 unresolved coordinates excluded from this auxiliary endpoint, not invented",
+    "actions": "single-drug dose tuples parsed with ast.literal_eval; exact provider drug-name matches only",
+    "chemical_groups": "RDKit FragmentParent + Uncharger, InChIKey connectivity block; salts grouped before outcome access",
+    "public_graph": "TxPert revision 08d82eea86746b044cf7531f4ec8c5f60e1cb73f, GO similarity graph, 9853 nodes/470783 weighted directed rows",
+    "metadata_revision": "Tahoe-100M 2dc57900b7981cfcf5e211527169a0b006546a95"
+  },
+  "facts_and_hypotheses": [
+    {
+      "statement": "Trametinib inhibits MEK1/2; MAP2K1 participates in the ERK1/2 cascade.",
+      "level": "public source-backed pharmacology/annotation",
+      "sources": ["knowledge_sources/chembl_trametinib_mechanism.raw: mechanisms[0], CHEMBL2103875/CHEMBL2111289 and linked FDA records", "knowledge_discovery/uniprot_map2k1.raw: Q02750, GO:0070371"],
+      "applicability": "target/pathway knowledge only; does not assert NCI-H596 dose-specific response or state gain"
+    },
+    {
+      "statement": "Provider cell metadata lists NCI-H596 PIK3CA p.E545K as gain-of-function, with RB1 and TP53 alterations.",
+      "level": "provider annotation, not new genotype measurement",
+      "source": "knowledge_sources/tahoe_cells.raw, cell_name=NCI-H596",
+      "hypothesis": "PI3K pathway state could modify sensitivity to pathway interventions, but genotype alone does not prove sensitivity or determine the best dose.",
+      "tested_this_round": false
+    },
+    {
+      "statement": "Drugs with similar annotated targets and GO neighborhoods may share transcriptional responses.",
+      "level": "mechanism-inspired statistical hypothesis",
+      "feature_realization": "sparse multi-target vectors; weighted one-step GO neighborhood expansion plus self edges; L2 row normalization; dose-interacted kernel ridge alpha=1",
+      "tested_this_round": true,
+      "result": "Retrospective GO model MSE exceeds the dose-only comparator by 4.6749%; it does not beat the no-change baseline. No superiority is claimed."
+    }
+  ],
+  "knowledge_quality": {
+    "all_drug_target_annotations_independently_validated": false,
+    "status": "provider-annotated drug targets with original row/hash trace; one mechanism chain independently checked via ChEMBL/UniProt",
+    "unused_fields": ["gpt-notes-approval", "human-approved", "clinical-trials", "test expression", "test perturbation outcomes"],
+    "unsupported_tokens": "retained in knowledge_rows.json; exact-match exclusions have reasons",
+    "graph_scope": "public TxPert GO subset does not cover all human drug targets; 743 deposited condition/plate groups lack an exact target in this graph",
+    "retrospective_exposure": "c39 was historically explored before this run; the new fold freeze does not erase that exposure"
+  },
+  "factorial_status": {
+    "A_vs_C": "auxiliary retrospective knowledge comparison with no per-question state features; predictions are control-centered expression deltas, training-only reference controls saved per fold",
+    "B_vs_A": "not_run: legal predecision RNA not certified",
+    "D_vs_C": "not_run: legal predecision RNA not certified",
+    "STATE_A_vs_B": "identical-baseline technical equality only, not biological efficacy",
+    "action_and_utility": "not_run / not_identified"
+  },
+  "TxPert_public_checkpoint": {
+    "readme_verified": true,
+    "public_checkpoint_archive": "Zenodo 15420279 checkpoints.zip, 291708781 bytes per registry; not downloaded",
+    "inference_calls": 0,
+    "reason": "Published checkpoints are gene-perturbation/K562 routes, not current NCI-H596 drug-dose queries. A separately named public-knowledge component implements the requested retrospective test without replacing maestro with TxPert's Python>=3.12/torch2.6 pinned environment.",
+    "private_assets": "PxMap and TxMap not used",
+    "license": "Recursion Non-Commercial End User License Agreement, original eight-page PDF and extracted text saved; not a permissive/open-source or commercial-use claim"
+  },
+  "data_license": "Official Tahoe metadata CC0-1.0, knowledge_sources/tahoe_license.raw",
+  "external_model_API_calls": 0,
+  "API_and_compute_cost": "unknown"
+}

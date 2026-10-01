@@ -14,6 +14,22 @@ from tools.datasets.state_search_build import (
 from tools.datasets.state_search_acquire import acquire, run
 
 
+def test_acquisition_does_not_save_signed_redirect_query(tmp_path, monkeypatch):
+    response = io.BytesIO(b"public fixture bytes")
+    response.status = 200
+    response.url = "https://cdn.example.invalid/object?Signature=fixture-secret&Expires=123"
+    response.headers = {"Content-Type": "application/octet-stream"}
+    monkeypatch.setattr("urllib.request.urlopen", lambda *args, **kwargs: response)
+    public_url = "https://example.invalid/public-file?revision=fixed"
+    receipt = acquire({"id": "signed_redirect", "url": public_url}, tmp_path)
+    assert receipt["error"] is None
+    assert receipt["url"] == public_url
+    assert receipt["final_url"] == "https://cdn.example.invalid/object"
+    assert receipt["final_url_query_omitted"]
+    assert "fixture-secret" not in json.dumps(receipt)
+    assert receipt["sha256"] == hashlib.sha256(b"public fixture bytes").hexdigest()
+
+
 def source_archive(tmp_path):
     path = tmp_path / "source.zip"
     # Immutable source-like software fixture, not a biological observation.

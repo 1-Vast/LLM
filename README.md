@@ -35,6 +35,9 @@ The subsequent public-source search, raw relation construction and collection sp
 The supplied evidence report and its independent replay, control-well erratum,
 and design-specific contracts are indexed in
 [the evidence addendum](log/20261001/README.md#16-independent-review-of-the-supplied-state-evidence-report).
+The real STATE input certification, public-knowledge retrospective prediction experiment,
+and executable collection templates are in
+[the prospective-input and knowledge report](tools/datasets/audit_results/20261001_state_prospective/REPORT.md).
 
 ## Run
 
@@ -49,3 +52,6 @@ python -m tools.evaluation.cli --help
 Dataset requirements and commands are in [tools/datasets/README.md](tools/datasets/README.md).
 Registered tool groups are in [tools/README.md](tools/README.md).
 Research status is indexed in [research/README.md](research/README.md).
+
+Raw RNA reconstruction, real STATE sensitivity and conditional retrospective state prediction are in
+[the STATE response research report](tools/datasets/audit_results/20261001_state_response/REPORT.md).
