@@ -1,0 +1,409 @@
+结论先行：当前框架在软件结构上确实是“双核心”，但在科学效果上还没有形成可证明的“双核心协同”。更准确的描述是：
+
+> **虚拟细胞世界模型负责生成有边界的预测，智能体负责把预测转化为动作、停止和证据更新；两者通过预测接口耦合，但没有形成端到端的联合决策闭环。**
+
+现有结果显示，主要问题不是模型规模不够，而是世界模型输出经过智能体后，尚未稳定改变动作，更没有稳定改变最终结论。
+
+---
+
+**一、当前双核心的实际结构**
+
+| 核心 | 代码位置 | 实际职责 | 当前限制 |
+|---|---|---|---|
+| 虚拟细胞世界模型 | world_model.py[`src/virtual_cell/world_model.py`](sandbox:/workspace/scratch/23cfc0dbed2f/repo/src/virtual_cell/world_model.py) | 判断查询是否受支持，生成状态或响应预测，返回不确定性与拒答信息 | 多个后端按注册顺序选择；预测输出主要是状态变化摘要 |
+| STATE 适配器 | state_runner.py[`src/virtual_cell/state_runner.py`](sandbox:/workspace/scratch/23cfc0dbed2f/repo/src/virtual_cell/state_runner.py) | 从对照和目标处理行构造查询，调用 STATE，验证输出 | 目标处理行必须已经存在，不能直接证明模型能预测完全未测的新处理 |
+| 研究型 WorldV2 | world3.py[`research/dual_core_v2/world3.py`](sandbox:/workspace/scratch/23cfc0dbed2f/repo/research/dual_core_v2/world3.py) | 对候选动作在不同假设下的 reading 结果进行预测 | 它是 reading-level forecast，不等同于生产路径中的 STATE |
+| 智能体 | orchestrator.py[`src/agent/orchestrator.py`](sandbox:/workspace/scratch/23cfc0dbed2f/repo/src/agent/orchestrator.py) | 形成假设、规划测量、选择动作、停止或修复、接收真实结果 | 初始规划先于世界模型查询；预测只在特定选择路径中真正影响动作 |
+| 研究型智能体实验臂 | arms.py[`research/dual_core_v2/arms.py`](sandbox:/workspace/scratch/23cfc0dbed2f/repo/research/dual_core_v2/arms.py) | 在同一菜单、预算和执行器下比较不同世界模型及风险政策 | 当前风险策略降低错误的同时也降低正确决策，没有证明 Pareto 改善 |
+
+这说明两个核心的训练目标和证据权限必须分开：
+
+- 世界模型的目标是预测质量、校准和适用范围；
+- 智能体的目标是动作效用、终局正确率、错误率、拒答率和实验成本；
+- 世界模型的预测不能直接成为科学证据；
+- 只有真实测量结果通过 QC 和解释规则后，才能进入证据状态。
+
+这一证据边界是正确的，应继续保留。
+
+---
+
+**二、当前最重要的发现不是“世界模型不够强”，而是“世界模型影响决策的链路很弱”**
+
+目前实际链路是：
+
+\[
+S \rightarrow \widehat{Y} \rightarrow \widehat{O} \rightarrow A \rightarrow R \rightarrow D
+\]
+
+其中：
+
+- \(S\)：决策前状态；
+- \(\widehat{Y}\)：世界模型预测的响应；
+- \(\widehat{O}\)：经过 reading 或 validator 转换后的预测结果；
+- \(A\)：智能体选择的动作；
+- \(R\)：真实实验结果；
+- \(D\)：最终机制结论。
+
+目前只能分别证明部分环节，不能把前一环节的改善自动解释为后一环节的改善。必须单独估计四种量：
+
+1. **响应预测质量**：预测向量、方向、幅度是否接近真实响应；
+2. **reading 预测质量**：预测是否能区分检测到、未检测到、歧义等结局；
+3. **动作价值**：预测是否改变了选择，并且改变后的动作更好；
+4. **终局价值**：最终正确、错误、拒答和成本是否改善。
+
+当前已有研究结果已经说明这种层级差异：
+
+- SciPlex3 上，理想响应信息能够改善 reading 层面的 log loss，但最终正确决策提升只有约 `0.008`，置信区间跨零；
+- L1000 上，理想响应信息对最终决策的提升约为 `0.002`，同样跨零；
+- WorldV2 与 reference 的最终决策差异接近零；
+- 2,951 个 episode 的首个动作没有出现差异；
+- 风险策略虽然减少了一部分错误，但 stop-only 明显损失正确决策，risk-select 没有得到更好的风险—覆盖率前沿。
+
+这些数字来自 README.md[`research/dual_core_v2/README.md`](sandbox:/workspace/scratch/23cfc0dbed2f/repo/research/dual_core_v2/README.md)，它们支持的结论是：
+
+> **当前任务的 validator、动作菜单和两步预算，已经把大部分决策收益压缩掉了。**
+
+因此，单纯继续优化 WorldV2、增加 planner 复杂度或扩大模型规模，预期收益很低。
+
+---
+
+**三、世界模型自身存在三个结构性问题**
+
+**第一，生产 STATE 和研究型 WorldV2 不能混称为同一个世界模型。**
+
+生产路径中的 STATE 主要产生条件级状态变化，例如 embedding shift、均值绝对变化和 L2 变化。研究型 WorldV2 则预测候选 reading 在不同假设下的结果。前者更接近响应后端，后者更接近决策模拟器。
+
+如果把两者合并报告，就会出现严重的归因错误：
+
+- STATE 的预测改善可能只是响应预测改善；
+- WorldV2 的改善可能来自 transfer、prompt 或 additive source；
+- agent 的动作改善还可能来自独立的 `outcome_forecaster`，而不是 STATE。
+
+现有 WorldV2 中 source 选择是混合的，已经有 transfer、transfer_dist、prompt、additive 和 off 多种来源。因此不能把所有收益都归因于某一个 checkpoint、STATE 或 rrt_q。
+
+**第二，`CompositeWorldModel` 的默认选择规则不具有科学可解释性。**
+
+当前 `predict()` 选择第一个满足条件的 backend，规则是：
+
+> first eligible backend in registration order
+
+这适合工程路由，不适合科学比较。只要注册顺序改变，得到的预测来源就可能改变。应调整为：
+
+- 单模型实验：每个实验臂只注册一个预先声明的 backend；
+- 多模型实验：保留所有预测，显式报告 disagreement；
+- 若要做 ensemble 或 arbitration，必须在训练折内学习，不能用测试 episode 决定；
+- 不确定性较大的模型分歧应触发 abstain 或降权，而不是静默选第一个。
+
+**第三，STATE 的“目标行依赖”尚未被解释清楚。**
+
+`state_runner.py` 会检查并复制目标处理行以及对照行。这里至少存在三种可能：
+
+1. 目标行只是为了确认该处理在数据资产中存在；
+2. 目标行的表达值实际参与了模型输入；
+3. 目标行的分组、批次或数量影响了结果。
+
+这三者的科学含义完全不同。
+
+必须做四组反事实测试：
+
+- 保持处理名称、批次和元数据不变，只替换目标表达矩阵；
+- 保持表达矩阵不变，改变目标行数量；
+- 保持表达矩阵不变，打乱目标行的 group/batch 标签；
+- 删除目标行，只保留对照，确认系统是否明确拒答。
+
+理想结果是：如果目标表达只是查询支持条件，改变目标表达不应改变预测；如果改变目标表达会改变预测，则该接口可能已经把干预后信息带入“预测前状态”。
+
+如果目标行缺失时系统拒答，这并不说明模型不能做新实验预测，只能说明当前接口没有为新处理定义可靠的输入协议。
+
+---
+
+**四、智能体目前并没有始终使用世界模型做动作决策**
+
+在生产路径中，`orchestrator.py` 的顺序是：
+
+1. planner 先提出初始 contrast；
+2. 再查询 world model；
+3. 再进行预算选择、review、repair 和 briefing。
+
+这意味着世界模型不是智能体初始推理的起点，而是后置的行动辅助信息。
+
+更关键的是，当前 `StatePrediction` 的使用方式存在明显的信息损失：
+
+- `_prediction_action_priorities()` 使用的是 `abs(state_change)`；
+- 方向被抹掉；
+- 哪个假设被支持或反驳没有直接进入优先级；
+- 预测优先级通常只作为覆盖率、成本和动作集合相同情况下的最后 tie-break；
+- 在 expected-coverage 路径中，预测优先级只记录，不主导选择；
+- 如果启用 discrimination selection，真正主导选择的是独立的 `outcome_forecaster`，而不是 STATE 输出。
+
+所以目前可能发生这种情况：
+
+> 世界模型预测很准，但它的输出没有真正进入动作选择；或者动作选择使用了 forecast，但 forecast 并非来自 STATE。
+
+这也是为什么必须逐步记录：
+
+- 哪个 backend 生成预测；
+- 预测是否可用；
+- 预测是否改变候选排序；
+- 排序改变后是否改变动作；
+- 动作改变后是否改变真实结局；
+- 最终结论是否改变。
+
+不能只比较“有 world model”和“无 world model”的总正确率。
+
+---
+
+**五、建议建立一个“双核心影响审计”，这是当前最有价值的创新研究**
+
+建议把整个系统改造成可做路径归因的实验，而不是继续做单一端到端 replay。
+
+定义：
+
+\[
+I_A = P(A_W \neq A_0)
+\]
+
+表示世界模型是否改变动作。
+
+\[
+I_D = P(D_W \neq D_0 \mid A_W \neq A_0)
+\]
+
+表示在动作确实改变时，动作是否改变了最终决策。
+
+\[
+\Delta U = E[U_W-U_0]
+\]
+
+表示世界模型相对基线的净效用变化。
+
+再定义世界模型和智能体的交互项：
+
+\[
+\Delta_{\text{interaction}}
+=
+(U_{W_1,A_1}-U_{W_0,A_1})
+-
+(U_{W_1,A_0}-U_{W_0,A_0})
+\]
+
+其中：
+
+- \(W_0\)：无世界模型或 reference world；
+- \(W_1\)：WorldV2 或候选新世界模型；
+- \(A_0\)：固定顺序或基线 planner；
+- \(A_1\)：world-aware planner 或 risk policy。
+
+这样才能区分：
+
+- 世界模型本身是否提供预测增益；
+- 智能体是否能利用这些增益；
+- 两者是否存在真正的协同；
+- 收益是否只是拒答率变化或动作成本变化。
+
+实验矩阵建议如下：
+
+| 世界模型 | 智能体策略 | 用途 |
+|---|---|---|
+| off | fixed | 基础决策基线 |
+| reference | baseline planner | 当前标准 |
+| WorldV2 | baseline planner | 测世界模型增益 |
+| diagnostic oracle | baseline planner | 仅测任务理论上限 |
+| reference | discrimination selection | 测智能体利用预测的能力 |
+| WorldV2 | discrimination selection | 测双核心交互 |
+| WorldV2 | risk-select | 测风险控制代价 |
+| WorldV2 | stop-only | 测单纯拒答代价 |
+
+所有臂必须固定：
+
+- episode 划分；
+- 动作菜单；
+- 合法性；
+- 测量预算；
+- QC 规则；
+- 成本；
+- 终点评分；
+- 拒答规则；
+- 随机种子和 planner 提示版本。
+
+当前 case-memory 和 e_data1 中 fixed、oracle、空序列与非空序列存在不对称，必须在此实验前彻底修正，否则 \(I_A\)、\(I_D\) 和 \(\Delta U\) 都不能解释。
+
+---
+
+**六、必须加入三种反事实干预，验证到底是“预测有效”还是“代码路径有效”**
+
+第一种是 **forecast swap**：
+
+- 固定相同 episode、历史和 planner；
+- 只替换 world forecast；
+- 比较 off、reference、WorldV2、置换 forecast、常数 forecast。
+
+如果 WorldV2 和置换 forecast 的动作影响相同，说明 agent 可能没有使用 forecast 内容。
+
+第二种是 **policy swap**：
+
+- 固定完全相同的 world forecast；
+- 只替换 fixed、baseline planner、discrimination selection、risk-select；
+- 比较动作与终局。
+
+这样可把智能体政策收益与世界模型收益分开。
+
+第三种是 **timing intervention**：
+
+- 当前路径：先 planner，再查询 world model；
+- 新实验臂：先生成所有候选动作的 world forecast，再让 planner 形成 contrast；
+- 比较第一步动作是否开始出现变化。
+
+如果把查询提前后仍然没有动作变化，说明是任务 headroom 或 forecast 表达问题；如果提前查询后才有变化，说明原有顺序造成了桥接延迟。
+
+这三种干预比再增加一个 planner 更有价值，因为它们直接检验双核心之间的因果路径。
+
+---
+
+**七、世界模型输出应从“变化幅度”改成“动作—假设区分价值”**
+
+当前使用 `abs(state_change)` 作为动作优先级，最多只能回答：
+
+> 哪个动作可能变化得更大？
+
+但智能体真正需要的是：
+
+> 哪个动作最可能区分当前竞争假设，并且值得付出测量成本？
+
+建议未来定义动作级结构化预测：
+
+\[
+p(o \mid a,h,s)
+\]
+
+其中：
+
+- \(a\)：动作；
+- \(h\)：竞争假设；
+- \(s\)：决策前状态；
+- \(o\)：validator 可解释的 reading 结果。
+
+再计算动作的期望决策价值：
+
+\[
+V(a)
+=
+E_{o\sim p(o|a,h,s)}
+[
+U(\text{posterior update},o)
+]
+-
+C(a)
+\]
+
+其中 \(U\) 应由终局正确、错误、拒答和成本共同定义。
+
+世界模型至少应分别输出：
+
+- response direction；
+- response magnitude；
+- reading class probability；
+- interval 或 calibrated uncertainty；
+- supporting hypothesis；
+- contradicting hypothesis；
+- support boundary；
+- backend/source lineage。
+
+方向性读数可以作为后续实验，但不能直接把完整向量交给 planner。必须先定义从向量到 reading、从 reading 到假设更新的规则，否则只是把信息损失推迟到更深的模块。
+
+---
+
+**八、状态增益实验必须与动作价值实验分开**
+
+如果动作可比较性审计通过，状态增益实验应设置至少三组：
+
+| 条件 | 含义 |
+|---|---|
+| state-free | 只用上下文、动作菜单和历史 |
+| true pre-action state | 使用真实决策前状态 |
+| context-preserving permutation | 在相同细胞系、批次、板等层级内置换状态 |
+
+可额外加入：
+
+- post-treatment state negative control；
+- control-only query；
+- target-row expression mutation；
+- batch-preserving 与 batch-breaking permutation。
+
+评价不能只看 NLL：
+
+1. 状态是否改善 response/reading 预测；
+2. 是否改变所选动作；
+3. 是否改善 terminal utility；
+4. 是否改变错误率与拒答率；
+5. 是否改善被选动作上的校准。
+
+如果真实状态优于无状态，但与保持上下文的置换状态相同，说明模型利用的是细胞系、板或批次身份，而不是可泛化的生物状态。
+
+如果真实状态改善 NLL，却不改变动作或终局，则只能称为“预测增益”，不能称为“决策增益”。
+
+如果干预后表达谱能够显著改变所谓的“初始状态预测”，则应阻止该接口进入真实决策前状态实验，因为它存在时间泄漏风险。
+
+---
+
+**九、智能体风险模块需要从“步骤风险”改成“条件终局风险”**
+
+当前 risk-select 和 stop-only 的风险主要绑定在单步错误预测上，但智能体真正关心的是：
+
+\[
+P(\text{final wrong}\mid
+\text{selected action},\text{current evidence},\text{remaining menu})
+\]
+
+两者不是同一个量。
+
+建议重新定义风险数据集：
+
+- 单位是独立实验单位，而不是 cell 或 well；
+- 条件包含当前证据状态和剩余动作菜单；
+- 标签是最终错误、正确或拒答；
+- 风险只在真实选中动作上评分；
+- calibration 必须用 nested split；
+- 所有风险阈值只在校准折选择；
+- 测试折不能参与阈值修正。
+
+风险策略必须按匹配覆盖率比较：
+
+- wrong among decided；
+- correct among decided；
+- abstention；
+- measurement cost；
+- terminal utility。
+
+在风险前沿没有改善前，risk-select 只能作为研究臂，不能成为默认政策。
+
+---
+
+**十、明确的继续或停止判定**
+
+| 审计结果 | 结论 |
+|---|---|
+| 关键动作缺少真实可比较结局 | 不能报告策略价值，只能报告预测或描述性回放 |
+| 统一评分后 oracle 收益区间跨零 | 当前任务不适合继续优化 planner/world model，应重设计动作菜单或 validator |
+| 世界模型预测改善，但 \(I_A\) 接近零 | 桥接接口或动作排序失效，不应扩大世界模型 |
+| \(I_A\) 明显，但 \(I_D\) 接近零 | 动作虽改变，validator 或任务终点无法利用动作差异 |
+| 动作和终局都改善，但只通过拒答实现 | 需要报告 matched-coverage frontier，不能宣称一般性提升 |
+| 真实状态与置换状态无差异 | 不能声称用户状态提供增量价值 |
+| 被选动作没有可重建预测—实测配对 | 只能描述性使用，不能声称校准可靠 |
+| target-row mutation 改变预测 | 暂停状态决策通道，先处理输入泄漏或时间边界 |
+| 只有 response NLL 改善，没有 action/decision 改善 | 结论限于预测层，不进入 agent 默认策略 |
+
+收益区间跨零时，结论应写成“当前数据无法判定”，不能写成模型有效或无效。
+
+---
+
+因此，当前最合理的研究顺序是：
+
+1. 先完成动作来源、对照、QC、独立单位和统一评分审计；
+2. 构建双核心影响审计，分离预测、动作、终局和风险四类增益；
+3. 用 forecast swap、policy swap 和 timing intervention 验证世界模型是否真正影响智能体；
+4. 对 STATE 做目标行依赖和决策前状态泄漏测试；
+5. 只有在任务有 oracle headroom、动作结果可比较、状态时间有效时，才进行状态增益实验；
+6. 最后才考虑方向性 reading、新 planner 或更复杂的风险策略。
+
+当前最值得保留的资产是智能体的证据纪律、WorldV2 的 nested lineage 和明确拒答机制。当前最需要调整的不是模型规模，而是把双核心之间的“预测—动作—终局”桥接变成可干预、可归因、可校准的研究对象。

@@ -339,6 +339,19 @@ class MAESTROOrchestrator:
         case_id = case_id or session_id
         case = self._case_store.open_case(case_id, budget=budget) if self._case_store else None
         awaiting_current_plan = case is not None and case.state is CaseState.AWAITING_RESULT
+        if awaiting_current_plan:
+            self._logger.event(
+                "case_awaiting_result", {"case_id": case_id, "plan_version": case.plan_version},
+                session_id=session_id,
+            )
+            return MAESTROTurn(
+                session_id=session_id,
+                intent=TaskIntent("awaiting_result", "Resume the persisted measurement plan.",
+                                  (), (), intervention_profile.context_identifier, None,
+                                  (), (), (), False),
+                response="This case is awaiting measurements for its current plan; import those results before submitting a new execution plan.",
+                case=case,
+            )
         self._logger.event(
             "task_received",
             {
@@ -426,8 +439,26 @@ class MAESTROOrchestrator:
             # propagates, because an evaluation records it as a lost case.
             self._log_planner_feedback(feedback_marks, "contrast_planner", session_id)
         contrast = proposal.to_contrast(available_actions)
+        remaining = case.remaining_budget if case and case.remaining_budget is not None else budget
+        prediction_candidates, prediction_rejected = [], {}
+        for action in available_actions:
+            if isinstance(action.cost, bool) or not isinstance(action.cost, (int, float)) or not math.isfinite(action.cost) or action.cost < 0:
+                prediction_rejected[action.identifier] = "invalid_action_cost"
+            elif remaining is not None and action.cost > remaining:
+                prediction_rejected[action.identifier] = "unaffordable"
+            elif missing := intervention_profile.unmeasured(action.prerequisites):
+                prediction_rejected[action.identifier] = "missing_prerequisites:" + ",".join(missing)
+            else:
+                prediction_candidates.append(action)
+        self._logger.event(
+            "virtual_cell_candidates_filtered",
+            {"eligible_action_ids": [a.identifier for a in prediction_candidates],
+             "rejected": prediction_rejected, "remaining_budget": remaining,
+             "scope": "prediction calls only; the registered evidence menu remains available"},
+            session_id=session_id,
+        )
         world = self._query_world_model(
-            contrast, intent, case, case_id, session_id, available_actions,
+            contrast, intent, case, case_id, session_id, tuple(prediction_candidates),
             prediction_request=prediction_request, template=virtual_cell_template,
         )
         action_requests, action_assessments, action_predictions = (
@@ -443,6 +474,7 @@ class MAESTROOrchestrator:
             contrast, available_actions, intervention_profile, briefing_rows, topology, session_id,
             evidence_summary=context.rendered,
         )
+        reviewed_action_ids = [action.identifier for action in contrast.actions()]
         selection = self._select_budgeted_actions(
             contrast, available_actions, intervention_profile, case, budget, session_id,
             prediction=prediction, prediction_request=effective_request,
@@ -484,6 +516,37 @@ class MAESTROOrchestrator:
                 session_id=session_id,
             )
             execution_actions = ()
+        final_audit = {
+            "reviewed_action_ids": reviewed_action_ids if review.model_version else [],
+            "submitted_action_ids": [action.identifier for action in execution_actions],
+            "review_matches_submitted_plan": (
+                reviewed_action_ids == [action.identifier for action in execution_actions]
+                if review.model_version else None
+            ),
+            "scope": "identity audit only; no additional model review or action reselection",
+        }
+        self._logger.event("final_plan_audit", final_audit, session_id=session_id)
+        selection_source = (
+            "discrimination" if self._discrimination_selection else
+            "expected_coverage" if self._power_aware_selection else "budgeted_coverage"
+        ) if selection is not None else "planner_and_directed_repair"
+        self._logger.event(
+            "prediction_usage",
+            {"backend": self._backend_name(), "selection_source": selection_source,
+             "response_prediction_use": "advisory_and_constraint_checks",
+             "response_priority_use": (
+                 "last_tiebreak_only" if selection_source in ("discrimination", "budgeted_coverage")
+                 else "diagnostic_only"
+             ),
+             "outcome_forecast_use": (
+                 "selection" if self._discrimination_selection and selection is not None
+                 else "shadow" if self._outcome_forecaster is not None and selection is not None
+                 else "not_used"
+             ),
+             "queried_action_ids": list(action_requests),
+             "submitted_action_ids": final_audit["submitted_action_ids"]},
+            session_id=session_id,
+        )
         if awaiting_current_plan:
             execution_actions = ()
             self._logger.event(
@@ -555,7 +618,7 @@ class MAESTROOrchestrator:
             action_prediction_requests=action_requests,
             world_model_rows=briefing_rows,
             action_topology=topology,
-            decision_review=review.payload() if review.model_version else {},
+            decision_review={**review.payload(), **final_audit} if review.model_version else {},
         )
         for action in execution_actions:
             self._reconciliation[(case_id, action.identifier)] = (turn, action)
@@ -1430,6 +1493,8 @@ class MAESTROOrchestrator:
                 action_requests, assessments, predictions, None,
                 assessments.get(plan) if plan else None, predictions.get(plan) if plan else None,
             )
+        if contrast.plan is None or contrast.plan.identifier not in {a.identifier for a in available_actions}:
+            return WorldModelQueries()
         request = prediction_request or self._build_prediction_request(
             template, intent, contrast, case_id, case, session_id
         )

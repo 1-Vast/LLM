@@ -55,3 +55,7 @@ Research status is indexed in [research/README.md](research/README.md).
 
 Raw RNA reconstruction, real STATE sensitivity and conditional retrospective state prediction are in
 [the STATE response research report](tools/datasets/audit_results/20261001_state_response/REPORT.md).
+
+The review-guided ASTRA decision/feedback prototype, paired STATE correction and residual
+diagnostics are in [research/astra/README.md](research/astra/README.md) and
+[the October 2 record](log/20261002/README.md).

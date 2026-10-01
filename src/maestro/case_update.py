@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
+import math
 from typing import Any, Mapping, Sequence
 
 from .acquisition import OutcomeForecast, expected_terminal_decision_value
@@ -183,6 +184,37 @@ class IngestResult:
     qualification: OutcomeQualification
     eliminated: tuple[str, ...]
     calibration: CalibrationEntry | None
+    categorical_scores: Mapping[str, Any] | None = None
+
+
+def validate_reading_distribution(probabilities: Mapping[str, float]) -> dict[str, float]:
+    """Validate a declared categorical forecast, without guessing missing mass."""
+    if not probabilities or any(not isinstance(k, str) or not k.strip() for k in probabilities):
+        raise ValueError("nonempty categorical distribution required")
+    if any(isinstance(p, bool) or not isinstance(p, (int, float)) or not math.isfinite(p)
+           or not 0 <= p <= 1 for p in probabilities.values()):
+        raise ValueError("probabilities must be finite numbers in [0, 1]")
+    if not math.isclose(sum(probabilities.values()), 1.0, rel_tol=0, abs_tol=1e-9):
+        raise ValueError("probabilities must sum to one; no implicit normalization")
+    return dict(probabilities)
+
+
+def score_reading_distribution(probabilities: Mapping[str, float], observed: str) -> dict[str, Any]:
+    """Multiclass Brier sum and natural-log loss, independently of mechanism verdict.
+
+    Zero observed probability is infinite log loss, explicitly represented for
+    JSON storage rather than silently clipped to a finite score.
+    """
+    p = validate_reading_distribution(probabilities)
+    if observed not in p:
+        raise ValueError("observed category absent from declared distribution")
+    return {
+        "brier": sum((value - float(label == observed)) ** 2 for label, value in p.items()),
+        "log_loss": -math.log(p[observed]) if p[observed] > 0 else None,
+        "log_loss_infinite": p[observed] == 0,
+        "observed_probability": p[observed],
+        "observed_category": observed,
+    }
 
 
 def ingest_result(
@@ -195,6 +227,9 @@ def ingest_result(
     contrast: tuple[str, str],
     eliminated: Sequence[str] = (),
     forecast_probability: float | None = None,
+    forecast_label: str | None = None,
+    forecast_distribution: Mapping[str, float] | None = None,
+    conditions_matched: bool | None = None,
     model_version: str = "",
 ) -> IngestResult:
     """Close the loop for one real result, append-only.
@@ -202,15 +237,32 @@ def ingest_result(
     - not measured / QC failed: no hypothesis update, the episode is not superseded for hypotheses;
     - undetected: recorded as a negative reading, nothing eliminated;
     - qualified: the registered elimination is recorded and the episode gains a new version;
-    - the probability the system gave the realised reading is stored as a calibration entry.
+    - reading calibration requires an explicit event or complete distribution;
+    - QC/conditions gate scoring; hypothesis elimination does not define its label.
     """
 
+    if type(qc_passed) is not bool or (detected is not None and type(detected) is not bool):
+        raise ValueError("QC and detection flags must be explicit booleans or unknown detection")
+    if conditions_matched is not None and type(conditions_matched) is not bool:
+        raise ValueError("conditions_matched must be explicit boolean or unknown")
+    if conditions_matched is False and eliminated:
+        raise ValueError("condition-unmatched result cannot eliminate mechanisms")
     qualification = qualify_result(measurement, qc_passed=qc_passed, detected=detected,
                                    eliminated=eliminated)
+    if forecast_probability is not None:
+        if (forecast_distribution is not None or not isinstance(forecast_label, str)
+                or not forecast_label.strip()):
+            raise ValueError("binary forecast requires explicit forecast_label and no distribution")
+        if (isinstance(forecast_probability, bool) or not isinstance(forecast_probability, (int, float))
+                or not math.isfinite(forecast_probability) or not 0 <= forecast_probability <= 1):
+            raise ValueError("forecast_probability must be finite in [0, 1]")
+    if forecast_distribution is not None:
+        validate_reading_distribution(forecast_distribution)
     changes: dict = {}
     updates = list(episode.hypothesis_updates)
     eliminated_tuple: tuple[str, ...] = ()
     calibration = None
+    categorical_scores = None
     if qualification is OutcomeQualification.QUALIFIED:
         eliminated_tuple = tuple(eliminated)
         updates.append(HypothesisUpdate(measurement.action_id, contrast, "real_result",
@@ -220,17 +272,28 @@ def ingest_result(
                                         (), False, qualification.value))
     if updates or qualification in (OutcomeQualification.UNRELIABLE, OutcomeQualification.NOT_MEASURED):
         changes["hypothesis_updates"] = tuple(updates)
-    if forecast_probability is not None and measurement.outcome_label is not None:
+    scorable = (qc_passed is True and conditions_matched is True and measurement.status.biological
+                and type(measurement.independent_units) is int and measurement.independent_units >= 1
+                and bool(measurement.source) and measurement.outcome_label is not None)
+    if forecast_distribution is not None and scorable:
+        categorical_scores = score_reading_distribution(forecast_distribution, measurement.outcome_label)
+        entries = tuple(CalibrationEntry(model_version, measurement.action_id, float(probability),
+                                        float(label == measurement.outcome_label),
+                                        f"reading_category:{label}", episode.digest)
+                        for label, probability in sorted(forecast_distribution.items()))
+        calibration = next(entry for entry in entries if entry.kind == f"reading_category:{measurement.outcome_label}")
+        changes["calibration_history"] = tuple(episode.calibration_history) + entries
+    elif forecast_probability is not None and scorable:
         calibration = CalibrationEntry(model_version, measurement.action_id,
                                        float(forecast_probability),
-                                       1.0 if qualification is OutcomeQualification.QUALIFIED else 0.0,
-                                       "reading_probability", episode.digest)
+                                       float(measurement.outcome_label == forecast_label),
+                                       f"reading_category:{forecast_label}", episode.digest)
         changes["calibration_history"] = tuple(episode.calibration_history) + (calibration,)
     measurements = {m.action_id: m for m in episode.real_measurements}
     measurements[measurement.action_id] = measurement
     changes["real_measurements"] = tuple(measurements.values())
     new_episode = store.supersede(episode, **changes)
-    return IngestResult(new_episode, qualification, eliminated_tuple, calibration)
+    return IngestResult(new_episode, qualification, eliminated_tuple, calibration, categorical_scores)
 
 
 # The forecaster serves hypothesis-conditioned outcome distributions. History

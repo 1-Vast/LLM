@@ -289,16 +289,23 @@ def test_a_second_round_reuses_the_first_rounds_inference(tmp_path: Path, case_s
                             case_id="case", virtual_cell_template=_template(), session_id="round-2")
 
     assert world_model.predictions == 1
-    reused = second.action_predictions["model-guided"]
-    assert reused.request_id == second.action_prediction_requests["model-guided"].request_id == "round-2.model-guided"
-    assert reused.compute_cost == 0.0
     assert first.action_predictions["model-guided"].compute_cost == 3.0
-    row = next(item for item in second.world_model_rows if item.action == "model-guided")
-    assert row.reused_from_request == "round-1.model-guided"
-    assert "1 reused from an identical earlier query" in second.response
     if case_store:
         assert second.selected_actions == ()
+        assert second.case == first.case
         assert second.case.plan_version == first.case.plan_version
+        assert second.contrast is None
+        assert second.action_prediction_requests == {}
+        assert second.action_predictions == {}
+        assert second.world_model_rows == ()
+        assert len(client.calls) == 2
+    else:
+        reused = second.action_predictions["model-guided"]
+        assert reused.request_id == second.action_prediction_requests["model-guided"].request_id == "round-2.model-guided"
+        assert reused.compute_cost == 0.0
+        row = next(item for item in second.world_model_rows if item.action == "model-guided")
+        assert row.reused_from_request == "round-1.model-guided"
+        assert "1 reused from an identical earlier query" in second.response
 
     fresh = _controller(tmp_path / "off", StubClient([TASK, _plan("plain"), TASK, _plan("plain")]),
                         world_model=(counted := CountingWorldModel()), reuse_predictions=False)
@@ -335,18 +342,18 @@ def test_the_repair_planner_sees_predictions_and_abstentions_labelled_as_plannin
     content = client.calls[2][0][1]["content"]
     section = content[content.index(BRIEFING_HEADING):]
     rows = {row["action"]: row for row in map(json.loads, section.splitlines()[BRIEFING_HEADING.count("\n") + 1:])}
-    assert rows["model-guided"]["status"] == "predicted"
-    assert rows["model-guided"]["value"] == 1.25
-    assert rows["model-guided"]["interval"] == [1.0, 1.5]
-    assert rows["model-guided"]["interval_claims_coverage"] is True
-    assert rows["model-guided"]["reliability_weight"] == 1.0
+    assert "model-guided" not in rows
+    assert "model-guided" not in turn.action_prediction_requests
+    filtered = _events(tmp_path, "virtual_cell_candidates_filtered")[0]
+    assert "missing_prerequisites:functional:target_activity" in filtered["rejected"]["model-guided"]
+    assert controller._virtual_cell.predictions == 0
     assert rows["plain"]["status"] == "abstained"
     assert rows["plain"]["abstain_reason"] == "query_unsupported"
     # The briefing informs the proposal; it never becomes a satisfied premise: the gated
     # action stays blocked and the step executed is the functional measurement.
     assert turn.check is not None and not turn.check.ready_for_mechanism_update
     assert [action.identifier for action in turn.selected_actions] == ["plain"]
-    assert "Virtual cell: 1 of 2 action queries answered" in turn.response
+    assert "Virtual cell: 0 of 1 action queries answered" in turn.response
     assert "abstained on plain" in turn.response
 
 

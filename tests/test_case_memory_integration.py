@@ -372,10 +372,15 @@ def test_case_update_after_new_result_is_append_only_and_grades_the_forecast():
     store = CM.EpisodeStore()
     episode = _episode()
     store.append(episode)
-    measurement = CM.RealMeasurement("a1", Q, "match_h1", 3)
+    measurement = CM.RealMeasurement("a1", Q, "match_h1", 3, "fixture:measurement")
+    with pytest.raises(ValueError, match="forecast_label"):
+        CU.ingest_result(store, episode, measurement, qc_passed=True, detected=True,
+                         contrast=("H_on", "H_off"), forecast_probability=0.7)
+    assert store.versions(episode.case_id) == (1,)
     result = CU.ingest_result(store, episode, measurement, qc_passed=True, detected=True,
                               contrast=("H_on", "H_off"), eliminated=("H_off",),
-                              forecast_probability=0.7, model_version="case-memory-production-1")
+                              forecast_probability=0.7, forecast_label="match_h1", conditions_matched=True,
+                              model_version="case-memory-production-1")
     assert result.qualification is CU.OutcomeQualification.QUALIFIED
     assert result.eliminated == ("H_off",)
     assert result.episode.case_version == 2 and store.get(episode.case_id, 1).digest == episode.digest

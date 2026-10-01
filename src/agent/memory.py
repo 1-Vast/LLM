@@ -414,6 +414,116 @@ class CaseStore:
             ).fetchall()
         return tuple(row["action_identifier"] for row in rows)
 
+    def record_prediction(self, case_id: str, plan_version: int, action_id: str, request_id: str,
+                          payload: Mapping[str, Any], *, attempt_id: str | None = None) -> bool:
+        """Opt-in immutable prediction envelope for one already committed action.
+
+        This records no execution or biological evidence. ``attempt_id`` remains
+        unknown unless supplied from an external execution receipt. Runtime
+        prediction restoration and scoring are not automatically enabled.
+        """
+        if (type(plan_version) is not int or plan_version < 1
+                or any(not isinstance(value, str) or not value.strip() for value in (case_id, action_id, request_id))
+                or (attempt_id is not None and (not isinstance(attempt_id, str) or not attempt_id.strip()))):
+            raise ValueError("Exact plan/request identity required.")
+        if not isinstance(payload, Mapping) or not payload:
+            raise ValueError("A nonempty prediction envelope is required.")
+        encoded = json.dumps(dict(payload), sort_keys=True, separators=(",", ":"), allow_nan=False)
+        with self._connection() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            plan = connection.execute(
+                "SELECT status FROM planned_actions WHERE case_id=? AND plan_version=? AND action_identifier=?",
+                (case_id, plan_version, action_id),
+            ).fetchone()
+            if plan is None:
+                raise ValueError("Prediction action is not an exact committed plan.")
+            existing = connection.execute(
+                "SELECT * FROM prediction_records WHERE case_id=? AND plan_version=? AND action_identifier=?",
+                (case_id, plan_version, action_id),
+            ).fetchone()
+            if existing:
+                if (existing["request_id"], existing["attempt_id"], existing["payload_json"]) != (request_id, attempt_id, encoded):
+                    raise ValueError("Prediction identity or content is immutable.")
+                return False
+            if plan["status"] != "planned":
+                raise ValueError("Prediction must be recorded before the result.")
+            case = self._case_row(connection, case_id)
+            if case["plan_version"] != plan_version or case["state"] != CaseState.AWAITING_RESULT.value:
+                raise ValueError("Prediction plan is not the active awaiting plan.")
+            connection.execute(
+                """INSERT INTO prediction_records(case_id,plan_version,action_identifier,request_id,
+                attempt_id,payload_json) VALUES (?,?,?,?,?,?)""",
+                (case_id, plan_version, action_id, request_id, attempt_id, encoded),
+            )
+        return True
+
+    @staticmethod
+    def _prediction_for_result(connection, case_id: str, result_id: str):
+        return connection.execute(
+            """SELECT p.* FROM results r JOIN prediction_records p
+            ON p.case_id=r.case_id AND p.plan_version=r.plan_version
+            AND p.action_identifier=r.action_identifier WHERE r.case_id=? AND r.result_id=?""",
+            (case_id, result_id),
+        ).fetchone()
+
+    def prediction_for_result(self, case_id: str, result_id: str) -> dict[str, Any] | None:
+        """Resolve using the accepted result's original plan, never latest action."""
+        with self._connection() as connection:
+            row = self._prediction_for_result(connection, case_id, result_id)
+        if row is None:
+            return None
+        record = dict(row)
+        record["payload"] = json.loads(record.pop("payload_json"))
+        return record
+
+    def record_prediction_score(self, case_id: str, result_id: str, request_id: str,
+                                score: Mapping[str, Any], *, conditions_matched: bool) -> bool:
+        """Persist caller-computed scoring as a derived view of an accepted result.
+
+        The caller authenticates endpoint interpretation and computes the score.
+        This method only checks exact pairing, QC, real evidence and known units;
+        it does not fit calibration, update hypotheses, or charge a budget.
+        """
+        if conditions_matched is not True:
+            raise ValueError("Explicit matched conditions required for scoring.")
+        if not isinstance(score, Mapping) or not score:
+            raise ValueError("Nonempty score payload required.")
+        encoded = json.dumps(dict(score), sort_keys=True, separators=(",", ":"), allow_nan=False)
+        with self._connection() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            prediction = self._prediction_for_result(connection, case_id, result_id)
+            if prediction is None or prediction["request_id"] != request_id:
+                raise ValueError("No exact accepted result/prediction pair.")
+            result = connection.execute("SELECT * FROM results WHERE result_id=? AND case_id=?",
+                                        (result_id, case_id)).fetchone()
+            if (not result["quality_passed"] or result["evidence_kind"] != EvidenceKind.REAL_MEASUREMENT.value
+                    or result["independent_units"] is None or result["independent_units"] < 1):
+                raise ValueError("Result is not a qualified real measurement with known units.")
+            existing = connection.execute("SELECT * FROM prediction_scores WHERE result_id=?", (result_id,)).fetchone()
+            if existing:
+                if (existing["case_id"], existing["request_id"], existing["score_json"]) != (case_id, request_id, encoded):
+                    raise ValueError("Prediction score identity or content is immutable.")
+                return False
+            connection.execute(
+                "INSERT INTO prediction_scores(result_id,case_id,request_id,score_json) VALUES (?,?,?,?)",
+                (result_id, case_id, request_id, encoded),
+            )
+        return True
+
+    def prediction_scores(self, case_id: str) -> tuple[dict[str, Any], ...]:
+        """Read only this case's derived scores, including original plan identity."""
+        with self._connection() as connection:
+            rows = connection.execute(
+                """SELECT s.*,r.plan_version,r.action_identifier FROM prediction_scores s
+                JOIN results r ON r.result_id=s.result_id WHERE s.case_id=? ORDER BY s.rowid""", (case_id,),
+            ).fetchall()
+        records = []
+        for row in rows:
+            record = dict(row)
+            record["score"] = json.loads(record.pop("score_json"))
+            records.append(record)
+        return tuple(records)
+
     def record_plan(
         self,
         case_id: str,
@@ -619,6 +729,19 @@ class CaseStore:
                     limitations TEXT NOT NULL, created_at TEXT NOT NULL,
                     interpretation_fields_json TEXT NOT NULL DEFAULT '[]'
                 )"""
+            )
+            connection.execute(
+                """CREATE TABLE IF NOT EXISTS prediction_records (
+                    case_id TEXT NOT NULL, plan_version INTEGER NOT NULL, action_identifier TEXT NOT NULL,
+                    request_id TEXT NOT NULL, attempt_id TEXT, payload_json TEXT NOT NULL,
+                    PRIMARY KEY(case_id,plan_version,action_identifier),
+                    FOREIGN KEY(case_id,plan_version,action_identifier)
+                        REFERENCES planned_actions(case_id,plan_version,action_identifier))"""
+            )
+            connection.execute(
+                """CREATE TABLE IF NOT EXISTS prediction_scores (
+                    result_id TEXT PRIMARY KEY REFERENCES results(result_id), case_id TEXT NOT NULL,
+                    request_id TEXT NOT NULL, score_json TEXT NOT NULL)"""
             )
             plan_columns = {row["name"] for row in connection.execute("PRAGMA table_info(planned_actions)")}
             if "expected_conditions_json" not in plan_columns:
