@@ -180,3 +180,9 @@ Second-round final verification passed **1,861 tests**, including **118 ASTRA co
 with zero failures or skips. Only four existing production/tool files were changed; tracked
 file counts remain44 under `src` and913 under `tools`. See
 [full verification receipt](results/20261002_round2_verification/receipt.json).
+
+The subsequent [EGR1 zero and refusal audit](ZERO_AUDIT.md) traces all18 exact-zero
+action means to strictly negative pre-ReLU values, with9 bitwise-identical real
+STATE replays. It separates numerical ranking, meaningful action advantage and
+measured benefit; Plate10's aggregate middle-dose rank remains an unvalidated
+hypothesis. No new production/tool policy is promoted.

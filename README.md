@@ -59,3 +59,5 @@ Raw RNA reconstruction, real STATE sensitivity and conditional retrospective sta
 The review-guided ASTRA decision/feedback prototype, paired STATE correction and residual
 diagnostics are in [research/astra/README.md](research/astra/README.md) and
 [the October 2 record](log/20261002/README.md).
+The subsequent native zero attribution and bounded policy diagnostics are in
+[the ASTRA EGR1 audit](research/astra/ZERO_AUDIT.md).

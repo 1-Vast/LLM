@@ -329,3 +329,106 @@ parsed Python AST. The focused decision/query/repository follow-up passes62 test
 recorded in `research/astra/results/20261002_round2/formatting_correction/receipt.json` and
 `regression.xml`, without replacing the full-suite receipt or changing scientific analysis.
 Scoped attributes permit hashed CRLF source bytes while retaining normal whitespace checks.
+
+## 17. Native EGR1 zero and paired-action follow-up
+
+The supplied review requires three separate judgments: computational stability,
+meaningful action advantage, and actual experimental benefit. The follow-up keeps
+the registered STATE checkpoint, historical NCI-H596 pools, Trametinib action menu,
+16 slots/action, seeds 17/42/103, negative mean log1p EGR1 utility and numerical
+tie tolerance 1e-6. No thresholds, biological test labels or action outcomes are
+changed or invented. Code is `research/astra/zero_audit.py`; full report is
+[`ZERO_AUDIT.md`](../../research/astra/ZERO_AUDIT.md).
+
+Three agents independently audit statistics, native mapping/model paths and saved
+output/pairing. All nine original request arrays and source manifests match. All
+18 zero means have 16/16 exactly zero EGR1 values: no cancellation or display rounding.
+All seven original refusals are exact top-score ties, not interval-width refusals.
+The sampled native IDs, indices and actual tensors match within each request's
+three action calls. Equal integer seeds across pools do not authenticate physical
+pairing, independent cultures or shared biological cell identity.
+
+A separate chunked, read-only check of all 30,394 c39 rows verifies the unique EGR1
+gene at normalized X column 5090 and X_hvg column 546. Maximum absolute log1p
+correspondence difference is 2.384185791e-7, with zero rows exceeding the existing
+1e-5 tolerance and 4,969 nonzero values. Dataset, identity and installed inference
+hashes match before/after. Code and receipt are in
+`research/astra/results/20261002_egr1_identity/`. This certifies the local gene
+mapping, not the other 31 unresolved coordinates, new RNA precision, actual training
+exposure or biological input availability. Normalized X is not raw UMI.
+
+The observation budget was frozen before new execution: repeat the same nine
+requests, 36 actual forwards including controls, no new seeds or adaptive stopping.
+A read-only module hook records pre/post final ReLU without modifying outputs or
+RNG; the existing paired worker preserves its original action loop. All nine
+complete 78x2000 returned matrices match the historical arrays bitwise in dtype,
+shape and raw bytes, with equal output identities. EGR1 export equals native forward
+exactly despite a separate official export clip. All 18 all-zero action conditions
+have 16 strictly negative pre-ReLU values: 288/288 zeros are attributed to the
+model's final ReLU. Elapsed audit time is 297.90 seconds. Observation receipt,
+activation traces, full-precision readout vectors and manifests remain in the new
+`research/astra/results/20261002_zero_audit_v1/`; prior frozen materials are untouched.
+Negative pre-ReLU numbers do not become RNA observations, utility or evidence of
+real drug benefit. Across completed rounds there are now 91 real forwards, with
+zero physical experiments.
+
+Plate10 has changing top-tie pairs. Uniform aggregation ranks the middle dose
+above high by 0.01015909 and above low by 0.05298151 in internal utility. Descriptive
+sd/sqrt(3) values are 0.01015909 and 0.05131179, conditional on the numerical
+resampling assumption only. All fixed-pair linear-aggregation checks pass. No
+physical interval, meaningful delta, real equivalence or scientific advantage is
+inferred. Each seed being tied does not imply a fixed pair remains tied under
+aggregation. No attempt forces an extreme dose or extends seeds until one wins.
+
+The bounded replay reports original single-seed, fixed K=3 aggregation, same-K
+contrast/candidate-set, and fixed low-dose strategies. Prospective model forwards
+are 4/12/12/0, separately reported; the strategies are not all compute-matched.
+The aggregate changes refusal to a numerical middle-dose output on Plate10; the
+scientific candidate set retains all three actions because delta and calibrated
+measured outcome contrasts are missing. This is unknown advantage, not proven
+equivalence. Outputs were previously inspected, so this is a diagnostic comparison,
+not independent confirmation. Actual terminal utility, refusal benefit, deployment
+cost and state gain remain unidentified. Treatment-minus-shared-input positions
+are set-to-set computational diagnostics, not cell trajectories or measured effects.
+
+The research interface now retains contrasts, estimand, randomness, paired-input
+status, numerical precision, original refusal causes and uncovered uncertainties.
+The next budget should validate the readout and collect matched measured outcomes.
+More seeds can reduce numerical error but cannot resolve model bias, illegal
+decision-time state, missing outcomes or costs. No new policy is promoted to src
+or tools; their counts remain 44 and 913.
+
+Initial 15 new contracts and the 332-test scoped run pass. Review subsequently
+identifies two failure-receipt issues: partial timeout logs were not saved, and
+failed validation could be counted as a completed observation. Both are repaired
+after preserving the successful v1 source and receipts. Two timeout/nonzero-exit
+fixtures verify retained logs and separate started/completed/validated counts.
+AST comparison confirms nine observation/inference/analysis functions unchanged;
+no further model forward runs. The final scoped maestro check passes 334 tests,
+including 135 ASTRA contracts, with zero failures, errors or skips in
+`research/astra/results/20261002_zero_audit_verification_v2/`. All four baseline
+snapshots, eleven frozen grid inputs and 96 grid output files remain unchanged.
+The previous full 1,861-test run is not repeated or relabeled as this follow-up.
+
+Reproduction, using fresh output directories and the pinned local model/data:
+
+```powershell
+$py = 'D:/anaconda/envs/maestro/python.exe'
+& $py -m research.astra.zero_audit run --observe --out research/astra/results/NEW_ZERO_DIRECTORY
+& $py -m research.astra.verify --out research/astra/results/NEW_ZERO_VERIFICATION_DIRECTORY
+Copy-Item research/astra/results/20261002_egr1_identity/verify_egr1.py research/astra/results/NEW_IDENTITY_DIRECTORY/verify_egr1.py
+& $py research/astra/results/NEW_IDENTITY_DIRECTORY/verify_egr1.py
+```
+
+Create the new identity directory before copying; the script refuses to overwrite
+its existing receipt. Omit `--observe` for saved-output-only analysis. Large local
+H5AD/NumPy matrices are ignored and reproduced through earlier pinned commands;
+compact receipts, activation vectors and source snapshots are published. No API,
+physical benefit test or new prospective task qualification runs. Main publication
+uses the user's existing explicit authorization; local/remote equality and clean
+worktree are checked after push, with the final commit reported separately.
+The final documentation/navigation follow-up passes all 21 repository-shape
+checks (`docs_followup.xml`); these overlap the 334 scoped tests and are not summed.
+The supplied review is copied byte-for-byte with its own provenance receipt under
+`research/astra/evidence/20261002_zero_review*`. The existing daily-log prefix and
+unchanged production/tool counts are separately verified before publication.
