@@ -1,0 +1,314 @@
+"""Reproduce the raw-metadata review without fitting, API calls or outcome inference.
+
+The frozen review notes supply human classifications, not new measured results.
+Fresh source schemas and raw locators are rebuilt. --reuse-recorded-hashes avoids
+rehashing large assets and explicitly retains their prior verification status.
+Every invocation requires a new output leaf; partial failures remain preserved.
+"""
+from __future__ import annotations
+
+import argparse
+from collections import Counter, defaultdict
+import csv
+from datetime import datetime, timezone
+import gzip
+import hashlib
+import io
+import json
+import math
+from pathlib import Path
+import platform
+import sys
+import zipfile
+
+import h5py
+from scipy.io import loadmat
+
+from tools.datasets.catalog import _sha256
+
+
+ROOT = Path(__file__).resolve().parents[2]
+NOTES = ROOT / "outputs/state_identifiability_20261001/raw_review/raw_source_review.json"
+NYMAN = "data/external/nyman2020/data/data_preparation"
+
+
+def _plain(value):
+    if isinstance(value, bytes):
+        return value.decode("utf-8", errors="replace")
+    if hasattr(value, "item"):
+        return _plain(value.item())
+    if isinstance(value, float) and not math.isfinite(value):
+        return {"nonfinite": str(value)}
+    return value
+
+
+def _write(path: Path, value) -> None:
+    with path.open("x", encoding="utf-8", newline="\n") as handle:
+        json.dump(value, handle, indent=2, ensure_ascii=True, allow_nan=False)
+        handle.write("\n")
+
+
+def _obs_values(obs, key, limit=None):
+    value = obs[key]
+    if isinstance(value, h5py.Group):
+        categories = value["categories"][:]
+        return [None if code < 0 else _plain(categories[code])
+                for code in value["codes"][:limit]]
+    return [_plain(item) for item in value[:limit]]
+
+
+def _source_schema(prior: dict) -> dict:
+    """Read metadata only. LINCS2020 reads its header, with no QC values."""
+    path = ROOT / prior["path"]
+    result = {key: prior[key] for key in ("path", "kind")}
+    kind = prior["kind"]
+    if kind == "h5ad_obs_schema_only":
+        with h5py.File(path, "r") as file:
+            obs = file["obs"]
+            first = obs[next(iter(obs))]
+            result.update(columns=list(obs), row_count=len(
+                first["codes"] if isinstance(first, h5py.Group) else first))
+            allowed = [key for key in ("cell_line", "cell_name", "perturbation",
+                       "perturbation_2", "dose_value", "dose_value_2", "time",
+                       "plate", "plate_id", "well", "well_id", "replicate",
+                       "sample", "pass_filter", "drugname_drugconc") if key in obs]
+            values = {key: _obs_values(obs, key, 3) for key in allowed}
+            result["sample_metadata_rows"] = [
+                {key: values[key][index] for key in allowed} for index in range(3)]
+    elif kind == "raw_or_derived_table_header":
+        opener = gzip.open if path.suffix == ".gz" else open
+        with opener(path, "rt", encoding="utf-8", errors="replace") as handle:
+            reader = csv.reader(handle, delimiter="," if path.suffix == ".csv" else "\t")
+            header = next(reader)
+            result["columns"] = header
+            if "siginfo_beta" not in path.name and "sig_metrics" not in path.name:
+                result["sample_metadata_row"] = dict(zip(header, next(reader)))
+        result["row_count"] = None
+        result["row_count_reason"] = "schema only; deposited rows are not all attempts"
+    elif kind == "headerless_sample_sheet":
+        with gzip.open(path, "rt", encoding="utf-8", errors="replace") as handle:
+            rows = [line.rstrip().split() for line in handle]
+        result.update(row_count=len(rows), sample_raw_rows=rows[:2])
+    elif kind == "GEO_SOFT_protocol":
+        result["protocol_fields"] = [line for line in path.read_text(
+            encoding="utf-8", errors="replace").splitlines() if line.startswith((
+                "!Sample_treatment_protocol_ch1", "!Sample_extract_protocol_ch1",
+                "!Sample_characteristics_ch1"))]
+    elif kind == "author_processing_code_or_readme":
+        result["salient_source_lines"] = [
+            {"line": index + 1, "text": line}
+            for index, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines())
+            if any(token in line for token in ("realtime=", "remove bad time",
+                   "select significant responses", "set nan to 0", "signal_median",
+                   "normalize_to_dmso", "Median"))]
+    elif kind == "processed_protein_or_phenotype_matrix":
+        with path.open(encoding="utf-8") as handle:
+            result["columns"] = next(csv.reader(handle))
+            result["row_count"] = sum(1 for _ in handle)
+    elif kind == "raw_mat_schema_only":
+        matrix = loadmat(path)
+        result["variables"] = [{"name": key, "shape": list(value.shape),
+            "dtype": str(value.dtype), "structured_fields": list(value.dtype.names or ())}
+            for key, value in matrix.items() if not key.startswith("__")]
+        if "data_count" in matrix:
+            times = matrix["data_count"][0, 0]["time"].reshape(-1)
+            result["time_vector"] = {"count": len(times), "first": _plain(times[0]),
+                "last": _plain(times[-1]), "unit": "not encoded in MAT schema"}
+    elif kind == "raw_RPPA_archive":
+        result["members"] = []
+        with zipfile.ZipFile(path) as archive:
+            for name in archive.namelist():
+                if not name.endswith((".csv", "README.txt")):
+                    continue
+                data = archive.read(name)
+                member = {"member": name, "size_bytes": len(data)}
+                if name.endswith(".csv"):
+                    rows = [row for row in csv.reader(io.StringIO(data.decode())) if any(row)]
+                    index = next(i for i, row in enumerate(rows) if row[0] == "Cell Line")
+                    samples = rows[index + 1:]
+                    member.update(metadata_columns=rows[index][:6], row_count=len(samples),
+                        time_counts=dict(Counter(row[3] for row in samples)),
+                        inhibitor_counts=dict(Counter(row[2] for row in samples)))
+                else:
+                    member["source_text"] = data.decode()
+                result["members"].append(member)
+    result["time_like_columns"] = [key for key in result.get("columns", ())
+        if any(token in key.lower() for token in ("time", "date", "avail", "decision"))]
+    return result
+
+
+def _raw_locators(digests: dict) -> tuple[list, list]:
+    rows, specifications = [], []
+
+    def record(study, relative, raw, kind, **locator):
+        rows.append({"study": study, "source_path": relative,
+            "source_sha256": digests[relative], "raw_fields": raw,
+            "record_kind": kind, "state_measured_at": None, "state_available_at": None,
+            "decision_at": None, "baseline_outcome_relationship": None,
+            "attempt_complete": False, **locator})
+
+    for study in ("sciplex2", "sciplex4"):
+        relative = f"data/external/sciplex_family/SrivatsanTrapnell2020_{study}.h5ad"
+        columns = (["cell_line", "perturbation", "dose_value", "well"] if study == "sciplex2"
+            else ["cell_line", "perturbation", "dose_value", "perturbation_2", "dose_value_2",
+                  "plate_id", "well_id"])
+        with h5py.File(ROOT / relative) as file:
+            values = {key: _obs_values(file["obs"], key) for key in columns}
+        groups = defaultdict(list)
+        for index in range(len(values[columns[0]])):
+            groups[tuple(values[key][index] for key in columns)].append(index)
+        for group, indices in groups.items():
+            record(study, relative, dict(zip(columns, group)),
+                "deposited_cell_records_grouped_by_raw_well_and_condition",
+                source_row_indices=indices, observed_cells=len(indices),
+                execution_status="observed posttreatment cells in processed source")
+        specifications.append({"study": study, "path": relative,
+            "format": "AnnData obs HDF5", "raw_grouping_columns": columns,
+            "source_rows": len(values[columns[0]]), "output_groups": len(groups),
+            "warning": "unknown-identity groups retained; no culture replicates inferred"})
+        sheet = ("GSM4150377_sciPlex2_hashSampleSheet.txt.gz" if study == "sciplex2"
+            else "GSM4150379_sciPlex4_hashSampleSheet.txt.gz")
+        relative = "data/external/sciplex_family/" + sheet
+        with gzip.open(ROOT / relative, "rt") as handle:
+            for index, line in enumerate(handle):
+                raw = line.rstrip().split()
+                record(study, relative, dict(zip(
+                    ("condition_token", "hash_barcode", "expected_hash_count"), raw)),
+                    "source_sample_sheet_design_only", source_row_index=index,
+                    execution_status="not inferred from sheet")
+        specifications.append({"study": study, "path": relative,
+            "format": "gzip whitespace-delimited, no header", "row_index_basis": "zero based",
+            "warning": "sheet presence is design, not completed experiment"})
+    relative = "data/external/hill2017/DataS1.zip"
+    with zipfile.ZipFile(ROOT / relative) as archive:
+        for name in archive.namelist():
+            if not name.endswith(".csv"):
+                continue
+            data = archive.read(name)
+            member_digest = hashlib.sha256(data).hexdigest()
+            samples = list(csv.reader(io.StringIO(data.decode())))
+            header = next(i for i, row in enumerate(samples) if row and row[0] == "Cell Line")
+            columns = samples[header][:6]
+            for index, row in enumerate(samples[header + 1:], header + 1):
+                if any(row):
+                    record("hill2017", relative, dict(zip(columns, row[:6])),
+                        "deposited_RPPA_sample_metadata", source_member=name,
+                        source_member_sha256=member_digest, source_row_index=index,
+                        execution_status="deposited sample; manuscript inclusion is not attempt completeness")
+            specifications.append({"study": "hill2017", "path": relative, "member": name,
+                "format": "CSV in ZIP", "metadata_columns": columns,
+                "row_index_basis": "csv.reader including blank records",
+                "task_grouping": ["Cell Line", "Stimulus", "source_member_unmerged_batch"],
+                "action_grouping": ["Inhibitor", "Timepoint"],
+                "qc_warning": "core exclusion flag and complete inclusion flag have opposite meanings"})
+    relative = NYMAN + "/data_zeptosens1/RFI_no_protein_loading_normalisation.mat"
+    labels = loadmat(ROOT / NYMAN / "data_incucyte/conc_list_of_drugs.mat")["conc_list_of_drugs"]
+    times = [10, 27, 74, 180, 540, 1440, 2880, 4020]
+    for condition, label in enumerate(labels):
+        for time_index, minutes in enumerate(times):
+            record("nyman2020", relative,
+                {"condition_token": str(label[0][0]), "posttreatment_time_minutes": minutes},
+                "raw_RPPA_matrix_slots_and_author_mapping", source_locator={"variable": "RFI",
+                    "raw_column_indices": [rep * 480 + condition * 8 + time_index for rep in range(3)],
+                    "condition_index_zero_based": condition, "time_index_zero_based": time_index},
+                execution_status="matrix slot only; per-slot finite measurement/QC not asserted",
+                temporal_mapping_source={"path": NYMAN + "/main.m", "sha256": digests[NYMAN + "/main.m"]},
+                condition_mapping_source={"path": NYMAN + "/data_incucyte/conc_list_of_drugs.mat",
+                    "sha256": digests[NYMAN + "/data_incucyte/conc_list_of_drugs.mat"]})
+    specifications.append({"study": "nyman2020", "path": relative, "format": "MAT RFI72x1440",
+        "raw_mapping": "zero-based column=rep*480+condition*8+time_index",
+        "time_units": "main.m minutes; 4020=67h versus nearby 72h comment",
+        "warning": "RPPA is posttreatment; live t0 chronology and well identities unverified"})
+    relative = "data/raw/kinome_gxe/GSM7056149/GSM7056149_sciPlexGxE_2_hash_sample_sheet.txt.gz"
+    with gzip.open(ROOT / relative, "rt") as handle:
+        for index, line in enumerate(handle):
+            record("GxE_GSM7056149", relative,
+                dict(zip(("plate_well", "hash_barcode", "expected_hash_count"), line.rstrip().split())),
+                "hash_sheet_design_only", source_row_index=index,
+                execution_status="unknown; separate treatment hash metadata absent")
+    specifications.append({"study": "GxE_GSM7056149", "path": relative,
+        "format": "gzip whitespace no header", "required_join": "sciPlexGxE_2_hash_metadata.txt"})
+    return rows, specifications
+
+
+def run(output: Path, notes_path: Path, reuse_recorded_hashes: bool = False) -> dict:
+    output.mkdir(parents=True, exist_ok=False)
+    notes = json.loads(notes_path.read_text(encoding="utf-8"))
+    receipts, digests = [], {}
+    prior_sources = list(notes["source_receipts"])
+    # The condition MAT is needed for locators but was not in the first schema list.
+    additional = NYMAN + "/data_incucyte/conc_list_of_drugs.mat"
+    prior_sources.append({"path": additional, "kind": "raw_mat_schema_only"})
+    for prior in prior_sources:
+        path = ROOT / prior["path"]
+        if reuse_recorded_hashes and "sha256" in prior:
+            if path.stat().st_size != prior["size_bytes"]:
+                raise ValueError(f"source size changed: {prior['path']}")
+            digest, basis = prior["sha256"], "prior review receipt; whole file not rehashed this invocation"
+        else:
+            digest, basis = _sha256(path), "fresh whole-file SHA-256"
+            if "sha256" in prior and digest != prior["sha256"]:
+                raise ValueError(f"source hash changed: {prior['path']}")
+        current = _source_schema(prior)
+        if "columns" in prior and current.get("columns") != prior["columns"]:
+            raise ValueError(f"source schema changed: {prior['path']}")
+        current.update(size_bytes=path.stat().st_size, sha256=digest, hash_verification_basis=basis)
+        receipts.append(current)
+        digests[prior["path"]] = digest
+    rows, specifications = _raw_locators(digests)
+    _write(output / "raw_source_review.json", {"schema_version": "state_raw_review.reproduction.v1",
+        "reviewed_at_utc": datetime.now(timezone.utc).isoformat(), "source_receipts": receipts,
+        "task_assessments": notes["task_assessments"], "gate": notes["gate"],
+        "classification_basis": "frozen human-reviewed notes; not independently inferred from design",
+        "notes_path": str(notes_path), "notes_sha256": _sha256(notes_path),
+        "LINCS2020_access": "header only in reproduction; prior first-row QC exposure stays declared",
+        "scope": "no X/gctx response values read; MAT schemas loaded without fitting"})
+    with (output / "raw_action_rows.jsonl").open("x", encoding="utf-8", newline="\n") as handle:
+        for row in rows:
+            handle.write(json.dumps(row, ensure_ascii=True, allow_nan=False) + "\n")
+    _write(output / "action_mapping_specs.json", {"source_specs": specifications, "rows": len(rows)})
+    relative = NYMAN + "/data_incucyte/data_count.mat"
+    matrix = loadmat(ROOT / relative)["data_count"][0, 0]
+    structure = []
+    for rep in ("rep1", "rep2", "rep3"):
+        for quantity in ("apoptosis", "cell_growth"):
+            summary = matrix[rep][0, 0][quantity][0, 0]
+            structure.append({"path": f"data_count.{rep}.{quantity}", "stored_summaries": [
+                {"name": name, "shape": list(summary[name].shape)} for name in ("mean", "std")]})
+    _write(output / "nyman_live_candidate_addendum.json", {"data_path": relative,
+        "sha256": digests[relative], "time_vector": matrix["time"].reshape(-1).tolist(),
+        "summary_structure": structure, "hard_gate_pass": False,
+        "time_unit": "not encoded in MAT schema", "shared_control_indices_one_based": [1, 15, 30, 31, 45, 60],
+        "candidate": "live t0 exists; dosing chronology, availability and well matching unverified"})
+    checks = []
+    for study, cells in (("sciplex2", 24262), ("sciplex4", 98437)):
+        observed = [row for row in rows if row["study"] == study and "source_row_indices" in row]
+        indices = [index for row in observed for index in row["source_row_indices"]]
+        checks.append({"name": study + "_partition", "passed": sorted(indices) == list(range(cells))})
+    checks.append({"name": "temporal_nulls", "passed": all(row["decision_at"] is None and
+        row["state_available_at"] is None and row["state_measured_at"] is None for row in rows)})
+    receipt = {"code_path": str(Path(__file__).resolve()), "code_sha256": _sha256(Path(__file__)),
+        "notes_sha256": _sha256(notes_path), "command": sys.argv, "sources": len(receipts),
+        "rows": len(rows), "by_study": dict(Counter(row["study"] for row in rows)),
+        "checks": checks, "passed": all(check["passed"] for check in checks),
+        "environment": {"python": sys.version, "executable": sys.executable, "platform": platform.platform()},
+        "reuse_recorded_hashes": reuse_recorded_hashes,
+        "artifact_hashes": {path.name: _sha256(path) for path in sorted(output.iterdir()) if path.is_file()}}
+    _write(output / "execution_receipt.json", receipt)
+    return receipt
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--out", type=Path, required=True, help="new output leaf, never overwrite")
+    parser.add_argument("--review-notes", type=Path, default=NOTES,
+                        help="frozen human-review input, preserved unchanged")
+    parser.add_argument("--reuse-recorded-hashes", action="store_true",
+                        help="explicitly reuse prior whole-file hashes; freshly snapshot metadata")
+    args = parser.parse_args()
+    receipt = run(args.out.resolve(), args.review_notes.resolve(), args.reuse_recorded_hashes)
+    print(json.dumps({"out": str(args.out), "rows": receipt["rows"], "passed": receipt["passed"]}))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,71 @@
+from pathlib import Path
+import gzip
+import hashlib
+import json
+import re
+import subprocess
+import urllib.parse
+import xml.etree.ElementTree as ET
+
+root = Path('D:/MAESTRO')
+published = root / 'tools/datasets/audit_results/20261001_state'
+manifest_path = published / 'manifest.json'
+manifest = json.loads(manifest_path.read_text())
+rows = manifest['files']
+names = [(published / row['published_file']).relative_to(root).as_posix() for row in rows if row['published_file']]
+result = subprocess.run(['git', 'cat-file', '--batch'], cwd=root,
+                        input=''.join(':' + name + '\n' for name in names).encode(),
+                        capture_output=True, check=True)
+offset = 0
+blob_digests = {}
+for name in names:
+    end = result.stdout.index(b'\n', offset)
+    header = result.stdout[offset:end].split()
+    assert len(header) == 3 and header[1] == b'blob', name
+    size = int(header[2]); offset = end + 1
+    blob = result.stdout[offset:offset+size]
+    blob_digests[name] = hashlib.sha256(blob).hexdigest()
+    offset += size + 1
+assert offset == len(result.stdout)
+
+for row in rows:
+    assert row['published_file'], 'this audit publishes every scientific receipt'
+    path = published / row['published_file']
+    content = path.read_bytes()
+    assert hashlib.sha256(content).hexdigest() == row['published_sha256']
+    assert blob_digests[path.relative_to(root).as_posix()] == row['published_sha256']
+    restored = gzip.decompress(content) if row['encoding'] == 'gzip_of_original_bytes' else content
+    assert hashlib.sha256(restored).hexdigest() == row['original_sha256']
+
+before = subprocess.check_output(['git', 'show', 'HEAD:log/20261001/README.md'], cwd=root)
+staged = subprocess.check_output(['git', 'show', ':log/20261001/README.md'], cwd=root)
+assert staged.startswith(before), 'historical log prefix changed in Git'
+assert not subprocess.check_output(['git','diff','--cached','--name-only','--','src'],cwd=root).strip()
+
+documents = [root / name for name in ['README.md','log/INDEX.md','log/20261001/README.md',
+    'tools/datasets/README.md','tools/datasets/STATE_IDENTIFIABILITY.md','tools/datasets/STATE_DATA_PLAN.md']]
+local_links = 0
+for path in documents:
+    for destination in re.findall(r'\]\(([^)]+)\)', path.read_text(encoding='utf-8')):
+        destination = destination.split('#',1)[0].strip('<>')
+        if not destination or urllib.parse.urlsplit(destination).scheme:
+            continue
+        assert (path.parent / urllib.parse.unquote(destination)).exists(), (str(path), destination)
+        local_links += 1
+
+language = ET.parse(root/'outputs/state_identifiability_20261001/publication_language_checks.xml').getroot()
+suites = [language] if language.tag == 'testsuite' else list(language.findall('testsuite'))
+counts = {key: sum(int(suite.get(key,0)) for suite in suites) for key in ('tests','failures','errors','skipped')}
+assert counts['failures'] == counts['errors'] == counts['skipped'] == 0
+receipt = {'passed':True,'published_originals_checked':len(rows),'staged_git_blobs_checked':len(names),
+    'manifest_sha256':hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+    'local_document_links_checked':local_links,'post_publication_repository_checks':counts,
+    'historical_log_git_prefix_preserved':True,'production_source_changes':0,
+    'scope':'byte preservation, staged Git integrity, navigation and language contracts; no efficacy experiment',
+    'command_source':'reporting/validate_publication_command.py.txt'}
+with (published/'publication_validation.json').open('x',encoding='utf-8') as handle:
+    json.dump(receipt,handle,indent=2);handle.write('\n')
+shutil_source = published/'reporting/validate_publication_command.py.txt'
+with shutil_source.open('xb') as handle:
+    handle.write((root/'outputs/state_identifiability_20261001/reporting/validate_publication_command.py.txt').read_bytes())
+print(json.dumps(receipt))

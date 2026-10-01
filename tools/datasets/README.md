@@ -41,3 +41,9 @@ and leakage checks, not independent external validation or deployment calibratio
 
 Candidate research history is in `research/dataset_discovery/`; the current audit and module
 changes are in `log/20260929/README.md`. Large assets stay under ignored local `data/`.
+
+The next [real predecision-state audit](STATE_IDENTIFIABILITY.md) reruns raw
+episode/action joins, inspects twelve local task families and three public
+sources, and stops at its eligibility gate. Collection/verification/construction
+code remains in this module; [STATE_DATA_PLAN.md](STATE_DATA_PLAN.md) specifies
+the missing event/sample/attempt records required before a state-gain experiment.

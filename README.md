@@ -28,6 +28,8 @@ The literature-guided frozen-data experiments, negative policy result and source
 [research/dual_core_followup/README.md](research/dual_core_followup/README.md).
 The live DeepSeek/Jev validation, report-only defect auditor and general contract evaluation are in
 [research/dual_core_live/README.md](research/dual_core_live/README.md).
+The next real predecision-state data audit and acquisition plan are indexed in
+[tools/datasets/STATE_IDENTIFIABILITY.md](tools/datasets/STATE_IDENTIFIABILITY.md).
 
 ## Run
 
