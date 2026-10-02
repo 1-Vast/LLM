@@ -12,6 +12,7 @@ from pathlib import Path
 
 
 DEFAULT_TARGETS = ("research",)
+ARCHIVE_GLOBS = ("*/results/*", "*/baseline_*/*", "*/snapshots/*", "*/execution_sources/*")
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -30,7 +31,14 @@ def main() -> int:
         import pytest
     except ImportError as exc:  # pragma: no cover - exercised by an environment, not a test
         raise SystemExit("Install the test dependency before running this research test command") from exc
-    return int(pytest.main([str(ROOT / target) for target in DEFAULT_TARGETS] + sys.argv[1:]))
+    args = sys.argv[1:]
+    include_archives = "--include-archives" in args
+    args = [arg for arg in args if arg != "--include-archives"]
+    exclusions = [] if include_archives else [
+        f"--ignore={ROOT / 'research/experiments'}", f"--ignore={ROOT / 'research/data'}",
+        *(f"--ignore-glob={pattern}" for pattern in ARCHIVE_GLOBS),
+    ]
+    return int(pytest.main([str(ROOT / target) for target in DEFAULT_TARGETS] + exclusions + args))
 
 
 if __name__ == "__main__":  # pragma: no cover

@@ -5,7 +5,7 @@ from pathlib import Path
 import h5py
 import numpy as np
 
-from src.virtual_cell.state_runner import _column
+from virtual_cell.state_runner import _column
 from tools.datasets.state_prospective_input import write_json
 from tools.datasets.state_remote_h5 import RangeFile
 

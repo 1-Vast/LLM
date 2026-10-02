@@ -7,8 +7,8 @@ File summary
   labels), the missingness rule (no zero-filled condition), the frozen protocol hash and the
   production-schema episodes built from the reference blocks.
 - Depends on: data/processed/case_memory_integration (the built pack),
-  research/case_memory_integration/{PROTOCOL.md,freeze_protocol.json,external_data.py,
-  external_replay.py}, outputs/case_memory_integration/episodes (optional)
+  research/case_memory_integration/{PROTOCOL.md,freeze_protocol.json,external_replay.py},
+  tools/datasets/lincs_pack.py, outputs/case_memory_integration/episodes (optional)
 """
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ import json
 import numpy as np
 import pytest
 
-from research.case_memory_integration import external_data as XD
+from tools.datasets import lincs_pack as XD
 
 
 @pytest.fixture(scope="module")

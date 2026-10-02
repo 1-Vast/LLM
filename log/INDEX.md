@@ -1,5 +1,6 @@
 # Experiment record index
 
+
 The day records are the entry points. Existing machine-local artifacts under
 `20260915/` are listed below for auditability; the verification reports under
 `outputs/local_verification/` remain local and are not part of this log.
@@ -19,6 +20,7 @@ The day records are the entry points. Existing machine-local artifacts under
 | `20260930/README.md` | Round 1 source and identifiability audit; Round 2 forecast/policy interventions, source corrections, STATE interface recheck and partial-identification limits |
 | `20261001/README.md` | Collaborative dual-core module/data qualification and runtime fixes; literature-guided no-training policy, denominator and value-scope experiments; source bounds and preserved recovery receipts; live DeepSeek/Jev validation, general contract benchmark and report-only defect audit; section 14: real predecision-state raw-data gate, public source review, stopped state-gain experiment and content-bound historical language isolation |
 | `20261002/README.md` | ASTRA two-round multi-agent adjustments: paired STATE and input-dependency/influence audits, residual diagnostics, verified runtime/scoring/persistence guards promoted into four existing files, research curation and main publication;1,861 full tests pass, biological gain unestablished |
+| `20261003/README.md` | Reviewed CLI plan-version and QC-bundle faults repaired; default engineering tests and installed-package boundaries verified; research fitting/replay separated; measured-realisation intake remains unexecuted; 1,949 aggregate tests passed |
 
 ## Files
 

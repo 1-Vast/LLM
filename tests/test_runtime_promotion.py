@@ -7,8 +7,8 @@ import pytest
 
 from agent.memory import CaseState
 from maestro.models import FunctionalInterventionProfile
-from tests.test_orchestrator_execution_authority import TASK, _action, _controller, _plan
-from tests.test_virtual_cell_orchestration import ApplicableWorldModel
+from tests.fixtures.orchestration import TASK, _action, _controller, _plan
+from tests.fixtures.world_model import ApplicableWorldModel
 from virtual_cell.interface import SystemContext, VirtualCellQueryTemplate
 
 

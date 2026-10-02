@@ -19,6 +19,7 @@ import pytest
 import runpy
 
 from agent.orchestrator import MAESTROOrchestrator
+from agent.memory import CaseState
 from maestro.outcome import MODE_COMPARATOR_FIELD, REALISATION_FIELD, SUFFICIENT_FUNCTION_FIELD, InterpretationTable, OutcomeClass, OutcomeRule
 from maestro.models import DecisionStatus, EvidenceKind, EvidenceScope, MechanismContrast
 from maestro import EvidenceAction, FunctionalInterventionProfile, MechanismHypothesis
@@ -62,8 +63,10 @@ def test_f01_model_prediction_neither_licenses_a_decision_nor_marks_a_prerequisi
         budget=5.0,
         max_rounds=1,
     )
-    assert loop.decision is not None
-    assert loop.decision.status is not DecisionStatus.DECIDED
+    assert loop.decision is None
+    assert loop.stop_reason == "awaiting_result"
+    assert controller._case_store.snapshot("audit-f01-live").state is CaseState.AWAITING_RESULT
+    assert controller._case_store.snapshot("audit-f01-live").spent == 0
     assert loop.evidence_state is not None
     assert loop.evidence_state.mechanism_updates() == ()
     assert not controller._profile_after_result(

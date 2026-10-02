@@ -14,7 +14,7 @@ File summary
     the fact. `oracle` is clairvoyant and reported for headroom only.
   - The unseen stratum is exploratory (protocol section 8): no confirmatory claim is computed.
 - Interfaces: `run_replay`, `load_results`, `ARM_NAMES`, `READING_CODES`
-- Depends on: research/case_memory_integration/external_data.py (the hashed pack), numpy
+- Depends on: tools/datasets/lincs_pack.py (the hashed pack), numpy
 """
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .external_data import CORE_CELL_LINES, ROOT, SEED, load_pack
+from tools.datasets.lincs_pack import CORE_CELL_LINES, ROOT, SEED, load_pack
 
 READING_CODES = ("match_own", "match_decoy", "unresolved", "undetected")
 ARM_NAMES = ("scalar", "signed_direction", "pathway_direction", "combined",
@@ -352,3 +352,65 @@ def run_replay(out_dir: Path | None = None) -> dict:
 
 def load_results() -> dict:
     return json.loads((OUT / "results.json").read_text(encoding="utf-8"))
+
+
+MPIE_CORRECT = 0.02
+HEADROOM_FACTOR = 2.0
+
+
+def replay() -> int:
+    results = run_replay()
+    print(json.dumps({
+        "population": results["population"],
+        "primary": results["primary_endpoint_full_minus_scalar_nll"],
+        "headroom": results["oracle_headroom_correct"],
+    }, indent=1))
+    return 0
+
+
+def evaluate() -> int:
+    path = ROOT / "outputs/case_memory_integration/results.json"
+    if not path.is_file():
+        print(json.dumps({"error": "results.json missing; run research.case_memory_integration.external_replay replay first"}))
+        return 1
+    results = json.loads(path.read_text(encoding="utf-8"))
+    metrics = results["forecast_metrics"]
+    arms = ("scalar", "signed_direction", "pathway_direction", "combined", "full")
+    fields = ("nll", "brier_wrong_elimination", "directional_accuracy", "discrimination_nats")
+    ablation = {arm: {key: metrics[arm][key] for key in fields} for arm in arms}
+    headroom = results["oracle_headroom_correct"]
+    required = HEADROOM_FACTOR * MPIE_CORRECT
+    gate = {
+        "headroom": headroom,
+        "headroom_required": required,
+        "headroom_gate_met": headroom >= required,
+        "exploratory": results["exploratory"],
+        "activation_verdict": (
+            "no default activation: the unseen stratum is exploratory, the headroom gate fails, "
+            "and the full arm does not improve the primary endpoint"
+        ),
+    }
+    summary = {
+        "population": results["population"],
+        "forecast_table": metrics,
+        "directional_ablation": ablation,
+        "primary_endpoint": results["primary_endpoint_full_minus_scalar_nll"],
+        "decision_table": results["decision_metrics"],
+        "gates": gate,
+    }
+    out = ROOT / "outputs/case_memory_integration/evaluation_summary.json"
+    out.write_text(json.dumps(summary, indent=1), encoding="utf-8")
+    print(json.dumps({"out": str(out), "activation_verdict": gate["activation_verdict"]}))
+    return 0
+
+
+def main(argv=None):
+    import argparse
+    parser = argparse.ArgumentParser(description="Research-only LINCS replay and evaluation")
+    parser.add_argument("step", choices=("replay", "evaluate"))
+    args = parser.parse_args(argv)
+    return {"replay": replay, "evaluate": evaluate}[args.step]()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

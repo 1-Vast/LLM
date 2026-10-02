@@ -12,7 +12,7 @@ import h5py
 import numpy as np
 import pandas as pd
 
-from src.virtual_cell.state_runner import _column
+from virtual_cell.state_runner import _column
 from tools.datasets.state_prospective_input import (
     CONTROL, CONTEXT, KEY, PERT, build_requests, digest, load_contract, predict, write_json,
 )

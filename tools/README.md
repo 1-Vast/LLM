@@ -19,14 +19,14 @@ commands share the reference-vector index and byte-hash helpers instead of resca
 arrays or duplicating checksum loops.
 The two validation modes use one entry point: `python -m tools.case_memory.validate forecasts` and
 `python -m tools.case_memory.validate calibration`.
-The external evaluation workflow also uses one entry point:
+Source and pack preparation is installed tooling; the scientific replay is checkout-local:
 
 ```bash
 python -m tools.case_memory.workflow sources
 python -m tools.case_memory.workflow pack
 python -m tools.case_memory.workflow graphs
-python -m tools.case_memory.workflow replay
-python -m tools.case_memory.workflow evaluate
+python -m research.case_memory_integration.external_replay replay
+python -m research.case_memory_integration.external_replay evaluate
 python -m tools.case_memory.audit quality
 python -m tools.case_memory.audit figures
 ```
@@ -34,6 +34,10 @@ python -m tools.case_memory.audit figures
 These replace the former `download_sources`, `build_hypothesis_graph`, `preprocess`,
 `replay` and `evaluate` modules. Run
 `python -m tools.case_memory.workflow --help` for the available steps.
+The pack step accepts `--workspace PATH`; `load_pack(workspace=PATH)` can also read
+an explicit data workspace outside the checkout. Source verification and graph
+construction retain their fixed checkout scope. Replay/evaluation no longer import
+research from installed tooling.
 
 ## Model Benchmark
 
@@ -59,7 +63,11 @@ Run evaluation through `python -m tools.evaluation.cli` and
 `python -m tools.evaluation.construction build|screen`. Only `maestro` is an installed command.
 The checkout-local research test
 runner is `python -m tools.research_validation` from the repository root; it checks code under
-`research/` and does not imply that a research claim is validated.
+active code under `research/` and does not imply that a research claim is validated.
+Results, baseline/snapshot source copies, `research/experiments` and supplied
+`research/data` copies are excluded by default. Use `--include-archives` only for an
+explicit historical collection; an active regression may still load an archived
+source deliberately to reproduce a known defect.
 
 Synthetic biological, virtual-cell, and provider-client fixtures are test-only and live in
 `tests/fixtures/`.

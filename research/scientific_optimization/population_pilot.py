@@ -19,7 +19,7 @@ import torch
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'src'))
 from virtual_cell.artifacts import shift_labels
-from virtual_cell.learned_response import PopulationPair, fit_population_flow, population_mmd
+from research.scientific_optimization.population_model import PopulationPair, fit_population_flow, population_mmd
 
 
 def digest(path):

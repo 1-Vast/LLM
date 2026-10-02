@@ -1,6 +1,8 @@
 """Evaluation engagement cases: consolidated module responsibilities."""
 from __future__ import annotations
 
+from tools.evaluation.engagement_sources import _number
+
 import csv
 import json
 from dataclasses import dataclass, field
@@ -291,14 +293,6 @@ def _prism_phenotype(row: Mapping[str, str]) -> PhenotypeRecord | None:
     )
 
 
-def _number(value: object) -> float | None:
-    if value in (None, "", "NA", "NaN", "Inf", "-Inf"):
-        return None
-    try:
-        number = float(str(value))
-    except (TypeError, ValueError):
-        return None
-    return number if number == number and abs(number) != float("inf") else None
 
 
 def _primary_target(targets: Sequence[str], profile: DepMapProfile) -> str | None:

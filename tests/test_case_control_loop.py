@@ -10,6 +10,7 @@ File summary
 - Depends on: agent.memory, agent.memory, agent.context, agent.knowledge, agent.memory, agent.orchestrator, agent.planner, agent.llm, maestro
 """
 from pathlib import Path
+import pytest
 
 from maestro.models import BiologicalQuantity
 
@@ -173,3 +174,34 @@ def test_result_quality_failure_is_the_primary_stop_reason(tmp_path: Path):
     assert loop.stop_reason == "result_quality_failed"
     assert not loop.evidence_state.mechanism_updates()
     assert loop.reflections[0].outcome_class == "record_quality_failed"
+
+
+@pytest.mark.parametrize("valid_present", [True, False])
+def test_qc_failure_drains_committed_bundle_before_stopping(tmp_path, valid_present):
+    controller, _, store = _controller(tmp_path, [_intent(), _contrast("failed")])
+    actions = (
+        EvidenceAction("failed", "Assay A", 1, ("functional-gap",),
+                       expected_outcomes={"functional-gap": "a", "mode-gap": "b"}),
+        EvidenceAction("valid", "Assay B", 1, ("mode-gap",),
+                       expected_outcomes={"functional-gap": "a", "mode-gap": "b"}),
+    )
+    calls = []
+    def provider(action, turn):
+        calls.append((action.identifier, turn.case.plan_version))
+        if action.identifier == "valid" and not valid_present:
+            return None
+        return MeasurementResult(action.identifier, "Instrument result", "instrument:" + action.identifier,
+            "cell-a", None, 2, action.identifier == "valid", result_id="r:" + action.identifier,
+            plan_version=turn.case.plan_version)
+
+    loop = controller.run_case_loop("task", available_actions=actions,
+        intervention_profile=FunctionalInterventionProfile("drug", context_identifier="cell-a"),
+        result_provider=provider, case_id="bundle", budget=3, max_rounds=2)
+    assert calls == [("failed", 1), ("valid", 1)]
+    assert len(loop.turns) == 1
+    assert loop.stop_reason == "result_quality_failed"
+    assert len(loop.reflections) == (2 if valid_present else 1)
+    assert store.snapshot("bundle").spent == (2 if valid_present else 1)
+    assert store.snapshot("bundle").state is (CaseState.RESULT_QC_FAILED if valid_present else CaseState.AWAITING_RESULT)
+    assert {a["status"] for a in store.action_states("bundle", 1)} == (
+        {"qc_failed", "result_recorded"} if valid_present else {"qc_failed", "planned"})

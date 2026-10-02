@@ -17,7 +17,7 @@ from tools.datasets.state_prospective_input import (
     CONTROL, CONTEXT, KEY, PERT, build_requests, digest, load_contract,
     predict, preprocess_new_rna, validate_requests, write_json,
 )
-from src.virtual_cell.state_runner import _column
+from virtual_cell.state_runner import _column
 
 
 def prepare(root, out):

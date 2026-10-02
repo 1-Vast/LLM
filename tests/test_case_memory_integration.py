@@ -429,3 +429,57 @@ def test_grouped_source_workflow_propagates_integrity_failures(tmp_path, monkeyp
     assert workflow.main(["sources"]) == int(tampered)
     manifest = json.loads((tmp_path / "outputs/case_memory_integration/external_source_manifest.json").read_text())
     assert manifest["verification_ok"] is (not tampered)
+
+
+def test_pack_workspace_keeps_test_values_out_of_reference_centroids(tmp_path):
+    import h5py
+    import numpy as np
+    import pandas as pd
+    from tools.datasets import lincs_pack
+
+    source = tmp_path / "data/external/lincs2020"
+    (source / "level5").mkdir(parents=True)
+    compounds, signatures, references = [], [], []
+    for klass in ("class-a", "class-b"):
+        for index in range(13):
+            identifier = f"{klass}-{index:02d}"
+            block = f"{klass}-{index:06d}"
+            compounds.append(dict(pert_id=identifier, inchi_key=block + "-suffix",
+                                  moa=klass, cmap_name=identifier))
+            signatures.append(dict(sig_id=identifier, pert_id=identifier, pert_type="trt_cp",
+                                   cell_iname="A549", pert_dose=10, pert_time=24))
+            if index < 10:
+                references.append(dict(pert_type="trt_cp", inchi_key_prefix=block))
+    pd.DataFrame(compounds).to_csv(source / "compoundinfo_beta.txt", sep="\t", index=False)
+    pd.DataFrame(signatures).to_csv(source / "siginfo_beta.txt", sep="\t", index=False)
+    for phase in (1, 2):
+        folder = tmp_path / f"data/external/lincs_l1000_phase{phase}"
+        folder.mkdir(parents=True)
+        rows = pd.DataFrame(references) if phase == 1 else pd.DataFrame(columns=["pert_type", "inchi_key"])
+        name = "GSE92742" if phase == 1 else "GSE70138"
+        rows.to_csv(folder / f"{name}_Broad_LINCS_pert_info.txt.gz", sep="\t", index=False)
+    genes = [f"gene-{index}" for index in range(5)]
+    pd.DataFrame(dict(gene_id=range(5), gene_symbol=genes, feature_space=["landmark"] * 5)).to_csv(
+        source / "geneinfo_beta.txt", sep="\t", index=False)
+    gmt = tmp_path / "data/external/msigdb/h.all.v2024.1.Hs.symbols.gmt"
+    gmt.parent.mkdir(parents=True)
+    gmt.write_text("set\tsource\t" + "\t".join(genes) + "\n")
+    matrix = source / "level5/level5_beta_trt_cp_n720216x12328.gctx"
+    with h5py.File(matrix, "w") as handle:
+        handle["0/DATA/0/matrix"] = np.arange(130, dtype=np.float32).reshape(26, 5)
+        handle["0/META/COL/id"] = np.array([row["sig_id"].encode() for row in signatures])
+        handle["0/META/ROW/id"] = np.array([str(index).encode() for index in range(5)])
+    first = lincs_pack.build_pack(workspace=tmp_path)
+    pack, before = lincs_pack.load_pack(workspace=tmp_path)
+    assert pack["counts"] == {"pool_classes": 2, "reference_blocks": 20, "unseen_blocks": 6}
+    with h5py.File(matrix, "r+") as handle:
+        for index in (10, 11, 12, 23, 24, 25):
+            handle["0/DATA/0/matrix"][index] = 10000
+    second = lincs_pack.build_pack(workspace=tmp_path)
+    _, after = lincs_pack.load_pack(workspace=tmp_path)
+    for key in before:
+        if key.startswith("centroid::"):
+            np.testing.assert_array_equal(before[key], after[key])
+    assert first["inputs"]["gctx"]["sha256"] != second["inputs"]["gctx"]["sha256"]
+    for name, digest in second["outputs"].items():
+        assert lincs_pack.sha256_file(tmp_path / "data/processed/case_memory_integration" / name) == digest

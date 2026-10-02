@@ -228,6 +228,39 @@ def test_results_keep_omitted_units_unknown(result_data):
     assert result.record_count == 1
 
 
+@pytest.mark.parametrize("version", [None, 1, 2])
+def test_results_preserve_explicit_plan_version(result_data, version):
+    result_data["plan_version"] = version
+    parsed = cli._results({"assay": result_data})["assay"]
+    assert parsed.plan_version == version
+
+
+@pytest.mark.parametrize("version", [True, False, 0, -1, 2.0, "2"])
+def test_results_reject_invalid_plan_version(result_data, version):
+    result_data["plan_version"] = version
+    with pytest.raises(ValueError, match="plan_version.*positive integer"):
+        cli._results({"assay": result_data})
+
+
+def test_cli_result_can_enter_second_plan_without_rebinding(result_data, tmp_path):
+    from agent.memory import CaseStore
+    from maestro.models import EvidenceAction
+
+    store = CaseStore(tmp_path / "case.sqlite")
+    store.open_case("case", budget=2)
+    action = EvidenceAction("assay", "Assay", 1, ("h",))
+    first = store.record_plan("case", (action,), ready_to_measure=True, context_identifier=None)
+    result_data.update(result_id="first", plan_version=first.plan_version)
+    parsed = cli._results({"assay": result_data})["assay"]
+    store.import_measurement("case", parsed)
+    second = store.record_plan("case", (action,), ready_to_measure=True, context_identifier=None)
+    result_data.update(result_id="second", plan_version=second.plan_version)
+    second_result = cli._results({"assay": result_data})["assay"]
+    assert store.import_measurement("case", second_result).snapshot.spent == 2
+    assert store.result_plan_version("case", "first") == 1
+    assert store.result_plan_version("case", "second") == 2
+
+
 def test_results_reject_null_record_count(result_data):
     result_data["record_count"] = None
     with pytest.raises(ValueError, match="record_count.*positive integer"):

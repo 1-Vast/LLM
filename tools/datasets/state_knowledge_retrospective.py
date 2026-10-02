@@ -19,7 +19,7 @@ from scipy import sparse
 from scipy.linalg import cho_factor, cho_solve
 from threadpoolctl import threadpool_limits
 
-from src.virtual_cell.state_runner import _column
+from virtual_cell.state_runner import _column
 from tools.datasets.state_prospective_input import CONTROL, CONTEXT, KEY, PERT, digest, write_json
 
 

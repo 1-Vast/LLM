@@ -36,7 +36,7 @@ def write_json(path, value):
 
 def load_contract(root):
     import torch
-    from src.virtual_cell.state_runner import _numpy_scalar_globals
+    from virtual_cell.state_runner import _numpy_scalar_globals
 
     root = Path(root)
     registry_path = root / "data/virtual_cell/registry.json"

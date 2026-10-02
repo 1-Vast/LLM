@@ -21,6 +21,22 @@ not a status report; verdict labels are the blocks' own registered words, cross-
 The new ASTRA entry uses its own current round reports; the dated consolidation inventory
 remains a historical record and is not rewritten by this iteration.
 
+Current ownership follows verified responsibilities rather than whole experiment scripts.
+The [October 3 follow-up](astra/FEEDBACK_BOUNDARY_FOLLOWUP.md) records the exact migration.
+
+| Lifecycle | Owner and entry point | Scientific status |
+|---|---|---|
+| Active engineering | `src/`, `tools/`, default `tests/`; exact result attribution and evidence admission | Software contracts only |
+| Active research | ASTRA decision diagnostics; `scientific_optimization/response_training.py` and `population_model.py`; LINCS `case_memory_integration/external_replay.py` | Experimental; no new promotion of biological validity |
+| Paused pending data | ASTRA measured-realisation and two-round biological comparison | Unregistered design; matched measurements, prices and power absent |
+| Completed diagnostics | Dated reports/results and earlier negative/inconclusive blocks | Retain original claim boundaries and hashes |
+| Reference archive | `research/data/`, results, baseline/snapshot/execution source copies, `experiments/` | Not active implementations or independent observations |
+
+`python -m tools.research_validation` collects active research by default. Explicit
+historical collection uses `--include-archives`; this does not authenticate old
+dependencies or qualify historical datasets. The supplied review copies remain
+byte-preserved and excluded from routine collection.
+
 ## (a) Agent and decision core
 
 | Path | Verdict | Contents |

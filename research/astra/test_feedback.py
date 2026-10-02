@@ -10,7 +10,6 @@ import pytest
 
 from maestro.case_memory import EpisodeStore, RealMeasurement, ScientificMeasurementStatus as Status
 from maestro import case_update as production_update
-from research.astra import case_update as astra_update
 from research.astra.feedback import FeedbackLink, FeedbackStore, categorical_score
 from tests.fixtures.case_memory_integration import _episode
 
@@ -49,11 +48,10 @@ def test_actual_legacy_bug_and_research_categorical_correction():
     assert bad.calibration.realised == 0.0  # Reproduces the production semantic bug.
     research = EpisodeStore()
     research.append(episode)
-    good = astra_update.ingest_result(research, episode, measurement(), qc_passed=True,
+    good = production_update.ingest_result(research, episode, measurement(), qc_passed=True,
                                      detected=True, contrast=("H_on", "H_off"),
                                      forecast_distribution={"unresolved": 0.8, "match_h1": 0.2},
                                      conditions_matched=True, model_version="fixture")
-    assert astra_update.ingest_result is production_update.ingest_result
     assert good.qualification.value == "reliable_but_inconclusive"
     assert good.eliminated == ()
     assert good.calibration.realised == 1
@@ -68,10 +66,10 @@ def test_legacy_scalar_needs_explicit_predicted_event():
     store = EpisodeStore()
     store.append(episode)
     with pytest.raises(ValueError, match="forecast_label"):
-        astra_update.ingest_result(store, episode, measurement(), qc_passed=True, detected=True,
+        production_update.ingest_result(store, episode, measurement(), qc_passed=True, detected=True,
                                   contrast=("H_on", "H_off"), forecast_probability=0.8)
     assert store.versions(episode.case_id) == (1,)
-    result = astra_update.ingest_result(store, episode, measurement(), qc_passed=True, detected=True,
+    result = production_update.ingest_result(store, episode, measurement(), qc_passed=True, detected=True,
                                        contrast=("H_on", "H_off"), forecast_probability=0.8,
                                        forecast_label="match_h1", conditions_matched=True)
     assert result.calibration.realised == 0

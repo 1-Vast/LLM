@@ -260,7 +260,7 @@ def part2() -> dict:
     from rdkit.Chem import rdFingerprintGenerator
     sys.path.insert(0, str(ROOT / "src"))
     from scipy.spatial.distance import pdist
-    from virtual_cell.learned_response import PopulationPair, fit_population_flow, population_mmd
+    from research.scientific_optimization.population_model import PopulationPair, fit_population_flow, population_mmd
     RDLogger.DisableLog("rdApp.*")
     torch.set_num_threads(2)
     d = load_cells()

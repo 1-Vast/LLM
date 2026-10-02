@@ -13,7 +13,8 @@ import xml.etree.ElementTree as ET
 
 
 TESTS = [
-    "research/astra", "tests/test_case_memory_integration.py",
+    "research/astra", "tests/test_runtime_promotion.py", "tests/test_feedback_promotion.py",
+    "tests/test_case_memory_integration.py",
     "tests/test_case_memory_forecast_modes.py", "tests/test_case_memory_orchestrator.py",
     "tests/test_case_memory_state_visibility.py", "tests/test_case_memory_scientific_boundaries.py",
     "tests/test_acquisition.py", "tests/test_discriminating_acquisition.py",

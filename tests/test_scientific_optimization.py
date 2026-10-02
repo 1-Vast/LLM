@@ -9,7 +9,7 @@ from agent.planner import MechanismContrastPlanner, PlannerContractError
 from maestro.outcome import InterpretationTable, OutcomeClass, OutcomeRule
 from maestro import FunctionalInterventionProfile
 from tests.fixtures.stub_client import StubClient
-from tests.test_learned_response import registered_model
+from tests.fixtures.learned_response import registered_model
 from tests.test_outcome_decision import _contrast, _result
 from virtual_cell.interface import IntervalKind, safe_predict
 from virtual_cell.learned_response import LearnedTranscriptWorldModel

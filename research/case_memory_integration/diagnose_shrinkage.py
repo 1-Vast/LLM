@@ -12,7 +12,7 @@ import numpy as np
 
 from maestro.case_memory import EpisodeStore
 from maestro.hypothesis_forecast import support_aware_shrinkage
-from research.case_memory_integration.external_data import ROOT, load_pack
+from tools.datasets.lincs_pack import ROOT, load_pack
 from tools.case_memory.build_cases import build_reference_episodes
 
 

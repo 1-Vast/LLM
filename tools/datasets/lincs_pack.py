@@ -9,7 +9,9 @@ File summary
   fitting step; `load_pack` separates reference-side and test-side payloads.
 - Core points:
   - Scope: trt_cp Level 5 signatures in A549, MCF7, PC3, VCAP at 24 h and 10 uM.
-  - Pool: `moa` classes with >= 12 reference blocks and >= 3 unseen blocks (metadata-only rule).
+  - Pool: `moa` classes with >= 12 total pool blocks and >= 3 unseen blocks (metadata-only rule).
+    The historical protocol said reference blocks; the already-recorded implementation
+    deviation is retained, without changing the frozen selection rule.
   - Split: test = InChIKey connectivity blocks absent from GSE92742 and GSE70138 trt_cp lists;
     reference = the remaining blocks in pool classes.
   - The pack records the SHA-256 of every input and of itself; the protocol freeze names the code
@@ -49,31 +51,35 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
-def _development_blocks() -> set[str]:
+def _development_blocks(workspace: Path | None = None) -> set[str]:
     """The trt_cp connectivity blocks of GSE92742 and GSE70138: the split's reference-study list."""
 
-    p1 = pd.read_csv(ROOT / "data/external/lincs_l1000_phase1/GSE92742_Broad_LINCS_pert_info.txt.gz",
+    root = Path(workspace).resolve() if workspace is not None else ROOT
+
+    p1 = pd.read_csv(root / "data/external/lincs_l1000_phase1/GSE92742_Broad_LINCS_pert_info.txt.gz",
                      sep="\t", low_memory=False)
-    p2 = pd.read_csv(ROOT / "data/external/lincs_l1000_phase2/GSE70138_Broad_LINCS_pert_info.txt.gz",
+    p2 = pd.read_csv(root / "data/external/lincs_l1000_phase2/GSE70138_Broad_LINCS_pert_info.txt.gz",
                      sep="\t", low_memory=False)
     blocks = set(p1.loc[p1.pert_type == "trt_cp", "inchi_key_prefix"].dropna())
     blocks |= set(p2.loc[p2.pert_type == "trt_cp", "inchi_key"].dropna().str[:14])
     return blocks
 
 
-def select_population() -> dict:
+def select_population(workspace: Path | None = None) -> dict:
     """Metadata-only population selection per protocol section 2 (no signature values)."""
 
-    ci = pd.read_csv(ROOT / "data/external/lincs2020/compoundinfo_beta.txt", sep="\t", low_memory=False)
+    root = Path(workspace).resolve() if workspace is not None else ROOT
+
+    ci = pd.read_csv(root / "data/external/lincs2020/compoundinfo_beta.txt", sep="\t", low_memory=False)
     ci["block"] = ci.inchi_key.str[:14]
     cols = ["sig_id", "pert_id", "pert_type", "cell_iname", "pert_dose", "pert_time"]
-    si = pd.read_csv(ROOT / "data/external/lincs2020/siginfo_beta.txt", sep="\t", usecols=cols,
+    si = pd.read_csv(root / "data/external/lincs2020/siginfo_beta.txt", sep="\t", usecols=cols,
                      low_memory=False)
     si = si[si.pert_type == "trt_cp"].merge(ci[["pert_id", "block", "moa", "cmap_name", "inchi_key"]],
                                             on="pert_id", how="left")
     scope = si[si.cell_iname.isin(CORE_CELL_LINES) & (si.pert_time == CORE_TIME_H)
                & (si.pert_dose == CORE_DOSE_UM)].copy()
-    dev = _development_blocks()
+    dev = _development_blocks(root)
     scope["unseen"] = ~scope.block.isin(dev)
     labeled = scope[scope.moa.notna()]
     per_class_all = labeled.groupby("moa").block.nunique()
@@ -95,11 +101,13 @@ def select_population() -> dict:
                        "unseen_blocks": sum(1 for u in units.values() if u["unseen"])}}
 
 
-def _hallmark_landmark(landmark_symbols: set[str]) -> dict[str, tuple[str, ...]]:
+def _hallmark_landmark(landmark_symbols: set[str], workspace: Path | None = None) -> dict[str, tuple[str, ...]]:
     """Hallmark v2024.1 gene sets restricted to the measured landmark space (frozen rule)."""
 
+    root = Path(workspace).resolve() if workspace is not None else ROOT
+
     sets: dict[str, tuple[str, ...]] = {}
-    path = ROOT / "data/external/msigdb/h.all.v2024.1.Hs.symbols.gmt"
+    path = root / "data/external/msigdb/h.all.v2024.1.Hs.symbols.gmt"
     for line in path.read_text(encoding="utf-8").splitlines():
         parts = line.rstrip("\n").split("\t")
         if len(parts) < 3:
@@ -110,21 +118,23 @@ def _hallmark_landmark(landmark_symbols: set[str]) -> dict[str, tuple[str, ...]]
     return sets
 
 
-def build_pack(out_dir: Path | None = None) -> dict:
+def build_pack(out_dir: Path | None = None, *, workspace: Path | None = None) -> dict:
     """Extract the population's signatures from the registered GCTX and write the hashed pack.
 
     Reference-side artifacts (centroids, reference readings, feature matrices for references) are
     fitted here; test-unit signature columns are stored raw. Nothing on the test side is read.
     """
 
+    root = Path(workspace).resolve() if workspace is not None else ROOT
+
     import h5py
 
-    out_dir = out_dir or ROOT / "data/processed/case_memory_integration"
+    out_dir = out_dir or root / "data/processed/case_memory_integration"
     out_dir.mkdir(parents=True, exist_ok=True)
-    gctx_path = ROOT / "data/external/lincs2020/level5/level5_beta_trt_cp_n720216x12328.gctx"
+    gctx_path = root / "data/external/lincs2020/level5/level5_beta_trt_cp_n720216x12328.gctx"
     if not gctx_path.is_file():
         raise PackError(f"registered source missing:{gctx_path}")
-    population = select_population()
+    population = select_population(root)
     pool, units = population["pool"], population["units"]
     with h5py.File(gctx_path, "r") as gctx:
         matrix = gctx["0/DATA/0/matrix"]
@@ -135,7 +145,7 @@ def build_pack(out_dir: Path | None = None) -> dict:
         col_pos = {c: i for i, c in enumerate(col_ids)}
         wanted = sorted({sig for u in units.values() for sig in u["signatures"].values()
                          if sig in col_pos})
-        gene_info = pd.read_csv(ROOT / "data/external/lincs2020/geneinfo_beta.txt", sep="\t")
+        gene_info = pd.read_csv(root / "data/external/lincs2020/geneinfo_beta.txt", sep="\t")
         landmark = set(gene_info.loc[gene_info.feature_space == "landmark", "gene_symbol"])
         gene_symbols = dict(zip(gene_info.gene_id.astype(str), gene_info.gene_symbol))
         symbols = [gene_symbols.get(g, g) for g in gene_ids]
@@ -151,7 +161,7 @@ def build_pack(out_dir: Path | None = None) -> dict:
             if j % 1000 == 999:
                 print(f"  extracted {j + 1}/{len(positions)} signature columns", flush=True)
     sig_index = {s: j for j, s in enumerate(wanted_sorted)}
-    gene_sets = _hallmark_landmark(set(landmark_symbols))
+    gene_sets = _hallmark_landmark(set(landmark_symbols), root)
     set_names = sorted(gene_sets)
     set_rows = np.array([[landmark_symbols.index(g) for g in gene_sets[name]] for name in set_names],
                         dtype=object)
@@ -192,9 +202,9 @@ def build_pack(out_dir: Path | None = None) -> dict:
         "pack_version": PACK_VERSION,
         "built_at": pd.Timestamp.now().isoformat(),
         "inputs": {
-            "gctx": {"path": str(gctx_path.relative_to(ROOT)), "sha256": sha256_file(gctx_path)},
+            "gctx": {"path": str(gctx_path.relative_to(root)), "sha256": sha256_file(gctx_path)},
             "compoundinfo": {"path": "data/external/lincs2020/compoundinfo_beta.txt",
-                             "sha256": sha256_file(ROOT / "data/external/lincs2020/compoundinfo_beta.txt")},
+                             "sha256": sha256_file(root / "data/external/lincs2020/compoundinfo_beta.txt")},
             "siginfo_columns_used": ["sig_id", "pert_id", "pert_type", "cell_iname",
                                      "pert_dose", "pert_time"],
         },
@@ -213,10 +223,12 @@ def build_pack(out_dir: Path | None = None) -> dict:
     return manifest
 
 
-def load_pack() -> tuple[dict, dict[str, np.ndarray]]:
+def load_pack(*, workspace: Path | None = None) -> tuple[dict, dict[str, np.ndarray]]:
     """Load the pack. Callers must keep reference-side and test-side keys apart."""
 
-    out_dir = ROOT / "data/processed/case_memory_integration"
+    root = Path(workspace).resolve() if workspace is not None else ROOT
+
+    out_dir = root / "data/processed/case_memory_integration"
     pack = json.loads((out_dir / "pack.json").read_text(encoding="utf-8"))
     arrays = dict(np.load(out_dir / "pack_arrays.npz"))
     return pack, arrays

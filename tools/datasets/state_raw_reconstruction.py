@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-from src.virtual_cell.state_runner import _numpy_scalar_globals
+from virtual_cell.state_runner import _numpy_scalar_globals
 from tools.datasets.state_prospective_input import digest, write_json
 
 

@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import torch
 
-from virtual_cell.learned_response import (
+from research.scientific_optimization.population_model import (
     ConditionalPopulationFlow, PopulationPair, fit_population_flow, population_mmd,
 )
 

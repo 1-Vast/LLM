@@ -1119,21 +1119,25 @@ class MAESTROOrchestrator:
                 if not result.quality_passed:
                     stop_reason = "result_quality_failed"
                     result_quality_failed = True
-                    awaiting = True
-                    break
+                    # Drain this committed bundle. A provider returns an available
+                    # result or None; it must not silently start an unrelated plan.
+                    # Stop new rounds only after all sibling results are processed.
             snapshot = self._case_store.snapshot(case_id)
+            if awaiting or snapshot.state is CaseState.AWAITING_RESULT:
+                stop_reason = "awaiting_result" if stop_reason == "max_rounds_reached" else stop_reason
+                break
             if state is not None and turn.contrast is not None:
                 decision = self._decide(
                     case_id, state, turn.contrast, admitted_scopes, observed_units, evidence_ids, turn, snapshot
                 )
+                if result_quality_failed:
+                    break
                 if decision is not None and decision.is_terminal:
                     # A terminal decision ends the case in the same transition that produced it.
                     self._case_store.record_decision(case_id, status=decision.status.value)
-                    if not result_quality_failed:
-                        stop_reason = f"decision:{decision.status.value}"
+                    stop_reason = f"decision:{decision.status.value}"
                     break
-            if awaiting:
-                stop_reason = "awaiting_result" if stop_reason == "max_rounds_reached" else stop_reason
+            if result_quality_failed:
                 break
             if snapshot.remaining_budget is not None and snapshot.remaining_budget <= 0:
                 stop_reason = "budget_exhausted"

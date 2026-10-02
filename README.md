@@ -21,7 +21,7 @@ measured, qualified evidence controls scientific conclusions.
 The core does not import tools or research. Research protocols and hashes remain historical
 records; a positive development result does not automatically qualify a production model.
 The current dual-core workflow and verification record is
-[log/20261001/README.md](log/20261001/README.md).
+[log/20261003/README.md](log/20261003/README.md).
 The supported architecture, reproduction entry point and dataset qualification are in
 [research/dual_core_completion/README.md](research/dual_core_completion/README.md).
 The literature-guided frozen-data experiments, negative policy result and source limits are in

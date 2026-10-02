@@ -473,6 +473,8 @@ def _results(data: Any) -> dict[str, MeasurementResult]:
             interpretation_fields=tuple(str(item) for item in value.get("interpretation_fields", ())),
             limitations=tuple(str(item) for item in value.get("limitations", ())),
             result_id=value.get("result_id"),
+            plan_version=(_positive_int(value["plan_version"], "plan_version")
+                          if value.get("plan_version") is not None else None),
         )
     return results
 

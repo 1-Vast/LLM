@@ -157,7 +157,7 @@ def predict_mlp_existing(d: FoldData, seeds: list[int]) -> dict:
 
     from sklearn.decomposition import TruncatedSVD
     from sklearn.preprocessing import StandardScaler
-    from virtual_cell.learned_response import fit_response
+    from research.scientific_optimization.response_training import fit_response
 
     fit, val = d.fit_rows(), d.val
     dose = gate(d.cond_dose)

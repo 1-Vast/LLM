@@ -1,5 +1,11 @@
 # ASTRA: dual-core research adjustments
 
+The latest [feedback and ownership follow-up](FEEDBACK_BOUNDARY_FOLLOWUP.md) fixes
+CLI plan attribution and committed-bundle draining, puts promoted contracts in
+default tests, and separates research training/replay from production inference.
+Its [measured-realisation design](results/20261003_feedback_boundary_v1/realisation_intake_v3/readiness.json)
+is unexecuted; supplied `research/data` files contain no new measurement table.
+
 The latest [dual-core contract optimization](DUAL_CORE_OPTIMIZATION.md) implements
 shared selection/admission, durable feedback attribution and arm failure handling.
 Full maestro regression passes1,924tests. A corrected480-well pilot remains an
@@ -19,11 +25,12 @@ different evidence levels. The last remains unidentified.
 | [decision_path.py](decision_path.py) | Minimal opt-in decision runner using the production `CaseStore`, with injected planner, predictor and selector. |
 | [interface.py](interface.py) | Research-only `StateRef`, `ScientificQuery`, `ExecutionBinding` and raw cache identity; supported prediction types remain production-owned. |
 | [feedback.py](feedback.py) | SQLite derived pairing and categorical scores, not a biological evidence authority. |
-| [case_update.py](case_update.py) | Compatibility exports of promoted production scoring; fixed historical source reproduces the original bug. |
+| [../../src/maestro/case_update.py](../../src/maestro/case_update.py) | Authoritative promoted scoring; the retired forwarding module is preserved in the new inert source archive. |
 | [paired_state.py](paired_state.py) | Real official STATE inference with the same actual basal tensor for every planned action. |
 | [paired_matrix.py](paired_matrix.py) | Frozen three-pool, three-seed technical matrix; original surrogate and tie rule retained. |
 | [state_interaction.py](state_interaction.py) | Action contrasts, top-choice vs abstention changes, residual alignment, matched permutations and development-only shrinkage. |
-| [runtime.py](runtime.py) | Stable exports of the tested production orchestrator and STATE adapter. |
+| [../../src/agent/orchestrator.py](../../src/agent/orchestrator.py) | Supported orchestrator; callers now import it and the STATE adapter directly. |
+| [realisation_plan.py](realisation_plan.py) | Read-only review-input audit, unregistered measured-action development specification and empty intake tables. |
 | [influence_audit.py](influence_audit.py) | Real STATE dependency audit, frozen-grid influence and constructed forecast/policy/timing swaps. |
 | [PROTOCOL.md](PROTOCOL.md) | Admission rules, scientific questions and the next independent experiment. |
 

@@ -110,7 +110,7 @@ def test_unregistered_selector_and_bundle_over_budget_are_rejected(tmp_path):
 
 def test_research_runtime_returns_before_interpreter(tmp_path):
     from tests.fixtures.biological import orchestrator, contract
-    from research.astra.runtime import MAESTROOrchestrator
+    from agent.orchestrator import MAESTROOrchestrator
     core = orchestrator(tmp_path)
     core.__class__ = MAESTROOrchestrator
     actions, _, profile = contract()
@@ -124,7 +124,8 @@ def test_research_runtime_returns_before_interpreter(tmp_path):
 
 
 def test_runtime_reuses_supported_adapter_and_nonwaiting_orchestration(tmp_path):
-    from research.astra.runtime import StateCapabilityAdapter, StateAdapterConfig, MAESTROOrchestrator
+    from virtual_cell.state_adapter import StateCapabilityAdapter, StateAdapterConfig
+    from agent.orchestrator import MAESTROOrchestrator
     from virtual_cell.state_adapter import StateCapabilityAdapter as ProductionAdapter
     from virtual_cell.state_adapter import StateAdapterConfig as ProductionConfig
     from tests.fixtures.biological import orchestrator, contract

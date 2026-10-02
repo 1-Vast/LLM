@@ -809,3 +809,13 @@ def load_kinobeads(path: Path, *, compounds: Sequence[str] = ()) -> tuple[Kinobe
         )
     workbook.close()
     return tuple(records)
+
+
+def _number(value: object) -> float | None:
+    if value in (None, "", "NA", "NaN", "Inf", "-Inf"):
+        return None
+    try:
+        number = float(str(value))
+    except (TypeError, ValueError):
+        return None
+    return number if number == number and abs(number) != float("inf") else None

@@ -1,7 +1,7 @@
 """External case-memory evaluation workflow.
 
-This module owns the source, pack, graph, replay and evaluation steps of one
-case-memory pipeline. Scientific implementations remain in ``research``.
+This module prepares sources, packs and graphs. Scientific replay and evaluation
+are owned by ``research.case_memory_integration.external_replay``.
 
 Run one step with ``python -m tools.case_memory.workflow <step>``.
 """
@@ -14,11 +14,7 @@ from pathlib import Path
 from tools.case_memory import sha256
 
 ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
 
-MPIE_CORRECT = 0.02
-HEADROOM_FACTOR = 2.0
 EXPECTED_LEVEL5_BYTES = 35518405386
 
 
@@ -136,10 +132,10 @@ def build_graphs() -> int:
     return 0
 
 
-def build_pack() -> int:
+def build_pack(workspace: Path | None = None) -> int:
     from tools.datasets.lincs_pack import build_pack as _build_pack
 
-    manifest = _build_pack()
+    manifest = _build_pack(workspace=workspace)
     print(json.dumps({
         "pack_version": manifest["pack_version"],
         "counts": manifest["counts"],
@@ -148,60 +144,20 @@ def build_pack() -> int:
     return 0
 
 
-def replay() -> int:
-    from research.case_memory_integration.external_replay import run_replay
-
-    results = run_replay()
-    print(json.dumps({
-        "population": results["population"],
-        "primary": results["primary_endpoint_full_minus_scalar_nll"],
-        "headroom": results["oracle_headroom_correct"],
-    }, indent=1))
-    return 0
 
 
-def evaluate() -> int:
-    path = ROOT / "outputs/case_memory_integration/results.json"
-    if not path.is_file():
-        print(json.dumps({"error": "results.json missing; run tools.case_memory.workflow replay first"}))
-        return 1
-    results = json.loads(path.read_text(encoding="utf-8"))
-    metrics = results["forecast_metrics"]
-    arms = ("scalar", "signed_direction", "pathway_direction", "combined", "full")
-    fields = ("nll", "brier_wrong_elimination", "directional_accuracy", "discrimination_nats")
-    ablation = {arm: {key: metrics[arm][key] for key in fields} for arm in arms}
-    headroom = results["oracle_headroom_correct"]
-    required = HEADROOM_FACTOR * MPIE_CORRECT
-    gate = {
-        "headroom": headroom,
-        "headroom_required": required,
-        "headroom_gate_met": headroom >= required,
-        "exploratory": results["exploratory"],
-        "activation_verdict": (
-            "no default activation: the unseen stratum is exploratory, the headroom gate fails, "
-            "and the full arm does not improve the primary endpoint"
-        ),
-    }
-    summary = {
-        "population": results["population"],
-        "forecast_table": metrics,
-        "directional_ablation": ablation,
-        "primary_endpoint": results["primary_endpoint_full_minus_scalar_nll"],
-        "decision_table": results["decision_metrics"],
-        "gates": gate,
-    }
-    out = ROOT / "outputs/case_memory_integration/evaluation_summary.json"
-    out.write_text(json.dumps(summary, indent=1), encoding="utf-8")
-    print(json.dumps({"out": str(out), "activation_verdict": gate["activation_verdict"]}))
-    return 0
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("step", choices=("sources", "pack", "graphs", "replay", "evaluate"))
+    parser.add_argument("step", choices=("sources", "pack", "graphs"))
+    parser.add_argument("--workspace", type=Path, help="Data workspace for the pack builder")
     args = parser.parse_args(argv)
-    return {"sources": verify_sources, "pack": build_pack, "graphs": build_graphs,
-            "replay": replay, "evaluate": evaluate}[args.step]()
+    if args.workspace is not None:
+        if args.step != "pack":
+            parser.error("--workspace is supported for pack only; sources/graphs are checkout-local")
+        return build_pack(args.workspace)
+    return {"sources": verify_sources, "pack": build_pack, "graphs": build_graphs}[args.step]()
 
 
 if __name__ == "__main__":

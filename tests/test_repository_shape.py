@@ -48,7 +48,7 @@ def test_package_roots_expose_only_entry_points(package, expected):
     ("tools.evaluation.construction", ["screen"], "--registry"),
     ("tools.evaluation.scoring", ["adjudicate"], "--public-cases"),
     ("tools.evaluation.scoring", ["table"], "--evaluation"),
-    ("tools.case_memory.workflow", [], "sources,pack,graphs,replay,evaluate"),
+    ("tools.case_memory.workflow", [], "sources,pack,graphs"),
 ])
 def test_consolidated_command_entrypoints_run(module, arguments, expected):
     result = subprocess.run(
