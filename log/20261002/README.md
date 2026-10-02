@@ -762,3 +762,41 @@ Upload hashes and scope are in
 code, scientific threshold, STATE inference or physical experiment changes.
 Repository-shape verification passes21tests with0failures/skips. All four staged
 report blobs match their original SHA256 byte-for-byte.
+
+
+## 22. Dual-core engineering contracts and scientific protocol
+
+Implemented both supplied opinions from base e988e7b. Coverage selection shares
+menu validation and exact subset search. Complete attempt distributions and forecast
+identity gate terminal decision value; harmful registered rules retain negative
+value. Inference, cache, briefing and controller use share request/version/readout
+validation. Evidence admission gates mechanism updates and independent support.
+
+CaseStore retains plan/result identity, immutable prediction envelopes and
+restart/reimport attribution. Repeated-action results require explicit plan version.
+Individual QC failures leave sibling arms importable. External start receipts,
+cancellation reasons, arm statuses and pending commitments remain visible; failed
+attempts consume declared budget units. Predictions cannot complete measurement
+plans; registered evidence reviews retain derived/retrieved records without
+promotion to measured evidence. Final review compares complete declared conditions.
+Unknown provider charge stays unknown while reservations remain visible for budget
+accounting; fixed profile pricing does not certify a current invoice.
+
+Pilot corrections:three terminal and three baseline blanks per parent,360 terminal
+plus120 baseline wells,480 total on8plates. Capacity checked before allocation.
+Proposed24-hour seeding wait and72-hour treatment are distinct from uncertified
+historical timing. First regeneration used the wrong snapshot and failed; receipt
+retained. Retry uses pinned15fec7c inputs and preserves the roster. Zero physical
+executions, no branch merge and no model refit.
+
+Final maestro regression:1,924passed,0failed,0errors,0skipped. Intermediate failures
+and repairs retained. All1,733pre-change evidence files retain their SHA256.
+No new src/tools files, checkpoint/dependency changes, STATE research forward,
+paid LLM API request or biological efficacy experiment. The four-arm ablation,
+composite-world semantics, bridge calibration and continue/modify/stop gates are
+specified; prices, minimum gain, power and net value remain unknown. Engineering
+verification does not establish biological benefit.
+
+Report:research/astra/DUAL_CORE_OPTIMIZATION.md. Commands, source hashes, full XML,
+history verifier, supplied opinion and prospective protocol:
+research/astra/results/20261002_contract_optimization_v1/receipt.json.

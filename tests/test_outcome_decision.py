@@ -75,6 +75,22 @@ def _table(contrast: MechanismContrast) -> InterpretationTable:
     return InterpretationTable(default_rules_for(contrast))
 
 
+def test_mechanism_update_cannot_bypass_admission():
+    from maestro.outcome import OutcomeInterpretation
+
+    interpretation = OutcomeInterpretation(OutcomeClass.PREDICTED, EvidenceScope.MECHANISM_CONTRAST,
+        "registered", "positive", frozenset({"h2"}), True, (), "rule fired", "registered conditions")
+    state = EvidenceState(frozenset({"h1", "h2"}))
+    valid = _result()
+    for invalid in (replace(valid, quality_passed=False), replace(valid, evidence_kind=EvidenceKind.MODEL_PREDICTION)):
+        updated = state.apply(interpretation, invalid, source_cluster="unqualified")
+        assert updated.candidates == state.candidates
+        assert not updated.independent_source_clusters
+    for unknown in (False, None, "unknown"):
+        verdict = replace(interpretation, conditions_matched=unknown)
+        assert state.apply(verdict, valid).candidates == state.candidates
+
+
 def test_quality_failure_is_retained_but_cannot_update_the_contrast():
     contrast = _contrast()
     interpretation = _table(contrast).interpret(

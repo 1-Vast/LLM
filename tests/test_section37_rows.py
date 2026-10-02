@@ -252,7 +252,21 @@ def test_the_ceiling_is_refused_before_the_call_not_after(tmp_path):
     ledger = SpendLedger(path=tmp_path / "spend.json", ceiling_usd=1.0, prior_total_usd=0.999)
     with pytest.raises(ValueError, match="provider_ceiling_exceeded"):
         ledger.reserve("row4:case-1", 0.01)
-    assert price_usage({"prompt_cache_hit_tokens": 1_000_000}) == pytest.approx(float(RATES["input_cache_hit"]))
+    assert price_usage({"prompt_cache_hit_tokens": 1_000_000, "completion_tokens": 0}) == pytest.approx(float(RATES["input_cache_hit"]))
+
+
+def test_unknown_usage_is_not_a_measured_charge_and_reservation_survives_reload(tmp_path):
+    ledger = SpendLedger(tmp_path / "unknown.json", ceiling_usd=1)
+    entry = ledger.charge("failed", None, status="failed", reserved_usd=.2)
+    assert entry.charged_usd is None
+    assert ledger.total_usd == .2
+    assert ledger.payload()["priced_session_total_usd"] is None
+    ledger.write()
+    restored = SpendLedger.load(ledger.path)
+    assert restored.entries[0].charged_usd is None and restored.total_usd == .2
+    assert price_usage({"prompt_tokens": 10}) is None
+    assert price_usage({"prompt_tokens": True, "completion_tokens": 1}) is None
+    assert price_usage({"model": "unpriced", "prompt_tokens": 10, "completion_tokens": 1}) is None
 
 
 def test_an_adjudication_packet_carries_the_evidence_and_no_ones_answer(tmp_path):

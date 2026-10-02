@@ -12,6 +12,7 @@ File summary
 - Depends on: agent.orchestrator, agent.memory, maestro, tests.test_case_decision_loop (helpers)
 """
 from pathlib import Path
+from dataclasses import replace
 
 import pytest
 
@@ -333,7 +334,7 @@ def test_f06_prediction_priority_follows_each_action_own_readout():
     )
     request = PredictionRequest(
         "r", "c", "k", 1, Intervention("D", "drug", ()), SystemContext("C", "C"),
-        ("r1", "r2", "absent"), "m",
+        ("r1", "r2"), "m",
     )
     prediction = StatePrediction(
         True, {"r1": 1.0, "r2": 100.0}, 0.0, (), model_version="m",
@@ -349,6 +350,7 @@ def test_f06_prediction_priority_follows_each_action_own_readout():
     assert original == {"a": 1.0, "b": 100.0}
     assert swapped == {"a": 100.0, "b": 1.0}
     assert "missing" not in original, "A readout absent from the prediction carries no weight."
+    assert controller._prediction_action_priorities(prediction, replace(request, readouts=("r1", "r2", "absent")), actions) == {}
 
 
 def test_f06_a_prediction_cannot_buy_a_redundant_or_costlier_action():

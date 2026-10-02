@@ -84,3 +84,62 @@ def test_policy_input_has_only_public_prediction_state():
 def test_policy_input_rejects_evaluator_fields_even_when_constructed_directly():
     with pytest.raises(ValueError, match="evaluator-only"):
         PolicyInput(visible_evidence=({"truth": "H1"},), budget=1.0)
+
+
+@pytest.mark.parametrize("mass", [0.5, 1.5, True])
+def test_incomplete_or_invalid_attempt_distribution_is_not_renormalised(mass):
+    forecast = _forecast("a", {"supports_h1": mass}, {"supports_h2": mass})
+    with pytest.raises(ValueError, match="invalid_probabilities"):
+        expected_terminal_decision_value({"H1", "H2"}, forecast, {})
+
+
+def test_wrong_action_forecast_cannot_select_an_action():
+    action = EvidenceAction("a", "A", 0.1, ("H1", "H2"))
+    plan = select_decision_sensitive_action(
+        frozenset({"H1", "H2"}), (action,), FunctionalInterventionProfile("drug"), 1,
+        {"a": _forecast("other", {"h1": 1.0}, {"h2": 1.0})},
+        {"h1": frozenset({"H2"}), "h2": frozenset({"H1"})},
+    )
+    assert plan.chosen is None
+    assert "forecast_for_another_action" in plan.evaluations[0].reason
+
+
+def test_harmful_registered_rule_retains_negative_value():
+    value = expected_terminal_decision_value({"H1", "H2"},
+        _forecast("a", {"wrong_rule": 1}, {"wrong_rule": 1}),
+        {"wrong_rule": frozenset({"H1"})}, prior={"H1": .99, "H2": .01})
+    assert value.expected_value == pytest.approx(-.98)
+    assert not value.admissible
+
+
+def test_coverage_search_is_permutation_invariant_and_shared_at_certain_power():
+    from itertools import permutations
+    from maestro.acquisition import select_expected_coverage
+    from maestro.composition import BudgetedEvidenceSelector
+    required = frozenset({"h1", "h2"})
+    profile = FunctionalInterventionProfile("drug")
+    actions = (EvidenceAction("z", "Z", 1, ("h1",)), EvidenceAction("a", "A", 1, ("h1",)),
+               EvidenceAction("b", "B", 1, ("h2",)))
+    for menu in permutations(actions):
+        deterministic = BudgetedEvidenceSelector().select(required, menu, profile, 2)
+        probabilistic = select_expected_coverage(required, menu, profile, 2)
+        assert tuple(a.identifier for a in deterministic.actions) == ("a", "b")
+        assert deterministic.actions == probabilistic.plan.actions
+
+
+@pytest.mark.parametrize("bad", [float("nan"), float("inf"), True, -1, "1"])
+def test_all_selectors_reject_invalid_costs(bad):
+    from maestro.acquisition import select_expected_coverage, select_discriminating_action
+    from maestro.composition import BudgetedEvidenceSelector
+
+    action = EvidenceAction("a", "A", bad, ("H1", "H2"))
+    candidates = frozenset({"H1", "H2"})
+    profile = FunctionalInterventionProfile("drug")
+    with pytest.raises(ValueError, match="invalid_action_cost"):
+        BudgetedEvidenceSelector().select(candidates, (action,), profile, 1)
+    with pytest.raises(ValueError, match="invalid_action_cost"):
+        select_expected_coverage(candidates, (action,), profile, 1)
+    with pytest.raises(ValueError, match="invalid_action_cost"):
+        select_decision_sensitive_action(candidates, (action,), profile, 1, {}, {})
+    with pytest.raises(ValueError, match="invalid_action_cost"):
+        select_discriminating_action(candidates, (action,), profile, 1, {}, {})

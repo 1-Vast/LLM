@@ -287,6 +287,8 @@ def test_prediction_derived_results_never_become_mechanism_updates(tmp_path: Pat
         update.scope is not EvidenceScope.MECHANISM_CONTRAST
         for update in loop.evidence_state.updates
     )
+    assert controller._case_store.snapshot("case-prediction").spent == 0
+    assert not controller._case_store.recorded_action_identifiers("case-prediction")
 
 
 def test_repair_records_are_exposed_on_a_single_turn(tmp_path: Path):

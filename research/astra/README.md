@@ -1,5 +1,10 @@
 # ASTRA: dual-core research adjustments
 
+The latest [dual-core contract optimization](DUAL_CORE_OPTIMIZATION.md) implements
+shared selection/admission, durable feedback attribution and arm failure handling.
+Full maestro regression passes1,924tests. A corrected480-well pilot remains an
+unexecuted proposal; the four-arm scientific design and evidence gaps are explicit.
+
 This research implementation applies the two supplied scientific and architecture reviews.
 It preserves the agent and world-model responsibilities, with one plan-submission path and
 an exact prediction/attempt/result feedback ledger. The second round promotes only tested

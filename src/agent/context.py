@@ -398,7 +398,7 @@ def world_model_rows(
     reliability: PredictionReliabilityLedger | None = None,
 ) -> tuple[WorldModelRow, ...]:
     """One row per registered action that was queried, in catalogue order."""
-
+    from virtual_cell.interface import prediction_request_errors
     rows: list[WorldModelRow] = []
     for action in actions:
         request = requests.get(action.identifier)
@@ -408,7 +408,8 @@ def world_model_rows(
         assessment = assessments.get(action.identifier)
         readout = action.prediction_readout or (request.readouts[0] if len(request.readouts) == 1 else None)
         validation = assessment.validation_status.value if assessment is not None else None
-        if prediction is None or not prediction.applicable:
+        errors = prediction_request_errors(prediction, request) if prediction is not None else ("not_answered",)
+        if errors or prediction is None or not prediction.applicable:
             rows.append(
                 WorldModelRow(
                     action=action.identifier,
@@ -417,7 +418,7 @@ def world_model_rows(
                     readout=readout,
                     validation_status=validation,
                     model_version=request.model_version,
-                    abstain_reason=(prediction.abstain_reason if prediction is not None else None) or "not_answered",
+                    abstain_reason=errors[0] if errors else (prediction.abstain_reason or "not_answered"),
                 )
             )
             continue

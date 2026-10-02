@@ -43,6 +43,9 @@ class LabCost:
     source: str = ""
 
     def __post_init__(self) -> None:
+        if (type(self.wells) is not int or isinstance(self.turnaround_days, bool)
+                or not isinstance(self.turnaround_days, (int, float)) or not math.isfinite(self.turnaround_days)):
+            raise ValueError("lab_cost_invalid: integer wells and finite turnaround required")
         if self.wells < 0 or self.turnaround_days < 0:
             raise ValueError("lab_cost_negative: wells and turnaround days cannot be negative.")
         if self.basis is CostBasis.RECORD_RETRIEVAL and (
@@ -82,6 +85,9 @@ class SharedControl:
     source: str = ""
 
     def __post_init__(self) -> None:
+        if (type(self.wells) is not int or isinstance(self.turnaround_days, bool)
+                or not isinstance(self.turnaround_days, (int, float)) or not math.isfinite(self.turnaround_days)):
+            raise ValueError("shared_control_invalid: integer wells and finite turnaround required")
         if self.wells <= 0 or self.turnaround_days < 0:
             raise ValueError(
                 f"shared_control_invalid:{self.identifier}: a control uses at least one well and "
@@ -251,8 +257,17 @@ RATES: Mapping[str, object] = {
 }
 
 
-def price_usage(usage: Mapping[str, object]) -> float:
-    """Price one call from the provider's own usage fields, in US dollars."""
+def price_usage(usage: Mapping[str, object]) -> float | None:
+    """Price known provider usage; incomplete usage or unknown rates remain unknown."""
+
+    if usage.get("model") not in (None, "deepseek-chat"):
+        return None
+    if (not any(name in usage for name in ("prompt_tokens", "prompt_cache_miss_tokens", "prompt_cache_hit_tokens"))
+            or "completion_tokens" not in usage):
+        return None
+    token_fields = {name: raw for name, raw in usage.items() if name.endswith("_tokens")}
+    if any(type(raw) is not int or raw < 0 for raw in token_fields.values()):
+        return None
 
     def value(name: str, fallback: int = 0) -> int:
         raw = usage.get(name, fallback)
@@ -260,8 +275,8 @@ def price_usage(usage: Mapping[str, object]) -> float:
             return fallback
         return int(raw)
 
-    miss = value("prompt_cache_miss_tokens", value("prompt_tokens"))
     hit = value("prompt_cache_hit_tokens")
+    miss = value("prompt_cache_miss_tokens", max(0, value("prompt_tokens") - hit))
     output = value("completion_tokens")
     return (
         miss * float(RATES["input_cache_miss"])
@@ -278,7 +293,7 @@ class SpendEntry:
     label: str
     status: str
     reserved_usd: float
-    charged_usd: float
+    charged_usd: float | None
     usage: Mapping[str, object]
     note: str = ""
 
@@ -288,7 +303,8 @@ class SpendEntry:
             "label": self.label,
             "status": self.status,
             "reserved_usd": round(self.reserved_usd, 8),
-            "charged_usd": round(self.charged_usd, 8),
+            "charged_usd": None if self.charged_usd is None else round(self.charged_usd, 8),
+            "cost_status": "unknown" if self.charged_usd is None else "priced_from_usage_or_refused",
             "usage": dict(self.usage),
             "note": self.note,
         }
@@ -306,7 +322,8 @@ class SpendLedger:
 
     @property
     def session_total_usd(self) -> float:
-        return sum(entry.charged_usd for entry in self.entries)
+        """Budget accounting only: retain reservations for calls with unknown charges."""
+        return sum(entry.charged_usd if entry.charged_usd is not None else entry.reserved_usd for entry in self.entries)
 
     @property
     def total_usd(self) -> float:
@@ -334,9 +351,9 @@ class SpendLedger:
         reserved_usd: float = 0.0,
         note: str = "",
     ) -> SpendEntry:
-        """Record one call. A failure after token processing is charged at its reservation."""
+        """Record unknown charge separately from its budget reservation."""
 
-        charged = price_usage(usage) if usage else (reserved_usd if status != "refused" else 0.0)
+        charged = 0.0 if status == "refused" else price_usage(usage or {})
         entry = SpendEntry(
             at=datetime.now(timezone.utc).isoformat(),
             label=label,
@@ -358,6 +375,10 @@ class SpendLedger:
             "session_total_usd": round(self.session_total_usd, 8),
             "total_usd": round(self.total_usd, 8),
             "remaining_usd": round(self.remaining_usd, 8),
+            "total_basis": "priced_usage_plus_unknown_charge_reservations; not an invoice",
+            "unknown_charge_calls": sum(entry.charged_usd is None for entry in self.entries),
+            "priced_session_total_usd": (None if any(entry.charged_usd is None for entry in self.entries)
+                                         else round(self.session_total_usd, 8)),
             "calls": len(self.entries),
             "entries": [entry.payload() for entry in self.entries],
         }
@@ -386,7 +407,7 @@ class SpendLedger:
                         label=str(entry.get("label", "")),
                         status=str(entry.get("status", "ok")),
                         reserved_usd=float(entry.get("reserved_usd", 0.0)),
-                        charged_usd=float(entry.get("charged_usd", 0.0)),
+                        charged_usd=float(entry["charged_usd"]) if entry.get("charged_usd") is not None else None,
                         usage=dict(entry.get("usage", {})),
                         note=str(entry.get("note", "")),
                     )
@@ -403,6 +424,8 @@ def summarise(ledgers: Sequence[SpendLedger]) -> Mapping[str, object]:
         "calls": sum(len(ledger.entries) for ledger in ledgers),
         "session_total_usd": round(sum(ledger.session_total_usd for ledger in ledgers), 8),
         "total_usd": round(max((ledger.total_usd for ledger in ledgers), default=0.0), 8),
+        "total_basis": "budget accounting; includes reservations, not an invoice",
+        "unknown_charge_calls": sum(entry.charged_usd is None for ledger in ledgers for entry in ledger.entries),
     }
 
 

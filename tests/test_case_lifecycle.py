@@ -175,3 +175,89 @@ def test_case_store_does_not_overwrite_an_unfinished_action_bundle(tmp_path: Pat
         "case-5", MeasurementResult("first", "Observed.", "run-1", "cell-a", None, 2, True)
     )
     assert imported.snapshot.state is CaseState.NEXT_ROUND
+
+
+def test_failed_action_keeps_sibling_results_importable_and_charges_both(tmp_path):
+    store = CaseStore(tmp_path / "cases.sqlite")
+    store.open_case("partial", budget=5)
+    actions = (EvidenceAction("failed", "A", 2, ("a",)), EvidenceAction("valid", "B", 3, ("b",)))
+    store.record_plan("partial", actions, ready_to_measure=True, context_identifier="cell-a")
+    failed = MeasurementResult("failed", "QC failed", "run-1", "cell-a", None, None, False, result_id="f")
+    first = store.import_measurement("partial", failed)
+    assert first.snapshot.state is CaseState.AWAITING_RESULT
+    second = store.import_measurement("partial", MeasurementResult(
+        "valid", "Observed", "run-2", "cell-a", None, 2, True, result_id="v"))
+    assert second.snapshot.state is CaseState.RESULT_QC_FAILED
+    assert second.snapshot.spent == 5
+    assert not store.import_measurement("partial", failed).created
+
+
+def test_execution_and_cancellation_are_separate_and_idempotent(tmp_path):
+    import pytest
+    store = CaseStore(tmp_path / "cases.sqlite")
+    store.open_case("arms", budget=5)
+    actions = (EvidenceAction("run", "A", 2, ("a",)), EvidenceAction("cancel", "B", 3, ("b",)))
+    store.record_plan("arms", actions, ready_to_measure=True, context_identifier="cell-a")
+    store.start_action("arms", 1, "run", attempt_id="attempt-1", source="operator-receipt")
+    assert store.start_action("arms", 1, "run", attempt_id="attempt-1", source="operator-receipt").spent == 0
+    with pytest.raises(ValueError, match="unexecuted"):
+        store.cancel_unexecuted_action("arms", 1, "run", reason="not used")
+    cancelled = store.cancel_unexecuted_action("arms", 1, "cancel", reason="no material")
+    assert cancelled.state is CaseState.AWAITING_RESULT and cancelled.spent == 0
+    assert store.cancel_unexecuted_action("arms", 1, "cancel", reason="no material") == cancelled
+    result = MeasurementResult("run", "QC failed", "run-source", "cell-a", None, None, False,
+                               result_id="failed", plan_version=1)
+    assert store.import_measurement("arms", result).snapshot.spent == 2
+    arms = store.action_states("arms", 1)
+    assert {a["status"] for a in arms} == {"qc_failed", "cancelled"}
+    assert next(a for a in arms if a["status"] == "qc_failed")["attempt_id"] == "attempt-1"
+
+
+def test_repeated_action_requires_explicit_plan_attribution(tmp_path):
+    import pytest
+    store = CaseStore(tmp_path / "cases.sqlite")
+    store.open_case("repeat", budget=3)
+    action = EvidenceAction("a", "A", 1, ("h",))
+    store.record_plan("repeat", (action,), ready_to_measure=True, context_identifier=None)
+    store.import_measurement("repeat", MeasurementResult("a", "First", "s1", None, None, 1, True, result_id="r1"))
+    store.record_plan("repeat", (action,), ready_to_measure=True, context_identifier=None)
+    ambiguous = MeasurementResult("a", "Next", "s2", None, None, 1, True, result_id="r2")
+    with pytest.raises(ValueError, match="ambiguous_result_plan_version"):
+        store.import_measurement("repeat", ambiguous)
+    from dataclasses import replace
+    assert store.import_measurement("repeat", replace(ambiguous, plan_version=2)).snapshot.spent == 2
+
+
+def test_prediction_is_not_an_execution_result_or_consumed_budget(tmp_path):
+    import pytest
+    from maestro.models import EvidenceKind
+    store = CaseStore(tmp_path / "cases.sqlite")
+    store.open_case("forecast", budget=1)
+    action = EvidenceAction("a", "A", 1, ("h",))
+    store.record_plan("forecast", (action,), ready_to_measure=True, context_identifier=None)
+    with pytest.raises(ValueError, match="only_real_measurements"):
+        store.import_measurement("forecast", MeasurementResult("a", "Predicted", "model", None, None, 1, True,
+            evidence_kind=EvidenceKind.MODEL_PREDICTION, result_id="fake"))
+    assert store.snapshot("forecast").state is CaseState.AWAITING_RESULT
+    assert store.snapshot("forecast").spent == 0
+    assert store.budget_status("forecast")["reserved"] == 1
+
+
+def test_derived_record_is_accepted_only_for_a_registered_review(tmp_path):
+    import pytest
+    from maestro.models import EvidenceActionKind, EvidenceKind
+    store = CaseStore(tmp_path / "cases.sqlite")
+    source = MeasurementResult("a", "Derived published record", "published-source", None, None, None, True,
+                               evidence_kind=EvidenceKind.DERIVED_ANALYSIS, result_id="derived")
+    for case, kind in (("measurement", EvidenceActionKind.READOUT_MEASUREMENT),
+                       ("review", EvidenceActionKind.EVIDENCE_REVIEW)):
+        store.open_case(case, budget=1)
+        store.record_plan(case, (EvidenceAction("a", "A", 1, ("h",), kind=kind),),
+                          ready_to_measure=True, context_identifier=None)
+        if case == "measurement":
+            with pytest.raises(ValueError, match="requires_registered_evidence_review"):
+                store.import_measurement(case, source)
+            assert store.snapshot(case).spent == 0
+        else:
+            assert store.import_measurement(case, source).snapshot.spent == 1
+            assert store.action_states(case, 1)[0]["action_kind"] == kind.value
