@@ -351,3 +351,15 @@ Independent review corrects the mechanism-to-statistical-null implication direct
 and clarifies that verified independent pilot cultures can support assumption-dependent
 intervals; batch labels alone cannot. It also retains opposing parent-level action
 advantages as a possible interaction even if the marginal contrast cancels.
+
+## Subsequent executed phenotype task
+
+The historical sections above retain their original STATE/Tahoe scope. The later
+[GDSC_SCREEN.md](GDSC_SCREEN.md) selects a new, explicitly frozen three-drug phenotype
+task and executes real same-plate measurements with a patient-and-date holdout.
+It updates questions 1/2/3/6/8 with measured offline evidence: the added seeding-density
+policy has -0.52 ATP-inhibition percentage points versus the background policy,
+97.5% CI [-1.69,+0.65]. Its upper bound is below the frozen 2/5/10/20pp sensitivity
+thresholds under the stated cluster-inference assumptions. The background signal is
+positive but meaningful/net deployment value remains uncertified. Molecular state,
+mechanism discrimination, STATE superiority and four-way scheduling remain open.

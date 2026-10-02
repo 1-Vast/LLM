@@ -5,7 +5,13 @@ It preserves the agent and world-model responsibilities, with one plan-submissio
 an exact prediction/attempt/result feedback ledger. The second round promotes only tested
 engineering contracts into existing production files; see [ROUND2.md](ROUND2.md).
 Engineering verification, historical prediction diagnostics, and observed policy value are
-different evidence levels. The last remains unidentified.
+different evidence levels. Prospective biological and net deployment value remain unidentified.
+
+The subsequent [GDSC phenotype study](GDSC_SCREEN.md) executes matched-plate measured-data
+analysis and offline replay on 214 held-out patient clusters across 19 later dates.
+Adding registered seeding density gives -0.52 ATP-inhibition percentage points versus the
+background predictor (97.5% CI -1.69 to +0.65); the tested density extension is stopped.
+This ordinary conditional predictor is a world-core baseline, not STATE or a new model claim.
 
 ## Entry points and scope
 
@@ -21,8 +27,12 @@ different evidence levels. The last remains unidentified.
 | [runtime.py](runtime.py) | Stable exports of the tested production orchestrator and STATE adapter. |
 | [influence_audit.py](influence_audit.py) | Real STATE dependency audit, frozen-grid influence and constructed forecast/policy/timing swaps. |
 | [PROTOCOL.md](PROTOCOL.md) | Admission rules, scientific questions and the next independent experiment. |
+| [gdsc_screen.py](gdsc_screen.py) | Frozen metadata/split, grouped development and measured phenotype confirmation; all commands create new directories. |
+| [gdsc_replay.py](gdsc_replay.py) | Pre-outcome plans and real result reveals using the existing DecisionPath and CaseStore. |
+| [GDSC_SCREEN.md](GDSC_SCREEN.md) | Chinese task, qualification, actual results, costs, limits and reproducible commands. |
 
-Run from `D:\MAESTRO` using `D:\anaconda\envs\maestro\python.exe`.
+The following historical STATE commands ran from `D:\MAESTRO` using `D:\anaconda\envs\maestro\python.exe`.
+The GDSC runner is portable and uses the commands in its report from the actual checkout root.
 The existing editable MAESTRO package and installed STATE assets are required. No dependency
 or checkpoint change was made. The query/predictor bridge and experimental execution remain
 explicit caller responsibilities; the runner is not a drop-in production CLI replacement.

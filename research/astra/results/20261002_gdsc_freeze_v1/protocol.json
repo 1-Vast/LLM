@@ -1,0 +1,171 @@
+{
+  "version": "gdsc-phenotype-v1",
+  "frozen_at_utc": "2026-10-01T18:53:55.627385+00:00",
+  "base_commit": "84da7242db5c5b0833e0cc45d291a527cd9a1e4b",
+  "sources": {
+    "raw": {
+      "path": "/workspace/scratch/d1b03fc28617/LLM/data/external/gdsc_screen/gdsc_example.rda",
+      "sha256": "40bc65d4fd9cd61bb8c0faf5fa60ee32a05fccce7eb441cc74e3ed37666ef10a"
+    },
+    "annotations": {
+      "path": "/workspace/scratch/d1b03fc28617/LLM/data/external/gdsc_screen/Cell_Lines_Details.xlsx",
+      "sha256": "5520e779d25469f864de9cc5d42b99bf9632bd346607c0ee6a9ebad7ece17ac3"
+    },
+    "passports": {
+      "path": "/workspace/scratch/d1b03fc28617/LLM/data/external/gdsc_screen/model_list_latest.csv.gz",
+      "sha256": "333affaa690c9f7e517467a6f78b00ffb418cb8449e2eb1cc5d93d85f7b0862e"
+    },
+    "compounds": {
+      "path": "/workspace/scratch/d1b03fc28617/LLM/data/external/gdsc_screen/screened_compounds_rel_8.5.csv",
+      "sha256": "d3cbb8b595980b36bf92d54af1da1dd995d2e2ce624c7cc70aacf2a754dce782"
+    }
+  },
+  "raw_upstream_commit": "34d842254a33bd04f318449969ff9976237c9295",
+  "raw_url": "https://github.com/CancerRxGene/gdscIC50/blob/34d842254a33bd04f318449969ff9976237c9295/data/gdsc_example.rda",
+  "decision_unit": "one assay plate; equal weight to patient/parent-connected cluster",
+  "target": "published GDSC example DRUGSET_ID 159; new patient clusters on later dates",
+  "estimand": "associative expected measured normalized ATP inhibition under published fixed layout; causal action value requires no position/action artifact and transport assumptions",
+  "task": "retrospective intervention prioritization at exact screening concentrations; one reveal per plate",
+  "menu": [
+    {
+      "id": "gdsc:1032:2uM",
+      "drug_id": 1032,
+      "name": "Afatinib",
+      "concentration_uM": 2.0
+    },
+    {
+      "id": "gdsc:1036:10uM",
+      "drug_id": 1036,
+      "name": "PLX-4720",
+      "concentration_uM": 10.0
+    },
+    {
+      "id": "gdsc:1060:0.25uM",
+      "drug_id": 1060,
+      "name": "PD0325901",
+      "concentration_uM": 0.25
+    }
+  ],
+  "menu_rationale": "EGFR/ERBB2, BRAF and MEK pathway interventions in a public common-plate design; maximum tested concentrations chosen before outcomes, no toxicity/dose penalty",
+  "endpoint": "1 - (CellTiter-Glo intensity - mean blank)/(mean DMSO - mean blank)",
+  "normalization": "per-plate NC-1 and B means; no clipping, no outcome filtering or imputation",
+  "time": {
+    "recorded_DURATION_days": 4,
+    "nominal_drug_exposure_hours": 72,
+    "nominal_preincubation_hours": 24,
+    "actual_treatment_timestamp": null,
+    "binding": "recorded 4-day assay protocol; 72h drug exposure from GDSC2 protocol, not individual timestamp proof"
+  },
+  "background": [
+    "tissue",
+    "growth",
+    "medium"
+  ],
+  "added_input": "log2 registered cells seeded per well; protocol context, NOT measured molecular state",
+  "forbidden_features": [
+    "CELL_LINE_NAME",
+    "MASTER_CELL_ID",
+    "CELL_ID",
+    "patient_id",
+    "BARCODE",
+    "SCAN_ID",
+    "date_cluster",
+    "INTENSITY",
+    "NC-1",
+    "B",
+    "future outcomes"
+  ],
+  "metadata_timing": "tissue/growth/medium treated as static background; contemporary annotations are retrospective, not a historical availability audit",
+  "cheap_state_RNA_arms": "not run; no measured marker or RNA input authenticated; no zero-padding into STATE",
+  "cutoff": "2015-10-22 23:00:00",
+  "split_rule": "first 70% distinct seed dates develop; later dates confirm only unseen patient/parent clusters; unresolved patient IDs excluded with denominator retained",
+  "splits": {
+    "confirmation": {
+      "plates": 222,
+      "cell_lines": 214,
+      "patient_clusters": 214,
+      "date_clusters": 19
+    },
+    "development": {
+      "plates": 617,
+      "cell_lines": 516,
+      "patient_clusters": 516,
+      "date_clusters": 48
+    },
+    "excluded_seen_patient_late": {
+      "plates": 71,
+      "cell_lines": 17,
+      "patient_clusters": 17,
+      "date_clusters": 4
+    },
+    "excluded_unknown_identity": {
+      "plates": 4,
+      "cell_lines": 3,
+      "patient_clusters": 0,
+      "date_clusters": 4
+    }
+  },
+  "split_sha256": "0c4b948d3688b1d73e8cde7c26063c7721728085bca3581af5a721d00afa9e40",
+  "QC": "reject FAIL well positions, ambiguous/double-tagged action wells, nonfinite readouts, missing menu/controls, nonpositive control range; >=3 distinct control wells of each kind; preserve rejects",
+  "main_utility": "U=1-normalized ATP viability; untrimmed; E[U(Y)] equals U(E[Y]) because affine with a fixed observed plate denominator",
+  "delta_sensitivity": [
+    0.02,
+    0.05,
+    0.1,
+    0.2
+  ],
+  "delta_basis": "2/5/10/20 percentage-point screening-effect thresholds are assumptions frozen before outcomes; no single biologically validated delta or monetary conversion",
+  "budgets": {
+    "reveal_units": 1,
+    "model_queries": 3,
+    "state_assays": 0,
+    "physical_actions_this_run": 0,
+    "money": null
+  },
+  "costs": {
+    "historical_measurement": null,
+    "processing": null,
+    "waiting_money": null,
+    "failures": null,
+    "compute_money": null
+  },
+  "refusal": "unsupported model input => fixed development action fallback, counted; missing actual outcome => no imputation, coverage-only scope; stop after one reveal",
+  "tie": "argmax in frozen menu order within 1e-12 numerical tolerance; no scientific equivalence claim",
+  "models": {
+    "background_and_density": [
+      [
+        "ridge",
+        1.0
+      ],
+      [
+        "ridge",
+        10.0
+      ],
+      [
+        "ridge",
+        100.0
+      ],
+      [
+        "forest",
+        3
+      ],
+      [
+        "forest",
+        6
+      ]
+    ],
+    "selection": "5-fold patient-group CV mean squared action-contrast error, equal patient weight; refit on all development",
+    "features_density": "C plus standardized log2 seeding density; forest allows C-by-density interactions; independently fitted C baseline",
+    "interpretation": "ordinary conditional response predictors, minimal world-core baseline, no novel world-model claim or STATE equivalence"
+  },
+  "primary_comparisons": [
+    "selected C+density minus selected C",
+    "selected C+density minus development fixed action"
+  ],
+  "CI": "paired equal-patient-weight mean; t with min(patient,date)-1 df; conservative max of patient, seed-date, and two-way cluster SE; 97.5% CI for each of two primary comparisons, no per-unit calibration guarantee",
+  "A": "all three paired contrasts with Bonferroni 98.333% CIs; first-to-last different-day assay replay on development repeats only; never evaluate same-row observed maximum as headroom",
+  "shuffle": "one fixed-seed density shuffle within identical tissue/growth/medium in confirmation; input corruption diagnostic, no exchangeability-based p-value; preserve singleton strata",
+  "stop": "no extra seeds for deterministic predictors; do not buy state without measured value/cost; retain simple baseline unless independently measured net value justifies complexity",
+  "seed": 20261002,
+  "confirmation_outcomes_opened": false
+}
