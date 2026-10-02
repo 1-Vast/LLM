@@ -748,3 +748,17 @@ not rerun. There is no new STATE forward, LLM API request, RNA measurement, phys
 experiment, checkpoint or dependency change. Money and net deployment value stay
 unknown. The report gives reproduction commands using new directories and a bounded
 search coverage/evidence boundary; the original research PR remains unmerged.
+
+## 21. Publish all remaining supplied reports
+
+The user explicitly requested all remaining material on main. Four source reports
+are published at their original ASTRA paths, including the newly present
+`MAESTRO_TRANSPORT_RESEARCH_REVIEW.md`. Original bytes are preserved; three Chinese
+Markdown sources receive exact-content-bound registrations in the existing language
+manifest. Project-authored prose remains English-only. The new supplied review is
+archived as source evidence, not newly validated science or executed instructions.
+Upload hashes and scope are in
+`research/astra/results/20261002_report_sync/receipt.json`. No dataset, production
+code, scientific threshold, STATE inference or physical experiment changes.
+Repository-shape verification passes21tests with0failures/skips. All four staged
+report blobs match their original SHA256 byte-for-byte.
