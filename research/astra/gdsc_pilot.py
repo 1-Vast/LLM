@@ -1,0 +1,109 @@
+"""Generate a randomized pilot allocation, never fabricate execution or outcomes."""
+from __future__ import annotations
+
+import argparse
+import hashlib
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+from research.astra.gdsc_transport import MENU, digest, save
+
+
+SEED = 2026100201
+
+
+def design(roster):
+    if len(roster) != 12 or roster.MASTER_CELL_ID.nunique() != 12:
+        raise ValueError("exactly twelve unique cell lines required")
+    if roster.groupby("C_action").size().to_dict() != {0:4,1:4,2:4}:
+        raise ValueError("four lines per frozen recommendation stratum required")
+    blocks = []
+    for action, group in roster.groupby("C_action",sort=True):
+        for j,row in enumerate(group.itertuples()):
+            for start,day in enumerate([j % 4,(j+1) % 4],1):
+                blocks.append(dict(planned_culture_id=f"planned:{row.MASTER_CELL_ID}:start{start}",
+                    MASTER_CELL_ID=int(row.MASTER_CELL_ID), CELL_LINE_NAME=row.CELL_LINE_NAME,
+                    original_recommendation=int(action), planned_day=day+1,
+                    actual_culture_id=None, independently_started_verified=False))
+    wells, rng = [], np.random.default_rng(SEED)
+    for day in range(1,5):
+        terminal, baseline = [], []
+        for block in [b for b in blocks if b["planned_day"] == day]:
+            for drug,name,dose in MENU:
+                for rep in range(1,4):
+                    terminal.append(dict(**block,role="drug",drug_id=drug,drug_name=name,
+                        concentration_uM=dose,technical_replicate=rep,
+                        control_group=block["planned_culture_id"] + ":vehicle+blank"))
+            for role,count in [("vehicle",3),("blank",2)]:
+                for rep in range(1,count+1):
+                    terminal.append(dict(**block,role=role,drug_id=None,drug_name=None,
+                        concentration_uM=None,technical_replicate=rep,
+                        control_group=block["planned_culture_id"] + ":vehicle+blank"))
+            for rep in range(1,3):
+                baseline.append(dict(**block,role="destructive_sister_timezero_ATP",
+                    drug_id=None,drug_name=None,concentration_uM=None,technical_replicate=rep,
+                    control_group=None))
+        for stage,records in [("terminal",terminal),("baseline",baseline)]:
+            for record,position in zip(records,rng.permutation(96)[:len(records)]):
+                position = int(position)
+                wells.append(dict(**record,planned_plate=f"D{day}:{stage}",
+                    planned_well=f"{chr(65+position//12)}{position%12+1:02d}",
+                    executed=False,raw_result_id=None,endpoint_value=None,actual_cost=None))
+    return pd.DataFrame(blocks),pd.DataFrame(wells)
+
+
+def run(snapshot,out):
+    out.mkdir(parents=True,exist_ok=False)
+    results = snapshot / "research/astra/results"
+    metadata_path = results / "20261002_gdsc_freeze_v1/split.csv"
+    predictions_path = results / "20261002_gdsc_development_v1/sealed_confirmation_predictions.csv"
+    metadata = pd.read_csv(metadata_path)
+    predictions = pd.read_csv(predictions_path)
+    candidates = metadata.merge(predictions[["BARCODE","C_action"]],on="BARCODE",validate="one_to_one")
+    identities = candidates.groupby("MASTER_CELL_ID").C_action.nunique()
+    candidates = candidates.loc[candidates.MASTER_CELL_ID.isin(identities.index[identities == 1])].drop_duplicates("MASTER_CELL_ID")
+    candidates["selection_hash"] = candidates.MASTER_CELL_ID.map(lambda x:hashlib.sha256(f"{SEED}:{x}".encode()).hexdigest())
+    roster = candidates.sort_values("selection_hash").groupby("C_action",sort=True).head(4)
+    roster = roster[["MASTER_CELL_ID","CELL_LINE_NAME","model_id","unit", "C_action","selection_hash"]].sort_values(["C_action","selection_hash"])
+    blocks,wells = design(roster)
+    roster.to_csv(out / "proposed_roster.csv",index=False)
+    blocks.to_csv(out / "planned_cultures.csv",index=False)
+    wells.to_csv(out / "randomized_wells.csv",index=False)
+    events = blocks[["planned_culture_id","MASTER_CELL_ID","planned_day"]].copy()
+    for name in ["actual_culture_id","parent_id","passage","medium","growth_mode","cells_seeded_per_well",
+                 "state_sampled_at","state_processing_completed_at","state_available_at","decision_at",
+                 "allocation_at","drug_executed_at","endpoint_measured_at","result_available_at",
+                 "state_qc","assay_qc","failure_or_not_executed_reason","state_cost","assay_cost",
+                 "compute_seconds","compute_cost","raw_file_sha256"]:
+        events[name] = None
+    events.to_csv(out / "unfilled_event_ledger.csv",index=False)
+    save(out / "protocol.json",dict(code_sha256=digest(__file__),seed=SEED,
+        metadata_sha256=digest(metadata_path),predictions_sha256=digest(predictions_path),
+        selection="hash-seeded four lines per frozen recommendation; no outcomes used for roster selection",
+        status="executable allocation proposal; zero physical executions, not a frozen confirmation study",
+        menu=MENU,endpoint="ATP; same original four-day exposure; no GR/death/clinical interpretation",
+        design="12 lines, 2 separately initiated planned cultures each, 4 days; randomized wells within each day",
+        terminal_wells=int((wells.role != "destructive_sister_timezero_ATP").sum()),baseline_wells=int((wells.role == "destructive_sister_timezero_ATP").sum()),
+        plates=int(wells.planned_plate.nunique()),culture_starts=len(blocks),independent_donors=None,
+        blank_control="medium without cells, matched to each block; culture media verified before execution",
+        baseline="destructive sister aliquot; technical replicates; not the same cell or certified GR cell count",
+        reserves="12 terminal and 84 baseline wells per day remain unallocated for calibration/failure capacity",
+        primary_comparator="frozen original C, fixed Afatinib, fixed PLX, fixed PD; all three exact actions measured",
+        actual_state_test="not registered by this allocation; choose a single cheap-state question after feasibility",
+        minimal_meaningful_gain=None,estimated_cost=None,power=None,
+        claims="enriched feasibility/repeatability pilot, not representative original policy value or 24 donors",
+        before_execution=["actual independent-culture and sister relationships", "medium/control and assay calibration",
+                          "actual chronology and timestamps", "cost/QC/refusal/minimum gain", "operator-approved handling protocol"],
+        before_confirmation="representative sampling, physical variance and a prospectively frozen primary estimand required"))
+    save(out / "manifest.json",{p.name:digest(p) for p in sorted(out.iterdir()) if p.is_file() and p.name != "manifest.json"})
+    print(dict(lines=len(roster),planned_starts=len(blocks),wells=len(wells),plates=wells.planned_plate.nunique(),physical_executions=0))
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--snapshot",type=Path,required=True)
+    parser.add_argument("--out",type=Path,required=True)
+    args = parser.parse_args()
+    run(args.snapshot,args.out)

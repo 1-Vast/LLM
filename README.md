@@ -66,3 +66,5 @@ coverage and next experimental gates are in
 [the ASTRA eight-question review](research/astra/EIGHT_QUESTIONS.md).
 Independent source reproduction and finite sensitivity analysis of the supplied
 GDSC policy reports are in [the GDSC review](research/astra/GDSC_INDEPENDENT_REVIEW.md).
+Later-layout measured transport, CTRP menu qualification and randomized pilot preparation
+are in [the GDSC follow-up](research/astra/GDSC_TRANSPORT_FOLLOWUP.md).

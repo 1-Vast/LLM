@@ -1,0 +1,1468 @@
+var username = null;
+var featureDisplayMap = null;
+
+var enrichmentTableDisplayLength = 10;
+var geneAnnotations = null;
+
+var hideFeaturesForReviewers = true;
+var hideCluster = true;
+var hideCorrelation = false;
+
+
+var ctrpVersion = "2.3";
+
+if (ctrpVersion == "2"){
+	 hideFeaturesForReviewers = false;
+	 hideCluster = false;
+	 hideCorrelation = false;
+} else if (ctrpVersion == "2.2") {
+	// brintons clustering paper version
+	 hideFeaturesForReviewers = true;
+	 hideCluster = false;
+	 hideCorrelation = true;
+	
+} else if (ctrpVersion == "2.1") {
+	// the correlation paper version
+	 hideFeaturesForReviewers = true;
+	 hideCluster = true;
+	 hideCorrelation = false;
+} else if (ctrpVersion == "2.3") {
+	// the cluster + correlation but no AUC version
+	 hideFeaturesForReviewers = true;
+	 hideCluster = false;
+	 hideCorrelation = false;
+}
+
+
+window.onpopstate = function(event) {
+	
+	navigateBack();
+};
+	
+if (typeof String.prototype.startsWith != 'function') {
+	  // see below for better implementation!
+	  String.prototype.startsWith = function (str){
+	    return this.indexOf(str) == 0;
+	  };
+}
+
+$(document).ready(function(){
+	jQuery.fn.dataTableExt.oSort['allnumeric-asc']  = function(a,b) {
+        var x = parseFloat(a);
+        var y = parseFloat(b);
+        return ((x < y) ? -1 : ((x > y) ?  1 : 0));
+      };
+
+    jQuery.fn.dataTableExt.oSort['allnumeric-desc']  = function(a,b) {
+        var x = parseFloat(a);
+        var y = parseFloat(b);
+        return ((x < y) ? 1 : ((x > y) ?  -1 : 0));
+      };    
+      
+     jQuery.fn.dataTableExt.oSort["string-asc"] = function (str1, str2) {
+    	        if(str1 == "")
+    	            return 1;
+    	        if(str2 == "")
+    	            return -1;
+    	        return ((str1 < str2) ? -1 : ((str1 > str2) ? 1 : 0));
+    	    };
+    	 
+	    jQuery.fn.dataTableExt.oSort["string-desc"] = function (str1, str2) {
+	        if(str1 == "")
+	            return 1;
+	        if(str2 == "")
+	            return -1;
+	        return ((str1 < str2) ? 1 : ((str1 > str2) ? -1 : 0));
+	    };
+    	
+
+      
+      
+      // make the wait image/cursor follow the mouse
+      $(document).on('mousemove', function(e){
+          $('#processingIndicator').css({
+             left:  e.pageX-1,
+             top:   e.pageY-1
+          });
+      });
+      
+      $('#processingIndicator').click(function(e) {
+    	  e.preventDefault();
+    	  alert("Please wait ... request is still processing");
+      });
+      
+	 $("html").bind("ajaxStart", function(){  
+	    // $(this).addClass('busy');  
+	     setWaitCursor();
+	   }).bind("ajaxStop", function(){  
+	    // $(this).removeClass('busy'); 
+	     removeWaitCursor();
+	   });  
+	 $.support.cors = true;
+	 
+	 $('#copyrightYear').html(new Date().getFullYear() );
+	// $('#buildConfig').html("version "+buildNumber+" " + buildDate);
+	 DTGetBuildInfo(function(bi){
+		 $('#buildConfig').html(bi.versioncode);
+	 });
+
+	 var menuTimeout;
+	 $('#headerV2Menu').hover(function(e){
+		 clearTimeout(menuTimeout);
+		 $('#headerV1Menu').show(250);
+		 $('#headerV1Menu').css('left', $('#headerV2Menu').css('left'));
+	 });
+	 $('#headerV1Menu').mouseout(function(e){
+		 clearTimeout(menuTimeout);
+		 menuTimeout = setTimeout(function(){
+			 $('#headerV1Menu').hide(250);
+		 }, 1000);;
+	 });
+	 $('#headerV1Menu').mouseenter(function(e){
+		 clearTimeout(menuTimeout);
+	 });
+	 $('#headerV2Menu').mouseout(function(e){
+		 menuTimeout = setTimeout(function(){
+			 $('#headerV1Menu').hide(250);
+		 }, 1000);
+	 });
+	 $('#headerV1Menu').click(function(e){
+		 var switchV2 = window.confirm("Switch to the version 1 Cancer Therapeutics Response Portal dataset?");
+		 if(switchV2 == true){
+			 window.location = "../ctrp.v1";
+		 };
+	 });
+	 
+	$('#toggleAdvancedFilters').click(function(e){
+		$('#toggleAdvancedFilters').addClass('filterTypeSelectorSelected');
+		$('#toggleBasicFilters').removeClass('filterTypeSelectorSelected');
+		$('#selectAllFiltersWrapper').show();
+		$('#filterDetails').show();
+		$('#filterPresets').hide();
+	});
+	
+	$('#toggleBasicFilters').click(function(e){
+		$('#toggleBasicFilters').addClass('filterTypeSelectorSelected');
+		$('#toggleAdvancedFilters').removeClass('filterTypeSelectorSelected');
+		$('#selectAllFiltersWrapper').hide();
+		$('#filterDetails').hide();
+		$('#filterPresets').show();
+	});
+	 
+	$('#applyFilterBtn').click(function(e){
+		 filterDatasetColumns();
+		 filtersInSynchWithDisplay();
+		 rememberAppliedFiltersForResetButton();
+		 
+	});
+	$('#resetToAppliedFilters') .click(function(e){
+		
+		var appliedFilters  = $('#applyFilterBtn').data('currentFilters');
+		if (appliedFilters.length > 0){
+			$('.siteFilterCheckbox').prop('checked', false);
+			$(appliedFilters).prop('checked', true);
+		}
+		var appliedPresets  = $('#applyFilterBtn').data('currentPresets');
+		if (appliedPresets.length > 0){
+			$('.sitePresetFilterCheckbox').prop('checked', false);
+			$(appliedPresets).prop('checked', true);
+		}
+		filtersInSynchWithDisplay();
+		
+	});
+	
+	$('#selectAllFilters') .click(function(e){
+		var currentState = $('#selectAllFilters').data('toggleState');
+		
+		// all
+		if (currentState != 'all'){
+			$('.sitePresetFilterCheckbox').prop('checked', false);
+			$('.siteFilterCheckbox').prop('checked', true);
+			$('#selectAllFilters').data('toggleState', 'all')
+		} else {// none
+			$('.sitePresetFilterCheckbox').prop('checked', false);
+			$('.siteFilterCheckbox').prop('checked', false);
+			$('#selectAllFilters').data('toggleState', 'none')
+		}
+		filtersOutOfSynchWithDisplay();
+		
+	});
+
+	if (hideCluster == true){
+		$("#clusterMenuItem").hide();
+		$(".menu-item").css("width", "33.33%");
+	}
+	if (ctrpVersion == "2.1"){
+		$('#splash20').hide();
+        $('#splash23').hide();
+		$('#splash21').show();
+		
+	} else if (ctrpVersion == "2.2"){
+		$('#splash20').hide();
+        $('#splash23').hide();
+		$('#splash22').show();
+		
+	} else if (ctrpVersion == "2.3"){
+        $('#splash20').hide();
+        $('#splash22').hide();
+        $('#splash23').show();
+
+    }
+
+
+    configureAllAjaxRequests();
+
+	DTConnect(initializeForUse); 
+	setupMainNavigationLinks();
+	setupDatasetTableFilters(function(){
+		 // open on a compound or a target if one has been passed in.  This allows deep linking or for 
+	    // users to right click and open compound/feature links in another window  
+	    var compoundName =  $.getUrlVar('compoundName');  
+	    var compoundId =  $.getUrlVar('compoundId');  
+	    var featureName =  $.getUrlVar('featureName');  
+	    var isCluster = $.getUrlVar('cluster'); 
+	    if (isCluster != null) navigateToPage('#ctd2Cluster', null, false);
+	    else if (compoundName != null) compoundClicked(compoundId, compoundName);
+	    else if (featureName != null) featureClicked(featureName);
+	    else {
+	    	// the above is to preserve old links.  new links use the page parameter
+	    	var page =  $.getUrlVar('page');
+	    	if (page != null) 
+	    		navigateToPage(page);
+	    }
+	    
+	});
+	
+	var initialFilterTop = null;
+	 $(window).scroll(function(){
+		 	if (initialFilterTop == null){
+		 		initialFilterTop = parseInt($("#filters").css("top"));
+		 	}
+	       // Get container scroll position
+	       var winFromTop = $(this).scrollTop();
+	        var x = Math.max(0, initialFilterTop - winFromTop); // css duplication 
+	        $("#filters").css('transition', '.0s ease-in-out');
+	    	
+	       $("#filters").css("top", x);
+	  
+	 });
+	
+	 
+	 
+});
+
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+
+function configureAllAjaxRequests(){
+	$.ajaxSetup({
+		xhrFields: {
+	        withCredentials: true
+	    },
+	    mozBackgroundRequest: true,
+	    crossDomain: true,
+	    cache: false
+	});
+	$("html").bind("ajaxStart", function(){  
+		var x = $(this);
+		setTimeout(function(){	x.addClass('waiting');}, 1);});
+	$("html").bind("ajaxComplete", function(){
+		var x = $(this);
+		setTimeout(function(){x.removeClass('waiting');}, 1);}); 
+}
+
+function initializeForUse(initializationObject, goHome){
+	// cause the server to wakeup and get back any initialization we want from it
+	var userEmail = initializationObject.email;
+	if ((userEmail != null) && (userEmail.length > 0)){
+		username = userEmail;
+		
+		if (goHome != false){
+			navigateToPage('#ctd2BodyHome');	
+		}
+		
+	} else {
+		username = null;
+		
+	}
+	
+}
+
+
+
+// Page Navigation
+// defines a html page to load and a function to call after the load
+// expects a div called '#<name>Body' to load it into
+var pageInitialization = new Object();
+pageInitialization['#ctd2Compounds.html'] = './dialogs/compoundStart.html';
+pageInitialization['#ctd2Compounds.loadFunction'] = initializeCompoundStart;
+pageInitialization['#ctd2Compounds.menuClass'] = 'page-indicator-compounds';
+pageInitialization['#ctd2Compounds.reportTag'] = '/compoundList';
+pageInitialization['#ctd2Compounds.filterDisplay'] = false;
+
+pageInitialization['#ctd2Dataset.html'] = './dialogs/featureStart.html';
+pageInitialization['#ctd2Dataset.loadFunction'] = initializeFeaturesStart;
+pageInitialization['#ctd2Dataset.menuClass'] = 'page-indicator-features';
+pageInitialization['#ctd2Dataset.reportTag'] = '/featureList';
+pageInitialization['#ctd2Dataset.filterDisplay'] = false;
+
+pageInitialization['#ctd2Cluster.html'] = './dialogs/cluster.html';
+pageInitialization['#ctd2Cluster.loadFunction'] = loadClusterDisplay;
+pageInitialization['#ctd2Cluster.menuClass'] = 'page-indicator-cluster';
+pageInitialization['#ctd2Cluster.reportTag'] = '?cluster=true';
+pageInitialization['#ctd2Cluster.filterDisplay'] = false;
+
+
+pageInitialization['#ctd2Target.html'] = './dialogs/targetStart.html';
+pageInitialization['#ctd2Target.loadFunction'] = initializeTargetStart;
+pageInitialization['#ctd2Target.menuClass'] = 'page-indicator-targets';
+pageInitialization['#ctd2Target.reportTag'] = '/targetList';
+pageInitialization['#ctd2Target.filterDisplay'] = false;
+
+
+pageInitialization['#ctd2Heatmap.html'] = './dialogs/heatmapStart.html';
+pageInitialization['#ctd2Heatmap.loadFunction'] = initializeHeatmapStart;
+pageInitialization['#ctd2Heatmap.menuClass'] = '';
+pageInitialization['#ctd2Heatmap.reportTag'] = '/heatmap';
+
+
+pageInitialization['#ctd2CompoundDetails.html'] = './dialogs/compoundDetails.html';
+pageInitialization['#ctd2CompoundDetails.loadFunction'] = initializeCompoundDetails;
+pageInitialization['#ctd2CompoundDetails.menuClass'] = 'page-indicator-compounds';
+pageInitialization['#ctd2CompoundDetails.reportTag'] = '?compoundId=';
+pageInitialization['#ctd2CompoundDetails.reportFromLoadFunction'] = true;
+pageInitialization['#ctd2CompoundDetails.filterDisplay'] = true;
+
+
+pageInitialization['#ctd2FeatureDetails.html'] = './dialogs/featureDetails.html';
+pageInitialization['#ctd2FeatureDetails.loadFunction'] = initializeFeatureDetails;
+pageInitialization['#ctd2FeatureDetails.menuClass'] = 'page-indicator-features';
+pageInitialization['#ctd2FeatureDetails.reportTag'] = '?featureName=';
+pageInitialization['#ctd2FeatureDetails.reportFromLoadFunction'] = true;
+pageInitialization['#ctd2FeatureDetails.filterDisplay'] = true;
+
+pageInitialization['#ctd2Contact.html'] = './dialogs/contact.html';
+pageInitialization['#ctd2Contact.loadFunction'] = initializeContactPage;
+pageInitialization['#ctd2Contact.menuClass'] = '';
+pageInitialization['#ctd2Contact.reportTag'] = '/contact';
+
+
+
+// pages to allow non logged in users
+pageInitialization['#ctd2BodyHome.anonymous'] = true;
+
+
+function gaqReport(pageId, reportPath){
+	_gaq.push(['_setAccount', 'UA-50140054-1']);
+	if (reportPath != null){
+		if (pageInitialization[pageId + ".reportTag"] != null){
+			_gaq.push(['_trackPageview',  pageInitialization[pageId + ".reportTag"]]);
+		} else {
+			_gaq.push(['_trackPageview',  "/" + pageId]);
+		}
+	} else {
+		_gaq.push(['_trackPageview', reportPath]);
+	}
+}
+
+function isLoggedIn(){
+	return username != null;
+}
+var deferredNavigation = null;
+var deferredCallback = null;
+var deferredSave = null;
+function navigateToPage(pageId, callback, saveState){
+	setDatasetFilterDisplay();
+	
+	$('.contentbody').hide(); // hide any of the full page bits
+	// notify google analytics unless the load function will do it (with more than the default details)
+	if (pageInitialization[pageId + ".reportFromLoadFunction"] != null){
+		gaqReport(pageId);
+	}
+	
+	
+	//$(pageId).show();
+	selectMenu(pageInitialization[pageId + ".menuClass"]);
+	setFilterDisplay(pageInitialization[pageId + ".filterDisplay"]);
+	
+	$(pageId).show(100, 'swing', function(){
+		if ((saveState != false)){
+			navigationStack.push({page: pageId, callback: callback});
+			try {
+				window.history.pushState({page: pageId}, "ctd2 "+pageId, "?page="+pageId);
+				
+			} catch(ex){// swallow exceptions, just can't backup
+				alert(ex);
+			}
+		}
+		
+		if (pageInitialization[pageId + ".html"] != null){
+			try {
+			$(pageId+"Body").load(pageInitialization[pageId + ".html"], function(){
+				try {
+					var loadFunction = (pageInitialization[pageId + ".loadFunction"]);
+					if (loadFunction != null){
+						(pageInitialization[pageId + ".loadFunction"]).call();
+					}
+				} catch(e) {
+					alert(e);
+					throw e;
+				}
+				if (callback != null){
+					callback.call();
+				}	
+			} );
+			pageInitialization[pageId + ".html"] = null; // this is done only once
+			} catch (Ex){
+				alert(Ex);
+			}
+			
+		} else {
+			// already initialized
+			if (callback != null){
+				callback.call();
+			}
+		}
+		
+		
+	});
+	
+}
+
+var navigationStack = new Array();
+
+function setupMainNavigationLinks(){
+	
+	$('#compoundLink').click(function(e){
+		e.preventDefault();
+		navigateToPage('#ctd2Compounds');
+	});
+	
+	$('#featureLink').click(function(e){
+		e.preventDefault();
+		navigateToPage('#ctd2Dataset', reopenFeatureStart);
+	});
+	
+	$('#targetLink').click(function(e){
+		e.preventDefault();
+		navigateToPage('#ctd2Target');
+	});
+	$('.returnToHomeLink').click(function(e){
+		e.preventDefault();
+		navigateToPage('#ctd2BodyHome');
+	});
+	$('.cdetBackToCompounds').click(function(e){
+		e.preventDefault();
+		navigateToPage('#ctd2Compounds');
+	});
+	$('.cdetBackToCluster').click(function(e){
+		e.preventDefault();
+		navigateToPage('#ctd2Cluster');
+	});
+	$('.cdetBackToDatasets').click(function(e){
+		e.preventDefault();
+		navigateToPage('#ctd2Dataset', reopenFeatureStart);
+	});
+	$('.cdetBackToTargets').click(function(e){
+		e.preventDefault();
+		navigateToPage('#ctd2Target');
+	});
+	$('.cdetBackToHeatmap').click(function(e){
+		e.preventDefault();
+		navigateToPage('#ctd2Heatmap');
+	});
+	
+	$('.cdetContact').click(function(e){
+			e.preventDefault();
+			navigateToPage('#ctd2Contact');
+		});
+
+}
+
+function selectMenu(menuClass){
+	$('.menu-band').removeClass('page-indicator-home');
+	$('.menu-band').removeClass('page-indicator-features');
+	$('.menu-band').removeClass('page-indicator-compounds');
+	$('.menu-band').removeClass('page-indicator-targets');
+	if (menuClass == null) $('.menu-band').addClass('page-indicator-home');
+	else $('.menu-band').addClass(menuClass);
+	
+}
+
+function setFilterDisplay(display){
+	if (hideFeaturesForReviewers && hideCorrelation ) {
+		// leave the filters alone they are not needed
+	} else {
+	
+		if (display == true){
+			$(".filters-open").show();
+			$("#filterSummary").show();
+		} else {
+			$(".filters-open").hide();
+			$("#filterSummary").hide();
+		}
+	}
+}
+
+function openFilter() {
+	if (document.getElementById('toggle').textContent == "Close") {
+		
+		if (parseInt($('.contentbody').css('opacity')) < 0.99){
+			 $( "#dialog-confirm-filter-close" ).dialog({
+				 resizable: false,
+				 height:160,
+				 modal: true,
+				 closeOnEscape: false,
+				 open: function(event, ui) { 
+					 $(".ui-dialog-titlebar-close").hide();
+					 },
+
+				 buttons: {
+				 "Apply the filters": function() {
+					 $('#applyFilterBtn').trigger('click');
+					 $( this ).dialog( "close" );
+				 },
+				 Reset: function() {
+					 $('#resetToAppliedFilters').trigger('click');
+					 $( this ).dialog( "close" );
+				 }
+				 }
+				 });
+			
+		}
+		
+		
+		var div = $('#filters');
+		//div.style.right = '-274px';
+		$(div).css('transition', '.5s ease-in-out');
+		$(div).css("transform", "translate(28em,0)");
+		document.getElementById('toggle').textContent = "Open";
+	} else {
+		var div = $('#filters');
+		//div.style.right = '3px';
+		$(div).css("transform", "translate(0em, 0)");
+		document.getElementById('toggle').textContent = "Close";
+	}
+}
+
+
+
+
+
+function initializeContactPage(){
+	$('#contactSendMessage').click(function(e){
+		e.preventDefault();
+		var from = $('#contactEmail').val();
+		var sub = $('#contactSubject').val();
+		var msg = $('#contactBody').val();
+		var iAmASpamBot = $('#asdjklhjkahdsf').val().length > 0;
+		if (iAmASpamBot) return;
+		DTContact(from, sub, msg, function(resp){
+			if (resp.error != null){
+				alert('There was a problem sending the message: ' + resp.problem);
+			} else {
+				alert('Your message has been sent to the portal curators and administrator.');
+				 $('#contactSubject').val("");
+				 $('#contactBody').val("");
+				 navigateToPage('#ctd2BodyHome');
+			}
+			
+		});
+		
+	});
+	
+}
+
+
+function initializeRegistrationDialog(){
+	
+	$("#cdtRegistrationForm").validate({
+        rules: {
+        	ctdRegisterName: "required",
+            ctdRegisterEmail: {
+                    required: true,
+                    email: true
+            },
+            ctdRegisterOrganization: "required"
+    },
+    messages: {
+    		ctdRegisterName: "Please enter your name",
+    		ctdRegisterName: {
+                    required: "Please enter your name",
+                    minlength: "Your name must consist of at least 2 characters"
+            },
+            ctdRegisterEmail: "Please enter a valid email address",
+            ctdRegisterOrganization: "Please enter your organization"
+    },
+
+    submitHandler: function(form) {
+		 
+			var email = $('#ctdRegisterEmail').val();
+			var name = $('#ctdRegisterName').val();
+			var org = $('#ctdRegisterOrganization').val();
+			
+			DTRegister(name, email, org, function(obj){
+				initializeForUse(obj);
+	        	if (deferredNavigation != null) {
+	        		navigateToPage(deferredNavigation);
+	        		deferredNavigation = null;
+	        	}	
+			} );
+			return false;
+	 }
+		});
+	
+	
+	
+	$('#ctdCancelRegisterBtn').click(function(e){
+		e.preventDefault();
+		navigateToPage('#ctd2BodyHome');
+	});
+}
+
+
+function initializeHeatmapStart(){
+	alert('HeatMap not yet implemented');
+
+}
+
+
+
+function initializeTargetStart(){
+	var cols = [ 'gene_symbol_of_protein_target', 'gene_name_of_protein_target', 'gene_location', 
+		             'gene_family', 'compound_name', 'target_compound_id_list'];
+	var colDisplayNames = [ 'gene symbol of protein target', 'gene name of protein target', 'gene location', 
+	                        'gene family', 'compound name', 'target_compound_id_list'];
+	
+	DTGetAllTargetsBrief(cols,  function(dataArray){
+		
+		for (var i=0; i< cols.length; i++){
+			dataArray.aoColumns[i].sTitle=colDisplayNames[i];
+			dataArray.aoColumns[i].sName=colDisplayNames[i];
+		}
+		var oTable = $('#targetTableTable').dataTable( {
+				"bJQueryUI": true,
+				"sPaginationType": "full_numbers",
+				"aaData": dataArray.aaData,
+				"oLanguage": {
+		            "sSearch": "search all columns:",
+		    	    "sLengthMenu": "show _MENU_ entries",
+		    	    "sInfo": "showing _START_ to _END_ of _TOTAL_ entries"
+		        },
+		 		"aoColumns": dataArray.aoColumns,
+				"aoColumnDefs": [
+					 {
+	                     // `data` refers to the data for the cell (defined by `mData`, which
+	                     // defaults to the column being worked with, in this case is the first
+	                     // Using `row[0]` is equivalent.
+	                     "mRender": function ( data, type, row ) {
+	                    	 var cnames  = row[4].split(';');
+	                    	 var cids = row[5].split(';');
+	                    	 
+	                    	 var rowDisp = "";
+	                    	 $.each(cnames, function (idx, cname){
+	                    		 if (idx != 0) rowDisp = rowDisp + ", ";
+	                    		 var lnk = "<a onclick='compoundClicked("+cids[idx]+", \""+cname+"\")'>"+cname+"</a>";
+	                    		 rowDisp = rowDisp + lnk;
+	                    	 });
+	                    	 var link = ""+data+ " <input type='hidden' class='compoundId' value='"+row[3]+"'>";
+	                    	 return rowDisp;
+	                     },
+	                     "aTargets": [ 4 ]
+	                 },
+	                 {
+	                     // `data` refers to the data for the cell (defined by `mData`, which
+	                     // defaults to the column being worked with, in this case is the first
+	                     // Using `row[0]` is equivalent.
+	                     "mRender": function ( data, type, row ) {
+	                    	 var fname  = row[0];
+	                    	 var rowDisp =  "<a onclick='featureClicked(\""+fname+"\")'>"+fname+"</a>";
+	                    	 return rowDisp;
+	                     },
+	                     "aTargets": [0 ]
+	                 }
+	                
+		             ], 
+		             "aaSorting": [[ 0, "asc" ]]  // sort on compound name  
+				}
+			);
+		// hide the idlist col which is just used for searching
+		oTable.fnSetColumnVis( 5, false  );
+		
+		
+
+
+		});
+	
+}
+
+function showDatatablesTooltip(text){
+	var div = $("<div></div>");
+	$(div).html(text)
+	$(window).append(div);
+	
+	alert( text);
+}
+
+
+
+function navigateBack(){
+	try {
+		navigationStack.pop(); //drop the current on the floor
+		var previous = navigationStack.pop();
+		if (previous != null){
+			navigateToPage(previous.page, previous.callback, true);
+		} 
+	} catch(Exception){
+		alert(Exception);
+		// if it fails, just go back like we did nothing here
+		// this gives backwards compatibility
+	}
+}
+
+
+function fnCreateColumnSelect( aData )
+{
+    var r='<select><option value=""></option>', i, iLen=aData.length;
+    for ( i=0 ; i<iLen ; i++ )
+    {
+        r += '<option value="'+aData[i]+'">'+aData[i]+'</option>';
+    }
+    return r+'</select>';
+}
+
+function clearAllFilters(){
+	setMultipleFilters("cellLineSubset", false);
+	setMultipleFilters("cellLineExclusion", false);
+	setMultipleFilters("dataset", false);
+	setTimeout(function(){filterDatasetColumns();}, 100);
+}
+
+function resetFilters(filterType){
+	setMultipleFilters(filterType, false);
+	
+	var filterClass = "." + filterType + "FilterCheckbox.defaultFilter";
+	
+	$(filterClass ).prop('checked', true);
+	setTimeout(function(){filterDatasetColumns();}, 100);
+}
+
+
+function setMultipleFilters(filterType, value){
+	var filterClass = "." + filterType + "FilterCheckbox";
+	$(filterClass).prop('checked', value);
+	setTimeout(function(){filterDatasetColumns();}, 100);
+}
+
+function setFilter(filterFor, value){
+	$('#cbFilt_'+filterFor).prop('checked', value);
+}
+
+
+function setupDatasetTableFilters(callback){
+	
+		 /* Add a filter to the columns.  These vary by col and arte set one by one for now */
+	 // cell line subset  
+	
+	DTGetFacetConfig(function(facetConfig){
+		setupDatasetFilterFacet(facetConfig["dataset"]);
+		setupGrowthModeFilterFacet(facetConfig["growthMode"]);
+		setupSiteFilterFacet(facetConfig["sitePrimary"]);
+		DTGetPresetFilterConfig(function(presets) {
+			setupPresetFilterFacet(presets);
+			$(".sitePresetFilterCheckbox:first").prop('checked', true);
+			$(".sitePresetFilterCheckbox:first").trigger("click");
+			filtersInSynchWithDisplay();
+			rememberAppliedFiltersForResetButton();
+			 if (callback != null) callback();
+		}
+		);
+			
+	});
+		
+	
+ 	 
+	 $('#dsGeneNameSearchBtn').click(function(e) {
+		 e.preventDefault();
+		 filterDatasetColumns();
+	 });
+	 $('#dsGeneNameFilter').keypress(function(e) {
+	        if(e.which == 13) {
+	            jQuery(this).blur();
+	            $('#dsGeneNameSearchBtn').click();
+	        }
+	    });
+}
+
+function replaceSpecials( s){
+	var s2 =  s.replace(" ", "_");
+	return s2.replace(";", "_");
+}
+
+function setupDatasetFilterFacet(set ){
+	 var defaultSelection = "CCLE Targeted Exome Mutations";
+	 var styleClass = "datasetFilterCheckbox";
+	 
+ 	 // removed displayMap and codes
+ 	 $.each(set, function(k,filterConf){
+		 
+		 var checked = filterConf.name == "TES" ? " checked ": " ";
+		 var filterValue = replaceSpecials(filterConf.name);
+		 var filterDisplay = filterConf.display; 
+		 var cbStyle = styleClass;
+		
+		 var checkBox = $('<input type="checkbox" id="cbFilt_'+filterValue+'"  '+checked+'  class="'+cbStyle+'"></input>');
+		 var filt = $('<span class="mutFilter">'+ filterDisplay + '<span>');
+		 $(checkBox).data("filterValue",filterValue);
+			
+		 filt.prepend(checkBox);
+		 if (checked.indexOf("checked") != -1) checkBox.addClass('defaultFilter');
+			
+		 $(filt).data('display',filterDisplay);
+		 $(filt).data('filterOn',filterValue);
+			$(filt).click(function () {
+				 $('.sitePresetFilterCheckbox').prop('checked', false);	
+				 filtersOutOfSynchWithDisplay();
+		 } );
+			
+		 $('#dsCLDFilter').append(filt);
+	 });
+}
+
+function setupGrowthModeFilterFacet(set ){
+	 //var defaultSelection="suspension";
+	 var defaultSelection="adherent";
+		
+	 var styleClass = "growthModeFilterCheckbox";
+	 var filterTable = $('<table class="filterTable"></table>');
+	 $('#dsCLEFilter').append(filterTable);
+	 // removed displayMap and codes
+	 $.each(set, function(k,filterConf){
+		 filtRow = $('<tr></tr>');
+		 filterTable.append(filtRow);
+		 
+		 var checked = (filterConf.name == defaultSelection) ? " checked " : " ";
+		 var filterValue = replaceSpecials(filterConf.name);
+		 var displayValue = (replaceUnderscoresWithSpaces(filterConf.name));
+		 var cbStyle = styleClass;
+		
+		 var checkBox = $('<input type="checkbox" id="cbFilt_'+filterValue+'"  '+checked+'  class="'+cbStyle+'"></input>');
+		 $(checkBox).data("filterValue",filterValue);
+		 var filt = $('<td class="leftFilter">'+ displayValue + '</td>');
+		 filt.prepend(checkBox);
+		 if (checked.indexOf("checked") != -1) checkBox.addClass('defaultFilter');
+			
+		 $(filt).data('display',displayValue);
+		 $(filt).data('filterOn',filterValue);
+		$(filt).click(function () {
+				 $('.sitePresetFilterCheckbox').prop('checked', false);
+				 filtersOutOfSynchWithDisplay();
+		 } );
+		 $(filtRow).append(filt);
+	 });
+}
+
+function setupSiteFilterFacet(set ){
+	//var defaultSelection  = "haematopoietic_and_lymphoid_tissue";
+	var defaultSelection  = "lung";
+	
+	 var styleClass = "siteFilterCheckbox";
+	 var filterTable = $('<table class="filterTable"></table>');
+	 $('#dsCLSFilter').append(filterTable);
+	 // removed displayMap and codes
+	 $.each(set, function(k,filterConf){
+		 filtRow = $('<tr></tr>');
+		 filterTable.append(filtRow);
+		 
+		 var checked = (filterConf.name == defaultSelection) ? " checked " : "  ";// for now check the second (i=1) site primary only
+		
+		 var filterValue = replaceSpecials(filterConf.name);
+		 var displayValue = (replaceUnderscoresWithSpaces(filterConf.name));
+		 var cbStyle = styleClass;
+		
+		 var checkBox = $('<input type="checkbox" id="cbFilt_'+filterValue+'"  '+checked+'  class="'+cbStyle+'"></input>');
+		 if (checked.indexOf("checked") != -1) checkBox.addClass('defaultFilter');
+		 var fullCount = 0;
+		
+		 $.each(filterConf.histSubtype, function(k,histSubtype){
+			 subRow = $('<tr class="rowFilt_'+filterValue+'"></tr>');
+			 filterTable.append(subRow);
+			 	
+			 var subValue = replaceSpecials(histSubtype.name);
+			 var subDisplayValue = (replaceUnderscoresWithSpaces(histSubtype.name));
+				
+			 fullCount = fullCount += histSubtype.count;
+			 
+			 var checkBox = $('<input type="checkbox" id="cbFilt_'+filterValue+ '_' + subValue+'"  '+checked+'  class="'+cbStyle+'"></input>');
+			 
+			 var subFilt = $('<td class="insetFilter">'+ subDisplayValue + ' ('+histSubtype.count+')</td>');
+			 subFilt.prepend(checkBox);
+			 if (checked.indexOf("checked") != -1) checkBox.addClass('defaultFilter');
+			 $(subFilt).data('display',displayValue+':'+subDisplayValue);
+			 $(subFilt).data('filterOn',filterValue+':'+histSubtype.name);
+				$(subFilt).click(function () {
+		             $('.sitePresetFilterCheckbox').prop('checked', false);
+		             filtersOutOfSynchWithDisplay();
+			 } );
+			 $(subRow).append(subFilt);
+		 });
+		 
+		 var filt = $('<td class="leftFilter"><span class="closedFilter">&#9660;</span><span class="openFilter" style="display:none">&#9654;</span>'+ displayValue + '('+fullCount+')</td>');
+		 filt.prepend(checkBox);
+		
+		 
+		 $(filt).data('filterOn',null);// these are not use as filters really, just their children are
+		 $(filt).data('display',displayValue);
+		 $(filt).data('isParent',true);
+		 // click the checkbox to show and to set all children to the same value
+		 $(checkBox).click(function(e){
+			 $('.sitePresetFilterCheckbox').prop('checked', false);
+			 e.stopPropagation();
+			 var val = $(checkBox).prop('checked');
+			 $('.rowFilt_'+filterValue+ " input").prop('checked', val);
+			 $('.rowFilt_'+filterValue).show();
+			 filtersOutOfSynchWithDisplay();
+		 });
+
+		 // clicking on the site primary just expands/contracts
+		 $(filt).click(function () {
+			 $('.rowFilt_'+filterValue).toggle();
+			 $('#cbFilt_'+filterValue).siblings('.closedFilter').toggle();
+			 $('#cbFilt_'+filterValue).siblings('.openFilter').toggle();
+			 
+		 } );
+		 $(filtRow).append(filt);
+		 
+		 // initial hiding of the subtypes
+		 $('.rowFilt_'+filterValue).toggle();
+		 
+	 });
+	 
+}
+
+
+function loadClusterDisplay(){
+	var reportPath =  pageInitialization[ "#ctd2Cluster.reportTag"];
+	gaqReport("#ctd2Cluster", reportPath );
+	
+	// to handle page reloads
+	var compoundId =  $.getUrlVar('compoundId'); 
+	var compoundName =  $.getUrlVar('compoundName'); 
+	if (compoundId != null){
+		window.history.replaceState({page: "#ctd2Cluster"}, "ctd2 #ctd2Cluster", reportPath + '&compoundId='+compoundId+ "&compoundName=" +encodeURIComponent(compoundName)+"?page=#ctd2Cluster");
+		$('#clusterIFrame').attr('src', './cluster.html?compoundId='+compoundId+'&compoundName='+encodeURIComponent(compoundName));
+	} else {
+		window.history.replaceState({page: "#ctd2Cluster"}, "ctd2 #ctd2Cluster", reportPath+"?page=#ctd2Cluster");
+
+	}
+	
+	
+	
+}
+
+
+function setupPresetFilterFacet(presetConfig){
+	 var styleClass = "sitePresetFilterCheckbox";
+	 var filterTable = $('<table class="filterTable"></table>');
+	 $('#dsPresetFilters').append(filterTable);
+	 var defaultSelection = 'Any primary site/subtype, adherent';
+	 
+	 $.each(presetConfig, function(k,presetConf){
+		 filtRow = $('<tr></tr>');
+		 filterTable.append(filtRow);
+		 
+		 var checked = (presetConf.name == defaultSelection) ? " checked " : "  ";// for now check the second (i=1) site primary only
+		
+		 var filterName = presetConf.name;
+		 var filtersToApply = presetConf.filters;
+		 var displayValue = (replaceUnderscoresWithSpaces(filterName));
+		 var cbStyle = styleClass;
+		
+		 var radioBtn = $('<input type="radio" name="preset" id="cbFilt_'+filterName+'"  '+checked+'  class="'+cbStyle+'"></input>');
+		 if (checked.indexOf("checked") != -1) radioBtn.addClass('defaultFilter');
+		 
+		 var filt = $('<td class="leftFilter">'+ displayValue +'</td>');
+		 filt.prepend(radioBtn);
+		
+		 $(radioBtn).click(function(e){
+			 e.stopPropagation();
+			 $('.siteFilterCheckbox').prop('checked', false);// uncheck everything first
+			 $('.growthModeFilterCheckbox').prop('checked', false);// uncheck everything first
+			 var val = $(radioBtn).prop('checked');
+			 $.each(filtersToApply, function(idx, filterDef){
+				 var major = filterDef.major;
+				 var minor = filterDef.minor;
+				 if (filterDef.name == 'site_primary'){
+					 $('.rowFilt_'+major).show();
+					 //$('#cbFilt_'+major).prop('checked', val);
+					 $('#cbFilt_'+major + '_'+ replaceSpecials(minor)).prop('checked', val);
+				 } else if (filterDef.name == 'growth_mode'){
+					 $('.rowFilt_'+major).show();
+					 //$('#cbFilt_'+major).prop('checked', val);
+					 $('#cbFilt_'+major ).prop('checked', val);
+				 } if (filterDef.name == 'site_primary_major'){
+					 $('#cbFilt_'+major).prop('checked', val);
+				 }
+				 
+			 });
+			// setTimeout(100, function(){
+			 filtersOutOfSynchWithDisplay();
+			$('#applyFilterBtn').removeAttr("disabled");		
+			
+			// });
+		 });
+
+		
+		 $(filtRow).append(filt);
+	 });
+}
+
+
+function rememberAppliedFiltersForResetButton(){
+	 var currentFilters = $('.siteFilterCheckbox:checked');
+	 var currentPresets = $('input:radio[name=preset]:checked');
+	 $('#applyFilterBtn').data('currentFilters', currentFilters); // remember for a reset
+	 $('#applyFilterBtn').data('currentPresets', currentPresets); // remember for a reset
+}
+
+function filtersOutOfSynchWithDisplay(){
+	setFilterSummary();
+	$('#applyFilterBtn').removeAttr("disabled");	
+	$('.contentbody').css('opacity', '0.5')
+}
+
+function filtersInSynchWithDisplay(){
+	setFilterSummary();
+	$('#applyFilterBtn').attr("disabled", "disabled");	
+	$('.contentbody').css('opacity', '1.0')
+}
+
+
+function replaceUnderscoresWithSpaces(aString){
+	 return aString.replace(/_/g, " ");
+}
+
+function capitalizeFirstChar(aString){
+	if (aString.size == 0) return aString;
+	var lc = aString.toLowerCase();
+	return lc[0].toUpperCase() + lc.substring(1);
+	
+}
+
+
+function collectFilterStrings(){
+	var retVal = new Object();
+	var subs = '';
+	
+	//var oTable;
+	$('#dsCLSFilter input').each(function(k,v){
+		if ($(v).is(':checked')){
+			if ($(v).parent().data('filterOn') != null){
+				if (subs.length>0)subs = subs + "\t";
+				subs = subs + ($(v).parent().data('filterOn'));
+			}
+		}
+	});
+	var exclusions = '';
+	$('#dsCLEFilter input').each(function(k,v){
+		if ($(v).is(':checked')){
+			if (exclusions.length>0)exclusions = exclusions + "\t";
+			exclusions = exclusions + ($(v).parent().data('filterOn'));
+		}
+	});
+	var datasets = '';
+	$('#dsCLDFilter input').each(function(k,v){
+		if ($(v).is(':checked')){
+			if (datasets.length>0)datasets = datasets + "\t";
+			datasets = datasets + ($(v).parent().data('filterOn'));
+		}
+	});
+	
+	retVal['site_primary'] = subs;
+	retVal['growth_mode'] = exclusions;
+	retVal['feature_dataset'] = datasets;
+	
+	return retVal;
+}
+
+function collectFilterArrays(){
+	var retVal = new Object();
+	
+	var subArray = new Array();
+	var exclArray = new Array();
+	var dsArray = new Array();
+	
+	//var oTable;
+	$('#dsCLSFilter input').each(function(k,v){
+		if ($(v).is(':checked')){
+			subArray.push(($(v).parent().data('filterOn')));
+		}
+	});
+	$('#dsCLEFilter input').each(function(k,v){
+		if ($(v).is(':checked')){
+			exclArray.push(($(v).parent().data('filterOn')));
+		}
+	});
+	$('#dsCLDFilter input').each(function(k,v){
+		if ($(v).is(':checked')){
+			dsArray.push(($(v).parent().data('filterOn')));
+		}
+	});
+	
+	retVal['site_primary_array'] = subArray;
+	retVal['growth_mode_array'] = exclArray;
+	retVal['dataset_array'] = dsArray;
+	
+	return retVal;
+}
+
+function setWaitCursor(){
+	$('html').addClass('busy');
+	$('#processingIndicator').show();
+}
+function removeWaitCursor(){
+	$('html').removeClass('busy');
+	$('#processingIndicator').hide();
+}
+
+function allFiltersAreChecked(){
+	var allChecked = true;
+	$('#dsCLSFilter input').each(function(k,v){
+		allChecked = allChecked && ($(v).is(':checked'));
+	});
+	$('#dsCLEFilter input').each(function(k,v){
+		allChecked = allChecked && ($(v).is(':checked'));	
+	});
+	$('#dsCLDFilter input').each(function(k,v){
+		allChecked = allChecked && ($(v).is(':checked'));
+	});
+	return allChecked;
+}
+
+/**
+ * Sets up a filter summary string to be the small version of the filters
+ */
+function setFilterSummary(){
+	$('#filterSummarySite').html("");
+	$('#filterSummaryMutation').html("");
+	$('#filterSummaryGrowthMode').html("");
+	var dsArrayChecked = new Array();
+	var siteArrayChecked = new Array();
+	var growthModeArrayChecked = new Array();
+	var dsArrayUnChecked = new Array();
+	var siteArrayUnChecked = new Array();
+	var growthModeArrayUnChecked = new Array();
+	
+	var entireCategoriesChecked = new Array();
+	$('#dsCLSFilter input').each(function(k,v){
+		var wholeCategory = $(v).parent().data('isParent');
+		// leep track of categories so in all lung types are checked then just say lun and don't enumerate them
+		// this will fail if all sub cateforiues are checked but the top one isn't
+		var name = ($(v).parent().data('display'));
+		if ($(v).is(':checked')){
+			var coveredByParent = false;
+			$.each(entireCategoriesChecked, function(kk, cat){
+				if (name.indexOf(cat) == 0) coveredByParent = true;
+			});
+			if (!coveredByParent) siteArrayChecked.push(name);
+			if (wholeCategory) entireCategoriesChecked.push(name);
+		} else {
+			siteArrayUnChecked.push(name);
+		}
+	});
+	$('#dsCLEFilter input').each(function(k,v){
+		if ($(v).is(':checked')){
+			growthModeArrayChecked.push(($(v).parent().data('display')));
+		} else {
+			growthModeArrayUnChecked.push(($(v).parent().data('display')));
+		}
+	});
+	$('#dsCLDFilter input').each(function(k,v){
+		if ($(v).is(':checked')){
+			dsArrayChecked.push(($(v).parent().data('display')));
+		} else {
+			dsArrayUnChecked.push(($(v).parent().data('display')));	
+		}
+	});
+
+	var str = getFilterSummaryString("mutations called by", dsArrayChecked, dsArrayUnChecked);
+	$('#filterSummaryMutation').append(str);
+	var str1 = getFilterSummaryString("growth mode", growthModeArrayChecked, growthModeArrayUnChecked);
+	$('#filterSummaryGrowthMode').append(str1);
+	var str2 = getFilterSummaryString("CCL", siteArrayChecked, siteArrayUnChecked);
+	$('#filterSummarySite').append(str2);
+	
+	
+}
+
+function showGrowthModeHelp(){
+	//alert('growth mode');
+	$( "#growthModeHelpDialog" ).dialog(     {
+		modal: true,
+		buttons: {
+	          Close: function() {
+	            $( this ).dialog( "close" );
+	          }
+	        }
+	});	      
+}
+
+function showPrimarySiteHelp(){
+	//alert('growth mode');
+	$( "#primarySiteHelpDialog" ).dialog(     {
+		modal: true,
+		buttons: {
+	          Close: function() {
+	            $( this ).dialog( "close" );
+	          }
+	        }
+	});
+		      
+}
+
+
+
+function getFilterSummaryString(type, checked, unchecked){
+	if (unchecked.length == 0) return "all "+ type + "s. ";
+	if (unchecked.length == 1) return "excluding "+ unchecked[0]+". " ;
+	if (checked.length <= 3) {
+		var str = "";
+		var count = 0;
+		$.each(checked, function(k, item){
+			if (item != null){
+				if (count != 0) str = str + ", ";
+				str = str + item;
+				count++;
+			}
+		});
+		return str + ". ";
+	}
+	if (checked.length > 3){
+		return "multiple user-specified CCL" + + type + "s. ";
+	}
+	
+}
+
+
+
+var prevGeneFilter = "";
+function filterDatasetColumns(){
+	setFilterSummary();
+	var filters = collectFilterStrings();
+	var subs = filters['site_primary'];
+	var exclusions = filters['growth_mode'];
+	var datasets = filters['feature_dataset'];
+	
+	var currentPage = (lastElement(navigationStack)).page;
+	if (currentPage == '#ctd2FeatureDetails'){
+		// update the gene page 
+		initializeDetailsForFeature($('#dsGeneNameFilter').val());
+	} else if (currentPage == '#ctd2CompoundDetails'){
+		// update the compound page
+		initializeCompoundDetailsForCompound($('#dsCompoundIdFilter').val());
+	} 
+	// update the features table
+	// the fnFilter is not called if empty so we fake it out like so
+	//var featureDetailTable = $('#datasetTableTable').dataTable();
+	
+	if (subs.length == 0) subs = "\t";
+	if (exclusions.length == 0) exclusions = "\t";
+	if (datasets.length == 0) datasets = "\t";
+	
+	var featureName = $('#dsGeneNameFilter').val();
+	if (prevGeneFilter != featureName){
+		//featureDetailTable.fnFilter( featureName, 4);
+		prevGeneFilter = featureName;
+	}		
+	//featureDetailTable.fnMultiFilter( { "Cell Line Subset": subs, "Cell Line Exclusion": exclusions, "Dataset":datasets });
+	
+	var featureSummaryTable = $('#summaryDatasetTableTable').dataTable();
+	
+	
+	// create the list of unique 'sub excl dataset' and then join them using '\t' into one string
+	// in this the sub, exxcl and ds are seperated by spaces and each set is seperated by a tab
+	var filterArrays = collectFilterArrays();
+	var subArray = filterArrays['site_primary_array'];
+	var exclArray = filterArrays['growth_mode_array'];
+	var dsArray = filterArrays['dataset_array'];
+	var uniqueEntries = "\t";
+	$.each(subArray, function(k, sub){
+		$.each(exclArray, function(k, excl){
+			$.each(dsArray, function(k, ds){
+				uniqueEntries = uniqueEntries + sub + " " + excl + " " + ds + "\t";
+			});		
+		});
+	});
+	
+	var warningMsg = "";
+	if (subArray.length == 0) {
+		warningMsg +="\nPlease choose at least one primary site/subtype.";
+	} 
+	if (exclArray.length == 0) {
+		warningMsg +="\nPlease choose at least one growth mode.";
+	} 
+	if (dsArray.length == 0) {
+		warningMsg +="\nPlease choose at least one Dataset.";
+	}
+	
+	if (warningMsg.length == 0){
+		if (allFiltersAreChecked()){
+			featureSummaryTable.fnMultiFilter( { "Entries": "" });
+	
+		} else {
+			featureSummaryTable.fnMultiFilter( { "Entries": uniqueEntries });
+		}
+		//removeWaitCursor();
+	} else {
+		removeWaitCursor();
+		alert(warningMsg);
+		
+	}
+}
+
+
+
+function IsEmail(email) {
+	  var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+	  return regex.test(email);
+	}
+
+function toggleSubsetFilters(){
+	$('#dsCLSFilter').toggle(); 
+	$('#dsCLSFilterShow').toggle();
+	$('#dsCLSFilterHide').toggle();
+	return false;
+}
+function toggleExclusionFilters(){
+	$('#dsCLEFilter').toggle(); 
+	$('#dsCLEFilterShow').toggle();
+	$('#dsCLEFilterHide').toggle();
+	return false;
+}
+function toggleDatasetFilters(){
+	$('#dsCLDFilter').toggle(); 
+	$('#dsCLDFilterShow').toggle();
+	$('#dsCLDFilterHide').toggle();
+	return false;
+}
+
+function setDatasetFilterDisplay(isCorrelationTab){
+	// activating correlation tab
+	if (isCorrelationTab == true){
+		if (hideCorrelation == true){
+			$("#filters").hide();
+			$('#filterSummary').hide();
+		} else {
+			$("#dsCLDFilter").hide();
+			$('#dsFilterButtons').hide();
+			$("#dsFiltersNotValid").show();
+			$('#filterSummaryMutation').hide();
+		}
+	} else {
+		if (hideFeaturesForReviewers == true){
+			$("#filters").hide();
+		} else {
+			$("#dsCLDFilter").show();
+			$('#dsFilterButtons').show();
+			$("#dsFiltersNotValid").hide();
+			$('#filterSummaryMutation').show();
+		}
+	}
+	
+	if (hideFeaturesForReviewers == true){
+		$('#filterSummaryMutation').hide();
+	}
+	
+	setTimeout(function(){
+		
+		var y = $('#dsCLSFilter').find('input:checked:first').position().top;
+		y2 = $('#dsCLSFilter').position().top;
+		$('#dsCLSFilter').scrollTop(y-y2)-20;
+	
+	}, 250);
+}
+
+function lastElement(anArray){
+	return anArray.slice(-1)[0];
+}
+
+// add the multiColFilter plugin to datatables
+// TODO this should move to a different file
+$.fn.dataTableExt.oApi.fnMultiFilter = function( oSettings, oData ) {
+	if (oSettings == null) return;
+    for ( var key in oData )
+    {
+        if ( oData.hasOwnProperty(key) )
+        {
+            for ( var i=0, iLen=oSettings.aoColumns.length ; i<iLen ; i++ )
+            {
+                if( oSettings.aoColumns[i].sName == key )
+                {
+                    /* Add single column filter */
+                    oSettings.aoPreSearchCols[ i ].sSearch = oData[key];
+                    break;
+                }
+            }
+        }
+    }
+    this.oApi._fnDraw( oSettings );
+   
+};
+
+
+function daysBetween( date1, date2 ) {
+	  //Get 1 day in milliseconds
+	  var one_day=1000*60*60*24;
+
+	  // Convert both dates to milliseconds
+	  var date1_ms = date1.getTime();
+	  var date2_ms = date2.getTime();
+
+	  // Calculate the difference in milliseconds
+	  var difference_ms = date2_ms - date1_ms;
+	    
+	  // Convert back to days and return
+	  return Math.round(difference_ms/one_day); 
+	};
+
+
+
+$.extend({
+    getUrlVars: function(){
+      var vars = [], hash;
+      var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+      for(var i = 0; i < hashes.length; i++)
+      {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        vars[hash[0]] = hash[1];
+      }
+      return vars;
+    },
+    getUrlVar: function(name){
+      return $.getUrlVars()[name];
+    }
+  });
+
+var boxWhiskerOutlierSize = 2;
+function  setBoxWhiskerRadios(integerOutlierRadius){
+	if (integerOutlierRadius == null){
+		integerOutlierRadius = boxWhiskerOutlierSize;
+	} else {
+		boxWhiskerOutlierSize = integerOutlierRadius;
+	}
+	
+	// first uncheck all
+	$('input.bwo1').prop('checked', false);
+	$('input.bwo2').prop('checked', false);
+	$('input.bwo4').prop('checked', false);
+	$('input.bwo8').prop('checked', false);
+	// then check the one that should be
+	$('input.bwo'+integerOutlierRadius).prop('checked', true);
+}
+

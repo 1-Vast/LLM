@@ -1,0 +1,168 @@
+"""Metadata-first transport qualification; no fitted curves replace measured doses."""
+from __future__ import annotations
+
+import argparse
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import sys
+import time
+from urllib.parse import quote
+
+import numpy as np
+import pandas as pd
+import requests
+
+
+MENU = [(1032, "Afatinib", 2.), (1036, "PLX-4720", 10.), (1060, "PD0325901", .25)]
+RAW_SHA = "40bc65d4fd9cd61bb8c0faf5fa60ee32a05fccce7eb441cc74e3ed37666ef10a"
+
+
+def digest(path):
+    with Path(path).open("rb") as stream:
+        return hashlib.file_digest(stream, "sha256").hexdigest()
+
+
+def save(path, value):
+    Path(path).write_text(json.dumps(value, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+
+
+def exact_menu_records(raw):
+    """Use only assignment/identity fields; never inspect INTENSITY for qualification."""
+    columns = ["BARCODE", "DRUGSET_ID", "DRUG_ID", "CONC", "POSITION", "TAG",
+               "ASSAY", "DURATION", "MASTER_CELL_ID", "CELL_ID", "SCAN_ID"]
+    meta = raw[columns].copy()
+    records = []
+    for drug, name, dose in MENU:
+        selected = meta.loc[(meta.DRUG_ID == drug) & np.isclose(meta.CONC, dose, rtol=0, atol=1e-12)]
+        for row in selected.itertuples():
+            records.append(dict(source_row=int(row.Index), **{c: getattr(row, c) for c in columns},
+                                action=f"gdsc:{drug}:{dose:g}uM", drug_name=name))
+    return pd.DataFrame(records)
+
+
+def fetch(url, out, name):
+    """Save every response including failures, with raw-byte hashes and timestamps."""
+    started = time.perf_counter()
+    record = dict(url=url, requested_at_utc=datetime.now(timezone.utc).isoformat(),
+                  license="unknown; verify provider terms separately")
+    try:
+        response = requests.get(url, timeout=45, stream=True)
+        path = out / (name + ".raw.txt")
+        with path.open("wb") as stream:
+            for chunk in response.iter_content(1 << 20):
+                stream.write(chunk)
+        record.update(status=response.status_code, final_url=response.url, file=path.name,
+                      bytes=path.stat().st_size, sha256=digest(path),
+                      content_type=response.headers.get("Content-Type"),
+                      last_modified=response.headers.get("Last-Modified"),
+                      etag=response.headers.get("ETag"))
+    except requests.RequestException as exc:
+        record["error"] = str(exc)
+    record["elapsed_seconds"] = time.perf_counter() - started
+    return record
+
+
+def scan_gdsc_csv(source, out, prior_metadata):
+    """Scan a full release using metadata only, preserving global native CSV row IDs."""
+    out.mkdir(parents=True, exist_ok=False)
+    columns = ["BARCODE", "DRUGSET_ID", "DRUG_ID", "CONC", "POSITION", "TAG", "ASSAY", "DURATION",
+               "MASTER_CELL_ID", "CELL_ID", "SCAN_ID", "DATE_CREATED", "SCAN_DATE", "SANGER_MODEL_ID"]
+    save(out / "protocol.json", dict(at_utc=datetime.now(timezone.utc).isoformat(),
+         source=str(source), sha256=digest(source), code_sha256=digest(__file__), menu=MENU,
+         prior_metadata_sha256=digest(prior_metadata), inspected_fields=columns,
+         outcome_fields_read=[], no_refit=True, purpose="exact-menu and layout qualification only"))
+    records = []
+    raw_rows = 0
+    for chunk in pd.read_csv(source, usecols=columns, chunksize=250000):
+        raw_rows += len(chunk)
+        selected = exact_menu_records(chunk)
+        if len(selected):
+            selected = selected.merge(chunk[["DATE_CREATED", "SCAN_DATE", "SANGER_MODEL_ID"]],
+                                      left_on="source_row", right_index=True, validate="many_to_one")
+            records.append(selected)
+    found = pd.concat(records, ignore_index=True)
+    previous = pd.read_csv(prior_metadata)
+    found["prior_scan"] = found.SCAN_ID.isin(previous.SCAN_ID.unique())
+    found.to_csv(out / "exact_menu_metadata.csv", index=False)
+    layout = found.groupby(["DRUGSET_ID", "action", "POSITION", "TAG", "ASSAY", "DURATION"], dropna=False).agg(
+        rows=("BARCODE", "size"), scans=("SCAN_ID", "nunique"), lines=("MASTER_CELL_ID", "nunique")).reset_index()
+    layout.to_csv(out / "layout_coverage.csv", index=False)
+    coverage = found.groupby(["BARCODE", "SCAN_ID", "DRUGSET_ID", "prior_scan"], dropna=False).action.nunique().reset_index(name="actions")
+    coverage.to_csv(out / "scan_menu_coverage.csv", index=False)
+    summary = dict(raw_rows=raw_rows, exact_action_rows=len(found), exact_complete_scans=int((coverage.actions == 3).sum()),
+                   new_exact_complete_scans=int(((coverage.actions == 3) & ~coverage.prior_scan).sum()),
+                   positions={a: sorted(map(int, g.POSITION.unique())) for a,g in found.groupby("action")},
+                   outcome_evaluation_run=False)
+    save(out / "summary.json", summary)
+    save(out / "manifest.json", {p.name: digest(p) for p in sorted(out.iterdir())
+                                 if p.is_file() and p.name != "manifest.json"})
+    print(json.dumps(summary))
+
+
+def discover(snapshot, dependency_dir, out):
+    out.mkdir(parents=True, exist_ok=False)
+    source = snapshot / "research/astra/data/gdsc_screen_v1/gdsc_example.rda"
+    if digest(source) != RAW_SHA:
+        raise ValueError("source hash changed")
+    save(out / "protocol.json", dict(
+        at_utc=datetime.now(timezone.utc).isoformat(), source_sha256=RAW_SHA,
+        source_code_sha256=digest(__file__), menu=MENU,
+        goal="exact measured-menu layout crossover or independent assay qualification",
+        frozen_existing_policy=True, no_refit=True, no_outcome_based_selection=True,
+        gates=["exact chemical identity and measured concentration", "ATP assay and duration",
+               "raw well/control/QC provenance", "different action-to-position layout",
+               "sample/culture and input-availability evidence"],
+        status="metadata discovery; historical source already accessed in prior audit",
+        outcome_access="RDA parser loads INTENSITY, but this stage projects metadata only",
+        no_STATE_or_physical_experiment=True))
+    (out / "execution_source.py.txt").write_bytes(Path(__file__).read_bytes())
+    sys.path.insert(0, str(dependency_dir.resolve()))
+    import pyreadr
+    raw = pyreadr.read_r(str(source))["gdsc_example"]
+    records = exact_menu_records(raw)
+    records.to_csv(out / "exact_menu_metadata.csv", index=False)
+    layout = records.groupby(["DRUGSET_ID", "action", "POSITION", "TAG", "ASSAY", "DURATION"], dropna=False).agg(
+        rows=("BARCODE", "size"), plates=("BARCODE", "nunique"), lines=("MASTER_CELL_ID", "nunique")).reset_index()
+    layout.to_csv(out / "layout_coverage.csv", index=False)
+    coverage = records.groupby(["BARCODE", "DRUGSET_ID"], dropna=False).action.nunique().reset_index(name="actions")
+    coverage.to_csv(out / "plate_menu_coverage.csv", index=False)
+    save(out / "local_gate.json", dict(raw_rows=len(raw), raw_plates=int(raw.BARCODE.nunique()),
+         drugsets=raw.DRUGSET_ID.value_counts().to_dict(), exact_rows=len(records),
+         exact_menu_plates=int((coverage.actions == 3).sum()),
+         alternate_drugset_complete_plates=int(((coverage.actions == 3) & (coverage.DRUGSET_ID != 159)).sum()),
+         positions={a: sorted(map(int, g.POSITION.unique())) for a, g in records.groupby("action")}))
+    queries = ["EXT_ID:26482930", 'TITLE:"Correlating chemical sensitivity and basal gene expression"',
+               'TITLE:"Revisiting inconsistency in large pharmacogenomic studies"']
+    urls = [("ctrp_portal", "https://portals.broadinstitute.org/ctrp.v2.1/?page=data"),
+            ("broad_ctd2", "https://ocg.cancer.gov/programs/ctd2/data-portal"),
+            ("gdsc_downloads", "https://www.cancerrxgene.org/downloads/bulk_download")]
+    urls.extend((f"literature_{i}", "https://www.ebi.ac.uk/europepmc/webservices/rest/search?format=json&query=" + quote(q))
+                for i, q in enumerate(queries))
+    receipts = []
+    for name, url in urls:
+        receipts.append(fetch(url, out, name))
+        save(out / "source_receipts.json", receipts)
+    save(out / "manifest.json", {p.name: digest(p) for p in sorted(out.iterdir())
+                                 if p.is_file() and p.name != "manifest.json"})
+    print(json.dumps(dict(out=str(out), local=json.loads((out / "local_gate.json").read_text()),
+                         sources=[{k:r.get(k) for k in ("url", "status", "bytes", "error")} for r in receipts])))
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--snapshot", type=Path)
+    parser.add_argument("--dependency-dir", type=Path)
+    parser.add_argument("--csv", type=Path)
+    parser.add_argument("--prior-metadata", type=Path)
+    parser.add_argument("--out", type=Path, required=True)
+    args = parser.parse_args()
+    if args.csv:
+        if args.prior_metadata is None:
+            parser.error("--csv requires --prior-metadata")
+        scan_gdsc_csv(args.csv, args.out, args.prior_metadata)
+    else:
+        if args.snapshot is None or args.dependency_dir is None:
+            parser.error("discovery requires --snapshot and --dependency-dir")
+        discover(args.snapshot, args.dependency_dir, args.out)

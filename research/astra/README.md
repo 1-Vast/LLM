@@ -199,3 +199,10 @@ contribution, denominator and all-date omission diagnostics. The tested density
 increment remains negative; the background association remains positive but causal,
 prospective state and agent gains are unestablished. The PR is inspected in an
 isolated pinned snapshot and is not merged by this review.
+
+The [GDSC transport follow-up](GDSC_TRANSPORT_FOLLOWUP.md) acquires the full official
+release and original CTRPv2 archive. A frozen two-action diagnostic on 200 later scans
+gains4.207pp versus development-fixed PD, but loses0.961pp to fixed PLX in a separate
+post-outcome diagnostic. CTRP lacks the exact menu. A randomized three-action pilot
+allocation is generated and contract-tested; no physical execution, STATE forward or
+cheap-state value is claimed. See [transport verification](results/20261002_gdsc_transport_verification_v1/receipt.json).

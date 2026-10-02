@@ -657,3 +657,94 @@ and restores all58 files. The saved file-based test runner initially lacks repo 
 on sys.path and fails before test collection; its source and failure receipt are
 retained. Adding the root makes its final run pass67 tests. This does not change
 model/data/scientific rules. Main and PR suites remain overlapping counts.
+
+## 20. Autonomous later-layout transport and randomized pilot preparation
+
+The user authorized continuing the independent analysis and resolving difficulties
+through direct source inspection and literature access. Work remains in ASTRA;
+existing authorization covers synchronizing research progress to main. No additional
+agent was spawned, production change made, or original PR merged.
+
+The [transport follow-up](../../research/astra/GDSC_TRANSPORT_FOLLOWUP.md) records a
+metadata-first scan of the existing example, a real full official GDSC release
+download and the recovered original CTRPv2.0 expanded archive. The official release
+has15,069,449 native records; the CTRP archive has545 compound and12,470,175 raw well
+metadata records. Five fallback-source directories plus discovery retain37 HTTP
+requests, with timeouts, access failures, invalid routes and HTTP200 redirects that
+do not retrieve datasets. Failed article methods and CCLE original export access
+remain failed, not certified scientific exclusions. Source versions, timestamps,
+field dictionaries, exact native IDs/rows and SHA256 are retained. Large originals
+remain in ignored tmp and can be reacquired with frozen SHA verification.
+
+The existing1,837-plate example cannot remove the drug-position association. In the
+full release, original three-action complete scans still occur only in layout159;
+one is new to the example's scan IDs. Later layouts231/284 instead contain the exact
+PLX-472010uM and PD03259010.25uM pair in different wells. Those data support a separate
+two-action historical transport diagnostic, not confirmation of original three-action
+C-versus-Afatinib value. CTRP has neither original exact dose for its Afatinib/PLX
+records nor a PD0325901 compound. The native raw wells show closest doses2.1/8.3uM;
+no dose interpolation, predicted viability or MEK-drug substitution is allowed.
+All15 native archive MD5 entries match; SHA256 covers all16 members.
+
+Of992 metadata-complete scans in the two later GDSC layouts,694 overlap original
+development parent/components and98 lack unique matching original annotations/model
+identity. All metadata and gate-specific failure fields remain saved. The200 selected
+scans cover196 original patient/parent units,196 cell-line/expansion IDs and41 dates.
+Some were in the opened original confirmation set; this is later-assay transport
+within GDSC, not independent-study or entirely new-line replication. Actual background
+availability, randomized positions, full failure denominators and costs remain unknown.
+
+Exactly one reconstruction of the previously selected C Ridge alpha10 is fitted to
+original development rows; no pickle is loaded, target fit or hyperparameter search
+made. Original sealed forecasts reproduce to8.326673e-16. Source/code/membership,
+two-action menu, original tie tolerance, endpoint, QC, support fallback, equal-parent
+weighting and predictions are frozen in
+[layout freeze](../../research/astra/results/20261002_gdsc_layout_freeze_v1/protocol.json)
+before target responses are evaluated. All200 selected scans have both measured
+actions and matched controls under the unchanged rules.85/400 out-of-[0,1] values
+are retained. Zero QC failures in selected published scans is not a complete attempted
+experiment failure rate. Action and shared control source rows are saved explicitly.
+
+The registered C2-minus-development-fixed PD gain is+4.207pp pooled,+2.509pp for
+layout231 and+4.411pp for284. C2 chooses PLX71times and PD129times. A separate, labelled
+[post-outcome all-fixed diagnostic](../../research/astra/results/20261002_gdsc_layout_diagnostics_v1/summary.json)
+finds C2 loses0.961pp to fixed PLX, with negative differences in both layouts. No
+primary comparator is replaced and no target-selected policy is deployed. Predicted
+PD-minus-PLX mean is+3.893pp versus measured-5.168pp; mean contrast error is+9.061pp,
+contrast RMSE26.975pp. Measured single-pair ranking agrees in113scans, disagrees in86,
+and ties numerically in1; these are not verified biological/mechanism correctness.
+No physical confidence interval, causal state gain or net value is claimed.
+
+The results narrow the problem to transport/calibration and comparator strength.
+Beating development-fixed PD does not show superiority to both fixed actions. New
+positions reduce dependence on the exact old wells, but each action remains fixed
+within each later layout; position, date, culture and composition remain entangled.
+Do not refit on opened outcomes, add seeds for deterministic Ridge, or claim agent
+gain from static argmax. The strongest next test randomizes positions and measures
+all three exact actions, with every fixed policy included before outcomes.
+
+[Pilot generation](../../research/astra/results/20261002_gdsc_randomized_pilot_v1/protocol.json)
+actually runs and yields12 proposed lines selected by hash from sealed recommendation
+strata,24 planned separate starts across4days,336terminal+48destructive-sister baseline
+wells and8plates. It includes randomized assignments, matched per-culture vehicle/
+blank groups and an unfilled real-event/cost ledger. All executed/culture-verified
+flags are false and outcomes/times/costs empty. Technical repeats are not independent
+starts;24starts are not24donors. Enriched feasibility does not estimate original
+population policy value. Baseline blanks/calibration, real culture/media linkage,
+handling, timestamps, QC/refusal, practical effect threshold, power and money must be
+certified before physical execution/confirmation. No physical work is performed.
+
+Initial9 and final12 new transport/pilot contracts pass. Final scoped maestro
+[verification](../../research/astra/results/20261002_gdsc_transport_verification_v1/receipt.json)
+passes358tests, including159ASTRA contracts, with0failures/errors/skips;12new contracts
+are included and counts are not summed. Tests check outcome-independent metadata,
+exact dose, shared controls, missing/failed/duplicate/nonfinite readings, raw identity,
+control range, tie rules, plate capacity, complete menus and no fabricated executions.
+The old frozen STATE inputs/outputs and original copies remain unchanged. Further
+publication validation covers old GDSC manifests, all58snapshot files, supplied
+originals, new artifact manifests and unchanged source/code hashes. Production file
+counts remain44src/913tools. Full prior suite, original60fits and888ledger cases are
+not rerun. There is no new STATE forward, LLM API request, RNA measurement, physical
+experiment, checkpoint or dependency change. Money and net deployment value stay
+unknown. The report gives reproduction commands using new directories and a bounded
+search coverage/evidence boundary; the original research PR remains unmerged.
