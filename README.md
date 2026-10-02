@@ -3,6 +3,10 @@
 MAESTRO is an evidence-driven biological decision agent. Predictions support planning;
 measured, qualified evidence controls scientific conclusions.
 
+Latest executed phenotype study: [GDSC matched-plate screening](research/astra/GDSC_SCREEN.md).
+Held-out patient/date replay finds no useful increment from seeding density over a simple
+background predictor; prospective molecular-state and net deployment value remain unverified.
+
 ## Layout
 
 | Path | Responsibility |

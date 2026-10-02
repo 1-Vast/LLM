@@ -545,3 +545,49 @@ opposing state-dependent advantages can cancel in a marginal average.
 Final navigation/documentation checks pass 21 repository-shape tests and are not
 added to the overlapping 341 count. Source dtype is float32: read CSV EGR1 as that
 dtype before float64 aggregation to reproduce native means exactly.
+
+## 19. GDSC 同板表型任务与跨供体、跨日期确认
+
+在实际基线 `84da724` 上接手；远端 main 与其父提交 `6bbe233` 均核对一致，
+初始工作树干净，仓库未发现 AGENTS.md。独立核对旧 decision_space_v2 全部哈希和
+冻结 CSV 覆盖；c39 原始文件和 STATE checkpoint 未取得，不重跑零值前向。
+
+本轮从现有 Tahoe 和两个公开候选 NCI-ALMANAC、GDSC 中选择 GDSC 官方原始示例。
+主任务版本 `gdsc-phenotype-v1` 为同板 Afatinib 2uM、PLX-4720 10uM、PD0325901
+0.25uM 的真实 ATP 表型选择；没有剂量惩罚，不填补缺失结局。数据与协议见
+[GDSC_SCREEN.md](../../research/astra/GDSC_SCREEN.md)。固定布局、历史背景注释、
+完整失败分母和成本的不确定性均保留，不称因果或前瞻廉价分子状态试验。
+
+开发 617 板、516 供体簇；确认 222 板、214 个未见供体簇、19 个后续日期。
+三药菜单、未截断效用、2/5/10/20pp 敏感性阈值、划分与分析规则先冻结。
+背景 C 与 C+播种密度臂均在分组 CV 中选中 Ridge alpha=10，小型森林未保留。
+确认预测和 888 个回放计划先登记，再揭示真实结果：
+
+- C+密度相对 C：-0.52 ATP 抑制百分点，主要 97.5% CI [-1.69,+0.65]，12 次具体动作切换。
+- C+密度相对开发固定 Afatinib：+2.81pp，主要 97.5% CI [-0.03,+5.64]，78 次切换。
+- C 相对固定动作：辅助 +3.32pp，95% CI [+0.96,+5.69]，有意义的 2/5pp 收益仍未定。
+
+这是所测试密度策略的负结果，不是所有廉价状态无效；保留简单背景模型，停止密度
+路线复杂化。货币和失败成本未知，未取得净部署收益或 STATE/多智能体优势。
+
+新增 gdsc_screen.py 和 gdsc_replay.py 复用 DecisionPath/CaseStore，保持预测—实测
+分离、精确条件绑定和预算。888 次受控揭示全部匹配，重复导入不重复扣预算，
+一次揭示后停止；888 次回放只复用 222 个历史板，不是独立或新增物理实验。
+未认证亲本数，因此不绕过生产的独立单位评分门。没有 src/tools 默认行为变更。
+
+初轮相关回归 61 项通过、0 失败、0 跳过，包含先前 14 项新测试，不相加。独立核对
+2,517 个原始动作记录和 888 个结果绑定，归一化最大往返差 1.11e-16。
+历史 341/1,861 不计为本轮测试。初次元数据导出缺 pyarrow 的两个失败、外部论文
+访问受阻、未采用候选均记录；文档索引编辑还发生两次 patch 上下文不匹配，
+没有改动冻结科学输出，随后按实际文件尾修正。
+
+完整结果在 `research/astra/results/20261002_gdsc_{freeze,development,confirmation,replay,verification}_v1/`。
+源文件与必要 GPL 许可、哈希另归档到 `research/astra/data/gdsc_screen_v1/`。
+最后复核修正了 v1 的输入溯源：C 臂去掉未消费密度，置换臂绑定实际置换值，
+模型文件中的 C/CS 成员也进入预测身份。新 `20261002_gdsc_replay_v2/` 明确标记
+结果已打开后的工程复现；v1 原件保留。重算 1,998 个预测与冻结值最大差 9.71e-17，
+888 个动作和实测效用不变。最终回归为 62 项通过、0 失败、0 跳过，不与前轮相加。
+下一步只建议同菜单的独立亲本、随机孔位复测，以区分背景响应与位置/批次偏差；
+先导 12 细胞系×2 独立启动、384 个基础孔位；time-zero 使用独立早期板，共至少 6 张板。
+功效情景和明确继续/修改/停止门槛在报告中。
+该物理实验未运行；本轮新增物理实验、RNA、STATE 前向和付费 LLM 调用均为零。

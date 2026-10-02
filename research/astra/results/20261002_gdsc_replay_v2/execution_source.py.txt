@@ -1,0 +1,221 @@
+"""GDSC controlled reveals through the existing DecisionPath and CaseStore.
+
+`plan` has no response-table argument. `reveal` accepts original measured wells,
+checks their source/conditions, and spends one offline reveal unit per case.
+No new scheduler, fact ledger, mechanism update, or physical execution is created.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+import time
+
+import numpy as np
+import pandas as pd
+
+from agent.memory import CaseStore, MeasurementResult
+from maestro.models import EvidenceAction, FunctionalInterventionProfile
+from .decision_path import Candidate, DecisionPath
+from .interface import ExecutionBinding, ScientificQuery, StateRef
+from .gdsc_screen import (ACTION_IDS, MENU, ENDPOINT, VERSION, CATS, SEED, choose, identity,
+                          load_freeze, manifest, save, sha, stamp, verify_manifest)
+
+REPLAY_VERSION = "gdsc-replay-v2"
+
+
+def forecast_inputs(meta):
+    """Reconstruct the frozen negative control without consulting any outcome.
+
+    C does not consume density; shuffle consumes the permuted value, not the
+    original plate value. Keep the row order used by the frozen development run.
+    """
+    original = meta.loc[meta.split == "confirmation"].copy().reset_index(drop=True)
+    shuffled = original.copy()
+    rng = np.random.default_rng(SEED)
+    for _, ids in shuffled.groupby(CATS).groups.items():
+        ids = list(ids)
+        shuffled.loc[ids, "log2_density"] = rng.permutation(shuffled.loc[ids, "log2_density"].to_numpy())
+    return {"C": original.set_index("BARCODE")[CATS],
+            "CS": original.set_index("BARCODE")[CATS + ["log2_density"]],
+            "shuffle": shuffled.set_index("BARCODE")[CATS + ["log2_density"]]}
+
+
+def bound_state(inputs, unit, model_member):
+    state = StateRef(identity(inputs), identity(list(inputs)), VERSION, str(unit), "historical")
+    # A file can contain more than one fitted model. Include its selected member
+    # in the transform identity so future shared caches cannot alias C and CS.
+    return state, f"{VERSION}:model={model_member}"
+
+
+def choose_from_forecasts(eligible, predictions, fixed):
+    """No interval-based confidence is claimed for this point-prediction policy."""
+    if not predictions:
+        return (next(c for c in eligible if c.action.identifier == ACTION_IDS[fixed]),)
+    values = [predictions.get(c.action.identifier, {}) for c in eligible]
+    if any(v.get("supported") is not True or not np.isfinite(v.get("q", np.nan)) for v in values):
+        return (next(c for c in eligible if c.action.identifier == ACTION_IDS[fixed]),)
+    pick = int(choose(np.array([[v["q"] for v in values]]))[0])
+    return (eligible[pick],)
+
+
+def plan(args):
+    start = time.perf_counter()
+    p, meta = load_freeze(args.freeze)
+    verify_manifest(args.development)
+    args.out.mkdir(parents=True, exist_ok=False)
+    d = json.loads((args.development / "development.json").read_text())
+    if d["freeze_manifest_sha256"] != sha(args.freeze / "manifest.json"):
+        raise ValueError("Development/replay freeze mismatch")
+    preds = pd.read_csv(args.development / "sealed_confirmation_predictions.csv", dtype={"BARCODE": str})
+    inputs = forecast_inputs(meta)
+    meta = meta.loc[meta.split == "confirmation"].set_index("BARCODE")
+    model_hash = sha(args.development / "models.pkl")
+    rows, forecast_calls = [], 0
+    store = CaseStore(args.out / "cases.sqlite")
+    for row in preds.itertuples(index=False):
+        info = meta.loc[row.BARCODE]
+        context = f"gdsc:master:{int(info.MASTER_CELL_ID)}:plate:{row.BARCODE}"
+        actions = []
+        for action, (drug, _, conc) in zip(ACTION_IDS, MENU):
+            conditions = {"drug_id": str(drug), "concentration_uM": f"{conc:g}", "barcode": row.BARCODE,
+                          "scan_id": str(int(info.SCAN_ID)), "source_sha256": p["sources"]["raw"]["sha256"],
+                          "endpoint": ENDPOINT, "duration_field_days": "4"}
+            action_spec = EvidenceAction(action, "Offline intervention selection and measured outcome reveal", 1., (),
+                                        readout=ENDPOINT, time_hours=96., expected_conditions=conditions)
+            actions.append(action_spec)
+        for arm in ("fixed", "C", "CS", "shuffle"):
+            allowed_input = {} if arm == "fixed" else inputs[arm].loc[row.BARCODE].to_dict()
+            member = "CS" if arm == "shuffle" else arm
+            state, transform = bound_state(allowed_input, info.unit, member)
+            bind = ExecutionBinding(model_hash, transform, identity("deterministic/no_sampling"), SEED, REPLAY_VERSION)
+            candidates = [Candidate(a, ScientificQuery(state, a.identifier, identity(dict(a.expected_conditions)),
+                           context, "GDSC159 published panel", ENDPOINT, 96., "continuous"), bind) for a in actions]
+            q = [float(getattr(row, f"{arm}_q{i}")) for i in range(3)] if arm != "fixed" else None
+            def forecast(query, binding):
+                nonlocal forecast_calls
+                forecast_calls += 1
+                i = ACTION_IDS.index(query.action_id)
+                return {"valid": True, "supported": bool(getattr(row, f"{arm}_supported")), "q": q[i],
+                        "all_actions": ACTION_IDS, "contrasts_to_first": [v-q[0] for v in q],
+                        "input_sha256": state.content_sha256, "model_sha256": binding.checkpoint_sha256,
+                        "input_fields": allowed_input, "model_member": member,
+                        "endpoint": ENDPOINT, "duration_field_days": 4,
+                        "estimand": p["estimand"], "uncertainty_covered": "development grouped-CV errors; no per-query interval",
+                        "uncertainty_uncovered": ["physical calibration", "layout bias", "out-of-distribution", "cost"],
+                        "cost": {"prior_batch_inference": True, "compute_money": None, "new_physical_measurements": 0}}
+            # Fixed policy is deliberately model-free; all legal actions still exist.
+            local = candidates if arm != "fixed" else [Candidate(c.action) for c in candidates]
+            core = DecisionPath(store, lambda case, profile: tuple(local),
+                                lambda eligible, forecasts: choose_from_forecasts(eligible, forecasts, d["fixed_action"]), forecast)
+            case = f"gdsc159:{arm}:{row.BARCODE}"
+            result = core.run(case, FunctionalInterventionProfile("offline_screen", context_identifier=context),
+                              budget=1., prediction_use="selection")
+            action = result.actions[0]
+            expected = ACTION_IDS[int(getattr(row, f"{arm}_action"))]
+            if action.identifier != expected:
+                raise ValueError("Live selector disagrees with sealed pre-outcome action")
+            request = identity({"case": case, "model": model_hash, "version": result.plan_version})
+            payload = result.predictions.get(action.identifier, {"policy": "development fixed action; no world forecast"})
+            store.record_prediction(case, result.plan_version, action.identifier, request, payload, attempt_id=None)
+            rows.append({"case_id": case, "arm": arm, "BARCODE": row.BARCODE, "context": context,
+                         "action": action.identifier, "plan_version": result.plan_version, "request_id": request,
+                         "conditions": dict(action.expected_conditions), "prediction": payload,
+                         "plan_status": result.status, "input_fields": allowed_input,
+                         "model_fallback": arm != "fixed" and not bool(getattr(row, f"{arm}_supported"))})
+    save(args.out / "plans.json", rows)
+    save(args.out / "plan_receipt.json", {"planned_at_utc": stamp(), "confirmation_results_read": False,
+         "previous_confirmation_already_opened": bool(args.reproduction), "replay_version": REPLAY_VERSION,
+         "cases": len(rows), "prediction_artifact_queries": forecast_calls, "new_model_fits": 0,
+         "new_physical_experiments": 0, "elapsed_seconds": time.perf_counter()-start,
+         "predictions_sha256": sha(args.development / "sealed_confirmation_predictions.csv"),
+         "source_sha256": sha(__file__), "protocol_sha256": sha(args.freeze / "protocol.json"),
+         "budget_unit": "one archival result reveal, not currency"})
+    (args.out / "execution_source.py.txt").write_bytes(Path(__file__).read_bytes())
+    # SQLite is mutable on reveal; freeze the plans and receipt, not DB bytes.
+    save(args.out / "plan_manifest.json", {name: sha(args.out/name) for name in ("plans.json", "plan_receipt.json", "execution_source.py.txt")})
+    print(json.dumps({"cases": len(rows), "forecast_artifact_queries": forecast_calls, "results_read": False}))
+
+
+def reveal(args):
+    start = time.perf_counter()
+    output = args.plans / "reveal_receipt.json"
+    if output.exists():
+        raise FileExistsError("Do not overwrite an opened replay receipt")
+    for name, digest in json.loads((args.plans / "plan_manifest.json").read_text()).items():
+        if sha(args.plans / name) != digest:
+            raise ValueError("Plan changed after commit")
+    verify_manifest(args.confirmation)
+    planned = json.loads((args.plans / "plan_receipt.json").read_text())
+    opened = json.loads((args.confirmation / "opening.json").read_text())
+    if planned["protocol_sha256"] != opened["protocol_sha256"]:
+        raise ValueError("Confirmation belongs to a different frozen task")
+    observations = pd.read_csv(args.confirmation / "confirmation_observations.csv", dtype={"BARCODE": str})
+    if observations.duplicated(["BARCODE", "action"]).any():
+        raise ValueError("Ambiguous result identity")
+    lookup = observations.set_index(["BARCODE", "action"])
+    store = CaseStore(args.plans / "cases.sqlite")
+    records = []
+    for record in json.loads((args.plans / "plans.json").read_text()):
+        key = (record["BARCODE"], record["action"])
+        if key not in lookup.index:
+            records.append({"case_id": record["case_id"], "status": "missing_real_outcome", "utility": None})
+            continue
+        actual = lookup.loc[key]
+        conditions = dict(record["conditions"])
+        # Match original record fields, not model output or a different action.
+        actual_conditions = {**conditions, "drug_id": str(int(actual.drug_id)),
+                             "concentration_uM": f"{float(actual.concentration_uM):g}",
+                             "scan_id": str(int(actual.SCAN_ID)), "barcode": key[0]}
+        result_id = identity({"case": record["case_id"], "source_row": int(actual.source_row), "conditions": actual_conditions})
+        fact = MeasurementResult(record["action"], "Historical published CellTiter-Glo measurement, controlled offline reveal",
+                                 f"sha256:{conditions['source_sha256']}:row:{int(actual.source_row)}:position:{int(actual.POSITION)}",
+                                 record["context"], 96., None, True, conditions=actual_conditions,
+                                 metrics={"utility": repr(float(actual.utility)), "raw_intensity": repr(float(actual.raw_intensity)),
+                                          "shared_control_id": str(actual.control_id)},
+                                 biological_replicates=None, result_id=result_id,
+                                 limitations=("Unknown independently initiated culture count; one assay well, shared controls.",
+                                              "Archive replay, no new execution or mechanism evidence."))
+        imported = store.import_measurement(record["case_id"], fact)
+        duplicate = store.import_measurement(record["case_id"], fact)
+        if duplicate.created or store.snapshot(record["case_id"]).spent != 1.:
+            raise ValueError("Duplicate reveal charged budget")
+        binding = store.prediction_for_result(record["case_id"], result_id)
+        if binding["request_id"] != record["request_id"]:
+            raise ValueError("Prediction/result plan binding failed")
+        # Stop through the same authoritative path when its reveal budget is spent.
+        action = EvidenceAction(record["action"], "No second reveal budget", 1., ())
+        stopped = DecisionPath(store, lambda case, profile: (Candidate(action),),
+                               lambda eligible, forecasts: eligible[:1],
+                               lambda *unused: (_ for _ in ()).throw(AssertionError("budget gate must run first")))
+        stop = stopped.run(record["case_id"], FunctionalInterventionProfile("offline_screen", context_identifier=record["context"]),
+                           prediction_use="selection")
+        records.append({"case_id": record["case_id"], "arm": record["arm"], "BARCODE": key[0], "action": key[1],
+                        "status": "revealed", "created": imported.created, "duplicate_created": duplicate.created,
+                        "result_id": result_id, "source_row": int(actual.source_row), "utility": float(actual.utility),
+                        "next_status": stop.status, "remaining_budget": store.snapshot(record["case_id"]).remaining_budget,
+                        "production_scoring": "not promoted: independent culture count unknown; research point errors evaluated separately"})
+    save(output, {"revealed_at_utc": stamp(), "elapsed_seconds": time.perf_counter()-start,
+         "new_physical_experiments": 0, "records": records})
+    print(json.dumps({"revealed": sum(r["status"] == "revealed" for r in records), "missing": sum(r["status"] != "revealed" for r in records),
+                      "all_duplicates_idempotent": all(not r.get("duplicate_created", False) for r in records)}))
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    sub = parser.add_subparsers(dest="command", required=True)
+    p = sub.add_parser("plan")
+    for name in ("freeze", "development", "out"):
+        p.add_argument("--"+name, type=Path, required=True)
+    p.add_argument("--reproduction", action="store_true", help="Declare replay after confirmation outcomes were already opened")
+    p.set_defaults(run=plan)
+    p = sub.add_parser("reveal")
+    for name in ("plans", "confirmation"):
+        p.add_argument("--"+name, type=Path, required=True)
+    p.set_defaults(run=reveal)
+    args = parser.parse_args()
+    args.run(args)
+
+
+if __name__ == "__main__":
+    main()
