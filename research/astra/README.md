@@ -192,3 +192,10 @@ coverage audit:146 Trametinib cells,5 nonzero EGR1 values, six dose/plate condit
 and no within-plate action pair. It defines separate decision-value and mechanism-
 value evidence chains and per-question continue/modify/stop criteria. Descriptive
 RNA differences and three-seed ranks do not identify intervention utility.
+
+The [independent GDSC review](GDSC_INDEPENDENT_REVIEW.md) verifies the supplied PR's
+2,517 native ATP action records, policy intervals and split. It adds complete
+contribution, denominator and all-date omission diagnostics. The tested density
+increment remains negative; the background association remains positive but causal,
+prospective state and agent gains are unestablished. The PR is inspected in an
+isolated pinned snapshot and is not merged by this review.

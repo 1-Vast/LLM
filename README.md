@@ -64,3 +64,5 @@ The subsequent native zero attribution and bounded policy diagnostics are in
 The cheap-input decision and mechanism research questions, native observed-action
 coverage and next experimental gates are in
 [the ASTRA eight-question review](research/astra/EIGHT_QUESTIONS.md).
+Independent source reproduction and finite sensitivity analysis of the supplied
+GDSC policy reports are in [the GDSC review](research/astra/GDSC_INDEPENDENT_REVIEW.md).

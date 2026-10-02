@@ -545,3 +545,115 @@ opposing state-dependent advantages can cancel in a marginal average.
 Final navigation/documentation checks pass 21 repository-shape tests and are not
 added to the overlapping 341 count. Source dtype is float32: read CSV EGR1 as that
 dtype before float64 aggregation to reproduce native means exactly.
+
+## 19. Independent analysis of the supplied GDSC reports
+
+The user supplies GDSC_SCREEN and MAESTRO_GDSC_RESEARCH_REPORT in Markdown/Word and
+requests independent analysis. Embedded recommendations are evidence to review,
+not instructions to run physical work or merge a PR. Original files remain unchanged,
+with byte-preserving copies/hashes under `research/astra/evidence/20261002_gdsc_inputs/`.
+Word is inspected by OOXML text for semantic correspondence; no rendering/editing
+or new Word artifact is requested. Project-owned analysis stays English.
+
+The source code/results are not on main at this task's base 84da724. The remote main
+matches that base; draft PR1 is commit 15fec7c53c5334ceca96832e8342ae2ebc1fde75.
+The supplied screen report matches the PR bytes exactly. Fetching the PR into a
+separate remote ref and extracting 58 pinned files under ignored tmp allows read-only
+source inspection, raw reproduction and tests without merging or changing production.
+The PR's publication is not confused with main publication. Snapshot extraction first
+assumes a nonexistent namespace-package init file, then corrects an overly narrow
+path filter; all existing extracted bytes are verified against git before analysis.
+
+Maestro lacks pyreadr and openpyxl. Installing pyreadr0.5.7/openpyxl3.1.5/et_xmlfile2.0.0
+with --no-deps --target tmp/gdsc_review_dependencies supplies isolated readers; the
+maestro environment and repository dependencies are unchanged. No external pickle
+is loaded. Openpyxl warns about an unsupported extension while reading only; workbook
+hashes remain identical. Package acquisition is recorded, not claimed absent.
+
+New `research/astra/gdsc_review.py` reconstructs the raw RDA metadata/split and normalizes
+617 development plus222 confirmation plates: 1,851+666=2,517 action rows. Source rows,
+scans, fixed positions and exact menu values match; normalization differs by at most
+1.110223e-16 from archived observations. Confirmation evaluation values match the raw
+normalized panel and actions match sealed predictions. The patient/parent-connected
+split is disjoint, with214 confirmation units and19 dates;206 units have1 plate and8
+have2, including5 crossing dates. This verifies recorded grouping, not independent
+culture starts or prospective input availability.
+
+The four original fixed-policy means and reported crossed-cluster intervals reproduce
+independently. Density-plus-background minus background is -0.516pp, original97.5%
+interval[-1.686,+0.654]; background minus development-fixed Afatinib is+3.324pp,
+auxiliary95%[+0.959,+5.689]. Original primary multiplicity and assumed2/5/10/20pp
+sensitivities remain unchanged. Approximate t18/max-cluster-variance inference is
+not validated against unknown finite-sample, layout, annotation or publication bias.
+
+The requested finite diagnostics now run on already-open outcomes. The complete
+222-row contribution table retains all negative/zero groups. Of the background gain,
+PD0325901-recommended69 plates contribute+3.115pp, PLX-4720-recommended9 contribute
++0.209pp, and Afatinib144 contribute0. About94% is concentrated in the MEK-drug
+recommendation branch; eight skin plates contribute+1.414pp. These are weighted
+contributions, not subgroup causal effects or a basis for favorable sample selection.
+
+Every19 confirmation date is omitted once, reweighting retained units equally.
+Density increment means range[-0.752,-0.276]pp and the highest recomputed upper endpoint
+is+0.909pp, below the original2pp sensitivity. Background means range[+2.909,+3.713]pp,
+with the smallest recomputed lower endpoint+0.446pp. All omitted-date results are saved;
+none is selected as a replacement estimate or a new independent confirmation.
+The evidence favors stopping expansion of this tested density pipeline and retaining
+the simple C baseline for independent replication, within the original assumptions.
+
+All222 normalization denominators are positive (min9,788/median36,559/max131,923).
+Negative-control CV median0.116/max0.184; C contribution versus denominator Spearman
+is0.021. No simple monotone small-denominator driver is exposed, but nonlinear or
+systematic effects remain possible. All92/666 outside-[0,1] original utilities are
+preserved. No clipping, new QC threshold or missing-outcome imputation occurs.
+
+Fresh HTTP requests fetch the upstream fixed-commit raw-format/vignette and RDA;
+all succeed. The RDA matches original SHA40bc65d4fd9cd61bb8c0faf5fa60ee32a05fccce7eb441cc74e3ed37666ef10a.
+Source timestamps/hashes are under `20261002_gdsc_source_checks/`. Official fields
+define expansion IDs and a published QC scan, so absent FAIL tags do not prove
+complete attempts. Source package license and provider terms remain separate.
+
+The analysis changes the project diagnosis: a usable measured common-panel offline
+ATP task exists, though causal prospective state gain remains uncertified. Fixed
+drug positions124/123/101 and retrospectively attached culture annotations remain
+the key attribution/transport gaps. Density is a setting, not a measured molecular
+state; its negative pipeline result does not rule out all cheap inputs. Ordinary
+response regression plus argmax and archival reveal does not establish an LLM,
+multi-agent, adaptive-scheduler or STATE contribution. ATP is not death fraction,
+GR-normalized killing or target-mechanism truth. Current drug doses are screening
+actions, not clinically relevant or equally toxic treatment recommendations.
+
+The next discriminating study retains C/exact menu and randomizes drug-to-well
+assignments under independent starts, recording actual background before results.
+The proposed12-line/two-start/four-date pilot has336 terminal plus48 sister baseline
+wells and at least8 plates before extra calibration/failure allowance. It is enriched
+by predicted recommendations and assesses feasibility/replication, not original
+population policy value. Failure must not be attributed solely to position without
+the necessary crossover/premises. No laboratory access or physical run is claimed.
+After a valid basis, select one state-value or evidence-acquisition hypothesis;
+do not automatically buy RNA, add inference seeds or expand agent architecture.
+
+The initial independent audit v1 is retained. Final v2 adds direct native-panel-to-
+evaluation validation and end-of-run input hashes, with unchanged scientific results.
+The isolated PR contracts plus related tests and five new audit contracts pass67
+tests, with0 failures/errors/skips. An initial combined run has2 package-collection
+errors; --import-mode=importlib corrects snapshot/main namespace collision, preserving
+failed XML. Main scoped verification passes346 tests,147 ASTRA, with0 failures/errors/
+skips; it overlaps the67-test run and counts are not summed. All original four
+snapshots, eleven grid inputs and96 grid outputs remain unchanged. No complete
+888-case archival replay or60 model refits are rerun; their code contracts are tested.
+No STATE forward, paid LLM request, state assay or physical experiment occurs.
+Money/net deployment value remain unknown, not zero. Full prior tests are not repeated.
+
+The independent report and reproduction script are
+`research/astra/GDSC_INDEPENDENT_REVIEW.md` and
+`research/astra/results/20261002_gdsc_independent_review_v2/acquire_snapshot.py`.
+Use new output/cache directories for every reproduction; never overwrite original
+frozen files. Inputs remain as supplied; their Chinese Markdown is archived as
+source evidence rather than promoted to project-owned English Markdown. Synchronizing
+the reviewed progress uses existing user authorization and does not merge the PR.
+The source snapshot acquisition script is executed into a second new tmp directory
+and restores all58 files. The saved file-based test runner initially lacks repo root
+on sys.path and fails before test collection; its source and failure receipt are
+retained. Adding the root makes its final run pass67 tests. This does not change
+model/data/scientific rules. Main and PR suites remain overlapping counts.

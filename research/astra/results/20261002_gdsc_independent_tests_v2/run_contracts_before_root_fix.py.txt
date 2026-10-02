@@ -1,0 +1,43 @@
+"""Run pinned PR contracts alongside main without copying them into main."""
+import argparse
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import sys
+import time
+import xml.etree.ElementTree as ET
+
+import pytest
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--snapshot", type=Path, required=True)
+parser.add_argument("--out", type=Path, required=True)
+args = parser.parse_args()
+root = Path.cwd()
+snapshot = args.snapshot.resolve()
+manifest = json.loads((snapshot / "snapshot_manifest.json").read_text())
+assert manifest["commit"] == "15fec7c53c5334ceca96832e8342ae2ebc1fde75"
+for name in ["research/astra/gdsc_screen.py", "research/astra/gdsc_replay.py", "research/astra/test_gdsc_screen.py"]:
+    assert hashlib.sha256((snapshot / name).read_bytes()).hexdigest() == manifest["paths"][name]
+sys.path.insert(0, str(root / "src"))
+for name in ["gdsc_screen", "gdsc_replay"]:
+    spec = importlib.util.spec_from_file_location("research.astra." + name, snapshot / "research/astra" / (name + ".py"))
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+args.out.mkdir(parents=True, exist_ok=False)
+tick = time.perf_counter()
+command = ["-o", "addopts=", "--import-mode=importlib", "-q", str(snapshot / "research/astra/test_gdsc_screen.py"),
+           "research/astra/test_decision_path.py", "tests/test_case_memory_scientific_boundaries.py",
+           "tests/test_decision_sensitive_acquisition.py", "research/astra/test_gdsc_review.py",
+           "--junitxml", str(args.out / "pytest.xml")]
+code = pytest.main(command)
+cases = list(ET.parse(args.out / "pytest.xml").getroot().iter("testcase"))
+receipt = dict(pytest_arguments=command, tests=len(cases), returncode=code,
+               failures=sum(c.find("failure") is not None for c in cases),
+               errors=sum(c.find("error") is not None for c in cases),
+               skips=sum(c.find("skipped") is not None for c in cases),
+               source_commit=manifest["commit"], elapsed_seconds=time.perf_counter() - tick)
+(args.out / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+raise SystemExit(code)
