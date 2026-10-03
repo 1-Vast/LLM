@@ -49,6 +49,10 @@ python -m tools.datasets.catalog --help
 python -m tools.evaluation.cli --help
 ```
 
+Default pytest runs the explicit asset-free core contracts. Small frozen replay
+and full research require explicit paths and their declared assets; commands and
+cross-environment limits are in [the convergence report](research/astra/CONVERGENCE.md).
+
 Dataset requirements and commands are in [tools/datasets/README.md](tools/datasets/README.md).
 Registered tool groups are in [tools/README.md](tools/README.md).
 Research status is indexed in [research/README.md](research/README.md).

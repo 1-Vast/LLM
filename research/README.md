@@ -7,7 +7,7 @@
 >     (e) literature and design sources; (f) engineering records.
 >   - Every entry carries a verdict label: verified / negative / inconclusive / design / archive.
 >   - Code here is not part of MAESTRO's supported production decision path; the current
->     evidence summary is maintained in the root [README](../README.md) and `task.md` section 11.
+>     task and evidence boundaries are maintained in `task.md`; results belong to topical reports.
 > - **Interfaces / data**: `CONSOLIDATION_INVENTORY.md` (per-block verdicts and evidence),
 >   `topics/` (categorized root-level reports), `../log/INDEX.md`.
 > - **Depends on**: `PROMPT_consolidation.md` (Phase C specification).
@@ -27,12 +27,13 @@ The [October 3 follow-up](astra/FEEDBACK_BOUNDARY_FOLLOWUP.md) records the exact
 | Lifecycle | Owner and entry point | Scientific status |
 |---|---|---|
 | Active engineering | `src/`, `tools/`, default `tests/`; exact result attribution and evidence admission | Software contracts only |
-| Active research | ASTRA decision diagnostics; `scientific_optimization/response_training.py` and `population_model.py`; LINCS `case_memory_integration/external_replay.py` | Experimental; no new promotion of biological validity |
+| Active research | ASTRA: cheap state × action ordering; intervention realisation and mechanism evidence | Bounded diagnostics/design; qualified biological confirmation still blocked |
+| Historical dependencies | `scientific_optimization/response_training.py`, `population_model.py`; LINCS `case_memory_integration/external_replay.py` | Frozen comparisons and inference dependencies; no active training expansion |
 | Paused pending data | ASTRA measured-realisation and two-round biological comparison | Unregistered design; matched measurements, prices and power absent |
 | Completed diagnostics | Dated reports/results and earlier negative/inconclusive blocks | Retain original claim boundaries and hashes |
 | Reference archive | `research/data/`, results, baseline/snapshot/execution source copies, `experiments/` | Not active implementations or independent observations |
 
-`python -m tools.research_validation` collects active research by default. Explicit
+`python -m tools.research_validation` collects ASTRA entries by default. Explicit
 historical collection uses `--include-archives`; this does not authenticate old
 dependencies or qualify historical datasets. The supplied review copies remain
 byte-preserved and excluded from routine collection.
@@ -45,10 +46,10 @@ or deleted solely because production has a similarly named concept.
 
 | Directory or explicit research component | Lifecycle | Maintenance boundary |
 |---|---|---|
-| `astra/` engineering contracts and input/decision experiments | active | Current thin experiment entries; formal rules, result facts and runtime are production-owned |
+| `astra/` input/decision and realisation diagnostics | active | Only the two questions above; [convergence report](astra/CONVERGENCE.md) defines boundaries and next discriminating work |
 | `astra/realisation_plan.py` biological confirmation | paused | Matched actual-action measurements, prices and power missing |
-| `scientific_optimization/` candidate fitting | paused | Experimental training retained; no new promotion without qualified independent task |
-| `case_memory_integration/` | completed | Shared tools pack builder; pinned scientific replay and metrics stay research-owned |
+| `scientific_optimization/` candidate fitting | paused; historical inference dependency | Restart only with a qualified independent task and frozen training/evaluation contract; existing model definitions remain available |
+| `case_memory_integration/` | historical dependency; study completed | Small registered regression is explicit, shared builder in tools; no new replay variants |
 | `scientific_case_memory/` | completed | Legacy schema/retrieval prototype; historical consumers retained; new research uses production schema |
 | `belief_planning/`, `external_validation/`, `protocol_v2/` | completed | Frozen historical benchmark dependencies; no new implicit layered pipeline |
 | `viability_contrast/`, `sequence_audit/`, `acquisition_followup/` | completed | Negative or limited results retained; no parallel variant expansion |
@@ -61,7 +62,9 @@ or deleted solely because production has a similarly named concept.
 | `knowledge/`, `topics/`, `prompt_review_20260927/` | archived | Reference/design documents; no experiment-state authority |
 | `data/`, `experiments/`, results and baseline/snapshot/execution source copies | archived | Byte-preserved evidence or supplied references; explicit historical access |
 
-This is a navigation/maintenance decision, not a deletion or test-exclusion list.
+Historical source and verdicts remain accessible. Default pytest runs the asset-free
+core list in `pyproject.toml`; registered replay and full research are explicit scopes.
+No missing assets are converted to passing or skipped tests by this maintenance index.
 The three permissions are distinct: engineering contracts verified, scientific
 gain supported, and default activation allowed. See the field-level schema audit
 and responsibility matrix in [the latest follow-up](astra/RESPONSIBILITY_FOLLOWUP.md).
@@ -147,7 +150,9 @@ blocks stay in place with their READMEs; they are neither deleted nor promoted.
 
 ## Reproduction
 
-Run current source contracts from the repository root with `python -m pytest`. Run the protocol-v2
+Run core source contracts from the repository root with `python -m pytest`.
+The [convergence report](astra/CONVERGENCE.md) gives registered replay restoration,
+Linux verification and full-research commands. Run the protocol-v2
 test suite with `python -m pytest research/protocol_v2 -q`. The registered `belief-planning-1`
 experiment is reproduced from archive commit `83b9aa9`; see
 [`experiments/README.md`](experiments/README.md). Its GSE70138 study was consumed and cannot serve

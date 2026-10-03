@@ -62,8 +62,9 @@ archives are removed. Historical findings remain in the dataset-discovery report
 Run evaluation through `python -m tools.evaluation.cli` and
 `python -m tools.evaluation.construction build|screen`. Only `maestro` is an installed command.
 The checkout-local research test
-runner is `python -m tools.research_validation` from the repository root; it checks code under
-active code under `research/` and does not imply that a research claim is validated.
+runner is `python -m tools.research_validation` from the repository root; it checks ASTRA
+entries and does not imply that a research claim is validated. Other historical
+suites use explicit pytest paths; `--include-archives` scans the historical tree.
 Results, baseline/snapshot source copies, `research/experiments` and supplied
 `research/data` copies are excluded by default. Use `--include-archives` only for an
 explicit historical collection; an active regression may still load an archived
@@ -82,6 +83,11 @@ python -m research.astra.state_sensitivity --help
 python -m research.astra.state_knowledge_retrospective --help
 python -m research.astra.state_knowledge_diagnose --help
 python -m research.astra.state_identifiability --help
+python -m research.astra.resistrace_retrospective --help
+python -m research.astra.state_evidence_followup --help
+python -m research.astra.state_prospective_certify --help
+python -m research.astra.state_prospective_review --help
+python -m research.astra.state_raw_reconstruction --help
 ```
 
 `tools.datasets.state_identifiability` retains the pure source/sample/time/action

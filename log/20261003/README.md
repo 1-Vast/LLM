@@ -265,3 +265,32 @@ not new measurements. Scientific gain and default promotion remain unestablished
 Reproduce with maestro: run the complete aggregate command and recovery commands
 in the follow-up report, using fresh outputs. Test identity, skip reasons, source
 hashes, byte overlays, asset inventories and environment are in `receipt.json`.
+
+
+## 13. Convergence of execution ownership and verification scopes
+
+The [convergence report](../../research/astra/CONVERGENCE.md) owns the detailed
+implementation, scientific boundaries and reproduction commands. The
+[run receipt](../../research/astra/results/20261003_convergence_v1/receipt.json)
+records successful scopes, intermediate failures, exact source identities and
+unrun work. Runtime extraction is committed as `0b6fe51`; the clean-environment
+scope correction is `d116eda`.
+
+Prediction coordination and authoritative case facts now have independent owners.
+Selection uses one named policy entrance while retaining distinct scientific
+algorithms. Fixed ReSisTrace, Cycloop and checkpoint experiment bodies moved to
+ASTRA; shared input and admission contracts remain tools-owned. No complete
+research controller or scientifically unqualified model was promoted.
+
+Verification covered before/after behavior, old-method parity, independent Python
+processes receiving sibling results, immutable audit/review reconstruction,
+Windows maestro regression, and isolated clean Linux core and published-package
+regression. The first Linux core exposed a misplaced asset-dependent test; it was
+moved intact to the existing package suite. Missing/unrestored regression assets
+retain their failure receipt, and exact restoration does not revise frozen hashes.
+The historical evidence byte audit and existing log prefix remain preserved.
+
+Research maintenance is limited to cheap state-dependent action ordering and
+measured intervention-realisation/mechanism acquisition. Their biological evidence
+and price/power gaps remain. No new STATE forward, live model API, training,
+physical experiment, biological state gain or agent utility claim was run.

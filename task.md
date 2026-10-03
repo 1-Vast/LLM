@@ -26,6 +26,17 @@ or registered experiment. See the current summary in [`README.md`](README.md).
 
 ## 1. Objective
 
+Current maintenance is limited to two scientific questions: whether cheap,
+legally available predecision state changes generalizable action ordering beyond
+background, and whether measured intervention realisation improves response
+difference prediction and mechanism evidence acquisition. Other model roadmaps
+below remain historical or paused proposals, not concurrent implementation work.
+Engineering correctness, endpoint prediction validity and observed decision value
+are separate admission levels. Execution facts belong to CaseStore; memory and
+audit summaries are derived. See [the convergence report](research/astra/CONVERGENCE.md)
+for current execution ownership and continuation/stopping experiments; numerical
+run results are maintained there, not duplicated in this task definition.
+
 Given a desired biological state, current evidence, constraints, and a resource limit, MAESTRO must
 answer:
 

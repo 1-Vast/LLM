@@ -1,5 +1,9 @@
 # ASTRA: dual-core research adjustments
 
+The current [convergence report](CONVERGENCE.md) defines the two maintained research
+questions, single production prediction/selection ownership, restart boundaries,
+and explicit core, regression and full-research verification scopes.
+
 The [prediction/audit follow-up](PREDICTION_AUDIT_FOLLOWUP.md) repairs panel
 identity binding and multi-result audit preservation, and supplies verified replay
 fixtures with explicit clean-checkout and raw-byte reproduction boundaries.
@@ -26,7 +30,7 @@ is unexecuted; supplied `research/data` files contain no new measurement table.
 
 The latest [dual-core contract optimization](DUAL_CORE_OPTIMIZATION.md) implements
 shared selection/admission, durable feedback attribution and arm failure handling.
-Full maestro regression passes1,924tests. A corrected480-well pilot remains an
+Its historical verification is recorded in that report. A corrected 480-well pilot remains an
 unexecuted proposal; the four-arm scientific design and evidence gaps are explicit.
 
 This research implementation applies the two supplied scientific and architecture reviews.
