@@ -294,3 +294,23 @@ Research maintenance is limited to cheap state-dependent action ordering and
 measured intervention-realisation/mechanism acquisition. Their biological evidence
 and price/power gaps remain. No new STATE forward, live model API, training,
 physical experiment, biological state gain or agent utility claim was run.
+
+
+## 14. Measured audit and evidence-processing efficiency
+
+The [efficiency report](../../research/astra/EFFICIENCY.md) owns the benchmark
+comparison, preserved contracts, verification scopes and reproduction commands.
+The [new receipt](../../research/astra/results/20261003_efficiency_v1/receipt.json)
+records environment, source identities, initial fixture failures, successful runs,
+history preservation and work not executed. Execution code is committed as `24ccfb5`.
+
+The work replaces repeated dependency scans with local graph traversal and removes
+repeated audit file reads/parsing within one reconstruction. Events stream from
+disk. Conflicting retries, unavailable ancestry, incomplete views and later file
+corruption still fail closed; CaseStore remains the sole experimental fact owner.
+Windows maestro verification includes the default core and the full registered
+aggregate; an independent Linux checkout verifies the asset-free core.
+
+No new model/API experiment, biological measurement or decision-value study ran.
+The maintained state-ordering and intervention-realisation questions retain their
+data, timing, replication and cost gaps; software efficiency does not resolve them.

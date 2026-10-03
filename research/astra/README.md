@@ -1,5 +1,8 @@
 # ASTRA: dual-core research adjustments
 
+The [efficiency report](EFFICIENCY.md) measures reduced audit reads and dependency
+graph scans, with unchanged scientific permissions and independent verification.
+
 The current [convergence report](CONVERGENCE.md) defines the two maintained research
 questions, single production prediction/selection ownership, restart boundaries,
 and explicit core, regression and full-research verification scopes.
