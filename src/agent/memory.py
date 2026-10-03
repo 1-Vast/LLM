@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from maestro.models import EvidenceKind
-from maestro.handoff import RoundRecord, read_round, review_run, write_round
+from maestro.handoff import RoundRecord, json_loads, review_run, write_round
 # Historical imports remain aliases to the single fact implementation.
 from .case_store import CaseState, CaseSnapshot, MeasurementResult, ResultImport, CaseStore, connect, _now
 
@@ -152,14 +152,17 @@ class MemoryStore:
             known = {row[0]: tuple(item for item in row[1].split(",") if item) for row in rows}
             if identifier not in known:
                 raise ValueError(f"Unknown active memory: {identifier}")
+            children = {}
+            for child, parents in known.items():
+                for parent in parents:
+                    children.setdefault(parent, []).append(child)
             affected = {identifier}
-            changed = True
-            while changed:
-                changed = False
-                for child, parents in known.items():
-                    if child not in affected and any(parent in affected for parent in parents):
+            pending = [identifier]
+            while pending:
+                for child in children.get(pending.pop(), ()):
+                    if child not in affected:
                         affected.add(child)
-                        changed = True
+                        pending.append(child)
             connection.executemany("UPDATE memories SET retracted = 1 WHERE id = ?", ((item,) for item in affected))
         return tuple(sorted(affected))
 
@@ -414,49 +417,59 @@ class RunLogger:
 
         Missing derived result views remain an explicit blocker. CaseStore facts
         can still be received after restart without pretending a scientific review exists.
+        Each unique view is a byte snapshot within this call; later calls reauthenticate.
         """
         records = {}
         ownership = {row["result_id"]: row for row in store.result_identities(case_id)}
         seen_results = set()
         bindings = {}
-        for line in self.events_path.read_text(encoding="utf-8").splitlines():
-            event = json.loads(line)
-            payload = event.get("payload", {})
-            if event.get("kind") not in ("round_record_written", "round_result_recorded") or payload.get("case_id") != case_id:
-                continue
-            stage = "result" if event["kind"] == "round_result_recorded" else "plan"
-            session = event["session_id"]
-            version = payload.get("plan_version")
-            if type(version) is not int or version < 1:
-                raise ValueError("round_audit_plan_binding_missing")
-            if session in bindings and bindings[session] != version:
-                raise ValueError("round_audit_plan_binding_conflict")
-            bindings[session] = version
-            result_id = payload.get("result_id") if stage == "result" else None
-            if stage == "result" and (not isinstance(result_id, str) or not result_id):
-                raise ValueError("round_audit_result_identity_missing")
-            suffix = "plan" if stage == "plan" else "result." + hashlib.sha256(result_id.encode("utf-8")).hexdigest()
-            expected_name = f"{session}.{suffix}.json"
-            logged = Path(payload["path"])
-            if logged.name != expected_name or logged.parent.name != "rounds":
-                raise ValueError("round_audit_path_mismatch")
-            path = self.root / "rounds" / expected_name
-            if not path.resolve().is_relative_to(self.root.resolve()):
-                raise ValueError("round_audit_path_outside_root")
-            if hashlib.sha256(path.read_bytes()).hexdigest() != payload["sha256"]:
-                raise ValueError("round_audit_hash_mismatch")
-            record = RoundRecord.from_payload(read_round(path))
-            if record.session_id != session or record.execution.result_id != result_id:
-                raise ValueError("round_audit_identity_mismatch")
-            if stage == "result":
-                fact = ownership.get(result_id)
-                if fact is None or fact["plan_version"] != version:
-                    raise ValueError("round_audit_case_plan_mismatch")
-                seen_results.add(result_id)
-            key = (session, stage, result_id)
-            if key in records and records[key] != record:
-                raise ValueError("round_audit_identity_conflict")
-            records[key] = record
+        digests = {}  # Invocation-local authenticated bytes; never trusted across reviews.
+        resolved_root = self.root.resolve()
+        with self.events_path.open(encoding="utf-8") as stream:
+            for line in stream:
+                event = json.loads(line)
+                payload = event.get("payload", {})
+                if event.get("kind") not in ("round_record_written", "round_result_recorded") or payload.get("case_id") != case_id:
+                    continue
+                stage = "result" if event["kind"] == "round_result_recorded" else "plan"
+                session = event["session_id"]
+                version = payload.get("plan_version")
+                if type(version) is not int or version < 1:
+                    raise ValueError("round_audit_plan_binding_missing")
+                if session in bindings and bindings[session] != version:
+                    raise ValueError("round_audit_plan_binding_conflict")
+                bindings[session] = version
+                result_id = payload.get("result_id") if stage == "result" else None
+                if stage == "result" and (not isinstance(result_id, str) or not result_id):
+                    raise ValueError("round_audit_result_identity_missing")
+                suffix = "plan" if stage == "plan" else "result." + hashlib.sha256(result_id.encode("utf-8")).hexdigest()
+                expected_name = f"{session}.{suffix}.json"
+                logged = Path(payload["path"])
+                if logged.name != expected_name or logged.parent.name != "rounds":
+                    raise ValueError("round_audit_path_mismatch")
+                path = self.root / "rounds" / expected_name
+                if not path.resolve().is_relative_to(resolved_root):
+                    raise ValueError("round_audit_path_outside_root")
+                key = (session, stage, result_id)
+                if key in records:
+                    if digests[key] != payload["sha256"]:
+                        raise ValueError("round_audit_hash_mismatch")
+                    record = records[key]
+                else:
+                    raw = path.read_bytes()
+                    digest = hashlib.sha256(raw).hexdigest()
+                    if digest != payload["sha256"]:
+                        raise ValueError("round_audit_hash_mismatch")
+                    record = RoundRecord.from_payload(json_loads(raw.decode("utf-8")))
+                    digests[key] = digest
+                if record.session_id != session or record.execution.result_id != result_id:
+                    raise ValueError("round_audit_identity_mismatch")
+                if stage == "result":
+                    fact = ownership.get(result_id)
+                    if fact is None or fact["plan_version"] != version:
+                        raise ValueError("round_audit_case_plan_mismatch")
+                    seen_results.add(result_id)
+                records[key] = record
         if not records:
             raise ValueError("case_audit_binding_missing")
         if seen_results != set(ownership):
@@ -475,32 +488,33 @@ class RunLogger:
 
         if not self.events_path.is_file():
             return None
-        for line in self.events_path.read_text(encoding="utf-8").splitlines():
-            try:
-                event = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if event.get("session_id") != session_id or event.get("kind") != "dataset_tool_failed":
-                continue
-            payload = event.get("payload")
-            if not isinstance(payload, Mapping):
-                continue
-            trace = payload.get("failure_trace")
-            if isinstance(trace, Mapping):
+        with self.events_path.open(encoding="utf-8") as stream:
+            for line in stream:
+                try:
+                    event = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if event.get("session_id") != session_id or event.get("kind") != "dataset_tool_failed":
+                    continue
+                payload = event.get("payload")
+                if not isinstance(payload, Mapping):
+                    continue
+                trace = payload.get("failure_trace")
+                if isinstance(trace, Mapping):
+                    return {
+                        "first_invalid_transition": trace.get("first_invalid_transition"),
+                        "violated_contracts": trace.get("violated_contracts", ()),
+                        "affected_claims": trace.get("affected_claims", ()),
+                        "candidate_causes": trace.get("candidate_causes", ()),
+                        "recovery_actions": trace.get("recovery_actions", ()),
+                    }
                 return {
-                    "first_invalid_transition": trace.get("first_invalid_transition"),
-                    "violated_contracts": trace.get("violated_contracts", ()),
-                    "affected_claims": trace.get("affected_claims", ()),
-                    "candidate_causes": trace.get("candidate_causes", ()),
-                    "recovery_actions": trace.get("recovery_actions", ()),
+                    "first_invalid_transition": "unknown",
+                    "violated_contracts": (),
+                    "affected_claims": (),
+                    "candidate_causes": (str(payload.get("error", "unknown tool failure")),),
+                    "recovery_actions": (),
                 }
-            return {
-                "first_invalid_transition": "unknown",
-                "violated_contracts": (),
-                "affected_claims": (),
-                "candidate_causes": (str(payload.get("error", "unknown tool failure")),),
-                "recovery_actions": (),
-            }
         return None
 
     @staticmethod

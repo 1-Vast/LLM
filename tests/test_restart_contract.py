@@ -130,3 +130,25 @@ def test_legacy_unbound_view_cannot_claim_a_case_summary(tmp_path):
                             DecisionLayer(), ExecutionLayer()), stage="plan")
     with pytest.raises(ValueError, match="binding_missing"):
         logger.review_case("case", store)
+
+
+@pytest.mark.parametrize("field,value,reason", [
+    ("sha256", "wrong", "hash_mismatch"),
+    ("plan_version", 2, "binding_conflict"),
+    ("result_id", "different", "path_mismatch"),
+])
+def test_duplicate_audit_receipts_still_validate_every_binding(tmp_path, field, value, reason):
+    store = setup_case(tmp_path)
+    logger = RunLogger(tmp_path)
+    plan = RoundRecord("session", 1, EvidenceLayer(missing_reason=("fixture_no_sources",)),
+                       WorldModelLayer.no_model(), DecisionLayer(), ExecutionLayer())
+    assert logger.round(plan, stage="plan", case_id="case", plan_version=1)
+    store.import_measurement("case", result("a"))
+    view = replace(plan, execution=ExecutionLayer(result_id="result:a"))
+    assert logger.round(view, stage="result", case_id="case", plan_version=1)
+    event = json.loads(logger.events_path.read_text().splitlines()[-1])
+    event["payload"][field] = value
+    with logger.events_path.open("a", encoding="utf-8") as stream:
+        stream.write(json.dumps(event) + "\n")
+    with pytest.raises(ValueError, match=reason):
+        logger.review_case("case", store)

@@ -488,12 +488,20 @@ class EvidenceLedger:
                 continue
             records[record.identifier] = record
         # Filter unverifiable or out-of-scope legacy lineage on reads as well.
-        while True:
-            invalid = [key for key, record in records.items() if any(parent not in records for parent in record.lineage_ids)]
-            if not invalid:
-                return records
-            for key in invalid:
-                del records[key]
+        children = {}
+        invalid = set()
+        for key, record in records.items():
+            for parent in record.lineage_ids:
+                children.setdefault(parent, []).append(key)
+                if parent not in records:
+                    invalid.add(key)
+        pending = list(invalid)
+        while pending:
+            for child in children.get(pending.pop(), ()):
+                if child not in invalid:
+                    invalid.add(child)
+                    pending.append(child)
+        return {key: record for key, record in records.items() if key not in invalid}
 
     def get_evidence(self, identifier: str, *, scope: MemoryScope | None = None) -> EvidenceRecord | None:
         with self._connection() as connection:
@@ -607,11 +615,16 @@ class EvidenceLedger:
     @staticmethod
     def _retract(connection: sqlite3.Connection, affected: set[str]) -> tuple[str, ...]:
         rows = connection.execute("SELECT id, lineage_ids FROM evidence").fetchall()
-        while True:
-            children = {row["id"] for row in rows if set(_ids(row["lineage_ids"])) & affected}
-            if children <= affected:
-                break
-            affected |= children
+        children = {}
+        for row in rows:
+            for parent in _ids(row["lineage_ids"]):
+                children.setdefault(parent, []).append(row["id"])
+        pending = list(affected)
+        while pending:
+            for child in children.get(pending.pop(), ()):
+                if child not in affected:
+                    affected.add(child)
+                    pending.append(child)
         connection.executemany("UPDATE evidence SET retracted = 1 WHERE id = ?", ((key,) for key in affected))
         for row in connection.execute("SELECT * FROM claims").fetchall():
             if set(_ids(row["evidence_ids"])) & affected and row["verdict"] != ClaimVerdict.UNKNOWN.value:
