@@ -58,12 +58,12 @@ def test_round_deduplication_is_independent_of_cross_round_cache(tmp_path, paral
     controller = _controller(tmp_path, StubClient([]), world_model=model,
                              max_parallel_predictions=parallel, reuse_predictions=reuse)
     for run in ("first", "second"):
-        answers = controller._predict_many({"a": _request(run + "a"), "b": _request(run + "b")}, run)
+        answers = controller._predictions.predict_many({"a": _request(run + "a"), "b": _request(run + "b")}, run)
         assert [v[1].request_id for v in answers.values()] == [run + "a", run + "b"]
         assert answers["b"][1].compute_cost == 0
     assert model.predictions == (1 if reuse else 2)
     # Distinct model inputs still require distinct inferences.
-    controller._predict_many({"different": _request("different", dose=2)}, "third")
+    controller._predictions.predict_many({"different": _request("different", dose=2)}, "third")
     assert model.predictions == (2 if reuse else 3)
 
 

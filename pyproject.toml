@@ -9,14 +9,45 @@ dependencies = []
 maestro = "agent.cli:main"
 
 [project.optional-dependencies]
-test = ["pytest==9.1.1"]
+test = ["pytest==9.1.1", "numpy"]
 research = ["numpy", "scipy", "pandas", "h5py", "scikit-learn", "torch", "rdkit"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = [
+    "tests/test_handoff.py",
+    "tests/test_restart_contract.py",
+    "tests/test_research_validation.py",
+    "tests/test_case_lifecycle.py",
+    "tests/test_case_control_loop.py",
+    "tests/test_case_decision_loop.py",
+    "tests/test_orchestrator_execution_authority.py",
+    "tests/test_orchestrator_repair_execution.py",
+    "tests/test_budgeted_orchestration.py",
+    "tests/test_agent_world_model_integration.py",
+    "tests/test_discriminating_acquisition.py",
+    "tests/test_integrated_research_contract.py",
+    "tests/test_model_runtime_defects.py",
+    "tests/test_runtime_promotion.py",
+    "tests/test_memory_scope_and_retraction.py",
+    "tests/test_context_evidence_cards.py",
+    "tests/test_evidence_audit_prerequisites.py",
+    "tests/test_feedback_promotion.py",
+    "tests/test_virtual_cell_contract.py",
+    "tests/test_virtual_cell_panel.py",
+    "tests/test_prediction_reliability.py",
+    "tests/test_selection.py",
+    "tests/test_acquisition.py",
+    "tests/test_outcome_decision.py",
+    "tests/test_state_evidence_followup.py",
+]
 python_files = ["test_*.py"]
 addopts = "-q"
 pythonpath = ["src"]
+markers = [
+    "core: asset-free execution, prediction and evidence contracts (default testpaths)",
+    "regression: explicit small distributed frozen-replay package",
+    "research: remaining opt-in studies, tools and optional-asset contracts",
+]
 
 [build-system]
 requires = ["setuptools>=68"]

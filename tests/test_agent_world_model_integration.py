@@ -387,7 +387,7 @@ def test_the_repair_planner_sees_predictions_and_abstentions_labelled_as_plannin
     assert "model-guided" not in turn.action_prediction_requests
     filtered = _events(tmp_path, "virtual_cell_candidates_filtered")[0]
     assert "missing_prerequisites:functional:target_activity" in filtered["rejected"]["model-guided"]
-    assert controller._virtual_cell.predictions == 0
+    assert controller._predictions.backend.predictions == 0
     assert rows["plain"]["status"] == "abstained"
     assert rows["plain"]["abstain_reason"] == "query_unsupported"
     # The briefing informs the proposal; it never becomes a satisfied premise: the gated

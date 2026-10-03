@@ -15,7 +15,7 @@ from .llm import JsonCompleter
 
 
 if TYPE_CHECKING:
-    from .memory import MeasurementResult
+    from .case_store import MeasurementResult
     from .tool_runtime import ToolExecution
     from .llm import VisualInspection
 @dataclass(frozen=True)

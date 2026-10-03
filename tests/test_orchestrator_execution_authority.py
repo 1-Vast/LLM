@@ -164,7 +164,7 @@ def test_workspace_factory_reaches_the_forecaster_in_shadow_and_active_modes(tmp
 ])
 def test_only_sufficiently_measured_same_condition_premise_is_removed_from_selection(tmp_path, change, expected):
     controller = _controller(tmp_path, [])
-    controller._power_aware_selection = True
+    controller._selection_strategy = "expected_coverage"
     controller._interpretation_table = InterpretationTable((
         OutcomeRule("premise", "measured", frozenset({"premise"}), action_identifier="first",
                     scope=EvidenceScope.INTERVENTION_IMPLEMENTATION, minimum_independent_units=3),

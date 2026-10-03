@@ -149,7 +149,7 @@ def test_multiple_results_keep_receipt_hashes_and_all_revisions(tmp_path, revise
     controller._logger = RunLogger(tmp_path)
     controller._round_records = {"session-1": _round()}
     controller._round_results = {}
-    turn = SimpleNamespace(session_id="session-1")
+    turn = SimpleNamespace(session_id="session-1", case=None)
     records = []
     for index, revised in enumerate((revised_first, not revised_first)):
         result_id = f"result:{index}"

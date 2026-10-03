@@ -6,6 +6,7 @@ from types import SimpleNamespace
 import pytest
 
 from agent.orchestrator import MAESTROOrchestrator
+from agent.prediction import PredictionCoordinator
 from agent.tool_runtime import ToolRouter
 from maestro import EvidenceAction, FunctionalInterventionProfile
 from maestro.acquisition import select_expected_coverage
@@ -89,9 +90,8 @@ def test_main_agent_and_composite_enforce_the_same_boundary(change, reason):
             return replace(super().predict(query), **change)
 
     logger = SimpleNamespace(event=lambda *a, **k: None, experiment=lambda *a, **k: None)
-    controller = object.__new__(MAESTROOrchestrator)
-    controller._logger, controller._virtual_cell = logger, Corrupt()
-    _, output = controller._predict_virtual_cell(request(), "test")
+    coordinator = PredictionCoordinator(Corrupt(), logger)
+    _, output = coordinator.predict(request(), "test")
     composite = CompositeWorldModel([Corrupt()]).predict(request())
     for prediction in (output, composite):
         assert prediction.abstain_reason == reason

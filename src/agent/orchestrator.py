@@ -4,7 +4,6 @@ from __future__ import annotations
 import uuid
 import math
 import json
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from types import SimpleNamespace
@@ -18,7 +17,9 @@ from maestro.handoff import SourceClusterIndex
 from maestro.composition import ActionTopology
 from maestro.judgment import PredictionReliabilityLedger
 from maestro.repair import RepairController, RepairLedger, RepairRecord
-from .memory import CaseSnapshot, CaseState, CaseStore, EpistemicStatus, MeasurementResult, MemoryKind, MemoryScope, MemoryStore, ReflectionRecord, ResultImport, RunLogger, reflect_on_result
+from .case_store import CaseSnapshot, CaseState, CaseStore, MeasurementResult, ResultImport
+from .memory import EpistemicStatus, MemoryKind, MemoryScope, MemoryStore, ReflectionRecord, RunLogger, reflect_on_result
+from .prediction import PredictionCoordinator
 from .llm import DeepSeekChatClient, LLMError, MAESTROSettings, VisualInspection, VisualInspector
 from .decision_critic import CritiqueOutcome, TypeSafeJevClient, TypeSafeSettings, TypedDecisionCritic
 from .context import ContextBuilder, TaskIntent, TaskInterpreter, WorldModelRow, render_world_model_briefing, summarize_world_model, world_model_rows
@@ -26,7 +27,7 @@ from .knowledge import EvidenceLedger
 from maestro.models import ContrastCheck, DecisionStatus, DevelopmentAction, EvidenceAction, EvidenceActionKind, EvidenceKind, EvidenceScope, FunctionalInterventionProfile, MeasurementStatus, MechanismContrast, MechanismHypothesis, NonDiscriminabilityReason, PremiseRequirement, RepairKind, RepairProposal
 from .planner import LLMRepairDraft, MechanismContrastPlanner
 from .tool_runtime import ToolExecution, ToolRouter, ToolRuntimeError
-from virtual_cell.interface import safe_predict, prediction_request_errors
+from virtual_cell.interface import prediction_request_errors
 from virtual_cell.interface import PredictionCache, QueryAssessment, VirtualCellQueryTemplate, VirtualCellWorldModel
 from virtual_cell import PredictionRequest, StatePrediction
 from virtual_cell.state_adapter import StateAdapterConfig, StateCapabilityAdapter
@@ -37,23 +38,6 @@ class AcceptedLLMRepair:
     draft: LLMRepairDraft
     contrast: MechanismContrast
     check: ContrastCheck
-
-
-@dataclass(frozen=True)
-class WorldModelQueries:
-    """One round's virtual-cell answers: per registered action, and the plan-level view.
-
-    ``request``/``assessment``/``prediction`` are what the controller reads when no
-    per-action map exists (an explicit request, or a template without per-action
-    labels); with a per-action map they are the plan action's own entries.
-    """
-
-    requests: dict[str, PredictionRequest] = field(default_factory=dict)
-    assessments: dict[str, QueryAssessment] = field(default_factory=dict)
-    predictions: dict[str, StatePrediction] = field(default_factory=dict)
-    request: PredictionRequest | None = None
-    assessment: QueryAssessment | None = None
-    prediction: StatePrediction | None = None
 
 
 @dataclass(frozen=True)
@@ -115,15 +99,11 @@ class MAESTROCaseLoop:
 class MAESTROOrchestrator:
     """Single-controller agent that keeps planning, observations, and evidence distinct."""
 
-    # A partially constructed controller (tests build one without __init__) must
-    # still answer "is prediction reuse enabled?" rather than raise.
-    _prediction_cache: PredictionCache | None = None
-    _max_parallel_predictions: int = 1
     _decision_critic: TypedDecisionCritic | None = None
     _runtime_client: object | None = None
     _decision_repeats: int = 1
     _outcome_forecaster: OutcomeForecaster | None = None
-    _discrimination_selection: bool = False
+    _selection_strategy: str = "budgeted_coverage"
 
     def __init__(
         self,
@@ -152,14 +132,17 @@ class MAESTROOrchestrator:
         decision_critic: TypedDecisionCritic | None = None,
         outcome_forecaster: OutcomeForecaster | None = None,
         discrimination_selection: bool = False,
+        selection_strategy: str | None = None,
     ):
-        if (
-            isinstance(max_parallel_predictions, bool)
-            or not isinstance(max_parallel_predictions, int)
-            or max_parallel_predictions < 1
-        ):
-            raise ValueError("max_parallel_predictions must be a positive integer.")
-        if discrimination_selection and outcome_forecaster is None:
+        if selection_strategy is not None and (power_aware_selection or discrimination_selection):
+            raise ValueError("Use selection_strategy or legacy flags, not both.")
+        strategy = selection_strategy if selection_strategy is not None else (
+            "discrimination" if discrimination_selection else
+            "expected_coverage" if power_aware_selection else "budgeted_coverage"
+        )
+        if strategy not in ("budgeted_coverage", "expected_coverage", "discrimination"):
+            raise ValueError("Unknown selection_strategy.")
+        if strategy == "discrimination" and outcome_forecaster is None:
             raise ValueError("discrimination_selection requires an outcome_forecaster.")
         self._interpreter = interpreter
         self._context_builder = context_builder
@@ -171,18 +154,15 @@ class MAESTROOrchestrator:
         self._tool_router = tool_router
         self._case_store = case_store
         self._enable_llm_repair = enable_llm_repair
-        self._virtual_cell = virtual_cell
         self._repair_controller = repair_controller or RepairController(
             self._controller, max_attempts=max_repair_attempts
         )
         self._interpretation_table = interpretation_table or InterpretationTable()
         self._decision_engine = decision_engine or DecisionEngine()
         self._reliability = reliability or PredictionReliabilityLedger()
-        # The ledger and the reconciliation registry below live in memory only.
-        # A restart loses the scored prediction record and every unresolved
-        # prediction-to-observation pair; no supported workflow persists them
-        # yet, so this is a stated limitation rather than a hidden one. A caller
-        # that needs the record to outlive the process passes its own ledger.
+        # Reliability aggregation remains process-local. Exact prediction/result
+        # pairs and scores are persisted by CaseStore; reconciliation can restore
+        # those pairs without treating a rebuilt ledger as scientific evidence.
         self._source_clusters = source_clusters or SourceClusterIndex()
         self._repair_ledgers: dict[str, RepairLedger] = {}
         self._evidence_states: dict[str, EvidenceState] = {}
@@ -193,24 +173,24 @@ class MAESTROOrchestrator:
         # Exact plan identity for cases; anonymous repeated actions are ambiguous.
         self._reconciliation: dict[tuple[str, int, str], tuple["MAESTROTurn", EvidenceAction]] = {}
         self._reconciliation_by_action: dict[str, tuple["MAESTROTurn", EvidenceAction] | None] = {}
-        self._power_aware_selection = power_aware_selection
-        # A multi-round case re-queries every action every round with unchanged
-        # model inputs. Reuse is keyed on those inputs only; see virtual_cell.interface.
-        self._prediction_cache = (
-            prediction_cache if prediction_cache is not None else PredictionCache() if reuse_predictions else None
+        self._selection_strategy = strategy
+        self._predictions = PredictionCoordinator(
+            virtual_cell, logger,
+            cache=prediction_cache if prediction_cache is not None else PredictionCache() if reuse_predictions else None,
+            max_parallel_predictions=max_parallel_predictions,
         )
-        # Independent per-action queries may run concurrently, but only when the
-        # caller declares the backend safe to call from several threads.
-        self._max_parallel_predictions = max_parallel_predictions
         self._decision_critic = decision_critic
         # Forecasts of each action's reading under each hypothesis. Without the flag they are
         # computed and logged beside the coverage choice (shadow); with it they choose the action.
         self._outcome_forecaster = outcome_forecaster
-        self._discrimination_selection = discrimination_selection
+
+    @property
+    def selection_strategy(self) -> str:
+        return self._selection_strategy
 
     @property
     def prediction_cache(self) -> PredictionCache | None:
-        return self._prediction_cache
+        return self._predictions.cache
 
     @property
     def decision_critic(self) -> TypedDecisionCritic | None:
@@ -243,6 +223,7 @@ class MAESTROOrchestrator:
         knowledge_packages: Sequence[Path] = (),
         outcome_forecaster: OutcomeForecaster | None = None,
         discrimination_selection: bool = False,
+        selection_strategy: str | None = None,
     ) -> "MAESTROOrchestrator":
         """Create a controller; evaluations may supply an isolated state directory.
 
@@ -251,6 +232,8 @@ class MAESTROOrchestrator:
         with any backend that satisfies the world-model protocol.
         """
 
+        if selection_strategy is not None and discrimination_selection:
+            raise ValueError("Use selection_strategy or legacy flags, not both.")
         settings = MAESTROSettings.from_workspace(workspace, require_provider=client is None)
         # The typed decision model is optional: with no TypeSafe block in the environment or
         # .env the critic is simply absent, and the loop behaves exactly as before.
@@ -273,7 +256,8 @@ class MAESTROOrchestrator:
             memory=memory,
             logger=logger,
             tool_router=ToolRouter(runtime_client, workspace / "tools"),
-            power_aware_selection=True,
+            selection_strategy=selection_strategy if selection_strategy is not None else (
+                "discrimination" if discrimination_selection else "expected_coverage"),
             case_store=None if disable_case_store else case_store if case_store is not None else CaseStore(runtime_directory / "cases.sqlite"),
             enable_llm_repair=True,
             virtual_cell=(
@@ -292,7 +276,6 @@ class MAESTROOrchestrator:
                 TypedDecisionCritic(TypeSafeJevClient(typesafe)) if typesafe is not None else None
             ),
             outcome_forecaster=outcome_forecaster,
-            discrimination_selection=discrimination_selection,
         )
         # Keep the client the components share, so a run can report what it was charged. The
         # per-response usage is otherwise parsed and dropped at every call site.
@@ -458,7 +441,7 @@ class MAESTROOrchestrator:
              "scope": "prediction calls only; the registered evidence menu remains available"},
             session_id=session_id,
         )
-        world = self._query_world_model(
+        world = self._predictions.query(
             contrast, intent, case, case_id, session_id, tuple(prediction_candidates),
             prediction_request=prediction_request, template=virtual_cell_template,
         )
@@ -484,7 +467,7 @@ class MAESTROOrchestrator:
             prior_evidence=prior_evidence,
         )
         acquisition_stop = self._acquisition_stop_reason(session_id)
-        if selection is not None and selection.actions and (self._discrimination_selection or not selection.uncovered):
+        if selection is not None and selection.actions and ((self._selection_strategy == "discrimination") or not selection.uncovered):
             contrast = replace(
                 contrast,
                 plan=selection.actions[0],
@@ -505,7 +488,7 @@ class MAESTROOrchestrator:
         execution_actions = self._execution_actions(
             contrast, check, repair, intervention_profile, available_actions
         )
-        if (self._power_aware_selection or self._discrimination_selection) and selection is not None:
+        if self._selection_strategy in ("expected_coverage", "discrimination") and selection is not None:
             allowed = {action.identifier for action in selection.actions}
             execution_actions = tuple(action for action in execution_actions if action.identifier in allowed)
         execution_stop = None
@@ -531,19 +514,18 @@ class MAESTROOrchestrator:
         }
         self._logger.event("final_plan_audit", final_audit, session_id=session_id)
         selection_source = (
-            "discrimination" if self._discrimination_selection else
-            "expected_coverage" if self._power_aware_selection else "budgeted_coverage"
+            self._selection_strategy
         ) if selection is not None else "planner_and_directed_repair"
         self._logger.event(
             "prediction_usage",
-            {"backend": self._backend_name(), "selection_source": selection_source,
+            {"backend": self._predictions.backend_name(), "selection_source": selection_source,
              "response_prediction_use": "advisory_and_constraint_checks",
              "response_priority_use": (
                  "last_tiebreak_only" if selection_source in ("discrimination", "budgeted_coverage")
                  else "diagnostic_only"
              ),
              "outcome_forecast_use": (
-                 "selection" if self._discrimination_selection and selection is not None
+                 "selection" if (self._selection_strategy == "discrimination") and selection is not None
                  else "shadow" if self._outcome_forecaster is not None and selection is not None
                  else "not_used"
              ),
@@ -842,7 +824,9 @@ class MAESTROOrchestrator:
                 )
             ),
         )
-        if not self._logger.round(record, stage="plan"):
+        if not self._logger.round(record, stage="plan",
+                                  case_id=turn.case.case_id if turn.case else None,
+                                  plan_version=turn.case.plan_version if turn.case else None):
             return None
         self._round_records[turn.session_id] = record
         return record
@@ -893,7 +877,9 @@ class MAESTROOrchestrator:
                 result_id=result_id,
             ),
         )
-        if not self._logger.round(record, stage="result"):
+        if not self._logger.round(record, stage="result",
+                                  case_id=turn.case.case_id if turn.case else None,
+                                  plan_version=turn.case.plan_version if turn.case else None):
             return None
         self._round_results.setdefault(turn.session_id, {})[result_id] = record
         return record
@@ -1458,264 +1444,6 @@ class MAESTROOrchestrator:
             session_id=turn.session_id,
         )
 
-    def _query_world_model(
-        self,
-        contrast: MechanismContrast,
-        intent: TaskIntent,
-        case: CaseSnapshot | None,
-        case_id: str,
-        session_id: str,
-        available_actions: Sequence[EvidenceAction],
-        *,
-        prediction_request: PredictionRequest | None,
-        template: VirtualCellQueryTemplate | None,
-    ) -> WorldModelQueries:
-        """Ask the virtual cell about this round's actions, once per distinct query.
-
-        A template with per-action labels yields one request per registered
-        action, so each action is ranked by its own condition. Otherwise the
-        single explicit or template request belongs only to the plan action
-        that prompted it, never to a neighbour.
-        """
-
-        action_requests = self._build_action_prediction_requests(
-            template, intent, contrast, case_id, case, session_id, available_actions
-        )
-        not_built = {
-            action.identifier: f"execution_context_differs_from_template:{action.execution_context}"
-            for action in available_actions
-            if template is not None and action.identifier in template.action_interventions
-            and action.identifier not in action_requests
-        }
-        if not_built:
-            self._logger.event("virtual_cell_query_not_built", {"reasons": not_built}, session_id=session_id)
-        if action_requests:
-            answered = self._predict_many(action_requests, session_id)
-            assessments = {key: pair[0] for key, pair in answered.items() if pair[0] is not None}
-            predictions = {key: pair[1] for key, pair in answered.items() if pair[1] is not None}
-            plan = contrast.plan.identifier if contrast.plan is not None else None
-            return WorldModelQueries(
-                action_requests, assessments, predictions, None,
-                assessments.get(plan) if plan else None, predictions.get(plan) if plan else None,
-            )
-        if contrast.plan is None or contrast.plan.identifier not in {a.identifier for a in available_actions}:
-            return WorldModelQueries()
-        request = prediction_request or self._build_prediction_request(
-            template, intent, contrast, case_id, case, session_id
-        )
-        assessment, prediction = self._predict_virtual_cell(request, session_id)
-        requests: dict[str, PredictionRequest] = {}
-        assessments: dict[str, QueryAssessment] = {}
-        predictions: dict[str, StatePrediction] = {}
-        if request is not None and contrast.plan is not None:
-            requests[contrast.plan.identifier] = request
-            if assessment is not None:
-                assessments[contrast.plan.identifier] = assessment
-            if prediction is not None:
-                predictions[contrast.plan.identifier] = prediction
-        return WorldModelQueries(requests, assessments, predictions, request, assessment, prediction)
-
-    def _predict_many(
-        self, requests: Mapping[str, PredictionRequest], session_id: str
-    ) -> dict[str, tuple[QueryAssessment | None, StatePrediction | None]]:
-        """Answer independent requests, dispatching distinct misses concurrently when allowed.
-
-        Inference runs at most once per distinct query in a round, including when
-        reuse across rounds is disabled. A duplicate is rebound to its lineage. Recording
-        and logging happen in request order on the calling thread, so the run
-        record is identical whether or not inference ran in parallel.
-        """
-
-        answered: dict[str, tuple[QueryAssessment | None, StatePrediction | None]] = {}
-        pending: dict[str, PredictionRequest] = {}
-        for identifier, request in requests.items():
-            hit = self._reused_prediction(request, session_id)
-            if hit is not None:
-                answered[identifier] = hit
-            else:
-                pending[identifier] = request
-        distinct: dict[str, str] = {}
-        origins: dict[str, str] = {}
-        for identifier, request in pending.items():
-            key = PredictionCache.key_for(request, self._backend_name()) or f"uncacheable:{identifier}"
-            origins[identifier] = distinct.setdefault(key, identifier)
-        computed: dict[str, tuple[QueryAssessment | None, StatePrediction | None]] = {}
-        if self._virtual_cell is not None and self._max_parallel_predictions > 1 and len(distinct) > 1:
-            workers = min(self._max_parallel_predictions, len(distinct))
-            with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="virtual-cell") as pool:
-                futures = {
-                    identifier: pool.submit(safe_predict, self._virtual_cell, pending[identifier])
-                    for identifier in distinct.values()
-                }
-            computed = {identifier: future.result() for identifier, future in futures.items()}
-        for identifier, request in pending.items():
-            origin = origins[identifier]
-            if origin != identifier:
-                reused = self._reused_prediction(request, session_id)
-                if reused is not None:
-                    answered[identifier] = reused
-                    continue
-                assessment, prediction = computed[origin]
-                if prediction is not None:
-                    prediction = replace(
-                        prediction, request_id=request.request_id, compute_cost=0.0,
-                        limitations=tuple(prediction.limitations) + (
-                            f"reused_prediction_from_request:{pending[origin].request_id}; identical query in this round.",
-                        ),
-                    )
-                    self._record_prediction(request, assessment, prediction, session_id)
-                answered[identifier] = (assessment, prediction)
-            elif identifier in computed:
-                assessment, prediction = computed[identifier]
-                self._record_prediction(request, assessment, prediction, session_id)
-                answered[identifier] = (assessment, prediction)
-            else:
-                answered[identifier] = self._predict_virtual_cell(request, session_id)
-                computed[identifier] = answered[identifier]
-        return {identifier: answered[identifier] for identifier in requests}
-
-    def _backend_name(self) -> str:
-        return getattr(self._virtual_cell, "name", None) or type(self._virtual_cell).__name__
-
-    def _predict_virtual_cell(
-        self, request: PredictionRequest | None, session_id: str
-    ) -> tuple[QueryAssessment | None, StatePrediction | None]:
-        if request is None or self._virtual_cell is None:
-            return None, None
-        reused = self._reused_prediction(request, session_id)
-        if reused is not None:
-            return reused
-        assessment, prediction = safe_predict(self._virtual_cell, request)
-        self._record_prediction(request, assessment, prediction, session_id)
-        return assessment, prediction
-
-    def _reused_prediction(
-        self, request: PredictionRequest, session_id: str
-    ) -> tuple[QueryAssessment, StatePrediction] | None:
-        """An earlier answer to the identical query, rebound to this request and logged."""
-
-        if self._prediction_cache is None or self._virtual_cell is None:
-            return None
-        backend = self._backend_name()
-        cached = self._prediction_cache.lookup(request, backend)
-        if cached is None:
-            return None
-        assessment, prediction, origin = cached
-        self._logger.experiment(
-            "virtual_cell_prediction_reused",
-            {
-                "request_id": request.request_id,
-                "reused_from_request_id": origin,
-                "backend": backend,
-                "artifact_ref": prediction.artifact_ref,
-                "cache": self._prediction_cache.stats(),
-            },
-            session_id=session_id,
-        )
-        return assessment, prediction
-
-    def _record_prediction(
-        self,
-        request: PredictionRequest,
-        assessment: QueryAssessment,
-        prediction: StatePrediction,
-        session_id: str,
-    ) -> None:
-        """Keep a fresh answer for reuse and write its assessment and outcome to the run log."""
-
-        if self._prediction_cache is not None:
-            self._prediction_cache.store(request, self._backend_name(), assessment, prediction)
-        self._logger.event(
-            "virtual_cell_query_assessed",
-            {
-                "request_id": request.request_id,
-                "support": assessment.support.value,
-                "missing_inputs": assessment.missing_inputs,
-                "limitations": assessment.limitations,
-                "model_identifier": assessment.capabilities.model_identifier,
-                "model_version": assessment.capabilities.model_version,
-            },
-            session_id=session_id,
-        )
-        self._logger.experiment(
-            "virtual_cell_prediction_completed",
-            {
-                "request_id": request.request_id,
-                "applicable": prediction.applicable,
-                "artifact_ref": prediction.artifact_ref,
-                "limitations": prediction.limitations,
-                "supported_variables": prediction.supported_variables,
-                "abstain_reason": prediction.abstain_reason,
-                "in_distribution": prediction.in_distribution,
-            },
-            session_id=session_id,
-        )
-
-    @staticmethod
-    def _build_action_prediction_requests(
-        template: VirtualCellQueryTemplate | None,
-        intent: TaskIntent,
-        contrast: MechanismContrast,
-        case_id: str,
-        case: CaseSnapshot | None,
-        session_id: str,
-        available_actions: Sequence[EvidenceAction],
-    ) -> dict[str, PredictionRequest]:
-        """One request per registered action that names its own exact condition.
-
-        A template that states exposure time as a model input states it per action: the action's
-        declared ``time_hours`` replaces the template's, so a 72 h action is asked about 72 h and a
-        24 h-only model refuses it by name instead of lending it the 24 h answer. A template that
-        leaves time to the perturbation label is unchanged. An action declared in another context
-        than the template's is not queried at all, because the request could only describe the
-        template's context.
-        """
-
-        if template is None or not template.action_interventions:
-            return {}
-        registered = {action.identifier: action for action in available_actions}
-        requests: dict[str, PredictionRequest] = {}
-        for action_identifier, label in template.action_interventions.items():
-            action = registered.get(action_identifier)
-            if action is None:
-                continue
-            if action.execution_context is not None and action.execution_context != template.context.identifier:
-                continue
-            time_hours = (
-                action.time_hours
-                if template.time_hours is not None and action.time_hours is not None
-                else template.time_hours
-            )
-            requests[action_identifier] = template.build(
-                request_id=f"{session_id}.{action_identifier}",
-                case_id=case_id,
-                contrast_id=contrast.identifier,
-                plan_version=(case.plan_version + 1) if case else 1,
-                intended_targets=intent.target_or_targets,
-                intervention_identifier=label,
-                time_hours=time_hours,
-            )
-        return requests
-
-    @staticmethod
-    def _build_prediction_request(
-        template: VirtualCellQueryTemplate | None,
-        intent: TaskIntent,
-        contrast: MechanismContrast,
-        case_id: str,
-        case: CaseSnapshot | None,
-        session_id: str,
-    ) -> PredictionRequest | None:
-        if template is None:
-            return None
-        return template.build(
-            request_id=f"{session_id}.state",
-            case_id=case_id,
-            contrast_id=contrast.identifier,
-            plan_version=(case.plan_version + 1) if case else 1,
-            intended_targets=intent.target_or_targets,
-        )
-
     def _select_budgeted_actions(
         self,
         contrast: MechanismContrast,
@@ -1755,12 +1483,12 @@ class MAESTROOrchestrator:
                 contrast, available_actions, profile, remaining, priorities, case_id, session_id,
             )
             path = "budgeted"
-            if discriminating is not None and self._discrimination_selection:
+            if discriminating is not None and (self._selection_strategy == "discrimination"):
                 # The forecast-driven choice replaces the coverage choice only when a caller asked
                 # for it; the coverage path below is then not consulted.
                 selection = discriminating.plan
                 path = "discrimination"
-            elif self._power_aware_selection:
+            elif (self._selection_strategy == "expected_coverage"):
                 path = "expected_coverage"
                 # Magnitude priorities are logged, not used, on this path: letting them break ties
                 # here failed its pre-registered keep rule on 2026-09-26 (tier A utility interval
@@ -1907,7 +1635,7 @@ class MAESTROOrchestrator:
             "discrimination_selection_computed",
             {
                 "forecaster": getattr(forecaster, "name", type(forecaster).__name__),
-                "drives_selection": self._discrimination_selection,
+                "drives_selection": (self._selection_strategy == "discrimination"),
                 "forecast_bases": {key: value.basis for key, value in sorted(forecasts.items())},
                 **plan.payload(),
             },
@@ -1919,7 +1647,7 @@ class MAESTROOrchestrator:
         """A named reason to defer when forecast-driven selection found nothing admissible."""
 
         plan = self.__dict__.get("_discrimination_plans", {}).pop(session_id, None)
-        if plan is None or not self._discrimination_selection or plan.status == "selected":
+        if plan is None or not (self._selection_strategy == "discrimination") or plan.status == "selected":
             return None
         return f"acquisition_{plan.status}: {plan.reason}"
 

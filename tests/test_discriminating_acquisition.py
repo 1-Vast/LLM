@@ -525,14 +525,16 @@ def _flat(identifier: str) -> OutcomeForecast:
 
 @pytest.mark.parametrize("separating, expected", [("measure_low", "measure_low"), ("measure_high", "measure_high")])
 @pytest.mark.parametrize("power_aware", [False, True])
-def test_power_aware_selection_follows_outcome_forecasts_when_enabled(tmp_path, separating, expected, power_aware):
+@pytest.mark.parametrize("named_strategy", [False, True])
+def test_power_aware_selection_follows_outcome_forecasts_when_enabled(tmp_path, separating, expected, power_aware, named_strategy):
     other = "measure_high" if separating == "measure_low" else "measure_low"
     forecaster = _StubForecaster({separating: _separating(separating), other: _flat(other)})
     profile = FunctionalInterventionProfile(mode="inhibition", context_identifier="NCI-H596", time_hours=24.0)
     # Equal magnitudes: only the forecasts differ between the two parametrisations.
+    options = ({"selection_strategy": "discrimination", "power_aware_selection": False} if named_strategy else
+               {"discrimination_selection": True, "power_aware_selection": power_aware})
     orchestrator = _orchestrator(tmp_path, _LabelWorldModel({CONTROL_LOW: 2.0, CONTROL_HIGH: 2.0}),
-                                 outcome_forecaster=forecaster, discrimination_selection=True,
-                                 power_aware_selection=power_aware)
+                                 outcome_forecaster=forecaster, **options)
     turn = orchestrator.run(
         "Which exposure should be measured first?", available_actions=_runtime_actions(), intervention_profile=profile,
         case_id="forecast", budget=1.0, virtual_cell_template=_template(),
@@ -544,6 +546,28 @@ def test_power_aware_selection_follows_outcome_forecasts_when_enabled(tmp_path, 
     # Nothing but the plan moved: no hypothesis was removed and the case waits for a real result.
     assert orchestrator.evidence_state("forecast") is None or orchestrator.evidence_state("forecast").eliminated == frozenset()
     assert turn.case is not None and turn.case.state is CaseState.AWAITING_RESULT
+
+
+@pytest.mark.parametrize("strategy", ["budgeted_coverage", "expected_coverage"])
+def test_named_coverage_strategies_match_legacy_actions_and_case_budget(tmp_path, strategy):
+    profile = FunctionalInterventionProfile(mode="inhibition", context_identifier="NCI-H596", time_hours=24.0)
+    results = []
+    for label, options in (("legacy", {"power_aware_selection": strategy == "expected_coverage"}),
+                           ("named", {"power_aware_selection": False, "selection_strategy": strategy})):
+        controller = _orchestrator(tmp_path / label, _LabelWorldModel({CONTROL_LOW: 2, CONTROL_HIGH: 2}), **options)
+        turn = controller.run("Which exposure?", available_actions=_runtime_actions(), intervention_profile=profile,
+                              case_id="case", budget=1, virtual_cell_template=_template())
+        results.append((turn.selected_actions, turn.case, turn.prediction.abstain_reason if turn.prediction else None))
+        assert controller.selection_strategy == strategy
+    assert results[0] == results[1]
+
+
+@pytest.mark.parametrize("options", [{"selection_strategy": "unknown", "power_aware_selection": False},
+                                    {"selection_strategy": "", "power_aware_selection": False},
+                                    {"selection_strategy": "expected_coverage", "power_aware_selection": True}])
+def test_named_strategy_refuses_unknown_names_and_legacy_flag_combinations(tmp_path, options):
+    with pytest.raises(ValueError):
+        _orchestrator(tmp_path, None, **options)
 
 
 @pytest.mark.parametrize("power_aware", [False, True])

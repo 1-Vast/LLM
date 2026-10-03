@@ -13,7 +13,7 @@ from maestro.outcome import InterpretationTable, OutcomeRule
 from virtual_cell.interface import Intervention, SystemContext, VirtualCellQueryTemplate
 from virtual_cell import PredictionRequest
 from virtual_cell.world_model import build_backend
-from .memory import MeasurementResult
+from .case_store import MeasurementResult
 from .llm import ConfigurationError, LLMError, TemplateCompleter, TemplateCompleterError
 from .orchestrator import MAESTROOrchestrator
 from .planner import PlannerContractError

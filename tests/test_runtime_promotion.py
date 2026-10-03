@@ -31,7 +31,7 @@ def test_waiting_skips_interpreter_context_tools_planner_model_and_review(tmp_pa
     core._case_store.open_case("case", budget=2)
     before = core._case_store.record_plan("case", (action,), ready_to_measure=True,
                                           context_identifier="cell-a")
-    for name in ("_interpreter", "_context_builder", "_planner", "_visual_inspector", "_virtual_cell", "_decision_critic", "_tool_router"):
+    for name in ("_interpreter", "_context_builder", "_planner", "_visual_inspector", "_predictions", "_decision_critic", "_tool_router"):
         setattr(core, name, Mock(side_effect=AssertionError("must not be called while waiting")))
     result = core.run("unchanged task", available_actions=(action,),
                       intervention_profile=FunctionalInterventionProfile("fixture"), case_id="case", budget=2)
@@ -39,7 +39,7 @@ def test_waiting_skips_interpreter_context_tools_planner_model_and_review(tmp_pa
     assert result.case.state is CaseState.AWAITING_RESULT
     assert not result.selected_actions
     assert not result.contrast
-    for name in ("_interpreter", "_context_builder", "_planner", "_visual_inspector", "_virtual_cell", "_decision_critic", "_tool_router"):
+    for name in ("_interpreter", "_context_builder", "_planner", "_visual_inspector", "_predictions", "_decision_critic", "_tool_router"):
         assert not getattr(core, name).mock_calls
 
 
@@ -50,7 +50,7 @@ def test_budget_and_execution_prerequisites_filtered_before_model(tmp_path):
     actions = (legal, expensive, blocked)
     core = _controller(tmp_path, [TASK, _plan("legal")])
     world = ApplicableWorldModel()
-    core._virtual_cell = world
+    core._predictions.backend = world
     turn = core.run("task", available_actions=actions,
                     intervention_profile=FunctionalInterventionProfile("fixture"),
                     case_id="case", budget=1, virtual_cell_template=template(actions))
@@ -64,7 +64,7 @@ def test_interpretation_gate_is_not_an_execution_prerequisite(tmp_path):
     action = replace(_action(), interpretation_gate="unmeasured_gate")
     core = _controller(tmp_path, [TASK, _plan(action.identifier)])
     world = ApplicableWorldModel()
-    core._virtual_cell = world
+    core._predictions.backend = world
     core.run("task", available_actions=(action,),
              intervention_profile=FunctionalInterventionProfile("fixture"),
              case_id="case", budget=1, virtual_cell_template=template((action,)))
@@ -76,7 +76,7 @@ def test_single_explicit_query_for_blocked_plan_does_not_run(tmp_path, blocked_b
     action = replace(_action(), cost=2) if blocked_by == "budget" else replace(_action(), prerequisites=("missing",))
     core = _controller(tmp_path, [TASK, _plan(action.identifier)])
     world = ApplicableWorldModel()
-    core._virtual_cell = world
+    core._predictions.backend = world
     query = template((action,)).build(request_id="query", case_id="case", contrast_id="contrast",
                                       plan_version=1, intended_targets=("TARGET",))
     core.run("task", available_actions=(action,),
@@ -89,7 +89,7 @@ def test_legal_evidence_action_survives_unavailable_model(tmp_path):
     from virtual_cell.interface import UnavailableVirtualCellWorldModel
     action = _action()
     core = _controller(tmp_path, [TASK, _plan(action.identifier)])
-    core._virtual_cell = UnavailableVirtualCellWorldModel()
+    core._predictions.backend = UnavailableVirtualCellWorldModel()
     turn = core.run("task", available_actions=(action,),
                     intervention_profile=FunctionalInterventionProfile("fixture"), budget=1,
                     virtual_cell_template=template((action,)))
@@ -117,8 +117,8 @@ def test_final_identity_audit_marks_review_as_stale_without_another_call(tmp_pat
 def test_expected_coverage_logs_response_as_diagnostic(tmp_path):
     action = _action()
     core = _controller(tmp_path, [TASK, _plan(action.identifier)])
-    core._power_aware_selection = True
-    core._virtual_cell = ApplicableWorldModel()
+    core._selection_strategy = "expected_coverage"
+    core._predictions.backend = ApplicableWorldModel()
     turn = core.run("task", available_actions=(action,),
                     intervention_profile=FunctionalInterventionProfile("fixture"), budget=1,
                     virtual_cell_template=template((action,)))

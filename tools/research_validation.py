@@ -1,9 +1,9 @@
 """Checkout-local entry point for the opt-in research test suite.
 
-The production test target remains ``pytest`` (``tests/`` in ``pyproject.toml``).  Research
+The production test target remains ``pytest`` (core testpaths in ``pyproject.toml``). Research
 replays depend on prepared data and optional scientific packages, so they are intentionally not
 collected by that default command. This developer command runs the tests and contracts under the
-current checkout's ``research/`` directory.
+current checkout's ASTRA entries; historical suites use explicit pytest paths.
 """
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 
-DEFAULT_TARGETS = ("research",)
+DEFAULT_TARGETS = ("research/astra",)
 ARCHIVE_GLOBS = ("*/results/*", "*/baseline_*/*", "*/snapshots/*", "*/execution_sources/*")
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -38,7 +38,8 @@ def main() -> int:
         f"--ignore={ROOT / 'research/experiments'}", f"--ignore={ROOT / 'research/data'}",
         *(f"--ignore-glob={pattern}" for pattern in ARCHIVE_GLOBS),
     ]
-    return int(pytest.main([str(ROOT / target) for target in DEFAULT_TARGETS] + exclusions + args))
+    targets = ("research",) if include_archives else DEFAULT_TARGETS
+    return int(pytest.main([str(ROOT / target) for target in targets] + exclusions + args))
 
 
 if __name__ == "__main__":  # pragma: no cover
