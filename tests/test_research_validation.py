@@ -44,7 +44,7 @@ def test_research_runner_can_explicitly_include_archives(monkeypatch):
 
 
 def test_default_collection_excludes_archived_test_copies(tmp_path):
-    (tmp_path / "pyproject.toml").write_text("")
+    (tmp_path / "pyproject.toml").write_text("[tool.pytest.ini_options]\naddopts = ''\n")
     tree = tmp_path / "research"
     for directory in ("active", "active/results/frozen", "active/baseline_20261002", "data", "experiments"):
         folder = tree / directory
@@ -52,8 +52,10 @@ def test_default_collection_excludes_archived_test_copies(tmp_path):
         (folder / "test_probe.py").write_text("def test_probe():\n    pass\n")
     script = ("from pathlib import Path; from tools import research_validation as runner; "
               "runner.ROOT=Path.cwd(); raise SystemExit(runner.main())")
-    result = subprocess.run([sys.executable, "-c", script, "--collect-only", "-q"], cwd=tmp_path,
+    config = tmp_path / "pyproject.toml"
+    result = subprocess.run([sys.executable, "-c", script, "-c", str(config), "--collect-only", "-q"], cwd=tmp_path,
                             env={**os.environ, "PYTHONPATH": str(ROOT)}, capture_output=True, text=True)
     assert result.returncode == 0, result.stdout + result.stderr
-    assert "1 test collected" in result.stdout
+    collected = [line for line in result.stdout.splitlines() if "::" in line]
+    assert collected == ["research/active/test_probe.py::test_probe"]
     assert "results/frozen" not in result.stdout and "baseline_20261002" not in result.stdout

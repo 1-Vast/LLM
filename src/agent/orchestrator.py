@@ -187,6 +187,7 @@ class MAESTROOrchestrator:
         self._repair_ledgers: dict[str, RepairLedger] = {}
         self._evidence_states: dict[str, EvidenceState] = {}
         self._round_records: dict[str, RoundRecord] = {}
+        self._round_results: dict[str, dict[str, RoundRecord]] = {}
         # What a result that arrives outside the case loop can be scored against:
         # the turn and the action of the plan that asked for it, recorded by run().
         # Exact plan identity for cases; anonymous repeated actions are ambiguous.
@@ -858,9 +859,10 @@ class MAESTROOrchestrator:
     ) -> RoundRecord | None:
         """Update this round's L4 layer from the real result that arrived.
 
-        The current in-process round view is re-issued with its execution layer
-        filled. RunLogger persists the derived view; CaseStore remains the fact
-        authority. This cache does not restore scientific state after a restart.
+        Each result fills its own copy of the original plan view. RunLogger
+        persists immutable result views; the run review reads every result.
+        CaseStore remains the fact authority. These in-process caches do not
+        restore scientific state after a restart.
         """
 
         plan = self._round_records.get(turn.session_id)
@@ -893,7 +895,7 @@ class MAESTROOrchestrator:
         )
         if not self._logger.round(record, stage="result"):
             return None
-        self._round_records[turn.session_id] = record
+        self._round_results.setdefault(turn.session_id, {})[result_id] = record
         return record
 
     def _execution_actions(
@@ -1113,7 +1115,9 @@ class MAESTROOrchestrator:
                 stop_reason = "budget_exhausted"
                 break
         records = tuple(
-            self._round_records[turn.session_id] for turn in turns if turn.session_id in self._round_records
+            record for turn in turns if turn.session_id in self._round_records
+            for record in (tuple(self._round_results.get(turn.session_id, {}).values())
+                           or (self._round_records[turn.session_id],))
         )
         if records:
             self._logger.event(

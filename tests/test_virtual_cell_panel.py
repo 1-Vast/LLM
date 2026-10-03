@@ -17,6 +17,7 @@ File summary
 - Depends on: virtual_cell
 """
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -149,6 +150,44 @@ def test_panel_records_abstentions_and_bills_compute_separately():
     assert refused.evidence_kind == "model_prediction"
     assert refused.planning_only is True
     assert refused.artifact_ref is None
+
+
+@pytest.mark.parametrize("change,reason", [
+    ({"request_id": "other-request"}, "request_id_mismatch"),
+    ({"model_version": "other-model"}, "prediction_model_mismatch"),
+    ({"state_change": {"other_readout": 0.2}}, "readout_mismatch"),
+])
+def test_panel_refuses_misbound_predictions_and_records_violations(change, reason):
+    class Backend(_StubBackend):
+        def predict(self, request):
+            return replace(super().predict(request), **change)
+    run = run_panel(Backend({"condition_a"}), _panel(("condition_a",)))
+    row, = run.rows
+    assert not row.applicable and row.abstain_reason == reason
+    assert not row.values and row.artifact_ref is None
+    ranking = rank_conditions(run, readout=READOUT)
+    assert not ranking.entries
+    assert run.ledger.contract_violations == {"stub_backend": 1}
+
+
+@pytest.mark.parametrize("stage", ["assess_query", "predict"])
+def test_panel_keeps_backend_exceptions_as_refusal_rows(stage):
+    backend = _StubBackend({"condition_a"})
+    def fail(request):
+        raise RuntimeError("backend failed")
+    setattr(backend, stage, fail)
+    row, = run_panel(backend, _panel(("condition_a",))).rows
+    assert not row.applicable
+    assert row.abstain_reason == ("assessment_exception:RuntimeError" if stage == "assess_query"
+                                  else "prediction_exception:RuntimeError")
+    assert not row.values
+
+
+def test_panel_refuses_a_panel_bound_to_another_model_version():
+    run = run_panel(_StubBackend({"condition_a"}), replace(_panel(("condition_a",)), model_version="wrong"))
+    row, = run.rows
+    assert not row.applicable and row.abstain_reason == "model_version_mismatch"
+    assert run.ledger.contract_violations == {"stub_backend": 1}
 
 
 def test_artifact_reader_refuses_a_vector_that_does_not_match_its_digest(tmp_path: Path):

@@ -10,6 +10,8 @@ File summary
 - Depends on: agent.memory, agent.memory, agent.context, agent.knowledge, agent.memory, agent.orchestrator, agent.planner, agent.llm, maestro
 """
 from pathlib import Path
+import hashlib
+import json
 import pytest
 
 from maestro.models import BiologicalQuantity
@@ -205,3 +207,11 @@ def test_qc_failure_drains_committed_bundle_before_stopping(tmp_path, valid_pres
     assert store.snapshot("bundle").state is (CaseState.RESULT_QC_FAILED if valid_present else CaseState.AWAITING_RESULT)
     assert {a["status"] for a in store.action_states("bundle", 1)} == (
         {"qc_failed", "result_recorded"} if valid_present else {"qc_failed", "planned"})
+    events = [json.loads(line) for line in controller._logger.events_path.read_text().splitlines()]
+    receipts = [event["payload"] for event in events if event["kind"] == "round_result_recorded"]
+    assert len(receipts) == (2 if valid_present else 1)
+    assert len({receipt["path"] for receipt in receipts}) == len(receipts)
+    for receipt in receipts:
+        assert hashlib.sha256(Path(receipt["path"]).read_bytes()).hexdigest() == receipt["sha256"]
+    review, = [event["payload"] for event in events if event["kind"] == "round_records_reviewed"]
+    assert review["rounds"] == 1 and review["rounds_with_a_result"] == 1

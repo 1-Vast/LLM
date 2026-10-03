@@ -1030,8 +1030,15 @@ class RunLogger:
         if stage not in ("plan", "result"):
             raise ValueError("Round stage must be plan or result.")
         path = self.root / "rounds" / f"{record.session_id}.{stage}.json"
+        if stage == "result":
+            if not record.execution.result_id:
+                self.event("round_record_rejected", {"session_id": record.session_id,
+                           "reason": "result_record_identity_missing"}, session_id=record.session_id)
+                return False
+            identity = hashlib.sha256(record.execution.result_id.encode("utf-8")).hexdigest()
+            path = self.root / "rounds" / f"{record.session_id}.result.{identity}.json"
         try:
-            digest = write_round(path, record)
+            digest = write_round(path, record, immutable=stage == "result")
         except ValueError as error:
             self.event("round_record_rejected", {"session_id": record.session_id, "reason": str(error)},
                        session_id=record.session_id)

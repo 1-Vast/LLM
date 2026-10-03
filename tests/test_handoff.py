@@ -15,6 +15,9 @@ File summary
 - Depends on: maestro.handoff, agent
 """
 import json
+import hashlib
+from dataclasses import replace
+from types import SimpleNamespace
 from pathlib import Path
 
 import pytest
@@ -120,7 +123,7 @@ def test_run_logger_preserves_round_bytes_and_event_identity(tmp_path, stage, ki
     digest = write_round(expected, record)
     logger = RunLogger(tmp_path / "log")
     assert logger.round(record, stage=stage)
-    path = logger.root / "rounds" / f"session-1.{stage}.json"
+    path, = (logger.root / "rounds").glob(f"session-1.{stage}*.json")
     assert path.read_bytes() == expected.read_bytes()
     event, = map(json.loads, logger.events_path.read_text().splitlines())
     assert event["kind"] == kind and event["session_id"] == "session-1"
@@ -140,13 +143,56 @@ def test_run_logger_refuses_incomplete_round_without_creating_a_file(tmp_path):
     assert "l2_in_distribution_missing" in event["payload"]["reason"]
 
 
+@pytest.mark.parametrize("revised_first", [True, False])
+def test_multiple_results_keep_receipt_hashes_and_all_revisions(tmp_path, revised_first):
+    controller = object.__new__(MAESTROOrchestrator)
+    controller._logger = RunLogger(tmp_path)
+    controller._round_records = {"session-1": _round()}
+    controller._round_results = {}
+    turn = SimpleNamespace(session_id="session-1")
+    records = []
+    for index, revised in enumerate((revised_first, not revised_first)):
+        result_id = f"result:{index}"
+        admission = SimpleNamespace(result_id=result_id, admitted_fields=(), admissible=True)
+        state = SimpleNamespace(updates=[SimpleNamespace(result_id=result_id,
+                                                         eliminated=("a",) if revised else ())])
+        records.append(controller._write_result_round(turn, SimpleNamespace(identifier=f"act-{index}"),
+            SimpleNamespace(metrics={"shared_readout": float(index)}), admission, state, result_id=result_id))
+    events = [json.loads(line) for line in controller._logger.events_path.read_text().splitlines()]
+    assert len({event["payload"]["path"] for event in events}) == 2
+    for event in events:
+        path = Path(event["payload"]["path"])
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == event["payload"]["sha256"]
+    cached = tuple(controller._round_results["session-1"].values())
+    assert cached == tuple(records)
+    assert [record.execution.observed["shared_readout"] for record in cached] == [0.0, 1.0]
+    review = review_run(cached)
+    assert review["rounds"] == 1 and review["rounds_with_a_result"] == 1
+    assert review["result_records"] == 2
+    assert review["rounds_that_revised_a_judgement"] == 1
+    assert review["judgement_never_changed"] is False
+
+
+def test_result_receipt_retry_is_identical_and_conflict_cannot_overwrite(tmp_path):
+    logger = RunLogger(tmp_path)
+    record = _round(execution=ExecutionLayer(result_id="r:/1", observed={"readout": 1.0}))
+    assert logger.round(record, stage="result")
+    event = json.loads(logger.events_path.read_text().splitlines()[0])
+    path = Path(event["payload"]["path"])
+    original = path.read_bytes()
+    assert logger.round(record, stage="result")
+    assert not logger.round(replace(record, execution=replace(record.execution, observed={"readout": 2.0})),
+                            stage="result")
+    assert path.read_bytes() == original
+
+
 def test_review_run_reports_a_run_that_never_revised():
     planned = _round()
     executed = _round(
         execution=ExecutionLayer(observed={"readout": 1.0}, result_id="result-1", stop_decision="result_imported")
     )
     review = review_run((planned, executed))
-    assert review["rounds"] == 2
+    assert review["rounds"] == 1
     assert review["rounds_with_a_result"] == 1
     assert review["judgement_never_changed"] is True
 

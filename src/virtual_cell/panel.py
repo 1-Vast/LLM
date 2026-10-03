@@ -37,11 +37,10 @@ from .interface import (
     Interval,
     Intervention,
     PredictionRequest,
-    QueryAssessment,
     QuerySupport,
-    StatePrediction,
     SystemContext,
     VirtualCellWorldModel,
+    safe_predict,
 )
 from .biology import (
     BackgroundPool,
@@ -226,9 +225,14 @@ def run_panel(
     rows: list[PanelRow] = []
     for index, condition in enumerate(panel.conditions):
         request = panel.build_request(condition, index=index)
-        assessment: QueryAssessment = backend.assess_query(request)
+        assessment, prediction = safe_predict(backend, request)
+        violation = prediction.abstain_reason in {
+            "contract_violation", "request_id_mismatch", "prediction_model_mismatch",
+            "model_version_mismatch", "readout_mismatch", "invalid_prediction_type",
+            "invalid_assessment", "assessment_model_mismatch", "invalid_capabilities",
+        }
         if assessment.support is not QuerySupport.SUPPORTED:
-            books.record(name, abstained=True, violation=False)
+            books.record(name, abstained=True, violation=violation)
             limitations = assessment.limitations + tuple(
                 f"missing_input:{item}" for item in assessment.missing_inputs
             )
@@ -246,8 +250,6 @@ def run_panel(
                 )
             )
             continue
-        prediction: StatePrediction = backend.predict(request)
-        violation = not prediction.contract_valid
         books.record(name, abstained=not prediction.applicable, violation=violation)
         verified: bool | None = None
         if prediction.artifact_ref and Path(prediction.artifact_ref).is_file():

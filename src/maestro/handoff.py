@@ -612,14 +612,22 @@ class RoundRecord:
             raise ValueError(f"invalid_round_record:{error}") from error
 
 
-def write_round(path: Path | str, record: RoundRecord) -> str:
-    """Validate, write and return the SHA-256 of one round record."""
+def write_round(path: Path | str, record: RoundRecord, *, immutable: bool = False) -> str:
+    """Validate and hash a round; immutable writes permit only byte-identical retries."""
 
     record.validate()
     encoded = (json.dumps(record.to_payload(), indent=1, ensure_ascii=True, sort_keys=False, allow_nan=False) + "\n").encode("utf-8")
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_bytes(encoded)
+    if immutable:
+        try:
+            with destination.open("xb") as stream:
+                stream.write(encoded)
+        except FileExistsError:
+            if destination.read_bytes() != encoded:
+                raise ValueError("round_record_identity_conflict")
+    else:
+        destination.write_bytes(encoded)
     return hashlib.sha256(encoded).hexdigest()
 
 
@@ -630,13 +638,15 @@ def read_round(path: Path | str) -> Mapping[str, object]:
 
 
 def review_run(records: Sequence[RoundRecord]) -> Mapping[str, object]:
-    """Report the two run-level findings a per-round validator cannot see."""
+    """Review every result, counting each session/round once even with several results."""
 
-    rounds = len(records)
-    revisions = [record.round_index for record in records if record.execution.contradiction_flag]
-    executed = [record.round_index for record in records if record.execution.observed]
+    rounds = len({(record.session_id, record.round_index) for record in records})
+    revisions = {(record.session_id, record.round_index) for record in records if record.execution.contradiction_flag}
+    executed = {(record.session_id, record.round_index) for record in records if record.execution.result_id}
     return {
         "rounds": rounds,
+        "result_records": len({(record.session_id, record.round_index, record.execution.result_id)
+                               for record in records if record.execution.result_id}),
         "rounds_with_a_result": len(executed),
         "rounds_that_revised_a_judgement": len(revisions),
         "judgement_never_changed": bool(records) and not revisions and bool(executed),
