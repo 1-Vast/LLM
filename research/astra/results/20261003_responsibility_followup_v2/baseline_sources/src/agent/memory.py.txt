@@ -16,7 +16,6 @@ from typing import Any, Sequence
 
 from maestro.models import DecisionStatus, EvidenceAction, EvidenceActionKind, EvidenceKind
 from maestro.composition import finite_number, validate_action_menu
-from maestro.handoff import RoundRecord, write_round
 
 
 @contextmanager
@@ -1024,28 +1023,6 @@ class RunLogger:
 
     def experiment(self, kind: str, payload: Mapping[str, Any], *, session_id: str) -> None:
         self._append(self.experiments_path, kind, payload, session_id)
-
-    def round(self, record: RoundRecord, *, stage: str) -> bool:
-        """Persist a derived round view; never mutate case facts or evidence state."""
-        if stage not in ("plan", "result"):
-            raise ValueError("Round stage must be plan or result.")
-        path = self.root / "rounds" / f"{record.session_id}.{stage}.json"
-        try:
-            digest = write_round(path, record)
-        except ValueError as error:
-            self.event("round_record_rejected", {"session_id": record.session_id, "reason": str(error)},
-                       session_id=record.session_id)
-            return False
-        payload = {"path": str(path), "sha256": digest}
-        if stage == "plan":
-            kind = "round_record_written"
-            payload["layers"] = 4
-        else:
-            kind = "round_result_recorded"
-            payload.update(result_id=record.execution.result_id,
-                           contradiction_flag=record.execution.contradiction_flag)
-        self.event(kind, payload, session_id=record.session_id)
-        return True
 
     def explain_failure(self, session_id: str) -> Mapping[str, Any] | None:
         """Return the first recorded tool failure for a session without inferring biology."""

@@ -112,6 +112,34 @@ def test_write_round_refuses_an_incomplete_record(tmp_path: Path):
     assert layers["L4_execution"]["contradiction_flag"] is False
 
 
+@pytest.mark.parametrize("stage,kind", [("plan", "round_record_written"), ("result", "round_result_recorded")])
+def test_run_logger_preserves_round_bytes_and_event_identity(tmp_path, stage, kind):
+    record = _round(execution=ExecutionLayer(observed={"readout": 1.0}, result_id="r1",
+                                          stop_decision="result_imported:act-1"))
+    expected = tmp_path / "expected.json"
+    digest = write_round(expected, record)
+    logger = RunLogger(tmp_path / "log")
+    assert logger.round(record, stage=stage)
+    path = logger.root / "rounds" / f"session-1.{stage}.json"
+    assert path.read_bytes() == expected.read_bytes()
+    event, = map(json.loads, logger.events_path.read_text().splitlines())
+    assert event["kind"] == kind and event["session_id"] == "session-1"
+    assert event["payload"]["sha256"] == digest
+    if stage == "result":
+        assert event["payload"]["result_id"] == "r1"
+    else:
+        assert event["payload"]["layers"] == 4
+
+
+def test_run_logger_refuses_incomplete_round_without_creating_a_file(tmp_path):
+    logger = RunLogger(tmp_path)
+    assert not logger.round(_round(world_model=WorldModelLayer(in_distribution=None)), stage="plan")
+    assert not (tmp_path / "rounds/session-1.plan.json").exists()
+    event, = map(json.loads, logger.events_path.read_text().splitlines())
+    assert event["kind"] == "round_record_rejected"
+    assert "l2_in_distribution_missing" in event["payload"]["reason"]
+
+
 def test_review_run_reports_a_run_that_never_revised():
     planned = _round()
     executed = _round(

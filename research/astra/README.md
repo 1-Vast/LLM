@@ -1,5 +1,19 @@
 # ASTRA: dual-core research adjustments
 
+The [responsibility and maintenance follow-up](RESPONSIBILITY_FOLLOWUP.md) completes
+the remaining review-guided ownership changes, with no new scientific promotion.
+Current navigation separates engineering contracts, STATE diagnostics and GDSC
+decision research:
+
+| Area | Current entries | Evidence level |
+|---|---|---|
+| Engineering contracts | Default `tests/test_runtime_promotion.py`, `test_feedback_promotion.py`; production `agent`, `maestro`, `virtual_cell`; [feedback follow-up](FEEDBACK_BOUNDARY_FOLLOWUP.md) | Verified software behaviour; scientific benefit unestablished |
+| STATE diagnostics | `paired_state`, `paired_matrix`, `zero_audit`, `state_interaction`, `influence_audit`; migrated `state_sensitivity` | Technical sensitivity and historical diagnostics; no certified deployment utility |
+| Knowledge retrospective | Migrated `state_knowledge_retrospective`, `state_knowledge_diagnose` | PublicTargetGOKernel development analyses; not STATE or fresh confirmation |
+| Source qualification | `state_identifiability` driver; reusable rules in `tools.datasets.state_identifiability` | Historical raw joins/evidence gates; new eligible task still absent |
+| GDSC decisions | `decision_space`, `gdsc_review`, `gdsc_transport`, `gdsc_layout_validation`, `gdsc_pilot` | Retrospective measured contrasts; corrected 480-well pilot remains unexecuted |
+| Candidate contributions | `decision_path`, `feedback`, `realisation_plan` | Opt-in experiments and derived views; no alternative fact authority or default model |
+
 The latest [feedback and ownership follow-up](FEEDBACK_BOUNDARY_FOLLOWUP.md) fixes
 CLI plan attribution and committed-bundle draining, puts promoted contracts in
 default tests, and separates research training/replay from production inference.
@@ -31,6 +45,9 @@ different evidence levels. The last remains unidentified.
 | [state_interaction.py](state_interaction.py) | Action contrasts, top-choice vs abstention changes, residual alignment, matched permutations and development-only shrinkage. |
 | [../../src/agent/orchestrator.py](../../src/agent/orchestrator.py) | Supported orchestrator; callers now import it and the STATE adapter directly. |
 | [realisation_plan.py](realisation_plan.py) | Read-only review-input audit, unregistered measured-action development specification and empty intake tables. |
+| [state_sensitivity.py](state_sensitivity.py) | Fixed-menu historical STATE sensitivity experiment; moved from tools with identical scientific functions. |
+| [state_knowledge_retrospective.py](state_knowledge_retrospective.py), [state_knowledge_diagnose.py](state_knowledge_diagnose.py) | Specific knowledge kernels, folds and nested shrinkage studies; no deployed prediction capability. |
+| [state_identifiability.py](state_identifiability.py) | Historical lineage/source audit orchestration; calls stable tools rules and explicit historical research sources. |
 | [influence_audit.py](influence_audit.py) | Real STATE dependency audit, frozen-grid influence and constructed forecast/policy/timing swaps. |
 | [PROTOCOL.md](PROTOCOL.md) | Admission rules, scientific questions and the next independent experiment. |
 

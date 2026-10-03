@@ -8,9 +8,7 @@ import pandas as pd
 import pytest
 
 from tools.datasets.resistrace_retrospective import baseline_groups, load_counts, predict_pair, attach_responses
-from tools.datasets.state_knowledge_diagnose import shrinkage
 from tools.datasets.state_raw_reconstruction import convert_counts
-from tools.datasets.state_sensitivity import choose
 from tools.datasets.state_remote_h5 import RangeFile
 
 
@@ -71,12 +69,6 @@ def test_reading_counts_validates_identity_and_total(tmp_path):
     meta.loc['a','nCount_RNA']=5
     with pytest.raises(ValueError,match='totals disagree'):load_counts(path,meta,['ENS1'])
 
-
-def test_no_support_shrinkage_and_selector_ties_are_explicit():
-    assert shrinkage(np.zeros((2,3)),np.ones((2,3)),['a','b'])==0
-    assert shrinkage(np.ones((2,3)),-np.ones((2,3)),['a','b'])==0
-    assert choose([0,0,1]) is None
-    assert choose([2,1,0])==2
 
 
 def test_range_reader_checks_response_offsets_and_hides_exception_urls(tmp_path,monkeypatch):

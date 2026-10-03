@@ -37,6 +37,35 @@ historical collection uses `--include-archives`; this does not authenticate old
 dependencies or qualify historical datasets. The supplied review copies remain
 byte-preserved and excluded from routine collection.
 
+Current maintenance scope is listed separately from each block's historical
+scientific verdict. `Completed` below means no new method development is assigned
+by this iteration; its tests and reproduction sources remain available and may
+still be dependencies of fixed historical studies. No legacy schema is converted
+or deleted solely because production has a similarly named concept.
+
+| Directory or explicit research component | Lifecycle | Maintenance boundary |
+|---|---|---|
+| `astra/` engineering contracts and input/decision experiments | active | Current thin experiment entries; formal rules, result facts and runtime are production-owned |
+| `astra/realisation_plan.py` biological confirmation | paused | Matched actual-action measurements, prices and power missing |
+| `scientific_optimization/` candidate fitting | paused | Experimental training retained; no new promotion without qualified independent task |
+| `case_memory_integration/` | completed | Shared tools pack builder; pinned scientific replay and metrics stay research-owned |
+| `scientific_case_memory/` | completed | Legacy schema/retrieval prototype; historical consumers retained; new research uses production schema |
+| `belief_planning/`, `external_validation/`, `protocol_v2/` | completed | Frozen historical benchmark dependencies; no new implicit layered pipeline |
+| `viability_contrast/`, `sequence_audit/`, `acquisition_followup/` | completed | Negative or limited results retained; no parallel variant expansion |
+| `acquisition_link/`, `sparse_value/` | paused | Inconclusive candidate methods; no default activation |
+| `dynamic_world_model/`, `biological_depth/`, `incontext_world/`, `dual_core/`, `dual_core_v2/` | completed | Historical model comparisons and promotion restrictions remain binding |
+| `identifiability_audit/`, `dual_core_followup/` | completed | Historical attribution and source-boundary studies; source/result archives excluded from current-code views |
+| `dual_core_completion/`, `dual_core_live/`, `maestro_vc_v1/` | completed | Engineering/live/replay records; scientific limitations retained |
+| `dataset_discovery/`, `premise_forecast/`, `local_verification/` | completed | Prepared-data, source and feasibility checks; no new task admitted by directory status |
+| `analysis/`, `asrg/`, `gated_plan/` | paused | Design/probe proposals; need explicit experiment before any scientific claim |
+| `knowledge/`, `topics/`, `prompt_review_20260927/` | archived | Reference/design documents; no experiment-state authority |
+| `data/`, `experiments/`, results and baseline/snapshot/execution source copies | archived | Byte-preserved evidence or supplied references; explicit historical access |
+
+This is a navigation/maintenance decision, not a deletion or test-exclusion list.
+The three permissions are distinct: engineering contracts verified, scientific
+gain supported, and default activation allowed. See the field-level schema audit
+and responsibility matrix in [the latest follow-up](astra/RESPONSIBILITY_FOLLOWUP.md).
+
 ## (a) Agent and decision core
 
 | Path | Verdict | Contents |

@@ -12,7 +12,7 @@ from typing import Callable, Mapping, Sequence
 from maestro.contrast import MAESTROAgent
 from maestro.acquisition import DiscriminationPlan, OutcomeForecaster, outcome_consequences, select_discriminating_action, select_expected_coverage
 from maestro.decision import DecisionEngine, DevelopmentDecision
-from maestro.handoff import ComparabilityStatus, DecisionLayer, EvidenceLayer, ExecutionLayer, RoundRecord, WorldModelLayer, rejected_from_selection, review_run
+from maestro.handoff import ComparabilityStatus, DecisionLayer, EvidenceLayer, ExecutionLayer, RoundRecord, WorldModelLayer, rejected_from_selection, review_run, write_round
 from maestro.outcome import EvidenceState, InterpretationTable, MeasuredPremise, OutcomeRule, ValidatedEvidenceUpdate, admit_evidence, default_rules_for, scope_rank
 from maestro.handoff import SourceClusterIndex
 from maestro.composition import ActionTopology
@@ -841,10 +841,24 @@ class MAESTROOrchestrator:
                 )
             ),
         )
-        if not self._logger.round(record, stage="plan"):
+        path = self._round_path(turn.session_id, suffix="plan")
+        try:
+            digest = write_round(path, record)
+        except ValueError as error:
+            self._logger.event(
+                "round_record_rejected", {"session_id": turn.session_id, "reason": str(error)}, session_id=turn.session_id
+            )
             return None
+        self._logger.event(
+            "round_record_written",
+            {"path": str(path), "sha256": digest, "layers": 4},
+            session_id=turn.session_id,
+        )
         self._round_records[turn.session_id] = record
         return record
+
+    def _round_path(self, session_id: str, *, suffix: str) -> Path:
+        return self._logger.root / "rounds" / f"{session_id}.{suffix}.json"
 
     def _write_result_round(
         self,
@@ -858,9 +872,9 @@ class MAESTROOrchestrator:
     ) -> RoundRecord | None:
         """Update this round's L4 layer from the real result that arrived.
 
-        The current in-process round view is re-issued with its execution layer
-        filled. RunLogger persists the derived view; CaseStore remains the fact
-        authority. This cache does not restore scientific state after a restart.
+        The plan record is read back from where it was written and re-issued with the
+        execution layer filled, so the two files together are the round: what was
+        planned, and what the measurement did to the judgement.
         """
 
         plan = self._round_records.get(turn.session_id)
@@ -891,9 +905,25 @@ class MAESTROOrchestrator:
                 result_id=result_id,
             ),
         )
-        if not self._logger.round(record, stage="result"):
+        path = self._round_path(turn.session_id, suffix="result")
+        try:
+            digest = write_round(path, record)
+        except ValueError as error:
+            self._logger.event(
+                "round_record_rejected", {"session_id": turn.session_id, "reason": str(error)}, session_id=turn.session_id
+            )
             return None
         self._round_records[turn.session_id] = record
+        self._logger.event(
+            "round_result_recorded",
+            {
+                "path": str(path),
+                "sha256": digest,
+                "result_id": result_id,
+                "contradiction_flag": record.execution.contradiction_flag,
+            },
+            session_id=turn.session_id,
+        )
         return record
 
     def _execution_actions(

@@ -71,3 +71,22 @@ source deliberately to reproduce a known defect.
 
 Synthetic biological, virtual-cell, and provider-client fixtures are test-only and live in
 `tests/fixtures/`.
+
+## STATE research commands
+
+Specific diagnostic menus, feature kernels, held-out comparisons and historical
+lineage replays are checkout-local research, not installed dataset capabilities:
+
+```bash
+python -m research.astra.state_sensitivity --help
+python -m research.astra.state_knowledge_retrospective --help
+python -m research.astra.state_knowledge_diagnose --help
+python -m research.astra.state_identifiability --help
+```
+
+`tools.datasets.state_identifiability` retains the pure source/sample/time/action
+checks; `state_prospective_input`, raw-count conversion and metadata readers stay
+in tools. Moving an experiment does not authenticate its dataset or improve its
+scientific result. Earlier frozen commands use their pinned Git versions.
+The case-memory audit and fixed source/graph commands still need their declared
+checkout assets and protocols; installation does not bundle biological data.

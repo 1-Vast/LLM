@@ -1,0 +1,667 @@
+{
+  "automatic_conversion_permitted": false,
+  "reason": "Different schema fields and enum domains require a versioned, loss-audited mapping; no such mapping was certified this round",
+  "sources": {
+    "research/scientific_case_memory/case_schema.py": {
+      "sha256": "7dbbf930042ef2a10d977e4bbad8cf859160c8dc758026b817373f9fea20cef4",
+      "classes": {
+        "RawDataRef": {
+          "uri": "str",
+          "sha256": "str",
+          "role": "str",
+          "row": "int | None"
+        },
+        "Observation": {
+          "condition_id": "str",
+          "status": "MeasurementStatus",
+          "assay": "str",
+          "cell_line": "str | None",
+          "time_h": "float | None",
+          "dose_nM": "float | None",
+          "readout": "str | None",
+          "value": "float | None",
+          "replicate_agreement": "float | None",
+          "detected": "bool | None",
+          "state_ref": "RawDataRef | None",
+          "note": "str"
+        },
+        "HypothesisClaim": {
+          "hypothesis_id": "str",
+          "claim": "str",
+          "assumptions": "tuple[str, ...]",
+          "predicted": "Mapping[str, str]",
+          "advisory": "bool"
+        },
+        "ActionSpec": {
+          "action_id": "str",
+          "description": "str",
+          "assay": "str",
+          "cost_wells": "float",
+          "duration_days": "float",
+          "readout": "str",
+          "cell_line": "str | None",
+          "time_h": "float | None",
+          "dose_nM": "float | None",
+          "prerequisites": "tuple[str, ...]",
+          "controls": "tuple[str, ...]",
+          "detection_power": "float | None",
+          "available": "bool"
+        },
+        "KnowledgeRef": {
+          "source": "str",
+          "identifier": "str",
+          "statement": "str",
+          "evidence_class": "EvidenceClass",
+          "sha256": "str | None"
+        },
+        "ForecastRecord": {
+          "action_id": "str",
+          "hypothesis_id": "str",
+          "branches": "Mapping[str, float]",
+          "support": "float",
+          "model_version": "str",
+          "basis": "str",
+          "interval": "tuple[float, float] | None",
+          "applicable": "bool",
+          "refusal": "str | None",
+          "evidence_class": "EvidenceClass"
+        },
+        "Measurement": {
+          "action_id": "str",
+          "status": "MeasurementStatus",
+          "outcome_label": "str | None",
+          "independent_units": "int | None",
+          "source": "str"
+        },
+        "HypothesisUpdate": {
+          "action_id": "str",
+          "contrast": "tuple[str, str]",
+          "reading": "str",
+          "eliminated": "tuple[str, ...]",
+          "qualified": "bool",
+          "reading_kind": "ReadingKind",
+          "note": "str",
+          "codes": "str"
+        },
+        "FailureMode": {
+          "code": "str",
+          "description": "str",
+          "action_id": "str | None",
+          "contrast": "tuple[str, str] | None",
+          "severity": "str"
+        },
+        "AdaptationLink": {
+          "source_case": "str",
+          "target_case": "str",
+          "differences": "Mapping[str, Any]",
+          "operations": "tuple[str, ...]",
+          "cost": "float",
+          "success": "bool | None",
+          "valid_when": "tuple[str, ...]",
+          "failed_when": "tuple[str, ...]"
+        },
+        "CalibrationEntry": {
+          "model_version": "str",
+          "action_id": "str",
+          "forecast": "float",
+          "realised": "float",
+          "kind": "str",
+          "snapshot": "str"
+        },
+        "Case": {
+          "case_id": "str",
+          "case_version": "int",
+          "case_kind": "CaseKind",
+          "problem_type": "ProblemType",
+          "problem_statement": "str",
+          "user_question": "str",
+          "raw_data_references": "tuple[RawDataRef, ...]",
+          "data_quality_report": "Mapping[str, Any]",
+          "context_fingerprint": "Mapping[str, Any]",
+          "initial_observations": "tuple[Observation, ...]",
+          "initial_hypotheses": "tuple[HypothesisClaim, ...]",
+          "candidate_actions": "tuple[ActionSpec, ...]",
+          "retrieved_knowledge": "tuple[KnowledgeRef, ...]",
+          "virtual_cell_predictions": "tuple[ForecastRecord, ...]",
+          "predicted_outcome_branches": "tuple[ForecastRecord, ...]",
+          "real_measurements": "tuple[Measurement, ...]",
+          "measurement_quality": "Mapping[str, Any]",
+          "qualified_evidence": "tuple[Mapping[str, Any], ...]",
+          "hypothesis_updates": "tuple[HypothesisUpdate, ...]",
+          "final_decision": "Mapping[str, Any]",
+          "next_action": "Mapping[str, Any]",
+          "failure_modes": "tuple[FailureMode, ...]",
+          "adaptation_map": "tuple[AdaptationLink, ...]",
+          "calibration_history": "tuple[CalibrationEntry, ...]",
+          "provenance": "Mapping[str, Any]",
+          "supersedes": "str | None",
+          "schema_version": "str"
+        },
+        "OpenProblem": {
+          "problem_id": "str",
+          "biological_system": "str",
+          "cell_line_or_context": "str",
+          "tissue_or_disease": "str | None",
+          "intervention": "str",
+          "compound_identity": "Mapping[str, Any]",
+          "chemical_structure": "str | None",
+          "nominal_target": "str | None",
+          "measured_engagement": "MeasurementStatus",
+          "functional_activity": "MeasurementStatus",
+          "time_h": "float | None",
+          "dose_nM": "float | None",
+          "assay": "str",
+          "control_design": "str",
+          "replicates": "int | None",
+          "batch": "str | None",
+          "observed_features": "tuple[str, ...]",
+          "pathway_readouts": "Mapping[str, float]",
+          "phenotype": "str | None",
+          "measurement_status": "Mapping[str, MeasurementStatus]",
+          "quality_status": "Mapping[str, Any]",
+          "known_constraints": "tuple[str, ...]",
+          "user_goal": "str",
+          "history": "tuple[Mapping[str, Any], ...]"
+        }
+      }
+    },
+    "src/maestro/case_memory.py": {
+      "sha256": "53676febe42e161c2dbe2a8778739197c6ad0f05dbccda70502722327198c866",
+      "classes": {
+        "RawDataRef": {
+          "uri": "str",
+          "sha256": "str",
+          "role": "str",
+          "row": "int | None"
+        },
+        "EpisodeObservation": {
+          "condition_id": "str",
+          "status": "ScientificMeasurementStatus",
+          "assay": "str",
+          "cell_line": "str | None",
+          "time_h": "float | None",
+          "dose_nM": "float | None",
+          "readout": "str | None",
+          "value": "float | None",
+          "direction": "int | None",
+          "pathway_direction": "Mapping[str, float]",
+          "replicate_agreement": "float | None",
+          "detected": "bool | None",
+          "state_ref": "RawDataRef | None",
+          "note": "str",
+          "availability": "str"
+        },
+        "HypothesisClaim": {
+          "hypothesis_id": "str",
+          "claim": "str",
+          "assumptions": "tuple[str, ...]",
+          "predicted": "Mapping[str, str]",
+          "advisory": "bool"
+        },
+        "CandidateAction": {
+          "action_id": "str",
+          "description": "str",
+          "assay": "str",
+          "cost_wells": "float",
+          "duration_days": "float",
+          "readout": "str",
+          "cell_line": "str | None",
+          "time_h": "float | None",
+          "dose_nM": "float | None",
+          "prerequisites": "tuple[str, ...]",
+          "controls": "tuple[str, ...]",
+          "detection_power": "float | None",
+          "available": "bool"
+        },
+        "ForecastRecord": {
+          "action_id": "str",
+          "hypothesis_id": "str",
+          "branches": "Mapping[str, float]",
+          "support": "float",
+          "model_version": "str",
+          "basis": "str",
+          "interval": "tuple[float, float] | None",
+          "applicable": "bool",
+          "refusal": "str | None",
+          "evidence_class": "EvidenceClass"
+        },
+        "RealMeasurement": {
+          "action_id": "str",
+          "status": "ScientificMeasurementStatus",
+          "outcome_label": "str | None",
+          "independent_units": "int | None",
+          "source": "str",
+          "conditioning_hypothesis": "str | None",
+          "contrast": "tuple[str, str] | None",
+          "label_kind": "str",
+          "sampling_frame": "str"
+        },
+        "HypothesisUpdate": {
+          "action_id": "str",
+          "contrast": "tuple[str, str]",
+          "reading": "str",
+          "eliminated": "tuple[str, ...]",
+          "qualified": "bool",
+          "note": "str"
+        },
+        "FailureMode": {
+          "code": "str",
+          "description": "str",
+          "action_id": "str | None",
+          "contrast": "tuple[str, str] | None",
+          "severity": "str"
+        },
+        "AdaptationLink": {
+          "source_case": "str",
+          "target_case": "str",
+          "differences": "Mapping[str, Any]",
+          "operations": "tuple[str, ...]",
+          "cost": "float",
+          "success": "bool | None",
+          "valid_when": "tuple[str, ...]",
+          "failed_when": "tuple[str, ...]"
+        },
+        "CalibrationEntry": {
+          "model_version": "str",
+          "action_id": "str",
+          "forecast": "float",
+          "realised": "float",
+          "kind": "str",
+          "snapshot": "str"
+        },
+        "BranchingPlan": {
+          "action_id": "str",
+          "on_outcome": "Mapping[str, str]",
+          "on_ambiguous": "str",
+          "on_invalid": "str"
+        },
+        "RetrievedPrecedent": {
+          "case_id": "str",
+          "hypothesis": "str",
+          "score": "float",
+          "components": "Mapping[str, float]",
+          "matches": "tuple[str, ...]",
+          "differences": "Mapping[str, Any]",
+          "adaptation": "Mapping[str, Any]",
+          "why": "str"
+        },
+        "ScientificEpisode": {
+          "case_id": "str",
+          "case_version": "int",
+          "case_kind": "CaseKind",
+          "problem_type": "str",
+          "user_question": "str",
+          "raw_data_references": "tuple[RawDataRef, ...]",
+          "data_quality_report": "Mapping[str, Any]",
+          "context_fingerprint": "Mapping[str, Any]",
+          "initial_observations": "tuple[EpisodeObservation, ...]",
+          "initial_hypotheses": "tuple[HypothesisClaim, ...]",
+          "hypothesis_graph": "Mapping[str, Any]",
+          "retrieved_cases": "tuple[RetrievedPrecedent, ...]",
+          "adaptation_map": "tuple[AdaptationLink, ...]",
+          "candidate_actions": "tuple[CandidateAction, ...]",
+          "virtual_cell_forecasts": "tuple[ForecastRecord, ...]",
+          "predicted_outcome_branches": "tuple[ForecastRecord, ...]",
+          "real_measurements": "tuple[RealMeasurement, ...]",
+          "measurement_quality": "Mapping[str, Any]",
+          "qualified_evidence": "tuple[Mapping[str, Any], ...]",
+          "hypothesis_updates": "tuple[HypothesisUpdate, ...]",
+          "next_action": "Mapping[str, Any]",
+          "branching_interpretation_plan": "tuple[BranchingPlan, ...]",
+          "final_decision": "Mapping[str, Any]",
+          "failure_modes": "tuple[FailureMode, ...]",
+          "calibration_history": "tuple[CalibrationEntry, ...]",
+          "provenance": "Mapping[str, Any]",
+          "problem_statement": "str",
+          "supersedes": "str | None",
+          "schema_version": "str"
+        }
+      }
+    }
+  },
+  "research_schema_current_callers": [
+    {
+      "path": "research/maestro_vc_v1/analyze.py",
+      "line": 32,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/analyze.py",
+      "line": 33,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/bridges.py",
+      "line": 37,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/bridges.py",
+      "line": 38,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/data_layer.py",
+      "line": 110,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/data_layer.py",
+      "line": 81,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/examples.py",
+      "line": 36,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/examples.py",
+      "line": 46,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/family2.py",
+      "line": 41,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/family2.py",
+      "line": 42,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/family2.py",
+      "line": 43,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/family2.py",
+      "line": 44,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/online_update.py",
+      "line": 39,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/online_update.py",
+      "line": 40,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/online_update.py",
+      "line": 41,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/plots.py",
+      "line": 80,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/plots.py",
+      "line": 358,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/plots.py",
+      "line": 464,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/plots.py",
+      "line": 465,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/plots.py",
+      "line": 466,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/plots.py",
+      "line": 505,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/replay.py",
+      "line": 47,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/replay.py",
+      "line": 48,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/replay.py",
+      "line": 49,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/replay.py",
+      "line": 50,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/run_audits.py",
+      "line": 27,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/run_audits.py",
+      "line": 28,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/run_audits.py",
+      "line": 29,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/stress.py",
+      "line": 40,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/stress.py",
+      "line": 41,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/stress.py",
+      "line": 42,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/stress.py",
+      "line": 43,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/system.py",
+      "line": 48,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/system.py",
+      "line": 49,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/system.py",
+      "line": 50,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/system.py",
+      "line": 51,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/system.py",
+      "line": 52,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/system.py",
+      "line": 53,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/system.py",
+      "line": 631,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/system.py",
+      "line": 106,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/tables.py",
+      "line": 77,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/test_maestro_vc_v1.py",
+      "line": 27,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/test_maestro_vc_v1.py",
+      "line": 215,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/test_maestro_vc_v1.py",
+      "line": 279,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/test_maestro_vc_v1.py",
+      "line": 303,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/test_maestro_vc_v1.py",
+      "line": 358,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/test_maestro_vc_v1.py",
+      "line": 372,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/maestro_vc_v1/test_maestro_vc_v1.py",
+      "line": 396,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    },
+    {
+      "path": "research/scientific_case_memory/test_case_memory.py",
+      "line": 359,
+      "modules": [
+        "research.scientific_case_memory"
+      ]
+    }
+  ]
+}

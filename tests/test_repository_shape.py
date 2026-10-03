@@ -95,6 +95,34 @@ def test_source_packages_do_not_import_research_or_tools():
     assert not offenders, "source packages import research or tool code: " + ", ".join(offenders)
 
 
+def test_current_tools_do_not_import_or_launch_research_code():
+    """Ignore inert evidence copies; check static imports and dynamic module requests."""
+    offenders = []
+    for path in sorted((ROOT / "tools").rglob("*.py")):
+        if "audit_results" in path.parts:
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                names = [item.name for item in node.names]
+            elif isinstance(node, ast.ImportFrom):
+                names = [node.module or ""]
+            elif isinstance(node, ast.Call) and isinstance(node.func, (ast.Name, ast.Attribute)):
+                method = node.func.id if isinstance(node.func, ast.Name) else node.func.attr
+                names = [arg.value for arg in node.args if isinstance(arg, ast.Constant) and isinstance(arg.value, str)] if method in ("__import__", "import_module") else []
+            elif isinstance(node, (ast.List, ast.Tuple)):
+                # Catch Python -m research drivers, including f-string module names.
+                names = [ast.literal_eval(arg) if isinstance(arg, ast.Constant) else ast.unparse(arg)
+                         for arg in node.elts if isinstance(arg, (ast.Constant, ast.JoinedStr))]
+                if "-m" not in names:
+                    continue
+            else:
+                continue
+            if any(isinstance(name, str) and (name.startswith("research.") or "research." in name and name.startswith("f")) for name in names):
+                offenders.append(f"{path.relative_to(ROOT)}:{node.lineno}")
+    assert not offenders, "tools depend on research code: " + ", ".join(offenders)
+
+
 def test_tools_are_folder_scoped_runtime_components():
     assert (ROOT / "tools" / "registry.yaml").is_file()
     manifests = sorted(set((ROOT / "tools").glob("*/manifest.json"))

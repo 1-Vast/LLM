@@ -141,3 +141,67 @@ their code is neither executed as review instructions nor treated as new evidenc
 The existing historical manifests and day records remain unchanged. All source
 changes relate to these reviewed responsibilities; no dependency upgrade, Git
 history rewrite or scientific default activation is included.
+
+
+## 11. Review-guided responsibility continuation
+
+The user supplied the ownership opinion based on `52715c3` again and asked for its
+remaining implementation. Starting commit for this continuation was
+`e1676f6da6d73cdaa8ea4b259c8ccad1df270913`. The source review is preserved verbatim
+with hashes under `research/astra/results/20261003_responsibility_followup_v2`.
+Earlier statements and evidence remain as the original day-log prefix.
+
+This continuation relocates fixed STATE sensitivity, PublicTargetGOKernel and
+nested-shrinkage experiments from tools into ASTRA. Reusable raw input and
+sample/time/action evidence checks remain tools-owned. Inspection found one
+additional reverse dependency: the state-identifiability driver launched historical
+research joins via a subprocess. Its orchestration is now research-owned; the
+pure gate implementation and its tests remain unchanged. New lineage manifests
+also hash the stable rule dependency. These changes do not rerun biological data
+or relax any gate.
+
+Existing RunLogger now persists plan/result handoff files and their receipt events,
+calling the same maestro validator. Orchestrator retains view construction and
+scientific transitions. Three fixture main-loop comparisons preserve action
+choice, stop/diagnostic decision, budget, original plan binding, per-arm state,
+reflections and exact round-file bytes. Logger tests preserve write hashes,
+event identity and refusal of incomplete records. There is no new production
+module or competing fact authority.
+
+The aggregate maestro run passes **1,953**, with zero failures, errors or skips.
+Initial scoped and boundary runs pass **73** and **38**, respectively; their cases
+overlap the aggregate. Final post-edit verification and installed-package checks
+are recorded separately in the continuation machine receipt. Four research command
+help entries were checked; no new STATE forward or LLM API science ran.
+
+Research navigation now states active/paused/completed/archived maintenance scope,
+separate from scientific verdict and default-use permission. Field/caller inspection
+confirms the old scientific-case schema cannot simply replace the production schema;
+no lossy converter or wholesale deletion is introduced. DecisionPath and
+FeedbackStore remain opt-in research/directed derived views, not a second official
+controller or evidence Store. The existing 480-well proposal remains unchanged,
+unregistered for state benefit, and unexecuted.
+
+Preservation checks cover **2,058** historical/frozen/reference files and the prior
+log prefix. `src` remains **44** Python files; `src` plus `tools` decreases from
+**98 to 95** by moving three experiments. Frozen source snapshots are not counted
+as live modules. There is no artifact relocation or Git history rewrite.
+
+The initial baseline receipt command ran longer than expected and overlapped a
+source move, failing to read the old path. A new v2 receipt uses immutable Git
+blobs rather than pretending this was a pre-edit freeze. A first constructed parity
+probe reused a constant UUID and hit a memory uniqueness constraint; the corrected
+probe resets a deterministic unique sequence for each arm. Both failure receipts
+remain, and neither issue changed scientific or production rules.
+
+Full details, responsibility/evidence permissions and reproduction commands are in
+[the responsibility follow-up](../../research/astra/RESPONSIBILITY_FOLLOWUP.md).
+Unrun items include historical full lineage/replay, measured-cell model training,
+physical assays and four-arm science, numerical mechanism likelihood calibration
+and legacy schema conversion. Engineering migration does not establish a new
+STATE prediction, intervention, mechanism or deployment-value gain.
+
+Continuation finalization: the final focused post-edit scope passes **80** tests.
+The installed-wheel rule/logger probe and four research help entries pass. All
+**2,058** protected file hashes and the earlier day-log prefix match. Publication
+verification records the final source hashes and explicit unrun scientific items.

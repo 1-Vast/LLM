@@ -92,7 +92,7 @@ def quality_audit() -> int:
     # 5. replay results: every reported metric is finite and the item count matches
     results_path = ROOT / "outputs/case_memory_integration/results.json"
     if not results_path.is_file():
-        failures.append("missing:results.json (run tools.case_memory.workflow replay first)")
+        failures.append("missing:results.json (run research.case_memory_integration.external_replay replay first)")
     else:
         results = json.loads(results_path.read_text())
         for arm, m in results["forecast_metrics"].items():
