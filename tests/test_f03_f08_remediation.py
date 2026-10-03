@@ -249,6 +249,7 @@ class _SilentLogger:
 def _scoring_controller() -> MAESTROOrchestrator:
     controller = object.__new__(MAESTROOrchestrator)
     controller._reliability = PredictionReliabilityLedger()
+    controller._case_store = None  # Anonymous readout scoring fixture, without a persistent case.
     controller._logger = _SilentLogger()
     return controller
 

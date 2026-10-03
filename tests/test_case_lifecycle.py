@@ -11,12 +11,14 @@ File summary
 """
 from pathlib import Path
 import sqlite3
+from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier
 
 from agent.memory import RunLogger
 from agent.memory import CaseState, CaseStore, MeasurementResult
 from agent.context import ContextBuilder, TaskInterpreter
 from agent.knowledge import EvidenceLedger
-from agent.memory import MemoryStore
+from agent.memory import MemoryScope, MemoryStore
 from agent.orchestrator import MAESTROOrchestrator
 from agent.planner import MechanismContrastPlanner
 from agent.llm import VisualInspector
@@ -24,6 +26,52 @@ from maestro import EvidenceAction, FunctionalInterventionProfile, MAESTROAgent
 from maestro.models import EvidenceKind
 
 from tests.fixtures.stub_client import StubClient  # noqa: E402
+
+
+def test_parallel_results_update_budget_and_completion_atomically(tmp_path, monkeypatch):
+    from tests.test_restart_contract import setup_case, result
+    store = setup_case(tmp_path)
+    barrier = Barrier(2)
+    unlocked_reads = Barrier(2)
+    original = store._case_row
+
+    def read_case(connection, case_id):
+        row = original(connection, case_id)
+        if not connection.in_transaction:
+            # Force the old unlocked readers to see the same stale case. A
+            # write transaction must already exist before either first read.
+            unlocked_reads.wait(timeout=5)
+        return row
+    monkeypatch.setattr(store, "_case_row", read_case)
+
+    def submit(name):
+        barrier.wait(timeout=5)
+        return store.import_measurement("case", result(name))
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        receipts = tuple(pool.map(submit, ("a", "b")))
+    monkeypatch.setattr(store, "_case_row", original)
+    assert all(receipt.created for receipt in receipts)
+    assert len(store.result_identities("case")) == 2
+    assert store.snapshot("case").spent == 2
+    assert store.snapshot("case").state is CaseState.NEXT_ROUND
+    assert not store.pending_actions("case")
+
+
+def test_parallel_result_retries_are_idempotent(tmp_path):
+    from tests.test_restart_contract import setup_case, result
+    store = setup_case(tmp_path)
+    barrier = Barrier(2)
+
+    def submit(_):
+        barrier.wait(timeout=5)
+        return store.import_measurement("case", result("a"))
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        receipts = tuple(pool.map(submit, range(2)))
+    assert sorted(receipt.created for receipt in receipts) == [False, True]
+    assert store.snapshot("case").spent == 1
+    assert [row["action_identifier"] for row in store.pending_actions("case")] == ["b"]
 def _controller(tmp_path: Path) -> tuple[MAESTROOrchestrator, EvidenceLedger]:
     client = StubClient(
         [
@@ -104,7 +152,7 @@ def test_case_plan_result_import_is_idempotent_and_preserves_real_measurement_li
     assert not repeated.created
     assert imported.snapshot.state is CaseState.NEXT_ROUND
     assert imported.snapshot.remaining_budget == 0.0
-    record = evidence.retrieve("planned viability measurement", limit=1)[0]
+    record = evidence.retrieve("planned viability measurement", limit=1, scope=MemoryScope(case_id="case-1"))[0]
     assert record.evidence_kind is EvidenceKind.REAL_MEASUREMENT
     with sqlite3.connect(tmp_path / "log" / "20260910" / "cases.sqlite") as connection:
         conditions_json = connection.execute(

@@ -59,3 +59,24 @@ def test_default_collection_excludes_archived_test_copies(tmp_path):
     collected = [line for line in result.stdout.splitlines() if "::" in line]
     assert collected == ["research/astra/test_probe.py::test_probe"]
     assert "results/frozen" not in result.stdout and "baseline_20261002" not in result.stdout
+
+
+def test_new_maintained_test_requires_explicit_scope_even_outside_default_collection(tmp_path):
+    (tmp_path / "conftest.py").write_bytes((ROOT / "conftest.py").read_bytes())
+    tests = tmp_path / "tests"
+    tests.mkdir()
+    (tests / "test_core.py").write_text("def test_core(): pass\n")
+    (tests / "test_new.py").write_text("def test_new(): pass\n")
+    config = ("[tool.pytest.ini_options]\ntestpaths=['tests/test_core.py']\n"
+              "markers=['core','regression','research']\n"
+              "[tool.maestro.test_scopes]\nregression=[]\nresearch=[]\n")
+    path = tmp_path / "pyproject.toml"
+    path.write_text(config)
+    command = [sys.executable, "-m", "pytest", "-c", str(path), "--collect-only", "-q", "-o", "addopts="]
+    failed = subprocess.run(command, cwd=tmp_path, capture_output=True, text=True)
+    assert failed.returncode != 0
+    assert "Explicit test scope registration required" in failed.stderr and "tests/test_new.py" in failed.stderr
+    path.write_text(config.replace("research=[]", "research=['tests/test_new.py']"))
+    accepted = subprocess.run(command, cwd=tmp_path, capture_output=True, text=True)
+    assert accepted.returncode == 0, accepted.stdout + accepted.stderr
+    assert "tests/test_core.py::test_core" in accepted.stdout and "tests/test_new.py::test_new" not in accepted.stdout

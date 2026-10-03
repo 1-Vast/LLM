@@ -358,6 +358,7 @@ class EvidenceLedger:
             tuple(dict.fromkeys(source_lineage_ids)), json.loads(_json(dict(payload or {}))),
         )
         with self._connection() as connection:
+            connection.execute("BEGIN IMMEDIATE")
             return self._insert_evidence(connection, record)
 
     def _insert_evidence(self, connection: sqlite3.Connection, record: EvidenceRecord) -> EvidenceRecord:

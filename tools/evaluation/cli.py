@@ -324,6 +324,7 @@ def main() -> int:
                     enable_virtual_cell=False,
                     disable_case_store=True,
                     client=tracker,
+                    selection_strategy="expected_coverage",
                 )
             # `maestro_llm` lets the model submit the terminal decision.
             # `maestro_llm_ruled` keeps the model in charge of composing and

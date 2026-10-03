@@ -192,10 +192,12 @@ class ContextBuilder:
             visual_reviews=packet.visual_reviews,
         )
 
-    def record_result(self, result: "MeasurementResult") -> EvidenceRecord:
+    def record_result(self, result: "MeasurementResult", *, case_id: str | None = None) -> EvidenceRecord:
         """Persist a result with its original evidence kind and source conditions."""
 
         limitations = "; ".join(result.limitations) or "No result limitations supplied."
+        if case_id is not None and (not result.result_id or type(result.plan_version) is not int or result.plan_version < 1):
+            raise ValueError("result_projection_requires_accepted_identity")
         return self._evidence.add_evidence(
             result.statement,
             source=result.source_id,
@@ -209,6 +211,16 @@ class ContextBuilder:
             ),
             status=status_for_kind(result.evidence_kind),
             evidence_kind=result.evidence_kind,
+            case_id=case_id,
+            identifier=("result:" + json.dumps([case_id, result.result_id], separators=(",", ":")))
+                       if case_id is not None else None,
+            payload={"result_id": result.result_id, "plan_version": result.plan_version,
+                     "action_identifier": result.action_identifier, "case_id": case_id,
+                     "context_identifier": result.context_identifier, "time_hours": result.time_hours,
+                     "conditions": dict(result.conditions), "metrics": dict(result.metrics),
+                     "independent_units": result.independent_units, "quality_passed": result.quality_passed,
+                     "record_count": result.record_count, "biological_replicates": result.biological_replicates,
+                     "limitations": list(result.limitations), "interpretation_fields": list(result.interpretation_fields)},
         )
 
     def record_real_measurement(self, result: "MeasurementResult") -> EvidenceRecord:

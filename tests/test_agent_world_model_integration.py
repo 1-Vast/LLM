@@ -317,6 +317,97 @@ def _actions() -> tuple[EvidenceAction, ...]:
     return plain, model_guided
 
 
+def test_action_dose_is_preserved_and_different_doses_do_not_share_cache(tmp_path):
+    model = CountingWorldModel()
+    controller = _controller(tmp_path, StubClient([TASK, _plan("plain")]), world_model=model, case_store=True)
+    actions = tuple(replace(action, expected_conditions={"dose": dose}) for action, dose in
+                    zip(_actions(), ("10 nM", "1000 nM")))
+    template = replace(_template(), dose=10, dose_unit="nM",
+                       action_interventions={action.identifier: "drug-known" for action in actions})
+    turn = controller.run("Plan", available_actions=actions,
+                          intervention_profile=FunctionalInterventionProfile(mode="inhibition", context_identifier="cell-a"),
+                          budget=1, case_id="case", virtual_cell_template=template)
+    low, high = (turn.action_prediction_requests[action.identifier] for action in actions)
+    assert (low.intervention.dose, high.intervention.dose) == (10, 1000)
+    assert low.intervention.dose_unit == high.intervention.dose_unit == "nM"
+    assert PredictionCache.key_for(low, model.name) != PredictionCache.key_for(high, model.name)
+    assert model.predictions == 2
+
+
+@pytest.mark.parametrize("conditions", [{"dose": "unknown"}, {"dose": "10"}, {"assay_protocol": "unknown"}])
+def test_unexpressible_action_conditions_do_not_fall_back_to_shared_template(tmp_path, conditions):
+    model = CountingWorldModel()
+    controller = _controller(tmp_path, StubClient([TASK, _plan("model-guided")]), world_model=model)
+    action = replace(_actions()[1], expected_conditions=conditions)
+    turn = controller.run("Plan", available_actions=(action,),
+                          intervention_profile=FunctionalInterventionProfile(mode="inhibition", context_identifier="cell-a"),
+                          budget=1, virtual_cell_template=_template())
+    assert not turn.action_prediction_requests and not turn.action_predictions
+    assert model.predictions == 0
+
+
+def test_prediction_reliability_survives_restart_and_interrupted_projection(tmp_path, monkeypatch):
+    from agent.case_store import MeasurementResult
+    model = CountingWorldModel()
+    core = _controller(tmp_path, StubClient([TASK, _plan("plain")]), world_model=model, case_store=True,
+                       selection_strategy="budgeted_coverage")
+    action = EvidenceAction("a", "A", 1, ("a", "b"), prediction_readout="embedding_delta_l2")
+    for i in range(3):
+        case_id = f"case:{i}"
+        core._case_store.open_case(case_id, budget=2)
+        core._case_store.record_plan(case_id, (action,), ready_to_measure=True, context_identifier="cell-a")
+        request = _request(f"request-{i}", case_id=case_id)
+        answer = model.predict(request)
+        core._case_store.record_prediction(case_id, 1, "a", request.request_id,
+            {"schema": "state_response_pair_v1", "request": request.to_dict(), "prediction": asdict(answer),
+             "action": asdict(action), "biological_context": "cell-a"})
+        result = MeasurementResult("a", "Observed", f"independent:{i}", "cell-a", None, 2, True,
+                                    metrics={"embedding_delta_l2": "20"}, result_id=f"result:{i}", plan_version=1)
+        if i == 2:
+            original = core._case_store.record_prediction_score
+            monkeypatch.setattr(core._case_store, "record_prediction_score",
+                                lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("score interrupted")))
+            with pytest.raises(RuntimeError, match="score interrupted"):
+                core.import_measurement(case_id, result)
+            monkeypatch.setattr(core._case_store, "record_prediction_score", original)
+        core.import_measurement(case_id, result)
+        core.import_measurement(case_id, result)
+    before = core._reliability.summarize("model-1", "embedding_delta_l2", "cell-a")
+    assert before.revoked and before.weight == 0 and before.records == 3
+    assert len(core._case_store.prediction_scores()) == 3
+    restarted = _controller(tmp_path, StubClient([TASK, _plan("plain")]), world_model=model, case_store=True,
+                            selection_strategy="budgeted_coverage")
+    assert restarted._reliability.records == core._reliability.records
+    assert restarted._reliability.summarize("model-1", "embedding_delta_l2", "cell-a") == before
+    kwargs = dict(available_actions=_actions(), budget=1, virtual_cell_template=_template(),
+                  intervention_profile=FunctionalInterventionProfile(mode="inhibition", context_identifier="cell-a"))
+    continuous_turn = core.run("Compare", case_id="new-analysis:continuous", **kwargs)
+    restarted_turn = restarted.run("Compare", case_id="new-analysis:restart", **kwargs)
+    assert continuous_turn.selected_actions == restarted_turn.selected_actions
+    assert all(core._case_store.snapshot(f"case:{i}").spent == 1 for i in range(3))
+    with pytest.raises(ValueError, match="policy_mismatch"):
+        _controller(tmp_path, StubClient([]), case_store=True, reliability=PredictionReliabilityLedger(minimum_records=4))
+
+
+@pytest.mark.parametrize("dose,unit,value", [("10 nM", "nM", 10), ("1e3", "nM", 1000),
+                                            ("0.25 uM", "uM", .25)])
+def test_condition_binding_covers_explicit_units_time_and_readout(dose, unit, value):
+    action = EvidenceAction("a", "A", 1, ("a", "b"), time_hours=72,
+                            expected_conditions={"dose": dose, "dose_unit": unit, "readout": "embedding_delta_l2"},
+                            prediction_readout="embedding_delta_l2")
+    request = _request(dose=1)
+    bound = request.intervention.for_action(action, request.context, request.readouts)
+    assert (bound.dose, bound.dose_unit, bound.time_hours) == (value, unit, 72)
+    assert bound.for_action(action, request.context, request.readouts) == bound
+
+
+def test_condition_binding_rejects_conflicting_units():
+    action = EvidenceAction("a", "A", 1, ("a", "b"), expected_conditions={"dose": "10 nM", "dose_unit": "uM"})
+    request = _request()
+    with pytest.raises(ValueError, match="dose_unit"):
+        request.intervention.for_action(action, request.context, request.readouts)
+
+
 @pytest.mark.parametrize("case_store", [False, True])
 def test_a_second_round_reuses_the_first_rounds_inference(tmp_path: Path, case_store):
     client = StubClient([TASK, _plan("plain"), TASK, _plan("plain")])

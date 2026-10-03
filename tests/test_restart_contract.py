@@ -152,3 +152,84 @@ def test_duplicate_audit_receipts_still_validate_every_binding(tmp_path, field, 
         stream.write(json.dumps(event) + "\n")
     with pytest.raises(ValueError, match=reason):
         logger.review_case("case", store)
+
+
+def test_result_retry_repairs_scoped_projection_without_double_charge(tmp_path, monkeypatch):
+    from tests.fixtures.orchestration import _controller
+    from agent.knowledge import EvidenceLedger
+    from agent.memory import MemoryScope
+    store = setup_case(tmp_path)
+    controller = _controller(tmp_path, [])
+    builder = controller._context_builder
+    original = builder.record_result
+    monkeypatch.setattr(builder, "record_result", lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("projection interrupted")))
+    with pytest.raises(RuntimeError, match="projection interrupted"):
+        controller.import_measurement("case", result("a"))
+    assert store.snapshot("case").spent == 1
+
+    monkeypatch.setattr(builder, "record_result", original)
+    retry = controller.import_measurement("case", result("a"))
+    assert retry.created is False
+    assert controller.import_measurement("case", result("a")).created is False
+    ledger = EvidenceLedger(tmp_path / "evidence.sqlite")
+    rows = ledger.retrieve("Observed", scope=MemoryScope(case_id="case"))
+    assert len(rows) == 1
+    assert rows[0].payload["result_id"] == "result:a" and rows[0].payload["plan_version"] == 1
+    assert rows[0].payload["conditions"] == {"dose": "1 uM"}
+    assert not ledger.retrieve("Observed", scope=MemoryScope(case_id="other"))
+    from agent.context import TaskIntent
+    packet = builder.build(TaskIntent("mechanism_diagnosis", "Review the next experiment", (), (),
+                                      "cells", "ATP", (), (), (), False), memory_scope=MemoryScope(case_id="case"))
+    assert rows[0].identifier in packet.included_record_ids
+    assert store.snapshot("case").spent == 1
+
+
+def test_restart_receives_facts_but_cannot_reopen_an_old_scientific_case(tmp_path):
+    from tests.fixtures.orchestration import _controller, _action
+    from maestro.models import FunctionalInterventionProfile
+    store = setup_case(tmp_path)
+    store.import_measurement("case", result("a"))
+    store.import_measurement("case", result("b"))
+    # Saved historical interpretation excluded b. A rebuilt process must not
+    # run a fresh planner with an empty EvidenceState, even if it sees the facts.
+    logger = RunLogger(tmp_path)
+    logger.event("evidence_state_updated", {"case_id": "case", "eliminated": ["b"]}, session_id="case")
+    code = '''
+import json, sys
+from pathlib import Path
+from tests.fixtures.orchestration import _controller, _action
+from maestro.models import FunctionalInterventionProfile
+core = _controller(Path(sys.argv[1]), [])
+turn = core.run("Continue", available_actions=(_action(),),
+    intervention_profile=FunctionalInterventionProfile(mode="inhibition", context_identifier="cells"), case_id="case")
+print(json.dumps({"reason": turn.repair_stop_reason, "selected": len(turn.selected_actions),
+    "capabilities": core.recovery_capabilities("case")}))
+'''
+    actual = child(code, tmp_path)
+    assert actual["reason"] == "scientific_state_not_restored" and actual["selected"] == 0
+    assert actual["capabilities"]["receive_results"] and actual["capabilities"]["query_facts_and_budget"]
+    assert not actual["capabilities"]["scientific_continuation"]
+    core = _controller(tmp_path, [])
+    loop = core.run_case_loop("Continue", available_actions=(_action(),),
+        intervention_profile=FunctionalInterventionProfile(mode="inhibition", context_identifier="cells"),
+        result_provider=lambda *args: pytest.fail("provider must not be invoked"), case_id="case")
+    assert loop.stop_reason == "scientific_loop_state_not_restored" and loop.evidence_state is None
+
+
+def test_parallel_retries_project_one_case_evidence_record(tmp_path):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+    from tests.fixtures.orchestration import _controller
+    from agent.knowledge import EvidenceLedger
+    from agent.memory import MemoryScope
+    store = setup_case(tmp_path)
+    controllers = [_controller(tmp_path, []), _controller(tmp_path, [])]
+    barrier = Barrier(2)
+    def submit(core):
+        barrier.wait(timeout=5)
+        return core.import_measurement("case", result("a"))
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        receipts = tuple(pool.map(submit, controllers))
+    assert sorted(receipt.created for receipt in receipts) == [False, True]
+    assert store.snapshot("case").spent == 1
+    assert len(EvidenceLedger(tmp_path / "evidence.sqlite").retrieve("Observed", scope=MemoryScope(case_id="case"))) == 1

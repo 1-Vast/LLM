@@ -3,7 +3,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from math import isfinite, sqrt
-from typing import Iterable, Mapping, Protocol, Sequence
+from typing import TYPE_CHECKING, Iterable, Mapping, Protocol, Sequence
+
+if TYPE_CHECKING:
+    from .hypothesis_forecast import UserStateContext
 
 from .handoff import RejectedCandidate
 from .models import EvidenceAction, EvidenceKind, EvidenceScope, FunctionalInterventionProfile, MechanismContrast
@@ -304,6 +307,7 @@ class OutcomeForecaster(Protocol):
         contrast: MechanismContrast,
         actions: Sequence[EvidenceAction],
         evidence: EvidenceState | None,
+        user_state: UserStateContext | None = None,
     ) -> Mapping[str, OutcomeForecast]:
         ...
 

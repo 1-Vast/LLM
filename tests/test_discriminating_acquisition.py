@@ -415,6 +415,55 @@ class _StubForecaster:
         return dict(self.forecasts)
 
 
+def test_state_snapshot_reaches_forecaster_and_changes_selection_without_evidence_update(tmp_path):
+    from maestro.hypothesis_forecast import UserStateContext
+
+    class StatefulForecaster:
+        name = "stateful-fixture"
+        def __init__(self):
+            self.seen = []
+        def forecast(self, contrast, actions, evidence, user_state=None):
+            self.seen.append(user_state)
+            chosen = "measure_high" if user_state.cell_state_summaries["marker"] > 0 else "measure_low"
+            return {action.identifier: _separating(action.identifier) if action.identifier == chosen
+                    else _flat(action.identifier) for action in actions}
+
+    choices = []
+    for marker in (-1, 1):
+        forecaster = StatefulForecaster()
+        root = tmp_path / str(marker)
+        core = _orchestrator(root, _LabelWorldModel({CONTROL_LOW: 1, CONTROL_HIGH: 1}),
+                             outcome_forecaster=forecaster, selection_strategy="discrimination", power_aware_selection=False)
+        state = UserStateContext(cell_context="NCI-H596", cell_state_summaries={"marker": marker})
+        turn = core.run("Choose", available_actions=_runtime_actions(),
+                        intervention_profile=FunctionalInterventionProfile(mode="inhibition", context_identifier="NCI-H596"),
+                        case_id="case", budget=1, virtual_cell_template=_template(), user_state=state)
+        assert forecaster.seen == [state]
+        choices.append(tuple(action.identifier for action in turn.selected_actions))
+        assert core.evidence_state("case") is None
+        assert _events(root, "runtime_contract")[0]["payload"]["user_state_identity"] == state.identity()
+    assert choices == [("measure_low",), ("measure_high",)]
+
+
+@pytest.mark.parametrize("policy,expected", [("stop", False), ("coverage", True)])
+def test_forecaster_failure_never_silently_changes_decision_policy(tmp_path, policy, expected):
+    class FailedForecaster:
+        name = "failed-fixture"
+        def forecast(self, *args, **kwargs):
+            raise RuntimeError("fixture failure")
+    core = _orchestrator(tmp_path, _LabelWorldModel({CONTROL_LOW: 1, CONTROL_HIGH: 1}),
+                         outcome_forecaster=FailedForecaster(), selection_strategy="discrimination",
+                         forecast_failure_policy=policy, power_aware_selection=False)
+    turn = core.run("Choose", available_actions=_runtime_actions(),
+                    intervention_profile=FunctionalInterventionProfile(mode="inhibition", context_identifier="NCI-H596"),
+                    case_id="case", budget=1, virtual_cell_template=_template())
+    assert bool(turn.selected_actions) is expected
+    if expected:
+        assert _events(tmp_path, "outcome_forecast_fallback")[-1]["payload"]["mode"] == "explicit_fallback"
+    else:
+        assert turn.case.stop_reason.startswith("acquisition_forecast_failed")
+
+
 def _runtime_actions(late_time: float | None = None) -> tuple[EvidenceAction, ...]:
     common = dict(
         cost=1.0, distinguishes=(REALISED, NOT_REALISED), supplies=("realization:transcript_response",),

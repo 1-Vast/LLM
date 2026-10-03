@@ -328,6 +328,13 @@ class PredictionReliabilityLedger:
     def records(self) -> tuple[ScoredPrediction, ...]:
         return tuple(self._records)
 
+    @property
+    def policy(self) -> Mapping[str, object]:
+        """Version the deterministic aggregation rule used for persisted scores."""
+        return {"version": "prediction_reliability_v1", "minimum_records": self._minimum_records,
+                "maximum_miss_rate": self._maximum_miss_rate,
+                "revoke_after_consecutive_misses": self._revoke_after}
+
     def record(self, entry: ScoredPrediction) -> ScoredPrediction:
         for existing in self._records:
             if existing.model_version != entry.model_version or existing.readout != entry.readout:

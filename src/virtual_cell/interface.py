@@ -9,7 +9,7 @@ from enum import Enum
 from math import isfinite
 from typing import Mapping, Protocol
 
-from maestro.models import FunctionalInterventionProfile, MeasurementStatus
+from maestro.models import EvidenceAction, FunctionalInterventionProfile, MeasurementStatus
 
 from .applicability import SupportLevel
 
@@ -59,6 +59,63 @@ class Intervention:
     dose_unit: str | None = None
     time_hours: float | None = None
     functional_profile: FunctionalInterventionProfile | None = None
+
+    def for_action(self, action: EvidenceAction, context: "SystemContext", readouts: tuple[str, ...]) -> "Intervention":
+        """Bind supported declared conditions; an unexpressible condition is not guessed.
+
+        Dose units remain explicit. No concentration-to-response equivalence or
+        unknown assay/protocol condition is silently assumed by the backend.
+        """
+        conditions = action.expected_conditions
+        supported = {"dose", "dose_unit", "dose_nM", "dose_uM", "time_hours", "exposure_hours",
+                     "intervention", "mode", "context_identifier", "readout"}
+        unknown = set(conditions) - supported
+        if unknown:
+            raise ValueError("unexpressible_action_conditions:" + ",".join(sorted(unknown)))
+        for key, expected in (("intervention", self.identifier), ("context_identifier", context.identifier)):
+            if key in conditions and conditions[key] != expected:
+                raise ValueError(f"action_query_{key}_mismatch")
+        if action.execution_context is not None and action.execution_context != context.identifier:
+            raise ValueError("action_query_context_mismatch")
+        if "readout" in conditions and conditions["readout"] not in readouts:
+            raise ValueError("action_query_readout_mismatch")
+        if action.prediction_readout and action.prediction_readout not in readouts:
+            raise ValueError("action_query_readout_mismatch")
+        dose, unit = self.dose, self.dose_unit
+        dose_keys = set(conditions) & {"dose", "dose_nM", "dose_uM"}
+        if len(dose_keys) > 1:
+            raise ValueError("ambiguous_action_dose")
+        if dose_keys:
+            key = next(iter(dose_keys))
+            raw = conditions[key]
+            if not isinstance(raw, str):
+                raise ValueError("invalid_action_dose")
+            match = re.fullmatch(r"\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*([^\s]+)?\s*", raw)
+            if match is None:
+                raise ValueError("invalid_action_dose")
+            dose = float(match.group(1))
+            explicit_unit = conditions.get("dose_unit")
+            embedded_unit = match.group(2)
+            unit = {"dose_nM": "nM", "dose_uM": "uM"}.get(key) or embedded_unit or explicit_unit
+            if unit is None or (explicit_unit is not None and explicit_unit != unit) or (
+                    embedded_unit is not None and embedded_unit != unit):
+                raise ValueError("invalid_action_dose_unit")
+            if not _finite(dose) or dose < 0:
+                raise ValueError("invalid_action_dose")
+        elif "dose_unit" in conditions:
+            raise ValueError("action_dose_unit_without_dose")
+        time_hours = action.time_hours if action.time_hours is not None else self.time_hours
+        declared_times = [conditions[key] for key in ("time_hours", "exposure_hours") if key in conditions]
+        for raw in declared_times:
+            try:
+                value = float(raw)
+            except (TypeError, ValueError):
+                raise ValueError("invalid_action_time") from None
+            if not _finite(value) or value < 0 or (time_hours is not None and value != time_hours):
+                raise ValueError("action_query_time_mismatch")
+            time_hours = value
+        return replace(self, dose=dose, dose_unit=unit, time_hours=time_hours,
+                       mode=conditions.get("mode", self.mode))
 
 
 @dataclass(frozen=True)

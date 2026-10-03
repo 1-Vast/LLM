@@ -2,11 +2,52 @@
 import numpy as np
 import pandas as pd
 import pytest
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import csv
 
 from research.astra.gdsc_transport import exact_menu_records
 from research.astra.gdsc_layout_validation import PAIR, choose_pair, normalize_scan
 from research.astra.gdsc_pilot import design
 from research.astra.ctrp_qualification import normalized_name
+from research.astra.feedback_protocol import freeze, PILOT
+
+
+def test_new_protocol_retains_unknowns_and_never_claims_execution(tmp_path):
+    root = Path(__file__).resolve().parents[2]
+    readiness = freeze(root, tmp_path / "sealed")
+    assert readiness["status"] == "blocked" and readiness["physical_executions"] == 0
+    protocol = json.loads((tmp_path / "sealed/protocol.json").read_text())
+    assert len(protocol["actions"]) == 3
+    assert protocol["analysis"]["minimum_meaningful_net_gain"] is None
+    assert protocol["analysis"]["cost_bound"] is None
+    assert protocol["later_state_comparison"]["status"].startswith("blocked")
+    with pytest.raises(FileExistsError):
+        freeze(root, tmp_path / "sealed")
+
+
+def test_protocol_freeze_refuses_changed_source_and_measured_outcomes(tmp_path):
+    root = Path(__file__).resolve().parents[2]
+    source = tmp_path / PILOT
+    shutil.copytree(root / PILOT, source)
+    path = source / "randomized_wells.csv"
+    with path.open(newline="") as stream:
+        records = list(csv.DictReader(stream))
+    records[0]["executed"] = "True"
+    with path.open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=records[0])
+        writer.writeheader()
+        writer.writerows(records)
+    with pytest.raises(ValueError, match="source_hash_mismatch"):
+        freeze(tmp_path, tmp_path / "wrong-hash")
+    manifest_path = source / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest[path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
+    manifest_path.write_text(json.dumps(manifest))
+    with pytest.raises(ValueError, match="cannot_open_measured_outcomes"):
+        freeze(tmp_path, tmp_path / "wrong-outcome")
 
 
 def assignment():

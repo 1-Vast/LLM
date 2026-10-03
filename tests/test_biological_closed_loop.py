@@ -191,6 +191,7 @@ def _scoring_fixture():
     controller = object.__new__(MAESTROOrchestrator)
     controller._logger = Logger()
     controller._reliability = PredictionReliabilityLedger()
+    controller._case_store = None  # This fixture deliberately tests anonymous scoring, not persistence.
     return controller, turn, action, observed
 
 

@@ -160,7 +160,7 @@ class CaseStore:
 
         This records no execution or biological evidence. ``attempt_id`` remains
         unknown unless supplied from an external execution receipt. Runtime
-        prediction restoration and scoring are not automatically enabled.
+        payloads without a registered runtime schema remain opt-in research records.
         """
         if (type(plan_version) is not int or plan_version < 1
                 or any(not isinstance(value, str) or not value.strip() for value in (case_id, action_id, request_id))
@@ -223,6 +223,25 @@ class CaseStore:
                                      (case_id, result_id)).fetchone()
         return row["plan_version"] if row is not None else None
 
+    def measurement(self, case_id: str, result_id: str) -> MeasurementResult:
+        """Read the accepted fact for an idempotent projection; never infer missing fields."""
+        with self._connection() as connection:
+            row = connection.execute("SELECT * FROM results WHERE case_id=? AND result_id=?",
+                                     (case_id, result_id)).fetchone()
+        if row is None:
+            raise ValueError("Unknown accepted case result.")
+        return MeasurementResult(
+            action_identifier=row["action_identifier"], statement=row["statement"], source_id=row["source_id"],
+            context_identifier=row["context_identifier"], time_hours=row["time_hours"],
+            independent_units=row["independent_units"], quality_passed=bool(row["quality_passed"]),
+            conditions=json.loads(row["conditions_json"]), metrics=json.loads(row["metrics_json"]),
+            record_count=row["record_count"], biological_replicates=row["biological_replicates"],
+            evidence_kind=EvidenceKind(row["evidence_kind"]),
+            interpretation_fields=tuple(json.loads(row["interpretation_fields_json"])),
+            limitations=tuple(json.loads(row["limitations"])), result_id=row["result_id"],
+            plan_version=row["plan_version"],
+        )
+
     def record_prediction_score(self, case_id: str, result_id: str, request_id: str,
                                 score: Mapping[str, Any], *, conditions_matched: bool) -> bool:
         """Persist caller-computed scoring as a derived view of an accepted result.
@@ -257,12 +276,14 @@ class CaseStore:
             )
         return True
 
-    def prediction_scores(self, case_id: str) -> tuple[dict[str, Any], ...]:
-        """Read only this case's derived scores, including original plan identity."""
+    def prediction_scores(self, case_id: str | None = None) -> tuple[dict[str, Any], ...]:
+        """Read derived scores in commit order, optionally for one isolated case."""
         with self._connection() as connection:
             rows = connection.execute(
                 """SELECT s.*,r.plan_version,r.action_identifier FROM prediction_scores s
-                JOIN results r ON r.result_id=s.result_id WHERE s.case_id=? ORDER BY s.rowid""", (case_id,),
+                JOIN results r ON r.result_id=s.result_id """
+                + ("WHERE s.case_id=? " if case_id is not None else "") + "ORDER BY s.rowid",
+                (case_id,) if case_id is not None else (),
             ).fetchall()
         records = []
         for row in rows:
@@ -450,6 +471,7 @@ class CaseStore:
             raise ValueError("Biological replicate count must be a positive integer when known.")
         result_id = result.result_id or str(uuid.uuid4())
         with self._connection() as connection:
+            connection.execute("BEGIN IMMEDIATE")
             case = self._case_row(connection, case_id)
             existing = connection.execute(
                 "SELECT * FROM results WHERE result_id = ?", (result_id,)

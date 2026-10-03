@@ -37,6 +37,8 @@ def main() -> int:
     parser.add_argument("--workspace", type=Path, default=Path.cwd())
     parser.add_argument("--case-id", help="Optional durable case identifier for resume and result import.")
     parser.add_argument("--budget", type=float, help="Optional total evidence budget for this case.")
+    parser.add_argument("--selection-strategy", choices=("budgeted_coverage", "expected_coverage"),
+                        default="expected_coverage", help="Explicit selection rule; recorded in the runtime contract.")
     parser.add_argument(
         "--state-request",
         type=Path,
@@ -161,6 +163,7 @@ def _run(arguments: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
         enable_decision_critic=arguments.decision_critic == "auto",
         decision_repeats=arguments.decision_repeats,
         knowledge_packages=arguments.knowledge_package,
+        selection_strategy=arguments.selection_strategy,
     )
     if arguments.max_rounds == 1:
         turn = controller.run(

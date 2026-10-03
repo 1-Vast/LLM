@@ -62,18 +62,13 @@ class PredictionCoordinator:
         that prompted it, never to a neighbour.
         """
 
+        not_built = {}
         action_requests = self._build_action_prediction_requests(
-            template, intent, contrast, case_id, case, session_id, available_actions
+            template, intent, contrast, case_id, case, session_id, available_actions, rejections=not_built
         )
-        not_built = {
-            action.identifier: f"execution_context_differs_from_template:{action.execution_context}"
-            for action in available_actions
-            if template is not None and action.identifier in template.action_interventions
-            and action.identifier not in action_requests
-        }
         if not_built:
             self._logger.event("virtual_cell_query_not_built", {"reasons": not_built}, session_id=session_id)
-        if action_requests:
+        if template is not None and template.action_interventions:
             answered = self.predict_many(action_requests, session_id)
             assessments = {key: pair[0] for key, pair in answered.items() if pair[0] is not None}
             predictions = {key: pair[1] for key, pair in answered.items() if pair[1] is not None}
@@ -87,6 +82,15 @@ class PredictionCoordinator:
         request = prediction_request or self._build_prediction_request(
             template, intent, contrast, case_id, case, session_id
         )
+        if request is not None:
+            try:
+                bound = request.intervention.for_action(contrast.plan, request.context, request.readouts)
+                if bound != request.intervention:
+                    raise ValueError("explicit_query_action_conditions_mismatch")
+            except ValueError as error:
+                self._logger.event("virtual_cell_query_not_built",
+                                   {"reasons": {contrast.plan.identifier: str(error)}}, session_id=session_id)
+                return WorldModelQueries()
         assessment, prediction = self.predict(request, session_id)
         requests: dict[str, PredictionRequest] = {}
         assessments: dict[str, QueryAssessment] = {}
@@ -244,15 +248,13 @@ class PredictionCoordinator:
         case: CaseSnapshot | None,
         session_id: str,
         available_actions: Sequence[EvidenceAction],
+        *, rejections: dict[str, str] | None = None,
     ) -> dict[str, PredictionRequest]:
         """One request per registered action that names its own exact condition.
 
-        A template that states exposure time as a model input states it per action: the action's
-        declared ``time_hours`` replaces the template's, so a 72 h action is asked about 72 h and a
-        24 h-only model refuses it by name instead of lending it the 24 h answer. A template that
-        leaves time to the perturbation label is unchanged. An action declared in another context
-        than the template's is not queried at all, because the request could only describe the
-        template's context.
+        The action's declared exposure and dose replace the shared template's.
+        Contradictory or unexpressible conditions refuse a query, never fall back
+        to a shared condition. Other-context actions cannot borrow this template.
         """
 
         if template is None or not template.action_interventions:
@@ -264,13 +266,15 @@ class PredictionCoordinator:
             if action is None:
                 continue
             if action.execution_context is not None and action.execution_context != template.context.identifier:
+                if rejections is not None:
+                    rejections[action_identifier] = f"execution_context_differs_from_template:{action.execution_context}"
                 continue
             time_hours = (
                 action.time_hours
                 if template.time_hours is not None and action.time_hours is not None
                 else template.time_hours
             )
-            requests[action_identifier] = template.build(
+            request = template.build(
                 request_id=f"{session_id}.{action_identifier}",
                 case_id=case_id,
                 contrast_id=contrast.identifier,
@@ -279,6 +283,13 @@ class PredictionCoordinator:
                 intervention_identifier=label,
                 time_hours=time_hours,
             )
+            try:
+                intervention = request.intervention.for_action(action, request.context, request.readouts)
+            except ValueError as error:
+                if rejections is not None:
+                    rejections[action_identifier] = str(error)
+                continue
+            requests[action_identifier] = replace(request, intervention=intervention)
         return requests
 
     @staticmethod

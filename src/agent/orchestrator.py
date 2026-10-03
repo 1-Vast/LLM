@@ -7,7 +7,9 @@ import json
 from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Callable, Mapping, Sequence
+from typing import TYPE_CHECKING, Callable, Mapping, Sequence
+if TYPE_CHECKING:
+    from maestro.hypothesis_forecast import UserStateContext
 from maestro.contrast import MAESTROAgent
 from maestro.acquisition import DiscriminationPlan, OutcomeForecaster, outcome_consequences, select_discriminating_action, select_expected_coverage
 from maestro.decision import DecisionEngine, DevelopmentDecision
@@ -15,7 +17,7 @@ from maestro.handoff import ComparabilityStatus, DecisionLayer, EvidenceLayer, E
 from maestro.outcome import EvidenceState, InterpretationTable, MeasuredPremise, OutcomeRule, ValidatedEvidenceUpdate, admit_evidence, default_rules_for, scope_rank
 from maestro.handoff import SourceClusterIndex
 from maestro.composition import ActionTopology
-from maestro.judgment import PredictionReliabilityLedger
+from maestro.judgment import PredictionReliabilityLedger, ScoredPrediction
 from maestro.repair import RepairController, RepairLedger, RepairRecord
 from .case_store import CaseSnapshot, CaseState, CaseStore, MeasurementResult, ResultImport
 from .memory import EpistemicStatus, MemoryKind, MemoryScope, MemoryStore, ReflectionRecord, RunLogger, reflect_on_result
@@ -133,6 +135,7 @@ class MAESTROOrchestrator:
         outcome_forecaster: OutcomeForecaster | None = None,
         discrimination_selection: bool = False,
         selection_strategy: str | None = None,
+        forecast_failure_policy: str = "stop",
     ):
         if selection_strategy is not None and (power_aware_selection or discrimination_selection):
             raise ValueError("Use selection_strategy or legacy flags, not both.")
@@ -144,6 +147,8 @@ class MAESTROOrchestrator:
             raise ValueError("Unknown selection_strategy.")
         if strategy == "discrimination" and outcome_forecaster is None:
             raise ValueError("discrimination_selection requires an outcome_forecaster.")
+        if forecast_failure_policy not in ("stop", "coverage"):
+            raise ValueError("Unknown forecast_failure_policy.")
         self._interpreter = interpreter
         self._context_builder = context_builder
         self._planner = planner
@@ -160,12 +165,11 @@ class MAESTROOrchestrator:
         self._interpretation_table = interpretation_table or InterpretationTable()
         self._decision_engine = decision_engine or DecisionEngine()
         self._reliability = reliability or PredictionReliabilityLedger()
-        # Reliability aggregation remains process-local. Exact prediction/result
-        # pairs and scores are persisted by CaseStore; reconciliation can restore
-        # those pairs without treating a rebuilt ledger as scientific evidence.
+        # Scores restore planning reliability only, never mechanism conclusions.
         self._source_clusters = source_clusters or SourceClusterIndex()
         self._repair_ledgers: dict[str, RepairLedger] = {}
         self._evidence_states: dict[str, EvidenceState] = {}
+        self._active_scientific_cases: set[str] = set()
         self._round_records: dict[str, RoundRecord] = {}
         self._round_results: dict[str, dict[str, RoundRecord]] = {}
         # What a result that arrives outside the case loop can be scored against:
@@ -174,6 +178,7 @@ class MAESTROOrchestrator:
         self._reconciliation: dict[tuple[str, int, str], tuple["MAESTROTurn", EvidenceAction]] = {}
         self._reconciliation_by_action: dict[str, tuple["MAESTROTurn", EvidenceAction] | None] = {}
         self._selection_strategy = strategy
+        self._forecast_failure_policy = forecast_failure_policy
         self._predictions = PredictionCoordinator(
             virtual_cell, logger,
             cache=prediction_cache if prediction_cache is not None else PredictionCache() if reuse_predictions else None,
@@ -183,6 +188,7 @@ class MAESTROOrchestrator:
         # Forecasts of each action's reading under each hypothesis. Without the flag they are
         # computed and logged beside the coverage choice (shadow); with it they choose the action.
         self._outcome_forecaster = outcome_forecaster
+        self._restore_prediction_reliability()
 
     @property
     def selection_strategy(self) -> str:
@@ -201,6 +207,45 @@ class MAESTROOrchestrator:
 
     def evidence_state(self, case_id: str) -> EvidenceState | None:
         return self._evidence_states.get(case_id)
+
+    def recovery_capabilities(self, case_id: str) -> Mapping[str, object]:
+        """Facts can resume; absent original scientific state cannot be reopened."""
+        history = bool(self._case_store and self._case_store.result_identities(case_id))
+        continuation = not history or case_id in self._active_scientific_cases
+        return {"receive_results": self._case_store is not None,
+                "query_facts_and_budget": self._case_store is not None,
+                "scientific_continuation": continuation,
+                "mechanism_state_restored": False,
+                "reason": None if continuation else "scientific_state_not_restored"}
+
+    def _restore_prediction_reliability(self) -> None:
+        if self._case_store is None:
+            return
+        for receipt in self._case_store.prediction_scores():
+            payload = receipt["score"]
+            if payload.get("schema") != "runtime_prediction_score_v1":
+                continue  # Historical research scores have no runtime aggregation contract.
+            if payload.get("policy") != self._reliability.policy:
+                raise ValueError("prediction_reliability_policy_mismatch")
+            entry = dict(payload["entry"])
+            for key in ("interval", "descriptive_interval"):
+                if entry[key] is not None:
+                    entry[key] = tuple(entry[key])
+            if entry["result_id"] != receipt["result_id"] or entry["request_id"] != receipt["request_id"]:
+                raise ValueError("prediction_reliability_identity_mismatch")
+            pair = self._case_store.prediction_for_result(receipt["case_id"], receipt["result_id"])
+            fact = self._case_store.measurement(receipt["case_id"], receipt["result_id"])
+            request = PredictionRequest.from_dict(pair["payload"]["request"])
+            answer = StatePrediction.from_dict(pair["payload"]["prediction"])
+            if (not _answers(answer, request) or request.request_id != receipt["request_id"]
+                    or request.case_id != receipt["case_id"] or request.plan_version != receipt["plan_version"]
+                    or entry["action_identifier"] != receipt["action_identifier"]
+                    or entry["model_version"] != answer.model_version or entry["readout"] not in request.readouts
+                    or entry["context_identifier"] != fact.context_identifier
+                    or entry["predicted_value"] != (answer.state_change or {}).get(entry["readout"])
+                    or entry["realized_value"] != _to_float(fact.metrics.get(entry["readout"]))):
+                raise ValueError("prediction_reliability_pair_mismatch")
+            self._reliability.record(ScoredPrediction(**entry))
 
     @classmethod
     def from_workspace(
@@ -224,6 +269,7 @@ class MAESTROOrchestrator:
         outcome_forecaster: OutcomeForecaster | None = None,
         discrimination_selection: bool = False,
         selection_strategy: str | None = None,
+        forecast_failure_policy: str = "stop",
     ) -> "MAESTROOrchestrator":
         """Create a controller; evaluations may supply an isolated state directory.
 
@@ -258,6 +304,7 @@ class MAESTROOrchestrator:
             tool_router=ToolRouter(runtime_client, workspace / "tools"),
             selection_strategy=selection_strategy if selection_strategy is not None else (
                 "discrimination" if discrimination_selection else "expected_coverage"),
+            forecast_failure_policy=forecast_failure_policy,
             case_store=None if disable_case_store else case_store if case_store is not None else CaseStore(runtime_directory / "cases.sqlite"),
             enable_llm_repair=True,
             virtual_cell=(
@@ -311,6 +358,7 @@ class MAESTROOrchestrator:
         expected_hypotheses: Sequence[MechanismHypothesis] = (),
         prior_evidence: Sequence[MeasuredPremise] = (),
         session_id: str | None = None,
+        user_state: UserStateContext | None = None,
     ) -> MAESTROTurn:
         """Execute one bounded cycle without fabricating a biological result or tool capability."""
 
@@ -320,6 +368,12 @@ class MAESTROOrchestrator:
         ):
             raise ValueError("Budget must be finite and nonnegative.")
         session_id = session_id or str(uuid.uuid4())
+        if user_state is not None:
+            from maestro.hypothesis_forecast import UserStateContext
+            if not isinstance(user_state, UserStateContext):
+                raise ValueError("user_state_requires_compiled_context")
+            if user_state.cell_context is not None and user_state.cell_context != intervention_profile.context_identifier:
+                raise ValueError("user_state_context_mismatch")
         case_id = case_id or session_id
         case = self._case_store.open_case(case_id, budget=budget) if self._case_store else None
         awaiting_current_plan = case is not None and case.state is CaseState.AWAITING_RESULT
@@ -336,6 +390,30 @@ class MAESTROOrchestrator:
                 response="This case is awaiting measurements for its current plan; import those results before submitting a new execution plan.",
                 case=case,
             )
+        if case is not None and not self.recovery_capabilities(case_id)["scientific_continuation"]:
+            self._logger.event("scientific_continuation_blocked", {"case_id": case_id,
+                               "reason": "scientific_state_not_restored"}, session_id=session_id)
+            return MAESTROTurn(
+                session_id=session_id,
+                intent=TaskIntent("scientific_recovery_blocked", "Original scientific state is unavailable.",
+                                  (), (), intervention_profile.context_identifier, None, (), (), (), False),
+                response="Facts, budget and pending-result reception remain available. Original mechanism, repair and decision state is not restored; create an explicitly registered new analysis instead of continuing this case.",
+                case=case, repair_stop_reason="scientific_state_not_restored",
+            )
+        self._active_scientific_cases.add(case_id)
+        self._logger.event(
+            "runtime_contract",
+            {"selection_strategy": self._selection_strategy,
+             "selection_parameters": {"forecast_failure_policy": self._forecast_failure_policy},
+             "prediction_use": "outcome_selection" if self._selection_strategy == "discrimination" else "response_advisory",
+             "response_priority_use": "diagnostic" if self._selection_strategy == "expected_coverage" else "last_tiebreak",
+             "rule_contract": "registered_interpretation_table_or_default_rules_for_contrast",
+             "registered_rules": [json.loads(json.dumps(asdict(rule), default=sorted)) for rule in self._interpretation_table.rules],
+             "action_menu": [asdict(action) for action in available_actions], "budget": budget,
+             "remaining_budget": case.remaining_budget if case is not None else budget,
+             "user_state_identity": user_state.identity() if user_state is not None else None,
+             "model_backend": self._predictions.backend_name()}, session_id=session_id,
+        )
         self._logger.event(
             "task_received",
             {
@@ -465,6 +543,7 @@ class MAESTROOrchestrator:
             prediction=prediction, prediction_request=effective_request,
             action_predictions=action_predictions, action_requests=action_requests, case_id=case_id,
             prior_evidence=prior_evidence,
+            user_state=user_state,
         )
         acquisition_stop = self._acquisition_stop_reason(session_id)
         if selection is not None and selection.actions and ((self._selection_strategy == "discrimination") or not selection.uncovered):
@@ -940,6 +1019,7 @@ class MAESTROOrchestrator:
         virtual_cell_template: VirtualCellQueryTemplate | None = None,
         expected_hypothesis_identifiers: Sequence[str] = (),
         expected_hypotheses: Sequence[MechanismHypothesis] = (),
+        user_state: UserStateContext | None = None,
     ) -> MAESTROCaseLoop:
         """Run plan-observe-reflect cycles, stopping before any unsupplied measurement.
 
@@ -957,6 +1037,11 @@ class MAESTROOrchestrator:
             raise ValueError("max_rounds must be positive.")
         if self._case_store is None:
             raise RuntimeError("Multi-round execution requires a configured CaseStore.")
+        self._case_store.open_case(case_id, budget=budget)
+        if self._case_store.result_identities(case_id):
+            self._logger.event("scientific_continuation_blocked", {"case_id": case_id,
+                               "reason": "scientific_loop_state_not_restored"}, session_id=case_id)
+            return MAESTROCaseLoop(case_id, (), (), "scientific_loop_state_not_restored")
         profile = intervention_profile
         loop_token = f"loop-{uuid.uuid4().hex[:12]}"
         turns: list[MAESTROTurn] = []
@@ -984,6 +1069,7 @@ class MAESTROOrchestrator:
                 expected_hypothesis_identifiers=expected_hypothesis_identifiers,
                 expected_hypotheses=expected_hypotheses,
                 prior_evidence=measured_premises,
+                user_state=user_state,
                 session_id=f"{loop_token}-round-{round_index}",
             )
             turns.append(turn)
@@ -1018,7 +1104,8 @@ class MAESTROOrchestrator:
                 state = self._state_for_round(case_id, state, turn.contrast)
             if not turn.selected_actions:
                 stop_reason = (
-                    "awaiting_result" if turn.case is not None and turn.case.state is CaseState.AWAITING_RESULT
+                    turn.repair_stop_reason if turn.repair_stop_reason == "scientific_state_not_restored"
+                    else "awaiting_result" if turn.case is not None and turn.case.state is CaseState.AWAITING_RESULT
                     else "no_executable_action"
                 )
                 break
@@ -1359,7 +1446,7 @@ class MAESTROOrchestrator:
         if request is not None:
             if result.plan_version is not None and request.plan_version != result.plan_version:
                 return
-            if not _answers(prediction, request):
+            if not _answers(prediction, request) or not _states_action_condition(request, action):
                 return
             if result.context_identifier != request.context.identifier:
                 return
@@ -1408,7 +1495,7 @@ class MAESTROOrchestrator:
         clusters = getattr(self, "_source_clusters", None)
         cluster = clusters.cluster_of(result.source_id) if clusters is not None else result.source_id
         before = len(self._reliability.records)
-        self._reliability.record_pair(
+        entry = ScoredPrediction(
             model_version=model_version,
             readout=readout,
             predicted_value=float(predicted),
@@ -1423,6 +1510,11 @@ class MAESTROOrchestrator:
             time_hours=result.time_hours,
             condition_fingerprint=json.dumps(dict(result.conditions), sort_keys=True, separators=(",", ":")),
         )
+        if self._case_store is not None and request is not None and result.result_id is not None:
+            self._case_store.record_prediction_score(request.case_id, result.result_id, request.request_id,
+                {"schema": "runtime_prediction_score_v1", "policy": dict(self._reliability.policy),
+                 "entry": asdict(entry)}, conditions_matched=True)
+        self._reliability.record(entry)
         if len(self._reliability.records) == before:
             self._logger.event(
                 "prediction_reliability_duplicate_ignored",
@@ -1459,6 +1551,7 @@ class MAESTROOrchestrator:
         action_requests: Mapping[str, PredictionRequest] | None = None,
         case_id: str | None = None,
         prior_evidence: Sequence[MeasuredPremise] = (),
+        user_state: UserStateContext | None = None,
     ):
         remaining = case.remaining_budget if case and case.remaining_budget is not None else budget
         if remaining is None:
@@ -1480,7 +1573,7 @@ class MAESTROOrchestrator:
                 action_predictions=action_predictions, action_requests=action_requests,
             )
             discriminating = self._discriminating_selection(
-                contrast, available_actions, profile, remaining, priorities, case_id, session_id,
+                contrast, available_actions, profile, remaining, priorities, case_id, session_id, user_state=user_state,
             )
             path = "budgeted"
             if discriminating is not None and (self._selection_strategy == "discrimination"):
@@ -1603,11 +1696,12 @@ class MAESTROOrchestrator:
         priorities: Mapping[str, float],
         case_id: str | None,
         session_id: str,
+        *, user_state: UserStateContext | None = None,
     ) -> DiscriminationPlan | None:
         """Ask the forecaster how each action would read under each hypothesis, and choose by it.
 
         The plan is always logged; it drives the round only with ``discrimination_selection``.
-        A forecaster failure is recorded by type and leaves the coverage choice in charge.
+        A decision-mode failure stops selection unless coverage fallback was explicitly requested.
         """
 
         forecaster = self._outcome_forecaster
@@ -1618,13 +1712,24 @@ class MAESTROOrchestrator:
         evidence = self._evidence_states.get(case_id) if case_id and hasattr(self, "_evidence_states") else None
         candidates = contrast.identifiers() & evidence.candidates if evidence is not None else contrast.identifiers()
         try:
-            forecasts = dict(forecaster.forecast(contrast, available_actions, evidence))
+            forecasts = dict(forecaster.forecast(contrast, available_actions, evidence, user_state=user_state)
+                             if user_state is not None else forecaster.forecast(contrast, available_actions, evidence))
         except Exception as error:  # a model component failing must not stop the round
             self._logger.event(
                 "outcome_forecast_failed",
                 {"forecaster": getattr(forecaster, "name", type(forecaster).__name__), "error": type(error).__name__},
                 session_id=session_id,
             )
+            if self._selection_strategy == "discrimination" and self._forecast_failure_policy == "stop":
+                from maestro.composition import BudgetedEvidencePlan
+                plan = DiscriminationPlan(BudgetedEvidencePlan(actions=(), total_cost=0.0, covered=frozenset(),
+                                          uncovered=frozenset(candidates), waiting_for_prerequisites=()),
+                                          (), status="forecast_failed", reason=type(error).__name__)
+                plans[session_id] = plan
+                return plan
+            self._logger.event("outcome_forecast_fallback",
+                               {"policy": "coverage", "mode": "diagnostic" if self._selection_strategy != "discrimination" else "explicit_fallback"},
+                               session_id=session_id)
             return None
         plan = select_discriminating_action(
             frozenset(candidates), available_actions, profile, remaining, forecasts,
@@ -1908,12 +2013,13 @@ class MAESTROOrchestrator:
         if self._case_store is None:
             raise RuntimeError("Measurement import requires a configured CaseStore.")
         imported = self._case_store.import_measurement(case_id, result)
-        result = replace(result, result_id=imported.result_id)
-        if imported.created and result.quality_passed:
-            record = self._context_builder.record_result(result)
+        result = self._case_store.measurement(case_id, imported.result_id)
+        if result.quality_passed:
+            record = self._context_builder.record_result(result, case_id=case_id)
             self._logger.event(
                 "measurement_imported",
-                {"case_id": case_id, "result_id": imported.result_id, "evidence_id": record.identifier},
+                {"case_id": case_id, "result_id": imported.result_id, "evidence_id": record.identifier,
+                 "new_fact": imported.created, "plan_version": result.plan_version},
                 session_id=case_id,
             )
         elif imported.created:
@@ -2106,7 +2212,14 @@ def _states_action_condition(request: PredictionRequest, action: EvidenceAction)
     stated = request.intervention.time_hours
     if action.time_hours is not None and stated is not None and abs(stated - action.time_hours) > 1.0:
         return False
-    return action.execution_context is None or request.context.identifier == action.execution_context
+    if action.execution_context is not None and request.context.identifier != action.execution_context:
+        return False
+    if action.expected_conditions:
+        try:
+            return request.intervention.for_action(action, request.context, request.readouts) == request.intervention
+        except ValueError:
+            return False
+    return True
 
 
 def _stronger_scope(
