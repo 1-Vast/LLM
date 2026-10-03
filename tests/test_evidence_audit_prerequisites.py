@@ -10,9 +10,7 @@ File summary
 """
 from __future__ import annotations
 
-from pathlib import Path
 
-import pytest
 
 from maestro.models import BiologicalQuantity, PremiseGrant, PremiseRequirement
 from maestro.handoff import SourceCluster, SourceClusterIndex
@@ -42,17 +40,3 @@ def test_an_unsited_engagement_premise_accepts_a_lysate_grant():
                           quality_passed=True)
     assert unsited.unmet_reasons(lysate) == ()
     assert any(reason.startswith("site_mismatch") for reason in sited.unmet_reasons(lysate))
-
-
-def test_the_case_lint_names_unsited_engagement_premises_in_the_engagement_package():
-    public = Path("data/evaluation/cases/engagement_v1/public")
-    private = Path("data/evaluation/cases/engagement_v1/private")
-    if not public.is_dir():
-        pytest.skip("engagement_v1 package unavailable")
-    from tools.evaluation.cases import CaseRepository
-    cases = CaseRepository(public, private).load()
-    assert cases
-    for case, _ in cases:
-        flagged = case.public.unsited_engagement_premises()
-        assert "engagement:index_on_target" in flagged
-        assert "abundance:target_rna" not in flagged

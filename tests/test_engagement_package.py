@@ -614,3 +614,17 @@ def test_registry_extended_case_only_adds_repairs_with_a_registered_result(tmp_p
     # repair compiles but adds nothing that could have been learned.
     assert added == {canonical_repair_identifier("index_offer", "Dasatinib", "ABL1")}
     assert set(extended_outcomes) - set(outcomes) == added
+
+
+def test_the_case_lint_names_unsited_engagement_premises_in_the_engagement_package():
+    public = Path("data/evaluation/cases/engagement_v1/public")
+    private = Path("data/evaluation/cases/engagement_v1/private")
+    if not public.is_dir():
+        pytest.skip("engagement_v1 package unavailable")
+    from tools.evaluation.cases import CaseRepository
+    cases = CaseRepository(public, private).load()
+    assert cases
+    for case, _ in cases:
+        flagged = case.public.unsited_engagement_premises()
+        assert "engagement:index_on_target" in flagged
+        assert "abundance:target_rna" not in flagged
