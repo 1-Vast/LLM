@@ -1,0 +1,247 @@
+..........FFF........................................................    [100%]
+================================== FAILURES ===================================
+_ test_state_snapshot_reaches_forecaster_and_changes_selection_without_evidence_update _
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2607/test_state_snapshot_reaches_fo0')
+
+    def test_state_snapshot_reaches_forecaster_and_changes_selection_without_evidence_update(tmp_path):
+        from maestro.hypothesis_forecast import UserStateContext
+    
+        class StatefulForecaster:
+            name = "stateful-fixture"
+            def __init__(self):
+                self.seen = []
+            def forecast(self, contrast, actions, evidence, user_state=None):
+                self.seen.append(user_state)
+                chosen = "measure_high" if user_state.cell_state_summaries["marker"] > 0 else "measure_low"
+                return {action.identifier: _separating(action.identifier) if action.identifier == chosen
+                        else _flat(action.identifier) for action in actions}
+    
+        choices = []
+        for marker in (-1, 1):
+            forecaster = StatefulForecaster()
+            root = tmp_path / str(marker)
+>           core = _orchestrator(root, _LabelWorldModel({CONTROL_LOW: 1, CONTROL_HIGH: 1}),
+                                 outcome_forecaster=forecaster, selection_strategy="discrimination")
+
+tests\test_discriminating_acquisition.py:435: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_discriminating_acquisition.py:490: in _orchestrator
+    return MAESTROOrchestrator(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <agent.orchestrator.MAESTROOrchestrator object at 0x0000027C9A3AF050>
+interpreter = <agent.context.TaskInterpreter object at 0x0000027C9A3AED10>
+context_builder = <agent.context.ContextBuilder object at 0x0000027CFFE9EF50>
+planner = <agent.planner.MechanismContrastPlanner object at 0x0000027CFE702510>
+visual_inspector = <agent.llm.VisualInspector object at 0x0000027C9A3ACE10>
+memory = <agent.memory.MemoryStore object at 0x0000027CFFEB62D0>
+logger = <agent.memory.RunLogger object at 0x0000027C9A3ACAD0>
+controller = <maestro.contrast.MAESTROAgent object at 0x0000027C9A3AEBD0>
+tool_router = None
+case_store = <agent.case_store.CaseStore object at 0x0000027C9A3ACD10>
+enable_llm_repair = False
+virtual_cell = <test_discriminating_acquisition._LabelWorldModel object at 0x0000027C9A3ACE50>
+repair_controller = None
+interpretation_table = <maestro.outcome.InterpretationTable object at 0x0000027C9A3AD410>
+decision_engine = None, reliability = None, source_clusters = None
+max_repair_attempts = 3, power_aware_selection = True, prediction_cache = None
+reuse_predictions = True, max_parallel_predictions = 1, decision_critic = None
+outcome_forecaster = <test_discriminating_acquisition.test_state_snapshot_reaches_forecaster_and_changes_selection_without_evidence_update.<locals>.StatefulForecaster object at 0x0000027C9A3ACD90>
+discrimination_selection = False, selection_strategy = 'discrimination'
+forecast_failure_policy = 'stop'
+
+    def __init__(
+        self,
+        *,
+        interpreter: TaskInterpreter,
+        context_builder: ContextBuilder,
+        planner: MechanismContrastPlanner,
+        visual_inspector: VisualInspector,
+        memory: MemoryStore,
+        logger: RunLogger,
+        controller: MAESTROAgent | None = None,
+        tool_router: ToolRouter | None = None,
+        case_store: CaseStore | None = None,
+        enable_llm_repair: bool = False,
+        virtual_cell: VirtualCellWorldModel | None = None,
+        repair_controller: RepairController | None = None,
+        interpretation_table: InterpretationTable | None = None,
+        decision_engine: DecisionEngine | None = None,
+        reliability: PredictionReliabilityLedger | None = None,
+        source_clusters: SourceClusterIndex | None = None,
+        max_repair_attempts: int = 3,
+        power_aware_selection: bool = False,
+        prediction_cache: PredictionCache | None = None,
+        reuse_predictions: bool = True,
+        max_parallel_predictions: int = 1,
+        decision_critic: TypedDecisionCritic | None = None,
+        outcome_forecaster: OutcomeForecaster | None = None,
+        discrimination_selection: bool = False,
+        selection_strategy: str | None = None,
+        forecast_failure_policy: str = "stop",
+    ):
+        if selection_strategy is not None and (power_aware_selection or discrimination_selection):
+>           raise ValueError("Use selection_strategy or legacy flags, not both.")
+E           ValueError: Use selection_strategy or legacy flags, not both.
+
+src\agent\orchestrator.py:141: ValueError
+_ test_forecaster_failure_never_silently_changes_decision_policy[stop-False] __
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2607/test_forecaster_failure_never_0')
+policy = 'stop', expected = False
+
+    @pytest.mark.parametrize("policy,expected", [("stop", False), ("coverage", True)])
+    def test_forecaster_failure_never_silently_changes_decision_policy(tmp_path, policy, expected):
+        class FailedForecaster:
+            name = "failed-fixture"
+            def forecast(self, *args, **kwargs):
+                raise RuntimeError("fixture failure")
+>       core = _orchestrator(tmp_path, _LabelWorldModel({CONTROL_LOW: 1, CONTROL_HIGH: 1}),
+                             outcome_forecaster=FailedForecaster(), selection_strategy="discrimination",
+                             forecast_failure_policy=policy)
+
+tests\test_discriminating_acquisition.py:453: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_discriminating_acquisition.py:490: in _orchestrator
+    return MAESTROOrchestrator(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <agent.orchestrator.MAESTROOrchestrator object at 0x0000027C9A27A550>
+interpreter = <agent.context.TaskInterpreter object at 0x0000027CFFF4BDD0>
+context_builder = <agent.context.ContextBuilder object at 0x0000027C9A2791D0>
+planner = <agent.planner.MechanismContrastPlanner object at 0x0000027C9A279810>
+visual_inspector = <agent.llm.VisualInspector object at 0x0000027C9A27B590>
+memory = <agent.memory.MemoryStore object at 0x0000027CFFF49D10>
+logger = <agent.memory.RunLogger object at 0x0000027C9A27AC50>
+controller = <maestro.contrast.MAESTROAgent object at 0x0000027C9A2796D0>
+tool_router = None
+case_store = <agent.case_store.CaseStore object at 0x0000027C9A27B550>
+enable_llm_repair = False
+virtual_cell = <test_discriminating_acquisition._LabelWorldModel object at 0x0000027CFFF4BA10>
+repair_controller = None
+interpretation_table = <maestro.outcome.InterpretationTable object at 0x0000027C9A27A410>
+decision_engine = None, reliability = None, source_clusters = None
+max_repair_attempts = 3, power_aware_selection = True, prediction_cache = None
+reuse_predictions = True, max_parallel_predictions = 1, decision_critic = None
+outcome_forecaster = <test_discriminating_acquisition.test_forecaster_failure_never_silently_changes_decision_policy.<locals>.FailedForecaster object at 0x0000027CFFF4B310>
+discrimination_selection = False, selection_strategy = 'discrimination'
+forecast_failure_policy = 'stop'
+
+    def __init__(
+        self,
+        *,
+        interpreter: TaskInterpreter,
+        context_builder: ContextBuilder,
+        planner: MechanismContrastPlanner,
+        visual_inspector: VisualInspector,
+        memory: MemoryStore,
+        logger: RunLogger,
+        controller: MAESTROAgent | None = None,
+        tool_router: ToolRouter | None = None,
+        case_store: CaseStore | None = None,
+        enable_llm_repair: bool = False,
+        virtual_cell: VirtualCellWorldModel | None = None,
+        repair_controller: RepairController | None = None,
+        interpretation_table: InterpretationTable | None = None,
+        decision_engine: DecisionEngine | None = None,
+        reliability: PredictionReliabilityLedger | None = None,
+        source_clusters: SourceClusterIndex | None = None,
+        max_repair_attempts: int = 3,
+        power_aware_selection: bool = False,
+        prediction_cache: PredictionCache | None = None,
+        reuse_predictions: bool = True,
+        max_parallel_predictions: int = 1,
+        decision_critic: TypedDecisionCritic | None = None,
+        outcome_forecaster: OutcomeForecaster | None = None,
+        discrimination_selection: bool = False,
+        selection_strategy: str | None = None,
+        forecast_failure_policy: str = "stop",
+    ):
+        if selection_strategy is not None and (power_aware_selection or discrimination_selection):
+>           raise ValueError("Use selection_strategy or legacy flags, not both.")
+E           ValueError: Use selection_strategy or legacy flags, not both.
+
+src\agent\orchestrator.py:141: ValueError
+_ test_forecaster_failure_never_silently_changes_decision_policy[coverage-True] _
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2607/test_forecaster_failure_never_1')
+policy = 'coverage', expected = True
+
+    @pytest.mark.parametrize("policy,expected", [("stop", False), ("coverage", True)])
+    def test_forecaster_failure_never_silently_changes_decision_policy(tmp_path, policy, expected):
+        class FailedForecaster:
+            name = "failed-fixture"
+            def forecast(self, *args, **kwargs):
+                raise RuntimeError("fixture failure")
+>       core = _orchestrator(tmp_path, _LabelWorldModel({CONTROL_LOW: 1, CONTROL_HIGH: 1}),
+                             outcome_forecaster=FailedForecaster(), selection_strategy="discrimination",
+                             forecast_failure_policy=policy)
+
+tests\test_discriminating_acquisition.py:453: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_discriminating_acquisition.py:490: in _orchestrator
+    return MAESTROOrchestrator(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <agent.orchestrator.MAESTROOrchestrator object at 0x0000027C9A4304D0>
+interpreter = <agent.context.TaskInterpreter object at 0x0000027C9A431E10>
+context_builder = <agent.context.ContextBuilder object at 0x0000027C9A430510>
+planner = <agent.planner.MechanismContrastPlanner object at 0x0000027C9A431A50>
+visual_inspector = <agent.llm.VisualInspector object at 0x0000027C9A432850>
+memory = <agent.memory.MemoryStore object at 0x0000027C9A431710>
+logger = <agent.memory.RunLogger object at 0x0000027C9A431B50>
+controller = <maestro.contrast.MAESTROAgent object at 0x0000027C9A431850>
+tool_router = None
+case_store = <agent.case_store.CaseStore object at 0x0000027C9A4328D0>
+enable_llm_repair = False
+virtual_cell = <test_discriminating_acquisition._LabelWorldModel object at 0x0000027C9A4312D0>
+repair_controller = None
+interpretation_table = <maestro.outcome.InterpretationTable object at 0x0000027C9A4327D0>
+decision_engine = None, reliability = None, source_clusters = None
+max_repair_attempts = 3, power_aware_selection = True, prediction_cache = None
+reuse_predictions = True, max_parallel_predictions = 1, decision_critic = None
+outcome_forecaster = <test_discriminating_acquisition.test_forecaster_failure_never_silently_changes_decision_policy.<locals>.FailedForecaster object at 0x0000027C9A431490>
+discrimination_selection = False, selection_strategy = 'discrimination'
+forecast_failure_policy = 'coverage'
+
+    def __init__(
+        self,
+        *,
+        interpreter: TaskInterpreter,
+        context_builder: ContextBuilder,
+        planner: MechanismContrastPlanner,
+        visual_inspector: VisualInspector,
+        memory: MemoryStore,
+        logger: RunLogger,
+        controller: MAESTROAgent | None = None,
+        tool_router: ToolRouter | None = None,
+        case_store: CaseStore | None = None,
+        enable_llm_repair: bool = False,
+        virtual_cell: VirtualCellWorldModel | None = None,
+        repair_controller: RepairController | None = None,
+        interpretation_table: InterpretationTable | None = None,
+        decision_engine: DecisionEngine | None = None,
+        reliability: PredictionReliabilityLedger | None = None,
+        source_clusters: SourceClusterIndex | None = None,
+        max_repair_attempts: int = 3,
+        power_aware_selection: bool = False,
+        prediction_cache: PredictionCache | None = None,
+        reuse_predictions: bool = True,
+        max_parallel_predictions: int = 1,
+        decision_critic: TypedDecisionCritic | None = None,
+        outcome_forecaster: OutcomeForecaster | None = None,
+        discrimination_selection: bool = False,
+        selection_strategy: str | None = None,
+        forecast_failure_policy: str = "stop",
+    ):
+        if selection_strategy is not None and (power_aware_selection or discrimination_selection):
+>           raise ValueError("Use selection_strategy or legacy flags, not both.")
+E           ValueError: Use selection_strategy or legacy flags, not both.
+
+src\agent\orchestrator.py:141: ValueError
+=========================== short test summary info ===========================
+FAILED tests/test_discriminating_acquisition.py::test_state_snapshot_reaches_forecaster_and_changes_selection_without_evidence_update
+FAILED tests/test_discriminating_acquisition.py::test_forecaster_failure_never_silently_changes_decision_policy[stop-False]
+FAILED tests/test_discriminating_acquisition.py::test_forecaster_failure_never_silently_changes_decision_policy[coverage-True]
+3 failed, 66 passed in 8.79s

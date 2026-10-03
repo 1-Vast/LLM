@@ -1,0 +1,32 @@
+........................................................................ [ 69%]
+.........F.....................                                          [100%]
+================================== FAILURES ===================================
+_ test_an_action_in_another_context_is_not_queried_with_the_template_context __
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2605/test_an_action_in_another_cont0')
+
+    def test_an_action_in_another_context_is_not_queried_with_the_template_context(tmp_path):
+        world_model = _LabelWorldModel({CONTROL_LOW: 1.0, CONTROL_HIGH: 5.0})
+        low, high = _runtime_actions()
+        elsewhere = EvidenceAction(
+            high.identifier, high.description, high.cost, high.distinguishes, time_hours=24.0,
+            execution_context="MCF7", prediction_readout=high.prediction_readout, prediction_relevance=1.0,
+        )
+        profile = FunctionalInterventionProfile(mode="inhibition", context_identifier="NCI-H596", time_hours=24.0)
+        _orchestrator(tmp_path, world_model).run(
+            "Which exposure should be measured first?", available_actions=(low, elsewhere), intervention_profile=profile,
+            case_id="elsewhere", budget=1.0, virtual_cell_template=_template(),
+        )
+        assert {request.request_id.rsplit(".", 1)[-1] for request in world_model.requests} == {"measure_low"}
+        reasons = _events(tmp_path, "virtual_cell_query_not_built")[-1]["payload"]["reasons"]
+>       assert reasons == {"measure_high": "execution_context_differs_from_template:MCF7"}
+E       AssertionError: assert {'measure_hig...und_to_query'} == {'measure_hig...emplate:MCF7'}
+E         
+E         Differing items:
+E         {'measure_high': 'action_condition_cannot_be_bound_to_query'} != {'measure_high': 'execution_context_differs_from_template:MCF7'}
+E         Use -v to get more diff
+
+tests\test_discriminating_acquisition.py:661: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_discriminating_acquisition.py::test_an_action_in_another_context_is_not_queried_with_the_template_context
+1 failed, 102 passed in 13.60s

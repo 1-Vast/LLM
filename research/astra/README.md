@@ -1,5 +1,9 @@
 # ASTRA: dual-core research adjustments
 
+The current [feedback-closure report](FEEDBACK_CLOSURE.md) fixes reproduced
+fact/condition/recovery defects and freezes the main architecture. Its complete-menu
+pilot registration explicitly blocks execution on missing scientific records.
+
 The [efficiency report](EFFICIENCY.md) measures reduced audit reads and dependency
 graph scans, with unchanged scientific permissions and independent verification.
 

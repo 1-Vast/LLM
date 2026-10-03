@@ -1,0 +1,26 @@
+........................................................................ [ 64%]
+...........................F............                                 [100%]
+================================== FAILURES ===================================
+______ test_protocol_freeze_refuses_changed_source_and_measured_outcomes ______
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2615/test_protocol_freeze_refuses_c0')
+
+    def test_protocol_freeze_refuses_changed_source_and_measured_outcomes(tmp_path):
+        root = Path(__file__).resolve().parents[2]
+        source = tmp_path / PILOT
+        shutil.copytree(root / PILOT, source)
+        path = source / "randomized_wells.csv"
+        path.write_bytes(path.read_bytes().replace(b"False", b"True", 1))
+        with pytest.raises(ValueError, match="source_hash_mismatch"):
+            freeze(tmp_path, tmp_path / "wrong-hash")
+        manifest_path = source / "manifest.json"
+        manifest = json.loads(manifest_path.read_text())
+        manifest[path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
+        manifest_path.write_text(json.dumps(manifest))
+>       with pytest.raises(ValueError, match="cannot_open_measured_outcomes"):
+E       Failed: DID NOT RAISE ValueError
+
+research\astra\test_gdsc_transport.py:42: Failed
+=========================== short test summary info ===========================
+FAILED research/astra/test_gdsc_transport.py::test_protocol_freeze_refuses_changed_source_and_measured_outcomes
+1 failed, 111 passed in 23.46s

@@ -314,3 +314,30 @@ aggregate; an independent Linux checkout verifies the asset-free core.
 No new model/API experiment, biological measurement or decision-value study ran.
 The maintained state-ordering and intervention-realisation questions retain their
 data, timing, replication and cost gaps; software efficiency does not resolve them.
+
+
+## 15. Verified feedback closure and blocked scientific registration
+
+The [feedback-closure report](../../research/astra/FEEDBACK_CLOSURE.md) owns the
+implementation, recovery capabilities, failure repairs and reproduction commands.
+Its [new run receipt](../../research/astra/results/20261003_feedback_closure_v1/receipt.json)
+records base reproductions, verification and byte preservation. The main
+architecture is frozen; no new backend, store, controller or full recovery system
+was introduced.
+
+Four extra tests fail on the isolated old source: concurrent sibling-result budget,
+interrupted case evidence projection, action-specific dose and score persistence.
+The fixes serialize result import, recover idempotent views from accepted facts,
+bind action conditions and persist/restore versioned planning reliability.
+Missing original scientific state blocks a resumed selection while original
+results and budgets remain accessible. State-aware conditional prediction is now
+explicitly wired and forecast-dependent failures stop unless fallback is declared.
+New maintained test files require a named verification scope.
+
+The [sealed full-menu pilot protocol](../../research/astra/results/20261003_feedback_closure_v1/protocol/protocol.json)
+and readiness record freeze design and admission rules, not a fully approved
+confirmation experiment. All physical executions remain zero. Culture provenance,
+legal predecision availability, assay QC, complete failures, credible costs and
+minimum meaningful gain are unresolved. State and mechanism comparisons retain
+separate prerequisites; no model prediction replaces an unmeasured endpoint.
+No new API/model or physical experiment ran, and no scientific gain is claimed.
