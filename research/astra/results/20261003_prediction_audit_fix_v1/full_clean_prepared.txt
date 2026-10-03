@@ -1,0 +1,346 @@
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 10%]
+........................................................................ [ 14%]
+........................................................................ [ 18%]
+........................................................................ [ 21%]
+........................................................................ [ 25%]
+........................................................................ [ 29%]
+........................................................................ [ 32%]
+........................................................................ [ 36%]
+........................................................................ [ 40%]
+........................................................................ [ 43%]
+........................................................................ [ 47%]
+........................................................................ [ 51%]
+........................ssssss.............s............................ [ 54%]
+.....................................F.F..............................ss [ 58%]
+s....................................................................... [ 62%]
+........................................................................ [ 65%]
+........................................................................ [ 69%]
+.....EEE.E.............................................................. [ 73%]
+......s..................................................s.............. [ 76%]
+.........s.............................................................. [ 80%]
+....................................................................s... [ 84%]
+........................................................................ [ 87%]
+........................................................................ [ 91%]
+........................................................................ [ 95%]
+........................................................................ [ 98%]
+.....................                                                    [100%]
+=================================== ERRORS ====================================
+_ ERROR at setup of test_real_population_preserves_unit_reading_query_denominators _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x0000020AFFB358D0>, _basetemp=WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2579'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def real_run(tmp_path_factory):
+        out = tmp_path_factory.mktemp("real_denominator") / "run"
+        calls = Counter()
+        original_forecast = audit.CaseMemoryOutcomeForecaster.forecast
+        original_selector = audit.select_discriminating_action
+    
+        def forecast(model, contrast, actions, evidence, user_state=None):
+            assert (out / "predeclared.json").is_file()
+            assert evidence is not None and not evidence.updates
+            calls[f"forecast:{user_state.outcome_mode}"] += 1
+            return original_forecast(model, contrast, actions, evidence, user_state)
+    
+        def selector(candidates, actions, profile, budget, forecasts, consequences, **kwargs):
+            assert (out / "predeclared.json").is_file()
+            calls["production_selector"] += 1
+            return original_selector(candidates, actions, profile, budget, forecasts, consequences, **kwargs)
+    
+        with pytest.MonkeyPatch.context() as patch:
+            patch.setattr(audit.CaseMemoryOutcomeForecaster, "forecast", forecast)
+            patch.setattr(audit, "select_discriminating_action", selector)
+>           summary = audit.run(out, command=["pytest", "tests/test_real_case_memory_denominator.py"])
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_real_case_memory_denominator.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+research\dual_core_followup\denominator.py:119: in run
+    sources = source_records(root)
+              ^^^^^^^^^^^^^^^^^^^^
+research\dual_core_followup\denominator.py:63: in source_records
+    actual = file_sha(root / path)
+             ^^^^^^^^^^^^^^^^^^^^^
+research\dual_core_followup\denominator.py:57: in file_sha
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+                          ^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1050: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/outputs/case_memory_integration/episodes/proxy_reference_cases_v3.jsonl.gz')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\outputs\\case_memory_integration\\episodes\\proxy_reference_cases_v3.jsonl.gz'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+_ ERROR at setup of test_both_forecasters_and_production_selector_really_execute _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x0000020AFFB358D0>, _basetemp=WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2579'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def real_run(tmp_path_factory):
+        out = tmp_path_factory.mktemp("real_denominator") / "run"
+        calls = Counter()
+        original_forecast = audit.CaseMemoryOutcomeForecaster.forecast
+        original_selector = audit.select_discriminating_action
+    
+        def forecast(model, contrast, actions, evidence, user_state=None):
+            assert (out / "predeclared.json").is_file()
+            assert evidence is not None and not evidence.updates
+            calls[f"forecast:{user_state.outcome_mode}"] += 1
+            return original_forecast(model, contrast, actions, evidence, user_state)
+    
+        def selector(candidates, actions, profile, budget, forecasts, consequences, **kwargs):
+            assert (out / "predeclared.json").is_file()
+            calls["production_selector"] += 1
+            return original_selector(candidates, actions, profile, budget, forecasts, consequences, **kwargs)
+    
+        with pytest.MonkeyPatch.context() as patch:
+            patch.setattr(audit.CaseMemoryOutcomeForecaster, "forecast", forecast)
+            patch.setattr(audit, "select_discriminating_action", selector)
+>           summary = audit.run(out, command=["pytest", "tests/test_real_case_memory_denominator.py"])
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_real_case_memory_denominator.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+research\dual_core_followup\denominator.py:119: in run
+    sources = source_records(root)
+              ^^^^^^^^^^^^^^^^^^^^
+research\dual_core_followup\denominator.py:63: in source_records
+    actual = file_sha(root / path)
+             ^^^^^^^^^^^^^^^^^^^^^
+research\dual_core_followup\denominator.py:57: in file_sha
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+                          ^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1050: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/outputs/case_memory_integration/episodes/proxy_reference_cases_v3.jsonl.gz')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\outputs\\case_memory_integration\\episodes\\proxy_reference_cases_v3.jsonl.gz'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+_ ERROR at setup of test_real_valid_only_records_cannot_supply_attempted_experiment_distribution _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x0000020AFFB358D0>, _basetemp=WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2579'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def real_run(tmp_path_factory):
+        out = tmp_path_factory.mktemp("real_denominator") / "run"
+        calls = Counter()
+        original_forecast = audit.CaseMemoryOutcomeForecaster.forecast
+        original_selector = audit.select_discriminating_action
+    
+        def forecast(model, contrast, actions, evidence, user_state=None):
+            assert (out / "predeclared.json").is_file()
+            assert evidence is not None and not evidence.updates
+            calls[f"forecast:{user_state.outcome_mode}"] += 1
+            return original_forecast(model, contrast, actions, evidence, user_state)
+    
+        def selector(candidates, actions, profile, budget, forecasts, consequences, **kwargs):
+            assert (out / "predeclared.json").is_file()
+            calls["production_selector"] += 1
+            return original_selector(candidates, actions, profile, budget, forecasts, consequences, **kwargs)
+    
+        with pytest.MonkeyPatch.context() as patch:
+            patch.setattr(audit.CaseMemoryOutcomeForecaster, "forecast", forecast)
+            patch.setattr(audit, "select_discriminating_action", selector)
+>           summary = audit.run(out, command=["pytest", "tests/test_real_case_memory_denominator.py"])
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_real_case_memory_denominator.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+research\dual_core_followup\denominator.py:119: in run
+    sources = source_records(root)
+              ^^^^^^^^^^^^^^^^^^^^
+research\dual_core_followup\denominator.py:63: in source_records
+    actual = file_sha(root / path)
+             ^^^^^^^^^^^^^^^^^^^^^
+research\dual_core_followup\denominator.py:57: in file_sha
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+                          ^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1050: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/outputs/case_memory_integration/episodes/proxy_reference_cases_v3.jsonl.gz')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\outputs\\case_memory_integration\\episodes\\proxy_reference_cases_v3.jsonl.gz'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+________ ERROR at setup of test_existing_output_cannot_be_overwritten _________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x0000020AFFB358D0>, _basetemp=WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2579'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def real_run(tmp_path_factory):
+        out = tmp_path_factory.mktemp("real_denominator") / "run"
+        calls = Counter()
+        original_forecast = audit.CaseMemoryOutcomeForecaster.forecast
+        original_selector = audit.select_discriminating_action
+    
+        def forecast(model, contrast, actions, evidence, user_state=None):
+            assert (out / "predeclared.json").is_file()
+            assert evidence is not None and not evidence.updates
+            calls[f"forecast:{user_state.outcome_mode}"] += 1
+            return original_forecast(model, contrast, actions, evidence, user_state)
+    
+        def selector(candidates, actions, profile, budget, forecasts, consequences, **kwargs):
+            assert (out / "predeclared.json").is_file()
+            calls["production_selector"] += 1
+            return original_selector(candidates, actions, profile, budget, forecasts, consequences, **kwargs)
+    
+        with pytest.MonkeyPatch.context() as patch:
+            patch.setattr(audit.CaseMemoryOutcomeForecaster, "forecast", forecast)
+            patch.setattr(audit, "select_discriminating_action", selector)
+>           summary = audit.run(out, command=["pytest", "tests/test_real_case_memory_denominator.py"])
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_real_case_memory_denominator.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+research\dual_core_followup\denominator.py:119: in run
+    sources = source_records(root)
+              ^^^^^^^^^^^^^^^^^^^^
+research\dual_core_followup\denominator.py:63: in source_records
+    actual = file_sha(root / path)
+             ^^^^^^^^^^^^^^^^^^^^^
+research\dual_core_followup\denominator.py:57: in file_sha
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+                          ^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1050: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/outputs/case_memory_integration/episodes/proxy_reference_cases_v3.jsonl.gz')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\outputs\\case_memory_integration\\episodes\\proxy_reference_cases_v3.jsonl.gz'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+================================== FAILURES ===================================
+_ test_biological_population_is_frozen_by_identifier_hash_without_reading_truth _
+
+    def test_biological_population_is_frozen_by_identifier_hash_without_reading_truth():
+        from research.dual_core_live.benchmark import choose_population
+>       population = choose_population()
+                     ^^^^^^^^^^^^^^^^^^^
+
+tests\test_live_api_contract.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+research\dual_core_live\benchmark.py:148: in choose_population
+    folds = json.loads((R2 / "interventions" / (task + "_freeze.json")).read_text())
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/outputs/identifiability_round2_20260930/interventions/sciplex3_B_freeze.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\outputs\\identifiability_round2_20260930\\interventions\\sciplex3_B_freeze.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+____ test_registered_replay_adapter_purchases_before_exposing_observations ____
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2579/test_registered_replay_adapter0')
+
+    def test_registered_replay_adapter_purchases_before_exposing_observations(tmp_path):
+        from research.dual_core_live.benchmark import best_action, choose_population, run_biology
+>       population = choose_population()
+                     ^^^^^^^^^^^^^^^^^^^
+
+tests\test_live_api_contract.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+research\dual_core_live\benchmark.py:148: in choose_population
+    folds = json.loads((R2 / "interventions" / (task + "_freeze.json")).read_text())
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/outputs/identifiability_round2_20260930/interventions/sciplex3_B_freeze.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\outputs\\identifiability_round2_20260930\\interventions\\sciplex3_B_freeze.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+=========================== short test summary info ===========================
+FAILED tests/test_live_api_contract.py::test_biological_population_is_frozen_by_identifier_hash_without_reading_truth
+FAILED tests/test_live_api_contract.py::test_registered_replay_adapter_purchases_before_exposing_observations
+ERROR tests/test_real_case_memory_denominator.py::test_real_population_preserves_unit_reading_query_denominators
+ERROR tests/test_real_case_memory_denominator.py::test_both_forecasters_and_production_selector_really_execute
+ERROR tests/test_real_case_memory_denominator.py::test_real_valid_only_records_cannot_supply_attempted_experiment_distribution
+ERROR tests/test_real_case_memory_denominator.py::test_existing_output_cannot_be_overwritten
+2 failed, 1945 passed, 14 skipped, 4 errors in 83.24s (0:01:23)

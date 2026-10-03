@@ -1,0 +1,56 @@
+.......................F                                                 [100%]
+================================== FAILURES ===================================
+____ test_registered_replay_adapter_purchases_before_exposing_observations ____
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2583/test_registered_replay_adapter0')
+
+    def test_registered_replay_adapter_purchases_before_exposing_observations(tmp_path):
+        from research.dual_core_live.benchmark import best_action, choose_population, run_biology
+        population = choose_population()
+        probe = [next(p for p in population if p["task"] == task and p["fold"] == 0)
+                 for task in ("sciplex3_B", "l1000_LT")]
+        calls = []
+    
+        def recorded_offline_proposal(card, call_id):
+            assert "truth" not in card and "outcomes" not in card
+            assert all(s["action"] in card["attempted_actions"] for s in card["evidence"])
+            calls.append((call_id, card))
+            proposal = {"action": best_action(card), "terminal_authorized": False}
+            return proposal, validate_proposal(card, proposal)
+    
+>       rows = run_biology({"biological_population": probe}, tmp_path, recorded_offline_proposal)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_live_api_contract.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+research\dual_core_live\benchmark.py:335: in run_biology
+    data, ctx, setting, design = V.load(item["dataset"], item["tier"], fold)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+research\protocol_v2\tasks_v21.py:85: in load
+    design = DS.load(dataset)
+             ^^^^^^^^^^^^^^^^
+research\protocol_v2\design.py:115: in load
+    frame = sciplex3_design() if dataset == "sciplex3" else l1000_design()
+            ^^^^^^^^^^^^^^^^^
+research\protocol_v2\design.py:53: in sciplex3_design
+    with h5py.File(path, "r") as handle:
+         ^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\site-packages\h5py\_hl\files.py:555: in __init__
+    fid = make_fid(name, mode, userblock_size, fapl, fcpl, swmr=swmr)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\site-packages\h5py\_hl\files.py:232: in make_fid
+    fid = h5f.open(name, flags, fapl=fapl)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+h5py/_objects.pyx:54: in h5py._objects.with_phil.wrapper
+    ???
+h5py/_objects.pyx:55: in h5py._objects.with_phil.wrapper
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+>   ???
+E   FileNotFoundError: [Errno 2] Unable to synchronously open file (unable to open file: name = 'D:\MAESTRO_TMP\20261003_prediction_audit_fix\clean\data\raw\sciplex3\SrivatsanTrapnell2020_sciplex3.h5ad', errno = 2, error message = 'No such file or directory', flags = 0, o_flags = 0)
+
+h5py/h5f.pyx:106: FileNotFoundError
+=========================== short test summary info ===========================
+FAILED tests/test_live_api_contract.py::test_registered_replay_adapter_purchases_before_exposing_observations
+1 failed, 23 passed in 25.77s

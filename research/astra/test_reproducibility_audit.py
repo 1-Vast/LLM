@@ -3,7 +3,7 @@ import json
 
 import pytest
 
-from research.astra.reproducibility_audit import digest, restore_pack
+from research.astra.reproducibility_audit import digest, restore_pack, restore_fixtures
 
 
 def _cache(tmp_path):
@@ -38,3 +38,13 @@ def test_corrupt_assets_fail_before_any_restoration(tmp_path, name):
     with pytest.raises(ValueError, match="frozen_asset_hash_mismatch"):
         restore_pack(cache, destination)
     assert not destination.exists()
+
+
+def test_fixture_archive_corruption_cannot_write_any_files(tmp_path):
+    bundle = tmp_path / "replay_fixture_bundle.zip"
+    bundle.write_bytes(b"corrupted archive")
+    bundle.with_name("replay_fixture_manifest.json").write_text(json.dumps({"archive_sha256": "0" * 64}))
+    root = tmp_path / "checkout"
+    with pytest.raises(ValueError, match="fixture_archive_hash_mismatch"):
+        restore_fixtures(bundle, root)
+    assert not root.exists()

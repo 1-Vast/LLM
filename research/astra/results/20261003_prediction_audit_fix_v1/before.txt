@@ -1,0 +1,200 @@
+.FFFFF...............FFF...                                              [100%]
+================================== FAILURES ===================================
+_ test_panel_refuses_misbound_predictions_and_records_violations[change0-request_id_mismatch] _
+
+change = {'request_id': 'other-request'}, reason = 'request_id_mismatch'
+
+    @pytest.mark.parametrize("change,reason", [
+        ({"request_id": "other-request"}, "request_id_mismatch"),
+        ({"model_version": "other-model"}, "prediction_model_mismatch"),
+        ({"state_change": {"other_readout": 0.2}}, "readout_mismatch"),
+    ])
+    def test_panel_refuses_misbound_predictions_and_records_violations(change, reason):
+        class Backend(_StubBackend):
+            def predict(self, request):
+                return replace(super().predict(request), **change)
+        run = run_panel(Backend({"condition_a"}), _panel(("condition_a",)))
+        row, = run.rows
+>       assert not row.applicable and row.abstain_reason == reason
+E       AssertionError: assert (not True)
+E        +  where True = PanelRow(condition='condition_a', request_id='panel-1.0', support='supported', applicable=True, in_distribution=True, ...fact_ref=None, artifact_sha256=None, artifact_digest_verified=None, compute_cost=1.0, evidence_kind='model_prediction').applicable
+
+tests\test_virtual_cell_panel.py:166: AssertionError
+_ test_panel_refuses_misbound_predictions_and_records_violations[change1-prediction_model_mismatch] _
+
+change = {'model_version': 'other-model'}, reason = 'prediction_model_mismatch'
+
+    @pytest.mark.parametrize("change,reason", [
+        ({"request_id": "other-request"}, "request_id_mismatch"),
+        ({"model_version": "other-model"}, "prediction_model_mismatch"),
+        ({"state_change": {"other_readout": 0.2}}, "readout_mismatch"),
+    ])
+    def test_panel_refuses_misbound_predictions_and_records_violations(change, reason):
+        class Backend(_StubBackend):
+            def predict(self, request):
+                return replace(super().predict(request), **change)
+        run = run_panel(Backend({"condition_a"}), _panel(("condition_a",)))
+        row, = run.rows
+>       assert not row.applicable and row.abstain_reason == reason
+E       AssertionError: assert (not True)
+E        +  where True = PanelRow(condition='condition_a', request_id='panel-1.0', support='supported', applicable=True, in_distribution=True, ...fact_ref=None, artifact_sha256=None, artifact_digest_verified=None, compute_cost=1.0, evidence_kind='model_prediction').applicable
+
+tests\test_virtual_cell_panel.py:166: AssertionError
+_ test_panel_refuses_misbound_predictions_and_records_violations[change2-readout_mismatch] _
+
+change = {'state_change': {'other_readout': 0.2}}, reason = 'readout_mismatch'
+
+    @pytest.mark.parametrize("change,reason", [
+        ({"request_id": "other-request"}, "request_id_mismatch"),
+        ({"model_version": "other-model"}, "prediction_model_mismatch"),
+        ({"state_change": {"other_readout": 0.2}}, "readout_mismatch"),
+    ])
+    def test_panel_refuses_misbound_predictions_and_records_violations(change, reason):
+        class Backend(_StubBackend):
+            def predict(self, request):
+                return replace(super().predict(request), **change)
+        run = run_panel(Backend({"condition_a"}), _panel(("condition_a",)))
+        row, = run.rows
+>       assert not row.applicable and row.abstain_reason == reason
+E       AssertionError: assert (not True)
+E        +  where True = PanelRow(condition='condition_a', request_id='panel-1.0', support='supported', applicable=True, in_distribution=True, ...fact_ref=None, artifact_sha256=None, artifact_digest_verified=None, compute_cost=1.0, evidence_kind='model_prediction').applicable
+
+tests\test_virtual_cell_panel.py:166: AssertionError
+______ test_panel_keeps_backend_exceptions_as_refusal_rows[assess_query] ______
+
+stage = 'assess_query'
+
+    @pytest.mark.parametrize("stage", ["assess_query", "predict"])
+    def test_panel_keeps_backend_exceptions_as_refusal_rows(stage):
+        backend = _StubBackend({"condition_a"})
+        def fail(request):
+            raise RuntimeError("backend failed")
+        setattr(backend, stage, fail)
+>       row, = run_panel(backend, _panel(("condition_a",))).rows
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_virtual_cell_panel.py:179: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\virtual_cell\panel.py:229: in run_panel
+    assessment: QueryAssessment = backend.assess_query(request)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = PredictionRequest(request_id='panel-1.0', case_id='panel-1', contrast_id='panel', plan_version=1, intervention=Interve...mbedding_delta_l2',), model_version='stub_v1', hypotheses=(), history=(), observation_context=None, forecast_mode=None)
+
+    def fail(request):
+>       raise RuntimeError("backend failed")
+E       RuntimeError: backend failed
+
+tests\test_virtual_cell_panel.py:177: RuntimeError
+________ test_panel_keeps_backend_exceptions_as_refusal_rows[predict] _________
+
+stage = 'predict'
+
+    @pytest.mark.parametrize("stage", ["assess_query", "predict"])
+    def test_panel_keeps_backend_exceptions_as_refusal_rows(stage):
+        backend = _StubBackend({"condition_a"})
+        def fail(request):
+            raise RuntimeError("backend failed")
+        setattr(backend, stage, fail)
+>       row, = run_panel(backend, _panel(("condition_a",))).rows
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_virtual_cell_panel.py:179: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\virtual_cell\panel.py:249: in run_panel
+    prediction: StatePrediction = backend.predict(request)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = PredictionRequest(request_id='panel-1.0', case_id='panel-1', contrast_id='panel', plan_version=1, intervention=Interve...mbedding_delta_l2',), model_version='stub_v1', hypotheses=(), history=(), observation_context=None, forecast_mode=None)
+
+    def fail(request):
+>       raise RuntimeError("backend failed")
+E       RuntimeError: backend failed
+
+tests\test_virtual_cell_panel.py:177: RuntimeError
+______ test_multiple_results_keep_receipt_hashes_and_all_revisions[True] ______
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2574/test_multiple_results_keep_rec0')
+revised_first = True
+
+    @pytest.mark.parametrize("revised_first", [True, False])
+    def test_multiple_results_keep_receipt_hashes_and_all_revisions(tmp_path, revised_first):
+        controller = object.__new__(MAESTROOrchestrator)
+        controller._logger = RunLogger(tmp_path)
+        controller._round_records = {"session-1": _round()}
+        controller._round_results = {}
+        turn = SimpleNamespace(session_id="session-1")
+        records = []
+        for index, revised in enumerate((revised_first, not revised_first)):
+            result_id = f"result:{index}"
+            admission = SimpleNamespace(result_id=result_id, admitted_fields=(), admissible=True)
+            state = SimpleNamespace(updates=[SimpleNamespace(result_id=result_id,
+                                                             eliminated=("a",) if revised else ())])
+            records.append(controller._write_result_round(turn, SimpleNamespace(identifier=f"act-{index}"),
+                SimpleNamespace(metrics={"shared_readout": float(index)}), admission, state, result_id=result_id))
+        events = [json.loads(line) for line in controller._logger.events_path.read_text().splitlines()]
+>       assert len({event["payload"]["path"] for event in events}) == 2
+E       AssertionError: assert 1 == 2
+E        +  where 1 = len({'C:\\Users\\59964\\AppData\\Local\\Temp\\pytest-of-59964\\pytest-2574\\test_multiple_results_keep_rec0\\rounds\\session-1.result.json'})
+
+tests\test_handoff.py:162: AssertionError
+_____ test_multiple_results_keep_receipt_hashes_and_all_revisions[False] ______
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2574/test_multiple_results_keep_rec1')
+revised_first = False
+
+    @pytest.mark.parametrize("revised_first", [True, False])
+    def test_multiple_results_keep_receipt_hashes_and_all_revisions(tmp_path, revised_first):
+        controller = object.__new__(MAESTROOrchestrator)
+        controller._logger = RunLogger(tmp_path)
+        controller._round_records = {"session-1": _round()}
+        controller._round_results = {}
+        turn = SimpleNamespace(session_id="session-1")
+        records = []
+        for index, revised in enumerate((revised_first, not revised_first)):
+            result_id = f"result:{index}"
+            admission = SimpleNamespace(result_id=result_id, admitted_fields=(), admissible=True)
+            state = SimpleNamespace(updates=[SimpleNamespace(result_id=result_id,
+                                                             eliminated=("a",) if revised else ())])
+            records.append(controller._write_result_round(turn, SimpleNamespace(identifier=f"act-{index}"),
+                SimpleNamespace(metrics={"shared_readout": float(index)}), admission, state, result_id=result_id))
+        events = [json.loads(line) for line in controller._logger.events_path.read_text().splitlines()]
+>       assert len({event["payload"]["path"] for event in events}) == 2
+E       AssertionError: assert 1 == 2
+E        +  where 1 = len({'C:\\Users\\59964\\AppData\\Local\\Temp\\pytest-of-59964\\pytest-2574\\test_multiple_results_keep_rec1\\rounds\\session-1.result.json'})
+
+tests\test_handoff.py:162: AssertionError
+____ test_result_receipt_retry_is_identical_and_conflict_cannot_overwrite _____
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2574/test_result_receipt_retry_is_i0')
+
+    def test_result_receipt_retry_is_identical_and_conflict_cannot_overwrite(tmp_path):
+        logger = RunLogger(tmp_path)
+        record = _round(execution=ExecutionLayer(result_id="r:/1", observed={"readout": 1.0}))
+        assert logger.round(record, stage="result")
+        event = json.loads(logger.events_path.read_text().splitlines()[0])
+        path = Path(event["payload"]["path"])
+        original = path.read_bytes()
+        assert logger.round(record, stage="result")
+>       assert not logger.round(replace(record, execution=replace(record.execution, observed={"readout": 2.0})),
+                                stage="result")
+E       AssertionError: assert not True
+E        +  where True = round(RoundRecord(session_id='session-1', round_index=1, evidence=EvidenceLayer(records=('evidence-1',), conflicts=('a', 'b'...utionLayer(observed={'readout': 2.0}, belief_delta={}, contradiction_flag=False, stop_decision=None, result_id='r:/1')), stage='result')
+E        +    where round = <agent.memory.RunLogger object at 0x000002A739E7ADD0>.round
+E        +    and   RoundRecord(session_id='session-1', round_index=1, evidence=EvidenceLayer(records=('evidence-1',), conflicts=('a', 'b'...utionLayer(observed={'readout': 2.0}, belief_delta={}, contradiction_flag=False, stop_decision=None, result_id='r:/1')) = replace(RoundRecord(session_id='session-1', round_index=1, evidence=EvidenceLayer(records=('evidence-1',), conflicts=('a', 'b'...utionLayer(observed={'readout': 1.0}, belief_delta={}, contradiction_flag=False, stop_decision=None, result_id='r:/1')), execution=ExecutionLayer(observed={'readout': 2.0}, belief_delta={}, contradiction_flag=False, stop_decision=None, result_id='r:/1'))
+E        +      where ExecutionLayer(observed={'readout': 2.0}, belief_delta={}, contradiction_flag=False, stop_decision=None, result_id='r:/1') = replace(ExecutionLayer(observed={'readout': 1.0}, belief_delta={}, contradiction_flag=False, stop_decision=None, result_id='r:/1'), observed={'readout': 2.0})
+E        +        where ExecutionLayer(observed={'readout': 1.0}, belief_delta={}, contradiction_flag=False, stop_decision=None, result_id='r:/1') = RoundRecord(session_id='session-1', round_index=1, evidence=EvidenceLayer(records=('evidence-1',), conflicts=('a', 'b'...utionLayer(observed={'readout': 1.0}, belief_delta={}, contradiction_flag=False, stop_decision=None, result_id='r:/1')).execution
+
+tests\test_handoff.py:183: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_virtual_cell_panel.py::test_panel_refuses_misbound_predictions_and_records_violations[change0-request_id_mismatch]
+FAILED tests/test_virtual_cell_panel.py::test_panel_refuses_misbound_predictions_and_records_violations[change1-prediction_model_mismatch]
+FAILED tests/test_virtual_cell_panel.py::test_panel_refuses_misbound_predictions_and_records_violations[change2-readout_mismatch]
+FAILED tests/test_virtual_cell_panel.py::test_panel_keeps_backend_exceptions_as_refusal_rows[assess_query]
+FAILED tests/test_virtual_cell_panel.py::test_panel_keeps_backend_exceptions_as_refusal_rows[predict]
+FAILED tests/test_handoff.py::test_multiple_results_keep_receipt_hashes_and_all_revisions[True]
+FAILED tests/test_handoff.py::test_multiple_results_keep_receipt_hashes_and_all_revisions[False]
+FAILED tests/test_handoff.py::test_result_receipt_retry_is_identical_and_conflict_cannot_overwrite
+8 failed, 19 passed in 1.97s

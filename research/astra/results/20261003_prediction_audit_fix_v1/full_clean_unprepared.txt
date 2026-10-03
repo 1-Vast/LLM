@@ -1,0 +1,2155 @@
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 10%]
+........................................................................ [ 14%]
+........................................................................ [ 18%]
+........................................................................ [ 21%]
+........................................................................ [ 25%]
+...........................F............................................ [ 29%]
+........................................................................ [ 32%]
+........................................................................ [ 36%]
+.....................F..FFF.F........................................... [ 40%]
+.sF................................FFF...F...FFF.FFFFFFFFFFFF....F..s... [ 43%]
+..FFF................................................................... [ 47%]
+........................................................................ [ 51%]
+........................ssssss.............s............................ [ 54%]
+.....................................F.F..............................ss [ 58%]
+s....................................................................... [ 62%]
+........................................................................ [ 65%]
+........................................................................ [ 69%]
+.....EEE.EFF.......FFF.................................................. [ 73%]
+......s..................................................s.............. [ 76%]
+.........s.............................................................. [ 80%]
+....................................................................s... [ 84%]
+........................................................................ [ 87%]
+............FFFFF....................................................... [ 91%]
+........................................................................ [ 95%]
+........................................................................ [ 98%]
+.............EEF..EE.                                                    [100%]
+=================================== ERRORS ====================================
+_ ERROR at setup of test_real_population_preserves_unit_reading_query_denominators _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000001DD7E5982D0>, _basetemp=WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def real_run(tmp_path_factory):
+        out = tmp_path_factory.mktemp("real_denominator") / "run"
+        calls = Counter()
+        original_forecast = audit.CaseMemoryOutcomeForecaster.forecast
+        original_selector = audit.select_discriminating_action
+    
+        def forecast(model, contrast, actions, evidence, user_state=None):
+            assert (out / "predeclared.json").is_file()
+            assert evidence is not None and not evidence.updates
+            calls[f"forecast:{user_state.outcome_mode}"] += 1
+            return original_forecast(model, contrast, actions, evidence, user_state)
+    
+        def selector(candidates, actions, profile, budget, forecasts, consequences, **kwargs):
+            assert (out / "predeclared.json").is_file()
+            calls["production_selector"] += 1
+            return original_selector(candidates, actions, profile, budget, forecasts, consequences, **kwargs)
+    
+        with pytest.MonkeyPatch.context() as patch:
+            patch.setattr(audit.CaseMemoryOutcomeForecaster, "forecast", forecast)
+            patch.setattr(audit, "select_discriminating_action", selector)
+>           summary = audit.run(out, command=["pytest", "tests/test_real_case_memory_denominator.py"])
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_real_case_memory_denominator.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+research\dual_core_followup\denominator.py:119: in run
+    sources = source_records(root)
+              ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean')
+
+    def source_records(root: Path) -> dict:
+        records = {}
+        for path, expected in FROZEN_SHA256.items():
+            actual = file_sha(root / path)
+            if actual != expected:
+>               raise ValueError(f"frozen_source_hash_mismatch:{path}")
+E               ValueError: frozen_source_hash_mismatch:data/processed/case_memory_integration/pack.json
+
+research\dual_core_followup\denominator.py:65: ValueError
+_ ERROR at setup of test_both_forecasters_and_production_selector_really_execute _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000001DD7E5982D0>, _basetemp=WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def real_run(tmp_path_factory):
+        out = tmp_path_factory.mktemp("real_denominator") / "run"
+        calls = Counter()
+        original_forecast = audit.CaseMemoryOutcomeForecaster.forecast
+        original_selector = audit.select_discriminating_action
+    
+        def forecast(model, contrast, actions, evidence, user_state=None):
+            assert (out / "predeclared.json").is_file()
+            assert evidence is not None and not evidence.updates
+            calls[f"forecast:{user_state.outcome_mode}"] += 1
+            return original_forecast(model, contrast, actions, evidence, user_state)
+    
+        def selector(candidates, actions, profile, budget, forecasts, consequences, **kwargs):
+            assert (out / "predeclared.json").is_file()
+            calls["production_selector"] += 1
+            return original_selector(candidates, actions, profile, budget, forecasts, consequences, **kwargs)
+    
+        with pytest.MonkeyPatch.context() as patch:
+            patch.setattr(audit.CaseMemoryOutcomeForecaster, "forecast", forecast)
+            patch.setattr(audit, "select_discriminating_action", selector)
+>           summary = audit.run(out, command=["pytest", "tests/test_real_case_memory_denominator.py"])
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_real_case_memory_denominator.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+research\dual_core_followup\denominator.py:119: in run
+    sources = source_records(root)
+              ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean')
+
+    def source_records(root: Path) -> dict:
+        records = {}
+        for path, expected in FROZEN_SHA256.items():
+            actual = file_sha(root / path)
+            if actual != expected:
+>               raise ValueError(f"frozen_source_hash_mismatch:{path}")
+E               ValueError: frozen_source_hash_mismatch:data/processed/case_memory_integration/pack.json
+
+research\dual_core_followup\denominator.py:65: ValueError
+_ ERROR at setup of test_real_valid_only_records_cannot_supply_attempted_experiment_distribution _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000001DD7E5982D0>, _basetemp=WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def real_run(tmp_path_factory):
+        out = tmp_path_factory.mktemp("real_denominator") / "run"
+        calls = Counter()
+        original_forecast = audit.CaseMemoryOutcomeForecaster.forecast
+        original_selector = audit.select_discriminating_action
+    
+        def forecast(model, contrast, actions, evidence, user_state=None):
+            assert (out / "predeclared.json").is_file()
+            assert evidence is not None and not evidence.updates
+            calls[f"forecast:{user_state.outcome_mode}"] += 1
+            return original_forecast(model, contrast, actions, evidence, user_state)
+    
+        def selector(candidates, actions, profile, budget, forecasts, consequences, **kwargs):
+            assert (out / "predeclared.json").is_file()
+            calls["production_selector"] += 1
+            return original_selector(candidates, actions, profile, budget, forecasts, consequences, **kwargs)
+    
+        with pytest.MonkeyPatch.context() as patch:
+            patch.setattr(audit.CaseMemoryOutcomeForecaster, "forecast", forecast)
+            patch.setattr(audit, "select_discriminating_action", selector)
+>           summary = audit.run(out, command=["pytest", "tests/test_real_case_memory_denominator.py"])
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_real_case_memory_denominator.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+research\dual_core_followup\denominator.py:119: in run
+    sources = source_records(root)
+              ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean')
+
+    def source_records(root: Path) -> dict:
+        records = {}
+        for path, expected in FROZEN_SHA256.items():
+            actual = file_sha(root / path)
+            if actual != expected:
+>               raise ValueError(f"frozen_source_hash_mismatch:{path}")
+E               ValueError: frozen_source_hash_mismatch:data/processed/case_memory_integration/pack.json
+
+research\dual_core_followup\denominator.py:65: ValueError
+________ ERROR at setup of test_existing_output_cannot_be_overwritten _________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000001DD7E5982D0>, _basetemp=WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def real_run(tmp_path_factory):
+        out = tmp_path_factory.mktemp("real_denominator") / "run"
+        calls = Counter()
+        original_forecast = audit.CaseMemoryOutcomeForecaster.forecast
+        original_selector = audit.select_discriminating_action
+    
+        def forecast(model, contrast, actions, evidence, user_state=None):
+            assert (out / "predeclared.json").is_file()
+            assert evidence is not None and not evidence.updates
+            calls[f"forecast:{user_state.outcome_mode}"] += 1
+            return original_forecast(model, contrast, actions, evidence, user_state)
+    
+        def selector(candidates, actions, profile, budget, forecasts, consequences, **kwargs):
+            assert (out / "predeclared.json").is_file()
+            calls["production_selector"] += 1
+            return original_selector(candidates, actions, profile, budget, forecasts, consequences, **kwargs)
+    
+        with pytest.MonkeyPatch.context() as patch:
+            patch.setattr(audit.CaseMemoryOutcomeForecaster, "forecast", forecast)
+            patch.setattr(audit, "select_discriminating_action", selector)
+>           summary = audit.run(out, command=["pytest", "tests/test_real_case_memory_denominator.py"])
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_real_case_memory_denominator.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+research\dual_core_followup\denominator.py:119: in run
+    sources = source_records(root)
+              ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean')
+
+    def source_records(root: Path) -> dict:
+        records = {}
+        for path, expected in FROZEN_SHA256.items():
+            actual = file_sha(root / path)
+            if actual != expected:
+>               raise ValueError(f"frozen_source_hash_mismatch:{path}")
+E               ValueError: frozen_source_hash_mismatch:data/processed/case_memory_integration/pack.json
+
+research\dual_core_followup\denominator.py:65: ValueError
+___ ERROR at setup of test_the_split_excludes_every_development_study_block ___
+
+    @pytest.fixture(scope="module")
+    def pack_and_arrays():
+>       return XD.load_pack()
+               ^^^^^^^^^^^^^^
+
+research\case_memory_integration\test_external_evaluation.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tools\datasets\lincs_pack.py:233: in load_pack
+    arrays = dict(np.load(out_dir / "pack_arrays.npz"))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+file = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/processed/case_memory_integration/pack_arrays.npz')
+mmap_mode = None, allow_pickle = False, fix_imports = True, encoding = 'ASCII'
+max_header_size = 10000
+
+    @set_module('numpy')
+    def load(file, mmap_mode=None, allow_pickle=False, fix_imports=True,
+             encoding='ASCII', *, max_header_size=_MAX_HEADER_SIZE):
+        """
+        Load arrays or pickled objects from ``.npy``, ``.npz`` or pickled files.
+    
+        .. warning:: Loading files that contain object arrays uses the ``pickle``
+                     module, which is not secure against erroneous or maliciously
+                     constructed data. Consider passing ``allow_pickle=False`` to
+                     load data that is known not to contain object arrays for the
+                     safer handling of untrusted sources.
+    
+        Parameters
+        ----------
+        file : file-like object, string, or pathlib.Path
+            The file to read. File-like objects must support the
+            ``seek()`` and ``read()`` methods and must always
+            be opened in binary mode.  Pickled files require that the
+            file-like object support the ``readline()`` method as well.
+        mmap_mode : {None, 'r+', 'r', 'w+', 'c'}, optional
+            If not None, then memory-map the file, using the given mode (see
+            `numpy.memmap` for a detailed description of the modes).  A
+            memory-mapped array is kept on disk. However, it can be accessed
+            and sliced like any ndarray.  Memory mapping is especially useful
+            for accessing small fragments of large files without reading the
+            entire file into memory.
+        allow_pickle : bool, optional
+            Allow loading pickled object arrays stored in npy files. Reasons for
+            disallowing pickles include security, as loading pickled data can
+            execute arbitrary code. If pickles are disallowed, loading object
+            arrays will fail. Default: False
+        fix_imports : bool, optional
+            Only useful when loading Python 2 generated pickled files,
+            which includes npy/npz files containing object arrays. If `fix_imports`
+            is True, pickle will try to map the old Python 2 names to the new names
+            used in Python 3.
+        encoding : str, optional
+            What encoding to use when reading Python 2 strings. Only useful when
+            loading Python 2 generated pickled files, which includes
+            npy/npz files containing object arrays. Values other than 'latin1',
+            'ASCII', and 'bytes' are not allowed, as they can corrupt numerical
+            data. Default: 'ASCII'
+        max_header_size : int, optional
+            Maximum allowed size of the header.  Large headers may not be safe
+            to load securely and thus require explicitly passing a larger value.
+            See :py:func:`ast.literal_eval()` for details.
+            This option is ignored when `allow_pickle` is passed.  In that case
+            the file is by definition trusted and the limit is unnecessary.
+    
+        Returns
+        -------
+        result : array, tuple, dict, etc.
+            Data stored in the file. For ``.npz`` files, the returned instance
+            of NpzFile class must be closed to avoid leaking file descriptors.
+    
+        Raises
+        ------
+        OSError
+            If the input file does not exist or cannot be read.
+        UnpicklingError
+            If ``allow_pickle=True``, but the file cannot be loaded as a pickle.
+        ValueError
+            The file contains an object array, but ``allow_pickle=False`` given.
+        EOFError
+            When calling ``np.load`` multiple times on the same file handle,
+            if all data has already been read
+    
+        See Also
+        --------
+        save, savez, savez_compressed, loadtxt
+        memmap : Create a memory-map to an array stored in a file on disk.
+        lib.format.open_memmap : Create or load a memory-mapped ``.npy`` file.
+    
+        Notes
+        -----
+        - If the file contains pickle data, then whatever object is stored
+          in the pickle is returned.
+        - If the file is a ``.npy`` file, then a single array is returned.
+        - If the file is a ``.npz`` file, then a dictionary-like object is
+          returned, containing ``{filename: array}`` key-value pairs, one for
+          each file in the archive.
+        - If the file is a ``.npz`` file, the returned value supports the
+          context manager protocol in a similar fashion to the open function::
+    
+            with load('foo.npz') as data:
+                a = data['a']
+    
+          The underlying file descriptor is closed when exiting the 'with'
+          block.
+    
+        Examples
+        --------
+        >>> import numpy as np
+    
+        Store data to disk, and load it again:
+    
+        >>> np.save('/tmp/123', np.array([[1, 2, 3], [4, 5, 6]]))
+        >>> np.load('/tmp/123.npy')
+        array([[1, 2, 3],
+               [4, 5, 6]])
+    
+        Store compressed data to disk, and load it again:
+    
+        >>> a=np.array([[1, 2, 3], [4, 5, 6]])
+        >>> b=np.array([1, 2])
+        >>> np.savez('/tmp/123.npz', a=a, b=b)
+        >>> data = np.load('/tmp/123.npz')
+        >>> data['a']
+        array([[1, 2, 3],
+               [4, 5, 6]])
+        >>> data['b']
+        array([1, 2])
+        >>> data.close()
+    
+        Mem-map the stored array, and then access the second row
+        directly from disk:
+    
+        >>> X = np.load('/tmp/123.npy', mmap_mode='r')
+        >>> X[1, :]
+        memmap([4, 5, 6])
+    
+        """
+        if encoding not in ('ASCII', 'latin1', 'bytes'):
+            # The 'encoding' value for pickle also affects what encoding
+            # the serialized binary data of NumPy arrays is loaded
+            # in. Pickle does not pass on the encoding information to
+            # NumPy. The unpickling code in numpy._core.multiarray is
+            # written to assume that unicode data appearing where binary
+            # should be is in 'latin1'. 'bytes' is also safe, as is 'ASCII'.
+            #
+            # Other encoding values can corrupt binary data, and we
+            # purposefully disallow them. For the same reason, the errors=
+            # argument is not exposed, as values other than 'strict'
+            # result can similarly silently corrupt numerical data.
+            raise ValueError("encoding must be 'ASCII', 'latin1', or 'bytes'")
+    
+        pickle_kwargs = {'encoding': encoding, 'fix_imports': fix_imports}
+    
+        with contextlib.ExitStack() as stack:
+            if hasattr(file, 'read'):
+                fid = file
+                own_fid = False
+            else:
+>               fid = stack.enter_context(open(os.fspath(file), "rb"))
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\processed\\case_memory_integration\\pack_arrays.npz'
+
+D:\anaconda\envs\maestro\Lib\site-packages\numpy\lib\_npyio_impl.py:454: FileNotFoundError
+_____ ERROR at setup of test_the_population_matches_the_frozen_pool_rule ______
+
+    @pytest.fixture(scope="module")
+    def pack_and_arrays():
+>       return XD.load_pack()
+               ^^^^^^^^^^^^^^
+
+research\case_memory_integration\test_external_evaluation.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tools\datasets\lincs_pack.py:233: in load_pack
+    arrays = dict(np.load(out_dir / "pack_arrays.npz"))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+file = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/processed/case_memory_integration/pack_arrays.npz')
+mmap_mode = None, allow_pickle = False, fix_imports = True, encoding = 'ASCII'
+max_header_size = 10000
+
+    @set_module('numpy')
+    def load(file, mmap_mode=None, allow_pickle=False, fix_imports=True,
+             encoding='ASCII', *, max_header_size=_MAX_HEADER_SIZE):
+        """
+        Load arrays or pickled objects from ``.npy``, ``.npz`` or pickled files.
+    
+        .. warning:: Loading files that contain object arrays uses the ``pickle``
+                     module, which is not secure against erroneous or maliciously
+                     constructed data. Consider passing ``allow_pickle=False`` to
+                     load data that is known not to contain object arrays for the
+                     safer handling of untrusted sources.
+    
+        Parameters
+        ----------
+        file : file-like object, string, or pathlib.Path
+            The file to read. File-like objects must support the
+            ``seek()`` and ``read()`` methods and must always
+            be opened in binary mode.  Pickled files require that the
+            file-like object support the ``readline()`` method as well.
+        mmap_mode : {None, 'r+', 'r', 'w+', 'c'}, optional
+            If not None, then memory-map the file, using the given mode (see
+            `numpy.memmap` for a detailed description of the modes).  A
+            memory-mapped array is kept on disk. However, it can be accessed
+            and sliced like any ndarray.  Memory mapping is especially useful
+            for accessing small fragments of large files without reading the
+            entire file into memory.
+        allow_pickle : bool, optional
+            Allow loading pickled object arrays stored in npy files. Reasons for
+            disallowing pickles include security, as loading pickled data can
+            execute arbitrary code. If pickles are disallowed, loading object
+            arrays will fail. Default: False
+        fix_imports : bool, optional
+            Only useful when loading Python 2 generated pickled files,
+            which includes npy/npz files containing object arrays. If `fix_imports`
+            is True, pickle will try to map the old Python 2 names to the new names
+            used in Python 3.
+        encoding : str, optional
+            What encoding to use when reading Python 2 strings. Only useful when
+            loading Python 2 generated pickled files, which includes
+            npy/npz files containing object arrays. Values other than 'latin1',
+            'ASCII', and 'bytes' are not allowed, as they can corrupt numerical
+            data. Default: 'ASCII'
+        max_header_size : int, optional
+            Maximum allowed size of the header.  Large headers may not be safe
+            to load securely and thus require explicitly passing a larger value.
+            See :py:func:`ast.literal_eval()` for details.
+            This option is ignored when `allow_pickle` is passed.  In that case
+            the file is by definition trusted and the limit is unnecessary.
+    
+        Returns
+        -------
+        result : array, tuple, dict, etc.
+            Data stored in the file. For ``.npz`` files, the returned instance
+            of NpzFile class must be closed to avoid leaking file descriptors.
+    
+        Raises
+        ------
+        OSError
+            If the input file does not exist or cannot be read.
+        UnpicklingError
+            If ``allow_pickle=True``, but the file cannot be loaded as a pickle.
+        ValueError
+            The file contains an object array, but ``allow_pickle=False`` given.
+        EOFError
+            When calling ``np.load`` multiple times on the same file handle,
+            if all data has already been read
+    
+        See Also
+        --------
+        save, savez, savez_compressed, loadtxt
+        memmap : Create a memory-map to an array stored in a file on disk.
+        lib.format.open_memmap : Create or load a memory-mapped ``.npy`` file.
+    
+        Notes
+        -----
+        - If the file contains pickle data, then whatever object is stored
+          in the pickle is returned.
+        - If the file is a ``.npy`` file, then a single array is returned.
+        - If the file is a ``.npz`` file, then a dictionary-like object is
+          returned, containing ``{filename: array}`` key-value pairs, one for
+          each file in the archive.
+        - If the file is a ``.npz`` file, the returned value supports the
+          context manager protocol in a similar fashion to the open function::
+    
+            with load('foo.npz') as data:
+                a = data['a']
+    
+          The underlying file descriptor is closed when exiting the 'with'
+          block.
+    
+        Examples
+        --------
+        >>> import numpy as np
+    
+        Store data to disk, and load it again:
+    
+        >>> np.save('/tmp/123', np.array([[1, 2, 3], [4, 5, 6]]))
+        >>> np.load('/tmp/123.npy')
+        array([[1, 2, 3],
+               [4, 5, 6]])
+    
+        Store compressed data to disk, and load it again:
+    
+        >>> a=np.array([[1, 2, 3], [4, 5, 6]])
+        >>> b=np.array([1, 2])
+        >>> np.savez('/tmp/123.npz', a=a, b=b)
+        >>> data = np.load('/tmp/123.npz')
+        >>> data['a']
+        array([[1, 2, 3],
+               [4, 5, 6]])
+        >>> data['b']
+        array([1, 2])
+        >>> data.close()
+    
+        Mem-map the stored array, and then access the second row
+        directly from disk:
+    
+        >>> X = np.load('/tmp/123.npy', mmap_mode='r')
+        >>> X[1, :]
+        memmap([4, 5, 6])
+    
+        """
+        if encoding not in ('ASCII', 'latin1', 'bytes'):
+            # The 'encoding' value for pickle also affects what encoding
+            # the serialized binary data of NumPy arrays is loaded
+            # in. Pickle does not pass on the encoding information to
+            # NumPy. The unpickling code in numpy._core.multiarray is
+            # written to assume that unicode data appearing where binary
+            # should be is in 'latin1'. 'bytes' is also safe, as is 'ASCII'.
+            #
+            # Other encoding values can corrupt binary data, and we
+            # purposefully disallow them. For the same reason, the errors=
+            # argument is not exposed, as values other than 'strict'
+            # result can similarly silently corrupt numerical data.
+            raise ValueError("encoding must be 'ASCII', 'latin1', or 'bytes'")
+    
+        pickle_kwargs = {'encoding': encoding, 'fix_imports': fix_imports}
+    
+        with contextlib.ExitStack() as stack:
+            if hasattr(file, 'read'):
+                fid = file
+                own_fid = False
+            else:
+>               fid = stack.enter_context(open(os.fspath(file), "rb"))
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\processed\\case_memory_integration\\pack_arrays.npz'
+
+D:\anaconda\envs\maestro\Lib\site-packages\numpy\lib\_npyio_impl.py:454: FileNotFoundError
+_ ERROR at setup of test_no_condition_is_zero_filled_and_condition_keys_are_consistent _
+
+    @pytest.fixture(scope="module")
+    def pack_and_arrays():
+>       return XD.load_pack()
+               ^^^^^^^^^^^^^^
+
+research\case_memory_integration\test_external_evaluation.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tools\datasets\lincs_pack.py:233: in load_pack
+    arrays = dict(np.load(out_dir / "pack_arrays.npz"))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+file = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/processed/case_memory_integration/pack_arrays.npz')
+mmap_mode = None, allow_pickle = False, fix_imports = True, encoding = 'ASCII'
+max_header_size = 10000
+
+    @set_module('numpy')
+    def load(file, mmap_mode=None, allow_pickle=False, fix_imports=True,
+             encoding='ASCII', *, max_header_size=_MAX_HEADER_SIZE):
+        """
+        Load arrays or pickled objects from ``.npy``, ``.npz`` or pickled files.
+    
+        .. warning:: Loading files that contain object arrays uses the ``pickle``
+                     module, which is not secure against erroneous or maliciously
+                     constructed data. Consider passing ``allow_pickle=False`` to
+                     load data that is known not to contain object arrays for the
+                     safer handling of untrusted sources.
+    
+        Parameters
+        ----------
+        file : file-like object, string, or pathlib.Path
+            The file to read. File-like objects must support the
+            ``seek()`` and ``read()`` methods and must always
+            be opened in binary mode.  Pickled files require that the
+            file-like object support the ``readline()`` method as well.
+        mmap_mode : {None, 'r+', 'r', 'w+', 'c'}, optional
+            If not None, then memory-map the file, using the given mode (see
+            `numpy.memmap` for a detailed description of the modes).  A
+            memory-mapped array is kept on disk. However, it can be accessed
+            and sliced like any ndarray.  Memory mapping is especially useful
+            for accessing small fragments of large files without reading the
+            entire file into memory.
+        allow_pickle : bool, optional
+            Allow loading pickled object arrays stored in npy files. Reasons for
+            disallowing pickles include security, as loading pickled data can
+            execute arbitrary code. If pickles are disallowed, loading object
+            arrays will fail. Default: False
+        fix_imports : bool, optional
+            Only useful when loading Python 2 generated pickled files,
+            which includes npy/npz files containing object arrays. If `fix_imports`
+            is True, pickle will try to map the old Python 2 names to the new names
+            used in Python 3.
+        encoding : str, optional
+            What encoding to use when reading Python 2 strings. Only useful when
+            loading Python 2 generated pickled files, which includes
+            npy/npz files containing object arrays. Values other than 'latin1',
+            'ASCII', and 'bytes' are not allowed, as they can corrupt numerical
+            data. Default: 'ASCII'
+        max_header_size : int, optional
+            Maximum allowed size of the header.  Large headers may not be safe
+            to load securely and thus require explicitly passing a larger value.
+            See :py:func:`ast.literal_eval()` for details.
+            This option is ignored when `allow_pickle` is passed.  In that case
+            the file is by definition trusted and the limit is unnecessary.
+    
+        Returns
+        -------
+        result : array, tuple, dict, etc.
+            Data stored in the file. For ``.npz`` files, the returned instance
+            of NpzFile class must be closed to avoid leaking file descriptors.
+    
+        Raises
+        ------
+        OSError
+            If the input file does not exist or cannot be read.
+        UnpicklingError
+            If ``allow_pickle=True``, but the file cannot be loaded as a pickle.
+        ValueError
+            The file contains an object array, but ``allow_pickle=False`` given.
+        EOFError
+            When calling ``np.load`` multiple times on the same file handle,
+            if all data has already been read
+    
+        See Also
+        --------
+        save, savez, savez_compressed, loadtxt
+        memmap : Create a memory-map to an array stored in a file on disk.
+        lib.format.open_memmap : Create or load a memory-mapped ``.npy`` file.
+    
+        Notes
+        -----
+        - If the file contains pickle data, then whatever object is stored
+          in the pickle is returned.
+        - If the file is a ``.npy`` file, then a single array is returned.
+        - If the file is a ``.npz`` file, then a dictionary-like object is
+          returned, containing ``{filename: array}`` key-value pairs, one for
+          each file in the archive.
+        - If the file is a ``.npz`` file, the returned value supports the
+          context manager protocol in a similar fashion to the open function::
+    
+            with load('foo.npz') as data:
+                a = data['a']
+    
+          The underlying file descriptor is closed when exiting the 'with'
+          block.
+    
+        Examples
+        --------
+        >>> import numpy as np
+    
+        Store data to disk, and load it again:
+    
+        >>> np.save('/tmp/123', np.array([[1, 2, 3], [4, 5, 6]]))
+        >>> np.load('/tmp/123.npy')
+        array([[1, 2, 3],
+               [4, 5, 6]])
+    
+        Store compressed data to disk, and load it again:
+    
+        >>> a=np.array([[1, 2, 3], [4, 5, 6]])
+        >>> b=np.array([1, 2])
+        >>> np.savez('/tmp/123.npz', a=a, b=b)
+        >>> data = np.load('/tmp/123.npz')
+        >>> data['a']
+        array([[1, 2, 3],
+               [4, 5, 6]])
+        >>> data['b']
+        array([1, 2])
+        >>> data.close()
+    
+        Mem-map the stored array, and then access the second row
+        directly from disk:
+    
+        >>> X = np.load('/tmp/123.npy', mmap_mode='r')
+        >>> X[1, :]
+        memmap([4, 5, 6])
+    
+        """
+        if encoding not in ('ASCII', 'latin1', 'bytes'):
+            # The 'encoding' value for pickle also affects what encoding
+            # the serialized binary data of NumPy arrays is loaded
+            # in. Pickle does not pass on the encoding information to
+            # NumPy. The unpickling code in numpy._core.multiarray is
+            # written to assume that unicode data appearing where binary
+            # should be is in 'latin1'. 'bytes' is also safe, as is 'ASCII'.
+            #
+            # Other encoding values can corrupt binary data, and we
+            # purposefully disallow them. For the same reason, the errors=
+            # argument is not exposed, as values other than 'strict'
+            # result can similarly silently corrupt numerical data.
+            raise ValueError("encoding must be 'ASCII', 'latin1', or 'bytes'")
+    
+        pickle_kwargs = {'encoding': encoding, 'fix_imports': fix_imports}
+    
+        with contextlib.ExitStack() as stack:
+            if hasattr(file, 'read'):
+                fid = file
+                own_fid = False
+            else:
+>               fid = stack.enter_context(open(os.fspath(file), "rb"))
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\processed\\case_memory_integration\\pack_arrays.npz'
+
+D:\anaconda\envs\maestro\Lib\site-packages\numpy\lib\_npyio_impl.py:454: FileNotFoundError
+______ ERROR at setup of test_fitted_quantities_are_blind_to_test_labels ______
+
+    @pytest.fixture(scope="module")
+    def pack_and_arrays():
+>       return XD.load_pack()
+               ^^^^^^^^^^^^^^
+
+research\case_memory_integration\test_external_evaluation.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tools\datasets\lincs_pack.py:233: in load_pack
+    arrays = dict(np.load(out_dir / "pack_arrays.npz"))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+file = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/processed/case_memory_integration/pack_arrays.npz')
+mmap_mode = None, allow_pickle = False, fix_imports = True, encoding = 'ASCII'
+max_header_size = 10000
+
+    @set_module('numpy')
+    def load(file, mmap_mode=None, allow_pickle=False, fix_imports=True,
+             encoding='ASCII', *, max_header_size=_MAX_HEADER_SIZE):
+        """
+        Load arrays or pickled objects from ``.npy``, ``.npz`` or pickled files.
+    
+        .. warning:: Loading files that contain object arrays uses the ``pickle``
+                     module, which is not secure against erroneous or maliciously
+                     constructed data. Consider passing ``allow_pickle=False`` to
+                     load data that is known not to contain object arrays for the
+                     safer handling of untrusted sources.
+    
+        Parameters
+        ----------
+        file : file-like object, string, or pathlib.Path
+            The file to read. File-like objects must support the
+            ``seek()`` and ``read()`` methods and must always
+            be opened in binary mode.  Pickled files require that the
+            file-like object support the ``readline()`` method as well.
+        mmap_mode : {None, 'r+', 'r', 'w+', 'c'}, optional
+            If not None, then memory-map the file, using the given mode (see
+            `numpy.memmap` for a detailed description of the modes).  A
+            memory-mapped array is kept on disk. However, it can be accessed
+            and sliced like any ndarray.  Memory mapping is especially useful
+            for accessing small fragments of large files without reading the
+            entire file into memory.
+        allow_pickle : bool, optional
+            Allow loading pickled object arrays stored in npy files. Reasons for
+            disallowing pickles include security, as loading pickled data can
+            execute arbitrary code. If pickles are disallowed, loading object
+            arrays will fail. Default: False
+        fix_imports : bool, optional
+            Only useful when loading Python 2 generated pickled files,
+            which includes npy/npz files containing object arrays. If `fix_imports`
+            is True, pickle will try to map the old Python 2 names to the new names
+            used in Python 3.
+        encoding : str, optional
+            What encoding to use when reading Python 2 strings. Only useful when
+            loading Python 2 generated pickled files, which includes
+            npy/npz files containing object arrays. Values other than 'latin1',
+            'ASCII', and 'bytes' are not allowed, as they can corrupt numerical
+            data. Default: 'ASCII'
+        max_header_size : int, optional
+            Maximum allowed size of the header.  Large headers may not be safe
+            to load securely and thus require explicitly passing a larger value.
+            See :py:func:`ast.literal_eval()` for details.
+            This option is ignored when `allow_pickle` is passed.  In that case
+            the file is by definition trusted and the limit is unnecessary.
+    
+        Returns
+        -------
+        result : array, tuple, dict, etc.
+            Data stored in the file. For ``.npz`` files, the returned instance
+            of NpzFile class must be closed to avoid leaking file descriptors.
+    
+        Raises
+        ------
+        OSError
+            If the input file does not exist or cannot be read.
+        UnpicklingError
+            If ``allow_pickle=True``, but the file cannot be loaded as a pickle.
+        ValueError
+            The file contains an object array, but ``allow_pickle=False`` given.
+        EOFError
+            When calling ``np.load`` multiple times on the same file handle,
+            if all data has already been read
+    
+        See Also
+        --------
+        save, savez, savez_compressed, loadtxt
+        memmap : Create a memory-map to an array stored in a file on disk.
+        lib.format.open_memmap : Create or load a memory-mapped ``.npy`` file.
+    
+        Notes
+        -----
+        - If the file contains pickle data, then whatever object is stored
+          in the pickle is returned.
+        - If the file is a ``.npy`` file, then a single array is returned.
+        - If the file is a ``.npz`` file, then a dictionary-like object is
+          returned, containing ``{filename: array}`` key-value pairs, one for
+          each file in the archive.
+        - If the file is a ``.npz`` file, the returned value supports the
+          context manager protocol in a similar fashion to the open function::
+    
+            with load('foo.npz') as data:
+                a = data['a']
+    
+          The underlying file descriptor is closed when exiting the 'with'
+          block.
+    
+        Examples
+        --------
+        >>> import numpy as np
+    
+        Store data to disk, and load it again:
+    
+        >>> np.save('/tmp/123', np.array([[1, 2, 3], [4, 5, 6]]))
+        >>> np.load('/tmp/123.npy')
+        array([[1, 2, 3],
+               [4, 5, 6]])
+    
+        Store compressed data to disk, and load it again:
+    
+        >>> a=np.array([[1, 2, 3], [4, 5, 6]])
+        >>> b=np.array([1, 2])
+        >>> np.savez('/tmp/123.npz', a=a, b=b)
+        >>> data = np.load('/tmp/123.npz')
+        >>> data['a']
+        array([[1, 2, 3],
+               [4, 5, 6]])
+        >>> data['b']
+        array([1, 2])
+        >>> data.close()
+    
+        Mem-map the stored array, and then access the second row
+        directly from disk:
+    
+        >>> X = np.load('/tmp/123.npy', mmap_mode='r')
+        >>> X[1, :]
+        memmap([4, 5, 6])
+    
+        """
+        if encoding not in ('ASCII', 'latin1', 'bytes'):
+            # The 'encoding' value for pickle also affects what encoding
+            # the serialized binary data of NumPy arrays is loaded
+            # in. Pickle does not pass on the encoding information to
+            # NumPy. The unpickling code in numpy._core.multiarray is
+            # written to assume that unicode data appearing where binary
+            # should be is in 'latin1'. 'bytes' is also safe, as is 'ASCII'.
+            #
+            # Other encoding values can corrupt binary data, and we
+            # purposefully disallow them. For the same reason, the errors=
+            # argument is not exposed, as values other than 'strict'
+            # result can similarly silently corrupt numerical data.
+            raise ValueError("encoding must be 'ASCII', 'latin1', or 'bytes'")
+    
+        pickle_kwargs = {'encoding': encoding, 'fix_imports': fix_imports}
+    
+        with contextlib.ExitStack() as stack:
+            if hasattr(file, 'read'):
+                fid = file
+                own_fid = False
+            else:
+>               fid = stack.enter_context(open(os.fspath(file), "rb"))
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\processed\\case_memory_integration\\pack_arrays.npz'
+
+D:\anaconda\envs\maestro\Lib\site-packages\numpy\lib\_npyio_impl.py:454: FileNotFoundError
+================================== FAILURES ===================================
+_ test_current_real_partial_case_is_explicitly_ineligible_for_directed_repair_evaluation _
+
+    def test_current_real_partial_case_is_explicitly_ineligible_for_directed_repair_evaluation():
+>       assessment = assess_registry(ROOT / "data/evaluation/candidate_registry.json")[0]
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_candidate_screening.py:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tools\evaluation\construction.py:1371: in assess_registry
+    return tuple(assess_candidate(candidate) for candidate in load_candidate_registry(path))
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\evaluation\construction.py:1337: in load_candidate_registry
+    data = json.loads(path.read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/evaluation/candidate_registry.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\evaluation\\candidate_registry.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+_______ test_a_cross_context_review_is_planned_without_the_case_context _______
+
+    def test_a_cross_context_review_is_planned_without_the_case_context():
+        """A panel review and an orthogonal control declare where they run.
+    
+        Planning every action in the case's own context made the store reject a
+        valid cross-context record, so the declaration is read instead.
+        """
+    
+        cases = CaseRepository(
+            Path("data/evaluation/cases/real/public"), Path("data/evaluation/cases/real/private")
+        ).load()
+>       case = next(item for item, _ in cases if item.public.action("dependency_selectivity_profile"))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests\test_directed_repair_and_licensing.py:277: StopIteration
+________ test_deferral_is_correct_only_when_nothing_else_is_licensable ________
+
+    def test_deferral_is_correct_only_when_nothing_else_is_licensable():
+        """Refusing to act is right when nothing is licensable and wrong when something is."""
+    
+>       case, outcomes = next(
+            item
+            for item in CaseRepository(
+                Path("data/evaluation/cases/real/public"), Path("data/evaluation/cases/real/private")
+            ).load()
+            if any(rule.required_outcomes for rule in item[0].scoring.decision_rules)
+        )
+E       StopIteration
+
+tests\test_directed_repair_and_licensing.py:353: StopIteration
+_____________ test_a_quality_failed_measurement_licenses_nothing ______________
+
+    def test_a_quality_failed_measurement_licenses_nothing():
+        """An uninterpretable record cannot license a development action.
+    
+        A rule resting on a measurement requires that measurement to have passed
+        its declared quality check, so marking the record failed withdraws the
+        licence even though the record stays valid and keeps its outcome label.
+        """
+    
+        from dataclasses import replace as dataclass_replace
+    
+>       case, outcomes = next(
+            item
+            for item in CaseRepository(
+                Path("data/evaluation/cases/real/public"), Path("data/evaluation/cases/real/private")
+            ).load()
+            if any(
+                rule.required_outcomes and rule.require_biological_quality
+                for rule in item[0].scoring.decision_rules
+            )
+        )
+E       StopIteration
+
+tests\test_directed_repair_and_licensing.py:396: StopIteration
+__________ test_a_terminal_decision_may_cite_public_premise_evidence __________
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_a_terminal_decision_may_c0')
+
+    def test_a_terminal_decision_may_cite_public_premise_evidence(tmp_path: Path):
+        """A decision licensed by the public premise has no revealed record to cite.
+    
+        Requiring one forced every policy to buy something before it could submit
+        anything, which is a spending bias rather than an evidence contract.
+        """
+    
+>       case, outcomes = next(
+            item
+            for item in CaseRepository(
+                Path("data/evaluation/cases/real/public"), Path("data/evaluation/cases/real/private")
+            ).load()
+            if not any(rule.required_outcomes for rule in item[0].scoring.decision_rules)
+        )
+E       StopIteration
+
+tests\test_directed_repair_and_licensing.py:428: StopIteration
+_____ test_a_provider_failure_is_recorded_as_one_lost_case_not_a_lost_run _____
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_a_provider_failure_is_rec0')
+
+    def test_a_provider_failure_is_recorded_as_one_lost_case_not_a_lost_run(tmp_path: Path):
+        """One transport failure must not discard an entire multi-case comparison."""
+    
+        from agent.llm import LLMError
+    
+>       case, outcomes = _real_case("")
+                         ^^^^^^^^^^^^^^
+
+tests\test_directed_repair_and_licensing.py:467: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+identifier_fragment = ''
+
+    def _real_case(identifier_fragment: str):
+        cases = CaseRepository(
+            Path("data/evaluation/cases/real/public"), Path("data/evaluation/cases/real/private")
+        ).load()
+>       return next(item for item in cases if identifier_fragment in item[0].public.identifier)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests\test_directed_repair_and_licensing.py:347: StopIteration
+______________ test_a_missing_archive_member_is_refused_by_name _______________
+
+    def test_a_missing_archive_member_is_refused_by_name():
+        with pytest.raises(KeyError):
+>           Workbook(PISA_ZIP, member="not-a-member.xlsx")
+
+tests\test_engagement_package.py:236: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tools\evaluation\engagement_sources.py:49: in __init__
+    with zipfile.ZipFile(self.path) as outer:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <zipfile.ZipFile [closed]>
+file = 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\external\\pisa_living_cells\\PMC11554310_supplementary.zip'
+mode = 'r', compression = 0, allowZip64 = True, compresslevel = None
+strict_timestamps = True, metadata_encoding = None
+
+    def __init__(self, file, mode="r", compression=ZIP_STORED, allowZip64=True,
+                 compresslevel=None, *, strict_timestamps=True, metadata_encoding=None):
+        """Open the ZIP file with mode read 'r', write 'w', exclusive create 'x',
+        or append 'a'."""
+        if mode not in ('r', 'w', 'x', 'a'):
+            raise ValueError("ZipFile requires mode 'r', 'w', 'x', or 'a'")
+    
+        _check_compression(compression)
+    
+        self._allowZip64 = allowZip64
+        self._didModify = False
+        self.debug = 0  # Level of printing: 0 through 3
+        self.NameToInfo = {}    # Find file info given name
+        self.filelist = []      # List of ZipInfo instances for archive
+        self.compression = compression  # Method of compression
+        self.compresslevel = compresslevel
+        self.mode = mode
+        self.pwd = None
+        self._comment = b''
+        self._strict_timestamps = strict_timestamps
+        self.metadata_encoding = metadata_encoding
+    
+        # Check that we don't try to write with nonconforming codecs
+        if self.metadata_encoding and mode != 'r':
+            raise ValueError(
+                "metadata_encoding is only supported for reading files")
+    
+        # Check if we were passed a file-like object
+        if isinstance(file, os.PathLike):
+            file = os.fspath(file)
+        if isinstance(file, str):
+            # No, it's a filename
+            self._filePassed = 0
+            self.filename = file
+            modeDict = {'r' : 'rb', 'w': 'w+b', 'x': 'x+b', 'a' : 'r+b',
+                        'r+b': 'w+b', 'w+b': 'wb', 'x+b': 'xb'}
+            filemode = modeDict[mode]
+            while True:
+                try:
+>                   self.fp = io.open(file, filemode)
+                              ^^^^^^^^^^^^^^^^^^^^^^^
+E                   FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\external\\pisa_living_cells\\PMC11554310_supplementary.zip'
+
+D:\anaconda\envs\maestro\Lib\zipfile.py:1312: FileNotFoundError
+____ test_fresh_runs_and_policies_have_separate_state_and_explicit_resume _____
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_fresh_runs_and_policies_h0')
+
+    def test_fresh_runs_and_policies_have_separate_state_and_explicit_resume(tmp_path: Path):
+>       case, outcomes = _case("synthetic-functional-calibration-001")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_evaluation_isolation.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+identifier = 'synthetic-functional-calibration-001'
+
+    def _case(identifier):
+>       return next(item for item in _cases() if item[0].public.identifier == identifier)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests\test_evaluation_isolation.py:40: StopIteration
+____ test_decision_mode_scores_a_wrong_policy_without_replacing_its_answer ____
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_decision_mode_scores_a_wr0')
+
+    def test_decision_mode_scores_a_wrong_policy_without_replacing_its_answer(tmp_path: Path):
+>       case, outcomes = _case("depmap-prism-snu761-egfr-osimertinib-001")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_evaluation_isolation.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+identifier = 'depmap-prism-snu761-egfr-osimertinib-001'
+
+    def _case(identifier):
+>       return next(item for item in _cases() if item[0].public.identifier == identifier)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests\test_evaluation_isolation.py:40: StopIteration
+_ test_qc_failure_and_insufficient_function_do_not_unlock_mode_mechanism_support _
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_qc_failure_and_insufficie0')
+
+    def test_qc_failure_and_insufficient_function_do_not_unlock_mode_mechanism_support(tmp_path: Path):
+>       case, outcomes = _case("synthetic-functional-calibration-001")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_evaluation_isolation.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+identifier = 'synthetic-functional-calibration-001'
+
+    def _case(identifier):
+>       return next(item for item in _cases() if item[0].public.identifier == identifier)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests\test_evaluation_isolation.py:40: StopIteration
+_ test_production_planner_context_cannot_read_production_or_other_run_private_evidence _
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_production_planner_contex0')
+
+    def test_production_planner_context_cannot_read_production_or_other_run_private_evidence(tmp_path: Path):
+>       case, outcomes = _case("depmap-prism-snu761-egfr-osimertinib-001")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_evaluation_isolation.py:184: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+identifier = 'depmap-prism-snu761-egfr-osimertinib-001'
+
+    def _case(identifier):
+>       return next(item for item in _cases() if item[0].public.identifier == identifier)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests\test_evaluation_isolation.py:40: StopIteration
+_ test_the_contract_case_is_priced_in_wells_and_days_beside_its_abstract_cost _
+
+    def test_the_contract_case_is_priced_in_wells_and_days_beside_its_abstract_cost():
+>       priced = _contract_cases()
+                 ^^^^^^^^^^^^^^^^^
+
+tests\test_evaluation_protocol.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_evaluation_protocol.py:44: in _contract_cases
+    profile = load_costing_profile(COSTING_PUBLIC) if costing else None
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\evaluation\costs.py:222: in load_costing_profile
+    raw = Path(path).read_bytes()
+          ^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1050: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/evaluation/costing/contract_and_boundary_cases.json')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\evaluation\\costing\\contract_and_boundary_cases.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+_ test_every_executable_action_in_the_real_packages_is_a_retrieval_that_uses_no_wells _
+
+    def test_every_executable_action_in_the_real_packages_is_a_retrieval_that_uses_no_wells():
+>       profile = load_costing_profile(COSTING_REAL)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_evaluation_protocol.py:124: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tools\evaluation\costs.py:222: in load_costing_profile
+    raw = Path(path).read_bytes()
+          ^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1050: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/evaluation/costing/real_record_retrieval.json')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\evaluation\\costing\\real_record_retrieval.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+________ test_an_overlay_that_contradicts_a_declared_price_is_refused _________
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_an_overlay_that_contradic0')
+
+    def test_an_overlay_that_contradicts_a_declared_price_is_refused(tmp_path: Path):
+        def inline_price(public):
+            public["actions"][0]["lab_cost"] = {"basis": "new_measurement", "wells": 12, "turnaround_days": 3}
+    
+>       public_dir, private_dir = _synthetic_package(tmp_path, public_edit=inline_price)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_evaluation_protocol.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_evaluation_protocol.py:52: in _synthetic_package
+    public = json.loads((PUBLIC / "synthetic_functional_calibration.json").read_text(encoding="utf-8"))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/evaluation/cases/public/synthetic_functional_calibration.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\evaluation\\cases\\public\\synthetic_functional_calibration.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+__________ test_every_refused_query_carries_a_machine_readable_code ___________
+
+    def test_every_refused_query_carries_a_machine_readable_code():
+        cases = _contract_cases(costing=False)
+>       case, outcomes = cases[SYNTHETIC]
+                         ^^^^^^^^^^^^^^^^
+E       KeyError: 'synthetic-functional-calibration-001'
+
+tests\test_evaluation_protocol.py:162: KeyError
+__________ test_a_final_test_record_can_never_be_reached_by_a_policy __________
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_a_final_test_record_can_n0')
+
+    def test_a_final_test_record_can_never_be_reached_by_a_policy(tmp_path: Path):
+        held = _final_test("independent_compound_same_target", confirms=["change_intervention_mode"])
+>       public_dir, private_dir = _synthetic_package(tmp_path, private_edit=lambda private: private.update(final_test=[held]))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_evaluation_protocol.py:185: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_evaluation_protocol.py:52: in _synthetic_package
+    public = json.loads((PUBLIC / "synthetic_functional_calibration.json").read_text(encoding="utf-8"))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/evaluation/cases/public/synthetic_functional_calibration.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\evaluation\\cases\\public\\synthetic_functional_calibration.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+_ test_a_final_test_record_a_policy_could_reach_or_that_tests_nothing_is_refused[record0-final_test_record_shadows_public_action] _
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_a_final_test_record_a_pol0')
+record = {'identifier': 'broad_transcriptome', 'statement': 'Synthetic held-back result used only to test a terminal decision.', 'source_id': 'synthetic:functional-calibration-001:final-test', 'outcome': 'held_back_outcome', ...}
+message = 'final_test_record_shadows_public_action'
+
+    @pytest.mark.parametrize(
+        "record, message",
+        [
+            (_final_test("broad_transcriptome", confirms=["stop"]), "final_test_record_shadows_public_action"),
+            (_final_test("held_back", confirms=[]), "final_test_record_bears_on_no_decision"),
+            (_final_test("held_back", confirms=["stop"], contradicts=["stop"]), "final_test_record_confirms_and_contradicts"),
+        ],
+    )
+    def test_a_final_test_record_a_policy_could_reach_or_that_tests_nothing_is_refused(tmp_path: Path, record, message):
+>       public_dir, private_dir = _synthetic_package(tmp_path, private_edit=lambda private: private.update(final_test=[record]))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_evaluation_protocol.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_evaluation_protocol.py:52: in _synthetic_package
+    public = json.loads((PUBLIC / "synthetic_functional_calibration.json").read_text(encoding="utf-8"))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/evaluation/cases/public/synthetic_functional_calibration.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\evaluation\\cases\\public\\synthetic_functional_calibration.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+_ test_a_final_test_record_a_policy_could_reach_or_that_tests_nothing_is_refused[record1-final_test_record_bears_on_no_decision] _
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_a_final_test_record_a_pol1')
+record = {'identifier': 'held_back', 'statement': 'Synthetic held-back result used only to test a terminal decision.', 'source_id': 'synthetic:functional-calibration-001:final-test', 'outcome': 'held_back_outcome', ...}
+message = 'final_test_record_bears_on_no_decision'
+
+    @pytest.mark.parametrize(
+        "record, message",
+        [
+            (_final_test("broad_transcriptome", confirms=["stop"]), "final_test_record_shadows_public_action"),
+            (_final_test("held_back", confirms=[]), "final_test_record_bears_on_no_decision"),
+            (_final_test("held_back", confirms=["stop"], contradicts=["stop"]), "final_test_record_confirms_and_contradicts"),
+        ],
+    )
+    def test_a_final_test_record_a_policy_could_reach_or_that_tests_nothing_is_refused(tmp_path: Path, record, message):
+>       public_dir, private_dir = _synthetic_package(tmp_path, private_edit=lambda private: private.update(final_test=[record]))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_evaluation_protocol.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_evaluation_protocol.py:52: in _synthetic_package
+    public = json.loads((PUBLIC / "synthetic_functional_calibration.json").read_text(encoding="utf-8"))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/evaluation/cases/public/synthetic_functional_calibration.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\evaluation\\cases\\public\\synthetic_functional_calibration.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+_ test_a_final_test_record_a_policy_could_reach_or_that_tests_nothing_is_refused[record2-final_test_record_confirms_and_contradicts] _
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_a_final_test_record_a_pol2')
+record = {'identifier': 'held_back', 'statement': 'Synthetic held-back result used only to test a terminal decision.', 'source_id': 'synthetic:functional-calibration-001:final-test', 'outcome': 'held_back_outcome', ...}
+message = 'final_test_record_confirms_and_contradicts'
+
+    @pytest.mark.parametrize(
+        "record, message",
+        [
+            (_final_test("broad_transcriptome", confirms=["stop"]), "final_test_record_shadows_public_action"),
+            (_final_test("held_back", confirms=[]), "final_test_record_bears_on_no_decision"),
+            (_final_test("held_back", confirms=["stop"], contradicts=["stop"]), "final_test_record_confirms_and_contradicts"),
+        ],
+    )
+    def test_a_final_test_record_a_policy_could_reach_or_that_tests_nothing_is_refused(tmp_path: Path, record, message):
+>       public_dir, private_dir = _synthetic_package(tmp_path, private_edit=lambda private: private.update(final_test=[record]))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_evaluation_protocol.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_evaluation_protocol.py:52: in _synthetic_package
+    public = json.loads((PUBLIC / "synthetic_functional_calibration.json").read_text(encoding="utf-8"))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/evaluation/cases/public/synthetic_functional_calibration.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\evaluation\\cases\\public\\synthetic_functional_calibration.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+_ test_the_final_test_verdict_sits_beside_the_licensing_verdict_and_never_changes_it[record0-consistent] _
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_the_final_test_verdict_si0')
+record = {'identifier': 'held_back', 'statement': 'Synthetic held-back result used only to test a terminal decision.', 'source_id': 'synthetic:functional-calibration-001:final-test', 'outcome': 'held_back_outcome', ...}
+expected = 'consistent'
+
+    @pytest.mark.parametrize(
+        "record, expected",
+        [
+            (_final_test("held_back", confirms=["change_intervention_mode"]), "consistent"),
+            (_final_test("held_back", contradicts=["change_intervention_mode"]), "contradicted"),
+            (_final_test("held_back", confirms=["change_intervention_mode"], quality="failed"), "inadmissible"),
+            (_final_test("held_back", confirms=["stop"]), "untested"),
+        ],
+    )
+    def test_the_final_test_verdict_sits_beside_the_licensing_verdict_and_never_changes_it(tmp_path: Path, record, expected):
+>       public_dir, private_dir = _synthetic_package(tmp_path, private_edit=lambda private: private.update(final_test=[record]))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_evaluation_protocol.py:220: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_evaluation_protocol.py:52: in _synthetic_package
+    public = json.loads((PUBLIC / "synthetic_functional_calibration.json").read_text(encoding="utf-8"))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/evaluation/cases/public/synthetic_functional_calibration.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\evaluation\\cases\\public\\synthetic_functional_calibration.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+_ test_the_final_test_verdict_sits_beside_the_licensing_verdict_and_never_changes_it[record1-contradicted] _
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_the_final_test_verdict_si1')
+record = {'identifier': 'held_back', 'statement': 'Synthetic held-back result used only to test a terminal decision.', 'source_id': 'synthetic:functional-calibration-001:final-test', 'outcome': 'held_back_outcome', ...}
+expected = 'contradicted'
+
+    @pytest.mark.parametrize(
+        "record, expected",
+        [
+            (_final_test("held_back", confirms=["change_intervention_mode"]), "consistent"),
+            (_final_test("held_back", contradicts=["change_intervention_mode"]), "contradicted"),
+            (_final_test("held_back", confirms=["change_intervention_mode"], quality="failed"), "inadmissible"),
+            (_final_test("held_back", confirms=["stop"]), "untested"),
+        ],
+    )
+    def test_the_final_test_verdict_sits_beside_the_licensing_verdict_and_never_changes_it(tmp_path: Path, record, expected):
+>       public_dir, private_dir = _synthetic_package(tmp_path, private_edit=lambda private: private.update(final_test=[record]))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_evaluation_protocol.py:220: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_evaluation_protocol.py:52: in _synthetic_package
+    public = json.loads((PUBLIC / "synthetic_functional_calibration.json").read_text(encoding="utf-8"))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/evaluation/cases/public/synthetic_functional_calibration.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\evaluation\\cases\\public\\synthetic_functional_calibration.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+_ test_the_final_test_verdict_sits_beside_the_licensing_verdict_and_never_changes_it[record2-inadmissible] _
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_the_final_test_verdict_si2')
+record = {'identifier': 'held_back', 'statement': 'Synthetic held-back result used only to test a terminal decision.', 'source_id': 'synthetic:functional-calibration-001:final-test', 'outcome': 'held_back_outcome', ...}
+expected = 'inadmissible'
+
+    @pytest.mark.parametrize(
+        "record, expected",
+        [
+            (_final_test("held_back", confirms=["change_intervention_mode"]), "consistent"),
+            (_final_test("held_back", contradicts=["change_intervention_mode"]), "contradicted"),
+            (_final_test("held_back", confirms=["change_intervention_mode"], quality="failed"), "inadmissible"),
+            (_final_test("held_back", confirms=["stop"]), "untested"),
+        ],
+    )
+    def test_the_final_test_verdict_sits_beside_the_licensing_verdict_and_never_changes_it(tmp_path: Path, record, expected):
+>       public_dir, private_dir = _synthetic_package(tmp_path, private_edit=lambda private: private.update(final_test=[record]))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_evaluation_protocol.py:220: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_evaluation_protocol.py:52: in _synthetic_package
+    public = json.loads((PUBLIC / "synthetic_functional_calibration.json").read_text(encoding="utf-8"))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/evaluation/cases/public/synthetic_functional_calibration.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\evaluation\\cases\\public\\synthetic_functional_calibration.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+_ test_the_final_test_verdict_sits_beside_the_licensing_verdict_and_never_changes_it[record3-untested] _
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_the_final_test_verdict_si3')
+record = {'identifier': 'held_back', 'statement': 'Synthetic held-back result used only to test a terminal decision.', 'source_id': 'synthetic:functional-calibration-001:final-test', 'outcome': 'held_back_outcome', ...}
+expected = 'untested'
+
+    @pytest.mark.parametrize(
+        "record, expected",
+        [
+            (_final_test("held_back", confirms=["change_intervention_mode"]), "consistent"),
+            (_final_test("held_back", contradicts=["change_intervention_mode"]), "contradicted"),
+            (_final_test("held_back", confirms=["change_intervention_mode"], quality="failed"), "inadmissible"),
+            (_final_test("held_back", confirms=["stop"]), "untested"),
+        ],
+    )
+    def test_the_final_test_verdict_sits_beside_the_licensing_verdict_and_never_changes_it(tmp_path: Path, record, expected):
+>       public_dir, private_dir = _synthetic_package(tmp_path, private_edit=lambda private: private.update(final_test=[record]))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_evaluation_protocol.py:220: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_evaluation_protocol.py:52: in _synthetic_package
+    public = json.loads((PUBLIC / "synthetic_functional_calibration.json").read_text(encoding="utf-8"))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/evaluation/cases/public/synthetic_functional_calibration.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\evaluation\\cases\\public\\synthetic_functional_calibration.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+_________ test_the_trace_names_every_candidate_the_policy_passed_over _________
+
+    def test_the_trace_names_every_candidate_the_policy_passed_over():
+        cases = _contract_cases(costing=False)
+>       report = EvaluationRunner().evaluate(MAESTROCorePolicy(), (cases[SYNTHETIC],))
+                                                                   ^^^^^^^^^^^^^^^^
+E       KeyError: 'synthetic-functional-calibration-001'
+
+tests\test_evaluation_protocol.py:230: KeyError
+________ test_the_shuffle_moves_every_available_value_and_nothing_else ________
+
+    def test_the_shuffle_moves_every_available_value_and_nothing_else():
+        loaded = CaseRepository(CASES / "real_v3" / "public", CASES / "real_v3" / "private").load()
+        for case, outcomes in loaded:
+            assignment = shuffled_assignment(case.public)
+            available = {item.action.identifier: item.prediction_value for item in case.public.actions if item.available}
+            assert set(assignment) == set(available)
+            assert sorted(assignment.values()) == sorted(available.values())
+            assert all(assignment[name] != value for name, value in available.items())
+            assert not is_identity(case.public)
+            view = ReplayEnvironment(case, outcomes).view()
+            moved = with_prediction_values(view, assignment)
+            assert [item.action.identifier for item in moved.available_actions()] == [
+                item.action.identifier for item in view.available_actions()
+            ]
+>       first = loaded[0][0].public
+                ^^^^^^^^^
+E       IndexError: tuple index out of range
+
+tests\test_evaluation_protocol.py:251: IndexError
+_____ test_the_score_table_keeps_all_six_rows_and_names_what_did_not_run ______
+
+    def test_the_score_table_keeps_all_six_rows_and_names_what_did_not_run():
+>       cases = tuple(_contract_cases().values())
+                      ^^^^^^^^^^^^^^^^^
+
+tests\test_evaluation_protocol.py:256: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_evaluation_protocol.py:44: in _contract_cases
+    profile = load_costing_profile(COSTING_PUBLIC) if costing else None
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\evaluation\costs.py:222: in load_costing_profile
+    raw = Path(path).read_bytes()
+          ^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1050: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/evaluation/costing/contract_and_boundary_cases.json')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\evaluation\\costing\\contract_and_boundary_cases.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+_____ test_the_cli_records_the_preregistration_and_writes_the_score_table _____
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_the_cli_records_the_prere0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001DD59C3B910>
+
+    def test_the_cli_records_the_preregistration_and_writes_the_score_table(tmp_path: Path, monkeypatch):
+        preregistration = tmp_path / "PREREGISTRATION.md"
+        preregistration.write_text("MAESTRO test pre-registration.\n", encoding="utf-8")
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            [
+                "maestro-evaluate",
+                "--public-cases", str(PUBLIC),
+                "--private-results", str(PRIVATE),
+                "--workspace", str(ROOT),
+                "--output", str(tmp_path / "out"),
+                "--state-root", str(tmp_path / "state"),
+                "--mode", "decision",
+                "--policy", "protocol",
+                "--costing", str(COSTING_PUBLIC),
+                "--preregistration", str(preregistration),
+                "--score-table",
+                "--run-id", "protocol-test",
+            ],
+        )
+>       assert cli.main() == 0
+               ^^^^^^^^^^
+
+tests\test_evaluation_protocol.py:358: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tools\evaluation\cli.py:224: in main
+    costing = load_costing_profile(arguments.costing) if arguments.costing is not None else None
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\evaluation\costs.py:222: in load_costing_profile
+    raw = Path(path).read_bytes()
+          ^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1050: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/data/evaluation/costing/contract_and_boundary_cases.json')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\data\\evaluation\\costing\\contract_and_boundary_cases.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+_ test_f08_failed_or_unknown_biological_quality_cannot_satisfy_a_prerequisite _
+
+    def test_f08_failed_or_unknown_biological_quality_cannot_satisfy_a_prerequisite():
+>       case, outcomes = _synthetic()
+                         ^^^^^^^^^^^^
+
+tests\test_f03_f08_remediation.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _synthetic():
+>       return next(
+            item
+            for item in CaseRepository(
+                ROOT / "data/evaluation/cases/public", ROOT / "data/evaluation/cases/private"
+            ).load()
+            if item[0].public.identifier == "synthetic-functional-calibration-001"
+        )
+E       StopIteration
+
+tests\test_f03_f08_remediation.py:38: StopIteration
+_____ test_f08_a_derived_record_cannot_satisfy_a_biological_prerequisite ______
+
+    def test_f08_a_derived_record_cannot_satisfy_a_biological_prerequisite():
+>       case, outcomes = _synthetic()
+                         ^^^^^^^^^^^^
+
+tests\test_f03_f08_remediation.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _synthetic():
+>       return next(
+            item
+            for item in CaseRepository(
+                ROOT / "data/evaluation/cases/public", ROOT / "data/evaluation/cases/private"
+            ).load()
+            if item[0].public.identifier == "synthetic-functional-calibration-001"
+        )
+E       StopIteration
+
+tests\test_f03_f08_remediation.py:38: StopIteration
+_ test_f08_record_count_never_becomes_independent_units_and_unknown_quality_is_not_a_pass _
+
+    def test_f08_record_count_never_becomes_independent_units_and_unknown_quality_is_not_a_pass():
+>       _, outcomes = _synthetic()
+                      ^^^^^^^^^^^^
+
+tests\test_f03_f08_remediation.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _synthetic():
+>       return next(
+            item
+            for item in CaseRepository(
+                ROOT / "data/evaluation/cases/public", ROOT / "data/evaluation/cases/private"
+            ).load()
+            if item[0].public.identifier == "synthetic-functional-calibration-001"
+        )
+E       StopIteration
+
+tests\test_f03_f08_remediation.py:38: StopIteration
+_ test_biological_population_is_frozen_by_identifier_hash_without_reading_truth _
+
+    def test_biological_population_is_frozen_by_identifier_hash_without_reading_truth():
+        from research.dual_core_live.benchmark import choose_population
+>       population = choose_population()
+                     ^^^^^^^^^^^^^^^^^^^
+
+tests\test_live_api_contract.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+research\dual_core_live\benchmark.py:148: in choose_population
+    folds = json.loads((R2 / "interventions" / (task + "_freeze.json")).read_text())
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/outputs/identifiability_round2_20260930/interventions/sciplex3_B_freeze.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\outputs\\identifiability_round2_20260930\\interventions\\sciplex3_B_freeze.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+____ test_registered_replay_adapter_purchases_before_exposing_observations ____
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_registered_replay_adapter0')
+
+    def test_registered_replay_adapter_purchases_before_exposing_observations(tmp_path):
+        from research.dual_core_live.benchmark import best_action, choose_population, run_biology
+>       population = choose_population()
+                     ^^^^^^^^^^^^^^^^^^^
+
+tests\test_live_api_contract.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+research\dual_core_live\benchmark.py:148: in choose_population
+    folds = json.loads((R2 / "interventions" / (task + "_freeze.json")).read_text())
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/MAESTRO_TMP/20261003_prediction_audit_fix/clean/outputs/identifiability_round2_20260930/interventions/sciplex3_B_freeze.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\MAESTRO_TMP\\20261003_prediction_audit_fix\\clean\\outputs\\identifiability_round2_20260930\\interventions\\sciplex3_B_freeze.json'
+
+D:\anaconda\envs\maestro\Lib\pathlib.py:1044: FileNotFoundError
+________ test_real_partial_case_keeps_curve_values_private_until_query ________
+
+    def test_real_partial_case_keeps_curve_values_private_until_query():
+>       case, outcomes = _real_case()
+                         ^^^^^^^^^^^^
+
+tests\test_real_replay_case.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _real_case():
+        loaded = CaseRepository(
+            ROOT / "data" / "evaluation" / "cases" / "public",
+            ROOT / "data" / "evaluation" / "cases" / "private",
+        ).load()
+>       return next(item for item in loaded if item[0].public.identifier == "depmap-prism-snu761-egfr-osimertinib-001")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests\test_real_replay_case.py:26: StopIteration
+____ test_real_partial_case_ends_in_supported_deferral_not_mechanism_claim ____
+
+    def test_real_partial_case_ends_in_supported_deferral_not_mechanism_claim():
+>       case, outcomes = _real_case()
+                         ^^^^^^^^^^^^
+
+tests\test_real_replay_case.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _real_case():
+        loaded = CaseRepository(
+            ROOT / "data" / "evaluation" / "cases" / "public",
+            ROOT / "data" / "evaluation" / "cases" / "private",
+        ).load()
+>       return next(item for item in loaded if item[0].public.identifier == "depmap-prism-snu761-egfr-osimertinib-001")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests\test_real_replay_case.py:26: StopIteration
+__________ test_public_replay_view_has_no_hidden_result_before_query __________
+
+    def test_public_replay_view_has_no_hidden_result_before_query():
+>       case, outcomes = _synthetic_case()
+                         ^^^^^^^^^^^^^^^^^
+
+tests\test_replay_evaluation.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _synthetic_case():
+>       return next(item for item in _case_data() if item[0].public.identifier == "synthetic-functional-calibration-001")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests\test_replay_evaluation.py:40: StopIteration
+_______ test_shared_replay_reports_cost_evidence_and_supported_decision _______
+
+    def test_shared_replay_reports_cost_evidence_and_supported_decision():
+        cases = _case_data()
+        runner = EvaluationRunner()
+    
+        expert = runner.evaluate(ExpertWorkflowPolicy(), cases)
+        maestro = runner.evaluate(MAESTROCorePolicy(), cases)
+        prediction = runner.evaluate(PredictionValuePolicy(), cases)
+    
+>       expert_result = next(item for item in expert.results if item.case_id == "synthetic-functional-calibration-001")
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests\test_replay_evaluation.py:67: StopIteration
+____ test_production_orchestrator_replay_receives_results_only_after_query ____
+
+tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2577/test_production_orchestrator_r0')
+
+    def test_production_orchestrator_replay_receives_results_only_after_query(tmp_path: Path):
+        task = {
+            "task_type": "mechanism_diagnosis", "research_question": "Resolve discrepancy.",
+            "target_or_targets": ["TARGET"], "interventions": ["compound"],
+            "biological_context": "synthetic-cell-context", "phenotype_endpoint": "viability",
+            "supplied_evidence": [], "constraints": [], "missing_information": [], "needs_visual_review": False,
+        }
+        plan = {
+            "identifier": "contrast",
+            "hypotheses": [
+                {"identifier": "functional_gap", "description": "The drug condition did not sufficiently alter target function.", "proposed_action": "revise_intervention"},
+                {"identifier": "mode_mismatch", "description": "The genetic and pharmacological perturbations are not functionally equivalent.", "proposed_action": "change_intervention_mode"},
+            ],
+            "differing_assumptions": ["functional calibration"], "action_identifier": "mode_matched_comparator",
+            "outcome_categories": ["a", "b"], "interpretation_boundaries": ["Real results remain required."],
+        }
+        client = StubClient([task, plan, task, plan])
+        root = tmp_path / "log" / "20260910"
+        memory = MemoryStore(root / "memory.sqlite")
+        controller = MAESTROOrchestrator(
+            interpreter=TaskInterpreter(client),
+            context_builder=ContextBuilder(EvidenceLedger(root / "evidence.sqlite"), memory),
+            planner=MechanismContrastPlanner(client),
+            visual_inspector=VisualInspector(client, "vision"),
+            memory=memory,
+            logger=RunLogger(root),
+            controller=MAESTROAgent(),
+            case_store=CaseStore(root / "cases.sqlite"),
+        )
+    
+        report = EvaluationRunner().evaluate(
+>           MAESTROOrchestratorPolicy(controller), (_synthetic_case(),)
+                                                    ^^^^^^^^^^^^^^^^^
+        )
+
+tests\test_replay_evaluation.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _synthetic_case():
+>       return next(item for item in _case_data() if item[0].public.identifier == "synthetic-functional-calibration-001")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests\test_replay_evaluation.py:40: StopIteration
+________ test_terminal_submission_reports_structured_contract_failures ________
+
+    def test_terminal_submission_reports_structured_contract_failures():
+>       view = _synthetic_view()
+               ^^^^^^^^^^^^^^^^^
+
+tests\test_submission_and_sequential_repair.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _synthetic_view():
+        from tools.evaluation import CaseRepository
+    
+        root = Path(__file__).resolve().parents[1]
+>       case, outcomes = next(
+            item for item in CaseRepository(
+                root / "data/evaluation/cases/public", root / "data/evaluation/cases/private"
+            ).load() if item[0].public.identifier == "synthetic-functional-calibration-001"
+        )
+E       StopIteration
+
+tests\test_submission_and_sequential_repair.py:29: StopIteration
+________ test_a_supported_decision_stands_while_the_menu_is_still_open ________
+
+    def test_a_supported_decision_stands_while_the_menu_is_still_open():
+        """A nonempty menu is a fact about the menu, not a defect in the decision."""
+    
+>       view = _synthetic_view()
+               ^^^^^^^^^^^^^^^^^
+
+tests\test_submission_and_sequential_repair.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _synthetic_view():
+        from tools.evaluation import CaseRepository
+    
+        root = Path(__file__).resolve().parents[1]
+>       case, outcomes = next(
+            item for item in CaseRepository(
+                root / "data/evaluation/cases/public", root / "data/evaluation/cases/private"
+            ).load() if item[0].public.identifier == "synthetic-functional-calibration-001"
+        )
+E       StopIteration
+
+tests\test_submission_and_sequential_repair.py:29: StopIteration
+________ test_a_policy_that_is_not_ready_must_name_the_missing_premise ________
+
+    def test_a_policy_that_is_not_ready_must_name_the_missing_premise():
+>       view = _synthetic_view()
+               ^^^^^^^^^^^^^^^^^
+
+tests\test_submission_and_sequential_repair.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _synthetic_view():
+        from tools.evaluation import CaseRepository
+    
+        root = Path(__file__).resolve().parents[1]
+>       case, outcomes = next(
+            item for item in CaseRepository(
+                root / "data/evaluation/cases/public", root / "data/evaluation/cases/private"
+            ).load() if item[0].public.identifier == "synthetic-functional-calibration-001"
+        )
+E       StopIteration
+
+tests\test_submission_and_sequential_repair.py:29: StopIteration
+_____ test_a_decision_cannot_be_submitted_while_declaring_it_is_not_ready _____
+
+    def test_a_decision_cannot_be_submitted_while_declaring_it_is_not_ready():
+>       view = _synthetic_view()
+               ^^^^^^^^^^^^^^^^^
+
+tests\test_submission_and_sequential_repair.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _synthetic_view():
+        from tools.evaluation import CaseRepository
+    
+        root = Path(__file__).resolve().parents[1]
+>       case, outcomes = next(
+            item for item in CaseRepository(
+                root / "data/evaluation/cases/public", root / "data/evaluation/cases/private"
+            ).load() if item[0].public.identifier == "synthetic-functional-calibration-001"
+        )
+E       StopIteration
+
+tests\test_submission_and_sequential_repair.py:29: StopIteration
+_____________ test_terminal_submission_uses_one_format_only_retry _____________
+
+    def test_terminal_submission_uses_one_format_only_retry():
+>       view = _synthetic_view()
+               ^^^^^^^^^^^^^^^^^
+
+tests\test_submission_and_sequential_repair.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _synthetic_view():
+        from tools.evaluation import CaseRepository
+    
+        root = Path(__file__).resolve().parents[1]
+>       case, outcomes = next(
+            item for item in CaseRepository(
+                root / "data/evaluation/cases/public", root / "data/evaluation/cases/private"
+            ).load() if item[0].public.identifier == "synthetic-functional-calibration-001"
+        )
+E       StopIteration
+
+tests\test_submission_and_sequential_repair.py:29: StopIteration
+__________________ test_pack_checksums_match_their_manifest ___________________
+
+    def test_pack_checksums_match_their_manifest():
+        manifest = json.loads(
+            (XD.ROOT / "data/processed/case_memory_integration/pack_manifest.json").read_text())
+        for name, recorded in manifest["outputs"].items():
+>           assert _sha(XD.ROOT / "data/processed/case_memory_integration" / name) == recorded
+E           AssertionError: assert 'bbc6c0e1864a...d4078b453e938' == '5e4100852551...8a714b178c120'
+E             
+E             - 5e4100852551e8945f88dda92cc60fcf21960e1034320ea90ca8a714b178c120
+E             + bbc6c0e1864a302069ffb4f86c2c1a3905f743bafae489aa445d4078b453e938
+
+research\case_memory_integration\test_external_evaluation.py:71: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_candidate_screening.py::test_current_real_partial_case_is_explicitly_ineligible_for_directed_repair_evaluation
+FAILED tests/test_directed_repair_and_licensing.py::test_a_cross_context_review_is_planned_without_the_case_context
+FAILED tests/test_directed_repair_and_licensing.py::test_deferral_is_correct_only_when_nothing_else_is_licensable
+FAILED tests/test_directed_repair_and_licensing.py::test_a_quality_failed_measurement_licenses_nothing
+FAILED tests/test_directed_repair_and_licensing.py::test_a_terminal_decision_may_cite_public_premise_evidence
+FAILED tests/test_directed_repair_and_licensing.py::test_a_provider_failure_is_recorded_as_one_lost_case_not_a_lost_run
+FAILED tests/test_engagement_package.py::test_a_missing_archive_member_is_refused_by_name
+FAILED tests/test_evaluation_isolation.py::test_fresh_runs_and_policies_have_separate_state_and_explicit_resume
+FAILED tests/test_evaluation_isolation.py::test_decision_mode_scores_a_wrong_policy_without_replacing_its_answer
+FAILED tests/test_evaluation_isolation.py::test_qc_failure_and_insufficient_function_do_not_unlock_mode_mechanism_support
+FAILED tests/test_evaluation_isolation.py::test_production_planner_context_cannot_read_production_or_other_run_private_evidence
+FAILED tests/test_evaluation_protocol.py::test_the_contract_case_is_priced_in_wells_and_days_beside_its_abstract_cost
+FAILED tests/test_evaluation_protocol.py::test_every_executable_action_in_the_real_packages_is_a_retrieval_that_uses_no_wells
+FAILED tests/test_evaluation_protocol.py::test_an_overlay_that_contradicts_a_declared_price_is_refused
+FAILED tests/test_evaluation_protocol.py::test_every_refused_query_carries_a_machine_readable_code
+FAILED tests/test_evaluation_protocol.py::test_a_final_test_record_can_never_be_reached_by_a_policy
+FAILED tests/test_evaluation_protocol.py::test_a_final_test_record_a_policy_could_reach_or_that_tests_nothing_is_refused[record0-final_test_record_shadows_public_action]
+FAILED tests/test_evaluation_protocol.py::test_a_final_test_record_a_policy_could_reach_or_that_tests_nothing_is_refused[record1-final_test_record_bears_on_no_decision]
+FAILED tests/test_evaluation_protocol.py::test_a_final_test_record_a_policy_could_reach_or_that_tests_nothing_is_refused[record2-final_test_record_confirms_and_contradicts]
+FAILED tests/test_evaluation_protocol.py::test_the_final_test_verdict_sits_beside_the_licensing_verdict_and_never_changes_it[record0-consistent]
+FAILED tests/test_evaluation_protocol.py::test_the_final_test_verdict_sits_beside_the_licensing_verdict_and_never_changes_it[record1-contradicted]
+FAILED tests/test_evaluation_protocol.py::test_the_final_test_verdict_sits_beside_the_licensing_verdict_and_never_changes_it[record2-inadmissible]
+FAILED tests/test_evaluation_protocol.py::test_the_final_test_verdict_sits_beside_the_licensing_verdict_and_never_changes_it[record3-untested]
+FAILED tests/test_evaluation_protocol.py::test_the_trace_names_every_candidate_the_policy_passed_over
+FAILED tests/test_evaluation_protocol.py::test_the_shuffle_moves_every_available_value_and_nothing_else
+FAILED tests/test_evaluation_protocol.py::test_the_score_table_keeps_all_six_rows_and_names_what_did_not_run
+FAILED tests/test_evaluation_protocol.py::test_the_cli_records_the_preregistration_and_writes_the_score_table
+FAILED tests/test_f03_f08_remediation.py::test_f08_failed_or_unknown_biological_quality_cannot_satisfy_a_prerequisite
+FAILED tests/test_f03_f08_remediation.py::test_f08_a_derived_record_cannot_satisfy_a_biological_prerequisite
+FAILED tests/test_f03_f08_remediation.py::test_f08_record_count_never_becomes_independent_units_and_unknown_quality_is_not_a_pass
+FAILED tests/test_live_api_contract.py::test_biological_population_is_frozen_by_identifier_hash_without_reading_truth
+FAILED tests/test_live_api_contract.py::test_registered_replay_adapter_purchases_before_exposing_observations
+FAILED tests/test_real_replay_case.py::test_real_partial_case_keeps_curve_values_private_until_query
+FAILED tests/test_real_replay_case.py::test_real_partial_case_ends_in_supported_deferral_not_mechanism_claim
+FAILED tests/test_replay_evaluation.py::test_public_replay_view_has_no_hidden_result_before_query
+FAILED tests/test_replay_evaluation.py::test_shared_replay_reports_cost_evidence_and_supported_decision
+FAILED tests/test_replay_evaluation.py::test_production_orchestrator_replay_receives_results_only_after_query
+FAILED tests/test_submission_and_sequential_repair.py::test_terminal_submission_reports_structured_contract_failures
+FAILED tests/test_submission_and_sequential_repair.py::test_a_supported_decision_stands_while_the_menu_is_still_open
+FAILED tests/test_submission_and_sequential_repair.py::test_a_policy_that_is_not_ready_must_name_the_missing_premise
+FAILED tests/test_submission_and_sequential_repair.py::test_a_decision_cannot_be_submitted_while_declaring_it_is_not_ready
+FAILED tests/test_submission_and_sequential_repair.py::test_terminal_submission_uses_one_format_only_retry
+FAILED research/case_memory_integration/test_external_evaluation.py::test_pack_checksums_match_their_manifest
+ERROR tests/test_real_case_memory_denominator.py::test_real_population_preserves_unit_reading_query_denominators
+ERROR tests/test_real_case_memory_denominator.py::test_both_forecasters_and_production_selector_really_execute
+ERROR tests/test_real_case_memory_denominator.py::test_real_valid_only_records_cannot_supply_attempted_experiment_distribution
+ERROR tests/test_real_case_memory_denominator.py::test_existing_output_cannot_be_overwritten
+ERROR research/case_memory_integration/test_external_evaluation.py::test_the_split_excludes_every_development_study_block
+ERROR research/case_memory_integration/test_external_evaluation.py::test_the_population_matches_the_frozen_pool_rule
+ERROR research/case_memory_integration/test_external_evaluation.py::test_no_condition_is_zero_filled_and_condition_keys_are_consistent
+ERROR research/case_memory_integration/test_external_evaluation.py::test_fitted_quantities_are_blind_to_test_labels
+43 failed, 1898 passed, 16 skipped, 8 errors in 95.58s (0:01:35)

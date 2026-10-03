@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="24" time="25.753" timestamp="2026-10-03T10:15:30.414407+08:00" hostname="上善若水"><testcase classname="research.case_memory_integration.test_external_evaluation" name="test_the_split_excludes_every_development_study_block" time="0.112" /><testcase classname="research.case_memory_integration.test_external_evaluation" name="test_the_population_matches_the_frozen_pool_rule" time="0.001" /><testcase classname="research.case_memory_integration.test_external_evaluation" name="test_pack_checksums_match_their_manifest" time="0.002" /><testcase classname="research.case_memory_integration.test_external_evaluation" name="test_the_frozen_protocol_is_unmodified" time="0.055" /><testcase classname="research.case_memory_integration.test_external_evaluation" name="test_the_validator_assigns_the_four_reading_codes" time="0.006" /><testcase classname="research.case_memory_integration.test_external_evaluation" name="test_no_condition_is_zero_filled_and_condition_keys_are_consistent" time="0.005" /><testcase classname="research.case_memory_integration.test_external_evaluation" name="test_fitted_quantities_are_blind_to_test_labels" time="0.002" /><testcase classname="research.case_memory_integration.test_external_evaluation" name="test_reference_episodes_satisfy_the_production_schema_when_built" time="0.086" /><testcase classname="tests.test_real_case_memory_denominator" name="test_real_population_preserves_unit_reading_query_denominators" time="21.627" /><testcase classname="tests.test_real_case_memory_denominator" name="test_both_forecasters_and_production_selector_really_execute" time="0.001" /><testcase classname="tests.test_real_case_memory_denominator" name="test_real_valid_only_records_cannot_supply_attempted_experiment_distribution" time="0.001" /><testcase classname="tests.test_real_case_memory_denominator" name="test_frozen_input_mismatch_stops_before_running_models" time="0.001" /><testcase classname="tests.test_real_case_memory_denominator" name="test_existing_output_cannot_be_overwritten" time="0.012" /><testcase classname="tests.test_live_api_contract" name="test_budget_prerequisite_and_repeat_constraints_apply_together" time="0.001" /><testcase classname="tests.test_live_api_contract" name="test_a_legal_proposal_cannot_authorize_a_terminal" time="0.001" /><testcase classname="tests.test_live_api_contract" name="test_forecasts_do_not_supply_prerequisites_or_change_evidence" time="0.001" /><testcase classname="tests.test_live_api_contract" name="test_credentials_are_rejected_before_artifact_write" time="0.001" /><testcase classname="tests.test_live_api_contract" name="test_a_malformed_proposal_is_refused_without_guessing" time="0.001" /><testcase classname="tests.test_live_api_contract" name="test_the_recorder_uses_existing_deepseek_protocol_without_logging_auth" time="0.004" /><testcase classname="tests.test_live_api_contract" name="test_the_jev_recorder_retains_typed_answers_and_safe_envelope" time="0.001" /><testcase classname="tests.test_live_api_contract" name="test_preregistered_review_population_contains_four_distinct_defect_classes" time="0.014" /><testcase classname="tests.test_live_api_contract" name="test_biological_population_is_frozen_by_identifier_hash_without_reading_truth" time="0.068" /><testcase classname="tests.test_live_api_contract" name="test_unit_weighted_interval_endpoints_do_not_overweight_large_units" time="0.001" /><testcase classname="tests.test_live_api_contract" name="test_registered_replay_adapter_purchases_before_exposing_observations" time="1.791"><failure message="FileNotFoundError: [Errno 2] Unable to synchronously open file (unable to open file: name = 'D:\MAESTRO_TMP\20261003_prediction_audit_fix\clean\data\raw\sciplex3\SrivatsanTrapnell2020_sciplex3.h5ad', errno = 2, error message = 'No such file or directory', flags = 0, o_flags = 0)">tmp_path = WindowsPath('C:/Users/59964/AppData/Local/Temp/pytest-of-59964/pytest-2583/test_registered_replay_adapter0')
+
+    def test_registered_replay_adapter_purchases_before_exposing_observations(tmp_path):
+        from research.dual_core_live.benchmark import best_action, choose_population, run_biology
+        population = choose_population()
+        probe = [next(p for p in population if p["task"] == task and p["fold"] == 0)
+                 for task in ("sciplex3_B", "l1000_LT")]
+        calls = []
+    
+        def recorded_offline_proposal(card, call_id):
+            assert "truth" not in card and "outcomes" not in card
+            assert all(s["action"] in card["attempted_actions"] for s in card["evidence"])
+            calls.append((call_id, card))
+            proposal = {"action": best_action(card), "terminal_authorized": False}
+            return proposal, validate_proposal(card, proposal)
+    
+&gt;       rows = run_biology({"biological_population": probe}, tmp_path, recorded_offline_proposal)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_live_api_contract.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+research\dual_core_live\benchmark.py:335: in run_biology
+    data, ctx, setting, design = V.load(item["dataset"], item["tier"], fold)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+research\protocol_v2\tasks_v21.py:85: in load
+    design = DS.load(dataset)
+             ^^^^^^^^^^^^^^^^
+research\protocol_v2\design.py:115: in load
+    frame = sciplex3_design() if dataset == "sciplex3" else l1000_design()
+            ^^^^^^^^^^^^^^^^^
+research\protocol_v2\design.py:53: in sciplex3_design
+    with h5py.File(path, "r") as handle:
+         ^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\site-packages\h5py\_hl\files.py:555: in __init__
+    fid = make_fid(name, mode, userblock_size, fapl, fcpl, swmr=swmr)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\envs\maestro\Lib\site-packages\h5py\_hl\files.py:232: in make_fid
+    fid = h5f.open(name, flags, fapl=fapl)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+h5py/_objects.pyx:54: in h5py._objects.with_phil.wrapper
+    ???
+h5py/_objects.pyx:55: in h5py._objects.with_phil.wrapper
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+&gt;   ???
+E   FileNotFoundError: [Errno 2] Unable to synchronously open file (unable to open file: name = 'D:\MAESTRO_TMP\20261003_prediction_audit_fix\clean\data\raw\sciplex3\SrivatsanTrapnell2020_sciplex3.h5ad', errno = 2, error message = 'No such file or directory', flags = 0, o_flags = 0)
+
+h5py/h5f.pyx:106: FileNotFoundError</failure></testcase></testsuite></testsuites>

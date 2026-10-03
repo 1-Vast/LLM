@@ -1,5 +1,9 @@
 # ASTRA: dual-core research adjustments
 
+The [prediction/audit follow-up](PREDICTION_AUDIT_FOLLOWUP.md) repairs panel
+identity binding and multi-result audit preservation, and supplies verified replay
+fixtures with explicit clean-checkout and raw-byte reproduction boundaries.
+
 The [responsibility and maintenance follow-up](RESPONSIBILITY_FOLLOWUP.md) completes
 the remaining review-guided ownership changes, with no new scientific promotion.
 Current navigation separates engineering contracts, STATE diagnostics and GDSC

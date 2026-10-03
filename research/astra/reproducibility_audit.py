@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import json
 import subprocess
+import zipfile
 from pathlib import Path
 
 
@@ -64,6 +65,36 @@ def restore_pack(cache: Path, destination: Path, *, manifest_path: Path | None =
     return result
 
 
+def restore_fixtures(bundle: Path, root: Path) -> dict:
+    """Restore the published replay package, verifying every member before writing."""
+    manifest = json.loads(bundle.with_name("replay_fixture_manifest.json").read_text())
+    if file_digest(bundle) != manifest["archive_sha256"]:
+        raise ValueError("fixture_archive_hash_mismatch")
+    root = root.resolve()
+    restored = {}
+    with zipfile.ZipFile(bundle) as archive:
+        if set(archive.namelist()) != set(manifest["files"]):
+            raise ValueError("fixture_archive_members_mismatch")
+        for name, identity in manifest["files"].items():
+            destination = (root / name).resolve()
+            if not destination.is_relative_to(root):
+                raise ValueError("fixture_path_outside_checkout")
+            raw = archive.read(name)
+            if digest(raw) != identity["sha256"] or len(raw) != identity["bytes"]:
+                raise ValueError(f"fixture_member_hash_mismatch:{name}")
+            if destination.is_file():
+                current = destination.read_bytes()
+                if current != raw and current.replace(b"\r\n", b"\n") != raw.replace(b"\r\n", b"\n"):
+                    raise ValueError(f"fixture_destination_conflict:{name}")
+            restored[name] = raw
+    for name, raw in restored.items():
+        destination = root / name
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(raw)
+    return {"files": len(restored), "archive_sha256": manifest["archive_sha256"],
+            "rule": "Restored exact registered member bytes; no frozen manifest was regenerated."}
+
+
 def audit(root: Path, revision: str) -> dict:
     before = json.loads((root / "research/astra/results/20261003_responsibility_followup_v2/before.json").read_text())
     protected = before["protected_sha256"]
@@ -86,8 +117,11 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--restore-pack-from", type=Path)
     parser.add_argument("--restore-pack-to", type=Path)
+    parser.add_argument("--restore-fixtures-from", type=Path)
     args = parser.parse_args()
     result = {}
+    if args.restore_fixtures_from:
+        result["fixtures"] = restore_fixtures(args.restore_fixtures_from, args.root)
     if bool(args.restore_pack_from) != bool(args.restore_pack_to):
         parser.error("--restore-pack-from and --restore-pack-to must be supplied together")
     if args.restore_pack_from:
