@@ -183,6 +183,21 @@ retains 1,945 passed, 2 failed, 4 errors and 14 skipped. Further restoration fix
 the frozen-schema/source and prepared-data blockers rather than suppressing them;
 later scopes and final clean counts are listed separately in the receipt.
 
+| Final validation environment | Passed | Failed | Errors | Skipped |
+|---|---:|---:|---:|---:|
+| Original maestro environment, complete declared aggregate | 1,966 | 0 | 0 | 0 |
+| Clean source checkout after documented byte/fixture/cache recovery | 1,954 | 0 | 0 | 12 |
+| Corrected-contract scope in both environments | 41 | 0 | 0 | 0 |
+
+The prepared aggregate ran source commit
+`2db34264d5371556c0960a020b9a4d4c5efa3c54`. Twelve optional asset checks remained
+skipped with reasons in the final XML/receipt; they are not counted as verified.
+Four tracked text assets were restored to original CRLF bytes in that prepared
+checkout (`pack.json`, `pack_manifest.json`, the historical `results.json`, and
+`freeze_protocol.json`). Their Git blobs stay LF; `prepared_checkout_scope.json`
+records both byte identities and the empty semantic Git diff. The old working-tree
+preservation inventory remains exactly unchanged in the original environment.
+
 Two verification-command mistakes are retained: the first broad local collector
 encountered the temporary nested fixture tree left by our inside-repository test;
 it was moved outside the collection tree before retry. The first clean focused

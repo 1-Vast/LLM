@@ -205,3 +205,63 @@ Continuation finalization: the final focused post-edit scope passes **80** tests
 The installed-wheel rule/logger probe and four research help entries pass. All
 **2,058** protected file hashes and the earlier day-log prefix match. Publication
 verification records the final source hashes and explicit unrun scientific items.
+
+## 12. Prediction binding, multi-result audit and reproducibility correction
+
+The review of `16eed51` correctly identified pre-existing panel and audit defects.
+This continuation fixes the defects, without treating earlier directory migration
+or local green tests as a scientific or clean-download reproduction guarantee.
+The implementation and recovery instructions are in
+`research/astra/PREDICTION_AUDIT_FOLLOWUP.md`; fresh receipts are under
+`research/astra/results/20261003_prediction_audit_fix_v1/`.
+
+Panel conditions now use `safe_predict`; request/version/readout mismatches refuse
+and cannot rank. Backend exceptions remain refusal rows. Result handoffs are
+immutable per session/result identity, byte-identical retries are permitted, and
+conflicting retries are rejected. Every result view enters run review; revisions
+survive either ordering and shared metric names stay attached to separate results.
+CaseStore evidence and budget rules are unchanged. The child pytest test has an
+explicit independent config and validates node identity, including inside-checkout
+execution. Eight regression cases failed before the fix; failure receipts remain.
+
+The original environment's final aggregate passes **1,966**, with zero failures,
+errors or skips. The final corrected-contract scope passes **41** in the original
+and recovered checkouts. These scopes overlap. The clean unprepared checkout is
+also reported: **1,898 passed, 43 failed, 8 errors, 16 skipped**. Recovery of exact
+replay fixtures, original PISA and the 17-file prepared cache leads to **1,954
+passed, zero failures/errors, 12 skipped** on source commit
+`2db34264d5371556c0960a020b9a4d4c5efa3c54`. The twelve skips require optional assets
+and are not successful verifications. This uses the same Windows/maestro Python,
+not an independently provisioned Linux environment or fresh-download replication.
+
+The original environment retains all **2,058** protected hashes. Its old day-log
+prefix is preserved. A raw LF checkout matches **2,057**; `intervention.py` is
+Git-identical to the baseline and its original raw hash corresponds to CRLF.
+`pack.json` has the same distinction. Recovery exposed another original CRLF hash
+in `freeze_protocol.json`; the supplemental v3 package retains the original bytes
+and both identities. Four text assets receive original-byte overlays in the
+prepared checkout; its semantic source diff stays empty. Old frozen hashes,
+protocols and manifests are not regenerated or relaxed.
+
+The LINCS pack was freshly rebuilt into a new directory from the registered local
+sources; both `pack.json` and `pack_arrays.npz` exactly reproduce their frozen raw
+SHA256 values. Small public source downloads and a gzip-alias discrepancy are
+registered separately. The main 392-member replay fixture package and the complete
+16-member legacy package include member hashes and fail-closed recovery. PISA's
+377,658,784-byte original and the 126,841,252-byte prepared cache were restored from
+verified local originals; exact prepared-cache public hosting remains unavailable.
+The source-rebuild inventory and cache recovery commands make those limits explicit.
+
+Verification mistakes remain in fresh receipts: a nested temporary fixture tree
+interfered with initial broad collection, one basetemp parent was missing, and the
+first supplemental asset enumerations omitted named constants/original schema
+bytes. Corrected commands and complete enumeration resolved these issues without
+changing scientific thresholds or erasing failed receipts.
+
+No new STATE inference, live API science, biological model fit, physical assay or
+state/agent utility comparison ran. Historical replay tests are engineering checks,
+not new measurements. Scientific gain and default promotion remain unestablished.
+
+Reproduce with maestro: run the complete aggregate command and recovery commands
+in the follow-up report, using fresh outputs. Test identity, skip reasons, source
+hashes, byte overlays, asset inventories and environment are in `receipt.json`.
