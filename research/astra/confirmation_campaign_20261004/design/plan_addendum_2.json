@@ -1,0 +1,46 @@
+{
+ "owner": "design",
+ "written_at": "2026-10-04T15:52:50+0800",
+ "label": "POST HOC addendum 2, EXPLORATORY (exposed data). Requested by the parent after the feedback_eval results were seen (U_screen_post strongest existing comparator on the same-condition target; its matched no-feedback control was not reported). Not part of the registered diagnostic decision; no verdict.",
+ "question": "Is U_screen_post's advantage attributable to feedback? Compare it with its matched no-feedback control U_screen_static, and U_lambda with U_V0, on the identical campaigns and eligible sets.",
+ "definitions": {
+  "U_screen_static": "S0 = frozen TransferWorld(WorldConfig(context=False)) prior mean on the screen scale (world.prior_target), the world fitted exactly as for U_screen_post (role panel, HD lines + target; E campaigns exclude every other E line); no purchased label enters",
+  "U_screen_post": "S0 + F (F = posterior mean - prior mean given R's purchased round-1 screen labels)",
+  "U_V0": "shrunk history mean of the verification label (L_v score)",
+  "U_lambda": "U_V0 + lambda x F, lambda = 0.36615008975859115 from design/feedback_fit.json (HD fit, unchanged)",
+  "campaigns": "exactly those of the feedback_eval stage: role-swapped E = 61 E lines x 2 roles (122); same-condition = 14 repeat lines x 2 roles (28), chrono seeding events R1 (screen) / R2 (verification), eligible menu = finite R1 and R2",
+  "eligible_set": "the campaign's unscreened candidates after R's P3 round 1 (identical for all four rankings)",
+  "endpoints": {
+   "AUC": "per campaign AUC (rounded score, ties 0.5) among eligible candidates against the realised joint call; undefined if 0 or all joint hits; line = mean over defined roles",
+   "log_loss": "undefined for all four (continuous label-scale predictions, not probabilities): reported as null with the reason; no post hoc probability mapping is fitted",
+   "P3_yield": "confirmed discoveries under P3 (measurement cap) with R's round 1, R's verify order p_v|s and reserve p_s, round-2 screen order by the ranking (identical machinery to feedback_eval)"
+  },
+  "contrasts": [
+   "AUC U_screen_post - U_screen_static",
+   "AUC U_lambda - U_V0",
+   "P3 confirmed yield for the same two pairs"
+  ],
+  "inference": "contract bootstrap: rng = default_rng(20261004), lines sorted by SIDM within tissue (Breast, Colon, Pancreas), 10,000 resamples of rng.integers(0, n_t, n_t) per tissue, percentile [2.5, 97.5]; for AUC over the lines where both rankings are defined (fresh indices for that line set)",
+  "targets_reported_separately": [
+   "role_swapped_E (61 lines)",
+   "same_condition_all (14 lines; development-grade)",
+   "same_condition_HD (6) and same_condition_E (8) as descriptive splits"
+  ]
+ },
+ "reproduction_check": "AUC, P3 confirmed and frozen-prediction hashes of U_screen_post, U_lambda, U_V0 must equal the stored per-campaign values in results/feedback_eval_20261004_130535 (counted; any mismatch reported)",
+ "inputs_sha256": {
+  "design/feedback_fit.json": "e1636b773f5cb0010c4077f1c10d74fc8c900ea0c4e51aa1b008aec915361e82",
+  "design/plan_addendum_1.json": "b4c5ae38643782f6973b1599dad83a3062db34929858c633b246515aa2d107a0",
+  "feedback_eval_e.jsonl.gz": "c86a507d6b53bae567b292a2c7a5bdbe44abcd9a38422605036efee6227c2b99",
+  "feedback_eval_same_condition.jsonl.gz": "50e86f150d598f716133866dc4a862d390c81ea15a7e466f195918239fa9f7c6"
+ },
+ "feedback_fit_sha256": "e1636b773f5cb0010c4077f1c10d74fc8c900ea0c4e51aa1b008aec915361e82",
+ "code_sha256": {
+  "research/astra/confirmation_campaign_20261004/design/addendum_2_screen_static.py": "892c7d6e9e4b911a5998978a89ab05e3d42ef29981d8854da24144c0c1ffba90",
+  "research/astra/confirmation_campaign_20261004/design/campaign.py": "651d495b8a044a62f3b1defb49547cca07ed68c69978104031a0880d7a5f27e5",
+  "research/astra/confirmation_campaign_20261004/design/feedback.py": "b70b0cbbab7af578a52c66de2c241add2bab9735531c2bd084eb92f50d85193f",
+  "research/astra/confirmation_campaign_20261004/design/stages.py": "0c195d10ab19bad0161ac86dc0585363a55ea141a63615bec4bb6fea87670198"
+ },
+ "synthetic_test": "scratchpad test on the frozen builder's synthetic release (10 lines, 12 drugs), 2026-10-04 ~15:53: 20 E campaigns; U_screen_post / U_lambda / U_V0 AUC, P3 yield and prediction hashes identical to feedback.evaluate_campaign (60/60); U_screen_static invariant to revealed labels and equal to world.prior_target; poisoned unpurchased outcomes give identical purchases; spend <= cap; no round-3 screens; identical round 1. PASS.",
+ "command": "python -m research.astra.confirmation_campaign_20261004.design.addendum_2_screen_static (one new exposed_ticket; output design/results/addendum2_<stamp>/, never overwritten)"
+}

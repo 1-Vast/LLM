@@ -1,0 +1,83 @@
+{
+ "owner": "verify (subagent), Task 3",
+ "written_at": "2026-10-04T13:08:50+0800 (file time of the first version; an estimated 13:10 typed earlier is corrected here); completed 2026-10-04T15:59+0800 with the design-only partition proposal and power planning (file time is authoritative)",
+ "question": "Is there an untouched evaluation for a NARROWER estimand related to the primary question: does a history-derived joint confirmation rate rank candidates better for confirmed yield / confirmation than simple marginal or response rankings, with identical information?",
+ "rule": "design metadata only for unopened data; no outcome column of any unopened file was parsed (explicit allow lists in design_census.py, design_census_addendum1, design_census_vis*.py). Jaaks 2022 is exposed; its design columns were read freely.",
+ "verdict_overall": "ONE CANDIDATE QUALIFIES (conditionally on pre-registered gates): the Vis et al. 2024 pan-cancer anchored screen (Cell Rep Med 5:101687), whose 19 ordered combinations were measured in two separate screening projects (GDSC_002 and GDSC_005) on different plates at identical concentrations in 730 lines. Proposal: verify/untouched_plan.json (not frozen; no outcome opened), with a design-only partition of 710 eligible lines into E = 298 / H = 412 (every Jaaks line in H). It is a different estimand (same-condition cross-run confirmation, not orientation swap) and is likely underpowered for tau = 0.05. Because the Jaaks primary is EXPLORATORY_WORTHWHILE_EXCLUDED (contract: STOP), running it is optional and is the parent's decision. Every other candidate is NOT_QUALIFIED or UNVERIFIED; no blocking receipt is written because one candidate qualifies.",
+ "candidates": [
+  {
+   "name": "Vis et al. 2024 Cell Rep Med pan-cancer anchored screen, cross-project repeats (Data S1 pancan_combi_fitted_data_jan21.tsv.gz)",
+   "status_in_programme": "UNTOUCHED: never opened by any study in this repository (grep of research/, src/, tools/ for the DOI / PMCID / title: no hit); downloaded 2026-10-04 13:01 by this workstream; only design columns parsed. The paper text read (aggregate synergy rate 12%, combination-level concordance with Jaaks) is disclosed.",
+   "estimand": "R vs development-selected strongest simple same-information predictor C*: confirmed yield under the contract-v2 P2 campaign (two rounds, cap M = ceil(0.2 x menu), integer arithmetic, same predictors and tie rule), where screen = the measurement of an ordered combination in one project and confirmation = the same ordered combination at identical concentrations on different plates of the other project (two role assignments per line, paired). Population: new lines of the same tissues, this 19-combination menu, this history library. Secondary: within-line concordance (AUC) of the screen score with the joint call.",
+   "design_facts": {
+    "release": "137,738 rows, 762 lines, 26 tissues, 2,953 plates (barcodes; one scan each), 9 anchors x 26 libraries = 51 ordered combinations, 6 drug sets in 3 projects x 2 line arms (GDSC_002 A/B, GDSC_004 A/B, GDSC_005 A/B: arms split lines, they are not replicates)",
+    "menu": "19 ordered combinations shared by GDSC_002 and GDSC_005 with identical anchor concentrations and library maximum concentration (a 20th shared combination, MK-1775 + temozolomide, changes anchor concentration and is excluded); complete in 730 lines (pre-QC), 20 tissues with >= 10 such lines (Lung 134, Haematopoietic 128, Breast 43, Large Intestine 40, CNS 36, Bone 34, ...)",
+    "independence_of_the_two_measurements": "different project, drug-set layout and plates (0 shared barcodes); minimum barcode distance between the two projects' plates 5,173 (median 11,934), i.e. separate screening runs; identical compound IDs and concentrations; cell-line batch (CL) disjoint for every candidate in 163 lines and shared in the other 567 (same stock batch, different run); no seeding or scan dates in the release (a single fit time stamp 2021-01-12); all plates fitted in one hierarchical model run (shared line-level curve parameters: the fitted values are not statistically independent, exactly as for the Jaaks SV/VS orientations)",
+    "replicates_inside_a_project": "102 of 730 lines have > 1 plate for some (combination, project) (reference/QC lines); the authors' >= half rule aggregates them",
+    "overlap_with_exposed_jaaks": "116 Jaaks lines are in the release (109 with the complete 19-menu); 0 barcodes shared with Jaaks's 3,106 plates; 1,630 line x menu-combination cells also measured in Jaaks (exposed screen; not used by the proposal)"
+   },
+   "legal_predictor_information": "history = both projects' calls and labels of the H lines of the same tissue (stage 1: opened for history, C*/fp* selection and power only); target information = only purchased measurements; E-line outcomes sealed until the analysis freeze (staged parsing that drops E rows before any outcome column is converted)",
+   "power": "not computable from design counts alone (needs the variance of the paired line difference). Planning relation: 95% relative half-width hw ~ 1.96 x SD(paired line difference) / (mean C* line yield x sqrt(n_E)); with n_E = 298, hw = 0.114 x (SD/mean). Jaaks gave SD/mean ~ 0.22 (verify-hits, statistics.json) and ~ 0.30 (this study's P2 primary, from its interval), but the 19-menu with M = 4 (two screens, two verification slots) has small-count yields; SD/mean ~ 0.7-1.5 is expected, i.e. hw ~ 8-17%. The proposal computes the projection from H lines (gate G4) and records it before stage-2 (E) access.",
+   "verdict": "QUALIFIED_FOR_CROSS_RUN_CONFIRMATION_YIELD (design; conditional on gates G1-G4 in untouched_plan.json; power UNVERIFIED and likely insufficient for tau = 0.05: resolves tau only if the H-projected SD/mean <= ~0.44)"
+  },
+  {
+   "name": "Jaaks 2022 screen (exposed) verified by the Vis 2024 measurement of the same line and ordered combination (cross-screen)",
+   "estimand": "same contrast with confirmation = later independent screen of the same orientation",
+   "design_facts": "116 lines in both; 4,001 line x ordered-combination cells in both (49 combinations), 2,917 at identical anchor concentrations; 1,948 of these are in the frozen builder's S x V menu (1,631 SV-screen and 947 VS-screen orientation before the concentration filter), median 12 per line (range 3-31); 0 shared barcodes",
+   "independence": "different screening campaigns (projects), different plates; screen side already exposed",
+   "power": "about 58 evaluation lines with ~12 candidates (M = 3): far below the 146-line requirement for a 5% claim (statistics.json); detection only of very large gains",
+   "verdict": "NOT_QUALIFIED (TOO_FEW_UNITS for tau; INCOMPLETE_MENU: verification exists for a median 12 of the ~150-pair Jaaks menu, so the registered Jaaks campaigns cannot be replayed). Subsumed by the within-Vis cross-project design, which has 6x more lines and untouched screens."
+  },
+  {
+   "name": "Nair et al. 2023 Nat Commun 14:3830 validation menu (PMC10307832)",
+   "estimand": "cross-protocol confirmation of original-screen hits on the author-selected menu",
+   "design_facts": "validation: 29 combinations (27 shared with the original screen) x 15 NSCLC lines, 10 x 10 matrices in four dilution series, CellTiter-Glo at 48 h, different laboratory and independently sourced cell stocks; original screen: 81 lines, 1 anchor dose x 5 library doses, nuclei count at 5 days, technical duplicate plates seeded the same day",
+   "independence": "fully independent laboratory and stocks, but a large declared condition change (assay, readout, time, dose design)",
+   "legal_information": "a joint rate needs history lines with both measurements, i.e. other validation lines: at most 7-8 sealed evaluation lines after an H/E split",
+   "power": "15 lines in total: power 0.14 / 0.44 for 5% / 10% gains even with all lines as targets (statistics.json scale); with <= 8 sealed lines, lower",
+   "verdict": "NOT_QUALIFIED (TOO_FEW_UNITS; OUTCOME_SELECTED_MENU: combinations chosen to confirm top original-screen synergies; DECLARED_CONDITION_CHANGE). Could support only a descriptive cross-protocol calibration check (UNVERIFIED: Supplementary Data S8 not inspected)."
+  },
+  {
+   "name": "BATCHIE prospective release, random validation round (Zenodo 13871987, PAIR_SCREEN.csv)",
+   "estimand": "prediction validation of single-well viability on a uniformly sampled set of pair x line cells",
+   "design_facts": "control wells excluded (addendum 1): random validation 3,729 pair x lines (3,555 pairs, 12 lines, median 1 well, <= 2 dose pairs); 324 of them were also measured in the adaptive phase, in only 4 lines (RPE 162, U2OS 135, MSKEWS-33838 15, SJSA-1 12), and only 15 at the same dose pair; no pair has both-phase measurements in any other line",
+   "independence": "different plates and iterations; but almost never the same condition",
+   "legal_information": "a history joint rate is undefined (0 history lines with two measurements of the same pair); R collapses to its pooled prior",
+   "verdict": "NOT_QUALIFIED (NO_SAME_CONDITION_SECOND_MEASUREMENT: 15 cells; NO_PAIR_HISTORY_FOR_A_JOINT_RATE; UNIT_IS_A_SINGLE_WELL, no dose-response synergy call). Earlier counts (348 / 3,753) used ordered pairs; the corrected unordered, control-free counts are in design_census_addendum1.json."
+  },
+  {
+   "name": "GDSC matrix releases gdsc-007..010 (portal, outcome-unread)",
+   "estimand": "technical-duplicate agreement on a 25-28 pair matrix menu (not confirmation)",
+   "design_facts": "from the earlier census (reproducible_allocation_20261003/review/design_census_replicates.json): 4.0-6.9% of pair x lines on >= 2 plates; full-replicate lines 26/19/13/9 per release, 7 of them the same reference lines; 63-71% of replicate plates have consecutive barcodes. New check (2026-10-04 12:50): the portal Downloads page offers only matrix summaries and documentation; no raw plate or seeding-date file exists, so independence cannot be recovered",
+   "verdict": "NOT_QUALIFIED (NO_SEEDING_RECORDS; REPEAT_INDEPENDENCE_UNKNOWN; MENU_TOO_SMALL; TOO_FEW_UNITS: about 35 non-reference line x release units)"
+  },
+  {
+   "name": "Jaaks 2022 screen (exposed) verified by GDSC matrix measurements (cross-protocol)",
+   "design_facts": "name-matched overlap: gdsc-007 0, gdsc-008 113 line x pairs (1 pair: taselisib + trametinib), gdsc-009 180 (4 pairs), gdsc-010 106 (4 pairs), sandpiper-01 0; at most 4 candidates per line, 9 distinct pairs in total; matrix drug IDs differ from Jaaks IDs (24xx vs 10xx: possibly different compound batches)",
+   "verdict": "NOT_QUALIFIED (TOO_FEW_PAIRS: 9 pairs, <= 4 per line; DECLARED_CONDITION_CHANGE: 7 x 7 matrix Bliss/HSA vs anchored delta-Emax)"
+  },
+  {
+   "name": "Melanoma full-matrix screen (Commun Med 2026, PMC13338063; Zenodo 10.5281/zenodo.18962045)",
+   "design_facts": "23 melanoma + 2 melanocyte lines, 61 drugs, all pairs at 4 x 4 concentrations; 'drug combinations were tested as single replicates' (Methods)",
+   "verdict": "NOT_QUALIFIED (NO_SECOND_MEASUREMENT; TOO_FEW_UNITS: 25 lines)"
+  },
+  {
+   "name": "Same-condition repeats inside Jaaks 2022 (14 repeat lines), Jaaks rescreen, Jaaks raw/day-1 data, GDSC portal anchor files",
+   "verdict": "NOT_QUALIFIED (EXPOSED: opened by feedback_validation_20261003 / reproducible_allocation_20261003, or the same experiment)"
+  },
+  {
+   "name": "AstraZeneca-Sanger DREAM combination data",
+   "verdict": "UNVERIFIED (ACCESS_BLOCKED: Synapse login; excluded by the no-login rule)"
+  },
+  {
+   "name": "Randomized complete-policy comparisons",
+   "design_facts": "no public release found in which two allocation policies were randomized over the same lines; BATCHIE's model-selected validation hits vs its random round compare one policy with random sampling, not R vs a marginal ranking",
+   "verdict": "NOT_QUALIFIED (NO_SUCH_DESIGN_FOUND in a bounded search: Europe PMC 2023-2026 queries, figshare search)"
+  }
+ ],
+ "files": ["verify/design_census.py", "verify/design_census.json (its 'batchie' section superseded)", "verify/design_census_addendum1.json",
+           "verify/design_census_vis.py", "verify/design_census_vis.json", "verify/design_census_vis_repeats.py",
+           "verify/design_census_vis_repeats.json", "verify/design_census_vis_crossproject.py",
+           "verify/design_census_vis_crossproject.json", "verify/design_census_vis_menu.py", "verify/design_census_vis_menu.json",
+           "verify/download_manifest.json", "verify/untouched_partition.py", "verify/untouched_partition_proposal.json", "verify/untouched_plan.json"]
+}

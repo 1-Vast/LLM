@@ -1,0 +1,25 @@
+{
+ "owner": "design",
+ "written_at": "2026-10-04T13:00 +0800 (from `date`), before any outcome read of this study by design",
+ "status": "NON-BLOCKING: contract v2 resolved the earlier ambiguities; these are the remaining implementation readings adopted in design/campaign.py, feedback.py and stages.py. None changes an estimand. Flag any you reject before the eval stage; otherwise they stand and are listed in design/receipts/deviations.json if they turn out to matter.",
+ "items": [
+  {"id": "Q1", "topic": "feedback gate (a) 'same count and reserve rule'",
+   "reading": "the oracle buys exactly as many round-2 screens as R bought in that campaign (hence the same reserve and round-3 budget), choosing them by the true joint outcome (shared tie-break); round 3 verifies round-2 hits in R's verify order. The variant 'oracle order under the reserve acceptance rule' (count may differ) is computed and reported next to it; the gate decision uses the same-count version."},
+  {"id": "Q2", "topic": "where the feedback models are evaluated",
+   "reading": "all coefficients (F0, Fm, Ff, c_f bootstrap, lambda) are fitted in a separate HD-only stage (feedback_dev) and hashed in plan_addendum_1.json BEFORE any E outcome is read. 'Role-swapped transport (all lines)' is reported as E lines (out of sample; the registered diagnostic decision uses this) and HD lines (in-sample fit) separately, never pooled."},
+  {"id": "Q3", "topic": "same-condition repeatability target (development-grade, 14 lines)",
+   "reading": "screen = seeding event R1 (chrono) of the screen orientation, verification = event R2 of the same orientation (model_id.event_table / event_arrays on plate_hierarchy.csv); menu = candidates with finite R1 and R2 labels and calls; M = (n_eligible + 4) // 5; tie order = the full-menu rank restricted to the eligible candidates; R's p_sv (role-swapped history) as the F0 base; worlds and histories as for the role-swapped campaigns of that line (HD repeat line: other HD lines; E repeat line: HD lines); coefficients and lambda transported from the role-swapped HD fit (no refit on repeat lines, so no E outcome enters any fit). Campaigns with < 10 eligible candidates are skipped and listed. HD (6), E (8) and all 14 reported; no verdict."},
+  {"id": "Q4", "topic": "two-way line x pair bootstrap seed and draw order",
+   "reading": "rng = default_rng(20261005) (the frozen verdict.two_way used SEED + 1); for b in range(10000): for tissue in (Breast, Colon, Pancreas): line indices rng.integers(0, n_t, n_t), then pair multiplicities bincount(rng.integers(0, P_t, P_t)); P_t = distinct tissue pairs in the E menus; percentile [2.5, 97.5]."},
+  {"id": "Q5", "topic": "c_f and lambda intervals",
+   "reading": "c_f: refit Ff with line-multiplicity weights on the registered resample indices (default_rng(20261004), HD lines sorted by SIDM within tissue, 10,000 resamples); c_f = 0 iff the percentile interval contains 0, in which case Ff uses Fm's coefficients. lambda (U_lambda) = model_id.fit_lambda on the eligible round-2 candidates (v = verification label, V0 = shrunk verification-label mean = L_v score); its interval on the same indices is descriptive."},
+  {"id": "Q6", "topic": "b > 0 constraint",
+   "reading": "maximum likelihood first; if b <= 0, b is fixed at 1e-6 (so the order is R's p_sv order, as H5 requires) and the other coefficients are refitted with b x logit(p_sv) as an offset; recorded as b_constrained."},
+  {"id": "Q7", "topic": "pipeline diagnostic p_sv / (c_s + p_s x c_v)",
+   "reading": "design reports it descriptively on E under P2 at fp*: measurement cap (c = 1: screen p_sv / (1 + p_s), verify p_v|s) and wells cap (screen p_sv / (c_s + p_s c_v), verify p_v|s / c_v). Not a comparator, no verdict; the resources workstream may report its own version."},
+  {"id": "Q8", "topic": "power analysis method",
+   "reading": "from the HD per-line R - C* differences at fp* (C* selected on the same lines, so the development contrast is biased toward C*): per-line deviations z = d - G y kept, scenarios with true relative effect delta use d' = z + delta y; analytic delta-method SE of the ratio and a tissue-stratified simulation (4,000 simulated studies per n and delta; E tissue proportions 25/22/14) with a 95% delta-method interval per study; P(L > 0), P(L > tau), P(U < tau) for n = 61, 64, 100, 125, 150, 200, 250, 300, 400, 500, 750, 1000."},
+  {"id": "Q9", "topic": "development-stage data handling",
+   "reading": "the frozen builder necessarily loads the whole release; the dev and feedback_dev stages drop every E row from both role panels (TissueData.restrict / world library subset) before any computation, and nothing from E lines is written by them."}
+ ]
+}

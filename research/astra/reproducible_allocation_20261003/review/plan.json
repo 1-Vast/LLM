@@ -1,0 +1,45 @@
+{
+ "owner": "review (subagent 3 of 3)",
+ "written_at": "2026-10-04T02:14:02+0800 (from `date`), before any outcome-derived value was read for the analyses below",
+ "status": "PLAN, written before the analyses it governs; never edited after their outcomes are read (addenda only)",
+ "evidence_status": "Every quantity derived from Jaaks 2022 in this workstream is EXPLORATORY (the release was opened six times by ../feedback_validation_20261003). The raw release is NOT read by this workstream; only result files the earlier study already wrote are read.",
+ "disclosure_before_plan": [
+  "results/followup_verification.json (earlier study) was printed in full while orienting; its totals and contrast intervals are the ones already reported in that study's REPORT.md section 6.",
+  "The first 3,000 characters of results/jaaks_primary/lines.jsonl were printed while orienting (one line record: SIDM00097, breast, SV; history_mean / history_rate / ridge_static purchases and validated counts 0). No other per-line value was read before this plan."
+ ],
+ "analyses": {
+  "A1_power": {
+   "question": "How many target lines does a future frozen 2x2 (static vs reproducibility-aware predictor x simple vs proposed adaptive scheduler) need for its primary contrast, given realistic between-line variance of the paired difference?",
+   "inputs": [
+    "../feedback_validation_20261003/results/jaaks_primary/lines.jsonl: per (line, replicate) arm totals 'validated', 'screen_hits' at the primary 20% budget (derived, exposed)",
+    "../feedback_validation_20261003/results/followup_verification.json: contrast mean_diff and bootstrap intervals (derived, exposed); per-line verify-hits values are not stored there, so their SD is back-calculated from the interval half-width x sqrt(125)/1.96 and labelled as an approximation"
+   ],
+   "estimand": "per-line mean paired difference D = Y_proposed - Y_baseline in independently confirmed discoveries per line (line = unit; SV and VS replicates averaged per line where both exist), and ratio-of-sums gain G = sum Y_proposed / sum Y_baseline - 1",
+   "quantities": [
+    "mean and SD of per-line validated discoveries for history_mean (the static* arm) and other static arms",
+    "SD of per-line paired differences between arms whose purchase sets differ (feedback - history_mean, history_rate - history_mean, ridge_static - history_mean, gbm_static - history_mean, random - history_mean)",
+    "correlation between SV and VS replicate values within a line (how much a single-replicate design inflates variance)",
+    "per-tissue mean and SD",
+    "required lines n for (i) superiority (lower bound > 0) and (ii) threshold claim (lower bound > tau) at alpha 0.05 two-sided-equivalent one-sided 0.025 and power 0.8 / 0.9, for tau in {0.05, 0.10} relative and assumed true gains in {tau, 1.5 tau, 2 tau}; and the n at which an upper bound below tau (futility) is reachable when the true gain is 0",
+    "design effect from pairs recurring across lines: compare line-bootstrap SE with a two-way (line x pair) bootstrap SE, using the earlier study's S13 interval width ratio"
+   ],
+   "method": "normal approximation for n = ((z_a + z_b) * SD_D / (delta_abs))^2 with delta_abs = G * baseline mean; checked by a stratified line bootstrap of the observed per-line data (10,000 resamples, seed 20261004) and by resampling-based power for selected n (2,000 simulated studies, lines resampled with replacement and a constant per-line shift added to generate the alternative); no new outcome of any release is read",
+   "units": "cell line (stratified by tissue); pairs recur across lines (design effect reported); SV/VS are two plate-disjoint role assignments of the same line, not independent units",
+   "stopping": "single pass; the numbers are reported as computed; if lines.jsonl lacks a needed field, record it as unavailable rather than reconstructing it from the raw release"
+  },
+  "A2_design_census": {
+   "question": "Do the downloaded but outcome-unread GDSC matrix releases (gdsc-007..010, sandpiper-01) contain repeated plates of the same combination x line that could serve as independent verification for a complete declared menu? Are the portal anchor_combo files the Jaaks 2022 data?",
+   "columns_allowed": {
+    "matrix": ["BARCODE", "DRUGSET_ID", "cmatrix", "CELL_LINE_NAME", "SIDM", "TISSUE", "lib1_ID", "lib1_name", "lib1_minc", "lib1_maxc", "lib2_ID", "lib2_name", "lib2_minc", "lib2_maxc"],
+    "anchor_combo": ["Cell Line name", "SDIM", "Tissue", "Anchor Name", "Anchor Conc", "Library Name", "Maxc"],
+    "jaaks_original_and_rescreen (already opened; design columns only are needed)": ["BARCODE", "Tissue", "SIDM", "ANCHOR_NAME", "ANCHOR_CONC", "LIBRARY_NAME", "LIBRARY_CONC"]
+   },
+   "columns_forbidden": "every other column (MaxE, IC50, RMSE, combo_MaxE, Delta_*, Bliss_*, HSA_*, window_*, day1_*, growth_rate, doubling_time, Emax, Synergy?, etc.); reads use pandas usecols so forbidden columns are never parsed",
+   "quantities": "per release: plates per pair x line; whether repeated plates share DRUGSET_ID / concentrations; lines in which every pair of the release has >= 2 plates; pairs with >= 2 plates in many lines; distribution of repeats over barcodes; anchor_combo vs Jaaks (line, anchor, library, anchor conc) tuple overlap",
+   "stopping": "single pass; design-only receipts written to review/"
+  },
+  "A3_literature": "Europe PMC / arXiv / JMLR primary sources for the statistics memo (theorem conditions) and the novelty check; no paid calls",
+  "A4_downloads": "only if needed for Nair 2023 or BATCHIE design qualification: official sources, no login, <= 500 MB total, recorded in review/download_manifest.json; design columns only; nothing executed"
+ },
+ "provider_calls": "none (an LLM diagnostic, if judged necessary, is written as review/llm_plan.json and not run)"
+}

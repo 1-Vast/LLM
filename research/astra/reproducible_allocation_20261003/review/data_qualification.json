@@ -1,0 +1,94 @@
+{
+ "owner": "review (subagent 3 of 3)",
+ "written_at": "2026-10-04T02:32:03+0800 (file time; an estimated time typed earlier was corrected)",
+ "question": "Can any dataset serve as UNTOUCHED evaluation for the frozen model x scheduler 2x2? Requirement: a declared full action menu per target line in which EVERY candidate has (a) a screen measurement and (b) an independent verification measurement (different plates and, ideally, different cultures/seedings; same conditions or an explicitly declared condition change), plus plate identifiers, enough target lines for the estimand (statistics.json: about 37-62 lines to resolve a 10% gain, about 146-245 to resolve a 5% gain), and outcome columns never read before a freeze.",
+ "rule": "design columns only for unopened data (pandas usecols; receipts list every parsed column); no outcome column of any unopened file was read by this workstream",
+ "verdict_overall": "NO DATASET QUALIFIES. The 2x2 cannot be run as an untouched evaluation on any locally available or official no-login public release. The parent should deliver an executable protocol and a blocking receipt (DATA_NOT_QUALIFIED), not a run.",
+ "datasets": [
+  {
+   "name": "Nair et al. 2023 Nat Commun 14:3830 NSCLC anchored screen (DOI 10.1038/s41467-023-39528-9; Europe PMC PMC10307832)",
+   "verdict": "NOT_QUALIFIED",
+   "reasons": [
+    "NO_INDEPENDENT_PRIMARY_REPLICATE: the authors state the screen 'was performed in technical duplicates with two sets of identical plates seeded on a given day' (Methods, Europe PMC full text) - same seeding, same day; these are technical, not independent, verification measurements",
+    "VERIFICATION_ONLY_ON_SELECTED_MENU: the independent validation (second laboratory, independently sourced cell stocks, CellTiter-Glo instead of nuclei imaging, 48 h, 10 x 10 matrices in four dilution series) covers 27 shared combinations x 15 lines that were chosen 'to confirm some of the top synergies observed in the original screen' - an outcome-selected menu, so verification exists only for candidates pre-selected on screen outcomes",
+    "DECLARED_CONDITION_CHANGE_IS_LARGE: assay, readout, time point, dose design and laboratory all change; a confirmation there measures cross-protocol robustness, not reproducibility of the screen measurement",
+    "TOO_FEW_UNITS: 15 validation lines; power to show even a 10% gain is about 0.28-0.44 (statistics.json)",
+    "DESIGN_DIFFERS_FROM_DEVELOPMENT: 1 anchor dose x 5 library doses (sqrt(10) series), 5-day nuclei count, 21 anchors x 242 library drugs in 81 lines - a predictor/scheduler developed on Jaaks 2 x 7 anchored data would need new development"
+   ],
+   "census": "verdict from the authors' Methods/Data availability text (full text read via Europe PMC fullTextXML); supplementary Data S1/S2/S8/S12 and https://github.com/nishanth83/NSCLC were NOT downloaded, because no count in them can remove the disqualifying design facts above. Not a GDSC-portal release (screen run at the MGH Center for Molecular Therapeutics; the portal has no lung anchored file: HEAD 404).",
+   "possible_bounded_use": "cross-protocol robustness of a frozen predictor on the 27 x 15 validation menu, explicitly labelled selective and condition-changed"
+  },
+  {
+   "name": "GDSC matrix projects gdsc-007, gdsc-008, gdsc-009, gdsc-010 (portal downloads, outcome-unread)",
+   "verdict": "NOT_QUALIFIED",
+   "reasons": [
+    "INCOMPLETE_VERIFICATION: only 4.0-6.9% of pair x line cells have >= 2 plates (gdsc-007 1,234/18,022; gdsc-008 1,179/20,567; gdsc-009 776/19,208; gdsc-010 508/10,139); lines with EVERY pair repeated: 26, 19, 13, 9 per release, of which 7 in each release are the recurring reference/QC lines (HT-29, PC-14, MHH-ES-1, A375, SW620, C32, U-2-OS); about 35 non-reference line x release units in total",
+    "REPEAT_INDEPENDENCE_UNKNOWN: 78-100% of repeated pair x lines are on the same drug set (plate layout) with identical concentrations; within full-replicate lines 63-71% of replicate plates have consecutive barcodes (gap 1), consistent with same-run technical duplicates; the release has no seeding date, culture id or scan date",
+    "MENU_TOO_SMALL: 25-28 pairs per line (2 drug sets of 10-15 matrices); a 20% budget is 5-6 purchases, leaving almost no allocation decision",
+    "DIFFERENT_ASSAY: 7 x 7 matrices scored by Bliss/HSA excess; development on anchored Delta-Emax calls does not transfer without re-development"
+   ],
+   "census_file": "review/design_census.json (matrix section) and review/design_census_replicates.json",
+   "census_numbers": {"lines": [733, 736, 737, 376], "pairs": [25, 28, 28, 27], "plates": [1806, 1783, 1751, 893], "drugsets": [4, 4, 4, 2], "share_pair_x_line_repeated": [0.0685, 0.0573, 0.0404, 0.0501], "repeated_same_drugset_share": [0.8379, 0.8338, 0.7758, 1.0], "repeated_same_concentrations_share": [1.0, 1.0, 1.0, 1.0], "full_replicate_lines": [26, 19, 13, 9], "of_which_reference_lines": [7, 7, 7, 7], "cross_release_pair_x_line": "594 triples, all one pair (2431|2574) measured in gdsc-007 and gdsc-008 at identical concentrations"},
+   "possible_bounded_use": "still unopened: a small same-condition repeat diagnostic for the repeats workstream's scalar correction (lambda) on about 35 non-reference line x release units x about 25 pairs, ONLY if the plate hierarchy (seeding date / culture) is recovered from raw files and a plan is frozen before any outcome column is read; it cannot evaluate allocation"
+  },
+  {
+   "name": "GDSC sandpiper-01 matrix project",
+   "verdict": "NOT_QUALIFIED",
+   "reasons": ["MENU_TOO_SMALL: 2 pairs per line (4 drugs, 737 lines); 49 lines have both pairs repeated, 7 of them reference lines; no allocation problem exists"],
+   "census_file": "review/design_census.json, review/design_census_replicates.json"
+  },
+  {
+   "name": "GDSC portal anchor_combo files (breast, colon, pancreas)",
+   "verdict": "NOT_QUALIFIED",
+   "reasons": [
+    "SAME_DATA_AS_JAAKS_2022 (EXPOSED): every one of the Jaaks original screen's 108,259 ordered combination x line keys (line, anchor, library) is in the portal files (100%); the portal has 111,650 keys (126 lines vs 125), i.e. 3% more, and 95.7% of its (key, anchor concentration) tuples match the Jaaks release",
+    "NO_PLATE_IDS: summarised per line x anchor x anchor concentration x library; plate disjointness cannot be asserted"
+   ],
+   "census_file": "review/design_census.json (anchor_vs_jaaks)"
+  },
+  {
+   "name": "Jaaks 2022 validation rescreen (figshare 16843600)",
+   "verdict": "NOT_QUALIFIED (for untouched evaluation); useful exploratory development set",
+   "reasons": [
+    "EXPOSED: opened by the earlier study (S11)",
+    "OUTCOME_SELECTED_MENU: author-chosen pairs (30-50 per tissue) re-screened after the original results",
+    "DECLARED_CONDITION_CHANGE: 0% of rescreen measurements share the original concentrations (earlier WS1 census)"
+   ],
+   "structure": "the most complete independent-verification design available: 30-50 pairs x 29-35 lines per tissue, about 99% complete, separate later plates (0 shared barcodes)",
+   "census_source": "../feedback_validation_20261003/workstreams/ws1_feedback_validation/receipts/step3g_jaaks_design_census.json; review/design_census.json"
+  },
+  {
+   "name": "BATCHIE prospective release (Tosh et al. 2025; Zenodo 10.5281/zenodo.13871987, PAIR_SCREEN.csv downloaded by this workstream)",
+   "verdict": "NOT_QUALIFIED",
+   "reasons": [
+    "ADAPTIVE_MENU: plates were chosen by the BATCHIE model over 15 iterations; 52,832 of 409,032 pair x line cells (12.9%) were measured and only 2 of 18,939 measured pairs were measured in all 19 lines; an alternative policy would request unmeasured cells",
+    "VERIFICATION_SPARSE: 406 pair x lines were measured in both the adaptive phase and a validation round; the round-15 random validation covers 3,753 pair x lines (3,557 pairs, 12 lines) of which 348 overlap the adaptive screen",
+    "DOSE_LEVEL_UNITS: median 1 well (one dose pair) per pair x line; the unit of purchase is a single-dose well, not a combination dose-response",
+    "DIFFERENT_DISEASE_AND_LINES: 19 paediatric sarcoma and other lines (A673, TC-71, MSKEWS-..., U2OS ...); note 'MG-63' and 'MG63' appear as distinct labels"
+   ],
+   "census_file": "review/design_census_batchie.json and review/design_census_batchie_addendum.json",
+   "possible_bounded_use": "the random validation round is an unbiased sample for checking a frozen predictor's calibration on held-out cells (prediction validation), not a policy replay"
+  },
+  {
+   "name": "AstraZeneca-Sanger DREAM combination data",
+   "verdict": "UNVERIFIED",
+   "reasons": ["ACCESS_BLOCKED: Synapse account/request needed; excluded by the no-login rule"]
+  },
+  {
+   "name": "Jaaks 2022 raw and day-1 data (figshare 19141916, 19141919)",
+   "verdict": "NOT_QUALIFIED",
+   "reasons": ["SAME_EXPERIMENT_AS_EXPOSED_RELEASE: raw plates of the already-opened screen; useful for provenance (repeats workstream), not for untouched evaluation"]
+  },
+  {
+   "name": "O'Neil 2016, NCI-ALMANAC 2017 (local)",
+   "verdict": "NOT_QUALIFIED",
+   "reasons": ["EXPOSED (development data of earlier blocks)", "ALMANAC has no independent second centre per experiment; within-centre repeats r 0.29-0.50 (earlier WS1)"]
+  }
+ ],
+ "if_anything_qualified": "nothing qualified; no exact menu, verification pairing or line count can be proposed for an untouched 2x2. The nearest legitimate options are (1) an exploratory 2x2 on the exposed Jaaks complete panels (development only, labelled EXPLORATORY), (2) a prospective experiment designed for the purpose, or (3) a new release with complete same-condition repeats, sized by statistics.json.",
+ "what_a_qualifying_prospective_design_needs": {
+  "menu": ">= 100 pairs per line declared before screening, every pair measured in screen orientation and once more as verification on a different seeding day (different DATE_CREATED; ideally a new culture expansion) under the same conditions",
+  "lines": "about 146 lines with two role assignments per line (or about 245 with one) to resolve the 5% bar in both directions at 80% power; about 37 / 62 lines for a 10% bar (statistics.json)",
+  "records": "plate barcode, seeding date, culture id, scan date per plate; QC flags; cost per plate/well"
+ }
+}

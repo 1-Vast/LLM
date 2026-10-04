@@ -1,0 +1,62 @@
+{
+ "written": "2026-10-03T22:04:00+08:00",
+ "question": "does the LLM add decision value beyond presentation order and displayed scores?",
+ "data": {
+  "library": "O'Neil 2016 (data/processed/certified_discovery/oneil_v1.npz), EXPOSED development data; hits are the O'Neil primary-screen label (> 10); this is a diagnostic, not confirmation",
+  "library_sha256": "2edc5e7a351e7ded3daf6a37dcf6a32f76d442216bf2cb1a9feff5f97baeeb1f",
+  "lines": 39,
+  "rounds": 4,
+  "k": "15, 15, 15, 14",
+  "state": "frozen TransferWorld after the deterministic world-model campaign's purchases (sort by P(hit)); menu = top 2k untested; identical menu, line evidence and presented order for both arms"
+ },
+ "arms": {
+  "L_true": "LLM, names + true scores, shuffled order (seed [20261004, line, round])",
+  "L_perm": "LLM, names + score tuples permuted across menu rows (seed [20261004, line, round, 7]), same shuffled order",
+  "R_sort_true": "deterministic world-model top k (sort by true score)",
+  "R_order": "deterministic first k presented (uniform random subset of the menu)",
+  "R_sort_displayed": "deterministic sort by the scores the arm was shown (= R_sort_true for L_true)"
+ },
+ "contract": {
+  "prompt": "frozen LLMPlannerArm named prompt (SYSTEM), exact k, one call per round",
+  "ids": "O'Neil candidate indices 0..582 (<= 3 digits)",
+  "model": "deepseek-flash",
+  "temperature": 0.0,
+  "thinking": "disabled",
+  "max_tokens": 600,
+  "logging": "presented order, displayed numbers, raw replies (results_gate/calls.jsonl), usage, latency"
+ },
+ "rules": {
+  "valid": "parsed list of exactly k distinct integers, all in the presented menu",
+  "retry": "one corrective retry after an invalid or unparseable reply, or a resend after a transport failure; charged; 'valid after retry' counts as an LLM selection and is reported separately",
+  "repair": "if still invalid: fallback policy = first distinct valid ids, filled from the arm's deterministic reference (L_true: R_sort_true; L_perm: R_order); reported as its own policy and EXCLUDED from E1/E2 (contrasts use rounds where the LLM selection is valid; pairing kept per round)",
+  "pricing": "provider-usage delta per call, so unparseable replies are priced; no decoded response -> charged at reservation and marked unknown-actual",
+  "ceiling": "new spend <= USD 0.4, checked before every call against spent + reservation (prompt chars / 1.8 at cache-miss rate + 600 output tokens); WS4 spend before this run USD 0.2171"
+ },
+ "estimands": {
+  "E1": "per line, sum over valid rounds of hits(L_true) - hits(R_sort_true)",
+  "E2": "per line, sum over valid rounds of hits(L_perm) - hits(R_order)",
+  "explained": "pooled share of LLM picks inside R_order, inside R_sort_displayed, and inside their union (chance: 0.5, 0.5, ~0.75)",
+  "residual": "L_perm picks outside R_order and R_sort_displayed: pooled hit rate minus the pooled menu base rate of the same rounds",
+  "uncertainty": "percentile bootstrap over the 39 lines, 10000 resamples, seed 20261004",
+  "secondary": "E2 against the menu-random expectation k * menu hits / 2k; L_perm vs R_sort_displayed; fallback-policy contrasts"
+ },
+ "decision": {
+  "STOP": "upper 95% bound of E1 < +0.5 AND upper 95% bound of E2 < +0.5 hits/line, OR the best single-rule explained share (max of order, displayed score) > 0.90 in both LLM arms",
+  "CONTINUE": "not STOP, AND E2 lower 95% bound > 0, AND residual hit rate - menu base rate has lower 95% bound > 0",
+  "MODIFY": "otherwise (e.g. E1 > 0 only, or inconclusive)",
+  "precedence": "STOP is evaluated first"
+ },
+ "cost": {
+  "calls_first_attempt": 312,
+  "max_calls_with_retries": 624,
+  "expected_usd": 0.163,
+  "worst_usd_first_attempts_at_max_tokens": 0.369,
+  "ceiling_new_usd": 0.4,
+  "ws4_prior_usd": 0.21713,
+  "ws4_cumulative_cap_usd": 0.6171
+ },
+ "code_sha256": {
+  "gate.py": "82f39d95b46a164c12bf97da4d58af0af7b05469e139c14aed40e6e4b61ff0ec",
+  "diagnostic.py": "c12695eccb0a09cc08c58dff5f0b78a39f7837eaad85b786067531c91ea43b3b"
+ }
+}

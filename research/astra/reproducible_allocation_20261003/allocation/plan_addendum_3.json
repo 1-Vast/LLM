@@ -1,0 +1,28 @@
+{
+ "written_at": "2026-10-04T02:44:33+0800",
+ "written_before_the_addendum_run": true,
+ "status": "EXPLORATORY and POST HOC: defined by the coordinator after the main replay and addendum 2 were seen. Jaaks was already opened. No verdict category. Earlier plans unchanged.",
+ "question": "R (p_sv) sees other lines' validation-orientation measurements, S (history_mean of the screen label) does not. Does R's gain under scheduler V come from the extra history information or from modelling confirmation (P(screen call AND validation call))?",
+ "data_access": "one new common.exposed_ticket(..., 'allocation') then the frozen jaaks.build_panels; lines built exactly as in replay.build_lines",
+ "scheduler": "V = verify_hits_terminal only (verify pending hits first by screen label; screen in the arm's order; reserve ceil(sum p_s x c_v) in round R with p_s = history screen-call rate for every arm; terminal verification round R+1; leftover to terminal screens in the arm's order). Measurement (B = M) and physical (B = W, cost 14 x design plates) versions; budgets, rounds, carry-over and seeds as in plan.json.",
+ "history": "other lines of the same panel (same tissue, same swap replicate); per pair, shrunk mean (sum over history lines of z + k0 x mu_z) / (n + k0) with k0 = WorldConfig.shrink = 2.0 and mu_z the pooled history mean of z; target-line labels never enter",
+ "arms": {
+  "S": "reference: history_mean of the screen-orientation label (TransferWorld X_target[:, 0]); must reproduce verify_hits_terminal (252.5 measurement, 251.5 physical)",
+  "R": "reference: p_sv = shrunk history P(screen call AND validation call); must reproduce addendum-2 R+V (269.0 measurement, 264.5 physical)",
+  "S_both": "shrunk history mean of z = (screen-orientation label + validation-orientation label) / 2",
+  "S_valid": "shrunk history mean of z = validation-orientation label",
+  "S_vrate": "shrunk history validation-call rate, z = 1[validation call] (same k0 shrinkage toward the pooled rate)",
+  "order": "new screens by the arm's score descending, ties by history_mean then rng (default_rng(line index)), as in addendum 2"
+ },
+ "labels": "screen-orientation label = panel.library.y; validation-orientation label = panel.valid_y (100 x max over anchor concentrations of mean SYNERGY_DELTA_EMAX of the other orientation); validation call = panel.valid_hit",
+ "checks": ["S purchases equal replay verify_hits_terminal; R purchases equal addendum-2 R+V (counts of mismatches reported)", "the recomputed shrunk screen-label mean equals line.static (max absolute difference reported)", "every history validation label is finite"],
+ "endpoints": ["confirmed discoveries", "screen hits", "screens", "verifications", "confirmation rate = confirmed / verified screen hits", "hidden validated screen hits", "missed validated hits left unverified", "terminal screens", "mean last round"],
+ "contrasts": {
+  "primary_listed_by_coordinator": ["R - S_both", "R - S_valid", "R - S_vrate", "S_both - S"],
+  "secondary": ["S_valid - S", "S_vrate - S"],
+  "inference": "verdict.contrast: paired line differences, line-stratified percentile bootstrap by tissue, 10,000 resamples, seed 20261003; line = mean of SV and VS; 125 lines"
+ },
+ "stopping_rule": "one execution after synthetic tests and one dry run; reproduction failures are reported as found",
+ "output": "results/addendum_3_information.json (new; refusal if it exists)",
+ "code": "allocation/addendum_3_information.py and allocation/test_addendum_3.py; replay.py and addendum_2x2.py are imported, not edited"
+}

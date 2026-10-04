@@ -1,0 +1,44 @@
+{
+ "status": "DESIGN ONLY - not run. Recommended verdict before running: STOP the LLM-as-selector line unless the gate experiment below finds residual (non-echo, non-score-following) choices that beat menu-random.",
+ "written": "2026-10-03 (+0800), WS4",
+ "evidence_basis": {
+  "this_workstream": "O'Neil, k = 5..128, 117 calls: named replies with k >= 32 are verbatim prefixes of the presented order (9/9); with scores shown and order shuffled the reply re-sorts by displayed score (top-k overlap with presented order 0.49, with world-model top-k 0.77; Kendall tau vs model rank 0.66); blind replies reproduce the shuffled presented order (tau vs presented 1.0; world-model overlap 0.50 = chance)",
+  "prior_receipts": "dev_v2 (k = 15) agreement with world-model top-k 0.95 named / 0.94 anonymised / 0.50 blind; S6 blind - menu_random -0.17 [-0.71, 0.36]; S7 named - wm_full +0.05 [-0.05, 0.15]",
+  "literature": "Gupta et al. EMNLP 2025: permuted feedback labels do not change LLM-agent performance; classical BO beats LLM agents"
+ },
+ "gate_experiment": {
+  "question": "Does the LLM make any choice that is not explained by presentation order or displayed scores, and are those choices enriched for hits?",
+  "data": "O'Neil development (exposed; diagnostic only), all 39 lines, frozen campaign spec (10% budget, 4 rounds, k = 14-15, kappa 2)",
+  "contract": "frozen exact-k prompt at k <= 16 (one call per round), ids kept <= 3 digits (or positional codes 1..2k), presented order randomised per call with recorded seed, raw reply and presented order logged, failed calls priced at provider usage or reservation",
+  "arms": {
+   "L_true": "LLM, names + TRUE scores, shuffled order",
+   "L_perm": "LLM, names + scores PERMUTED across menu items, shuffled order (score-following control)",
+   "R_sort": "deterministic: sort the menu by displayed score (the rule L_true would follow if it only reads numbers) = wm top-k",
+   "R_order": "deterministic: take the first k of the presented order (= menu-random)"
+  },
+  "estimands": ["E1: hits(L_true) - hits(R_sort) per line", "E2: hits(L_perm) - hits(R_order) per line (pharmacology/name knowledge net of the displayed numbers)", "E3: share of picks not predicted by R_sort or R_order, and their hit rate vs the menu base rate"],
+  "calls_and_cost": "39 lines x 4 rounds x 2 LLM arms = 312 calls at about USD 0.0005 = about USD 0.16 (ceiling USD 0.30 incl. retries); one retry per invalid reply, charged and reported apart from first-attempt validity",
+  "stop": "STOP the LLM-as-selector line if the upper 95% bound of E1 and E2 (bootstrap over lines) is < +0.5 hits/line, or if > 90% of picks are predicted by R_sort/R_order",
+  "continue": "only if E2 > 0 with lower bound > 0 AND residual picks have a hit rate above the menu base rate; then run the full comparison below, preregistered, on a qualified untouched screen",
+  "modify": "if E1 ~ 0 but E2 > 0: use the LLM only to re-rank inside the world-model menu where it disagrees, with the certificate audit unchanged"
+ },
+ "full_comparison_if_gate_passes": {
+  "arms": [
+   "A0 random over all candidates (zero arm)",
+   "A1 static retrieval (history)",
+   "A2 strong deterministic agent WITHOUT the world model: retrieval + in-line drug-offset update from purchases (closed form, no learned variances)",
+   "A3 deterministic world-model selection (wm_full top-k)",
+   "A4 uniform choice from the world model's 2k menu (wm_menu_random) - the null for any within-menu planner",
+   "A5 LLM with world-model information (scores visible, order randomised)",
+   "A6 LLM with ablated model information: (a) scores withheld, (b) scores permuted, (c) drug names anonymised",
+   "A7 fallback/repair policy (LLM reply repaired from world-model order) reported as its OWN policy, never as LLM success"
+  ],
+  "matching": "identical 2k menus from the same world-model state; identical line evidence text; identical budget (experiments, dose points, wells, days) and round count; no arm may stop early unless all may, under the same rule; identical terminal audit and certificate",
+  "attribution": "incremental contrasts A2-A1 (feedback without model), A3-A2 (model), A5-A3 (LLM beyond model), A6x-A4 (LLM knowledge net of model numbers), A7 vs A5 (repair); never only vs random",
+  "validity_gate": "registered first-attempt exact-k validity >= 99% of calls on development at the evaluation screen's id format; otherwise the run is a protocol failure and no LLM contrast is reported",
+  "reporting": "laboratory cost in wells/days per arm; provider USD, calls, tokens, latency and failures separately; unpriced failed calls bounded at reservation",
+  "inference": "unit = target line; bootstrap over lines; LLM randomness: >= 2 seeds of presentation order per line; data scope: screens the model may have seen in pretraining (memorisation caveat stated)",
+  "data_prerequisite": "a qualified untouched combination screen with the same label definition; ALMANAC is exposed and cannot serve as confirmation"
+ },
+ "worth_running": "Gate only (USD ~0.16). The full comparison is not worth running on current evidence: the named planner's measurable degrees of freedom are presentation order and displayed scores, and the maximum effect is bounded by its disagreement with the world model (5-9% of picks at k = 15)."
+}

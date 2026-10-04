@@ -341,3 +341,179 @@ legal predecision availability, assay QC, complete failures, credible costs and
 minimum meaningful gain are unresolved. State and mechanism comparisons retain
 separate prerequisites; no model prediction replaces an unmeasured endpoint.
 No new API/model or physical experiment ran, and no scientific gain is claimed.
+
+
+## 16. Certified dual-core discovery: pre-registration (written before the vault opened)
+
+A separate session (Claude Code, 17:18 onward) took the owner's request to refine the dual
+core. Earlier blocks found the decision side binds on every registered task, and forecasts
+were about 2x optimistic on selected actions. So this block moves the dual core to `task.md`
+Task 3 (combination and synergy), where purchases decide outcomes, and adds a design-based
+certificate for claims about untested candidates. The design and literature are in
+[the design record](../../research/certified_discovery/DESIGN.md).
+
+The development screen was O'Neil 2016 (exposed). It covered 39 target lines with a 10%
+budget in four rounds.
+- **Discovery:** the world model with in-context feedback found 475 hits against 401 for
+  static retrieval and 78.9 for random.
+- **Ingredients:** feedback is the active ingredient; cell-state context, uncertainty and an
+  LLM planner add nothing.
+- **Certificates:** they held (FDR 0.045 at alpha 0.2, yield-bound coverage 0.97). The
+  model's own claimed yield was 1.72x the realised yield.
+- **Failure receipt:** one invalid LLM run is kept as a receipt.
+
+The confirmatory screen is NCI-ALMANAC (downloaded 17:28 from the NCI wiki, SHA-256
+`69367a8b...6100`). Only its header, field documentation, compound names and a design-only
+census were read. The protocol is `research/certified_discovery/protocol/confirmatory.json`.
+The freeze, `protocol/freeze.json`, has SHA-256
+`222ef72b69598cf12025f19b8e4c5206a92972dc163b5a1ba984f8991be35508` and covers 18 files,
+frozen 17:58:20. Both primary hypotheses must pass for the framework claim:
+- H1: the certified dual-core loop finds more measured hits than static retrieval, per line;
+- H2: certified nominations keep FDR <= 0.2 and yield-bound coverage >= 0.87.
+Results are appended below after the single opening.
+
+**Results (appended after the single opening).**
+
+*The run.*
+- The vault was opened once at 17:58:48 (`protocol/vault_log.jsonl`, 0 prior openings). The
+  freeze was still intact after the run.
+- The library holds 304,943 experiments across 105 drugs and 60 lines, with 8,722 hits (2.86%).
+- Steps and timing: library build 11 s; replay of 11 arms over 60 lines 86 s (20 workers);
+  LLM replay 30 min, 468 priced calls, USD 1.53.
+
+*Primary tests.*
+- **H1 PASS.** The certified loop beats static retrieval by +2.58 hits per line [0.57, 4.93],
+  34 lines better and 25 worse. Totals: 5,752 against 5,597, with random at 875 and the
+  oracle at 8,658.
+- **H2 PASS.** FDR 0.043 [0.032, 0.054]; yield-bound coverage 0.958.
+- **Framework: SUPPORTED, with a small effect** (+2.8% after the audit, +4.9% without it).
+
+*Secondary estimates.*
+- Feedback +2.15 [0.70, 3.62] per line.
+- Single-agent context -0.40 [-1.82, 1.20]; uncertainty -0.23 [-0.75, 0.30].
+- World-model claims 1.58x [1.39, 1.80] optimistic.
+- Price of certification 2.02 [1.37, 2.70] hits per line.
+- The yield bound certifies 224.5 of the 469 hits left in untested remainders.
+
+*LLM arms.*
+- Every LLM round failed validation: DeepSeek returned the whole 256-item menu instead of about
+  128 ids.
+- `llm_named` therefore equals the world model through the repair. `llm_blind`'s +1.96
+  [0.75, 3.19] over a random menu choice is a protocol-failure number, not evidence of LLM
+  value.
+- Certificates under these black-box hybrids stayed valid (FDR 0.090, coverage 0.932).
+
+*Promotion.*
+- Promoted to `src/maestro/certification.py` (standard library only),
+  `src/virtual_cell/combination_world.py` (numpy only), `src/agent/discovery.py`,
+  `tools/datasets/combination_screens.py` and `tools/evaluation/discovery_replay.py`.
+- On the confirmatory library the promoted replay reproduces history 5,597, wm_static 5,744 and
+  wm_full 5,873 exactly.
+- The promoted optimizer reaches an equal or better likelihood than the frozen scipy fit. This
+  is a disclosed deviation.
+- Tests:
+  - core 354 passed in 48.8 s (12 new, adding 1.3 s);
+  - research parity 7 passed;
+  - research package 16 passed.
+- Nothing was committed. Report: `research/certified_discovery/README.md`.
+
+
+## 17. Feedback-validation study: pre-registration (written before the vault opened)
+
+Study directory: `research/astra/feedback_validation_20261003/`. Four investigation subagents
+(WS1 feedback and validation, WS2 predecision state, WS3 certification, costs and chronology,
+WS4 agent and literature) reported first; their receipts are under `workstreams/`.
+
+- **Question.** Does updating the empirical-Bayes world model with a few target-line
+  measurements give more independently validated synergy discoveries than the strongest static
+  alternative at equal wells?
+- **Why a new test.** On O'Neil, re-scoring with single-agent replicates the model never saw
+  removed most of the feedback gain over retrieval (+2.05 -> +0.17 hits per line, WS2).
+  ALMANAC is exposed, so it can only give exploratory evidence.
+- **Primary data (untouched).** Jaaks et al. 2022 GDSC anchored screen (figshare 16843597,
+  SHA-256 `1188968c...a278`).
+  - Only design columns and one accidentally printed row (disclosed) were seen.
+  - A seeded split of library-drug doublets into S and V makes the screen measurement and the
+    hidden validation measurement of every S x V pair sit on disjoint plates.
+  - There are two swap replicates, and the menu is 153-168 pairs per line in 125 lines.
+- **Arms and budget.**
+  - Arms: retrieval (mean and call rate), ridge and GBM static models, feedback, offset-only,
+    feedback on other priors, a call-rate learner, shuffle and wrong-line controls, random and
+    oracles.
+  - Budget: 20% of the menu in 4 rounds (10% as a sensitivity).
+- **Primary endpoint.** Validated discoveries per line (screen call AND validation call),
+  feedback against the best static arm re-selected in each bootstrap resample. The meaningful
+  gain is 10%.
+  - The verdict categories are MEANINGFUL_GAIN, SMALL_GAIN, INCONCLUSIVE, NO_MEANINGFUL_GAIN and
+    HARM.
+  - A stop verdict also needs agreement against history_rate.
+- **Second-agent review before freeze.** It found one blocking flaw: a per-pair orientation coin
+  shared plates between the screen and validation measurements of different pairs. The flaw was
+  fixed by the doublet split, and nine other changes were made (`protocol.json` "review").
+- **Development (O'Neil, validation := screen).** Feedback vs the best static arm was +9.2%
+  [2.6, 16.9] at 20% and +15.4% [6.9, 24.5] at 10%.
+- **Freeze.** `protocol/freeze.json` SHA-256
+  `56286578b3a52189d42b1e239eb6e36874252d3b769be10ed4f92790a9c4de1c` (21:54:48 +0800, 15
+  files). Two superseded freezes are kept: they corrected guessed timestamps in the protocol
+  text, and no outcome had been read.
+- **Exploratory E1.** ALMANAC re-scored against single agents from a different test date of the
+  same screening centre. NCI's reference is same-plate or same-date singles for all but 3 of
+  2.87 M records. No verdict.
+
+
+### 17.1 Feedback-validation study: results (appended after the run)
+
+- **Vault.**
+  - Opened at 21:55:18 against freeze `56286578...de1c`, with no prior openings.
+  - Later entries, all labelled: rescreen (S11), ALMANAC E1, two post-hoc analyses and one
+    exploratory follow-up.
+  - Both freezes still match: this study 15/15 files, certified_discovery 18/18.
+- **Primary (Jaaks 2022, 125 lines x 2 swap replicates, 20% budget): NO_MEANINGFUL_GAIN.**
+  - Feedback found 274.5 validated discoveries against 277.5 for history_mean: G = -1.1%
+    [-4.0, +1.4].
+  - Against history_rate the gain is +0.7% [-2.5, +4.1]. The two-way line x pair bootstrap gives
+    [-6.6, +3.5].
+  - Screen calls rose by +3.0% [0.3, 5.4]. Feedback's purchases scored lower on the validation
+    label (-0.30 pp [-0.44, -0.16]).
+  - The authors' rescreen confirms about 62% of purchased screen hits in every arm.
+- **Post hoc.**
+  - Drug-in-line effects transfer across independent orientations with r 0.16-0.36; their
+    cross-orientation R2 is -0.03 to -0.05.
+  - Experiments only feedback bought had more screen calls (8.3% vs 5.4%) but fewer validation
+    calls (4.6% vs 8.3%) than the ones it displaced.
+- **Exploratory.**
+  - ALMANAC re-referenced to off-date singles: feedback +3.1% [0.5, 5.9] over history_rate. The
+    validation rate is about 0.59 in every arm, and combination wells are shared.
+  - Verifying screen hits beat paired measurement by +16% [12, 21] at equal measurements.
+    Feedback added nothing on top.
+- **Agent.**
+  - The exact-k failure is a 4-digit id artefact.
+  - Gate test: 312 calls, all valid, USD 0.1384. The LLM beats sort-by-score by +0.33 [-0.10, 0.77]
+    hits per line, and with permuted scores beats first-k by +0.08 [-0.87, 0.97].
+  - Its remaining picks hit at the base rate, so the gate outcome is MODIFY.
+- **State.** The gate failed: DepMap gives one profile per line, released after both screens.
+  Single-agent context is uncharged and coupled to the label.
+- **Certificates.**
+  - Valid but weak: 5.6% of lists are non-empty, and a non-empty list has FDP 0.77.
+  - The summed yield bound is not simultaneous. Valid aggregates are 82.2 (Bonferroni) and 371.5
+    (pooled).
+- **Spend.** New provider spend was USD 0.3555 over 429 calls, at peak ledger rates; the billed
+  amount is unknown.
+- **Tests.**
+  - core: 354 passed in 41.6 s;
+  - study and certified-discovery research: 42 passed;
+  - repository shape: 22 passed.
+- **Commits.** Nothing was committed.
+- **Records.** Report `research/astra/feedback_validation_20261003/REPORT.md`; corrections in
+  `ADDENDUM_certified_discovery.md`; next experiment in `NEXT_PROTOCOL.json`.
+
+
+## 18. Multi-agent exploration after feedback validation
+
+- Three subagents explored verification allocation, repeat-aware prediction, and agent/certificate decisions; primary literature and existing receipts were inspected.
+- New constraint: the exploratory verify-hits comparison spent 3,958 measurements versus paired 3,762. Its +16% is not an equal-consumption estimate. Unit-cost normalization (~10.58%) is diagnostic only; physical branch costs remain unreconciled.
+- Role swapping changes doses and readout conditions; same-condition repeat metadata must be qualified before noise attribution. Barcode-to-culture identity remains unknown.
+- Recommended order: reconcile exposed allocation accounting; qualify repeats; test a scalar feedback-to-validation correction allowing zero; only then prepare a model-by-scheduler comparison against strong verification baselines.
+- Lower bounds support proceeding; futility requires upper bounds or unresolved status. New meaningful-gain thresholds need actual incremental costs.
+- Report: [direction exploration](../../research/astra/direction_exploration_20261003_v2/REPORT.md). English continuation: [NEXT_PROMPT.md](../../research/astra/direction_exploration_20261003_v2/NEXT_PROMPT.md).
+- No model API, new confirmation, physical experiment, production edit, test-suite run, commit, or push in this exploration. Historical results and freezes were preserved.

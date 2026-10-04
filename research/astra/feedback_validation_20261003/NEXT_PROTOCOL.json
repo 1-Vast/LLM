@@ -1,0 +1,40 @@
+{
+  "protocol": "next experiment (ready to run once its data gate passes): replicate-aware feedback vs verify-hits static allocation",
+  "written_at": "2026-10-03 (+0800), after the feedback-validation verdict",
+  "status": "NOT FROZEN, NOT RUN. Freeze with a fresh freeze.json and vault log before any outcome of the new release is read.",
+  "question": "Once verification is paid for, does a feedback model that separates measurement-specific (plate/orientation) effects from shared drug-in-line effects find more verified discoveries per measurement than static retrieval with verify-hits allocation?",
+  "why_this": [
+    "Registered result: in-context drug-in-line feedback gave NO_MEANINGFUL_GAIN in validated discoveries (G -1.1% [-4.0, +1.4]); its changed decisions raise screen calls and lower validation calls.",
+    "Post hoc: drug-in-line effects transfer across independent measurements with r 0.16-0.36 and negative out-of-orientation R2, so a model must learn from replicated measurements to learn anything reproducible.",
+    "Exploratory: verify-hits allocation gives +16% [12, 21] verified discoveries over paired measurement at equal measurements; feedback adds nothing to it as built."
+  ],
+  "data_gate": {
+    "candidates": ["Nair et al. 2023 Nat Commun NSCLC anchored screen (21 anchors x 242 library x 81 lines; second-facility validation on 15 lines)", "any GDSC anchored release not used here"],
+    "requirements": ["both drug orientations (or two independent measurements) for a complete, design-defined menu", "plate identifiers to assert screen/validation plate disjointness", "the authors' synergy rule and QC", "at least about 60 lines with menus of at least about 100 pairs", "design columns only read before freeze"],
+    "refusal": "DATA_NOT_QUALIFIED if any requirement fails; record the census and stop"
+  },
+  "part_A_arms": {
+    "static_verify_hits": "history_mean ranking; each round verifies earlier unverified screen hits first (registered best policy in the exploratory follow-up)",
+    "feedback_verify_hits": "frozen in-context posterior on screen measurements only (the registered null, as a reference)",
+    "replicate_aware_feedback_verify_hits": "in-context model with two effect blocks: shared drug-in-line effects (fed by both screen and verification measurements) and orientation-specific drug effects (fed by one orientation only); ranking uses the shared block only; variances fitted on history lines only",
+    "static_paired": "both orientations for every purchase",
+    "random_verify_hits": "zero arm"
+  },
+  "budget": "M = ceil(0.20 x menu) measurements per line in 4 rounds",
+  "primary_endpoint": "verified discoveries per line (pairs measured in both orientations and synergistic in both), replicate_aware_feedback_verify_hits minus static_verify_hits",
+  "meaningful_gain": "G >= 0.10 (a 4x longer campaign must buy at least 10% more verified discoveries); categories and stop guard as in protocol/protocol.json",
+  "inference": "stratified line bootstrap 10,000 (seed 20261003) and two-way lines x pairs sensitivity",
+  "part_B_certificate_decision_aid": {
+    "question": "Does a valid pooled yield bound change the terminal decision (buy the shortlist remainder vs move that budget) better than the model's claim or a plug-in audit rate, at matched dose points?",
+    "rules": ["always exploit", "valid pooled (or Bonferroni) lower bound >= tau", "model claimed yield >= tau", "plug-in audit hit rate x remainder >= tau"],
+    "tau": "set from the cost ratio before evaluation; no tuning",
+    "endpoints": ["hits per 1,000 dose points", "rate of remainders bought with fewer than tau hits (<= delta under the valid rule)", "regret vs the oracle decision"],
+    "prerequisites": ["per-item ids and costs in receipts", "independent audit seeds per line", "charged context and verification", "complete untouched panel"]
+  },
+  "stopping": "one opening per release; any rerun is a logged second opening; no interim looks",
+  "commands_after_gate": [
+    "write builder for the release (design census first), reuse research/astra/feedback_validation_20261003/study.py campaign/record and verdict.py bootstrap",
+    "freeze: sha256 of builder, arms, verdict, protocol; append day-log pre-registration",
+    "open vault once; run; verdict"
+  ]
+}

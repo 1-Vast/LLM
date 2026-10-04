@@ -1,0 +1,24 @@
+{
+ "owner": "design",
+ "written_at": "2026-10-04T13:06 +0800 (from `date`; file time is authoritative), after all design stages ran",
+ "label": "EXPLORATORY (exposed data)",
+ "sequence": [
+  "12:44-13:00 code (campaign.py, feedback.py, stages.py) and test_design.py written; the contract was frozen as v2 at 12:43:42 while step 1 was in progress, so the code was written directly to v2",
+  "13:00 18/18 synthetic tests passed; questions.json (Q1-Q9, interpretations), READY.json and plan.json (13:01:09, code sha256s) written before the first design outcome read",
+  "13:01:19 dev stage (access log entry 1, HD only) -> selection.json and feedback_gate.json (13:01:41)",
+  "13:02:18 feedback_dev stage (entry 2, HD only) -> feedback_fit.json (13:04:20)",
+  "13:04:37 plan_addendum_1.json: sha256 of selection.json, feedback_gate.json, feedback_fit.json and the code, before any E outcome was used",
+  "13:04:47 eval stage (entry 3, E targets); 13:05:31 feedback_eval stage (entry 4)"
+ ],
+ "deviations": [
+  {"id": "D1", "kind": "interpretation", "text": "Q1-Q9 of design/questions.json were applied as written (gate oracle with the same round-2 count as R; feedback coefficients fitted on HD before E and evaluated on E; same-condition coefficients transported from the role-swapped HD fit; two-way bootstrap seed 20261005; c_f / lambda intervals on the registered indices; b > 0 rule; pipeline diagnostic; power method; E rows dropped before any dev computation). No parent objection was received before the eval stage."},
+  {"id": "D2", "kind": "addition", "text": "The pipeline diagnostic p_sv / (c_s + p_s c_v) was run by design under P2 at fp* (measurement and wells caps), labelled descriptive, not a comparator; the contract names no owner for it."},
+  {"id": "D3", "kind": "limitation (M1)", "text": "Per-line design-menu pairs excluded by QC = 0 for all 125 lines (19,549 designed pairs with both orientations = 19,549 menu pairs): the exported release is already QC-filtered (the builder's RMSE / missing filter removes 0 rows), so pre-export QC exclusions by the authors cannot be counted. The M1 limitation (menu conditions on QC passing) therefore stands unquantified."},
+  {"id": "D4", "kind": "precision", "text": "The feedback relative-action-value endpoint (AUC among eligible round-2 candidates) is undefined in 76 of 122 E campaigns and 71 of 128 HD campaigns (no joint hit among the eligible candidates); the registered diagnostic decision rests on the 23 E lines with a defined AUC in at least one role."},
+  {"id": "D5", "kind": "note", "text": "R's own HD-best fp (30) equals fp* (30) and C*'s own fp is fp*, so the H2 own-fp secondary is numerically identical to the primary; it agrees in sign, so the primary verdict carries no 'C*-optimal split' qualification."},
+  {"id": "D6", "kind": "note", "text": "The development R - C* contrast in selection.json is in-sample for the C* selection (winner's curse favours C*) and is not an estimate of the E effect; the power analysis uses its per-line deviations, not its point estimate, for the scenarios."},
+  {"id": "D7", "kind": "note", "text": "The frozen builder loads the whole release (including E outcomes) into memory in every stage; the dev and feedback_dev stages remove every E row (TissueData.restrict, world library subset with an assertion) before any computation and write nothing derived from E lines."},
+  {"id": "D9", "kind": "POST HOC addendum (parent request, 2026-10-04 ~15:50)", "text": "addendum_2_screen_static.py: matched no-feedback control U_screen_static (frozen-world prior S0) for U_screen_post, and U_V0 vs U_lambda, on the identical feedback_eval campaigns and eligible sets. plan_addendum_2.json written 15:52:50 (code sha256, definitions, synthetic test PASS) before the one new exposed_ticket (15:52:58, access-log entry with prior_openings 8); output results/addendum2_20261004_155303/; reproduction of the stored U_screen_post / U_lambda / U_V0 values 366/366 (E) and 84/84 (same-condition) identical. Log loss undefined for these continuous rankings (null). No verdict."},
+  {"id": "D8", "kind": "note", "text": "The 'scored' field of each round log records the revealed hits and the mean frozen screen / verify score of the purchased items (a scoring of the frozen predictions on the revealed outcomes); it is not a proper scoring rule for non-probability scores. Probability scoring (Brier, log loss) is in the menu metrics and the feedback evaluations."}
+ ]
+}

@@ -59,6 +59,25 @@ leakage checks and development comparisons, not independent validation or deploy
 The sciPlex-v2 builder and QA are in `datasets`; superseded v1 scripts and duplicate
 archives are removed. Historical findings remain in the dataset-discovery reports.
 
+## Certified Combination Discovery
+
+```bash
+python -m tools.datasets.combination_screens oneil --out data/processed/certified_discovery/oneil_tools_v1.npz
+python -m tools.datasets.combination_screens almanac-design
+python -m tools.evaluation.discovery_replay --library data/processed/certified_discovery/oneil_tools_v1.npz --out NEW_OUTPUT
+```
+
+`datasets.combination_screens` builds O'Neil 2016 and NCI-ALMANAC 2017 libraries. Each
+candidate is an unordered drug pair x cell line. The label is the Bliss excess averaged over
+the dose grid, and a hit is a label above 10. Context comes from single agents only.
+ALMANAC outcomes are readable only through `open_vault` against an intact freeze record.
+`evaluation.discovery_replay` runs every arm at equal budget, one campaign per target line,
+and branches each campaign into exploit and certify variants. It uses
+`virtual_cell.combination_world`, `maestro.certification` and the loop in `agent.discovery`.
+Both modules were promoted from `research/certified_discovery`, which keeps the frozen
+originals and the confirmatory evidence. `tests/test_combination_screens.py` (research
+scope) checks parity against them.
+
 Run evaluation through `python -m tools.evaluation.cli` and
 `python -m tools.evaluation.construction build|screen`. Only `maestro` is an installed command.
 The checkout-local research test

@@ -1,0 +1,41 @@
+{
+ "written_at": "2026-10-03T21:35+0800",
+ "scope": "WS1 feedback generalisation, independent validation, strong baselines. O'Neil = exposed development data; every ALMANAC number here is EXPLORATORY (opened 2026-10-03T17:58:48).",
+ "step1_receipts": {
+  "file": "receipts/step1_receipts_recomputed.json",
+  "result": "all 11 arms' exploit/certify totals match summary.json on dev v2 and the confirmatory replay; 5 lines rerun with frozen replay.run_line give 0 mismatches",
+  "almanac_H1_decomposition_per_line": {"wm_static - history": 2.45, "wm_full - wm_static (S1)": 2.15, "price of certification": -2.02, "H1": 2.58},
+  "oneil_wm_static_minus_history": "0.15 [-0.44, 0.82]"
+ },
+ "step2_decomposition": {
+  "files": ["receipts/step2_oneil/summary.json", "receipts/step2_almanac_exploratory/summary.json"],
+  "identities_verified": "offset-only == static and drug-only == full under mean ranking (identical purchases in 39/39 and 60/60 lines)",
+  "oneil_hits": {"history": 401, "static_mean": 406, "gbm_static": 416, "full_mean": 476, "full_phit": 475, "history_feedback_mean": 474, "shufres_mean": 384.2, "shuflab_mean": 377.4, "random": 78.9, "oracle": 746},
+  "almanac_hits": {"history": 5597, "static_mean": 5773, "gbm_static": 5767, "full_mean": 5887, "full_phit": 5873, "gbm_feedback_mean": 5892, "shufres_mean": 5451.7, "shuflab_mean": 5227.8, "random": 875.2, "oracle": 8658},
+  "per_line_contrasts": {
+   "oneil full_mean - static_mean": "1.79 [1.05, 2.62] (+17%)", "oneil full_mean - gbm_static": "1.54 [0.56, 2.59]",
+   "oneil full_mean - shufres_mean": "2.35 [1.54, 3.23]", "oneil shufres_mean - static_mean": "-0.56 [-0.91, -0.23]",
+   "almanac full_mean - static_mean": "1.90 [0.43, 3.40] (+2.0%)", "almanac full_mean - gbm_static": "2.00 [0.47, 3.58]",
+   "almanac full_mean - shufres_mean": "7.25 [5.33, 9.35]", "almanac shufres_mean - static_mean": "-5.36 [-6.99, -3.91]"
+  },
+  "fitted_variances_median": {"oneil": {"s_line": 2.6, "s_drug": 66.7, "s_noise": 20.1}, "almanac": {"s_line": 0.0, "s_drug": 60.9, "s_noise": 26.2}}
+ },
+ "step3_validation": {
+  "oneil_repeat_batch": "receipts/step3_oneil_validation.json, step3e_incontext_replication.json, step3b_reference_artifact.json",
+  "almanac_replicates": "receipts/step3_almanac_replicates.json",
+  "cross_study": "receipts/step3_cross_study_overlap.json",
+  "gdsc_design": "receipts/step3f_gdsc_design_census.json, step3g_jaaks_design_census.json, download_manifest.json"
+ },
+ "draft_decisive_experiment": {
+  "estimand": "per target cell line, validated synergistic pairs found within a 10% budget in 4 rounds: feedback model vs the strongest static model with identical information and wells",
+  "data": "Jaaks et al. 2022 original anchored screen (figshare 16843597): colon 45 lines and pancreas 29 lines x 325 pairs, every pair screened in both anchor/library orientations on separate plates; breast restricted to its 300 two-orientation pairs as a secondary stratum",
+  "split": "per pair, a seeded coin (seed frozen before opening) assigns one orientation as the purchasable screen measurement and the other as the validation measurement; history = other lines of the same tissue, screen orientation only",
+  "label": "screen label = max over the two anchor concentrations of SYNERGY_DELTA_EMAX (viability units x 100); hit = the authors' Synergy flag; validated hit = purchased pair with Synergy in the screen orientation AND in the validation orientation",
+  "arms": ["random", "history", "ridge static (wm prior, mean ranking)", "GBM static", "full feedback (mean ranking)", "within-round residual shuffle", "oracle (screen label)"],
+  "primary_endpoint": "validated hits per line, feedback minus max(history, ridge static, GBM static) totals; 95% percentile bootstrap over lines (10,000, seed 20261003)",
+  "meaningful_gain": "lower bound > 0 AND point gain >= 10% of the strongest static arm's validated hits",
+  "secondary": "screen-orientation hits; validation rate; continuous delta-Emax of purchases; authors' validation rescreen (figshare 16843600: 50/30/40 pre-selected pairs x 33/35/29 lines) on its restricted menu as a selective diagnostic",
+  "stop_rules": "continue if meaningful gain holds; modify (replicate-aware or shrunk drug-in-line feedback, verification allocation) if screen gain holds but validated gain CI includes 0; stop the feedback claim if the validated-gain upper bound < 5% of the static arm",
+  "prerequisites": "freeze builder + protocol + seeds + verdict code before any outcome column is read; decide single-agent context source (same-plate singles are coupled to labels; GDSC2 single-agent release is a separate screen); log the one opening"
+ }
+}

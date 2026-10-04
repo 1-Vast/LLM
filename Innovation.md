@@ -51,6 +51,36 @@ proxy task. The research outcome forecaster and belief planner have not shown in
 decision benefit on development data; wrong-risk forecasts are under-calibrated. The production
 repair path and research planner are not connected, and their combined benefit is untested.
 
+**Evidence status (2026-10-03): certified discovery.** The dual core was moved to combination
+discovery in a newly screened cell line ([`research/certified_discovery/`](research/certified_discovery/README.md)).
+That is a task where prediction binds decisions, unlike the mechanism-class proxy. A
+pre-registered run on an independent screen (NCI-ALMANAC, 60 lines, opened once) gives:
+- **Discovery:** a world model that learns in context from the agent's purchases finds more
+  measured synergies than static retrieval at equal wells and days: +2.58 hits per line
+  [0.57, 4.93], about +3%, after paying for an audit.
+- **Certificates:** design-randomised audits make the agent's claims about untested
+  candidates hold with finite-sample guarantees (FDR 0.043 at alpha 0.2; yield-bound coverage
+  0.958) whatever planner chose the purchases.
+- **Optimizer's curse:** the world model's own claims about its selections were 1.6x
+  optimistic, the same selection effect this project kept measuring on its earlier tasks.
+- **Nulls:** single-agent cell-state context and uncertainty-aware acquisition added nothing.
+  An LLM planner added nothing on development, and on the confirmatory screen it never chose
+  exactly k of about 128 ids, so its comparison is reported as a protocol failure.
+
+**Update (2026-10-03, later): the discovery gain does not validate.** The audit and a
+pre-registered test on an untouched screen
+([`research/astra/feedback_validation_20261003/`](research/astra/feedback_validation_20261003/REPORT.md))
+qualify the result above.
+- The gain is a screen-label gain.
+- On Jaaks 2022, every candidate's second measurement sits on disjoint plates. There, in-context
+  feedback gave −1.1% [−4.0, +1.4] validated discoveries against static retrieval
+  (NO_MEANINGFUL_GAIN).
+- The decisions it changed bought candidates that were worse on the independent measurement.
+- The FDR guarantee is met mostly through empty lists, and the summed yield bound is not a
+  simultaneous certificate.
+
+Corrections are in that directory's `ADDENDUM_certified_discovery.md`.
+
 **What is not claimed.** Generic replanning, task-graph repair, uncertainty routing,
 hierarchical delegation and value-of-information planning all have precedents. None is claimed
 as new. The claim is confined to the biological repair operation and its measured effect on
@@ -520,6 +550,16 @@ anchored selection, certified support, and calibrated critics that can be revoke
 unsupported decisions and cost-to-admissible-action relative to equal-budget controls.**
 Nothing in that sentence claims a new foundation model, a validated biological mechanism, or a
 general-purpose discovery system.
+
+A second, measured claim comes from the certified-discovery block of 2026-10-03:
+- **Mechanism:** claims about untested candidates are licensed only by a uniformly random
+  audit inside the agent's own shortlist.
+- **What it gives:** conformal selection and an exact hypergeometric yield bound then hold for
+  any planner, including a language model whose selection probabilities cannot be written
+  down. The cost is measured in wells.
+- **Prior art, not claimed:** active learning for combination screens (RECOVER, BATCHIE),
+  conformal selection (Jin and Candes) and weighted conformal methods for feedback loops
+  (Fannjiang et al.; Prinster et al.).
 
 ## 10. Limits
 

@@ -1,0 +1,63 @@
+{
+ "owner": "repeats",
+ "written": "2026-10-04 02:58 +0800 (from `date`)",
+ "label": "EXPLORATORY workstream; every item below is disclosed, none changes a pre-specified rule after its outcome was read",
+ "deviations": [
+  {
+   "id": "D1",
+   "when": "about 02:12 +0800, before any exposed_ticket",
+   "what": "`head -c 1500` on original_screen_all_tissues_fitted.csv to read the header also printed the first data row (BARCODE 14576, CAL-120, AZD7762 x cisplatin) including outcome columns (Synergy FALSE, delta-Emax 0.204...). Not logged in protocol/access_log.jsonl.",
+   "impact": "None on any analysis (the release is already opened; the row was not used). Disclosed because the rule is that every outcome read follows a ticket."
+  },
+  {
+   "id": "D2",
+   "what": "The brief named figshare 19141922 as day-1 data. Its API record is the VALIDATION-screen raw data. The original-screen day-1 file is figshare 19141919 (found via the figshare search API) and was downloaded instead; 19141922 was not downloaded.",
+   "impact": "None; recorded in download_manifest.json."
+  },
+  {
+   "id": "D3",
+   "what": "Design-only exploration before provenance.py existed: raw-data and day-1 design columns (never INTENSITY) and fitted-release design columns were read in scratch scripts (scratchpad pickles) to understand the layout; later census of event availability and the provenance addendum also read design columns of the fitted release without a ticket.",
+   "impact": "No outcome column read; design reads need no ticket under STUDY_PLAN rule (data opened for design columns only). The plate-level DAY1/GROWTH columns were read only behind the 02:28:09 ticket."
+  },
+  {
+   "id": "D4",
+   "what": "provenance_addendum.json (v1, 02:39) mis-computed 'seed_to_read_days_london_calendar' for 38 plates (3 instead of 4 days: tz-aware midnights subtracted across the 2017-03-26 / 2018-03-25 BST change). v1 is kept unchanged; provenance_addendum_v2.json (same content, corrected field: 4 days for 3106/3106 plates) supersedes it. provenance.json reports UTC day differences (4: 3068, 3: 38), which are correct as UTC differences.",
+   "impact": "Descriptive field only."
+  },
+  {
+   "id": "D5",
+   "what": "Provenance status rule (STATUS_RULE in provenance.py, written before its run) is stricter than the brief's definition: it requires, besides the documented per-plate fields, a matched public day-1 plate for every plate and paper-count agreement. Result: CORROBORATED_NOT_AUTHENTICATED (107 of 3106 plates, 26 seeding events, have no day-1 plate in the public day-1 file) and UNKNOWN for 'seeding event = the paper's biological replicate' (per-tuple maximum 5 events, not 18; plates per tuple-event median 1, not 3; 4 non-flagged lines also have repeated events). Under the brief's looser definition the documented CELL_ID / DATE_CREATED fields alone would map plates to culture expansion and seeding date for 3106/3106 plates.",
+   "impact": "The pre-specified status is reported as the status; the addendum (post hoc, design-only) explains the mismatches. Not changed after the fact."
+  },
+  {
+   "id": "D6",
+   "what": "Known simplification in target (i) development units: a development line in a different tissue from the held-out line shares its world/unit with its own evaluation unit, so its pooled P(R2 call | R1 call) (arm p_cond) includes the held-out line's R1/R2 calls.",
+   "impact": "Affects only the p_cond arm's development log loss, i.e. the choice of the strongest CALLS baseline in target (i) folds. It never enters lambda, the MSE-based strongest baseline, the stop rule or any evaluation metric. (In the primary target (i) cells the strongest calls baseline was never p_cond; in the random-purchase sensitivity cell it was p_cond in 1 of 70 fold x seed fits, estimand P.)"
+  },
+  {
+   "id": "D7",
+   "what": "Clarification of the yield metric: the U_lambda arm in the purchase-yield campaign uses lambda_U10, fitted on development with the round-1 (10%) purchased sets (correction F_U10), rather than lambda_U fitted with the 20% sets. The plan defined the campaign but not which lambda; the matching purchase size was used.",
+   "impact": "Yield rows only; lambda_U10 per fold is reported next to lambda_U."
+  },
+  {
+   "id": "D8",
+   "what": "Event identifiers use the UTC calendar date of DATE_CREATED as published (e.g. AU565@2016-03-30 = seeded 2016-03-31 00:00 BST).",
+   "impact": "Labels only; event grouping and chronological ordering are unaffected."
+  },
+  {
+   "id": "D9",
+   "what": "Additions not in plan.json: posthoc_r2_check.json also recomputes the registered in-sample statistic; phase2_key_results.json is an extraction of summary.json; the provenance addendum (post hoc, design-only).",
+   "impact": "Descriptive; no decision depends on them."
+  },
+  {
+   "id": "D11",
+   "what": "The free-text 'independence_label' in provenance.json (written into the code before the run) calls the seeding events \"the paper's 'biological replicates'\". The same file's pre-specified rule marks that identity UNKNOWN (counts not reproduced). Read the label as: separate seeding events (different dates, own day-1 reference plate, dosing and read-out), mostly from one culture expansion; whether they are exactly the paper's 'biological replicates' is not established.",
+   "impact": "Wording only; provenance.json is not edited (no-overwrite rule)."
+  },
+  {
+   "id": "D10",
+   "what": "Not done: single-drug functional probes (LIBRARY_EMAX, ANCHOR_VIABILITY) were not tested as a separate arm; no arm adapts on the target line's R2 (so R3 served as a second clean evaluation, not as the evaluation of an R2-adapted model); the validation-screen raw/day-1 files and the GDSC portal were not downloaded.",
+   "impact": "Scope statement."
+  }
+ ]
+}

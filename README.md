@@ -22,6 +22,17 @@ The core does not import tools or research. Research protocols and hashes remain
 records; a positive development result does not automatically qualify a production model.
 The current dual-core workflow and verification record is
 [log/20261003/README.md](log/20261003/README.md).
+The certified dual-core discovery block is in
+[research/certified_discovery/README.md](research/certified_discovery/README.md). Combination
+discovery is a task where prediction binds decisions. The world model learns in context, and
+claims about untested candidates are certified by a random audit. Its confirmatory run on
+NCI-ALMANAC passed both pre-registered tests, and its components are promoted into `src/` and
+`tools/`. A later audit and an untouched validation test found that this gain does not produce
+more independently validated discoveries:
+[research/astra/feedback_validation_20261003/REPORT.md](research/astra/feedback_validation_20261003/REPORT.md).
+How to split a fixed budget between screening, independent verification and stopping, with
+repaired accounting and a blocked confirmatory protocol, is in
+[research/astra/reproducible_allocation_20261003/REPORT.md](research/astra/reproducible_allocation_20261003/REPORT.md).
 The supported architecture, reproduction entry point and dataset qualification are in
 [research/dual_core_completion/README.md](research/dual_core_completion/README.md).
 The literature-guided frozen-data experiments, negative policy result and source limits are in

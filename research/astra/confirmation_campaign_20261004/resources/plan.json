@@ -1,0 +1,156 @@
+{
+ "owner": "resources (subagent), research/astra/confirmation_campaign_20261004/resources/",
+ "written_at": "2026-10-04T13:02:57+0800",
+ "written_before_first_outcome_read_of_this_workstream": true,
+ "status": "EXPLORATORY: Jaaks et al. 2022 is exposed; frontier and accounting replay under the frozen contract v2; no verdict",
+ "contract": {
+  "path": "protocol/campaign_contract.json",
+  "sha256": "38953c51953f89c39683be7b86f492f111b4d201f43291bf50eb91696138c03c",
+  "freeze_sha256": "fd15ef8099e068e765024f84d15c0d7ae06938a467ae22e9910174bf5a6a8e2d"
+ },
+ "reads_before_this_plan": [
+  "STUDY_PLAN.md, campaign_contract.json (draft v1 and frozen v2), verify/contract_challenge.json, partition.json, common.py",
+  "direction_exploration_20261004_v1 REPORT.md and EXPLORATION_RECEIPT.json",
+  "reproducible_allocation_20261003: REPORT.md, allocation/plan.json, replay.py, receipts/accounting.json, deviations.json, results/replay.json, summary_tables.json, lines.jsonl; repeats/receipts provenance.json, plate_hierarchy.csv",
+  "feedback_validation_20261003/jaaks.py (code), results/jaaks_primary/candidates.json",
+  "Jaaks release DESIGN columns only (jaaks._read with DESIGN_COLUMNS; no outcome column, no ticket)",
+  "design/campaign.py (code only, read-only, to confirm identical contract arithmetic)"
+ ],
+ "code_sha256": {
+  "resources/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "resources/design_facts.py": "58cd572a8046edb3b4ffdd391cbeca0d145420750961e16062a1566e9c5d2f3e",
+  "resources/frontier.py": "496732ce8b4b78c342da1aaf4d2af776f9723294069fb320ee0cee6a77a155f9",
+  "resources/layout.py": "2f006bb693fd19dbd453afaa4eaeedfbed04eb17eb96f7e9ebdffb245d8f0b63",
+  "resources/native.py": "644d430276aadb4297919aa6ec0cba5a484ac131e7145448bdc64f941435d388",
+  "resources/reproduce_totals.py": "d1cc265c2710ea1b9773e885df8d6b44e5745140eadedcfcd320f8f6d17bfc20",
+  "resources/run.py": "4f8d882d592fbd789597e6b62d0cadacbd8649e34b368ab1890849b8c77d8817",
+  "resources/test_resources.py": "b0931da64d7f737b6b36baf03dab6c5f3f60aecd0ae3b8fd33023c45bb6f504b"
+ },
+ "receipts": {
+  "reproduced_totals.json": "2902371e9111901081785546612a579d209d946f0aba4ea6b56687d4b00ec625",
+  "design_facts.json": "8792194004ea9003522247f5b59ae0172f38c84cf802a866b6b21fa8fc83473a",
+  "READY.json": "423e8abe71afbfa5845e9f896aee400404dfd57550130692460e01bc2bccfa5d"
+ },
+ "data_access": "outcomes only via common.exposed_ticket(purpose, 'resources') and the frozen jaaks.build_panels; one ticket per execution of run.py; the design-derived menu is asserted equal to the builder menu (layout.check_against_panels)",
+ "stages": {
+  "hd": "now (allowed before design/selection.json): HD development targets only (64 lines x 2 roles; history = other HD lines of the tissue; E rows never in H, E units never built), every predictor + oracle, design-independent frontier at every fp of the contract grid. Labelled DESIGN-INDEPENDENT DEVELOPMENT FRONTIER.",
+  "eval": "only after design/selection.json exists (run.py refuses otherwise; its sha256 is recorded): E targets (61 lines x 2 roles; history = all HD lines of the tissue), every predictor + oracle, with C* and fp* passed exactly as written in selection.json (--c-star, --fp-star; --r-fp for R's own fp if given). One execution per stage; no re-run with changed rules."
+ },
+ "custom_frontier": {
+  "engine": "frontier.run_custom: contract v2 P1/P2/P3 exactly (M = ceil(cp x menu / 100), = (menu + 4) // 5 at cp 20; n1 = ((100 - fp) M) // 100; P3 round 1 = (M + 1) // 2 and the reserve rule with stop at first failure; P1 = M // 2 pairs; tie-break lexsort((rank, -round(score, 12)))); stopping = no screens in the final round, cap need not be spent",
+  "grid": {
+   "rounds": [
+    1,
+    2,
+    3
+   ],
+   "fp": [
+    10,
+    15,
+    20,
+    25,
+    30,
+    35,
+    40,
+    45,
+    50,
+    55,
+    60
+   ],
+   "cap_percent_cp": [
+    10,
+    20,
+    30,
+    40
+   ],
+   "primary_cap": "cp = 20 (contract)",
+   "wells_cap": "cp = 20: W = ceil(Fraction(M) x sum(c_s + c_v) / (2 menu)); P2 per contract (round-1 budget ((100 - fp) W) // 100, greedy skip; round 2 hits in verify order, skip non-fitting). Extensions prespecified here (not in the contract): P1 under W = pairs in screen order, skip a pair whose c_s + c_v does not fit; P3 under W = round-1 budget (W + 1) // 2 greedy skip, round-2 hits skip non-fitting, reserve ceil(round(sum p_s x c_v, 12)) with stop at first failure, round 3 round-2 hits skip non-fitting"
+  },
+  "predictors": [
+   "S",
+   "S_both",
+   "L_v",
+   "C_s",
+   "C_v",
+   "C_mean",
+   "C_prod",
+   "R",
+   "oracle"
+  ],
+  "spend_all_reference": "cp 20 measurement: P2 and P3 with the leftover cap spent on final-round screens (the earlier replays' terminal screens) - a REFERENCE to quantify what stopping saves, never an evaluated arm",
+  "explicit_stopping_replay": "consumption, wells, plates and days are recomputed from the replayed purchases; never by subtracting historical terminal-screen charges"
+ },
+ "accounting": {
+  "per_campaign": "frontier.account_custom by round and branch: orientation measurements; dose points (14 distinct dose points per orientation measurement) and combination wells (14 x design plates = the contract's '14 per orientation measurement per plate'); builder-QC wells; exported-row wells; replicate plate-measurements; failures (purchased orientations with 0 QC-passing plates; the release is pre-filtered: 0 of 296,707 rows excluded); custom 1536-well plate starts, control wells, shared single-agent wells (10 per distinct anchor + 28 per distinct library drug per plate) and empty wells at 200 (documented), 216 (raw fixed minimum), 226 (raw median) and 254 (raw maximum) controls per plate; branch-shared joint packing diagnostic; native plates and seeding events touched (first touch, union); rounds used and minimum days (4 per used round); unused cap = cap - consumption.",
+  "aggregation": "line value = mean over SV and VS; totals = sums over lines; days as mean and max per campaign",
+  "unknown_null": {
+   "price": null,
+   "labour": null,
+   "culture_capacity": null,
+   "days_beyond_assay": null,
+   "custom_layout_feasibility": null,
+   "per_plate_dmso_only_count": null
+  },
+  "unknown_reasons": {
+   "price": "not published",
+   "labour": "not recorded",
+   "culture_capacity": "not recorded",
+   "days_beyond_assay": "dispensing, reading, fitting, decision and expansion times not recorded",
+   "custom_layout_feasibility": "a model; the authors never ran a custom layout",
+   "per_plate_dmso_only_count": "receipts give only 0/10/38 (median 10); the raw file is not re-read"
+  }
+ },
+ "native_frontier": {
+  "action": "(line, component): all release plates of the line holding one library doublet (component of library drugs sharing plates; 2 Breast singletons), cost = plate starts. Repeat lines are charged EVERY release plate behind the doublet (all seeding events) because the credited labels and calls are the frozen builder's, which pool all replicate rows of all events; a single-event action would reveal a measurement that is not the one credited. Seeding events behind purchased plates are reported.",
+  "credit": "role SV: V-library plate sets reveal screen orientations, S-library plate sets verification orientations; VS reversed; every menu orientation sits on exactly one component and a component is bought at most once (credited exactly once). Off-menu orientations on bought plates (same-side pairs, cross pairs without the reverse orientation) are counted as legal information, never discoveries.",
+  "endpoint": "pairs whose screen and verification orientations were both revealed before the deadline with both calls synergistic; split into screen-first, same-round and verification-first",
+  "policies": "N1/N2/N3 as documented in native.py (pair-driven greedy in the predictor's orders, skip non-fitting actions; N2 round 2 buys only verification plate sets containing a pending round-1 hit, no round-2 screen plate sets; N3 reserve = ceil(round(expected verification plate starts, 12)), skip; round 3 verification plate sets for pending hits only)",
+  "caps": {
+   "definition": "K = ceil(pct x menu-relevant release plates of the line / 100) plate starts, identical for SV and VS",
+   "pct_grid": [
+    5,
+    10,
+    15,
+    20,
+    30,
+    40,
+    50,
+    75,
+    100
+   ],
+   "basis": "design facts (resources/receipts/design_facts.json): median 13 menu-relevant plates per line, ~22-24 menu screen orientations per plate set, M ~ 32 orientation measurements = 10% of the line's menu orientations; 10% of plates is the same design fraction, 100% buys the whole menu in one round"
+  },
+  "fp": "N2 at every fp of the contract grid (and fp* in the eval stage)",
+  "predictors": [
+   "S",
+   "S_both",
+   "L_v",
+   "C_s",
+   "C_v",
+   "C_mean",
+   "C_prod",
+   "R",
+   "oracle"
+  ],
+  "reported_separately": "native and custom layouts are never pooled; equal combination wells is not equal total cost"
+ },
+ "scheduler_headroom": {
+  "diagnostics": [
+   "P2 at every fp: campaigns whose round-1 hits exceed the verification capacity M - n1 (a substantive which-to-verify choice), excess hits, stops with unused cap, n1 = 0 campaigns, oracle perfect verification order (holding round 1 fixed)",
+   "P2 per-campaign hindsight-best fp (outcome-aware upper bound on any split rule)",
+   "P3: campaigns with round-2 screens, B2 = 0, hits exceeding round-2 capacity, stops with unused cap, round-2 oracle screens with the same count (contract gate-style headroom)",
+   "P3 round-2 decision: index crossing max p_sv/c_s > min pending p_v|s/c_v and pipeline crossing max p_sv/(c_s + p_s c_v) > min pending p_v|s/c_v, in measurement and well units, using the history quantities (diagnostic, NOT an optimal policy)"
+  ],
+  "rule": "SCHEDULER_ARM_INDICATED iff choice_frequency >= 0.10 and oracle_bound_relative >= tau = 0.05 (definitions in run.summarize_headroom); otherwise SCHEDULER_ARM_NOT_INDICATED. Descriptive input to the parent; not a registered verdict.",
+  "predictors": "every predictor except the oracle"
+ },
+ "outputs": "resources/results/<stage>_<timestamp>/: manifest.json, custom_frontier.json (table + Pareto fronts per resource), native_frontier.json, headroom.json, per_line_cp20.json, campaigns_custom_p_cp20.jsonl (S, S_both, R, C*: n_menu, M, n1, ordered screens/verifies, hits, confirmed, spent, rounds used), campaigns_native.jsonl; deviations to resources/receipts/deviations.json",
+ "stopping_rule": "one execution per stage with this plan; run.py refuses if any resources/*.py hash differs from code_sha256 above; a bug fix after an outcome read only if a test exposes it, recorded with before/after values; new analyses after outcome reads get a plan addendum",
+ "tests": "test_resources.py (synthetic only): integer caps, tie-break, history without target or E rows, scores invariant to E outcomes, spend <= cap, no final-round screens, verification only of earlier-round hits, P3 reserve stop-not-skip, legal access, pack_custom identical to the earlier replay, accounting sums, native single crediting and legality, reproducibility",
+ "limitations": [
+  "the custom per-pair layout is a hypothetical (no custom layout was run by the authors)",
+  "the menu conditions on target-line QC (contract M1)",
+  "minimum days count the 4-day assay only",
+  "native campaigns charge all events of repeat lines at once although the release seeded them on different dates"
+ ]
+}

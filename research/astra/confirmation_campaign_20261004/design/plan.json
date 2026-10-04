@@ -1,0 +1,87 @@
+{
+ "owner": "design",
+ "written_at": "2026-10-04T13:01:09+0800",
+ "label": "EXPLORATORY: Jaaks 2022 is exposed (opened by feedback_validation_20261003); every result of this plan is exploratory; verdicts carry the EXPLORATORY_ prefix",
+ "contract": {
+  "path": "protocol/campaign_contract.json (v2)",
+  "sha256": "38953c51953f89c39683be7b86f492f111b4d201f43291bf50eb91696138c03c",
+  "freeze_sha256": "fd15ef8099e068e765024f84d15c0d7ae06938a467ae22e9910174bf5a6a8e2d"
+ },
+ "code_sha256": {
+  "research/astra/confirmation_campaign_20261004/design/campaign.py": "651d495b8a044a62f3b1defb49547cca07ed68c69978104031a0880d7a5f27e5",
+  "research/astra/confirmation_campaign_20261004/design/feedback.py": "b70b0cbbab7af578a52c66de2c241add2bab9735531c2bd084eb92f50d85193f",
+  "research/astra/confirmation_campaign_20261004/design/stages.py": "0c195d10ab19bad0161ac86dc0585363a55ea141a63615bec4bb6fea87670198",
+  "research/astra/confirmation_campaign_20261004/design/test_design.py": "e342a853f1b914f60e5c9535f477524d3a37ece5fc641a01c47eafc3173e12b5",
+  "research/astra/confirmation_campaign_20261004/common.py": "cab91526eac73c41d67b03b299c4a00723b8a45614068cb591e54b57d4694c45",
+  "research/astra/confirmation_campaign_20261004/protocol/campaign_contract.json": "38953c51953f89c39683be7b86f492f111b4d201f43291bf50eb91696138c03c",
+  "research/astra/confirmation_campaign_20261004/protocol/partition.json": "19b82c5a8059cc12e59448aaa129e575d4365ba5f873f0375f6792d523203e16",
+  "research/astra/feedback_validation_20261003/jaaks.py": "c6a271bbbbcf2959f10630cc9920c6dda0247d8ca34ac8630d16d62d50342c46",
+  "research/astra/feedback_validation_20261003/study.py": "d15dbbc1195ab6dee8d86d23286e3f3f0be5ccc72b90d71cc9ec0047cba9bcad",
+  "research/certified_discovery/world.py": "268f01f92d244c49b068382842cb995222db958e50e358a5524a7dff0e00509f",
+  "research/certified_discovery/screens.py": "1a9e9ca41413289c6d84460f9576666b0cb66781d88cd578df69b1a97929d178",
+  "research/astra/reproducible_allocation_20261003/allocation/replay.py": "a313201bbda49b77cbf4ae3e89f1b91404b159441ea446bdfd895d136b36ca6e",
+  "research/astra/reproducible_allocation_20261003/repeats/model_id.py": "7bce1a37e7d8564fd8046d728c15a2c3f582e7d12a44aaaf116ddd7497e9dc19",
+  "research/astra/reproducible_allocation_20261003/repeats/provenance.py": "2bc5186975c709f644898e82da355381c0a0edeb7f43b02a4c9e6e85d01aa5af",
+  "tools/datasets/combination_screens.py": "6dec4ec9f24870136281b6d00bb494b874771e2377ac2d5131f7fa544f35d77d"
+ },
+ "outcome_access": "only common.exposed_ticket(purpose, 'design') (one logged access per stage) + the frozen jaaks.build_panels; event labels of repeat lines via model_id.event_table with the same ticket",
+ "stages": [
+  {
+   "name": "dev",
+   "command": "python -m research.astra.confirmation_campaign_20261004.design.stages dev",
+   "data": "HD lines only: every E row removed from both role panels before any computation; history = other HD lines of the tissue",
+   "runs": "P2 (measurement cap) for R, S_both, L_v, C_s, C_v, C_mean, C_prod, S, oracle x fp in {10,...,60}; P3 for all; gate campaigns (R round 1 + oracle round 2, same count; variant with the reserve rule); menu metrics",
+   "writes": [
+    "design/selection.json (C*, integer fp*, R's own fp, every predictor's own fp, full development table, in-sample R - C*, power)",
+    "design/feedback_gate.json (written before the diagnostic)",
+    "design/results/dev_<stamp>/ (per-campaign JSONL.gz: P2 grid, P3, gate; menu metrics; dev_summary.json)"
+   ]
+  },
+  {
+   "name": "feedback_dev",
+   "command": "... stages feedback_dev",
+   "condition": "only if feedback_gate.json pass = true (else writes feedback_fit.json with run = false)",
+   "data": "HD campaigns only; TransferWorld(WorldConfig(context=False)) on the role panel with every E line excluded",
+   "runs": "R's P3 round 1; F = posterior - prior from purchased round-1 screen labels; m_line, f_i on the eligible set; fit F0, Fm, Ff (b > 0), c_f line bootstrap (10,000), lambda; in-sample HD evaluation",
+   "writes": [
+    "design/feedback_fit.json",
+    "design/results/feedback_dev_<stamp>/"
+   ]
+  },
+  {
+   "name": "addendum",
+   "command": "... stages addendum",
+   "writes": [
+    "design/plan_addendum_1.json: sha256 of selection.json, feedback_gate.json, feedback_fit.json and the code, before any E outcome is used"
+   ]
+  },
+  {
+   "name": "eval",
+   "command": "... stages eval",
+   "refuses_unless": "plan_addendum_1.json hashes match",
+   "data": "E targets, history = all HD lines; all-lines sensitivity: every line, history = all other lines",
+   "runs": "primary R - C* under P2 at fp* (decision rule, EXPLORATORY_ prefix, H2 qualification); own-fp secondary; R - each simple predictor; S_both - S, R - S; P3 R - C*, R - S_both; wells cap R - C*; LOO 125 R - C*; menu >= 10; two-way line x pair bootstrap; SV / VS diagnostic; concordance, Brier/log loss (R, C_prod); consumption, hits, verifications, confirmation rate, missed, rounds used, native plates and seeding events; menu QC exclusions per line (M1); pipeline diagnostic",
+   "writes": [
+    "design/results/eval_<stamp>/"
+   ]
+  },
+  {
+   "name": "feedback_eval",
+   "command": "... stages feedback_eval",
+   "condition": "feedback_fit.json run = true; addendum hashes match",
+   "runs": "E role-swapped campaigns (worlds without other E lines) with the HD coefficients: AUC among eligible round-2 candidates, calibration-in-the-large, log loss, P3 yield for R, F0, Fm, Ff, U_lambda, U_screen_post, U_V0; registered diagnostic decision; same-condition repeat lines (development-grade)",
+   "writes": [
+    "design/results/feedback_eval_<stamp>/"
+   ]
+  }
+ ],
+ "inference": "registered tissue-stratified line bootstrap (default_rng(20261004), lines sorted by SIDM within tissue, 10,000, percentile [2.5, 97.5]); two-way bootstrap default_rng(20261005)",
+ "interpretations": "design/questions.json (Q1-Q9)",
+ "never": [
+  "E outcomes before plan_addendum_1.json",
+  "overwriting any output",
+  "editing this plan after an outcome read (deviations go to design/receipts/deviations.json and addenda)",
+  "LLM or provider calls",
+  "commits"
+ ]
+}

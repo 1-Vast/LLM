@@ -1,0 +1,78 @@
+{
+ "workstream": "WS4 agent contribution, selection validity, literature",
+ "environment": {
+  "python": "D:/anaconda/envs/maestro/python.exe 3.11.16",
+  "numpy": "2.4.6",
+  "scipy": "1.17.1",
+  "provider_model": "deepseek-flash (temperature 0, thinking disabled, max_tokens 3000)"
+ },
+ "commands": [
+  "python receipt_audit.py   # read-only audit of frozen LLM receipts",
+  "python diagnostic.py --plan   # 2026-10-03T20:01-20:02, before any call",
+  "python diagnostic.py --run    # 20:02:59-20:05:32, 76 calls",
+  "python addendum.py --plan     # 21:12:40, after the main results were seen, before any addendum call",
+  "python addendum.py --run      # 21:12:47-21:14:26, 41 calls (35 sequential + 6 concurrent)",
+  "python summarise.py",
+  "python gate.py --plan   # 2026-10-03T22:04:00, before any gate call",
+  "python gate.py --run    # 22:04:07-22:10:42, 312 calls",
+  "python gate.py --analyse"
+ ],
+ "run_from": "research/astra/feedback_validation_20261003/workstreams/ws4_agent_literature (scripts set sys.path themselves)",
+ "data": {
+  "library": "data/processed/certified_discovery/oneil_v1.npz",
+  "sha256": "2edc5e7a351e7ded3daf6a37dcf6a32f76d442216bf2cb1a9feff5f97baeeb1f",
+  "lines": "HT144 (10), OV90 (23), UACC62 (34)",
+  "almanac": "not loaded; only frozen ALMANAC LLM receipts were read"
+ },
+ "spend": {
+  "main_usd": 0.12403560000000001,
+  "main_calls": 76,
+  "addendum_usd": 0.093094332,
+  "addendum_calls": 41,
+  "total_usd": 0.35549588400000004,
+  "total_calls": 429,
+  "http_attempts": 429,
+  "retries_sent": 0,
+  "unpriced_calls": 0,
+  "ceiling_usd": 0.8,
+  "stopped_by_ceiling": false,
+  "gate_usd": 0.13836595200000001,
+  "gate_calls": 312
+ },
+ "deviations": [
+  "addendum (4-digit ids, round-0, inflated scores, concurrency) was declared after the main run showed the base cell valid; its plan file predates its calls",
+  "concurrency was replicated only on conditions that already failed sequentially, so it cannot test concurrency as a cause",
+  "no retry was triggered: every block-A exact and chunk16 call was valid at first attempt",
+  "gate: max_tokens 600 instead of the frozen 3000 (k <= 15 replies use ~85-160 tokens; no truncation occurred); one-step paired evaluation on the deterministic world-model trajectory, not closed-loop LLM campaigns; 'explained by order or score' operationalised as the best single-rule share (union share reported, chance ~0.75)"
+ ],
+ "files": {
+  "addendum.py": "4bdefbedbe63a0f6b75245f80b6d2cf106277a0f87a593f7fa86e5c14901088b",
+  "agent_comparison_protocol.json": "d40860f30a67b6b27f885df4e8da6ca4254c768dd449fff68de02881bbf7f2ee",
+  "diagnostic.py": "c12695eccb0a09cc08c58dff5f0b78a39f7837eaad85b786067531c91ea43b3b",
+  "gate.py": "82f39d95b46a164c12bf97da4d58af0af7b05469e139c14aed40e6e4b61ff0ec",
+  "gate_plan.json": "ed7c77a22b6d91e66904893dc00fe7bbcdde9bd9ac3a6e695df527795e738edd",
+  "gate_summary.json": "955ed9d148f7c69b535143e4e1ed42f2658a807c00df9ba2ab58558307c82f4f",
+  "literature_verification.json": "741890cb32e8dbd791629377c80d4814e9f36e07ed691328d677f617d2c36a7d",
+  "plan.json": "758bd3a207b7fb7964abe849c37f72420f2f334770d6e2476d7f65b2ef878b2b",
+  "plan_addendum.json": "13dcb2bc354e4cdc18a2e3f20186d58ef605af4f96699f34ed29ddcd208a16fc",
+  "receipt_audit.json": "7da3fce506a9987f86ef59248538b2209891311c3f15cef70a9d01cd1f6291f2",
+  "receipt_audit.py": "07d718c90c57ca155bb88c1f05843c3fb70117193b11ab66250986ff174f0aa4",
+  "results/calls.jsonl": "1cd29fe44c38f2797336904bfe4ac9d712f753bfb2283507fd46201dafe12d79",
+  "results/manifest.json": "fa1475cc8f480f4d0d128bee9ca3a7de036541462c5bc6b570e20370523a6f35",
+  "results/selections.jsonl": "6546136e9c007241cdecd5a167b12d6fdda61626af3e095b134e150f88a3749c",
+  "results/spend.json": "9990fe1961b0ed5e6a2f1b80df2de959563c0cb25e6b4df25f1c6e14f818de83",
+  "results_addendum/calls.jsonl": "bfffa7218241df35dab7b57e3d417195a786c7504a46b01d06515af579b58961",
+  "results_addendum/manifest.json": "90260509d06b5e1e287aa4096f362434dab83a628d1751682b56141c72d05917",
+  "results_addendum/selections.jsonl": "4e973c76c699bb4106313556cd0b4c1945c2892bd8780a42e281a669080d0300",
+  "results_addendum/spend.json": "5008e0ca29e72bb17ee520d0d915dc8c2861264d3aef28813a472fb6e4236242",
+  "results_gate/calls.jsonl": "514e47031b0b797633cf5f24e49bfff839b54cfd7dc94bde018f585bfb8837d3",
+  "results_gate/manifest.json": "e553960c8adf0051c989d1d04ac88a7252a5a739fee9e84af9d05aa17b5ffe89",
+  "results_gate/rounds.jsonl": "c8e776a0fc012429a34664e82160038bcc109979f40730d064fc4550d27255b4",
+  "results_gate/spend.json": "3665ffaab5d5b8f6eaa81d339e3b94905f5a4ca162f9cf3e6007b66457eb2aa9",
+  "run_addendum_stdout.txt": "95577e557b174e5eb78c8c6f353e08564ae3dc40953dc1f750aa86223ba71a08",
+  "run_gate_stdout.txt": "184007a231e959bbcf7746b6916ebb916bb3bb1a7cf116afacc4f48d4dc6faaa",
+  "run_stdout.txt": "8d4abc9090397d8f5368aca898d1513b2d648a5f82226a7adc4205861bf2e4ac",
+  "summarise.py": "16e5d40813ba4fdbf2a72da3568a0884208f40800dd9fd848bd06f6163b41f39",
+  "summary.json": "2f2e0648382e9ba42fb0f8d2b7e9f6f3fa1df7934c6e294272b02f2f43571aae"
+ }
+}

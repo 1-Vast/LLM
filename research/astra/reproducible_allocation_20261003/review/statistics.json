@@ -1,0 +1,349 @@
+{
+ "owner": "review (subagent 3 of 3)",
+ "written_at": "2026-10-04T02:35:44+0800 (file time; an estimated time typed earlier was corrected)",
+ "memo": "review/statistics.md",
+ "evidence_status": "EXPLORATORY: all variances/headroom derived from already-written results of the opened Jaaks 2022 release; no outcome of any unopened release read; no provider call",
+ "units": {
+  "unit": "cell line, stratified by tissue (51/45/29)",
+  "SV_VS": "same line, shared measurements (SV validation = VS screen); average within line; static line totals r = 0.97 between SV and VS; paired-difference correlation r = 0.19, so averaging lowers SD(diff) 0.458 -> 0.353",
+  "pairs": "recur across lines; line bootstrap = fixed-library scope; two-way variance ratio 3.34, pair-component SE 0.0214 on G (does not shrink with lines)",
+  "not_units": [
+   "plates",
+   "seeding events",
+   "culture expansions",
+   "technical repeats",
+   "random seeds",
+   "SV/VS assignments"
+  ],
+  "history_dependence": "targets share other-line history; line bootstrap ignores it; report per tissue + leave-one-tissue-out",
+  "tissue_weighting": "pancreas = 47% of static* validated discoveries (4.52 per line vs breast 1.19, colon 1.91); report per tissue and absolute per-line difference next to G",
+  "zero_inflation": "29% of lines have 0 static* validated; 79% of paired differences are 0"
+ },
+ "bootstrap": {
+  "primary": "stratified percentile line bootstrap of ratio-of-sums G, 10,000 resamples (adequate >= ~40 lines; studentized/BCa or t on mean difference below that)",
+  "comparator_reselection": "conservative guard; in a frozen 2x2 register the strong baseline from development and report max-over-baselines as sensitivity",
+  "two_way": "conservative sensitivity, needed only for claims over new pairs",
+  "power_check_truncation_bias": "power_check.json (Gaussian noise truncated at 0) adds ~+2.5 points spurious gain; superseded by power_check2.json (joint empirical resampling)"
+ },
+ "exposed_data_and_leakage": [
+  "every parameter selected on Jaaks (lambda, fixed split f, reserve, thresholds, arms, tau) is development; re-evaluation on Jaaks is in-sample",
+  "study-level leakage: verify-hits and role-swapped verification were chosen after Jaaks outcomes were seen",
+  "within-analysis: no target hidden label in any decision; SV validation (= VS screen) of the target never history; development selection leave-one-tissue-out",
+  "hidden validation labels cannot both adapt and evaluate a model: use prequential predictions frozen before each reveal or a third untouched measurement"
+ ],
+ "multiplicity": {
+  "allocation_replay": "6 contrasts x 2 budget versions + sensitivities: descriptive only",
+  "future_2x2": "one primary (combined arm vs registered strong baseline); model, scheduler, interaction secondary with Holm; simultaneous claims Bonferroni over 3 (n x 1.33); interaction ~2x variance of a main effect",
+  "certificates_across_lines": "per-line bounds are not simultaneous (earlier receipts: all-lines simultaneous coverage 0.0 vs Bonferroni 0.95); use alpha/L or a pooled uniformly drawn audit"
+ },
+ "decision_rules": {
+  "MEANINGFUL": "L > tau -> proceed",
+  "POSITIVE_UNRESOLVED": "0 < L <= tau <= U -> real gain, size unresolved; no meaningful claim",
+  "SMALL": "L > 0 and U < tau -> real but below bar; adopt only if free at equal rounds and wells",
+  "FUTILE": "L <= 0 and 0 <= U < tau -> stop pursuing",
+  "HARM": "U < 0 -> stop",
+  "UNRESOLVED": "L <= 0 and U >= tau -> abstain; not evidence of no effect",
+  "note": "a lower bound below tau never establishes futility"
+ },
+ "risk_types": {
+  "marginal": "P(act and Y < tau) <= delta for 'act iff certified bound >= tau' when P(bound > Y) <= delta",
+  "conditional": "P(Y < tau | act) <= delta / P(act): uncontrolled when acting is rare",
+  "example": "earlier confirmatory LLM-named arm: marginal FDR 0.043 vs FDP given a non-empty list 0.77 (about 5.6% of lists non-empty)",
+  "to_control_conditional": [
+   "delta <= gamma * p_min with a registered development lower bound p_min on P(act)",
+   "a selective (conditional-on-selection) procedure",
+   "Bayesian posterior risk, labelled as such"
+  ],
+  "label_scope": "certificates control the declared measured label (verification-orientation synergy call), not biological reproducibility"
+ },
+ "certificates": {
+  "waudby_smith_ramdas": {
+   "source": "arXiv 2006.04347 v4 (NeurIPS 2020); full text read (pypdf extraction)",
+   "model": "fixed nonrandom population x_1..x_N; X_t uniform over unobserved items (eq. 1.2)",
+   "results": [
+    "Theorem 2.1: binary CS for N+ via prior-posterior-ratio martingale (beta-binomial working prior, hypergeometric likelihood); running intersection valid",
+    "Theorem 3.1: Hoeffding-type CS for bounded values with predictable lambda",
+    "eq. (1.1): uniform-in-time validity <=> validity at arbitrary stopping times (licenses repeated looks / optional stopping)"
+   ],
+   "conditions_for_this_study": [
+    "audited population fixed before the first audited label",
+    "audit order uniformly random without replacement (verify-hits is score-ordered: NOT satisfied)",
+    "label = the measurement the audit returns (CS covers the measured-label total)",
+    "bounded values (binary calls ok)"
+   ],
+   "not_covered": [
+    "adaptive shortlist changes (new population: restart the CS and split alpha across restarts; not provided)",
+    "score-ordered audits",
+    "simultaneous claims across lines (alpha/L or a pooled uniform audit)"
+   ]
+  },
+  "jin_candes": {
+   "source": "JMLR 24(244):1-41 (2023); full text read",
+   "results": [
+    "Theorem 3: monotone score, i.i.d. calibration and test, mutual-independence condition -> cfBH FDR <= q",
+    "Theorem 6: exchangeability of {V_1..V_n, V_n+j} conditional on the other test scores suffices (finite-library sampling without replacement)",
+    "model trained independently of calibration/test (conditioned on)"
+   ],
+   "guarantee": "marginal FDR, one-shot selection",
+   "not_covered": [
+    "calibration labels from score-based verification (verify-hits labels exist only for screen hits)",
+    "repeated re-selection as calibration grows (needs ACS-type information control or alpha spending; ACS arXiv 2507.15825 checked by earlier WS4, not re-read here)",
+    "FDR conditional on a non-empty selection"
+   ]
+  },
+  "recommendation": "one fixed evaluation time (terminal decision after the last screening round) with a fixed-time hypergeometric bound on a pre-fixed, uniformly audited population; no sequential certificates now; justified later only with a fixed audited population, a dedicated uniform audit stream separate from verify-hits, and pre-allocated alpha across restarts (earlier WS3: coverage fell to 0.83 under informal optional stopping)"
+ },
+ "threshold": {
+  "historical_10pct": "priced feedback's 4x elapsed time against a one-round static arm; static verify-hits is itself multistage (>= 2 rounds; 4 as run, 5 with the repaired terminal round), so the rationale does not carry over; historical threshold and verdict unchanged",
+  "incremental_resources": {
+   "wells": "0 by design (tolerance <= 0.5%)",
+   "rounds": "0 if the proposed arm keeps the comparator's rounds; each extra round >= 4 days (24 h attachment + 72 h drug) -> time-match, do not price into tau",
+   "plates_controls": "0 for a predictor swap; more partially filled custom plates (200 control wells each) for a finer-grained scheduler: measurable, charge it",
+   "compute": "seconds per campaign (earlier Jaaks stage 32.6 s for 14 arms x 250 records)",
+   "provider": "0 (no LLM arm)",
+   "decision_overhead": "development repeat dataset (one-off) + software maintenance; price unknown (null)",
+   "external_requirement": "none found"
+  },
+  "headroom_exploratory": {
+   "screen_only_oracle_validated_over_static_star": 0.16756756756756763,
+   "verify_hits_ceiling_all_available_over_static_verify_hits": 0.35849056603773577,
+   "scheduler_only_ceiling_same_screens": 0.09643605870020955,
+   "note": "oracle_validated buys every validated pair in budget, so the available total bounds any policy's confirmed discoveries at this budget; the scheduler-only ceiling assumes the same screened pairs and verification of every validated screen hit"
+  },
+  "recommended_tau": 0.05,
+  "recommended_tau_absolute": "about 0.095 confirmed discoveries per line at the verify-hits baseline (1.908 per line); about 12 per 125 lines",
+  "conditions": "equal wells (+-0.5%) and no more rounds than the comparator; otherwise a time-matched comparison with measured extra controls and days",
+  "measured_parts": [
+   "~0 incremental wells, rounds, compute",
+   "headroom +35.8% / +9.6% / +16.8%"
+  ],
+  "judgement_parts": [
+   "a positive bar rather than any L > 0: protects against adopting complexity for gains of the size that did not transfer here (+2-3% screen-level ALMANAC/Jaaks S1; +9-15% O'Neil vanished on independent measurement) while the verify-hits allocation effect survived",
+   "5% sits above residual accounting artefacts (odd-budget remainder ~1.5% averaged; old avoidable underuse 4.95%) and is ~1/7 of attainable headroom and half the scheduler-only ceiling",
+   "10% would make a pure scheduler contribution with unchanged screens nearly impossible (ceiling 9.6%)"
+  ],
+  "sensitivities": [
+   0.0,
+   0.1
+  ]
+ },
+ "sample_size": {
+  "scale": "verify-hits confirmed discoveries per line",
+  "baseline_mean": 1.908,
+  "sd_diff_two_assignments": 0.41070636321424714,
+  "sd_diff_one_assignment": 0.532838832098401,
+  "sd_source": "back-calculated from the earlier follow-up interval (feedback-verify-hits minus static-verify-hits; verify-hits minus paired gives 0.422); single-assignment SD scaled by the observed single/averaged ratio 1.30",
+  "alpha": "two-sided 95% (one-sided 0.025 per bound)",
+  "table": [
+   {
+    "design": "two_assignments_per_line",
+    "sd": 0.411,
+    "claim": "lower bound > 0",
+    "true_gain": 0.05,
+    "n80": 146,
+    "n90": 195,
+    "power_at_125": 0.738,
+    "power_at_81": 0.552,
+    "power_at_15": 0.144
+   },
+   {
+    "design": "two_assignments_per_line",
+    "sd": 0.411,
+    "claim": "lower bound > 0",
+    "true_gain": 0.1,
+    "n80": 37,
+    "n90": 49,
+    "power_at_125": 0.999,
+    "power_at_81": 0.987,
+    "power_at_15": 0.436
+   },
+   {
+    "design": "two_assignments_per_line",
+    "sd": 0.411,
+    "claim": "lower bound > 0",
+    "true_gain": 0.15,
+    "n80": 17,
+    "n90": 22,
+    "power_at_125": 1.0,
+    "power_at_81": 1.0,
+    "power_at_15": 0.77
+   },
+   {
+    "design": "two_assignments_per_line",
+    "sd": 0.411,
+    "claim": "lower bound > 0.05",
+    "true_gain": 0.1,
+    "n80": 146,
+    "n90": 195,
+    "power_at_125": 0.738,
+    "power_at_81": 0.552,
+    "power_at_15": 0.144
+   },
+   {
+    "design": "two_assignments_per_line",
+    "sd": 0.411,
+    "claim": "lower bound > 0.05",
+    "true_gain": 0.15,
+    "n80": 37,
+    "n90": 49,
+    "power_at_125": 0.999,
+    "power_at_81": 0.987,
+    "power_at_15": 0.436
+   },
+   {
+    "design": "two_assignments_per_line",
+    "sd": 0.411,
+    "claim": "lower bound > 0.1",
+    "true_gain": 0.2,
+    "n80": 37,
+    "n90": 49,
+    "power_at_125": 0.999,
+    "power_at_81": 0.987,
+    "power_at_15": 0.436
+   },
+   {
+    "design": "two_assignments_per_line",
+    "sd": 0.411,
+    "claim": "lower bound > 0.1",
+    "true_gain": 0.15,
+    "n80": 146,
+    "n90": 195,
+    "power_at_125": 0.738,
+    "power_at_81": 0.552,
+    "power_at_15": 0.144
+   },
+   {
+    "design": "two_assignments_per_line",
+    "sd": 0.411,
+    "claim": "upper bound < 0.05 (futility)",
+    "true_gain": 0.0,
+    "n80": 146,
+    "n90": 195,
+    "power_at_125": 0.738,
+    "power_at_81": 0.552,
+    "power_at_15": 0.144
+   },
+   {
+    "design": "two_assignments_per_line",
+    "sd": 0.411,
+    "claim": "upper bound < 0.1 (futility)",
+    "true_gain": 0.0,
+    "n80": 37,
+    "n90": 49,
+    "power_at_125": 0.999,
+    "power_at_81": 0.987,
+    "power_at_15": 0.436
+   },
+   {
+    "design": "one_assignment_per_line",
+    "sd": 0.533,
+    "claim": "lower bound > 0",
+    "true_gain": 0.05,
+    "n80": 245,
+    "n90": 328,
+    "power_at_125": 0.517,
+    "power_at_81": 0.364,
+    "power_at_15": 0.103
+   },
+   {
+    "design": "one_assignment_per_line",
+    "sd": 0.533,
+    "claim": "lower bound > 0",
+    "true_gain": 0.1,
+    "n80": 62,
+    "n90": 82,
+    "power_at_125": 0.979,
+    "power_at_81": 0.897,
+    "power_at_15": 0.283
+   },
+   {
+    "design": "one_assignment_per_line",
+    "sd": 0.533,
+    "claim": "lower bound > 0",
+    "true_gain": 0.15,
+    "n80": 28,
+    "n90": 37,
+    "power_at_125": 1.0,
+    "power_at_81": 0.998,
+    "power_at_15": 0.548
+   },
+   {
+    "design": "one_assignment_per_line",
+    "sd": 0.533,
+    "claim": "lower bound > 0.05",
+    "true_gain": 0.1,
+    "n80": 245,
+    "n90": 328,
+    "power_at_125": 0.517,
+    "power_at_81": 0.364,
+    "power_at_15": 0.103
+   },
+   {
+    "design": "one_assignment_per_line",
+    "sd": 0.533,
+    "claim": "lower bound > 0.05",
+    "true_gain": 0.15,
+    "n80": 62,
+    "n90": 82,
+    "power_at_125": 0.979,
+    "power_at_81": 0.897,
+    "power_at_15": 0.283
+   },
+   {
+    "design": "one_assignment_per_line",
+    "sd": 0.533,
+    "claim": "lower bound > 0.1",
+    "true_gain": 0.2,
+    "n80": 62,
+    "n90": 82,
+    "power_at_125": 0.979,
+    "power_at_81": 0.897,
+    "power_at_15": 0.283
+   },
+   {
+    "design": "one_assignment_per_line",
+    "sd": 0.533,
+    "claim": "lower bound > 0.1",
+    "true_gain": 0.15,
+    "n80": 245,
+    "n90": 328,
+    "power_at_125": 0.517,
+    "power_at_81": 0.364,
+    "power_at_15": 0.103
+   },
+   {
+    "design": "one_assignment_per_line",
+    "sd": 0.533,
+    "claim": "upper bound < 0.05 (futility)",
+    "true_gain": 0.0,
+    "n80": 245,
+    "n90": 328,
+    "power_at_125": 0.517,
+    "power_at_81": 0.364,
+    "power_at_15": 0.103
+   },
+   {
+    "design": "one_assignment_per_line",
+    "sd": 0.533,
+    "claim": "upper bound < 0.1 (futility)",
+    "true_gain": 0.0,
+    "n80": 62,
+    "n90": 82,
+    "power_at_125": 0.979,
+    "power_at_81": 0.897,
+    "power_at_15": 0.283
+   }
+  ],
+  "check": "power_check2.json joint empirical resampling agrees with the normal approximation within MC error (e.g. L > 0 at G = 10%, 40 lines: 0.85-0.98 resampled vs 0.87-0.98 predicted)",
+  "multipliers": {
+   "bonferroni_3_contrasts": 1.3338354518884552,
+   "new_pairs_scope_variance": 3.3421104604499905,
+   "policy_disagreement": "observed SDs come from policies differing on ~21% of lines; the random-ranking contrast SD 1.94 is an extreme upper bound; re-estimate on the repaired replay before freezing n"
+  },
+  "consequence": "resolving tau = 5% in both directions needs ~146 lines (two role assignments per line) or ~245 (one); more than any single anchored screen (Jaaks 125, Nair 81, Nair validation 15); at Jaaks size pre-register UNRESOLVED as the likely outcome for true gains of 0-10%; a 60-line gate is arbitrary (too many for 15% effects, too few for the 5% bar)"
+ },
+ "files": {
+  "power": "review/power.py, power.json, power_check.json (superseded: truncation bias), power_check2.json",
+  "plan": "review/plan.json"
+ }
+}

@@ -140,6 +140,28 @@ and report sensitivity to alternatives. Transcriptomic interaction is not viabil
 efficacy and toxicity remain separate outcomes. Stress tests include absent combination labels,
 out-of-distribution pairs, schedule dependence, shared off-targets, and growth-rate confounding.
 
+Status 2026-10-03: qualified as a replay task for *certified discovery* in a newly screened cell
+line. It is the first registered task where prediction binds decisions: oracle 0.99 against
+random 0.10 of a line's hits at a 10% budget.
+- **Data:** two public full-factorial screens, O'Neil 2016 (development) and NCI-ALMANAC 2017
+  (one pre-registered confirmatory opening).
+- **Label:** the Bliss-type excess as defined by each source, hit above 10.
+- **Result:** the dual core passes both registered tests. Effect, certificates and limits are
+  in `research/certified_discovery/README.md`.
+- **Not tested:** schedule dependence, toxicity and transcriptomic interaction.
+- **Later the same day:** the gain did not survive independent validation. On the untouched Jaaks
+  2022 screen, with each candidate's second measurement on disjoint plates, feedback gave
+  NO_MEANINGFUL_GAIN in validated discoveries. Report:
+  `research/astra/feedback_validation_20261003/REPORT.md`.
+- **Allocation follow-up (2026-10-04, exploratory on the exposed Jaaks screen):**
+  - At an equal budget, verifying screen hits beats measuring both orientations of every pair, but it
+    needs more rounds.
+  - Target-line feedback does not improve candidate ordering.
+  - A static ranking that uses other lines' independent confirmations helps, mostly through richer
+    history.
+  - The confirmatory 2×2 is blocked for lack of qualified data. Report:
+    `research/astra/reproducible_allocation_20261003/REPORT.md`.
+
 ### Task 4 — Toxicity And Safety Liability
 
 Prioritize in-vitro hazards while preserving activity. This cannot establish clinical safety or an

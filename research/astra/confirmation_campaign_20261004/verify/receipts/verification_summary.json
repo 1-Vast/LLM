@@ -1,0 +1,35 @@
+{
+ "owner": "verify (subagent)",
+ "written_at": "2026-10-04T16:00+0800 (from `date`; file time is authoritative)",
+ "evidence_status": "EXPLORATORY (Jaaks 2022 exposed); verification of computations, not of the scientific claim",
+ "exposed_reads_by_verify": [
+  "2026-10-04T13:09:04+0800 independent_check.py (plan.json, code sha256 bb4e744f...995d)",
+  "2026-10-04T15:52 check_design.py (plan_addendum_1.json, sha256 142304a0...452f)",
+  "2026-10-04T15:54 independent_frontier.py (plan_addendum_2.json, sha256 b6828caf...0831)"
+ ],
+ "receipts": {
+  "verify/receipts/verification.json": "5cbe0a0a51bf152cc234fdf7439d12b29f2df59ec20fe7f2fb13977ee60f7971",
+  "verify/receipts/verify_campaigns.jsonl": "7213e9e0c2590b8c42cd17ff779c573919d219af516927e6215c519f7372628f",
+  "verify/receipts/design_check.json": "b6591372b239da6674b6618b64625d98e1022d7c5e526acf07ccd8972078e949",
+  "verify/receipts/frontier_check.json": "0a510d46412fb783b740a24c778e44dfdf37ec5e1703ac299037fc788ae90d0e"
+ },
+ "independence": "verify/independent_check.py and independent_frontier.py were written from the frozen contract v2 text; they import no design or resources code. Design code was imported read-only only by check_design.py, after the independent run, to rerun and poison it.",
+ "results": {
+  "selection": "independent HD development table (8 predictors x 11 fp, 88 cells) equals design/selection.json exactly; C* = C_mean, fp* = 30, R own fp = 30 reproduced (C_mean 134.5 and R 124.0 at fp 30; HD rows R 82.5..109.0 and C_mean 91.0..107.0 over fp 10..60 identical)",
+  "primary_per_campaign": "1,098 E campaigns (9 arms x 61 lines x 2 roles) at fp 30: n_menu, M, n1, ordered screens, screen hits, ordered verifies, verification hits, confirmed, spent, rounds used all identical to design (0 mismatches); own-fp file 854 of 976 records compared (L_v at fp 25 not run by verify), 0 mismatches; per-line values identical for R, C_mean, S_both on all 61 lines",
+  "primary_totals_and_inference": "R 110.5, C_mean 117.5, S_both 118.5, S 104.5 (E, fp 30); mean difference -0.11475 per line [-0.25410, +0.03279]; relative -5.957% [-13.364%, +1.674%]; 0 zero-denominator resamples; verdict EXPLORATORY_WORTHWHILE_EXCLUDED; equal to design to 1e-12",
+  "p1_p2_p3_frontier": "per-campaign equality with resources campaigns_custom_p_cp20 (HD: 384 one-round, 4,224 two-round, 384 three-round; E: 488, 5,368, 488; 0 mismatches, totals equal) and with design dev P2 grid (12,672), dev P3 (1,152), eval P3 (1,098) and the R arm of both feedback P3 files (128 + 122): 0 mismatches. E P3 totals: R 113.0, C_mean 120.0, S_both 120.0, C_prod 116.5, C_s 115.0, C_v 113.0, S 111.0, L_v 110.0, oracle 152.0. E P1 totals: R 106.0, C_mean 106.0, C_prod 106.0, S_both 104.0, oracle 152.0.",
+  "budget_stopping_legality": "0 invariant violations on 20,972 design campaign records (dev P2 grid, dev P3, gate, eval primary, own fp, wells, pipeline, P3, LOO-125) and 1,750 feedback records (all 7 arms): spent <= cap; no screen in the final round; every verification is an earlier-round revealed screen hit of the same campaign; no re-purchase; round logs consistent with record lists; measurement spend = purchases. Verify's own 1,098 campaigns: 0 violations.",
+  "leakage_poisoning": "verify implementation: 244 E campaigns (R and C_mean at fp 30, R at own fp) with every unpurchased target-line outcome flipped and every other E line randomised -> identical purchases. Design code: 366 E campaigns (R, C_mean, S_both at fp 30) with unpurchased target-line outcomes flipped, the target line's other role assignment randomised and every other E line randomised in both roles -> identical purchases and confirmed counts.",
+  "condition_identity": "builder panels: SV/VS share rows and lines; SV verification call and label equal VS screen call and label and vice versa in all 3 tissues (7,363 / 7,405 / 4,781 rows). Design primary records: all 23,868 revealed screen values and 4,398 revealed verification values equal the builder value of the same line, role and menu row, and every verification equals the other role's screen measurement of the same pair and line.",
+  "reproducibility": "verify in-process rerun identical (digest c540aa62...7831); design code rerun (366 campaigns) identical to its files; across processes the three verify runs agree transitively (first run = design primary = resources two-round records = third run)",
+  "code_review_notes": "design: history views remove E rows before any computation and make_target asserts target and forbidden lines absent; feedback worlds use HD lines plus the target only (world_keep) with an assertion, and the frozen TransferWorld zeroes the target line's own labels in its history (world.py _build_history)."
+ },
+ "not_done": [
+  "feedback F0/Fm/Ff/U_lambda/U_screen_post rankings, logistic fits and the gate were not independently re-implemented (only invariants and the R-arm P3 records were checked)",
+  "the combination-well cap (campaigns_wells), the pipeline diagnostic and the LOO-125 sensitivity were checked for invariants only, not re-implemented",
+  "the resources code was not rerun or poisoned; its native-plate replay, layout accounting and design_facts were not checked",
+  "verify did not run L_v at its own fp 25 (122 own-fp records not compared)"
+ ],
+ "tests": "verify/test_verify.py (16) and verify/test_frontier.py (24): 40 passed, synthetic data only"
+}

@@ -1,0 +1,27 @@
+{
+ "owner": "resources",
+ "written_at": "2026-10-04T13:12+0800 (from the session clock; file time is authoritative)",
+ "status": "EXPLORATORY resources workstream: deviations from resources/plan.json and from the coordinator brief, plus interpretations fixed before the outcome reads",
+ "execution": {
+  "outcome_reads": 2,
+  "access_log_entries": ["protocol/access_log.jsonl 2026-10-04T13:03:16+0800 [resources] stage hd", "protocol/access_log.jsonl 2026-10-04T13:04:38+0800 [resources] stage eval"],
+  "plan_written": "resources/plan.json 2026-10-04T13:02:57+0800, before both reads; run.py verified every resources/*.py hash against it at start",
+  "code_changes_after_outcome_reads": "none to layout.py, frontier.py, native.py, run.py, test_resources.py, reproduce_totals.py or design_facts.py; summarize.py added afterwards under plan_addendum_1.json (reads written outputs only)",
+  "pre_read_reads": "Jaaks DESIGN columns only (no outcome column, no ticket) for the layout, receipt reproduction and design facts; earlier studies' receipts read, never written"
+ },
+ "deviations": [
+  {"id": "D1", "what": "Selection timing disclosure.", "evidence": "design/selection.json was written 13:01:41 and read by resources only after plan.json (13:02:57). design hashed it in design/plan_addendum_1.json at 13:04:37.68; the resources eval ticket opened 13:04:38 and its manifest records the same sha256 (76210fc7...0c404), computed before the ticket. No separate resources addendum was written before the eval run.", "consequence": "STUDY_PLAN rule 2 (E outcomes only after the selection file is written and hashed) held, by about one second."},
+  {"id": "D2", "what": "plan_addendum_1.json was rewritten once.", "evidence": "the first summarize.py call crashed on a relative input path before writing any output; the path is now resolved and the addendum's summarize.py hash updated (field 'rewritten').", "consequence": "none on numbers; summary_20261004_130800 is the only summary."},
+  {"id": "D3", "what": "Dose points interpretation.", "evidence": "the contract lists 'dose points (14 per orientation measurement per plate)'.", "consequence": "dose_points = 14 x orientation measurements (distinct dose points); combination_wells = 14 x design plates (the per-plate reading). Both reported."},
+  {"id": "D4", "what": "Wells-cap P1 and P3 are resources extensions.", "evidence": "the contract defines only P2 under W.", "consequence": "P1/P3 under W were prespecified in plan.json (skip non-fitting; P3 reserve stop-at-first-failure with sum p_s x c_v) and are labelled extensions."},
+  {"id": "D5", "what": "Raw control wells per plate are not known plate by plate.", "evidence": "the provenance receipt gives 216 fixed control wells plus 0/10/38 DMSO-only positions (median 10).", "consequence": "the custom model is run at 200, 216, 226 and 254 controls. Plate starts are identical across the four values in every cp = 20 configuration and in the earlier receipts; they differ only in 17-18 cp = 40, small-fp configurations. Control wells scale with the value."},
+  {"id": "D6", "what": "Seed-to-read days.", "evidence": "plate_hierarchy.csv: naive date difference 4 days on 3,068 plates and 3 days on 38 plates; those 38 were seeded at 00:00 and read at 23:00 across the UK summer-time change (2017-03-26, 2018-03-25).", "consequence": "local calendar difference is 4 days on all 3,106 plates; minimum days = 4 per used round as registered."},
+  {"id": "D7", "what": "Scheduler rule caveat (interpretation, rule unchanged).", "evidence": "on E the mechanical rule returns SCHEDULER_ARM_INDICATED for S, L_v and C_s; on HD it returns NOT_INDICATED for every predictor. Their choice frequency comes from pipeline crossings computed with two-orientation history quantities (p_sv, p_v|s) that these rankings do not use, and their bound from the per-campaign hindsight-best fp (an outcome-aware maximum over 11 noisy values).", "consequence": "reported as computed; the flags measure ranking information gaps plus hindsight, not a legal scheduling decision. Same-information predictors with the best yields (C_mean, S_both, C_prod, R) are NOT_INDICATED on both HD and E."},
+  {"id": "D8", "what": "Native N3 round 3 eligibility.", "evidence": "native.py round 3 buys verification plate sets for all pending earlier-round hits, the contract's P3 says round-2 hits only.", "consequence": "equivalent: a round-1 hit left pending after round 2 cannot fit in round 3 because the remaining cap only decreases; prespecified in native.py before any read."}
+ ],
+ "notes": [
+  "Equal measurement caps are not equal consumption: P2 stops with unused cap in 110-116 of 122 E campaigns at fp* = 30.",
+  "The custom per-pair layout is hypothetical; per-pair purchases are not separable on native Jaaks plates.",
+  "Prices, labour, culture capacity, days beyond the assay, custom-layout feasibility and per-plate DMSO-only counts remain null."
+ ]
+}
