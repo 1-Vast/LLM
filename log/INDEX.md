@@ -21,11 +21,16 @@ The day records are the entry points. Existing machine-local artifacts under
 | `20261001/README.md` | Collaborative dual-core module/data qualification and runtime fixes; literature-guided no-training policy, denominator and value-scope experiments; source bounds and preserved recovery receipts; live DeepSeek/Jev validation, general contract benchmark and report-only defect audit; section 14: real predecision-state raw-data gate, public source review, stopped state-gain experiment and content-bound historical language isolation |
 | `20261002/README.md` | ASTRA two-round multi-agent adjustments: paired STATE and input-dependency/influence audits, residual diagnostics, verified runtime/scoring/persistence guards promoted into four existing files, research curation and main publication;1,861 full tests pass, biological gain unestablished |
 | `20261003/README.md` | Reviewed CLI plan-version and QC-bundle faults repaired; default engineering tests and installed-package boundaries verified; research fitting/replay separated; measured-realisation intake remains unexecuted; 1,949 aggregate tests passed; section 16 (separate session): certified dual-core combination discovery, pre-registered and confirmed once on NCI-ALMANAC (H1 and H2 PASS; +2.58 hits per line over static retrieval after paying for a random audit; FDR and yield certificates valid; context and uncertainty null; LLM planner arms invalid on confirmation), promoted to `src/` and `tools/`; section 17: feedback-validation study, pre-registered on untouched Jaaks 2022 with plate-disjoint validation, NO_MEANINGFUL_GAIN (feedback -1.1% [-4.0, +1.4] validated discoveries vs static retrieval) |
-| `20261004/README.md` | Reproducible-allocation study on exposed Jaaks 2022 data (EXPLORATORY): equal-budget repair of the verification comparison (verify-hits +17.7% [13.1, 23.1] over paired, but 5 rounds vs 1; fixed split wins at 2 rounds); repeat provenance corroborated, not authenticated; development-fitted feedback (lambda ~0.3) improves squared error but not candidate ordering; static reproducibility-aware ranking +6.5% [2.6, 10.6], mostly from richer history; no scheduler or LLM contribution; 2x2 blocked (no qualified data), executable protocol delivered |
+| `20261004/README.md` | Exposed-data allocation and confirmation studies; constructive batch-action/raw-response exploration; supplied knowledge-study import, read-only retrieval optimization and second curation. Detailed findings and executed checks remain in the linked daily entries and topical reports |
+
+| `20261005/README.md` | Public single-drug pretraining; original results and development repair preserved; later scope clarification appended |
+| `20261006/README.md` | Independent strict-repeat review, shared feature retrieval and first-screen design; canonical findings remain in topical reports |
+
+| `20261007/README.md` | Main publication of recent studies and verified maintenance; exact staged checks are recorded in the publication receipt |
 
 ## Files
 
-The latest dual-core workflow and verification record is in `20261001/README.md`.
+The latest working-day entry is `20261007/README.md`; historical records below retain their original scope.
 
 - `20260915/README.md`
 - `20260915/biological_closure/outputs/comparison.json`
@@ -151,3 +156,4 @@ The latest dual-core workflow and verification record is in `20261001/README.md`
 - `20260930/README.md`
 - `20261001/README.md`
 - `20260928/CONSOLIDATION.md`
+- `20261005/README.md`

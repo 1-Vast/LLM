@@ -1,0 +1,96 @@
+{
+ "stage": "S0",
+ "status": "DESIGN_CONTRACT_NO_OUTCOME_VALUES_READ",
+ "built_utc": "2026-10-04T18:09:12Z",
+ "source": {
+  "file": "GDSC2_fitted_dose_response_27Oct23.xlsx",
+  "release": "GDSC release 8.5 (file dated 27Oct23)",
+  "sha256": "f950a7027be265f8a7a74220a27fd18cbd368485349bd8c2048e88bb1cd07560",
+  "rows": 242036,
+  "cells": 969,
+  "drug_ids": 295,
+  "dataset": [
+   "GDSC2"
+  ],
+  "webrelease": [
+   "Y"
+  ]
+ },
+ "assay": {
+  "endpoint": "cell viability by metabolic assay CellTiter-Glo (ATP luminescence); GDSC1 used Resazurin/Syto60 and is NOT this file",
+  "duration_h": 72,
+  "format": "1536-well plates, Echo555 acoustic dispensing, drugging 24 h after seeding, RPMI or DMEM/F12 with 10% FBS",
+  "dose_formats": "7-point curves: half-log steps (1000-fold) or 2x2-fold then 4x4-fold (1024-fold); per-row MIN_CONC/MAX_CONC give the realised range",
+  "negative_control": "DMSO/medium-treated cells",
+  "positive_control": "blank wells (medium, no cells)",
+  "normalisation": "per-plate viability = (treated - blank)/(negative control - blank)",
+  "source": "Sanger DepMap documentation page Drug Sensitivity (retrieved 2026-10-04) and gdscIC50 vignette"
+ },
+ "fitting": {
+  "method": "non-linear mixed-effects (NLME) two-parameter logistic of Vis et al. 2016, R package gdscIC50 (GPL-3, v0.99.4 at master commit recorded in sources/gdscIC50_commit.json)",
+  "joint_fit": "NLME_RESULT_ID is constant (['343']) -> one joint fit over all cell x compound series; scale varies by cell model only, position (xmid) by cell model and compound; replicates of one cell+compound are pooled into one curve",
+  "independence": "fitted records are NOT independent observations: they share the joint model (borrowing strength). Treat as fitted-parameter transfer; split by cell entity so one cell's shape/position parameters stay on one side",
+  "x_scale": "x = log2(conc / maxc) + 9, so MAX_CONC is x=9 (gdscIC50 getXfromConc/getConcFromX)",
+  "drug_level_specifier": "drug = DRUG_ID plus maxc by default: different MAX_CONC of the same DRUG_ID are different drug-level models"
+ },
+ "LN_IC50": {
+  "definition": "natural log of the fitted IC50 (xmid) converted to micromolar: LN_IC50 = log(maxc * 2^(xmid - 9)), maxc in micromolar (gdscIC50 R/nlme_fit_stats.R calcIC50 + getConcFromX; plot axis label 'log_e uM')",
+  "unit": "ln(micromolar); IC50 = exp(LN_IC50) uM",
+  "relative_form": "LN_IC50 - ln(MAX_CONC) = (xmid - 9) * ln 2, i.e. a dose-range-normalised potency in natural-log units; computed from MIN_CONC/MAX_CONC design columns only",
+  "documented_in": [
+   "DepMap docs: 'LN_IC50 Natural log of the fitted IC50'; 'MIN_CONC/MAX_CONC: minimum/maximum micromolar screening concentration of the drug within the dataset'",
+   "gdscIC50 source (formula)"
+  ],
+  "verification_status": "documentation/source-level verified; VALUE-LEVEL check (fraction of LN_IC50 inside [ln MIN_CONC, ln MAX_CONC], sanity on known potent compounds) is DEFERRED to S1 after FREEZE because it needs outcome values",
+  "jaaks_library_ic50_scale": "Jaaks LIBRARY_XMID_uM is IC50 in uM; its LIBRARY_XMID is log2-scale relative to the library range -1..9 (glossary) -> comparable form (log2 uM) differs by constant ln2 factors; not read at S0"
+ },
+ "out_of_range_ic50": {
+  "documented_behaviour": "The fit is a sigmoid; xmid is a model parameter and is NOT clipped to the tested range. An IC50 beyond MAX_CONC is an extrapolation of the fitted curve, not an observed threshold. No censoring flag exists in the file.",
+  "evidence": "gdscIC50 code computes IC50 from xmid with no clipping; DepMap docs mention no censoring; protocol 'do_not_infer' list",
+  "design_columns_for_flag": "out_of_range_high := LN_IC50 > ln(MAX_CONC); out_of_range_low := LN_IC50 < ln(MIN_CONC) (to be computed at S1 from values + design columns)",
+  "handling_rule": "keep the fitted value as the label but carry the flag; report model error separately for in-range vs extrapolated rows; do not convert to right-censored data and do not drop silently; a sensitivity arm clips LN_IC50 to [ln MIN, ln MAX] (a recorded alternative, not the primary)"
+ },
+ "author_QC": {
+  "RMSE": "root mean squared error of the fitted curve against the viability points; DepMap docs: 'Curves with RMSE > 0.3 are excluded prior to release as part of quality control' -> every released row already passed RMSE <= 0.3 (documented; unverified at S0)",
+  "Z_SCORE": "z of LN_IC50 vs mean/SD of that drug over all models in the dataset (descriptive; NOT a QC filter; depends on the cell panel and on the drug-ID's dose-range mixture)",
+  "plate_QC": "plates with failed controls are excluded upstream (gdscIC50 removeFailedDrugs 'FAIL' tag); thresholds for GDSC2 plates are not in the file. The Jaaks screening documentation lists CV<=0.18 and Z-factor>=0.3 for the combination screen; GDSC2 plate thresholds are not documented in the files read.",
+  "no_additional_filter_at_S0": "S1 may apply the documented RMSE <= 0.3 only as an assertion check; any stricter RMSE filter (e.g. Jaaks-style 0.2) must be declared in the freeze with the number of rows it drops"
+ },
+ "comparability_across_drugs": {
+  "statement": "Raw LN_IC50 is NOT comparable across drugs: it is an absolute potency in each drug's own units and bounded in practice by that drug's screened range (ln MIN..ln MAX); ranges differ by up to orders of magnitude (see fit_duplicate_groups.csv).",
+  "handling": [
+   "primary label: dose-range-normalised potency y = (LN_IC50 - ln(MAX_CONC)) / ln 2 = xmid - 9 (log2 steps below the top dose); uses ONLY design columns MAX_CONC; removes the dose-range offset between drugs and between ranges of one drug",
+   "then standardise per drug within the mono TRAINING fold only (mean, SD from training cells), parameters exported; never from validation or Jaaks lines",
+   "drug-wise random effect b_a absorbs residual drug offset; cross-drug ranking is not claimed from mono labels",
+   "records of one DRUG_ID with different MAX_CONC are different dose-range groups; the xmid-9 normalisation handles the offset but the group id is carried as a covariate or the drug standardisation is done per dose-range group when a group has >= 30 training cells"
+  ]
+ },
+ "recommended_primary_mono_target": {
+  "choice": "y_rel = (LN_IC50 - ln MAX_CONC)/ln 2 (= xmid - 9), standardised per drug on training cells; AUC reported as a secondary target",
+  "rationale": [
+   "it is the quantity actually modelled by the NLME fit (xmid) and is invariant to the arbitrary top-dose choice",
+   "AUC (fraction of area between lowest and highest tested conc) is bounded in [0,1], never extrapolated, but is range dependent (a drug screened up to its toxic ceiling vs a narrow range gives different AUC for the same biology) and loses potency resolution for inactive drugs",
+   "the Jaaks action contrast is a within-cell comparison across drugs; a range-normalised potency retains within-cell ordering information better than raw ln uM when top doses differ; it also matches Jaaks LIBRARY_XMID (log2 scale relative to the library range)",
+   "decision only: no values were read, no choice between candidates was made on performance"
+  ],
+  "secondary": [
+   "AUC",
+   "raw LN_IC50 (diagnostic only)"
+  ],
+  "forbidden": [
+   "adding mono IC50/AUC to a synergy score",
+   "treating extrapolated IC50 as observed threshold"
+  ]
+ },
+ "licence": {
+  "summary": "Sanger DepMap Data Usage Policy: non-exclusive, non-transferable, internal proprietary research and educational use; excludes resale (alone or combined) and commercial services; as-is; commercial use needs prior consent. Research use in this repo is compatible; any redistribution of derived files must keep this notice.",
+  "source_url": "https://depmap.sanger.ac.uk/documentation/data-usage-policy/"
+ },
+ "unknown_at_S0": [
+  "whether any LN_IC50 is missing/non-finite (needs values)",
+  "per-row RMSE (needs values)",
+  "screening dates/barcodes of GDSC2 plates (not in the file)",
+  "lot/vendor identity of compounds vs the Jaaks stocks",
+  "whether fitted values were later revised across releases"
+ ]
+}

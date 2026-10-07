@@ -216,3 +216,24 @@ A bounded study ran on exposed Jaaks 2022 data, so every result is EXPLORATORY. 
 - **Untouched data.** One release qualifies conditionally (Vis et al. 2024 cross-run repeats). It is kept sealed under the stop rule.
 - **Tests.** 481 study tests, 354 core and 22 shape tests passed.
 - **Records.** Nothing committed. Report: [REPORT.md](../../research/astra/confirmation_campaign_20261004/REPORT.md); manifest: [RUN_MANIFEST.json](../../research/astra/confirmation_campaign_20261004/RUN_MANIFEST.json); blocking receipt: `research/astra/confirmation_campaign_20261004/receipts/evaluation_blocking.json`.
+
+
+## Constructive solution exploration (2026-10-04)
+
+Three agents investigated solutions rather than extending the previous stop conclusion. The selected next task is native plate-set acquisition with fixed predictions and first-round purchases, followed by independent raw-response recovery and a bounded potency/efficacy predictor. Parent checks confirmed the 2–7 components per side and the local raw intensity schema. Vis author endpoint code was inspected; fitted evaluation values and supplementary outcome tables remain unopened. No campaign/model experiment, API inference, source change or Git publication occurred.
+
+- [Solution report](../../research/astra/solution_exploration_20261004/REPORT.md)
+- [English execution prompt](../../research/astra/solution_exploration_20261004/NEXT_PROMPT.md)
+- [Exploration receipt](../../research/astra/solution_exploration_20261004/EXPLORATION_RECEIPT.json)
+
+
+## Biological knowledge optimization and second curation (2026-10-04)
+
+Imported the 83-file supplied knowledge package without changing its bytes. Three agents reviewed model/pretraining, data contracts and maintenance. Added an explicit read-only datasets query tool; opposite protein/transcription signs remain distinct, unknown applicability/structure remains unknown. Added non-overwriting import and 49,424-campaign verification, with the external partition CRLF/LF difference recorded rather than refrozen.
+
+The original 14 synthetic checks and four new query tests pass; related structure/collection checks bring the executed range to 45 passing tests. No model training, Vis outcome access, paid inference, src change or Git publication. Local GDSC2 metadata supports a staged 14-pathway mono-pretraining design; metadata coverage is not QC or sample independence.
+
+- [Optimization and curation report](../../research/astra/knowledge_optimization_20261004/REPORT_ZH.md)
+- [Current maintenance and reproduction entry](../../research/astra/knowledge_optimization_20261004/README.md)
+- [Pretraining design](../../research/astra/knowledge_optimization_20261004/PRETRAINING_PROTOCOL.json)
+- [Run manifest](../../research/astra/knowledge_optimization_20261004/RUN_MANIFEST.json)

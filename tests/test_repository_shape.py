@@ -210,7 +210,7 @@ def test_project_markdown_has_no_chinese_prose():
 
 
 def _historical_markdown_exemptions():
-    """Preserve twelve immutable historical/source records; new prose is English-only."""
+    """Preserve registered immutable historical/source records; active prose is English-only."""
     manifest = json.loads((ROOT / "tests/fixtures/historical_markdown.json").read_text(encoding="utf-8"))
     for name, record in manifest["files"].items():
         path = ROOT / name
@@ -222,7 +222,7 @@ def _historical_markdown_exemptions():
 
 
 def test_historical_language_exemptions_are_content_bound():
-    assert len(_historical_markdown_exemptions()) == 12
+    assert len(_historical_markdown_exemptions()) == 28
 
 
 def test_tracked_markdown_is_never_empty():

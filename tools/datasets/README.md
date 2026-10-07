@@ -1,5 +1,31 @@
 # Dataset Tools
 
+`biological_knowledge` provides read-only, provenance-preserving access to an
+explicit SQLite snapshot. It has no dependency on a research runner and does
+not convert annotations into evidence of current-cell mechanism or efficacy:
+
+```powershell
+python -m tools.datasets.biological_knowledge --database research/astra/knowledge_transfer_20261004/biological_knowledge.sqlite context SIDM00097 --kind pathway
+python -m tools.datasets.biological_knowledge --database research/astra/knowledge_transfer_20261004/biological_knowledge.sqlite drug Alpelisib
+python -m tools.datasets.biological_knowledge --database research/astra/knowledge_transfer_20261004/biological_knowledge.sqlite paths AR CASP2 --hops 1
+python -m tools.datasets.biological_knowledge --database research/astra/repeat_signal_20261005/feature_catalog.sqlite repeat_features SIDM00136
+```
+
+Protein influence and transcriptional regulation remain separate relation
+layers. Missing activity records are unavailable, not zeros; complex components
+are not expanded into direct-binding claims. The snapshot's original source
+licenses still apply. [Verification and asset recovery](../../research/astra/knowledge_optimization_20261004/README.md)
+are explicit research operations.
+
+`repeat_features` reads the distinct feature-catalog schema: basal pathways,
+hotspot calls and CRISPR target dependency with source and missingness records.
+It rejects outcome-containing experimental evidence databases. Hotspot zero is
+not verified wild type, missing dependency is not zero effect, and CRISPR
+knockout is not drug inhibition. The original `context`, `drug` and `paths`
+operations continue to require the original biological-knowledge schema.
+The [repeat maintenance entry](../../research/astra/repeat_optimization_20261006/README.md)
+owns snapshot verification and reproduction limits.
+
 This module owns dataset discovery, acquisition, source provenance, response construction
 and public/hidden benchmark preparation. Discovery results are candidates, not qualified
 evaluation data. Every source needs separate identity, control, unit, exposure and task audits.
