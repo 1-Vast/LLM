@@ -11,7 +11,7 @@ from maestro.models import EvidenceAction
 from maestro.judgment import PredictionReliabilityLedger
 from virtual_cell.interface import REUSE_NOTE_PREFIX
 from virtual_cell.interface import PredictionRequest, QueryAssessment, StatePrediction
-from .llm import JsonCompleter
+from .llm import JsonCompleter, optional_text as _optional_text, text_items as _string_tuple
 
 
 if TYPE_CHECKING:
@@ -323,16 +323,6 @@ def _required_text(data: dict[str, Any], field: str) -> str:
     if value is None:
         raise ValueError(f"Task interpretation is missing '{field}'.")
     return value
-
-
-def _optional_text(value: Any) -> str | None:
-    return value.strip() if isinstance(value, str) and value.strip() else None
-
-
-def _string_tuple(value: Any) -> tuple[str, ...]:
-    if not isinstance(value, list):
-        return ()
-    return tuple(item.strip() for item in value if isinstance(item, str) and item.strip())
 
 
 # A missing *task* field is one of these and nothing else. The closed set is enforced

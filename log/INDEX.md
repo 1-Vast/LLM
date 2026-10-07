@@ -163,3 +163,7 @@ and [the evidence register](../research/EVIDENCE.md).
 - `20261007/staged_core_tests.xml`
 - `20261007/staged_focused_tests.xml`
 - `INDEX.md`
+
+- `20261007/function_consolidation.json`
+- `20261007/function_core_tests.xml`
+- `20261007/function_contract_tests.xml`

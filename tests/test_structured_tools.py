@@ -86,7 +86,7 @@ def test_adapters_are_registered_typed_and_source_versioned():
         elif item.identifier == "condition_sources":
             assert item.evidence_kind is EvidenceKind.DERIVED_ANALYSIS
             assert ROOT / "tools/datasets/condition_sources.py" in item.source_files
-            assert len(item.entrypoint.read_text(encoding="utf-8").splitlines()) <= 12
+            assert item.function == "condition_sources"
         else:
             assert item.evidence_kind is EvidenceKind.DERIVED_ANALYSIS
             assert ROOT / "src/maestro/tool_analysis.py" in item.source_files
@@ -100,6 +100,23 @@ def test_grouped_manifests_share_code_but_keep_separate_contracts(tmp_path):
     assert profile.manifest_path != summary.manifest_path
     assert profile.tool_version_sha256 != summary.tool_version_sha256
     assert profile.function == "data_profile" and summary.function == "column_summary"
+    for name in ("table_filter", "evidence_bundle_optimize", "multimodal_alignment", "typed_decision_review", "condition_sources"):
+        assert descriptors[name].entrypoint == profile.entrypoint
+
+
+def test_entrypoint_uses_its_own_annotation_semantics(tmp_path):
+    root, _ = custom_tool(tmp_path, body=(
+        "from dataclasses import asdict, dataclass\n"
+        "@dataclass\n"
+        "class Record:\n"
+        "    count: int\n"
+        "def run(parameters):\n"
+        "    return {'schema_version': '1.0', 'payload': asdict(Record(1))}\n"
+    ))
+    dataset = write_json(tmp_path, "input.json", [])
+    router = ToolRouter(SequenceClient(selection("custom")), root)
+    result = router.select_and_execute(context(), (dataset,))
+    assert result.payload == {"count": 1}
 
 
 def test_named_manifest_changes_are_detected_before_invocation(tmp_path):

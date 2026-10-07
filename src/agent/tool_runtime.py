@@ -458,7 +458,7 @@ Return {"tool_id": string or null, "dataset_id": string or null, "arguments": ob
         # Compile checked source bytes to avoid stale pyc hits; this is not a sandbox.
         module = types.ModuleType(f"maestro_tool_{descriptor.identifier}")
         module.__file__ = str(descriptor.entrypoint)
-        exec(compile(source, str(descriptor.entrypoint), "exec"), module.__dict__)
+        exec(compile(source, str(descriptor.entrypoint), "exec", dont_inherit=True), module.__dict__)
         run = getattr(module, descriptor.function, None)
         if not callable(run):
             raise ToolRuntimeError(f"Tool {descriptor.identifier} does not expose {descriptor.function}(parameters).")

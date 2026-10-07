@@ -527,12 +527,16 @@ Return {\"observations\":[\"...\"],\"quality_concerns\":[\"...\"],
         )
         return VisualInspection(
             path=path,
-            observations=_text_items(data.get("observations")),
-            quality_concerns=_text_items(data.get("quality_concerns")),
+            observations=text_items(data.get("observations")),
+            quality_concerns=text_items(data.get("quality_concerns")),
             decision_relevance=str(data.get("decision_relevance") or "No relevance stated."),
-            limitations=_text_items(data.get("limitations")),
+            limitations=text_items(data.get("limitations")),
         )
 
 
-def _text_items(value: Any) -> tuple[str, ...]:
+def text_items(value: Any) -> tuple[str, ...]:
     return tuple(item.strip() for item in value if isinstance(item, str) and item.strip()) if isinstance(value, list) else ()
+
+
+def optional_text(value: Any) -> str | None:
+    return value.strip() if isinstance(value, str) and value.strip() else None

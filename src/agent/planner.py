@@ -10,7 +10,7 @@ from pathlib import Path
 from maestro.case_memory import EpisodeStore, case_memory_enabled
 from maestro.adaptive_retrieval import FeatureArm
 from maestro.hypothesis_forecast import CaseMemoryOutcomeForecaster
-from .llm import JsonCompleter
+from .llm import JsonCompleter, optional_text as _optional_text, text_items as _texts
 
 
 _Parsed = TypeVar("_Parsed")
@@ -411,16 +411,8 @@ def _development_action(value: Any) -> DevelopmentAction | None:
         return None
 
 
-def _texts(value: Any) -> tuple[str, ...]:
-    return tuple(item.strip() for item in value if isinstance(item, str) and item.strip()) if isinstance(value, list) else ()
-
-
 def _text(value: Any, fallback: str) -> str:
     return value.strip() if isinstance(value, str) and value.strip() else fallback
-
-
-def _optional_text(value: Any) -> str | None:
-    return value.strip() if isinstance(value, str) and value.strip() else None
 
 
 def forecaster_from_environment(

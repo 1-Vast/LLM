@@ -7,11 +7,10 @@ bytes are verified again before invocation. Receipts retain their declared evide
 
 | Directory | Registered Capability IDs |
 |---|---|
-| `data/` | `data_profile`, `column_summary`, `table_filter` |
-| `evidence/` | `evidence_bundle_optimize`, `multimodal_alignment`, `typed_decision_review` |
+| `analysis/` | `data_profile`, `column_summary`, `table_filter`, `evidence_bundle_optimize`, `multimodal_alignment`, `typed_decision_review`, `condition_sources` |
 | `prediction/` | `signature_retrieval`, `virtual_cell_query` |
 | `case_memory/` | `case_memory`; case construction, audit and replay commands |
-| `datasets/` | `condition_sources`; discovery, hash-pinned acquisition, data construction and QA |
+| `datasets/` | Discovery, hash-pinned acquisition, condition-source lookup implementation, data construction and QA |
 | `evaluation/` | Case replay, costs and scoring (no runtime manifest) |
 
 The larger case-memory workflow is grouped under `case_memory/`: its builders and validation

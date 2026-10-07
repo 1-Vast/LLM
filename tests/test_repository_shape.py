@@ -128,11 +128,9 @@ def test_tools_are_folder_scoped_runtime_components():
     manifests = sorted(set((ROOT / "tools").glob("*/manifest.json"))
                        | set((ROOT / "tools").glob("*/*.manifest.json")))
     assert {path.parent.name for path in manifests} == {
-        "data",
-        "evidence",
+        "analysis",
         "prediction",
         "case_memory",
-        "datasets",
     }
     assert all((path.parent / json.loads(path.read_text(encoding="utf-8"))["entrypoint"]).is_file()
                for path in manifests)

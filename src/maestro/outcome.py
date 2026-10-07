@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Mapping, Protocol, Sequence
 
+from .composition import finite_number as _finite_number
 from .models import (
     BiologicalQuantity,
     EvidenceAction,
@@ -601,10 +602,6 @@ class InterpretationTable:
             elif abs(expected - observed) > self._time_tolerance:
                 unmatched.append(f"time:{observed}!={expected}")
         return tuple(unmatched)
-
-
-def _finite_number(value: object) -> bool:
-    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
 
 
 def _valid_units(value: object, *, minimum: int = 1) -> bool:

@@ -81,3 +81,16 @@ code mappings record original identities, canonical replacements and verificatio
 The root README, task contract and innovation statement were shortened around
 current supported responsibilities. Actual datasets, numerical facts, frozen
 algorithm inputs and unique failed-execution evidence remain separate.
+
+### Function consolidation follow-up
+
+The registered read-only adapters now share `tools/analysis/`; their seven IDs,
+schemas, evidence types and parameter boundaries remain separate. Exact-condition
+lookup uses the same adapter, removing its standalone forwarding module while
+retaining its condition-matching implementation and avoiding repeated class setup.
+Agent text-response parsing shares the existing LLM module; measured-condition
+and action validation share the existing finite-number gate. No new scientific
+experiment or API call was made. Direct registration exposed inherited Python
+compiler flags; the runtime now compiles each entrypoint with its own flags.
+The reproducing dataclass test and final regression receipts are recorded in
+[function_consolidation.json](function_consolidation.json).
