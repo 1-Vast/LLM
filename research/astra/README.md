@@ -1,5 +1,26 @@
 # ASTRA: dual-core research adjustments
 
+Current study interpretation and maintenance are indexed in
+[repeat optimization](repeat_optimization_20261006/README.md).
+Earlier public-input work remains in
+[knowledge optimization](knowledge_optimization_20261004/README.md).
+The imported [knowledge study](knowledge_transfer_20261004/REPORT_ZH.md) is a
+byte-preserved completed experiment. New retrieval code lives in
+`tools/datasets/biological_knowledge.py`; training proposals and verification
+remain in research. Public basal profiles are static cell-line information,
+not measurements of a new culture's decision-time state.
+
+Recent research separates immutable experiments from maintained tools and designs:
+
+| Entry | Maintenance role |
+|---|---|
+| `knowledge_transfer_20261004/` | Frozen three-model results, original data and reusable snapshot assets; rerun only in an isolated copy |
+| `knowledge_optimization_20261004/` | Maintained original knowledge verifier and retrieval tests; pretraining design superseded by the executed mono study |
+| `mono_pretraining_20261005/` | Frozen mono-pretraining study, v1 and v1.1 retained; E combination evaluation not run, E mono data partly used; residual correlation is not a variance ceiling |
+| `repeat_signal_20261005/` | Byte-preserved strict-repeat, raw-well and recovered biological-feature experiments; archive report supersedes the supplied earlier root report |
+| `repeat_optimization_20261006/` | Current independent verification, feature-access tests, review and next first-screen design; no alternative executor or fact store |
+| `solution_exploration_20261004/` | Native batch-action and raw-response recovery design; not an executed experiment |
+
 The current [feedback-closure report](FEEDBACK_CLOSURE.md) fixes reproduced
 fact/condition/recovery defects and freezes the main architecture. Its complete-menu
 pilot registration explicitly blocks execution on missing scientific records.
