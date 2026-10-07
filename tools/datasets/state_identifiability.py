@@ -6,18 +6,12 @@ The historical lineage reconstruction command is checkout-local research:
 from __future__ import annotations
 
 from datetime import datetime
-import hashlib
+from tools.case_memory import sha256
 import json
 from pathlib import Path
 import re
 
 
-def sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(4 << 20), b""):
-            digest.update(block)
-    return digest.hexdigest()
 
 
 def write_json(path: Path, value: object) -> None:

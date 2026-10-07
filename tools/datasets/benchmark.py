@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import argparse
 import gzip
-import hashlib
+from tools.case_memory import sha256 as sha256_file
 import json
 import io
 from pathlib import Path
@@ -28,12 +28,6 @@ DEFAULT_OUT = ROOT / "data/processed/model_experiment_v1"
 TASKS = ("sciplex3_A", "sciplex3_B", "l1000_LT", "l1000_T")
 
 
-def sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1 << 20), b""):
-            digest.update(block)
-    return digest.hexdigest()
 
 
 def _json_default(value):

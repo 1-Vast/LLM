@@ -84,9 +84,15 @@ class PredictionCoordinator:
         )
         if request is not None:
             try:
+                if prediction_request is not None and (
+                    request.case_id != case_id or request.contrast_id != contrast.identifier
+                    or request.plan_version != ((case.plan_version + 1) if case else 1)
+                ):
+                    raise ValueError("explicit_query_plan_identity_mismatch")
                 bound = request.intervention.for_action(contrast.plan, request.context, request.readouts)
-                if bound != request.intervention:
+                if prediction_request is not None and bound != request.intervention:
                     raise ValueError("explicit_query_action_conditions_mismatch")
+                request = replace(request, intervention=bound)
             except ValueError as error:
                 self._logger.event("virtual_cell_query_not_built",
                                    {"reasons": {contrast.plan.identifier: str(error)}}, session_id=session_id)

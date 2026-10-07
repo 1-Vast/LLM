@@ -18,7 +18,7 @@ Success requires named refusal of unsupported modes; observable shadow/active fo
 
 Workspace: `D:\MAESTRO`. Interpreter: `D:\anaconda\envs\maestro\python.exe`, Python 3.11.16, Windows/PowerShell, existing maestro environment. Exact package versions and per-file code SHA-256 are recorded by each `execution.json`. Live provider calls, external downloads, new model training and fresh STATE inference were not performed.
 
-The data review describes 21 dataset/version records, 39 hashed source snapshots and seven explicitly scoped checks in [data_readiness.json](../../research/dual_core_completion/data_readiness.json). It rescanned the model_experiment_v1 public/hidden boundary: 6,601 one-to-one episodes and 49,304 action records, no forbidden public fields, no source unit crossing folds and matching menu action sets. Other statistics distinguish fresh recounts from cited frozen receipts. Read [DATA_READINESS.md](../../research/dual_core_completion/DATA_READINESS.md) before interpreting dataset eligibility.
+The data review describes 21 dataset/version records, 39 hashed source snapshots and seven explicitly scoped checks in [data_readiness.json](../../research/dual_core_completion/data_readiness.json). It rescanned the model_experiment_v1 public/hidden boundary: 6,601 one-to-one episodes and 49,304 action records, no forbidden public fields, no source unit crossing folds and matching menu action sets. Other statistics distinguish fresh recounts from cited frozen receipts. Read [DATA_READINESS.md](../../research/EVIDENCE.md#dual_core_completion) before interpreting dataset eligibility.
 
 ## 4. Experimental design and controls
 
@@ -63,7 +63,7 @@ STATE conclusions remain restricted to currently registered, previously exposed 
 
 ## 8. Reproduction and artifact ledger
 
-Code: [workflow and commands](../../research/dual_core_completion/README.md), [write-once verifier](../../research/dual_core_completion/verify.py). Source/statistic attribution: [data qualification](../../research/dual_core_completion/DATA_READINESS.md) and its JSON companion. Durable verification copies belong in `research/dual_core_completion/results/20261001/`; large historical local assets stay in their registered locations.
+Code: [workflow and commands](../../research/EVIDENCE.md#dual_core_completion), [write-once verifier](../../research/dual_core_completion/verify.py). Source/statistic attribution: [data qualification](../../research/EVIDENCE.md#dual_core_completion) and its JSON companion. Durable verification copies belong in `research/dual_core_completion/results/20261001/`; large historical local assets stay in their registered locations.
 
 Executed full commands (from the workspace root):
 
@@ -91,7 +91,7 @@ This is a new execution record on the actual verification date. Reviews read loc
 
 ### 11.1 Questions, comparison and source review
 
-The follow-up starts from delivered commit `5d982070fe88e04a2fb1ee5212a8eed39e8df405`. Three delegated investigations cover the policy/forecast connection, case-memory data target, and acquisition/evidence objective. Primary-source literature is reviewed in [LITERATURE.md](../../research/dual_core_followup/LITERATURE.md), [DATA_LITERATURE.md](../../research/dual_core_followup/DATA_LITERATURE.md) and [DECISION_CONTRACT.md](../../research/dual_core_followup/DECISION_CONTRACT.md), with access limits and publication status in the [source ledger](../../research/dual_core_followup/literature_sources.json). A focused review is not claimed to be a systematic literature survey.
+The follow-up starts from delivered commit `5d982070fe88e04a2fb1ee5212a8eed39e8df405`. Three delegated investigations cover the policy/forecast connection, case-memory data target, and acquisition/evidence objective. Primary-source literature is reviewed in [LITERATURE.md](../../research/EVIDENCE.md#dual_core_followup), [DATA_LITERATURE.md](../../research/EVIDENCE.md#dual_core_followup) and [DECISION_CONTRACT.md](../../research/EVIDENCE.md#dual_core_followup), with access limits and publication status in the [source ledger](../../research/dual_core_followup/literature_sources.json). A focused review is not claimed to be a systematic literature survey.
 
 The only new policy intervention sets the existing planner's legal fixed-action anchor and `deviation_z=1.645`. The four preregistered arms are fixed/no forecast, baseline/reference, anchored/reference and anchored/permuted on the frozen SciPlex3 B and L1000 LT episodes, five folds each. Predictor parameters, prior, menus, budgets, QC, endpoint and maximum measurements stay frozen. This heuristic carries no safe-policy-improvement guarantee; it is not an implementation of SPIBB. The test folds do not pick a parameter or winning model. All effects belong to ReferenceWorld and its policy, not STATE or WorldV2.
 
@@ -151,7 +151,7 @@ Executed experiment commands use the existing maestro environment from `D:\MAEST
 & 'D:\anaconda\envs\maestro\python.exe' -m research.dual_core_completion.verify --out outputs/dual_core_followup_20261001/verification_recovery_01
 ```
 
-Every rerun requires a new leaf directory and declared local assets. [Follow-up report](../../research/dual_core_followup/README.md) links commands, episode paths, task summaries and [publication hashes](../../research/dual_core_followup/results/20261001/manifest.json). Copied or gzipped published tables retain exact original bytes; oversized or incomplete compressed banks stay local with their hashes.
+Every rerun requires a new leaf directory and declared local assets. [Follow-up report](../../research/EVIDENCE.md#dual_core_followup) links commands, episode paths, task summaries and [publication hashes](../../research/dual_core_followup/results/20261001/manifest.json). Copied or gzipped published tables retain exact original bytes; oversized or incomplete compressed banks stay local with their hashes.
 
 All data, labels and development folds remain exposed. Chemical skeleton/component unit-mean bootstrap inference is separate by task; shared physical plate/batch dependence does not provide an independent physical interval. Reading quality is conditional proxy-label quality, averaged within episode then chemical unit. Fixed has no forecast ranking; later ranking comparisons can follow different measured histories. Common decided/acted coverage is descriptive and outcome-conditioned, not a calibrated pre-action risk guarantee.
 
@@ -159,7 +159,7 @@ No new training, model grid, live biological/provider experiment, oracle policy,
 
 ## 12. Live APIs, generic contracts and independent defect review
 
-This extension executes actual DeepSeek and TypeSafe Jev requests under the existing maestro environment, following the user's explicit provider instruction. The preceding section's no-live-experiment statement describes its own earlier protocol. The design/implementation, primary literature access, metrics and pre-experiment hypotheses are in [DESIGN_REVIEW.md](../../research/dual_core_live/DESIGN_REVIEW.md); provider documentation and role assignment are in [API_DESIGN.md](../../research/dual_core_live/API_DESIGN.md).
+This extension executes actual DeepSeek and TypeSafe Jev requests under the existing maestro environment, following the user's explicit provider instruction. The preceding section's no-live-experiment statement describes its own earlier protocol. The design/implementation, primary literature access, metrics and pre-experiment hypotheses are in [DESIGN_REVIEW.md](../../research/EVIDENCE.md#dual_core_live); provider documentation and role assignment are in [API_DESIGN.md](../../research/EVIDENCE.md#dual_core_live).
 
 ### 12.1 Roles, frozen design and scientific scope
 
@@ -227,7 +227,7 @@ Use fresh leaf directories for every replay. The live recovery command reuses re
 & 'D:\anaconda\envs\maestro\python.exe' -m research.dual_core_live.benchmark recover --from-run outputs/dual_core_live_20261001/fixed_benchmark_v1 --out outputs/dual_core_live_20261001/fixed_benchmark_recovered_new
 ```
 
-The [live report](../../research/dual_core_live/API_RESULTS.md) gives the full grouped metrics and commands. The [publication manifest](../../research/dual_core_live/results/20261001/manifest.json) binds every archived receipt to original bytes and records source/input hashes, code version, run command and environment. Existing Round 1/2 and earlier follow-up freezes remain unchanged.
+The [live report](../../research/EVIDENCE.md#dual_core_live) gives the full grouped metrics and commands. The [publication manifest](../../research/dual_core_live/results/20261001/manifest.json) binds every archived receipt to original bytes and records source/input hashes, code version, run command and environment. Existing Round 1/2 and earlier follow-up freezes remain unchanged.
 
 ## 13. Repairs prompted by negative results
 
@@ -245,7 +245,7 @@ An independent report-only audit recomputes 2,936 original/recovered checks: 522
 
 The post-fix full regression has **1,621 passes, one inherited historical Markdown-language failure, two fitting checks excluded**, no errors/skips/source drift. All 333 frozen historical files and 39 data-review source identities match. Strict validation still records the inherited failure. Twenty-eight support, nine prospective and two uncertainty tests are included in this scope; they are not independent scientific experiments.
 
-Current execution source bytes are additionally archived under execution_sources/ (296 files), so their SHA256 records survive Git line-ending normalization. Original pre-serialization source is separately archived. The [post-fix report](../../research/dual_core_live/POST_FIX_RESULTS.md), [design record](../../research/dual_core_live/DESIGN_REVIEW.md), episode/response tables and [publication manifest](../../research/dual_core_live/results/20261001/manifest.json) retain expected versus observed conclusions, commands, environments and hashes.
+Current execution source bytes are additionally archived under execution_sources/ (296 files), so their SHA256 records survive Git line-ending normalization. Original pre-serialization source is separately archived. The [post-fix report](../../research/EVIDENCE.md#dual_core_live), [design record](../../research/EVIDENCE.md#dual_core_live), episode/response tables and [publication manifest](../../research/dual_core_live/results/20261001/manifest.json) retain expected versus observed conclusions, commands, environments and hashes.
 
 Resolved: reproduced runtime defects, explicit support-rule violations under the optional contract, serializer failure and single-unit uncertainty reporting. Retained as scientific limitations: null biological terminal gain, costs saved mainly by refusal, external-provider judgment errors, exposed-data scope and unresolved source counterfactuals outside the pilot. The validator and evidence rules are not relaxed to change those conclusions.
 
@@ -263,8 +263,8 @@ This is a data-identifiability result, not evidence that biological state has no
 value. The earlier ReferenceWorld pilot and exposed-card repairs are not reused
 as STATE, WorldV2 or state-gain evidence.
 
-The complete entry point is [tools/datasets/STATE_IDENTIFIABILITY.md](../../tools/datasets/STATE_IDENTIFIABILITY.md).
-The [source and collection plan](../../tools/datasets/STATE_DATA_PLAN.md) specifies
+The complete entry point is [tools/datasets/STATE_IDENTIFIABILITY.md](../../research/EVIDENCE.md#state-data-audits).
+The [source and collection plan](../../research/EVIDENCE.md#state-data-audits) specifies
 the records required next. [Published byte receipts](../../tools/datasets/audit_results/20261001_state/manifest.json)
 retain local frozen inputs, raw/public metadata, failures and all commands.
 Local originals are `outputs/state_identifiability_20261001/`; previous outputs
@@ -495,7 +495,7 @@ fixtures do not certify data eligibility or biological performance.
 ### 14.7 Required next evidence
 
 Priority is operational event/sample/attempt records, not a more complex planner
-or larger synthetic card set. The [collection plan](../../tools/datasets/STATE_DATA_PLAN.md)
+or larger synthetic card set. The [collection plan](../../research/EVIDENCE.md#state-data-audits)
 specifies state, attempts, response and checkpoint-exposure exports; same-well
 live frames or randomized matched sister aliquots; independent physical batches
 with identical action menus; actual QC/failures, shared controls, costs and
@@ -738,7 +738,7 @@ output names before rerunning their write-once scripts.
 
 ### 15.6 Concrete collection delivery and conclusions
 
-[The collection specification](../../tools/datasets/state_collection_20261001/README.md)
+[The collection specification](../../research/EVIDENCE.md#state-data-audits)
 and five empty CSV schemas define native enrollment, raw/online-feature hashes,
 processed-state availability before randomized assignment, actual hardware
 acknowledgements, both actions, controls, track losses/QC, true culture/chip units
@@ -944,7 +944,7 @@ on `codex/state-prospective-certification-20261001`. The supplied AGENTS.md
 instructions govern the work; there is no on-disk root AGENTS.md. Sections 15/16
 remain historical records. The new Chinese report, raw-source receipts, failures,
 freezes, software and numerical results are indexed in
-[the prospective-input and knowledge report](../../tools/datasets/audit_results/20261001_state_prospective/REPORT.md).
+[the prospective-input and knowledge report](../../research/EVIDENCE.md#state-data-audits).
 
 ### 17.1 Environment and actual STATE forwards
 
@@ -996,7 +996,7 @@ uses future resistant barcodes to identify baseline cells retrospectively. These
 are specific evidence limitations, not a rule requiring both potential outcomes
 on one cell. Two additional search leads remain unreviewed, not falsely excluded.
 
-[Five relation templates and collection instructions](../../tools/datasets/audit_results/20261001_state_prospective/collection/README.md)
+[Five relation templates and collection instructions](../../research/EVIDENCE.md#state-data-audits)
 cover independent parents, baseline RNA, completed/readable processing, decision,
 randomized sister aliquots, two actions plus vehicle, waiting drift, all failures,
 QC, endpoints and costs. Structural validation is explicitly insufficient for
@@ -1061,7 +1061,7 @@ deployment value are **untested/unidentified**, not measured zero effects.
 
 This round continued from `1d8c9440070b77f43094c9f5da81d3f88a3964f4`, preserving existing work. The user-provided Karpathy guidelines were applied; no on-disk AGENTS.md was found. A/B/C/D hypotheses and verifiable conditions preceded input recovery, state sensitivity, retrospective prediction and knowledge-model diagnosis.
 
-The [complete report](../../tools/datasets/audit_results/20261001_state_response/REPORT.md) and [minimum collection addendum](../../tools/datasets/audit_results/20261001_state_response/collection_addendum.md) preserve original sources, freezes, failures and receipts in `20261001_state_response`. Earlier frozen results remain unchanged.
+The [complete report](../../research/EVIDENCE.md#state-data-audits) and [minimum collection addendum](../../research/EVIDENCE.md#state-data-audits) preserve original sources, freezes, failures and receipts in `20261001_state_response`. Earlier frozen results remain unchanged.
 
 ### 18.1 Partial raw RNA reconstruction; full certification remains incomplete
 

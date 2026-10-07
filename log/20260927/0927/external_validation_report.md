@@ -220,9 +220,9 @@ Largest stratum miscalibration (correct-reading forecasts, strata with 50 or mor
 
 ## Figures
 
-- [correct_cost](figures/correct_cost.png)
-- [wrong_cost](figures/wrong_cost.png)
-- [risk_coverage](figures/risk_coverage.png)
+- Historical figure `figures/correct_cost.png` (unavailable in this checkout).
+- Historical figure `figures/wrong_cost.png` (unavailable in this checkout).
+- Historical figure `figures/risk_coverage.png` (unavailable in this checkout).
 
 External comparator frozen for a future study: `fixed`.
 Not executed: {'maestro_vc_jev': 'provider_arm_reserved_for_external_study'}.

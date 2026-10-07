@@ -14,7 +14,7 @@ python -m tools.datasets.biological_knowledge --database research/astra/repeat_s
 Protein influence and transcriptional regulation remain separate relation
 layers. Missing activity records are unavailable, not zeros; complex components
 are not expanded into direct-binding claims. The snapshot's original source
-licenses still apply. [Verification and asset recovery](../../research/astra/knowledge_optimization_20261004/README.md)
+licenses still apply. [Verification and asset recovery](../../research/EVIDENCE.md#knowledge_optimization_20261004)
 are explicit research operations.
 
 `repeat_features` reads the distinct feature-catalog schema: basal pathways,
@@ -23,7 +23,7 @@ It rejects outcome-containing experimental evidence databases. Hotspot zero is
 not verified wild type, missing dependency is not zero effect, and CRISPR
 knockout is not drug inhibition. The original `context`, `drug` and `paths`
 operations continue to require the original biological-knowledge schema.
-The [repeat maintenance entry](../../research/astra/repeat_optimization_20261006/README.md)
+The [repeat maintenance entry](../../research/EVIDENCE.md#repeat_optimization_20261006)
 owns snapshot verification and reproduction limits.
 
 This module owns dataset discovery, acquisition, source provenance, response construction
@@ -68,8 +68,8 @@ and leakage checks, not independent external validation or deployment calibratio
 Candidate research history is in `research/dataset_discovery/`; the current audit and module
 changes are in `log/20260929/README.md`. Large assets stay under ignored local `data/`.
 
-The next [real predecision-state audit](STATE_IDENTIFIABILITY.md) reruns raw
+The next [real predecision-state audit](../../research/EVIDENCE.md#state-data-audits) reruns raw
 episode/action joins, inspects twelve local task families and three public
 sources, and stops at its eligibility gate. Collection/verification/construction
-code remains in this module; [STATE_DATA_PLAN.md](STATE_DATA_PLAN.md) specifies
+code remains in this module; [STATE_DATA_PLAN.md](../../research/EVIDENCE.md#state-data-audits) specifies
 the missing event/sample/attempt records required before a state-gain experiment.

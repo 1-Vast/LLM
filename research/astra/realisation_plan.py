@@ -14,7 +14,7 @@ REFERENCE_FILES = {
     "learned_response.py": "src/virtual_cell/learned_response.py",
     "external_data.py": "tools/datasets/lincs_pack.py",
     "orchestrator.py": "src/agent/orchestrator.py",
-    "DUAL_CORE_OPTIMIZATION.md": "research/astra/DUAL_CORE_OPTIMIZATION.md",
+    "DUAL_CORE_OPTIMIZATION.md": "research/EVIDENCE.md",
 }
 
 TABLES = {

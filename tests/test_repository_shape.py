@@ -132,8 +132,10 @@ def test_tools_are_folder_scoped_runtime_components():
         "evidence",
         "prediction",
         "case_memory",
+        "datasets",
     }
-    assert all((path.parent / "tool.py").is_file() for path in manifests)
+    assert all((path.parent / json.loads(path.read_text(encoding="utf-8"))["entrypoint"]).is_file()
+               for path in manifests)
     assert not (ROOT / "tools" / "tool.py").exists()
     shared = ROOT / "tools" / "shared"
     assert not shared.exists()
@@ -210,14 +212,27 @@ def test_project_markdown_has_no_chinese_prose():
 
 
 def _historical_markdown_exemptions():
-    """Preserve registered immutable historical/source records; active prose is English-only."""
+    """Validate original identities or explicitly consolidated English replacements."""
     manifest = json.loads((ROOT / "tests/fixtures/historical_markdown.json").read_text(encoding="utf-8"))
+    consolidation = ROOT / "research/report_consolidation.json"
+    retired = {
+        record["path"]: record
+        for record in json.loads(consolidation.read_text(encoding="utf-8"))["removed"]
+    } if consolidation.is_file() else {}
     for name, record in manifest["files"].items():
         path = ROOT / name
-        assert path.is_file(), f"historical language record is missing: {name}"
         # Git may normalize CRLF. The text hash still detects every content change.
-        digest = hashlib.sha256(path.read_text(encoding="utf-8").encode("utf-8")).hexdigest()
-        assert digest == record["sha256_lf"], f"historical language record changed: {name}"
+        digest = hashlib.sha256(path.read_text(encoding="utf-8").encode("utf-8")).hexdigest() if path.is_file() else None
+        if digest == record["sha256_lf"]:
+            continue
+        removal = retired.get(name)
+        assert removal and removal["status"] == "removed", f"historical record changed without completed consolidation: {name}"
+        assert not path.exists(), f"consolidated original still exists: {name}"
+        assert removal["sha256_lf"] == record["sha256_lf"], f"original historical identity changed: {name}"
+        replacement = ROOT / removal["replacement"].split("#")[0]
+        assert replacement.is_file(), f"consolidated replacement is missing: {name}"
+        prose = MARKDOWN_LINK_DESTINATION.sub("", INLINE_CODE.sub("", replacement.read_text(encoding="utf-8")))
+        assert not CJK_PATTERN.search(prose), f"consolidated replacement is not English: {name}"
     return manifest["files"]
 
 

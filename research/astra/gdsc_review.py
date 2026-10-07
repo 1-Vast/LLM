@@ -29,6 +29,28 @@ def sha(path):
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
+def supplied_report_paths(root=Path(".")):
+    """Use existing original input bytes when a duplicate narrative was retired."""
+    directory = root / "research/astra"
+    evidence = directory / "evidence/20261002_gdsc_inputs"
+    receipt = None
+    paths = []
+    for name in ("GDSC_SCREEN.md", "MAESTRO_GDSC_RESEARCH_REPORT.md", "MAESTRO_GDSC_RESEARCH_REPORT.docx"):
+        original = directory / name
+        if original.is_file():
+            paths.append(original)
+            continue
+        retained = evidence / (name + ".txt" if name.endswith(".md") else name)
+        if not retained.is_file():
+            raise ValueError(f"Retired GDSC source input {name}; restore registered original bytes from the source receipt.")
+        if receipt is None:
+            receipt = json.loads((evidence / "receipt.json").read_text(encoding="utf-8"))
+        if sha(retained) != receipt[name]["sha256"]:
+            raise ValueError(f"Registered GDSC source input changed: {name}")
+        paths.append(retained)
+    return paths
+
+
 def save(path, payload):
     Path(path).write_text(json.dumps(payload, indent=2, allow_nan=False) + "\n", encoding="utf-8")
 
@@ -107,8 +129,7 @@ def run(snapshot, out, dependency_dir=None):
     freeze = results / "20261002_gdsc_freeze_v1"
     dev = results / "20261002_gdsc_development_v1"
     confirm = results / "20261002_gdsc_confirmation_v1"
-    supplied = [Path("research/astra") / name for name in
-                ("GDSC_SCREEN.md", "MAESTRO_GDSC_RESEARCH_REPORT.md", "MAESTRO_GDSC_RESEARCH_REPORT.docx")]
+    supplied = supplied_report_paths()
     input_hashes = {str(p.resolve()): sha(p) for p in supplied + [Path(__file__), snapshot / "snapshot_manifest.json"]}
     save(out / "freeze.json", dict(at_utc=datetime.now(timezone.utc).isoformat(), source_commit=COMMIT,
          inputs=input_hashes, snapshot_files=snapshot_receipt["paths"], analysis="post-outcome independent reproduction and finite sensitivity",

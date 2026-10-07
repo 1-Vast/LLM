@@ -7,6 +7,9 @@ selection:
   policy: "单步接口兼容；select_and_execute_many 每步由 LLM 查看结构化回执后选择，受0至32步、含声明默认值的重复调用和共享有限总预算约束。默认0仅是声明工具成本，不代表LLM/token免费。"
   boundary: "拒绝未批准路径、未注册工具、未知参数/schema、非有限数及不支持的类型或任务；自然语言适用边界交给模型判断，不冒充确定性校验。可信入口在当前进程执行，不是进程沙箱。"
 tools:
+  - id: condition_sources
+    directory: datasets
+    purpose: Resolve exact declared context, drug, dose and source identity in approved metadata; derived analysis, never an authenticated observation or calibration certificate.
   - id: data_profile
     directory: data
     purpose: Profile CSV, TSV, or JSON structure before task-specific analysis.

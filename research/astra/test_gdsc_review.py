@@ -6,6 +6,28 @@ import pytest
 from research.astra.gdsc_review import contribution_table, crossed_mean, grouped_contributions, unit_weights
 
 
+def test_retired_narratives_use_only_registered_original_bytes(tmp_path):
+    import hashlib
+    import json
+    from research.astra.gdsc_review import supplied_report_paths
+    evidence = tmp_path / "research/astra/evidence/20261002_gdsc_inputs"
+    evidence.mkdir(parents=True)
+    receipt = {}
+    for name in ("GDSC_SCREEN.md", "MAESTRO_GDSC_RESEARCH_REPORT.md", "MAESTRO_GDSC_RESEARCH_REPORT.docx"):
+        raw = (name + "\r\nOriginal supplied bytes\r\n").encode()
+        (evidence / (name + ".txt" if name.endswith(".md") else name)).write_bytes(raw)
+        receipt[name] = {"sha256": hashlib.sha256(raw).hexdigest()}
+    (evidence / "receipt.json").write_text(json.dumps(receipt))
+    paths = supplied_report_paths(tmp_path)
+    assert len(paths) == 3 and all(p.parent == evidence for p in paths)
+    paths[0].write_bytes(paths[0].read_bytes().replace(b"\r\n", b"\n"))
+    with pytest.raises(ValueError, match="source input changed"):
+        supplied_report_paths(tmp_path)
+    paths[0].unlink()
+    with pytest.raises(ValueError, match="Retired GDSC source input"):
+        supplied_report_paths(tmp_path)
+
+
 def frame():
     return pd.DataFrame({"BARCODE": list("abcde"), "unit": ["u1", "u1", "u2", "u3", "u4"],
                          "date_cluster": ["d1", "d2", "d1", "d2", "d3"],

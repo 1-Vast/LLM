@@ -1,0 +1,12 @@
+"""Verify actual new model representations without reloading STATE."""
+from pathlib import Path
+import json,hashlib,numpy as np
+B=Path(__file__).resolve().parents[1];W=B/'world';OLD=B.parent/'state_dual_core_20261007';read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();p=read(W/'PROTOCOL.json');freeze=read(W/'FREEZE.json');assert sha(W/'PROTOCOL.json')==freeze['protocol_sha256'];r=np.load(W/'representations.npz');old=np.load(OLD/'world/state_features.npz');assert np.array_equal(r['condition_id'],old['condition_id']);assert r['counterfactual_delta'].shape==(2,144,2000);np.testing.assert_array_equal(r['raw_delta'],r['predicted_mean']-r['basal_mean']);np.testing.assert_array_equal(r['counterfactual_delta'],r['predicted_mean']-r['dmso_mean']);np.testing.assert_array_equal(r['raw_delta'][0],old['state_delta']);assert all(np.isfinite(r[k]).all() for k in r.files if r[k].dtype.kind in 'fi')
+trace=read(W/'forward_trace.json');assert len(trace)==316
+for n in (32,256):
+ control={x['plate']:x for x in trace if x['set_length']==n and x['condition_id'].startswith('control:')};drug=[x for x in trace if x['set_length']==n and not x['condition_id'].startswith('control:')];assert len(drug)==144 and len(control)==14
+ for row in drug:assert row['basal_sha256']==control[row['plate']]['basal_sha256']
+res=read(W/'resources.json');assert res['forwards']==316 and res['model_loads']==1 and res['predictions_sha256']==sha(W/'representations.npz');diag=read(W/'clipping_diagnostics.json');summary=read(W/'diagnostics_summary.json')
+for n in (32,256):
+ rows=[x for x in diag if x['set_length']==n];np.testing.assert_allclose(sum(x['erased_by_relu_values'] for x in rows)/sum(x['nonzero_pre_values'] for x in rows),summary[str(n)]['pre_nonzero_fraction_erased'])
+receipt={'status':'PASS','real_forwards_verified':316,'drug_conditions_per_set_size':144,'matched_DMSO_groups_per_set_size':14,'set_sizes':[32,256],'same_basal_drug_and_DMSO_every_forward':True,'counterfactual_identity_exact':True,'raw32_matches_previous_run_bitwise':True,'predictions_sha256':sha(W/'representations.npz'),'clipping_ratios_independently_rebuilt':True,'scope':'Actual checkpoint numerical representation/identity; no inference of biological usefulness from clipping.'};(B/'verification/representation_independent_verification.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt,indent=2))

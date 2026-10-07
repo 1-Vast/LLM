@@ -338,7 +338,7 @@ the registered STATE checkpoint, historical NCI-H596 pools, Trametinib action me
 16 slots/action, seeds 17/42/103, negative mean log1p EGR1 utility and numerical
 tie tolerance 1e-6. No thresholds, biological test labels or action outcomes are
 changed or invented. Code is `research/astra/zero_audit.py`; full report is
-[`ZERO_AUDIT.md`](../../research/astra/ZERO_AUDIT.md).
+[`ZERO_AUDIT.md`](../../research/EVIDENCE.md#engineering-convergence).
 
 Three agents independently audit statistics, native mapping/model paths and saved
 output/pairing. All nine original request arrays and source manifests match. All
@@ -439,7 +439,7 @@ The user requests separate decision-value and mechanism-value chains, with evide
 uncertainty, a discriminating next experiment and continue/modify/stop criteria for
 all eight questions. Priority remains zero attribution, observed decision space and
 seed aggregation (questions 4, 2, 5). The full response is
-[`EIGHT_QUESTIONS.md`](../../research/astra/EIGHT_QUESTIONS.md).
+[`EIGHT_QUESTIONS.md`](../../research/EVIDENCE.md#engineering-convergence).
 
 New `research/astra/decision_space.py` directly reads the pinned raw c39 metadata
 and EGR1 coordinate, retaining native observation IDs/source rows/sample/plate,
@@ -665,7 +665,7 @@ through direct source inspection and literature access. Work remains in ASTRA;
 existing authorization covers synchronizing research progress to main. No additional
 agent was spawned, production change made, or original PR merged.
 
-The [transport follow-up](../../research/astra/GDSC_TRANSPORT_FOLLOWUP.md) records a
+The [transport follow-up](../../research/EVIDENCE.md#engineering-convergence) records a
 metadata-first scan of the existing example, a real full official GDSC release
 download and the recovered original CTRPv2.0 expanded archive. The official release
 has15,069,449 native records; the CTRP archive has545 compound and12,470,175 raw well

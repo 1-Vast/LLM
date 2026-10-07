@@ -1,9 +1,7 @@
 """Design-specific evidence admission; no controller replay or biological estimation."""
-import hashlib
+from tools.case_memory import sha256
 
 
-def sha256(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def assess(design, evidence):

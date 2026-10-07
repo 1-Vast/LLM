@@ -71,6 +71,7 @@ def test_orchestrator_checks_a_supported_virtual_cell_prediction(tmp_path: Path)
         ),),
         intervention_profile=FunctionalInterventionProfile(mode="inhibition"),
         prediction_request=request,
+        case_id="case-1",
     )
 
     assert turn.prediction is not None and turn.prediction.applicable

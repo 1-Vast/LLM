@@ -155,7 +155,7 @@ All results are EXPLORATORY; intervals are 95% line-bootstrap intervals.
 
 ## 8. Reproduction and artifact ledger
 
-- **Report:** [REPORT.md](../../research/astra/reproducible_allocation_20261003/REPORT.md).
+- **Report:** [REPORT.md](../../research/EVIDENCE.md#reproducible_allocation_20261003).
 - **Manifest:** [RUN_MANIFEST.json](../../research/astra/reproducible_allocation_20261003/RUN_MANIFEST.json),
   with hashes of all study files, commands, runtimes, seeds, the access log and the downloads.
 - **Executable protocol:**
@@ -197,8 +197,8 @@ Every number above is in the cited result or receipt files.
 
 Three specialist agents and a parent receipt audit narrowed the continuation to an information-matched predictor comparison under a resource/deadline contract. The report documents terminal-screen expenditure, the distinction between budget caps and consumption, and the small same-condition feedback signal with its stronger comparator. Historical outcomes remain exploratory; intervals were read rather than refitted. No production code, new model experiment, API call, commit or push occurred.
 
-- Exploration: [REPORT.md](../../research/astra/direction_exploration_20261004_v1/REPORT.md)
-- English continuation: [NEXT_PROMPT.md](../../research/astra/direction_exploration_20261004_v1/NEXT_PROMPT.md)
+- Exploration: [REPORT.md](../../research/EVIDENCE.md#direction_exploration_20261004_v1)
+- English continuation: [NEXT_PROMPT.md](../../research/EVIDENCE.md#direction_exploration_20261004_v1)
 - Source hashes and independently extracted values: [EXPLORATION_RECEIPT.json](../../research/astra/direction_exploration_20261004_v1/EXPLORATION_RECEIPT.json)
 
 
@@ -215,15 +215,15 @@ A bounded study ran on exposed Jaaks 2022 data, so every result is EXPLORATORY. 
 - **Scheduler and agent.** No headroom; no API calls.
 - **Untouched data.** One release qualifies conditionally (Vis et al. 2024 cross-run repeats). It is kept sealed under the stop rule.
 - **Tests.** 481 study tests, 354 core and 22 shape tests passed.
-- **Records.** Nothing committed. Report: [REPORT.md](../../research/astra/confirmation_campaign_20261004/REPORT.md); manifest: [RUN_MANIFEST.json](../../research/astra/confirmation_campaign_20261004/RUN_MANIFEST.json); blocking receipt: `research/astra/confirmation_campaign_20261004/receipts/evaluation_blocking.json`.
+- **Records.** Nothing committed. Report: [REPORT.md](../../research/EVIDENCE.md#confirmation_campaign_20261004); manifest: [RUN_MANIFEST.json](../../research/astra/confirmation_campaign_20261004/RUN_MANIFEST.json); blocking receipt: `research/astra/confirmation_campaign_20261004/receipts/evaluation_blocking.json`.
 
 
 ## Constructive solution exploration (2026-10-04)
 
 Three agents investigated solutions rather than extending the previous stop conclusion. The selected next task is native plate-set acquisition with fixed predictions and first-round purchases, followed by independent raw-response recovery and a bounded potency/efficacy predictor. Parent checks confirmed the 2–7 components per side and the local raw intensity schema. Vis author endpoint code was inspected; fitted evaluation values and supplementary outcome tables remain unopened. No campaign/model experiment, API inference, source change or Git publication occurred.
 
-- [Solution report](../../research/astra/solution_exploration_20261004/REPORT.md)
-- [English execution prompt](../../research/astra/solution_exploration_20261004/NEXT_PROMPT.md)
+- [Solution report](../../research/EVIDENCE.md#solution_exploration_20261004)
+- [English execution prompt](../../research/EVIDENCE.md#solution_exploration_20261004)
 - [Exploration receipt](../../research/astra/solution_exploration_20261004/EXPLORATION_RECEIPT.json)
 
 
@@ -233,7 +233,7 @@ Imported the 83-file supplied knowledge package without changing its bytes. Thre
 
 The original 14 synthetic checks and four new query tests pass; related structure/collection checks bring the executed range to 45 passing tests. No model training, Vis outcome access, paid inference, src change or Git publication. Local GDSC2 metadata supports a staged 14-pathway mono-pretraining design; metadata coverage is not QC or sample independence.
 
-- [Optimization and curation report](../../research/astra/knowledge_optimization_20261004/REPORT_ZH.md)
-- [Current maintenance and reproduction entry](../../research/astra/knowledge_optimization_20261004/README.md)
+- [Optimization and curation report](../../research/EVIDENCE.md#knowledge_optimization_20261004)
+- [Current maintenance and reproduction entry](../../research/EVIDENCE.md#knowledge_optimization_20261004)
 - [Pretraining design](../../research/astra/knowledge_optimization_20261004/PRETRAINING_PROTOCOL.json)
 - [Run manifest](../../research/astra/knowledge_optimization_20261004/RUN_MANIFEST.json)

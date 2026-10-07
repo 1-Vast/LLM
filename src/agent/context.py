@@ -166,7 +166,8 @@ class ContextBuilder:
             return packet
         return self._packet(packet.intent, packet.evidence, packet.memories, visual_reviews=summaries)
 
-    def add_tool_execution(self, packet: ContextPacket, execution: "ToolExecution") -> ContextPacket:
+    def add_tool_execution(self, packet: ContextPacket, execution: "ToolExecution", *,
+                           case_id: str | None = None) -> ContextPacket:
         """Persist dataset observations with provenance, then expose their limits to the planner."""
 
         source = f"tool:{execution.tool_id}:{execution.dataset_path.name}"
@@ -181,13 +182,15 @@ class ContextBuilder:
                 ),
                 status=status_for_kind(execution.evidence_kind),
                 evidence_kind=execution.evidence_kind,
+                case_id=case_id,
+                identifier="tool:" + json.dumps([case_id, execution.receipt.request_id], separators=(",", ":")),
                 payload={"tool_payload": dict(execution.payload),
                          "receipt": execution.to_dict().get("receipt")},
             ),
         )
         return self._packet(
             packet.intent,
-            records + packet.evidence,
+            records + tuple(item for item in packet.evidence if item.identifier != records[0].identifier),
             packet.memories,
             visual_reviews=packet.visual_reviews,
         )

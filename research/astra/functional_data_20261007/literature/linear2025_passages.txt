@@ -1,0 +1,115 @@
+Recent research in deep-learning-based foundation models promises to learn representations of single-cell data that enable prediction of the effects of genetic perturbations. Here we compared five foundation models and two other deep learning models against deliberately simple baselines for predicting transcriptome changes after single or double perturbations. None outperformed the baselines, which highlights the importance of critical benchmarking in directing and evaluating method development.
+
+The analysis presented in this Brief Communication shows that, despite their complexity, current deep learning models do not outperform linear baselines in predicting gene perturbation effects, thus emphasizing the importance of further method development and thorough evaluation.
+
+In the present study, we benchmarked the performance of these models against GEARS9 and CPA10 and against deliberately simplistic baselines. To provide additional perspective, we also included three single-cell foundation models—scBERT4, Geneformer5 and UCE6—that were not explicitly designed for this task but can be repurposed for it by combining them with a linear decoder that maps the cell embedding to the gene expression space. In the figures, we marked their results with an asterisk.
+
+For comparison, we included two simple baselines: (1) the ‘no change’ model that always predicts the same expression as in the control condition and (2) the ‘additive’ model that, for each double perturbation, predicts the sum of the individual logarithmic fold changes (LFCs). Neither uses the double perturbation data.
+
+All models had a prediction error substantially higher than the additive baseline (Fig. 1a,b). Here, prediction error is the L2 distance between predicted and observed expression values for the 1,000 most highly expressed genes. We also examined other summary statistics, such as the Pearson delta measure, and L2 distances for other gene subsets: the n most highly expressed or the n most differentially expressed genes, for various n. We got the same overall result (Extended Data Fig. 2).Fig. 1Double perturbation prediction.a, Beeswarm plot of the prediction errors for 62 double perturbations across five test–training splits. The prediction error is measured by the L2 distance between the predicted and the observed expression profile of the n = 1,000 most highly expressed genes. The horizontal red lines show the mean per model, which, for the best-performing model, is extended by the dashed line. b, Scatterplots of observed versus predicted expression from one example of the 62 double perturbations. The numbers indicate error measured by the L2 distance and the Pearson delta (R2). c, TPR (recall) of the interaction predictions as a function of the false discovery proportion. FN, false negative; FP, false positive; TP, true positive. d, Schematic of the classification of interactions based on the difference from the additive expectation (the error bars show the additive range). e, Bar chart of the composition of the observed interaction classes. f, Top: scatterplot of observed versus predicted expression compared to the additive expectation. Each point is one of the 1,000 read-out genes under one of the 62 double perturbations across five test–training splits. The 500 predictions that deviated most from the additive expectation are depicted with bigger and more saturated points. Bottom: mosaic plots that compare the composition of highlighted predictions from the top panel stratified by the interaction class of the prediction. The width of the bars is scaled to match the number of instances. Source data for Fig. 1 are provided. expr., expression.Source data
+
+None of the models was better than the ‘no change’ baseline. The same ranking of models was observed when using other metrics (Extended Data Fig. 4).
+
+To further dissect this finding, we classified the interactions as ‘buffering’, ‘synergistic’ or ‘opposite’ (Fig. 1d,e and Methods). All models mostly predicted buffering interactions. The ‘no change’ baseline cannot, by definition, find synergistic interactions, but also the deep learning models rarely predicted synergistic interactions, and it was even rarer that those predictions were correct (Fig. 1f).
+
+To our surprise, we often found the same pair of hemoglobin genes (HBG2 and HBZ) among the top predicted interactions, across models and double perturbations (Extended Data Fig. 5). Examining the data, we noted that all models except Geneformer and scFoundation predicted LFC ≈ 0—like the ‘no change’ baseline—for the double perturbation of these two genes, despite their strong individual effects (Extended Data Fig. 6). More generally, we noted that, for most genes, the predictions of scGPT, UCE and scBERT did not vary across perturbations, and those of GEARS and scFoundation varied considerably less than the ground truth (Extended Data Fig. 7).
+
+GEARS, scGPT and scFoundation also claim the ability to predict the effect of unseen perturbations. GEARS uses shared Gene Ontology12 annotations to extrapolate from the training data, whereas the foundation models are supposed to have learned the relationships between genes during pretraining to predict unseen perturbations.
+
+As a baseline, we devised a simple linear model. It represents each read-out gene with a K-dimensional vector and each perturbation with an L-dimensional vector. These vectors are collected in the matrices G, with one row per read-out gene, and P, with one row per perturbation. G and P are either obtained as dimension-reducing embeddings of the training data (Methods) or provided by an external source (see below). Then, given a data matrix Ytrain of gene expression values, with one row per read-out gene and one column per perturbation (that is, per condition pseudobulk of the single-cell data), the K × L matrix W is found as1\documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym} 
+				\usepackage{amsfonts} 
+				\usepackage{amssymb} 
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$$\mathop{{\rm{argmin}}}\limits_{{\bf{W}}}| | {{\bf{Y}}}_{{\rm{train}}}-({\bf{G}}{\bf{W}}{{\bf{P}}}^{T}+{\boldsymbol{b}})| {| }_{2}^{2},$$\end{document}argminW∣∣Ytrain−(GWPT+b)∣∣22,where b is the vector of row means of Ytrain (Fig. 2b).Fig. 2Single perturbation prediction.a, Beeswarm plot of the prediction errors for 134, 210 and 24 unseen single perturbations across two test–training splits (Methods). The prediction error is measured by the L2 distance between the mean predicted and observed expression profile of the n = 1,000 most highly expressed genes. The horizontal red lines show the mean per model, which, for the best-performing model, is extended by the dashed line. DL, deep learning; LM, linear model. b, Schematic of the LM and how it can accommodate available gene (G) or perturbation (P) embeddings. c, Forest plot comparing the performance of all models relative to the error of the ‘mean’ baseline. The point ranges show the overall mean and 95% confidence interval of the bootstrapped mean ratio between each model and the baseline for 134, 210 and 24 unseen single perturbations across two test–training splits. The opacity of the point range is reduced if the confidence interval contains 0. Source data for Fig. 2 are provided.Source data
+
+a, Beeswarm plot of the prediction errors for 134, 210 and 24 unseen single perturbations across two test–training splits (Methods). The prediction error is measured by the L2 distance between the mean predicted and observed expression profile of the n = 1,000 most highly expressed genes. The horizontal red lines show the mean per model, which, for the best-performing model, is extended by the dashed line. DL, deep learning; LM, linear model. b, Schematic of the LM and how it can accommodate available gene (G) or perturbation (P) embeddings. c, Forest plot comparing the performance of all models relative to the error of the ‘mean’ baseline. The point ranges show the overall mean and 95% confidence interval of the bootstrapped mean ratio between each model and the baseline for 134, 210 and 24 unseen single perturbations across two test–training splits. The opacity of the point range is reduced if the confidence interval contains 0. Source data for Fig. 2 are provided.
+
+We also included an even simpler baseline, b, the mean across the perturbations in the training set, following the preprints by Kernfeld et al.15 and Csendes et al.16 that appeared while this paper was in revision.
+
+None of the deep learning models was able to consistently outperform the mean prediction or the linear model (Fig. 2a and Extended Data Fig. 8). We did not include scFoundation in this benchmark, as it required each dataset to exactly match the genes from its own pretraining data, and, for the Adamson and Replogle data, most of the required genes were missing. We also did not include CPA, as it is not designed to predict the effects of unseen perturbations.
+
+Next, we asked whether we could find utility in the data representations that GEARS, scGPT and scFoundation had learned during their pretraining. We extracted a gene embedding matrix G from scFoundation and scGPT, respectively, and a perturbation embedding matrix P from GEARS. The above linear model, equipped with these embeddings, performed as well or better than scGPT and GEARS with their in-built decoders (Fig. 2c). Furthermore, the linear models with the gene embeddings from scFoundation and scGPT outperformed the ‘mean’ baseline, but they did not consistently outperform the linear model using G and P from the training data.
+
+The approach that did consistently outperform all other models was a linear model with P pretrained on the Replogle data (using the K562 cell line data as pretraining for the Adamson and RPE1 data and the RPE1 cell line for the K562 data). The predictions were more accurate for genes that were more similar between K562 and RPE1 (Extended Data Fig. 9). Together, these results suggest that pretraining on the single-cell atlas data provided only a small benefit over random embeddings, but pretraining on perturbation data increased predictive performance.
+
+In summary, we presented prediction tasks where current foundation models did not perform better than deliberately simplistic linear prediction models, despite significant computational expenses for fine-tuning the deep learning models (Extended Data Fig. 10). As our deliberately simple baselines are incapable of representing realistic biological complexity, yet were not outperformed by the foundation models, we conclude that the latter’s goal of providing a generalizable representation of cellular states and predicting the outcome of not-yet-performed experiments is still elusive.
+
+The publications that presented GEARS, scGPT and scFoundation included comparisons against GEARS and CPA and against a linear model. Some of these comparisons may have happened to be particularly ‘easy’. For instance, CPA was never designed to predict effects of unseen perturbations and was particularly uncompetitive in the double perturbation benchmark. The linear model used in scGPT’s benchmark appears to have been set up such that it reverts to predicting no change over the control condition for any unseen perturbation.
+
+Our results are in line with previously published benchmarks that assessed the performance of foundation models for other tasks and found negligible benefits compared to simpler approaches17–19. Our results also concur with two previous studies showing that simple baselines outperform GEARS for predicting unseen single or double perturbations20,21. Since the release of our paper as a preprint, several other benchmarks15,16,22–27 were released that also show that deep learning models struggle to outperform simple baselines. Two of these preprints15,16 suggested an even simpler baseline than our linear model (equation (1)), namely, to always predict the overall average, and we have included this idea here.
+
+We used two baseline models: ‘no change’ and ‘additive’. The ‘no change’ model ‘predicted’, for each double perturbation, the expression values seen in the control condition (\documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym} 
+				\usepackage{amsfonts} 
+				\usepackage{amssymb} 
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$${{\boldsymbol{y}}}^{\varnothing }$$\end{document}y∅). The ‘additive’ model predicts the expression after a double perturbation of genes A and B as2\documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym} 
+				\usepackage{amsfonts} 
+				\usepackage{amssymb} 
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$${\hat{{\boldsymbol{y}}}}^{{\rm{add}}}={{\boldsymbol{y}}}^{\,A}+{{\boldsymbol{y}}}^{B}-{{\boldsymbol{y}}}^{\varnothing },$$\end{document}y^add=yA+yB−y∅,where yA and yB are the mean observed expression vectors for the single perturbation of genes A and B, respectively.
+
+To predict the effects of unseen single perturbations, we used two baselines. The ‘mean’ model calculated the mean of the expression values in the training data. The ‘linear model’ is implied in equation (1). We set b to the row means of the training data (\documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym} 
+				\usepackage{amsfonts} 
+				\usepackage{amssymb} 
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$${\boldsymbol{b}}=1/N{\sum }_{i}{{\bf{Y}}}_{:i}^{{\rm{train}}}$$\end{document}b=1/N∑iY:itrain). We find G and P as follows. Perform a principal component analysis (PCA) on Ytrain and use the top K principal components for G. Then, subset this G to only the rows corresponding to genes that were perturbed in the training data (and, hence, appear as columns in Ytrain) and use the resulting matrix for P.
+
+For the single perturbation analysis, not all models were able to predict the expression change for all unseen perturbations. For example, the linear model with G and \documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym} 
+				\usepackage{amsfonts} 
+				\usepackage{amssymb} 
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$$\tilde{{\bf{P}}}$$\end{document}P~ from the training data could only predict perturbations where the target genes were also part of the read-out genes. To evaluate all models on a consistent set of perturbations, we restricted our analysis to those perturbations for which we had predictions from all models (73 perturbations for Adamson, 398 for Replogle K562 and 629 for Replogle RPE1).
+
+We converted GEARS’ Gene Ontology annotations into a perturbation embedding P by computing a spectral embedding31,32 of the pathway membership matrix. We extracted the gene embedding G from scGPT following their tutorial on gene regulatory inference. For scFoundation, we extract G directly from the pretrained model weights (‘pos_emb.weight’). For the linear model with P from the Replogle data, we fitted a 10-dimensional PCA on the columns of the matrix with the perturbation means of the reference data. We fitted all linear models as described in the main text with K = 10; if G or P was provided, we simply replaced the estimate from the training data with the provided matrix before calculating W.
+
+The additive model is a special case of the linear model (equation (1)) where the gene embedding is simply the single perturbation data, without any further transformation or dimension reduction (G = Ysingle); the perturbation embedding P is a binary coding, where each column vector has 1s in the rows of the perturbed genes and is 0 otherwise; and W is an identity matrix and \documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym} 
+				\usepackage{amsfonts} 
+				\usepackage{amssymb} 
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$${\boldsymbol{b}}=-{{\boldsymbol{y}}}^{\varnothing }$$\end{document}b=−y∅.
+
+
+Extended Data Fig. 7Variation of the predicted and observed expression values.Histogram of the standard deviation per gene for the predicted and observed expression values across perturbations facetted by the model. The red vertical bar indicates the mean of the standard deviations for the ground truth for (a) the Norman dataset and (b) the Replogle K562 dataset. The data reflects the variation for the 1 000 most highly expressed genes and is aggregated across five test-training splits. LM: linear model.
+
+
+Histogram of the standard deviation per gene for the predicted and observed expression values across perturbations facetted by the model. The red vertical bar indicates the mean of the standard deviations for the ground truth for (a) the Norman dataset and (b) the Replogle K562 dataset. The data reflects the variation for the 1 000 most highly expressed genes and is aggregated across five test-training splits. LM: linear model.
+
+
+Extended Data Fig. 8Alternative measures of the single perturbation prediction performance.(a) The Pearson delta measure calculates the correlation of the prediction and observations after subtracting the expression in the control condition. The horizontal red lines show the mean per model and the dashed line indicates the correlation of the best-performing model. (b) Prediction error as a function of n, the number of read-out genes. Top: genes ranked by expression in the control condition. Bottom: by differential expression between observed value and expression in the control condition. Note that sorting by differential expression is only possible if access to the ground truth is available and can thus not be applied in real-world use cases. The dashed line at n = 1000 is the choice in Panel a and elsewhere in this work. LM: linear model, DL: deep learning.
+Source data
+
+
+
+(a) The Pearson delta measure calculates the correlation of the prediction and observations after subtracting the expression in the control condition. The horizontal red lines show the mean per model and the dashed line indicates the correlation of the best-performing model. (b) Prediction error as a function of n, the number of read-out genes. Top: genes ranked by expression in the control condition. Bottom: by differential expression between observed value and expression in the control condition. Note that sorting by differential expression is only possible if access to the ground truth is available and can thus not be applied in real-world use cases. The dashed line at n = 1000 is the choice in Panel a and elsewhere in this work. LM: linear model, DL: deep learning.
+
+We thank an anonymous reviewer of one of our previous papers34 for the suggestion to compare foundation models against simple linear models, which eventually led to this work. This work has been supported by the European Research Council (Synergy Grant DECODE under grant agreement number 810296) and by the Klaus Tschira Foundation (grant number 00.022.2019).

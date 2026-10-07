@@ -49,6 +49,14 @@ class DiscoverySpec:
     def __post_init__(self) -> None:
         if self.terminal not in ("certify", "exploit"):
             raise ValueError("terminal must be 'certify' or 'exploit'")
+        if type(self.rounds) is not int or type(self.kappa) is not int:
+            raise ValueError("rounds and kappa must be integers")
+        for name in ("budget_fraction", "alpha", "delta"):
+            value = getattr(self, name)
+            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+                raise ValueError(f"{name} must be finite and numeric")
+        if not 0 < self.alpha < 1 or not 0 < self.delta < 1:
+            raise ValueError("alpha and delta must lie in (0, 1)")
         if self.rounds < 2 or not 0 < self.budget_fraction <= 1 or self.kappa < 1:
             raise ValueError("need at least two rounds, a budget fraction in (0, 1] and kappa >= 1")
 
@@ -96,8 +104,11 @@ class DiscoveryReport:
 
 
 def _top(scores: np.ndarray, available: np.ndarray, k: int, rng: np.random.Generator) -> np.ndarray:
+    scores = np.asarray(scores)
+    if scores.shape != available.shape or scores.dtype.kind not in "iuf" or not np.isfinite(scores).all():
+        raise ValueError("planner scores must be one finite numeric value per candidate")
     candidates = np.flatnonzero(available)
-    order = np.lexsort((rng.random(candidates.size), -scores[candidates]))
+    order = np.lexsort((-rng.random(candidates.size), scores[candidates]))[::-1]
     return candidates[order[:k]]
 
 
@@ -114,15 +125,27 @@ def run_discovery(world: CombinationWorld, measure: Callable[[np.ndarray], np.nd
     labels: dict[int, float] = {}
     purchases: list[list[int]] = []
 
-    def buy(indices: np.ndarray) -> None:
-        indices = np.asarray(indices, int)
+    def buy(indices: np.ndarray, limit: int) -> None:
+        # Validate identities before conversion or calling a potentially paid measurement.
+        indices = np.asarray(indices, dtype=object)
+        if indices.ndim != 1 or any(isinstance(i, (bool, np.bool_)) or not isinstance(i, (int, np.integer))
+                                    for i in indices):
+            raise ValueError("planner indices must be a one-dimensional sequence of integers")
+        if any(i < 0 or i >= n for i in indices):
+            raise ValueError("planner candidate index out of range")
+        if indices.size > min(limit, budget - measured.sum()):
+            raise ValueError("planner purchase exceeds the round quota or remaining budget")
+        indices = indices.astype(int)
         if indices.size == 0:
             return
         if measured[indices].any() or len(set(indices.tolist())) != indices.size:
             raise ValueError("a planner may not buy a candidate twice")
-        values = np.asarray(measure(indices), float)
+        values = np.asarray(measure(indices))
         if values.shape != indices.shape:
             raise ValueError("measure() must return one label per purchased candidate")
+        if values.dtype.kind not in "iuf" or not np.isfinite(values).all():
+            raise ValueError("measure() must return finite numeric labels")
+        values = values.astype(float)
         measured[indices] = True
         labels.update(zip(indices.tolist(), values.tolist()))
         purchases.append(indices.tolist())
@@ -135,17 +158,17 @@ def run_discovery(world: CombinationWorld, measure: Callable[[np.ndarray], np.nd
     for _ in range(spec.rounds - 1):
         k = int(min(batch, budget - measured.sum()))
         idx, vals = history()
-        buy(choose(~measured, idx, vals, k) if choose else _top(planner.scores(idx, vals), ~measured, k, rng))
+        buy(choose(~measured, idx, vals, k) if choose else _top(planner.scores(idx, vals), ~measured, k, rng), k)
     last = int(budget - measured.sum())
     idx, vals = history()
     certificate = None
     if spec.terminal == "exploit":
-        buy(choose(~measured, idx, vals, last) if choose else _top(planner.scores(idx, vals), ~measured, last, rng))
+        buy(choose(~measured, idx, vals, last) if choose else _top(planner.scores(idx, vals), ~measured, last, rng), last)
     else:
         scores = ranker.scores(idx, vals)                 # fixed before any audit label is seen
         shortlist = _top(scores, ~measured, spec.kappa * last, rng).tolist()
         audit, _ = certification.draw_audit(shortlist, last, random.Random(seed))
-        buy(np.array(audit, int))
+        buy(np.array(audit, int), last)
         certificate = certification.certify(
             shortlist, [scores[i] for i in shortlist], audit,
             [labels[i] > world.screen.threshold for i in audit], alpha=spec.alpha, delta=spec.delta)

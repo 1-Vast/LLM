@@ -470,7 +470,7 @@ class MAESTROOrchestrator:
 
         tool_executions = self._run_dataset_tool(context, dataset_paths, session_id)
         for execution in tool_executions:
-            context = self._context_builder.add_tool_execution(context, execution)
+            context = self._context_builder.add_tool_execution(context, execution, case_id=case_id)
 
         visual_inspections = self._inspect_visuals(intent, image_paths, session_id)
         context = self._context_builder.add_visual_reviews(context, visual_inspections)

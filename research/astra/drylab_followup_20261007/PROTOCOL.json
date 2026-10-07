@@ -1,0 +1,22 @@
+{
+  "status": "EXPLORATORY_EXPOSED_DEVELOPMENT_ONLY",
+  "question": "Do actual public dose-support and observed-range summaries improve first-screen substitutions beyond the frozen prior and design-only correction?",
+  "baseline": "Supplied prior_control_score, original tie order, screen fraction 0.7, two rounds, ceil(0.2*menu) unit credits",
+  "menu": "All 4519 candidates, 14 complete cell groups, both directions together; no coverage filtering",
+  "endpoint": "Purchased source hit1 followed by purchased source hit2; published fitted calls, not independent culture confirmation",
+  "conditions": "Library concentration is curve top in uM; anchor_set is a set of fixed-dose vectors in uM, not one well. local_days=4 is seeding-to-read, treatment duration is 72h by Jaaks methods.",
+  "mono_source": "Existing GDSC2 release8.5 plus preserved mono_labels.csv.gz and audited drug_identity_map.csv",
+  "mono_exclusion": "Exclude every cell marked cell_excluded_from_mono (126 entities, including Jaaks cells and recorded related exclusion). All 14 target cells must be excluded. No target-specific mono values, Z_SCORE or RMSE features.",
+  "mono_support": "Require exact drug registry match and exact library top-dose range. At least 5 distinct non-Jaaks cells per group. Tissue-specific summaries where >=5, otherwise global reference with transport flag. Anchor dose support uses highest fixed dose, exact top range preferred, otherwise closest top range on log scale explicitly flagged.",
+  "features": "Design logs and anchor span; mono median lnIC50, fraction in measured range, median AUC, dose relative median potency, inside-tested-range flag, dose-range transport, tissue transport, count and missingness. Pair product of bounded-dose-supported mono margins is a learned covariate, never a joint mechanism probability. No fabricated slope or Emax.",
+  "models": ["frozen_static", "design_only", "missingness_only", "tier_a", "tier_a_shuffled"],
+  "model": "Centered/scaled ridge residual of joint binary historical call minus frozen prior score; mean loss gives equal total weight to each cell-role. Same alpha and ridge grids per correction arm; zero correction allowed. Missing or composite candidates use exact static fallback in all correction arms.",
+  "grid": {"alpha": [0, 0.25, 0.5, 1], "lambda": [100, 10, 1]},
+  "split": "Outer leave-one-cell-out; inner leave-one-cell-out of 13 development cells for parameter selection. Both roles remain together. Only 13 historical cells' joint labels are given to training in each outer fold. Scale/imputation fit on training rows only.",
+  "selection": "Inner legal-replay confirmed yield, ties prefer alpha0 then lower alpha then stronger shrinkage. Final confirmation order remains frozen static for every arm to isolate screen substitutions.",
+  "shuffle": "One fixed seed 20261007. Permute functional mono feature blocks within exact tissue, library top dose, anchor_set and support status; preserve design and missingness. Report fraction actually moved. This is a diagnostic, not a randomization p-value.",
+  "outputs": ["full purchased traces", "outer choices", "swapped-in/out condition identities and joint-label contributions", "confirmation and budget differences", "per-cell and unordered-pair dependence sensitivity", "covered/full-menu results", "source qualification and hashes", "runtime"],
+  "limitations": ["All14 cells already exposed; no confirmatory claim", "GDSC parameters share original NLME fit; removing target rows does not refit that model or certify parameter independence", "GDSC-Jaaks plate overlap unresolved", "Public references are available at this replay experiment time, not certified available before historical2016 screens", "Public menu is complete-repeat retrospective subset", "Credits and rounds are simulated, not money and physical deadline", "No LLM contribution tested"],
+  "continuation": "Do not fetch ChEMBL or LINCS or promote into src solely because a tuned exploratory arm wins. Require useful boundary replacement beyond design/missingness and mapping-destroying control, then freeze an independent task and cost threshold. If richer dose evidence is insufficient, report its specific acquisition gaps.",
+  "preservation": "Original ZIP, HTML, imported20 files and historical freezes remain unchanged. New outputs must refuse an existing destination."
+}

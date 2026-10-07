@@ -1,0 +1,83 @@
+{
+ "study": "zeroshot_context_20261007",
+ "rule": "Every change to the plan in RESEARCH_COMMITMENT.md, and every failed or superseded attempt, is listed here in the order it happened. Nothing listed here touched an evaluation line's responses.",
+ "entries": [
+  {
+   "when": "2026-10-07 ~13:45 local",
+   "what": "census attempt 1 stopped",
+   "detail": "Layout probing called get_storage_size on the chunked X/data and X/indices datasets, walking their remote chunk index (hundreds of 512 KiB blocks per file). Stopped, fixed (chunked datasets described without storage queries), restarted. Outputs and ledgers preserved in census/attempt1_stopped/.",
+   "evaluation_data_read": false
+  },
+  {
+   "when": "2026-10-07 ~14:10",
+   "what": "STATE forecast attempt 1 superseded",
+   "detail": "The batched-vs-native agreement check was element-wise at 1e-4 and ran only on the first batch of a run; it failed on c20 at 0.0049 (attention reduction order). Attempt 2 pins full float32, checks every context's first batch, and applies 1e-4 to the per-condition cell mean (the analysed quantity; c20 agrees to 1.1e-5). See state_forecasts/superseded_attempt1/SUPERSEDED.json, which also records a corrected misattribution to TF32.",
+   "evaluation_data_read": false
+  },
+  {
+   "when": "2026-10-07 ~14:25",
+   "what": "preliminary development exploration with a partial panel",
+   "detail": "explore_dev_partial.py ran on the two development lines with the 14 training contexts extracted at the time (world_dev/PRELIMINARY_partial_panel.json). It showed that the panel mean built from 32-cell training subsamples carries substantial sampling noise (and the 5-context kNN deviation far more), which STATE, trained on full-depth data, does not. Development data only; no selection was made from it.",
+   "evaluation_data_read": false
+  },
+  {
+   "when": "2026-10-07 ~14:30-15:00, before world_dev.py ran",
+   "what": "comparison and comparator changes made after the preliminary look",
+   "changes": [
+    "All model comparisons use depth-corrected squared error: the forecast's own panel sampling variance (sum_l w_l^2 noise_l) is subtracted along with the held-out observation's. The commitment specified noise correction for the observation only. This removes a handicap my subsampling imposed on the comparators; it cannot favour STATE, whose forecasts have no panel sampling term.",
+    "M0 aggregation variants reduced from four to the two linear ones (equal, precision-weighted): trimmed and median panel means have no analytic sampling variance, so they could not be depth-corrected.",
+    "M1 family expanded from the registered k=5 nearest contexts to also include kernel ridge over contexts (lambda chosen leave-one-context-out on training contexts only) and a gene-gated panel mean (each coordinate's panel response regressed on that coordinate's basal level, the 'basal masking' alternative). M1 now has 12 tuning options against M2's 4; this strengthens the comparator for H1.",
+    "Smoke test of the pipeline on 300 keys of PANC-1 with 23 training contexts (scratch output only, not saved as a result) printed development errors for these families before the full development run."
+   ],
+   "evaluation_data_read": false
+  },
+  {
+   "when": "2026-10-07 ~15:25",
+   "what": "STATE forecast attempt 2 (batched) superseded",
+   "detail": "Batched forward passed a 1e-4 cell-mean agreement check on 48 contexts but c43 (SHP-77) reached 1.28e-4, stopping c43-c44. The guard was not loosened; attempt 3 regenerated all 50 contexts with the native predict_step on one 256-cell set per forward (exact-repeat check passed on all 50). Only the partial-panel exploration and the smoke test used attempt-2 forecasts.",
+   "evaluation_data_read": false
+  },
+  {
+   "when": "2026-10-07 ~15:50",
+   "what": "world_dev run 1 superseded by run 2",
+   "detail": "Dose strata for the permutation control split labels on commas; three drug names contain commas. Switched to ast.literal_eval parsing; selections identical; permutation contrast changed from -0.000563 to -0.000562. Run 1 preserved in world_dev/run1_label_parse_bug/.",
+   "evaluation_data_read": false
+  },
+  {
+   "when": "2026-10-07 ~16:00",
+   "what": "development diagnostics and training-exposure audit after selection, before freeze",
+   "detail": "world_dev_diagnostics.py (in-sample deviation skill on training contexts, dose breakdown, plate-common component) and TRAINING_EXPOSURE_AUDIT.json (official data_module, hparams, metrics.csv, cell-load val fallback). These did not change any selection.",
+   "evaluation_data_read": false
+  },
+  {
+   "when": "2026-10-07 ~16:10",
+   "what": "agent development gates failed for the registered objective; two alternative objectives checked and not pursued",
+   "detail": "agent_dev.py: no-screening already flags the true top responders (attainable remainder far below delta_agent), so the registered gate disables LLM arms. agent_dev_excess.py: deviation in excess of panel expectation has replicate-well reliability 0.11-0.28 and STATE's prediction of it changes sign between development lines. agent_dev_profile.py: per-gene target-modulation ranking improves with STATE forecasts but first-well screens reduce validated value (single-gene replicate reliability ~0.39). No LLM call was made.",
+   "evaluation_data_read": false
+  },
+  {
+   "when": "2026-10-07 16:04:06 local (08:04:06 UTC)",
+   "what": "freeze_agent.py edited after the world freeze",
+   "detail": "freeze_agent.py failed with a JSON serialisation error (numpy bool) on its first run, 12 s after WORLD_FREEZE; the fix (cast to bool) was written 0.85 s before AGENT_FREEZE. WORLD_PROTOCOL.json therefore records the pre-fix hash of freeze_agent.py (152a9dc0...); AGENT_PROTOCOL.json records the fixed one (7813a382...). freeze_agent.py plays no part in the world evaluation; all other world-protocol code hashes match. Found by the independent verifier.",
+   "evaluation_data_read": false
+  },
+  {
+   "when": "recorded after verification",
+   "what": "erratum: time label of the agent-development entry",
+   "detail": "The entry labelled '~16:10' happened 16:00-16:03 local (agent_dev outputs 16:00-16:03, DEVIATIONS.json saved 16:03:53), before both freezes. The order of events is unchanged; the original label is left as written.",
+   "evaluation_data_read": false
+  },
+  {
+   "when": "process statement",
+   "what": "what of the evaluation lines existed before the freeze",
+   "detail": "Raw sampled rows of the three evaluation lines (treated and DMSO) were on disk from 06:18-06:46 UTC, and their label-free STATE forecasts from 07:35-07:41 UTC, both before the 08:03:54 UTC freeze. Before the freeze only their DMSO rows were read (STATE basal inputs, feature-axis check); treated rows were first summarised by observations.py at 08:04:32-08:05:06 UTC, after both freezes, behind the evaluation guard. Timestamps confirm the order of the summaries but cannot prove that raw rows were not inspected earlier; that rests on the code path and this statement.",
+   "evaluation_data_read": false
+  },
+  {
+   "when": "after independent verification",
+   "what": "feature-axis check extended to the 45 training contexts",
+   "detail": "The verifier noted that column alignment of the training files had not been checked. axis_check.py was run on all 45 training files: 45/45 pass (max |log1p(X) - X_hvg| = 2.06e-07, sampled gene names match). 845207996 additional bytes. No result changes.",
+   "evaluation_data_read": false
+  }
+ ]
+}

@@ -1,0 +1,217 @@
+"""Bounded native STATE experiment. Prepare metadata/controls before outcome access.
+
+Stages deliberately separate predictions from measured treated responses. All
+arrays retain the official X_hvg basis; no invented biological inputs are used.
+"""
+from __future__ import annotations
+
+import argparse
+import ast
+from collections import Counter, defaultdict
+from datetime import datetime, timezone
+import hashlib
+import importlib.metadata
+import json
+from pathlib import Path
+import sys
+import threading
+import time
+
+ROOT = Path(__file__).resolve().parents[4]
+sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT))
+OUT = Path(__file__).resolve().parent
+from tools.datasets.state_prospective_input import load_contract, digest, write_json, CONTROL, PERT
+from virtual_cell.state_runner import _column
+
+
+def prepare():
+    import h5py
+    import numpy as np
+    import pandas as pd
+    from research.astra.state_knowledge_retrospective import chemical_group
+    source_drugs = pd.read_parquet(ROOT / "tools/datasets/audit_results/20261001_state_prospective/knowledge_sources/tahoe_drugs.raw")
+    drug_lookup = {str(row.drug).strip().casefold(): row for row in source_drugs.itertuples()}
+    contract = load_contract(ROOT)
+    write_json(OUT / "contract.json", contract)
+    with h5py.File(contract["hashes"]["dataset"]["path"], "r") as f:
+        labels, plates = [_column(f["obs"], key) for key in (PERT, "plate")]
+        ids = _column(f["obs"], f["obs"].attrs["_index"])
+        # No treated expression is read during metadata selection.
+        by_drug = defaultdict(dict)
+        for label in sorted(set(labels)):
+            components = ast.literal_eval(label)
+            if len(components) != 1 or label == CONTROL or label not in contract["mapping"]:
+                continue
+            drug, dose, unit = components[0]
+            rows = np.flatnonzero(labels == label)
+            if unit != "uM" or dose not in (0.05, 0.5, 5.0) or len(rows) < 5:
+                continue
+            counts = Counter(plates[rows])
+            plate = sorted(counts, key=lambda p: (-counts[p], p))[0]
+            selected = rows[plates[rows] == plate]
+            if len(selected) >= 5:
+                by_drug[drug][dose] = (label, plate, selected)
+        eligible = [d for d, doses in by_drug.items() if len(doses) == 3]
+        selected_drugs, groups, seen_groups = [], {}, set()
+        for drug in sorted(eligible, key=lambda d: hashlib.sha256(("maestro-native-v1:" + d).encode()).hexdigest()):
+            metadata = drug_lookup.get(drug.strip().casefold())
+            if metadata is None or not isinstance(metadata.canonical_smiles, str):
+                continue
+            group = chemical_group(metadata.canonical_smiles)
+            if group in seen_groups:
+                continue
+            selected_drugs.append(drug)
+            groups[drug] = group
+            seen_groups.add(group)
+            if len(selected_drugs) == 48:
+                break
+        rows, basal, controls, pool_ids = [], {}, {}, {}
+        for ordinal, drug in enumerate(selected_drugs):
+            split = "train" if ordinal < 24 else "development" if ordinal < 30 else "calibration" if ordinal < 36 else "evaluation"
+            for dose in sorted(by_drug[drug]):
+                label, plate, treated = by_drug[drug][dose]
+                if plate not in basal:
+                    indices = np.flatnonzero((labels == CONTROL) & (plates == plate))
+                    # Disjoint basal and outcome-reference controls, selected by ID hash.
+                    indices = sorted(indices.tolist(), key=lambda i: hashlib.sha256(str(ids[i]).encode()).hexdigest())
+                    first, second = sorted(indices[::2]), sorted(indices[1::2])
+                    basal[plate] = np.asarray(f["obsm"]["X_hvg"][first], dtype=np.float32)
+                    controls[plate] = {"basal_rows": first, "reference_rows": second}
+                    pool_ids[plate] = [str(ids[i]) for i in first]
+                condition_id = hashlib.sha256((label + "|" + plate + "|NCI-H596|24h|RNA|X_hvg").encode()).hexdigest()[:20]
+                rows.append({"condition_id": condition_id, "drug": drug, "dose_uM": dose,
+                             "chemical_group": groups[drug],
+                             "plate": plate, "cell": "NCI-H596", "time_hours": 24.0,
+                             "assay": "single_cell_RNA", "readout": "X_hvg_native_shift",
+                             "split": split, "label": label, "n_cells": len(treated),
+                             "treated_rows": treated.tolist()})
+    metadata = pd.DataFrame([{k: v for k, v in r.items() if k != "treated_rows"} for r in rows])
+    metadata.to_csv(OUT / "conditions.csv", index=False)
+    np.savez_compressed(OUT / "basal_controls.npz", **basal)
+    plan = {"created_at_utc": datetime.now(timezone.utc).isoformat(), "selection": "SHA256 drug order, metadata only, first 48 eligible three-dose compounds",
+            "eligible_drugs": len(eligible), "drug_count": len(selected_drugs), "conditions": rows,
+            "controls": controls, "basal_sample_ids": pool_ids, "sample_count": 32, "seed": 731,
+            "split_counts_drugs": dict(Counter(r["split"] for r in rows)),
+            "status": "exploratory: previously exposed c39 and unresolved checkpoint training overlap",
+            "outcomes_read": False, "full_source_candidate_labels": sorted(set(labels)),
+            "unsupported_or_unselected_policy": "retain baseline/refuse STATE extrapolation; bounded study is not full menu deployment"}
+    write_json(OUT / "metadata_freeze.json", plan)
+    write_json(OUT / "prepare_receipt.json", {"plan_sha256": digest(OUT / "metadata_freeze.json"),
+               "conditions_sha256": digest(OUT / "conditions.csv"), "controls_sha256": digest(OUT / "basal_controls.npz"), "treated_expression_read": False})
+    print(json.dumps({"conditions": len(rows), "eligible_drugs": len(eligible), "plates": sorted(basal)}))
+
+
+def infer():
+    import numpy as np
+    import psutil
+    import torch
+    from state.tx.models.state_transition import StateTransitionPerturbationModel
+    t0 = time.perf_counter()
+    process = psutil.Process()
+    cpu0 = process.cpu_times()
+    resource = {"peak_rss_bytes": 0, "api_calls": 0, "api_tokens": 0, "api_cost_usd": 0.0,
+                "downloaded_bytes": 0, "laboratory_credits": 0, "local_financial_cost_usd": None}
+    stopped = threading.Event()
+    def monitor():
+        while not stopped.wait(0.1):
+            resource["peak_rss_bytes"] = max(resource["peak_rss_bytes"], process.memory_info().rss)
+    thread = threading.Thread(target=monitor, daemon=True)
+    thread.start()
+    contract = load_contract(ROOT)
+    plan = json.loads((OUT / "metadata_freeze.json").read_text())
+    receipts = json.loads((OUT / "prepare_receipt.json").read_text())
+    assert digest(OUT / "metadata_freeze.json") == receipts["plan_sha256"]
+    assert digest(OUT / "basal_controls.npz") == receipts["controls_sha256"]
+    checkpoint = contract["hashes"]["weights"]["path"]
+    basals = np.load(OUT / "basal_controls.npz")
+    sampled = {p: basals[p][np.random.RandomState(plan["seed"]).choice(len(basals[p]), plan["sample_count"], replace=True)] for p in basals.files}
+    torch.manual_seed(plan["seed"])
+    torch.set_num_threads(2)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    if device == "cuda":
+        torch.cuda.reset_peak_memory_stats()
+    try:
+        load_start = time.perf_counter()
+        model = StateTransitionPerturbationModel.load_from_checkpoint(checkpoint, map_location="cpu").to(device).eval()
+        resource["load_seconds"] = time.perf_counter() - load_start
+        write_json(OUT / "runtime_architecture.json", {"parameter_count": sum(p.numel() for p in model.parameters()),
+                   "input_dim": model.input_dim, "pert_dim": model.pert_dim, "cell_sentence_len": model.cell_sentence_len,
+                   "output_space": model.output_space, "batch_encoder": model.batch_encoder is not None,
+                   "confidence_token": model.confidence_token is not None, "arc_state_version": importlib.metadata.version("arc-state"),
+                   "torch_version": torch.__version__, "device": device,
+                   "gpu": torch.cuda.get_device_name() if device == "cuda" else None})
+        predictions, basal_means, trace = [], [], []
+        with torch.inference_mode():
+            for row in plan["conditions"]:
+                start = time.perf_counter()
+                basal = sampled[row["plate"]]
+                onehot = torch.zeros((len(basal), model.pert_dim), device=device)
+                onehot[:, contract["mapping"][row["label"]]] = 1
+                batch = {"ctrl_cell_emb": torch.tensor(basal, device=device), "pert_emb": onehot,
+                         "pert_name": [row["label"]] * len(basal)}
+                pred = model.predict_step(batch, batch_idx=0, padded=False)["preds"].detach().cpu().numpy().reshape(len(basal), -1)
+                assert pred.shape == basal.shape and np.isfinite(pred).all()
+                mean = pred.mean(0)
+                predictions.append(mean)
+                basal_means.append(basal.mean(0))
+                trace.append({"condition_id": row["condition_id"], "label": row["label"], "plate": row["plate"],
+                              "basal_sha256": hashlib.sha256(basal.tobytes()).hexdigest(), "seconds": time.perf_counter() - start,
+                              "predicted_cells": len(basal), "zero_fraction": float((pred == 0).mean())})
+            # Exact-input warm reuse consistency; no additional biological query.
+            repeated = model.predict_step(batch, batch_idx=0, padded=False)["preds"].detach().cpu().numpy().reshape(len(basal), -1)
+        write_json(OUT / "numerical_consistency.json", {"same_model_same_input_max_abs": float(np.max(np.abs(repeated - pred))),
+                   "passed": bool(np.array_equal(repeated, pred)), "reload_comparison": "not run: constrained host memory; no reload speed claim"})
+        np.savez_compressed(OUT / "state_features.npz", predicted_mean=np.asarray(predictions), basal_mean=np.asarray(basal_means),
+                            state_delta=np.asarray(predictions) - np.asarray(basal_means), condition_id=np.asarray([r["condition_id"] for r in plan["conditions"]]))
+        write_json(OUT / "forward_trace.json", trace)
+        resource.update(status="completed", forwards=len(trace) + 1, model_loads=1,
+                        predictions_sha256=digest(OUT / "state_features.npz"))
+    except Exception as exc:
+        resource.update(status="failed", error=f"{type(exc).__name__}: {exc}")
+        raise
+    finally:
+        stopped.set()
+        thread.join()
+        cpu1 = process.cpu_times()
+        resource.update(elapsed_seconds=time.perf_counter() - t0, cpu_seconds=cpu1.user + cpu1.system - cpu0.user - cpu0.system,
+                        peak_cuda_allocated_bytes=torch.cuda.max_memory_allocated() if device == "cuda" else 0,
+                        peak_cuda_reserved_bytes=torch.cuda.max_memory_reserved() if device == "cuda" else 0)
+        write_json(OUT / "inference_resources.json", resource)
+    print(json.dumps(resource))
+
+
+def outcomes():
+    import h5py
+    import numpy as np
+    assert (OUT / "state_features.npz").exists(), "predict before reading treated outcomes"
+    plan = json.loads((OUT / "metadata_freeze.json").read_text())
+    contract = json.loads((OUT / "contract.json").read_text())
+    with h5py.File(contract["hashes"]["dataset"]["path"], "r") as f:
+        references = {p: np.asarray(f["obsm"]["X_hvg"][v["reference_rows"]]).mean(0) for p, v in plan["controls"].items()}
+        means = [np.asarray(f["obsm"]["X_hvg"][r["treated_rows"]]).mean(0) for r in plan["conditions"]]
+    reference = np.asarray([references[r["plate"]] for r in plan["conditions"]])
+    delta = np.asarray(means) - reference
+    np.savez_compressed(OUT / "sealed_outcomes.npz", observed_mean=np.asarray(means), reference_mean=reference,
+                        observed_delta=delta, magnitude=np.sqrt(np.mean(delta ** 2, axis=1)),
+                        condition_id=np.asarray([r["condition_id"] for r in plan["conditions"]]))
+    write_json(OUT / "outcome_receipt.json", {"sha256": digest(OUT / "sealed_outcomes.npz"), "conditions": len(means),
+               "endpoint": "RMS native X_hvg change vs disjoint same-plate reference controls",
+               "predictor_has_no_outcome_path": True, "physical_measurements_new": 0})
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("stage", choices=("prepare", "infer", "outcomes"))
+    parser.add_argument("--out", type=Path, default=OUT,
+                        help="Fresh output directory for an independent reproduction")
+    args = parser.parse_args()
+    OUT = args.out.resolve()
+    OUT.mkdir(parents=True, exist_ok=True)
+    markers = {"prepare": "metadata_freeze.json", "infer": "inference_resources.json",
+               "outcomes": "sealed_outcomes.npz"}
+    if (OUT / markers[args.stage]).exists():
+        raise FileExistsError("preserve existing stage output; select a fresh --out directory")
+    if args.stage == "infer":
+        (OUT / "execution_source.py.txt").write_bytes(Path(__file__).read_bytes())
+    globals()[args.stage]()

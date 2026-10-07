@@ -67,7 +67,7 @@ def test_adapters_are_registered_typed_and_source_versioned():
     descriptors = LocalToolCatalog(TOOLS).discover()
     assert {item.identifier for item in descriptors} == {
         "data_profile", "column_summary", "table_filter", "evidence_bundle_optimize", "multimodal_alignment", "typed_decision_review", "virtual_cell_query",
-        "signature_retrieval", "case_memory",
+        "signature_retrieval", "case_memory", "condition_sources",
     }
     for item in descriptors:
         assert item.parameter_schema and item.schema_version == TOOL_SCHEMA_VERSION
@@ -83,6 +83,10 @@ def test_adapters_are_registered_typed_and_source_versioned():
             assert item.evidence_kind is EvidenceKind.DERIVED_ANALYSIS
             assert ROOT / "src/virtual_cell/signature_retrieval.py" in item.source_files
             assert item.function == "signature_retrieval"
+        elif item.identifier == "condition_sources":
+            assert item.evidence_kind is EvidenceKind.DERIVED_ANALYSIS
+            assert ROOT / "tools/datasets/condition_sources.py" in item.source_files
+            assert len(item.entrypoint.read_text(encoding="utf-8").splitlines()) <= 12
         else:
             assert item.evidence_kind is EvidenceKind.DERIVED_ANALYSIS
             assert ROOT / "src/maestro/tool_analysis.py" in item.source_files

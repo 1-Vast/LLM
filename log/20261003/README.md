@@ -102,7 +102,7 @@ API authorization cannot substitute for absent physical measurements.
 
 ## 8. Reproduction and artifact ledger
 
-See [the full follow-up](../../research/astra/FEEDBACK_BOUNDARY_FOLLOWUP.md) and
+See [the full follow-up](../../research/EVIDENCE.md#engineering-convergence) and
 [the receipts](../../research/astra/results/20261003_feedback_boundary_v1/).
 
 ```powershell
@@ -195,7 +195,7 @@ probe resets a deterministic unique sequence for each arm. Both failure receipts
 remain, and neither issue changed scientific or production rules.
 
 Full details, responsibility/evidence permissions and reproduction commands are in
-[the responsibility follow-up](../../research/astra/RESPONSIBILITY_FOLLOWUP.md).
+[the responsibility follow-up](../../research/EVIDENCE.md#engineering-convergence).
 Unrun items include historical full lineage/replay, measured-cell model training,
 physical assays and four-arm science, numerical mechanism likelihood calibration
 and legacy schema conversion. Engineering migration does not establish a new
@@ -269,7 +269,7 @@ hashes, byte overlays, asset inventories and environment are in `receipt.json`.
 
 ## 13. Convergence of execution ownership and verification scopes
 
-The [convergence report](../../research/astra/CONVERGENCE.md) owns the detailed
+The [convergence report](../../research/EVIDENCE.md#engineering-convergence) owns the detailed
 implementation, scientific boundaries and reproduction commands. The
 [run receipt](../../research/astra/results/20261003_convergence_v1/receipt.json)
 records successful scopes, intermediate failures, exact source identities and
@@ -298,7 +298,7 @@ physical experiment, biological state gain or agent utility claim was run.
 
 ## 14. Measured audit and evidence-processing efficiency
 
-The [efficiency report](../../research/astra/EFFICIENCY.md) owns the benchmark
+The [efficiency report](../../research/EVIDENCE.md#engineering-convergence) owns the benchmark
 comparison, preserved contracts, verification scopes and reproduction commands.
 The [new receipt](../../research/astra/results/20261003_efficiency_v1/receipt.json)
 records environment, source identities, initial fixture failures, successful runs,
@@ -318,7 +318,7 @@ data, timing, replication and cost gaps; software efficiency does not resolve th
 
 ## 15. Verified feedback closure and blocked scientific registration
 
-The [feedback-closure report](../../research/astra/FEEDBACK_CLOSURE.md) owns the
+The [feedback-closure report](../../research/EVIDENCE.md#engineering-convergence) owns the
 implementation, recovery capabilities, failure repairs and reproduction commands.
 Its [new run receipt](../../research/astra/results/20261003_feedback_closure_v1/receipt.json)
 records base reproductions, verification and byte preservation. The main
@@ -350,7 +350,7 @@ core. Earlier blocks found the decision side binds on every registered task, and
 were about 2x optimistic on selected actions. So this block moves the dual core to `task.md`
 Task 3 (combination and synergy), where purchases decide outcomes, and adds a design-based
 certificate for claims about untested candidates. The design and literature are in
-[the design record](../../research/certified_discovery/DESIGN.md).
+[the design record](../../research/EVIDENCE.md#certified_discovery).
 
 The development screen was O'Neil 2016 (exposed). It covered 39 target lines with a 10%
 budget in four rounds.
@@ -515,5 +515,5 @@ WS4 agent and literature) reported first; their receipts are under `workstreams/
 - Role swapping changes doses and readout conditions; same-condition repeat metadata must be qualified before noise attribution. Barcode-to-culture identity remains unknown.
 - Recommended order: reconcile exposed allocation accounting; qualify repeats; test a scalar feedback-to-validation correction allowing zero; only then prepare a model-by-scheduler comparison against strong verification baselines.
 - Lower bounds support proceeding; futility requires upper bounds or unresolved status. New meaningful-gain thresholds need actual incremental costs.
-- Report: [direction exploration](../../research/astra/direction_exploration_20261003_v2/REPORT.md). English continuation: [NEXT_PROMPT.md](../../research/astra/direction_exploration_20261003_v2/NEXT_PROMPT.md).
+- Report: [direction exploration](../../research/EVIDENCE.md#direction_exploration_20261003_v2). English continuation: [NEXT_PROMPT.md](../../research/EVIDENCE.md#direction_exploration_20261003_v2).
 - No model API, new confirmation, physical experiment, production edit, test-suite run, commit, or push in this exploration. Historical results and freezes were preserved.

@@ -2,7 +2,7 @@
 
 Tools are grouped by responsibility. Each capability keeps its own ID, schema, applicability
 boundary and source hashes. The router discovers `*/manifest.json` and `*/*.manifest.json`;
-each manifest selects a public function in the group's `tool.py`. The exact manifest and source
+each manifest selects a public function in its declared Python entrypoint. The exact manifest and source
 bytes are verified again before invocation. Receipts retain their declared evidence type.
 
 | Directory | Registered Capability IDs |
@@ -11,7 +11,7 @@ bytes are verified again before invocation. Receipts retain their declared evide
 | `evidence/` | `evidence_bundle_optimize`, `multimodal_alignment`, `typed_decision_review` |
 | `prediction/` | `signature_retrieval`, `virtual_cell_query` |
 | `case_memory/` | `case_memory`; case construction, audit and replay commands |
-| `datasets/` | Discovery, hash-pinned acquisition, data construction and QA (no runtime manifest) |
+| `datasets/` | `condition_sources`; discovery, hash-pinned acquisition, data construction and QA |
 | `evaluation/` | Case replay, costs and scoring (no runtime manifest) |
 
 The larger case-memory workflow is grouped under `case_memory/`: its builders and validation
