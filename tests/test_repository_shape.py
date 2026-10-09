@@ -48,6 +48,10 @@ def test_package_roots_expose_only_entry_points(package, expected):
     ("tools.evaluation.scoring", ["adjudicate"], "--public-cases"),
     ("tools.evaluation.scoring", ["table"], "--evaluation"),
     ("tools.case_memory.workflow", [], "sources,pack,graphs"),
+    ("tools.datasets.catalog", [], "candidates,source,probe,search,fetch"),
+    ("tools.evaluation.cli", [], "--public-cases"),
+    ("tools.evaluation.discovery_replay", [], "--library"),
+    ("tools.case_memory.audit", [], "quality,figures"),
 ])
 def test_consolidated_command_entrypoints_run(module, arguments, expected):
     result = subprocess.run(
@@ -58,6 +62,21 @@ def test_consolidated_command_entrypoints_run(module, arguments, expected):
     assert result.returncode == 0, result.stderr
     assert "usage:" in result.stdout
     assert expected in result.stdout
+
+
+def test_published_data_tool_modules_import_without_loading_assets():
+    import importlib
+
+    for module in (
+        "tools.case_memory.build_cases",
+        "tools.case_memory.validate",
+        "tools.analysis.tool",
+        "tools.datasets.catalog",
+        "tools.datasets.lincs_pack",
+        "tools.datasets.combination_screens",
+        "tools.evaluation.discovery_replay",
+    ):
+        importlib.import_module(module)
 
 
 def test_source_is_separated_by_core_agent_and_virtual_cell_responsibility():

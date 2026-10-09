@@ -18,14 +18,13 @@ commands share the reference-vector index and byte-hash helpers instead of resca
 arrays or duplicating checksum loops.
 The two validation modes use one entry point: `python -m tools.case_memory.validate forecasts` and
 `python -m tools.case_memory.validate calibration`.
-Source and pack preparation is installed tooling; the scientific replay is checkout-local:
+Source and pack preparation is installed tooling. Pack construction and audits require their
+registered LINCS inputs; a missing pack is an asset blocker, not an empty dataset.
 
 ```bash
 python -m tools.case_memory.workflow sources
 python -m tools.case_memory.workflow pack
 python -m tools.case_memory.workflow graphs
-python -m research.case_memory_integration.external_replay replay
-python -m research.case_memory_integration.external_replay evaluate
 python -m tools.case_memory.audit quality
 python -m tools.case_memory.audit figures
 ```
@@ -35,28 +34,8 @@ These replace the former `download_sources`, `build_hypothesis_graph`, `preproce
 `python -m tools.case_memory.workflow --help` for the available steps.
 The pack step accepts `--workspace PATH`; `load_pack(workspace=PATH)` can also read
 an explicit data workspace outside the checkout. Source verification and graph
-construction retain their fixed checkout scope. Replay/evaluation no longer import
-research from installed tooling.
-
-## Model Benchmark
-
-```bash
-python -m tools.datasets.benchmark
-```
-
-This replaces `tools.model_experiment.build_benchmark`. It reads the existing protocol-v2.1
-tables and writes `data/processed/model_experiment_v1/`: `public_episodes.jsonl.gz`,
-`hidden_outcomes.jsonl.gz` and a hashed `manifest.json`. There are 6,601 episodes and 49,304
-measured action records across SciPlex3 A/B and L1000 LT/T. Fold 0 is evaluation; folds 1-4
-are development. The source-unit field is retained for clustered reporting.
-
-Public episodes contain legal menus and budgets, with no truth, outcome, readout, lifecycle or
-score fields. `tools.evaluation.scoring.score_sequence` validates the submitted sequence before
-joining hidden outcomes by `episode_id`. These previously exposed records support replay and
-leakage checks and development comparisons, not independent validation or deployment calibration.
-
-The sciPlex-v2 builder and QA are in `datasets`; superseded v1 scripts and duplicate
-archives are removed. Historical findings remain in the dataset-discovery reports.
+construction retain their fixed checkout scope. The historical external replay package
+is not part of this release.
 
 ## Certified Combination Discovery
 
@@ -73,9 +52,9 @@ ALMANAC outcomes are readable only through `open_vault` against an intact freeze
 `evaluation.discovery_replay` runs every arm at equal budget, one campaign per target line,
 and branches each campaign into exploit and certify variants. It uses
 `virtual_cell.combination_world`, `maestro.certification` and the loop in `agent.discovery`.
-Both modules were promoted from `research/certified_discovery`, which keeps the frozen
-originals and the confirmatory evidence. `tests/test_combination_screens.py` (research
-scope) checks parity against them.
+The library builder and replay entry points are retained. Their historical parity suite is
+archived because its `research/certified_discovery` source package is not in this release;
+asset-free combination-world contracts remain in the default suite.
 
 Run evaluation through `python -m tools.evaluation.cli` and
 `python -m tools.evaluation.construction build|screen`. Only `maestro` is an installed command.
@@ -108,9 +87,8 @@ python -m research.astra.state_prospective_review --help
 python -m research.astra.state_raw_reconstruction --help
 ```
 
-`tools.datasets.state_identifiability` retains the pure source/sample/time/action
-checks; `state_prospective_input`, raw-count conversion and metadata readers stay
-in tools. Moving an experiment does not authenticate its dataset or improve its
-scientific result. Earlier frozen commands use their pinned Git versions.
-The case-memory audit and fixed source/graph commands still need their declared
-checkout assets and protocols; installation does not bundle biological data.
+Historical dataset audit commands are recoverable from Git history and are not release
+entry points. Dataset discovery and source inspection remain available through
+`python -m tools.datasets.catalog`; no dataset acquisition is performed by `--help`.
+Case-memory source, pack and graph commands require their declared checkout assets; missing
+assets are blockers, not zero-valued records.

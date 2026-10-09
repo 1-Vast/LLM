@@ -22,7 +22,9 @@ python -m tools.evaluation.cli --help
 
 Default tests cover asset-free production contracts. The three current research
 test groups are explicit: `python -m tools.research_validation`. Frozen studies
-require their listed packet and, where noted, external assets.
+require their listed packet and outputs. Run `python -m tools.research_validation --verify`
+for a hash and asset preflight; missing files are reported as `BLOCKED/ASSET_MISSING`.
+Passing contract tests does not mean a research experiment was rerun.
 
 ## Ownership
 
@@ -44,7 +46,10 @@ summaries retain their source identity. The core does not import research or too
 Engineering closure is verified. The original STATE study reports a task-specific
 RNA prediction signal, while independent decision benefit, LLM advantage,
 functional phenotype and mechanism causality remain unestablished. All five
-current target contexts were previously exposed.
+current target contexts were previously exposed. The current readout verifier is
+blocked in a clean checkout by absent Tahoe feature-name metadata; MAP native replay
+needs external weights/source assets, and risk calibration needs its ignored prepared
+pack. See [blocked assets](BLOCKED_ASSETS.md).
 
 Read [the research report](research/REPORT.md) for claim boundaries and next
 steps, [the evidence register](research/EVIDENCE.md) for canonical results and

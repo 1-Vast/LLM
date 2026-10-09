@@ -1,75 +1,29 @@
 # Dataset Tools
 
-`biological_knowledge` provides read-only, provenance-preserving access to an
-explicit SQLite snapshot. It has no dependency on a research runner and does
-not convert annotations into evidence of current-cell mechanism or efficacy:
-
-```powershell
-python -m tools.datasets.biological_knowledge --database research/astra/knowledge_transfer_20261004/biological_knowledge.sqlite context SIDM00097 --kind pathway
-python -m tools.datasets.biological_knowledge --database research/astra/knowledge_transfer_20261004/biological_knowledge.sqlite drug Alpelisib
-python -m tools.datasets.biological_knowledge --database research/astra/knowledge_transfer_20261004/biological_knowledge.sqlite paths AR CASP2 --hops 1
-python -m tools.datasets.biological_knowledge --database research/astra/repeat_signal_20261005/feature_catalog.sqlite repeat_features SIDM00136
-```
-
-Protein influence and transcriptional regulation remain separate relation
-layers. Missing activity records are unavailable, not zeros; complex components
-are not expanded into direct-binding claims. The snapshot's original source
-licenses still apply. [Verification and asset recovery](../../research/EVIDENCE.md#knowledge_optimization_20261004)
-are explicit research operations.
-
-`repeat_features` reads the distinct feature-catalog schema: basal pathways,
-hotspot calls and CRISPR target dependency with source and missingness records.
-It rejects outcome-containing experimental evidence databases. Hotspot zero is
-not verified wild type, missing dependency is not zero effect, and CRISPR
-knockout is not drug inhibition. The original `context`, `drug` and `paths`
-operations continue to require the original biological-knowledge schema.
-The [repeat maintenance entry](../../research/EVIDENCE.md#repeat_optimization_20261006)
-owns snapshot verification and reproduction limits.
-
-This module owns dataset discovery, acquisition, source provenance, response construction
-and public/hidden benchmark preparation. Discovery results are candidates, not qualified
-evaluation data. Every source needs separate identity, control, unit, exposure and task audits.
+The maintained commands are dataset discovery and explicitly scoped data builders. Discovery
+does not qualify a source as evaluation data. Acquisition requires a caller-selected URL,
+declared hash and byte limit; `--help` performs no network request.
 
 ```bash
+python -m tools.datasets.catalog --help
 python -m tools.datasets.catalog candidates
-python -m tools.datasets.catalog candidates --role A
 python -m tools.datasets.catalog source sciplex3
-python -m tools.datasets.catalog search "perturbation single cell" --provider figshare --limit 5 --output data/manifests/metadata_search.json
-python -m tools.datasets.catalog probe https://zenodo.org/api/records/13350497
-python -m tools.datasets.catalog fetch HTTPS_FILE_URL data/external/FILE --sha256 DECLARED_SHA256 --max-bytes DECLARED_BYTE_LIMIT
-python -m tools.datasets.build_sciplex_pilot_v2
-python -m tools.datasets.qa_sciplex_pilot_v2
-python -m tools.datasets.benchmark
+python -m tools.datasets.combination_screens --help
 ```
 
-`sources.json` carries the audited local source registry from MAESTRO-VC v1. `catalog`
-distinguishes computed hashes, recorded but unverified hashes, missing sources and unknown
-licenses. Metadata search queries Figshare or Zenodo, records query/URL/time/response hash,
-and downloads no expression matrices. Acquisition streams one explicitly selected HTTPS
-file, enforces the byte budget, verifies SHA-256 and records provenance before use. Existing
-unverified files are never silently overwritten. The default download limit is 32 MiB.
+`catalog` reads `candidates.json` and `sources.json`. It distinguishes recorded hashes from
+verified local files and preserves missing or unqualified status. `condition_sources` resolves
+only exact registered context, drug, dose and provenance identities; it does not infer absent
+measurements.
 
-`lincs_pack` is the validated data construction implementation previously used from
-`research/case_memory_integration/external_data.py`. Its frozen research original remains
-for historical protocol and digest checks. Active case tools now import `tools.datasets`.
-The frozen eight-arm research replay remains under research and is not a certified model.
+`lincs_pack` builds the case-memory data pack from the registered LINCS inputs. The builder,
+case-memory audit and validation commands require those source assets. A missing pack or source
+is an asset blocker and must not be represented as an empty dataset.
 
-The sciPlex-v2 tools quarantine incomplete identity metadata, match controls within the
-declared cell/plate, preserve unavailable contrasts and the original feature axis, and
-reconcile stable gene IDs and sample sheets. Combination rescue is unavailable on the
-qualified subset. Dose units and biological replication remain unresolved. The QA gates
-check construction correctness, not biological accuracy.
+`combination_screens` and `evaluation.discovery_replay` remain importable release entry points.
+The former historical parity test is archived because its frozen `research/certified_discovery`
+package is not included. The production `virtual_cell.combination_world` contracts remain in the
+default asset-free test suite.
 
-The benchmark builder separates public episodes from hidden measured outcomes. It produces
-6,601 SciPlex3/L1000 episodes and 49,304 action records; fold 0 is evaluation, folds 1-4 are
-development. These source records were previously exposed. They support development replay
-and leakage checks, not independent external validation or deployment calibration.
-
-Candidate research history is in `research/dataset_discovery/`; the current audit and module
-changes are in `log/20260929/README.md`. Large assets stay under ignored local `data/`.
-
-The next [real predecision-state audit](../../research/EVIDENCE.md#state-data-audits) reruns raw
-episode/action joins, inspects twelve local task families and three public
-sources, and stops at its eligibility gate. Collection/verification/construction
-code remains in this module; [STATE_DATA_PLAN.md](../../research/EVIDENCE.md#state-data-audits) specifies
-the missing event/sample/attempt records required before a state-gain experiment.
+Other historical dataset auditors and benchmark builders are recoverable from Git history; they
+are not current release commands. Large scientific data and generated outputs are not bundled.

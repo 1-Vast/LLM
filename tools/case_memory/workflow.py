@@ -1,7 +1,7 @@
-"""External case-memory evaluation workflow.
+"""Case-memory source, pack and graph preparation workflow.
 
-This module prepares sources, packs and graphs. Scientific replay and evaluation
-are owned by ``research.case_memory_integration.external_replay``.
+Each step requires its registered input assets. Historical replay results and
+their archived runner are not part of this release.
 
 Run one step with ``python -m tools.case_memory.workflow <step>``.
 """

@@ -29,3 +29,13 @@ def test_research_runner_targets_only_the_current_studies(monkeypatch):
     args = targets[0]
     expected = [str(ROOT / path) for path in research_validation.DEFAULT_TARGETS]
     assert args == [*expected, "--collect-only"]
+
+
+def test_research_verification_preflight_reports_missing_assets(tmp_path):
+    for study, _ in research_validation.STUDIES:
+        path = tmp_path / study
+        path.mkdir(parents=True)
+        (path / "FREEZE.json").write_text('{"inputs": {}}', encoding="utf-8")
+
+    blocked = research_validation.blocked_assets(tmp_path)
+    assert blocked == sorted(result for _, result in research_validation.STUDIES)
