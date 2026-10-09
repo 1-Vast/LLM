@@ -59,36 +59,24 @@ asset-free combination-world contracts remain in the default suite.
 Run evaluation through `python -m tools.evaluation.cli` and
 `python -m tools.evaluation.construction build|screen`. Only `maestro` is an installed command.
 The checkout-local research test
-runner is `python -m tools.research_validation` from the repository root; it checks ASTRA
-entries and does not imply that a research claim is validated. Other historical
-suites use explicit pytest paths; `--include-archives` scans the historical tree.
-Results, baseline/snapshot source copies, `research/experiments` and supplied
-`research/data` copies are excluded by default. Use `--include-archives` only for an
-explicit historical collection; an active regression may still load an archived
-source deliberately to reproduce a known defect.
+runner is `python -m tools.research_validation` from the repository root; it runs only the
+three current study contract suites and does not imply that a research claim is validated.
+Historical suites and their required data are not part of default collection.
 
 Synthetic biological, virtual-cell, and provider-client fixtures are test-only and live in
 `tests/fixtures/`.
 
-## STATE research commands
+## Research Validation
 
-Specific diagnostic menus, feature kernels, held-out comparisons and historical
-lineage replays are checkout-local research, not installed dataset capabilities:
+The maintained research test suites are explicitly opt-in:
 
 ```bash
-python -m research.astra.state_sensitivity --help
-python -m research.astra.state_knowledge_retrospective --help
-python -m research.astra.state_knowledge_diagnose --help
-python -m research.astra.state_identifiability --help
-python -m research.astra.resistrace_retrospective --help
-python -m research.astra.state_evidence_followup --help
-python -m research.astra.state_prospective_certify --help
-python -m research.astra.state_prospective_review --help
-python -m research.astra.state_raw_reconstruction --help
+python -m tools.research_validation
+python -m tools.research_validation --verify
 ```
 
-Historical dataset audit commands are recoverable from Git history and are not release
-entry points. Dataset discovery and source inspection remain available through
-`python -m tools.datasets.catalog`; no dataset acquisition is performed by `--help`.
-Case-memory source, pack and graph commands require their declared checkout assets; missing
-assets are blockers, not zero-valued records.
+The first command runs contract tests. The second checks frozen inputs and generated outputs
+before invoking study verifiers. Missing assets produce `BLOCKED/ASSET_MISSING`. Historical
+dataset audit commands and older ASTRA drivers are recoverable from Git history, not current
+release entry points. Case-memory builders and audits likewise require their declared local
+assets and do not replace missing values with zeros.
