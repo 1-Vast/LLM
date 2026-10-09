@@ -1,12 +1,20 @@
 # Experiment record: 2026-10-09
 
 > - **Path**: `log/20261009/README.md`
-> - **Purpose**: Record STATE readout calibration, joint-feedback development and decision-value comparison.
+> - **Purpose**: Record STATE readout calibration, feedback, decision value, MAP content and difficult-task module validation.
 > - **Core points**: Readout calibration improves a bounded RNA prediction metric but not final equal-budget choices. Joint feedback improves some reference diagnostics but not exposed-target acquisition utility. Strict no-screen comparison does not establish screening value.
 
 ## 1. Record control
 
-This record summarizes the three canonical development studies. No model was promoted to production.
+This record summarizes three development studies, a knowledge-content audit and subsequent module experiments. No model was promoted to production.
+
+A subsequent MAP-KG audit restores pinned public tables and compares existing
+official molecular/knowledge caches with Morgan and permutation controls. It
+uses no new RNA outcomes. Knowledge retrieves 11 of 44 known-target queries, below
+Morgan's 13 of 44; source identity and assertion joins are independently verified. At
+that audit, protein shared-space and decision utility remained unvalidated. See
+`KNOWLEDGE_LAYER_VALIDATION.json` and the canonical evidence register for the
+protocol, primary-source interpretation, limitations and numerical checks.
 
 ## 2. Research questions and hypotheses
 
@@ -34,11 +42,22 @@ These are engineering and development results. They do not establish independent
 
 ## 8. Reproduction and artifact ledger
 
-Canonical results: `STATE_READOUT_REPAIR.json`, `STATE_FEEDBACK_REPAIR.json` and `DECISION_VALUE_REPAIR.json`. Code and freezes remain in their named research directories. See `MANIFEST.json` for file hashes.
+Canonical results: `STATE_READOUT_REPAIR.json`, `STATE_FEEDBACK_REPAIR.json`, `DECISION_VALUE_REPAIR.json` and `KNOWLEDGE_LAYER_VALIDATION.json`. Code and freezes remain in their named research directories. See `MANIFEST.json` for file hashes.
 
 ## 9. Open items and next experiments
 
 Use qualified, previously unused units with authenticated functional outcomes and registered model-risk, utility, cost and failure contracts.
+
+The subsequent MAP module study restores genuine protein and relation tensors,
+compares matched-information feedback, restricts historical labels to 4/8/16
+contexts with three repeats, and runs real bounded-source agent calls. Its
+independent verifiers reconstruct model choices, purchase receipts, source
+assertions, provider responses and all content scores. Source selection and
+schema failures are distinguished from unsupported biological claims. Original
+answers remain intact; the offline gate and deterministic source renderer are
+disclosed as post-hoc diagnostics. Canonical results, protocol amendments,
+resource usage and limitations are in `MAP_MODULE_REPLACEMENT.json` and the
+linked section of `research/EVIDENCE.md`.
 
 ## 10. Curation provenance
 

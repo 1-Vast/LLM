@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "experiment": "MAP molecule-to-projected-protein content retrieval",
+  "registered_before_scoring": true,
+  "downloaded_asset_scope": "Partial official MAP-KG gene_projector and smiles_projector storages plus original ESM vectors; no full MAP runtime or RNA response model.",
+  "asset_authentication": "Official pinned ESM revision and current public MAP Drive file ID; exact range byte counts, member ZIP CRC32 and local SHA256. No verification of the full checkpoint/ESM SHA256 from partial downloads. Reconstruct old knowledge1024 cache from original molecule256 and extracted smiles projector before scoring.",
+  "scoring_scope": "Unconditioned shared-space cosine query, not the complete relation-conditioned MAP pretraining objective, novel-edge generalization or biological target engagement.",
+  "inputs": {
+    "features": "outputs/paper_01286/released_test/FEATURES.npz",
+    "identities": "outputs/knowledge_layer_validation_20261009/AUDIT.json",
+    "gene_nodes": "data/external/mapkg_20261009/GENE_tahoe_filtered.csv",
+    "protein_features": "data/external/map_module_replacement_20261009/PROTEIN_FEATURES.npz",
+    "qualification": "research/map_module_replacement_20261009/asset_audit/GALLERY_QUALIFICATION.json"
+  },
+  "identity_rule": "Full canonical isomeric SMILES and PubChem CID; use existing strict source-qualified identities. Deduplicate identical (CID,SMILES), exclude any structural neighbor sharing CID or full SMILES with the query. Preserve missing/ambiguous coverage for the full 146-candidate menu.",
+  "protein_rule": "One exact ESM symbol per stable gene ID and one stable gene ID per symbol, exact original ESM lookup entry. Duplicate identical rows collapse; all ambiguous mappings remain recorded. No fuzzy or isoform reconstruction.",
+  "protein_gallery": "All resolvable menu known-edge target genes plus exactly 1000 sampled symbols from the full eligible global gene-node set, excluding target symbols; stable sorted population, NumPy default_rng seed 20261009, sample without replacement. Target-enriched gallery, not genome-wide retrieval.",
+  "queries": "All unique strict-qualified molecular identities with >=1 known drug-gene assertion in the full menu, fixed before scoring. Report 146 menu candidates, all encodable candidates, all unique identities, all known-assertion query identities and all unresolved target IDs. Do not replace denominators post hoc.",
+  "truth": "Exact stable gene IDs present in source assertions; unknown/missing graph edges remain unknown. Original relation and row lineage retained. No edge heldout was imposed on pretrained assets.",
+  "arms": [
+    "knowledge1024_to_projected_protein1024_cosine",
+    "knowledge1024_to_fixed_symbol_shuffled_protein1024_cosine",
+    "knowledge1024_fixed_whole_query_identity_permutation_to_projected_protein1024_cosine",
+    "molecule256_nearest_five_other_identities_target_votes",
+    "query_excluded_other_identity_target_popularity"
+  ],
+  "control_definitions": {
+    "protein_shuffle": "One fixed permutation of full protein gallery rows, RNG seed 20261010; preserve actual truth and gene labels.",
+    "identity_permutation": "One fixed permutation of all encodable deduplicated molecule identities, RNG seed 20261011; preserve actual query truth.",
+    "molecule_votes": "Top-five other molecule identities by original molecule256 cosine, stable identity-order ties; score each gene by fraction of those five neighbors with a raw known assertion to that gene. Unknown neighbor annotations contribute no assertion; do not call them biological negatives.",
+    "popularity": "Count known assertions to each gene across all other unique source-qualified gallery identities; leave out the query identity and any shared-CID/shared-SMILES variants. No query truth is used to compute its score.",
+    "dimension_rule": "No cosine between incompatible molecule256 and protein5120 dimensions, no random projection baseline, no fitted mapping."
+  },
+  "metrics": {
+    "primary": "known-annotation hit@5",
+    "secondary": [
+      "hit@20",
+      "known-annotation recall@5",
+      "known-annotation recall@20",
+      "mean reciprocal rank"
+    ],
+    "denominators": "Primary includes every fixed known-assertion query identity. Recall uses all raw known target IDs, including explicitly documented unavailable/ambiguous targets. Queries without any gallery-resolvable truth have hit/recall/MRR=0 for this assay and remain flagged as unassessable biology. Also report a descriptive eligible-truth-only view without changing the primary denominator.",
+    "ties": "Descending score, stable ascending gene stable ID; molecule neighbors descending cosine then stable (CID,SMILES).",
+    "uncertainty": "Descriptive paired counts and per-query scores; no independent biological significance or policy gain is inferred."
+  },
+  "acceptance": "All partial storages and cache compatibility must pass. A content-retrieval advantage is observed only if primary knowledge hit@5 strictly exceeds both molecular target-vote and query-excluded popularity controls; report shuffled/identity nulls and secondary metrics without threshold tuning. Any failure or mixed result remains a negative/mixed content audit. No runtime promotion.",
+  "limitations": [
+    "Known graph assertions may have appeared in knowledge pretraining.",
+    "Gallery intentionally includes all available menu targets and a fixed distractor subset.",
+    "Exact symbol lookup is not an independently authenticated protein-sequence/isoform lineage.",
+    "Unconditioned cosine does not supply direction, affinity, potency, dose/time dependence, RNA response, efficacy, safety or EVSI.",
+    "No new RNA or functional outcomes are accessed."
+  ],
+  "native_MAP_blockers": [
+    "Original epoch_3 PrimeKG_ver1 forward semantics are absent from inspected public history.",
+    "Exact ordered 2000-output HVG map and decoder target scale remain missing.",
+    "Prior checkpoint-compatible current-code bridge showed causal first-CLS drug invariance and dose invariance; changing masks is a new model, not authenticated reproduction.",
+    "Full checkpoint/source restoration alone cannot resolve these semantic blockers."
+  ]
+}

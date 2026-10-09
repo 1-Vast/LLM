@@ -1,0 +1,194 @@
+{
+  "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs42256-026-01286-w/MediaObjects/42256_2026_1286_MOESM1_ESM.pdf",
+  "file": "research/knowledge_layer_validation_20261009/sources/SUPPLEMENTARY_INFORMATION.pdf",
+  "status": 200,
+  "bytes": 971339,
+  "sha256": "f23358fbbd1479de34cbb96aebc353f8b3669ac6dae02db27c473dfcd97baf60",
+  "pages": 19,
+  "targeted_reading": [
+    {
+      "page": 6,
+      "text": "self-attention: tokens from di\u0000erent modalities can attend to each other and exchange information. In particular, drug tokens enriched with mechanistic knowledge can interact with gene tokens, allowing the model to capture drug\u2013gene interaction patterns. Meanwhile, the cell token, which is pre-trained to decode jointly with gene-level signals, can aggregate gene-level perturbation information into a compact cell-level representation. To evaluate the e\u0000ectiveness of this design, we conduct ablation studies on OP3 under the zero-shot gen- eralization to unpro\ufb01led drugs setting. In each variant, we remove one type of feature while keeping the rest unchanged. The drug token is not ablated, as it is an essential input; its role is analyzed in Section 2.5. Speci\ufb01cally, we consider the following four variants: (i) w/o cell emb , where the cell embedding is replaced"
+    },
+    {
+      "page": 6,
+      "text": "attention-based sequence is essential for capturing cross-modal dependencies and achieving strong predictive performance. A.5 Implementation details and computational cost The MAP model was implemented using PyTorch(v.2.1) as the deep learning framework. Data preprocessing was conducted with Scanpy(v.1.9) and anndata(v.0.9). The Knowledge-driven multi-modal pre-training was implemented on 4 NVIDIA A-100 GPU. Pre-training on the full MAP-KG took approximately 25h to converge. A scalability analysis of running time is conducted by varying the proportion of training data from 25% to 100%. As shown in Table 19, the convergence time increases approximately linearly with the data size, rising from 6.72 hours at 25% to 25.44 hours at full scale, with the normalized training time (hours per 1% of data)"
+    },
+    {
+      "page": 6,
+      "text": "The MAP model was implemented using PyTorch(v.2.1) as the deep learning framework. Data preprocessing was conducted with Scanpy(v.1.9) and anndata(v.0.9). The Knowledge-driven multi-modal pre-training was implemented on 4 NVIDIA A-100 GPU. Pre-training on the full MAP-KG took approximately 25h to converge. A scalability analysis of running time is conducted by varying the proportion of training data from 25% to 100%. As shown in Table 19, the convergence time increases approximately linearly with the data size, rising from 6.72 hours at 25% to 25.44 hours at full scale, with the normalized training time (hours per 1% of data) remains nearly constant (0.254\u20130.269 h/%), indicating reliable extension to larger knowledge graphs without incurring disproportionate computational overhead. The perturbation response prediction training was implemented on four NVIDIA A100 GPUs. As shown in"
+    },
+    {
+      "page": 6,
+      "text": "remains nearly constant (0.254\u20130.269 h/%), indicating reliable extension to larger knowledge graphs without incurring disproportionate computational overhead. The perturbation response prediction training was implemented on four NVIDIA A100 GPUs. As shown in |25"
+    },
+    {
+      "page": 7,
+      "text": "Table 20, training on the Tahoe-100M dataset took approximately 11.9 h to converge. We compared the computational cost of MAP with two strong baseline methods, XPert and CRISP. Under the same experimental setting, the convergence time of MAP (11.91 h) was comparable to XPert (12.25 h) and moderately higher than CRISP (8.63 h), indicating improved predictive performance without a substantial increase in training time. In terms of memory usage, MAP required a higher peak single-GPU memory footprint than XPert and CRISP. This is mainly attributable to our representation design, where a relatively long sequence of gene-level tokens is incorporated into the Transformer encoder to enable \ufb01ne-grained interactions among cell, gene, and drug representations."
+    },
+    {
+      "page": 7,
+      "text": "setting, the convergence time of MAP (11.91 h) was comparable to XPert (12.25 h) and moderately higher than CRISP (8.63 h), indicating improved predictive performance without a substantial increase in training time. In terms of memory usage, MAP required a higher peak single-GPU memory footprint than XPert and CRISP. This is mainly attributable to our representation design, where a relatively long sequence of gene-level tokens is incorporated into the Transformer encoder to enable \ufb01ne-grained interactions among cell, gene, and drug representations. Together, these runtime and memory measurements provide a practical reference for estimating the com- putational resources required to apply MAP to new datasets under comparable model and data settings. In general, full training or large-scale adaptation of MAP is expected to require multi-GPU acceleration"
+    },
+    {
+      "page": 7,
+      "text": "Together, these runtime and memory measurements provide a practical reference for estimating the com- putational resources required to apply MAP to new datasets under comparable model and data settings. In general, full training or large-scale adaptation of MAP is expected to require multi-GPU acceleration with high-memory devices, whereas applying the released pretrained knowledge encoders can reduce the requirement to dataset-speci\ufb01c response-prediction training or \ufb01ne-tuning. |26"
+    },
+    {
+      "page": 11,
+      "text": "Supplementary T able 20 | Comparison of running time and memory usage across methods. The comparison was conducted on the Tahoe-100M, under the zero-shot generalization setting for unpro\ufb01led drugs. All methods were trained with the same pseudo-bulk size of 24 using four A100 GPUs. We report the convergence time, de\ufb01ned as the training time required to trigger the early-stopping criterion after 1,000 steps without a new minimum loss, and the peak memory usage per GPU. Methods MAP XPert CRISP chemCPA PRnet Converge time (h) 11.91 12.25 8.63 19.90 6.77 Peak Memory Usage (GB) 42.48 28.54 20.15 9.86 16.71 |30"
+    },
+    {
+      "page": 11,
+      "text": "on the Tahoe-100M, under the zero-shot generalization setting for unpro\ufb01led drugs. All methods were trained with the same pseudo-bulk size of 24 using four A100 GPUs. We report the convergence time, de\ufb01ned as the training time required to trigger the early-stopping criterion after 1,000 steps without a new minimum loss, and the peak memory usage per GPU. Methods MAP XPert CRISP chemCPA PRnet Converge time (h) 11.91 12.25 8.63 19.90 6.77 Peak Memory Usage (GB) 42.48 28.54 20.15 9.86 16.71 |30"
+    },
+    {
+      "page": 12,
+      "text": "(sign of NES) and relative magnitude across pathways. For each drug, we consider pathways that are biologically relevant to its mechanism of action and expected e\u0000ects in NSCLC, based on established drug\u2013 target annotations (mainly DrugBank [ 50]) and disease-associated pathways. Supplementary Table S10 reports these pathway-level comparisons, supporting the consistency between predicted and known mechanisms. A.7 Literature support for homoharringtonine in A-549 screening We performed literature mining for the top-ranked non-standard candidates from the A549 simulated screening. Among these compounds, homoharringtonine (HHT; omacetaxine mepesuccinate) emerged as one of the most strongly supported candidates with direct A549 evidence. In a study of NSCLC cell lines, HHT showed cytotoxic activity against A549 cells, with a reported IC50 of 3.7 \u00b5M , and inhibited A549 cell proliferation,"
+    },
+    {
+      "page": 13,
+      "text": "Adagrasib. Adagrasib is a covalent inhibitor targeting the mutant KRAS G12C protein and is designed to attenuate downstream RAS\u2013MAPK signaling [ 56, 57]. In the A549 perturbation data, key KRAS pathway- associated oncogenic programs exhibit clear negative enrichment, and MAP closely reproduces these suppressive patterns. Notably, the model correctly predicts downregulation of KRAS-driven lung cancer signatures, accompanied by reduced activity of downstream proliferative programs such as MYC-associated gene sets. This coordinated agreement forms a coherent pathway-level response that is consistent with attenuation of KRAS-linked transcriptional output observed in the experimental GSEA. Osimertinib. Osimertinib is a third-generation EGFR tyrosine kinase inhibitor [ 58]. In Figure 4c, MAP reproduces the experimentally observed activation of an EGFR signaling response signature, consistent"
+    },
+    {
+      "page": 13,
+      "text": "i=1(Yi \u2260 \u00afY )2 (14) The coe\u0000cient ranges from -1 to 1, where 1 indicates perfect positive correlation, -1 indicates perfect negative correlation, and 0 indicates no linear relationship. We calculate Pr \u0000 for both highly variable genes (HVG) and top-50 di\u0000erentially expressed (DE) genes. Direction accuracy evaluates whether the model predicts the correct direction of regulation relative to the |32"
+    },
+    {
+      "page": 14,
+      "text": "more accurate prediction of perturbation-induced expression magnitudes. W asserstein distance evaluates the discrepancy between predicted and observed perturbation responses at the distribution level, capturing di\u0000erences beyond pointwise errors. The metric measures the minimal cost of transforming the predicted expression distribution into the observed one, thereby re\ufb02ecting global structural di\u0000erences in expression pro\ufb01les. Formally, let P and Q denote the empirical distributions of predicted and observed gene expression values under perturbation p, respectively. The Wasserstein distance is de\ufb01ned as: W (P, Q)= i n f \u201c\u0153\u0000(P,Q) \u2044"
+    },
+    {
+      "page": 15,
+      "text": "A.10 Details of Knowledge Sources To ensure the diversity, high quality and broad coverage of MAP-KG, we curate and integrate fragmented knowledge from 14 public sources. Here, we brie\ufb02y introduce each source below, and summarize their contributions of knowledge data in Table 21. BindingDB [ 61] is a public database specializing in experimentally measured binding a\u0000nities of small molecules to their protein targets. BioGRID [ 62] (Biological General Repository for Interaction Datasets) is a curated biological database of"
+    },
+    {
+      "page": 15,
+      "text": "knowledge from 14 public sources. Here, we brie\ufb02y introduce each source below, and summarize their contributions of knowledge data in Table 21. BindingDB [ 61] is a public database specializing in experimentally measured binding a\u0000nities of small molecules to their protein targets. BioGRID [ 62] (Biological General Repository for Interaction Datasets) is a curated biological database of protein, chemical, and genetic interactions. It archives interaction data from multiple organisms, supporting network-based analysis of cellular pathways and gene function. ChEMBL [ 63] is a manually curated, open-source database of bioactive molecules with drug-like properties, maintained by the European Bioinformatics Institute (EMBL-EBI). It provides a vast repository of high-quality"
+    },
+    {
+      "page": 15,
+      "text": "BindingDB [ 61] is a public database specializing in experimentally measured binding a\u0000nities of small molecules to their protein targets. BioGRID [ 62] (Biological General Repository for Interaction Datasets) is a curated biological database of protein, chemical, and genetic interactions. It archives interaction data from multiple organisms, supporting network-based analysis of cellular pathways and gene function. ChEMBL [ 63] is a manually curated, open-source database of bioactive molecules with drug-like properties, maintained by the European Bioinformatics Institute (EMBL-EBI). It provides a vast repository of high-quality bioactivity data extracted from scienti\ufb01c literature and deposited datasets. DrugBank [ 50] is a bioinformatics and cheminformatics resource that combines detailed drug data with"
+    },
+    {
+      "page": 15,
+      "text": "protein, chemical, and genetic interactions. It archives interaction data from multiple organisms, supporting network-based analysis of cellular pathways and gene function. ChEMBL [ 63] is a manually curated, open-source database of bioactive molecules with drug-like properties, maintained by the European Bioinformatics Institute (EMBL-EBI). It provides a vast repository of high-quality bioactivity data extracted from scienti\ufb01c literature and deposited datasets. DrugBank [ 50] is a bioinformatics and cheminformatics resource that combines detailed drug data with comprehensive drug target information. It integrates chemical, pharmacological, and pharmaceutical data with detailed target sequence and pathway information, making it a gold-standard database for pharmacologists and pharmaceutical researchers."
+    },
+    {
+      "page": 15,
+      "text": "maintained by the European Bioinformatics Institute (EMBL-EBI). It provides a vast repository of high-quality bioactivity data extracted from scienti\ufb01c literature and deposited datasets. DrugBank [ 50] is a bioinformatics and cheminformatics resource that combines detailed drug data with comprehensive drug target information. It integrates chemical, pharmacological, and pharmaceutical data with detailed target sequence and pathway information, making it a gold-standard database for pharmacologists and pharmaceutical researchers. DrugCentral [ 64] is a comprehensive online drug database that provides information about active pharma- ceutical ingredients. It serves as a key resource for drug discovery and development by integrating drug data from various authoritative sources, including information on indications and pharmacological actions."
+    },
+    {
+      "page": 15,
+      "text": "DrugBank [ 50] is a bioinformatics and cheminformatics resource that combines detailed drug data with comprehensive drug target information. It integrates chemical, pharmacological, and pharmaceutical data with detailed target sequence and pathway information, making it a gold-standard database for pharmacologists and pharmaceutical researchers. DrugCentral [ 64] is a comprehensive online drug database that provides information about active pharma- ceutical ingredients. It serves as a key resource for drug discovery and development by integrating drug data from various authoritative sources, including information on indications and pharmacological actions. Ensembl [ 40] is a comprehensive genome database that provides integrated access to high-quality annotated genome sequences for vertebrates and other model organisms. It aggregates genomic and gene annotation data,"
+    },
+    {
+      "page": 15,
+      "text": "detailed target sequence and pathway information, making it a gold-standard database for pharmacologists and pharmaceutical researchers. DrugCentral [ 64] is a comprehensive online drug database that provides information about active pharma- ceutical ingredients. It serves as a key resource for drug discovery and development by integrating drug data from various authoritative sources, including information on indications and pharmacological actions. Ensembl [ 40] is a comprehensive genome database that provides integrated access to high-quality annotated genome sequences for vertebrates and other model organisms. It aggregates genomic and gene annotation data, including gene models, transcript and protein sequences, variation and comparative genomics information, and provides tools for data retrieval and analysis to support a range of genomic research tasks."
+    },
+    {
+      "page": 15,
+      "text": "ceutical ingredients. It serves as a key resource for drug discovery and development by integrating drug data from various authoritative sources, including information on indications and pharmacological actions. Ensembl [ 40] is a comprehensive genome database that provides integrated access to high-quality annotated genome sequences for vertebrates and other model organisms. It aggregates genomic and gene annotation data, including gene models, transcript and protein sequences, variation and comparative genomics information, and provides tools for data retrieval and analysis to support a range of genomic research tasks. HGNC [ 41] (HUGO Gene Nomenclature Committee) database is the authoritative resource for standardized human gene nomenclature. It assigns unique symbols and names to each human gene to ensure clear scienti\ufb01c communication and facilitate unambiguous data retrieval from publications and other databases."
+    },
+    {
+      "page": 15,
+      "text": "including gene models, transcript and protein sequences, variation and comparative genomics information, and provides tools for data retrieval and analysis to support a range of genomic research tasks. HGNC [ 41] (HUGO Gene Nomenclature Committee) database is the authoritative resource for standardized human gene nomenclature. It assigns unique symbols and names to each human gene to ensure clear scienti\ufb01c communication and facilitate unambiguous data retrieval from publications and other databases. Human PPI [ 65] is a computational resource that provides a predicted human protein-protein interactome. It allows users to search for interactions via gene names or UniProt identi\ufb01ers and to check for interactions between speci\ufb01c protein pairs. IntAct [66] is an open-source database system that provides a freely available resource for molecular interaction"
+    },
+    {
+      "page": 15,
+      "text": "HGNC [ 41] (HUGO Gene Nomenclature Committee) database is the authoritative resource for standardized human gene nomenclature. It assigns unique symbols and names to each human gene to ensure clear scienti\ufb01c communication and facilitate unambiguous data retrieval from publications and other databases. Human PPI [ 65] is a computational resource that provides a predicted human protein-protein interactome. It allows users to search for interactions via gene names or UniProt identi\ufb01ers and to check for interactions between speci\ufb01c protein pairs. IntAct [66] is an open-source database system that provides a freely available resource for molecular interaction data. It o\u0000ers a rich platform for studying protein functions in cellular processes through experimentally determined interactions."
+    },
+    {
+      "page": 15,
+      "text": "communication and facilitate unambiguous data retrieval from publications and other databases. Human PPI [ 65] is a computational resource that provides a predicted human protein-protein interactome. It allows users to search for interactions via gene names or UniProt identi\ufb01ers and to check for interactions between speci\ufb01c protein pairs. IntAct [66] is an open-source database system that provides a freely available resource for molecular interaction data. It o\u0000ers a rich platform for studying protein functions in cellular processes through experimentally determined interactions. PrimeKG [ 38] is a biomedical knowledge graph that integrates curated information from public resources into a uni\ufb01ed graph. It links entities such as diseases, drugs, genes/proteins, pathways/biological processes,"
+    },
+    {
+      "page": 15,
+      "text": "It allows users to search for interactions via gene names or UniProt identi\ufb01ers and to check for interactions between speci\ufb01c protein pairs. IntAct [66] is an open-source database system that provides a freely available resource for molecular interaction data. It o\u0000ers a rich platform for studying protein functions in cellular processes through experimentally determined interactions. PrimeKG [ 38] is a biomedical knowledge graph that integrates curated information from public resources into a uni\ufb01ed graph. It links entities such as diseases, drugs, genes/proteins, pathways/biological processes, phenotypes, and anatomical concepts. We incorporate the drug\u2013gene relationships from this resource into MAP-KG."
+    },
+    {
+      "page": 15,
+      "text": "PrimeKG [ 38] is a biomedical knowledge graph that integrates curated information from public resources into a uni\ufb01ed graph. It links entities such as diseases, drugs, genes/proteins, pathways/biological processes, phenotypes, and anatomical concepts. We incorporate the drug\u2013gene relationships from this resource into MAP-KG. PubChem [ 39] is a public repository of chemical molecules and their biological activities, maintained by the National Center for Biotechnology Information (NCBI). It provides extensive data on chemical structures, identi\ufb01ers, physicochemical properties, and bioassay results, serving as a foundational resource for chemical biology and drug discovery research. STITCH [ 67] (Search Tool for Interacting Chemicals) is a database of known and predicted interactions"
+    },
+    {
+      "page": 15,
+      "text": "phenotypes, and anatomical concepts. We incorporate the drug\u2013gene relationships from this resource into MAP-KG. PubChem [ 39] is a public repository of chemical molecules and their biological activities, maintained by the National Center for Biotechnology Information (NCBI). It provides extensive data on chemical structures, identi\ufb01ers, physicochemical properties, and bioassay results, serving as a foundational resource for chemical biology and drug discovery research. STITCH [ 67] (Search Tool for Interacting Chemicals) is a database of known and predicted interactions between chemicals and proteins. It integrates interaction data from experiments, databases, and literature to build comprehensive networks."
+    },
+    {
+      "page": 15,
+      "text": "identi\ufb01ers, physicochemical properties, and bioassay results, serving as a foundational resource for chemical biology and drug discovery research. STITCH [ 67] (Search Tool for Interacting Chemicals) is a database of known and predicted interactions between chemicals and proteins. It integrates interaction data from experiments, databases, and literature to build comprehensive networks. STRING [ 68] is a biological database and web resource for known and predicted protein-protein interactions. These interactions include both direct (physical) and indirect (functional) associations. TTD [ 69] (Therapeutic Target Database) is a specialized resource that provides information about known therapeutic protein and nucleic acid targets, along with their targeted diseases, pathway information and the"
+    },
+    {
+      "page": 15,
+      "text": "biology and drug discovery research. STITCH [ 67] (Search Tool for Interacting Chemicals) is a database of known and predicted interactions between chemicals and proteins. It integrates interaction data from experiments, databases, and literature to build comprehensive networks. STRING [ 68] is a biological database and web resource for known and predicted protein-protein interactions. These interactions include both direct (physical) and indirect (functional) associations. TTD [ 69] (Therapeutic Target Database) is a specialized resource that provides information about known therapeutic protein and nucleic acid targets, along with their targeted diseases, pathway information and the |34"
+    },
+    {
+      "page": 15,
+      "text": "between chemicals and proteins. It integrates interaction data from experiments, databases, and literature to build comprehensive networks. STRING [ 68] is a biological database and web resource for known and predicted protein-protein interactions. These interactions include both direct (physical) and indirect (functional) associations. TTD [ 69] (Therapeutic Target Database) is a specialized resource that provides information about known therapeutic protein and nucleic acid targets, along with their targeted diseases, pathway information and the |34"
+    },
+    {
+      "page": 15,
+      "text": "STRING [ 68] is a biological database and web resource for known and predicted protein-protein interactions. These interactions include both direct (physical) and indirect (functional) associations. TTD [ 69] (Therapeutic Target Database) is a specialized resource that provides information about known therapeutic protein and nucleic acid targets, along with their targeted diseases, pathway information and the |34"
+    },
+    {
+      "page": 16,
+      "text": "Supplementary T able 21 | Links and statistics of the 14 knowledge sources in MAP-KG . Source Link Type of Feature Count ChEMBL [ 63] https://www.ebi.ac.uk/chembl Drug 16,002 DrugBank [ 50] https://www.drugbank.com Drug 17,459 PubChem [ 39] https://pubchem.ncbi.nlm.nih.gov Drug 168,209 Ensembl [ 40] https://www.ensembl.org Gene 86,599 HGNC [ 41] https://www.genenames.org/ Gene 44,433 BindingDB [ 61] https://www.bindingdb.org Drug-Gene 279,857 DrugCentral [ 64] https://drugcentral.org Drug-Gene 28,665"
+    },
+    {
+      "page": 16,
+      "text": "Source Link Type of Feature Count ChEMBL [ 63] https://www.ebi.ac.uk/chembl Drug 16,002 DrugBank [ 50] https://www.drugbank.com Drug 17,459 PubChem [ 39] https://pubchem.ncbi.nlm.nih.gov Drug 168,209 Ensembl [ 40] https://www.ensembl.org Gene 86,599 HGNC [ 41] https://www.genenames.org/ Gene 44,433 BindingDB [ 61] https://www.bindingdb.org Drug-Gene 279,857 DrugCentral [ 64] https://drugcentral.org Drug-Gene 28,665 STITCH [ 67] http://stitch.embl.de Drug-Gene 81,346"
+    },
+    {
+      "page": 16,
+      "text": "ChEMBL [ 63] https://www.ebi.ac.uk/chembl Drug 16,002 DrugBank [ 50] https://www.drugbank.com Drug 17,459 PubChem [ 39] https://pubchem.ncbi.nlm.nih.gov Drug 168,209 Ensembl [ 40] https://www.ensembl.org Gene 86,599 HGNC [ 41] https://www.genenames.org/ Gene 44,433 BindingDB [ 61] https://www.bindingdb.org Drug-Gene 279,857 DrugCentral [ 64] https://drugcentral.org Drug-Gene 28,665 STITCH [ 67] http://stitch.embl.de Drug-Gene 81,346 TTD [ 69] https://db.idrblab.net/ttd Drug-Gene 32,920"
+    },
+    {
+      "page": 16,
+      "text": "Ensembl [ 40] https://www.ensembl.org Gene 86,599 HGNC [ 41] https://www.genenames.org/ Gene 44,433 BindingDB [ 61] https://www.bindingdb.org Drug-Gene 279,857 DrugCentral [ 64] https://drugcentral.org Drug-Gene 28,665 STITCH [ 67] http://stitch.embl.de Drug-Gene 81,346 TTD [ 69] https://db.idrblab.net/ttd Drug-Gene 32,920 PrimeKG [ 38] https://zitniklab.hms.harvard.edu/projects/PrimeKG/ Drug-Gene 23904 BioGRID [ 62] https://thebiogrid.org Drug-Gene 5,085"
+    },
+    {
+      "page": 17,
+      "text": "25\u201340 words for readability. Canonical gene sequences are included as attributes in MAP-KG but omitted here due to length. Drug nodes. PubChem ID Drug name SMILES MOA (truncated) 10013505 NGX-267 CC[C@@H]1SC2(CCN(C)CC2) NC1=O NGX267 has been shown to stimu- late M1 receptors in a fashion anal- ogous to acetylcholine, a neuro... 100154 CA4P COC1=C(C=C(C=C1)CC(C2="
+    },
+    {
+      "page": 17,
+      "text": "via its interactions with neurexin family members... Drug\u2013gene relations. Drug PubChem ID Gene stable ID Relation text 44230999 ENSG00000125384 functions as an agonist on the protein target 65243 ENSG00000145888 functions as an inhibitor on the protein target 4956 ENSG00000127955 functions as a reactant involved in biochemical processes of the protein encoded by gene Gene\u2013gene relations."
+    },
+    {
+      "page": 17,
+      "text": "family members... Drug\u2013gene relations. Drug PubChem ID Gene stable ID Relation text 44230999 ENSG00000125384 functions as an agonist on the protein target 65243 ENSG00000145888 functions as an inhibitor on the protein target 4956 ENSG00000127955 functions as a reactant involved in biochemical processes of the protein encoded by gene Gene\u2013gene relations. Gene 1 stable ID Gene 2 stable ID Relation text"
+    },
+    {
+      "page": 18,
+      "text": "enrichment analysis in python. Bioinformatics, 39(1):btac757, 2023. [50] Craig Knox, Mike Wilson, Christen M Klinger, Mark Franklin, Eponine Oler, Alex Wilson, Allison Pon, Jordan Cox, Na Eun Chin, Seth A Strawbridge, et al. Drugbank 6.0: the drugbank knowledgebase for 2024. Nucleic Acids Research , 52(D1):D1265\u2013D1275, 2024. [51] Petra Ho\u0000knecht, Amanda Tufman, Thomas Wehler, Theo Pelzer, Rainer Wiewrodt, Martin Sch\u00fctz, Monika Serke, Jan St\u00f6hlmacher-Williams, Angela M\u00e4rten, Rudolf Maria Huber, et al. E\u0000cacy of the irreversible erbb family blocker afatinib in epidermal growth factor receptor (egfr) tyrosine kinase inhibitor (tki)\u2013pretreated non\u2013small-cell lung cancer patients with brain metastases or leptomeningeal disease. Journal of Thoracic Oncology , 10(1):156\u2013163, 2015."
+    },
+    {
+      "page": 18,
+      "text": "of Cancer , 121(9):725\u2013737, 2019. [61] Tiqing Liu, Linda Hwang, Stephen K Burley, Carmen I Nitsche, Christopher Southan, W Patrick Walters, and Michael K Gilson. Bindingdb in 2024: a fair knowledgebase of protein-small molecule binding data. Nucleic Acids Research , 53(D1):D1633\u2013D1644, 2025. [62] Rose Oughtred, Jennifer Rust, Christie Chang, Bobby-Joe Breitkreutz, Chris Stark, Andrew Willems, Lorrie Boucher, Genie Leung, Nadine Kolas, Frederick Zhang, et al. The biogrid database: A com- prehensive biomedical resource of curated protein, genetic, and chemical interactions. Protein Science, 30(1):187\u2013200, 2021. |37"
+    },
+    {
+      "page": 18,
+      "text": "Nucleic Acids Research , 53(D1):D1633\u2013D1644, 2025. [62] Rose Oughtred, Jennifer Rust, Christie Chang, Bobby-Joe Breitkreutz, Chris Stark, Andrew Willems, Lorrie Boucher, Genie Leung, Nadine Kolas, Frederick Zhang, et al. The biogrid database: A com- prehensive biomedical resource of curated protein, genetic, and chemical interactions. Protein Science, 30(1):187\u2013200, 2021. |37"
+    },
+    {
+      "page": 19,
+      "text": "[63] Anna Gaulton, Louisa J Bellis, A Patricia Bento, Jon Chambers, Mark Davies, Anne Hersey, Yvonne Light, Shaun McGlinchey, David Michalovich, Bissan Al-Lazikani, et al. Chembl: a large-scale bioactivity database for drug discovery. Nucleic Acids Research , 40(D1):D1100\u2013D1107, 2012. [64] Oleg Ursu, Jayme Holmes, Je\u0000rey Knockel, Cristian G Bologa, Jeremy J Yang, Stephen L Mathias, Stuart J Nelson, and Tudor I Oprea. Drugcentral: online drug compendium. Nucleic Acids Research , page gkw993, 2016. [65] Jing Zhang, Ian R Humphreys, Jimin Pei, Jinuk Kim, Chulwon Choi, Rongqing Yuan, Jesse Durham, Siqi Liu, Hee-Jung Choi, Minkyung Baek, et al. Predicting protein-protein interactions in the human"
+    },
+    {
+      "page": 19,
+      "text": "[63] Anna Gaulton, Louisa J Bellis, A Patricia Bento, Jon Chambers, Mark Davies, Anne Hersey, Yvonne Light, Shaun McGlinchey, David Michalovich, Bissan Al-Lazikani, et al. Chembl: a large-scale bioactivity database for drug discovery. Nucleic Acids Research , 40(D1):D1100\u2013D1107, 2012. [64] Oleg Ursu, Jayme Holmes, Je\u0000rey Knockel, Cristian G Bologa, Jeremy J Yang, Stephen L Mathias, Stuart J Nelson, and Tudor I Oprea. Drugcentral: online drug compendium. Nucleic Acids Research , page gkw993, 2016. [65] Jing Zhang, Ian R Humphreys, Jimin Pei, Jinuk Kim, Chulwon Choi, Rongqing Yuan, Jesse Durham, Siqi Liu, Hee-Jung Choi, Minkyung Baek, et al. Predicting protein-protein interactions in the human proteome. Science, 390(6771):eadt1630, 2025."
+    },
+    {
+      "page": 19,
+      "text": "[66] Henning Hermjakob, Luisa Montecchi-Palazzi, Chris Lewington, Sugath Mudali, Samuel Kerrien, Sandra Orchard, Martin Vingron, Bernd Roechert, Peter Roepstor\u0000, Alfonso Valencia, et al. Intact: an open source molecular interaction database. Nucleic Acids Research , 32(suppl_1):D452\u2013D455, 2004. [67] Damian Szklarczyk, Alberto Santos, Christian Von Mering, Lars Juhl Jensen, Peer Bork, and Michael Kuhn. Stitch 5: augmenting protein\u2013chemical interaction networks with tissue and a\u0000nity data. Nucleic Acids Research, 44(D1):D380\u2013D384, 2016. [68] Damian Szklarczyk, Annika L Gable, Katerina C Nastou, David Lyon, Rebecca Kirsch, Sampo Pyysalo, Nadezhda T Doncheva, Marc Legeay, Tao Fang, Peer Bork, et al. The string database in 2021: customizable protein\u2013protein networks, and functional characterization of user-uploaded gene/measurement sets."
+    },
+    {
+      "page": 19,
+      "text": "Acids Research, 44(D1):D380\u2013D384, 2016. [68] Damian Szklarczyk, Annika L Gable, Katerina C Nastou, David Lyon, Rebecca Kirsch, Sampo Pyysalo, Nadezhda T Doncheva, Marc Legeay, Tao Fang, Peer Bork, et al. The string database in 2021: customizable protein\u2013protein networks, and functional characterization of user-uploaded gene/measurement sets. Nucleic Acids Research , 49(D1):D605\u2013D612, 2021. [69] Xin Chen, Zhi Liang Ji, and Yu Zong Chen. Ttd: therapeutic target database. Nucleic Acids Research , 30(1):412\u2013415, 2002. |38"
+    },
+    {
+      "page": 19,
+      "text": "protein\u2013protein networks, and functional characterization of user-uploaded gene/measurement sets. Nucleic Acids Research , 49(D1):D605\u2013D612, 2021. [69] Xin Chen, Zhi Liang Ji, and Yu Zong Chen. Ttd: therapeutic target database. Nucleic Acids Research , 30(1):412\u2013415, 2002. |38"
+    }
+  ]
+}

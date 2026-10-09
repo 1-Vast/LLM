@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "experiment": "Original MAP-KG relation-conditioned known-assertion content assay",
+  "prior_results_disclosed": "Unconditioned molecule→protein known-target hit5 was 3/44; structural vote7/44 and popularity9/44. Initial explicit source-qualification agent arms tied12/12. This is a new mechanism-specific assay, not a revised interpretation of those results.",
+  "registered_before_relation_scores": true,
+  "asset_scope": "Original fine-tuned BioBERT text_encoder, original text_projector, GatedFusion, original gene projector/protein subset and original molecule cache. All222 original new tensors strict-loaded; 500MB additional partial-download budget. No full runtime or native response reconstruction.",
+  "authentication": "Pinned source/model tokenizer metadata plus current official Drive file-ID, exact ZIP member size/CRC/localSHA256; full GB checkpoint digest unverified. Original molecule/projector cache reconstruction separately passed. No random replacement tensors or generic pretrained BioBERT weights substituted.",
+  "primary_queries": "Every distinct (strict-qualified drugidentity, exact genericrelation) pair present in raw source rows for five registered phrases, with nonempty known targets. Thirty drug identities and32 pairs in fixed menu. All44 known-target identities and146 candidates retained as coverage; absent genericrelation queries flagged rather than generated.",
+  "generic_relations": [
+    {
+      "phrase": "functions as an inhibitor on the protein target",
+      "mode": "inhibit"
+    },
+    {
+      "phrase": "functions as an activator on the protein target",
+      "mode": "activate"
+    },
+    {
+      "phrase": "functions as an agonist on the protein target",
+      "mode": "agonist"
+    },
+    {
+      "phrase": "functions as an antagonist on the protein target",
+      "mode": "antagonist"
+    },
+    {
+      "phrase": "binds to the protein target",
+      "mode": "bind"
+    }
+  ],
+  "exploratory_queries": "All258 distinct drug+originalrelation pairs from162 verbatim relation phrases over44 identities. Target-naming or assay conditions in prose may provide answers; report only original-source content and relation-only baseline. No rewriting/removing target names after seeing ranks.",
+  "protein_gallery": "Exact frozen1241 protein gallery:241 unambiguous menu known targets+1000 fixed global distractors,21 ambiguous target IDs excluded and retained in truth denominators. Target-enriched gallery, not genome-wide.",
+  "truth": "For each drug+relation phrase, use exactly its raw original edge-target set. No target gene appears in the generic query text. Unknown/missing graph edges remain unknown; no heldout-edge or biological absence assertions.",
+  "official_composition": {
+    "outgoing": "GatedFusion(z_drug,z_relation) -> z_gene; public forward source-side conditioning uses this order.",
+    "incoming": "z_drug -> GatedFusion(z_relation,z_gene); public forward target-side conditioning uses this order, where the gate multiplies its SECOND argument.",
+    "drug_space": "Primary uses original knowledge1024 modality representation from molecular cache; canonical drug-name embedding secondary checks actual name anchors used by public edge dataloader.",
+    "gene_space": "Primary uses original projected protein1024 modality representation; canonical gene-name embedding secondary checks actual name anchors.",
+    "relation_encoder": "Original fine-tuned BioBERT pooler output followed by original text projector; official tokenizer max_length512, fixed maximum padding, special tokens, truncation and attention mask; eval dropout disabled. Original names/phrases, no invented TransE.",
+    "primary_arm": "outgoing_molecule_relation_to_projected_protein_cosine",
+    "prespecified_other_directions": [
+      "incoming_molecule_to_relation_projected_protein_cosine",
+      "outgoing_canonical_name_relation_to_canonical_gene_name_cosine",
+      "incoming_canonical_drug_name_to_relation_canonical_gene_name_cosine"
+    ],
+    "direction_selection": "All directions reported separately; never select the best direction after results."
+  },
+  "controls": [
+    "relation_only_to_projected_protein_cosine",
+    "outgoing_molecule_with_fixed_relation_identity_permutation",
+    "outgoing_molecule_relation_with_fixed_protein_identity_permutation",
+    "molecule256_nearest_five_other_identity_exactrelation_target_votes",
+    "query_excluded_other_identity_exactrelation_target_popularity"
+  ],
+  "control_detail": {
+    "relation_permutation": "Fixed RNG20261012 permutation of the sorted available generic phrase dictionary for generic queries; other exploratory phrases use a fixed permutation of the full162 dictionary. If a fixed point occurs retain it and report. No query truth relabeling.",
+    "protein_permutation": "Reuse fixed RNG20261010 full protein-row identity permutation.",
+    "vote": "Existing molecule256 cosine selects five other identities excluding sameCID/fullSMILES, before relation filtering; each donor votes once per known target with the EXACT queryrelation. No adaptive expansion to find annotated neighbors.",
+    "popularity": "Each other exact-qualified unique identity votes once per target for the EXACT queryrelation; query/sameCID/sameSMILES excluded.",
+    "zero_controls": "Stable gene-ID tie order; absence of donor assertion is no assertion, not experimental negative.",
+    "relation_only": "Same fine-tuned relation embedding; ranks same projected proteins without drug input to quantify semantic/target-naming content."
+  },
+  "metrics": {
+    "primary": "Drug-macro known-assertion hit@5 for outgoing modality arm on generic32pairs, averaging relation-query hit per each of30 drugs and then drugs. Query-micro32 denominator also reported.",
+    "secondary": [
+      "hit@20",
+      "recall@5",
+      "recall@20",
+      "MRR",
+      "incoming direction metrics",
+      "canonical name-anchor directions",
+      "generic mode strata",
+      "exploratory verbatim-phrase metrics"
+    ],
+    "recall": "All known targets for exactly that queryrelation, including absent/ambiguous gallery IDs. No denominator repair based on results.",
+    "ties": "Descending score then ascending stable geneID, identical to frozen protein assay.",
+    "uncertainty": "Descriptive per-query/paired counts; graph exposure and limited known-annotation endpoints preclude independent biological significance."
+  },
+  "acceptance": "Outgoing generic drug-macro hit5 must exceed relation-only, molecule-vote and query-excluded exactrelation popularity, with permutation metrics reported. Do not promote or claim relationconditioned method superiority from mixed results, nameanchor-only success or exploratory target-named phrases.",
+  "registration_note": "Features/names/relations/source identities and compatibility outputs frozen before scoring. Protein-feature result is known; relation query endpoints were defined before relation scores.",
+  "limits": [
+    "Potential prior knowledge-graph exposure",
+    "Target-enriched gallery and source-known annotation truth",
+    "Gene name encodings index the candidate gallery; canonical source names may be ambiguous, preserved in metadata",
+    "No cell/time/dose/assay-conditioned intervention probability",
+    "No RNA/function/risk/EVSI or agent policy benefit",
+    "Native response gene map and checkpoint matched forward remain blocked"
+  ]
+}

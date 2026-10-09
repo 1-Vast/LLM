@@ -22,4 +22,16 @@ No LLM advantage, functional phenotype gain or mechanism causality is establishe
 
 ## Next decisive experiment
 
+The [MAP module experiments](EVIDENCE.md#map-module-replacement-and-hard-task-tests--2026-10-09)
+now include genuine released protein and relation encoders, matched-information
+STATE feedback, scarce-history repeats and bounded-source agent API tests.
+Original name-anchor relation composition retains substantial known-graph
+content, but the primary molecule/protein direction does not beat structural
+votes or popularity. Scarce-history knowledge feedback mainly prevents noisy
+updates; it does not reliably beat structure, shuffled knowledge or no-screen.
+Hard source-selection trials expose prototype schema and routing failures;
+source-typed context alone does not fix them. Neither world-model nor agent
+replacement meets its declared evidence requirements. Native MAP RNA output
+order and training-time semantics remain unauthenticated.
+
 Use qualified, previously unused biological units and a frozen complete-menu protocol to compare no-screen, strong deterministic acquisition and STATE-informed acquisition under identical information, measurement budgets and authenticated functional outcomes. Pre-register model-risk, cost, latency and failure handling. In parallel, authenticate the MAP training-time forward and output gene order before any native-response claim. Promotion requires independent prediction and decision results; another model expansion is not justified by the current evidence.

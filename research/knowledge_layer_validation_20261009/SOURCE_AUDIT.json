@@ -1,0 +1,692 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-10-09",
+  "audit_owner": "validation_units",
+  "scope": {
+    "objective": "Fresh official-source audit of MAP-KG / MAP for provenance-bound knowledge-layer research in MAESTRO.",
+    "reading_depth": "Targeted official full-text Methods, benchmark and screening sections, Extended Data Figures 1-2, supplementary A.5/A.10 and Tables 19-21, and six inspected public implementation files. Not an exhaustive scientific or software reproduction.",
+    "excluded": [
+      "No full model-weight download",
+      "No author contact",
+      "No new biological outcome access",
+      "No duplicate full CSV download; coverage/schema audit is a separate parent-owned artifact"
+    ],
+    "inspection_vs_execution": "Code findings are static inspection of the pinned public revision. Published checkpoints, original training logs, and exact author's execution path were not run."
+  },
+  "official_sources": {
+    "paper": {
+      "title": "A knowledge-driven framework for predicting single-cell responses for unprofiled drugs",
+      "doi": "10.1038/s42256-026-01286-w",
+      "published_online": "2026-08-26",
+      "url": "https://www.nature.com/articles/s42256-026-01286-w",
+      "local_file": "sources/PAPER.html",
+      "sections_file": "sources/PAPER_TARGETED_SECTIONS.json",
+      "crossref_file": "sources/CROSSREF.json"
+    },
+    "dataset": {
+      "id": "RainGate/MAP-KG",
+      "url": "https://huggingface.co/datasets/RainGate/MAP-KG/tree/main",
+      "revision": "2a9af1bd2645fef86fab495b85a1b08a52356e26",
+      "last_modified": "2026-03-03T06:32:11.000Z",
+      "card_declared_license": "Apache-2.0",
+      "metadata_file": "sources/HF_METADATA.json",
+      "tree_file": "sources/HF_TREE.json",
+      "card_file": "sources/HF_README.md",
+      "freshness": "A new fetch confirms this revision; the sparse card still says 'We will release MAP-KG data soon', although four CSV assets are present.",
+      "advertised_assets": [
+        {
+          "path": "DRUG_merged_drugs_with_residuals.csv",
+          "bytes": 30886178,
+          "lfs_sha256": "19b9fd94475ad9d3f47f8c73c9ce10a2f04d29e16b0e2df35c2cb29e49f63e3f"
+        },
+        {
+          "path": "DRUG-GENE_filtered_by_existing_drugs_and_genes.csv",
+          "bytes": 36169383,
+          "lfs_sha256": "3b4edcab5c98c441cadcb7a3e4c61cbc3048c065223c555694f9c9313c225aa4"
+        },
+        {
+          "path": "GENE-GENE_filtered_by_existing_genes.csv",
+          "bytes": 30749549,
+          "lfs_sha256": "742bbd685f1100e9168e4e6df75171b8a9917561d71e46d640908b1c16a2fd95"
+        },
+        {
+          "path": "GENE_tahoe_filtered.csv",
+          "bytes": 688979,
+          "git_oid": "759059d8e1423e9d05ef8f55c2f8189c25eff5cd"
+        }
+      ],
+      "actual_csv_counts_and_coverage": "Counts, schema and menu coverage are recorded in outputs/knowledge_layer_validation_20261009/AUDIT.json and independently reconstructed in VERIFIED.json. This paper/source audit did not independently repeat full CSV coverage; release counts must not be substituted for paper counts."
+    },
+    "code": {
+      "url": "https://github.com/MAGIC-AI4Med/MAP",
+      "commit": "629ebdc1617eaf89825185a1512d772eccc3dc7e",
+      "license": "MIT",
+      "license_file": "sources/CODE_LICENSE.txt",
+      "tree_file": "sources/GITHUB_TREE.json",
+      "readme_file": "sources/GITHUB_README.md",
+      "freshness": "Fresh metadata/tree fetch agrees with the previously inspected revision; no newer implementation was established by this audit.",
+      "inspected_files": [
+        "MAP-KG/model/model.py",
+        "MAP-KG/data/dataload.py",
+        "MAP-KG/train_resume.py",
+        "MAP/model/pert.py",
+        "MAP/model/smiles_kg_encoder_v3.py",
+        "MAP/model/model.py"
+      ],
+      "checkpoint_release": {
+        "status": "Advertised by official README, not independently downloaded or checksum-verified.",
+        "url": "https://drive.google.com/drive/folders/1cV0ZTk92PguKS2nyii6dLV0IfqoSDHsQ?usp=drive_link",
+        "claim": "README advertises multi-modal knowledge encoders and perturbation prediction model weights.",
+        "limitation": "No authoritative per-checkpoint provenance, manifest, architecture compatibility, dataset split or exclusion certificate was validated."
+      }
+    },
+    "supplement": {
+      "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs42256-026-01286-w/MediaObjects/42256_2026_1286_MOESM1_ESM.pdf",
+      "local_file": "sources/SUPPLEMENTARY_INFORMATION.pdf",
+      "pages": 19,
+      "evidence_pages": {
+        "knowledge_sources": [
+          15,
+          16
+        ],
+        "implementation_resources": [
+          6,
+          7,
+          11
+        ]
+      },
+      "page_number_convention": "One-based PDF pages; printed supplementary pagination differs."
+    },
+    "licensing_scope": {
+      "verified": [
+        "HF dataset card: Apache-2.0 declaration",
+        "GitHub LICENSE: MIT",
+        "Paper Crossref license: CC BY-NC-ND 4.0"
+      ],
+      "not_verified": [
+        "Individual upstream database terms",
+        "Checkpoint-specific redistribution terms"
+      ],
+      "interpretation": "These license declarations apply to separate assets. A dataset-card declaration does not certify all upstream-source or checkpoint rights."
+    }
+  },
+  "published_graph": {
+    "node_ids": {
+      "drug": "PubChem CID",
+      "gene": "Ensembl stable gene ID"
+    },
+    "node_modalities": {
+      "drug": [
+        "name text",
+        "SMILES",
+        "MOA and therapeutic/function text"
+      ],
+      "gene": [
+        "gene symbol/name text",
+        "canonical amino acid sequence",
+        "functional summaries and pathway text"
+      ]
+    },
+    "relation_form": "Natural-language edge description plus optional numeric strength/confidence. Paper says all graph edges are directed.",
+    "reported_union_counts": {
+      "drug_nodes": 187089,
+      "gene_nodes": 22924,
+      "drug_gene_edges": 428192,
+      "gene_gene_edges": 266054
+    },
+    "evidence": "Methods / Knowledge graph construction",
+    "source_databases": [
+      "BindingDB",
+      "BioGRID",
+      "ChEMBL",
+      "DrugBank",
+      "DrugCentral",
+      "Ensembl",
+      "HGNC",
+      "Human PPI",
+      "IntAct",
+      "PrimeKG",
+      "PubChem",
+      "STITCH",
+      "STRING",
+      "TTD"
+    ],
+    "source_contribution_counts_not_unique_union": {
+      "ChEMBL_drug": 16002,
+      "DrugBank_drug": 17459,
+      "PubChem_drug": 168209,
+      "Ensembl_gene": 86599,
+      "HGNC_gene": 44433,
+      "BindingDB_drug_gene": 279857,
+      "DrugCentral_drug_gene": 28665,
+      "STITCH_drug_gene": 81346,
+      "TTD_drug_gene": 32920,
+      "PrimeKG_drug_gene": 23904,
+      "BioGRID_drug_gene": 5085,
+      "BioGRID_gene_gene": 219214,
+      "HumanPPI_gene_gene": 24178,
+      "IntAct_gene_gene": 10623,
+      "STRING_gene_gene": 20881
+    },
+    "evidence_quality": [
+      "Sources mix measured binding, curated annotations, literature-derived relations, and predicted/functional associations.",
+      "Supplement A.10 explicitly calls Human PPI predicted; STITCH and STRING include known and predicted interactions.",
+      "Directed graph storage does not by itself establish causal evidence, signed regulatory effect, or cell-context-specific target engagement."
+    ]
+  },
+  "embedding_mechanism": {
+    "evidence": [
+      "Methods / Knowledge-driven multimodal pretraining",
+      "Extended Data Fig. 1 (https://www.nature.com/articles/s42256-026-01286-w/figures/6)",
+      "sources/MAP-KG__model__model.py"
+    ],
+    "encoders": {
+      "text": "BioBERT",
+      "molecule": "MoleculeSTM",
+      "protein": "ESM-2"
+    },
+    "published_freezing": "MoleculeSTM and ESM-2 frozen; trainable modality adaptation heads; biomedical text encoder participates in alignment.",
+    "canonical_entity_anchor": "Embedding of the entity name text; each entity's attributes align to its own name anchor.",
+    "shared_space": "All projected attributes and relation-conditioned entity compositions occupy a shared d-dimensional space.",
+    "public_defaults": {
+      "shared_dimension": 1024,
+      "protein_input_dimension": 5120,
+      "molecule_input_dimension": 256
+    },
+    "ordered_relation_composition": {
+      "outgoing": "phi_rc(concat(z_source, z_relation))",
+      "incoming": "phi_rc(concat(z_relation, z_target))",
+      "interpretation": "Ordered concatenation through an MLP distinguishes source and target roles.",
+      "not_claimed": [
+        "No additive TransE equation h+r=t",
+        "No indiscriminate collapse of linked drug and protein embeddings to the same entity"
+      ]
+    },
+    "alignment": {
+      "intra_node": "Randomly sampled text, molecule or protein attributes align to that same entity's canonical name.",
+      "inter_node": "A relation-conditioned representation aligns with its linked neighboring entity.",
+      "published_objective": "Symmetric contrastive InfoNCE over minibatches.",
+      "public_implementation": "GatedFusion with ordered inputs; source/target conditioning randomly selected; normalized cosine logits in both directions; same-endpoint groups form soft labels normalized by F.normalize(labels, dim=0), then soft cross-entropy.",
+      "code_anchors": [
+        {
+          "file": "sources/MAP-KG__model__model.py",
+          "lines": [
+            54,
+            82
+          ]
+        },
+        {
+          "file": "sources/MAP-KG__model__model.py",
+          "lines": [
+            89,
+            143
+          ]
+        },
+        {
+          "file": "sources/MAP-KG__model__model.py",
+          "lines": [
+            296,
+            361
+          ]
+        }
+      ],
+      "technical_caution": "Inspecting this normalization is not a proof of exact equivalence to a textbook probability-target InfoNCE implementation; the inspected code uses the default L2 F.normalize, not an explicitly specified L1 probability normalization."
+    },
+    "negatives": {
+      "actual_supervision": "Contrastive minibatch negatives / non-existing graph edges, rather than authenticated no-effect experimental pairs.",
+      "figure_reading": "Extended Fig. 1 shows a gray 'non-existing edge' being pushed away.",
+      "limitation": "Missing graph edges cannot be treated as experimentally observed absence of binding, no transcriptional response, no efficacy, or safety."
+    },
+    "quantitative_scores": "The inspected dataloader selects only endpoint identifiers and relation text for drug-gene edge sampling. Optional numeric affinity/confidence is not used in the inspected loss path.",
+    "caption_inconsistency": "Extended Fig. 1 caption swaps inter/intra wording relative to Methods. This audit follows the operational definitions in Methods."
+  },
+  "public_implementation_gaps": [
+    {
+      "id": "gene_gene_sampling",
+      "paper": "Graph construction and knowledge ablations describe gene-gene relations.",
+      "inspected_code": "DrugGeneKG_Dataset and train_resume receive drug-node, gene-node and drug-gene CSVs only; no gene-gene sampler/argument was found in the inspected path.",
+      "evidence": [
+        {
+          "file": "sources/MAP-KG__data__dataload.py",
+          "lines": [
+            7,
+            25
+          ]
+        },
+        {
+          "file": "sources/MAP-KG__train_resume.py",
+          "lines": [
+            27,
+            29
+          ]
+        },
+        {
+          "file": "sources/MAP-KG__train_resume.py",
+          "lines": [
+            493,
+            498
+          ]
+        }
+      ],
+      "implication": "Do not assume running this public path includes the published complete graph pretraining.",
+      "conclusion_scope": "Absence in this inspected path; not proof the author training lacked gene-gene supervision."
+    },
+    {
+      "id": "protein_lookup_external_asset",
+      "paper": "Canonical amino-acid sequences encoded by ESM-2.",
+      "inspected_code": "An external gene-symbol-to-ESM lookup tensor is required at a placeholder path; the dataloader's ESM column selects the lookup branch.",
+      "evidence": [
+        {
+          "file": "sources/MAP-KG__model__model.py",
+          "lines": [
+            12,
+            22
+          ]
+        },
+        {
+          "file": "sources/MAP-KG__data__dataload.py",
+          "lines": [
+            68,
+            78
+          ]
+        }
+      ],
+      "implication": "Need an authenticated lookup with gene identity, sequence/version, dimension and order manifest for compatible reuse."
+    },
+    {
+      "id": "dose_forward",
+      "paper": "Drug embedding is scaled by log-transformed dose before downstream prediction (Methods, equation 8 context).",
+      "inspected_code": "PerturbationEncoder.forward accepts concs but its body never uses it; MAP/model/model.py passes encode_conc=False.",
+      "evidence": [
+        {
+          "file": "sources/MAP__model__pert.py",
+          "lines": [
+            83,
+            111
+          ]
+        },
+        {
+          "file": "sources/MAP__model__model.py",
+          "lines": [
+            56,
+            65
+          ]
+        }
+      ],
+      "implication": "The inspected path cannot substantiate dose-responsive predictions or exact reproduction of the dose-conditioned published method.",
+      "conclusion_scope": "Implementation-to-paper discrepancy; no inference about uninspected checkpoint training code."
+    },
+    {
+      "id": "gene_knowledge_projector",
+      "paper": "STATE gene tokens are fused with knowledge-informed projected protein representations (Methods, equation 7).",
+      "inspected_code": "Public downstream gene fusion concatenates STATE 2048-dimensional tokens with ESM 5120-dimensional features into a separate residual projector; no explicit pretrained KG gene projector is loaded in this inspected path. The pretrained molecular KG encoder is explicitly loaded.",
+      "evidence": [
+        {
+          "file": "sources/MAP__model__pert.py",
+          "lines": [
+            39,
+            57
+          ]
+        },
+        {
+          "file": "sources/MAP__model__pert.py",
+          "lines": [
+            132,
+            138
+          ]
+        },
+        {
+          "file": "sources/MAP__model__smiles_kg_encoder_v3.py",
+          "lines": [
+            61,
+            75
+          ]
+        }
+      ],
+      "implication": "Verify original compatible forward and checkpoint mappings before claiming published multimodal knowledge transfer."
+    },
+    {
+      "id": "resume_and_path_configuration",
+      "inspected_code": "Knowledge training defaults resume_from to ./checkpoints/kg_v3/best_model.pt, uses site-specific/placeholder external lookup paths, and downstream KG checkpoint is path/to/your/pretrained/kg/encoder/best_model.pt.",
+      "evidence": [
+        {
+          "file": "sources/MAP-KG__train_resume.py",
+          "lines": [
+            23,
+            39
+          ]
+        },
+        {
+          "file": "sources/MAP__model__pert.py",
+          "lines": [
+            41,
+            47
+          ]
+        }
+      ],
+      "implication": "The public code is a reproducibility starting point, not a self-contained runnable release with verified original assets."
+    }
+  ],
+  "published_validation": {
+    "evidence_sections": [
+      "Benchmark description",
+      "Zero-shot generalization across unseen cell line–drug combinations",
+      "Zero-shot generalization to unprofiled drugs",
+      "Functionally interpretable pathway responses",
+      "Biological knowledge enhances zero-shot generalization to unprofiled drugs",
+      "Datasets"
+    ],
+    "supported_task": "Within-dataset prediction of drug-induced single-cell RNA responses, evaluated at pseudobulk resolution.",
+    "tahoe_scope": {
+      "atlas_description": "50 cell lines and 379 drugs",
+      "evaluated_cell_lines": [
+        "A-172",
+        "A-498",
+        "A-549",
+        "HepG2/C3A",
+        "PANC-1",
+        "SK-MEL-2"
+      ],
+      "evaluation_count": 6
+    },
+    "protocols": [
+      {
+        "name": "unseen_cell_drug_pair",
+        "held_out": "5% drugs per cell line; held-out drug sets non-overlapping across lines",
+        "what_remains_seen": "Every held-out drug appears in training in other cellular contexts",
+        "claim_boundary": "Context compositional transfer"
+      },
+      {
+        "name": "unprofiled_drug",
+        "held_out": "5% drugs removed entirely from perturbation training; 16 Tahoe test compounds",
+        "kg_exclusion_claim": "Held-out drug entities, aliases and incident edges excluded from knowledge pretraining",
+        "claim_boundary": "Compound transfer in already represented cellular datasets; exclusion claim not independently reconstructed from author's training inputs"
+      }
+    ],
+    "datasets": [
+      "Tahoe-100M (six selected lines)",
+      "SciPlex3",
+      "OP3",
+      "ComboSciPlex (auxiliary two-drug RNA response evaluation)"
+    ],
+    "cross_dataset_evaluation": false,
+    "cross_dataset_evidence": "Methods / Datasets explicitly says all experiments are conducted within each dataset (no cross-dataset evaluation).",
+    "gene_sets": [
+      "top 2,000 HVGs",
+      "top 50 DEGs"
+    ],
+    "metrics": [
+      "Pearson delta correlation",
+      "direction accuracy",
+      "perturbation discrimination (HVG only)",
+      "mean squared error",
+      "Wasserstein distance"
+    ],
+    "gene_selection_boundary": "HVGs selected per dataset; top-50 DEGs use experimental condition-specific differential expression. Such evaluation does not certify accuracy for a prospectively known universal DEG set.",
+    "knowledge_ablation": "Paper reports added-knowledge improvements and category removal decreases; drug-gene relation removal produces the largest reported drop in DEG direction/delta correlation.",
+    "statistical_unit": "Figures summarize n=5 independent evaluations on the same held-out test set, with unadjusted two-sided Welch tests against the second-best method.",
+    "statistical_boundary": "Five evaluations on a common held-out test set do not establish independent prospective biological replication."
+  },
+  "screening_validation_boundary": {
+    "published_setup": "Simulated in silico screen of 58 held-out candidate drugs in A-549.",
+    "decision_score": "GSEA on predicted RNA responses; aggregate disease-relevant pathway enrichment into drug-level downregulation score.",
+    "validation": [
+      "Top-k retrieval of clinically approved drugs",
+      "Predicted-versus-observed RNA normalized enrichment scores",
+      "Literature-supported homoharringtonine nomination"
+    ],
+    "not_established_by_paper": [
+      "Prospective efficacy, viability or survival outcome measured for model-selected interventions",
+      "Authenticated matched-condition RNA-to-function transfer",
+      "Same-budget sequential closed-loop policy gain",
+      "Calibrated expected value of sample information or regret",
+      "Cell- and condition-specific potency, target occupancy or safety guarantee"
+    ],
+    "implication": "Pathway-aligned RNA ranking is useful mechanistic evidence; it does not directly certify therapeutic response or downstream decision utility."
+  },
+  "computational_resources": {
+    "evidence": "Supplement A.5; Tables 19-20",
+    "kg_pretraining": {
+      "hardware": "4 NVIDIA A100 GPUs",
+      "full_graph_hours_approx": 25,
+      "table19_full_scale_hours": 25.44
+    },
+    "downstream_training": {
+      "hardware": "4 NVIDIA A100 GPUs",
+      "Tahoe_convergence_hours": 11.91,
+      "peak_memory_per_gpu_gb": 42.48,
+      "pseudobulk_size": 24
+    },
+    "reuse_boundary": "Released compatible encoders can avoid knowledge pretraining, but dataset-specific response fitting or finetuning and compatible identity/axis handling remain necessary.",
+    "local_execution_performed": false
+  },
+  "research_role_recommendations": {
+    "agent_layer": [
+      "Resolve compound and gene identities exactly; preserve aliases, structure identity and raw provenance.",
+      "Retrieve source-backed mechanisms with directed source/relation/target semantics and explicit evidence quality.",
+      "Generate falsifiable mechanism hypotheses and identify missing context-specific evidence.",
+      "Prioritize evidence collection using uncertainty or downstream value only when these quantities are independently validated."
+    ],
+    "world_model_layer": [
+      "Evaluate a modest shared-embedding adapter or conditional mechanistic residual against a fixed RNA baseline.",
+      "Condition response predictions explicitly on cell/background, dose, exposure time and assay.",
+      "Keep provenance, evidence strength and calibrated uncertainty separate from embedding geometry.",
+      "Use only verified assets, gene/drug axes, and a compatible original forward path for reproduction; record deliberate deviations as new implementations."
+    ],
+    "avoid_inherited_claims": [
+      "Embedding cosine is not binding affinity, potency, target occupancy or cell-specific causal effect.",
+      "Natural-language inhibitor/activator relation alone is not a measured sign or magnitude of downstream RNA/viability response.",
+      "Knowledge encoder reuse alone does not create a response world model.",
+      "MAP RNA gains do not automatically transfer to agent value, calibrated EVSI, risk certification or matched functional outcomes."
+    ],
+    "minimal_validation_gates": [
+      "Authenticate exact molecular/protein identity, source versions, raw relation evidence and released asset compatibility.",
+      "Audit held-out drug/alias/edge exclusions independently before claiming strict unseen-drug generalization.",
+      "Compare fixed-budget baseline, molecule-only and knowledge-adapter variants under the same locked split.",
+      "Evaluate biologically authentic matched-context outcomes before making RNA-to-function claims.",
+      "Assess sequential decision benefit using a policy comparison and an independently defined utility; do not infer it from RNA correlation."
+    ]
+  },
+  "verification": {
+    "status": "passed",
+    "download_receipts_verified": 20,
+    "manifest_files": 25,
+    "manifest_total_bytes": 2520530,
+    "code_anchors_with_valid_line_bounds": 15,
+    "dataset_revision_confirmed": "2a9af1bd2645fef86fab495b85a1b08a52356e26",
+    "code_revision_confirmed": "629ebdc1617eaf89825185a1512d772eccc3dc7e",
+    "paper_to_source_findings": "Targeted reading and static inspection; no checkpoint execution or prospective validation performed."
+  },
+  "source_manifest": [
+    {
+      "file": "sources/CODE_LICENSE.txt",
+      "bytes": 1114,
+      "sha256": "e2e5f9dd54e8cb8c79b085b1d08277891406a7582502871efd28643b6e52dc24",
+      "url": "https://raw.githubusercontent.com/MAGIC-AI4Med/MAP/629ebdc1617eaf89825185a1512d772eccc3dc7e/LICENSE",
+      "receipt_file": "sources/FETCH_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/CROSSREF.json",
+      "bytes": 19978,
+      "sha256": "04440a94e9a3d72db3d0112f62195e8d661bb9e53bc2599c19702bf91bae8f12",
+      "url": "https://api.crossref.org/works/10.1038/s42256-026-01286-w",
+      "receipt_file": "sources/FETCH_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/EXTENDED_FIGURE_1.html",
+      "bytes": 171560,
+      "sha256": "6fb4e9a9acfd2bc9d76e00548058d9200e7f8882702da2ea0e35ccab0618f616",
+      "url": "https://www.nature.com/articles/s42256-026-01286-w/figures/6",
+      "receipt_file": "sources/FIGURE_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/EXTENDED_FIGURE_2.html",
+      "bytes": 171505,
+      "sha256": "cc1517c8ee2ee24d5896d5448529afdda2b3933fde693d68553246e48acae65f",
+      "url": "https://www.nature.com/articles/s42256-026-01286-w/figures/7",
+      "receipt_file": "sources/FIGURE_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/FETCH_RECEIPTS.json",
+      "bytes": 7574,
+      "sha256": "aadc6e30b449dc7076d79517134cc3b7e9d5f0b6da4634870d9320ea25a57f37",
+      "role": "Receipt/derived extraction; its own digest is bound by this audit manifest."
+    },
+    {
+      "file": "sources/FIGURE_6.jpg",
+      "bytes": 340958,
+      "sha256": "b31d97095f7681181d7bd263ba94f2348df9beddd729c2a10ec947da4be5d4ba",
+      "url": "https://media.springernature.com/full/springer-static/esm/art%3A10.1038%2Fs42256-026-01286-w/MediaObjects/42256_2026_1286_Fig6_ESM.jpg",
+      "receipt_file": "sources/FIGURE_IMAGE_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/FIGURE_7.jpg",
+      "bytes": 200454,
+      "sha256": "b537e314bbd4e9c4a51641fbc2a3d5dd327bdc032c9ac69c2f97da49e52fe8d3",
+      "url": "https://media.springernature.com/full/springer-static/esm/art%3A10.1038%2Fs42256-026-01286-w/MediaObjects/42256_2026_1286_Fig7_ESM.jpg",
+      "receipt_file": "sources/FIGURE_IMAGE_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/FIGURE_IMAGE_RECEIPTS.json",
+      "bytes": 737,
+      "sha256": "132ad78d141df96be9b0648ce87bdf833a0f8a8d915d83139b3e2abab02befcb",
+      "role": "Receipt/derived extraction; its own digest is bound by this audit manifest."
+    },
+    {
+      "file": "sources/FIGURE_RECEIPTS.json",
+      "bytes": 1925,
+      "sha256": "3aaabf53ba5cda649157309b09cbf877834d88a5cd79b21e23cf06d5f8cd9767",
+      "role": "Receipt/derived extraction; its own digest is bound by this audit manifest."
+    },
+    {
+      "file": "sources/GITHUB_METADATA.json",
+      "bytes": 6119,
+      "sha256": "8de7ac70380c867350b430c7d550f5047d229b0d458a61dd1e4bd37ebd384a8c",
+      "url": "https://api.github.com/repos/MAGIC-AI4Med/MAP",
+      "receipt_file": "sources/FETCH_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/GITHUB_README.md",
+      "bytes": 3714,
+      "sha256": "d43aecfd1965cdf15d4fd893bcf81896d02e698bd6dd2de741d6985970476db3",
+      "url": "https://raw.githubusercontent.com/MAGIC-AI4Med/MAP/629ebdc1617eaf89825185a1512d772eccc3dc7e/README.md",
+      "receipt_file": "sources/FETCH_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/GITHUB_TREE.json",
+      "bytes": 44568,
+      "sha256": "adad6197cdea768cd7b22c2609e097e10fb7dac65973e6e7565f398a0658a541",
+      "url": "https://api.github.com/repos/MAGIC-AI4Med/MAP/git/trees/629ebdc1617eaf89825185a1512d772eccc3dc7e?recursive=1",
+      "receipt_file": "sources/FETCH_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/HF_METADATA.json",
+      "bytes": 859,
+      "sha256": "755cb2fcfd0c64d2599ec842a425ba73d66c1eac79b83fffe1b904535324dc40",
+      "url": "https://huggingface.co/api/datasets/RainGate/MAP-KG",
+      "receipt_file": "sources/FETCH_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/HF_README.md",
+      "bytes": 199,
+      "sha256": "b82c845b8a90595ee494214b87b528108072dd8916c73f4f78b4eb2a0fed6c57",
+      "url": "https://huggingface.co/datasets/RainGate/MAP-KG/raw/2a9af1bd2645fef86fab495b85a1b08a52356e26/README.md",
+      "receipt_file": "sources/FETCH_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/HF_TREE.json",
+      "bytes": 1284,
+      "sha256": "3451017d053d7bc93a079eaf344a70c99e06781e815e7ff6f423376644df0160",
+      "url": "https://huggingface.co/api/datasets/RainGate/MAP-KG/tree/2a9af1bd2645fef86fab495b85a1b08a52356e26?recursive=true&limit=100",
+      "receipt_file": "sources/FETCH_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/MAP-KG__data__dataload.py",
+      "bytes": 6781,
+      "sha256": "abf15a3bd43ece10722aaa7d8d09c4b5fe19744275dc0cc18c6ba5cb0764fc96",
+      "url": "https://raw.githubusercontent.com/MAGIC-AI4Med/MAP/629ebdc1617eaf89825185a1512d772eccc3dc7e/MAP-KG/data/dataload.py",
+      "receipt_file": "sources/FETCH_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/MAP-KG__model__model.py",
+      "bytes": 13039,
+      "sha256": "7d3da3f392792d2ddfad135766bba88ad47676798625ee39a69fc2377b6ad62c",
+      "url": "https://raw.githubusercontent.com/MAGIC-AI4Med/MAP/629ebdc1617eaf89825185a1512d772eccc3dc7e/MAP-KG/model/model.py",
+      "receipt_file": "sources/FETCH_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/MAP-KG__train_resume.py",
+      "bytes": 21817,
+      "sha256": "78cb2e0ac332ad84205a65802ba1c3bdba84b4e2b9b8676142cb9aa977a9becd",
+      "url": "https://raw.githubusercontent.com/MAGIC-AI4Med/MAP/629ebdc1617eaf89825185a1512d772eccc3dc7e/MAP-KG/train_resume.py",
+      "receipt_file": "sources/FETCH_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/MAP__model__model.py",
+      "bytes": 5177,
+      "sha256": "11fab3ec81c0dc37ca00625039bd90acffe912d06eb6596ab72bc43f803fa7ed",
+      "url": "https://raw.githubusercontent.com/MAGIC-AI4Med/MAP/629ebdc1617eaf89825185a1512d772eccc3dc7e/MAP/model/model.py",
+      "receipt_file": "sources/FETCH_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/MAP__model__pert.py",
+      "bytes": 4675,
+      "sha256": "8ddda0ff496791401f8ce9b15d70320dad218bd2e2cc86bef6556a7bd7e02ae5",
+      "url": "https://raw.githubusercontent.com/MAGIC-AI4Med/MAP/629ebdc1617eaf89825185a1512d772eccc3dc7e/MAP/model/pert.py",
+      "receipt_file": "sources/FETCH_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/MAP__model__smiles_kg_encoder_v3.py",
+      "bytes": 2543,
+      "sha256": "5abe1fb56ce9ce21dcdc98e880ab401b87383d7c2398f8608d294fdd614b039a",
+      "url": "https://raw.githubusercontent.com/MAGIC-AI4Med/MAP/629ebdc1617eaf89825185a1512d772eccc3dc7e/MAP/model/smiles_kg_encoder_v3.py",
+      "receipt_file": "sources/FETCH_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/PAPER.html",
+      "bytes": 439259,
+      "sha256": "b601956cc7af864c06043d4f035e7874c6f98f8d88826f61898a06c17b6eb18b",
+      "url": "https://www.nature.com/articles/s42256-026-01286-w",
+      "receipt_file": "sources/FETCH_RECEIPTS.json",
+      "receipt_verified": true
+    },
+    {
+      "file": "sources/PAPER_TARGETED_SECTIONS.json",
+      "bytes": 49607,
+      "sha256": "7b918d3a82eec8d7c56ad5bc3a1be01da4d3a90b44cbb530d7d451baad99bb2a",
+      "role": "Receipt/derived extraction; its own digest is bound by this audit manifest."
+    },
+    {
+      "file": "sources/SUPPLEMENT_RECEIPT.json",
+      "bytes": 33745,
+      "sha256": "a5c4d045173e4d4b83d931e9c90067b8f041ff668dae654b9606a4355098c33c",
+      "role": "Receipt/derived extraction; its own digest is bound by this audit manifest."
+    },
+    {
+      "file": "sources/SUPPLEMENTARY_INFORMATION.pdf",
+      "bytes": 971339,
+      "sha256": "f23358fbbd1479de34cbb96aebc353f8b3669ac6dae02db27c473dfcd97baf60",
+      "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs42256-026-01286-w/MediaObjects/42256_2026_1286_MOESM1_ESM.pdf",
+      "receipt_file": "sources/SUPPLEMENT_RECEIPT.json",
+      "receipt_verified": true
+    }
+  ]
+}
