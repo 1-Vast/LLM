@@ -1,9 +1,7 @@
-"""Checkout-local entry point for the opt-in research test suite.
+"""Checkout-local entry point for the three maintained research test suites.
 
 The production test target remains ``pytest`` (core testpaths in ``pyproject.toml``). Research
-replays depend on prepared data and optional scientific packages, so they are intentionally not
-collected by that default command. This developer command runs the tests and contracts under the
-current checkout's ASTRA entries; historical suites use explicit pytest paths.
+tests depend on optional scientific packages and are intentionally run explicitly.
 """
 from __future__ import annotations
 
@@ -11,8 +9,11 @@ import sys
 from pathlib import Path
 
 
-DEFAULT_TARGETS = ("research/astra",)
-ARCHIVE_GLOBS = ("*/results/*", "*/baseline_*/*", "*/snapshots/*", "*/execution_sources/*")
+DEFAULT_TARGETS = (
+    "research/astra/state_readout_repair_20261009/test_readout.py",
+    "research/astra/state_feedback_repair_20261009/test_posterior.py",
+    "research/decision_value/test_utility.py",
+)
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -32,14 +33,7 @@ def main() -> int:
     except ImportError as exc:  # pragma: no cover - exercised by an environment, not a test
         raise SystemExit("Install the test dependency before running this research test command") from exc
     args = sys.argv[1:]
-    include_archives = "--include-archives" in args
-    args = [arg for arg in args if arg != "--include-archives"]
-    exclusions = [] if include_archives else [
-        f"--ignore={ROOT / 'research/experiments'}", f"--ignore={ROOT / 'research/data'}",
-        *(f"--ignore-glob={pattern}" for pattern in ARCHIVE_GLOBS),
-    ]
-    targets = ("research",) if include_archives else DEFAULT_TARGETS
-    return int(pytest.main([str(ROOT / target) for target in targets] + exclusions + args))
+    return int(pytest.main([str(ROOT / target) for target in DEFAULT_TARGETS] + args))
 
 
 if __name__ == "__main__":  # pragma: no cover

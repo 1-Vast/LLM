@@ -1,0 +1,20 @@
+Environment: Python 3.14; pytest 9.1.1; NumPy 2.4.4.
+
+Commands and results:
+- python -m pip install -e ".[test]": PASS.
+- python -m pytest: PASS, 412 passed.
+- Explicit current research suites: PASS, 21 passed across decision_value, STATE feedback repair and STATE readout repair.
+- python -m compileall -q src tools research/astra research/decision_value: PASS.
+- python -m tools.research_validation --help: exit 0; forwards --help to pytest and displays pytest help.
+- git diff --check: PASS (Git reports only CRLF-to-LF normalization warnings).
+- python -m tools.log_manifest --check: PASS.
+
+Known frozen-integrity blocker:
+- decision_value/FREEZE.json expects state_feedback_repair_20261009/FREEZE.json SHA-256 2d7cfb509b2b9eed8386fffa4dd3df48ccef042907f8ebe8d636711bd83dfcab.
+- The retained file and baseline Git blob both hash to d49bcd326ffeeef3fb5add1938f631f8e1f89bd454f0977262cdb8336b4cbed2.
+- Frozen source files were left unchanged. The full historical trial verifier was not run.
+
+Clean-checkout missing assets must be reported BLOCKED/ASSET_MISSING:
+- MAP released-weight replay requires external checkpoint/source/compatibility assets and Tahoe metadata listed in research/astra/map_release_test_20261008/ASSET_MANIFEST.json.
+- Viability risk-calibration replay requires ignored outputs/viability_contrast_20260928/prepared inputs. They exist in this local checkout only.
+- No missing input is replaced with a zero-valued outcome.

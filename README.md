@@ -20,9 +20,9 @@ python -m tools.datasets.catalog --help
 python -m tools.evaluation.cli --help
 ```
 
-Default tests cover asset-free contracts. Research and frozen regression runs
-require their explicit data and commands; see [research](research/README.md).
-No optional model or raw-data dependency is required for the default contracts.
+Default tests cover asset-free production contracts. The three current research
+test groups are explicit: `python -m tools.research_validation`. Frozen studies
+require their listed packet and, where noted, external assets.
 
 ## Ownership
 
@@ -41,16 +41,11 @@ summaries retain their source identity. The core does not import research or too
 
 ## Current evidence
 
-The measured engineering repairs support request binding, source resolution,
-feedback, retries and bounded execution. Native-STATE public-data studies show
-condition-specific signals, but a general dual-core or LLM decision advantage
-has not been established. The latest candidate-comparison acquisition experiment
-matches strong KG on final value and cost; its stopping rule does not save profiles.
-All five target contexts were previously exposed.
+Engineering closure is verified. The original STATE study reports a task-specific
+RNA prediction signal, while independent decision benefit, LLM advantage,
+functional phenotype and mechanism causality remain unestablished. All five
+current target contexts were previously exposed.
 
-Read [the consolidated research report](research/REPORT.md) for conclusions and
-[the evidence register](research/EVIDENCE.md) for exact results, limits and
-reproduction. [The experiment log](log/INDEX.md) holds dated records.
-[task.md](task.md) defines the operating contract; [Innovation.md](Innovation.md)
-states the falsifiable research hypothesis. Reports are maintained in English;
-obsolete narrative copies are removed rather than archived.
+Read [the research report](research/REPORT.md) for claim boundaries and next
+steps, [the evidence register](research/EVIDENCE.md) for canonical results and
+reproduction paths, and [the experiment log](log/INDEX.md) for dated receipts.

@@ -1,909 +1,0 @@
-Multiple Identiﬁcations in Multi-Armed Bandits
-S´ ebastien Bubeck sbubeck@princeton.edu
-Department of Operations Research and Financial Engineering, Princeton University
-Tengyao Wang tengyaow@princeton.edu
-Department of Mathematics, Princeton University
-Nitin Viswanathan nviswana@princeton.edu
-Department of Computer Science, Princeton University
-Abstract
-We study the problem of identifying the top
-m arms in a multi-armed bandit game. Our
-proposed solution relies on a new algorithm
-based on successive rejects of the seemingly
-bad arms, and successive accepts of the good
-ones. This algorithmic contribution allows to
-tackle other multiple identiﬁcations settings
-that were previously out of reach. In partic-
-ular we show that this idea of successive ac-
-cepts and rejects applies to the multi-bandit
-best arm identiﬁcation problem.
-1. Introduction
-We are interested in the following situation: An agent
-faces K unknown distributions, and he is allowed to
-do n sequential evaluations of the form ( i,X ) where
-i∈{ 1,...,K } is chosen by the agent and X is a ran-
-dom variable drawn from the ith distribution and re-
-vealed to the agent. The goal of the agent after the n
-evaluations is to identify a subset of the distributions
-(or arms in the multi-armed bandit terminology) cor-
-responding to some prespeciﬁed criterion. This set-
-ting was introduced in (Bubeck et al., 2009), where
-the goal was to identify the distribution with maxi-
-mal mean. Note that in this formulation of the prob-
-lem the evaluation budget n is ﬁxed. Another possi-
-ble formulation is the one of the PAC model studied
-in (Even-Dar et al., 2002; Mannor & Tsitsiklis, 2004)
-where an accuracy ε and a probability of correctness δ
-are prespeciﬁed, and one wants to minimize the num-
-ber of evaluations to attain this prespeciﬁed accuracy
-Proceedings of the 30 th International Conference on Ma-
-chine Learning , Atlanta, Georgia, USA, 2013. JMLR:
-W&CP volume 28. Copyright 2013 by the author(s).
-and probability of correctness. This latter formulation
-has a long history which goes back to the seminal work
-(Bechhofer, 1954).
-In this paper we focus on the ﬁxed budget setting of
-(Bubeck et al., 2009). For this ﬁxed budget problem,
-(Audibert et al., 2010) proposed a new analysis and an
-optimal algorithm (up to a logarithmic factor). In par-
-ticular this work introduced a notion of best arm iden-
-tiﬁcation complexity, and it was shown that this quan-
-tity, denoted H, characterizes the hardness of identi-
-fying the best distribution in a speciﬁc set of K dis-
-tributions. Intuitively, it was shown that the number
-of evaluations n has to be Ω( H/ logK) to be able to
-ﬁnd the best arm, and the algorithm SR (Successive
-Rejects) ﬁnds it with O(H log2K) evaluations. Fur-
-thermore in the latter paper the authors also suggested
-the open problem of generalizing the analysis and algo-
-rithms to the identiﬁcation of them distributions with
-the top m means. Our main contribution is to solve
-this open problem. We suggest a non-trivial extension
-of the complexityH, denotedH⟨m⟩, to the problem of
-identifying the top m distributions, and we introduce
-a new algorithm, called SAR (Successive Accepts and
-Rejects), that requires only ~O
-(
-H⟨m⟩)
-evaluations1 to
-ﬁnd the top m arms. We also propose a numerical
-comparison between SAR, SR and uniform sampling
-for the problem of ﬁnding the m top arms. Interest-
-ingly the experiments show that SR performs badly for
-m> 1, which shows that the tradeoﬀs involved in this
-generalized problem are fundamentally diﬀerent from
-the ones for the single best arm identiﬁcation.
-Note that this problem and the associated complexity
-H⟨m⟩ have been studied recently in the PAC model
-1In the m-best arms identiﬁcation problem we write
-un = ~O(vn) when un =O(vn) up to logarithmic factor
-in K
-Multiple Identiﬁcations in Multi-Armed Bandits
-in (Kalyanakrishnan et al., 2012). The present paper
-is a concurrent and independent work with respect to
-the latter paper. In particular, the algorithm LUCB
-designed in (Kalyanakrishnan et al., 2012) is based
-on fundamentally diﬀerent ideas (conﬁdence intervals
-and UCB type algorithms) than the one developed in
-this paper.
-As a by-product of our new analysis we are also able
-to solve an open problem of (Gabillon et al., 2011).
-In this paper the authors studied the setting where
-the agent faces M distinct best arm identiﬁcation
-problems. A multi-bandit identiﬁcation complexity
-was introduced, that we denote H [M ]. On the con-
-trary to the setting of single best arm identiﬁcation,
-here the algorithm proposed in (Gabillon et al.,
-2011) that needs of order of H [M ] evaluations to
-ﬁnd the best arm in each bandit requires to know
-the complexity H [M ] to tune its parameters. Using
-our SAR machinery, we construct a parameter-free
-algorithm that identiﬁes the best arm in each bandit
-with ~O
-(
-H [M ])
-evaluations2.
-Both the m-best arms identiﬁcation and the multi-
-bandit best arm identiﬁcation have numerous poten-
-tial applications. We refer the interested reader to the
-previously cited papers for several examples.
-2. Problem setup
-We adopt the terminology of multi-armed bandits.
-The agent faces K arms and he has a budget of n
-evaluations (or pulls). To each arm i∈ {1,...,K }
-there is an associated probability distribution νi,
-supported3 on [0, 1]. These distributions are unknown
-to the agent. The sequential evaluations protocol
-goes as follows: at each round t = 1,...,n , the agent
-chooses an arm It, and observes a reward drawn
-from νIt independently from the past given It. In
-the m-best arms identiﬁcation problem, at the end of
-the n evaluations, the agent selects m arms denoted
-J1,...,J m. The objective of the agent is that the set
-{J1,...,J m} corresponds to the set of arms with the
-m highest mean rewards.
-Denote by µ1,...,µ K the mean of the arms. In the
-following we assume thatµ1 >...>µ K. The ordering
-2In the multi-bandit best arm identiﬁcation problem we
-write un = ~O(vn) when un = O(vn) up to logarithmic
-factor in MK
-3One can directly generalize the discussion to σ-
-subgaussian distributions.
-assumption comes without loss of generality, and the
-assumption that the means are all distinct is made for
-sake of notation (the complexity measures are slightly
-diﬀerent if there is an ambiguity for the topm means).
-We evaluate the performance of the agent’s strategy by
-the probability of misidentiﬁcation, that is
-en = P ({J1,...,J m}⁄ ={1,...,m }).
-Finer measures of performance can be proposed, such
-as the simple regret rn =∑m
-i=1(µi− EµJi). However,
-as it was argued in (Audibert et al., 2010), for a ﬁrst
-order analysis it is enough to focus on the quantity
-en.
-In the (single) best arm identiﬁcation, (Audibert et al.,
-2010) introduced the following complexity measures.
-Let ∆i =µ1−µi for i⁄= 1, ∆1 =µ1−µ2,
-H1 =
-K∑
-i=1
-1
-∆2
-i
-and H2 = max
-i∈{1,...,K}
-i∆−2
-i .
-It is easy to see that these two complexity measures
-are equivalent up to a logarithmic factor since we have
-(see (Audibert et al., 2010))
-H2≤H1≤ log(2K)H2. (1)
-[Theorem 4, (Audibert et al., 2010)] shows that the
-complexity H1 represents the hardness of the best
-arm identiﬁcation problem. While the proof of the
-latter result is diﬃcult and technical, it is intuitively
-obvious that H1 is a lower bound on the number
-of evaluations necessary to identify the best arm.
-Indeed, merely to check if an arm has mean µi or
-µ∗, one needs to sample it of order of 1 /∆2
-i times.
-The surprising fact is that of order of H1 evaluations
-suﬃces to identify the best arm. Note that as far as
-upper bounds are concerned, the quantity H2 proved
-to be a useful surrogate for H1 to express the bounds
-on en.
-For the m-best arms identiﬁcation problem we deﬁne
-the following gaps and the associated complexity mea-
-sures:
-∆⟨m⟩
-i =
-{ µi−µm+1 if i≤m
-µm−µi if i>m ,
-H⟨m⟩
-1 =
-K∑
-i=1
-1
-(
-∆⟨m⟩
-i
-)2,
-H⟨m⟩
-2 = max
-i∈{1,...,K}
-i
-(
-∆⟨m⟩
-(i)
-)−2
-,
-Multiple Identiﬁcations in Multi-Armed Bandits
-where the notation ( i)∈ {1,...,K } is deﬁned such
-that ∆⟨m⟩
-(1) ≤... ≤ ∆⟨m⟩
-(K). We conjecture that a similar
-lower bound to [Theorem 4, (Audibert et al., 2010)]
-with H1 replaced by H⟨m⟩
-1 holds true for the m-best
-arms identiﬁcation problem. Again such a statement
-is pretty much obvious. Indeed assume that we know
-the critical valuesµm andµm+1. Then for each arm we
-have an hypothesis testing problem which corresponds
-to deciding whether µi >µ m+1 (i.e., the arm is in the
-m best) orµi <µ m (i.e., the arm is not in them best).
-For this hypothesis testing problem to be feasible, it is
-easy to see that one needs of order of 1/
-(
-∆⟨m⟩
-i
-)2
-eval-
-uations of arm i. While this does not prove the lower
-bound, it strongly suggests that Ω
-(
-H⟨m⟩
-1
-)
-evaluations
-are necessary to identify the top m arms.
-In this paper we shall focus on positive results. In
-particular we will prove an upper bound on en that
-gets small when n = ~O
-(
-H⟨m⟩
-2
-)
-(recall that by (1),
-~O
-(
-H⟨m⟩
-2
-)
-= ~O
-(
-H⟨m⟩
-1
-)
-). This result is derived in
-Section 3, where we introduce our key algorithmic
-contribution, the SAR (Successive Accepts and
-Rejects) algorithm. We also present experiments for
-this setting in Section 5.
-In Section 4 we consider the framework of multi-
-bandit introduced in (Gabillon et al., 2011), where the
-agent faces M distinct best arm identiﬁcation prob-
-lems. For sake of notation we assume that each prob-
-lemm∈{ 1,...,M } has the same number of arms K.
-We also restrict our attention to the single best arm
-identiﬁcation within each problem, but we could deal
-with m-best arms identiﬁcation within each problem.
-We denote by ν1(m),...,ν K(m) the unknown distri-
-butions of the arms in problem m. We deﬁne simi-
-larly all the relevant quantities for each problem, that
-is µ1(m) > ... > µK(m), ∆1(m),..., ∆K(m),H 1(m)
-and H2(m). Finally we denote by ( i,m ) the arm i in
-problem m. In the multi-bandit best arm identiﬁca-
-tion, the forecaster performs n sequential evaluations
-of the form (It,mt)∈{ 1,...,K }×{ 1,...,M }. At the
-end of the n evaluations, the agent selects one arm for
-each problem, denoted ( J1, 1),..., (JM,M ). The ob-
-jective of the agent is to ﬁnd the arm with the highest
-mean reward in each problem, that is in this setting
-the probability of misidentiﬁcation can be written as
-en = P(∃m∈{ 1,...,M } :Jm⁄= 1).
-Following (Gabillon et al., 2011) we introduce the fol-
-lowing complexity measure
-H [M ]
-1 =
-M∑
-m=1
-H1(m).
-Again we deﬁne a sort of weaker complexity measure
-by ordering the gaps. Let
-∆[M ]
-1 ≤ ∆[M ]
-2 ≤···≤ ∆[M ]
-MK
-be a rearrangement of {∆i(m) : 1≤ i≤ K, 1≤ m≤
-M} in ascending order, and let
-H [M ]
-2 = max
-k∈{1,...,MK}
-k
-(
-∆[M ]
-k
-)−2
-.
-Similarly to the m-best arms identiﬁcation problem
-we conjecture that the lower bound [Theorem 4,
-(Audibert et al., 2010)] with H1 replaced by H [M ]
-1
-holds true for the multi-bandit best arm identiﬁ-
-cation problem. Here we prove, using a variation
-of SAR, that n = ~O
-(
-H [M ]
-2
-)
-(recall that by (1),
-~O
-(
-H [M ]
-2
-)
-= ~O
-(
-H [M ]
-1
-)
-) is enough to have a small
-probability of error en. This result is derived in
-Section 4. The improvement with respect to (Gabillon
-et al., 2011) is that our strategy is parameter-free,
-while the theoretical Gap-E introduced in (Gabillon
-et al., 2011) requires the knowledge of H [M ]
-1 to tune
-its parameter. Moreover the analysis of SAR is much
-simpler than the one of Gap-E.
-For each arm i and all time rounds t≥ 1, we denote
-byTi(t) =∑t
-s=1 1It=i the number of times arm i was
-pulled from rounds 1 tot, and byXi,1,Xi,2,...,X i,Ti,t
-the sequence of associated rewards. Introduce ˆµi,s =
-1
-s
-∑s
-t=1Xi,t the empirical mean of armi afters evalua-
-tions. Denote by Xi,s(m) andˆµi,s(m) the correspond-
-ing quantities in the multi-bandit problem.
-3. m-best arms identiﬁcation
-In this section we describe and analyze a new algo-
-rithm, called SAR (Sucessive Accepts and Rejects),
-for the m-best arms identiﬁcation problem, see Fig-
-ure 1 for its precise description. The idea behind SAR
-is similar to the one for SR (Successive Rejects) that
-was designed for the (single) best arm identiﬁcation
-problem, with the additional feature that SAR some-
-times accepts an arm because it is conﬁdent enough
-that this arm is among the m top arms. Informally
-SAR proceeds as follows. First the algorithm divides
-the time (i.e., the n rounds) in K− 1 phases. At the
-end of each phase, the algorithm either accepts the
-Multiple Identiﬁcations in Multi-Armed Bandits
-arm with the highest empirical mean or dismisses the
-arm with the lowest empirical mean, and in both cases
-the corresponding arm is deactivated. During the next
-phase, it pulls equally often each active arm. The key
-to decide whether to accept or reject during a cer-
-tain phase k is to rely on estimates for the gaps ∆⟨m⟩
-i .
-More precisely, assume that the algorithm has already
-accepted m−m(k) arms J1,...,J m−m(k), i.e. there
-is m(k) arms left to ﬁnd. Then, at the end of phase
-k, SAR computes for the m(k) empirical best arms
-(among the active arms) the distance (in terms of em-
-pirical mean) to the ( m(k) + 1)th empirical best arm
-among the active arms. On the other hand for the
-active arms that are not among the m(k) empirical
-best arms, SAR computes the distance to the m(k)th
-empirical best arm. Finally SAR deactivates the arm
-ik that maximizes these empirical distances. If ik is
-currently the empirical best arm, then SAR accepts
-ik and sets m(k + 1) = m(k)− 1, Jm−m(k+1) = ik,
-and otherwise it simply rejects ik. The length of the
-phases are chosen similarly to what was done for the
-SR algorithm.
-Theorem 1 The probability of error of SAR in the
-m-best arms identiﬁcation problem satisﬁes
-en≤ 2K 2 exp
-(
-− n−K
-8log(K)H⟨m⟩
-2
-)
-.
-Proof Consider the event ξ deﬁned by
-ξ =
-{
-∀i∈{ 1,...,K },k∈{ 1,...,K − 1},
-⏐⏐⏐⏐⏐
-1
-nk
-nk∑
-s=1
-Xi,s−µi
-⏐⏐⏐⏐⏐≤ 1
-4∆⟨m⟩
-(K+1−k)
-}
-.
-By Hoeﬀding’s Inequality and an union bound, the
-probability of the complementary event ¯ξ can be
-bounded as follows
-P(¯ξ)≤
-K∑
-i=1
-K−1∑
-k=1
-P
-(⏐⏐⏐⏐⏐
-1
-nk
-nk∑
-s=1
-Xi,s−µi
-⏐⏐⏐⏐⏐> 1
-4∆⟨m⟩
-(K+1−k)
-)
-≤
-K∑
-i=1
-K−1∑
-k=1
-2 exp(−2nk(∆⟨m⟩
-(K+1−k)/4)2)
-≤ 2K 2 exp
-(
-− n−K
-8log(K)H⟨m⟩
-2
-)
-,
-Let A1 = {1,...,K }, m(1) = m, log(K) = 1
-2 +∑K
-i=2
-1
-i , n0 = 0 and for k∈{ 1,...,K − 1},
-nk =
-⌈ 1
-log(K)
-n−K
-K + 1−k
-⌉
-.
-For each phase k = 1, 2,...,K − 1:
-(1) For each active arm i∈Ak, select arm i fornk−
-nk−1 rounds.
-(2) Let σk :{1,...,K + 1−k}→ Ak be the bijection
-that orders the empirical means by ˆµσk(1),nk ≥
-ˆµσk(2),nk ≥···≥ ˆµσk(K+1−k),nk. For 1 ≤ r≤
-K + 1−k, deﬁne empirical gaps
-ˆ∆σk(r),nk =
-
-
-
-ˆµσk(r),nk−ˆµσk(m(k)+1),nk
-if r≤m(k)
-ˆµσk(m(k)),nk−ˆµσk(r),nk
-if r≥m(k) + 1
-(3) Let ik ∈ argmaxi∈Ak
-ˆ∆i,nk (ties broken arbi-
-trarily). Deactivate arm ik, that is set Ak+1 =
-Ak\{ik}.
-(4) If ˆµik,nk > ˆµσk(m(k)+1),nk then arm ik is ac-
-cepted, that is set m(k + 1) = m(k)− 1 and
-Jm−m(k+1) =ik.
-Output: The m accepted arms J1,...,J m.
-Figure 1. SAR (Successive Accepts and Rejects) algorithm
-for m-best arms identiﬁcation.
-where the last inequality comes from the fact that
-nk
-(
-∆⟨m⟩
-(K+1−k)
-)2
-≥ n−K
-log(K)(K + 1−k)
-(
-∆⟨m⟩
-(K+1−k)
-)−2
-≥ n−K
-log(K)H⟨m⟩
-2
-.
-Thus, it suﬃces to show that on the event ξ, the al-
-gorithm does not make any error. We prove this by
-induction on k. Let k ≥ 1. Assume the algorithm
-makes no error in all previous k− 1 stages, that is no
-bad arm i > mhas been accepted and no good arm
-i≤ m has been rejected. Note that event ξ implies
-that at the end of stage k, all empirical means are
-within 1
-4∆⟨m⟩
-(K+1−k) of the respective true means.
-Let Ak ={a1,...,a K+1−k} be the the set of active
-arms during phase k. We order the ai’s such that
-µa1 > µa2 >··· > µaK+1−k. To slightly lighten the
-Multiple Identiﬁcations in Multi-Armed Bandits
-notation we denotem′ =m(k) for the number of arms
-that are left to ﬁnd in phase k. The assumption that
-no error occurs in the ﬁrst k− 1 stages implies that
-a1,a 2,...,a m′∈{ 1,...,m },
-and
-am′+1,...,a K+1−k∈{m + 1,...,K }.
-If an error is made at stage k, it can be one of the
-following two types:
-1. The algorithm accepts aj at stage k for some j≥
-m′ + 1.
-2. The algorithm rejects aj at stage k for some j≤
-m′.
-Again to slightly shorten the notation we denote σ =
-σk for the bijection (from {1,...,K + 1−k} to Ak)
-such that ˆµσ(1),nk ≥ ˆµσ(2),nk ≥···≥ ˆµσ(K+1−k),nk.
-Suppose Type 1 error occurs. Then aj = σ(1) since
-if the algorithm accepts, it must accept the empirical
-best arm. Furthermore we also have
-ˆµaj,nk−ˆµσ(m′+1),nk≥ˆµσ(m′),nk−ˆµσ(K+1−k),nk, (2)
-since otherwise the algorithm would rather reject arm
-σ(K + 1−k). The condition aj =σ(1) and the event
-ξ implies that
-ˆµaj,nk≥ˆµa1,nk
-⇒µaj + 1
-4∆⟨m⟩
-(K+1−k)≥µa1− 1
-4∆⟨m⟩
-(K+1−k)
-⇒ ∆⟨m⟩
-(K+1−k) > 1
-2∆⟨m⟩
-(K+1−k)≥µa1−µaj≥µa1−µm+1
-We then look at the condition (2). In the event of ξ,
-for all i≤m′, we have
-ˆµai,nk ≥ µai− 1
-4∆⟨m⟩
-(K+1−k)
-≥ µam′− 1
-4∆⟨m⟩
-(K+1−k)
-≥ µm− 1
-4∆⟨m⟩
-(K+1−k).
-So there are m + 1 arms in Ak (namely
-a1,a 2,...,a m′,aj) whose empirical means
-are at least µm − 1
-4∆⟨m⟩
-(K+1−k), which means
-ˆµσ(m′+1),nk ≥ µm− 1
-4∆⟨m⟩
-(K+1−k). On the other hand,
-ˆµσ(K+1−k),nk≤ ˆµaK+1−k,nk≤ µaK+1−k + 1
-4∆⟨m⟩
-(K+1−k).
-Therefore, using those two observations and (2) we
-deduce
-(
-µaj + 1
-4∆⟨m⟩
-(K+1−k)
-)
-−
-(
-µm− 1
-4∆⟨m⟩
-(K+1−k)
-)
-≥
-(
-µm− 1
-4∆⟨m⟩
-(K+1−k)
-)
-−
-(
-µaK+1−k + 1
-4∆⟨m⟩
-(K+1−k)
-)
-⇒ ∆⟨m⟩
-(K+1−k)≥ 2µm−µaj−µaK+1−k >µ m−µaK+1−k.
-Thus so far we proved that if there is a Type 1 error,
-then
-∆⟨m⟩
-(K+1−k) > max(µa1−µm,µm−µaK+1−k).
-But at stage k, only k− 1 arms have been accepted
-or rejected, thus ∆ ⟨m⟩
-(K+1−k) ≤ max(µa1−µm,µm−
-µaK+1−k). By contradiction, we conclude that Type 1
-error does not occur.
-Suppose Type 2 error occurs. The reasoning is
-symmetric to Type 1. In fact, if we rephrase the
-problem as ﬁnding the K−m worst arms instead of
-the m best arms, this is exactly the same as Type 1
-error. Hence Type 2 error cannot occur as well. This
-completes the induction and consequently the proof
-of the theorem.
-4. Multi-bandit best arm identiﬁcation
-In this section we use the idea of SAR for multi-bandit
-best arm identiﬁcation. Here at the end of each phase
-we estimate the gaps ∆i(m) within each problem, and
-we reject the arm with the largest such estimated gap.
-Moreover if a problem is left with only one active arm,
-then this arm is accepted and the problem is deacti-
-vated. The corresponding strategy is described pre-
-cisely in Figure 2
-Theorem 2 The probability of error of SAR in the
-multi-bandit best arm identiﬁcation problem satisﬁes
-en≤ 2M 2K 2 exp
-(
-− n−MK
-8log(MK )H [M ]
-2
-)
-.
-Proof Consider the event ξ deﬁned by
-ξ =
-{
-∀ 1≤i≤K, 1≤m≤M, 1≤k≤MK− 1,
-⏐⏐⏐⏐⏐
-1
-nk
-nk∑
-s=1
-Xi,s(m)−µi(m)
-⏐⏐⏐⏐⏐≤ 1
-4∆(MK +1−k)
-}
-.
-Following the same reasoning as in the proof of The-
-orem 1, it suﬃces to show that in the event of ξ the
-Multiple Identiﬁcations in Multi-Armed Bandits
-Let A1 = {(1, 1),..., (K,M )}, log(MK ) = 1
-2 +∑MK
-i=2
-1
-i , n0 = 0 and for k∈{ 1,...,MK − 1},
-nk =
-⌈ 1
-log(MK )
-n−MK
-MK + 1−k
-⌉
-.
-For each phase k = 1, 2,...,MK − 1:
-(1) For each active pair (arm, problem) ( i,m )∈Ak,
-select arm i in problem m for nk−nk−1 rounds.
-(2) Let hk(m) be the arm with the highest empiri-
-cal mean ˆµi,nk(m) among the active arms in the
-active problemm (that is such that (i,m )∈Ak).
-(3) If there is a problem m such that hk(m) is the
-last active arm in problem m, then deactivate
-both the arm and the problem, and accept the
-arm. That is, set Ak+1 =Ak\{ (hk(m),m )} and
-Jm =hk(m). Otherwise proceed to step (4).
-(4) Let
-(ik,mk)∈ argmax
-(i,m)∈Ak
-(
-ˆµhk(m),nk(m)−ˆµi,nk(m)
-)
-.
-(Ties broken arbitrarily.) Deactivate arm ik in
-problem mk, that is set Ak+1 =Ak\{ (ik,mk)}.
-Output: The M accepted arms ( J1, 1),..., (JM,M )
-(where the last accepted arm is deﬁned by the unique
-element of AMK ).
-Figure 2. SAR (Successive Accepts and Rejects) algorithm
-for the multi-bandit best arm identiﬁcation.
-algorithm makes no error. We do this by induction on
-the phase k of the algorithm. Let k≥ 1. Assume the
-algorithm makes no error in all previous k− 1 stages.
-Then at phase k, for each active problem m, the arm
-(1,m ) is still active. Moreover, as onlyk−1 arms have
-been deactivated, one clearly has
-max
-(i,m)∈Ak
-(µ1(m)−µi(m))≥ ∆(MK +1−k).
-Suppose the above maximum is achieved for the arm
-(i∗,m∗), so we have
-µ1(m∗)−µi∗(m∗)≥ ∆(MK +1−k). (3)
-Assume now that the algorithm makes an error at the
-end of phasek, i.e. some arm (1,m ) is deactivated and
-it was not the last active arm in problemm. For this to
-happen, we necessarily have for some j∈{ 2,...,K }
-(e.g., j =hk(m)),
-ˆµj,nk(m)−ˆµ1,nk(m)≥ˆµ1,nk(m∗)−ˆµi∗,nk(m∗). (4)
-Clearly on the event ξ one has
-ˆµj,nk(m)−ˆµ1,nk(m)
-=ˆµj,nk(m)−µj(m)
-+µj(m)−µ1(m) +µ1(m)−ˆµ1,nk(m)
-< 1
-2∆(MK +1−k).
-On the other hand, using (3) and ξ, one has
-ˆµ1,nk(m∗)−ˆµi∗,nk(m∗)
-=ˆµ1,nk(m∗)−µ1(m∗)
-+µ1(m∗)−µi∗(m∗) +µi∗(m∗)−ˆµi∗,nk(m∗)
-≥ 1
-2∆(MK +1−k).
-Therefore, ˆµ1,nk(m∗)− ˆµi∗,nk(m∗) > ˆµj,nk(m)−
-ˆµ1,nk(m), contradicting (4). This completes the
-induction and the proof.
-5. Experiments
-In this section we revisit the simple experiments of
-(Audibert et al., 2010) in the setting of multiple iden-
-tiﬁcations. Since our objective is simply to illustrate
-our theoretical analysis we focus on the m-best arms
-identiﬁcation problem, but similar numerical simula-
-tions could be conducted in the multi-bandit setting
-and compared to the results of (Gabillon et al., 2011).
-We compare our proposed strategy SAR to three com-
-petitors: The uniform sampling strategy that divides
-evenly the allocation budget n between the K arms,
-and then return the m arms with the highest empir-
-ical mean (see (Bubeck et al., 2011) for a discussion
-of this strategy in the single best arm identiﬁcation).
-The SR strategy is the plain Successive Rejects strat-
-egy of (Audibert et al., 2010) which was designed to
-ﬁnd the (single) best arm. We slightly improve it for
-m-best identiﬁcation by running onlyK−m−1 phases
-(while still using the full budget n) and then return-
-ing the last m surviving arms. Finally we consider
-the extension of UCB-E to the m-best arms identiﬁ-
-cation problem, which is based on a similar idea than
-the extension Gap-E of (Gabillon et al., 2011) for the
-multi-bandit best arm identiﬁcation, see Figure 3 for
-the details. Note that this last algorithm requires to
-know the complexity H⟨m⟩
-1 . One could propose an
-adaptive version, using ideas described in (Audibert
-et al., 2010), but for sake of simplicity we restrict our
-attention to the non-adaptive algorithm.
-In our experiments we consider only Bernoulli distri-
-butions, and the optimal arm always has parameter
-Multiple Identiﬁcations in Multi-Armed Bandits
-Parameter: exploration parameter c> 0.
-For each round t = 1, 2,...,n :
-(1) Let σt be the permutation of{1,...,K } that or-
-ders the empirical means, i.e., ˆµσt(1),Tσt (1)(t−1)≥
-ˆµσt(2),Tσt (2)(t−1)≥···≥ ˆµσt(K),Tσt (K)(t−1). For
-1≤r≤K, deﬁne the empirical gaps
-ˆ∆σt(r),t =
-
-
-
-ˆµσt(r),Tσt (r)(t−1)−ˆµσt(m+1),Tσt (m+1)(t−1)
-if r≤m
-ˆµσt(m),Tσt (m)(t−1)−ˆµσt(r),Tσt (r)(t−1)
-if r≥m + 1
-(2) Draw
-It∈ argmax
-i∈{1,...,K}
-−ˆ∆i,t +c
-√
-n/H⟨m⟩
-1
-Ti(t− 1).
-Let J1,...,J m be the m arms with highest empirical
-meansˆµi,Ti(n).
-Figure 3. Gap-E algorithm for them-best arms identiﬁca-
-tion problem.
-1/2. Each experiment corresponds to a diﬀerent sit-
-uation for the gaps, they are either clustered in few
-groups, or distributed according to an arithmetic or
-geometric progression. For each experiment we plot
-the probability of misidentiﬁcation for each strategy,
-varyingm between 2 andK−1. The allocation budget
-for each experiment is chosen to be roughly equal to
-max1≤m≤K−1H⟨m⟩
-1 . We report our results in Figure
-4. The parameters for the experiments are as follows:
-• Experiment 1: One group of bad arms, K = 20,
-µ2:20 = 0.4 (meaning for anyj∈{ 2,..., 20},µj =
-0.4)
-• Experiment 2: Two groups of bad arms, K = 20,
-µ2:6 = 0.42, µ7:20 = 0.38.
-• Experiment 3: Geometric progression, K = 4,
-µi = 0.5− (0.37)i, i∈{ 2, 3, 4}.
-• Experiment 4: 6 arms divided in three groups,
-K = 6, µ2 = 0.42, µ3:4 = 0.4, µ5:6 = 0.35.
-• Experiment 5: Arithmetic progression, K = 15,
-µi = 0.5− 0.025i, i∈{ 2,..., 15}.
-• Experiment 6: Three groups of bad arms,K = 30,
-µ2:6 = 0.45, µ7:20 = 0.43, µ21:30 = 0.38.
-It is interesting to note that SR performs badly for
-m-best arms identiﬁcation when m> 1, as it has even
-worse performances than the naive uniform sampling
-in many cases. This shows that the tradeoﬀs involved
-in ﬁnding the single best arm and ﬁnding the top m
-arms are fundamentally diﬀerent. As expected SAR
-always outperforms uniform sampling, and Gap-E has
-slightly better performances than SAR (but Gap-E re-
-quires an extra information to tune its parameter, and
-the adapative version comes with no provable guaran-
-tee).
-References
-Audibert, J.-Y., Bubeck, S., and Munos, R. Best arm
-identiﬁcation in multi-armed bandits. InProceedings
-of the 23rd Annual Conference on Learning Theory
-(COLT), 2010.
-Bechhofer, R. E. A single-sample multiple decision
-procedure for ranking means of normal populations
-with known variances. Annals of Mathematical
-Statistics, 25:16–39, 1954.
-Bubeck, S., Munos, R., and Stoltz, G. Pure explo-
-ration in multi-armed bandits problems. In Proceed-
-ings of the 20th International Conference on Algo-
-rithmic Learning Theory (ALT), 2009.
-Bubeck, S., Munos, R., and Stoltz, G. Pure ex-
-ploration in ﬁnitely-armed and continuously-armed
-bandits. Theoretical Computer Science , 412:1832–
-1852, 2011.
-Even-Dar, E., Mannor, S., and Mansour, Y. Pac
-bounds for multi-armed bandit and markov deci-
-sion processes. In Proceedings of the Fifteenth An-
-nual Conference on Computational Learning Theory
-(COLT), 2002.
-Gabillon, V., Ghavamzadeh, M., Lazaric, A., and
-Bubeck, S. Multi-bandit best arm identiﬁcation. In
-Advances in Neural Information Processing Systems
-(NIPS), 2011.
-Kalyanakrishnan, S., Tewari, A., Auer, P., and Stone,
-P. Pac subset selection in stochastic multi-armed
-bandits. In Proceedings of the 29th International
-Conference on Machine Learning (ICML) , 2012.
-Mannor, S. and Tsitsiklis, J. N. The sample complex-
-ity of exploration in the multi-armed bandit prob-
-lem. Journal of Machine Learning Research, 5:623–
-648, 2004.
-Multiple Identiﬁcations in Multi-Armed Bandits
-0	  
-0.05	  
-0.1	  
-0.15	  
-0.2	  
-0.25	  
-0.3	  
-0.35	  
-0.4	  
-0.45	  
-0.5	  
-0	   5	   10	   15	   20	  
-Experiment	  1	  (n	  =	  2000)	  
-UNI	   SR	   SAR	   Gap-­‐E	  (c=2)	  
-0	  
-0.1	  
-0.2	  
-0.3	  
-0.4	  
-0.5	  
-0.6	  
-0.7	  
-0.8	  
-0.9	  
-1	  
-0	   5	   10	   15	   20	  
-Experiment	  2	  (n	  =	  12000)	  
-UNI	   SR	   SAR	   Gap-­‐E	  (c=2)	  
-0	  
-0.02	  
-0.04	  
-0.06	  
-0.08	  
-0.1	  
-0.12	  
-0.14	  
-0.16	  
-0.18	  
-0	   1	   2	   3	   4	  
-Experiment	  3	  (n	  =	  6000)	  
-UNI	   SR	   SAR	   Gap-­‐E	  (c=2)	  
-Figure 4. Numerical simulations for the m-best arms iden-
-tiﬁcation problem. We chosec = 2 (exploration parameter)
-for the Gap-E algorithm in all experiments.
-0	  
-0.05	  
-0.1	  
-0.15	  
-0.2	  
-0.25	  
-0.3	  
-0	   1	   2	   3	   4	   5	   6	  
-Experiment	  4	  (n	  =	  8000)	  
-UNI	   SR	   SAR	   Gap-­‐E	  (c=2)	  
-0	  
-0.1	  
-0.2	  
-0.3	  
-0.4	  
-0.5	  
-0.6	  
-0	   2	   4	   6	   8	   10	   12	   14	   16	  
-Experiment	  5	  (n	  =	  4000)	  
-UNI	   SR	   SAR	   Gap-­‐E	  (c=2)	  
-0	  
-0.1	  
-0.2	  
-0.3	  
-0.4	  
-0.5	  
-0.6	  
-0.7	  
-0.8	  
-0.9	  
-1	  
-0	   5	   10	   15	   20	   25	   30	  
-Experiment	  6	  (n	  =	  50000)	  
-UNI	   SR	   SAR	   Gap-­‐E	  (c=2)	  

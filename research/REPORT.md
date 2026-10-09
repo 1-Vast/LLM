@@ -1,227 +1,24 @@
-# MAESTRO: dual-core research assessment
+# MAESTRO Research Report
 
-Authoritative English synthesis, consolidated on 2026-10-07. [EVIDENCE.md](EVIDENCE.md)
-contains study-level findings, limitations, primary-source interpretation and reproduction
-routes. Machine-readable result receipts, scientific protocols, code and source assets
-remain in their study directories. [report_consolidation.json](report_consolidation.json)
-records every removed narrative, its original byte and LF hashes, and its replacement.
-Historical freezes retain their original hashes; authorized removal is a documented
-change, never a claim of unchanged bytes. The dated execution record belongs in `log`.
+## Scope and claim boundary
 
-The 2026-10-08 risk-calibration continuation corrected the prior CRC/LTT validity
-errors and model/calibration split mismatch. Honest fixed-policy LTT reduced joint
-error by largely abstaining: only 2.6–3.4% evaluation coverage, with no conditional
-error certificate. The pilot did not authorize five-fold expansion. It also isolated
-a substantive repair target: class-agnostic completion with blend weight 1 erases
-all hypothesis-specific forecasts after one observation. A research-only conditional
-completion prototype addresses this defect; it does not establish a STATE or decision
-advantage. See [the detailed evidence](EVIDENCE.md#honest-fixed-policy-risk-calibration--2026-10-08).
+MAESTRO connects an evidence-gathering agent, a scientific decision layer and a virtual-cell predictor. This release preserves the three active STATE/decision studies and the minimum frozen inputs needed by their verifiers. Predictions remain model outputs; only qualified measurements can support scientific updates.
 
-The subsequent repair pilot connects hypothesis-conditioned completion, fits its
-covariance from training class residuals and records raw purchase identities.
-It improves prediction versus static templates but does not beat legacy completion;
-proper calibration certifies no decisions. The repaired interface is verified while
-decision value remains unresolved. [Repair evidence](EVIDENCE.md#conditional-feedback-repair-pilot--2026-10-08)
-records the same-information comparisons and remaining score/selection limitations.
+The current endpoint is a signed 39-gene RNA response. It does not establish functional phenotype, protein activity, causal mechanism, clinical efficacy or the value of an experiment. Five target cell backgrounds in the current STATE studies were previously exposed, and reference contexts overlap STATE pretraining.
 
-## What the framework has established
+## Established results
 
-MAESTRO combines an agent that proposes and selects executable evidence-gathering
-actions with a virtual-cell world model that forecasts explicitly conditioned
-perturbation responses. The current world-model research uses the actual pretrained
-STATE checkpoint rather than a substitute named STATE. Deterministic contracts bind
-cell context, drug/components, dose, time, readout, request, model version, plan,
-attempt and measurement. Predictions can influence a declared selection strategy;
-only qualified measured evidence can support the corresponding scientific update.
+- Engineering closure is verified: condition-bound requests, bounded execution, persistence, feedback and restart contracts operate across the agent, decision and virtual-cell layers.
+- The original held-out-context STATE study reported about 41% lower depth-corrected RNA error than its empirical baseline on three checkpoint-held-out contexts. This is task-specific prediction evidence.
+- The STATE readout repair lowers development RNA MSE by 2.17% on reference folds and 7.84% on five previously exposed targets. The joint-feedback repair passes its registered reference development gate and improves posterior prediction under matched information.
+- The compact MAP audit strictly loads the released checkpoint hierarchy and executes a native forward. Its output gene order and training-time forward semantics remain unauthenticated, so no native response comparison is established.
 
-The strongest scientific result is a **task-specific STATE prediction improvement**:
-in the original zero-shot context experiment, an empirical perturbation-panel mean
-plus a development-selected STATE correction lowered depth-corrected RNA prediction
-error by approximately 41% on three checkpoint-held-out cell backgrounds. Drug-cluster
-uncertainty excluded zero and each background improved. Correct basal/context and
-drug correspondence mattered. This result concerns mean transcriptional response,
-not apoptosis, target activity, ATP, synergy or clinical efficacy.
+## Not established / blocked
 
-The strongest engineering result is an **operational two-round feedback chain**:
-real tool/API routing, production prediction and case storage, paid public-observation
-replay, restart and subsequent measurement are connected. Condition matching, durable
-facts, budget/idempotence, scoped evidence projection, prediction reliability history,
-and scientific-state restart restrictions have targeted verification. Production
-integration does not confer biological validity on an adapter or policy.
+Independent decision benefit is not established. The STATE readout repair does not change final equal-budget selections; joint-feedback acquisition loses utility on the five exposed target contexts; strict decision-value LOO finds joint KG only 0.0000544 above no-screen while using eight extra measurements. The registered risk-calibration study certifies no conditional-risk threshold and achieves only 2.6% to 3.4% marginal evaluation coverage.
 
-The research has **not established a general dual-core decision advantage** over
-strong deterministic policies supplied with the same legal information and resources.
-Better RNA prediction did not automatically improve final selection. The earlier STATE
-boundary study matched an existing knowledge-gradient policy; its uncertainty
-rescaling and stopping convention produced no additional utility or savings. The
-LLM operational loop selects the same actions as its deterministic control. These
-are scoped findings that identify the remaining contribution to demonstrate.
+No LLM advantage, functional phenotype gain or mechanism causality is established. Functional bridges, independent qualified evaluation units, a calibrated model-risk contract, utility-unit prices, failure/latency costs and the MAP decoder output map remain unavailable or unqualified. Missing inputs must block with `ASSET_MISSING`; they are not replaced with zero-valued outcomes.
 
-The subsequent [joint-feedback development study](EVIDENCE.md#state-joint-feedback-development--2026-10-09)
-tests prediction errors between the purchased and terminal source observations.
-It identifies a retained, research-only utility signal in whole-reference-context
-validation, including an identical-information comparison. Adaptive acquisition
-does not improve the five exposed target backgrounds, so it supplies neither
-independent transfer confirmation nor a general agent advantage. Forecast quality,
-feedback interpretation and information-acquisition value remain separate checks.
+## Next decisive experiment
 
-The [decision-utility follow-up](EVIDENCE.md#decision-utility-and-protected-updates--2026-10-09)
-adds no-screen as the primary comparator and refits all policies under strict
-whole-context LOO. Joint KG then has negligible average improvement while buying
-eight extra observations. Conservative EVSI shadow rules abstain completely;
-the strict path refuses purchases lacking risk, price and failure/latency
-registration. This verifies an admission boundary, not a new decision advantage.
-Signed RNA utility remains separate from any functional or economic endpoint.
-
-## Responsibilities and scientific permissions
-
-| Component | Authority | Boundary |
-|---|---|---|
-| `src/agent` | Candidate proposals, legal tool use, round advancement, strategy invocation and review | An LLM cannot declare its output trusted, spend outside constraints, manufacture measured evidence or restore missing scientific state |
-| `src/maestro` | Admission, registered interpretation, mechanism compatibility, distinct acquisition objectives and stopping rules | Coverage, response magnitude, mechanism discrimination and information value retain different meanings |
-| `src/virtual_cell` | Condition-bound supported response forecasts, refusal and uncertainty metadata | RNA response does not become functional or hypothesis-conditional mechanism probability without a validated bridge |
-| `CaseStore` | Committed plans/actions, execution status, accepted results and budget | A single execution fact source; derived audit, retrieval and reliability views can be rebuilt without charging again |
-| Evidence/retrieval stores | Scoped source assertions, versions, lineage, visibility and auxiliary context | Multiple records of one experiment do not multiply independent support; future outcomes cannot become predecision inputs |
-| `tools` | Reusable acquisition, identity alignment, schema/quality checks and provenance | Dataset qualification is distinct from file availability and from biological validity |
-| `research` | Study-specific training, protocols, policies, analysis and evaluation | No scientific promotion solely because code passes tests or occupies a production directory |
-
-Restarted cases may receive committed results and expose facts/history. A decision
-depending on unavailable mechanism/repair state must block or start an explicit new
-analysis. Historical explanations are read under their recorded versions; reloading
-an empty EvidenceState must not silently resurrect excluded hypotheses.
-
-## Why the earlier work often failed to improve decisions
-
-1. **The task had little useful choice.** Several transcriptomic class menus are near
-   an oracle ceiling or have only one observable action. A predictor or planner cannot
-   earn measurable selection value when the available menu cannot support a beneficial
-   replacement. Mechanism-class identification is also not causal mechanism validation.
-2. **Information gain was confused with model gain.** A second measurement orientation,
-   continuous response values or more history can improve a simple ranking. Compare
-   models with identical histories, measurement menus, purchase budgets and deadlines;
-   do not attribute richer data to the world model.
-3. **Forecast calibration and ranking were different bottlenecks.** Confirmation-aware
-   shrinkage calibrated reasonably but ranked candidates worse than simple averages.
-   RNA vector error reductions need not resolve consequential top-k comparisons.
-4. **Feedback changed actions without improving independent outcomes.** Role-swapped
-   and same-repeat studies contain reproducible response signal, yet small biological
-   model gains are matched by simple prior mixtures or disappear after a matched
-   no-feedback control. Shared drug/target propagation also loses to static replay.
-5. **Conditions or observational meaning did not transfer.** Equal compound names do
-   not imply equal concentration, duration, source well, assay, engagement or response.
-   Separate wells are not authenticated independent culture starts. Shared plate
-   controls, fitted source parameters, selected rescreens and repeated drug pairs
-   constrain inference.
-6. **Uncertainty was too strong for the evidence.** Model/seed spread, training-context
-   residuals and stable posterior rankings are diagnostics, not calibrated out-of-context
-   confidence or a multistep value bound. Attempt failure mass cannot be silently
-   renormalized into successful readings.
-
-## What data can legitimately be cheap
-
-The public-data bottleneck has materially improved. All 125 Jaaks cell lines map by
-SIDM to public 14-pathway and 771-TF baseline-expression-derived scores. Typed
-drug/target/network sources support a reusable knowledge database. Direct Jaaks
-monotherapy endpoints cover 4,424 of 4,519 candidate rows, including the previously
-unsupported boundary rows. GDSC and selected PRISM references can support response
-tasks under explicit assay/dose/time conditions.
-
-This permits a smaller observation contract: compound/components, dose/vector, cell
-or reference background, time/assay, one qualified response and source/QC. A sample
-does not need every molecular modality, a complete Hill curve or protein measurement
-to train a supported response head. Full curves remain necessary for claims about
-curve shape; binding/engagement and proximal evidence remain necessary for the
-corresponding mechanism claims. Cross-assay references require a separate head or a
-validated transport relation. Missing labels never become zeros.
-
-The STATE checkpoint still requires its authenticated basal population, ordered native
-features, exact preprocessing and supported perturbation labels. Cheap lookup data or
-sparse markers cannot be padded into that input and called STATE. The 31 unresolved
-native coordinates remain unnamed; verified named readouts use only authenticated
-coordinates.
-
-## The next scientific contribution to test
-
-Freeze the main architecture. Use a bounded study to test whether **condition-qualified
-information about consequential candidate comparisons improves independent measured
-selection or saves information cost**, beyond a competent same-input deterministic
-policy. Keep the pretrained STATE checkpoint fixed unless a development limitation
-justifies a separately registered adaptation.
-
-For a prediction contribution, compare empirical panel, strong basal/design comparator,
-anchored STATE, and correctly matched/permuted context and drug controls. For an
-acquisition contribution, compare the same worlds under fixed prior, existing KG,
-transparent boundary acquisition and any justified new method. For an agent contribution,
-first establish real heterogeneous tools/evidence actions with actual returns, coverage,
-latency and cost; compare an LLM and deterministic resolver with those same tools.
-Use a four-arm factorial only when both contribution gates support an informative
-comparison. An architecture diagram or successful API call is not an interaction effect.
-
-The current five STATE target backgrounds and the 14 repeat-panel lines are already
-exposed. They support development and debugging, including honest negative conclusions,
-not a new confirmation claim. Independent context/source-unit evaluation must be
-qualified from design metadata and frozen before outcomes are opened. Culture-level
-transport or phenotype/engagement claims need their own measurements and estimands.
-No same-physical-cell pair of potential outcomes is required: randomized sister
-allocation, a supported complete-action panel, or qualified randomized logs can suffice.
-
-Report the selected and rejected candidates, first-round swaps, replacement contribution,
-independent outcome, wrong advancement, refusal/QC/failure, total charges, unused capacity,
-rounds, plate starts, delay, API tokens and compute. Choose the minimum useful benefit
-from a scientific/resource requirement before evaluation. Keep cell, drug-pair and
-source dependence sensitivity separate; a narrow cell-only interval does not establish
-transfer to new pairs.
-
-## Maintenance and validation
-
-Promote verified reusable contracts to `src`/`tools` only with parity and boundary
-tests; keep study objectives, training and inferential verdicts in `research`. Current
-source/condition lookup and tool-catalog improvements are engineering contributions.
-Within-call dependency-byte reuse preserves registry identity and revalidation; no
-cross-call cache or STATE/API inference
-acceleration is inferred from filesystem timing. The attempted batched KG optimization
-was slower/more memory intensive and was not promoted.
-
-Core tests run without large biological assets; registered small regression packages
-require explicit asset recovery; full research reproduction requires the original
-datasets, checkpoints and historical caches. A missing-asset or intentionally removed
-narrative report must be identified explicitly, not hidden behind a green test count
-or overwritten freeze hash. Test counts belong to their precise session/scope and
-overlapping suites must not be summed.
-
-The narrative consolidation removes parallel explanations while preserving executable
-scientific protocols, result JSON/CSV/NPZ, numerical verification receipts, invalid-run
-receipts, raw logs, primary literature, code and source snapshots. Reproduction routes
-and original source citations are indexed in [EVIDENCE.md](EVIDENCE.md) and the
-consolidation manifest. Parent-owned navigation and dated logs record release-specific
-verification and publication facts.
-
-
-The October 8 [MAP-inspired pilot](EVIDENCE.md#map-knowledge-pilot-20261008)
-adds public pharmacological knowledge and small contrastive representation pretraining
-to cached STATE forecasts. Attribute alignment improves, but reference validation
-rejects all tested response corrections; final decisions equal the original M2.
-This exposed-data pilot is neither a reproduction of MAP nor independent confirmation.
-
-The subsequent [released-weight test](EVIDENCE.md#map-released-weights-20261008)
-uses the official knowledge encoder and expands structure coverage to the complete
-146-candidate menu; validation still disables every response correction, preserving
-M2 decisions. A real checkpoint-backed STATE-SE/component forward exposes public
-code/checkpoint incompatibility, evaluation dropout, a causal CLS readout that
-cannot access drug tokens, dose omission and missing decoder gene order. The
-component bridge and mask probe remain research diagnostics; authentic native
-response comparison and additional agent value are not established.
-
-The subsequent runtime repair passed engineering sensitivity checks but did not
-establish prediction or decision benefit. Its unpromoted implementation and
-transient outputs were removed on October9 to reduce maintenance. The
-[historical evidence](EVIDENCE.md#map-runtime-repair-20261008) preserves that
-qualification; native scientific validation remains unresolved.
-
-The [named STATE readout study](EVIDENCE.md#state-readout-repair-20261009) uses
-existing authenticated responses to test a small drug-shared gain calibration.
-Development MSE falls7.84% across the five exposed backgrounds and2.17% in
-nested reference folds; only one initial candidate replacement improves, while
-final equal-budget choices remain identical. It is retained as a small research
-prediction candidate, with no production promotion or independent decision-gain
-claim. Missing original MAP gene order/forward remains explicitly unresolved.
+Use qualified, previously unused biological units and a frozen complete-menu protocol to compare no-screen, strong deterministic acquisition and STATE-informed acquisition under identical information, measurement budgets and authenticated functional outcomes. Pre-register model-risk, cost, latency and failure handling. In parallel, authenticate the MAP training-time forward and output gene order before any native-response claim. Promotion requires independent prediction and decision results; another model expansion is not justified by the current evidence.

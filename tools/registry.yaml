@@ -1,11 +1,11 @@
 version: 4
 discovery:
   manifest_patterns: ["tools/*/manifest.json", "tools/*/*.manifest.json"]
-  execution_contract: "run(parameters) 返回严格 JSON 对象：schema_version=1.0 与结构化 payload；observations、limitations、artifacts 仅作展示兼容。"
+  execution_contract: "run(parameters) returns a strict JSON object with schema_version=1.0 and a structured payload; observations, limitations and artifacts are display-only compatibility fields."
 selection:
   controller: "agent.tool_runtime.ToolRouter"
-  policy: "单步接口兼容；select_and_execute_many 每步由 LLM 查看结构化回执后选择，受0至32步、含声明默认值的重复调用和共享有限总预算约束。默认0仅是声明工具成本，不代表LLM/token免费。"
-  boundary: "拒绝未批准路径、未注册工具、未知参数/schema、非有限数及不支持的类型或任务；自然语言适用边界交给模型判断，不冒充确定性校验。可信入口在当前进程执行，不是进程沙箱。"
+  policy: "The single-step interface remains compatible. In select_and_execute_many, the LLM sees each structured receipt before choosing the next call; execution is bounded to 0-32 steps, repeated calls including declared defaults, and one shared finite budget. A declared tool cost of zero does not make LLM or token use free."
+  boundary: "Reject unapproved paths, unregistered tools, unknown parameters or schemas, non-finite numbers, and unsupported types or tasks. Natural-language applicability remains a model judgment, not deterministic validation. Trusted entrypoints run in-process and are not a process sandbox."
 tools:
   - id: condition_sources
     directory: analysis
@@ -21,10 +21,10 @@ tools:
     purpose: Apply one declarative, bounded table filter without arbitrary expressions.
   - id: evidence_bundle_optimize
     directory: analysis
-    purpose: 使用现有精确选择器优化显式预算下的声明式证据覆盖，不虚构测量或效用。
+    purpose: Optimize declared evidence coverage under an explicit budget using the existing exact selector; do not invent measurements or utility.
   - id: multimodal_alignment
     directory: analysis
-    purpose: 对显式配对模态记录做对齐QC，仅输出待复核不一致候选，不生成embedding或活性预测。
+    purpose: Run alignment QC on explicitly paired modality records and return discrepancies for review; do not generate embeddings or activity predictions.
   - id: typed_decision_review
     directory: analysis
     purpose: Validate recorded Typed Jev judgments as advisory model predictions and preserve deterministic decision authority.
@@ -36,4 +36,4 @@ tools:
     purpose: Retrieve precedent scientific episodes with per-case reasons and adaptation requirements, and return hypothesis-conditional forecasts as planning-only model predictions; disabled by default behind the case-memory feature flag.
   - id: virtual_cell_query
     directory: prediction
-    purpose: 在推理前检查适用域与端点可表达性，返回规划专用预测或具名拒绝，绝不返回实测证据。
+    purpose: Check applicability and endpoint support before inference; return a planning-only prediction or named refusal, never measured evidence.

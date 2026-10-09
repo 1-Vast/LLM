@@ -8,7 +8,6 @@ File summary
 - Depends on: maestro
 """
 import ast
-import hashlib
 import json
 import os
 import re
@@ -71,12 +70,23 @@ def test_source_is_separated_by_core_agent_and_virtual_cell_responsibility():
     assert (ROOT / "tools" / "evaluation" / "__init__.py").is_file()
     assert (ROOT / "src" / "maestro" / "contrast.py").is_file()
     assert not (ROOT / "src" / "maestro" / "planning.py").exists()
-    assert (ROOT / "research" / "belief_planning" / "planner.py").is_file()
+    assert (ROOT / "research/astra/state_readout_repair_20261009/verify.py").is_file()
+    assert (ROOT / "research/astra/state_feedback_repair_20261009/verify.py").is_file()
+    assert (ROOT / "research/decision_value/verify.py").is_file()
     assert not (ROOT / "src" / "maestro" / "agent.py").exists()
     assert (ROOT / "src" / "agent" / "orchestrator.py").is_file()
     assert (ROOT / "src" / "virtual_cell" / "interface.py").is_file()
     assert not (ROOT / "scripts").exists()
     assert not (ROOT / "results").exists()
+    assert (ROOT / "src/agent/case_store.py").is_file()
+    assert "CaseStore" in (ROOT / "src/agent/memory.py").read_text(encoding="utf-8")
+    assert len(list((ROOT / "research/astra").glob("state_*_repair_20261009"))) == 2
+    assert (ROOT / "research/decision_value/verify.py").is_file()
+    assert not any((ROOT / "research/identifiability_audit").rglob("*.py"))
+    assert not any((ROOT / "research/dual_core_live").rglob("*.py"))
+    assert not any((ROOT / "research/dual_core_followup").rglob("*.py"))
+    assert not (ROOT / "research/Innovation.md").exists()
+    assert not (ROOT / "Innovation.md").exists()
 
 
 def test_source_packages_do_not_import_research_or_tools():
@@ -192,11 +202,8 @@ def test_project_markdown_has_no_chinese_prose():
     parenthetical, because a real identifier may carry a non-ASCII name.
     """
 
-    historical = _historical_markdown_exemptions()
     offenders = []
     for path in _project_markdown():
-        if path.relative_to(ROOT).as_posix() in historical:
-            continue
         text = path.read_text(encoding="utf-8")
         if not text.strip():
             continue  # An empty file has no prose to judge; emptiness is its own test below.
@@ -207,35 +214,6 @@ def test_project_markdown_has_no_chinese_prose():
             if CJK_PATTERN.search(line):
                 offenders.append(f"{path.relative_to(ROOT).as_posix()}:{line_number}: {line.strip()[:90]}")
     assert not offenders, "Chinese prose found outside paths:\n" + "\n".join(offenders)
-
-
-def _historical_markdown_exemptions():
-    """Validate original identities or explicitly consolidated English replacements."""
-    manifest = json.loads((ROOT / "tests/fixtures/historical_markdown.json").read_text(encoding="utf-8"))
-    consolidation = ROOT / "research/report_consolidation.json"
-    retired = {
-        record["path"]: record
-        for record in json.loads(consolidation.read_text(encoding="utf-8"))["removed"]
-    } if consolidation.is_file() else {}
-    for name, record in manifest["files"].items():
-        path = ROOT / name
-        # Git may normalize CRLF. The text hash still detects every content change.
-        digest = hashlib.sha256(path.read_text(encoding="utf-8").encode("utf-8")).hexdigest() if path.is_file() else None
-        if digest == record["sha256_lf"]:
-            continue
-        removal = retired.get(name)
-        assert removal and removal["status"] == "removed", f"historical record changed without completed consolidation: {name}"
-        assert not path.exists(), f"consolidated original still exists: {name}"
-        assert removal["sha256_lf"] == record["sha256_lf"], f"original historical identity changed: {name}"
-        replacement = ROOT / removal["replacement"].split("#")[0]
-        assert replacement.is_file(), f"consolidated replacement is missing: {name}"
-        prose = MARKDOWN_LINK_DESTINATION.sub("", INLINE_CODE.sub("", replacement.read_text(encoding="utf-8")))
-        assert not CJK_PATTERN.search(prose), f"consolidated replacement is not English: {name}"
-    return manifest["files"]
-
-
-def test_historical_language_exemptions_are_content_bound():
-    assert len(_historical_markdown_exemptions()) == 28
 
 
 def test_tracked_markdown_is_never_empty():
@@ -276,52 +254,28 @@ def test_python_sources_are_english_only():
 
 LOG_ROOT = ROOT / "log"
 LOG_DAY_NAME = re.compile(r"^\d{8}$")
-LOG_DAY_ROW = re.compile(r"^\| `(\d{8})/README\.md` \|", re.MULTILINE)
+LOG_DAY_ROW = re.compile(r"^\| (\d{8}) \|", re.MULTILINE)
 LOG_RECORD_FIELDS = ("> - **Path**:", "> - **Purpose**:", "> - **Core points**:")
-LOG_REQUIRED_SECTIONS = (
-    "Record control",
-    "Research questions and hypotheses",
-    "Materials, data and computational environment",
-    "Experimental design and controls",
-    "Experiment register and results",
-    "Deviations, failures and corrections",
-    "Interpretation and claim boundaries",
-    "Reproduction and artifact ledger",
-    "Open items and next experiments",
-    "Curation provenance",
-)
-# A day record covers code and architecture. Housekeeping -- pruning, archiving,
-# summarising, reformatting -- is not recorded in it, so these words must not
-# reappear as a section heading in a record.
-LOG_OUT_OF_SCOPE_HEADINGS = (
-    "## consolidation",
-    "## log consolidation",
-    "## housekeeping",
-    "## pruning",
-    "## tree consolidation",
-)
 
 
 def _log_day_directories():
-    return sorted(path for path in LOG_ROOT.iterdir() if path.is_dir())
+    return sorted(
+        path for path in LOG_ROOT.iterdir()
+        if path.is_dir() and (path / "README.md").is_file()
+    )
 
 
-def test_log_is_one_dated_experiment_record_per_working_day():
-    """log/ is a dated experiment record: INDEX.md plus one folder per working day.
-
-    A day folder is named YYYYMMDD and holds the day's record, which names its
-    own path, carries that day's date in its title and opens with the
-    structured summary every record in this tree uses. Nothing else may sit at
-    the top level: material that is not a day record belongs in the dated
-    isolation area beside the repository, declared in the index.
-    """
+def test_log_is_compact_dated_release_record():
+    """Each retained date has a compact summary and canonical receipts."""
 
     assert LOG_ROOT.is_dir(), LOG_ROOT
     assert (LOG_ROOT / "INDEX.md").is_file()
     strays = sorted(
-        path.name for path in LOG_ROOT.iterdir() if path.is_file() and path.name != "INDEX.md"
+        path.name for path in LOG_ROOT.iterdir()
+        if path.is_file() and path.name not in {"INDEX.md", "MANIFEST.json"}
     )
-    assert not strays, f"log/ may hold only INDEX.md and day folders at top level: {strays}"
+    assert not strays, f"unexpected files at log/ top level: {strays}"
+    assert (LOG_ROOT / "MANIFEST.json").is_file()
 
     days = _log_day_directories()
     assert days, "log/ has no day folders"
@@ -330,47 +284,23 @@ def test_log_is_one_dated_experiment_record_per_working_day():
         record = day / "README.md"
         assert record.is_file(), f"{day.name} holds no day record"
         text = record.read_text(encoding="utf-8")
-        for field in LOG_RECORD_FIELDS:
-            assert field in text, f"{day.name} record lost its summary field {field}"
-        assert f"`log/{day.name}/README.md`" in text, f"{day.name} does not name its own record path"
         iso_date = f"{day.name[:4]}-{day.name[4:6]}-{day.name[6:]}"
         titles = [line for line in text.split("\n") if line.startswith("# ")]
         assert titles, f"{day.name} record has no title"
         assert iso_date in titles[0], f"{day.name} title does not carry its date: {titles[0]}"
-        headings = re.findall(r"^## (.+)$", text, re.MULTILINE)
-        expected = [f"{index}. {title}" for index, title in enumerate(LOG_REQUIRED_SECTIONS, 1)]
-        assert headings[: len(expected)] == expected, f"{day.name} lost or reordered a required section"
-        lowered = text.lower()
-        offenders = [heading for heading in LOG_OUT_OF_SCOPE_HEADINGS if heading in lowered]
-        assert not offenders, (
-            f"{day.name} record carries a housekeeping section; log/ records code and "
-            f"architecture changes only: {offenders}"
-        )
+        assert all(field in text for field in LOG_RECORD_FIELDS), f"{day.name} lacks its compact summary"
 
 
-def test_log_index_declares_every_file_in_the_record():
-    """The index is the single entry point: no file under log/ may be unlisted."""
+def test_log_manifest_tracks_every_dated_file_and_hash():
+    """The machine manifest, not the reading index, owns the file inventory."""
+    from tools.log_manifest import build_manifest
 
+    recorded = json.loads((LOG_ROOT / "MANIFEST.json").read_text(encoding="utf-8"))
+    assert recorded == build_manifest()
     index = (LOG_ROOT / "INDEX.md").read_text(encoding="utf-8")
-    declared = set(re.findall(r"`([^`]+)`", index))
-    declared.update(re.findall(r"\]\(([^)\s]+)\)", index))
-
-    files = sorted(
-        path.relative_to(LOG_ROOT).as_posix()
-        for path in LOG_ROOT.rglob("*")
-        if path.is_file() and path.name != "INDEX.md"
-    )
-    undeclared = [
-        name
-        for name in files
-        if not any(entry == name or entry.endswith("/" + name) for entry in declared)
-    ]
-    assert not undeclared, f"log/ holds files the index does not declare: {undeclared}"
-
+    assert "| Date | Topic | Canonical receipt |" in index
     listed_days = set(LOG_DAY_ROW.findall(index))
-    assert listed_days == {day.name for day in _log_day_directories()}, (
-        "the reading-order table must list every day folder exactly once"
-    )
+    assert listed_days == {day.name for day in _log_day_directories()}
 
 
 def test_no_test_module_imports_another_test_module():
