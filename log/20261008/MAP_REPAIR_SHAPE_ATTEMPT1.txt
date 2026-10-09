@@ -1,0 +1,29 @@
+...................F..                                                   [100%]
+================================== FAILURES ===================================
+______________ test_log_index_declares_every_file_in_the_record _______________
+
+    def test_log_index_declares_every_file_in_the_record():
+        """The index is the single entry point: no file under log/ may be unlisted."""
+    
+        index = (LOG_ROOT / "INDEX.md").read_text(encoding="utf-8")
+        declared = set(re.findall(r"`([^`]+)`", index))
+        declared.update(re.findall(r"\]\(([^)\s]+)\)", index))
+    
+        files = sorted(
+            path.relative_to(LOG_ROOT).as_posix()
+            for path in LOG_ROOT.rglob("*")
+            if path.is_file() and path.name != "INDEX.md"
+        )
+        undeclared = [
+            name
+            for name in files
+            if not any(entry == name or entry.endswith("/" + name) for entry in declared)
+        ]
+>       assert not undeclared, f"log/ holds files the index does not declare: {undeclared}"
+E       AssertionError: log/ holds files the index does not declare: ['20261008/MAP_RELEASE_CORE.txt', '20261008/MAP_RELEASE_REPEAT_ATTEMPT1.txt', '20261008/MAP_RELEASE_VERIFY_ATTEMPT2.txt', '20261008/MAP_REPAIR_CORE.txt', '20261008/MAP_REPAIR_SHAPE.txt', '20261008/MAP_REPAIR_TESTS.txt', '20261008/MAP_RUNTIME_REPAIR_AUDIT.txt', '20261008/map_repair_tests.xml', '20261008/v9_attempt1/freeze9.json', '20261008/v9_attempt1/run9.py', '20261008/v9_attempt1/test_run9.py']
+E       assert not ['20261008/MAP_RELEASE_CORE.txt', '20261008/MAP_RELEASE_REPEAT_ATTEMPT1.txt', '20261008/MAP_RELEASE_VERIFY_ATTEMPT2.txt', '20261008/MAP_REPAIR_CORE.txt', '20261008/MAP_REPAIR_SHAPE.txt', '20261008/MAP_REPAIR_TESTS.txt', ...]
+
+tests\test_repository_shape.py:368: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_repository_shape.py::test_log_index_declares_every_file_in_the_record
+1 failed, 21 passed in 11.76s

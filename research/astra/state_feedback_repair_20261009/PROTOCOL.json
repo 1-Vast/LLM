@@ -1,0 +1,23 @@
+{
+  "registered_question": "Does training-only joint A/B prediction-error feedback improve equal-budget terminal RNA-score selection compared with the same STATE prior and old independent-noise feedback?",
+  "scope": "Development only: 45 reference contexts overlap STATE pretraining; five targets already exposed. No independent biology, native MAP, STATE-SE, phenotype or LLM-agent-effect claim.",
+  "endpoint": "Authenticated signed mean of the existing 39 Hallmark Apoptosis RNA genes; terminal sum of five measured B scores. A/B are physical source observations, not authenticated independent culture starts.",
+  "inputs": "Frozen packet2 training_arrays, public_prior, evaluator_private and PACKET_MANIFEST; exact 146 drug-dose menu and original named endpoint. Candidate/context identities retained.",
+  "outer_validation": "Three whole-reference-context folds, held index modulo3. All 45 contexts can supply masked training observations; only 43 complete A/B menu contexts are selection-evaluable. Incomplete indices31 and34 remain explicitly unevaluated; no candidate is removed or missing observation treated as zero.",
+  "means": ["M0", "M2", "drug_gain"],
+  "mean_fitting": "Reuse the frozen readout arithmetic: precision-weighted empirical candidate baseline plus fixed0.5 STATE deviation or bounded drug-shared gain. Same six strengths and whole-cell inner LOO MSE selection. No decision-target tuning.",
+  "old_feedback": "Refit original fit_common_belief arithmetic inside each outer training set, including candidatewise missingness masks and original mean-filled B covariance. Offset=masked mean(A-B), obsvar=masked sample variance(A-B), covariance=50% empirical covariance+50% diagonal+1e-12. Joint embedding CBB=C,CBA=C,CAA=C+diag(obsvar).",
+  "joint_feedback": "For each complete outer-training context, exclude that entire context again from mean fitting, gain-strength selection, STATE centering and A-B offset. Stack errors [B-pB,A-pB-offset]. Use zero-mean second moment (not centered covariance),50% diagonal shrink and1e-12 jitter. No extra bias parameters, grids or added obsvar: A residual variance already contains observation noise. Covariance uses complete contexts only.",
+  "policies": {
+    "common_kg": "Original Gaussian KG with old feedback,64 standard normal draws seed20261008, deterministic lowest-index ties",
+    "joint_kg": "Same KG objective and draws using Cov(B,A_i)/sqrt(Var(A_i)); jointly condition A and B after every paid observation",
+    "joint_shared": "Joint feedback given exactly the corresponding common_kg eight purchased A indices and values; isolates interpretation of identical information",
+    "joint_boundary": "M2 and drug_gain only: fixed initial eight indices nearest the midpoint of ranks5and6, same joint update, same budget; a simple deterministic acquisition comparator"
+  },
+  "resources": "Every replay pays eight unique scalar A observations, then commits five B candidates;13 units/context, one fixed acquisition budget. No unpurchased A or any B passed to policy. Persist all models/forecasts before opening target evaluator. Log request and charge before callback release; evaluate B only after commitment.",
+  "primary": "M2 joint_kg minus M2 common_kg paired terminal B sum across43 complete outer-reference contexts. Report absolute difference, relative difference only with positive denominator, each of3folds, changed selections and per-context contributions.",
+  "secondary": "Same-information joint_shared differences; other mean arms and fixed-boundary comparator; static-versus-feedback gain; all-candidate posterior MSE; recorded A innovations; five exposed targets descriptive only. No best arm selected from target outcomes.",
+  "development_retention_gate": "Primary reference mean relative gain strictly greater than2%,at least2of3fold absolute gains positive, independent freeze/budget/arithmetic/no-leakage verification succeeds. This is a development retention rule, not a statistical certificate or production promotion. Negative useful diagnostic evidence retained; no further parameter search within this trial.",
+  "verification": "Independent gain/offset/covariance arithmetic, all reference and target outcomes/choices/costs, old target comparator equality, shared-information identity, held/excluded-label poisoning, closed-form updates, frozen source hashes and exact fresh complete numerical rerun.",
+  "novelty": "Gaussian conditioning, shrinkage and decision-focused evaluation are established. Novel dual-core contribution cannot be asserted without independent decision-value evidence. This trial tests the scientific feedback contract connecting STATE forecasts to deterministic evidence acquisition."
+}

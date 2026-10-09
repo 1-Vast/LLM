@@ -955,3 +955,691 @@ source inputs, paid API, download or one-time evaluation opening is not needed t
 compact scalar replay or prose. Check current help/input receipts before using historical
 commands: fixed controllers were moved from tools.datasets into research.astra. Current
 fact/condition/prediction permissions still apply during historical replay.
+
+
+<a id="map-knowledge-pilot-20261008"></a>
+## MAP-inspired knowledge representation pilot, 2026-10-08
+
+Primary source: Feng et al., *A knowledge-driven framework for predicting single-cell
+responses for unprofiled drugs*, Nature Machine Intelligence (2026),
+https://doi.org/10.1038/s42256-026-01286-w. Full article methods and official README
+were read; the supplement and released pretrained MAP weights were not evaluated.
+Code: https://github.com/MAGIC-AI4Med/MAP. Knowledge data:
+https://huggingface.co/datasets/RainGate/MAP-KG.
+
+The published MAP aligns molecular, text and protein representations using contrastive
+pretraining and conditions a new perturbation predictor on STATE SE-600M embeddings.
+This pilot tests two cheaper pieces of that idea using unchanged, actual cached STATE
+forecasts. It does not reproduce MAP, use its pretrained encoders, train its gene-token
+transformer, or extend the categorical STATE checkpoint to unseen drugs.
+
+### Data and qualification
+
+Downloaded the official drug table (30,886,178 bytes, 187,088 rows) and directed
+drug-gene table (36,169,383 bytes), pinned to a Hugging Face revision and verified
+against its published SHA256 digests. Exact unique casefolded drug-name matching
+qualifies 48 distinct drugs / 65 of 146 drug-dose candidates. Among these, 33 drugs
+have nonempty MOA text and only nine have directed relations in this exact mapping.
+Unmatched names, duplicate-name entities, salt/stereoisomer differences and invalid
+structures are not guessed or removed; their forecasts retain the original STATE
+fallback. This sparse relation coverage limits the test's mechanistic content.
+
+The predecessor supplies 45 reference contexts, their basal vectors, source availability,
+A/B RNA scalars and cached STATE predictions. STATE trained on those references.
+All five target contexts were exposed in predecessor studies. The endpoint remains
+the signed mean of 39 authenticated Hallmark Apoptosis RNA coordinates, not measured
+apoptosis, ATP or mechanism activity. No independent confirmation is available here.
+
+### Executed experiments
+
+Stage 1 froze its protocol before new fitting. Seven arms compared empirical mean,
+anchored STATE, design, missing markers, molecular structure, structure plus hashed
+MOA/directed-target knowledge, and same-drug-group knowledge permutation. Fixed random
+basal/drug projections and strongly shrunk ridge interactions give a small correction.
+Three grouped outer reference folds and three fixed held-cell inner validation units
+select among correction-disabled and four ridge penalties. Held cells are excluded
+from fitting and empirical priors. Inner tuning is intentionally inexpensive and
+limited; it is not an exhaustive or large-sample cross-validation claim.
+
+Stage 2 was designed after the first result and has a separate protocol/freeze. It
+performs actual symmetric InfoNCE pretraining of 24-dimensional linear molecular and
+text projection heads on fixed Morgan fingerprints and hashed MOA text. Of 2,048 unique
+structures, 1,792 train and 256 evaluate alignment; current menu drug names are excluded.
+This is not scaffold-disjoint validation or an audit of every alias for a menu structure.
+Twenty-five CPU epochs reduce heldout InfoNCE from 6.71572 to 5.94839. Structure-to-text
+retrieval reaches 14/256 (5.46875%), against 1/256 (0.390625%) chance. Training loss falls
+from 5.07685 to 1.50139. The representation learns an association, not biological
+response validity. Four equal-24-dimension downstream arms compare structure,
+random knowledge, contrastive knowledge and its grouped permutation.
+
+All five target contexts receive predictions and frozen model choices before the
+new evaluator access. The entire 146-candidate menu remains eligible. Common 64-sample
+KG purchases eight A scalars, commits five B choices, then accesses final B outcomes.
+Each campaign costs 13 simulated profiles. The policy's covariance/noise remain the
+predecessor's approximation; these results do not validate a posterior or stopping rule.
+No LLM acquisition/controller contribution is tested.
+
+### Results and interpretation
+
+| World | Mean scalar MSE, five exposed contexts | Static top-five B sum | Eight-A KG final B sum | Total simulated profiles |
+|---|---:|---:|---:|---:|
+| Empirical M0 | 0.0001696034 | 0.1415291 | 0.1582034 | 65 |
+| Anchored STATE M2 | 0.0001365107 | 0.1511611 | 0.1596629 | 65 |
+| All five stage-1 correction arms | 0.0001365107 | 0.1511611 | 0.1596629 | 65 each |
+| All four stage-2 correction arms | 0.0001365107 | 0.1511611 | 0.1596629 | 65 each |
+
+Reference-only tuning selects correction-disabled for every final correction arm.
+Thus the deployed candidates, forecasts and final value equal M2; no learned-knowledge
+response or decision gain is demonstrated. Nonzero stage-1 outer-fold corrections also
+raise average reference MSE: knowledge 0.000326837 versus M2 0.000319508. Reference
+selection being in STATE training and sparse exact-entity coverage limit transport.
+M0's KG value differs from the predecessor because this pilot freezes a different
+common random-number seed; do not splice its M0 result into an earlier paired comparison.
+The 55 arm-context episodes represent five biological contexts, not 55 independent units.
+
+The result rejects promotion of these particular lightweight correction heads. It does
+not falsify published MAP, rule out knowledge pretraining, or establish that an actual
+MAP encoder cannot improve STATE. The full-model next step needs authenticated
+MAP/STATE-SE weights, qualified entity mapping, and a new frozen downstream protocol.
+Independent biological decision confirmation remains blocked pending qualified units.
+
+### Verification and reproduction
+
+Eight behavioral/arithmetic checks verify predecessor identities, held-cell outcome
+poisoning invariance (floating tolerance 1e-12), exact unmatched fallback, true disabling,
+B-outcome invariance of purchases/commitment, unique purchases/cost, same-drug permutation,
+and independent reconstruction of all 55 target result rows. Separate rerun receipts
+record numerical reproducibility, not new biological observations.
+
+Research code and machine receipts: `research/astra/map_knowledge_pilot_20261008/`.
+Commands: `python research/astra/map_knowledge_pilot_20261008/run.py`, then
+`python research/astra/map_knowledge_pilot_20261008/contrastive.py`, then
+`python research/astra/map_knowledge_pilot_20261008/verify.py`.
+Restore the two raw CSVs to the paths in ACQUISITION.json from its revision-pinned URLs
+and validate their hashes. The predecessor packet and five original basal-observation
+caches are required; a missing cache explicitly blocks this scope. New STATE inference,
+paid APIs or full MAP/STATE retraining are not needed for this cached replay.
+Experiment execution/resource/provenance records belong in
+`log/20261008/MAP_KNOWLEDGE_PILOT.json`. No production policy is promoted.
+
+## Honest fixed-policy risk calibration — 2026-10-08
+
+The v9 development pilot audits and corrects v8 without changing its frozen
+sources or results. Independent review found three distinct validity defects:
+first-crossing wrong-decision loss is not monotone in threshold, the LTT safety
+test accepted non-rejections instead of rejecting the unsafe null, and full-fold
+variance/hyperparameter fitting leaked calibration outcomes while half-fit and
+deployed policies differed. The v8 rate 0.070 versus target 0.05 is not evidence
+that a measured 0.020 distribution shift caused failure. A plug-in separation
+score and a greedy future-reading oracle are not information-theoretic ceilings.
+
+v9 uses 200 proper-training connectivity units, 200 disjoint calibration units,
+and all 117 original fold-0 evaluation units. One fixed training-only model,
+rival map, variance estimate and policy is used on calibration and evaluation.
+Canonical pair ordering prevents truth position entering the predictor; task
+construction still supplies an annotated true-class-versus-rival challenge.
+Unsupported classes remain as explicit zero-purchase abstentions: 116/200
+calibration units and 73/117 evaluation units have training-supported rivals.
+
+Exact one-sided binomial bounds with Bonferroni adjustment cover three policies,
+21 fixed thresholds from 0.5 to 64, and both marginal and conditional endpoints
+(126 claims, alpha=delta=0.05). Calibration selects maximum coverage among
+certified thresholds. No safe threshold means immediate zero-purchase abstention;
+zero decisions never certify conditional risk. Exact validity requires independent
+same-distribution calibration/deployment units conditional on training. Original
+class-stratified, already exposed folds do not establish this assumption, so this
+is assumption-qualified development evidence, not distribution-free deployment
+confirmation. CRC and LTT primary-source methods were checked online; acquisition
+receipts and relevant sections are recorded in the dated log.
+
+| Policy, marginal rule | Decisions / all units | Wrong / decisions | Coverage | Wrong / all units |
+|---|---:|---:|---:|---:|
+| Static separation heuristic | 3/117 | 2/3 | 2.56% | 1.71% |
+| World-guided acquisition | 4/117 | 3/4 | 3.42% | 2.56% |
+| Random acquisition | 2/117 | 2/2 | 1.71% | 1.71% |
+
+Thresholds were 30.90996, 24.25147 and 24.25147, respectively; calibration made
+7, 3 and 2 decisions with zero errors. This certifies only the marginal endpoint
+under the stated assumptions, not reliable decisions. Conditional certification
+selects no threshold for any policy. Family correction needs at least 153
+zero-error decisions, but only 116 calibration units even have supported rivals.
+The registered 20% coverage pilot gate fails; global five-fold runs are blocked.
+The pilot took 52.23 CPU seconds. Nine behavioral/integration checks and the
+422-test default core scope passed. No paid API, new biological data, production
+change or Git publication was performed.
+
+A concrete model defect was also exposed: training selected world5b blend weight
+1.0, so after the first observation its class-agnostic completion overwrites every
+hypothesis with identical means and variances. The hypothesis-comparison acquisition
+then has zero discriminatory predicted increments. This is a fixable interface/model
+problem, not proof that feedback or virtual-cell acquisition cannot work. A separate
+research-only `ConditionalWorld` keeps each hypothesis's template as its prior mean
+and conditions its low-rank latent residual on the same bought readings. Independent
+joint-Gaussian conditioning checks validate its posterior means/diagonal uncertainty,
+and the existing acquisition interface consumes it without another controller.
+It completes the same partially observed response vector; it does not forecast a
+new replicate at an already measured coordinate. On the actual proper-training
+prior with one synthetic 0.5 reading, the maximum unbought class-mean gap is 0 for
+the old completion and 1.33897 for the new prototype. No calibration/evaluation
+outcomes were used for this diagnostic. Formula/interface correctness is established;
+predictive and decision value are not. This proxy is not STATE; gains here would
+not establish effectiveness of the STATE-based dual-core framework.
+
+Sources/protocol: `research/viability_contrast/run9.py`, `protocol9.json`, and
+`freeze9_retry1.json`. Raw pilot records are under
+`outputs/viability_contrast_20261008/run9_pilot/`; execution and resource receipt:
+`log/20261008/VIABILITY_CONTRAST_V9.json`. The failed pre-output purchase-tracer
+attempt and its original freeze/source are preserved under
+`log/20261008/v9_attempt1/`; the successful retry has its own immutable freeze.
+An independent verifier reconstructed 30 frozen pins, all 126 calibration bounds
+using binomial-CDF inversion, and all 1,053 decision/cost/QC rows. This reconstructs
+logged trajectories rather than independently replaying raw acquisition: v9 lacks
+ordered purchased source indices. Future experiments must log those indices for
+that stronger audit. Reproduce the independent check with
+`python log/20261008/v9_verify.py`. Prototype tests and the training-only diagnosis
+are recorded in `log/20261008/CONDITIONAL_WORLD_DIAGNOSTIC.json`.
+The final combined v9/prototype scope passed 28 checks, including a 16-purchase
+world-guided episode with two charged QC failures; this is separate from the
+422-test default core scope. Next experiments should test hypothesis-conditioned
+forecast contrasts first, compare template-only/random acquisition at equal cost,
+then use a training-ordered fixed-sequence or preselected-policy LTT to reduce
+certification multiplicity. Reduced multiplicity cannot repair bad predictions.
+The dated receipt records this design and hashes the prototype; independent
+confirmation and STATE endpoint integration remain necessary before promotion.
+
+## Conditional feedback repair pilot — 2026-10-08
+
+The v10 repair connects `ConditionalWorld` to the original acquisition simulator,
+without modifying v6-v9 sources, freezes or outputs. Covariance is now fitted to
+proper-training class residuals rather than global responses that mix class location
+with residual variation. A shared rank-8 residual model and its fitted residual center
+condition each hypothesis on the same purchased data. Means and uncertainty use one
+combined linear solve. This repairs the specific hypothesis-comparison path; it does
+not imply that a class-agnostic completion model is unsuitable for generic prediction.
+
+Every episode logs ordered purchased positions, source cell IDs, raw values, QC prefixes
+and scores. Four acquisition policies (legacy completion, conditional completion,
+fixed separation and random) share the original clipped LMM working score, budget,
+support/menu and canonical pair construction. The score itself remains unvalidated;
+it is kept identical to isolate acquisition changes, not claimed as a test martingale.
+
+Risk selection now uses eight fixed-sequence LTT families (four policies by two risk
+endpoints), each tested at delta/8. The candidate order is saved from proper-training
+trajectories before calibration is run; first nonrejection permanently stops the
+sequence. No threshold-grid Bonferroni penalty is required within that fixed sequence.
+The zero-error conditional sample requirement falls from 153 to 99. Training ordering
+uses in-sample trajectories and is optimistic; it is not predictive-validation evidence.
+All first calibration candidates fail certification. In the conditional repair arm,
+the first conditional candidate has 57 decisions and 11 errors, adjusted upper bound
+0.3541. Consequently every certified policy abstains before spending any measurement
+budget. This is not evidence of zero decision error or improved decision value.
+
+A separately registered forecast diagnostic gives all models the same four hash-ordered
+purchase attempts. It scores only finite unpurchased responses, preserves all 117
+evaluation compounds and uses the annotated true hypothesis for scoring only.
+
+| Forecast model | Mean compound MSE | Gaussian NLL |
+|---|---:|---:|
+| Static class template | 0.066047 | 0.72909 |
+| Legacy response completion | 0.034651 | -0.30728 |
+| Conditional residual completion | 0.036033 | -0.27591 |
+
+Conditional completion reduces MSE by about 45.4% versus templates; the paired
+compound difference is -0.030014 (95% bootstrap interval [-0.040566, -0.020144]).
+It does not demonstrate improvement over legacy completion: difference +0.001381
+[-0.000753, +0.003523]. These are exposed-fold, annotation-conditioned development
+diagnostics, not blind identification, independent confirmation or STATE results.
+
+The pilot takes 174.70 CPU seconds and fails the registered risk/coverage gate;
+global five-fold expansion is not run. Thirty-six behavioral checks and the 422-test
+default core scope pass. A separate verifier checks all 2,068 recorded episodes,
+21,312 purchased raw-source values and 21,312 scores using dense covariance evaluation,
+then reexecutes acquisition on the first three evaluation units (12 arm episodes).
+It reconstructs risk bounds by binomial-CDF inversion and checks CSV costs/QC. That
+subset replay is explicitly narrower than independently rerunning all acquisition.
+
+Implementation and protocol: `research/viability_contrast/run10.py`,
+`conditional_world.py`, `protocol10.json`, `freeze10.json` and `verify10.py`.
+Reproduce with `python -m research.viability_contrast.verify10`; full pilot output
+cannot be overwritten by the runner. Execution and verification receipts are
+`log/20261008/VIABILITY_CONTRAST_V10_REPAIR.json` and `VIABILITY_CONTRAST_V10_VERIFY.json`.
+The initial verifier had a receipt-writing NameError after its numeric checks; that
+verification-only error was fixed and the verifier rerun, without altering the trial.
+No production code, old freeze, paid API, GPU training or new biological dataset is
+involved. Next work must address hypothesis-consistent likelihood and honest training
+validation of the predictor/threshold ordering; reducing multiplicity alone cannot
+repair the observed calibration error. No policy is promoted to `src` or `tools`.
+
+<a id="map-released-weights-20261008"></a>
+## MAP released-weight transfer and native-forward audit, 2026-10-08
+
+**Result.** The official pretrained molecular tower and knowledge projector were
+acquired, strictly loaded and run, replacing the previous small newly trained
+contrastive representation. Every tested response correction is disabled by the
+registered reference selection; forecasts and equal-budget KG decisions remain
+identical to anchored STATE M2. This establishes execution and a narrow negative
+transfer result, not a reproduction or rejection of the complete MAP paper.
+
+Official sources are [MAP](https://github.com/MAGIC-AI4Med/MAP) at
+`629ebdc1617eaf89825185a1512d772eccc3dc7e`, the
+[paper](https://www.nature.com/articles/s42256-026-01286-w), its linked public
+Drive weight folder, and `arcinstitute/SE-600M` at
+`5a9a80f44f7ce32ce57059933ef0d735d7c10ce5`. Five weight/embedding files total
+9,036,692,272 bytes, including duplicate protein dictionaries from the two
+sources. Both Hugging Face LFS hashes match the published digests. Drive files
+have source/filename receipts and locally computed digests, not publisher-signed
+checksums. All five digests were rechecked after the experiments. Source and
+metadata hashes are in `research/astra/map_release_test_20261008/ASSET_MANIFEST.json`.
+Dependencies needed by the old Llama API are installed in a separate asset-local
+directory; the global maestro environment and official source files are unchanged.
+
+**Identity and transfer comparison.** Unique exact names in pinned official Tahoe
+metadata identify full stereochemical/fragment structures and PubChem IDs for
+all 146 menu candidates (111 distinct drug names/structures). A graph association
+additionally requires matching CID and identical complete canonical structure:
+108 candidates / 79 drugs qualify, and 44 drugs have directed relations. Encoding
+coverage does not imply direct graph evidence coverage or reliable response
+prediction. Dose and unit identities remain in the menu; the molecular tower
+itself represents structure, with condition fields in the downstream design.
+
+The official 256-dimensional molecular tower and 1024-dimensional knowledge
+projector use strict state loading and original component forwards. Both are
+projected to 24 dimensions with fixed outcome-independent random projections;
+the knowledge permutation reuses its projection and preserves structure/dose
+groups. Full-menu fallback, fitting capacity, shrinkage choices and selection
+budgets are held fixed. Arms are M2, missingness/design, released molecular,
+released knowledge, and permuted released knowledge. The three outer reference
+folds use complete background groups; selection uses three fixed inner background
+checks per fold, not a comprehensive hyperparameter search. All target forecasts
+and choices are saved before the private evaluator is opened. The 15-input freeze
+includes code, protocol, representations and predecessor packets.
+
+| Five-background result, each arm | Value |
+| --- | ---: |
+| Selected correction setting | 0 (disabled) |
+| Mean response MSE | 0.0001365107333 |
+| Mean pairwise ordering accuracy | 0.7816910723 |
+| Mean terminal B endpoint sum under KG | 0.1596629395 |
+| Simulated observation cost | 65 (13 per background) |
+
+The endpoint is the signed mean response of 39 authenticated Hallmark Apoptosis
+RNA genes, summed over five committed candidates. It is not measured apoptosis,
+ATP, confirmed discovery yield or a mechanism probability. KG purchases eight
+A scalars and commits five B choices per background. A separate verifier
+reconstructs all 25 target rows and five summaries, checks 225 reference rows,
+and tests held-label poisoning, inaccessible A/B outcomes, invalid SMILES,
+missing-structure fallback, disabling and permutation identity. Nine checks pass.
+A fresh-process rerun exactly reproduces all 25 prediction arrays, choices,
+diagnostics and results. The original 45 references were in STATE pretraining
+and the five target backgrounds were already exposed: neither set establishes
+new independent confirmation. The frozen baseline uses existing STATE-ST caches;
+the following SE audit is separate and does not relabel those caches as SE output.
+
+**Complete checkpoint and STATE-SE audit.** Direct loading of `epoch_3.pt` with
+the current public MAP constructor fails: its arguments say `PrimeKG_ver1`, and
+its keys contain a raw `smiles_encoder` plus `drug_projector`, whereas current
+code expects `kg_smiles_encoder`. Public `pert.py` history does not supply that
+old forward. A disclosed research bridge reconstructs the actual checkpoint
+hierarchy using public component classes, strictly loads all 499 tensor keys,
+and rebuilds only deterministic nonpersistent rotary caches. No missing trained
+parameters are filled randomly. Strict loading authenticates tensor compatibility,
+not the unavailable old forward semantics.
+
+The bridge performs a real GPU forward on one basal control in the official tiny
+fixture (CVCL_0023, 2048 tokens). All 238 SE tensors checked against the pinned
+public SE-600M weights are identical. Output shape is four drug/dose conditions
+by one batch by one cell by 2000 decoder coordinates; outputs are finite. The
+audit takes 29.84 seconds and peaks at 4.006 GB allocated GPU memory. These are
+single-fixture engineering figures, not a batching benchmark.
+
+Three barriers prevent a scientific native-response comparison:
+
+1. Current public SDPA passes dropout 0.1 even in evaluation mode. Changing the
+   random seed changes the SE embedding by up to 0.00669228. Setting that runtime
+   field to zero, without changing weights/source, makes repeated outputs exactly
+   equal. This is a disclosed corrected forward.
+2. In the Transformers4.30.1 compatibility path, the public perturbation forward
+   uses `[CLS | Drug | Genes]`, an effectively causal Llama backbone, and reads
+   position-zero CLS. Two different structures give a drug
+   vector gap of 13.4990 and a position-one hidden gap of 0.598018, yet exactly
+   zero CLS/output gap. A post-hoc runtime bidirectional-mask probe produces an
+   output gap of 0.000127137, isolating the input-path obstruction. Changing an
+   attention mask is not evidence of restored pretrained biological validity.
+   The follow-up below traces this to version-dependent hooks, despite the public
+   class's explicit bidirectional intent. This diagnosis concerns the component bridge; it is not a claim
+   about the unavailable training-time `PrimeKG_ver1` implementation.
+3. Current public forward ignores `concs` and the bridge is dose-invariant. Its
+   authenticated 2000-output HVG order is absent from the public fixture and
+   checkpoint; public preprocessing describes how to generate one but does not
+   recover the original decoder order. Tahoe vocabulary order or local STATE-ST
+   gene order must not be substituted. Native endpoint scoring remains blocked.
+
+**Dual-core implication.** Retain the knowledge tower as a qualified research
+input, with M2 fallback; do not promote this correction or bridge into production.
+Resolve checkpoint-specific forward, attention semantics and authenticated output
+gene order before registering a native comparison. Then freeze complete candidate
+conditions and independent units, and compare strong simple/STATE baselines under
+equal measurement budgets. Agent gain needs a later same-tools, same-cost
+information-acquisition comparison; no LLM contribution is tested here. This task
+uses GPU inference but no new model training, wet experiments or paid API calls.
+
+Reproduction instructions are in
+`research/astra/map_release_test_20261008/README.md`. Numerical outputs are under
+`outputs/paper_01286/released_test/`; the execution/asset/output manifest is
+`log/20261008/MAP_RELEASE_TEST.json`. The default asset-free core suite passes
+422 tests. Two verification attempts first used unnecessarily exact floating-point
+checks (maximum discrepancies 2.22e-16 and 2.78e-17); they were corrected to
+tight tolerances without changing any trial code or output. The first fresh-process
+repeat completed its numerical assertions but failed Windows temporary cleanup
+because NPZ readers remained open; closing readers fixes cleanup and the rerun
+passes. Those attempt logs and constructor/loading diagnostics are retained.
+
+<a id="map-runtime-repair-20261008"></a>
+## MAP runtime repair: removed after review, 2026-10-09
+
+The October8 research repair passed input-path engineering checks, including
+repeatability, drug/gene sensitivity and unchanged499persistent tensors. It did
+not establish response accuracy or decision gain: original checkpoint forward
+and output gene order remained unresolved. This is an unproven scientific benefit,
+not a measured finding that the repaired model is ineffective. Small batch
+inference was slower and used more memory than two single calls.
+
+At the user's request, its runtime, tests, scripts, protocol/freeze and diagnostic
+JSON outputs were deleted rather than maintained as another execution path.
+Automatic deletion review blocked removal of two compiled cache files and one
+NPZ array; those three artifacts remain without an executable research entry.
+The historical execution receipt remains at `log/20261008/MAP_RUNTIME_REPAIR.json`;
+its source/output hashes identify removed artifacts and are not a current runnable
+reproduction promise. Earlier released-encoder comparisons and official weights
+remain intact. The removal inventory and verification are recorded in
+`log/20261009/MAP_REPAIR_CLEANUP.json`. No component was promoted to `src` or `tools`.
+
+<a id="state-readout-repair-20261009"></a>
+## Authenticated STATE readout repair, 2026-10-09
+
+**Partial resolution.** A small, explicitly named RNA readout calibration improves
+development prediction error without interpreting unknown MAP decoder coordinates.
+It does not improve final equal-budget selection. The implementation remains a
+bounded research candidate, not a validated production world model or agent gain.
+
+A fresh read-only recovery audit checks official MAP releases, branches, issues
+and comments, RainGate model/dataset listings and Zenodo21053262. The sole GitHub
+release has no additional assets; Zenodo supplies a source ZIP, the alternate
+branch's perturbation source still lacks `PrimeKG_ver1`, and the ordered HVG list
+and checkpoint-specific forward remain unprovided in the inspected discussions.
+No author message or issue is posted in this task. These checked sources support
+an unresolved availability statement, not a claim that no copy exists anywhere.
+Receipts are `PUBLIC_RECOVERY.json`, `PUBLIC_COMMENTS.json`, `ALTERNATE_TREE.json`
+and `ALTERNATE_PERT.py.txt` in the study directory. Previous MAP repair code stays
+deleted; no guessed gene map or arbitrary dose response is reinstated.
+
+The alternative fixes one concrete readout issue: the frozen STATE-ST forecast
+previously uses `M0 + 0.5 * STATE_deviation` for every drug. M0 is a
+precision-weighted empirical candidate baseline. The proposed calibrated readout
+replaces0.5 with one coefficient per drug, shared across its dose candidates and
+shrunk toward0.5. Exact existing STATE drug/dose/source forecasts provide the
+condition differences; the new coefficient is not a separately learned mechanistic
+dose function. Its target is the already authenticated signed mean of39Hallmark
+Apoptosis RNA genes, not apoptosis, ATP, confirmed discovery, mechanism identity
+or the unresolved MAP/SE decoder. STATE weights and cached responses remain fixed.
+
+Five arms share the complete146candidate menu: M0, fixed M2, global calibrated
+gain, drug-shared gain and calibrated permuted STATE. The drug-shared model has
+111coefficients rather than a high-dimensional structure/context fusion. Gains
+are bounded0..1.5; the six registered strengths are fixed0.5 and penalties
+0,1,10,100,1000. Strength is chosen solely by complete-cell inner leave-one-out
+MSE, with ties preferring the fixed model. There are three outer complete-cell
+folds; inner-held/outer-held outcomes cannot enter fit targets, empirical baselines,
+STATE centering or penalty scale. Target forecasts and choices are saved before
+the private outcome packet is opened. The ten-input freeze predates fitting.
+
+| Arm | Reference outer MSE | Five-background MSE | Initial B sum | Terminal KG B sum |
+| --- | ---: | ---: | ---: | ---: |
+| Empirical M0 | 0.0003422070 | 0.0001696034 | 0.1415291 | 0.1582034 |
+| Fixed STATE M2 | 0.0003195080 | 0.0001365107 | 0.1511611 | 0.1596629 |
+| Global calibrated gain | 0.0003206767 | 0.0001365107 | 0.1511611 | 0.1596629 |
+| Drug-shared gain | 0.0003125623 | 0.0001258062 | 0.1536729 | 0.1596629 |
+| Permuted calibrated STATE | 0.0003449578 | 0.0001667590 | 0.1406760 | 0.1532145 |
+
+Drug-shared calibration selects penalty100; full-reference coefficients range
+0.17954..0.90798. Relative MSE reduction versus M2 is2.17% on reference outer
+folds and7.84% across five target backgrounds. Each of the three reference folds
+and all five target backgrounds has lower MSE. Pair ordering increases from
+0.78169 to0.78972. Global calibration selects the unchanged0.5 target coefficient;
+the reference result is slightly worse. Correct STATE matching matters descriptively:
+the separately fitted permutation control performs worse, but it does not provide
+independent validation of STATE generalization.
+
+Initial top-five membership changes in only HepG2/C3A: Adenine5uM replaces
+Daidzin0.05uM, adding0.0125591 to that background's observed B endpoint sum.
+The mean initial sum increases1.66%, concentrated entirely in that single event.
+After eight A measurements and five B commitments, the final selected set and
+endpoint sum match M2 in all five backgrounds, despite changed purchase sequences
+in three. Each arm costs13 per background,65 total. Thus prediction improvement
+has not supplied final decision gain: the existing measurement-feedback policy
+converges to the same choices. Relative changes refer to this RNA endpoint, not
+an increase in biological discoveries.
+
+The45reference contexts overlap STATE pretraining and all five target profiles
+were exposed in earlier studies. This is registered development with nested
+readout fitting, not independent biological confirmation, a new-drug test or a
+reproduction of MAP. No LLM policy is evaluated. The cheap-data path solves the
+named-output/calibration experiment without waiting for MAP's missing assets;
+it does not solve those missing assets themselves. No gain is claimed for native
+STATE-SE, the original MAP decoder or a complete dual-core factorial.
+
+Five behavior tests cover a known response gain, outer-held label poisoning,
+drug-sharing, fixed fallback and absent source support. A separate verifier
+reconstructs all five final coefficient vectors with independent arithmetic,
+all25predictions/outcome/cost records, and all25acquisition histories under
+poisoned B outcomes. A separate complete fitting/evaluation rerun exactly matches
+forecasts, chosen strengths,225reference rows and results. Six verification
+groups pass. The registered CPU experiment takes9.93seconds, with no download
+of biological datasets, GPU training, paid API or wet experiment.
+
+Code and protocol: `research/astra/state_readout_repair_20261009/`.
+Numeric outputs: `outputs/paper_01286/state_readout_repair/`.
+Execution/source/asset/verification receipt:
+`log/20261009/STATE_READOUT_REPAIR.json`. Keep this minimal candidate for its
+qualified prediction signal; do not promote or expand it as a decision method.
+Next validation needs independent qualified contexts/measurement units and
+predeclared useful prediction/selection benefit. No outcome-based threshold,
+new acquisition policy or extra model is selected from the five exposed targets.
+
+## STATE joint-feedback development — 2026-10-09
+
+Three parallel audits examined selection boundaries, feedback assumptions and
+evaluation-unit qualification. Their pre-registration diagnostics found that most
+of the readout MSE improvement was outside the initial top ten and that several
+missed high-B candidates had already been measured at A. These are descriptive
+findings on exposed data, not independent support for a new method. The resulting
+bounded experiment tests the A-to-B feedback model rather than adding another
+encoder, gain grid or controller.
+
+The original model assumes A equals latent B plus a candidate offset and
+independent noise. Its covariance therefore supplies the same uncertainty to
+B and to the B/A cross-block. The repair estimates joint prediction errors
+`[B-pB, A-pB-offset]` using training contexts only, with zero-mean second moments,
+fixed 50% diagonal shrinkage and tiny diagonal jitter. Observed-A error variance
+already includes its noise; the old observation variance is not added again.
+Both A and B are conditioned after each purchased A value. Gaussian conditioning
+and correlated KG are established methods, not a newly invented learning rule.
+
+Three prior means are held separate: empirical M0, fixed STATE M2 and the
+previous drug-shared gain. Their fitting and six-strength MSE selection are
+unchanged. The three outer folds exclude complete backgrounds; every covariance
+residual excludes its own background from coefficient selection, mean/STATE
+centering and offset fitting again. All 146 candidates remain. Two incomplete
+reference contexts contribute only masked training values; 43 complete contexts
+are selection-evaluable. Covariance residuals use complete training contexts,
+while the old comparator retains its original missingness-imputation arithmetic.
+Eleven fixed policies per context produce 528 replay records, not 528 independent
+experiments. Each receives eight paid A scalars, then commits five B candidates,
+at cost13. No B reaches policy code, and all forecasts/model choices are written
+before target evaluation. Shared-path controls receive exactly the corresponding
+old KG eight indices and values; a fixed initial boundary-eight policy supplies
+a simple acquisition comparison. No policy is chosen from target outcomes.
+
+| Fixed M2 comparison | 43 reference terminal B sum | Five exposed-target terminal B sum |
+| --- | ---: | ---: |
+| Old feedback, adaptive KG | 0.1581047 | 0.1596629 |
+| Joint feedback, adaptive KG | 0.1684529 (+6.55%) | 0.1582734 (-0.87%) |
+| Joint feedback, identical old-KG information | 0.1661608 (+5.10%) | 0.1615320 (+1.17%) |
+| Joint feedback, fixed boundary-eight acquisition | 0.1639083 (+3.67%) | 0.1557858 (-2.43%) |
+
+The registered primary absolute difference is0.0103482. Fold differences
+are0.0079456,0.0175339 and0.0065231: all three are positive, satisfying the
+development gate of greater than2% mean improvement and at least two positive
+folds. Independent verification also passes. Benefits are heterogeneous:21
+contexts improve,20 worsen and2 are unchanged; the median paired difference
+is zero. The gate is not a confidence interval, significance test or risk
+certificate. Forty-one actual selected sets change. The frozen summary's
+`changed_units` compares ordered lists and includes two rank-only changes;
+`diagnostics.json` supplies the explicit set comparison without rewriting it.
+
+Same-information M2 feedback lowers reference posterior MSE1.64% and exposed
+target posterior MSE10.22%, improving MSE in all five target contexts. This is
+a narrower, useful result: interpretation of identical purchased information
+improves descriptively, but adapting acquisition under the new posterior does
+not improve target terminal utility. A innovation RMS changes from0.530 under
+old feedback to1.021 under joint adaptive KG on reference purchases; this is
+an adaptively selected descriptive check, not calibrated interval coverage.
+Drug-gain joint KG improves reference utility4.31% versus its old feedback, but
+loses1.26% on exposed targets and falls below fixed M2 joint KG in both scopes.
+The earlier better-MSE head therefore remains a prediction candidate rather than
+the preferred decision model. Without STATE, M0 joint KG loses4.62% on references
+and9.32% on targets versus its old feedback. These factorial differences show
+dependence on the forecast/feedback combination within development, not an
+independently established STATE or LLM-agent benefit.
+
+The endpoint remains a signed39geneRNA score. It is not apoptosis, viability,
+drug-combination confirmation or causal mechanism identification. References
+overlap STATE pretraining, the five targets were already exposed, and A/B source
+wells do not authenticate independent culture starts. Retain the small joint
+component in research because it passes the registered development utility gate;
+do not promote it to `src`/`tools` or claim a stable dual-core scientific advantage.
+The experiment took88.59 CPU seconds without new response downloads, GPU training
+or paid API calls. Eight behavior tests,422 default core tests and22 repository-shape
+tests pass. Nine independent verification groups reconstruct all528records,
+cross-fitted model choices and batch conditional updates, check paid-only access,
+poison held/target outcomes and exactly reproduce all scientific JSON/arrays in
+a fresh complete run. These checks establish arithmetic and isolation, not biology.
+
+Canonical code/protocol: `research/astra/state_feedback_repair_20261009/`.
+Numeric artifacts: `outputs/paper_01286/state_feedback_repair/`.
+Execution receipt: `log/20261009/STATE_FEEDBACK_REPAIR.json`.
+Primary literature and the125KB public metadata qualification audit are in
+`LITERATURE_AND_SCOPE.md` beside the protocol. Annotation counts do not certify
+additional response units. The next useful question is whether the same frozen
+feedback interpretation transfers to qualified unused source units, followed by
+acquisition-value testing; another model expansion is not supported by this trial.
+
+## Decision utility and protected updates — 2026-10-09
+
+The follow-up asks whether a decision rule earns its measurement cost against
+no-screen, not just whether it beats a harmful earlier updater. The predecessor
+M2 joint KG reference utility of0.1684529 was6.55% above old KG0.1581047, but only
+2.93% above its own no-screen0.1636648. About53.73% of the reported absolute gain
+recovers utility lost by old screening. These descriptive differences use the
+previous three-fold split, not the new leave-one-out split. Benefits were highly
+heterogeneous and do not establish a general screening advantage.
+
+The user-described pair-loss validation package was absent locally when this
+study began. Its45-background table is not independently reproduced. Availability
+inspection confirms45 masked training contexts but only43 with the complete146
+A/B menu. Two incomplete contexts receive explicit blocked evaluation records;
+their finite zero placeholders never become observed outcomes. A varying-menu
+analysis would be a different estimand, not two extra full-menu evaluations.
+
+The new frozen study keeps the actual cached STATE-ST forecast and fixed0.5 M2
+readout, then performs strict complete-context LOO on43 evaluable references.
+Each outer fit uses44 contexts; its covariance residual predictions exclude both
+the outer-held and residual-held contexts from mean/STATE centering and offset
+fitting. The original common covariance, joint covariance and all comparators
+are refitted within the same split. Five exposed targets remain descriptive.
+There are336 replay records, not336 independent experiments.
+
+Utility is the authenticated signed39geneRNA sum with identity mapping and unit
+weights. Functional endpoints refuse without an authenticated bridge. Inspected
+local RNA/viability bridges match cell and compound identities across different
+assays, doses and times; they cannot validate current RNA-to-functional utility.
+Actual prices, delay/failure parameters and their utility conversion are absent.
+The strict EVSI path therefore refuses screening because independent model-risk,
+utility-unit cost and failure/latency registrations are missing. No-screen spends
+five B commitments, while forced screening spends eight A plus five B. Policies
+share the13-unit maximum cap; unused credits are not charged as measurements or
+subtracted from the RNA score as though they were commensurate utility.
+
+Two explicitly uncosted shadow rules integrate one-step model decision value.
+For every simulated observation they compare proposed/retained top5 against the
+incumbent under the same conditional mean. This paired nonnegative gain prevents
+an upward-biased estimator that would discard negative unpaired draws. A bounded
+clipped gain supplies a Hoeffding Monte Carlo lower bound, with multiplicity over
+146 candidates and eight looks and fresh512normal draws at each step. The bound
+controls integration error only; it cannot protect against incorrect response
+means, fitted covariance error or background shift. It is not certified net EVSI.
+
+Protected selection retains all valid paid observations in the posterior. Only
+the candidate-set change is gated. Every incoming/outgoing conditional Gaussian
+margin must pass a nominal bound allocating error over at most25 pairs and eight
+updates. This is a model-based protection rule, not a frequentist or biological
+safety certificate. Eight behavior tests include positive-information simulation,
+multiple-look bounds, strict refusal before A access, unsupported functional
+endpoints and a rejected swap whose paid measurement still changes the posterior.
+
+| Strict LOO reference policy | Mean terminal RNA sum | Mean A purchases | Harmed contexts versus no-screen |
+| --- | ---: | ---: | ---: |
+| No-screen | 0.1619812 | 0 | 0 |
+| Original common KG | 0.1564011 | 8 | 22 |
+| Joint KG | 0.1620356 | 8 | 18 |
+| Joint fixed-boundary screen | 0.1649646 | 8 | 19 |
+| Uncosted shadow EVSI | 0.1619812 | 0 | 0 |
+| Protected uncosted shadow EVSI | 0.1619812 | 0 | 0 |
+| Strict permission-gated EVSI | 0.1619812 | 0 | 0 |
+
+Joint KG adds only0.0000544 to no-screen under this matched LOO split while paying
+eight extra measurement units. The two shadow policies never buy; their zero harm
+is exact abstention, not evidence of valuable information selection or calibrated
+accepted decisions. Their development utility-retention criterion is not met.
+No threshold, Monte Carlo sample count or model is subsequently chosen from target
+answers. All-stopping under a conservative finite-integration bound does not prove
+the absence of information or the failure of every EVSI method. Separate numerical
+diagnostics and independent verification accompany the fixed result.
+
+Independent reconstruction passes nine groups across all336records, including
+all48LOO/target priors and240model arrays, scalar-versus-vectorized integration,
+paid-only observation access, actual held-data fitting poison, target-B poison and
+a bit-exact complete rerun of scientific JSON/arrays. Eight behavior tests,422
+default core tests and22repository-shape tests pass; these verify implementation,
+not a valid scientific risk certificate.
+
+The posthoc initial-model power check explains the abstention more precisely.
+All48contexts have positive ungated sampled gross information value, but none
+has a positive registered integration lower bound. Its Hoeffding radius is0.09911
+times the clipping cap; the typical best sampled signal/cap is much smaller.
+Holding the512-sample estimated ratio fixed gives indicative sample requirements
+from1076to123924on references, with median3415. These are diagnostics, not executed
+sample-count changes or accurate true-power estimates. Protected selection has
+no nontrivial accepted benefit in the registered512draws on any context. Thus
+both conservative integration and very restrictive model gates limit action.
+More simulation could address the former, but cannot manufacture an independent
+model-risk guarantee or functional/cost validity; loosening a gate after exposure
+would require a new protocol, not rewriting this result.
+
+The five exposed targets yield0.1511611 for no-screen,0.1596629 for common KG,
+0.1582734 for joint KG and0.1557858 for boundary screening. Both shadows and strict
+EVSI match no-screen. This favorable exposed-context screening pattern cannot
+serve as confirmation, nor can previous three-fold numbers be substituted for
+the new LOO comparator. Unique final replacement pairs use only committed model
+predictions for matching and B only for evaluation, avoiding duplicate cross-pair
+error counts. No LLM resolver contribution is evaluated.
+
+Code/protocol/source qualification: `research/decision_value/`. Exact outputs:
+`outputs/decision_value_validation_20261009/`. Dated receipt:
+`log/20261009/DECISION_VALUE_REPAIR.json`. The run takes48.63 CPU-environment wall
+seconds and does not download new biological outcomes or call paid APIs.
+Primary-source review qualifies BATCHIE as an executed Bayesian experimental-design
+study, while the cited Cell Research article is an editorial. Neither establishes
+the proposed STATE utility or risk guarantee. Retain the small validation/permission
+boundary in research; do not promote the shadow acquisition policy. Next activation
+requires qualified unused source units and the relevant utility/cost/risk contract.

@@ -8,6 +8,22 @@ records every removed narrative, its original byte and LF hashes, and its replac
 Historical freezes retain their original hashes; authorized removal is a documented
 change, never a claim of unchanged bytes. The dated execution record belongs in `log`.
 
+The 2026-10-08 risk-calibration continuation corrected the prior CRC/LTT validity
+errors and model/calibration split mismatch. Honest fixed-policy LTT reduced joint
+error by largely abstaining: only 2.6–3.4% evaluation coverage, with no conditional
+error certificate. The pilot did not authorize five-fold expansion. It also isolated
+a substantive repair target: class-agnostic completion with blend weight 1 erases
+all hypothesis-specific forecasts after one observation. A research-only conditional
+completion prototype addresses this defect; it does not establish a STATE or decision
+advantage. See [the detailed evidence](EVIDENCE.md#honest-fixed-policy-risk-calibration--2026-10-08).
+
+The subsequent repair pilot connects hypothesis-conditioned completion, fits its
+covariance from training class residuals and records raw purchase identities.
+It improves prediction versus static templates but does not beat legacy completion;
+proper calibration certifies no decisions. The repaired interface is verified while
+decision value remains unresolved. [Repair evidence](EVIDENCE.md#conditional-feedback-repair-pilot--2026-10-08)
+records the same-information comparisons and remaining score/selection limitations.
+
 ## What the framework has established
 
 MAESTRO combines an agent that proposes and selects executable evidence-gathering
@@ -35,11 +51,27 @@ integration does not confer biological validity on an adapter or policy.
 
 The research has **not established a general dual-core decision advantage** over
 strong deterministic policies supplied with the same legal information and resources.
-Better RNA prediction did not automatically improve final selection. Current STATE
-boundary acquisition matches an existing knowledge-gradient policy; its uncertainty
-rescaling and stopping convention produce no additional utility or savings. The
+Better RNA prediction did not automatically improve final selection. The earlier STATE
+boundary study matched an existing knowledge-gradient policy; its uncertainty
+rescaling and stopping convention produced no additional utility or savings. The
 LLM operational loop selects the same actions as its deterministic control. These
 are scoped findings that identify the remaining contribution to demonstrate.
+
+The subsequent [joint-feedback development study](EVIDENCE.md#state-joint-feedback-development--2026-10-09)
+tests prediction errors between the purchased and terminal source observations.
+It identifies a retained, research-only utility signal in whole-reference-context
+validation, including an identical-information comparison. Adaptive acquisition
+does not improve the five exposed target backgrounds, so it supplies neither
+independent transfer confirmation nor a general agent advantage. Forecast quality,
+feedback interpretation and information-acquisition value remain separate checks.
+
+The [decision-utility follow-up](EVIDENCE.md#decision-utility-and-protected-updates--2026-10-09)
+adds no-screen as the primary comparator and refits all policies under strict
+whole-context LOO. Joint KG then has negligible average improvement while buying
+eight extra observations. Conservative EVSI shadow rules abstain completely;
+the strict path refuses purchases lacking risk, price and failure/latency
+registration. This verifies an admission boundary, not a new decision advantage.
+Signed RNA utility remains separate from any functional or economic endpoint.
 
 ## Responsibilities and scientific permissions
 
@@ -163,3 +195,33 @@ receipts, raw logs, primary literature, code and source snapshots. Reproduction 
 and original source citations are indexed in [EVIDENCE.md](EVIDENCE.md) and the
 consolidation manifest. Parent-owned navigation and dated logs record release-specific
 verification and publication facts.
+
+
+The October 8 [MAP-inspired pilot](EVIDENCE.md#map-knowledge-pilot-20261008)
+adds public pharmacological knowledge and small contrastive representation pretraining
+to cached STATE forecasts. Attribute alignment improves, but reference validation
+rejects all tested response corrections; final decisions equal the original M2.
+This exposed-data pilot is neither a reproduction of MAP nor independent confirmation.
+
+The subsequent [released-weight test](EVIDENCE.md#map-released-weights-20261008)
+uses the official knowledge encoder and expands structure coverage to the complete
+146-candidate menu; validation still disables every response correction, preserving
+M2 decisions. A real checkpoint-backed STATE-SE/component forward exposes public
+code/checkpoint incompatibility, evaluation dropout, a causal CLS readout that
+cannot access drug tokens, dose omission and missing decoder gene order. The
+component bridge and mask probe remain research diagnostics; authentic native
+response comparison and additional agent value are not established.
+
+The subsequent runtime repair passed engineering sensitivity checks but did not
+establish prediction or decision benefit. Its unpromoted implementation and
+transient outputs were removed on October9 to reduce maintenance. The
+[historical evidence](EVIDENCE.md#map-runtime-repair-20261008) preserves that
+qualification; native scientific validation remains unresolved.
+
+The [named STATE readout study](EVIDENCE.md#state-readout-repair-20261009) uses
+existing authenticated responses to test a small drug-shared gain calibration.
+Development MSE falls7.84% across the five exposed backgrounds and2.17% in
+nested reference folds; only one initial candidate replacement improves, while
+final equal-budget choices remain identical. It is retained as a small research
+prediction candidate, with no production promotion or independent decision-gain
+claim. Missing original MAP gene order/forward remains explicitly unresolved.

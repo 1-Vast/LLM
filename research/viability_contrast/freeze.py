@@ -24,6 +24,9 @@ FREEZE3 = ROOT / "research/viability_contrast/freeze3.json"
 FREEZE4 = ROOT / "research/viability_contrast/freeze4.json"
 FREEZE5 = ROOT / "research/viability_contrast/freeze5.json"
 FREEZE5B = ROOT / "research/viability_contrast/freeze5b.json"
+FREEZE6 = ROOT / "research/viability_contrast/freeze6.json"
+FREEZE7 = ROOT / "research/viability_contrast/freeze7.json"
+FREEZE8 = ROOT / "research/viability_contrast/freeze8.json"
 
 
 def digest(path: Path) -> str:
@@ -35,6 +38,26 @@ def digest(path: Path) -> str:
 
 
 def targets(version: int = 1) -> dict:
+    if version == 9:
+        files = {"protocol": HERE / "protocol8.json", "run8": HERE / "run8.py",
+                 "run7": HERE / "run7.py", "run6": HERE / "run6.py"}
+        for name in ("auc.npz", "meta.csv", "folds.json", "menu.json", "manifest.json",
+                     "smiles.csv"):
+            files[f"pack/{name}"] = PACK / name
+        return files
+    if version == 8:
+        files = {"protocol": HERE / "protocol7.json", "run7": HERE / "run7.py",
+                 "run6": HERE / "run6.py"}
+        for name in ("auc.npz", "meta.csv", "folds.json", "menu.json", "manifest.json",
+                     "smiles.csv"):
+            files[f"pack/{name}"] = PACK / name
+        return files
+    if version == 7:
+        files = {"protocol": HERE / "protocol6.json", "run6": HERE / "run6.py"}
+        for name in ("auc.npz", "meta.csv", "folds.json", "menu.json", "manifest.json",
+                     "smiles.csv"):
+            files[f"pack/{name}"] = PACK / name
+        return files
     if version == 6:
         files = {"protocol": HERE / "protocol5b.json",
                  "world5b": HERE / "world5b.py", "run5b": HERE / "run5b.py"}
@@ -73,7 +96,7 @@ def targets(version: int = 1) -> dict:
 
 def freeze(version: int = 1) -> dict:
     target = {1: FREEZE, 2: FREEZE2, 3: FREEZE3, 4: FREEZE4, 5: FREEZE5,
-              6: FREEZE5B}[version]
+              6: FREEZE5B, 7: FREEZE6, 8: FREEZE7, 9: FREEZE8}[version]
     if target.exists():
         raise SystemExit(f"{target.name} exists; refusing to overwrite a write-once record")
     notes = {
@@ -109,6 +132,28 @@ def freeze(version: int = 1) -> dict:
             "every arm's code path including both decomposed oracles, printing shapes "
             "only, never a score. v5 outputs are retained unchanged and imported for "
             "cross-run comparison"),
+        7: ("frozen after the v5b measurement (log/20260928/VIABILITY_CONTRAST_V5B.md) "
+            "retired margin-statistic qualification on the 39-class task even under "
+            "perfect label-blind response prediction and carried the two-compound "
+            "contrast as the next registered direction. protocol6.json unifies it with "
+            "the e-process reformulation: a fixed a-priori LLR threshold, no "
+            "calibration. A synthetic smoke run (tmp/smoke6.py) exercised every arm's "
+            "code path including the oracle, masked, shuffled and no-winsorization "
+            "variants, printing shapes only, never a score"),
+        8: ("frozen after the v6 measurement (log/20261008/README.md) showed the "
+            "naive Gaussian LLR is not a valid e-process on this task (conditional "
+            "wrong 0.40-0.45 at threshold log(20); mechanism: heavy-tailed residuals "
+            "plus cross-line correlation mean |rho| = 0.49). protocol7.json registers "
+            "the three statistic families attacking exactly these mechanisms "
+            "(S_huber, S_corr, S_bet). A synthetic smoke run (tmp/smoke7.py) "
+            "exercised every arm's code path printing shapes only, never a score"),
+        9: ("frozen after a three-agent research synthesis (statistics: LMM "
+            "marginal LR with the compound random effect integrated out; "
+            "conformal-risk-control literature; repository empirics: ICC 0.49, "
+            "tau2 ~ 0.7, bet power insufficient at budget 48). protocol8.json "
+            "registers the double layer (LMM statistic + CRC certification) and "
+            "a fold-0 pilot before the global run. A synthetic smoke run "
+            "(tmp/smoke8.py) exercised every arm and stopping path, shapes only"),
     }
     record = {
         "frozen_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -121,7 +166,7 @@ def freeze(version: int = 1) -> dict:
 
 def verify(version: int = 1) -> dict:
     target = {1: FREEZE, 2: FREEZE2, 3: FREEZE3, 4: FREEZE4, 5: FREEZE5,
-              6: FREEZE5B}[version]
+              6: FREEZE5B, 7: FREEZE6, 8: FREEZE7, 9: FREEZE8}[version]
     record = json.loads(target.read_text(encoding="utf-8"))
     status = {}
     ok = True
@@ -137,7 +182,10 @@ def verify(version: int = 1) -> dict:
 
 
 if __name__ == "__main__":
-    version = (6 if "--v5b" in sys.argv else
+    version = (9 if "--v8" in sys.argv else
+               8 if "--v7" in sys.argv else
+               7 if "--v6" in sys.argv else
+               6 if "--v5b" in sys.argv else
                5 if "--v5" in sys.argv else
                4 if "--v4" in sys.argv else
                3 if "--v3" in sys.argv else

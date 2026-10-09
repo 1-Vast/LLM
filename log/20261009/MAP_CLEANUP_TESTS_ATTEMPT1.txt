@@ -1,0 +1,43 @@
+........................................................................ [ 16%]
+........................................................................ [ 32%]
+........................................................................ [ 48%]
+........................................................................ [ 64%]
+........................................................................ [ 81%]
+........................................................................ [ 97%]
+........F...                                                             [100%]
+================================== FAILURES ===================================
+___________ test_log_is_one_dated_experiment_record_per_working_day ___________
+
+    def test_log_is_one_dated_experiment_record_per_working_day():
+        """log/ is a dated experiment record: INDEX.md plus one folder per working day.
+    
+        A day folder is named YYYYMMDD and holds the day's record, which names its
+        own path, carries that day's date in its title and opens with the
+        structured summary every record in this tree uses. Nothing else may sit at
+        the top level: material that is not a day record belongs in the dated
+        isolation area beside the repository, declared in the index.
+        """
+    
+        assert LOG_ROOT.is_dir(), LOG_ROOT
+        assert (LOG_ROOT / "INDEX.md").is_file()
+        strays = sorted(
+            path.name for path in LOG_ROOT.iterdir() if path.is_file() and path.name != "INDEX.md"
+        )
+        assert not strays, f"log/ may hold only INDEX.md and day folders at top level: {strays}"
+    
+        days = _log_day_directories()
+        assert days, "log/ has no day folders"
+        for day in days:
+            assert LOG_DAY_NAME.match(day.name), f"day folder is not named YYYYMMDD: {day.name}"
+            record = day / "README.md"
+            assert record.is_file(), f"{day.name} holds no day record"
+            text = record.read_text(encoding="utf-8")
+            for field in LOG_RECORD_FIELDS:
+>               assert field in text, f"{day.name} record lost its summary field {field}"
+E               AssertionError: 20261009 record lost its summary field > - **Path**:
+E               assert '> - **Path**:' in "# October9 experiment maintenance\n\nThe latest unpromoted MAP runtime repair was removed at the user's request:\neng...eight studies remain. See `MAP_REPAIR_CLEANUP.json` for the\nremoval inventory, scope and post-cleanup verification.\n"
+
+tests\test_repository_shape.py:334: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_repository_shape.py::test_log_is_one_dated_experiment_record_per_working_day
+1 failed, 443 passed in 56.27s
