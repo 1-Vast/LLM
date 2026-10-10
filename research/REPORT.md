@@ -1,8 +1,8 @@
 # MAESTRO Research Report
 
-## Scope and claim boundary
+As of 2026-10-10, MAESTRO has a verified operational agent–decision–virtual-cell loop and reproducible development experiments. **Independent scientific decision gain from knowledge feedback or an LLM policy is not established.** The latest advance qualifies the 39 endpoint coordinates in two source files; it does not validate feedback or release active procurement.
 
-MAESTRO connects an evidence-gathering agent, a scientific decision layer and a virtual-cell predictor. This release preserves the three active STATE/decision studies and their tracked packet inputs. Generated results are local ignored outputs, not part of a clean checkout. `python -m tools.research_validation --verify` checks frozen inputs and outputs before invoking a study verifier; it reports `BLOCKED/ASSET_MISSING` when any are absent or mismatched.
+The [evidence register](EVIDENCE.md) owns cross-study numerical results. The [research index](INDEX.md) routes to detailed protocols and frozen receipts, and [scientific status](SCIENTIFIC_STATUS.json) records units, limitations and gates. Generated assets may be absent from a clean checkout. `python -m tools.research_validation --verify` must report missing or mismatched assets rather than substitute outcomes.
 
 The 2026-10-10 phenotype-anchored study evaluated Tahoe relative-survival selectivity and phase
 shift on five checkpoint-held-out lines, using phenotypes measured in the same spheroids as RNA.
@@ -22,32 +22,28 @@ cross-assay, cross-dose or cross-time bridges and undercounted contexts are refu
 
 The current endpoint is a signed 39-gene RNA response. It does not establish functional phenotype, protein activity, causal mechanism, clinical efficacy or the value of an experiment. Five target cell backgrounds in the current STATE studies were previously exposed, and reference contexts overlap STATE pretraining.
 
-## Established results
+## What has passed
 
-- Engineering closure is verified: condition-bound requests, bounded execution, persistence, feedback and restart contracts operate across the agent, decision and virtual-cell layers.
-- The original held-out-context STATE study has a recorded result of about 41% lower depth-corrected RNA error than its empirical baseline on three checkpoint-held-out contexts. This historical result is not rerun by the default test suite.
-- The STATE readout repair has a recorded development result: RNA MSE falls 2.17% on reference folds and 7.84% on five previously exposed targets. Clean-checkout replay is blocked by missing Tahoe feature-name metadata.
-- The joint-feedback repair has a recorded development result and matched-information posterior prediction improvement. Its frozen source hashes are checked by the preflight; full numerical verification still depends on generated outputs.
-- The recorded MAP audit strictly loaded the released checkpoint hierarchy and executed a native forward. A fresh released-weight replay is blocked by external checkpoint, source, compatibility and Tahoe metadata assets. Output gene order and training-time semantics remain unauthenticated.
+The operational contracts cover condition-bound requests, bounded execution, result persistence, feedback and restart. Historical STATE prediction evidence records approximately 41% lower RNA error than an empirical baseline across three checkpoint-held-out contexts. Later readout repair improves reference MSE by 2.17% and exposed-target MSE by 7.84%, without changing final equal-budget selections. These recorded prediction results do not establish independent decision value; source recovery requirements remain in the evidence register.
 
-## Not established / blocked
+The separately registered P0.5R extension uniquely matches **39/39 coordinates in c44 and c45** against all **62,710 source genes** with unchanged `log1p(stored normalized X)` and `1e-5` tolerance. Maximum differences are 1.4416e-7 and 1.4611e-7. c44 reuses 252 exposed cells and adds zero RNA bytes; without nine previously read consistency cells, its 243-cell subset still aliases TNF and SDK2. c45 receives exactly **133,564 bytes** for eleven frozen discriminating cells, 60.7% less new expression payload than the earlier 340,068-byte proposal. MILP minimality applies only to the retained pool and binary alias constraints.
 
-Independent decision benefit is not established. The STATE readout repair does not change final equal-budget selections; joint-feedback acquisition loses utility on the five exposed target contexts; the recorded strict decision-value LOO finds joint KG only 0.0000544 above no-screen while using eight extra measurements. Clean-checkout reruns need ignored generated outputs. The registered risk-calibration study certifies no conditional-risk threshold and achieves only 2.6% to 3.4% marginal evaluation coverage; its prepared pack is not tracked.
+An initial parser failure is preserved. A separately frozen offline repair uses already received bytes; a distinct logical-slice/blockwise arithmetic implementation agrees. Old protected studies remain unchanged. This is historical/adaptive file-local identity evidence, not a fresh holdout or biological confirmation. The [extension receipt](../log/20261010/P05R_EXTENSION.json) records execution, cost and reproduction.
 
-No LLM advantage, functional phenotype gain or mechanism causality is established. Functional bridges, independent qualified evaluation units, a calibrated model-risk contract, utility-unit prices, failure/latency costs and the MAP decoder output map remain unavailable or unqualified. Some local generated outputs exist in this working copy, but they are not a reproducible clean-checkout input. Missing inputs must block with `ASSET_MISSING`; they are not replaced with zero-valued outcomes.
+## What has failed or remains unqualified
 
-## Next decisive experiment
+MAP known-target retrieval is useful content evidence but does not reliably exceed Morgan or simple controls. Generic outgoing molecule–relation–protein fusion fails its primary retrieval gate; incoming and name-anchored results remain separate known-graph findings. Native MAP RNA comparison is blocked by output-axis and training-forward authentication, not solved by restoring embedding weights.
 
-The [MAP module experiments](EVIDENCE.md#map-module-replacement-and-hard-task-tests--2026-10-09)
-now include genuine released protein and relation encoders, matched-information
-STATE feedback, scarce-history repeats and bounded-source agent API tests.
-Original name-anchor relation composition retains substantial known-graph
-content, but the primary molecule/protein direction does not beat structural
-votes or popularity. Scarce-history knowledge feedback mainly prevents noisy
-updates; it does not reliably beat structure, shuffled knowledge or no-screen.
-Hard source-selection trials expose prototype schema and routing failures;
-source-typed context alone does not fix them. Neither world-model nor agent
-replacement meets its declared evidence requirements. Native MAP RNA output
-order and training-time semantics remain unauthenticated.
+Sparse-history MAP feedback exceeds empirical feedback by 11.17% at eight histories but not reliably Morgan, molecule, shuffled knowledge or no-screen. In the condition-bound pairwise study, knowledge+feedback regret is **0.00653089 versus 0.00640195** for no-update, with **43 corrected and 51 harmful flips**; the registered gate fails. All 6,192 policy rows have recorded separate reconstruction.
 
-Use qualified, previously unused biological units and a frozen complete-menu protocol to compare no-screen, strong deterministic acquisition and STATE-informed acquisition under identical information, measurement budgets and authenticated functional outcomes. Pre-register model-risk, cost, latency and failure handling. In parallel, authenticate the MAP training-time forward and output gene order before any native-response claim. Promotion requires independent prediction and decision results; another model expansion is not justified by the current evidence.
+V3 reconstructs all 3,870 rows, but feedback adds only **0.0000128654** terminal B utility over mean-only: nominal 95% CI **[-0.0000130981, +0.0000388290]**, Holm p=0.48456. No-update remains slightly better. Empirical and MAP residual banks select identical final sets; transfer and knowledge-attribution gates fail. Prebuy stopping reduces A purchases from 129 to 35 without changing matched-arm actions. Simulated total profiles fall 774→680; no-update costs 645. This supports avoiding unused purchases, not positive net information value or agent superiority.
+
+On difficult source tasks, lexical LLM and typed MAP+LLM complete 27/72 and 26/72 packages; deterministic same-tool routing completes 72/72. Actual provider usage is 456 calls and 932,407 tokens; monetary cost is unauthenticated. These repeated source cases are not independent biological units. The risk study certifies no conditional threshold and obtains only 2.6–3.4% marginal coverage, below its 20% gate.
+
+## Current gate and next step
+
+Original P0.5/P0.5R failures remain frozen: control-only matching was 27/39 c40 and 34/39 c44; the later compact panel was 16/39 c44 and 23/39 c45. The extension changes only the qualified c44/c45 data-coordinate prerequisite. It does not certify the complete 2,000-gene dataset axis or STATE checkpoint output order. The old c40/c44 250-cell noise plan is still blocked.
+
+The next eligible research task is a **new frozen P0.6 observation-reliability protocol**. Bind exact source revision, endpoint coordinates, exclusions, treated/control rows, actual group sizes, reference weights, shared-control uncertainty, source-repeat estimands and exact acquisition costs before reading expression. The proposed 24 line/plate treatment strata represent **12 pooled samples**, not 24 independent cultures. Source-wide 24-hour exposure is documented; per-sample timestamps and a third confirmation source remain absent. See [P0.6 readiness](decision_value/axis_extension_20261010/P06_READINESS.md).
+
+P0.6 execution is not released, P2 remains closed, and experimental feedback stays in research. Stable A-to-B transfer, beneficial final selection, harms, authenticated costs and untouched qualifying biological units are separate future gates. The endpoint remains an equal positive `+1/39` RNA expression-change mean, not viability, apoptosis, protein engagement or mechanism causality.

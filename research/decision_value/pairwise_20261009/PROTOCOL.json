@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "study": "Pairwise correction under scarce feedback",
+  "registration_scope": "New development comparison after the earlier MAP/scarcity results were exposed. Protocol and final code freeze precede this study's predictions and target scores. No independent biological confirmation claim.",
+  "question": "Can a condition-bound knowledge mean adapter and one purchased A observation correct frozen near-boundary comparisons on B better than no update and equally supported simple controls?",
+  "endpoint": "Existing signed named39geneRNA scalar. Larger is preferable under the original packet convention. Not viability, apoptosis phenotype, protein activity or authenticated financial utility.",
+  "data": {
+    "packet": "research/astra/boundary_acquisition_20261007/packet2",
+    "candidate_menu": 146,
+    "eligible_contexts": "All 43 rows with complete A and B availability; exclude incomplete rows31/34 before outcome-based selection.",
+    "history_sizes": [
+      4,
+      8,
+      16
+    ],
+    "primary_history_size": 8,
+    "history_seeds": [
+      11,
+      23,
+      47
+    ],
+    "history_sampling": "Reuse SeedSequence([seed,held_row]) permutation of the other42 complete contexts; nested prefixes, sorted after sampling.",
+    "representation_inputs": "Authenticated released molecule256/knowledge1024 caches, Morgan2048, fixed whole-identity-permuted knowledge; dose/unit binding preserved.",
+    "public_target_inputs": "Only target basal expression, frozen STATE scalar prediction/support, menu and conditions. Target A is accessible only via the charged one-action callback. Target B is evaluator-only.",
+    "independence": "Reference contexts overlap STATE pretraining. A/B are original packet partitions, not newly collected independent cultures. Three history draws are repeated development cases, not independent biological replicates."
+  },
+  "decision_definition": {
+    "initial_prior": "Original precision-weighted training B mean plus0.5 times target STATE deviation from training STATE mean; reimplement without touching target B.",
+    "pairs": "Freeze nine comparisons: baseline ranks3/4/5 crossed with ranks6/7/8. One-based ranks, stable ascending candidate index ties. Construct before any target A/B and use the same pairs for every arm.",
+    "one_A_action": "From the baseline full146 prior, buy the candidate closest to the midpoint of ranks5 and6, stable candidate-index tie. All feedback arms buy this same candidate once.",
+    "terminal_action": "Commit five full-menu B indices by coherent candidate-score ordering; no candidate filtering based on coverage or held outcomes.",
+    "cost": "No-feedback arms commit5 B units; feedback arms buy1 A then commit5 B units, cost6. Common cap6, idle capacity permitted. No simulated-profile to currency conversion.",
+    "budget_extension": "Adaptive0-to8 A scheduling is deferred until one-A transfer passes. No new LLM calls in this experiment.",
+    "pair_ties": "Exact equal candidate scores choose the lower candidate index, matching full-menu stable ranking; frozen left pair member need not have the lower index."
+  },
+  "models": {
+    "crossfit_residuals": "Within each fitting history, leave one background out for the fixed prior and A/B offset. Candidate residuals and moment matrices use only remaining training data.",
+    "condition_gate": "Apply the exact dose+unit equality mask as a Schur product to empirical and representation joint covariances, including A/B cross blocks. Existing role/readout/source contract is shared within this frozen packet; no claims of unseen time/dose interpolation.",
+    "observation_noise": "Joint A/B residual second moments already include measurement variation. Do not add public obsvar or treat precision_B as authenticated measurement-error variance. Tiny numerical diagonal regularization1e-12 remains explicit.",
+    "base_covariance": "Existing half diagonal shrink on joint residual moments; candidate kernels remain full-dimensional authenticated PSD cosine Grams. No unrestricted new covariance fit.",
+    "knowledge_mean_adapter": "Tensor-product kernel ridge on crossfit B residuals: training-centered L2-normalized basal cosine times exact-condition drug kernel. Factorize only n-by-n cell and146-by146 drug kernels. Target inputs contain no labels. Identical model and tuning opportunities for molecule/Morgan/knowledge/permutation.",
+    "mean_adapter_grid": [
+      null,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "mean_adapter_selection": "Null disables the correction. Choose lambda on inner pre-A frozen-pair regret, tie disables first. Retain the same selected lambda in its representation+feedback arm. Only B mean is adapted; A expected value stays baseline prior plus the training A-B offset.",
+    "feedback": "For joint BB=C, BA column c and A variance v, mean_B +=alpha*c/v*(y_A-mu_A), covariance_B -=alpha*c*c'/v. Scalar alpha in[0,1] preserves coherent candidate comparisons and matches an additional-noise interpretation. This is not a new Gaussian update formula. The added-independent-noise interpretation applies to fixed alpha only; after observation-dependent robust gating, the covariance is a declared diagnostic surrogate, not an exact Gaussian posterior.",
+    "alpha_grid": [
+      0.0,
+      0.1,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "kernel_mixture_grid": [
+      0.0,
+      0.5,
+      1.0
+    ],
+    "conditional_reliability_gate": "For every representation+feedback arm, use positive cosine similarities between target and training-centered normalized basal states. n_eff=(sumw)^2/sum(w^2), zero on insufficient/n_eff<2 support; support factor=min(1,n_eff/4). Multiply selected alpha by this factor and min(1,3/abs(innovation_z)), where innovation_z uses fitted A variance. These are registered heuristics, not source truth or risk certificates. Insufficient support blocks feedback and retains pre-feedback uncertainty; it does not automatically disable the independently selected mean adapter.",
+    "probability_calibration": "Inflate pair standard deviation by max(1,sqrt(mean innerOOF squared standardized pair prediction errors)) for each selected arm. Preserve no-update uncertainty when alpha0. Report Gaussian probabilities and empirical calibration diagnostics; no conformal, conditional-risk or time-uniform guarantee. Inflation multiplies pair standard deviation, equivalently covariance by its square.",
+    "inner_folds": "Three folds by sorted training-position modulo3, with at least two fit rows. Means, state centering, residuals, kernels, adapter, tuning and scales refit within each inner fold. Each fit excludes inner held and outer target.",
+    "inner_objective": "Mean continuous pairwise regret on each frozen nine-pair set, then average inner backgrounds. Alpha/eta tie preference favors less update; lambda tie favors disabled correction. Global MSE is diagnostic.",
+    "matched_strength_control": "Fit one alpha for empirical feedback from trainingOOF expected squared frozen-pair movement, matching the selected knowledge+feedback increment relative to knowledge-only. Use fitted A variance rather than outer realized A/B; capalpha at1 and report achieved/target movement and cap/mismatch. This control does not match the mean-adapter main effect.",
+    "matched_strength_expectation": "For the fixedGaussian standardized innovation Z, the robustupdate uses clip(Z,-3,3). E[clip(Z,-3,3)^2]=1-6*phi(3)+16*SF(3). Average trainingOOF (selectedalpha*statesupport)^2*(c_i-c_j)^2/v times this factor and match its RMS against empirical full expected RMS. Neither realized inner innovation amplitude nor outer A/B is used for matching."
+  },
+  "arms": [
+    "no_update",
+    "empirical_full",
+    "fixed_shrink",
+    "cv_shrink",
+    "gated_cv_shrink",
+    "matched_strength_empirical",
+    "molecule_only",
+    "Morgan_only",
+    "knowledge_only",
+    "permutedknowledge_only",
+    "molecule_feedback",
+    "Morgan_feedback",
+    "knowledge_feedback",
+    "permutedknowledge_feedback",
+    "knowledge_feedback_only",
+    "selective_knowledge"
+  ],
+  "controls": {
+    "fixed_shrink": "Empirical one-A update withalpha0.1, no representation mean adapter.",
+    "cv_shrink": "Empirical alpha chosen by inner pair regret, no representation mean adapter.",
+    "strong_simple": "Choose among no_update, empirical_full, fixed_shrink, cv_shrink and gated_cv_shrink by inner regret, tie order as listed. Store training-side choice; never select the best on evaluation B.",
+    "knowledge_feedback_only": "Use selected knowledge covariance/reliability and same one-A innovation with no mean adapter; diagnostic isolation of feedback increment.",
+    "selective_knowledge": "Same knowledge feedback scores; only accept the proposed top5 replacement if every incoming-versus-outgoing Gaussian pair has probability>=0.95, otherwise retain initial top5. Pair-level selective decisions separately require probability>=0.95 or<=0.05. Nominal model protection only.",
+    "gated_cv_shrink": "Empirical covariance, no mean adapter, alpha selected with the same inner regret grid and identical state-support/outlier gates as representation feedback. Isolates protection without biological knowledge."
+  },
+  "metrics": {
+    "primary": "Mean pair regret: max(B_i,B_j) minus B of score-selected winner, averaged across frozen nine pairs within episode. Improvement=no_update regret minus updated regret. Continuous B values do not certify underlying biological wins.",
+    "flips": "Count corrected, harmful and ambiguous score-order reversals relative to baseline. Exact-zero B ties within1e-12 are ambiguous; separately report fixed0.001 RNA difference-band sensitivity. This band is a sensitivity definition, not measured replicate uncertainty.",
+    "coverage": "Fraction of frozen pairs whose order flips; probability-qualified pair coverage reported separately so abstention cannot masquerade as efficacy.",
+    "calibration": "Pair Brier score, five fixed-bin calibration summaries, Gaussian interval diagnostic coverage and inflation scales. Binary observed B ordering, with exact ties excluded. No independent risk certification.",
+    "secondary": "Finaltop5 B sum/regret, replacement identities, harmful replacements, globalRNA MSE, purchased A/cost, condition/support/outlier refusals and actual runtimes.",
+    "factorial_interaction": "U(knowledge_feedback)-U(knowledge_only)-U(gated_cv_shrink)+U(no_update), separately for negative pair regret and terminaltop5 utility. Gated empirical feedback isolates the same reliability heuristic without knowledge. This is an interaction between frozen algorithms, not causal biological synergy."
+  },
+  "analysis_and_gate": {
+    "unit": "Average three seed results inside each outer background first, yielding43 paired context units per history size; pairs and seeds never increase the independent denominator.",
+    "primary_comparators": [
+      "no_update",
+      "inner_selected_simple",
+      "Morgan_feedback",
+      "permutedknowledge_feedback",
+      "matched_strength_empirical"
+    ],
+    "multiplicity": "One-sided paired t-tests on context-level regret improvements with Holm correction across these five primary comparisons. Also report nominal paired95%t intervals. Overlapping histories/development exposure limit inference; no deployment risk guarantee.",
+    "benefit_gate": "At n8, knowledge_feedback must have positive regret improvement and Holmadjustedp<=0.05 against every primary comparator; against no_update improvement must be>=0.001 RNAunits. Harmful/totalflip ratio<=0.10, flip coverage>=0.05, and Brier<=inner-selectedsimple Brier+0.01. Zero flips fails coverage. Registered development screen only.",
+    "promotion": "No src/tools promotion from this exposed development study even if gate passes. Fresh independently qualified A/B units and functional endpoint/cost evidence are separately required."
+  },
+  "execution": {
+    "freeze": "Parent hashes final protocol, producer, tests and all input/source/cache dependencies before new model fitting or target scores. Build persists all choices, baseline pairs/q and support before A. Update persists charged receipts and all predictions/probabilities/final commitments and hashes before evaluator accesses target B.",
+    "replay": "Refuse overwrite; keep original study outputs and earlier MAP freezes unchanged. Independent verifier self-freezes before new score inspection and reconstructs splits, models, commitments, receipts, metrics and gate.",
+    "integrity_checks": "Wrong-dose propagation forbidden; only charged A may enter; target B poisoning must leave histories/choices/actions/forecasts unchanged; no double-counted observation noise; no feedback support andalpha0 preserve the pre-feedback mean(base plus any selected adapter) and pre-feedback covariance; shrinking mean also reduces covariance reduction."
+  }
+}

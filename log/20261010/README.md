@@ -144,3 +144,11 @@ Promoted, with contract tests:
 Prepared from `RESULTS.json`, `GATE.json`, `VERIFIED.json`, `DEVIATIONS.json` and the test
 receipts on 2026-10-10. No number in this record was typed independently of those machine
 records. Frozen files were not edited after the freeze.
+
+## Additional 2026-10-10 record
+
+The same date also includes source-axis recovery, observation reliability and the P0.5R targeted
+extension. Receipts are `AXIS_RECOVERY.json`, `P05R_EXTENSION.json` and
+`RESEARCH_CONSOLIDATION.json`; protocols, source receipts and reproduction code are indexed in
+`research/INDEX.md` and retained under `research/decision_value/axis_recovery_20261010/` and
+`research/decision_value/axis_extension_20261010/`.

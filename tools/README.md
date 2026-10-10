@@ -1,5 +1,22 @@
 # Tools
 
+## Offline observation and maintenance checks
+
+`python -m tools.analysis.observation_audit axis input.npz` compares each target
+coordinate with the complete declared candidate gene pool. The NPZ contains
+`names`, already transformed and row-aligned `raw`, `targets`, and `symbols`;
+optional `consistency_raw`/`consistency_targets` remain exposed consistency.
+`python -m tools.analysis.observation_audit variance input.npz` consumes `values`
+and explicit `weights`, retains gene covariance and uses actual cell count.
+Neither command authenticates source identity, the STATE output axis or
+independent biological replication. Their frozen sources are the P0.5R
+extension matching and observation-reliability projection routines; validation
+and remaining limits are in [research/INDEX.md](../research/INDEX.md).
+
+`python -m tools.research_inventory --workspace . --out research/RESEARCH_INVENTORY.json`
+rebuilds the static path/hash/import inventory. Identical bytes and ASTs are
+cleanup candidates only; this command never deletes files or runs studies.
+
 Tools are grouped by responsibility. Each capability keeps its own ID, schema, applicability
 boundary and source hashes. The router discovers `*/manifest.json` and `*/*.manifest.json`;
 each manifest selects a public function in its declared Python entrypoint. The exact manifest and source

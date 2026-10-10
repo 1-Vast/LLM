@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "study": "Dual-source conditional means and cross-fitted feedback transfer",
+  "scope": "New preregistered development experiment on previously exposed cached RNA data. Prior v2 results and user supplied post-hoc diagnostics known; not independent confirmation.",
+  "stages": {
+    "P0": "Source provenance and A/B transfer identifiability audit, no causal variance decomposition without repeats.",
+    "P1": "Matched-information one-A comparison, dual conditional means and refitted residual transfer.",
+    "P2": "Full0-to8 adaptive/LLM acquisition remains gated by the P1 transfer screen. A supplementary training-alpha-zero pre-buy stop is evaluated now as a limited deterministic contract.",
+    "P3_P4": "Untouched qualified measurement units and functional cost evidence required before production."
+  },
+  "data": {
+    "packet": "research/astra/boundary_acquisition_20261007/packet2",
+    "menu": 146,
+    "backgrounds": 43,
+    "exclude_incomplete": [
+      31,
+      34
+    ],
+    "history_sizes": [
+      4,
+      8,
+      16
+    ],
+    "primary_history_size": 8,
+    "seeds": [
+      11,
+      23,
+      47
+    ],
+    "histories": "Original v2 SeedSequence([seed,held]) nested disjoint histories; whole-context3 inner folds by sorted position modulo3.",
+    "reference": "All45 public basal rows only. Freeze per-gene mean/RMSscale, positive median pairwise squared standardized distance. Transductive target-state access is allowed and disclosed; no target outcome or independent reference claim.",
+    "endpoint": "Original signed39geneRNA, not functional viability/apoptosis/protein engagement. Original A/B partitions are not independent cultures; STATE pretraining overlap and all outcomes previously exposed."
+  },
+  "means": {
+    "STATE": "Frozen cache and M2 history-weighted B mean+.5targetSTATEdeviation unchanged.",
+    "A_baseline": "M2 B mean plus historical A-B mean offset.",
+    "conditional": "Independent fixed-lambda10 tensor-product ridge adapters for A and B; public-reference RBFcell kernel times exact-dose/unit drugGram. MAP/molecule/Morgan/identity-permuted knowledge have identical fixed capacity.",
+    "singleton": "Baseline means only, exactly zero adapter, no pseudo labels.",
+    "OOF": "Each historical residual k uses complete conditional mean fit excluding k; its adapter baseline residual bank j excludes both k and j. Fixed penalty prevents own-label hyperparameter leakage. No residual-bank or model tuning on held outer labels."
+  },
+  "support": {
+    "state_weights": "z=(basal-centre)/RMS; w=exp(-squared_distance/(2median_positive_public_pair_distance_squared)).",
+    "continuous": "n_eff=sum(w)^2/sum(w^2); support=n_eff/(n_eff+4); distance_ratio=nearest_target_history_distance_squared/reference_bandwidth_squared; distance_factor=1/(1+distance_ratio). No small-fold hard threshold.",
+    "interpretation": "Heuristic distribution support, not demonstrated transfer reliability or risk certificate."
+  },
+  "covariance": {
+    "old": "Baseline LOO A/B residual second moments. Dual-corrected conditional A/B means still used for the old-covariance arm; isolates bank choice.",
+    "refit": "True-OOF dual-mean residual second moments, not unrestricted new covariance fit. Half diagonal shrink, exact-dose/unit Schurmask and tiny1e-12 numerical ridge. Representation matrices use the same existing PSDkernel/rho construction.",
+    "noise": "Observed residual second moments already include variation; do not add publicobsvar or treat precision as independently measured noise.",
+    "update": "B mean+=effectivealpha*c/vA*(yA-muA_corrected); covarianceBB-=effectivealpha*ccT/vA. effectivealpha=trainingselectedalpha*continuous_support*distancefactor*min(1,3/absinnovationz). This observation-dependent covariance is a diagnostic surrogate, not exact Gaussian posterior."
+  },
+  "decision": {
+    "pairs": "Same pre-A M2ranks3-5 crossed6-8, nine frozen pairs.",
+    "query": "Same M2boundary midpoint rank5/6 candidate, index ties. All primary feedback arms purchase the same one A.",
+    "selection": "Full146-menu top5 by coherent candidate scores.",
+    "tuning": "Inner whole-background mean Top5 B regret, alpha grid[0,.01,.1,.25], representationcoveta grid[0,.5]. Tie alpha0 theneta0. Fixed mean penalty10 for all representations.",
+    "probabilities": "InnerOOF RMS standardized pair error inflation at least1; exact ties undefined Brier handled with counts. Diagnostics only.",
+    "prices": "Each no-feedback policy cost5B; primary feedback cost1A+5B=6 even when alpha0, commoncap6. No currency or NetVOI. Supplementary prebuy stop skipsA when trainingalpha0, cost5, preserves same conditionalmean. Otherwise cost6 and sameupdate.",
+    "release": "A source service returns only chargedquery; all policyrequests persisted before release. Target B evaluator-only after commitmentfreeze."
+  },
+  "arms": [
+    "no_update",
+    "knowledge_mean",
+    "knowledge_old",
+    "knowledge_refit_empirical",
+    "knowledge_refit_map",
+    "knowledge_strong_shrink",
+    "molecule_refit_map",
+    "Morgan_refit_map",
+    "permutedknowledge_refit_map",
+    "knowledge_prebuy_stop"
+  ],
+  "analysis": {
+    "primary": "Full-menu Top5 B utility increment, and equivalent Top5 regret reduction.",
+    "mechanism": "Frozen-pair regret and corrected/harmful flips relative M2 AND the same mean-only adapter. Feedback-specific relativeknowledge_mean risk/coverage gates prevent mean-only effects being misattributed.",
+    "diagnostics": "OOFA/BMSE, covariance rho, transfer coefficient direction stability, effectiveupdates/support/eta, rawA/Bcorrelation and ambiguityband. No causal source/noise separation without independently known repeats.",
+    "units": "Average3seed results inside each of43 backgrounds. Pair/seeds/queries do not increase biological independent denominator. Nominal95%t intervals; exposed data and overlappingtrain histories limit inference.",
+    "transfer_comparators": [
+      "knowledge_mean",
+      "no_update",
+      "knowledge_old"
+    ],
+    "attribution_comparators": [
+      "knowledge_refit_empirical",
+      "knowledge_strong_shrink",
+      "molecule_refit_map",
+      "Morgan_refit_map",
+      "permutedknowledge_refit_map"
+    ],
+    "multiplicity": "Holm independently inside3primarytransfer Top5 comparisons and5knowledgeattribution Top5 comparisons; allreported.",
+    "transfer_gate": "n8 knowledge_refit_map haspositiveTop5increment andHolmp<=.05 againstall3transfercomparators; frozen-pair regretimprovementvsM2>=.001RNA(original meaningfulscreen retained); feedback-specificharmful/totalflip<=.10 andcoverage>=.05; Brier<=knowledge_mean+.01. Zero updates/flips fail coverage.",
+    "knowledge_gate": "Transfergate pluspositiveTop5gain/Holmp<=.05 againstall5attributioncontrols andatleastoneeffectiveeta>0 episode. An eta0 gain cannot support knowledgecovariance-specific claim.",
+    "P2_release": "Only transfergate passes enables broader0/1/2/4/8 acquisition/LLM factorial. Failures retain P0/P1result and use next alternatives; do not outcome-retune currentfreeze.",
+    "promotion": "No src/tools promotion from exposed development even if gates pass."
+  },
+  "execution": {
+    "pilot": "Firstcompletecontext only, nine episodes, ten arms; frozen before run. Gate is engineeringintegrity only (finite outputs, correctphases, counts); no scientificparameter decisions based on pilot outcomes. Then samefrozen full43context run.",
+    "freeze": "Finalprotocol/source/tests/publicreference/input hashes before new P1fitting. Independent verifier self-freezes before score inspection. Separateimmutable prepare/commit/evaluate.",
+    "reproduce": "Original v2 freeze and artifacts unchanged. Fullportablecachedreplay after independent reconstruction, sameWindowsdependencies. Rawcheckpoint/gene-axis missing remainsblocked."
+  }
+}

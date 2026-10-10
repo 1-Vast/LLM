@@ -20,8 +20,7 @@ python -m tools.datasets.catalog --help
 python -m tools.evaluation.cli --help
 ```
 
-Default tests cover asset-free production contracts. The three current research
-test groups are explicit: `python -m tools.research_validation`. Frozen studies
+Default tests cover asset-free production contracts. Research test groups are explicitly scoped: `python -m tools.research_validation`. Frozen studies
 require their listed packet and outputs. Run `python -m tools.research_validation --verify`
 for a hash and asset preflight; missing files are reported as `BLOCKED/ASSET_MISSING`.
 Passing contract tests does not mean a research experiment was rerun.
@@ -49,14 +48,20 @@ similarity transfer beat STATE (delta r -0.23) and generic ranking (top-10 +0.56
 registered world-model value gate refused STATE from reference data alone, and held-out lines
 confirmed the refusal. The gate, same-unit bridge rule and basal transfer are promoted with scope.
 
-Engineering closure is verified. The original STATE study reports a task-specific
-RNA prediction signal, while independent decision benefit, LLM advantage,
-functional phenotype and mechanism causality remain unestablished. All five
-current target contexts were previously exposed. The current readout verifier is
-blocked in a clean checkout by absent Tahoe feature-name metadata; MAP native replay
-needs external weights/source assets, and risk calibration needs its ignored prepared
-pack. See [blocked assets](BLOCKED_ASSETS.md).
+Software checks and replay receipts establish engineering behaviour, not independent
+scientific benefit. STATE remains the pretrained world-model foundation; decision
+benefit, LLM advantage and functional or causal claims remain unestablished.
 
-Read [the research report](research/REPORT.md) for claim boundaries and next
-steps, [the evidence register](research/EVIDENCE.md) for canonical results and
-reproduction paths, and [the experiment log](log/INDEX.md) for dated receipts.
+The separate P0.5R-Extension qualifies the specified **39 endpoint coordinates** in
+c44 and c45 against all 62,710 source genes. It reuses exposed c44 data and acquires
+133,564 new c45 expression bytes. This is file-local data identity evidence, not a
+fresh biological holdout. The full 2,000-gene and STATE checkpoint output axes
+remain uncertified. P0.6 needs a new execution freeze; P2 and production promotion
+remain closed. Historical failures are preserved.
+
+Read [the research index](research/INDEX.md) for navigation,
+[the report](research/REPORT.md) for current conclusions and next gates,
+[the evidence register](research/EVIDENCE.md) for numerical results and replay
+paths, and [the experiment log](log/INDEX.md) for dated receipts.
+[Blocked assets](BLOCKED_ASSETS.md) distinguishes locally retained evidence from
+what a clean checkout can reproduce.

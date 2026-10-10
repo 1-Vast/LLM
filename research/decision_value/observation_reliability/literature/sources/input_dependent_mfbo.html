@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Search Engine Info --><title>Multi-fidelity Bayesian Optimization with Multiple Information Sources of Input-dependent Fidelity</title><meta name="description" content="Multi-fidelity Bayesian Optimization with Multiple Information Sources of Input-dependent FidelityMingzhou Fan,&nbsp;Byung-Jun Yoon,&nbsp;Edward Dougherty,&n..."><!-- Solution from http://stackoverflow.com/questions/31593297/using-execcommand-javascript-to-copy-hidden-text-to-clipboard -->
+<script src="https://proceedings.mlr.press/v244/assets/js/copy_input.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://proceedings.mlr.press/v244/assets/js/download.js"></script>
+<meta name="citation_publisher" content="PMLR"/><meta name="citation_title" content="Multi-fidelity Bayesian Optimization with Multiple Information Sources of Input-dependent Fidelity"/><meta name="citation_language" content="en"/>
+<meta name="citation_abstract_html_url" content="https://proceedings.mlr.press/v244/fan24a.html"/><meta name="citation_pdf_url" content="https://raw.githubusercontent.com/mlresearch/v244/main/assets/fan24a/fan24a.pdf"><meta name="citation_firstpage" content="1271"><meta name="citation_lastpage" content="1293"><meta name="citation_author" content="Mingzhou Fan"><meta name="citation_author" content="Byung-Jun Yoon"><meta name="citation_author" content="Edward Dougherty"><meta name="citation_author" content="Nathan Urban"><meta name="citation_author" content="Francis Alexander"><meta name="citation_author" content="Raymundo Arróyave"><meta name="citation_author" content="Xiaoning Qian"><meta name="citation_publication_date" content="2024/09/12"><meta name="citation_inbook_title" content="Uncertainty in Artificial Intelligence"/><meta name="citation_conference_title" content="Uncertainty in Artificial Intelligence"/><meta name="citation_issn" content="2640-3498"><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Multi-fidelity Bayesian Optimization with Multiple Information Sources of Input-dependent Fidelity"/><meta name="twitter:site" content="@MLResearchPress" /><meta name="twitter:description" content="By querying approximate surrogate models of different fidelity as available information sources, Multi-Fidelity Bayesian Optimization (MFBO) aims at optimizi..."/><meta name="twitter:image" content="https://proceedings.mlr.press/v244/assets/images/logo-pmlr.png"/>
+<meta name="twitter:image:alt" content="PMLR Logo"/><meta property="og:title" content="Multi-fidelity Bayesian Optimization with Multiple Information Sources of Input-dependent Fidelity"/>
+<meta property="og:description" content="By querying approximate surrogate models of different fidelity as available information sources, Multi-Fidelity Bayesian Optimization (MFBO) aims at optimizing unknown functions that are costly if ..."/>
+<meta property="og:type" content="article"/><meta property="article:published_time" content="2024-09-12T00:00:00+00:00"><meta property="og:url" content="https://proceedings.mlr.press/v244/fan24a.html"/><meta property="og:image" content="https://proceedings.mlr.press/v244/assets/images/logo-pmlr.png"/><meta property="og:site_name" content="PMLR"/><!-- Style Info -->
+  <link rel="stylesheet" type="text/css" href="https://proceedings.mlr.press/v244/assets/css/pmlr.css" />
+  <style>.hero-text {
+    color: #303030;
+  }</style>
+
+  <!-- Icon Info -->
+  <link rel="shortcut icon" href="https://proceedings.mlr.press/v244/assets/images/favicon-pmlr.ico" type="image/x-icon">
+  <link rel="icon" href="https://proceedings.mlr.press/v244/assets/images/favicon-pmlr.ico" type="image/x-icon">
+
+  <!-- Feed Info --><link type="application/atom+xml" rel="alternate" href="https://proceedings.mlr.press/v244/feed.xml" title="Proceedings of Machine Learning Research" /><!-- Scripting info --><!-- Solution from http://stackoverflow.com/questions/31593297/using-execcommand-javascript-to-copy-hidden-text-to-clipboard -->
+<script src="https://proceedings.mlr.press/v244/assets/js/copy_input.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://proceedings.mlr.press/v244/assets/js/download.js"></script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-92432422-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+          autoNumber: "AMS"
+        }
+      },
+      tex2jax: {
+      inlineMath: [ ['$','$'], ['\\(', '\\)'] ],
+      displayMath: [ ['$$','$$'], ['\\[', '\\]'] ],
+      processEscapes: true,
+    }
+  });
+</script>
+<script  async
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  <!-- User custom header -->
+</head>
+
+
+
+
+
+
+<body>
+
+
+<header class="site-header">
+  <div class="wrapper">
+    
+
+
+<div class="hero-image">
+  <div class="hero-text">
+    <a href="/" target="_top"><img src="/v244/assets/images/logo-pmlr.svg" alt="[Uncertainty in Artificial Intelligence Logo]"></a>
+    Proceedings of Machine Learning Research
+  </div>
+</div>
+
+
+    <nav class="site-nav">
+  <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+  <label for="nav-trigger">
+  <span class="menu-icon"><svg viewBox="0 0 18 15" width="18px" height="15px">
+  <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+</svg>
+</span>
+  </label>
+  <div class="trigger"><a class="page-link" href="https://proceedings.mlr.press/v244/">Volume 244</a><a class="page-link" href="https://www.jmlr.org/">JMLR</a> 
+    <a class="page-link" href="https://data.mlr.press/">DMLR</a> 
+    <a class="page-link" href="https://jmlr.org/tmlr/">TMLR</a> 
+    <a class="page-link" href="https://www.jmlr.org/mloss">MLOSS</a>
+    <a class="page-link" href="/faq.html">FAQ</a>
+    <a class="page-link" href="/spec.html">Submission Format</a>
+    <a class="page-link" href="https://proceedings.mlr.press//v244/assets/rss/feed.xml">
+      <img src="https://proceedings.mlr.press/v244/assets/images/RSS.gif" class="rss" alt="RSS Feed">
+    </a>
+  </div>
+</nav>
+
+  </div>
+</header>
+
+
+
+
+
+<main class="page-content" aria-label="Content"><div class="wrapper">
+
+
+<p style="text-align:right">[<a href="https://github.com/mlresearch/v244/edit/gh-pages/_posts/2024-09-12-fan24a.md" target="_blank" onclick="ga('send', 'event', 'Edit Page', 'Edit', 'https://github.com/mlresearch/v244/edit/gh-pages/_posts/2024-09-12-fan24a.md', 13);">edit</a>]</p>
+
+<article class="post-content">
+  <h1>Multi-fidelity Bayesian Optimization with Multiple Information Sources of Input-dependent Fidelity</h1><span class="authors">Mingzhou Fan,&nbsp;Byung-Jun Yoon,&nbsp;Edward Dougherty,&nbsp;Nathan Urban,&nbsp;Francis Alexander,&nbsp;Raymundo Arróyave,&nbsp;Xiaoning Qian</span>
+<div id="info"><i>Proceedings of the Fortieth Conference on Uncertainty in Artificial Intelligence</i>,&nbsp;PMLR 244:1271-1293,&nbsp;2024.
+  </div> <!-- info -->
+  
+  <h4>Abstract</h4>
+  <div id="abstract" class="abstract">
+    By querying approximate surrogate models of different fidelity as available information sources, Multi-Fidelity Bayesian Optimization (MFBO) aims at optimizing unknown functions that are costly if not infeasible to evaluate. Existing MFBO methods often assume that approximate surrogates have consistently high/low fidelity across the input domain. However, approximate evaluations from the same surrogate can have different fidelity at different input regions due to data availability and model constraints, especially when considering machine learning surrogates. In this work, we investigate MFBO when multi-fidelity approximations have input-dependent fidelity. By explicitly capturing input dependency for multi-fidelity queries in Gaussian Process (GP), our new input-dependent MFBO (iMFBO) with learnable noise models better captures the fidelity of each information source in an intuitive way. We further design a new acquisition function for iMFBO and prove that the queries selected by iMFBO have higher quality than those by naive MFBO methods, with the derived sub-linear regret bound. Experiments on both synthetic and real-world data demonstrate its superior empirical performance.
+  </div>
+  <h4>Cite this Paper</h4>
+<hr class="bibhr">
+
+<div class="bibbuttongroup row row--justified">
+  <div class="bibbuttontext column">
+    BibTeX
+  </div>
+  <div class="column">
+  <div class="codebox">
+    <code class="citecode" id="bibtex">@InProceedings{pmlr-v244-fan24a,
+  title = 	 {Multi-fidelity Bayesian Optimization with Multiple Information Sources of Input-dependent Fidelity},
+  author =       {Fan, Mingzhou and Yoon, Byung-Jun and Dougherty, Edward and Urban, Nathan and Alexander, Francis and Arr\'oyave, Raymundo and Qian, Xiaoning},
+  booktitle = 	 {Proceedings of the Fortieth Conference on Uncertainty in Artificial Intelligence},
+  pages = 	 {1271--1293},
+  year = 	 {2024},
+  editor = 	 {Kiyavash, Negar and Mooij, Joris M.},
+  volume = 	 {244},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {15--19 Jul},
+  publisher =    {PMLR},
+  pdf = 	 {https://raw.githubusercontent.com/mlresearch/v244/main/assets/fan24a/fan24a.pdf},
+  url = 	 {https://proceedings.mlr.press/v244/fan24a.html},
+  abstract = 	 {By querying approximate surrogate models of different fidelity as available information sources, Multi-Fidelity Bayesian Optimization (MFBO) aims at optimizing unknown functions that are costly if not infeasible to evaluate. Existing MFBO methods often assume that approximate surrogates have consistently high/low fidelity across the input domain. However, approximate evaluations from the same surrogate can have different fidelity at different input regions due to data availability and model constraints, especially when considering machine learning surrogates. In this work, we investigate MFBO when multi-fidelity approximations have input-dependent fidelity. By explicitly capturing input dependency for multi-fidelity queries in Gaussian Process (GP), our new input-dependent MFBO (iMFBO) with learnable noise models better captures the fidelity of each information source in an intuitive way. We further design a new acquisition function for iMFBO and prove that the queries selected by iMFBO have higher quality than those by naive MFBO methods, with the derived sub-linear regret bound. Experiments on both synthetic and real-world data demonstrate its superior empirical performance.}
+}
+</code>
+  </div>
+  <button class="button"  id="button-bibtex1" onclick="CopyToClipboard('bibtex');  ga('send', 'event', 'Ref Copy', 'CopyToClipboard', '/v244/pmlr-v244-fan24a.bib', 15);">Copy to Clipboard</button>
+  <button class="button" id="button-bibtex2" onclick="DownloadTexToFile('pmlr-v244-fan24a.bib', 'bibtex'); ga('send', 'event', 'Ref Downloads', 'Download', '/v244/pmlr-v244-fan24a.bib', 16);">Download</button>
+  </div>
+</div>
+
+
+<div class="bibbuttongroup row row--justified">
+  <div class="bibbuttontext column">
+    Endnote
+  </div>
+  <div class="column">
+  <div class="codebox">
+    <code class="citecode" id="endnote">%0 Conference Paper
+%T Multi-fidelity Bayesian Optimization with Multiple Information Sources of Input-dependent Fidelity
+%A Mingzhou Fan
+%A Byung-Jun Yoon
+%A Edward Dougherty
+%A Nathan Urban
+%A Francis Alexander
+%A Raymundo Arróyave
+%A Xiaoning Qian
+%B Proceedings of the Fortieth Conference on Uncertainty in Artificial Intelligence
+%C Proceedings of Machine Learning Research
+%D 2024
+%E Negar Kiyavash
+%E Joris M. Mooij	
+%F pmlr-v244-fan24a
+%I PMLR
+%P 1271--1293
+%U https://proceedings.mlr.press/v244/fan24a.html
+%V 244
+%X By querying approximate surrogate models of different fidelity as available information sources, Multi-Fidelity Bayesian Optimization (MFBO) aims at optimizing unknown functions that are costly if not infeasible to evaluate. Existing MFBO methods often assume that approximate surrogates have consistently high/low fidelity across the input domain. However, approximate evaluations from the same surrogate can have different fidelity at different input regions due to data availability and model constraints, especially when considering machine learning surrogates. In this work, we investigate MFBO when multi-fidelity approximations have input-dependent fidelity. By explicitly capturing input dependency for multi-fidelity queries in Gaussian Process (GP), our new input-dependent MFBO (iMFBO) with learnable noise models better captures the fidelity of each information source in an intuitive way. We further design a new acquisition function for iMFBO and prove that the queries selected by iMFBO have higher quality than those by naive MFBO methods, with the derived sub-linear regret bound. Experiments on both synthetic and real-world data demonstrate its superior empirical performance.
+</code>
+  </div>
+  <button class="button"  id="button-endnote1" onclick="CopyToClipboard('endnote');  ga('send', 'event', 'Ref Copy', 'CopyToClipboard', '/v244/pmlr-v244-fan24a.enw', 15);">Copy to Clipboard</button>
+  <button class="button" id="button-endnote2" onclick="DownloadTexToFile('pmlr-v244-fan24a.enw', 'endnote'); ga('send', 'event', 'Ref Downloads', 'Download', '/v244/pmlr-v244-fan24a.enw', 16);">Download</button>
+  </div>
+</div>
+
+
+
+<div class="bibbuttongroup row row--justified">
+  <div class="bibbuttontext column">
+    APA
+  </div>
+  <div class="column">
+  <div class="codebox">
+    <code class="citecode" id="apa">Fan, M., Yoon, B., Dougherty, E., Urban, N., Alexander, F., Arróyave, R. & Qian, X.. (2024). Multi-fidelity Bayesian Optimization with Multiple Information Sources of Input-dependent Fidelity. <i>Proceedings of the Fortieth Conference on Uncertainty in Artificial Intelligence</i>, in <i>Proceedings of Machine Learning Research</i> 244:1271-1293 Available from https://proceedings.mlr.press/v244/fan24a.html.
+
+</code>
+  </div>
+  <button class="button"  id="button-apa1" onclick="CopyToClipboard('apa');  ga('send', 'event', 'Ref Copy', 'CopyToClipboard', '/v244/pmlr-v244-fan24a.txt', 15);">Copy to Clipboard</button>
+  <button class="button" id="button-apa2" onclick="DownloadTexToFile('pmlr-v244-fan24a.txt', 'apa'); ga('send', 'event', 'Ref Downloads', 'Download', '/v244/pmlr-v244-fan24a.txt', 16);">Download</button>
+  </div>
+</div>
+
+<hr class="bibhr">
+
+
+  
+  <h4>Related Material</h4>
+  <div id="extras">
+    <ul>
+      <li><a href="https://raw.githubusercontent.com/mlresearch/v244/main/assets/fan24a/fan24a.pdf" target="_blank" onclick="ga('send', 'event', 'PDF Downloads', 'Download', 'https://raw.githubusercontent.com/mlresearch/v244/main/assets/fan24a/fan24a.pdf', 10);">Download PDF</a></li>
+      <li><a href="https://openreview.net/forum?id=ZZBxbUMrP6" target="_blank" onclick="ga('send', 'event', 'OpenReview site', 'Openreview', 'https://openreview.net/forum?id=ZZBxbUMrP6', 10);">OpenReview</a></li>
+    </ul>
+  </div>
+  
+
+</article>
+
+
+
+
+
+
+
+
+
+      </div>
+    </main>
+
+
+<footer class="site-footer">
+  <div class="wrapper">
+    <p>This site last compiled Wed, 07 Oct 2026 11:41:15 +0000</p>
+      <div class="footer-left"><i><a href="https://github.com/mlresearch/v244">Github Account</a></i>
+      </div>
+      <div class="footer-right">Copyright &copy; <a href="https://proceedings.mlr.press">The authors and PMLR</a> 2026.<a href="https://twitter.com/MLResearchPress"><i class="icon-twitter"></i>&nbsp;MLResearchPress</a></div>
+  </div>
+</footer>
+
+
+
+
+
+</body>
+
+</html>

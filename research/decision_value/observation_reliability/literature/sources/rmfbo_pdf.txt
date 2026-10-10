@@ -1,0 +1,2566 @@
+PAGE 1
+Multi-Fidelity Bayesian Optimization with Unreliable Information Sources
+Petrus Mikkola Julien Martinelli Louis Filstroff Samuel Kaski
+Aalto University Aalto University ENSAI, CREST Aalto University
+University of Manchester
+Abstract
+Bayesian optimization (BO) is a powerful frame-
+work for optimizing black-box, expensive-to-
+evaluate functions. Over the past decade, many al-
+gorithms have been proposed to integrate cheaper,
+lower-fidelity approximations of the objective
+function into the optimization process, with the
+goal of converging towards the global optimum at
+a reduced cost. This task is generally referred to
+as multi-fidelity Bayesian optimization (MFBO).
+However, MFBO algorithms can lead to higher
+optimization costs than their vanilla BO counter-
+parts, especially when the low-fidelity sources
+are poor approximations of the objective func-
+tion, therefore defeating their purpose. To address
+this issue, we propose rMFBO (robust MFBO),
+a methodology to make any GP-based MFBO
+scheme robust to the addition of unreliable infor-
+mation sources. rMFBO comes with a theoretical
+guarantee that its performance can be bound to its
+vanilla BO analog, with high controllable prob-
+ability. We demonstrate the effectiveness of the
+proposed methodology on a number of numerical
+benchmarks, outperforming earlier MFBO meth-
+ods on unreliable sources. We expect rMFBO
+to be particularly useful to reliably include hu-
+man experts with varying knowledge within BO
+processes.
+1 INTRODUCTION
+Bayesian optimization (BO) has become a popular frame-
+work for global optimization of black-box functions, es-
+pecially when they are expensive to evaluate (Jones et al.,
+1998; Brochu et al., 2010). Such functions have neither
+known functional form nor derivatives, and conventional
+Proceedings of the 26th International Conference on Artificial Intel-
+ligence and Statistics (AISTATS) 2023, Valencia, Spain. PMLR:
+V olume 206. Copyright 2023 by the author(s).
+optimization techniques such as gradient descent cannot be
+directly employed. BO rests upon two key elements. First,
+it constructs a probabilistic surrogate model of the objec-
+tive function with built-in uncertainty estimates, typically a
+Gaussian process (GP), based on evaluations of the function.
+The obtained surrogate is then used to select the next point to
+evaluate by maximizing of a so-called acquisition function,
+which quantifies the expected utility of evaluating a specific
+point with the purpose of optimizing the black-box function.
+Many off-the-shelf acquisition functions achieve this task
+while balancing exploration and exploitation. Iterating these
+two steps produces a sequence of designs whose aim is to
+converge to the global optimum using a limited number of
+function queries. BO has proven effective for a variety of
+problems, including hyperparameter optimization (Snoek
+et al., 2012), materials science (Zhang et al., 2020), and
+drug discovery (G´omez-Bombarelli et al., 2018; Korovina
+et al., 2020).
+In many scenarios, lower-fidelity approximations of the
+objective function are available at a cheaper query cost.
+This occurs for instance when the evaluation of the objective
+function involves a numerical scheme, where computational
+cost and accuracy can be traded off. Another example is
+the knowledge of domain experts. Indeed, practitioners
+may have implicit knowledge of the objective function, for
+instance, they may be able to point out good candidate
+regions on the location of the global optimum (Hvarfner
+et al., 2022). Such knowledge may naturally be considered
+as a low-fidelity version of the true objective function.
+The problem of integrating these auxiliary information
+sources (ISs) to reduce the cost of BO has been tackled
+in the literature under the name multi-fidelity Bayesian op-
+timization (MFBO) (Huang et al., 2006; Kandasamy et al.,
+2016; Zhang et al., 2017; Sen et al., 2018; Song et al., 2019;
+Takeno et al., 2020; Li et al., 2020; Moss et al., 2021) when
+the different sources can be ranked by their degree of fidelity;
+when this is not possible, the problem has been studied as
+multi-task BO (Swersky et al., 2013), non-hierarchical multi-
+fidelity BO (Lam et al., 2015), or multi-information source
+BO (Poloczek et al., 2017). However, as we will empiri-
+cally demonstrate, state-of-the-art MFBO algorithms can
+fail when the auxiliary ISs are poor approximations of the
+
+PAGE 2
+Multi-Fidelity Bayesian Optimization with Unreliable Information Sources
+primary IS. More precisely, for a fixed budget, these algo-
+rithms will lead to a higher regret w.r.t. their single-fidelity
+counterparts (i.e., vanilla BO, which uses the primary IS
+only), defeating their purpose. For instance, the guaran-
+tees of Kandasamy et al. (2016) require that the deviation
+between an auxiliary IS and the primary IS is bounded by
+a constant known beforehand, which hardly ever holds in
+practice, for example when working with a human expert,
+or when experimenting with simulations to find the optimal
+control parameters for a robotic system (Marco et al., 2017).
+Surprisingly enough, this issue has not formally been ad-
+dressed in the BO literature so far. We fix this gap by
+introducing rMFBO, a methodology to make any GP-based
+MFBO algorithm robust to the addition of unreliable in-
+formation sources. More precisely, rMFBO comes with a
+theoretical guarantee that its performance can be bound to
+its vanilla BO analog, with high controllable probability.
+To the best of our knowledge, rMFBO is the first MFBO
+scheme providing such performance guarantees. We then
+proceed to demonstrate the effectiveness of the proposed
+methodology on various numerical settings using different
+MFBO algorithms of the literature. Through its building
+block nature, rMFBO paves the way towards a more sys-
+tematic usage of auxiliary ISs independently of their degree
+of fidelity, allowing human experts to join the optimization
+process in a reliable manner.
+2 PRELIMINARIES
+Gaussian process regression
+We begin by introducing the notation for single-output
+Gaussian process regression, the probabilistic surrogate
+upon which BO rests. Consider a dataset D =
+{(x1, y1), . . . ,(xn, yn)} with (xi, yi) ∈ Rd × R, for which
+we want to learn a model of the form yi = f (xi) + ϵ, with
+ϵ ∼ N(0, σ2
+noise) for all i. We may place a (zero-mean) GP
+prior on f:
+f (x) ∼ GP(0, k(x, x′)). (1)
+This defines a distribution over functions f whose mean is
+E[f (x)] = 0 and covariance cov[f (x), f(x′)] = k(x, x′).
+Here, k is a kernel function measuring the similarity be-
+tween inputs. Consequently, for any finite-dimensional col-
+lection of inputs (x1, . . . ,xn), the function values f =
+(f (x1), . . . , f(xn))T ∈ Rn follow a multivariate nor-
+mal distribution f ∼ N(0, K), where K ∈ Rn×n =
+(k(xi, xj))1≤i,j≤n is the kernel matrix.
+Given D, the posterior predictive distribution p(f (x) | D)
+is Gaussian for all x with mean µ(x) and variance σ2(x),
+such that
+µ(x) = kx(K + σ2
+noiseI)−1y,
+σ2(x) = k(x, x) − kx(K + σ2
+noiseI)−1kx,
+where y = [ y1, . . . , yn] ∈ Rn and kx =
+[k(x, x1), · · ·, k(x, xn)]T ∈ Rn.
+Multi-output Gaussian process regression
+GPs can be extended to multi-output Gaussian processes
+(MOGP), modeling any collection of m-sized vector-valued
+outputs (y1, ...,yn) based on inputs (x1, ...,xn) as a mul-
+tivariate normal distribution. One way to achieve this ex-
+tension is through the addition of a (d + 1)th dimension
+to the input space, representing the output index 1 ≤ l ≤
+m. This enables treating a MOGP as a single-output GP
+acting on the augmented space Rd+1 through the kernel
+k((x, ℓ), (x′, ℓ′)). The latter can, for instance, take the sep-
+arable form k((x, ℓ), (x′, ℓ′)) = kinput(x, x′) × kIS(ℓ, ℓ′).
+In particular, this setting allows for the use of the readily-
+available analytical formulae for the posterior mean and
+variance of single-output GPs.
+Problem setup
+We consider the problem of optimizing a black-box function
+f (m) : X →R, where X is a subset of Rd, i.e. solving
+arg max
+x∈X
+f (m)(x). (2)
+In addition to f (m) (the primary IS), we may also query
+m − 1 other auxiliary functions (auxiliary ISs), f (ℓ) : X →
+R, where ℓ ∈ Jm − 1K denotes the IS index. The cost of
+evaluating f (ℓ)(x) is λℓ for any x ∈ X. We assume that
+λℓ < λm for any auxiliary IS ℓ ∈ Jm − 1K. The objective is
+to solve (2) within the budget Λ > 0.
+Bayesian optimization
+At each round t, an input-IS pair (x, ℓ) ∈ X ×JmK is
+selected by maximizing the acquisition function α, which
+depends on the GP surrogate model on f given all the data
+acquired up until round t − 1:
+xt, ℓt = arg max
+(x,ℓ)∈X ×JmK
+α(x, ℓ). (3)
+Querying for f (ℓ)(x) returns a noisy observation y(ℓ)
+x =
+f (ℓ)(x) + ϵ, with i.i.d. noise ϵ ∼ N(0, σ2
+noise). We refer to
+the sequence of queries {xt}T
+t=1 returned by a BO algorithm
+as an acquisition trajectory.
+Note that vanilla BO (i.e., BO with the primary IS only)
+amounts to using the acquisition function x 7→ α(x, m),
+which will be referred to as single-fidelity BO (SFBO) from
+now on.
+Recall that we wish to optimize f (m) within the budget Λ.
+In this scenario, the performance metric of interest is the
+regret of the algorithm, whose definition is recalled below.
+
+PAGE 3
+Petrus Mikkola, Julien Martinelli, Louis Filstroff, Samuel Kaski
+Definition 1 (BO regret). The regret of the BO algorithm
+that spends Λcost and returns the final choice xchoice, is de-
+fined by
+R(Λcost, xchoice) :=
+(
+f ∗ − f (m)(xchoice) if Λcost ≤ Λ,
+∞ otherwise
+where f ∗ = max x∈X f (m) is the global maximum of the
+primary IS.
+Definition 2 (Number of queries). Let T := ⌊Λ/λm⌋ be
+the available number of primary IS queries. Let T (ℓ) be the
+random variable describing the number of ℓth-IS queries
+spent by the MFBO algorithm.
+There are two popular choices for xchoice. First, the Bayes-
+optimal choice
+xchoice = arg max
+x∈X
+µ(x, m),
+where µ(x, m) is the posterior mean of the GP model given
+all the data up to the final query Tlast = Pm
+ℓ=1 T (ℓ). The
+regret in this case is called the inference regret. Second, the
+simple choice
+xchoice = arg max
+t∈JT (m)K
+f (m)(xt),
+where (x1, ...,xT (m) ) is the primary IS acquisition trajec-
+tory returned by the MFBO algorithm. The regret in that
+case is called the simple regret.
+Lastly, we provide an informal definition for an unreliable
+IS. To the best of our knowledge, no formal definition has
+been proposed in the literature so far, in view of the non-
+trivial character of the task. Broadly speaking, an auxiliary
+IS ℓ is said to be unreliable, if querying f (ℓ)(x) does not
+lead to a decreasing inference regret when averaged over all
+sequences of queries x ∈ Xand all datasets D of any size.
+As such, the relevance on an IS then also depends on the
+MOGP model chosen.
+3 RELATED WORK
+As discussed in the introduction, many different multi-
+fidelity extensions of Bayesian optimization have been pro-
+posed in the literature; we refer the interested reader to
+Takeno et al. (2020, Section 5) for a review. The closest to
+our work are methods that do not assume a hierarchy be-
+tween the sources (e.g., when the degree of fidelity cannot
+be assessed in advance), as by Lam et al. (2015), where the
+focus lies in designing a GP model that takes into account
+the non-hierarchical nature of the sources. The multi-fidelity
+kernel introduced by Poloczek et al. (2017) (see Supplemen-
+tary F) is one example of such a design.
+Surprisingly, the problem of the potential performance
+degradation of MFBO algorithms has been largely ignored
+in the literature, with the exception of Kandasamy et al.
+(2016), who noticed that their multi-fidelity method per-
+formed poorly compared to all single-fidelity variants in one
+experiment (Kandasamy et al., 2016, Supplementary D.3).
+Lastly, we mention that robustness has been studied for
+vanilla BO in the context of (sometimes adversarially) noisy
+inputs or outputs (Martinez-Cantin et al., 2018; Bogunovic
+et al., 2018; Fr ¨ohlich et al., 2020; Kirschner and Krause,
+2021). This notion of robustness is fundamentally different
+from ours, indeed, we wish to provide guarantees that the
+addition of an auxiliary IS (or several) will not lead to worse
+performance w.r.t. vanilla BO.
+4 PITFALLS OF MFBO METHODS
+We now demonstrate, on a simple example, the influence
+of the auxiliary IS quality on the performance of MFBO
+algorithms. Let us consider the Hartmann6D function as the
+objective (i.e., the primary IS). We examine two scenarios:
+in the first one, the auxiliary IS is informative, consisting of
+a biased version of the primary IS, with a degree of fidelity
+l = 0.2. In the second scenario, the auxiliary IS is taken
+to be the 6-dimensional Rosenbrock function, an irrelevant
+source for this problem. Analytical forms for these examples
+can be found in Supplementary G. We evaluate the multi-
+fidelity maximum-entropy search (MF-MES) method from
+Takeno et al. (2020) on these two scenarios, as well as
+its single-fidelity counterpart (SF-MES), and our proposed
+algorithm, rMFBO, built on top of these methods (rMF-
+MES). In both cases, the cost of the primary IS is set to 1,
+and cost of the auxiliary IS to 0.2. The simple regret of the
+three algorithms is displayed in Figure 1.
+When the auxiliary IS is informative (left panel), MF-MES
+converges faster than SF-MES. This is the expected behavior
+from MFBO algorithms: they use cheap IS queries in the
+beginning to clear out unpromising regions of the space at a
+low cost, which eventually speeds up convergence. However,
+when the auxiliary IS is irrelevant (right panel), there is a
+clear gap between MF-MES and SF-MES, even in the long
+run. This demonstrates the inability of MF-MES to deal
+with an irrelevant IS. In that scenario, we hypothesize that
+the budget is wasted on uninformative queries, and thus too
+many rounds are spent on learning that the sources are not
+correlated (Figure 1, right bar plot), leading to a sub-optimal
+data acquisition trajectory.
+There is therefore a need for a robust method for such a
+scenario. This is what the proposed rMF-MES, formally
+introduced in the next section, achieves, by taking the best of
+both worlds: sticking close to the single fidelity track in case
+of an irrelevant IS, while using informative lower-fidelity
+queries to accelerate convergence.
+
+PAGE 4
+Multi-Fidelity Bayesian Optimization with Unreliable Information Sources
+0 10 20 30 40 50 60 70 80
+Budget
+10−2
+10−1
+Simple regret
+Informative Auxiliary Information Source
+0 10 20 30 40 50 60 70 80
+Budget
+Irrelevant Auxiliary Information Source
+MF-MESAuxiliary MF-MESPrimary rMF-MESAuxiliary rMF-MESPrimary
+0.0
+0.5
+Query
+Proportion
+0.62 0.38 0.14
+0.86
+MF-MESAuxiliary MF-MESPrimary rMF-MESAuxiliary rMF-MESPrimary
+0.58 0.42
+0.09
+0.91
+Hartmann6D
+MF-MES SF-MES rMF-MES
+Figure 1: Simple regret as a function of budget spent in two multi-fidelty problems, averaged over 100 repetitions. The
+informative auxiliary IS helps reduce the cost of BO (left panel: MF-MES in purple reduces regret faster than SF-MES in
+green), whereas the irrelevant IS catastrophically disrupts performance (right panel: MF-MES does not reach the low regret
+of SF-MES at all). In both settings, the primary IS cost is set to 1 and the auxiliary IS cost to 0.2. From relevant to irrelevant
+IS, the proportion of auxiliary IS queries remains high for MF-MES, while rMF-MES is more consistent (lower panel).
+5 ROBUST MFBO ALGORITHM
+In this section, we introduce rMFBO (robust MFBO), a
+methodology to make any GP-based MFBO scheme robust
+to the addition of unreliable ISs. The key idea is to con-
+trol the quality of the acquisitions to prevent the MFBO
+algorithm from behaving as described at the end of Section
+4.
+At round t, based on the acquisition function α, MFBO
+proposes the query (xMF
+t , ℓt) according to Eq. (3). The
+question is to decide whether to execute this query, or to go
+with a more conservative query from the primary IS. Indeed,
+we wish to curb the potential performance deterioration w.r.t.
+vanilla BO. To do so, we introduce a concurrent pseudo-
+SFBO algorithm, which constructs a GP surrogate based
+on data from the primary IS only, and so-called pseudo-
+observations, introduced later on. The pseudo-SFBO uses
+the acquisition function x 7→ α(x, m) and a separate single-
+output GP, yielding the query (xpSF
+t , m).
+Let us denote the predictive mean and standard deviation
+of the MOGP model (used by the MFBO algorithm) by
+µMF and σMF, and those of the GP model (used by the
+pseudo-SFBO algorithm) by µSF and σSF. In a nutshell,
+the proposed rMFBO follows the conservative query xpSF
+t ,
+unless the predictive variance of the MOGP model at xpSF
+t
+is small enough:
+σMF(xpSF
+t , m) ≤ c1, (4)
+where c1 > 0 is a user-specified parameter. The pseudo-
+SFBO learns from all the samples, even when the MFBO
+candidate xMF
+t is queried, by adding the pseudo-obervation
+µMF(xpSF
+t , m).
+It can easily be seen that if c1 → 0, the described algorithm
+becomes the SFBO algorithm, since the MFBO proposals
+would be always ignored. Our main result, formally dis-
+cussed in Section 6, is that we are able to derive a lower
+bound on the regret difference between robust MFBO and
+SFBO as a function of c1 > 0.
+While condition (4) ensures that we can achieve similar
+performance as SFBO when auxiliary IS is irrelevant, we
+also want to reap the benefits of the multi-fidelity approach
+when the auxiliary IS is relevant. To that end, we introduce
+a measure of IS relevance, s, and add this second condition
+for the acceptance of the MF query:
+s(xMF
+t , ℓt) ≥ c2, (5)
+with c2 > 0 a user-specified parameter. We want to draw at-
+tention to the fact that condition (4) operates over the SFBO
+proposal while condition (5) acts on the MFBO proposal,
+possibly based on an auxiliary IS. Condition (5) makes
+rMFBO revert more often to primary IS, and makes pseudo-
+observations more accurate overall. This allows the algo-
+rithm to consider less conservative values for c1, opening
+the door for the exploitation of auxiliary ISs. In this pa-
+per, we use a cost-adjusted information gain (Takeno et al.,
+2020),
+s(x, ℓ) = I(f (ℓ)(x), f∗ | DMF)
+λℓ
+, (6)
+where I is the mutual information between the obser-
+vation f (ℓ)(x) and the maximal value of f (m), f∗ :=
+
+PAGE 5
+Petrus Mikkola, Julien Martinelli, Louis Filstroff, Samuel Kaski
+Algorithm 1 Robust MFBO algorithm
+1: Input: Budget Λ, costs (λ1, ..., λm), acquisition func-
+tion α, hyperparameters c1 and c2, relevance measure s
+2: Initialize DpSF, DMF
+3: Perform Bayesian updates µSF, σSF, µMF, σMF
+4: t ← 1
+5: while ⌊Λ/λm⌋ ≥2λm do
+6: xpSF
+t ← arg maxx α(x, m| µSF, σSF)
+7: (xMF
+t , ℓt) ← arg maxx,ℓ α(x, ℓ| µMF, σMF)
+8: if σMF(xpSF
+t , m) ≤ c1 and s(xMF
+t , ℓt) ≥ c2 then
+9: yt ← f (xMF
+t , ℓt)
+10: DMF ← DMF ∪ {((xMF
+t , ℓt), yt)}
+11: Perform Bayesian updates µMF, σMF
+12: yt ← µMF(xpSF
+t , m) # pseudo-observation
+13: DpSF ← DpSF ∪ {(xpSF
+t , yt)}
+14: Λ ← Λ − λℓt
+15: else
+16: yt ← f (xpSF
+t , m)
+17: DpSF ← DpSF ∪ {(xpSF
+t , yt)}
+18: DMF ← DMF ∪ {((xpSF
+t , m), yt)}
+19: Λ ← Λ − λm
+20: end if
+21: Perform Bayesian updates µSF, σSF, µMF, σMF
+22: t ← t + 1
+23: end while
+24: S ← {x ∈ X |σMF(x, m) ≤ c1}
+25: xpSF
+t ← arg maxx∈S µMF(x, m)
+26: yt ← f (xpSF
+t , m)
+maxx∈X f (m)(x); in other words the information gain on
+f∗ brought by the observation f (x, ℓ).
+The whole procedure is summarized in Algorithm 1, and
+an extended version is discussed in Supplementary C. Note
+that lines 24-26 guarantee that if the maximizer is one of
+the unobserved pseudo-points, it is converted into an actual
+observation, a requirement in the proof of Theorem 1.
+6 THEORETICAL RESULTS
+In this section we tie the regret of rMFBO to that of its
+SFBO counterpart. The derivation holds for any relevance
+measure s.
+Let us first define the function f : X ×JmK → R such that
+f (x, ℓ) = f (ℓ)(x) for all (x, ℓ) ∈ X ×JmK. We assume
+that X is a convex compact subset of Rd, and we make the
+following assumptions about f:
+Assumption 1 (f is drawn from a MOGP). Assume f is a
+draw from a MOGP with zero-mean and covariance function
+κ((x, ℓ), (x′, ℓ′)). In other words, {f (xi, ℓi)}i is multivari-
+ate normal for any finite set of input-IS pairs {(xi, ℓi)}i.
+Assumption 2. κ is known.
+Assumption 3. κ is at least twice differentiable.
+These assumptions are common in the Bayesian optimiza-
+tion literature. For instance, see Srinivas et al. (2012) and
+Kandasamy et al. (2016). We also follow these authors in
+the next assumption.
+Assumption 4 (Bounded derivatives with high probability).
+P
+
+sup
+x∈X
+
+∂f
+∂xj
+ > L
+
+≤ ae−(L/bj )2
+, ∀ j ∈ JdK
+for some constants a, bj > 0.
+Since a function with bounded partial derivatives (with an
+uniform bound L) is Lipschitz continuous (with a Lipschitz
+constant
+√
+dL), Assumption 4 implies by complementing
+and the union bound that
+|f (m)(x) − f (m)(x′)| ≤
+√
+dL ∥x − x′∥2 ∀ x, x′ ∈ X,
+with probability greater than 1 − dae−(L/b)2
+, where b :=
+maxj bj. Further, Assumption 4 is satisfied for four times
+differentiable kernels (Ghosal and Roy, 2006, Theorem 5).
+The next assumptions relate to the acquisition function.
+Assumption 5. For any round t ∈ N, we assume that the
+mapping (x, Dt) 7→ α(x, m,Dt) is C 2.
+Assumption 6. The Hessian ∇2
+xα(x, m) is a definite matrix
+at the optimum x = x∗.
+Running Algorithm 1 for T rounds returns the trajectory
+{xpSF
+t }T
+t=1, which consists of primary IS queries and pseudo-
+primary IS queries. Moreover, we denote the acquisition
+trajectory returned by the single-fidelity counterpart as
+{xSF
+t }T
+t=1. Our reasoning is as follows: we first control
+the closeness of the two acquisition trajectories, then derive
+a lower bound on the difference of their regret.
+Let us consider the dataset as a t(d + 1)-dimensional vector
+Dt = ( x(1)
+1 , ..., x(d)
+t , y1, ..., yt). Let Dt be the closed line
+segment joining two datasets DA
+t and DB
+t . We introduce a
+concept, the maximum rate of change of the next query with
+respect to Dt, defined as the random variable Mt,
+Mt = max
+D∈Dt
+
+∂xt+1
+∂D (D)
+
+op
+,
+where ∥·∥op is the operator norm. Mt measures the sensitiv-
+ity of the next query when moving from a dataset DA
+t to a
+dataset DB
+t . It depends on the smoothness of the objective
+function f, the kernel k, and the acquisition function α. The
+detailed formulas Eqs. (13)-(14) and the computation details
+for Mt can be found in Supplementary B and D. Consider
+DA
+t = DpSF
+t and DB
+t = DSF
+t , and let us denote by ˆMt the
+largest product of any combination of M0, ..., Mt−1,
+ˆMt = max
+S∈2Jt−1K
+Y
+k∈S
+Mk. (7)
+
+PAGE 6
+Multi-Fidelity Bayesian Optimization with Unreliable Information Sources
+Proposition 1. Assume Algorithm (1) has been run with
+control parameter
+c1(ε, q) = εp
+−2 log(1 − q)
+, (8)
+for ε >0 and q ∈ (0, 1). Then, for all t ∈ JT − 1K,
+xSF
+t − xpSF
+t
+
+∞
+≤ εt ˆMtdt (9)
+holds with probability greater than q
+ 
+1 − da exp(−1/b2)
+
+.
+Proof. The proof for the noiseless scenario (σnoise = 0) is
+given in Supplementary B.1. For a noisy scenario (σnoise >
+0), see the proof in Supplementary B.2. In the noisy sce-
+nario, the statement holds with probability greater than
+erf
+
+1
+2√σnoise
+
+erf
+
+1√2σnoise
+
+q
+ 
+1 − da exp(−1/b2)
+
+, where
+erf is the Gauss error function.
+Corollary 1. The instant regret difference for allt ∈ JT −1K
+is bounded; we have
+f (m)(xSF
+t ) − f (m)(xpSF
+t )
+ ≤ εt ˆMtdt+1 (10)
+with probability greater than q
+ 
+1 − da exp(−1/b2)
+
+.
+Proof. By Assumption 4 and the equivalence of the norms
+∥·∥2 and ∥·∥∞ (with a constant
+√
+d), it holds with probabil-
+ity greater than 1 − da exp(− 1
+b2 ) that
+f (m)(x) − f (m)(x′)
+ ≤ d ∥x − x′∥∞ ,
+for all x, x′ ∈ X. Corollary 1 follows from Proposition
+1.
+We can now present our main result, which states that with a
+conservative control parameter c1(ε, q) (small ε and high q),
+the worst case regret remains close to the regret of the SFBO
+algorithm, with high probability. This means that including
+an auxiliary IS in the robust MFBO algorithm will not cause
+any “harm”, given conservative control parameters.
+Theorem 1 (“No harm”). Assume that both algorithms, the
+robust MFBO (Algorithm 1) and its SFBO variant, return
+their simple final choices. Then,
+R(Λ + λm, xrMF
+choice) ≤ R(Λ, xSF
+choice) (11)
++ ε max
+
+T ˆMT dT +1, 2
+	
+,
+with probability greater than q
+ 
+1 − da exp(− 1
+b2 )
+
+.
+Proof. The proof is given in Supplementary B.3.
+Theorem 1 says that the magnitude of a possible regret loss,
+compared to SFBO, is proportional to ε with a probability
+proportional to q. For instance, if we tolerate 0.1 units of
+regret undershoot with 90% probability, then by Theorem
+1 this is guaranteed with the control parameter value c1 =
+c1(0.1, 0.9) ≈ 0.05 for early BO rounds.
+The regret difference bound in Theorem 1 corresponds to
+the worst-case scenario where the multi-fidelity queries
+(xMF
+t , ℓt) are always accepted, and hence the bound is not
+tight. The bound is practically useful only in the first rounds
+due to the exponential dependence on T , however, in prac-
+tice the bound is tighter than stated in Theorem 1, because
+the acceptance probability is never one (due to c2 > 0).
+7 EXPERIMENTAL RESULTS
+We evaluate rMFBO on a benchmark of synthetic functions
+widely used in multi-fidelity studies. Our proposed method
+is used to make three state-of-the-art MFBO algorithms ro-
+bust: Maximum Entropy Search (MF-MES) (Takeno et al.,
+2020), General-purpose Information-Based Bayesian Opti-
+misatioN (MF-GIBBON) (Moss et al., 2021) and Knowl-
+edge Gradient (MF-KG) (Poloczek et al., 2017), the lat-
+ter being benchmarked only on low-dimensional prob-
+lems. All experiments are run within the BoTorch frame-
+work (Balandat et al., 2020). The probabilistic surro-
+gate model uses the downsampling kernel from Wu et al.
+(2020): k((x, ℓ), (x′, ℓ′)) = kinput(x, x′) × kIS(ℓ, ℓ′), where
+kinput(·, ·) is the RBF kernel, and kIS(ℓ, ℓ′) := c + (1 −
+ℓ)1+δ(1 − ℓ′)1+δ. Here, l ∈ [0, 1] represents the degree of
+fidelity of the IS, l = 1 corresponding to the target function,
+often denoted m. The hyperparameters c and δ are estimated
+by maximum marginal likelihood, similarly as those ofkinput.
+Results using alternative probabilistic surrogates can be
+found in Supplementary F. Each test function is rescaled in
+[0, 1]. Analytical forms can be found in Supplementary G,
+together with 2D plots when applicable. For all experiments,
+the initial dataset consists of 5d evaluations of the primary
+IS and 4d evaluations of each auxiliary IS. For the remainder
+of the section, except in the dedicated ablation study, we set
+rMFBO hyperparameters to c1 = c2 = 0.1. The latter corre-
+sponds to about 15% of the maximum information gain. For
+more information on choosing c2, see Supplementary E. For
+each experiment, we report the average and standard devia-
+tion of the simple regret computed over 100 repetitions with
+different initializations. Results displaying the inference
+regret instead can be found in Figure 3 in the Supplemen-
+tary. Source code reproducing the experiments is available
+at https://github.com/AaltoPML/rMFBO.
+7.1 Synthetic functions with one auxiliary IS
+The goal is to maximize a target function using noisy evalua-
+tions of the objective (primary IS), and an auxiliary IS. This
+is exactly the setting of the introductory example of Section
+4, where we discussed results obtained with an informative
+IS case, and an irrelevant IS case. In this subsection, we
+provide results with two additional objective functions and
+
+PAGE 7
+Petrus Mikkola, Julien Martinelli, Louis Filstroff, Samuel Kaski
+types of auxiliary ISs.
+Negated Exponential Currin 2D: We reproduce the ex-
+periment performed by Kandasamy et al. (2016) and con-
+sider the Exponential Currin function as the primary IS
+while the auxiliary IS is the negated objective function it-
+self, with λl = 0 .1, λm = 1 . The proposed rMFBO is
+able to find the global optimum using a lower budget than
+its MFBO counterpart (Figure 2, first row), even though
+performances are quite similar for the Knowledge Gradient
+acquisition function.
+Sinus-perturbed Rosenbrock 2D: Next, we examine the
+Rosenbrock 2D function as the target. In this experiment,
+the auxiliary IS is equal to the objective corrupted with a
+sinusoidal signal whose magnitude is the target function
+mean. The costs are λl = 0 .2, λm = 1 . rMFBO consis-
+tently improves over MFBO and leads to a simple regret on
+par with SFBO (Figure 2, second row). It is worth noticing
+that a similar experiment was performed by Poloczek et al.
+(2017), however using a sinusoidal signal with a magnitude
+200 times inferior to the mean of the objective function. Ap-
+plying a more realistic perturbation still produces an infor-
+mative IS, while illustrating a slightly increased robustness
+brought by rMF-KG with respect to MF-KG.
+7.2 XGBoost hyperparameter tuning
+We now assess the performance of rMFBO on a real-world
+hyperparameter tuning example. To that end, we follow
+the experiment introduced by Li et al. (2020) and train
+an XGBoost model (Chen and Guestrin, 2016) to predict
+a quantitative measure of the diabetes progression 1. The
+dataset includes 442 examples, two-thirds are used for train-
+ing and the remaining fraction for evaluation. We employ
+the implementation from the scikit-learn library (Pedregosa
+et al., 2011) and optimize 5 continuous hyperparameters de-
+scribed in Section G. The primary IS trains XGBoost with
+100 weak learners trees, while the auxiliary IS uses only
+10, with λl = 0.1, λm = 1. The optimization starts with
+10 random queries at each IS. We use the normalized root
+mean square error to evaluate the performance. rMF-MES is
+able to take advantage of the auxiliary IS and achieves faster
+convergence than SF-MES, while staying close to MF-MES
+(Figure 2, third row). Note that the auxiliary IS is in this case
+of extremely good quality and comes at a 10-times cheaper
+cost (see Figure 12 in the Supplementary), thus demon-
+strating the ability of rMF-MES to use these cheap queries
+even though the main purpose of the algorithm is to provide
+robustness against unreliable sources. On the other hand,
+rMF-GIBBON displays a behavior closer to SF-GIBBON.
+While a significant advantage over MF-GIBBON can be
+observed in the first half of the budget, rMF-GIBBON then
+gets distanced by its MFBO counterpart.
+1https://archive.ics.uci.edu/ml/datasets/diabetes
+7.3 Synthetic functions with several auxiliary ISs of
+varying relevance
+Next, we check whether rMFBO is able to distinguish be-
+tween relevant and irrelevant auxiliary ISs in the presence of
+multiple auxiliary ISs on two examples. In the first problem,
+the 6D Hartmann function is selected as the primary IS, with
+3 auxiliary ISs: Hartmann with degrees of fidelity 0.8, 0.1,
+and the Rosenbrock function, respectively. In the second
+problem, we wish to optimize the 2D Branin function with
+3 auxiliary ISs: Branin with degree of fidelity 0.8, 0.1, and
+the Ackley function. In both settings, the primary IS can
+be queried for a cost of 1, and all auxiliary ISs for a cost
+of 0.2. Regarding the Hartmann problem, rMFBO provides
+a consistent decrease of regret compared to MFBO across
+all methods. Our claim is backed up by the distribution of
+queries (Figure 4, top row), which show how rMFBO avoids
+querying uninformative sources while still taking advantage
+of the informative one, whereas MFBO queries are scattered
+across all ISs, delegating around 40% of them to ISs that are
+either irrelevant or not worth the incurred cost. Performance
+is slightly worse for the Branin problem, where rMFBO
+significantly improves over MFBO for the GIBBON acqui-
+sition function only. With a regret 100 times superior to that
+of MES and GIBBON methods, the KG method seems to
+converge very slowly for this example, even though only
+the primary IS is queried (Figure 4, lower panel, right). The
+close results between MF-MES and rMF-MES can be ex-
+plained by the fact that MF-MES only spends 26% of its
+queries on irrelevant ISs while dedicating 50% of its budget
+on a cheap and relevant AIS.
+7.4 Ablation study
+Lastly, we investigate the performance of rMFBO w.r.t. sev-
+eral changes such as auxiliary IS cost or hyperparameters
+values. The benchmarks are only performed using the MES
+and GIBBON strategies, due to the high computational over-
+head of the KG method, more than ten times larger than
+MES and GIBBON (Moss et al., 2021). We study the same
+setting described at the end of Section 4. All discussed
+figures are in the Supplementary material.
+Variation of the auxiliary IS cost λl: Figure 5 shows
+the evolution of the simple regret as the lower fidelity cost
+increases (λl ∈ {0.1, 0.2, 0.5, 0.8}). For the informative
+auxiliary IS case (first two columns), the increase in the cost
+naturally shifts the behavior of MFBO and rMFBO towards
+that of SFBO, losing the the acceleration of the convergence
+in the process. This illustrates the trade-off between informa-
+tiveness of an auxiliary IS and its query cost. Interestingly,
+MFBO methods fail to respect that trade-off in an irrelevant
+auxiliary IS setting. Indeed, MFBO regret eventually flats
+out for both MES and GIBBON acquisition strategies at
+high auxiliary IS query cost. For λl = 0.8, MF-MES spent
+82% of the budget on auxiliary IS queries on average, MF-
+
+PAGE 8
+Multi-Fidelity Bayesian Optimization with Unreliable Information Sources
+0 5 10 15 20 25
+10−3
+10−2
+10−1
+Currin
+Negated 2D
+0 5 10 15 20
+10−3
+10−2
+10−1
+0 10 20 30 40 50
+10−3
+10−2
+10−1
+0 10 20 30 40
+10−5
+10−3
+Sinus-Perturbed
+Rosenbrock 2D
+ 0 10 20 30 40
+10−5
+10−3
+0 10 20 30 40 50
+10−5
+10−3
+0 10 20 30 40 50 60 70 80
+10−2
+10−1
+XGBoost 5D
+ 0 10 20 30 40 50 60 70 80
+10−2
+10−1
+0 10 20 30 40 50 60 70 8010−3
+10−2
+10−1
+Hartmannn 6D
+Multiple AIS
+ 0 10 20 30 40 50 60 70 8010−3
+10−2
+10−1
+0 10 20 30 40 50
+10−3
+10−2
+10−1
+Branin 2D
+Multiple AIS
+ 0 10 20 30 40 50
+10−3
+10−2
+10−1
+0 10 20 30 40 50
+10−1
+Budget
+Simple regret
+MF-MES
+rMF-MES
+SF-MES
+MF-GIBBON
+rMF-GIBBON
+SF-GIBBON
+MF-KG
+rMF-KG
+SF-KG
+Figure 2: Simple regret depicted over budget spent in five multi-fidelity problems, averaged over 100 repetitions. The first
+three problems have one auxiliary IS and the last two have three. Three BO acquisition functions (MES, GIBBON, KG) are
+tested with their multi- and single-fidelity variants. The proposed robust multi-fidelity method is denoted by the letter ‘r’,
+e.g. ‘rMF-MES’.
+GIBBON 42%, over the 20 repetitions. Instead, rMFBO
+is, as expected, only slightly positively affected by the cost
+increase, since the irrelevant auxiliary IS becomes less and
+less relevant, showing again robustness to uninformative IS.
+Variation of rMFBO hyperparameters: We now inves-
+tigate how the hyperparameters c1 and c2 affect the perfor-
+mance of rMFBO. c1 constitutes a threshold on the primary
+IS MF model posterior variance evaluated at SFBO proposal
+(xpSF
+t , m), which leads to a primary IS query when exceeded.
+c2 measures the information gain provided by the MFBO
+proposal (xMF
+t , l) for l ∈ JmK, and leads to a primary IS
+query when not exceeded. We vary c1, c2 ∈ {0, 0.1, 0.2}
+and display the results in Figure 6.
+By construction, setting c1 to 0 (first two rows) essentially
+reduces rMFBO to SFBO, no matter the value of c2. As
+c1 increases and c2 = 0 (first column, third to sixth rows),
+rMFBO quickly transitions to the MFBO dynamics regard-
+less of the relevance of the IS. Then, increasing c2 provides
+a reasonable trade-off between robustness to irrelevant aux-
+iliary IS and exploitation of informative auxiliary IS.
+A tentative adaptive strategy to automatically set c2 is pre-
+sented in Supplementary Section E.2 and illustrated in Fig-
+ure 7. Results are comparable with that of Figure 2, where
+c2 = 0.1.
+Varying the kernel confidence level: The downsampling
+kernel used as joint model here involves a contribution
+that depends on the value ℓ associated to each IS (Equa-
+tion (19)). While the primary IS m always corresponds
+to the value ℓ = 1 , the value set for the auxiliary IS re-
+mains to be selected, and determines whether that IS is
+perceived as relevant in the optimization of the objective.
+In Figure 8, for each row, the auxiliary IS value ℓ varies in
+{0.1, 0.2, 0.5, 0.8}, so as to simulate increased confidence
+in the auxiliary IS for the MOGP. As expected, gradually
+increasing the level of confidence in the irrelevant IS case
+leads to optimization failure for MF-MES and MF-GIBBON
+(right panel), while rMF-MES and rMF-GIBBON maintain
+steady performances. In the relevant auxiliary IS case (left
+
+PAGE 9
+Petrus Mikkola, Julien Martinelli, Louis Filstroff, Samuel Kaski
+panel), there seems to exist an optimal value of ℓ ≈ 0.1
+matching the informativeness of the AIS, so that MFBO
+methods perform on par with rMFBO. Beyond that value,
+overconfidence leads to degraded performance for MFBO.
+Varying the MOGP model: Previous experiments were
+performed using the downsampling kernel as the joint model.
+We next employ the linear truncated kernel available from
+the BoTorch library, as well as the MISO kernel introduced
+in (Poloczek et al., 2017). These kernels are described in
+Section F and yield similar performance as the downsam-
+pling kernel (Figures 9 and 10), thus demonstrating that
+rMFBO is robust to the choice of a specific Gaussian pro-
+cess surrogate model.
+8 CONCLUSIONS
+In this paper, we introduced rMFBO, a building block to any
+MFBO method to make it robust to unreliable information
+sources, i.e., which do not decrease the regret on average
+when queried and therefore harmful to the optimization
+process. In particular, we showed that the regret bound of
+rMFBO can be tied to that of SFBO, with high probability.
+Upon extensive experiments, we further demonstrated that
+the current MFBO methods lack this notion of robustness,
+and that rMFBO was able to successfully fill this gap, while
+staying competitive when the auxiliary information sources
+are relevant.
+The proposed rMFBO method relies on two hyperparame-
+ters, c1 and c2. While c1 is theoretically grounded, c2 was
+set to a single fixed value which, even though not having
+deeper theoretic grounding, produced satisfactory results
+across the wide range of experiments. Its soundness was
+further empirically assessed through an ablation study. Nev-
+ertheless, c2 should adapt to the number of BO rounds, as
+would be expected from an entropy-based measure. A tenta-
+tive adaptive approach, which produced satisfactory results,
+was considered in Supplementary E. Gaining theoretical un-
+derstanding on how this value should be selected is left for
+future research. From a computational perspective, rMFBO
+keeps track of two acquisition trajectories, which leads to
+increased computation times, but negligible compared to the
+evaluation costs encountered in real-world settings. Lastly,
+the regret bound of rMFBO is practically useful only in
+the first rounds due to the exponential dependence on the
+number of BO rounds. Future research should use non-zero
+rejection probability of the multi-fidelity query proposals to
+derive a tighter regret bound for later BO rounds.
+Any safety-critical MFBO application can benefit from a
+methodology such as rMFBO, as our algorithm gives guar-
+antees against erroneous or even adversarial information
+sources. Finally, rMFBO opens the door to a more sys-
+tematic inclusion of human experts, with varying knowl-
+edge, within BO processes. Typically, these experts would
+have precise understanding on a specific region of the input
+domain, but would provide irrelevant feedback elsewhere.
+Our algorithm makes it possible to take into account these
+novel information sources with varying degree of fidelity
+across the input domain, opening exciting opportunities in
+Bayesian optimization.
+Acknowledgements
+Louis Filstroff was with the Department of Computer Sci-
+ence of Aalto University at the time this research was
+conducted. This work was supported by the Academy of
+Finland (Flagship programme: Finnish Center for Artifi-
+cial Intelligence FCAI and decision 341763), EU Horizon
+2020 (European Network of AI Excellence Centres ELISE,
+951847; HumanE AI Net, 952026), UKRI Turing AI World-
+Leading Researcher Fellowship (EP/W002973/1). We also
+acknowledge the computational resources provided by the
+Aalto Science-IT Project from Computer Science IT.
+References
+Lawrence W Baggett. Functional analysis: A primer .
+Dekker, 1992.
+Maximilian Balandat, Brian Karrer, Daniel Jiang, Samuel
+Daulton, Ben Letham, Andrew G Wilson, and Eytan Bak-
+shy. BoTorch: A Framework for Efficient Monte-Carlo
+Bayesian Optimization. In Advances in Neural Informa-
+tion Processing Systems (NeurIPS), pages 21524–21538,
+2020.
+Ilija Bogunovic, Jonathan Scarlett, Stefanie Jegelka, and
+V olkan Cevher. Adversarially robust optimization with
+Gaussian processes. In Advances in Neural Information
+Processing Systems (NeurIPS), 2018.
+Eric Brochu, Vlad M Cora, and Nando De Freitas. A tutorial
+on Bayesian optimization of expensive cost functions,
+with application to active user modeling and hierarchical
+reinforcement learning. arXiv preprint arXiv:1012.2599,
+2010.
+Tianqi Chen and Carlos Guestrin. XGBoost. In Proceedings
+of the 22nd ACM SIGKDD International Conference on
+Knowledge Discovery and Data Mining, 2016. doi: 10.
+1145/2939672.2939785.
+Lukas Fr¨ohlich, Edgar Klenske, Julia Vinogradska, Chris-
+tian Daniel, and Melanie Zeilinger. Noisy-input entropy
+search for efficient robust Bayesian optimization. InInter-
+national Conference on Artificial Intelligence and Statis-
+tics (AISTATS), pages 2262–2272, 2020.
+Jacob Gardner, Geoff Pleiss, Kilian Q Weinberger, David
+Bindel, and Andrew G Wilson. GPyTorch: Blackbox
+Matrix-Matrix Gaussian Process Inference with GPU Ac-
+celeration. In Advances in Neural Information Processing
+Systems (NeurIPS), 2018.
+
+PAGE 10
+Multi-Fidelity Bayesian Optimization with Unreliable Information Sources
+Subhashis Ghosal and Anindya Roy. Posterior consistency
+of Gaussian process prior for nonparametric binary regres-
+sion. The Annals of Statistics, 34(5):2413–2429, 2006.
+Rafael G´omez-Bombarelli, Jennifer N. Wei, David Duve-
+naud, Jos´e Miguel Hern´andez-Lobato, Benjam´ın S´anchez-
+Lengeling, Dennis Sheberla, Jorge Aguilera-Iparraguirre,
+Timothy D. Hirzel, Ryan P. Adams, and Al ´an Aspuru-
+Guzik. Automatic chemical design using a data-driven
+continuous representation of molecules. ACS Central
+Science, 4(2):268–276, jan 2018. doi: 10.1021/acscentsci.
+7b00572.
+Deng Huang, Theodore T Allen, William I Notz, and
+R Allen Miller. Sequential kriging optimization using
+multiple-fidelity evaluations. Structural and Multidisci-
+plinary Optimization, 32(5):369–382, 2006.
+Carl Hvarfner, Danny Stoll, Artur Souza, Marius Lindauer,
+Frank Hutter, and Luigi Nardi. πBO: Augmenting Ac-
+quisition Functions with User Beliefs for Bayesian Op-
+timization. In International Conference on Learning
+Representations (ICLR), 2022.
+Donald R. Jones, Matthias Schonlau, and William J. Welch.
+Efficient Global Optimization of Expensive Black-Box
+Functions. Journal of Global Optimization, 13:455–492,
+1998.
+Kirthevasan Kandasamy, Gautam Dasarathy, Junier B Oliva,
+Jeff Schneider, and Barnabas Poczos. Gaussian Pro-
+cess Bandit Optimisation with Multi-fidelity Evaluations.
+In Advances in Neural Information Processing Systems
+(NIPS), 2016.
+Johannes Kirschner and Andreas Krause. Bias-Robust
+Bayesian Optimization via Dueling Bandits. In Interna-
+tional Conference on Machine Learning (ICML), pages
+5595–5605, 2021.
+Ksenia Korovina, Sailun Xu, Kirthevasan Kandasamy,
+Willie Neiswanger, Barnabas Poczos, Jeff Schneider, and
+Eric Xing. ChemBO: Bayesian Optimization of Small Or-
+ganic Molecules with Synthesizable Recommendations.
+In International Conference on Artificial Intelligence and
+Statistics (AISTATS), pages 3393–3403, 2020.
+R´emi Lam, Douglas L Allaire, and Karen E Willcox. Mul-
+tifidelity optimization using statistical surrogate model-
+ing for non-hierarchical information sources. In 56th
+AIAA/ASCE/AHS/ASC Structures, Structural Dynamics,
+and Materials Conference, 2015.
+Shibo Li, Wei Xing, Robert Kirby, and Shandian Zhe. Multi-
+fidelity Bayesian optimization via deep neural networks.
+In Advances in Neural Information Processing Systems
+(NeurIPS), pages 8521–8531, 2020.
+Alonso Marco, Felix Berkenkamp, Philipp Hennig, An-
+gela P Schoellig, Andreas Krause, Stefan Schaal, and Se-
+bastian Trimpe. Virtual vs. real: Trading off simulations
+and physical experiments in reinforcement learning with
+Bayesian optimization. In IEEE International Conference
+on Robotics and Automation (ICRA), pages 1557–1563,
+2017.
+Ruben Martinez-Cantin, Kevin Tee, and Michael McCourt.
+Practical Bayesian optimization in the presence of out-
+liers. In International conference on Artificial Intelligence
+and Statistics (AISTATS), pages 1722–1731, 2018.
+Henry B. Moss, David S. Leslie, Javier Gonz´alez, and Paul
+Rayson. GIBBON: General-purpose Information-Based
+Bayesian Optimisation. Journal of Machine Learning
+Research, 22:1–49, 2021. URL http://jmlr.org/
+papers/v22/21-0120.html.
+F. Pedregosa, G. Varoquaux, A. Gramfort, V . Michel,
+B. Thirion, O. Grisel, M. Blondel, P. Prettenhofer,
+R. Weiss, V . Dubourg, J. Vanderplas, A. Passos, D. Cour-
+napeau, M. Brucher, M. Perrot, and E. Duchesnay. Scikit-
+learn: Machine learning in Python. Journal of Machine
+Learning Research, 12:2825–2830, 2011.
+Matthias Poloczek, Jialei Wang, and Peter Frazier. Multi-
+information source optimization. In Advances in Neural
+Information Processing Systems (NIPS), 2017.
+Rajat Sen, Kirthevasan Kandasamy, and Sanjay Shakkot-
+tai. Multi-fidelity black-box optimization with hierarchi-
+cal partitions. In International Conference on Machine
+Learning (ICML), pages 4538–4547, 2018.
+Jasper Snoek, Hugo Larochelle, and Ryan P Adams. Practi-
+cal Bayesian optimization of machine learning algorithms.
+In Advances in Neural Information Processing Systems
+(NIPS), 2012.
+Jialin Song, Yuxin Chen, and Yisong Yue. A general frame-
+work for multi-fidelity Bayesian optimization with gaus-
+sian processes. In International Conference on Artificial
+Intelligence and Statistics (AISTATS), pages 3158–3167,
+2019.
+Niranjan Srinivas, Andreas Krause, Sham M. Kakade,
+and Matthias W. Seeger. Information-Theoretic Regret
+Bounds for Gaussian Process Optimization in the Bandit
+Setting. IEEE Transactions on Information Theory, 58(5):
+3250–3265, may 2012. doi: 10.1109/tit.2011.2182033.
+Kevin Swersky, Jasper Snoek, and Ryan P Adams. Multi-
+task Bayesian optimization. In Advances in Neural Infor-
+mation Processing Systems (NIPS), 2013.
+Shion Takeno, Hitoshi Fukuoka, Yuhki Tsukada, Toshiyuki
+Koyama, Motoki Shiga, Ichiro Takeuchi, and Masayuki
+Karasuyama. Multi-fidelity Bayesian optimization with
+max-value entropy search and its parallelization. In Inter-
+national Conference on Machine Learning (ICML), pages
+9334–9345, 2020.
+Zi Wang and Stefanie Jegelka. Max-value entropy search
+for efficient Bayesian optimization. In International Con-
+ference on Machine Learning (ICML), pages 3627–3635.
+PMLR, 2017.
+
+PAGE 11
+Petrus Mikkola, Julien Martinelli, Louis Filstroff, Samuel Kaski
+Jian Wu, Saul Toscano-Palmerin, Peter I Frazier, and An-
+drew Gordon Wilson. Practical multi-fidelity Bayesian
+optimization for hyperparameter tuning. In Uncertainty
+in Artificial Intelligence (UAI), pages 788–798. PMLR,
+2020.
+Yehong Zhang, Trong Nghia Hoang, Bryan Kian Hsiang
+Low, and Mohan Kankanhalli. Information-based multi-
+fidelity Bayesian optimization. In NIPS Workshop on
+Bayesian Optimization, 2017.
+Yichi Zhang, Daniel W Apley, and Wei Chen. Bayesian
+optimization for materials design with mixed quantitative
+and qualitative variables. Scientific Reports, 10(1):1–13,
+2020.
+
+PAGE 12
+Supplementary Material
+Multi-Fidelity Bayesian Optimization with Unreliable Information Sources
+A Additional experimental results
+0 10 20
+10−3
+10−1
+Currin
+Negated 2D
+0 5 10 15 20
+10−3
+10−1
+0 20 40
+10−3
+10−1
+0 10 20 30 40
+10−4
+10−2
+Sinus-Perturbed
+Rosenbrock 2D
+ 0 10 20 30 40
+10−4
+10−2
+0 20 40
+10−4
+10−2
+0 10 20 30 40 50 60 70 80
+10−1
+3× 10−24× 10−2
+6× 10−2
+XGBoost 5D
+ 0 10 20 30 40 50 60 70 80
+10−1
+3× 10−24× 10−2
+6× 10−2
+0 10 20 30 40 50 60 70 80
+10−2
+10−1
+Hartmannn 6D
+Multiple AIS
+ 0 10 20 30 40 50 60 70 80
+10−2
+10−1
+0 20 40
+10−3
+Branin 2D
+Multiple AIS
+ 0 20 40
+10−3
+0 20 40
+10−3
+10−2
+10−1
+Budget
+Inference regret
+MF-MES
+rMF-MES
+SF-MES
+MF-GIBBON
+rMF-GIBBON
+SF-GIBBON
+MF-KG
+rMF-KG
+SF-KG
+Figure 3: Inference regret depicted over budget spent in five multi-fidelity problems, averaged over 100 repetitions. The first
+three problems have one auxiliary IS and the last two have three. Three BO acquisition functions (MES, GIBBON, KG) are
+tested with their multi- and single-fidelity variants. The proposed robust multi-fidelity method is denoted by the letter ‘r’,
+e.g. ‘rMF-MES’.
+
+PAGE 13
+Petrus Mikkola, Julien Martinelli, Louis Filstroff, Samuel Kaski
+rMF-MES rMF-GIBBON MF-MES MF-GIBBON0.0
+0.2
+0.4
+0.6
+0.8
+Query Proportion
+Hartmann Multiple
+0.81 0.83
+0.31
+0.170.16 0.16
+0.29
+0.43
+0.02 0.01
+0.24
+0.09
+0.01 0.0
+0.16
+0.31
+rMF-MES rMF-GIBBON MF-MES MF-GIBBON
+rMF-MES rMF-GIBBON MF-MES MF-GIBBON MF-KG rMF-KG0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Query Proportion
+Branin Multiple
+0.78 0.82
+0.24
+0.04
+0.96 0.98
+0.17 0.16
+0.51
+0.42
+0.02 0.010.01 0.01
+0.13
+0.35
+0.01 0.00.04 0.01
+0.13 0.2
+0.01 0.0
+Figure 4: Distribution of IS queries. From left to right, the bars are sorted in the following order: Hartmann (resp. Branin)
+primary IS , AIS with degree of fidelity l = 0.8, AIS with l = 0.1 and finally the Rosenbrock (resp. Ackley) function. We
+used the downsampling kernel. In the computation of kIS(ℓ, ℓ′), we used ℓ = 1, ℓ′ = 0.8, ℓ′′ = 0.1 and ℓ′′′ = 0.
+
+PAGE 14
+Multi-Fidelity Bayesian Optimization with Unreliable Information Sources
+0 25 50 75
+10−3
+10−2
+10−1
+AIS cost = 0 .1
+0 25 50 75
+ 0 25 50 75
+ 0 25 50 75
+0 25 50 75
+10−3
+10−2
+10−1
+AIS cost = 0 .2
+0 25 50 75
+ 0 25 50 75
+ 0 25 50 75
+0 25 50 75
+10−3
+10−2
+10−1
+AIS cost = 0 .5
+0 25 50 75
+ 0 25 50 75
+ 0 25 50 75
+0 25 50 75
+10−3
+10−2
+10−1
+AIS cost = 0 .8
+0 25 50 75
+ 0 25 50 75
+ 0 25 50 75
+Hartmann 6D
+Budget
+Simple regret
+Informative Auxiliary Information Source
+Hartmann 6D with bias l = 0.2
+Irrelevant Auxiliary Information Source
+Rosenbrock 6D
+MF-MES rMF-MES SF-MES rMF-GIBBON MF-GIBBON SF-GIBBON
+Figure 5: Simple regret depicted over budget spent for the Hartmann6D multi-fidelity problem, averaged over 100 repetitions.
+For each row, the auxiliary IS cost is varied. We used the downsampling kernel. In the computation ofkIS(ℓ, ℓ′), we used
+ℓ = 1, ℓ′ = 0.2 for the primary IS and the auxiliary IS, respectively.
+
+PAGE 15
+Petrus Mikkola, Julien Martinelli, Louis Filstroff, Samuel Kaski
+10−4
+10−3
+10−2
+10−1
+Informative AIS
+Hartmann 6D with bias l = 0.2
+c2 = 0.0
+ c2 = 0.1
+ c2 = 0.2
+10−4
+10−3
+10−2
+10−1
+Irrelevant AIS
+Rosenbrock 6D
+10−4
+10−3
+10−2
+10−1
+Informative AIS
+Hartmann 6D with bias l = 0.2
+10−4
+10−3
+10−2
+10−1
+Irrelevant AIS
+Rosenbrock 6D
+10−4
+10−3
+10−2
+10−1
+Informative AIS
+Hartmann 6D with bias l = 0.2
+0 20 40 60 80
+10−4
+10−3
+10−2
+10−1
+Irrelevant AIS
+Rosenbrock 6D
+0 20 40 60 80
+ 0 20 40 60 80
+c1 = 0.0c1 = 0.1c1 = 0.2
+Simple regret
+Budget
+rMF-MES MF-MES SF-MES rMF-GIBBON MF-GIBBON SF-GIBBON
+Figure 6: Simple regret depicted over budget spent for the Hartmann6D multi-fidelity problem, averaged over 100
+repetitions. At the row level, the hyperparameter c1 is varied, with even rows being the Hartmann/Hartmann0.2 (relevant IS)
+problem, while odd rows consider the Hartmann/HartmannRosenbrock (irrelevant IS) problem. At the column level, the
+hyperparameter c2 is varied. We used the downsampling kernel. In the computation of kIS(ℓ, ℓ′), we used ℓ = 1, ℓ′ = 0.2
+for the primary IS and the auxiliary IS, respectively.
+
+PAGE 16
+Multi-Fidelity Bayesian Optimization with Unreliable Information Sources
+B Proofs
+B.1 Noiseless scenario: Proposition 1
+Proof of Proposition 1. In the proof, we simplify the notations and denote the pseudo SFBO query at round t by xt = xpSF
+t ,
+and Dt = DpSF
+t for the pseudo SFBO dataset. The SFBO query at round t is denoted by xSF
+t , as earlier. The acquisition
+function is treated as a function of an input-IS pair(x, ℓ) and the dataset D. Let us think the dataset as a t(d + 1)-dimensional
+vector Dt = (x(1)
+1 , · · ·, x(d)
+1 , · · ·, x(1)
+t , · · ·, x(d)
+t , y1, ..., yt). Let us use a shorthand notation α(x, m,D) = α(x, D), and
+consider the next primary IS query
+xt+1 = arg max
+x∈X
+α(x, Dt) (12)
+which defines an implicit function xt+1(Dt) such that xt+1 solves ∇xα(x, Dt) = 0Rd. By applying the implicit function
+theorem to the continuously differentiable function ∇xα : X ×(X ×R)t → Rd (Assumption 5) with invertible Jacobian
+(Assumption 6), the rate of change of the next query with respect to the dataset can be defined as,
+
+∂xt+1
+∂Dt
+(Dt)
+
+op
+=
+
+"
+(Hα,x(xt+1(Dt), Dt))−1 ∂∇xα
+∂D(k)
+t
+(xt+1(Dt), Dt)
+#t(d+1)
+k=1
+
+op
+(13)
+where ∥A∥op := inf {c > 0 : ∥Ax∥∞ ≤ c ∥x∥∞ ∀x ∈ X }is the operator norm, and Hα,x denotes the Hessian of
+x 7→ α(x, Dt). Specifically, the (i, j)th-element of Hα,x reads as ∂2α
+∂xi∂xj
+. The ith-element of ∂∇xα
+∂D(k)
+t
+is ∂2α
+∂D(k)
+t ∂xi
+, which
+denotes the partial derivative w.r.t. the first and the second variable ofα(·, ·).
+We now show the proposition by induction.
+1◦ Base case t = 1: The claim follows by the design of Algorithm, since xSF
+1 = x1.
+2◦ Induction step: Let us assume that t ∈ {1, ..., T− 2}. The outcome vector of the SFBO algorithm is ySF
+t = (ySF
+1 , ..., ySF
+t ).
+The outcome vector of the pseudo-SFBO algorithm, yt = ( y1, ..., yt), consists of observations yτ = f (m)(xτ ) and
+pseudo-observations yτ = µMF(xτ , m).
+Consider the mapping xt+1 : ( X ×R)t → Xwith the domain and codomain equipped with the sup-norms. By the
+above-mentioned implicit function theorem, there exists a neighbourhood such that xt+1 is continuously differentiable with
+bounded derivatives. Since X is a compact subset of Rd, the spaces ((X ×R)t, ∥·∥∞) and (X , ∥·∥∞) are Banach spaces.
+Thus, by the mean value inequality on Banach spaces (Baggett, 1992, Theorem 12.6), if we consider the closed line segment
+joining Dt to DSF
+t (using the convexity of X ), and define Mt to be the maximum rate of change over the line segment,
+Mt := max
+D∈Dt
+
+∂xt+1
+∂D (D)
+
+op
+, where Dt =
+
+D | D= (1 − s)Dt + sDSF
+t , s∈ [0, 1]
+	
+(14)
+we can bound the closeness of the next queries at round t,
+xSF
+t+1 − xt+1
+
+∞ =
+xt+1(DSF
+t ) − xt+1(Dt)
+
+∞ ≤
+DSF
+t − Dt
+
+∞ Mt.
+It remains to bound
+DSF
+t − Dt
+
+∞. First, observe that,
+DSF
+t − Dt
+
+∞ = max
+xSF
+1 − x1
+
+∞ , ...,
+xSF
+t − xt
+
+∞ ,
+ySF
+1 − y1
+ , ...,
+ySF
+t − yt
+	
+.
+Let us consider |ySF
+τ − yτ | for any τ ∈ {1, ..., t}. It holds that,
+|ySF
+τ − yτ | =
+(
+|f (xSF
+τ ) − f (xτ )|, if Line 8 of Algorithm 1 false at query τ
+|f (xSF
+τ ) − µτ (xτ )|, if Line 8 true at query τ
+where we use the shorthand notations f (x) := f (x, m) and µτ,MF(x) := µMF(x, m| Dτ ).
+
+PAGE 17
+Petrus Mikkola, Julien Martinelli, Louis Filstroff, Samuel Kaski
+For the false case (real observation), we have
+|ySF
+τ − yτ | = |f (xSF
+τ ) − f (xτ )|
+≤
+√
+d
+xSF
+τ − xτ
+
+2 (15)
+≤ d
+xSF
+τ − xτ
+
+∞ (16)
+≤ dετ ˆMτ dτ (17)
+= ετ ˆMτ dτ +1
+with probability greater than 1 − da exp(− 1
+b2 ) by Assumption 4 exploited in (15). The inequalities (16) and (17) follow
+from the equivalence of the norms ( ∥x∥2 ≤
+√
+d ∥x∥∞) and the induction hypothesis, respectively. For the true case
+(pseudo-observations), as before we have
+|ySF
+τ − yτ | ≤ |f (xSF
+τ ) − µτ,MF(xτ )|
+≤ |f (xSF
+τ ) − f (xτ )| + |f (xτ ) − µτ,MF(xτ )|
+≤ ετ ˆMτ dτ +1 + |f (xτ ) − µτ,MF(xτ )|
+with probability greater than 1 − da exp(− 1
+b2 ). The first term represents the error for being off from the single-fidelity
+algorithm acquisition track, and the second term is the prediction error of the MOGP surrogate model. Given that the
+objective f is drawn from a MOGP with same covariance kernel than that of the MOGP surrogate in the Algorithm
+(Assumption 1), the latter term can be bounded. For any constant C >0, at round t,
+P
+ f (x) − µt,MF(x)
+σt,MF(x) > C
+
+≤ 1
+2 exp
+
+− C 2
+2
+
+P (|f (x) − µt,MF(x)| > Cσt,MF(x)) ≤ exp
+
+− C 2
+2
+
+P (|f (x) − µt,MF(x)| ≤Cσ t,MF(x)) ≥ 1 − exp
+
+− C 2
+2
+
+.
+Pick C = ε
+σt,MF(x). Then, we know that |f (x) − µt,MF(x)| ≤ε holds at least with probability 1 − exp
+
+− ε2
+2σ2
+t,MF(x)
+
+.
+If σt(x) ≤ ε√
+−2 log(1−q)
+, then |f (x) − µt,MF(x)| ≤ε holds with probability greater than q. Therefore, |f (xτ ) −
+µτ,MF(xτ )| ≤ε, and
+|ySF
+τ − yτ | ≤ετ ˆMτ dτ +1 + ε = ε(τ ˆMτ dτ +1 + 1).
+By combining the results, we have
+DSF
+t − Dt
+
+∞ = max
+xSF
+1 − x1
+
+∞ , · · ·,
+xSF
+t − xt
+
+∞ ,
+ySF
+1 − y1
+ , · · ·,
+ySF
+t − yt
+	
+≤ max
+n
+εM0d, · · ·, εtdt ˆMt, ε(M0d + 1), · · ·, ε(tdt+1 ˆMt + 1)
+o
+= ε
+
+tdt+1 ˆMt + 1
+
+with probability greater than q
+ 
+1 − da exp(− 1
+b2 )
+
+. Note that the event |f (x) − µt,MF(x)| ≤ε and the event in Assumption
+4 are independent given the assumptions. For all t ∈ {1, ..., T− 2},
+xSF
+t+1 − xt+1
+
+∞ ≤ ε
+ 
+tdt+1 max
+S∈2Jt−1K
+Y
+k∈S
+Mk + 1
+!
+Mt ≤ ε
+ 
+tMtdt+1 max
+S∈2Jt−1K
+Y
+k∈S
+Mk + dt+1 max
+S∈2JtK
+Y
+k∈S
+Mk
+!
+= εdt+1
+ 
+t max
+S∈2JtK
+Y
+k∈S
+Mk + max
+S∈2JtK
+Y
+k∈S
+Mk
+!
+= ε(t + 1) ˆMt+1dt+1
+holds with probability greater than q
+ 
+1 − da exp(− 1
+b2 )
+
+.
+
+PAGE 18
+Multi-Fidelity Bayesian Optimization with Unreliable Information Sources
+B.2 Noisy scenario: Proposition 1
+We consider a noisy scenario, that is,σnoise > 0. It can be shown that Proposition 1 holds if
+√σnoise
+ε ≤ (dt+1 ˆMt − 1)/2 for all
+t (with a negligible lower probability, specifically a factor of erf
+
+1
+2√σnoise
+
+erf
+
+1√2σnoise
+
+lower). Given empirical study on
+values ˆMt (Supplementary D), it is highly unlikely that this condition does not hold with reasonable values for ε and σnoise.
+Proof. Proof B.1 should be modified as follows.
+Let us consider |ySF
+τ − yτ | for any τ ∈ {1, ..., t}. It holds that,
+|ySF
+τ − yτ | =
+(
+|f (xSF
+τ ) + ϵ − f (xτ ) − ϵ′|, if Line 8 of Algorithm 1 false at query τ
+|f (xSF
+τ ) + ϵ − µτ,MF(xτ , m)|, if Line 8 false at query τ.
+Note that |ϵ − ϵ′| follows a half-normal distribution with scale parameter
+√
+2σnoise, and |ϵ| follows a half-normal distribution
+with scale parameter σnoise. This implies that P (|ϵ − ϵ′| ≤√σnoise) = erf
+
+1
+2√σnoise
+
+and P (|ϵ| ≤√σnoise) = erf
+
+1√2σnoise
+
+.
+For the false case (real observation), we have
+|ySF
+τ − yτ | = |f (xSF
+τ ) + ϵ − f (xτ ) − ϵ′|
+≤ |f (xSF
+τ ) − f (xτ )| + |ϵ − ϵ′|
+≤ 1√
+d
+xSF
+τ − xτ
+ + √σnoise
+≤ 1√
+d
+√
+dετ ˆMτ + √σnoise
+= ετ ˆMτ + √σnoise
+with probability greater than erf
+
+1
+2√σnoise
+  
+1 − da exp(− 1
+b2 )
+
+by Assumption 4. The last two inequalities follow from the
+induction hypothesis and the equivalence of the norms, ∥x∥ ≤
+√
+d ∥x∥∞.
+For the true case (pseudo-observation), as before we have,
+|ySF
+τ − yτ | ≤ |f (xSF
+τ ) − µ(xτ )| + |ϵ|
+≤ |f (xSF
+τ ) − f (xτ )| + |f (xτ ) − µ(xτ )| + √σnoise
+≤ ετ ˆMτ + |f (xτ ) − µ(xτ )| + 2√σnoise
+≤ ετ ˆMτ + ε + 2√σnoise
+= ε(τ ˆMτ + 1 + 2√σnoise
+ε )
+with probability greater than erf
+
+1
+2√σnoise
+
+erf
+
+1√2σnoise
+  
+1 − da exp(− 1
+b2 )
+
+.
+Hence, in this case we have
+DSF
+t − Dt
+
+∞
+= max
+xSF
+1 − x1
+
+∞ , ...,
+xSF
+t − xt
+
+∞ ,
+ySF
+1 − y1
+ , ...,
+ySF
+t − yt
+	
+≤ max
+
+εM0d, · · ·, εtdt ˆMt, ε(M0d + 1 + 2√σnoise
+ε ), · · ·, ε
+
+tdt+1 ˆMt + 1 + 2√σnoise
+ε
+
+= ε
+
+tdt+1 ˆMt + 1 + 2√σnoise
+ε
+
+with probability greater than erf
+
+1
+2√σnoise
+
+erf
+
+1√2σnoise
+  
+1 − da exp(− 1
+b2 )
+
+q.
+For all t ∈ {1, ..., T− 2},
+
+PAGE 19
+Petrus Mikkola, Julien Martinelli, Louis Filstroff, Samuel Kaski
+xSF
+t+1 − xt+1
+
+∞ ≤ ε
+ 
+tdt+1 max
+S∈2Jt−1K
+Y
+k∈S
+Mk + 1 + 2√σnoise
+ε
+!
+Mt
+≤ ε
+ 
+tMtdt+1 max
+S∈2Jt−1K
+Y
+k∈S
+Mk + dt+1 max
+S∈2JtK
+Y
+k∈S
+Mk
+!
+= εdt+1
+ 
+t max
+S∈2JtK
+Y
+k∈S
+Mk + max
+S∈2JtK
+Y
+k∈S
+Mk
+!
+= ε(t + 1) ˆMt+1dt+1
+holds with probability greater than erf
+
+1
+2√σnoise
+
+erf
+
+1√2σnoise
+  
+1 − da exp(− 1
+b2 )
+
+q, when 1 + 2√σnoise
+ε ≤ dt+1 ˆMt. Specifi-
+cally, when
+√σnoise
+ε ≤ (dt+1 ˆMt − 1)/2.
+B.3 Theorem 1
+Proof of Theorem 1. First, note that for any budget and any choice (simple or Bayes optimal) it holds,
+R(Λ, xSF
+choice) − R(Λ, xrMF
+choice) = f (xrMF
+choice) − f (xSF
+choice).
+For the simple choice, we have xSF
+choice = arg maxt∈JT K f (xSF
+t ), and xrMF
+choice = arg maxt∈JT (m)K f (xt) where x1, ...,xT (m)
+is the primary IS acquisition sequence returned by Algorithm 1 (pseudo-queries removed from the output sequence). With a
+slight abuse of notation we write T and T (m) for both the number of queries (Definition 2) and the corresponding index sets
+(e.g. t ∈ T (m) means that yt is not a pseudo-observation).
+For all t ∈ T , it holds that f (xrMF
+choice) − f (xSF
+choice) > −εT ˆMT dT +1 by Corollary 1 with probability greater than
+q
+ 
+1 − da exp(− 1
+b2 )
+
+. The problem is that the values yt for t ∈ T \ T (m) are never observed, and we cannot take
+minimum over these “NaN values” (i.e., arg max is not well-defined) in the computation of xrMF
+choice. To solve this issue, a
+quantity λm was saved from the budget Λ (Algorithm 1, Lines 24-26), thus ensuring that if the true maximizer is one of the
+pseudo-observations, then it will be queried at primary IS, leading to an actual observation.
+Specifically, for the last query at T + 1. Note that every pseudo-query is in S = {x ∈ X |σT,MF(x, m) ≤ c1}. For any
+x ∈ S, it holds that P (|f (x) − µT,MF(x)| ≤ε) ≥ q (see Proof B.1). Thus,
+|max
+x∈S
+f (x) − f (arg max
+x∈S
+µT,MF(x))| ≤2ε,
+with probability greater than q.
+C Full version of the algorithm
+Some modifications can be done to improve the empirical performance of Algorithm 1 while all the theoretical results of
+Section 6 still hold.
+Posterior mean update of the pseudo observations: Lines 12-13 of Algorithm 1 are for simplicity, the algorithm can
+be made more efficient by adjusting these. All the pseudo-observations in DpSF can be updated to correspond to the most
+recent predictive mean estimate of the joint surrogate model at the current round t. This does not break the condition
+σMF(xpSF
+t , m) ≤ c1, since the posterior variance cannot increase as new data is added. We go further and also check whether
+the single-fidelity GP surrogate can provide a more accurate estimate of the pseudo-observation in the sense of the accuracy
+of a nearest neighbor. For the pseudo-observation, we choose the most recent predictive mean estimate of the single-fidelity
+surrogate model if |f (xNN
+t , m) − µSF(xpSF
+t )| ≤ |f (xNN
+t , m) − µMF(xpSF
+t , m)| where xnn
+t is the nearest neighbor of xpSF
+t in
+the primary IS training data.
+
+PAGE 20
+Multi-Fidelity Bayesian Optimization with Unreliable Information Sources
+Round 1 2 3 4 5 6 7 8 9
+Mean 0.823668 1.081626 1.005563 1.199914 1.483624 1.454633 1.854412 2.625723 3.606273
+Std 0.398510 0.475530 0.358448 0.610190 0.559461 0.511228 0.903042 1.302165 1.784013
+Table 1: The mean and standard deviation of M t, t∈ J9K, over 20 repetitions.
+Multiple auxiliary IS relevance check: When the number of auxiliary ISs is more than two, the algorithm can give a
+chance also to other auxiliary IS, even if the first proposed query xMF
+t at IS ℓt is considered irrelevant by the algorithm.
+Looping over all IS, and checking their relevance, does not violate the conditions in Algorithm 1, so the theoretical results
+are preserved.
+Relevance check for primary IS: When (xMF
+t , ℓt) with ℓt = m is proposed, we can either have or not have a relevance
+check for that primary IS query. We consider a version that does not have a relevance check, which means that ifℓt = m,
+the query is automatically accepted.
+The pseudo code of the full algorithm is presented in Algorithm 2. Blue lines correspond to addition w.r.t. the first
+improvement, red lines to the second, and purple lines to the third.
+D Computing constants Mt
+Recall that the formula for Mt presented in Equations (13) and (14). The optimization over Dt makes the computation of
+Mt expensive. To avoid this, we consider a lower bound for Mt, defined as,
+M t :=
+
+"
+(Hα,x(xt+1(Dt), Dt))−1 ∂∇xα
+∂D(k)
+t
+(xt+1(Dt), Dt)
+#t(d+1)
+k=1
+
+op
+, (18)
+where ∥A∥op := inf {c > 0 : ∥Ax∥∞ ≤ c ∥x∥∞ ∀x ∈ X }is the operator norm, and Hα,x denotes the Hessian
+of x 7→ α(x, Dt). Specifically, the (i, j)th-element of Hα,x reads as ∂2α
+∂xi∂xj
+. The ith-element of ∂∇xα
+∂D(k)
+t
+is ∂2α
+∂D(k)
+t ∂xi
+,
+which denotes the partial derivative w.r.t. the first and the second variable of α(·, ·). Note that Hα,x(a, b) ∈ Rd×d and
+∂∇xα
+∂D(k)
+t
+(a, b) ∈ Rd for a ∈ Rd, b ∈ Rt(d+1).
+The gradient of ∇αx can be obtained by exploiting the automatic differentiation tools available in different programming
+frameworks. We used the BoTorch-GPyTorch ecosystems (Balandat et al., 2020; Gardner et al., 2018). Matrices in
+Equation (18) need not to compute separately, but instead by taking the Jacobian of (xt+1, Dt) 7→ ∇xα(xt+1, Dt), and
+by considering its sub-matrices, all the terms can be obtained. However, the automatic differentiation comes at the cost
+of possible numerical instability. Especially, a reliable estimate of the Hessian Hα,x turned out to be difficult to obtain,
+resulting often a Hessian with complex eigen values and lacking symmetry. However, we run an experiment where the
+Hessian was forced to be symmetric and a large jitter term was added to the diagonal. The results on Rosenbrock 2D with
+rMF-GIBBON over 20 repetitions are depicted in Table 1.
+M t grows as more data is obtained (as t grows), as expected. Namely, M t is same as (the maximum over j) the sum over
+(|∂xj/∂Dt,1|, ...,|∂xj/∂Dt,t|), where xj denotes jth coordinate of xt+1 and Dt,i denotes ith data point of Dt. That is, as
+the number of data points grows, the number of terms in the sum grows also.
+
+PAGE 21
+Petrus Mikkola, Julien Martinelli, Louis Filstroff, Samuel Kaski
+Algorithm 2 Full version of robust MFBO algorithm
+Input: Budget Λ, costs (λ1, ..., λm), acquisition function α, hyper-
+parameters c1 and c2, relevance measure s
+Initialize DpSF, DMF
+Perform Bayesian updates µSF, σSF, µMF, σMF
+pobs ← {}
+t ← 1
+while ⌊Λ/λm⌋ ≥2λm do
+xpSF
+t ← arg maxx α(x, m| µSF, σSF)
+condition1 ← σMF(xpSF
+t , m) ≤ c1
+condition2 ← False
+if condition1 then
+(xMF
+t , ℓt) ← arg maxx,ℓ α(x, ℓ| µMF, σMF)
+if ℓt = m then
+condition2 ← True
+else
+ISleft ← Jm − 1K
+while |ISleft| > 0 and not condition2 do
+(xMF
+t , ℓt) ← arg maxx∈X ,ℓ∈ISleft α(x, ℓ| µMF, σMF)
+if s(xMF
+t , ℓt) ≥ c2 then
+condition2 ← True
+else
+ISleft ← ISleft \ {ℓt}
+end if
+end while
+end if
+end if
+if condition1 and condition2 then
+pobs ← pobs ∪ {t}
+yt ← f (xMF
+t , ℓt)
+DMF ← DMF ∪ {((xMF
+t , ℓt), yt)}
+Perform Bayesian updates µMF, σMF
+yt ← µMF(xpSF
+t , m) # pseudo-observation
+DpSF ← DpSF ∪ {(xpSF
+t , yt)}
+Λ ← Λ − λℓt
+else
+yt ← f (xpSF
+t , m)
+DpSF ← DpSF ∪ {(xpSF
+t , yt)}
+DMF ← DMF ∪ {((xpSF
+t , m), yt)}
+Λ ← Λ − λm
+end if
+Perform Bayesian updates µSF, σSF, µMF, σMF
+DpSF ← UPDATE-PSEUDO-OBS(DpSF, DMF, µMF, µpSF, pobs)
+Perform Bayesian updates µSF, σSF
+t ← t + 1
+end while
+S ← {x ∈ X |σMF(x, m) ≤ c1}
+xpSF
+t ← arg maxx∈S µMF(x, m)
+yt ← f (xpSF
+t , m)
+Algorithm 3 UPDATE-PSEUDO-OBS
+Input: DpSF, DMF, µMF, µpSF, pobs
+for t in pobs do
+xnn
+t ← NearestNeighbor(xpSF
+t , DMF[ℓ = m])
+y ← f (xnn
+t , m)
+if |µMF(x, m) − y| > |µSF(x) − y| then
+DpSF[yt] ← µSF(xpSF
+t )
+else
+DpSF[yt] ← µMF(xpSF
+t , m)
+end if
+end for
+return DpSF
+
+PAGE 22
+Multi-Fidelity Bayesian Optimization with Unreliable Information Sources
+E Hyperparameter c2
+E.1 Non-adaptive strategy
+In experiments, we use a constant value c2 = 0.1 over all BO rounds. To understand how c2 is connected to the maximum
+information gain of the primary IS, we consider the maximum entropy search formula. Wang and Jegelka (2017) gives
+formula for the information gain with single y∗ draw (Formula 6, K = 1),
+I({x, y}; y∗ | Dt) ≈ γy∗ (x)ψ(γy∗ (x))
+2Ψ(γy∗ (x)) − log(Ψ(γy∗ (x))),
+where ψ is the probability density function and Ψ the cumulative density function of a normal distribution, and γy∗ (x) =
+y∗−µt(x)
+σt(x) . The information gain I is unbounded above but rarely in practice greater than − log(1/2), which is achieved
+when γy∗ (x) = 0 . Then, roughly speaking, c2 = 0.1 implies that the AIS query should give at least about 15% of the
+maximum information gain. We recommend setting c2 = −u log(1/2), where u is the percent of the maximum information
+gain required for a cost-adjusted AIS query. We found that u = 15% was a good default value.
+E.2 Adaptive strategy
+As entropy decreases during BO rounds, the information gain also decreases. For this reason, we also consider a strategy for
+setting c2, which adjusts to the amount of entropy at round t. Furthermore, this strategy automatically sets c2 without the
+user having to specify it. We consider adaptively set c2(t) = a
+R
+I(f (x, m), f∗ | DSF
+t )dx, where a is a positive constant.
+When a = 1/vol(X ), the threshold corresponds to the average information gain coming from the primary IS. However, this
+is too soft threshold value, as there are often large areas of space where the information gain is negligible, which in turn
+lowers the average information gain. For this reason, we found that a higher threshold works better empirically. Specifically,
+we found that the value a = 100/vol(X ) works well.
+The information gain I(f (x, m), f∗ | DSF
+t ) is computed by using the GP model that is trained on PIS data only. Pseudo-
+observations are not considered, so that they do not distort the information gain estimate. This requires one more GP model
+to be trained in the robust MFBO algorithm. Figure 7 reproduces the results previously displayed in Figure 2 using now the
+proposed adaptive criteria for c2.
+
+PAGE 23
+Petrus Mikkola, Julien Martinelli, Louis Filstroff, Samuel Kaski
+0 5 10 15 20 25
+10−3
+10−1
+Currin
+Negated 2D
+0 5 10 15 20
+10−3
+10−1
+0 10 20 30 40 50
+10−3
+10−1
+0 10 20 30 40
+10−5
+10−3
+Sinus-Perturbed
+Rosenbrock 2D
+ 0 10 20 30 40
+10−5
+10−3
+0 10 20 30 40 50
+10−5
+10−3
+0 10 20 30 40 50 60 70 80
+10−2
+10−1
+XGBoost 5D
+ 0 10 20 30 40 50 60 70 80
+10−2
+10−1
+0 10 20 30 40 50 60 70 8010−3
+10−2
+10−1
+Hartmannn 6D
+Multiple AIS
+ 0 10 20 30 40 50 60 70 8010−3
+10−2
+10−1
+0 10 20 30 40 50
+10−3
+10−1
+Branin 2D
+Multiple AIS
+ 0 10 20 30 40 50
+10−3
+10−1
+0 10 20 30 40 50
+10−1
+Budget
+Simple regret
+MF-MES
+rMF-MES
+SF-MES
+MF-GIBBON
+rMF-GIBBON
+SF-GIBBON
+MF-KG
+rMF-KG
+SF-KG
+Figure 7: Simple regret depicted over budget spent in five multi-fidelity problems, averaged over 100 repetitions. The first
+three problems have one auxiliary IS and the last two have three. Three BO algorithmic families (MES,GIBBON,KG)
+are tested with their multi- and single-fidelity variants. The proposed robust multi-fidelity method is denoted by the letter
+‘r’, e.g. ‘rMF-MES’. For rMF methods, the selection of c2 is done using the adaptive strategy proposed in Supplementary
+Section E.2.
+
+PAGE 24
+Multi-Fidelity Bayesian Optimization with Unreliable Information Sources
+F Multi-fidelity kernels
+We here give some insights about the different joint models that can be used in MFBO, as well as some additional numerical
+experiments using different kernels.
+F.1 Kernels
+The Downsampling kernel (Wu et al., 2020, Supplementary): Recall that the joint model employed in the experiments
+from the main text uses the following kernel:
+kDS((x, ℓ), (x′, ℓ′)) = kinput(x, x′) × kIS(ℓ, ℓ′)
+kinput(x, x′) = exp
+ 
+− 1
+2
+dX
+i=1
+(xi − x′
+i)2
+si
+!
+kIS(ℓ, ℓ′) = c + (1 − ℓ)1+δ(1 − ℓ′)1+δ
+The value ℓ ∈ [0, 1] needs to be specified, and represents the confidence we have in the IS, with the primary IS m being
+associated to ℓ = 1. Figure 8 investigates the effect of ℓ. The hyperparameters c, δand {si}1≤i≤d are obtained through
+marginal likelihood maximization. When δ = 0,
+kDS((x, ℓ), (x′, ℓ′)) = (c + (1 − ℓ)(1 − ℓ′))kinput(x, x′) (19)
+which can be written as
+kDS((x, ℓ), (x′, ℓ′)) =
+(
+ckinput(x, x′) + (1 − ℓ)(1 − ℓ′)kinput(x, x′) ℓ ̸= 1, ℓ′ ̸= 1
+ckinput(x, x′) otherwise
+The Linear Truncated kernel: The Linear Truncated kernel implemented in BoTorch reads as
+kLT((x, ℓ), (x′, ℓ′)) = kinput(x, x′) + c(ℓ, ℓ′)kIS(x, x′) (20)
+c(ℓ, ℓ′) = (1 − ℓ)(1 − ℓ′)(1 + ℓℓ′)p (21)
+where kinput and kIS are Matern kernels both with ν = 2.5, but each with their own lengthscale. For p = 0, this leads to
+kLT((x, ℓ), (x′, ℓ′)) =
+(
+kinput(x, x′) + (1 − ℓ)(1 − ℓ′)kIS(x, x′) ℓ ̸= 1, ℓ′ ̸= 1
+kinput(x, x′) otherwise
+This highlights a close correspondence with the Downsampling kernel when the hyperparameters of kIS are close to that of
+kinput. Figure 9 reproduces the results previously displayed in Figure 2 using now the linear truncated kernel as multiple
+output gaussian process kernel
+The MISO kernel (Poloczek et al., 2017, p.3): Following our notations, the Multi-Information Source Optimization
+(MISO) kernel reads as
+kMISO((x, ℓ), (x′, ℓ′)) = kinput(x, x′) + I(ℓ = ℓ′)kℓ(x, x′)
+where kinput and kℓ are similar kernels, e.g. both Matern or RBF, but each with their own lengthscale. We assume that there
+is a typo in the text, and the correct formula should be,
+kMISO((x, ℓ), (x′, ℓ′)) = kinput(x, x′) + I(ℓ = ℓ′ ̸= 1)kℓ(x, x′). (22)
+Here, ℓ and ℓ′ take categorical values, corresponding to ISs indexes, with m being the primary IS index, equivalent to ℓ = 1
+for the Downsampling and Linear Truncated kernels. This can also be written as
+kMISO((x, ℓ), (x′, ℓ′)) =
+(
+kinput(x, x′) + kℓ(x, x′) ℓ = ℓ′ ̸= 1
+kinput(x, x′) otherwise
+Figure 10 reproduces the results previously displayed in Figure 2 using now the MISO kernel as multiple output gaussian
+process kernel
+
+PAGE 25
+Petrus Mikkola, Julien Martinelli, Louis Filstroff, Samuel Kaski
+0 25 50 75
+10−3
+10−2
+10−1
+AIS MOGPﬁdelity level = 0.1
+0 25 50 75
+ 0 25 50 75
+ 0 25 50 75
+0 25 50 75
+10−3
+10−2
+10−1
+AIS MOGPﬁdelity level = 0.2
+0 25 50 75
+ 0 25 50 75
+ 0 25 50 75
+0 25 50 75
+10−3
+10−2
+10−1
+AIS MOGPﬁdelity level = 0.5
+0 25 50 75
+ 0 25 50 75
+ 0 25 50 75
+0 25 50 75
+10−3
+10−2
+10−1
+AIS MOGPﬁdelity level = 0.8
+0 25 50 75
+ 0 25 50 75
+ 0 25 50 75
+Hartmann 6D
+Budget
+Simple regret
+Informative Auxiliary Information Source
+Hartmann 6D with bias l = 0.2
+Irrelevant Auxiliary Information Source
+Rosenbrock 6D
+MF-MES rMF-MES SF-MES rMF-GIBBON MF-GIBBON SF-GIBBON
+Figure 8: Simple regret depicted over budget spent for the Hartmann6D multi-fidelity problem, averaged over 100 repetitions.
+For the informative auxiliary IS, the Hartmann function with bias l = 0.2 is considered (see Section G). The irrelevant
+auxiliary IS is the 6D Rosenbrock function. For each row, the confidence level ℓ that the MOGP places in the auxiliary IS is
+varied. The MOGP considered uses the downsampling kernel.
+
+PAGE 26
+Multi-Fidelity Bayesian Optimization with Unreliable Information Sources
+0 5 10 15 20 25
+10−3
+Currin
+Negated 2D
+0 5 10 15 20
+10−3
+0 10 20 30 40 50
+10−3
+0 10 20 30 40
+10−5
+10−3
+Sinus-Perturbed
+Rosenbrock 2D
+ 0 10 20 30 40
+10−5
+10−3
+0 10 20 30 40 50
+10−5
+10−3
+0 10 20 30 40 50 60 70 80
+10−2
+10−1
+XGBoost 5D
+ 0 10 20 30 40 50 60 70 80
+10−2
+10−1
+0 10 20 30 40 50 60 70 80
+10−3
+10−1
+Hartmannn 6D
+Multiple AIS
+ 0 10 20 30 40 50 60 70 80
+10−3
+10−1
+0 10 20 30 40 50
+10−2
+Branin 2D
+Multiple AIS
+ 0 10 20 30 40 50
+10−2
+0 10 20 30 40 50
+10−1
+Budget
+Simple regret
+MF-MES
+rMF-MES
+SF-MES
+MF-GIBBON
+rMF-GIBBON
+SF-GIBBON
+MF-KG
+rMF-KG
+SF-KG
+Figure 9: Simple regret depicted over budget spent in five multi-fidelity problems, averaged over 100 repetitions. The first
+three problems have one auxiliary IS and the last two have three. Three BO algorithmic families (MES,GIBBON,KG) are
+tested with their multi- and single-fidelity variants. The proposed robust multi-fidelity method is denoted by the letter ‘r’,
+e.g. ‘rMF-MES’. For MF methods, the joint model kernel used is the linear truncated kernel described in Paragraph F.1.
+
+PAGE 27
+Petrus Mikkola, Julien Martinelli, Louis Filstroff, Samuel Kaski
+0 10 20
+10−3
+Currin
+Negated 2D
+0 5 10 15 20
+10−3
+0 10 20
+10−3
+0 10 20 30 40
+10−5
+10−4
+10−3
+Sinus-Perturbed
+Rosenbrock 2D
+ 0 10 20 30 40
+10−5
+10−4
+10−3
+0 10 20 30
+10−5
+10−4
+10−3
+0 10 20 30 40 50 60 70 80
+10−2
+10−1
+XGBoost 5D
+ 0 10 20 30 40 50 60 70 80
+10−2
+10−1
+0 10 20 30 40 50 60 70 80
+10−3
+10−1
+Hartmannn 6D
+Multiple AIS
+ 0 10 20 30 40 50 60 70 80
+10−3
+10−1
+0 20 40
+10−3
+10−1
+Branin 2D
+Multiple AIS
+ 0 20 40
+10−3
+10−1
+0 20 40
+10−1
+Budget
+Simple regret
+MF-MES
+rMF-MES
+SF-MES
+MF-GIBBON
+rMF-GIBBON
+SF-GIBBON
+MF-KG
+rMF-KG
+SF-KG
+Figure 10: Simple regret depicted over budget spent in five multi-fidelity problems, averaged over 100 repetitions. The first
+three problems have one auxiliary IS and the last two have three. Three BO algorithmic families (MES,GIBBON,KG) are
+tested with their multi- and single-fidelity variants. The proposed robust multi-fidelity method is denoted by the letter ‘r’,
+e.g. ‘rMF-MES’. For MF methods, the joint model kernel used is the MISO kernel described in Paragraph F.1.
+
+PAGE 28
+Multi-Fidelity Bayesian Optimization with Unreliable Information Sources
+G Experiment details
+Hartmann-6D function:
+f (x, l) = −
+4X
+i=1
+αi exp
+
+−
+6X
+j=1
+Aij(xj − Pij)
+
+
+α = (1.0 − 0.1(1 − l), 1.2, 3.0, 3.2)T
+A =
+
+
+10 3 17 3 .5 1 .7 8
+0.05 10 17 0 .1 8 14
+3 3 .5 1 .7 10 17 8
+17 8 0 .05 10 0 .1 14
+
+
+P = 10−4
+
+
+1312 1696 5569 124 8283 5886
+2329 4135 8307 3736 1004 9991
+2348 1451 3522 2883 3047 6650
+4047 8828 8732 5743 1091 381
+
+
+defined over [0, 1]6, and l ∈ [0, 1] is the degree of fidelity. The primary IS is then reached for l = 1.
+Rosenbrock-dD function:
+f (x) =
+d−1X
+i=1
+ 
+100(xi+1 − x2
+i )2 + (xi − 1)2
+defined over [−5, 5]d. The sinus-perturbed version used in the 2D case is defined as:
+g(x) = f (x) + E[f (X)] × 0.8 sin (x1 + x2)
+The expectation is approximated by the empirical mean taken over a grid of 1000 × 1000 points linearly spaced across
+[−5, 5]2.
+Exponential Currin 2D function:
+f (x) =
+
+1 − exp
+
+− 1
+2x2
+ 2300x3
+1 + 1900x2
+1 + 2092x1 + 60
+100x3
+1 + 500x2
+1 + 4x1 + 20
+defined over [0, 1]2.
+Branin 2D function:
+f (x, l) =
+
+x2 −
+ 5.1
+4π2 − 0.1(1 − l)
+
+x2
+1 + 5
+π x1 − 6
+2
++ 10
+
+1 − 1
+8π
+
+cos(x1) + 10
+defined over [−5, 10] × [0, 15], and l ∈ [0, 1] is the degree of fidelity.
+Ackley 2D function:
+f (x) = −20 exp
+ 
+−0.2
+r
+1
+2 (x1 + x2)2
+!
+− exp
+ 1
+2 (cos(2πx1) + cos(2πx2)
+
++ 20 + e1
+defined over [−5, 10] × [0, 15].
+XGBoost hyperparameter tuning: The following hyperparameters are optimized: Huber loss parameter α ∈ [0.01, 0.1],
+complexity parameter used for minimal cost-complexity pruning ([0.01, 100]), fraction of samples used to fit individual
+base learners ([0.1, 1]), fraction of features considered when looking for the best tree split ([0.01, 1]) and learning rate
+([0.001, 1]). For the simple regret computation, f ∗ has been obtained using 30000 evaluations of the primary IS at random
+points.
+
+PAGE 29
+Petrus Mikkola, Julien Martinelli, Louis Filstroff, Samuel Kaski
+x1
+0.00 0.25 0.50 0.75 1.00
+x2
+0.00
+0.25
+0.50
+0.75
+1.00
+0.2
+0.4
+0.6
+0.8
+x1
+0.00 0.25 0.50 0.75 1.00
+x2
+0.00
+0.25
+0.50
+0.75
+1.00
+0.2
+0.4
+0.6
+0.8
+0.2
+0.4
+0.6
+0.8
+0.2
+0.4
+0.6
+0.8
+x1
+−5.0−2.5 0.0 2.5 5.0
+x2
+−5.0
+−2.5
+0.0
+2.5
+5.0
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+x1
+−5.0−2.5 0.0 2.5 5.0
+x2
+−5.0
+−2.5
+0.0
+2.5
+5.0
+0.00
+0.25
+0.50
+0.75
+1.00
+0.2
+0.4
+0.6
+0.8
+0.00
+0.25
+0.50
+0.75
+1.00
+Primary IS
+Branin
+Branin
+l = 0.8
+Branin
+l = 0.1
+Irrelevant IS
+Ackley
+0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
+Figure 11: Top: Currin Negated 2D plot of the primary IS (left) and the auxiliary IS (right). Middle: Sinus-perturbed
+Rosenbrock 2D plot of the primary IS (left) and the auxiliary IS (right). Bottom: 2D Plot of the Multiple IS Branin problem.
+
+PAGE 30
+Multi-Fidelity Bayesian Optimization with Unreliable Information Sources
+0.0 0.2 0.4 0.6 0.8 1.0
+Rescaled objective value
+0
+10
+20
+30
+40Density
+0.85 0.90 0.95 1.00
+Rescaled objective value
+0.0
+2.5
+5.0
+7.5
+10.0
+12.5
+Density
+0 1
+α
+0.0
+0.5
+1.0
+1.5
+Density
+0.0 0.2
+complexity
+0
+5
+10
+15Density
+0 1
+subsample
+0.0
+0.5
+1.0
+1.5
+2.0
+Density
+0 1
+max features
+0.0
+0.5
+1.0
+1.5
+2.0
+Density
+0 1
+learning rate
+0
+1
+2
+3Density
+Primary IS - 100 weak learner trees - λl = 1 Auxiliary IS - 10 weak learner trees - λl = 0.1
+Figure 12: Distribution of rescaled objective values and best samples for the XGBoost 5D hyperparameter tuning problem.
+For each IS, distributions are computed using 3000 random uniform samples within hyperparameter bounds and a kernel
+density estimator. Top left: the whole rescaled objective values distribution. Top right: density plot of the 5% best values.
+Bottom: density plot of the hyperparameters samples associated with 5% best values, demonstrating the strong agreement
+between the primary and the auxiliary IS.

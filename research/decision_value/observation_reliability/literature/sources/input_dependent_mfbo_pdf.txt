@@ -1,0 +1,1681 @@
+PAGE 1
+Multi-fidelity Bayesian Optimization with Multiple Information Sources of
+Input-dependent Fidelity
+Mingzhou Fan1 Byung-Jun Yoon1,2 Edward Dougherty1 Nathan Urban2
+Francis Alexander3 Raymundo Arróyave4,5 Xiaoning Qian1,2,6
+1Department of Electrical & Computer Engineering, Texas A&M University, College Station, Texas, USA,
+2Computational Science Initiative, Brookhaven National Laboratory, Upton, New York, USA,
+3Argonne National Laboratory, Lemont, Illinois, USA,
+4Department of Materials Science & Engineering, Texas A&M University, College Station, Texas, USA
+5Department of Mechanical Engineering, Texas A&M University, College Station, Texas, USA
+6Department of Computer Science & Engineering, Texas A&M University, College Station, Texas, USA
+Abstract
+By querying approximate surrogate models of dif-
+ferent fidelity as available information sources,
+Multi-Fidelity Bayesian Optimization (MFBO)
+aims at optimizing unknown functions that are
+costly if not infeasible to evaluate. Existing MFBO
+methods often assume that approximate surrogates
+have consistently high/low fidelity across the input
+domain. However, approximate evaluations from
+the same surrogate can have different fidelity at
+different input regions due to data availability and
+model constraints, especially when considering ma-
+chine learning surrogates. In this work, we inves-
+tigate MFBO when multi-fidelity approximations
+have input-dependent fidelity. By explicitly captur-
+ing input dependency for multi-fidelity queries in
+Gaussian Process (GP), our new input-dependent
+MFBO (iMFBO) with learnable noise models bet-
+ter captures the fidelity of each information source
+in an intuitive way. We further design a new ac-
+quisition function for iMFBO and prove that the
+queries selected by iMFBO have higher quality
+than those by naive MFBO methods, with the de-
+rived sub-linear regret bound. Experiments on both
+synthetic and real-world data demonstrate its supe-
+rior empirical performance.
+1 INTRODUCTION
+Bayesian Optimization (BO) [Frazier, 2018] has been a
+powerful tool to optimize black-box functions. The term
+‘black-box’ here indicates that we do not have access to the
+analytic form of either the objective function or its deriva-
+tives. We can only gain information about them by querying
+selected inputs to evaluate, where each evaluation can be
+time-consuming with prohibitive costs. Usually, BO first
+learns a probabilistic model, Gaussian Process (GP) [Ras-
+mussen, 2003] for example, from available evaluations as
+a surrogate of the black-box objective and then iteratively
+selects new input(s) to query guided by some acquisition
+function. The acquisition function is designed to be easier to
+optimize compared to the original objective and achieve the
+desired exploration and exploitation trade-off for efficient
+identification of global optimum.
+In Multi-fidelity Bayesian Optimization (MFBO) [Forrester
+et al., 2007], instead of directly evaluating expensive objec-
+tive functions, we can query their less resource-demanding
+approximation models. Most of the existing works on
+MFBO consider fixed fidelity for each approximation model
+and optimize the underlying function within the predefined
+budget of cost [Kandasamy et al., 2016]. However, the fi-
+delity of different approximation models may not be always
+fixed but is dependent on the input. This may arise in many
+adaptive reduced-order models and especially data-driven
+approximation models by recent machine learning (ML)
+methods. Typically, these approximation models tend to be
+more accurate in the ‘data-rich’ regions and less accurate in
+the other regions with less data.
+In this work, we focus on the cases where the multi-fidelity
+approximations have varying fidelity for different approxi-
+mation models and over the input space. We try to capture
+the varying fidelity by learning the input-dependent additive
+noise, usually ignored and considered as a hyper-parameter
+in many BO and MFBO methods.
+Our contribution in this work is three-fold:
+1. We adopted the heteroscedastic Gaussian Process to
+the Multi-Fidelity setup that the multi-fidelity approx-
+imations have varying fidelity over the input space
+as well as different input sources and proposed input-
+dependent MFBO (iMFBO) framework and extend it
+to cost-aware and bias-aware setups.
+Proceedings of the 40th Conference on Uncertainty in Artificial Intelligence (UAI 2024), PMLR 244:1271–1293.
+
+PAGE 2
+2. Based on the surrogate modeling, we proposed a new
+acquisition function Noise-Variant Upper Confidential
+Bound (NVUCB) and theoretically derived a sub-linear
+regret bound.
+3. We further empirically compare our iMFBO with ex-
+isting baselines on both synthetic and real-world exam-
+ples and demonstrate its superiority.
+2 BACKGROUND
+2.1 SINGLE FIDELITY BAYESIAN
+OPTIMIZATION
+For single fidelity BO (SFBO), we iteratively get noisy ob-
+servations y of the ground-truth objective function f : X →
+R by querying selected inputs x, where y = f (x) +δS, δ is
+noise scale, and S ∼ N(0, 1) is the standard normal white
+noise. BO iterates the surrogate model updating and select-
+ing query evaluation, aiming to find the global optimum of
+f (x) with the minimum number of queries.
+In iteration i, we query one input xi in the input space X ,
+and gradually build a dataset Dt = {(xi, yi)}i∈{1,2,...,t},
+denoting X = [ x1, x2, . . . , xt] and Y = [ y1, y2, . . . , yt].
+GPs are well studied probabilistic surrogate models and
+are commonly chosen in BO. Given Dt, we can derive the
+predictive posterior assuming the GP prior for the ground-
+truth objective values;
+[f (x1), f(x2), . . . , f(xt)] ∼ N(m, K), ∀xi ∈ X, (1)
+where m is the mean vector (usually chosen to be 0) and
+K is the covariance matrix with entries Ki,j = k(xi, xj),
+where k(·, ·) is a pre-defined kernel function. The prediction
+at x is then
+f (x)|Dt ∼ N(µt(x), σ2
+t (x)), (2)
+where µt(x) = K ′K −1
+t Y is the posterior mean,
+σ2
+t (x) = k(x, x) − K ′K −1
+t K ′T is the posterior vari-
+ance, Kt = K + δ2I is the covariance matrix of the
+observation with the observation noise δ, and K ′ =
+[k(x, x1), k(x, x2), . . . , k(x, xt)] [Rasmussen, 2003]. Al-
+though the observation noise δ is usually considered sta-
+tionary, there have also been works on GPs considering
+heteroscedastic noise setups [Goldberg et al., 1997, Kerst-
+ing et al., 2007, Liu et al., 2020], which inspired us to extend
+the input-dependent noise to the BO setup.
+There are many commonly used acquisition functions in BO,
+such as Expected Improvement (EI) [Jones et al., 1998] and
+Probability of Improvement (PI) [Kushner, 1964]. Another
+widely studied acquisition function is the Upper Confidence
+Bound (UCB):
+αt(x) = µt(x) + β
+1
+2
+t σt(x). (3)
+There are also many other complicated acquisition functions,
+especially the entropy-based ones including the Predictive
+Entropy Search (PES) [Hernández-Lobato et al., 2014] and
+Maximum-value Entropy Search (MES) [Wang and Jegelka,
+2017]. These usually do not have analytic forms and require
+approximation or sampling methods to compute.
+2.2 MULTI-FIDELITY BAYESIAN OPTIMIZATION
+For multi-fidelity BO (MFBO), the ground-truth objective
+function f is usually not able to be directly queried or evalu-
+ated without observation noise. Instead, we can query its dif-
+ferent black-box approximation models, namely f j : X →
+R at different cost cj, where j ∈ J= {1, 2, . . . , J} indexes
+the approximation functions to query. Such situations are
+ubiquitous in many real-world applications. Many complex
+systems in reality, such as the climate system, are difficult
+to evaluate at will. Alternative to directly measuring the
+actual status, we can query different surrogate models such
+as physics-based simulation models or data-driven ML sur-
+rogates.
+Unlike in classical BO, each iteration of MFBO necessitates
+the selection of both an input and an approximation model
+for querying. Let us denote the observed data DM F
+t =
+{(xi, yji
+i )}i∈{1,2,...,t}, where xi represents the ith queried
+input and yji
+i the corresponding evaluation result from the
+approximation model ji ∈ J. We refer DM F
+t as Dt in
+the following sections for simplicity. Note that we do not
+necessarily have results from all the approximation models
+for a given input.
+2.3 RELATED WORK
+The design of MFBO also considers two critical compo-
+nents as in BO: the surrogate modeling and the acquisition
+function derivation.
+Many different probabilistic models have been proposed as
+surrogates in MFBO, including independent GPs for differ-
+ent approximation models [Lam et al., 2015], Convolved
+Multi-Output Gaussian Process [Zhang et al., 2017], hi-
+erarchical (co-)kriging [Shu et al., 2021, Poloczek et al.,
+2017], recent Bayesian Neural Networks (BNNs) [Li
+et al., 2020, 2021], and the Semiparametric Latent Fac-
+tor Model (SLFM) [Teh et al., 2005], which is a Gaus-
+sian process-based multiple response model [Takeno et al.,
+2020a]. All the surrogate models previously mentioned for
+MFBO necessitate a pre-determined fixed fidelity. This can
+be achieved either by establishing correlations between ap-
+proximation models as hyper-parameters, as illustrated in
+the works of Lam et al. [2015], Zhang et al. [2017], and Teh
+et al. [2005], or by utilizing the low-fidelity approximation
+results as inputs to the high-fidelity surrogates. The latter
+approach is exemplified in the research by Shu et al. [2021],
+Li et al. [2020], and in the later publication [Li et al., 2021].
+Several MFBO acquisition functions have been derived from
+1272
+
+PAGE 3
+their classical counterparts in BO, each tailored to different
+models. While there are analytical acquisition functions,
+such as MF-GP-UCB [Kandasamy et al., 2016], the majority
+tend to be entropy-based. This trend stems from the inherent
+nature of MFBO, where the queried evaluations originate
+from multiple sources. For instance, the MF-MES [Takeno
+et al., 2020a, Li et al., 2020, 2021] is derived from the MES,
+and the MF-PES [Zhang et al., 2017] is adapted from the
+PES used in BO.
+There are also works considering different MFBO setups.
+For example, Song et al. [2019] proposed MF-MI-Greedy
+aiming at minimizing regret when querying high-fidelity
+evaluations is mandatory after spending a specified bud-
+get on lower-fidelity models. Kandasamy et al. [2017] con-
+sidered approximation models with fixed but continuous
+fidelity.
+Considering the observation has input-dependent noise and
+model it as heteroscedastic GP has previously been studied
+for SFBO Makarova et al. [2021], Tautvaišas and Žilinskas
+[2023], Griffiths et al. [2021], Kirschner and Krause [2018],
+sometimes termed as Risk-Averse BO, aiming at optimizing
+target function while restricting the risk. We extend the use
+of heteroscedastic GP as the surrogate model of MFBO and
+use the input-dependent noise to model the fidelity over
+different approximation models as well as the input space
+in this work.
+Similar BO setups that allow querying different informa-
+tion sources have been given different names such as
+MFBO [Kandasamy et al., 2016] or Multi-Information-
+Source BO [Poloczek et al., 2017]. We use MFBO for
+simplicity in this paper. To contextualize our contributions
+within the existing literature, we present the first-ever input-
+dependent MFBO (iMFBO) methodology that takes into
+account learnable input-dependent fidelity for queried evalu-
+ations facilitated by heteroscedastic learnable noise models.
+In this work, we are considering BO with different evalu-
+ation or information sources that have different "fidelity"
+compared to the ground truth, and the goal is to efficiently
+utilize the information from different sources to optimize
+the target function similar to the majority of MFBO work.
+While the term “MFBO” in the literature usually refers to
+BO problems with evaluation models with different costs
+and fixed fidelity, we want to note that this work considers a
+more flexible setup that is not restricted to fixed high-low
+fidelity but considers input-dependent fidelity to incorporate
+more complicated real-world scenarios.
+3 METHOD
+3.1 SURROGATE MODELING
+Here we first present the surrogate modeling for BO with
+evaluations from different information sources with approx-
+imation models that may have input-dependent noise. We
+then derive input-dependent BO methods with both single
+and multiple approximation models, which we respectively
+denote as iBO and iMFBO.
+Similar to existing BO methods, we model the objective
+function f to optimize by a GP. We would like to underscore
+that this study primarily focuses on scenarios where only
+evaluations from information sources with approximation
+models are accessible. In these cases, different evaluations
+from the corresponding approximation model may exhibit
+input-dependent fidelity. Consequently, the deviation from
+the underlying objective function f can vary in accordance
+with the input x. We aim to capture input-dependent fidelity
+of different evaluations for more efficient BO. Most of the
+existing BO methods ignore the evaluation noise and model
+evaluations by GPs with independent additive Gaussian
+noise of the fixed variance δ2. Here, we explicitly model the
+input-dependent fidelity by additive Gaussian noise with an
+input-dependent variance as a random variable δ2(x).
+The predictive posterior p(f (x)|Dt) with GP can be derived
+by marginalizing out the noise variable δ:
+p(f (x)|Dt) =
+Z
+δ
+p(f (x)|δ, Dt)p(δ|Dt)dδ. (4)
+In this setting, the GP surrogate modeling of any input-
+dependent approximation model of the ground-truth objec-
+tive function is f j(x) = f (x) + δ2
+j (x)S, where j ∈ J
+is the index of information sources, and δj(x) is now an
+input-dependent random variable and δ = [δ1, . . . , δJ ] and
+S ∼ N(0, 1).
+As stated before, to infer the posterior distribution of f,
+f (x)|δ,Dt, we need to define the prior on the queried noisy
+evaluation(s), for which the covariance takes the following
+form:
+cov[f j(x), fj′
+(x′)] = k(x, x′)+I(j, j′)I(x, x′)δ2
+j (x), (5)
+where I(a, a′) is the indicator function, and I(a, a′) = 1
+when a = a′ and 0 otherwise.
+At each iteration t, our prediction for the ground-truth ob-
+jective f (x) on input x can be written as:
+ft(x)|δ := f (x)|δ,Dt ∼ N(µt(x), σ2
+t (x)), (6)
+where the posterior mean is µt(x) = K ′ ˆK −1
+t Yt, and
+Yt = [ yj1
+1 , yj2
+2 , . . . , yjt
+t ] denotes the previous evaluation
+results. The updated posterior variance becomes σ2
+t (x) =
+k(x, x) − K ′ ˆK −1
+t K ′T , and the covariance matrix of the
+observations becomes ˆKt = K + Λ(δ2
+j1 (x1), . . . , δ2
+jt (xt)),
+where Λ(δ2
+j1 (x1), . . . , δ2
+jt (xt)) denotes a diagonal matrix
+with diagonal entries being δ2
+j1 (x1), . . . , δ2
+jt (xt).
+Here we have the form of p(f (x)|δ, Dt). The other impor-
+tant component of the posterior (4) is p(δ|Dt). Naturally,
+we believe that the input-dependent fidelity should have
+1273
+
+PAGE 4
+a certain level of continuity and, in turn, can be modeled
+either parametrically or non-parametrically. An example
+illustrating the performance of these surrogate modeling can
+be found in Appendix B
+3.1.1 Parametric Noise Model
+One way to capture the input-dependent noise variance δ(x)
+is by learnable parametric models, such as linear models
+or MLPs, denoted by δθ(x). The posterior of the objective
+function is then transformed to:
+p(f (x)|Dt) =
+Z
+θ
+p(f (x)|θ, Dt)p(θ|Dt)dθ. (7)
+In this setup, we aim to learn the posterior distribution of
+the parameters and use the model structure to preserve the
+continuity of δ(x).
+Model parameter posterior p(θ|Dt): The posterior of
+the learnable parameters θ that model input-dependent fi-
+delity, p(θ|Dt), is another important component in (11). By
+Bayes’ rule,
+p(θ|Dt) ∝ p(θ)p(Dt|θ), (8)
+where p(θ) is the prior distribution of the model parameters
+and p(Dt|θ) is the likelihood. While the prior distribution is
+usually selected beforehand, the likelihood takes the form:
+p(Dt|θ) = (2π)− t
+2 | ˆKt|− 1
+2 exp(− 1
+2 Y T
+t ( ˆKt)−1Yt). (9)
+Sampling: Although we have the analytic forms of the
+prior and likelihood in our settings, Bayesian inverse to
+update the posterior of θ given queried evaluations usu-
+ally does not have an analytic closed-form solution because
+of the integral in (4). One of the strategies to deal with
+the unnormalized distribution in (4) is by No-U-Turn Sam-
+pler (NUTS) [Hoffman et al., 2014], a variant of Hamil-
+tonian Monte-Carlo (HMC) [Betancourt, 2017], which en-
+ables efficient sampling from unnormalized distributions.
+Given the samples Θ = {θ1, θ2, . . . , θM } of the posterior
+θ|Dt, the posterior distribution in (4) can be estimated by:
+p(f (x)|Dt) ≈ 1
+M
+X
+θm∈Θ
+p(f (x)|θm, Dt), (10)
+where m ∈ 1, 2, . . . , Mand M is the number of samples.
+3.1.2 Non-parametric Noise Model
+We also apply a non-parametric GP noise model, assum-
+ing that the available data, δ(xi), are jointly Gaussian dis-
+tributed, the posterior can be written as
+p(f (x)|Dt) =
+Z
+δt
+p(f (x)|δt, Dt)p(δt|Dt)dδt, (11)
+where p(δt|Dt) ∝ p(δt)p(Dt|δt), and δt denotes the ran-
+dom vector [δj1 (x1), . . . , δjt (xt)].
+In this non-parametric setting, we update the posterior dis-
+tribution of the input-dependent variance for each input
+sample, and the continuity is captured by the GP prior.
+GP-modeled σ(x) will face the same intractability problem
+as in the parametric setup. Furthermore, δ(x)|Dt, which
+plays an important role in suggesting new samples, is also
+intractable because of the non-Gaussian likelihoodp(Dt|δt).
+Sampling methods can be time-consuming in this case be-
+cause when having a batch of M samples ˆδ(x), computing
+δ(x)|ˆδt
+has the complexity of O(M t3) in each iteration.
+In practice, we propose to apply the Maximum a Poste-
+rior (MAP, Murphy [2012]) point estimate ¯δt by maximiz-
+ing the posterior p(Dt|¯δt)p(¯δt) and then use δ(x)|¯δt to ap-
+proximate δ(x)|Dt. The corresponding estimated posterior
+becomes
+p(f (x)|Dt) ≈ p(f (x)|¯δt, Dt), (12)
+and δ(x)|¯δt can be acquired by ordinary GP updates.
+Comparing the posterior distributions from our setting and
+traditional BO settings, the main difference of our updated
+posterior covariance matrix ˆKt from the covariance Kn
+in previous settings is that we have replaced the constant
+noise variance δ2 with an input-dependent noise δ2(x).
+By doing this, different approximation models are depen-
+dent by modeling the covariance k(x, x′), instead of be-
+ing mutually independent as in Kandasamy et al. [2017].
+We also capture the input-dependent fidelity by observing
+that the correlation of the evaluations from the approxima-
+tion model(s) and the ground-truth objective function is
+corr(f j(x), f(x)) = k(x,x)√
+k(x,x)
+√
+k(x,x)+δj (x)
+= 1r
+1+
+δj (x)
+k(x,x)
+,
+which is again dependent on input x.
+3.2 NOISE-V ARIANT UCB (NVUCB)
+With the previously described surrogate model updates, we
+now investigate the acquisition function for iBO. To achieve
+better sample efficiency, we first propose a new acquisi-
+tion function—Noise-Variant UCB (NVUCB)—for single
+fidelity BO when the observation noise δ(x) is dependent
+on x:
+αN V
+t (x) = µt(x) + β
+1
+2
+σt(x)p
+σ2
+t (x) + δ2(x)
+σt(x). (13)
+Recall that the original UCB for BO takes the form of (3),
+our proposed NVUCB is basically the UCB with the stan-
+dard deviation factored by γt(x) = σt(x)√
+σ2
+t (x)+δ2(x)
+.
+Our NVUCB acquisition function can easily be extended
+to multi-fidelity BO by considering multiple approximation
+1274
+
+PAGE 5
+models, named as Multi-Fidelity NVUCB (MFNVUCB):
+αM F N V
+t (x, j) = µt(x) + β
+1
+2 σt(x)√
+σ2
+t (x)+δ2
+j (x) σt(x). (14)
+This proposed iMFBO follows the usual BO framework
+with our input-dependent surrogate model and MFNVUCB
+acquisition function, which is summarized in Algorithm 1
+in Appendix A.
+To explain the reason for the factorization of the deviation
+in (13), we go back to the idea of the original UCB (3).
+The first term µ(x) is designed for exploiting the surrogate
+estimation of potential optimal solutions and the second
+term encourages exploration into unknown regions in the
+design space.
+While it is natural to consider the inferred variance σ2(x)
+as quantified model uncertainty to guide exploration, we
+can also be more explicit to directly consider the potential
+reduction of the variance after querying x with noiseless
+observations.
+Consider a potential candidate x, in input-dependent fi-
+delity settings with N (0, δ2(x)) observation noise, our
+surrogate of the ground-truth objective function at it-
+eration t is ft(x) ∼ N(µ(x), σ2(x)), and the poten-
+tial observation f a(x) ∼ N(ft(x), δ2(x)). The pos-
+terior when the observation is y is then ft|y ∼
+N ( δ2(x)µ(x)+σ2(x)y
+δ2(x)+σ2(x) , δ2(x)
+σ2(x)+δ2(x) σ2(x)). The variance re-
+duction is Var(ft) − Var(ft|y) = γ2(x)σ2(x), which is
+exactly reflected in our factored variance term in NVUCB
+and MFNVUCB. In a noiseless setup, i.e. δ(x) = 0 ,
+γ(x) = σ(x)√
+σ2(x)+0
+= 1 so NVUCB would become orig-
+inal UCB. Compared to the penalty terms applied in Grif-
+fiths et al. [2021], Makarova et al. [2021], ours has similar
+penalty power for noisier points, but ours is derived from
+the information gain formulation and leads to our theoretical
+results. An illustration of different acquisition functions can
+be found in Appendix C.
+Though the discussion in this section is under the unbiased
+evaluations assumption and equal-cost setup, we want to
+note that this iMFBO is capable of being extended to a
+bias-aware and cost-aware version and we discuss such
+extensions in Appendix G and F, respectively.
+4 THEORETICAL RESULTS
+As another way to illustrate the importance of the factor
+γ(x), we show that it also shows up in the information gain
+of the ground-truth after observing noisy evaluations.
+Proposition 4.1. Given a set of input samples
+[x1, x2, . . . , xn], the information gain of the ground-
+truth function f (x) after querying approximation model
+f a, with observation noise variance δ2(x), getting
+F a
+n = [f a(x1), fa(x2), . . . , fa(xn)] is
+I(f ; F a
+n ) = − 1
+2
+nX
+i=1
+log(1 − γ2
+i (xi)), (15)
+where γi(xi) = σt(xi)√
+σ2
+i (xi)+δ2(xi), σ2
+i (xi) is
+the predictive variance after observing F a
+i =
+[f a(x1), fa(x2), . . . , fa(xi)].
+With the fact that − 1
+2 log(1 − γ2) is monotonically increas-
+ing with respect to γ, iBO guided by NVUCB, which en-
+courages querying samples with larger γt values at iteration
+t, is more likely resulting in more informative queries when
+exploring the input space. Formally, we have the following
+main theorem:
+Assumption 4.2. The ground-truth target functionf is sam-
+pled from a Gaussian Process with a kernel k(x, x′).
+Theorem 4.3. If the latent ground-truth f satisfies Assump-
+tion 4.2, denote xv as the selected candidate by the proposed
+NVUCB acquisition function (13), xu as the selected candi-
+date by the original UCB (3). At least one of the following
+statements holds true:
+• S1: The information gain of ground-truthf after query-
+ing approximation model f a, with observation noise
+variance δ2(x) at xv can be lower bounded by that at
+xu, I(f ; f a(xv)) ≥ I(f ; f a(xu));
+• S2: The predictive mean of the selected sample
+µ(xv) > µ(xu).
+Compared to the original UCB acquisition function, the
+NVUCB acquisition function would either get more infor-
+mative queries (S1), tend to exploit the current model (S2),
+or achieve both in SFBO setup.
+A sublinear regret bound can also be derived for
+MFNVUCB-guided iMFBO in the Multi-Fidelity setup
+to be O(
+p
+βT I max
+T T ) under mild assumptions, follow-
+ing Srinivas et al. [2009]. Formally, we prove the following
+theorem.
+Assumption 4.4. The target function f defined on D ⊂
+[0, r]d is compact and convex, d ∈ N, r >0.
+Assumption 4.5. The kernel k(x, x′) defined in Assump-
+tion 4.2 satisfies the following high probability bound on
+the derivatives of GP sample paths f: There exist constants
+a, b >0,
+P r{sup
+x∈D
+|∂f /∂xk| > L} ≤ae−(L/b)2
+, k= 1, . . . , d.
+Assumption 4.6. The observation noise δj(x) for any in-
+formation source j satisfies δmin ≤ δj(x) ≤ δmax.
+1275
+
+PAGE 6
+(a) Approximation models
+ (b) 100 samples
+ (c) Predictive mean
+Figure 1: (a) The approximation model and the ground truth, though the approximation model is deterministic, we here show
+that the model prediction can also benefit from considering the bias as input-dependent noise. (b) Randomly drawn 100
+samples, 50 from each of the approximation model. (c) The predictive mean of the surrogate models. the curve labeled with
+"GP with learnt noise" is the proposed GP with learnable noise, while "GP(1)" and "GP(2)" are GPs fitting approximation
+model f 1 and f 2 respectively. We also plotted the average value of "GP(1)" and "GP(2)" as "GP(average)".
+Theorem 4.7. For a constant ϵ ∈ (0, 1), and βt =
+2 log(t2π2/(3ϵ)) + 2 d log(t2dbr
+p
+log (4da/ϵ)), perform-
+ing MFNVUCB for a target f satisfying Assump-
+tions 4.2 4.4 4.5 with observation noise satisfying Assump-
+tion 4.6, we have
+P r{RT ≤ (
+p
+Cδmin +1)
+q
+2δ2maxβT I max
+T T + π2
+6 } ≥1−ϵ,
+(16)
+where RT = PT
+t=1[f (x∗) − f (xt)], I max
+T is the maximum
+information gain at iteration T , and the constant Cδmin > 1
+is related to δmin.
+The proofs for Proposition 4.1, Theorem 4.3 and Theo-
+rem 4.7 can be found in Appendix H.
+We note that the learnt input-dependent noise δ(x) is con-
+sidered as random variables and the acquisition functions
+used in the experiments are computed by taking expectation
+over the distribution of corresponding noise δ(x).
+5 NUMERICAL RESULTS
+We here first show that our surrogate modeling and acqui-
+sition function can capture input-dependent fidelity and ap-
+proximate the ground-truth more efficiently using a toy ex-
+ample. We then illustrate the performance of our proposed
+iMFBO methods with both the toy example and well-known
+benchmarking optimization targets. The performance of
+iBO is discussed in Appendeix D. Finally, we implement
+NVUCB to a real-world materials discovery dataset [Zhuo
+et al., 2018], for which we aim to maximize the band-gap
+of nonmetal materials.
+5.1 SURROGATE MODEL PERFORMANCE
+We illustrate the effectiveness of capturing input-dependent
+fidelity by our surrogate modeling strategy with a toy ex-
+ample in Figure 1, where the ground truth is f (x) =
+−(x2 − 1) cos(3πx), x ∈ [−1, 1], which has two local
+maximums (left and right) and one global maximum (cen-
+ter). Two different deterministic approximation models
+are considered as f 1(x) = f (x) + 0.5(x + 1) sin(32πx),
+f 2(x) = f (x) − 0.5(x − 1) sin(32πx) that has an observa-
+tion error compared to the target. We show the predictive
+mean of our proposed heteroscedastic noise GP (GP with
+inferred noise) and regular GP with constant observation
+noise (GP(1) and GP(2)). It can be observed that though
+“GP(1)” and “GP(2)” are able to correctly identify three
+peaks, they fail to identify the global maximum while our
+model can as shown in Figure 1c.
+5.2 ACQUISITION FUNCTION ILLUSTRATION
+The performance of our acquisition function is first tested
+with a toy example, where the ground truth is a sin wave
+over one period, f (x) = sin(2πx), x∈ [0, 1]. We consider
+two approximation models with the corresponding linear
+additive noise: f j(x) = f (x) + (ajx + bj)S, where a1 =
+0.5, b1 = 0 , a2 = −0.5, b2 = 0 .5, and S denotes the
+standard normal distributed noise, i.e. f 1 is with higher
+fidelity when x is small while f 2 is more precise when x is
+large.
+Compared with the MFBO proposed in Kandasamy et al.
+[2016], which directly applies UCB on the approximation
+models, we refer the acquisition function focusing only on
+the approximation models here as Noise UCB (NUCB):
+NUCB: αN
+t (x) = µt(x) + β
+1
+2
+q
+σ2
+t (x) + δ2(x). (17)
+The acquisition function values with 20 randomly sampled
+data trained with the parametric linear noise model are
+illustrated in Figure 2. We compare the performance of
+NVUCB (2a) and NUCB (2b). We also fit “Separated GPs”
+for the two approximation models and compute the UCB
+acquisition function values for each of them as illustrated in
+1276
+
+PAGE 7
+(a) NVUCB
+ (b) NUCB
+ (c) Separated GP
+Figure 2: The corresponding acquisition functions are illustrated as dashed lines based on the learned surrogate models of
+the ground-truth for (a) NVUCB, (b) NUCB, and (c) Separated GP, respectively. The shaded region is 1-σ confidence region.
+The number in parentheses indexes the corresponding approximation model, e.g. NVUCB(1) in (a) is by (14) with j = 1.
+The solid red line illustrates the latent ground truth f (x).
+(a) MFBO: sin wave
+ (b) MFBO: toy
+ (c) Queried samples
+Figure 3: (a)(b) Identified maximal ground-truth values by iMFBO over 10 independent runs with random initialization.
+The y-axis illustrates the log-regret log(1 − y∗), where y∗ is the largest value queried and 1 is the optimum for both target
+functions, and the shaded area represents 1-σ confidence. (c) The queried evaluations by iMFBO with different acquisition
+functions: the queried evaluations from f 1 are plotted in red and those from f 2 are blue.
+Figure 2b. The cost of evaluating either of the two approxi-
+mation models is set to 1 equally.
+As the approximation model f 1 has higher fidelity when x
+is small and f 2 is more accurate when x is large, intuitively
+one tends to query the evaluation from the approximation
+model with higher fidelity. Our NVUCB acquisition, as in
+Figure 2a, conforms to this intuition by showing NVUCB(1)
+is larger when x is closer to 0 and smaller when x is closer
+to 1 compared to NVUCB(2). However, NUCB has the
+opposite trend and does not make use of the learnt fidelity
+information as in Figure 2b. Separated GPs in Figure 2c, as
+expected, do not properly handle the input-dependent noise
+and result in overestimating the model uncertainty.
+We then test iMFBO with the two approximation mod-
+els, with the cost of querying either of the models set
+to 1. We compare iMFBO with NVUCB (MFNVUCB),
+NUCB (MFNUCB), separated GPs (SepGP), and MF-
+MES [Takeno et al., 2020b]. SepGP indicates maintaining a
+Gaussian Process for each information source and perform-
+ing BO over them. We also compare a two-step method,
+referred as UCBTS, in which we learn input-dependent sur-
+rogates and then choose the input by UCB and query the
+approximation model for the corresponding evaluation with
+the lowest noise.
+Figure 3a illustrates the performance assessment results of
+these different iMFBO methods. It is clear that our MFN-
+VUCB achieves the best MFBO performance and is more
+stable than the others. Although UCBTS shows better per-
+formance in the first few iterations, it fails to identify the
+global optimum with the increasing number of iterations.
+We have also tested the performances of the MFBO methods
+with the toy example in Section 5.1, which is more compli-
+cated than sin wave as illustrated in Figure 3b. We believe
+that our proposed surrogate model and acquisition function
+can better approximate the underlying function in this case
+and query better samples.
+Figure 3c plots the queried evaluations from the correspond-
+ing approximation models. We can see that during iMFBO
+iterations, our input-dependent fidelity GPs can capture the
+observation noise of the two approximation models while
+SepGP does not show a clear preference on which approxi-
+mation model to query. MFNVUCB tends to query f 1 near
+the global optimum 0.25, which has higher fidelity and is
+more informative. In contrast, MFNUCB does the oppo-
+1277
+
+PAGE 8
+Table 1: Minimal ground-truth values among queried sam-
+ples averaged over 10 independent runs.
+Hartmann 6D Branin Levy
+NVUCB -1.92 ±0.48 1.26±1.32 2.009 ±2.28
+NUCB -1.76 ±0.41 7.02 ±4.52 6.87 ±7.49
+SepGP -1.79 ±0.33 3.73 ±4.18 2.03 ±1.36
+MF-GP-UCB -1.80±0.18 2.66 ±1.50 2.006 ±2.33
+MF-MES –1.87 ±0.26 2.19 ±1.27 0.98±0.80
+Figure 4: Maximal band-gap (eV) for queried compositions
+by different MFBO methods.
+site, validating that our proposed surrogate modeling and
+NVUCB can help capture input-dependent fidelity and ef-
+ficiently guide the selection of inputs and approximation
+models to query.
+5.3 BENCHMARK OPTIMIZATION FUNCTIONS
+In Table 1, we present the performance of our iMFBO
+along with MF-GP-UCB [Kandasamy et al., 2016] and MF-
+MES [Takeno et al., 2020b] on minimizing three benchmark
+objective functions: Hartmann 6D, Branin, and Levy as
+mean and standard deviation over 10 independent runs. In
+all three cases, we set two approximation models with linear
+additive noise, with the cost of querying either approxima-
+tion model again set to 1. The detailed experimental settings
+can be found in Appendix I. We initialize the experiment
+with two randomly queried samples from each of the ap-
+proximation models, i.e. four samples in total, and run the
+experiment for 50 iterations. For Hartmann and Branin func-
+tions, our iMFBO with the proposed surrogate modeling
+and NVUCB acquisition function performs the best while
+NUCB performs the worst, demonstrating that our surrogate
+model can capture the input-dependent fidelity and NVUCB
+utilizes it efficiently. Our iMFBO with NVUCB also per-
+forms comparably well to MF-GP-UCB when optimizing
+the Levy benchmark function.
+5.4 MATERIALS DISCOVERY PROBLEM
+We now test our iMFBO on a real-world materials dataset,
+for which we must find the material with the largest band-
+gap.
+5.4.1 Data Collection
+We consider the experimental dataset used and reported
+by Zhuo et al. [2018] as the ground truthf. This data set con-
+sists of 3,896 experimentally-characterized band-gap mea-
+surements from 2,458 unique inorganic compounds. These
+experimental band-gaps were obtained using a number of
+experimental techniques, including diffuse reflectance, re-
+sistivity measurements, surface photovoltage, photoconduc-
+tion, and UV–vis measurements.
+Density Functional Theory (DFT) calculations are often
+used to predict a variety of material properties, including
+the band-gap [Jain et al., 2013]. These predictions can vary
+based on the structural and other configurations of the ma-
+terial. We take the band-gap characterized by the smallest
+energy per atom as reported in the open-access Material
+Project (MP) dataset [Jain et al., 2013], which is considered
+a suitable approximation [Ward et al., 2018] based on the
+principle that the compound with the lowest energy per atom
+corresponds to the predicted ground state for that particular
+chemical system. By querying the MP with the composi-
+tions present in the ground-truth dataset, we successfully
+identified DFT band-gap calculations for 1,439 out of the
+2,458 compositions. DFT band-gap values were not avail-
+able in the MP for the remaining 1,019 compositions, which
+we use to train another data-driven surrogate based on the
+experimental measurements.
+5.4.2 Preprocessing
+In dealing with duplicated compositions from the dataset
+provided by Zhuo et al. [2018], we opted to retain only the
+first reported entry, due to the absence of corresponding
+experimental conditions and energy per atom values within
+the dataset.
+We consider querying three approximation models: (1) the
+DFT-calculated band-gap f1 in MP, (2) the band-gap pre-
+dicted by a pre-trained MLP f2, and (3) the band-gap pre-
+dicted by a pre-trained linear model f3. The MLP and linear
+models are trained based on the 1,019 compositions with-
+out DFT band-gap values recorded in MP. The objective of
+iMFBO is to identify the material with the largest band-gap
+among the other 1,439 compositions. The experiments are
+initiated with one random sample from each approximation
+model. We evaluate performance over 20 independent runs
+with a budget (B) of 30, as illustrated in Figure 4. It is impor-
+tant to note that all queries in this experiment can only yield
+approximations (either from DFT or MLP evaluations), and
+performance is assessed based on the experimental band-
+gaps reported in Zhuo et al. [2018]. The details about the
+pre-trained MLP are provided in Appendix J. We use the in-
+put of the MLP’s final prediction layer as a feature extractor,
+distilling the original features down to two. All MFBO meth-
+ods are performed in this extracted 2-dimensional space.
+1278
+
+PAGE 9
+As shown in Figure 4, our MFNVUCB outperforms other
+models as anticipated. Interestingly, our UCBTS consis-
+tently surpasses SepGP, and we observe that MFNUCB
+yields superior final performance to SepGP within the
+budget. We also reported the performance of the random
+selection policy (RS) demonstrating the effectiveness of
+the BO methods. This outcome likely stems from our
+input-dependent fidelity surrogate modeling, which utilizes
+queried evaluations more efficiently in conjunction with the
+corresponding acquisition functions.
+6 CONCLUSION
+In this study, we have introduced iMFBO, an innovative
+Multi-Fidelity Bayesian Optimization method. This ap-
+proach models the input-dependent fidelity of each approx-
+imation model, formulates a novel acquisition function,
+NVUCB, and is capable of being extended to cost-aware
+and bias-aware setups. Our framework integrates the learned
+input-dependent fidelity to more effectively guide the adap-
+tive query evaluation of corresponding approximation mod-
+els in each iteration. Our method is particularly suited to
+many scientific problems, such as materials discovery, where
+multiple information sources are available, each providing
+insights into the ground truth at varying levels of fidelity. We
+evaluated our proposed iMFBO on both synthetic and real-
+world datasets, demonstrating its proficiency in capturing
+the input-dependent fidelity of multiple approximation mod-
+els and its efficiency in optimizing the underlying ground-
+truth objective function based on approximation evaluations.
+Therefore, this work underscores the potential of iMFBO
+in effectively addressing multi-fidelity optimization prob-
+lems, particularly in complex scientific fields where diverse
+sources of information must be synthesized.
+ACKNOWLEDGEMENTS
+This work was supported in part by the U.S. National Sci-
+ence Foundation (NSF) grants CCF-1553281, DMREF-
+2119103, SHF-2215573, and IIS-2212419; and by the U.S.
+Department of Engergy (DOE) Office of Science, Advanced
+Scientific Computing Research (ASCR) M2DT Mathemat-
+ical Multifaceted Integrated Capability Center (MMICC)
+under Award B&R# KJ0401010/FWP# CC130, program
+manager W. Spotz. Portions of this research were conducted
+with the advanced computing resources provided by Texas
+A&M High Performance Research Computing.
+References
+Michael Betancourt. A conceptual introduction to Hamil-
+tonian Monte Carlo. arXiv preprint arXiv:1701.02434,
+2017.
+Alexander IJ Forrester, András Sóbester, and Andy J Keane.
+Multi-fidelity optimization via surrogate modelling. Pro-
+ceedings of the royal society a: mathematical, physical
+and engineering sciences, 463(2088):3251–3269, 2007.
+Peter I Frazier. A tutorial on Bayesian optimization. arXiv
+preprint arXiv:1807.02811, 2018.
+Paul Goldberg, Christopher Williams, and Christopher
+Bishop. Regression with input-dependent noise: A Gaus-
+sian process treatment. Advances in neural information
+processing systems, 10, 1997.
+Ryan-Rhys Griffiths, Alexander A Aldrick, Miguel Garcia-
+Ortegon, Vidhi Lalchand, et al. Achieving robustness to
+aleatoric uncertainty with heteroscedastic bayesian opti-
+misation. Machine Learning: Science and Technology, 3
+(1):015004, 2021.
+José Miguel Hernández-Lobato, Matthew W Hoffman, and
+Zoubin Ghahramani. Predictive entropy search for effi-
+cient global optimization of black-box functions. Ad-
+vances in neural information processing systems , 27,
+2014.
+Matthew D Hoffman, Andrew Gelman, et al. The No-U-
+Turn sampler: adaptively setting path lengths in Hamil-
+tonian Monte Carlo. J. Mach. Learn. Res., 15(1):1593–
+1623, 2014.
+Anubhav Jain, Shyue Ping Ong, Geoffroy Hautier, Wei
+Chen, William Davidson Richards, Stephen Dacek,
+Shreyas Cholia, Dan Gunter, David Skinner, Gerbrand
+Ceder, et al. Commentary: The materials project: A ma-
+terials genome approach to accelerating materials innova-
+tion. APL materials, 1(1):011002, 2013.
+Donald R Jones, Matthias Schonlau, and William J Welch.
+Efficient global optimization of expensive black-box func-
+tions. Journal of Global optimization , 13(4):455–492,
+1998.
+Kirthevasan Kandasamy, Gautam Dasarathy, Junier B
+Oliva, Jeff Schneider, and Barnabas Poczos. Gaus-
+sian process bandit optimisation with multi-fidelity
+evaluations. In D. Lee, M. Sugiyama, U. Luxburg,
+I. Guyon, and R. Garnett, editors, Advances in Neural
+Information Processing Systems, volume 29. Curran As-
+sociates, Inc., 2016. URL https://proceedings.
+neurips.cc/paper/2016/file/
+605ff764c617d3cd28dbbdd72be8f9a2-Paper.
+pdf.
+1279
+
+PAGE 10
+Kirthevasan Kandasamy, Gautam Dasarathy, Jeff Schnei-
+der, and Barnabás Póczos. Multi-fidelity Bayesian op-
+timisation with continuous approximations. In Doina
+Precup and Yee Whye Teh, editors, Proceedings of
+the 34th International Conference on Machine Learn-
+ing, volume 70 of Proceedings of Machine Learning
+Research, pages 1799–1808. PMLR, 06–11 Aug 2017.
+URL https://proceedings.mlr.press/v70/
+kandasamy17a.html.
+Kristian Kersting, Christian Plagemann, Patrick Pfaff, and
+Wolfram Burgard. Most likely heteroscedastic Gaussian
+process regression. In Proceedings of the 24th interna-
+tional conference on Machine learning, pages 393–400,
+2007.
+Johannes Kirschner and Andreas Krause. Information di-
+rected sampling and bandits with heteroscedastic noise. In
+Conference On Learning Theory, pages 358–384. PMLR,
+2018.
+Harold J Kushner. A new method of locating the maximum
+point of an arbitrary multipeak curve in the presence of
+noise. 1964.
+Rémi Lam, Douglas L Allaire, and Karen E Willcox. Mul-
+tifidelity optimization using statistical surrogate model-
+ing for non-hierarchical information sources. In 56th
+AIAA/ASCE/AHS/ASC Structures, Structural Dynamics,
+and Materials Conference, page 0143, 2015.
+Shibo Li, Wei Xing, Robert Kirby, and Shandian Zhe. Multi-
+fidelity Bayesian optimization via deep neural networks.
+Advances in Neural Information Processing Systems, 33:
+8521–8531, 2020.
+Shibo Li, Robert Kirby, and Shandian Zhe. Batch
+multi-fidelity Bayesian optimization with deep auto-
+regressive networks. In M. Ranzato, A. Beygelzimer,
+Y . Dauphin, P.S. Liang, and J. Wortman Vaughan,
+editors, Advances in Neural Information Processing
+Systems, volume 34, pages 25463–25475. Curran As-
+sociates, Inc., 2021. URL https://proceedings.
+neurips.cc/paper/2021/file/
+d5e2c0adad503c91f91df240d0cd4e49-Paper.
+pdf.
+Haitao Liu, Yew-Soon Ong, and Jianfei Cai. Large-scale
+heteroscedastic regression via Gaussian process. IEEE
+transactions on neural networks and learning systems, 32
+(2):708–721, 2020.
+Anastasia Makarova, Ilnura Usmanova, Ilija Bogunovic, and
+Andreas Krause. Risk-averse heteroscedastic bayesian
+optimization. Advances in Neural Information Processing
+Systems, 34:17235–17245, 2021.
+Kevin P Murphy. Machine learning: a probabilistic per-
+spective. MIT press, 2012.
+Matthias Poloczek, Jialei Wang, and Peter Frazier. Multi-
+information source optimization. Advances in neural
+information processing systems, 30, 2017.
+Carl Edward Rasmussen. Gaussian processes in machine
+learning. In Summer school on machine learning, pages
+63–71. Springer, 2003.
+Matthias Seeger. Gaussian processes for machine learning.
+International journal of neural systems, 14(02):69–106,
+2004.
+Leshi Shu, Ping Jiang, and Yan Wang. A multi-fidelity
+Bayesian optimization approach based on the expected
+further improvement. Structural and Multidisciplinary
+Optimization, 63(4):1709–1719, 2021.
+Jialin Song, Yuxin Chen, and Yisong Yue. A general frame-
+work for multi-fidelity Bayesian optimization with Gaus-
+sian processes. In The 22nd International Conference
+on Artificial Intelligence and Statistics, pages 3158–3167.
+PMLR, 2019.
+Niranjan Srinivas, Andreas Krause, Sham M Kakade, and
+Matthias Seeger. Gaussian process optimization in the
+bandit setting: No regret and experimental design. arXiv
+preprint arXiv:0912.3995, 2009.
+Shion Takeno, Hitoshi Fukuoka, Yuhki Tsukada, Toshiyuki
+Koyama, Motoki Shiga, Ichiro Takeuchi, and Masayuki
+Karasuyama. Multi-fidelity Bayesian optimization
+with max-value entropy search and its parallelization.
+In Hal Daumé III and Aarti Singh, editors, Proceed-
+ings of the 37th International Conference on Ma-
+chine Learning , volume 119 of Proceedings of Ma-
+chine Learning Research, pages 9334–9345. PMLR, 13–
+18 Jul 2020a. URL https://proceedings.mlr.
+press/v119/takeno20a.html.
+Shion Takeno, Hitoshi Fukuoka, Yuhki Tsukada, Toshiyuki
+Koyama, Motoki Shiga, Ichiro Takeuchi, and Masayuki
+Karasuyama. Multi-fidelity Bayesian optimization with
+max-value entropy search and its parallelization. In Inter-
+national Conference on Machine Learning, pages 9334–
+9345. PMLR, 2020b.
+Saulius Tautvaišas and Julius Žilinskas. Heteroscedastic
+bayesian optimization using generalized product of ex-
+perts. Journal of Global Optimization, pages 1–21, 2023.
+Yee Whye Teh, Matthias Seeger, and Michael I Jordan.
+Semiparametric latent factor models. In International
+Workshop on Artificial Intelligence and Statistics, pages
+333–340. PMLR, 2005.
+Zi Wang and Stefanie Jegelka. Max-value entropy search
+for efficient Bayesian optimization. In International Con-
+ference on Machine Learning, pages 3627–3635. PMLR,
+2017.
+1280
+
+PAGE 11
+Logan Ward, Alexander Dunn, Alireza Faghaninia, Nils ER
+Zimmermann, Saurabh Bajaj, Qi Wang, Joseph Montoya,
+Jiming Chen, Kyle Bystrom, Maxwell Dylla, et al. Mat-
+miner: An open source toolkit for materials data mining.
+Computational Materials Science, 152:60–69, 2018.
+Yehong Zhang, Trong Nghia Hoang, Bryan Kian Hsiang
+Low, and Mohan Kankanhalli. Information-based multi-
+fidelity Bayesian optimization. In NIPS Workshop on
+Bayesian Optimization, 2017.
+Ya Zhuo, Aria Mansouri Tehrani, and Jakoah Brgoch. Pre-
+dicting the band gaps of inorganic solids by machine
+learning. The journal of physical chemistry letters, 9(7):
+1668–1673, 2018.
+1281
+
+PAGE 12
+Appendix
+(Supplementary Material)
+Mingzhou Fan1 Byung-Jun Yoon1,2 Edward Dougherty1 Nathan Urban2
+Francis Alexander3 Raymundo Arróyave4,5 Xiaoning Qian1,2,6
+1Department of Electrical & Computer Engineering, Texas A&M University, College Station, Texas, USA,
+2Computational Science Initiative, Brookhaven National Laboratory, Upton, New York, USA,
+3Argonne National Laboratory, Lemont, Illinois, USA,
+4Department of Materials Science & Engineering, Texas A&M University, College Station, Texas, USA
+5Department of Mechanical Engineering, Texas A&M University, College Station, Texas, USA
+6Department of Computer Science & Engineering, Texas A&M University, College Station, Texas, USA
+A IMFBO ALGORITHM
+We present our proposed iMFBO pseudo-code as follows:
+Algorithm 1 iMFBO
+Initialize Initial dataset Dt = D0, budget B, time step t = 1;
+repeat
+Fit the surrogate model of the latent ground truth and input-dependent fidelity to the current dataset Dt;
+Find (xt, jt) pair that maximize the equation (14);
+Query the j-th approximation model on sample xt;
+Update the dataset Dt+1 = Dt ∪ (xt, yjt
+t )
+Update budget B = B − 1;
+Update time step t = t + 1;
+until B ≤ 0
+B PERFORMANCE OF THE NOISE SURROGATE
+We illustrate the effectiveness of capturing input-dependent fidelity by our surrogate modeling strategy with a toy example,
+where the ground truth is a sin wave over one period, f (x) = sin(2 πx), x∈ [0, 1]. We consider two approximation
+surrogate models with the corresponding linear additive noise: f j(x) = f (x) + (ajx + bj)S, where a1 = 0.5, b1 = 0,
+a2 = −0.5, b2 = 0.5, and S is the standard normal distributed noise, i.e. f 1 is with higher fidelity when x is small while f 2
+is more precise when x is large.
+In parametric surrogate modeling (Sec. 3.1.1), we can take a linear noise model. The priors of the bias and weights are set to
+be standard normal distributions for both approximation models. The posterior of δ(x) trained with 20 and 500 random
+evaluation samples are illustrated in Figures 5a and 5b. In the non-parametric setting, as illustrated in Figure 5c, the prior of
+the noise model is set to be a Gaussian Process with zero mean and Radial Basis Function (RBF) covariance kernel [Seeger,
+2004].
+When acquiring more evaluations from approximation models, the uncertainty of the noise model reduces from Figure 5a to
+Figure 5b, indicating that our model can reliably capture the model uncertainty. When we have a large queried evaluation set,
+the learnt noise fits the ground truth well in Figure 5b. More importantly, even with a relatively limited number of queried
+approximation evaluations, the input-dependent noise trend can still be reliably learned as in Figure 5a. The trend of noise is
+also learnt reasonably well with the non-parametric surrogate modeling as shown in Figure 5c.
+1282
+
+PAGE 13
+(a) 20 samples with linear model
+ (b) 500 samples with linear model
+ (c) 500 samples with GP prior
+Figure 5: (a) The learnt noise with 20 random samples with the linear model. Each line is a sample generated by the
+updated parameter posterior. (b) The learnt linear noise model with 500 random samples. (c) The MAP estimation of the
+input-dependent noise over 500 random samples with the Gaussian Process prior. The number in parentheses indexes the
+approximation model, e.g., “Learnt noise(1)” in (a) is the learnt observation noise of the approximation model f 1.
+C AN EXAMPLE TO ILLUSTRATE THE EFFECTIVENESS OF NVUCB
+We here use an example to illustrate the effectiveness of our proposed acquisition function, NVUCB, in Figure 6. The
+controlling parameter β is set to 1 for all of the three acquisition functions: UCB, NUCB, and NVUCB. Consider we have
+three candidate samples at x1, x2, x3 to query. Comparing x2 and x3, with the same prediction mean 0 and prediction
+variance 12.5 by the approximation model, NUCB will face a tie. Both UCB and NVUCB break the tie by selecting more
+informative sample x3. However, x1, with predictive mean 0.5 and less observation noise variance 0.12, would have the
+same UCB value as the one at x2. NVUCB would select candidate x1 which not only has higher prediction mean but also is
+more informative with γ(x1) = 2√
+22+0.12 > 2.5√
+12.5 = γ(x3).
+Figure 6: An illustration of UCB, NUCB and NVUCB acquisition functions. The predictive mean is plotted in solid black,
+The red shaded region represents the 1 − σ confidence of the ground-truth model and the green shaded region represents the
+1 − σ confidence of the approximation model. NVUCB guides towards the best selection.
+D ACQUISITION FUNCTION PERFORMANCE ON SFBO
+We further test the performance of our proposed iBO using the corresponding single approximation model over 10
+independent runs, as illustrated in Figures 7a and 7b. In each run, we randomly select four samples in the design space of
+interval x ∈ [0, 1] for the initial dataset with two queried from f 1 and f 2 respectively. We compare iBO with NVUCB and
+NUCB to BO with UCB based on ordinary GP surrogates with constant observation noise. For an ablation study, we further
+1283
+
+PAGE 14
+test the performance of BO with UCB based on our input-dependent GP surrogates, referred to as iUCB.
+By comparing Figures 7a and 7b, we can observe that all methods perform better using f 1 evaluations than using f 2. This
+is because f 1 has higher fidelity in the relatively well-performing region (near the optimum x = 0.25) and can be more
+informative for BO to find the global maximum. The better performance of iUCB compared to UCB demonstrates that our
+input-dependent fidelity GP models the ground-truth objective better than constant noise GP. With only f 2 evaluations,
+iBO with NVUCB performs slightly worse than iUCB since NVUCB would encourage to query the inputs with smaller
+observation noise of f 2 evaluations, where the ground-truth objective values are smaller, hence hindering the maximization
+task.
+(a) With only f 1 queries
+ (b) With only f 2 queries
+Figure 7: Identified maximal ground-truth values by iBO with different surrogates and acquisition functions over 10
+independent runs with random initialization. The error bar represents the 1 − σ confidence interval.
+E EXTENDED EXPERIMENTAL RESULTS FOR THE MATERIALS DISCOVERY
+PROBLEM
+To better demonstrate our method, we extend the previous experiments in Section 5.4 by only considering querying the first
+two approximation models: (1) the DFT-calculated band-gap f1 in MP, and (2) the band-gap predicted by a pre-trained MLP
+f2. Similar to the previous experiment, the MLP alse is trained based on the 1,019 compositions without DFT band-gap
+values recorded in MP. The objective of iMFBO is to identify the material with the largest band-gap among the other
+1,439 compositions. The experiments are initiated with one random sample from each approximation model. We evaluate
+Figure 8: Maximal band-gap (eV) for queried compositions by different MFBO methods.
+1284
+
+PAGE 15
+performance over 20 independent runs with a budget (B) of 20, as illustrated in Figure 8.
+As shown in Figure 8, similar to the previous results, our MFNVUCB outperforms other models as anticipated. The
+performance of other methods also performs similarly as discussed before.
+F IMFBO CONSIDERING EV ALUATION COST
+To incorporate the fact that the information resources of different approximate evaluation models usually have different
+evaluation costs, we can further modify the acquisition function to
+αM F N V C
+t (x, j) = µt(x) + 1
+cj
+β
+1
+2
+σt(x)q
+σ2
+t (x) + δ2
+j (x)
+σt(x), (18)
+where ck is the cost to evaluate each of the approximation models. The reason that we put the cost on the standard deviation
+term is that our surrogates of the approximation models are only different on the input-dependent noise δ(x), which only
+appears in the variance reduction term in the acquisition function.
+We present our proposed iMFBO considering such costs as follows:
+Algorithm 2 iMFBO with cost
+Initialize Initial dataset Dt = D0, budget B, time step t = 1;
+repeat
+Fit the surrogate model of the latent ground-truth and input-dependent fidelity to the current dataset Dt;
+Find (xt, jt) pair that maximize the equation (18);
+Query the j-th approximation model on sample xt;
+Update the dataset Dt+1 = Dt ∪ (xt, yjt
+t )
+Update budget B = B − cjt;
+Update time step t = t + 1;
+until B ≤ 0
+To numerically test the performance of the iMFBO implementation considering evaluation cost, we test it with the benchmark
+in the materials discovery problem (Section 5.4).
+To reflect the reality that DFT computations are typically more resource-intensive than querying machine learning models,
+we set the cost for querying DFT computations and MLP to be 5 and 1, respectively.
+As shown in Figure 9, the performance trends of different competing models are similar as reported in Section 5.4 when the
+querying costs are taken into consideration, with our MFNVUCB-based iMFBO outperforming other models as anticipated.
+G IMFBO CONSIDERING EV ALUATION BIAS
+Though we consider unbiased evaluations in the main text, it is capable of extending the framework to multi-fidelity
+evaluations with bias. By considering the surrogate model for each evaluation model or information source fi(x) as the
+addition of the ground truth f (x) and a separate bias gi(x) modeled by a separate model, i.e. fi(x) = f (x) +gi(x) +δi(x)S.
+The posterior of the bias gi can also be inferred based on Bayes’ rule similar to the inference of δi in the main text.
+Here we use an illustrative experiment similar to the one in Section 5.2 to demonstrate the performance of iMFBO
+considering bias. The target function is set to be a sine wave f (x) = sin(2 πx), and the evaluation models as multiple
+information sources are biased such that f1(x) = f (x) + 0.5 + 0.5xS, f2(x) = f (x) − 0.5 + (−0.5x + 0.5)S. Similar to
+the previous experiments, we use a GP to estimate the ground truth, the input-dependent noise for each information source
+δi(x) is estimated by a linear model, and the bias is modeled as a constant in this case, and estimated by MAP.
+We illustrate the performance in Figure 10. It can be observed that our method (MFNVUCB) constantly outperforms other
+methods, indicating that our framework is capable to be extend to bias-aware versions.
+1285
+
+PAGE 16
+Figure 9: Maximal band-gap (eV) for queried compositions by different MFBO methods.
+Figure 10: Log regret for biased evaluations.
+H PROOFS
+Proposition H.1. Given a set of input samples [x1, x2, . . . , xn], the information gain of the ground-truth functionf (x) after
+querying approximation model f a, with observation noise variance δ2(x), getting F a
+n = [f a(x1), fa(x2), . . . , fa(xn)] is
+I(f ; F a
+n ) = − 1
+2
+nX
+i=1
+log(1 − γ2
+i (xi)), (19)
+Proof. By the definition of entropy, we can derive:
+I(f ; F a
+n ) = H(f ) − H(f |F a
+n ) = H(F a
+n ) − H(F a
+n |f ). (20)
+By the independent observation noise assumption,
+H(F a
+n |f ) = H(F a
+n |Fn), (21)
+where Fn = [f (x1), f(x2), . . . , f(xn)]; and the conditional entropy term H(F a
+n |Fn) = 1
+2
+Pn
+i=1 log(2πeδ(xi)), again by
+the independent noise assumption.
+1286
+
+PAGE 17
+The entropy term H(F a
+n ) can be recursively calculated as
+H(F a
+n ) =H(F a
+n−1) + H(f a(xn)|F a
+n−1)
+=H(F a
+n−1) + 1
+2 log[2πe(σ2
+n(xn) + δ2(xn))]
+= 1
+2
+nX
+i=1
+log[2πe(σ2
+i (xi) + δ2(xi))].
+Combining these two terms, we get the information gain with an analytic form as in (19).
+Lemma H.2. With the same setup as Theorem 4.3, the information gain can be lower bounded by
+I(f ; f a(xv)) ≥ I(f ; f a(xu)) +γ(xu)[σ(xv) − σ(xu)]
+[1 +γ(xu)]σ(xv) , (22)
+where γ(x) = σ(x)√
+σ2(x)+δ2(x)
+.
+Proof. By the assumptions that xv maximizes (13),
+µ(xv) + β1/2[γ(xv)σ(xv) − γ(xu)σ(xu)] ≥ µ(xu), (23)
+and xu maximizes (3),
+µ(xu) ≥ µ(xv) + β1/2σ(xv) − β1/2σ(xu). (24)
+Combining (23) and (24) gives us:
+γ(xv)σ(xv) − γ(xu)σ(xu) ≥ σ(xv) − σ(xu), (25)
+which can be rewritten as
+γ(xv) ≥ γ(xu) + σ(xv) − σ(xu)
+σ(xv) [1 − γ(xu)]. (26)
+With Proposition 4.1, for any x,
+I(f ; f a(x)) = H(f ) − H(f |f a(x)) = − 1
+2 log[1 − γ2(x)]. (27)
+By Jensen’s inequality and the fact that the function − 1
+2 log(1 − γ2) is convex with respect to γ,
+I(f ; f a(xu)) ≥ I(f ; f a(xv)) + G(xu, xv), (28)
+where G(xu, xv) = γ(xu)
+1−γ2(xu)
+σ(xv)−σ(xu)
+σ(xv) [1 − γ(xu)] = γ(xu)[σ(xv)−σ(xu)]
+[1+γ(xu)]σ(xv) .
+Lemma H.3. With the same setup as in Theorem 4.3, whenσ(xv) ≤ σ(xu), the information gain can also be lower bounded
+by:
+I(f ; f a(xv)) ≥ I(f ; f a(xu)) + γ(xu)[µ(xu) − µ(xv)]
+[1 − γ2(xu)]β
+1
+2 σ(xv)
+. (29)
+Proof. By the assumptions that xv maximizes (13),
+µ(xv) ≥µ(xu) + β1/2[γ(xu)σ(xu) − γ(xv)σ(xv)]
+=µ(xu) + β1/2[γ(xu)σ(xu) − γ(xu)σ(xv)]
++ β1/2[γ(xu)σ(xv) − γ(xv)σ(xv)]
+≥µ(xu) + β1/2[γ(xu)σ(xv) − γ(xv)σ(xv)]
+=µ(xu) + β1/2[γ(xu) − γ(xv)]σ(xv).
+(30)
+1287
+
+PAGE 18
+The last step can be derived by the assumption that σ(xv) ≤ σ(xu). Therefore we now have:
+γ(xv) ≥ γ(xu) + µ(xu) − µ(xv)
+β
+1
+2 σ(xv)
+. (31)
+Similar as Lemma H.2, by Jensen’s inequality,
+I(f ; f a(xv)) ≥ I(f ; f a(xu)) + γ(xu)
+1 − γ2(xu)
+µ(xu) − µ(xv)
+β
+1
+2 σ(xv)
+. (32)
+Theorem H.4. If the latent ground-truth f satisfies Assumption 4.2, denote xv as the selected candidate by the proposed
+NVUCB acquisition function (13), xu as the selected candidate by the original UCB (3). At least one of the following
+statements holds true:
+• S1: The information gain of ground-truth f after querying approximation model f a, with observation noise variance
+δ2(x) at xv can be lower bounded by that at xu, I(f ; f a(xv)) ≥ I(f ; f a(xu));
+• S2: The predictive mean of the selected sample µ(xv) > µ(xu).
+Compared to the original UCB acquisition function, the NVUCB acquisition function would either get more informative
+queries (S1), tend to exploit the current model (S2), or achieve both.
+Proof. We only need to prove that S1 holds when S2 does not.
+When S2 does not hold, i.e. µ(xv) ≤ µ(xu):
+1. If σ(xv) ≥ σ(xu), I(f ; f a(xv)) ≥ I(f ; f a(xu)) by Lemma H.2;
+2. If σ(xv) < σ(xu), I(f ; f a(xv)) ≥ I(f ; f a(xu)) by Lemma H.3.
+Therefore, we can conclude that I(f ; f a(xv)) ≥ I(f ; f a(xu)) if µ(xv) ≤ µ(xu), which proves that at least one of S1 and
+S2 is true.
+We would also like to first theoretically compare the performance of NUCB with our NVUCB in the single fidelity scenario.
+Theorem H.5. With the same setup as Theorem 4.3, denotexv as the selected candidate by our proposed NVUCB acquisition
+function (13), xn as the selected candidate by NUCB (17). At least one of the following statements holds true:
+• T1: The information gain I(f ; f a(xv)) ≥ I(f ; f a(xn));
+• T2: The predictive mean of the selected sample µ(xv) > µ(xn).
+Proof. As xv maximizes (13),
+µ(xv) + β1/2[γ(xv)σ(xv) − γ(xn)σ(xn)] ≥ µ(xn), (33)
+and xn maximizes (17),
+µ(xn) ≥µ(xv) + β1/2p
+σ2(xv) + δ2(xv)
+− β1/2p
+σ2(xn) + δ2(xn).
+(34)
+The standard deviation term
+p
+σ2(x) + δ2(x) can also be written as σ(x)
+γ(x) , combining (33) and (34), we have
+γ(xv)σ(xv) − γ(xn)σ(xn)
+≥
+p
+σ2(xv) + δ2(xv) −
+p
+σ2(xn) + δ2(xn)
+= σ(xv)
+γ(xv) − σ(xn)
+γ(xn) .
+(35)
+1288
+
+PAGE 19
+Rewriting (35), we have
+[γ(xv) − 1
+γ(xv) ]σ(xv) ≥ [γ(xn) − 1
+γ(xn) ]σ(xn). (36)
+Similar as in the proof of Theorem 4.3, we only need to prove that T1 holds when T2 does not.
+When T2 does not hold, i.e. µ(xv) ≤ µ(xn):
+1. If σ(xv) ≥ σ(xn), recall that 0 < γ(x) < 1, so γ(xv)− 1
+γ(xv) < 0, we have γ(xv)− 1
+γ(xv) ≥ γ(xn)− 1
+γ(xn) from (36).
+We can further have γ(xv) ≥ γ(xn) because of the monotonicity of function γ − 1
+γ .
+2. If σ(xv) < σ(xn),
+γ(xv) − γ(xu)
+=σ−1(xn)[γ(xv)σ(xn) − γ(xu)σ(xn)]
+>σ−1(xn)γ(xv)σ(xv) − γ(xu)σ(xn)
+≥σ−1(xn)β− 1
+2 [µ(xn) − µ(xv)]
+≥0.
+(37)
+We can then conclude that whenµ(xv) ≤ µ(xn), we have γ(xv) ≥ γ(xu), and can further get I(f ; f a(xv)) ≥ I(f ; f a(xn))
+because of the monotonicity of (19).
+Therefore we have proven the theorem.
+Note that Theorem 4.3 can also be proven with a similar strategy as in the proof of Theorem H.5 without using Lemma H.3
+and Lemma H.3. Those two lemmas, however, allow us to better understand the acquisition functions from the information-
+theoretic point of view.
+Theorem H.6. For a constantϵ ∈ (0, 1), and βt = 2 log(t2π2/(3ϵ))+2 d log(t2dbr
+p
+log (4da/ϵ)), performing MFNVUCB
+for a target f satisfying Assumptions 4.2 4.4 4.5 with observation noise satisfying Assumption 4.6, we have
+P r{RT ≤ (
+p
+Cδmin + 1)
+q
+2δ2maxβT I max
+T T + π2
+6 } ≥1 − ϵ, (38)
+where RT = PT
+t=1[f (x∗) − f (xt)], I max
+T is the maximum information gain at iteration T , and the constant Cδmin > 1 is
+related to δmin.
+Proof. Based on Lemma 5.7 in Srinivas et al. [2009], let [x∗]t be the closest point in Dt to x∗, where Dt is the discredited
+subset of D,
+|f (x∗) − µt([x∗]t)| ≤β
+1
+2
+t σt−1([x∗]t) + 1
+t2 (39)
+holds with probability greater or equal to 1 − δ. Note that our notation of time index is different from Srinivas et al. [2009].
+By definition of xt and jt,
+µt(xt) + β
+1
+2 γjt
+t (xt)σt(xt) ≥ µt([x∗]t) + β
+1
+2 γj∗
+t
+t ([x∗]t)σt([x∗]t), (40)
+1289
+
+PAGE 20
+The index on the RHS j∗
+t can be chosen arbitrarily so we omit it in the following derivation. So regret in one iteration:
+rt = f (x∗) − f (xt)
+≤ µt([x∗]t) + β
+1
+2
+t σt([x∗]t) + 1/t2 − f (xt) (by Equation 39)
+= µt([x∗]t) + β
+1
+2
+t γt([x∗]t)σt([x∗]t) + β
+1
+2
+t (1 − γt([x∗]t))σt([x∗]t) + 1/t2 − f (xt)
+≤ µt(xt) + β
+1
+2
+t γt(xt)σt(xt) + β
+1
+2
+t (1 − γt([x∗]t))σt([x∗]t) + 1/t2 − f (xt) (by Equation 40)
+≤ β
+1
+2
+t σt(xt) + β
+1
+2
+t γt(xt)σt(xt) + β
+1
+2
+t (1 − γt([x∗]t))σt([x∗]t) + 1/t2 (by Lemma 5.1 in Srinivas et al. [2009])
+= β
+1
+2
+t (1 + γt(xt))δmax
+σt(xt)
+δmax
++ β
+1
+2
+t (1 − γt([x∗]t))δmax
+σt([x∗]t)
+δmax
++ 1/t2
+≤ β
+1
+2
+t (1 + γt(xt))δmax
+σt(xt)
+δ(xt) + β
+1
+2
+t (1 − γt([x∗]t))δmax
+σt([x∗]t)
+δt([x∗]t) + 1/t2
+= δmaxβ
+1
+2
+t (1 + γt(xt)) γt(xt)p
+1 − γ2
+t (xt)
++ δmaxβ
+1
+2
+t (1 − γt([x∗]t)) γt([x∗]t)p
+1 − γ2
+t ([x∗]t)
++ 1/t2
+= δmaxβ
+1
+2
+t γt(xt)
+s
+1 + γt(xt)
+1 − γt(xt) + δmaxβ
+1
+2
+t γt([x∗]t)
+s
+1 − γt([x∗]t)
+1 + γt([x∗]t) + 1/t2.
+(41)
+The last two steps are based on the definition of γt.
+It can be shown that
+γ2
+t (xt) 1 + γt(xt)
+1 − γt(xt) ≤ −Cδmin log(1 − γ2
+t (xt)) (42)
+holds for some constant Cδmin > 1 related to δmin when 0 ≤ γt(x) ≤ σt(x)
+σt(x)+δmin
+< 1, ∀x, and
+γ2
+t ([x∗]t) 1 − γt([x∗]t)
+1 + γt([x∗]t) ≤ −log(1 − γ2
+t ([x∗]t)). (43)
+Therefore,
+TX
+t=1
+δ2
+maxβtγt(xt)2 1 + γt(xt)
+1 − γt(xt) ≤ −Cδmin δ2
+maxβT
+TX
+t=1
+log(1 − γ2
+t (xt)) (44)
+= − 2Cδmin δ2
+maxβT
+TX
+t=1
+1
+2 log(1 − γ2
+t (xt)) (45)
+=2Cδmin δ2
+maxβT I(f ; F a
+T ) (46)
+≤2Cδmin δ2
+maxβT I max
+T . (47)
+Similarly,
+TX
+t=1
+δ2
+maxβtγ2
+t ([x∗]t) 1 − γt([x∗]t)
+1 + γt([x∗]t) ≤ −δ2
+maxβT
+TX
+t=1
+log(1 − γ2
+t ([x∗]t)) (48)
+= − 2δ2
+maxβT
+TX
+t=1
+1
+2 log(1 − γ2
+t ([x∗]t)) (49)
+=2δ2
+maxβT I(f ; [F a
+T ]∗) (50)
+≤2δ2
+maxβT I max
+T , (51)
+where [F a
+T ]∗ = [f a([x∗]1]), . . . , fa([x∗]T )].
+By Cauchy-Schwarz inequality:
+TX
+t=1
+δmaxβ
+1
+2
+t γt(xt)
+s
+1 + γt(xt)
+1 − γt(xt) ≤
+q
+2Cδmin δ2maxβT I max
+T T , (52)
+1290
+
+PAGE 21
+and
+TX
+t=1
+δmaxβ
+1
+2
+t γt([x∗]t)
+s
+1 − γt([x∗]t)
+1 + γt([x∗]t) ≤
+q
+2δ2maxβT I max
+T T . (53)
+Now we have:
+RT =
+X
+rt ≤
+q
+2Cδmin δ2maxβT I max
+T T +
+q
+2δ2maxβT I max
+T T + π2
+6 , (54)
+because P∞
+t=1 1/t2 = π2
+6 .
+Notes on Equations (42) and (43): Consider g(x) = x2 1+x
+1−x +c log(1−x2): dg(x)
+dx = − 2x2
+(1−x)2(1+x) (x3 −(2+ c)x−1+ c).
+Given any xR ∈ (0, 1), there exists a constant cxR > 1 related to the choice of xR such that dg(x)
+dx ≤ 0, ∀x ∈ (0, xR), by
+the nature of the cubic function x3 − (2 + cxR )x − 1 + cxR. Therefore, g(x) ≤ g(0) = 0, ∀x ∈ (0, xR) when c = cR.
+Similarly, consider h(x) = x2 1−x
+1+x + log(1 − x2), dh(x)
+dx = 2x2
+(1−x)(1+x)2 (x3 − 3). We have dh(x)
+dx ≤ 0, ∀x ∈ (0, 1). So
+h(x) ≤ h(0) = 0, ∀x ∈ (0, 1).
+It is now clear that Equations (42) and (43) hold, by replacing x with γt.
+I EXPERIMENTAL DETAILS
+All the experiments are performed on Intel Xeon 8352Y processor with 256 GB memory. The benchmark functions are
+defined to be:
+I.1 HARTMANN
+I.1.1 Ground-truth objective function
+It is a 6-dimensional function
+f (x) = −
+4X
+i=1
+αi exp(−
+6X
+j=1
+Aij(xj − Pij)2), (55)
+where x = [ x1, . . . , x6]T , α = (1 .0, 1.2, 3.0, 3.2)T , A =
+
+
+10 3 17 3 .5 1 .7 8
+0.05 10 17 0 .1 8 14
+3 3 .5 1 .7 10 17 8
+17 8 0 .05 10 0 .1 14
+
+, P =
+10−4
+
+
+1312 1696 5569 124 8283 5886
+2329 4135 8307 3736 1004 9991
+2348 1451 3522 2883 3047 6650
+4047 8228 8732 5743 1091 381
+
+.
+I.1.2 Approximation Models
+We consider two approximation models with the same evaluation cost of 1:
+f 1(x) = f (x) + ([0.5, 0.5, 0.5, 0, 0, 0]x)S; (56)
+f 2(x) = f (x) + ([−0.5, −0.5, −0.5, 0, 0, 0]x + 1)S. (57)
+1291
+
+PAGE 22
+I.1.3 Surrogate modeling
+The ground-truth objective function is modeled with a GP with the RBF kernel
+k(x1, x2) = σ exp( ||x1 − x2||2
+2
+l2 ). (58)
+The prior of the parameters are set to σ ∼ Unif(1, 2), l ∼ Unif(0.01, 0.5), where Unif(a, b) represents a uniform
+distribution from a to b. The input-dependent noise is modeled linearly with the prior of weights set to Unif(0, 1) and the
+prior of biases set to Unif(−1, 1). The number of samples to approximate the posterior is 64.
+The implementation of MF-GP-UCB is set with the default configurations.
+I.2 BRANIN
+I.2.1 Ground-truth objective function
+It is a 2-dimensional function
+f (x) = a(x2 − bx2
+1 + cx1 − r)2 + s(1 − t) cos(x1) + s, (59)
+where x = [x1, x2]T , a = 1, b = 5.1/(4π2), c = 5/π, r = 6, s = 10, and t = 1/(8π).
+I.2.2 Approximation Models
+We consider two approximation models with the same cost of 1:
+f 1(x) = f (x) + ([3.33, 3.33]x + 16.67)S; (60)
+f 2(x) = f (x) + ([−3.33, −3.33]x + 83.33)S. (61)
+I.2.3 Surrogate modeling
+The ground-truth objective function is modeled with a GP with the RBF kernel (58). The prior of the parameters are set to
+σ ∼ Unif(100, 200), l ∼ Unif(0.15, 0.75). The input-dependent noise is modeled linearly with the prior of weights set to
+Unif(0, 100) and the prior of biases set to Unif(−100, 100). The number of samples to approximate the posterior is 64.
+The implementation of MF-GP-UCB is set with the default configurations.
+I.3 LEVY
+I.3.1 Ground-truth objective function
+It is a 3-dimensional function
+f (x) = sin2(πω1) +
+d−1X
+i=1
+(ωi − 1)2[1 + 10sin2(πωi + 1)] + (ωd − 1)2[1 + sin2(2πωd)], (62)
+where d = 3, x = [x1, . . . , x3]T , ωi = 1 + xi−1
+4 , for all i = 1, . . . , d.
+I.3.2 Approximation Models
+We consider two approximation models with the same cost of 1:
+f 1(x) = f (x) + ([1, 1, 0]x + 20)S; (63)
+f 2(x) = f (x) + ([−1, −1, 0]x + 20)S. (64)
+1292
+
+PAGE 23
+I.3.3 Surrogate Model
+The ground-truth objective function is modeled with a GP with the RBF kernel (58). The prior of the parameters are set
+to σ ∼ Unif(40, 80), l ∼ Unif(0.2, 1). The input-dependent noise is modeled linearly with the prior of weights set to
+Unif(0, 40) and the prior of biases set to Unif(−40, 40). The number of samples to approximate the posterior is 64.
+The implementation of MF-GP-UCB is set with the default configurations.
+I.4 MATERIALS DISCOVERY
+The approximation model and ground-truth objective have been described in the main text.
+The ground-truth band-gap objective is modeled with a GP with a RBF kernel (58), in which σ = 4 , l = 0 .5. The
+input-dependent noise is modeled with a GP with mean m = 1 and a RBF kernel parameterized by σ = 0.5, l = 0.5.
+J ADDITIONAL DETAILS ON THE MATERIALS DISCOVERY PROBLEM (SEC 5.4)
+J.1 DISCUSSION ON DENSITY FUNCTIONAL THEORY (DFT) CALCULATION
+Density Functional Theory (DFT) calculations are often used to predict a variety of material properties, including the
+band-gap [Jain et al., 2013]. These predictions can vary based on the structural and other configurations of the material.
+Despite their utility, DFT computations serve only as approximations to real experimental results, especially when calculating
+band-gaps. This limitation stems from the fact that DFT, strictly speaking, is a theory of the ground state of a material system,
+while the band-gap is essentially a property of the excited state. Consequently, for a single composition, the DFT-computed
+band-gaps can exhibit variation due to differences in material structural or other configurations. A case in point is the
+material CuBr, for which six different results are reported in the open-access Material Project (MP) dataset [Jain et al., 2013].
+This highlights the challenges associated with accurately predicting band-gaps using DFT.
+J.2 DETAILS ON THE PRE-TRAINED MLP
+The material compositions within the dataset incorporate a total of 80 distinct elements, with each material comprising two
+to four of these elements. Rather than using composition percentages directly as input for surrogate modeling, we initially
+generate 138 property-related features based on the material compositions. This is accomplished using the open-source
+Python package, matminer [Ward et al., 2018]. However, the data samples available in this generated 138-dimensional
+feature space are relatively sparse. To address this, we train a 3-layer Multilayer Perceptron (MLP) on the 1,019 samples
+that lack reported DFT-calculated band-gaps. The MLP accepts the 138-dimensional feature vector generated by matminer
+as input, with the two hidden layers comprising 8 and 2 neurons, respectively. The MLP is trained to minimize the mean
+square error between the MLP-predicted and ground-truth (experimental) band-gap values.
+We then use the input of the MLP’s final prediction layer as a feature extractor, distilling the original 138 features down
+to two. All MFBO methods are subsequently performed in this extracted 2-dimensional space. This approach effectively
+leverages the MLP as a tool for feature reduction, enhancing the explainability, scalability, and manageability of MFBO.
+1293

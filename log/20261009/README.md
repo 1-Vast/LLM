@@ -62,3 +62,102 @@ linked section of `research/EVIDENCE.md`.
 ## 10. Curation provenance
 
 This compact record preserves the canonical results and limitations. The content manifest is generated with `python -m tools.log_manifest`.
+
+## 11. Conditional pairwise development experiment
+
+`PAIRWISE_CORRECTION.json` records the frozen 146-action,43-background study,
+4/8/16 historical labels,16 controls, independent reconstruction and isolated
+portable replay. The primary eight-history gate fails: knowledge+feedback has
+higher pair regret than no update and 51 harmful versus 43 corrected flips.
+The four-history support gate is structurally disabled in inner calibration;
+the sixteen-history mean-only signal and separate feedback damage motivate
+crossfitted transfer-after-adaptation research. These are RNA development
+findings, not independent biology, functional gain or agent advantage.
+
+Original failed pre-B commit artifacts and freezes are preserved. Assembly and
+exact-tie fixes preceded new scores. A concurrent checkout switch was handled
+through an isolated worktree, with a JSON newline recovery audit. The receipt
+owns full results, execution hashes, runtime, software checks and claim limits.
+Production source and tools were not changed by this experiment.
+
+## 12. Dual-source residual transfer v3
+
+`PAIRWISE_V3.json` records the requested P0/P1 implementation, 387 episodes,
+3,870 policy rows and independent reconstruction. Separate A/B means, true
+nested crossfitted residuals, continuous transductive support, complete-menu
+Top-5 tuning and purchase-before-release accounting are verified. Both scientific
+gates fail: primary feedback increment over mean-only is +0.0000128654 with
+nominal CI spanning zero; no-update is slightly better. Old/refitted banks give
+identical terminal sets. One corrected feedback flip is not a risk certificate.
+
+Prebuy stop saves 94/129 primary A purchases with unchanged matched-arm actions,
+but no-update remains cheaper. A verifier-only one-ulp oracle-reduction amendment
+is disclosed and the original attempt retained; frozen producer/results are
+unchanged. Exact isolated cached replay and extracted independent verification
+both pass. Sources and byte identities are retained in their separate closures.
+
+Twenty actual HTTP range reads obtained 5,083,146 metadata bytes, matching
+archived source codes. The control-only recovery queue selects 250 cells with a
+proposed 2 MB RNA payload. Extraction is blocked by the missing authenticated
+gene axis; no RNA, treated outcomes, new STATE inference or LLM calls were used.
+Next work targets source/measurement reliability or an alternative observable,
+under a new registered contract. Broad acquisition and agent trials are not
+released by the failed transfer gate; production modules remain unchanged.
+
+Final checks: 653 default tests and 21 focused research tests pass; the extracted
+new-study suite passes 11. The final portable package is
+`outputs/decision_value/PAIRWISE_V3_REPLAY.zip` (3,416,286 bytes, 83 files).
+All packaged bytes and active scientific freezes match their receipts; the
+unchanged numerical inputs inherit the previously exact isolated replay. Added
+source-recovery documentation and receipts do not require a new numerical fit.
+
+## 13. Observation reliability and source qualification
+
+`OBSERVATION_RELIABILITY.json` records the P0.5 implementation and real
+control-only gene-axis experiment, with independently reconstructed results.
+The frozen audit used 448 DMSO cells disjoint from the reserved 250 noise cells.
+It identifies 27/39 endpoint coordinates in c40 and 34/39 in c44. The five
+unresolved c44 coordinates are all-zero in selected controls and cannot be
+uniquely matched. The complete certificate is blocked. This is insufficient
+identity evidence, not proof that historical names are incorrect. All 78 checks
+are reproduced offline from 1,101 retained HTTP payloads.
+
+The endpoint source definition uses equal positive +1/39 weights on expression
+changes, rather than gene-specific signed apoptosis weights. Stored source X is
+normalized expression, not raw UMI. Dataset-coordinate authentication remains
+separate from the STATE checkpoint output axis. These source clarifications do
+not rewrite prior results or their immutable receipts.
+
+The noise implementation uses actual group sizes 32,32,30,28,32,32,32,32,
+full-gene scalar covariance and complete-cell-vector bootstrap. Dividing by 32
+would understate the same conditional mean variance by 6.25% and 12.5% for the
+30- and 28-cell groups. The 250-cell noise payload remains unread, with zero of
+its planned 2 MB downloaded. No real endpoint variance is estimated.
+
+Fresh primary-source evidence authenticates global 24-hour exposure and the
+authors' plate6/14 biological-repeat description. Selected sample, plate and
+condition identities join pinned official metadata. Eight control strata
+correspond to four pooled sample IDs, not eight independent cultures.
+Per-sample timing and new culture exchangeability are not certified.
+
+Before any treated RNA freeze, a new metadata-only P0.6 proposal replaces the
+low-count NCI-H661 line with SW 1271, paired with SW 1088. Six outcome-free
+hash-selected 5 uM treatments have at least 50 full-QC cells per stratum.
+Sampling 32 cells would require 6.144 MB of treated RNA, currently unread.
+The 24 strata share 12 pooled treatment samples and have no third untouched
+source confirmation. A new c45 axis/control manifest and execution contract
+are still required.
+
+Authentication reads total 19,037,820 body bytes, including preparation
+metadata; a separate remedy probe adds 32,138 bytes. Literature retrieval
+records 9,446,452 successful response body bytes, including repeated requests;
+failed body sizes are unknown. These categories are distinct from planned RNA,
+local archive size and simulated purchase cost.
+
+The default suite passes 653 tests and the focused research suite passes 20.
+Fresh extraction of `outputs/decision_value/OBSERVATION_RELIABILITY_REPLAY.zip`
+passes both offline axis verifiers, published-source/sample-join verification
+and 20 tests with zero network calls. The 11,526,426-byte package contains 1,213
+files. Scientific authentication remains blocked despite successful replay.
+The shadow route requests axis authentication with zero purchases and unknown
+benefit. Broad P2, LLM comparisons and production promotion remain unreleased.

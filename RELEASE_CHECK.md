@@ -1,5 +1,11 @@
 # Release Check
 
+This document and `RELEASE_STATS.json` describe the historical compression
+release. They are not measurements of the present dirty worktree. Current
+local consolidation measurements are in `CURRENT_REPOSITORY_STATS.json` and
+[research/REFACTOR_REPORT.md](research/REFACTOR_REPORT.md); no new release,
+commit or push is implied.
+
 ## Revision and Size
 
 - Baseline: `540bc85801fa78a3a58780b37b81b4197449d107`.
