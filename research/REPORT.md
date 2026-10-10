@@ -4,6 +4,22 @@
 
 MAESTRO connects an evidence-gathering agent, a scientific decision layer and a virtual-cell predictor. This release preserves the three active STATE/decision studies and their tracked packet inputs. Generated results are local ignored outputs, not part of a clean checkout. `python -m tools.research_validation --verify` checks frozen inputs and outputs before invoking a study verifier; it reports `BLOCKED/ASSET_MISSING` when any are absent or mismatched.
 
+The 2026-10-10 phenotype-anchored study evaluated Tahoe relative-survival selectivity and phase
+shift on five checkpoint-held-out lines, using phenotypes measured in the same spheroids as RNA.
+For survival selectivity, basal-similarity transfer beat STATE (delta r -0.23); a perfect RNA
+oracle added only 0.003 r over the prior on reference lines, below the registered 0.05 minimum
+useful benefit. The gate refused STATE for this endpoint, and held-out oracle results supported
+that refusal. STATE's distinct held-out signal was predicted-cell G1 composition (+0.25 r on E2).
+This scoped result does not establish apoptosis, mechanism or general decision value. See the
+[canonical evidence](EVIDENCE.md#phenotype-anchored-dual-core--2026-10-10) and
+[study packet](astra/phenotype_anchor_20261010/README.md).
+
+A forecast may influence endpoint selection only after a same-unit readout-to-endpoint bridge
+(same culture unit, dose and time) and a reference ceiling pass: substitute observed responses
+for forecasts, score leave-one-context-out, and beat the best cheap prior by the declared minimum
+useful benefit. Passing admits evaluation; it does not certify the forecast. Unsupported
+cross-assay, cross-dose or cross-time bridges and undercounted contexts are refused.
+
 The current endpoint is a signed 39-gene RNA response. It does not establish functional phenotype, protein activity, causal mechanism, clinical efficacy or the value of an experiment. Five target cell backgrounds in the current STATE studies were previously exposed, and reference contexts overlap STATE pretraining.
 
 ## Established results

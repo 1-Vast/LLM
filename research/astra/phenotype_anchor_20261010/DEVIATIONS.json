@@ -1,0 +1,19 @@
+[
+ {
+  "when": "2026-10-10, after the held-out run",
+  "what": "verify.py raised PermissionError (WinError 32) when TemporaryDirectory cleanup tried to delete a temporary PREDICTIONS npz that np.load still held open. Five checks had already passed.",
+  "action": "verify.py was not edited, so its frozen hash still matches. It was rerun byte-identical through a wrapper: tempfile.TemporaryDirectory = functools.partial(tempfile.TemporaryDirectory, ignore_cleanup_errors=True). All seven checks passed. Log: heldout_logs/verify_rerun.log.",
+  "effect_on_results": "none; no analysis code, threshold or input changed",
+  "residue": "two temporary directories under %TEMP% hold copies of verification outputs"
+ },
+ {
+  "when": "2026-10-10, before freeze (reference extraction already complete)",
+  "what": "extract_expression.py gained a --basal-rows option (default 256, unchanged) so held-out lines could read 512 DMSO rows per plate. The local list that shadowed the new parameter was renamed.",
+  "effect_on_results": "reference extraction used the default path, which is byte-equivalent; held-out lines used 512 rows, as PROTOCOL section 4 states"
+ },
+ {
+  "when": "2026-10-10, before freeze",
+  "what": "The gate's first launch failed with FileNotFoundError, as did the phase classifier's: the launch was triggered one line before c49's extraction finished. Neither wrote output; both were rerun after c49 completed.",
+  "effect_on_results": "none"
+ }
+]

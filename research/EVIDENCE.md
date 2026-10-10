@@ -1,5 +1,35 @@
 # Evidence Register
 
+## Phenotype-anchored dual core — 2026-10-10
+
+**Primary result: null for STATE on Tahoe relative-survival selectivity; the cheap basal-context
+prior wins, and the registered world-model gate's refusal held.**
+
+Tahoe-100M pools 50 lines in spheroids for 24 h. Relative survival (line share against same-plate
+DMSO with a reference-line denominator) and phase log-odds shift are derived from per-cell obs
+codes in the same spheroids as RNA. Absolute survival is not identified because spheroid totals
+do not replicate. Five undercounted contexts are refused as `CONTEXT_UNDERCOUNTED`.
+
+On 40 qualified reference lines, the perfect-RNA-oracle ceiling improves mean within-line r by
+only 0.003 over basal-similarity transfer, below the preregistered 0.05 minimum useful benefit;
+the gate returns `WM_CEILING_BELOW_MUB`. On five checkpoint-held-out lines, STATE vs basal
+transfer is delta r -0.226 (95% CI [-0.266, -0.156], 0/5 better). Basal transfer beats generic
+potency ranking by +0.558 top-10 log2 utility (95% CI [0.235, 0.819], 5/5). The observed-profile
+oracle also fails to beat basal transfer on held-out lines. STATE's distinct held-out signal is
+predicted-cell G1 composition (+0.254 r on E2); this RNA-derived endpoint is not viability.
+
+The study promotes a same-unit bridge and value-ceiling admission contract, Tahoe phenotype
+construction, and scope-labelled basal transfer. Admission permits forecast evaluation; it does
+not certify the forecast. Cross-assay, cross-dose and cross-time bridges are refused, as are
+contexts below the declared count. No STATE readout, bridge or LLM policy is promoted. Limits:
+five held-out lines whose RNA was exposed in earlier blocks, reference overlap with STATE
+pretraining, 24 h relative share, and no claim of apoptosis, efficacy or mechanism.
+
+Study packet: `research/astra/phenotype_anchor_20261010/`. The frozen receipt records identities,
+gate, held-out results, deviations and verification: `log/20261010/PHENOTYPE_ANCHOR.json`.
+Run `python research/astra/phenotype_anchor_20261010/verify.py` to verify; study and promotion
+parity tests are registered under the research scope.
+
 | Study | Status | Question | Result | Limitation | Reproduction path |
 |---|---|---|---|---|---|
 | Engineering closure | `VERIFIED_CONTRACT_ONLY` | Does the operational agent-to-measurement loop preserve request, budget, result and restart contracts? | Two-round execution, feedback and durable CaseStore behavior pass the asset-free contract suite. | Operational correctness does not establish biological validity or agent advantage. | `python -m pytest`; this is software contract evidence. |

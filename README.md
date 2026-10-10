@@ -43,6 +43,12 @@ summaries retain their source identity. The core does not import research or too
 
 ## Current evidence
 
+The 2026-10-10 phenotype-anchored study tested STATE on a functional endpoint measured in the
+same spheroids as its RNA: Tahoe relative-survival selectivity on five held-out lines. Basal-
+similarity transfer beat STATE (delta r -0.23) and generic ranking (top-10 +0.56 log2, 5/5). A
+registered world-model value gate refused STATE from reference data alone, and held-out lines
+confirmed the refusal. The gate, same-unit bridge rule and basal transfer are promoted with scope.
+
 Engineering closure is verified. The original STATE study reports a task-specific
 RNA prediction signal, while independent decision benefit, LLM advantage,
 functional phenotype and mechanism causality remain unestablished. All five
