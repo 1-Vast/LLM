@@ -1,0 +1,322 @@
+{
+ "variant": "lit_critic",
+ "mechanism": "AMPK inhibitor",
+ "status": "ok",
+ "error": null,
+ "seconds": 6.95,
+ "model": "deepseek-flash",
+ "finish_reason": "stop",
+ "usage": {
+  "prompt_tokens": 5804,
+  "completion_tokens": 1398,
+  "total_tokens": 7202,
+  "prompt_cache_hit_tokens": 0,
+  "prompt_cache_miss_tokens": 5804
+ },
+ "dropped": {
+  "non_landmark_genes": 0,
+  "bad_levels": 0,
+  "foreign_pmids": 0,
+  "missing_lines": 0,
+  "bad_generic": 0
+ },
+ "hypothesis": {
+  "mechanism": "AMPK inhibitor",
+  "primary_targets": [
+   "PRKAA1",
+   "PRKAA2",
+   "PRKAB1",
+   "PRKAB2",
+   "PRKAG1",
+   "PRKAG2",
+   "ACVR1",
+   "BMPR1A",
+   "BMPR1B",
+   "EPHA2",
+   "FKBP1A",
+   "FLT1",
+   "FLT3",
+   "KDR",
+   "LCK",
+   "MKNK1",
+   "RPS6KA1"
+  ],
+  "proximal_up": [
+   "DDIT4",
+   "SQSTM1",
+   "TRIB3",
+   "CHAC1",
+   "ATF5",
+   "XBP1",
+   "HERPUD1",
+   "DNAJB1",
+   "HSPA1A",
+   "BAG3",
+   "SESN1"
+  ],
+  "proximal_down": [
+   "MYC",
+   "CCND1",
+   "ACLY",
+   "RPS6",
+   "EIF4EBP1",
+   "MKNK1",
+   "RPS6KA1",
+   "MCM3",
+   "PCNA",
+   "TOP2A"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "GADD45A",
+   "GADD45B",
+   "TP53",
+   "BAX",
+   "PMAIP1",
+   "TSC22D3",
+   "NFKBIA",
+   "IER3",
+   "ATF6",
+   "EDEM1",
+   "DNAJB6",
+   "HSPB1"
+  ],
+  "late_down": [
+   "CCNB1",
+   "CCNB2",
+   "CDK1",
+   "AURKA",
+   "AURKB",
+   "BIRC5",
+   "PLK1",
+   "UBE2C",
+   "CDC20",
+   "BUB1B",
+   "KIF20A",
+   "KIF2C",
+   "NUSAP1",
+   "STMN1",
+   "MELK"
+  ],
+  "generic_effects": [
+   "g2m_arrest",
+   "dna_damage_response",
+   "oxidative_stress",
+   "apoptosis",
+   "unfolded_protein_response"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "moderate",
+   "HT29": "moderate",
+   "MCF7": "moderate",
+   "PC3": "moderate",
+   "VCAP": "strong"
+  },
+  "context_requirements": [
+   "Active AMPK signaling and dependence on AMPK for metabolic homeostasis",
+   "Expression of the drug's off-target kinases (e.g., BMPR/ACVR1, KDR/FLT1, LCK, RSK/MKNK1) for AMPK-independent effects",
+   "Intact p53 pathway for maximal apoptosis and G2/M arrest",
+   "High metabolic/lipid synthesis flux (e.g., androgen-dependent prostate cancer) for strong anti-proliferative response"
+  ],
+  "falsifiers": [
+   "No change in HMGCR, HMGCS1, INSIG1, or other SREBP/lipid synthesis genes at 6 or 24 h",
+   "No induction of DDIT4, TRIB3, CHAC1, or other ATF4/ISR targets",
+   "No G2/M arrest or apoptosis signature at 24 h",
+   "No difference in response between p53-wildtype and p53-mutant lines",
+   "No anti-proliferative transcriptional signature in VCAP or other prostate lines"
+  ],
+  "confidence": "medium",
+  "evidence": [
+   {
+    "pmid": "24419061",
+    "supports": "Compound C inhibits AMPK but has AMPK-independent antiproliferative and cytotoxic effects in glioma cells"
+   },
+   {
+    "pmid": "22674626",
+    "supports": "Compound C suppresses colorectal cancer cell proliferation via G2/M arrest, apoptosis, and autophagy"
+   },
+   {
+    "pmid": "33492659",
+    "supports": "BAY-3827 is a potent AMPK inhibitor with anti-proliferative effects in androgen-dependent prostate cancer and affects HMGCR/FASN lipid metabolism genes"
+   },
+   {
+    "pmid": "23076030",
+    "supports": "BML-275/compound C induces ROS, DNA damage signaling, G2/M arrest, and apoptosis in pancreatic cancer cells"
+   },
+   {
+    "pmid": "23274516",
+    "supports": "Compound C induces p53-dependent apoptosis and G2/M arrest in skin cancer cells via ROS/DNA damage"
+   }
+  ]
+ },
+ "changes": [
+  "Moved HMGCR, HMGCS1, INSIG1, and FDFT1 from proximal_up to removed: AMPK inhibition does not directly induce SREBP/lipid synthesis genes; BAY-3827 evidence shows HMGCR/FASN are affected but not necessarily upregulated, and direction is not justified as proximal up.",
+  "Removed HMGCR, HMGCS1, INSIG1, FDFT1 from proximal_up because their direction contradicts the mechanism and evidence.",
+  "Kept DDIT4, TRIB3, CHAC1, ATF5, XBP1, HERPUD1, DNAJB1, HSPA1A, BAG3, SESN1 in proximal_up as stress/ISR/UPR genes consistent with AMPK inhibitor-induced stress, but note these are generic stress genes; however, they are retained as proximal because AMPK inhibition can induce ISR/UPR.",
+  "Removed generic proliferation genes from proximal_down? MYC, CCND1, ACLY, RPS6, EIF4EBP1, MKNK1, RPS6KA1, MCM3, PCNA, TOP2A are kept as proximal_down because they are direct AMPK/mTOR targets or proliferation genes; but MKNK1 and RPS6KA1 are primary targets and also listed as down, which is acceptable as they are inhibited.",
+  "No gene appears in both up and down lists of the same time.",
+  "Line responses: VCAP strong is supported by BAY-3827 in androgen-dependent prostate cancer; PC3 moderate is plausible; HA1E weak is plausible as immortalized normal cells; others moderate are plausible.",
+  "Kinetics: slow is supported by 6h weak, 24h moderate.",
+  "Magnitude: weak at 6h, moderate at 24h is consistent with slow kinetics.",
+  "Evidence: all five PMIDs support the stated claims based on abstracts."
+ ],
+ "raw": {
+  "mechanism": "AMPK inhibitor",
+  "primary_targets": [
+   "PRKAA1",
+   "PRKAA2",
+   "PRKAB1",
+   "PRKAB2",
+   "PRKAG1",
+   "PRKAG2",
+   "ACVR1",
+   "BMPR1A",
+   "BMPR1B",
+   "EPHA2",
+   "FKBP1A",
+   "FLT1",
+   "FLT3",
+   "KDR",
+   "LCK",
+   "MKNK1",
+   "RPS6KA1"
+  ],
+  "proximal_up": [
+   "DDIT4",
+   "SQSTM1",
+   "TRIB3",
+   "CHAC1",
+   "ATF5",
+   "XBP1",
+   "HERPUD1",
+   "DNAJB1",
+   "HSPA1A",
+   "BAG3",
+   "SESN1"
+  ],
+  "proximal_down": [
+   "MYC",
+   "CCND1",
+   "ACLY",
+   "RPS6",
+   "EIF4EBP1",
+   "MKNK1",
+   "RPS6KA1",
+   "MCM3",
+   "PCNA",
+   "TOP2A"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "GADD45A",
+   "GADD45B",
+   "TP53",
+   "BAX",
+   "PMAIP1",
+   "TSC22D3",
+   "NFKBIA",
+   "IER3",
+   "ATF6",
+   "EDEM1",
+   "DNAJB6",
+   "HSPB1"
+  ],
+  "late_down": [
+   "CCNB1",
+   "CCNB2",
+   "CDK1",
+   "AURKA",
+   "AURKB",
+   "BIRC5",
+   "PLK1",
+   "UBE2C",
+   "CDC20",
+   "BUB1B",
+   "KIF20A",
+   "KIF2C",
+   "NUSAP1",
+   "STMN1",
+   "MELK"
+  ],
+  "generic_effects": [
+   "g2m_arrest",
+   "dna_damage_response",
+   "oxidative_stress",
+   "apoptosis",
+   "unfolded_protein_response"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "moderate",
+   "HT29": "moderate",
+   "MCF7": "moderate",
+   "PC3": "moderate",
+   "VCAP": "strong"
+  },
+  "context_requirements": [
+   "Active AMPK signaling and dependence on AMPK for metabolic homeostasis",
+   "Expression of the drug's off-target kinases (e.g., BMPR/ACVR1, KDR/FLT1, LCK, RSK/MKNK1) for AMPK-independent effects",
+   "Intact p53 pathway for maximal apoptosis and G2/M arrest",
+   "High metabolic/lipid synthesis flux (e.g., androgen-dependent prostate cancer) for strong anti-proliferative response"
+  ],
+  "falsifiers": [
+   "No change in HMGCR, HMGCS1, INSIG1, or other SREBP/lipid synthesis genes at 6 or 24 h",
+   "No induction of DDIT4, TRIB3, CHAC1, or other ATF4/ISR targets",
+   "No G2/M arrest or apoptosis signature at 24 h",
+   "No difference in response between p53-wildtype and p53-mutant lines",
+   "No anti-proliferative transcriptional signature in VCAP or other prostate lines"
+  ],
+  "confidence": "medium",
+  "evidence": [
+   {
+    "pmid": "24419061",
+    "supports": "Compound C inhibits AMPK but has AMPK-independent antiproliferative and cytotoxic effects in glioma cells"
+   },
+   {
+    "pmid": "22674626",
+    "supports": "Compound C suppresses colorectal cancer cell proliferation via G2/M arrest, apoptosis, and autophagy"
+   },
+   {
+    "pmid": "33492659",
+    "supports": "BAY-3827 is a potent AMPK inhibitor with anti-proliferative effects in androgen-dependent prostate cancer and affects HMGCR/FASN lipid metabolism genes"
+   },
+   {
+    "pmid": "23076030",
+    "supports": "BML-275/compound C induces ROS, DNA damage signaling, G2/M arrest, and apoptosis in pancreatic cancer cells"
+   },
+   {
+    "pmid": "23274516",
+    "supports": "Compound C induces p53-dependent apoptosis and G2/M arrest in skin cancer cells via ROS/DNA damage"
+   }
+  ],
+  "changes": [
+   "Moved HMGCR, HMGCS1, INSIG1, and FDFT1 from proximal_up to removed: AMPK inhibition does not directly induce SREBP/lipid synthesis genes; BAY-3827 evidence shows HMGCR/FASN are affected but not necessarily upregulated, and direction is not justified as proximal up.",
+   "Removed HMGCR, HMGCS1, INSIG1, FDFT1 from proximal_up because their direction contradicts the mechanism and evidence.",
+   "Kept DDIT4, TRIB3, CHAC1, ATF5, XBP1, HERPUD1, DNAJB1, HSPA1A, BAG3, SESN1 in proximal_up as stress/ISR/UPR genes consistent with AMPK inhibitor-induced stress, but note these are generic stress genes; however, they are retained as proximal because AMPK inhibition can induce ISR/UPR.",
+   "Removed generic proliferation genes from proximal_down? MYC, CCND1, ACLY, RPS6, EIF4EBP1, MKNK1, RPS6KA1, MCM3, PCNA, TOP2A are kept as proximal_down because they are direct AMPK/mTOR targets or proliferation genes; but MKNK1 and RPS6KA1 are primary targets and also listed as down, which is acceptable as they are inhibited.",
+   "No gene appears in both up and down lists of the same time.",
+   "Line responses: VCAP strong is supported by BAY-3827 in androgen-dependent prostate cancer; PC3 moderate is plausible; HA1E weak is plausible as immortalized normal cells; others moderate are plausible.",
+   "Kinetics: slow is supported by 6h weak, 24h moderate.",
+   "Magnitude: weak at 6h, moderate at 24h is consistent with slow kinetics.",
+   "Evidence: all five PMIDs support the stated claims based on abstracts."
+  ]
+ },
+ "created_utc": "2026-10-10T11:49:00Z"
+}

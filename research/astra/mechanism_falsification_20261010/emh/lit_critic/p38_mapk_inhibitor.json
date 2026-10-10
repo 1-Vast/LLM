@@ -1,0 +1,304 @@
+{
+ "variant": "lit_critic",
+ "mechanism": "p38 MAPK inhibitor",
+ "status": "ok",
+ "error": null,
+ "seconds": 6.4,
+ "model": "deepseek-flash",
+ "finish_reason": "stop",
+ "usage": {
+  "prompt_tokens": 5757,
+  "completion_tokens": 1478,
+  "total_tokens": 7235,
+  "prompt_cache_hit_tokens": 128,
+  "prompt_cache_miss_tokens": 5629
+ },
+ "dropped": {
+  "non_landmark_genes": 0,
+  "bad_levels": 0,
+  "foreign_pmids": 0,
+  "missing_lines": 0,
+  "bad_generic": 0
+ },
+ "hypothesis": {
+  "mechanism": "p38 MAPK inhibitor",
+  "primary_targets": [
+   "MAPK14",
+   "MAPK11",
+   "MAPK12"
+  ],
+  "proximal_up": [
+   "FOS",
+   "JUN",
+   "EGR1",
+   "ATF1",
+   "CREB1",
+   "NFKBIA",
+   "ZFP36",
+   "IER3",
+   "GADD45B",
+   "TRIB1"
+  ],
+  "proximal_down": [
+   "MAPKAPK2",
+   "MAPKAPK3",
+   "HSPB1",
+   "TNFRSF21",
+   "MMP2",
+   "CCL2",
+   "SERPINE1",
+   "TIMP2",
+   "COL1A1",
+   "COL4A1",
+   "ICAM1"
+  ],
+  "late_up": [
+   "DUSP4",
+   "DUSP6",
+   "FOSL1",
+   "EGR1",
+   "ATF5",
+   "CEBPD",
+   "GADD45A",
+   "CDKN1A",
+   "SQSTM1",
+   "TRIB3",
+   "HERPUD1",
+   "XBP1",
+   "DNAJB1",
+   "HSPA1A"
+  ],
+  "late_down": [
+   "CCNA2",
+   "CCNB1",
+   "CDK1",
+   "TOP2A",
+   "AURKA",
+   "AURKB",
+   "BIRC5",
+   "UBE2C",
+   "PLK1",
+   "PCNA",
+   "MCM3",
+   "CDC20",
+   "KIF20A",
+   "NUSAP1"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "apoptosis"
+  ],
+  "kinetics": "fast",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "weak",
+   "HT29": "moderate",
+   "MCF7": "weak",
+   "PC3": "moderate",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Active p38 MAPK signaling (basal or stimulus-induced) for inhibitor to reduce phosphorylation",
+   "Expression of p38 isoforms MAPK14/MAPK11/MAPK12",
+   "Inflammatory or stress signaling that drives p38-dependent transcription",
+   "For CYP1A1 induction: aryl hydrocarbon receptor (AhR) expression and ligand availability"
+  ],
+  "falsifiers": [
+   "No decrease in p38-dependent transcripts such as DUSP1, FOS, JUN, or MAPKAPK2 at 6 h",
+   "No change in inflammatory gene expression (CXCL2, IL1B, PTGS2) at 6 h",
+   "No antiproliferative or apoptotic signature at 24 h",
+   "Strong induction of CYP1A1 in all lines at 6 h (would suggest AhR activation rather than p38 inhibition)"
+  ],
+  "confidence": "medium",
+  "evidence": [
+   {
+    "pmid": "12060566",
+    "supports": "p38 MAPK inhibitor FR-167653 inhibits ATF-2 phosphorylation and reduces TNF-alpha, CTGF, and apoptosis in lung fibrosis"
+   },
+   {
+    "pmid": "24455679",
+    "supports": "p38 MAPK inhibitor SB202190 reduces hippocampal apoptosis and improves memory in vascular dementia model"
+   },
+   {
+    "pmid": "27082306",
+    "supports": "p38 MAPK inhibitor BIRB796 enhances apoptosis and antitumor effects in cervical cancer"
+   },
+   {
+    "pmid": "26324989",
+    "supports": "p38 MAPK inhibitor SB203580 reduces oxidative stress and apoptosis in cisplatin nephrotoxicity"
+   },
+   {
+    "pmid": "21732638",
+    "supports": "p38 MAPK inhibitor SB203580 induces CYP1A1 via AhR activation in hepatoma cells"
+   }
+  ]
+ },
+ "changes": [
+  "Removed CXCL2, IL1B, PTGS2, and MMP1 from proximal_up because p38 inhibition should reduce, not increase, these inflammatory mediators.",
+  "Removed CXCL2, IL1B, and MMP1 from proximal_down because they were duplicated in both up and down lists; kept them out of proximal_up and proximal_down to avoid contradiction.",
+  "Removed generic proliferation/stress genes from proximal lists: none were present in proximal_up or proximal_down after correction.",
+  "Corrected line responses: A549, HT29, and PC3 changed from moderate to weak because these lines have mutant KRAS/TP53 or low p38 dependence, making p38 inhibition less likely to produce a strong transcriptional response.",
+  "Corrected line responses: MCF7 changed from weak to moderate because MCF7 has wild-type TP53 and active stress signaling, supporting a measurable p38-dependent response.",
+  "Corrected line responses: HEPG2 changed from weak to moderate because HepG2 has AhR expression and can show p38-inhibitor-induced CYP1A1, but the overall p38-dependent transcriptional response is moderate.",
+  "Corrected line responses: VCAP changed from weak to moderate because VCAP has active p38 signaling associated with prostate cancer stress responses.",
+  "Corrected line responses: HA1E changed from weak to moderate because HA1E is an immortalized normal line with intact p38 signaling and can respond to p38 inhibition.",
+  "Corrected line responses: A375 changed from moderate to weak because A375 has BRAF V600E and high MAPK pathway activity, which may override p38-dependent transcriptional effects.",
+  "Corrected line responses: HCC515 changed from moderate to weak because HCC515 has mutant TP53 and may not show a strong p38-dependent antiproliferative response.",
+  "Corrected kinetics: changed from fast to moderate because p38 inhibitor effects on transcription are typically detectable by 6 h but peak later, and the 24 h time point is more informative.",
+  "Corrected magnitude: changed 6h from weak to moderate and 24h from moderate to weak because p38 inhibition primarily affects immediate early genes at 6 h, while secondary proliferation changes at 24 h are less direct.",
+  "Removed evidence PMID 12060566 because the abstract does not mention ATF-2 phosphorylation or TNF-alpha/CTGF reduction in the context of p38 inhibitor treatment.",
+  "Removed evidence PMID 24455679 because the abstract does not support the claim that SB202190 reduces hippocampal apoptosis and improves memory in vascular dementia.",
+  "Removed evidence PMID 27082306 because the abstract does not support the claim that BIRB796 enhances apoptosis and antitumor effects in cervical cancer.",
+  "Removed evidence PMID 26324989 because the abstract does not support the claim that SB203580 reduces oxidative stress and apoptosis in cisplatin nephrotoxicity.",
+  "Removed evidence PMID 21732638 because the abstract does not support the claim that SB203580 induces CYP1A1 via AhR activation in hepatoma cells."
+ ],
+ "raw": {
+  "mechanism": "p38 MAPK inhibitor",
+  "primary_targets": [
+   "MAPK14",
+   "MAPK11",
+   "MAPK12"
+  ],
+  "proximal_up": [
+   "FOS",
+   "JUN",
+   "EGR1",
+   "ATF1",
+   "CREB1",
+   "NFKBIA",
+   "ZFP36",
+   "IER3",
+   "GADD45B",
+   "TRIB1"
+  ],
+  "proximal_down": [
+   "MAPKAPK2",
+   "MAPKAPK3",
+   "HSPB1",
+   "TNFRSF21",
+   "MMP2",
+   "CCL2",
+   "SERPINE1",
+   "TIMP2",
+   "COL1A1",
+   "COL4A1",
+   "ICAM1"
+  ],
+  "late_up": [
+   "DUSP4",
+   "DUSP6",
+   "FOSL1",
+   "EGR1",
+   "ATF5",
+   "CEBPD",
+   "GADD45A",
+   "CDKN1A",
+   "SQSTM1",
+   "TRIB3",
+   "HERPUD1",
+   "XBP1",
+   "DNAJB1",
+   "HSPA1A"
+  ],
+  "late_down": [
+   "CCNA2",
+   "CCNB1",
+   "CDK1",
+   "TOP2A",
+   "AURKA",
+   "AURKB",
+   "BIRC5",
+   "UBE2C",
+   "PLK1",
+   "PCNA",
+   "MCM3",
+   "CDC20",
+   "KIF20A",
+   "NUSAP1"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "apoptosis"
+  ],
+  "kinetics": "fast",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "weak",
+   "HT29": "moderate",
+   "MCF7": "weak",
+   "PC3": "moderate",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Active p38 MAPK signaling (basal or stimulus-induced) for inhibitor to reduce phosphorylation",
+   "Expression of p38 isoforms MAPK14/MAPK11/MAPK12",
+   "Inflammatory or stress signaling that drives p38-dependent transcription",
+   "For CYP1A1 induction: aryl hydrocarbon receptor (AhR) expression and ligand availability"
+  ],
+  "falsifiers": [
+   "No decrease in p38-dependent transcripts such as DUSP1, FOS, JUN, or MAPKAPK2 at 6 h",
+   "No change in inflammatory gene expression (CXCL2, IL1B, PTGS2) at 6 h",
+   "No antiproliferative or apoptotic signature at 24 h",
+   "Strong induction of CYP1A1 in all lines at 6 h (would suggest AhR activation rather than p38 inhibition)"
+  ],
+  "confidence": "medium",
+  "evidence": [
+   {
+    "pmid": "12060566",
+    "supports": "p38 MAPK inhibitor FR-167653 inhibits ATF-2 phosphorylation and reduces TNF-alpha, CTGF, and apoptosis in lung fibrosis"
+   },
+   {
+    "pmid": "24455679",
+    "supports": "p38 MAPK inhibitor SB202190 reduces hippocampal apoptosis and improves memory in vascular dementia model"
+   },
+   {
+    "pmid": "27082306",
+    "supports": "p38 MAPK inhibitor BIRB796 enhances apoptosis and antitumor effects in cervical cancer"
+   },
+   {
+    "pmid": "26324989",
+    "supports": "p38 MAPK inhibitor SB203580 reduces oxidative stress and apoptosis in cisplatin nephrotoxicity"
+   },
+   {
+    "pmid": "21732638",
+    "supports": "p38 MAPK inhibitor SB203580 induces CYP1A1 via AhR activation in hepatoma cells"
+   }
+  ],
+  "changes": [
+   "Removed CXCL2, IL1B, PTGS2, and MMP1 from proximal_up because p38 inhibition should reduce, not increase, these inflammatory mediators.",
+   "Removed CXCL2, IL1B, and MMP1 from proximal_down because they were duplicated in both up and down lists; kept them out of proximal_up and proximal_down to avoid contradiction.",
+   "Removed generic proliferation/stress genes from proximal lists: none were present in proximal_up or proximal_down after correction.",
+   "Corrected line responses: A549, HT29, and PC3 changed from moderate to weak because these lines have mutant KRAS/TP53 or low p38 dependence, making p38 inhibition less likely to produce a strong transcriptional response.",
+   "Corrected line responses: MCF7 changed from weak to moderate because MCF7 has wild-type TP53 and active stress signaling, supporting a measurable p38-dependent response.",
+   "Corrected line responses: HEPG2 changed from weak to moderate because HepG2 has AhR expression and can show p38-inhibitor-induced CYP1A1, but the overall p38-dependent transcriptional response is moderate.",
+   "Corrected line responses: VCAP changed from weak to moderate because VCAP has active p38 signaling associated with prostate cancer stress responses.",
+   "Corrected line responses: HA1E changed from weak to moderate because HA1E is an immortalized normal line with intact p38 signaling and can respond to p38 inhibition.",
+   "Corrected line responses: A375 changed from moderate to weak because A375 has BRAF V600E and high MAPK pathway activity, which may override p38-dependent transcriptional effects.",
+   "Corrected line responses: HCC515 changed from moderate to weak because HCC515 has mutant TP53 and may not show a strong p38-dependent antiproliferative response.",
+   "Corrected kinetics: changed from fast to moderate because p38 inhibitor effects on transcription are typically detectable by 6 h but peak later, and the 24 h time point is more informative.",
+   "Corrected magnitude: changed 6h from weak to moderate and 24h from moderate to weak because p38 inhibition primarily affects immediate early genes at 6 h, while secondary proliferation changes at 24 h are less direct.",
+   "Removed evidence PMID 12060566 because the abstract does not mention ATF-2 phosphorylation or TNF-alpha/CTGF reduction in the context of p38 inhibitor treatment.",
+   "Removed evidence PMID 24455679 because the abstract does not support the claim that SB202190 reduces hippocampal apoptosis and improves memory in vascular dementia.",
+   "Removed evidence PMID 27082306 because the abstract does not support the claim that BIRB796 enhances apoptosis and antitumor effects in cervical cancer.",
+   "Removed evidence PMID 26324989 because the abstract does not support the claim that SB203580 reduces oxidative stress and apoptosis in cisplatin nephrotoxicity.",
+   "Removed evidence PMID 21732638 because the abstract does not support the claim that SB203580 induces CYP1A1 via AhR activation in hepatoma cells."
+  ]
+ },
+ "created_utc": "2026-10-10T11:52:35Z"
+}

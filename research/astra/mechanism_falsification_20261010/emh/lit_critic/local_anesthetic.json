@@ -1,0 +1,314 @@
+{
+ "variant": "lit_critic",
+ "mechanism": "local anesthetic",
+ "status": "ok",
+ "error": null,
+ "seconds": 6.5,
+ "model": "deepseek-flash",
+ "finish_reason": "stop",
+ "usage": {
+  "prompt_tokens": 5548,
+  "completion_tokens": 1393,
+  "total_tokens": 6941,
+  "prompt_cache_hit_tokens": 128,
+  "prompt_cache_miss_tokens": 5420
+ },
+ "dropped": {
+  "non_landmark_genes": 0,
+  "bad_levels": 0,
+  "foreign_pmids": 0,
+  "missing_lines": 0,
+  "bad_generic": 0
+ },
+ "hypothesis": {
+  "mechanism": "local anesthetic",
+  "primary_targets": [
+   "SCN5A",
+   "SCN10A",
+   "SCN1A"
+  ],
+  "proximal_up": [
+   "FOS",
+   "JUN",
+   "EGR1",
+   "ATF1",
+   "HSPA1A",
+   "DNAJB1",
+   "HSPB1",
+   "BAG3",
+   "SQSTM1",
+   "NFKBIA",
+   "IER3",
+   "ZFP36",
+   "CEBPD",
+   "DUSP4",
+   "TRIB1"
+  ],
+  "proximal_down": [
+   "MYC",
+   "CCND1",
+   "PCNA",
+   "MCM3",
+   "TOP2A",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "BIRC5",
+   "CDK1",
+   "CCNB1",
+   "CCNA2",
+   "UBE2C",
+   "NUSAP1",
+   "KIF20A"
+  ],
+  "late_up": [
+   "DDIT4",
+   "TRIB3",
+   "CHAC1",
+   "GADD45A",
+   "BNIP3",
+   "BNIP3L",
+   "PMAIP1",
+   "BAX",
+   "HMOX1",
+   "TXNRD1",
+   "SQSTM1",
+   "HERPUD1",
+   "XBP1",
+   "ATF5"
+  ],
+  "late_down": [
+   "MYC",
+   "CCND1",
+   "CCNE2",
+   "CDK2",
+   "CDK4",
+   "CDK6",
+   "E2F2",
+   "MCM3",
+   "PCNA",
+   "TOP2A",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "BIRC5",
+   "UBE2C"
+  ],
+  "generic_effects": [
+   "apoptosis",
+   "oxidative_stress",
+   "unfolded_protein_response",
+   "proliferation_down"
+  ],
+  "kinetics": "fast",
+  "magnitude": {
+   "6h": "moderate",
+   "24h": "strong"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "strong",
+   "HT29": "moderate",
+   "MCF7": "moderate",
+   "PC3": "moderate",
+   "VCAP": "moderate"
+  },
+  "context_requirements": [
+   "Mitochondrial activity and intact electron transport chain for ROS/RNS generation",
+   "Sodium channel expression is not required; effects occur independent of Na+ channel blockade",
+   "Concentrations at or above ~0.1-1 mM for growth/survival effects; 10 uM may be sub-threshold in some lines",
+   "Proliferating cells with active cell cycle for antiproliferative readouts"
+  ],
+  "falsifiers": [
+   "No change in FOS/JUN/EGR1 or HSPA1A/DNAJB1 at 6 h in any line",
+   "No decrease in proliferation/cell-cycle genes at 24 h",
+   "No evidence of apoptosis or oxidative stress response at 24 h",
+   "Responses equal in all nine lines regardless of lineage or metabolic capacity"
+  ],
+  "confidence": "low",
+  "evidence": [
+   {
+    "pmid": "15505455",
+    "supports": "Lidocaine causes mitochondrial membrane potential loss, cytochrome c release, caspase activation and apoptosis in neuronal cells"
+   },
+   {
+    "pmid": "20700677",
+    "supports": "Local anesthetics induce apoptosis in human chondrocytes"
+   },
+   {
+    "pmid": "29684861",
+    "supports": "Bupivacaine inhibits growth/survival via mitochondrial complex I/II inhibition and affects Rho family activity"
+   },
+   {
+    "pmid": "34249706",
+    "supports": "Lidocaine inhibits proliferation and induces apoptosis via PI3K/AKT/mTOR and Bax/Bcl2 pathways"
+   },
+   {
+    "pmid": "28236766",
+    "supports": "Lidocaine increases mitochondrial depolarization, ROS/RNS and alters ATP:ADP ratio"
+   }
+  ]
+ },
+ "changes": [
+  "Removed generic proliferation genes (MYC, CCND1, PCNA, MCM3, TOP2A, AURKA, AURKB, PLK1, BIRC5, CDK1, CCNB1, CCNA2, UBE2C, NUSAP1, KIF20A) from proximal_down; these are not immediate transcriptional targets of sodium channel blockade and belong to generic proliferation_down.",
+  "Removed SQSTM1 from late_up because it already appears in proximal_up; a gene must not appear in both an up and a down list of the same time.",
+  "Removed HSPA1A, DNAJB1, HSPB1, BAG3 from proximal_up; heat-shock/proteostasis genes are generic stress responses, not proximal to local anesthetic sodium channel blockade.",
+  "Removed DDIT4, TRIB3, CHAC1, GADD45A, BNIP3, BNIP3L, PMAIP1, BAX, HMOX1, TXNRD1, HERPUD1, XBP1, ATF5 from late_up; these are generic apoptosis, oxidative stress, or unfolded protein response genes rather than specific late transcriptional consequences of local anesthetic action.",
+  "Removed CCNE2, CDK2, CDK4, CDK6, E2F2 from late_down; these are generic proliferation genes and not specific late targets of local anesthetics.",
+  "Kept primary_targets as SCN5A, SCN10A, SCN1A because local anesthetics block voltage-gated sodium channels, but noted that the cited evidence does not support transcriptional profiling at 10 uM.",
+  "Kept kinetics as fast because immediate early genes (FOS, JUN, EGR1) and stress responses can occur within 6 h, but the 10 uM concentration may be sub-threshold for many effects.",
+  "Kept magnitude as moderate at 6 h and strong at 24 h, consistent with time-dependent apoptosis and stress responses, but the evidence is from high concentrations (0.1-5 mM) and not 10 uM.",
+  "Kept line_response as moderate/weak/strong based on general metabolic and proliferative differences, but no direct evidence supports these specific levels at 10 uM.",
+  "Kept context_requirements and falsifiers as they are consistent with the mechanism and evidence.",
+  "Kept all evidence citations because their abstracts support the stated claims about local anesthetic effects on mitochondria, apoptosis, and proliferation."
+ ],
+ "raw": {
+  "mechanism": "local anesthetic",
+  "primary_targets": [
+   "SCN5A",
+   "SCN10A",
+   "SCN1A"
+  ],
+  "proximal_up": [
+   "FOS",
+   "JUN",
+   "EGR1",
+   "ATF1",
+   "HSPA1A",
+   "DNAJB1",
+   "HSPB1",
+   "BAG3",
+   "SQSTM1",
+   "NFKBIA",
+   "IER3",
+   "ZFP36",
+   "CEBPD",
+   "DUSP4",
+   "TRIB1"
+  ],
+  "proximal_down": [
+   "MYC",
+   "CCND1",
+   "PCNA",
+   "MCM3",
+   "TOP2A",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "BIRC5",
+   "CDK1",
+   "CCNB1",
+   "CCNA2",
+   "UBE2C",
+   "NUSAP1",
+   "KIF20A"
+  ],
+  "late_up": [
+   "DDIT4",
+   "TRIB3",
+   "CHAC1",
+   "GADD45A",
+   "BNIP3",
+   "BNIP3L",
+   "PMAIP1",
+   "BAX",
+   "HMOX1",
+   "TXNRD1",
+   "SQSTM1",
+   "HERPUD1",
+   "XBP1",
+   "ATF5"
+  ],
+  "late_down": [
+   "MYC",
+   "CCND1",
+   "CCNE2",
+   "CDK2",
+   "CDK4",
+   "CDK6",
+   "E2F2",
+   "MCM3",
+   "PCNA",
+   "TOP2A",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "BIRC5",
+   "UBE2C"
+  ],
+  "generic_effects": [
+   "apoptosis",
+   "oxidative_stress",
+   "unfolded_protein_response",
+   "proliferation_down"
+  ],
+  "kinetics": "fast",
+  "magnitude": {
+   "6h": "moderate",
+   "24h": "strong"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "strong",
+   "HT29": "moderate",
+   "MCF7": "moderate",
+   "PC3": "moderate",
+   "VCAP": "moderate"
+  },
+  "context_requirements": [
+   "Mitochondrial activity and intact electron transport chain for ROS/RNS generation",
+   "Sodium channel expression is not required; effects occur independent of Na+ channel blockade",
+   "Concentrations at or above ~0.1-1 mM for growth/survival effects; 10 uM may be sub-threshold in some lines",
+   "Proliferating cells with active cell cycle for antiproliferative readouts"
+  ],
+  "falsifiers": [
+   "No change in FOS/JUN/EGR1 or HSPA1A/DNAJB1 at 6 h in any line",
+   "No decrease in proliferation/cell-cycle genes at 24 h",
+   "No evidence of apoptosis or oxidative stress response at 24 h",
+   "Responses equal in all nine lines regardless of lineage or metabolic capacity"
+  ],
+  "confidence": "low",
+  "evidence": [
+   {
+    "pmid": "15505455",
+    "supports": "Lidocaine causes mitochondrial membrane potential loss, cytochrome c release, caspase activation and apoptosis in neuronal cells"
+   },
+   {
+    "pmid": "20700677",
+    "supports": "Local anesthetics induce apoptosis in human chondrocytes"
+   },
+   {
+    "pmid": "29684861",
+    "supports": "Bupivacaine inhibits growth/survival via mitochondrial complex I/II inhibition and affects Rho family activity"
+   },
+   {
+    "pmid": "34249706",
+    "supports": "Lidocaine inhibits proliferation and induces apoptosis via PI3K/AKT/mTOR and Bax/Bcl2 pathways"
+   },
+   {
+    "pmid": "28236766",
+    "supports": "Lidocaine increases mitochondrial depolarization, ROS/RNS and alters ATP:ADP ratio"
+   }
+  ],
+  "changes": [
+   "Removed generic proliferation genes (MYC, CCND1, PCNA, MCM3, TOP2A, AURKA, AURKB, PLK1, BIRC5, CDK1, CCNB1, CCNA2, UBE2C, NUSAP1, KIF20A) from proximal_down; these are not immediate transcriptional targets of sodium channel blockade and belong to generic proliferation_down.",
+   "Removed SQSTM1 from late_up because it already appears in proximal_up; a gene must not appear in both an up and a down list of the same time.",
+   "Removed HSPA1A, DNAJB1, HSPB1, BAG3 from proximal_up; heat-shock/proteostasis genes are generic stress responses, not proximal to local anesthetic sodium channel blockade.",
+   "Removed DDIT4, TRIB3, CHAC1, GADD45A, BNIP3, BNIP3L, PMAIP1, BAX, HMOX1, TXNRD1, HERPUD1, XBP1, ATF5 from late_up; these are generic apoptosis, oxidative stress, or unfolded protein response genes rather than specific late transcriptional consequences of local anesthetic action.",
+   "Removed CCNE2, CDK2, CDK4, CDK6, E2F2 from late_down; these are generic proliferation genes and not specific late targets of local anesthetics.",
+   "Kept primary_targets as SCN5A, SCN10A, SCN1A because local anesthetics block voltage-gated sodium channels, but noted that the cited evidence does not support transcriptional profiling at 10 uM.",
+   "Kept kinetics as fast because immediate early genes (FOS, JUN, EGR1) and stress responses can occur within 6 h, but the 10 uM concentration may be sub-threshold for many effects.",
+   "Kept magnitude as moderate at 6 h and strong at 24 h, consistent with time-dependent apoptosis and stress responses, but the evidence is from high concentrations (0.1-5 mM) and not 10 uM.",
+   "Kept line_response as moderate/weak/strong based on general metabolic and proliferative differences, but no direct evidence supports these specific levels at 10 uM.",
+   "Kept context_requirements and falsifiers as they are consistent with the mechanism and evidence.",
+   "Kept all evidence citations because their abstracts support the stated claims about local anesthetic effects on mitochondria, apoptosis, and proliferation."
+  ]
+ },
+ "created_utc": "2026-10-10T11:52:05Z"
+}

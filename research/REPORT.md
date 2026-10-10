@@ -32,6 +32,31 @@ Gate decisions now use interval lower bounds (`plan_measure_or_predict`, which c
 the [block K evidence](EVIDENCE.md#measure-or-predict-across-platform-and-time--2026-10-10) and
 [packet](astra/kinetic_horizon_20261010/README.md).
 
+Block M (2026-10-10) asked whether the agent and a world model can **falsify** mechanism
+hypotheses with a calibrated error rate. The test used 424 Repurposing Hub classes, 502 sealed
+L1000 drugs and four profiles per drug. Three findings:
+
+* **Calibration is necessary but not yet sufficient.**
+  * Neither the agent's own eliminations nor likelihood elimination is a falsification test. The
+    agent alone kept the true mechanism in 0 of 100 drugs, and 90% credible sets in 22%.
+  * A conformal test with relative scores, energy bins and episode-calibrated adaptive design
+    covered 0.892 on average.
+  * It failed the registered rule on the most active drugs (0.776, n 49), exactly where sets
+    shrink.
+* **The world model's class content falsifies** (19 fewer survivors than shuffled labels). It
+  ranks mechanisms no better than class-mean cosine, and like kNN-1 with four profiles.
+* **No agent contribution survived its controls.**
+  * Literature, critique, analogies and hypothesis content were tested, and a generic prototype
+    did as well.
+  * Neither planner reduced sets: the expected-survivor planner nor agent-chosen observations.
+  * The agent reading p-values lost coverage.
+  * Identifiability prediction matched a pair-blind baseline.
+  * The test never declared a hypothesis set inadequate.
+
+Nothing was promoted. See the
+[block M evidence](EVIDENCE.md#calibrated-falsification-of-mechanism-hypotheses--2026-10-10) and
+[packet](astra/mechanism_falsification_20261010/README.md).
+
 A forecast may influence endpoint selection only after a same-unit readout-to-endpoint bridge
 (same culture unit, dose and time) and a reference ceiling pass: substitute observed responses
 for forecasts, score leave-one-context-out, and beat the best cheap prior by the declared minimum

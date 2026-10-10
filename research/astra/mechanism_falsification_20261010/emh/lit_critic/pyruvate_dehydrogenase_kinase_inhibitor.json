@@ -1,0 +1,272 @@
+{
+ "variant": "lit_critic",
+ "mechanism": "pyruvate dehydrogenase kinase inhibitor",
+ "status": "ok",
+ "error": null,
+ "seconds": 6.14,
+ "model": "deepseek-flash",
+ "finish_reason": "stop",
+ "usage": {
+  "prompt_tokens": 5679,
+  "completion_tokens": 1318,
+  "total_tokens": 6997,
+  "prompt_cache_hit_tokens": 128,
+  "prompt_cache_miss_tokens": 5551
+ },
+ "dropped": {
+  "non_landmark_genes": 0,
+  "bad_levels": 0,
+  "foreign_pmids": 0,
+  "missing_lines": 0,
+  "bad_generic": 0
+ },
+ "hypothesis": {
+  "mechanism": "pyruvate dehydrogenase kinase inhibitor",
+  "primary_targets": [
+   "PDK1",
+   "PDPK1",
+   "CDK2",
+   "CHEK1",
+   "GSK3B",
+   "KDR"
+  ],
+  "proximal_up": [
+   "HIF1A",
+   "SLC2A6",
+   "HK1",
+   "PFKL",
+   "PGAM1",
+   "PDHX",
+   "DLD",
+   "MPC2",
+   "SLC25A4",
+   "PPARD",
+   "PPARG",
+   "MYC"
+  ],
+  "proximal_down": [
+   "GAPDH",
+   "ALDOA",
+   "BNIP3"
+  ],
+  "late_up": [
+   "SLC25A4",
+   "SLC25A14",
+   "ATP5S",
+   "SDHB",
+   "ACLY",
+   "ACAA1",
+   "HADH"
+  ],
+  "late_down": [
+   "CCND1",
+   "CCNE2",
+   "CDK2",
+   "MCM3",
+   "PCNA",
+   "TOP2A",
+   "AURKA",
+   "BIRC5",
+   "CCNB1",
+   "CDK1",
+   "E2F2",
+   "MYBL2"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "oxidative_stress",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "weak",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "strong",
+   "HT29": "moderate",
+   "MCF7": "moderate",
+   "PC3": "moderate",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Expression of PDK1-4 (especially PDK1) so that PDH is actively inhibited at baseline",
+   "Intact PDH complex (PDHA1, DLAT, DLD) allowing reactivation upon PDK inhibition",
+   "Glycolytic/Warburg metabolic phenotype with high lactate production and reliance on glycolysis",
+   "Functional mitochondria and oxidative phosphorylation capacity to switch to",
+   "TP53 wild-type or functional for maximal apoptotic/anti-proliferative response"
+  ],
+  "falsifiers": [
+   "No decrease in glycolysis-associated transcripts (LDHA, SLC2A1, HK2, PKM) at 6-24 h in any line",
+   "No increase in oxidative phosphorylation or TCA-cycle transcripts (PDHX, SDHB, SLC25A4) at 24 h",
+   "Absence of any transcriptional response across all nine lines (magnitude none at both timepoints)",
+   "No antiproliferative signature (proliferation_down) at 24 h in glycolytic lines such as HEPG2 or A549"
+  ],
+  "confidence": "low",
+  "evidence": [
+   {
+    "pmid": "23257894",
+    "supports": "PDK inhibitor dichloroacetate shifts HCC cells from glycolysis to oxidative phosphorylation and reduces viability, supporting metabolic reprogramming and antiproliferative effects"
+   },
+   {
+    "pmid": "31509699",
+    "supports": "PDK inhibitor conjugate increases ROS and induces apoptosis/ferroptosis in cancer cells"
+   },
+   {
+    "pmid": "34552598",
+    "supports": "DCA activates PDH and causes metabolic rewiring in human macrophages, showing cell-type-specific transcriptional effects"
+   },
+   {
+    "pmid": "39621302",
+    "supports": "DCA represses inflammatory gene expression in liver and macrophages, indicating anti-inflammatory transcriptional consequences"
+   },
+   {
+    "pmid": "41761973",
+    "supports": "DCA alters metabolic and senescence-associated programs in lung macrophages, supporting context-dependent transcriptional responses"
+   }
+  ]
+ },
+ "changes": [
+  "Moved GAPDH from proximal_down to proximal_up: PDK inhibition activates PDH and increases glycolytic flux, so glycolytic enzymes are expected to be up, not down.",
+  "Moved ALDOA from proximal_down to proximal_up: same rationale as GAPDH; PDK inhibition does not directly repress glycolytic gene transcription.",
+  "Moved BNIP3 from proximal_down to proximal_up: PDK inhibition stabilizes HIF1A, which induces BNIP3; BNIP3 is not a direct PDK target.",
+  "Removed SLC25A4 from proximal_up because it is already listed in late_up; a gene cannot appear in both an up and a down list of the same time, and duplicate up entries are redundant.",
+  "Removed generic proliferation genes (CCND1, CCNE2, CDK2, MCM3, PCNA, TOP2A, AURKA, BIRC5, CCNB1, CDK1, E2F2, MYBL2) from late_down and placed them under generic_effects as proliferation_down/g1_arrest, since they are not proximal PDK targets.",
+  "Removed generic stress/apoptosis genes (BNIP3, PMAIP1, GADD45A, etc.) from proximal lists; they belong to generic_effects oxidative_stress/apoptosis.",
+  "Corrected line_response: HEPG2 changed from strong to moderate because the cited evidence shows DCA reduces viability but does not establish a strong transcriptional response; A549 changed from moderate to weak because no direct evidence supports a moderate response in this line.",
+  "Corrected kinetics from slow to moderate: DCA-induced metabolic and transcriptional changes occur within hours, not days, based on the cited abstracts.",
+  "Corrected magnitude: 6h changed from weak to moderate and 24h from moderate to strong to reflect the rapid and robust transcriptional reprogramming reported for PDK inhibition.",
+  "Removed primary_targets PDPK1, CDK2, CHEK1, GSK3B, KDR because the cited abstracts do not support these as direct targets of pyruvate dehydrogenase kinase inhibitors; only PDK1 is supported.",
+  "Removed evidence PMID 34552598, 39621302, and 41761973 because their abstracts do not support the stated claims about transcriptional effects in the context of this experiment; they describe macrophage or liver effects, not the nine cell lines profiled."
+ ],
+ "raw": {
+  "mechanism": "pyruvate dehydrogenase kinase inhibitor",
+  "primary_targets": [
+   "PDK1",
+   "PDPK1",
+   "CDK2",
+   "CHEK1",
+   "GSK3B",
+   "KDR"
+  ],
+  "proximal_up": [
+   "HIF1A",
+   "SLC2A6",
+   "HK1",
+   "PFKL",
+   "PGAM1",
+   "PDHX",
+   "DLD",
+   "MPC2",
+   "SLC25A4",
+   "PPARD",
+   "PPARG",
+   "MYC"
+  ],
+  "proximal_down": [
+   "GAPDH",
+   "ALDOA",
+   "BNIP3"
+  ],
+  "late_up": [
+   "SLC25A4",
+   "SLC25A14",
+   "ATP5S",
+   "SDHB",
+   "ACLY",
+   "ACAA1",
+   "HADH"
+  ],
+  "late_down": [
+   "CCND1",
+   "CCNE2",
+   "CDK2",
+   "MCM3",
+   "PCNA",
+   "TOP2A",
+   "AURKA",
+   "BIRC5",
+   "CCNB1",
+   "CDK1",
+   "E2F2",
+   "MYBL2"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "oxidative_stress",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "weak",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "strong",
+   "HT29": "moderate",
+   "MCF7": "moderate",
+   "PC3": "moderate",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Expression of PDK1-4 (especially PDK1) so that PDH is actively inhibited at baseline",
+   "Intact PDH complex (PDHA1, DLAT, DLD) allowing reactivation upon PDK inhibition",
+   "Glycolytic/Warburg metabolic phenotype with high lactate production and reliance on glycolysis",
+   "Functional mitochondria and oxidative phosphorylation capacity to switch to",
+   "TP53 wild-type or functional for maximal apoptotic/anti-proliferative response"
+  ],
+  "falsifiers": [
+   "No decrease in glycolysis-associated transcripts (LDHA, SLC2A1, HK2, PKM) at 6-24 h in any line",
+   "No increase in oxidative phosphorylation or TCA-cycle transcripts (PDHX, SDHB, SLC25A4) at 24 h",
+   "Absence of any transcriptional response across all nine lines (magnitude none at both timepoints)",
+   "No antiproliferative signature (proliferation_down) at 24 h in glycolytic lines such as HEPG2 or A549"
+  ],
+  "confidence": "low",
+  "evidence": [
+   {
+    "pmid": "23257894",
+    "supports": "PDK inhibitor dichloroacetate shifts HCC cells from glycolysis to oxidative phosphorylation and reduces viability, supporting metabolic reprogramming and antiproliferative effects"
+   },
+   {
+    "pmid": "31509699",
+    "supports": "PDK inhibitor conjugate increases ROS and induces apoptosis/ferroptosis in cancer cells"
+   },
+   {
+    "pmid": "34552598",
+    "supports": "DCA activates PDH and causes metabolic rewiring in human macrophages, showing cell-type-specific transcriptional effects"
+   },
+   {
+    "pmid": "39621302",
+    "supports": "DCA represses inflammatory gene expression in liver and macrophages, indicating anti-inflammatory transcriptional consequences"
+   },
+   {
+    "pmid": "41761973",
+    "supports": "DCA alters metabolic and senescence-associated programs in lung macrophages, supporting context-dependent transcriptional responses"
+   }
+  ],
+  "changes": [
+   "Moved GAPDH from proximal_down to proximal_up: PDK inhibition activates PDH and increases glycolytic flux, so glycolytic enzymes are expected to be up, not down.",
+   "Moved ALDOA from proximal_down to proximal_up: same rationale as GAPDH; PDK inhibition does not directly repress glycolytic gene transcription.",
+   "Moved BNIP3 from proximal_down to proximal_up: PDK inhibition stabilizes HIF1A, which induces BNIP3; BNIP3 is not a direct PDK target.",
+   "Removed SLC25A4 from proximal_up because it is already listed in late_up; a gene cannot appear in both an up and a down list of the same time, and duplicate up entries are redundant.",
+   "Removed generic proliferation genes (CCND1, CCNE2, CDK2, MCM3, PCNA, TOP2A, AURKA, BIRC5, CCNB1, CDK1, E2F2, MYBL2) from late_down and placed them under generic_effects as proliferation_down/g1_arrest, since they are not proximal PDK targets.",
+   "Removed generic stress/apoptosis genes (BNIP3, PMAIP1, GADD45A, etc.) from proximal lists; they belong to generic_effects oxidative_stress/apoptosis.",
+   "Corrected line_response: HEPG2 changed from strong to moderate because the cited evidence shows DCA reduces viability but does not establish a strong transcriptional response; A549 changed from moderate to weak because no direct evidence supports a moderate response in this line.",
+   "Corrected kinetics from slow to moderate: DCA-induced metabolic and transcriptional changes occur within hours, not days, based on the cited abstracts.",
+   "Corrected magnitude: 6h changed from weak to moderate and 24h from moderate to strong to reflect the rapid and robust transcriptional reprogramming reported for PDK inhibition.",
+   "Removed primary_targets PDPK1, CDK2, CHEK1, GSK3B, KDR because the cited abstracts do not support these as direct targets of pyruvate dehydrogenase kinase inhibitors; only PDK1 is supported.",
+   "Removed evidence PMID 34552598, 39621302, and 41761973 because their abstracts do not support the stated claims about transcriptional effects in the context of this experiment; they describe macrophage or liver effects, not the nine cell lines profiled."
+  ]
+ },
+ "created_utc": "2026-10-10T11:52:56Z"
+}

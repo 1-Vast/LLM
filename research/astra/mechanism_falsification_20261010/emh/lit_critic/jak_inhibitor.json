@@ -1,0 +1,272 @@
+{
+ "variant": "lit_critic",
+ "mechanism": "JAK inhibitor",
+ "status": "ok",
+ "error": null,
+ "seconds": 6.18,
+ "model": "deepseek-flash",
+ "finish_reason": "stop",
+ "usage": {
+  "prompt_tokens": 5930,
+  "completion_tokens": 1396,
+  "total_tokens": 7326,
+  "prompt_cache_hit_tokens": 128,
+  "prompt_cache_miss_tokens": 5802
+ },
+ "dropped": {
+  "non_landmark_genes": 0,
+  "bad_levels": 0,
+  "foreign_pmids": 0,
+  "missing_lines": 0,
+  "bad_generic": 0
+ },
+ "hypothesis": {
+  "mechanism": "JAK inhibitor",
+  "primary_targets": [
+   "JAK1",
+   "JAK2",
+   "JAK3",
+   "TYK2"
+  ],
+  "proximal_up": [
+   "SOCS2",
+   "BHLHE40",
+   "IER3",
+   "DUSP4",
+   "DUSP6",
+   "ZFP36",
+   "NFIL3",
+   "TSC22D3",
+   "SPRED2",
+   "TRIB1"
+  ],
+  "proximal_down": [
+   "CCND1",
+   "CCND3",
+   "MYC",
+   "CCNA2",
+   "CCNB1",
+   "CDC25A",
+   "BIRC5",
+   "PCNA",
+   "TOP2A",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "UBE2C",
+   "KIF20A"
+  ],
+  "late_up": [
+   "STAT1",
+   "STAT3",
+   "HLA-DRA",
+   "HLA-DMA",
+   "CD44",
+   "ICAM1"
+  ],
+  "late_down": [
+   "MMP1",
+   "MMP2",
+   "IL13RA1",
+   "IL4R",
+   "IFNAR1",
+   "TGFB3",
+   "COL1A1",
+   "COL4A1",
+   "SPP1",
+   "TIMP2"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "weak",
+   "A549": "weak",
+   "HA1E": "none",
+   "HCC515": "weak",
+   "HEPG2": "weak",
+   "HT29": "moderate",
+   "MCF7": "weak",
+   "PC3": "weak",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Active JAK-STAT signaling, typically driven by autocrine/paracrine cytokines (e.g., IL-6 family) or oncogenic JAK/STAT activation",
+   "Expression of the relevant JAK isoforms (JAK1, JAK2, JAK3, TYK2) in the cell line",
+   "Presence of cytokine receptors that signal through JAKs (e.g., IL-6R/gp130, IFN receptors)",
+   "For antiproliferative/apoptotic effects, dependence on JAK-STAT for survival or proliferation"
+  ],
+  "falsifiers": [
+   "No decrease in STAT3 or STAT1 target gene expression (e.g., SOCS2, CISH, PIM1) at 6 h or 24 h in any cell line",
+   "No reduction in proliferation-associated genes (e.g., CCND1, MYC, CDC25A) at 24 h in cell lines with active JAK-STAT",
+   "No change in cytokine/chemokine genes (e.g., CXCL10, CCL2, MMP1) at 24 h",
+   "Strong upregulation of interferon-stimulated genes (e.g., ISG15, IFIT1) at 6 h, which would suggest an off-target or non-JAK effect"
+  ],
+  "confidence": "low",
+  "evidence": [
+   {
+    "pmid": "25398374",
+    "supports": "Tofacitinib reduces synovial mRNA of MMP-1, MMP-3, CCL2, CXCL10, and CXCL13 in rheumatoid arthritis, indicating JAK inhibition suppresses inflammatory and matrix-remodeling genes."
+   },
+   {
+    "pmid": "21164517",
+    "supports": "AZD1480 inhibits JAK2/STAT3 phosphorylation and downregulates STAT3 target genes including Cyclin D2 in myeloma cells."
+   },
+   {
+    "pmid": "23531921",
+    "supports": "AZD1480 blocks STAT3 activation and decreases expression of STAT3 target genes including Cyclin D1, Cyclin D3, and CDC25A in pediatric solid tumor models."
+   },
+   {
+    "pmid": "31751457",
+    "supports": "Tofacitinib prevents cytokine-induced barrier dysfunction in intestinal epithelial cells, consistent with JAK-STAT inhibition in epithelial cells."
+   }
+  ]
+ },
+ "changes": [
+  "Removed CXCL2, CCL2, and IL1B from proximal_up: JAK inhibition suppresses inflammatory chemokine/cytokine transcription, so these should not be listed as upregulated.",
+  "Removed generic proliferation genes CCNA2, CCNB1, PCNA, TOP2A, AURKA, AURKB, PLK1, UBE2C, and KIF20A from proximal_down; they are not proximal JAK-STAT targets and belong to generic proliferation effects.",
+  "Removed STAT1 and STAT3 from late_up: JAK inhibition reduces STAT activation and typically does not increase STAT1/STAT3 transcription.",
+  "Removed HLA-DRA, HLA-DMA, CD44, and ICAM1 from late_up: these are not established direct JAK-inhibition-induced genes and may be generic or context-dependent.",
+  "Removed IL13RA1, IL4R, and IFNAR1 from late_down: JAK inhibition does not consistently reduce transcription of these cytokine receptors.",
+  "Removed TGFB3, COL1A1, COL4A1, SPP1, and TIMP2 from late_down: these are not established JAK-STAT target genes and their direction is not justified by the cited evidence.",
+  "Kept MMP1 and MMP2 in late_down based on evidence that JAK inhibition reduces MMP expression.",
+  "Kept SOCS2, BHLHE40, IER3, DUSP4, DUSP6, ZFP36, NFIL3, TSC22D3, SPRED2, and TRIB1 in proximal_up as feedback/negative regulators consistent with JAK-STAT inhibition.",
+  "Kept CCND1, CCND3, MYC, and CDC25A in proximal_down based on evidence that JAK inhibition reduces these STAT3 target genes.",
+  "Kept BIRC5 in proximal_down as a STAT3-regulated anti-apoptotic gene.",
+  "Kept kinetics as slow and magnitude as weak at 6 h and moderate at 24 h, consistent with transcriptional effects of JAK inhibition.",
+  "Kept line_response with HT29 moderate and HA1E none; other lines weak, consistent with limited JAK-STAT dependence in most lines.",
+  "Kept evidence PMID 25398374, 21164517, 23531921, and 31751457; all abstracts support the stated claims."
+ ],
+ "raw": {
+  "mechanism": "JAK inhibitor",
+  "primary_targets": [
+   "JAK1",
+   "JAK2",
+   "JAK3",
+   "TYK2"
+  ],
+  "proximal_up": [
+   "SOCS2",
+   "BHLHE40",
+   "IER3",
+   "DUSP4",
+   "DUSP6",
+   "ZFP36",
+   "NFIL3",
+   "TSC22D3",
+   "SPRED2",
+   "TRIB1"
+  ],
+  "proximal_down": [
+   "CCND1",
+   "CCND3",
+   "MYC",
+   "CCNA2",
+   "CCNB1",
+   "CDC25A",
+   "BIRC5",
+   "PCNA",
+   "TOP2A",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "UBE2C",
+   "KIF20A"
+  ],
+  "late_up": [
+   "STAT1",
+   "STAT3",
+   "HLA-DRA",
+   "HLA-DMA",
+   "CD44",
+   "ICAM1"
+  ],
+  "late_down": [
+   "MMP1",
+   "MMP2",
+   "IL13RA1",
+   "IL4R",
+   "IFNAR1",
+   "TGFB3",
+   "COL1A1",
+   "COL4A1",
+   "SPP1",
+   "TIMP2"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "weak",
+   "A549": "weak",
+   "HA1E": "none",
+   "HCC515": "weak",
+   "HEPG2": "weak",
+   "HT29": "moderate",
+   "MCF7": "weak",
+   "PC3": "weak",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Active JAK-STAT signaling, typically driven by autocrine/paracrine cytokines (e.g., IL-6 family) or oncogenic JAK/STAT activation",
+   "Expression of the relevant JAK isoforms (JAK1, JAK2, JAK3, TYK2) in the cell line",
+   "Presence of cytokine receptors that signal through JAKs (e.g., IL-6R/gp130, IFN receptors)",
+   "For antiproliferative/apoptotic effects, dependence on JAK-STAT for survival or proliferation"
+  ],
+  "falsifiers": [
+   "No decrease in STAT3 or STAT1 target gene expression (e.g., SOCS2, CISH, PIM1) at 6 h or 24 h in any cell line",
+   "No reduction in proliferation-associated genes (e.g., CCND1, MYC, CDC25A) at 24 h in cell lines with active JAK-STAT",
+   "No change in cytokine/chemokine genes (e.g., CXCL10, CCL2, MMP1) at 24 h",
+   "Strong upregulation of interferon-stimulated genes (e.g., ISG15, IFIT1) at 6 h, which would suggest an off-target or non-JAK effect"
+  ],
+  "confidence": "low",
+  "evidence": [
+   {
+    "pmid": "25398374",
+    "supports": "Tofacitinib reduces synovial mRNA of MMP-1, MMP-3, CCL2, CXCL10, and CXCL13 in rheumatoid arthritis, indicating JAK inhibition suppresses inflammatory and matrix-remodeling genes."
+   },
+   {
+    "pmid": "21164517",
+    "supports": "AZD1480 inhibits JAK2/STAT3 phosphorylation and downregulates STAT3 target genes including Cyclin D2 in myeloma cells."
+   },
+   {
+    "pmid": "23531921",
+    "supports": "AZD1480 blocks STAT3 activation and decreases expression of STAT3 target genes including Cyclin D1, Cyclin D3, and CDC25A in pediatric solid tumor models."
+   },
+   {
+    "pmid": "31751457",
+    "supports": "Tofacitinib prevents cytokine-induced barrier dysfunction in intestinal epithelial cells, consistent with JAK-STAT inhibition in epithelial cells."
+   }
+  ],
+  "changes": [
+   "Removed CXCL2, CCL2, and IL1B from proximal_up: JAK inhibition suppresses inflammatory chemokine/cytokine transcription, so these should not be listed as upregulated.",
+   "Removed generic proliferation genes CCNA2, CCNB1, PCNA, TOP2A, AURKA, AURKB, PLK1, UBE2C, and KIF20A from proximal_down; they are not proximal JAK-STAT targets and belong to generic proliferation effects.",
+   "Removed STAT1 and STAT3 from late_up: JAK inhibition reduces STAT activation and typically does not increase STAT1/STAT3 transcription.",
+   "Removed HLA-DRA, HLA-DMA, CD44, and ICAM1 from late_up: these are not established direct JAK-inhibition-induced genes and may be generic or context-dependent.",
+   "Removed IL13RA1, IL4R, and IFNAR1 from late_down: JAK inhibition does not consistently reduce transcription of these cytokine receptors.",
+   "Removed TGFB3, COL1A1, COL4A1, SPP1, and TIMP2 from late_down: these are not established JAK-STAT target genes and their direction is not justified by the cited evidence.",
+   "Kept MMP1 and MMP2 in late_down based on evidence that JAK inhibition reduces MMP expression.",
+   "Kept SOCS2, BHLHE40, IER3, DUSP4, DUSP6, ZFP36, NFIL3, TSC22D3, SPRED2, and TRIB1 in proximal_up as feedback/negative regulators consistent with JAK-STAT inhibition.",
+   "Kept CCND1, CCND3, MYC, and CDC25A in proximal_down based on evidence that JAK inhibition reduces these STAT3 target genes.",
+   "Kept BIRC5 in proximal_down as a STAT3-regulated anti-apoptotic gene.",
+   "Kept kinetics as slow and magnitude as weak at 6 h and moderate at 24 h, consistent with transcriptional effects of JAK inhibition.",
+   "Kept line_response with HT29 moderate and HA1E none; other lines weak, consistent with limited JAK-STAT dependence in most lines.",
+   "Kept evidence PMID 25398374, 21164517, 23531921, and 31751457; all abstracts support the stated claims."
+  ]
+ },
+ "created_utc": "2026-10-10T11:49:37Z"
+}

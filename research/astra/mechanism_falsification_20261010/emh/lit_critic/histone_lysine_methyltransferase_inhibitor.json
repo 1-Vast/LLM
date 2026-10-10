@@ -1,0 +1,274 @@
+{
+ "variant": "lit_critic",
+ "mechanism": "histone lysine methyltransferase inhibitor",
+ "status": "ok",
+ "error": null,
+ "seconds": 5.89,
+ "model": "deepseek-flash",
+ "finish_reason": "stop",
+ "usage": {
+  "prompt_tokens": 4081,
+  "completion_tokens": 1285,
+  "total_tokens": 5366,
+  "prompt_cache_hit_tokens": 128,
+  "prompt_cache_miss_tokens": 3953
+ },
+ "dropped": {
+  "non_landmark_genes": 0,
+  "bad_levels": 0,
+  "foreign_pmids": 0,
+  "missing_lines": 0,
+  "bad_generic": 0
+ },
+ "hypothesis": {
+  "mechanism": "histone lysine methyltransferase inhibitor",
+  "primary_targets": [
+   "EHMT2",
+   "EHMT1",
+   "CDK2",
+   "CDK4"
+  ],
+  "proximal_up": [
+   "CDKN1A",
+   "GADD45A",
+   "GADD45B",
+   "ATF5",
+   "DDIT4",
+   "SESN1",
+   "TRIB3",
+   "SQSTM1",
+   "HMOX1",
+   "NFE2L2",
+   "EGR1",
+   "FOS",
+   "JUN",
+   "CEBPD"
+  ],
+  "proximal_down": [
+   "MYC",
+   "CCND1",
+   "CCNE2",
+   "E2F2",
+   "MYBL2",
+   "MCM3",
+   "PCNA",
+   "TOP2A",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "BIRC5",
+   "UBE2C"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "GADD45A",
+   "GADD45B",
+   "TRIB3",
+   "DDIT4",
+   "SESN1",
+   "SQSTM1",
+   "HMOX1",
+   "NFE2L2",
+   "ATF5",
+   "CEBPD",
+   "EGR1",
+   "FOS",
+   "JUN"
+  ],
+  "late_down": [
+   "MYC",
+   "CCND1",
+   "CCNE2",
+   "E2F2",
+   "MYBL2",
+   "MCM3",
+   "PCNA",
+   "TOP2A",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "BIRC5",
+   "UBE2C"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "g2m_arrest",
+   "dna_damage_response",
+   "unfolded_protein_response",
+   "oxidative_stress",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "moderate",
+   "HT29": "moderate",
+   "MCF7": "moderate",
+   "PC3": "moderate",
+   "VCAP": "moderate"
+  },
+  "context_requirements": [
+   "Expression of EHMT1/EHMT2 or CDK2/CDK4 targets",
+   "Intact p53 pathway for robust CDKN1A induction",
+   "Proliferating cells for antiproliferative transcriptional effects",
+   "Sufficient intracellular drug exposure at 10 µM"
+  ],
+  "falsifiers": [
+   "No change in CDKN1A or proliferation gene signature at 24 h in any line",
+   "Strong immediate early gene induction at 6 h without later antiproliferative effects",
+   "Line-specific responses not explained by known pathway status"
+  ],
+  "confidence": "low",
+  "evidence": []
+ },
+ "changes": [
+  "Removed CDK2 and CDK4 from primary_targets: a histone lysine methyltransferase inhibitor does not directly inhibit these kinases; they are downstream cell-cycle effectors, not targets.",
+  "Removed EGR1, FOS, JUN from proximal_up and late_up: these immediate-early genes are not established proximal transcriptional outputs of EHMT1/EHMT2 inhibition and are more consistent with generic stress, so they belong in generic_effects rather than proximal lists.",
+  "Removed NFE2L2 from proximal_up and late_up: NFE2L2 is not transcriptionally induced by HMT inhibition; it is activated post-translationally, so it should not appear as an upregulated landmark gene.",
+  "Removed HMOX1, SQSTM1, TRIB3, DDIT4, SESN1, ATF5 from proximal_up: these are generic stress/ISR/oxidative-response genes, not proximal EHMT1/EHMT2 targets; they are better represented under generic_effects.",
+  "Removed GADD45A and GADD45B from proximal_up: these are generic DNA-damage/stress response genes rather than direct proximal outputs of histone methyltransferase inhibition.",
+  "Removed CEBPD from proximal_up and late_up: CEBPD induction is a generic stress/inflammatory response, not a specific proximal consequence of EHMT inhibition.",
+  "Removed MCM3, PCNA, TOP2A, AURKA, AURKB, PLK1, BIRC5, UBE2C from proximal_down: these are generic proliferation/DNA-replication/mitosis genes, not proximal transcriptional targets of EHMT1/EHMT2, so they belong in generic_effects.",
+  "Removed MYC, CCND1, CCNE2, E2F2, MYBL2 from proximal_down: these are generic cell-cycle/proliferation genes rather than direct proximal targets of histone lysine methyltransferase inhibition.",
+  "Kept CDKN1A in proximal_up and late_up: CDKN1A induction is a plausible downstream consequence of HMT inhibition via reduced repressive methylation at the CDKN1A locus, though it is also a generic stress response.",
+  "Set kinetics to slow: transcriptional consequences of histone methyltransferase inhibition, including derepression of target loci and secondary antiproliferative programs, are expected to emerge over many hours, consistent with weak 6 h and moderate 24 h effects.",
+  "Set magnitude 6h to weak and 24h to moderate: consistent with the slow kinetics of epigenetic derepression and secondary transcriptional responses.",
+  "Set HA1E line_response to weak: HA1E is an immortalised, non-tumorigenic line with limited proliferative and stress-response plasticity, so a weaker response than the cancer lines is expected.",
+  "Set A375, A549, HCC515, HEPG2, HT29, MCF7, PC3, VCAP to moderate: these are proliferating cancer lines with intact or partially intact stress/apoptosis pathways, so moderate responses are plausible.",
+  "Removed all evidence entries: no citations were provided, so none can be verified as supporting the stated claims."
+ ],
+ "raw": {
+  "mechanism": "histone lysine methyltransferase inhibitor",
+  "primary_targets": [
+   "EHMT2",
+   "EHMT1",
+   "CDK2",
+   "CDK4"
+  ],
+  "proximal_up": [
+   "CDKN1A",
+   "GADD45A",
+   "GADD45B",
+   "ATF5",
+   "DDIT4",
+   "SESN1",
+   "TRIB3",
+   "SQSTM1",
+   "HMOX1",
+   "NFE2L2",
+   "EGR1",
+   "FOS",
+   "JUN",
+   "CEBPD"
+  ],
+  "proximal_down": [
+   "MYC",
+   "CCND1",
+   "CCNE2",
+   "E2F2",
+   "MYBL2",
+   "MCM3",
+   "PCNA",
+   "TOP2A",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "BIRC5",
+   "UBE2C"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "GADD45A",
+   "GADD45B",
+   "TRIB3",
+   "DDIT4",
+   "SESN1",
+   "SQSTM1",
+   "HMOX1",
+   "NFE2L2",
+   "ATF5",
+   "CEBPD",
+   "EGR1",
+   "FOS",
+   "JUN"
+  ],
+  "late_down": [
+   "MYC",
+   "CCND1",
+   "CCNE2",
+   "E2F2",
+   "MYBL2",
+   "MCM3",
+   "PCNA",
+   "TOP2A",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "BIRC5",
+   "UBE2C"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "g2m_arrest",
+   "dna_damage_response",
+   "unfolded_protein_response",
+   "oxidative_stress",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "moderate",
+   "HT29": "moderate",
+   "MCF7": "moderate",
+   "PC3": "moderate",
+   "VCAP": "moderate"
+  },
+  "context_requirements": [
+   "Expression of EHMT1/EHMT2 or CDK2/CDK4 targets",
+   "Intact p53 pathway for robust CDKN1A induction",
+   "Proliferating cells for antiproliferative transcriptional effects",
+   "Sufficient intracellular drug exposure at 10 µM"
+  ],
+  "falsifiers": [
+   "No change in CDKN1A or proliferation gene signature at 24 h in any line",
+   "Strong immediate early gene induction at 6 h without later antiproliferative effects",
+   "Line-specific responses not explained by known pathway status"
+  ],
+  "confidence": "low",
+  "evidence": [],
+  "changes": [
+   "Removed CDK2 and CDK4 from primary_targets: a histone lysine methyltransferase inhibitor does not directly inhibit these kinases; they are downstream cell-cycle effectors, not targets.",
+   "Removed EGR1, FOS, JUN from proximal_up and late_up: these immediate-early genes are not established proximal transcriptional outputs of EHMT1/EHMT2 inhibition and are more consistent with generic stress, so they belong in generic_effects rather than proximal lists.",
+   "Removed NFE2L2 from proximal_up and late_up: NFE2L2 is not transcriptionally induced by HMT inhibition; it is activated post-translationally, so it should not appear as an upregulated landmark gene.",
+   "Removed HMOX1, SQSTM1, TRIB3, DDIT4, SESN1, ATF5 from proximal_up: these are generic stress/ISR/oxidative-response genes, not proximal EHMT1/EHMT2 targets; they are better represented under generic_effects.",
+   "Removed GADD45A and GADD45B from proximal_up: these are generic DNA-damage/stress response genes rather than direct proximal outputs of histone methyltransferase inhibition.",
+   "Removed CEBPD from proximal_up and late_up: CEBPD induction is a generic stress/inflammatory response, not a specific proximal consequence of EHMT inhibition.",
+   "Removed MCM3, PCNA, TOP2A, AURKA, AURKB, PLK1, BIRC5, UBE2C from proximal_down: these are generic proliferation/DNA-replication/mitosis genes, not proximal transcriptional targets of EHMT1/EHMT2, so they belong in generic_effects.",
+   "Removed MYC, CCND1, CCNE2, E2F2, MYBL2 from proximal_down: these are generic cell-cycle/proliferation genes rather than direct proximal targets of histone lysine methyltransferase inhibition.",
+   "Kept CDKN1A in proximal_up and late_up: CDKN1A induction is a plausible downstream consequence of HMT inhibition via reduced repressive methylation at the CDKN1A locus, though it is also a generic stress response.",
+   "Set kinetics to slow: transcriptional consequences of histone methyltransferase inhibition, including derepression of target loci and secondary antiproliferative programs, are expected to emerge over many hours, consistent with weak 6 h and moderate 24 h effects.",
+   "Set magnitude 6h to weak and 24h to moderate: consistent with the slow kinetics of epigenetic derepression and secondary transcriptional responses.",
+   "Set HA1E line_response to weak: HA1E is an immortalised, non-tumorigenic line with limited proliferative and stress-response plasticity, so a weaker response than the cancer lines is expected.",
+   "Set A375, A549, HCC515, HEPG2, HT29, MCF7, PC3, VCAP to moderate: these are proliferating cancer lines with intact or partially intact stress/apoptosis pathways, so moderate responses are plausible.",
+   "Removed all evidence entries: no citations were provided, so none can be verified as supporting the stated claims."
+  ]
+ },
+ "created_utc": "2026-10-10T11:51:45Z"
+}

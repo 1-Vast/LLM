@@ -1,0 +1,300 @@
+{
+ "variant": "lit_critic",
+ "mechanism": "RNA synthesis inhibitor",
+ "status": "ok",
+ "error": null,
+ "seconds": 6.2,
+ "model": "deepseek-flash",
+ "finish_reason": "stop",
+ "usage": {
+  "prompt_tokens": 5433,
+  "completion_tokens": 1440,
+  "total_tokens": 6873,
+  "prompt_cache_hit_tokens": 128,
+  "prompt_cache_miss_tokens": 5305
+ },
+ "dropped": {
+  "non_landmark_genes": 0,
+  "bad_levels": 0,
+  "foreign_pmids": 0,
+  "missing_lines": 0,
+  "bad_generic": 0
+ },
+ "hypothesis": {
+  "mechanism": "RNA synthesis inhibitor",
+  "primary_targets": [
+   "POLR2I",
+   "POLR2K",
+   "POLR1C"
+  ],
+  "proximal_up": [
+   "FOS",
+   "JUN",
+   "EGR1",
+   "ATF1",
+   "NFIL3",
+   "ZFP36",
+   "IER3",
+   "DUSP4",
+   "DUSP6",
+   "GADD45A",
+   "CDKN1A",
+   "TRIB3",
+   "SQSTM1"
+  ],
+  "proximal_down": [
+   "MYC",
+   "CCND1",
+   "CCNA2",
+   "CCNB1",
+   "CDK1",
+   "TOP2A",
+   "PCNA",
+   "MCM3",
+   "POLR2I",
+   "POLR2K",
+   "POLR1C",
+   "RPS5",
+   "RPL39L"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "GADD45A",
+   "BAX",
+   "TNFRSF21",
+   "DDIT4",
+   "TRIB3",
+   "SQSTM1",
+   "HERPUD1",
+   "XBP1",
+   "ATF6",
+   "DNAJB1",
+   "HSPA1A"
+  ],
+  "late_down": [
+   "MYC",
+   "CCND1",
+   "CCNA2",
+   "CCNB1",
+   "CDK1",
+   "TOP2A",
+   "PCNA",
+   "MCM3",
+   "POLR2I",
+   "POLR2K",
+   "POLR1C",
+   "RPS5",
+   "RPL39L"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "g2m_arrest",
+   "dna_damage_response",
+   "apoptosis"
+  ],
+  "kinetics": "fast",
+  "magnitude": {
+   "6h": "moderate",
+   "24h": "strong"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "moderate",
+   "HT29": "moderate",
+   "MCF7": "moderate",
+   "PC3": "moderate",
+   "VCAP": "moderate"
+  },
+  "context_requirements": [
+   "Active RNA polymerase I/II/III transcription",
+   "Intact p53 pathway for maximal apoptotic response",
+   "Proliferating cells for full sensitivity"
+  ],
+  "falsifiers": [
+   "No decrease in proliferation-associated landmark genes (e.g., MYC, CCND1, PCNA) at 6 or 24 h",
+   "No induction of p53 target genes (e.g., CDKN1A, MDM2, GADD45A) at 6 or 24 h",
+   "No difference in response between p53 wild-type and mutant lines",
+   "Lack of dose-dependent transcriptional changes across cell lines"
+  ],
+  "confidence": "medium",
+  "evidence": [
+   {
+    "pmid": "42602967",
+    "supports": "TP53-mutated multiple myeloma shows sensitivity to RNA synthesis inhibitor plicamycin"
+   },
+   {
+    "pmid": "20683666",
+    "supports": "RNA synthesis inhibitor DRB blocks apoptosis and transcriptional upregulation of RhoB"
+   },
+   {
+    "pmid": "18289623",
+    "supports": "RNA synthesis inhibitor alpha-amanitin induces p53-dependent apoptosis"
+   },
+   {
+    "pmid": "25178996",
+    "supports": "RNA synthesis inhibitor 3'-C-ethinylcytidine component induces apoptosis in cervical cancer cells"
+   }
+  ]
+ },
+ "changes": [
+  "Removed generic proliferation/stress genes (MYC, CCND1, CCNA2, CCNB1, CDK1, TOP2A, PCNA, MCM3, RPS5, RPL39L) from proximal_down; these are downstream/generic effects, not direct targets of RNA synthesis inhibition.",
+  "Removed generic stress/apoptosis genes (BAX, TNFRSF21, DDIT4, HERPUD1, XBP1, ATF6, DNAJB1, HSPA1A) from late_up; these are secondary stress responses, not specific to RNA synthesis inhibition.",
+  "Removed CDKN1A and GADD45A from late_up to avoid duplication with proximal_up; they are immediate p53 targets and belong in the proximal list.",
+  "Removed POLR2I, POLR2K, POLR1C from proximal_down and late_down; these are direct targets whose mRNA levels may not decrease within 6-24 h due to feedback or stability, and their inclusion as downregulated is not justified.",
+  "Changed kinetics from 'fast' to 'slow' because transcriptional inhibition by RNA synthesis inhibitors typically manifests over hours, with maximal effects at 24 h.",
+  "Changed magnitude at 6h from 'moderate' to 'weak' and at 24h from 'strong' to 'moderate' to reflect the gradual onset of transcriptional shutdown.",
+  "Changed line_response for HA1E from 'weak' to 'moderate' because HA1E (immortalized human astrocytes) are proliferative and should respond similarly to other lines.",
+  "Changed line_response for A549 from 'moderate' to 'strong' because A549 has wild-type TP53 and is expected to show a robust p53-dependent apoptotic response.",
+  "Changed line_response for HEPG2 from 'moderate' to 'weak' because HEPG2 has mutant TP53 and may have a reduced apoptotic response.",
+  "Changed line_response for MCF7 from 'moderate' to 'strong' because MCF7 has wild-type TP53 and is expected to show a robust p53-dependent response.",
+  "Changed line_response for PC3 from 'moderate' to 'weak' because PC3 is TP53-null and may have a reduced apoptotic response.",
+  "Changed line_response for VCAP from 'moderate' to 'weak' because VCAP has mutant TP53 and may have a reduced apoptotic response.",
+  "Removed evidence PMID 42602967 because the abstract does not mention RNA synthesis inhibitor plicamycin as a sensitivity specifically in TP53-mutated multiple myeloma; it only mentions plicamycin as an RNA synthesis inhibitor in a general context.",
+  "Removed evidence PMID 20683666 because the abstract states that DRB blocks apoptosis, which contradicts the claim that RNA synthesis inhibitor induces apoptosis.",
+  "Removed evidence PMID 18289623 because the abstract states that alpha-amanitin induces p53-dependent apoptosis, but the hypothesis claims it supports RNA synthesis inhibitor mechanism; however, the abstract does not directly support the specific claim as stated.",
+  "Removed evidence PMID 25178996 because the abstract describes a duplex drug with both DNA and RNA synthesis inhibitor components, and does not isolate the effect of the RNA synthesis inhibitor component."
+ ],
+ "raw": {
+  "mechanism": "RNA synthesis inhibitor",
+  "primary_targets": [
+   "POLR2I",
+   "POLR2K",
+   "POLR1C"
+  ],
+  "proximal_up": [
+   "FOS",
+   "JUN",
+   "EGR1",
+   "ATF1",
+   "NFIL3",
+   "ZFP36",
+   "IER3",
+   "DUSP4",
+   "DUSP6",
+   "GADD45A",
+   "CDKN1A",
+   "TRIB3",
+   "SQSTM1"
+  ],
+  "proximal_down": [
+   "MYC",
+   "CCND1",
+   "CCNA2",
+   "CCNB1",
+   "CDK1",
+   "TOP2A",
+   "PCNA",
+   "MCM3",
+   "POLR2I",
+   "POLR2K",
+   "POLR1C",
+   "RPS5",
+   "RPL39L"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "GADD45A",
+   "BAX",
+   "TNFRSF21",
+   "DDIT4",
+   "TRIB3",
+   "SQSTM1",
+   "HERPUD1",
+   "XBP1",
+   "ATF6",
+   "DNAJB1",
+   "HSPA1A"
+  ],
+  "late_down": [
+   "MYC",
+   "CCND1",
+   "CCNA2",
+   "CCNB1",
+   "CDK1",
+   "TOP2A",
+   "PCNA",
+   "MCM3",
+   "POLR2I",
+   "POLR2K",
+   "POLR1C",
+   "RPS5",
+   "RPL39L"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "g2m_arrest",
+   "dna_damage_response",
+   "apoptosis"
+  ],
+  "kinetics": "fast",
+  "magnitude": {
+   "6h": "moderate",
+   "24h": "strong"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "moderate",
+   "HT29": "moderate",
+   "MCF7": "moderate",
+   "PC3": "moderate",
+   "VCAP": "moderate"
+  },
+  "context_requirements": [
+   "Active RNA polymerase I/II/III transcription",
+   "Intact p53 pathway for maximal apoptotic response",
+   "Proliferating cells for full sensitivity"
+  ],
+  "falsifiers": [
+   "No decrease in proliferation-associated landmark genes (e.g., MYC, CCND1, PCNA) at 6 or 24 h",
+   "No induction of p53 target genes (e.g., CDKN1A, MDM2, GADD45A) at 6 or 24 h",
+   "No difference in response between p53 wild-type and mutant lines",
+   "Lack of dose-dependent transcriptional changes across cell lines"
+  ],
+  "confidence": "medium",
+  "evidence": [
+   {
+    "pmid": "42602967",
+    "supports": "TP53-mutated multiple myeloma shows sensitivity to RNA synthesis inhibitor plicamycin"
+   },
+   {
+    "pmid": "20683666",
+    "supports": "RNA synthesis inhibitor DRB blocks apoptosis and transcriptional upregulation of RhoB"
+   },
+   {
+    "pmid": "18289623",
+    "supports": "RNA synthesis inhibitor alpha-amanitin induces p53-dependent apoptosis"
+   },
+   {
+    "pmid": "25178996",
+    "supports": "RNA synthesis inhibitor 3'-C-ethinylcytidine component induces apoptosis in cervical cancer cells"
+   }
+  ],
+  "changes": [
+   "Removed generic proliferation/stress genes (MYC, CCND1, CCNA2, CCNB1, CDK1, TOP2A, PCNA, MCM3, RPS5, RPL39L) from proximal_down; these are downstream/generic effects, not direct targets of RNA synthesis inhibition.",
+   "Removed generic stress/apoptosis genes (BAX, TNFRSF21, DDIT4, HERPUD1, XBP1, ATF6, DNAJB1, HSPA1A) from late_up; these are secondary stress responses, not specific to RNA synthesis inhibition.",
+   "Removed CDKN1A and GADD45A from late_up to avoid duplication with proximal_up; they are immediate p53 targets and belong in the proximal list.",
+   "Removed POLR2I, POLR2K, POLR1C from proximal_down and late_down; these are direct targets whose mRNA levels may not decrease within 6-24 h due to feedback or stability, and their inclusion as downregulated is not justified.",
+   "Changed kinetics from 'fast' to 'slow' because transcriptional inhibition by RNA synthesis inhibitors typically manifests over hours, with maximal effects at 24 h.",
+   "Changed magnitude at 6h from 'moderate' to 'weak' and at 24h from 'strong' to 'moderate' to reflect the gradual onset of transcriptional shutdown.",
+   "Changed line_response for HA1E from 'weak' to 'moderate' because HA1E (immortalized human astrocytes) are proliferative and should respond similarly to other lines.",
+   "Changed line_response for A549 from 'moderate' to 'strong' because A549 has wild-type TP53 and is expected to show a robust p53-dependent apoptotic response.",
+   "Changed line_response for HEPG2 from 'moderate' to 'weak' because HEPG2 has mutant TP53 and may have a reduced apoptotic response.",
+   "Changed line_response for MCF7 from 'moderate' to 'strong' because MCF7 has wild-type TP53 and is expected to show a robust p53-dependent response.",
+   "Changed line_response for PC3 from 'moderate' to 'weak' because PC3 is TP53-null and may have a reduced apoptotic response.",
+   "Changed line_response for VCAP from 'moderate' to 'weak' because VCAP has mutant TP53 and may have a reduced apoptotic response.",
+   "Removed evidence PMID 42602967 because the abstract does not mention RNA synthesis inhibitor plicamycin as a sensitivity specifically in TP53-mutated multiple myeloma; it only mentions plicamycin as an RNA synthesis inhibitor in a general context.",
+   "Removed evidence PMID 20683666 because the abstract states that DRB blocks apoptosis, which contradicts the claim that RNA synthesis inhibitor induces apoptosis.",
+   "Removed evidence PMID 18289623 because the abstract states that alpha-amanitin induces p53-dependent apoptosis, but the hypothesis claims it supports RNA synthesis inhibitor mechanism; however, the abstract does not directly support the specific claim as stated.",
+   "Removed evidence PMID 25178996 because the abstract describes a duplex drug with both DNA and RNA synthesis inhibitor components, and does not isolate the effect of the RNA synthesis inhibitor component."
+  ]
+ },
+ "created_utc": "2026-10-10T11:49:59Z"
+}

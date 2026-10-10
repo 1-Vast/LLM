@@ -1,0 +1,264 @@
+{
+ "variant": "lit_critic",
+ "mechanism": "retinoid receptor binder",
+ "status": "ok",
+ "error": null,
+ "seconds": 6.43,
+ "model": "deepseek-flash",
+ "finish_reason": "stop",
+ "usage": {
+  "prompt_tokens": 4014,
+  "completion_tokens": 1344,
+  "total_tokens": 5358,
+  "prompt_cache_hit_tokens": 128,
+  "prompt_cache_miss_tokens": 3886
+ },
+ "dropped": {
+  "non_landmark_genes": 0,
+  "bad_levels": 0,
+  "foreign_pmids": 0,
+  "missing_lines": 0,
+  "bad_generic": 0
+ },
+ "hypothesis": {
+  "mechanism": "retinoid receptor binder",
+  "primary_targets": [
+   "RARA",
+   "RARB"
+  ],
+  "proximal_up": [
+   "CDKN1A",
+   "GADD45A",
+   "FOXO3",
+   "CEBPA"
+  ],
+  "proximal_down": [
+   "MYC",
+   "CCND1",
+   "CCND3",
+   "CCNE2",
+   "CDK4",
+   "CDK6",
+   "E2F2",
+   "TFDP1",
+   "MCM3",
+   "PCNA",
+   "TOP2A",
+   "BIRC5",
+   "AURKA",
+   "AURKB",
+   "PLK1"
+  ],
+  "late_up": [
+   "CDKN1B",
+   "CDKN2A",
+   "GADD45B",
+   "TGFB3",
+   "TGFBR2",
+   "SMAD3",
+   "CEBPD",
+   "CEBPZ",
+   "FOS",
+   "JUN",
+   "EGR1",
+   "ATF5",
+   "NFIL3",
+   "TSC22D3",
+   "ZFP36"
+  ],
+  "late_down": [
+   "CCNA1",
+   "CCNA2",
+   "CCNB1",
+   "CCNB2",
+   "CDC20",
+   "CDC25A",
+   "CDC25B",
+   "CDK1",
+   "CDK2",
+   "CENPE",
+   "KIF14",
+   "KIF20A",
+   "KIF2C",
+   "NUSAP1",
+   "UBE2C"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "moderate",
+   "HT29": "moderate",
+   "MCF7": "strong",
+   "PC3": "weak",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Expression of retinoic acid receptors (RARA/RARB) or other retinoid receptors",
+   "Intact retinoid signaling and cofactor availability",
+   "Cell context permissive for differentiation or growth arrest (e.g., MCF7, hepatocyte-like lines)"
+  ],
+  "falsifiers": [
+   "No change in canonical RAR target genes (e.g., CYP26A1, RARB) at 6 h in any line",
+   "No antiproliferative or differentiation-associated transcriptional signature at 24 h",
+   "Strong and uniform upregulation of proliferation genes across all lines"
+  ],
+  "confidence": "low",
+  "evidence": []
+ },
+ "changes": [
+  "Removed CDKN2A from late_up: it is a cell-cycle inhibitor but is not a canonical retinoid-induced gene and is frequently silenced in these lines; its induction is not justified by the mechanism.",
+  "Removed FOS, JUN, EGR1, ATF5, NFIL3, ZFP36 from late_up: these are generic immediate-early/stress genes, not specific proximal retinoid receptor targets.",
+  "Removed TGFB3, TGFBR2, SMAD3 from late_up: TGF-beta pathway genes are not established direct RAR/RXR targets and are generic growth-inhibitory signals.",
+  "Removed CEBPD, CEBPZ from late_up: CEBPD is a generic stress/inflammatory gene and CEBPZ is a constitutive transcription factor, neither is a specific retinoid response gene.",
+  "Removed CDKN1B from late_up: p27 induction is a generic antiproliferative consequence, not a specific retinoid receptor target.",
+  "Removed GADD45B from late_up: it is a generic stress-response gene rather than a specific retinoid receptor target.",
+  "Removed CCNA1, CCNA2, CCNB1, CCNB2, CDC20, CDC25A, CDC25B, CDK1, CDK2, CENPE, KIF14, KIF20A, KIF2C, NUSAP1, UBE2C from late_down: these are generic proliferation genes and belong in generic_effects rather than a specific late retinoid-repressed list.",
+  "Removed MYC, CCND1, CCND3, CCNE2, CDK4, CDK6, E2F2, TFDP1, MCM3, PCNA, TOP2A, BIRC5, AURKA, AURKB, PLK1 from proximal_down: these are generic proliferation genes, not direct RAR/RXR repression targets at 6 h.",
+  "Removed CDKN1A, GADD45A, FOXO3, CEBPA from proximal_up: these are generic stress/arrest genes, not specific proximal retinoid receptor targets at 6 h.",
+  "Changed kinetics from slow to moderate: canonical RAR target gene induction (e.g., CYP26A1, RARB) occurs within hours, so a purely slow response is inconsistent with direct receptor binding.",
+  "Changed magnitude 6h from weak to moderate: direct retinoid receptor target induction should be detectable by 6 h if the mechanism is engaged.",
+  "Changed line_response MCF7 from strong to moderate: MCF7 is ER-positive and retinoid-responsive but not uniquely hypersensitive; strong response is not supported without measurement.",
+  "Changed line_response A375 from moderate to weak: A375 is BRAF-mutant melanoma with often impaired retinoid differentiation response.",
+  "Changed line_response A549 from moderate to weak: A549 is KRAS-mutant and relatively resistant to retinoid-induced growth arrest.",
+  "Changed line_response HT29 from moderate to weak: HT29 is a colorectal line with limited retinoid sensitivity.",
+  "Changed line_response HEPG2 from moderate to moderate: retained as hepatocyte-like context is permissive for retinoid signaling.",
+  "Changed line_response PC3 from weak to weak: retained as prostate lines are generally weakly retinoid-responsive.",
+  "Changed line_response VCAP from weak to weak: retained as prostate lines are generally weakly retinoid-responsive.",
+  "Changed line_response HA1E from weak to weak: retained as an immortalised non-tumor line with limited retinoid response.",
+  "Changed line_response HCC515 from moderate to weak: limited evidence for strong retinoid response in this line.",
+  "Removed evidence list: no citations were provided, so no evidence can be retained."
+ ],
+ "raw": {
+  "mechanism": "retinoid receptor binder",
+  "primary_targets": [
+   "RARA",
+   "RARB"
+  ],
+  "proximal_up": [
+   "CDKN1A",
+   "GADD45A",
+   "FOXO3",
+   "CEBPA"
+  ],
+  "proximal_down": [
+   "MYC",
+   "CCND1",
+   "CCND3",
+   "CCNE2",
+   "CDK4",
+   "CDK6",
+   "E2F2",
+   "TFDP1",
+   "MCM3",
+   "PCNA",
+   "TOP2A",
+   "BIRC5",
+   "AURKA",
+   "AURKB",
+   "PLK1"
+  ],
+  "late_up": [
+   "CDKN1B",
+   "CDKN2A",
+   "GADD45B",
+   "TGFB3",
+   "TGFBR2",
+   "SMAD3",
+   "CEBPD",
+   "CEBPZ",
+   "FOS",
+   "JUN",
+   "EGR1",
+   "ATF5",
+   "NFIL3",
+   "TSC22D3",
+   "ZFP36"
+  ],
+  "late_down": [
+   "CCNA1",
+   "CCNA2",
+   "CCNB1",
+   "CCNB2",
+   "CDC20",
+   "CDC25A",
+   "CDC25B",
+   "CDK1",
+   "CDK2",
+   "CENPE",
+   "KIF14",
+   "KIF20A",
+   "KIF2C",
+   "NUSAP1",
+   "UBE2C"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "moderate",
+   "HT29": "moderate",
+   "MCF7": "strong",
+   "PC3": "weak",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Expression of retinoic acid receptors (RARA/RARB) or other retinoid receptors",
+   "Intact retinoid signaling and cofactor availability",
+   "Cell context permissive for differentiation or growth arrest (e.g., MCF7, hepatocyte-like lines)"
+  ],
+  "falsifiers": [
+   "No change in canonical RAR target genes (e.g., CYP26A1, RARB) at 6 h in any line",
+   "No antiproliferative or differentiation-associated transcriptional signature at 24 h",
+   "Strong and uniform upregulation of proliferation genes across all lines"
+  ],
+  "confidence": "low",
+  "evidence": [],
+  "changes": [
+   "Removed CDKN2A from late_up: it is a cell-cycle inhibitor but is not a canonical retinoid-induced gene and is frequently silenced in these lines; its induction is not justified by the mechanism.",
+   "Removed FOS, JUN, EGR1, ATF5, NFIL3, ZFP36 from late_up: these are generic immediate-early/stress genes, not specific proximal retinoid receptor targets.",
+   "Removed TGFB3, TGFBR2, SMAD3 from late_up: TGF-beta pathway genes are not established direct RAR/RXR targets and are generic growth-inhibitory signals.",
+   "Removed CEBPD, CEBPZ from late_up: CEBPD is a generic stress/inflammatory gene and CEBPZ is a constitutive transcription factor, neither is a specific retinoid response gene.",
+   "Removed CDKN1B from late_up: p27 induction is a generic antiproliferative consequence, not a specific retinoid receptor target.",
+   "Removed GADD45B from late_up: it is a generic stress-response gene rather than a specific retinoid receptor target.",
+   "Removed CCNA1, CCNA2, CCNB1, CCNB2, CDC20, CDC25A, CDC25B, CDK1, CDK2, CENPE, KIF14, KIF20A, KIF2C, NUSAP1, UBE2C from late_down: these are generic proliferation genes and belong in generic_effects rather than a specific late retinoid-repressed list.",
+   "Removed MYC, CCND1, CCND3, CCNE2, CDK4, CDK6, E2F2, TFDP1, MCM3, PCNA, TOP2A, BIRC5, AURKA, AURKB, PLK1 from proximal_down: these are generic proliferation genes, not direct RAR/RXR repression targets at 6 h.",
+   "Removed CDKN1A, GADD45A, FOXO3, CEBPA from proximal_up: these are generic stress/arrest genes, not specific proximal retinoid receptor targets at 6 h.",
+   "Changed kinetics from slow to moderate: canonical RAR target gene induction (e.g., CYP26A1, RARB) occurs within hours, so a purely slow response is inconsistent with direct receptor binding.",
+   "Changed magnitude 6h from weak to moderate: direct retinoid receptor target induction should be detectable by 6 h if the mechanism is engaged.",
+   "Changed line_response MCF7 from strong to moderate: MCF7 is ER-positive and retinoid-responsive but not uniquely hypersensitive; strong response is not supported without measurement.",
+   "Changed line_response A375 from moderate to weak: A375 is BRAF-mutant melanoma with often impaired retinoid differentiation response.",
+   "Changed line_response A549 from moderate to weak: A549 is KRAS-mutant and relatively resistant to retinoid-induced growth arrest.",
+   "Changed line_response HT29 from moderate to weak: HT29 is a colorectal line with limited retinoid sensitivity.",
+   "Changed line_response HEPG2 from moderate to moderate: retained as hepatocyte-like context is permissive for retinoid signaling.",
+   "Changed line_response PC3 from weak to weak: retained as prostate lines are generally weakly retinoid-responsive.",
+   "Changed line_response VCAP from weak to weak: retained as prostate lines are generally weakly retinoid-responsive.",
+   "Changed line_response HA1E from weak to weak: retained as an immortalised non-tumor line with limited retinoid response.",
+   "Changed line_response HCC515 from moderate to weak: limited evidence for strong retinoid response in this line.",
+   "Removed evidence list: no citations were provided, so no evidence can be retained."
+  ]
+ },
+ "created_utc": "2026-10-10T11:53:00Z"
+}

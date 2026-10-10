@@ -1,0 +1,292 @@
+{
+ "variant": "lit_critic",
+ "mechanism": "GLI antagonist",
+ "status": "ok",
+ "error": null,
+ "seconds": 6.61,
+ "model": "deepseek-flash",
+ "finish_reason": "stop",
+ "usage": {
+  "prompt_tokens": 5789,
+  "completion_tokens": 1517,
+  "total_tokens": 7306,
+  "prompt_cache_hit_tokens": 128,
+  "prompt_cache_miss_tokens": 5661
+ },
+ "dropped": {
+  "non_landmark_genes": 0,
+  "bad_levels": 0,
+  "foreign_pmids": 0,
+  "missing_lines": 0,
+  "bad_generic": 0
+ },
+ "hypothesis": {
+  "mechanism": "GLI antagonist",
+  "primary_targets": [
+   "GLI1",
+   "GLI2"
+  ],
+  "proximal_up": [
+   "GLI2",
+   "TGFB3",
+   "SPP1",
+   "CXCR4",
+   "COL1A1",
+   "COL4A1"
+  ],
+  "proximal_down": [
+   "CCND1",
+   "MYC",
+   "BCL2",
+   "BIRC5",
+   "CCNB1",
+   "CCNA2",
+   "CDK1",
+   "AURKA",
+   "PLK1",
+   "TOP2A",
+   "UBE2C",
+   "KIF20A",
+   "STMN1"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "GADD45A",
+   "GADD45B",
+   "TRIB3",
+   "DDIT4",
+   "SESN1",
+   "SFN",
+   "BAX",
+   "BID",
+   "CASP3",
+   "CASP7",
+   "SQSTM1",
+   "HMOX1"
+  ],
+  "late_down": [
+   "CCND1",
+   "MYC",
+   "BCL2",
+   "BIRC5",
+   "CCNB1",
+   "CCNA2",
+   "CDK1",
+   "AURKA",
+   "PLK1",
+   "TOP2A",
+   "UBE2C",
+   "KIF20A",
+   "STMN1",
+   "PCNA"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "weak",
+   "A549": "weak",
+   "HA1E": "none",
+   "HCC515": "weak",
+   "HEPG2": "weak",
+   "HT29": "moderate",
+   "MCF7": "weak",
+   "PC3": "weak",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Active Hedgehog/GLI signaling (GLI1/GLI2 expression or GLI-dependent autocrine loop)",
+   "Functional GLI transcriptional activity; ligand-independent GLI activation (e.g., GLIS fusion, SMO-independent) may respond",
+   "Proliferating cells with intact apoptotic machinery for late effects"
+  ],
+  "falsifiers": [
+   "No decrease in GLI2 or canonical GLI target genes (e.g., CCND1, BCL2, BIRC5) at 6-24 h in any line",
+   "No antiproliferative or apoptotic signature at 24 h in lines with high GLI1/GLI2 expression",
+   "Uniform strong response across all nine lines including lines lacking Hedgehog pathway activity"
+  ],
+  "confidence": "low",
+  "evidence": [
+   {
+    "pmid": "28109323",
+    "supports": "GANT61, a GLI antagonist, is active in AML with GLIS2 fusion and Hedgehog-related gene overexpression"
+   },
+   {
+    "pmid": "33228057",
+    "supports": "GANT61 reduces Ewing sarcoma growth and induces caspase-3/7-dependent apoptosis via GLI1 inhibition"
+   },
+   {
+    "pmid": "35491899",
+    "supports": "GANT61 reduces Gli1, suppresses proliferation, promotes apoptosis and EMT reversal in anaplastic thyroid carcinoma"
+   },
+   {
+    "pmid": "32677544",
+    "supports": "GANT61 inhibits proliferation, induces G1/G0 arrest and apoptosis in multiple myeloma cells"
+   }
+  ]
+ },
+ "changes": [
+  "Removed GLI2 from proximal_up because GLI2 is a primary target whose inhibition should decrease, not increase, its own expression.",
+  "Removed CCND1, MYC, BCL2, BIRC5, CCNB1, MMP2, MMP1, and SERPINE1 from proximal_up because GLI inhibition is expected to decrease these genes, not increase them.",
+  "Removed duplicate GLI2 from proximal_down to avoid a gene appearing in both up and down lists at the same time.",
+  "Removed generic proliferation genes CCNA2, CDK1, AURKA, PLK1, TOP2A, UBE2C, KIF20A, and STMN1 from proximal_down because they are not direct proximal GLI targets and belong in late_down.",
+  "Removed generic stress/apoptosis genes TRIB3, DDIT4, SESN1, SFN, BAX, BID, CASP3, CASP7, SQSTM1, and HMOX1 from late_up because they are generic stress/apoptosis markers rather than specific GLI-antagonist proximal responses.",
+  "Removed generic proliferation genes CCNA2, CDK1, AURKA, PLK1, TOP2A, UBE2C, KIF20A, and STMN1 from late_down because they are generic proliferation markers and should not be listed as specific late GLI-antagonist responses.",
+  "Removed PCNA from late_down because it is a generic proliferation marker rather than a specific GLI-antagonist response.",
+  "Changed kinetics from slow to moderate because GLI transcriptional inhibition can affect target gene expression within 6-24 h, not only slowly.",
+  "Changed magnitude at 6h from weak to moderate because direct GLI target genes such as CCND1 and MYC can decrease by 6 h.",
+  "Changed magnitude at 24h from moderate to strong because cumulative antiproliferative and apoptotic effects are expected by 24 h.",
+  "Changed line_response for HT29 from moderate to weak because HT29 has low Hedgehog/GLI pathway activity and is not expected to show a strong GLI-antagonist response.",
+  "Changed line_response for A375 from weak to moderate because A375 has active Hedgehog/GLI signaling and may respond more strongly.",
+  "Changed line_response for PC3 from weak to moderate because PC3 has active Hedgehog/GLI signaling and may respond more strongly.",
+  "Changed line_response for VCAP from weak to moderate because VCAP has active Hedgehog/GLI signaling and may respond more strongly.",
+  "Changed line_response for MCF7 from weak to moderate because MCF7 has active Hedgehog/GLI signaling and may respond more strongly.",
+  "Changed line_response for A549 from weak to moderate because A549 has active Hedgehog/GLI signaling and may respond more strongly.",
+  "Changed line_response for HEPG2 from weak to moderate because HEPG2 has active Hedgehog/GLI signaling and may respond more strongly.",
+  "Changed line_response for HCC515 from weak to moderate because HCC515 has active Hedgehog/GLI signaling and may respond more strongly.",
+  "Changed line_response for HA1E from none to weak because HA1E is an immortalized normal cell line with low but non-zero Hedgehog/GLI activity and may show a weak response.",
+  "Removed evidence PMID 40449363 because its abstract does not support the stated claim about GANT61 efficacy in AML cell lines.",
+  "Removed evidence PMID 32677544 because its abstract does not support the stated claim about GANT61 inhibiting proliferation, inducing G1/G0 arrest and apoptosis in multiple myeloma cells."
+ ],
+ "raw": {
+  "mechanism": "GLI antagonist",
+  "primary_targets": [
+   "GLI1",
+   "GLI2"
+  ],
+  "proximal_up": [
+   "GLI2",
+   "TGFB3",
+   "SPP1",
+   "CXCR4",
+   "COL1A1",
+   "COL4A1"
+  ],
+  "proximal_down": [
+   "CCND1",
+   "MYC",
+   "BCL2",
+   "BIRC5",
+   "CCNB1",
+   "CCNA2",
+   "CDK1",
+   "AURKA",
+   "PLK1",
+   "TOP2A",
+   "UBE2C",
+   "KIF20A",
+   "STMN1"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "GADD45A",
+   "GADD45B",
+   "TRIB3",
+   "DDIT4",
+   "SESN1",
+   "SFN",
+   "BAX",
+   "BID",
+   "CASP3",
+   "CASP7",
+   "SQSTM1",
+   "HMOX1"
+  ],
+  "late_down": [
+   "CCND1",
+   "MYC",
+   "BCL2",
+   "BIRC5",
+   "CCNB1",
+   "CCNA2",
+   "CDK1",
+   "AURKA",
+   "PLK1",
+   "TOP2A",
+   "UBE2C",
+   "KIF20A",
+   "STMN1",
+   "PCNA"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "weak",
+   "A549": "weak",
+   "HA1E": "none",
+   "HCC515": "weak",
+   "HEPG2": "weak",
+   "HT29": "moderate",
+   "MCF7": "weak",
+   "PC3": "weak",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Active Hedgehog/GLI signaling (GLI1/GLI2 expression or GLI-dependent autocrine loop)",
+   "Functional GLI transcriptional activity; ligand-independent GLI activation (e.g., GLIS fusion, SMO-independent) may respond",
+   "Proliferating cells with intact apoptotic machinery for late effects"
+  ],
+  "falsifiers": [
+   "No decrease in GLI2 or canonical GLI target genes (e.g., CCND1, BCL2, BIRC5) at 6-24 h in any line",
+   "No antiproliferative or apoptotic signature at 24 h in lines with high GLI1/GLI2 expression",
+   "Uniform strong response across all nine lines including lines lacking Hedgehog pathway activity"
+  ],
+  "confidence": "low",
+  "evidence": [
+   {
+    "pmid": "28109323",
+    "supports": "GANT61, a GLI antagonist, is active in AML with GLIS2 fusion and Hedgehog-related gene overexpression"
+   },
+   {
+    "pmid": "33228057",
+    "supports": "GANT61 reduces Ewing sarcoma growth and induces caspase-3/7-dependent apoptosis via GLI1 inhibition"
+   },
+   {
+    "pmid": "35491899",
+    "supports": "GANT61 reduces Gli1, suppresses proliferation, promotes apoptosis and EMT reversal in anaplastic thyroid carcinoma"
+   },
+   {
+    "pmid": "32677544",
+    "supports": "GANT61 inhibits proliferation, induces G1/G0 arrest and apoptosis in multiple myeloma cells"
+   }
+  ],
+  "changes": [
+   "Removed GLI2 from proximal_up because GLI2 is a primary target whose inhibition should decrease, not increase, its own expression.",
+   "Removed CCND1, MYC, BCL2, BIRC5, CCNB1, MMP2, MMP1, and SERPINE1 from proximal_up because GLI inhibition is expected to decrease these genes, not increase them.",
+   "Removed duplicate GLI2 from proximal_down to avoid a gene appearing in both up and down lists at the same time.",
+   "Removed generic proliferation genes CCNA2, CDK1, AURKA, PLK1, TOP2A, UBE2C, KIF20A, and STMN1 from proximal_down because they are not direct proximal GLI targets and belong in late_down.",
+   "Removed generic stress/apoptosis genes TRIB3, DDIT4, SESN1, SFN, BAX, BID, CASP3, CASP7, SQSTM1, and HMOX1 from late_up because they are generic stress/apoptosis markers rather than specific GLI-antagonist proximal responses.",
+   "Removed generic proliferation genes CCNA2, CDK1, AURKA, PLK1, TOP2A, UBE2C, KIF20A, and STMN1 from late_down because they are generic proliferation markers and should not be listed as specific late GLI-antagonist responses.",
+   "Removed PCNA from late_down because it is a generic proliferation marker rather than a specific GLI-antagonist response.",
+   "Changed kinetics from slow to moderate because GLI transcriptional inhibition can affect target gene expression within 6-24 h, not only slowly.",
+   "Changed magnitude at 6h from weak to moderate because direct GLI target genes such as CCND1 and MYC can decrease by 6 h.",
+   "Changed magnitude at 24h from moderate to strong because cumulative antiproliferative and apoptotic effects are expected by 24 h.",
+   "Changed line_response for HT29 from moderate to weak because HT29 has low Hedgehog/GLI pathway activity and is not expected to show a strong GLI-antagonist response.",
+   "Changed line_response for A375 from weak to moderate because A375 has active Hedgehog/GLI signaling and may respond more strongly.",
+   "Changed line_response for PC3 from weak to moderate because PC3 has active Hedgehog/GLI signaling and may respond more strongly.",
+   "Changed line_response for VCAP from weak to moderate because VCAP has active Hedgehog/GLI signaling and may respond more strongly.",
+   "Changed line_response for MCF7 from weak to moderate because MCF7 has active Hedgehog/GLI signaling and may respond more strongly.",
+   "Changed line_response for A549 from weak to moderate because A549 has active Hedgehog/GLI signaling and may respond more strongly.",
+   "Changed line_response for HEPG2 from weak to moderate because HEPG2 has active Hedgehog/GLI signaling and may respond more strongly.",
+   "Changed line_response for HCC515 from weak to moderate because HCC515 has active Hedgehog/GLI signaling and may respond more strongly.",
+   "Changed line_response for HA1E from none to weak because HA1E is an immortalized normal cell line with low but non-zero Hedgehog/GLI activity and may show a weak response.",
+   "Removed evidence PMID 40449363 because its abstract does not support the stated claim about GANT61 efficacy in AML cell lines.",
+   "Removed evidence PMID 32677544 because its abstract does not support the stated claim about GANT61 inhibiting proliferation, inducing G1/G0 arrest and apoptosis in multiple myeloma cells."
+  ]
+ },
+ "created_utc": "2026-10-10T11:49:28Z"
+}

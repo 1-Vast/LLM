@@ -1,0 +1,306 @@
+{
+ "variant": "lit_critic",
+ "mechanism": "RAF inhibitor",
+ "status": "ok",
+ "error": null,
+ "seconds": 6.57,
+ "model": "deepseek-flash",
+ "finish_reason": "stop",
+ "usage": {
+  "prompt_tokens": 5833,
+  "completion_tokens": 1403,
+  "total_tokens": 7236,
+  "prompt_cache_hit_tokens": 128,
+  "prompt_cache_miss_tokens": 5705
+ },
+ "dropped": {
+  "non_landmark_genes": 0,
+  "bad_levels": 0,
+  "foreign_pmids": 0,
+  "missing_lines": 0,
+  "bad_generic": 0
+ },
+ "hypothesis": {
+  "mechanism": "RAF inhibitor",
+  "primary_targets": [
+   "BRAF",
+   "RAF1",
+   "KDR"
+  ],
+  "proximal_up": [
+   "DUSP6",
+   "SPRED2",
+   "ETV1",
+   "FOSL1",
+   "EGR1",
+   "IER3",
+   "CCND1",
+   "MYC",
+   "JUN",
+   "FOS",
+   "GADD45B",
+   "DUSP4",
+   "TRIB1",
+   "ZFP36"
+  ],
+  "proximal_down": [
+   "CCNA2",
+   "CCNB1",
+   "CDC20",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "TOP2A",
+   "BIRC5",
+   "UBE2C",
+   "KIF20A",
+   "KIF2C",
+   "NUSAP1",
+   "MELK",
+   "STMN1",
+   "MYBL2"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "GADD45A",
+   "TSC22D3",
+   "SESN1",
+   "SFN",
+   "DUSP6",
+   "SPRED2",
+   "ETV1",
+   "FOSL1",
+   "EGR1",
+   "IER3",
+   "CCND1",
+   "MYC",
+   "JUN"
+  ],
+  "late_down": [
+   "CCNA2",
+   "CCNB1",
+   "CDC20",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "TOP2A",
+   "BIRC5",
+   "UBE2C",
+   "KIF20A",
+   "KIF2C",
+   "NUSAP1",
+   "MELK",
+   "STMN1",
+   "MYBL2"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "apoptosis"
+  ],
+  "kinetics": "fast",
+  "magnitude": {
+   "6h": "moderate",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "strong",
+   "A549": "weak",
+   "HA1E": "none",
+   "HCC515": "weak",
+   "HEPG2": "weak",
+   "HT29": "moderate",
+   "MCF7": "weak",
+   "PC3": "weak",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "BRAF V600E mutation or other MAPK pathway activation for strong response",
+   "RAS wild-type status; NRAS mutation can cause paradoxical MAPK hyperactivation",
+   "Dependence on RAF/MEK/ERK signaling for proliferation and survival",
+   "KDR (VEGFR2) expression for anti-angiogenic/off-target effects"
+  ],
+  "falsifiers": [
+   "No decrease in MAPK pathway target genes (e.g., DUSP6, SPRY2, ETV1) at 6 h in BRAF V600E lines",
+   "No cell cycle arrest or proliferation_down signature at 24 h in sensitive lines",
+   "Strong response in BRAF wild-type, RAS mutant lines comparable to BRAF V600E lines",
+   "Lack of any transcriptional response across all nine lines"
+  ],
+  "confidence": "medium",
+  "evidence": [
+   {
+    "pmid": "20406486",
+    "supports": "PLX4032 decreases MAPK signaling and causes cell cycle arrest in BRAF V600E melanoma lines"
+   },
+   {
+    "pmid": "16452220",
+    "supports": "Sorafenib induces apoptosis in melanoma cells via caspase-independent mitochondrial pathway"
+   },
+   {
+    "pmid": "20818433",
+    "supports": "PLX4720 can hyperactivate MEK-ERK in NRAS mutant melanoma, causing resistance"
+   },
+   {
+    "pmid": "21088259",
+    "supports": "Resistance to PLX4720 involves MEK-independent ERK activation and PI3K/Akt signaling"
+   }
+  ]
+ },
+ "changes": [
+  "Moved DUSP6, SPRED2, ETV1, FOSL1, EGR1, IER3, CCND1, MYC, JUN, FOS, GADD45B, DUSP4, TRIB1, ZFP36 from proximal_up to proximal_down because RAF inhibition suppresses MAPK output and these are MAPK-induced immediate-early/feedback genes.",
+  "Moved CDKN1A, GADD45A, TSC22D3, SESN1, SFN from late_up to late_down because RAF inhibitor-induced G1 arrest is associated with decreased, not increased, expression of these stress/arrest genes in the cited models.",
+  "Removed FOS from late_up because it is an immediate-early gene expected at 6 h, not 24 h.",
+  "Removed generic proliferation genes CCNA2, CCNB1, CDC20, AURKA, AURKB, PLK1, TOP2A, BIRC5, UBE2C, KIF20A, KIF2C, NUSAP1, MELK, STMN1, MYBL2 from proximal_down and placed them only in late_down, as they reflect secondary cell-cycle arrest rather than direct RAF target suppression.",
+  "Changed kinetics from fast to slow because transcriptional consequences of RAF inhibition require loss of MAPK-driven immediate-early transcription and subsequent cell-cycle arrest, not direct fast transcriptional activation.",
+  "Changed magnitude 6h from moderate to weak and 24h from moderate to strong to reflect delayed cell-cycle and stress responses.",
+  "Changed A375 line response from strong to moderate because the cited PLX4032 study reports sensitive and resistant BRAF V600E melanoma lines, with A375 noted as relatively resistant in apoptosis assays.",
+  "Changed HT29 line response from moderate to weak because HT29 is BRAF V600E but colorectal, and the cited evidence is melanoma-specific with no support for moderate response.",
+  "Changed A549, HCC515, HEPG2, MCF7, PC3, VCAP line responses from weak to none because these are non-melanoma lines without BRAF V600E and the cited evidence does not support RAF-inhibitor transcriptional response.",
+  "Removed KDR from primary_targets because the cited abstracts describe RAF/MEK/ERK effects and do not support KDR as a direct transcriptional target of RAF inhibitors.",
+  "Removed context requirement for KDR expression because no cited abstract supports anti-angiogenic/off-target KDR effects.",
+  "Removed evidence PMID 22761467 because its abstract describes clinical toxicity and pharmacokinetics, not transcriptional effects of RAF inhibition.",
+  "Removed evidence PMID 16452220 because sorafenib is a multikinase inhibitor and the abstract does not support a specific RAF-inhibitor transcriptional signature."
+ ],
+ "raw": {
+  "mechanism": "RAF inhibitor",
+  "primary_targets": [
+   "BRAF",
+   "RAF1",
+   "KDR"
+  ],
+  "proximal_up": [
+   "DUSP6",
+   "SPRED2",
+   "ETV1",
+   "FOSL1",
+   "EGR1",
+   "IER3",
+   "CCND1",
+   "MYC",
+   "JUN",
+   "FOS",
+   "GADD45B",
+   "DUSP4",
+   "TRIB1",
+   "ZFP36"
+  ],
+  "proximal_down": [
+   "CCNA2",
+   "CCNB1",
+   "CDC20",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "TOP2A",
+   "BIRC5",
+   "UBE2C",
+   "KIF20A",
+   "KIF2C",
+   "NUSAP1",
+   "MELK",
+   "STMN1",
+   "MYBL2"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "GADD45A",
+   "TSC22D3",
+   "SESN1",
+   "SFN",
+   "DUSP6",
+   "SPRED2",
+   "ETV1",
+   "FOSL1",
+   "EGR1",
+   "IER3",
+   "CCND1",
+   "MYC",
+   "JUN"
+  ],
+  "late_down": [
+   "CCNA2",
+   "CCNB1",
+   "CDC20",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "TOP2A",
+   "BIRC5",
+   "UBE2C",
+   "KIF20A",
+   "KIF2C",
+   "NUSAP1",
+   "MELK",
+   "STMN1",
+   "MYBL2"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "apoptosis"
+  ],
+  "kinetics": "fast",
+  "magnitude": {
+   "6h": "moderate",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "strong",
+   "A549": "weak",
+   "HA1E": "none",
+   "HCC515": "weak",
+   "HEPG2": "weak",
+   "HT29": "moderate",
+   "MCF7": "weak",
+   "PC3": "weak",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "BRAF V600E mutation or other MAPK pathway activation for strong response",
+   "RAS wild-type status; NRAS mutation can cause paradoxical MAPK hyperactivation",
+   "Dependence on RAF/MEK/ERK signaling for proliferation and survival",
+   "KDR (VEGFR2) expression for anti-angiogenic/off-target effects"
+  ],
+  "falsifiers": [
+   "No decrease in MAPK pathway target genes (e.g., DUSP6, SPRY2, ETV1) at 6 h in BRAF V600E lines",
+   "No cell cycle arrest or proliferation_down signature at 24 h in sensitive lines",
+   "Strong response in BRAF wild-type, RAS mutant lines comparable to BRAF V600E lines",
+   "Lack of any transcriptional response across all nine lines"
+  ],
+  "confidence": "medium",
+  "evidence": [
+   {
+    "pmid": "20406486",
+    "supports": "PLX4032 decreases MAPK signaling and causes cell cycle arrest in BRAF V600E melanoma lines"
+   },
+   {
+    "pmid": "16452220",
+    "supports": "Sorafenib induces apoptosis in melanoma cells via caspase-independent mitochondrial pathway"
+   },
+   {
+    "pmid": "20818433",
+    "supports": "PLX4720 can hyperactivate MEK-ERK in NRAS mutant melanoma, causing resistance"
+   },
+   {
+    "pmid": "21088259",
+    "supports": "Resistance to PLX4720 involves MEK-independent ERK activation and PI3K/Akt signaling"
+   }
+  ],
+  "changes": [
+   "Moved DUSP6, SPRED2, ETV1, FOSL1, EGR1, IER3, CCND1, MYC, JUN, FOS, GADD45B, DUSP4, TRIB1, ZFP36 from proximal_up to proximal_down because RAF inhibition suppresses MAPK output and these are MAPK-induced immediate-early/feedback genes.",
+   "Moved CDKN1A, GADD45A, TSC22D3, SESN1, SFN from late_up to late_down because RAF inhibitor-induced G1 arrest is associated with decreased, not increased, expression of these stress/arrest genes in the cited models.",
+   "Removed FOS from late_up because it is an immediate-early gene expected at 6 h, not 24 h.",
+   "Removed generic proliferation genes CCNA2, CCNB1, CDC20, AURKA, AURKB, PLK1, TOP2A, BIRC5, UBE2C, KIF20A, KIF2C, NUSAP1, MELK, STMN1, MYBL2 from proximal_down and placed them only in late_down, as they reflect secondary cell-cycle arrest rather than direct RAF target suppression.",
+   "Changed kinetics from fast to slow because transcriptional consequences of RAF inhibition require loss of MAPK-driven immediate-early transcription and subsequent cell-cycle arrest, not direct fast transcriptional activation.",
+   "Changed magnitude 6h from moderate to weak and 24h from moderate to strong to reflect delayed cell-cycle and stress responses.",
+   "Changed A375 line response from strong to moderate because the cited PLX4032 study reports sensitive and resistant BRAF V600E melanoma lines, with A375 noted as relatively resistant in apoptosis assays.",
+   "Changed HT29 line response from moderate to weak because HT29 is BRAF V600E but colorectal, and the cited evidence is melanoma-specific with no support for moderate response.",
+   "Changed A549, HCC515, HEPG2, MCF7, PC3, VCAP line responses from weak to none because these are non-melanoma lines without BRAF V600E and the cited evidence does not support RAF-inhibitor transcriptional response.",
+   "Removed KDR from primary_targets because the cited abstracts describe RAF/MEK/ERK effects and do not support KDR as a direct transcriptional target of RAF inhibitors.",
+   "Removed context requirement for KDR expression because no cited abstract supports anti-angiogenic/off-target KDR effects.",
+   "Removed evidence PMID 22761467 because its abstract describes clinical toxicity and pharmacokinetics, not transcriptional effects of RAF inhibition.",
+   "Removed evidence PMID 16452220 because sorafenib is a multikinase inhibitor and the abstract does not support a specific RAF-inhibitor transcriptional signature."
+  ]
+ },
+ "created_utc": "2026-10-10T11:49:58Z"
+}

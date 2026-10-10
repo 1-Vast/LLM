@@ -11,6 +11,7 @@ Read [REPORT.md](REPORT.md) for current conclusions, [EVIDENCE.md](EVIDENCE.md) 
 | Active procurement P2 | [V3 protocol](decision_value/pairwise_v3/PROTOCOL.json) | Closed pending independent transfer, decision and cost gates |
 | Reusable offline observation checks | `tools.analysis.observation_audit` | Engineering-only promotion; no feedback model promotion |
 | Measure or predict across platform and time | [Block K](astra/kinetic_horizon_20261010/README.md) | STATE transport refused (48 MIX-Seq lines); measurement gate false positive; interval planner, paired increment and platform identity check promoted |
+| Calibrated mechanism falsification | [Block M](astra/mechanism_falsification_20261010/README.md) | Conformal falsification covers 0.892 on 502 sealed L1000 drugs but fails on the most active tier (0.776); agent knowledge, design, identifiability and adequacy not supported; nothing promoted |
 
 ## Frozen and diagnostic studies
 

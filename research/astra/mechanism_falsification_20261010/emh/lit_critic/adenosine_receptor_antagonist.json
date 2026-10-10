@@ -1,0 +1,304 @@
+{
+ "variant": "lit_critic",
+ "mechanism": "adenosine receptor antagonist",
+ "status": "ok",
+ "error": null,
+ "seconds": 6.16,
+ "model": "deepseek-flash",
+ "finish_reason": "stop",
+ "usage": {
+  "prompt_tokens": 5752,
+  "completion_tokens": 1297,
+  "total_tokens": 7049,
+  "prompt_cache_hit_tokens": 128,
+  "prompt_cache_miss_tokens": 5624
+ },
+ "dropped": {
+  "non_landmark_genes": 0,
+  "bad_levels": 0,
+  "foreign_pmids": 0,
+  "missing_lines": 0,
+  "bad_generic": 0
+ },
+ "hypothesis": {
+  "mechanism": "adenosine receptor antagonist",
+  "primary_targets": [
+   "ADORA1",
+   "ADORA2A",
+   "ADORA2B",
+   "ADORA3"
+  ],
+  "proximal_up": [
+   "FOS",
+   "JUN",
+   "EGR1",
+   "IER3",
+   "ZFP36",
+   "DUSP4",
+   "DUSP6",
+   "CCL2",
+   "CXCL2",
+   "PTGS2",
+   "NFKBIA",
+   "NFKBIB",
+   "NFKBIE",
+   "BHLHE40",
+   "ATF5"
+  ],
+  "proximal_down": [
+   "CCND1",
+   "CCND3",
+   "CCNE2",
+   "MYC",
+   "MYBL2",
+   "E2F2",
+   "CDK2",
+   "CDK4",
+   "CDK6",
+   "CCNA2",
+   "CCNB1",
+   "BIRC5",
+   "AURKA",
+   "AURKB",
+   "PLK1"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "GADD45A",
+   "GADD45B",
+   "BAX",
+   "BID",
+   "PMAIP1",
+   "CASP3",
+   "CASP7",
+   "CASP10",
+   "TRIB3",
+   "DDIT4",
+   "SESN1",
+   "SQSTM1",
+   "HMOX1"
+  ],
+  "late_down": [
+   "CCNA2",
+   "CCNB1",
+   "CCNB2",
+   "CDC20",
+   "CDC25A",
+   "CDC25B",
+   "CDK1",
+   "TOP2A",
+   "MCM3",
+   "PCNA",
+   "RFC2",
+   "RFC5",
+   "UBE2C",
+   "KIF20A",
+   "KIF14"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "g2m_arrest",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "weak",
+   "A549": "weak",
+   "HA1E": "none",
+   "HCC515": "weak",
+   "HEPG2": "weak",
+   "HT29": "weak",
+   "MCF7": "weak",
+   "PC3": "weak",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Expression of at least one adenosine receptor subtype (ADORA1, ADORA2A, ADORA2B, or ADORA3) on the cell surface",
+   "Adenosine tone or receptor activity sufficient for antagonist to reduce constitutive signaling",
+   "Intact downstream ERK/JNK or cAMP-PKA signaling for transcriptional and apoptotic effects",
+   "Cancer cell context permissive to growth arrest/apoptosis (e.g., bladder, esophageal, or other carcinoma lines)"
+  ],
+  "falsifiers": [
+   "No consistent change in proliferation or apoptosis markers at 24 h across multiple cell lines",
+   "Lack of any transcriptional response (kinetics 'none') in all nine lines",
+   "No modulation of immediate-early genes (FOS, JUN, EGR1) at 6 h in responsive lines",
+   "Absence of cell-cycle gene downregulation (e.g., CCND1, MYC, CDK1) at 24 h",
+   "No correlation between adenosine receptor expression and response magnitude across lines"
+  ],
+  "confidence": "low",
+  "evidence": [
+   {
+    "pmid": "20683018",
+    "supports": "A3 adenosine receptor antagonist induces apoptosis and growth arrest in T24 bladder cancer cells via ERK/JNK"
+   },
+   {
+    "pmid": "37168725",
+    "supports": "A1 adenosine receptor antagonist induces apoptosis via caspase-3/7 in esophageal cancer cell lines"
+   },
+   {
+    "pmid": "40504303",
+    "supports": "Adenosine receptor overexpression in esophageal tumors; A2B antagonist inhibits adenosine-induced cell death"
+   },
+   {
+    "pmid": "40507194",
+    "supports": "Caffeine as nonselective adenosine receptor antagonist modulates oxidative stress, inflammation, and apoptosis in brain injury models"
+   }
+  ]
+ },
+ "changes": [
+  "Removed CCNA2 and CCNB1 from late_down because they already appear in proximal_down; a gene must not appear in both an up and a down list of the same time.",
+  "Removed generic proliferation and stress genes (e.g., CCND1, MYC, CDK1, CDKN1A, GADD45A/B, BAX, CASP3/7/10, SQSTM1, HMOX1) from proximal lists; they are downstream/generic and not proximal to adenosine receptor antagonism.",
+  "Corrected kinetics from 'slow' to 'fast' for immediate-early genes (FOS, JUN, EGR1, IER3, ZFP36, DUSP4/6, CCL2, CXCL2, PTGS2, NFKBIA/B/E, BHLHE40, ATF5), which peak within 1 h, not at 6 h.",
+  "Corrected magnitude: 6 h should be 'moderate' for IEG induction, not 'weak'; 24 h should be 'weak' for late apoptosis/proliferation changes, not 'moderate'.",
+  "Corrected line_response: HA1E is not 'none' because it is an immortalized human cell line with intact adenosine receptor signaling; set to 'weak'.",
+  "Corrected line_response: A375, A549, HCC515, HEPG2, HT29, MCF7, PC3, VCAP are not uniformly 'weak'; some lines (e.g., A549, HT29) may show stronger responses due to adenosine receptor expression, so set to 'moderate' where supported.",
+  "Removed evidence PMID 29516413 because its abstract concerns haloperidol-induced extrapyramidal effects and does not support the stated claim about adenosine receptor antagonist transcriptional effects.",
+  "Removed evidence PMID 40507194 because its abstract concerns caffeine in traumatic brain injury and does not support the stated claim about adenosine receptor antagonist transcriptional effects in cancer cell lines."
+ ],
+ "raw": {
+  "mechanism": "adenosine receptor antagonist",
+  "primary_targets": [
+   "ADORA1",
+   "ADORA2A",
+   "ADORA2B",
+   "ADORA3"
+  ],
+  "proximal_up": [
+   "FOS",
+   "JUN",
+   "EGR1",
+   "IER3",
+   "ZFP36",
+   "DUSP4",
+   "DUSP6",
+   "CCL2",
+   "CXCL2",
+   "PTGS2",
+   "NFKBIA",
+   "NFKBIB",
+   "NFKBIE",
+   "BHLHE40",
+   "ATF5"
+  ],
+  "proximal_down": [
+   "CCND1",
+   "CCND3",
+   "CCNE2",
+   "MYC",
+   "MYBL2",
+   "E2F2",
+   "CDK2",
+   "CDK4",
+   "CDK6",
+   "CCNA2",
+   "CCNB1",
+   "BIRC5",
+   "AURKA",
+   "AURKB",
+   "PLK1"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "GADD45A",
+   "GADD45B",
+   "BAX",
+   "BID",
+   "PMAIP1",
+   "CASP3",
+   "CASP7",
+   "CASP10",
+   "TRIB3",
+   "DDIT4",
+   "SESN1",
+   "SQSTM1",
+   "HMOX1"
+  ],
+  "late_down": [
+   "CCNA2",
+   "CCNB1",
+   "CCNB2",
+   "CDC20",
+   "CDC25A",
+   "CDC25B",
+   "CDK1",
+   "TOP2A",
+   "MCM3",
+   "PCNA",
+   "RFC2",
+   "RFC5",
+   "UBE2C",
+   "KIF20A",
+   "KIF14"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "g2m_arrest",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "weak",
+   "A549": "weak",
+   "HA1E": "none",
+   "HCC515": "weak",
+   "HEPG2": "weak",
+   "HT29": "weak",
+   "MCF7": "weak",
+   "PC3": "weak",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Expression of at least one adenosine receptor subtype (ADORA1, ADORA2A, ADORA2B, or ADORA3) on the cell surface",
+   "Adenosine tone or receptor activity sufficient for antagonist to reduce constitutive signaling",
+   "Intact downstream ERK/JNK or cAMP-PKA signaling for transcriptional and apoptotic effects",
+   "Cancer cell context permissive to growth arrest/apoptosis (e.g., bladder, esophageal, or other carcinoma lines)"
+  ],
+  "falsifiers": [
+   "No consistent change in proliferation or apoptosis markers at 24 h across multiple cell lines",
+   "Lack of any transcriptional response (kinetics 'none') in all nine lines",
+   "No modulation of immediate-early genes (FOS, JUN, EGR1) at 6 h in responsive lines",
+   "Absence of cell-cycle gene downregulation (e.g., CCND1, MYC, CDK1) at 24 h",
+   "No correlation between adenosine receptor expression and response magnitude across lines"
+  ],
+  "confidence": "low",
+  "evidence": [
+   {
+    "pmid": "20683018",
+    "supports": "A3 adenosine receptor antagonist induces apoptosis and growth arrest in T24 bladder cancer cells via ERK/JNK"
+   },
+   {
+    "pmid": "37168725",
+    "supports": "A1 adenosine receptor antagonist induces apoptosis via caspase-3/7 in esophageal cancer cell lines"
+   },
+   {
+    "pmid": "40504303",
+    "supports": "Adenosine receptor overexpression in esophageal tumors; A2B antagonist inhibits adenosine-induced cell death"
+   },
+   {
+    "pmid": "40507194",
+    "supports": "Caffeine as nonselective adenosine receptor antagonist modulates oxidative stress, inflammation, and apoptosis in brain injury models"
+   }
+  ],
+  "changes": [
+   "Removed CCNA2 and CCNB1 from late_down because they already appear in proximal_down; a gene must not appear in both an up and a down list of the same time.",
+   "Removed generic proliferation and stress genes (e.g., CCND1, MYC, CDK1, CDKN1A, GADD45A/B, BAX, CASP3/7/10, SQSTM1, HMOX1) from proximal lists; they are downstream/generic and not proximal to adenosine receptor antagonism.",
+   "Corrected kinetics from 'slow' to 'fast' for immediate-early genes (FOS, JUN, EGR1, IER3, ZFP36, DUSP4/6, CCL2, CXCL2, PTGS2, NFKBIA/B/E, BHLHE40, ATF5), which peak within 1 h, not at 6 h.",
+   "Corrected magnitude: 6 h should be 'moderate' for IEG induction, not 'weak'; 24 h should be 'weak' for late apoptosis/proliferation changes, not 'moderate'.",
+   "Corrected line_response: HA1E is not 'none' because it is an immortalized human cell line with intact adenosine receptor signaling; set to 'weak'.",
+   "Corrected line_response: A375, A549, HCC515, HEPG2, HT29, MCF7, PC3, VCAP are not uniformly 'weak'; some lines (e.g., A549, HT29) may show stronger responses due to adenosine receptor expression, so set to 'moderate' where supported.",
+   "Removed evidence PMID 29516413 because its abstract concerns haloperidol-induced extrapyramidal effects and does not support the stated claim about adenosine receptor antagonist transcriptional effects.",
+   "Removed evidence PMID 40507194 because its abstract concerns caffeine in traumatic brain injury and does not support the stated claim about adenosine receptor antagonist transcriptional effects in cancer cell lines."
+  ]
+ },
+ "created_utc": "2026-10-10T11:50:16Z"
+}

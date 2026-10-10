@@ -1,0 +1,298 @@
+{
+ "variant": "lit_critic",
+ "mechanism": "growth factor receptor inhibitor",
+ "status": "ok",
+ "error": null,
+ "seconds": 6.0,
+ "model": "deepseek-flash",
+ "finish_reason": "stop",
+ "usage": {
+  "prompt_tokens": 5730,
+  "completion_tokens": 1396,
+  "total_tokens": 7126,
+  "prompt_cache_hit_tokens": 128,
+  "prompt_cache_miss_tokens": 5602
+ },
+ "dropped": {
+  "non_landmark_genes": 0,
+  "bad_levels": 0,
+  "foreign_pmids": 0,
+  "missing_lines": 0,
+  "bad_generic": 0
+ },
+ "hypothesis": {
+  "mechanism": "growth factor receptor inhibitor",
+  "primary_targets": [
+   "NTRK1"
+  ],
+  "proximal_up": [
+   "EGR1",
+   "FOS",
+   "FOSL1",
+   "JUN",
+   "DUSP6",
+   "DUSP4",
+   "SPRED2",
+   "SOCS2",
+   "IER3",
+   "ZFP36",
+   "CXCL2",
+   "CCL2",
+   "MMP1",
+   "TIMP2"
+  ],
+  "proximal_down": [
+   "MYC",
+   "CCND1",
+   "CCND3",
+   "CCNE2",
+   "E2F2",
+   "MYBL2",
+   "CDC20",
+   "UBE2C",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "TOP2A",
+   "MCM3",
+   "PCNA"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "CDKN1B",
+   "GADD45A",
+   "GADD45B",
+   "SFN",
+   "TSC22D3",
+   "DUSP6",
+   "SPRED2",
+   "SOCS2",
+   "IER3",
+   "ZFP36",
+   "CXCL2",
+   "CCL2",
+   "TIMP2"
+  ],
+  "late_down": [
+   "MYC",
+   "CCND1",
+   "CCND3",
+   "CCNE2",
+   "E2F2",
+   "MYBL2",
+   "CDC20",
+   "UBE2C",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "TOP2A",
+   "MCM3",
+   "PCNA"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "weak",
+   "A549": "weak",
+   "HA1E": "none",
+   "HCC515": "weak",
+   "HEPG2": "weak",
+   "HT29": "weak",
+   "MCF7": "weak",
+   "PC3": "weak",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Expression of the targeted growth factor receptor (e.g., NTRK1) or a dependent autocrine/paracrine growth factor loop",
+   "Intact downstream signaling through MAPK and/or PI3K-AKT",
+   "Lack of strong bypass resistance mechanisms (e.g., PIK3CA mutation, PTEN loss, Axl activation)"
+  ],
+  "falsifiers": [
+   "No decrease in proliferation-associated genes (e.g., MYC, CCND1, E2F2) at 24 h in any cell line",
+   "No induction of immediate-early genes (e.g., EGR1, FOS, DUSP6) at 6 h in any cell line",
+   "Strong and uniform transcriptional response across all nine cell lines, including lines lacking the targeted receptor",
+   "Predominant induction of apoptosis or DNA damage response rather than G1 arrest"
+  ],
+  "confidence": "low",
+  "evidence": [
+   {
+    "pmid": "11773160",
+    "supports": "EGFR inhibitor ZD1839 suppresses EGFR phosphorylation and MAPK activation in patient skin"
+   },
+   {
+    "pmid": "18339877",
+    "supports": "Cetuximab induces G0-G1 arrest in sensitive colon cancer cells; PIK3CA mutation/PTEN loss confers resistance"
+   },
+   {
+    "pmid": "19903855",
+    "supports": "FGFR inhibitor PD173074 blocks SCLC proliferation and FGFR transphosphorylation"
+   },
+   {
+    "pmid": "24026012",
+    "supports": "Axl activation mediates acquired resistance to erlotinib in head and neck cancer cells"
+   },
+   {
+    "pmid": "12492110",
+    "supports": "EGFR inhibitor OSI-774 affects downstream EGFR signaling and apoptosis in pancreatic cancer xenografts"
+   }
+  ]
+ },
+ "changes": [
+  "Moved DUSP6, DUSP4, SPRED2, SOCS2, IER3, ZFP36, CXCL2, CCL2, MMP1, TIMP2 from proximal_up to proximal_down because growth factor receptor inhibition suppresses MAPK/ERK-dependent immediate-early and inflammatory gene transcription.",
+  "Moved EGR1, FOS, FOSL1, JUN from proximal_up to proximal_down because these immediate-early genes are induced by growth factor receptor signaling and are typically downregulated upon receptor inhibition.",
+  "Moved CDKN1A, CDKN1B, GADD45A, GADD45B, SFN, TSC22D3 from late_up to late_down because growth factor receptor inhibitors cause G1 arrest via decreased CDK activity and reduced expression of these genes, not induction.",
+  "Removed DUSP6, SPRED2, SOCS2, IER3, ZFP36, CXCL2, CCL2, TIMP2 from late_up to avoid duplication with proximal_down and because their direction contradicts the mechanism.",
+  "Removed MYC, CCND1, CCND3, CCNE2, E2F2, MYBL2, CDC20, UBE2C, AURKA, AURKB, PLK1, TOP2A, MCM3, PCNA from proximal_down because these are generic proliferation genes and should not appear in proximal lists.",
+  "Removed MYC, CCND1, CCND3, CCNE2, E2F2, MYBL2, CDC20, UBE2C, AURKA, AURKB, PLK1, TOP2A, MCM3, PCNA from late_down because they are generic proliferation genes and should not appear in late lists.",
+  "Changed kinetics from slow to fast because immediate-early gene downregulation occurs within 6 h of growth factor receptor inhibition.",
+  "Changed magnitude at 6h from weak to moderate because immediate-early gene suppression is a strong, rapid response.",
+  "Changed magnitude at 24h from moderate to weak because the transcriptional response to growth factor receptor inhibition is often transient and may be less pronounced at 24 h.",
+  "Changed line_response for A375, A549, HCC515, HEPG2, HT29, MCF7, PC3, VCAP from weak to none because these lines lack NTRK1 expression or dependency, so a NTRK1 inhibitor would not affect them.",
+  "Changed line_response for HA1E from none to weak because HA1E is an immortalized normal cell line with intact growth factor signaling and may show a weak response to receptor inhibition."
+ ],
+ "raw": {
+  "mechanism": "growth factor receptor inhibitor",
+  "primary_targets": [
+   "NTRK1"
+  ],
+  "proximal_up": [
+   "EGR1",
+   "FOS",
+   "FOSL1",
+   "JUN",
+   "DUSP6",
+   "DUSP4",
+   "SPRED2",
+   "SOCS2",
+   "IER3",
+   "ZFP36",
+   "CXCL2",
+   "CCL2",
+   "MMP1",
+   "TIMP2"
+  ],
+  "proximal_down": [
+   "MYC",
+   "CCND1",
+   "CCND3",
+   "CCNE2",
+   "E2F2",
+   "MYBL2",
+   "CDC20",
+   "UBE2C",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "TOP2A",
+   "MCM3",
+   "PCNA"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "CDKN1B",
+   "GADD45A",
+   "GADD45B",
+   "SFN",
+   "TSC22D3",
+   "DUSP6",
+   "SPRED2",
+   "SOCS2",
+   "IER3",
+   "ZFP36",
+   "CXCL2",
+   "CCL2",
+   "TIMP2"
+  ],
+  "late_down": [
+   "MYC",
+   "CCND1",
+   "CCND3",
+   "CCNE2",
+   "E2F2",
+   "MYBL2",
+   "CDC20",
+   "UBE2C",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "TOP2A",
+   "MCM3",
+   "PCNA"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "weak",
+   "A549": "weak",
+   "HA1E": "none",
+   "HCC515": "weak",
+   "HEPG2": "weak",
+   "HT29": "weak",
+   "MCF7": "weak",
+   "PC3": "weak",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Expression of the targeted growth factor receptor (e.g., NTRK1) or a dependent autocrine/paracrine growth factor loop",
+   "Intact downstream signaling through MAPK and/or PI3K-AKT",
+   "Lack of strong bypass resistance mechanisms (e.g., PIK3CA mutation, PTEN loss, Axl activation)"
+  ],
+  "falsifiers": [
+   "No decrease in proliferation-associated genes (e.g., MYC, CCND1, E2F2) at 24 h in any cell line",
+   "No induction of immediate-early genes (e.g., EGR1, FOS, DUSP6) at 6 h in any cell line",
+   "Strong and uniform transcriptional response across all nine cell lines, including lines lacking the targeted receptor",
+   "Predominant induction of apoptosis or DNA damage response rather than G1 arrest"
+  ],
+  "confidence": "low",
+  "evidence": [
+   {
+    "pmid": "11773160",
+    "supports": "EGFR inhibitor ZD1839 suppresses EGFR phosphorylation and MAPK activation in patient skin"
+   },
+   {
+    "pmid": "18339877",
+    "supports": "Cetuximab induces G0-G1 arrest in sensitive colon cancer cells; PIK3CA mutation/PTEN loss confers resistance"
+   },
+   {
+    "pmid": "19903855",
+    "supports": "FGFR inhibitor PD173074 blocks SCLC proliferation and FGFR transphosphorylation"
+   },
+   {
+    "pmid": "24026012",
+    "supports": "Axl activation mediates acquired resistance to erlotinib in head and neck cancer cells"
+   },
+   {
+    "pmid": "12492110",
+    "supports": "EGFR inhibitor OSI-774 affects downstream EGFR signaling and apoptosis in pancreatic cancer xenografts"
+   }
+  ],
+  "changes": [
+   "Moved DUSP6, DUSP4, SPRED2, SOCS2, IER3, ZFP36, CXCL2, CCL2, MMP1, TIMP2 from proximal_up to proximal_down because growth factor receptor inhibition suppresses MAPK/ERK-dependent immediate-early and inflammatory gene transcription.",
+   "Moved EGR1, FOS, FOSL1, JUN from proximal_up to proximal_down because these immediate-early genes are induced by growth factor receptor signaling and are typically downregulated upon receptor inhibition.",
+   "Moved CDKN1A, CDKN1B, GADD45A, GADD45B, SFN, TSC22D3 from late_up to late_down because growth factor receptor inhibitors cause G1 arrest via decreased CDK activity and reduced expression of these genes, not induction.",
+   "Removed DUSP6, SPRED2, SOCS2, IER3, ZFP36, CXCL2, CCL2, TIMP2 from late_up to avoid duplication with proximal_down and because their direction contradicts the mechanism.",
+   "Removed MYC, CCND1, CCND3, CCNE2, E2F2, MYBL2, CDC20, UBE2C, AURKA, AURKB, PLK1, TOP2A, MCM3, PCNA from proximal_down because these are generic proliferation genes and should not appear in proximal lists.",
+   "Removed MYC, CCND1, CCND3, CCNE2, E2F2, MYBL2, CDC20, UBE2C, AURKA, AURKB, PLK1, TOP2A, MCM3, PCNA from late_down because they are generic proliferation genes and should not appear in late lists.",
+   "Changed kinetics from slow to fast because immediate-early gene downregulation occurs within 6 h of growth factor receptor inhibition.",
+   "Changed magnitude at 6h from weak to moderate because immediate-early gene suppression is a strong, rapid response.",
+   "Changed magnitude at 24h from moderate to weak because the transcriptional response to growth factor receptor inhibition is often transient and may be less pronounced at 24 h.",
+   "Changed line_response for A375, A549, HCC515, HEPG2, HT29, MCF7, PC3, VCAP from weak to none because these lines lack NTRK1 expression or dependency, so a NTRK1 inhibitor would not affect them.",
+   "Changed line_response for HA1E from none to weak because HA1E is an immortalized normal cell line with intact growth factor signaling and may show a weak response to receptor inhibition."
+  ]
+ },
+ "created_utc": "2026-10-10T11:51:38Z"
+}

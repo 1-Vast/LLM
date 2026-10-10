@@ -57,6 +57,16 @@ for a 5-day viability decision.
 * For trametinib, 5-day information appeared only at 24-48 h.
 * Gate decisions now require interval lower bounds and can abstain (`plan_measure_or_predict`).
 
+The 2026-10-10 block M tested whether the agent and a world model can falsify mechanism
+hypotheses (424 Repurposing Hub classes) with a calibrated error rate. It used 502 sealed L1000
+drugs and four profiles each.
+* A conformal test covered the true mechanism in 0.892 of drugs. It failed its registered rule on
+  the most active drugs (0.776).
+* The agent alone covered 0.00, and likelihood credible sets 0.22.
+* Class content falsifies.
+* Agent literature, critique, analogies, observation choice and p-value reading added nothing
+  beyond controls. The test never flagged an inadequate hypothesis set. Nothing was promoted.
+
 Software checks and replay receipts establish engineering behaviour, not independent
 scientific benefit. STATE remains the pretrained world-model foundation; decision
 benefit, LLM advantage and functional or causal claims remain unestablished.

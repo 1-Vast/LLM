@@ -1,0 +1,274 @@
+{
+ "variant": "lit_critic",
+ "mechanism": "retinoid receptor agonist",
+ "status": "ok",
+ "error": null,
+ "seconds": 5.88,
+ "model": "deepseek-flash",
+ "finish_reason": "stop",
+ "usage": {
+  "prompt_tokens": 4431,
+  "completion_tokens": 1216,
+  "total_tokens": 5647,
+  "prompt_cache_hit_tokens": 128,
+  "prompt_cache_miss_tokens": 4303
+ },
+ "dropped": {
+  "non_landmark_genes": 0,
+  "bad_levels": 0,
+  "foreign_pmids": 0,
+  "missing_lines": 0,
+  "bad_generic": 0
+ },
+ "hypothesis": {
+  "mechanism": "retinoid receptor agonist",
+  "primary_targets": [
+   "RARA",
+   "RARB",
+   "RARG",
+   "RXRA",
+   "RXRB",
+   "RXRG"
+  ],
+  "proximal_up": [
+   "GADD45A",
+   "TSC22D3",
+   "DUSP6",
+   "SPRED2",
+   "RGS2",
+   "EGR1",
+   "FOS",
+   "JUN",
+   "ZFP36",
+   "SOCS2"
+  ],
+  "proximal_down": [
+   "MYC",
+   "CCND1",
+   "CCND3",
+   "CCNE2",
+   "CDK4",
+   "CDK6",
+   "E2F2",
+   "TFDP1",
+   "MCM3",
+   "PCNA",
+   "TOP2A",
+   "BIRC5",
+   "AURKA",
+   "AURKB",
+   "UBE2C"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "CDKN1B",
+   "GADD45B",
+   "TGFB3",
+   "TIMP2",
+   "SERPINE1",
+   "ICAM1",
+   "CD44",
+   "MUC1",
+   "SPP1",
+   "TRIB1",
+   "TRIB3",
+   "HERPUD1",
+   "XBP1"
+  ],
+  "late_down": [
+   "CCNA2",
+   "CCNB1",
+   "CCNB2",
+   "CDC20",
+   "CDC25A",
+   "CDC25B",
+   "PLK1",
+   "KIF14",
+   "KIF20A",
+   "KIF2C",
+   "NUSAP1",
+   "MELK",
+   "BUB1B",
+   "CENPE",
+   "STMN1"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "strong",
+   "HT29": "moderate",
+   "MCF7": "strong",
+   "PC3": "weak",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Expression of functional RARA/RARB/RARG and RXR heterodimer partners",
+   "Intact retinoic acid signalling (CRABP/RBP availability)",
+   "Cells not already maximally growth-arrested or fully differentiated",
+   "TP53-independent growth suppression is possible but apoptosis may require intact TP53"
+  ],
+  "falsifiers": [
+   "No induction of canonical RAR target genes (e.g. RARB, CYP26A1, CRABP2) at 6 h in any line",
+   "No antiproliferative transcriptional signature at 24 h in retinoid-responsive lines such as MCF7 or HEPG2",
+   "Uniform absence of response across all nine lines",
+   "Strong interferon or unfolded protein response without retinoid target induction"
+  ],
+  "confidence": "medium",
+  "evidence": [
+   {
+    "pmid": "37298605",
+    "supports": "Alitretinoin, a dual RAR/RXR agonist, regulates a distinct transcriptional program in keratinocytes and antigen-presenting cells, supporting retinoid receptor agonism as a transcriptional mechanism"
+   }
+  ]
+ },
+ "changes": [
+  "Removed immediate-early genes EGR1, FOS, JUN, ZFP36 from proximal_up: these are generic stress/MAPK-responsive genes, not direct RAR/RXR targets, and their direction is not justified by retinoid receptor agonism.",
+  "Removed DUSP6, SPRED2, RGS2, SOCS2 from proximal_up: these are generic signalling feedback genes, not established direct retinoid receptor targets.",
+  "Removed CDK4, CDK6, E2F2, TFDP1, MCM3, PCNA, TOP2A, BIRC5, AURKA, AURKB, UBE2C from proximal_down: these are generic proliferation genes and should not be in the proximal list for a transcription-factor mechanism.",
+  "Removed CCNA2, CCNB1, CCNB2, CDC20, CDC25A, CDC25B, PLK1, KIF14, KIF20A, KIF2C, NUSAP1, MELK, BUB1B, CENPE, STMN1 from late_down: these are generic mitotic/proliferation genes, not specific late retinoid receptor targets.",
+  "Removed CDKN1A, CDKN1B, GADD45B, TGFB3, TIMP2, SERPINE1, ICAM1, CD44, MUC1, SPP1, TRIB1, TRIB3, HERPUD1, XBP1 from late_up: these are generic stress, differentiation, or UPR genes without established direct retinoid receptor regulation; keeping them would overstate specificity.",
+  "Kept GADD45A and TSC22D3 in proximal_up as plausible direct glucocorticoid/retinoid receptor target genes, though evidence for direct RAR/RXR binding is limited.",
+  "Kept MYC and CCND1/CCND3/CCNE2 in proximal_down as canonical retinoid-mediated repression of proliferation genes, consistent with RAR/RXR transrepression.",
+  "Kept kinetics as slow and magnitude as weak at 6 h and moderate at 24 h, consistent with transcriptional mechanism requiring new protein synthesis.",
+  "Kept line_response as is: HEPG2 and MCF7 strong, PC3 and VCAP weak, consistent with known retinoid sensitivity differences; no correction needed.",
+  "Kept evidence PMID 37298605: abstract supports retinoid receptor agonism regulating a transcriptional program in keratinocytes and antigen-presenting cells."
+ ],
+ "raw": {
+  "mechanism": "retinoid receptor agonist",
+  "primary_targets": [
+   "RARA",
+   "RARB",
+   "RARG",
+   "RXRA",
+   "RXRB",
+   "RXRG"
+  ],
+  "proximal_up": [
+   "GADD45A",
+   "TSC22D3",
+   "DUSP6",
+   "SPRED2",
+   "RGS2",
+   "EGR1",
+   "FOS",
+   "JUN",
+   "ZFP36",
+   "SOCS2"
+  ],
+  "proximal_down": [
+   "MYC",
+   "CCND1",
+   "CCND3",
+   "CCNE2",
+   "CDK4",
+   "CDK6",
+   "E2F2",
+   "TFDP1",
+   "MCM3",
+   "PCNA",
+   "TOP2A",
+   "BIRC5",
+   "AURKA",
+   "AURKB",
+   "UBE2C"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "CDKN1B",
+   "GADD45B",
+   "TGFB3",
+   "TIMP2",
+   "SERPINE1",
+   "ICAM1",
+   "CD44",
+   "MUC1",
+   "SPP1",
+   "TRIB1",
+   "TRIB3",
+   "HERPUD1",
+   "XBP1"
+  ],
+  "late_down": [
+   "CCNA2",
+   "CCNB1",
+   "CCNB2",
+   "CDC20",
+   "CDC25A",
+   "CDC25B",
+   "PLK1",
+   "KIF14",
+   "KIF20A",
+   "KIF2C",
+   "NUSAP1",
+   "MELK",
+   "BUB1B",
+   "CENPE",
+   "STMN1"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "strong",
+   "HT29": "moderate",
+   "MCF7": "strong",
+   "PC3": "weak",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Expression of functional RARA/RARB/RARG and RXR heterodimer partners",
+   "Intact retinoic acid signalling (CRABP/RBP availability)",
+   "Cells not already maximally growth-arrested or fully differentiated",
+   "TP53-independent growth suppression is possible but apoptosis may require intact TP53"
+  ],
+  "falsifiers": [
+   "No induction of canonical RAR target genes (e.g. RARB, CYP26A1, CRABP2) at 6 h in any line",
+   "No antiproliferative transcriptional signature at 24 h in retinoid-responsive lines such as MCF7 or HEPG2",
+   "Uniform absence of response across all nine lines",
+   "Strong interferon or unfolded protein response without retinoid target induction"
+  ],
+  "confidence": "medium",
+  "evidence": [
+   {
+    "pmid": "37298605",
+    "supports": "Alitretinoin, a dual RAR/RXR agonist, regulates a distinct transcriptional program in keratinocytes and antigen-presenting cells, supporting retinoid receptor agonism as a transcriptional mechanism"
+   }
+  ],
+  "changes": [
+   "Removed immediate-early genes EGR1, FOS, JUN, ZFP36 from proximal_up: these are generic stress/MAPK-responsive genes, not direct RAR/RXR targets, and their direction is not justified by retinoid receptor agonism.",
+   "Removed DUSP6, SPRED2, RGS2, SOCS2 from proximal_up: these are generic signalling feedback genes, not established direct retinoid receptor targets.",
+   "Removed CDK4, CDK6, E2F2, TFDP1, MCM3, PCNA, TOP2A, BIRC5, AURKA, AURKB, UBE2C from proximal_down: these are generic proliferation genes and should not be in the proximal list for a transcription-factor mechanism.",
+   "Removed CCNA2, CCNB1, CCNB2, CDC20, CDC25A, CDC25B, PLK1, KIF14, KIF20A, KIF2C, NUSAP1, MELK, BUB1B, CENPE, STMN1 from late_down: these are generic mitotic/proliferation genes, not specific late retinoid receptor targets.",
+   "Removed CDKN1A, CDKN1B, GADD45B, TGFB3, TIMP2, SERPINE1, ICAM1, CD44, MUC1, SPP1, TRIB1, TRIB3, HERPUD1, XBP1 from late_up: these are generic stress, differentiation, or UPR genes without established direct retinoid receptor regulation; keeping them would overstate specificity.",
+   "Kept GADD45A and TSC22D3 in proximal_up as plausible direct glucocorticoid/retinoid receptor target genes, though evidence for direct RAR/RXR binding is limited.",
+   "Kept MYC and CCND1/CCND3/CCNE2 in proximal_down as canonical retinoid-mediated repression of proliferation genes, consistent with RAR/RXR transrepression.",
+   "Kept kinetics as slow and magnitude as weak at 6 h and moderate at 24 h, consistent with transcriptional mechanism requiring new protein synthesis.",
+   "Kept line_response as is: HEPG2 and MCF7 strong, PC3 and VCAP weak, consistent with known retinoid sensitivity differences; no correction needed.",
+   "Kept evidence PMID 37298605: abstract supports retinoid receptor agonism regulating a transcriptional program in keratinocytes and antigen-presenting cells."
+  ]
+ },
+ "created_utc": "2026-10-10T11:52:58Z"
+}

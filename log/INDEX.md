@@ -7,5 +7,6 @@
 | 20261010 | Phenotype-anchored dual core: same-spheroid endpoints, world-model value gate, held-out evaluation and promotion | `20261010/PHENOTYPE_ANCHOR.json` |
 | 20261010 | Coordinate recovery, observation reliability, targeted extension and report/tool consolidation | `20261010/AXIS_RECOVERY.json`; `20261010/P05R_EXTENSION.json`; `20261010/RESEARCH_CONSOLIDATION.json` |
 | 20261010 | Measure or predict across platform and time: STATE transport refused, measurement gate false positive, interval planner promoted | `20261010/KINETIC_HORIZON.json` |
+| 20261010 | Calibrated mechanism falsification: conformal test valid on average, fails on the most active drugs; agent knowledge, design and adequacy not supported; nothing promoted | `20261010/MECHANISM_FALSIFICATION.json` |
 
 `MANIFEST.json` lists each retained dated file with its byte count and SHA-256. Regenerate it with `python -m tools.log_manifest` and validate it with `python -m tools.log_manifest --check`.

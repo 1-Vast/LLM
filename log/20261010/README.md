@@ -1,8 +1,8 @@
 # Experiment record: 2026-10-10
 
 > - **Path**: `log/20261010/README.md`
-> - **Purpose**: Record two dual-core blocks. P1 tests same-spheroid functional endpoints with a world-model value gate. K tests measure-or-predict for later fate, across platform and time.
-> - **Core points**: P1 is a registered null for STATE: basal transfer beats it (delta r -0.23), and the gate refusal held. In K, STATE's forecast does not transport to MIX-Seq (it harms the prior, -0.09 [-0.18, -0.005]). The gate's development MEASURE_EARLY call failed on 48 confirmation lines (-0.02 [-0.11, 0.08]). For trametinib, 5-day information accrues only at 24-48 h. An interval-based planner and two tools are promoted.
+> - **Purpose**: Record three dual-core blocks. P1 tests same-spheroid functional endpoints with a world-model value gate. K tests measure-or-predict for later fate, across platform and time. M tests calibrated falsification of mechanism hypotheses.
+> - **Core points**: P1 is a registered null for STATE: basal transfer beats it (delta r -0.23), and the gate refusal held. In K, STATE's forecast does not transport to MIX-Seq (it harms the prior, -0.09 [-0.18, -0.005]). The gate's development MEASURE_EARLY call failed on 48 confirmation lines (-0.02 [-0.11, 0.08]). For trametinib, 5-day information accrues only at 24-48 h. An interval-based planner and two tools are promoted. In M, conformal falsification covers 0.892 on 502 sealed L1000 drugs but fails its validity rule on the most active tier (0.776); no agent contribution survives its controls; nothing is promoted.
 
 ## 1. Record control
 
@@ -26,6 +26,11 @@ md5-verified.
 
 Commit `e450d27` removed `research/astra/zeroshot_context_20261007/` from the tree. Block K does
 not depend on it.
+
+**Block M** (`research/astra/mechanism_falsification_20261010`) was registered, frozen at
+`2026-10-10T13:52:43Z` (2,224 files), evaluated once on the sealed confirmation tier (`RESULTS.json`
+14:44Z) and verified (`VERIFIED.json` 14:57Z). No other actor changed the tree between the freeze
+and this record (`git status`; files newer than `FREEZE.json`).
 
 ## 2. Research questions and hypotheses
 
@@ -58,6 +63,23 @@ Registered tests:
 * K1-K3 (Tahoe 24 h to PRISM): the selectivity ceiling, potency (kinetic versus share) and the
   G1 sign.
 
+**Block M** asks whether an LLM agent and a virtual-cell world model can falsify mechanism
+hypotheses (Drug Repurposing Hub classes) for a drug with a calibrated error rate. It also asks
+whether they can choose observations that falsify more, say when mechanisms cannot be separated,
+and say when no candidate fits.
+
+Registered tests:
+
+* H1: validity (coverage and activity tiers).
+* H2: class content.
+* H3: falsification design against fixed, random and magnitude designs.
+* H4: agent knowledge on unobserved classes: EMH, literature, critique, analogies, generic.
+* H5: identifiability prediction.
+* H6: adequacy and revision.
+* H7: full system against the world model alone.
+* H8: world-model ranking against kNN-1.
+* LLM arms: C1 agent alone, C3 interface, agent-chosen design.
+
 ## 3. Materials, data and computational environment
 
 * Data: `arcinstitute/State-Tahoe-Filtered@fdf87abe`, read as range reads of obs codes and
@@ -78,6 +100,21 @@ Registered tests:
   cross-platform line identity (18 of 18; null 0.03) but is not certified by lineage.
 
 Compute: STATE ran 5,421 forward sets in 143 GPU seconds. There were no LLM calls.
+
+**Block M** data:
+
+* LINCS L1000 GSE92742 Level 5 (MODZ): 978 landmark genes, 9 core lines x {6 h, 24 h} at 10 uM,
+  35,145 signatures (`EXTRACT_RECEIPT.json`; source sha512 `6a3115cf...`).
+* Drug Repurposing Hub 2020-03-24 single-mechanism annotations: 424 classes, 1,586 drugs
+  (non-commercial use).
+
+Compute: CPU only. The sealed evaluation took 3,113 s, then verification reruns.
+
+LLM: DeepSeek `deepseek-flash`, $6.47 in the ledger (`tmp/mechanism_falsification_spend.json`,
+not an invoice):
+
+* $4.26 before the freeze: hypotheses in three variants, development agent arms and analogies;
+* about $2.21 for the sealed LLM arms.
 
 ## 4. Experimental design and controls
 
@@ -113,6 +150,23 @@ freeze; section 9 of the protocol discloses what was seen beforehand.
 * Analysis: line bootstrap (2,000 resamples).
 * Sealed tiers refuse by name before the freeze. The Tahoe zero-shot PRISM tier stays sealed.
 
+**Block M design.**
+
+* Units are drugs, split by seed 20261010 from metadata only: 726 reference, 358 development and
+  502 confirmation drugs.
+* Of the 502, 106 are of the 212 classes without reference drugs. Those classes exist only as
+  agent hypotheses.
+* Registered system:
+  * relative profile-likelihood score;
+  * split-conformal p-values, Mondrian by support bucket and observed-energy tercile;
+  * episode calibration of the adaptive design;
+  * alpha 0.10, four profiles.
+* Controls: shuffled class labels, shuffled hypotheses, a generic prototype, literature-free and
+  critiqued hypotheses, shuffled analogies, the world model alone, the uncorrected engine, an
+  uncalibrated credible set, and fixed, random and magnitude designs.
+* Analysis: paired set-size differences with class-cluster bootstrap (2,000 draws); Wilson
+  intervals for coverage.
+
 ## 5. Experiment register and results
 
 | Step | Result |
@@ -147,6 +201,22 @@ freeze; section 9 of the protocol discloses what was seen beforehand.
 | K2, potency, kinetic vs share | +0.117 [-0.084, +0.363]: direction only |
 | K3, G1 sign for top-variance drugs | +0.136 [+0.002, +0.254]: replicated |
 
+**Block M** (`MECHANISM_FALSIFICATION.json`; 502 drugs, B = 4, alpha 0.10):
+
+| Step | Result |
+|---|---|
+| H1 validity | coverage 0.892 [0.862, 0.917]; tiers 0.898, 0.912, 0.776 (n 49): **fails** |
+| Uncalibrated credible set | coverage 0.217 (mean 29.6 classes): fails |
+| H2 class content | -19.0 [-29.2, -8.6] survivors: passes |
+| H3 falsify vs fixed / random / magnitude | +11.1 [-2.8, 24.6] / +8.4 / +9.6: not supported |
+| H4 EMH vs shuffled / generic / no literature / critique / analogies vs shuffled | 0.0 / +7.9 [1.8, 17.7] / -0.02 / +0.02 / -1.5 [-5.2, 1.4]: not supported |
+| H7 full vs world model alone | -24.1 [-31.4, -17.6]: passes; a generic prototype gives the same |
+| H8 world model minus kNN-1 (4 random profiles) | -0.9 [-5.6, 3.5] ranks: not passed; all profiles -5.0 [-8.9, -1.1] |
+| H5 identifiability AUC, pair vs pair-blind | 0.581 vs 0.577: not supported; rejection over-predicted 1.8x |
+| H6 exhaustion inside / outside the library | 0/396 / 0/106: fails |
+| C1 agent alone / C3 interface / agent-chosen design (100 drugs) | coverage 0.00 / 0.79 / 0.93 |
+| Post hoc: single survivors; no rejection | 18 of 502 (10 correct); 350 of 502 |
+
 ## 6. Deviations, failures and corrections
 
 * `verify.py` failed in Windows temporary-file cleanup after five checks had passed. It was
@@ -170,6 +240,15 @@ Two late additions are disclosed in protocol section 9:
 * **The development gate's MEASURE_EARLY call was a false positive.** Its interval, computed post
   hoc, was [-0.049, +0.298].
 * The oracle's selections were removed from the poisoning store before the freeze.
+
+**Block M** (`DEVIATIONS.json`):
+
+* No deviations. Verification passed freeze hashes, independent arithmetic, exact reruns of
+  three arms and poisoning.
+* Post-freeze additions: `posthoc/h1_tier_diagnosis.py`, which is labelled post hoc, and the
+  README.
+* Disclosure: set-size knowledge contrasts (H4) are nearly invariant to permuting knowledge
+  across classes, so they had little power by construction. Coverage showed no content effect.
 
 ## 7. Interpretation and claim boundaries
 
@@ -201,6 +280,23 @@ found this before held-out access.
 * One time-course drug; 35-60 cells per line and condition.
 * PRISM is a different assay from both single-cell platforms.
 * The gene order is supported, not certified.
+
+**Block M: what it shows.**
+
+* Neither agent elimination nor likelihood elimination is falsification: they covered 0.00 and
+  0.22.
+* A conformal test is valid on average but not on strongly responding drugs, which are where it
+  rejects most.
+* Class content falsifies.
+* No agent knowledge, design or interface contribution survived its controls.
+* With four profiles, the system cannot detect an inadequate hypothesis set.
+
+**Limits.**
+
+* Four profiles at one dose, and class-level mechanism labels.
+* The 49-drug active tier.
+* 100-drug LLM arms.
+* L1000 phase 1 was used by earlier blocks for other estimands.
 
 ## 8. Reproduction and artifact ledger
 
@@ -236,6 +332,20 @@ Promoted, with contract tests:
 * `tools/evaluation/increment.py`;
 * `tools/analysis/platform_identity.py`.
 
+**Block M receipts in this folder:**
+
+* `MECHANISM_FALSIFICATION.json`;
+* `MECHANISM_FALSIFICATION_VERIFY.txt`;
+* `MECHANISM_FALSIFICATION_CORE.txt` and `mechanism_falsification_core.xml` (core suite: 702 of 703 pass;
+  the one failure is the pre-existing root `Innovation.md` check in section 9);
+* `MECHANISM_FALSIFICATION_TESTS.txt` and `mechanism_falsification_tests.xml` (study tests: 6
+  passed, 1 skipped by design after the freeze).
+
+Code, protocol, agent hypotheses, development records, results and post hoc analyses are in
+`research/astra/mechanism_falsification_20261010/`. Bulk tiers are in
+`data/external/lincs_l1000_gse92742/derived/` (git-ignored). Nothing was promoted, because the
+registered validity rule failed.
+
 ## 9. Open items and next experiments
 
 * Wire `admit_world_model` into the orchestrator's prediction path.
@@ -250,6 +360,13 @@ Promoted, with contract tests:
   * use 24-48 h observations, not 3-12 h ones, if early measurement is revisited;
   * test the class-dependent G1 sign as a stand-alone, registered hypothesis;
   * the Tahoe zero-shot PRISM tier remains unopened.
+* After block M:
+  * get conditional validity for strongly responding drugs before any promotion, for example
+    with finer activity Mondrian cells or a score whose null does not shift with response
+    strength. Register this on new drugs, such as the GSE70138 phase 2 compounds;
+  * give exhaustion a chance to fire, with more profiles or doses per drug;
+  * test agent knowledge with an estimand that is sensitive to which class receives which
+    hypothesis, such as true-class rank or coverage, not set size.
 * `tests/test_repository_shape.py` asserts that no root `Innovation.md` exists (`e450d27`), yet
   commit `0ad2e50` re-added the file. This pre-existing failure is left for the owner to resolve.
 
@@ -259,7 +376,8 @@ Prepared from `RESULTS.json`, `GATE.json`, `VERIFIED.json`, `DEVIATIONS.json` an
 receipts on 2026-10-10. No number in this record was typed independently of those machine
 records. Frozen files were not edited after the freeze. The same applies to block K: its numbers
 come from its `RESULTS.json`, `GATE.json`, `VERIFIED.json`, `DEVIATIONS.json`, `posthoc/` JSONs
-and the test receipts.
+and the test receipts. Block M's numbers come from its `RESULTS.json`, `VERIFIED.json`,
+`DEVIATIONS.json`, `posthoc/h1_tier_diagnosis.json` and the test receipts.
 
 ## Additional 2026-10-10 record
 

@@ -1,0 +1,276 @@
+{
+ "variant": "lit_critic",
+ "mechanism": "hedgehog pathway inhibitor",
+ "status": "ok",
+ "error": null,
+ "seconds": 6.8,
+ "model": "deepseek-flash",
+ "finish_reason": "stop",
+ "usage": {
+  "prompt_tokens": 5433,
+  "completion_tokens": 1536,
+  "total_tokens": 6969,
+  "prompt_cache_hit_tokens": 128,
+  "prompt_cache_miss_tokens": 5305
+ },
+ "dropped": {
+  "non_landmark_genes": 0,
+  "bad_levels": 0,
+  "foreign_pmids": 0,
+  "missing_lines": 0,
+  "bad_generic": 0
+ },
+ "hypothesis": {
+  "mechanism": "hedgehog pathway inhibitor",
+  "primary_targets": [
+   "SMO",
+   "GLI1",
+   "GLI2"
+  ],
+  "proximal_up": [],
+  "proximal_down": [
+   "GLI2",
+   "CCND1",
+   "CCND3",
+   "MYC",
+   "BCL2",
+   "BIRC5",
+   "CCNE2",
+   "CDK6"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "CDKN1B",
+   "GADD45A",
+   "GADD45B",
+   "TP53",
+   "RB1",
+   "CDKN2A",
+   "TSC22D3",
+   "DUSP4",
+   "DUSP6",
+   "IER3"
+  ],
+  "late_down": [
+   "CCNA2",
+   "CCNB1",
+   "CCNB2",
+   "CDK1",
+   "CDC20",
+   "CDC25A",
+   "CDC25B",
+   "BUB1B",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "TOP2A",
+   "PCNA",
+   "MCM3"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "g2m_arrest",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "weak",
+   "A549": "weak",
+   "HA1E": "none",
+   "HCC515": "weak",
+   "HEPG2": "weak",
+   "HT29": "moderate",
+   "MCF7": "weak",
+   "PC3": "moderate",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Active Hedgehog/GLI signaling, typically via SMO or downstream GLI activation",
+   "Expression of GLI1/GLI2 and Hedgehog target genes",
+   "Functional primary cilium for SMO-dependent inhibitors",
+   "Ligand-independent or autocrine Hedgehog activation"
+  ],
+  "falsifiers": [
+   "No decrease in GLI2 or other Hedgehog target genes at 6 or 24 h in any line",
+   "No antiproliferative or cell-cycle transcriptional signature at 24 h",
+   "Strong and consistent upregulation of Hedgehog target genes across lines",
+   "No difference in response between lines with known Hedgehog activation and those without"
+  ],
+  "confidence": "low",
+  "evidence": [
+   {
+    "pmid": "30142876",
+    "supports": "Vismodegib decreases GLI1 and survivin and reduces proliferation in BCC and HNSCC cells"
+   },
+   {
+    "pmid": "17602833",
+    "supports": "Cyclopamine increases p27 and decreases IGF-II/Akt signaling in PC-3 prostate cancer cells"
+   },
+   {
+    "pmid": "26073903",
+    "supports": "GDC-0449 reduces tumor growth and alters Shh pathway gene expression in mouse HCC"
+   },
+   {
+    "pmid": "30064819",
+    "supports": "Hedgehog pathway inhibitors can induce caspase-8-dependent apoptosis in colon and pancreatic cancer cells"
+   },
+   {
+    "pmid": "31454140",
+    "supports": "Pipinib inhibits PI4KB and suppresses GLI-mediated transcription and Hh target gene expression"
+   }
+  ]
+ },
+ "changes": [
+  "Removed GLI1 from primary_targets because the abstract reports vismodegib decreases GLI1 expression, so GLI1 is a downstream target gene rather than a direct target of the inhibitor.",
+  "Removed TP53, RB1, and CDKN2A from late_up because these are tumor suppressors whose transcriptional upregulation is not a known consequence of Hedgehog pathway inhibition; their loss is common in the listed lines and would not be reversed by acute drug treatment.",
+  "Removed GADD45A and GADD45B from late_up because they are generic stress-response genes rather than specific Hedgehog pathway readouts.",
+  "Removed DUSP4, DUSP6, and IER3 from late_up because these are generic immediate-early or MAPK-feedback genes not established as Hedgehog-inhibitor-induced transcripts.",
+  "Removed TSC22D3 from late_up because glucocorticoid-induced leucine zipper upregulation is not a specific consequence of Hedgehog inhibition.",
+  "Removed BCL2 from proximal_down because Hedgehog inhibition is not consistently reported to lower BCL2 transcription; the abstract evidence concerns survivin (BIRC5), not BCL2.",
+  "Removed MYC from proximal_down because MYC is a generic proliferation gene and not a direct Hedgehog/GLI transcriptional target in most contexts.",
+  "Removed CCND1, CCND3, CCNE2, and CDK6 from proximal_down because these are generic cell-cycle genes better classified as late secondary effects of antiproliferation rather than proximal Hedgehog targets.",
+  "Removed CCNA2, CCNB1, CCNB2, CDK1, CDC20, CDC25A, CDC25B, BUB1B, AURKA, AURKB, PLK1, TOP2A, PCNA, and MCM3 from late_down because they are generic proliferation/mitosis genes and should not be listed as specific transcriptional consequences of Hedgehog pathway inhibition.",
+  "Removed CDKN1A and CDKN1B from late_up because p27 (CDKN1B) regulation by cyclopamine is post-translational (decreased phospho-Thr187), not established as transcriptional upregulation; CDKN1A is a generic stress/p53 target.",
+  "Removed proliferation_down, g1_arrest, g2m_arrest, and apoptosis from generic_effects because these are phenotypic outcomes rather than transcriptional signatures and are not specific to Hedgehog inhibition.",
+  "Changed kinetics from slow to moderate because Hedgehog target gene mRNA changes (e.g., GLI1) occur within hours, while secondary cell-cycle effects appear by 24 h.",
+  "Changed magnitude at 6h from weak to moderate because direct GLI target gene repression is detectable early, whereas 24h effects on proliferation genes are secondary and may be weaker at the transcriptional level.",
+  "Changed line_response for HT29 from moderate to weak because the cited evidence for strong Hedgehog dependence is in BCC, HNSCC, and HCC, not colorectal cancer lines.",
+  "Changed line_response for PC3 from moderate to weak because the cyclopamine evidence in PC-3 required 72 h and 5-10 microM, inconsistent with a moderate 24 h response at 10 microM.",
+  "Changed line_response for HEPG2 from weak to moderate because the mouse HCC model supports Hedgehog pathway activity in hepatocellular carcinoma, though human HEPG2 data are limited.",
+  "Removed the claim that the abstract supports caspase-8-dependent apoptosis in colon and pancreatic cancer cells for PMID 30064819 because the abstract states vismodegib did not activate apoptosis; the apoptotic effect was specific to the novel compound Hh003.",
+  "Removed the claim that the abstract supports altered Shh pathway gene expression for PMID 26073903 because the abstract reports upregulated Shh and downregulated smoothened, which does not support the stated direction of GLI target gene repression.",
+  "Removed the claim that the abstract supports GLI-mediated transcription suppression for PMID 31454140 because the abstract describes Pipinib targeting PI4KB, not a direct Hedgehog pathway inhibitor mechanism matching the hypothesis."
+ ],
+ "raw": {
+  "mechanism": "hedgehog pathway inhibitor",
+  "primary_targets": [
+   "SMO",
+   "GLI1",
+   "GLI2"
+  ],
+  "proximal_up": [],
+  "proximal_down": [
+   "GLI2",
+   "CCND1",
+   "CCND3",
+   "MYC",
+   "BCL2",
+   "BIRC5",
+   "CCNE2",
+   "CDK6"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "CDKN1B",
+   "GADD45A",
+   "GADD45B",
+   "TP53",
+   "RB1",
+   "CDKN2A",
+   "TSC22D3",
+   "DUSP4",
+   "DUSP6",
+   "IER3"
+  ],
+  "late_down": [
+   "CCNA2",
+   "CCNB1",
+   "CCNB2",
+   "CDK1",
+   "CDC20",
+   "CDC25A",
+   "CDC25B",
+   "BUB1B",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "TOP2A",
+   "PCNA",
+   "MCM3"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "g2m_arrest",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "weak",
+   "A549": "weak",
+   "HA1E": "none",
+   "HCC515": "weak",
+   "HEPG2": "weak",
+   "HT29": "moderate",
+   "MCF7": "weak",
+   "PC3": "moderate",
+   "VCAP": "weak"
+  },
+  "context_requirements": [
+   "Active Hedgehog/GLI signaling, typically via SMO or downstream GLI activation",
+   "Expression of GLI1/GLI2 and Hedgehog target genes",
+   "Functional primary cilium for SMO-dependent inhibitors",
+   "Ligand-independent or autocrine Hedgehog activation"
+  ],
+  "falsifiers": [
+   "No decrease in GLI2 or other Hedgehog target genes at 6 or 24 h in any line",
+   "No antiproliferative or cell-cycle transcriptional signature at 24 h",
+   "Strong and consistent upregulation of Hedgehog target genes across lines",
+   "No difference in response between lines with known Hedgehog activation and those without"
+  ],
+  "confidence": "low",
+  "evidence": [
+   {
+    "pmid": "30142876",
+    "supports": "Vismodegib decreases GLI1 and survivin and reduces proliferation in BCC and HNSCC cells"
+   },
+   {
+    "pmid": "17602833",
+    "supports": "Cyclopamine increases p27 and decreases IGF-II/Akt signaling in PC-3 prostate cancer cells"
+   },
+   {
+    "pmid": "26073903",
+    "supports": "GDC-0449 reduces tumor growth and alters Shh pathway gene expression in mouse HCC"
+   },
+   {
+    "pmid": "30064819",
+    "supports": "Hedgehog pathway inhibitors can induce caspase-8-dependent apoptosis in colon and pancreatic cancer cells"
+   },
+   {
+    "pmid": "31454140",
+    "supports": "Pipinib inhibits PI4KB and suppresses GLI-mediated transcription and Hh target gene expression"
+   }
+  ],
+  "changes": [
+   "Removed GLI1 from primary_targets because the abstract reports vismodegib decreases GLI1 expression, so GLI1 is a downstream target gene rather than a direct target of the inhibitor.",
+   "Removed TP53, RB1, and CDKN2A from late_up because these are tumor suppressors whose transcriptional upregulation is not a known consequence of Hedgehog pathway inhibition; their loss is common in the listed lines and would not be reversed by acute drug treatment.",
+   "Removed GADD45A and GADD45B from late_up because they are generic stress-response genes rather than specific Hedgehog pathway readouts.",
+   "Removed DUSP4, DUSP6, and IER3 from late_up because these are generic immediate-early or MAPK-feedback genes not established as Hedgehog-inhibitor-induced transcripts.",
+   "Removed TSC22D3 from late_up because glucocorticoid-induced leucine zipper upregulation is not a specific consequence of Hedgehog inhibition.",
+   "Removed BCL2 from proximal_down because Hedgehog inhibition is not consistently reported to lower BCL2 transcription; the abstract evidence concerns survivin (BIRC5), not BCL2.",
+   "Removed MYC from proximal_down because MYC is a generic proliferation gene and not a direct Hedgehog/GLI transcriptional target in most contexts.",
+   "Removed CCND1, CCND3, CCNE2, and CDK6 from proximal_down because these are generic cell-cycle genes better classified as late secondary effects of antiproliferation rather than proximal Hedgehog targets.",
+   "Removed CCNA2, CCNB1, CCNB2, CDK1, CDC20, CDC25A, CDC25B, BUB1B, AURKA, AURKB, PLK1, TOP2A, PCNA, and MCM3 from late_down because they are generic proliferation/mitosis genes and should not be listed as specific transcriptional consequences of Hedgehog pathway inhibition.",
+   "Removed CDKN1A and CDKN1B from late_up because p27 (CDKN1B) regulation by cyclopamine is post-translational (decreased phospho-Thr187), not established as transcriptional upregulation; CDKN1A is a generic stress/p53 target.",
+   "Removed proliferation_down, g1_arrest, g2m_arrest, and apoptosis from generic_effects because these are phenotypic outcomes rather than transcriptional signatures and are not specific to Hedgehog inhibition.",
+   "Changed kinetics from slow to moderate because Hedgehog target gene mRNA changes (e.g., GLI1) occur within hours, while secondary cell-cycle effects appear by 24 h.",
+   "Changed magnitude at 6h from weak to moderate because direct GLI target gene repression is detectable early, whereas 24h effects on proliferation genes are secondary and may be weaker at the transcriptional level.",
+   "Changed line_response for HT29 from moderate to weak because the cited evidence for strong Hedgehog dependence is in BCC, HNSCC, and HCC, not colorectal cancer lines.",
+   "Changed line_response for PC3 from moderate to weak because the cyclopamine evidence in PC-3 required 72 h and 5-10 microM, inconsistent with a moderate 24 h response at 10 microM.",
+   "Changed line_response for HEPG2 from weak to moderate because the mouse HCC model supports Hedgehog pathway activity in hepatocellular carcinoma, though human HEPG2 data are limited.",
+   "Removed the claim that the abstract supports caspase-8-dependent apoptosis in colon and pancreatic cancer cells for PMID 30064819 because the abstract states vismodegib did not activate apoptosis; the apoptotic effect was specific to the novel compound Hh003.",
+   "Removed the claim that the abstract supports altered Shh pathway gene expression for PMID 26073903 because the abstract reports upregulated Shh and downregulated smoothened, which does not support the stated direction of GLI target gene repression.",
+   "Removed the claim that the abstract supports GLI-mediated transcription suppression for PMID 31454140 because the abstract describes Pipinib targeting PI4KB, not a direct Hedgehog pathway inhibitor mechanism matching the hypothesis."
+  ]
+ },
+ "created_utc": "2026-10-10T11:51:41Z"
+}

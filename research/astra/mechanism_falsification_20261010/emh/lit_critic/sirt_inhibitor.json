@@ -1,0 +1,306 @@
+{
+ "variant": "lit_critic",
+ "mechanism": "SIRT inhibitor",
+ "status": "ok",
+ "error": null,
+ "seconds": 5.88,
+ "model": "deepseek-flash",
+ "finish_reason": "stop",
+ "usage": {
+  "prompt_tokens": 6064,
+  "completion_tokens": 1251,
+  "total_tokens": 7315,
+  "prompt_cache_hit_tokens": 128,
+  "prompt_cache_miss_tokens": 5936
+ },
+ "dropped": {
+  "non_landmark_genes": 0,
+  "bad_levels": 0,
+  "foreign_pmids": 0,
+  "missing_lines": 0,
+  "bad_generic": 0
+ },
+ "hypothesis": {
+  "mechanism": "SIRT inhibitor",
+  "primary_targets": [
+   "SIRT1"
+  ],
+  "proximal_up": [
+   "CDKN1A",
+   "TP53",
+   "FOXO3",
+   "GADD45A",
+   "BAX",
+   "CHEK1",
+   "CHEK2",
+   "BRCA1",
+   "RAD51C",
+   "RPA1",
+   "RPA2",
+   "RPA3"
+  ],
+  "proximal_down": [
+   "CCND1",
+   "CCNE2",
+   "CDK2",
+   "CDK4",
+   "CDK6",
+   "E2F2",
+   "TFDP1",
+   "MYC",
+   "CCNA2",
+   "CCNB1",
+   "CDC25A",
+   "CDC25B",
+   "RB1",
+   "DNMT1",
+   "SIRT3"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "BAX",
+   "GADD45A",
+   "GADD45B",
+   "PMAIP1",
+   "BID",
+   "CASP3",
+   "CASP7",
+   "CASP10",
+   "DFFA",
+   "DFFB",
+   "PARP1",
+   "PARP2",
+   "TNFRSF21",
+   "SQSTM1"
+  ],
+  "late_down": [
+   "CCND1",
+   "CCNE2",
+   "CDK2",
+   "CDK4",
+   "CDK6",
+   "E2F2",
+   "MYC",
+   "CCNA2",
+   "CCNB1",
+   "BIRC5",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "TOP2A",
+   "MCM3"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "g2m_arrest",
+   "dna_damage_response",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "moderate",
+   "HT29": "moderate",
+   "MCF7": "strong",
+   "PC3": "moderate",
+   "VCAP": "moderate"
+  },
+  "context_requirements": [
+   "Expression of SIRT1 and dependence on SIRT1-mediated deacetylation for survival",
+   "Intact p53 pathway for robust p53 acetylation and p21 induction (wild-type TP53 preferred)",
+   "Functional apoptotic machinery (caspases, BAX) for late apoptotic gene expression",
+   "Proliferating cells with active cell cycle for cyclin/CDK downregulation"
+  ],
+  "falsifiers": [
+   "No decrease in SIRT1 target acetylation or no change in p53 acetylation in responsive lines",
+   "Lack of CDKN1A induction at 24 h in TP53 wild-type lines",
+   "No reduction in cyclin D1, cyclin E, CDK2, CDK4, or CDK6 at 24 h",
+   "Absence of apoptosis markers (e.g., caspase cleavage, BAX upregulation) at 24 h",
+   "Strong transcriptional response in HA1E similar to cancer lines"
+  ],
+  "confidence": "medium",
+  "evidence": [
+   {
+    "pmid": "27994519",
+    "supports": "SIRT inhibitor MHY2256 decreases viability and inhibits SIRT1 in MCF-7 breast cancer cells"
+   },
+   {
+    "pmid": "33073770",
+    "supports": "SIRT inhibitor MHY2256 induces G0/G1 arrest, reduces cyclin D1/E and CDK2/4/6, and causes apoptosis in HCT116 colorectal cancer cells"
+   },
+   {
+    "pmid": "35163511",
+    "supports": "SIRT inhibitor MHY2245 causes DNA damage, p53 acetylation, G2/M arrest via cyclin B1/Cdc2/Cdc25c downregulation, and apoptosis in HCT116 cells"
+   },
+   {
+    "pmid": "30217020",
+    "supports": "SIRT inhibitor MHY2256 induces p53 acetylation, G1 arrest, and apoptosis in endometrial cancer cells"
+   },
+   {
+    "pmid": "32398958",
+    "supports": "SIRT1 inhibitor MHY2245 induces G2/M arrest and apoptosis in ovarian cancer cells via PKM2/mTOR pathway"
+   }
+  ]
+ },
+ "changes": [
+  "Removed H2AFV from proximal_up: H2AFV is a histone variant, not a p53/SIRT1 transcriptional target; its direction is not justified by the mechanism.",
+  "Removed PCNA from proximal_up: PCNA is a generic proliferation/DNA replication gene, not a specific proximal SIRT1-inhibition target.",
+  "Kept CHEK1/CHEK2/BRCA1/RAD51C/RPA1/RPA2/RPA3 in proximal_up as DNA-damage response genes supported by MHY2245-induced DNA damage (PMID 35163511).",
+  "Kept CDKN1A, TP53, FOXO3, GADD45A, BAX in proximal_up as p53/FOXO acetylation targets supported by abstracts.",
+  "Kept cyclin/CDK/E2F/MYC downregulation in proximal_down and late_down as supported by G0/G1 and G2/M arrest data.",
+  "Kept SIRT3 in proximal_down: SIRT inhibitor MHY2256 reduces SIRT3 protein levels (PMID 30217020).",
+  "Kept kinetics slow and magnitude weak at 6 h / moderate at 24 h: abstracts report effects at 24-48 h, consistent with transcriptional response.",
+  "Kept line_response with MCF7 strong and HA1E weak: MCF7 is directly supported by PMID 27994519; HA1E is an immortalized non-cancer line expected to be less responsive.",
+  "Kept evidence list: all five abstracts support the stated claims about SIRT inhibition, cell cycle arrest, p53 acetylation, and apoptosis."
+ ],
+ "raw": {
+  "mechanism": "SIRT inhibitor",
+  "primary_targets": [
+   "SIRT1"
+  ],
+  "proximal_up": [
+   "CDKN1A",
+   "TP53",
+   "FOXO3",
+   "GADD45A",
+   "BAX",
+   "CHEK1",
+   "CHEK2",
+   "BRCA1",
+   "RAD51C",
+   "RPA1",
+   "RPA2",
+   "RPA3"
+  ],
+  "proximal_down": [
+   "CCND1",
+   "CCNE2",
+   "CDK2",
+   "CDK4",
+   "CDK6",
+   "E2F2",
+   "TFDP1",
+   "MYC",
+   "CCNA2",
+   "CCNB1",
+   "CDC25A",
+   "CDC25B",
+   "RB1",
+   "DNMT1",
+   "SIRT3"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "BAX",
+   "GADD45A",
+   "GADD45B",
+   "PMAIP1",
+   "BID",
+   "CASP3",
+   "CASP7",
+   "CASP10",
+   "DFFA",
+   "DFFB",
+   "PARP1",
+   "PARP2",
+   "TNFRSF21",
+   "SQSTM1"
+  ],
+  "late_down": [
+   "CCND1",
+   "CCNE2",
+   "CDK2",
+   "CDK4",
+   "CDK6",
+   "E2F2",
+   "MYC",
+   "CCNA2",
+   "CCNB1",
+   "BIRC5",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "TOP2A",
+   "MCM3"
+  ],
+  "generic_effects": [
+   "proliferation_down",
+   "g1_arrest",
+   "g2m_arrest",
+   "dna_damage_response",
+   "apoptosis"
+  ],
+  "kinetics": "slow",
+  "magnitude": {
+   "6h": "weak",
+   "24h": "moderate"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "moderate",
+   "HT29": "moderate",
+   "MCF7": "strong",
+   "PC3": "moderate",
+   "VCAP": "moderate"
+  },
+  "context_requirements": [
+   "Expression of SIRT1 and dependence on SIRT1-mediated deacetylation for survival",
+   "Intact p53 pathway for robust p53 acetylation and p21 induction (wild-type TP53 preferred)",
+   "Functional apoptotic machinery (caspases, BAX) for late apoptotic gene expression",
+   "Proliferating cells with active cell cycle for cyclin/CDK downregulation"
+  ],
+  "falsifiers": [
+   "No decrease in SIRT1 target acetylation or no change in p53 acetylation in responsive lines",
+   "Lack of CDKN1A induction at 24 h in TP53 wild-type lines",
+   "No reduction in cyclin D1, cyclin E, CDK2, CDK4, or CDK6 at 24 h",
+   "Absence of apoptosis markers (e.g., caspase cleavage, BAX upregulation) at 24 h",
+   "Strong transcriptional response in HA1E similar to cancer lines"
+  ],
+  "confidence": "medium",
+  "evidence": [
+   {
+    "pmid": "27994519",
+    "supports": "SIRT inhibitor MHY2256 decreases viability and inhibits SIRT1 in MCF-7 breast cancer cells"
+   },
+   {
+    "pmid": "33073770",
+    "supports": "SIRT inhibitor MHY2256 induces G0/G1 arrest, reduces cyclin D1/E and CDK2/4/6, and causes apoptosis in HCT116 colorectal cancer cells"
+   },
+   {
+    "pmid": "35163511",
+    "supports": "SIRT inhibitor MHY2245 causes DNA damage, p53 acetylation, G2/M arrest via cyclin B1/Cdc2/Cdc25c downregulation, and apoptosis in HCT116 cells"
+   },
+   {
+    "pmid": "30217020",
+    "supports": "SIRT inhibitor MHY2256 induces p53 acetylation, G1 arrest, and apoptosis in endometrial cancer cells"
+   },
+   {
+    "pmid": "32398958",
+    "supports": "SIRT1 inhibitor MHY2245 induces G2/M arrest and apoptosis in ovarian cancer cells via PKM2/mTOR pathway"
+   }
+  ],
+  "changes": [
+   "Removed H2AFV from proximal_up: H2AFV is a histone variant, not a p53/SIRT1 transcriptional target; its direction is not justified by the mechanism.",
+   "Removed PCNA from proximal_up: PCNA is a generic proliferation/DNA replication gene, not a specific proximal SIRT1-inhibition target.",
+   "Kept CHEK1/CHEK2/BRCA1/RAD51C/RPA1/RPA2/RPA3 in proximal_up as DNA-damage response genes supported by MHY2245-induced DNA damage (PMID 35163511).",
+   "Kept CDKN1A, TP53, FOXO3, GADD45A, BAX in proximal_up as p53/FOXO acetylation targets supported by abstracts.",
+   "Kept cyclin/CDK/E2F/MYC downregulation in proximal_down and late_down as supported by G0/G1 and G2/M arrest data.",
+   "Kept SIRT3 in proximal_down: SIRT inhibitor MHY2256 reduces SIRT3 protein levels (PMID 30217020).",
+   "Kept kinetics slow and magnitude weak at 6 h / moderate at 24 h: abstracts report effects at 24-48 h, consistent with transcriptional response.",
+   "Kept line_response with MCF7 strong and HA1E weak: MCF7 is directly supported by PMID 27994519; HA1E is an immortalized non-cancer line expected to be less responsive.",
+   "Kept evidence list: all five abstracts support the stated claims about SIRT inhibition, cell cycle arrest, p53 acetylation, and apoptosis."
+  ]
+ },
+ "created_utc": "2026-10-10T11:50:00Z"
+}

@@ -1,5 +1,81 @@
 # Evidence Register
 
+## Calibrated falsification of mechanism hypotheses — 2026-10-10
+
+**Primary results:**
+* A conformal falsification test over 424 mechanism classes reached nominal coverage on average.
+  It failed the registered validity rule on the most active drugs.
+* No agent contribution (literature, critique, analogies, hypothesis content, design or reading
+  p-values) survived its controls.
+
+Block M asked whether an LLM agent and a virtual-cell world model can falsify mechanism
+hypotheses with a calibrated error rate:
+* mechanism: the Drug Repurposing Hub class;
+* observations: L1000 landmark profiles, 9 lines x {6 h, 24 h};
+* budget: four profiles;
+* alpha: 0.10;
+* units: 502 sealed confirmation drugs, 106 of them in classes with no reference drug.
+
+The registered system:
+* compiles classes with reference drugs from data;
+* compiles classes without them from the agent's literature-grounded executable hypotheses;
+* scores with a relative profile likelihood;
+* calibrates by support bucket and observed energy, with the adaptive design calibrated as a
+  whole episode.
+
+**Results:**
+
+* **Validity, H1 FAIL.**
+  * Coverage of the true mechanism was 0.892 [0.862, 0.917], and 0.898 and 0.912 in the two lower
+    activity tiers.
+  * In the most active tier it was **0.776 (n 49)**, below the 0.80 floor.
+  * A post hoc check places the failure in the top two activity deciles (0.74, 0.64).
+  * The uncorrected engine's coverage there was 0.29-0.45.
+  * Gaussian-posterior 90% credible sets covered 0.217.
+  * The agent alone covered 0.00 of 100 drugs.
+* **World model.**
+  * Class content falsifies: true minus shuffled labels -19.0 [-29.2, -8.6] surviving classes
+    (H2 PASS).
+  * As a ranker it equals class-mean cosine. Against kNN-1 it is equal with four profiles
+    (-0.9 [-5.6, 3.5] ranks; H8 not passed) and better with all profiles (-5.0 [-8.9, -1.1]).
+* **Agent.**
+  * Literature vs none: -0.02. Critique vs single pass: +0.02. EMH vs shuffled EMH: 0.0.
+    Analogies vs shuffled: -1.5 [-5.2, 1.4]. All H4 NOT_SUPPORTED.
+  * A single generic prototype beat the agent's hypotheses (+7.9 [1.8, 17.7] for EMH).
+  * Full vs world-model-only passed (H7, -24.1 [-31.4, -17.6]), but the generic prototype gives
+    the same gain.
+  * The agent reading p-values (C3) covered 0.79 [0.70, 0.86]; it fell to 0.29-0.38 at two to
+    three profiles.
+  * Agent-chosen observations stayed valid (0.93) but left more survivors than a fixed order
+    (+18.4 [-7.7, 46.8], paired post hoc).
+* **Design and adequacy.**
+  * Expected-survivor design vs fixed: +11.1 [-2.8, 24.6] (H3 NOT_SUPPORTED).
+  * Predicted identifiability AUC was 0.581 vs 0.577 pair-blind (H5 NOT_SUPPORTED). The predicted
+    rejection rate was 1.8 times the realised rate.
+  * Exhaustion fired 0/396 inside and 0/106 outside the library (H6 FAIL).
+  * Single survivors: 18 of 502, of which 10 were correct. 350 episodes rejected nothing.
+
+Verification passed:
+* freeze hashes;
+* independent arithmetic;
+* exact rerun of three arms;
+* poisoning.
+
+No deviations. Nothing was promoted: a reimplementation matched the frozen engine but its
+validity rule failed.
+
+**Limits:**
+* four profiles at one dose;
+* class-level mechanism labels;
+* the most active tier has 49 drugs ([0.64, 0.87]);
+* set-size knowledge contrasts are nearly permutation-invariant (low power by construction;
+  coverage showed no content effect);
+* LLM arms used 100 drugs;
+* L1000 phase 1 was used by earlier blocks for other estimands.
+
+Provider spend $6.47 (ledger). Packet: `research/astra/mechanism_falsification_20261010/`.
+Receipt: `log/20261010/MECHANISM_FALSIFICATION.json`.
+
 ## Measure or predict across platform and time — 2026-10-10
 
 **Primary results:**
@@ -123,6 +199,7 @@ This is the canonical cross-study result table. [REPORT.md](REPORT.md) states cu
 | Direct-name control observation P0.5R | `VERIFIED_EXPLORATORY_CHANNEL` | What does gene covariance do to a separately named 39-gene control scalar? | 224 retained c44 controls, 28 groups, actual n=8; full/diagonal variance ratio median 1.473, range 0.709–3.731; independent vectors/bootstrap reproduced. | Only one unadjusted interval wholly exceeds one; no culture-level noise, old endpoint equivalence, treated reliability or decision gain. | `research/decision_value/axis_recovery_20261010/named_channel/`; independent `design/NAMED_VERIFIED.json`. |
 | Axis selection diagnostic | `OFFLINE_DIAGNOSTIC; NOT_CERTIFICATION` | Did positive-coverage allocation omit identifying zero contrasts? | Full retained support patterns are unique for all 39 genes per file; a heuristic adds 11 discovery rows per file, with fixed holdout and projected paired cost 340,068 bytes. | Binary presence need not equal numerical nonzero; this closed diagnostic reads no extra RNA, its numerical gate remains failed, and its row count is not proven minimal. | `research/decision_value/axis_recovery_20261010/calibration_v2/diagnosis/`; separate post-result freeze. |
 | Measure or predict (block K) | `CONFIRMATORY; M1_M3_FAILED; TRANSPORT_REFUSAL_CONFIRMED` | Can a frozen virtual cell's 24 h forecast replace measurement for a 5-day decision, and is any failure a ceiling, transport or timing failure? | MIX-Seq, 48 lines: measurement over the DepMap prior -0.021 [-0.109, +0.078]; STATE -0.091 [-0.182, -0.005]. Same-line cross-platform response r 0.13 or less versus within-platform 0.65. Trametinib 5-day information appears at 24-48 h (+0.16 at 48 h). Tahoe early state below the prior (USE_PRIOR confirmed). | Six drugs; one time-course drug; small cell counts; unpaired evaluator estimand (verdicts unchanged when paired); candidate gene order supported, not certified. | `research/astra/kinetic_horizon_20261010/`; `log/20261010/KINETIC_HORIZON.json`; `run_sealed.sh` then `verify.py`. |
+| Mechanism falsification (block M) | `CONFIRMATORY; H1_FAILED_ON_ACTIVE_TIER; AGENT_CONTRIBUTION_NOT_SUPPORTED` | Can an LLM agent plus a world model falsify mechanism hypotheses with calibrated error, design falsifying observations and detect inadequate hypothesis sets? | 502 sealed L1000 drugs, 424 classes, four profiles: coverage 0.892 [0.862, 0.917] but 0.776 in the most active tier (n 49). Class content -19.0 [-29.2, -8.6] survivors. Every knowledge, design, identifiability and adequacy test not supported. Agent alone coverage 0.00; credible sets 0.217. | Four profiles at one dose; class-level labels; 49-drug active tier; set-size knowledge contrasts nearly permutation-invariant; 100-drug LLM arms; L1000 exposed in earlier blocks for other estimands. | `research/astra/mechanism_falsification_20261010/`; `log/20261010/MECHANISM_FALSIFICATION.json`; `run_sealed.sh` (freeze, evaluate, verify, receipt). |
 | Historical union and targeted axis extension | `VERIFIED_FILE_LOCAL_ENDPOINT39; P06_UNFROZEN` | Can exposed c44 bytes and eleven explicitly discriminating c45 rows complete the data-coordinate gate cheaply? | Both files pass 39/39 unique matches among all 62,710 genes at 1e-5. c44 adds 0 bytes; c45 receives exactly 133,564. Separate logical-slice/blockwise reconstruction agrees; 3,334 protected old files unchanged. | Historical/adaptive coordinate evidence; exposed consistency is not fresh validation. Initial parser failure preserved with a zero-download offline amendment. Full 2,000/checkpoint axes and P06/P2 execution remain unqualified. | `research/decision_value/axis_extension_20261010/QUALIFIED_CERTIFICATE.json`; canonical receipt `log/20261010/P05R_EXTENSION.json`; standalone offline replay. |
 
 ## Interpretation and audit rules

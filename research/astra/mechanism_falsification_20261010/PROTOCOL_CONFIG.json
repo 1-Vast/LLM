@@ -1,0 +1,353 @@
+{
+ "budget": 4,
+ "alpha": 0.1,
+ "config": {
+  "k": 64,
+  "kappa": 0.05,
+  "alpha": 0.1,
+  "compile": "data",
+  "emh_variant": "lit",
+  "score": "relative",
+  "kcal": "all",
+  "n_bins": 3,
+  "tau2": 10.0,
+  "knowledge": "emh",
+  "calib": "set",
+  "seed": 20261010
+ },
+ "arms": [
+  {
+   "name": "episode",
+   "override": {
+    "calib": "episode"
+   },
+   "policies": [
+    "falsify",
+    "fixed",
+    "random",
+    "magnitude"
+   ]
+  },
+  {
+   "name": "set",
+   "override": {},
+   "policies": [
+    "fixed",
+    "random",
+    "falsify"
+   ]
+  },
+  {
+   "name": "naive",
+   "override": {
+    "score": "absolute",
+    "kcal": "mateless",
+    "kappa": 1.0,
+    "tau2": 0.0,
+    "n_bins": 1
+   },
+   "policies": [
+    "fixed",
+    "falsify"
+   ]
+  },
+  {
+   "name": "perm_classes",
+   "override": {
+    "permute_classes": true
+   },
+   "policies": [
+    "fixed",
+    "random"
+   ]
+  },
+  {
+   "name": "perm_emh",
+   "override": {
+    "permute_emh": true
+   },
+   "policies": [
+    "fixed",
+    "random"
+   ]
+  },
+  {
+   "name": "nolit",
+   "override": {
+    "emh_variant": "nolit"
+   },
+   "policies": [
+    "fixed",
+    "random"
+   ]
+  },
+  {
+   "name": "critic",
+   "override": {
+    "emh_variant": "lit_critic"
+   },
+   "policies": [
+    "fixed",
+    "random"
+   ]
+  },
+  {
+   "name": "generic",
+   "override": {
+    "knowledge": "generic"
+   },
+   "policies": [
+    "fixed",
+    "random"
+   ]
+  },
+  {
+   "name": "analogy",
+   "override": {
+    "knowledge": "analogy"
+   },
+   "policies": [
+    "fixed",
+    "random"
+   ]
+  },
+  {
+   "name": "analogy_perm",
+   "override": {
+    "knowledge": "analogy_permuted"
+   },
+   "policies": [
+    "fixed",
+    "random"
+   ]
+  },
+  {
+   "name": "c2_open",
+   "override": {
+    "knowledge_for_unreferenced": false
+   },
+   "policies": [
+    "fixed",
+    "random"
+   ]
+  },
+  {
+   "name": "c2_closed",
+   "override": {},
+   "hyp": "library",
+   "policies": [
+    "fixed",
+    "random"
+   ]
+  }
+ ],
+ "contrasts": [
+  {
+   "name": "H2_class_content_fixed",
+   "a": [
+    "set",
+    "fixed"
+   ],
+   "b": [
+    "perm_classes",
+    "fixed"
+   ]
+  },
+  {
+   "name": "H2_class_content_random",
+   "a": [
+    "set",
+    "random"
+   ],
+   "b": [
+    "perm_classes",
+    "random"
+   ]
+  },
+  {
+   "name": "H3_falsify_vs_fixed",
+   "a": [
+    "episode",
+    "falsify"
+   ],
+   "b": [
+    "episode",
+    "fixed"
+   ]
+  },
+  {
+   "name": "H3_falsify_vs_random",
+   "a": [
+    "episode",
+    "falsify"
+   ],
+   "b": [
+    "episode",
+    "random"
+   ]
+  },
+  {
+   "name": "H3_falsify_vs_magnitude",
+   "a": [
+    "episode",
+    "falsify"
+   ],
+   "b": [
+    "episode",
+    "magnitude"
+   ]
+  },
+  {
+   "name": "H4_emh_vs_permuted_unobserved",
+   "a": [
+    "set",
+    "fixed"
+   ],
+   "b": [
+    "perm_emh",
+    "fixed"
+   ],
+   "stratum": "knowledge_only"
+  },
+  {
+   "name": "H4_emh_vs_generic_unobserved",
+   "a": [
+    "set",
+    "fixed"
+   ],
+   "b": [
+    "generic",
+    "fixed"
+   ],
+   "stratum": "knowledge_only"
+  },
+  {
+   "name": "H4_lit_vs_nolit_unobserved",
+   "a": [
+    "set",
+    "fixed"
+   ],
+   "b": [
+    "nolit",
+    "fixed"
+   ],
+   "stratum": "knowledge_only"
+  },
+  {
+   "name": "H4_critic_vs_single_pass_unobserved",
+   "a": [
+    "critic",
+    "fixed"
+   ],
+   "b": [
+    "set",
+    "fixed"
+   ],
+   "stratum": "knowledge_only"
+  },
+  {
+   "name": "H4_analogy_vs_permuted_unobserved",
+   "a": [
+    "analogy",
+    "fixed"
+   ],
+   "b": [
+    "analogy_perm",
+    "fixed"
+   ],
+   "stratum": "knowledge_only"
+  },
+  {
+   "name": "H4_analogy_vs_emh",
+   "a": [
+    "analogy",
+    "fixed"
+   ],
+   "b": [
+    "set",
+    "fixed"
+   ]
+  },
+  {
+   "name": "H7_full_vs_world_model_only",
+   "a": [
+    "set",
+    "fixed"
+   ],
+   "b": [
+    "c2_open",
+    "fixed"
+   ]
+  }
+ ],
+ "rules": {
+  "primary_policy": "falsify",
+  "coverage_lower": 0.85,
+  "tier_coverage_min": 0.8,
+  "min_tier_n": 30,
+  "comparator_coverage_min": 0.85,
+  "contrasts": {
+   "H2_class_content": {
+    "contrast": "H2_class_content_fixed",
+    "direction": "a_smaller"
+   },
+   "H3_falsify_vs_fixed": {
+    "contrast": "H3_falsify_vs_fixed",
+    "direction": "a_smaller"
+   },
+   "H3_falsify_vs_random": {
+    "contrast": "H3_falsify_vs_random",
+    "direction": "a_smaller"
+   },
+   "H3_falsify_vs_magnitude": {
+    "contrast": "H3_falsify_vs_magnitude",
+    "direction": "a_smaller"
+   },
+   "H4_emh_vs_permuted_unobserved": {
+    "contrast": "H4_emh_vs_permuted_unobserved",
+    "direction": "a_smaller"
+   },
+   "H4_emh_vs_generic_unobserved": {
+    "contrast": "H4_emh_vs_generic_unobserved",
+    "direction": "a_smaller"
+   },
+   "H4_lit_vs_nolit_unobserved": {
+    "contrast": "H4_lit_vs_nolit_unobserved",
+    "direction": "a_smaller"
+   },
+   "H4_analogy_vs_permuted_unobserved": {
+    "contrast": "H4_analogy_vs_permuted_unobserved",
+    "direction": "a_smaller"
+   },
+   "H7_full_vs_world_model_only": {
+    "contrast": "H7_full_vs_world_model_only",
+    "direction": "a_smaller"
+   },
+   "H4_critic_vs_single_pass_unobserved": {
+    "contrast": "H4_critic_vs_single_pass_unobserved",
+    "direction": "a_smaller"
+   }
+  },
+  "H8_ranking": "PASS if world_model_minus_nearest_member/rand4 has a cluster-bootstrap 95% interval entirely below zero (world model ranks the true class better than kNN-1 at four random profiles)"
+ },
+ "identifiability": {
+  "n_sim": 64,
+  "n_boot": 500
+ },
+ "revision": {
+  "agent": true
+ },
+ "llm_arms": {
+  "n_ref": 60,
+  "n_know": 40,
+  "modes": [
+   "agent",
+   "interface"
+  ],
+  "workers": 8
+ },
+ "ranking": {
+  "n_rand": 4,
+  "note": "world model vs shuffled labels, nearest reference member and class-mean cosine as rankers of the true class among observed classes; reported, no pass rule except H8 below"
+ }
+}

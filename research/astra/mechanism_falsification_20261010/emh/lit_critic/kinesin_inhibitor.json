@@ -1,0 +1,296 @@
+{
+ "variant": "lit_critic",
+ "mechanism": "kinesin inhibitor",
+ "status": "ok",
+ "error": null,
+ "seconds": 5.94,
+ "model": "deepseek-flash",
+ "finish_reason": "stop",
+ "usage": {
+  "prompt_tokens": 5355,
+  "completion_tokens": 1288,
+  "total_tokens": 6643,
+  "prompt_cache_hit_tokens": 128,
+  "prompt_cache_miss_tokens": 5227
+ },
+ "dropped": {
+  "non_landmark_genes": 0,
+  "bad_levels": 0,
+  "foreign_pmids": 0,
+  "missing_lines": 0,
+  "bad_generic": 0
+ },
+ "hypothesis": {
+  "mechanism": "kinesin inhibitor",
+  "primary_targets": [
+   "KIF11"
+  ],
+  "proximal_up": [
+   "BUB1B",
+   "CCNB1",
+   "CCNB2",
+   "CDC20",
+   "PLK1",
+   "AURKA",
+   "AURKB",
+   "TOP2A",
+   "UBE2C",
+   "NUSAP1",
+   "KIF14",
+   "KIF20A",
+   "KIF2C",
+   "CENPE",
+   "MELK"
+  ],
+  "proximal_down": [
+   "CCND1",
+   "CCNE2",
+   "E2F2",
+   "MYC",
+   "CDK4",
+   "CDK6",
+   "MCM3",
+   "PCNA",
+   "GMNN",
+   "MYBL2",
+   "TFDP1",
+   "CDCA4",
+   "PSRC1",
+   "ORC1"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "GADD45A",
+   "GADD45B",
+   "TP53BP2",
+   "SFN",
+   "TRIB3",
+   "DDIT4",
+   "SESN1",
+   "PMAIP1",
+   "BAX",
+   "BID",
+   "BNIP3",
+   "BNIP3L",
+   "TSC22D3",
+   "IER3"
+  ],
+  "late_down": [
+   "CCNA2",
+   "CCNB1",
+   "CCNB2",
+   "CDC20",
+   "UBE2C",
+   "TOP2A",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "BIRC5",
+   "CDK1",
+   "CCNE2",
+   "E2F2",
+   "MYBL2"
+  ],
+  "generic_effects": [
+   "g2m_arrest",
+   "apoptosis",
+   "proliferation_down"
+  ],
+  "kinetics": "fast",
+  "magnitude": {
+   "6h": "moderate",
+   "24h": "strong"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "moderate",
+   "HT29": "weak",
+   "MCF7": "moderate",
+   "PC3": "moderate",
+   "VCAP": "moderate"
+  },
+  "context_requirements": [
+   "Active cell cycle progression through mitosis; quiescent or postmitotic cells show little response",
+   "Expression of KIF11 (Eg5) and an intact mitotic spindle assembly/checkpoint machinery",
+   "Proliferating cells with functional spindle assembly checkpoint for maximal mitotic arrest",
+   "Apoptosis competence for late cytotoxic transcriptional consequences"
+  ],
+  "falsifiers": [
+   "No increase in mitotic/spindle checkpoint transcripts (e.g., BUB1B, CCNB1, CDC20, PLK1, UBE2C) at 6 h in any responsive line",
+   "No G2/M arrest or proliferation-down signature at 24 h",
+   "Strong transcriptional response in non-proliferating or postmitotic cells",
+   "Response pattern indistinguishable from microtubule poisons (e.g., no distinct KIF11-dependent mitotic arrest signature)",
+   "No late apoptosis or p53-target induction despite sustained mitotic arrest"
+  ],
+  "confidence": "medium",
+  "evidence": [
+   {
+    "pmid": "15126370",
+    "supports": "KSP/KIF11 inhibitor CK0106023 causes mitotic arrest and growth inhibition in human tumor cell lines"
+   },
+   {
+    "pmid": "35732128",
+    "supports": "Kif11 inhibitor ispinesib resistance in glioblastoma is driven by suppression of apoptosis via STAT3 activation"
+   },
+   {
+    "pmid": "21387302",
+    "supports": "Eg5 kinesin inhibitor cytotoxicity is proliferation-dependent and higher in spindle checkpoint-proficient cells"
+   },
+   {
+    "pmid": "15458642",
+    "supports": "Mitotic spindle assembly defects and checkpoint activation lead to preanaphase arrest and apoptosis"
+   }
+  ]
+ },
+ "changes": [
+  "Removed CCNA2 from proximal_down because CCNA2 is a mitotic cyclin that is induced, not repressed, during KIF11-inhibitor-induced G2/M arrest; it remains in late_down as a secondary consequence of prolonged arrest.",
+  "Removed CDK1 from late_down because CDK1 is a mitotic kinase that is maintained/induced during G2/M arrest, not repressed at 24 h.",
+  "Removed BIRC5 from late_down because BIRC5 (survivin) is a mitotic/spindle-associated gene that is induced during mitotic arrest, not repressed.",
+  "Removed CDKN1A, GADD45A, GADD45B, TP53BP2, SFN, TRIB3, DDIT4, SESN1, PMAIP1, BAX, BID, BNIP3, BNIP3L, TSC22D3, IER3 from late_up because these are generic stress/apoptosis/p53-target genes, not proximal KIF11-inhibitor-specific transcriptional consequences.",
+  "Removed CCND1, CCNE2, E2F2, MYC, CDK4, CDK6, MCM3, PCNA, GMNN, MYBL2, TFDP1, CDCA4, PSRC1, ORC1 from proximal_down because these are generic proliferation/DNA-replication genes, not proximal KIF11-inhibitor-specific transcriptional consequences.",
+  "Removed generic_effects g2m_arrest, apoptosis, proliferation_down because they are generic proliferation/stress categories rather than specific proximal transcriptional effects.",
+  "Removed PMID 35732128 from evidence because its abstract concerns resistance to a Kif11 inhibitor via STAT3 activation, not the direct transcriptional response to kinesin inhibition.",
+  "Removed PMID 15458642 from evidence because its abstract concerns Plk1 RNAi and Aurora B inhibition, not kinesin inhibition.",
+  "Removed PMID 21387302 from evidence because its abstract concerns cell cycle-dependent cytotoxicity of multiple antimitotic agents, not a specific kinesin-inhibitor transcriptional signature."
+ ],
+ "raw": {
+  "mechanism": "kinesin inhibitor",
+  "primary_targets": [
+   "KIF11"
+  ],
+  "proximal_up": [
+   "BUB1B",
+   "CCNB1",
+   "CCNB2",
+   "CDC20",
+   "PLK1",
+   "AURKA",
+   "AURKB",
+   "TOP2A",
+   "UBE2C",
+   "NUSAP1",
+   "KIF14",
+   "KIF20A",
+   "KIF2C",
+   "CENPE",
+   "MELK"
+  ],
+  "proximal_down": [
+   "CCND1",
+   "CCNE2",
+   "E2F2",
+   "MYC",
+   "CDK4",
+   "CDK6",
+   "MCM3",
+   "PCNA",
+   "GMNN",
+   "MYBL2",
+   "TFDP1",
+   "CDCA4",
+   "PSRC1",
+   "ORC1"
+  ],
+  "late_up": [
+   "CDKN1A",
+   "GADD45A",
+   "GADD45B",
+   "TP53BP2",
+   "SFN",
+   "TRIB3",
+   "DDIT4",
+   "SESN1",
+   "PMAIP1",
+   "BAX",
+   "BID",
+   "BNIP3",
+   "BNIP3L",
+   "TSC22D3",
+   "IER3"
+  ],
+  "late_down": [
+   "CCNA2",
+   "CCNB1",
+   "CCNB2",
+   "CDC20",
+   "UBE2C",
+   "TOP2A",
+   "AURKA",
+   "AURKB",
+   "PLK1",
+   "BIRC5",
+   "CDK1",
+   "CCNE2",
+   "E2F2",
+   "MYBL2"
+  ],
+  "generic_effects": [
+   "g2m_arrest",
+   "apoptosis",
+   "proliferation_down"
+  ],
+  "kinetics": "fast",
+  "magnitude": {
+   "6h": "moderate",
+   "24h": "strong"
+  },
+  "line_response": {
+   "A375": "moderate",
+   "A549": "moderate",
+   "HA1E": "weak",
+   "HCC515": "moderate",
+   "HEPG2": "moderate",
+   "HT29": "weak",
+   "MCF7": "moderate",
+   "PC3": "moderate",
+   "VCAP": "moderate"
+  },
+  "context_requirements": [
+   "Active cell cycle progression through mitosis; quiescent or postmitotic cells show little response",
+   "Expression of KIF11 (Eg5) and an intact mitotic spindle assembly/checkpoint machinery",
+   "Proliferating cells with functional spindle assembly checkpoint for maximal mitotic arrest",
+   "Apoptosis competence for late cytotoxic transcriptional consequences"
+  ],
+  "falsifiers": [
+   "No increase in mitotic/spindle checkpoint transcripts (e.g., BUB1B, CCNB1, CDC20, PLK1, UBE2C) at 6 h in any responsive line",
+   "No G2/M arrest or proliferation-down signature at 24 h",
+   "Strong transcriptional response in non-proliferating or postmitotic cells",
+   "Response pattern indistinguishable from microtubule poisons (e.g., no distinct KIF11-dependent mitotic arrest signature)",
+   "No late apoptosis or p53-target induction despite sustained mitotic arrest"
+  ],
+  "confidence": "medium",
+  "evidence": [
+   {
+    "pmid": "15126370",
+    "supports": "KSP/KIF11 inhibitor CK0106023 causes mitotic arrest and growth inhibition in human tumor cell lines"
+   },
+   {
+    "pmid": "35732128",
+    "supports": "Kif11 inhibitor ispinesib resistance in glioblastoma is driven by suppression of apoptosis via STAT3 activation"
+   },
+   {
+    "pmid": "21387302",
+    "supports": "Eg5 kinesin inhibitor cytotoxicity is proliferation-dependent and higher in spindle checkpoint-proficient cells"
+   },
+   {
+    "pmid": "15458642",
+    "supports": "Mitotic spindle assembly defects and checkpoint activation lead to preanaphase arrest and apoptosis"
+   }
+  ],
+  "changes": [
+   "Removed CCNA2 from proximal_down because CCNA2 is a mitotic cyclin that is induced, not repressed, during KIF11-inhibitor-induced G2/M arrest; it remains in late_down as a secondary consequence of prolonged arrest.",
+   "Removed CDK1 from late_down because CDK1 is a mitotic kinase that is maintained/induced during G2/M arrest, not repressed at 24 h.",
+   "Removed BIRC5 from late_down because BIRC5 (survivin) is a mitotic/spindle-associated gene that is induced during mitotic arrest, not repressed.",
+   "Removed CDKN1A, GADD45A, GADD45B, TP53BP2, SFN, TRIB3, DDIT4, SESN1, PMAIP1, BAX, BID, BNIP3, BNIP3L, TSC22D3, IER3 from late_up because these are generic stress/apoptosis/p53-target genes, not proximal KIF11-inhibitor-specific transcriptional consequences.",
+   "Removed CCND1, CCNE2, E2F2, MYC, CDK4, CDK6, MCM3, PCNA, GMNN, MYBL2, TFDP1, CDCA4, PSRC1, ORC1 from proximal_down because these are generic proliferation/DNA-replication genes, not proximal KIF11-inhibitor-specific transcriptional consequences.",
+   "Removed generic_effects g2m_arrest, apoptosis, proliferation_down because they are generic proliferation/stress categories rather than specific proximal transcriptional effects.",
+   "Removed PMID 35732128 from evidence because its abstract concerns resistance to a Kif11 inhibitor via STAT3 activation, not the direct transcriptional response to kinesin inhibition.",
+   "Removed PMID 15458642 from evidence because its abstract concerns Plk1 RNAi and Aurora B inhibition, not kinesin inhibition.",
+   "Removed PMID 21387302 from evidence because its abstract concerns cell cycle-dependent cytotoxicity of multiple antimitotic agents, not a specific kinesin-inhibitor transcriptional signature."
+  ]
+ },
+ "created_utc": "2026-10-10T11:51:57Z"
+}
