@@ -1,0 +1,1589 @@
+PAGE 1
+Nature | 第655 | 9 卷2026年7月
+| 497
+文章
+用于自动化科学发现的多智能体系统
+AliE.Ghareeb1,4, BenjaminChang1,2,4, LudovicoMitchener1, AngelaYiu1,
+CaralynJ.Szostkiewicz1, DmytroShved3, GavinJ.Gyimesi3, JonM.Laurent1,
+SamanthaM.Wright1, MuhammedT.Razzak1, AndrewD.White1,5 ✉,SilviaC.Finnemann3,
+ 
+MichaelaM.Hinks1,5 ✉ &SamuelG.Rodriques1,5 ✉
+科学发现由观察、假设生成、实验和数据分析的迭代过程驱动。尽管近年来人工智能
+（AI）在生物学中的应用取得了进展，但尚无系统能完全自动化所有这些阶段1–3。在此
+我们介绍Robin，一种多智能体系统，能够完全自动化实验生物学中的假设生成和数
+据分析。通过将文献检索智能体与数据分析智能体整合，Robin能生成假设、提出实
+验、解释实验结果并生成更新的假设，从而实现对科学发现的半自主方法。应用该系统
+时，我们能够为干性年龄相关性黄斑变性（一种在发达国家导致失明的主要原因）识别
+出有前景的治疗候选物4,5。Robin提出通过增强视网膜色素上皮吞噬作用作为治疗策略，
+并鉴定且在体外验证了ripasudil和KL001的疗效。Ripasudil是一种临床使用的
+Rho激酶抑制剂，据我们所知此前从未被提出用于干性年龄相关性黄斑变性的治疗。
+为阐明ripasudil诱导吞噬作用上调的机制，Robin随后提出并分析了一项后续的
+RNA测序实验，结果显示ABCA1上调，该基因编码一种脂质外排泵，可能成为一种
+新的潜在靶点。本报告正文中的所有假设、实验方向、数据分析和数据图均由Robin
+生成。作为首批在迭代的“实验室闭环”框架内自主发现并验证新治疗候选物的AI系
+统之一，Robin为AI驱动的科学发现确立了新的范式。
+随着我们在测量、干预和建模生物系统方面能力的进步，我们的集体
+科学知识迅速增长6。然而，用于从这些知识中解释、综合和生成假设
+的互补技术却相对滞后7。基于大型语言模型（LLM）的人工智能系统
+在自动化这种知识综合过程并加速科学发现方面显示出希望。由于生
+物医学研究的主要目标之一是开发新的疾病治疗方法，我们产生新疗
+法的能力可能会成为这些方法的最终受益者。药物开发在很大程度上
+依赖于生物学、临床和制药专业知识的融合，其进展受限于这些专家
+综合科学文献的速度8。
+将现有药物重新用于新的适应症，为大型语言模型（LLM）系统提供
+了一个有前景的应用场景。药物重新定位的历史通常呈现出一个模式：尽
+管在科学文献中常已有相关见解，但这些知识往往要经过相当长的时间才
+会凝结为新的治疗方法。例如，达拉非尼（dabrafenib）是一种针对
+BRAF激酶的抑制剂，已用于多种具有促分裂突变的癌症中
+在BRAF中，正被重新用于预防听力丧失9,10。尽管其分子作用在2010
+年（参考文献11–13）就已被充分表征，达拉非尼的耳保护效应却是在
+十年后通过无偏见的高通量筛选才被发现。这一发现的延迟尽管达拉
+非尼的耳保护效应直接源于其已知的BRAF抑制作用9,10,14, ，表明通过
+将文献中现有的生物学见解进行逻辑连接，可能会识别出更多的重新
+定位机会。医学领域的其他案例，从氯胺酮（滞后22年）15,16 到叶酸辅
+酶（滞后5年）17,18 到KarXT（滞后13年）19,20 ，都强调了重新定位工作
+常常在核心见解记录多年之后才得以实现。将现有见解与新的治疗应
+用联系起来的这种延迟，凸显了综合零散科学知识的挑战。LLM受训
+于跨多个领域的数据，能够存储并回忆各种科学主题的信息，从而超
+越个体人类知识的局限。以往研究表明，经过微调的LLM和专门的检
+索增强生成系统在检索任务上可以超越人类表现
+https://doi.org/10.1038/s41586‑026‑10652‑y
+收到：2025年5月23日
+接受：2026年5月12日
+在线发表：2026年5月19日
+开放获取
+检查更新
+1FutureHouse，加利福尼亚州旧金山，美国。2牛津大学，牛津，英国。3福特汉姆大学，纽约州纽约市，美国。4这些作者贡献相同：AliE.Ghareeb，BenjaminChang。5这些作者共同监督本
+研究：AndrewD.White，MichaelaM.Hinks，SamuelG.Rodriques。✉电子邮件：andrew@futurehouse.org；michaela@edisonscientific.com；sam@futurehouse.org
+
+PAGE 2
+498 | Nature | 第655 | 9 卷2026年7月
+文章
+并总结科学文献中的信息。这些进展提出了这样一种可能性：大型语
+言模型系统可用于生成新的假设21–25。
+最近开发了多种大型语言模型(LLM)系统以自动生成假设1–3,26–29。
+还开发了专门的系统来自动化药物发现中的特定任务，例如预测药理
+特性和安全性谱3,27。这些系统通过利用将科学推理分解为可管理的离
+散子任务的多智能体架构3, 、领域特定的微调2,30,、外部工具的集成2,3 
+以及人类反馈的纳入3，已证明能够生成合理的假设。然而，这些系统
+尚未将科学过程中的所有关键智力步骤全部自动化，包括生成假设和
+实验策略、分析实验室实验结果并根据新数据修正假设。
+在此我们介绍了Robin——一个用于生物学发现的多智能体系统，
+它将新颖假设生成与实验数据分析整合到一个连续工作流中（图1a,
+b）。Robin使用专门的语言智能体进行文献检索（Crow和
+Falcon）和数据分析（Finch），以实现半自主的科学发现25,31 （图
+1c）。尽管该系统可应用于跨学科的科学发现，本文着重讨论其在治
+疗学方面的潜力
+在治疗学中的应用。在给定一个感兴趣的疾病后，Robin会自动识别
+模拟关键疾病机制的相关体外测定并提出在这些实验模型中评估的具
+体药物候选项。随后我们进行了这些实验，并将得到的数据提供给
+Robin进行自主分析。Robin接着解释该分析结果，以生成新一轮的
+治疗候选物。通过这一过程，Robin推动了一个迭代的疗法开发循环，
+在此过程中假设被不断生成
+‑在实验结果的基础上被验证、测试、分析和完善。因而科学方法
+的关键智力步骤在与科学家在整个实验环中的协调下实现了自动化。
+Robin是最早将基于文献的假设生成与对生物实验室数据的自主分析
+在连续反馈系统中连接起来的系统之一。
+为了展示Robin在生成和完善新型治疗假说方面的能力，我们尝
+试为干性年龄相关性黄斑变性（dAMD）识别潜在的新疗法。d
+AMD是发达国家导致不可逆视力丧失的主要原因，但可用的治疗选择
+有限。仅在美国，就有150万人患有威胁视力的dAMD，60万人因
+AMD法律意义上失明，预计到2050年由于人口老龄化这一数字将几
+乎增加三倍4,5。通过将Robin应用于发现dAMD的新治疗
+Crow
+金翅雀
+隼
+b
+假设生成
+实验室实验
+实验分析
+目标疾病名称
+输入
+科学家通过提
+供要针对的疾病名
+称来指挥系统
+输出
+Robin 系统
+治疗候选药物
+Robin推荐顶级治疗方
+案
+针对目标疾病的候选
+者
+a
+b
+c
+Crow代理执行
+简明文献综述以识别实验性证据
+策略与治疗候选者
+Finch代理对实验数据
+进行自主分析，以得出用于
+生成假设的见解
+Falcon代理开展深入文献
+综述，撰写全面报告以评估
+每一位治疗候选者
+假设生成
+实验分析
+数据分析
+结果解读
+治疗候选生成
+Robin通过Falcon文献检索进行科学综合
+来生成治疗候选物，并在提供时利用实验结果
+实验测定方案选择
+Robin首先通过使用Crow进行文献回顾
+并生成测定方案建议来选择实验测定
+实验见解被用来生成更有信息的
+假设和后续测定（如有需要）
+Finch被调用以从原始实验数据执行
+完整的生物信息学分析和可视化
+Laboratory experiments
+图1 | Robin系统的架构和工作流程。a，当给定一个目标疾病的名称时，Robin
+生成假设并挑选出需要实验测试的顶级治疗候选。Robin可以自主分析这些实验的
+原始数据，以综合科学见解并生成更新的治疗假设。b，Robin与语言代理交互以
+生成假设并分析实验数据。c，Crow和Falcon分别用于进行简明与深入的文
+献检索，以收集指导假设生成的信息。Finch执行实验数据的分析，Robin使
+用这些分析得出的见解来为下一轮假设生成提供依据。
+
+PAGE 3
+Nature | Vol655 | 9 July2026
+| 499
+候选者，本研究代表了朝着由AI生成的科学研究发现迈进的一步。
+Robin：用于科学发现的多智能体系统
+Robin将多个语言代理整合到一个结构化工作流程中，以为特定疾病
+生成治疗候选方案（图1a,b）。Crow和Falcon是基于PaperQA2
+的文献检索代理，分别执行简明和深入的文献摘要25。PaperQA2在信
+息检索和摘要方面达到了专家级表现，可访问科学文献、临床试验报
+告及OpenTargets平台32。Finch是一个科学数据分析代理，执行来
+自实验测定的数据分析，例如RNA测序（RNA‑seq）和流式细胞术31 
+(图1c)。通过协调这些代理以识别新颖且可在实验室中立即验证的治疗
+策略，我们使用Robin实现了一个以实验为指导的系统，推动科学发
+现过程。Robin假设生成工作流程的示例见补充图1。在本文所述的工
+作流程中，Robin在30分钟内分析了551篇论文，而人工估计需要
+294小时。根据已发表调查得出的估计，我们估计手动完成整个科学工
+作流程所花费的时间减少了约200倍（表1）。
+治疗假说生成。当提供感兴趣的疾病（dAMD）时，Robin就该疾病
+的病理提出一系列通用问题，并向Crow逐一询问以获取答案。基于
+Crow的报告作为背景，Robin随后确定了十种潜在的致病机制。对
+于每一种机制，Robin都调用Crow准备一份详细报告，描述可用于
+测试药物疗效的该疾病机制的体外模型。然后Robin使用大型语言模
+型评审对报告进行成对比较，并据此计算它们的相对排名（见方法）。
+排名最高的体外模型被Robin用来确定用于生成治疗候选假说的实验
+策略。
+一旦选择了体外模型，Robin便进行了类似的一系列通用文献回
+顾与假设生成步骤，以提出30个用于实验测试的治疗候选者。随后，
+Robin查询了Falcon，生成了用于评估每个候选者的详细报告。这些
+报告包含了每种
+药物为何适合缓解体外模型所代表的疾病机制的理由，以及该药物可
+能带来的潜在局限性。药物候选者根据科学依据的强度、药理学特征
+和支持文献的方法学，通过由大型语言模型裁定的锦标赛进行排序。
+然后人类科学家对该排序列表进行了审查，排名靠前的药物候选者由
+实验室根据Robin建议的检测方法并执行人类制定的实验方案进行测
+试。
+实验数据分析。实验完成后，我们上传了原始或半处理的数据（在本
+例中为流式细胞术的.FCS文件或RNA‑seq的基因计数）并向
+Robin提示所需的分析方法，例如“流式细胞术”或“差异表达分析”。
+随后，Robin调用Finch来执行所需的分析。由于生物数据解释本质
+上的模糊性，这一步分析存在独特挑战。例如，流式细胞术分析中的
+门控选择或RNA‑seq分析中使用的过滤条件在不同研究者之间会有所
+不同，并可能影响最终结论。同样，由于语言代理的随机性，Finch
+在多次运行中即便接收到相同的提示和数据，分析结果也可能有所不
+同。为利用这种多样性，我们将Robin配置为启动八个独立的
+Finch分析轨迹，每个轨迹独立分析实验数据。在每条轨迹中，
+Finch在Jupyternotebook中执行分析代码，并提供可解释且可复
+现的结论摘要。所有轨迹完成后，进行了元分析以综合所有输出，得
+出基于共识的结论。通过这种方式，Finch探索了多样的分析路径，
+同时基于共识提供高度一致的最终结果（见方法）33。
+最后，Robin从这些处理过的实验结果中提炼出可操作的科学见
+解。Robin还能够提出有针对性的后续检测方案，以探索或验证重要
+或意外的发现。这些实验见解被用来指导下一轮治疗假设的生成。该
+循环会持续，直到人类获得满意的候选药物。
+Robin加速了假设生成
+我们将Robin应用于生成针对晚发性黄斑变性（dAMD）的治疗候选
+方案，作为初步概念验证（图2a及补充图1–11）。Robin从识别并
+审阅151篇论文入手，提出了10个生物学上相关且适合检测的
+dAMD机制。在对疾病机制及相应实验策略进行排序后，Robin提议
+通过提高视网膜色素上皮（RPE）细胞的吞噬作用来治疗dAMD，并
+建议在流式细胞术检测中测试药物对来源于患者或干细胞分化得到的
+RPE细胞吞噬能力的提升效果。
+随后，Robin调用Crow（补充图4）对约400篇关于RPE吞噬
+作用及dAMD治疗格局的文献进行了综述，并将结果综合以提出30
+种现有药物候选用于吞噬作用检测的实验验证。Robin又调用
+Falcon为每种分子生成了全面的评估报告（补充图9），这些分子在
+一个由大型语言模型评判的竞赛中被排序。
+我们在论文中运行的相同配置下计算了Robin工作流的成本：
+num_queries= 5、num_assays= 10和num_candidates= 30。该
+配置将产生45次Crow调用和30次Falcon调用，平均成本分别为
+4.33美元和6.43美元，总运行成本为10.76美元。
+我们的任务时间分析（表1）表明，Robin框架将一次发现循环的
+总体认知劳动从估计的359–424人工小时减少到不到2小时。值得注
+意的是，该系统在大约30分钟内合成了约551条参考文献，而根据现
+有学术阅读的基准，这项工作手动处理大约需要294小时。
+表1 | 预计任务耗时比较：人类与Robin辅助发现
+发现阶段
+人类科学家
+（手动工作流）
+Robin
+（半自主）
+假设生成
+文献检索与综述
+294小时a
+大约0.5小时
+假设构思与排序
+20–40小时b
+约0.2小时
+实验设计规划c
+10–20小时b
+约0.1小时
+数据分析
+生物信息学流程设置
+10–20小时d
+大约0.1小时
+探索性数据分析（编码）20–40小时d
+大约0.5小时
+结果解读与绘图
+5–10小时
+大约0.1小时
+认知总时间
+359–424小时
+少于2小时
+该任务时间表针对单次发现周期内的智力任务。对于Robin，估算基于一次平均的Robin运行，
+通常会触发75次代理调用（45次Crow和30次Falcon），每次引用平均11篇参考文献，导
+致每次运行大约分析551篇独立论文。“文献检索”的人工时间是基于处理等量论文（551篇）
+并以每篇20–45分钟的综述速度计算得出（数值来源于已发表的调查）。“假设构思”和“实验
+设计”的估算来自资助申请写作调查。Robin的时间表示系统处理该数量时的实际墙钟时间。a
+按551篇论文× 32 每篇50分钟计算。b基于vonHippel等人的估算51 ，每个提案为116小时。
+c在两种工作流程中均由人工科学家执行（实验室在环）。d基于Sboner等人52 和Anaconda
+DataScienceReport53。
+
+PAGE 4
+500 | Nature | 第655 | 9 卷2026年7月
+文章
+ROCK抑制剂增强吞噬作用。随后我们从该排序中选择了前五名候选
+药物进行实验验证：exendin‑4、fingolimod、MFGE8、Y‑27632以
+及5‑氨基咪唑‑4‑羧酰核苷（AICAR）与牛磺熊去氧胆酸（TUDCA）
+的组合。已知MFGE8能在培养的RPE细胞中增加吞噬作用34, ，因此
+我们将其作为阳性对照纳入。尽管Robin建议使用荧光标记的感光细
+胞外节作为RPE吞噬的底物，但由于可得性，我们最初决定使用
+pHrodo微球。此外，Robin建议使用原代或干细胞分化的RPE，但
+我们在初始药物筛选中使用了ARPE‑19细胞，以加快对Robin提出
+假设的评估。pHrodo微球在溶酶体的低pH环境中被激活发荧光，
+使得可以通过流式细胞术在单细胞水平检测吞噬作用（图2b；显微镜
+验证见补充图12）。在RPE吞噬实验中测试这些治疗候选物后，原始
+流式细胞数据、相关元数据和分析提示被上传到Robin。Robin调用
+了数据分析代理Finch，后者开发了一个Jupyter笔记本，通过对流
+式细胞数据进行门控并执行统计检验来量化每种化合物对RPE吞噬的
+影响。一个具有代表性的Finch路径的绘图展示于图2c–e。相同数据
+的人类分析也确认了这些结果
+（补充表3与补充图13）。临床前模型已证明Y‑27632能恢复视网膜
+色素上皮细胞的吞噬效率35, ，证实了Robin基于文献提出该候选物的
+理由。
+自动化RNA‑seq分析。在分析了初步流式细胞仪结果后，Robin建
+议对Y‑27632处理的RPE细胞进行RNA‑seq，以研究ROCK抑制的
+转录效应（图3a）。我们在第二次RPE吞噬实验中使用了Y‑27632，
+并用宏量RNA‑seq对样本进行了分析。Finch进行了差异基因表达
+（DGE）分析，并在火山图中总结了结果（图3b）。尽管先前研究表
+明Y‑27632通过对F‑肌动蛋白动力学的翻译后调控增强吞噬杯形成
+35–37，Finch的差异基因表达分析显示，Y‑27632处理在吞噬过程中也
+在RPE细胞中引发了快速的转录变化。Finch的共识分析表明，
+Finch在超过50%的轨迹中识别出相同的显著差异表达基因（图3c）。
+接着，Finch进行了基因本体（GeneOntology）富集分析，发现
+Y‑27632在吞噬后显著改变了参与肌动蛋白丝组织、小GTP酶介导信
+号传导和自噬通路基因的表达（图3d）。这些结果
+0
+3
+6
+9
+0
+3
+6
+9
+FSC‑A（×105）
+SSC-A (×105)
+计数
+1
+10
+100
+1,000
+无袖衫
+2
+4
+6
+8
+3
+6
+9
+FSC‑A(×105)
+FSC-H (×105)
+计数
+1
+10
+100
+*
+0
+1
+2
+药物处理
+FC MFI
+DMSO
++药物
++微球
+1 h
+4 h
+吞噬作用
+Flow
+细胞计数术
+(1)吞噬作用增强测定
+(2)抗氧化应激能力测定
+(3)线粒体膜电位测定
+(4)类粟粒样沉积形成测定
+(5)RPE屏障的TEER测量...
+干性年龄相关性黄斑变性
+退行性病变
+输入
+(1)Exendin‑4，一种GLP‑1激动剂，将会...
+(2)Fingolimod增强吞噬作用...
+(3)AICAR与T的组合将会...
+(4)Y‑27632，一种ROCK抑制剂，将会...
+(5)MFGE8将增强由RPE介导的...
+(6)Danicopan，一种补体抑制剂，...
+治疗候选目标
+治疗候选者
+实验测定
+筛选多样化的小分子库以鉴定增强视网
+膜色素上皮（RPE）介导吞噬作用的化合物
+⋯⋯
+Live
+0
+1,000
+2,000
+0
+0.5
+1.0
+1.5
+2.0
+DAPI强度(×105)
+Count
+a
+b
+d
+c
+e
+f
+图2 | Robin为干性年龄相关黄斑变性（dAMD）生成治疗候选假设并分析体外实
+验的实验数据。a，Robin提出了若干实验测定方案，并最终决定使用一种RPE
+吞噬增强测定。Robin将该策略综合为整体目标，然后生成若干新颖的治疗候选
+物以增强RPE吞噬。TEER，跨上皮电阻。面板a中的文本由Robin生成。b，
+吞噬测定示意图。RPE细胞在加入pHrodo标记的微珠或视网膜外段（ROSs）之
+前与药物孵育1小时。细胞与微珠或ROSs共孵育3小时，并通过流式细胞术测量
+吞噬活性。示意图由BioRender制作；Ghareeb,A.
+https://biorender.com/yf9q8b1(2026)。c–f，示例
+plots来自Finch流式细胞术分析轨迹，由人工整理为用于发表的可读格式。c，
+Finch使用前向散射面积（FSC‑A）对比侧向散射面积（SSC‑A）图进行门控以剔
+除碎片。d，Finch在前向散射高度（FSC‑H）与FSC‑A图中对单细胞进行门控。
+红色轮廓区域（c、d）表示细胞群体。e，Finch识别4′,6‑二脒基‑2‑苯基吲哚（
+DAPI）信号并排除死亡细胞。f，Finch进行统计检验，将候选药物与DMSO对
+照进行比较并绘制结果。此条形图显示相对于DMSO对照的平均荧光强度倍数变
+化（FCMFI）（n= 3 孔；误差线为标准误；显著性使用Dunnett检验确定：*
+P< 0.05）。
+
+PAGE 5
+Nature | Vol655 | 9 July2026
+| 501
+提示Y‑27632可能通过细胞骨架重排增强吞噬初期的摄取阶段，并通
+过转录调控自噬促进已内吞物质的清除；然而，仍需进一步工作来验
+证其对自噬的任何影响。该分析的人类版本与Finch的类似，见补充
+图14。
+差异基因表达分析发现ABCA1在Y‑27632处理的细胞中上调了
+三倍（校正后P值= 2.13 × 10−83）。ABCA1编码关键的脂质外排泵，
+在ROCK抑制剂诱导的吞噬作用后ABCA1表达的差异对干性年龄相
+关性黄斑变性（dAMD）具有潜在影响，因为ABCA1对健康的视网膜
+色素上皮（RPE）功能至关重要。ABCA1促使胆固醇和磷脂从质膜主
+动转运到受体蛋白，然后被排出细胞。进一步将这些发现与dAMD病
+理学联系起来，作为ABCA1脂质受体的载脂蛋白E已在多项研究中
+被确定为黄斑变性的一种遗传易感等位基因38–40。
+由Robin提出实验并由Finch分析得出的这些机制性见解表明，
+人工智能驱动的科学发现不仅可以加速候选治疗化合物体外数据的生
+成，还能揭示疾病通路中原本可能被忽视的新分子靶点。
+一种用于干性年龄相关黄斑变性（dAMD）的重新定位药物。除了建议对
+Y‑27632进行RNA‑seq分析外，Robin还进行了候选药物假设的后续迭代
+（图4a）。我们对其中十种药物进行了实验测试，并将数据提供给Finch进
+行分析。分析
+由Finch显示，ripasudil（一种在日本获批用于治疗青光眼的
+ROCK抑制剂）优于Y‑27632，使视网膜色素上皮（RPE）细胞的吞
+噬作用较二甲基亚砜（DMSO）对照提高了1.89倍（图4b；人源分
+析显示提高了1.75倍；见补充表4和补充图15）。在ARPE‑19细胞
+中的剂量–反应实验确认了ripasudil比Y‑27632更具效力（图4c）。
+此外，作为一种已获批药物，ripasudil具有已知的安全性资料，这在
+临床转化上相比作为研究化合物的Y‑27632更具优势。
+在人类原代RPE细胞中的验证。RPE干细胞（RPE‑SCs）是人类RPE
+细胞的一个亚群，保留有限的有丝分裂潜能，能够在体外培养。当扩
+展成汇合的单层并在体外成熟时，已知RPE‑SCs会表达典型的RPE基
+因，保持极化的屏障功能并在形态上类似于原生的人类RPE细胞41。此
+外，与诱导多能干细胞来源的RPE细胞不同，RPE‑SCs的培养不需要
+ROCK抑制剂42。我们从SightRestoration眼库（纽约）获得了一位
+超过60岁患者分离的RPE‑SCs，并将其扩展为汇合的单层。我们通过
+对典型RPE标志物和吞噬机制的免疫细胞化学验证了它们的RPE表型43 
+(扩展数据图1和图2)。
+我们重新筛选了Robin建议的所有药物，这次用RPE‑SCs代替
+ARPE‑19细胞，并用荧光标记的牛视杆外段（ROSs）代替了珠子。再次筛选
+中，ripasudil和Y‑27632被鉴定为命中项，其中ripasudil再次表现出更高
+的
+0
+20
+40
+60
+80
+100
+Genes (%)
+轨迹（%）
+50–100
+0–50
+100
+CYP1B1
+FHL2
+ABCA1
+FSTL3
+0
+50
+100
+150
+200
+250
+–6
+–3
+0
+3
+6
+–log10 P value
+状态
+上调
+下调
+无显著性
+肌动蛋白细丝束
+组织
+rRNA代谢过程
+蛋白质定位到
+细胞核
+对⋯⋯的细胞响应
+外部刺激
+巨自噬
+核糖体生物发生
+肌动蛋白调控
+基于丝状结构的过程
+小GTP酶介导的信号传导
+传导
+核糖核蛋白复合体
+发生/生物发生
+肌动蛋白丝组织
+0.02
+0.03
+0.04
+0.05
+基因比率
+调整后的P值
+2 × 10–9
+4 × 10–9
+6 × 10–9
+80
+100
+120
+140
+160
+计数
+b
+d
+c
+a
+后续检测：RNA‑seq。对经
+处理的RPE细胞进行
+RNA‑seq⋯⋯
+用Y‑27632抑制ROCK
+可能促进肌动蛋白细胞骨架⋯⋯
+机制性见解：
+(1)哪些特定的分子
+潜在机制包括⋯⋯
+提出的问题：
+数据表明，在测试的化合
+物中⋯⋯
+数据解读：
+结果解读
+对⋯⋯进行RNA‑seq分析
+经⋯⋯处理的RPE细胞
+先导化合物（例如，
+Y‑27632和exendin‑4）
+单独使用以及
+联合使用将提供
+对⋯⋯的见解
+转录水平的变化
+潜在增强
+吞噬作用。这
+实验将有助于⋯
+RNA‑seq
+后续检测
+log2FC
+(Y‑27632 + 珠子对比WT+ 珠子)
+图3 | 对用ROCK抑制剂Y‑27632处理的ARPE‑19细胞进行的RNA‑seq分析。a，
+Robin解读首次实验结果并提出后续检测方案。面板a中的文字由Robin生成。b–
+d，来自Finch的RNA‑seq分析示例图，经人工排版以便用于出版。b，Finch绘制
+的火山图，显示在吞噬作用后Y‑27632处理组与野生型（WT）细胞之间的差异表达基
+因。
+Y‑27632处理组与野生型（WT）细胞之间的差异表达基因的比较。c，
+Finch汇总的来自八条RNA‑seq分析路径的一致性结果，显示被判定为持续
+上调或下调的基因所占分析百分比。d，Finch对差异表达基因的基因本体
+（GeneOntology）术语富集分析；n= 3 孔。
+
+PAGE 6
+502 | Nature | Vol655 | 9 July2026
+文章
+b
+2.0
+***
+***
+**
+20,000
+16,000
+15,000
+14,000
+13,000
+12,000
+11,000
+10,000
+18,000
+16,000
+14,000
+12,000
+10,000
+10–2
+10–1
+100
+101
+剂量(μM)
+102
+10–2
+10–1
+100
+101
+剂量(μM)
+102
+103
+1.5
+1.0
+0.5
+0
+1.75
+1.50
+1.25
+1.00
+0.75
+0.50
+0.25
+0
+Fold change in normalized MFI
+Fold change in normalized MFI
+MFI
+I
+F
+M
+a
+d
+治疗候选药物
+利帕舒地（
+GW4064
+B‑离烯酮
+NECA
+BayK8644
+KL001
+罗立帕姆
+沃利诺司他/沃利诺司塔
+辛伐他汀
+雷帕霉素
+白藜芦醇
+显著增加（P < 0≤.05）
+不显著
+DMSO
+对照水平（MFI= 1±0）
+显著增加（P< 0≤.05）
+不显著
+DMSO
+对照水平（MFI= 1±0）
+假设生成
+利帕舒地尔提供了更优的
+选择性和药代动力学，相较于传
+统的ROCK抑制剂如Y‑27632。
+通过促进细胞骨架
+松弛，利帕舒地尔可能使膜更具柔
+韧性并促进视网膜色素上皮（
+RPE）细胞的吞噬杯形成。鉴于实
+验数据表明ROCK抑制显著⋯⋯
+RNA测序。对接受处理的RPE细胞进行RNA‑
+测序⋯⋯
+后续测定：
+用Y‑27632 抑制ROCK
+可能促进肌动蛋白细胞骨架⋯⋯
+机制洞察：
+(1) 哪些特定的分子
+机制是⋯⋯的基础？
+提出的问题：
+数据表明
+在被测试的化合物中⋯⋯
+数据解读：
+结果解读
+治疗候选目标
+筛选多样化小分子库以鉴定能
+够增强视网膜色素上皮（RPE）介
+导吞噬作用的化合物...
+基于实验证据的文献
+综述
+此前已开展实验测试以鉴定用于
+治疗干性年龄相关性黄斑变性（
+dAMD）的治疗化合物。以下是结果
+摘要⋯⋯
+e
+Y‑27632（EC50 = 47.6）
+里帕司特（EC50 = 19.0）
+里帕司特（EC50 = 0.106 μM）
+Y‑27632数据
+里帕司特数据
+里帕司特异常值（1,000）
+相对效力：
+Ripasudil比2.5× 更有效
+(EC50：19.0vs47.6)
+Y‑27632(EC50 = 75.70 μM)
+Y‑27632 异常值（已排除）
+Ripasudil 异常值（已排除）
+Y‑27632数据（拟合）
+Ripasudil数据（拟合）
+*
+*
+*
+*
+相对效力：
+Ripasudil 比Y‑27632 713× 更有效
+c
+图4 | Ripasudil和KL001增强RPE吞噬作用。a，Robin关于ripasudil的提
+案摘录。基于第一轮实验分析的见解，Robin建议将ripasudil作为治疗
+dAMD的候选药物。为了解释结果，从Finch的结果中由大型语言模型生成了
+JSON结构的输出（参见RobinGitHub仓库中prompts.py的实验见解应用
+ENDAGE；见代码可用性）。NECA，5′‑N‑乙基羧酰氨基腺苷。面板a中的文本
+由Robin生成。b，第二轮在ARPE‑19细胞中实验的流式细胞术分析数据显示
+ripasudil显著增强吞噬作用
+(n= 3 孔)。c，ARPE‑19细胞中ripasudil和Y‑27632的剂量反应曲线。
+ripasudil在刺激ARPE‑19细胞吞噬作用方面比Y‑27632更有效（n= 3 孔）。虚
+线横线表示ripasudil（紫色）和Y‑27632（蓝色）的半数最大有效浓度（EC50）。
+d，在老年原代人RPE细胞（RPE‑SCs）中对ripasudil的验证重现了Y‑27632
+和ripasudil提高吞噬作用的效果（n= 4 孔）。e，ripasudil在RPE‑SCs中比
+Y‑27632更有效（n= 4 孔）。带灰色阴影的虚线横线表示DMSO对照的平均荧光
+强度（MFI）。所有图中的误差线表示标准误（s.e.m.）。显著性通过Dunnett
+检验确定：*P< 0.05。
+
+PAGE 7
+Nature | 卷655 | 9 2026年7月| 503
+效力（图4d；另见补充表5和补充图16中的人工分析）。两种ROCK抑
+制剂均呈剂量依赖性地增加吞噬作用，其中ripasudil的效力高于
+Y‑27632（图4e）。在此剂量反应实验中收集的上清液用于细胞毒性
+检测。Y‑27632剂量与RPE‑SC中乳酸脱氢酶（LDH）释放之间无相关
+性。ripasudil则呈负相关，更高药物浓度可降低LDH释放（扩展数据
+图3）。
+KL001是一种昼夜节律调节剂，其通过阻止CRY蛋白的泛素依赖
+性降解发挥作用，在RPE‑SC筛选中亦被鉴定为命中化合物。Robin基
+于RPE吞噬作用的昼夜节律调控提出了该药物43 ，据我们所知，此前
+尚无人将KL001提出为吞噬作用的增强剂。
+为了进一步验证ABCA1的发现，我们对用ripasudil或对照溶剂处
+理的RPE‑SCs（有或无ROSs）进行了RNA‑seq。ABCA1在RPE‑SCs
+对ripasudil处理的响应中也被上调，无论是否存在ROSs（补充图17）。
+尽管要做出最终比较还需要对两种药物在体内进行验证，但在这
+一体外测定中ripasudil起初优于Y‑27632，表明Robin能通过迭代
+实验和反馈逐步完善治疗假设。
+Robin架构的验证
+我们首先通过用OpenAI的o4‑mini替换文献检索代理Crow和
+Falcon来进行消融。然后，我们通过让两者各自为dAMD生成50条
+药物候选提案并评估抽样子集的质量，来评估Robin（野生型）与其
+消融版本的表现。
+我们通过人工参考核查对其质量进行了人工评估。如预期那样，
+消融Falcon，或同时消融Crow和Falcon（但单独消融Crow不会），
+导致虚构参考显著增加（扩展数据图4a和补充表6–8）。(Crow负责
+产生指导Falcon生成最终药物候选报告的文献检索，因此在Crow
+文献检索阶段出现的任何虚构参考都可能在Falcon生成最终报告时被
+纠正。)为了确认Falcon确实在仅保留Crow的消融中掩盖了LL
+M生成的虚构参考，我们分别从野生型和消融了Crow的Robin（产
+生最终测定报告的是Crow，而非Falcon；见补充图1）生成了15个
+测定提案。随后我们进行了人工参考核查，结果如预期：Crow没有产
+生虚构参考，而来自o4‑mini的参考中有44.5 ± 6.37%（均值± 
+s.e.m.，n= 15个测定提案）是虚构的（扩展数据图4b和补充表9）。
+为了探究Crow和Falcon的文献检索是否能比o4‑mini生成更
+高质量的提案，我们将50份完整模型（wild‑type）和50份被消融的
+提案进行了一对一比拼，由一位大型语言模型裁判（ClaudeSonnet
+3.7；裁判提示见补充图11）评判。消融Crow、Falcon或同时消融
+Crow和Falcon始终导致最终药物提案质量下降（扩展数据图4c）。
+接着，我们评估了Finch在第二轮dAMD药物筛选中执行流式
+细胞术和RNA‑seq任务时的表现。Finch收到第二轮的任务特定提示
+和数据，表现通过评估Finch对专家制定评分标准的遵从情况来衡量
+（补充图18和19）。Finch在RNA‑seq上表现稳健（86 ± 0%（均
+值± ，标准误）；n= 3 次运行）以及在流式细胞术上亦表现稳健（
+100 ± 0%（均值± ，标准误）；n= 3 次运行；见扩展数据图5a）。
+为了探究Finch在一系列更具挑战性的数据分析任务上的失败模式（这
+些任务没有像Robin工作流中那样提供特定任务的多步提示），我们从
+BixBench精心挑选了一组由专家生成的170对问答，涵盖生物信息学和
+与药物发现相关的统计学任务31 (扩展数据图5b和补充表10)。
+Finch的总体表现为22.8 ± 1.7%，而单独使用未配备agent框架的
+Sonnet3.7为1.6 ± 1.2%（均值± ±标准误），样本量为n= 3；见扩
+展数据图5c,d。Finch在统计学子集上的表现（47.9 ± 1.5%）优于生
+物信息学子集（15.3 ± 2.0%）。通常，生物信息学子集需要执行多步
+管道，且对参数设置敏感，而生物统计学问题只需在干净的表格数据
+上进行单步计算。这些结果表明像Finch这样的agent框架能够通过
+为大型语言模型提供访问数据源的必要工具而带来明显价值，但也指
+出在多步问题上仍有大幅提升的空间。
+为确认Robin在吞噬作用测定中鉴定ROCK抑制剂这一结果并非可
+被通用LLM代理轻易复现，我们将相同的候选生成提示（补充图8）提
+供给由OpenAI开发、用于在复杂任务上进行多步研究的代理Deep
+Research。与Robin相同，要求DeepResearch生成19个新药候选
+（等同于Robin在第一轮和第二轮的候选药物总数），我们在
+RPE‑SCs中对其进行筛选。DeepResearch生成了17个独特候选（重
+复了2个药物候选）。DeepResearch提出的药物在此测定中均未命中，
+值得注意的是，DeepResearch并未提出通过ROCK抑制来增强RPE
+吞噬作用（扩展数据图6）。
+讨论
+在本报告中，我们介绍了Robin——一个整合了自动假设生成与实验数
+据分析以促进科学发现的多智能体系统。在寻找dAMD新疗法的任务
+中，Robin提出通过增强吞噬作用作为dAMD的治疗策略，并在迭代
+的实验室环路发现过程中，从测试的化合物中鉴定出ripasudil和
+KL001作为能增强RPE吞噬作用的化合物。ripasudil已确立的安全特
+征及其眼用临床批准为药物再利用提供了可期的机会，而据我们所知，
+KL001代表了一种在RPE细胞中增强吞噬作用的新颖方法。
+值得注意的是，尽管ROCK抑制剂此前已被建议用于湿性老年性
+黄斑变性（AMD）及其他新生血管化视网膜疾病的治疗，Robin却是
+首批提出通过增强吞噬作用将其用于干性AMD（dAMD）治疗的研究
+者之一44。这一策略有多重证据支持。视网膜色素上皮（RPE）吞噬功
+能障碍不仅在正常衰老中可见，在AMD患者中更为明显45–47。此外，
+ROCK抑制通过增强RPE细胞吞噬功能的能力已为人所知35–37。当然，
+该假设需要在合适的疾病模型中验证，并最终在随机、安慰剂对照试
+验中确认其临床有效性。
+综上，这些结果表明Robin能够通过整合现有科学文献中的洞见，
+有效生成新颖且可检验的假说。通过聚焦“组合性综合”（识别不同
+领域之间的不明显联系），Robin有效瞄准了人类专家可能因科学知
+识的分隔而忽视的“唾手可得”的问题。这种以文献为基础、可靠的
+综合范式不仅适用于药物再利用，也可容易地扩展到如材料科学等领
+域48。
+除了在特定的dAMD应用之外，Robin还应对治疗研发中的更广
+泛挑战。由于美国食品药品监督管理局过去十年每年批准的新药数量
+大致停滞在约50种49, ，迫切需要新的方法来扩大治疗发现的规模。作
+为首批将基于文献的假设生成与实验生物学数据分析两者都实现自动
+化的系统之一，与传统方法相比，Robin有望加速药物发现的进程。
+
+PAGE 8
+504 | Nature | 第655 | 9 卷2026年7月
+文章
+鉴于自动化发现系统可能识别出高效生物制剂的潜在风险，我们
+在Robin框架中实施了多重防护措施。首先，系统优先考虑具有既定
+安全性谱的候选者，并检索已知毒性或非靶向相互作用。其次，作为
+“实验室在环”的系统，Robin的输出被视为需经标准临床前验证的
+治疗假设，确保通过传统的体外和体内安全筛查在临床转化前识别任
+何意外毒性。关于双重用途问题，Robin使用经过广泛安全对齐（通
+过红队测试和基于人类反馈的强化学习）的“现成”大型语言模型，
+以防止生成恶意生物学操作流程。此外，我们平台的所有查询都会通
+过一个大型语言模型分类器，以检查是否涉及不安全主题。
+在其当前实现中，Robin还有多个可持续改进的方向。例如，尽
+管Robin可以生成实验大纲，但尚未能产出精确且可执行的实验方案；
+未来的迭代目标是提供详细的方法学，能使实验室执行时几乎不需人
+工转换。Finch数据分析代理目前也依赖领域专家的提示工程来产出
+可靠的分析结果。若能使Finch自主为特定数据模态生成或调整提示，
+则可实现更为自主的发现流程。最后，尽管本文的结果依赖于2025年
+初可用的前沿大型语言模型，Robin的模型无关架构确保其能力可随
+底层基础模型的进步而扩展。尽管通用编码代理快速提升的基线能力
+可能在标准计算任务上与像Finch这样的专用框架达到同等水平，但
+领域特定的架构对于严格执行实验约束和可靠协调专用生物信息学工
+具链仍然至关重要。
+通过在一个集成系统中自动生成假设、规划实验并分析数据，
+Robin代表了一种面向人工智能驱动科学发现的强大新范式。这种方
+法不仅可以重塑治疗性产品的开发，还能从根本上加速科学进程，以
+推动对自然世界更深刻的理解。
+在线内容
+任何方法、补充参考文献、NaturePortfolio报告摘要、原始数据、
+扩展数据、补充信息、致谢、同行评审信息；作者贡献和竞争利益的
+详细说明；以及数据和代码可用性声明可在
+https://doi.org/10.1038/s41586‑026‑10652‑y获取。
+1. 
+Boiko, D. A., MacKnight, R., Kline, B. & Gomes, G. Autonomous chemical research with 
+large language models. Nature 624, 570–578 (2023).
+2. 
+Wang, E. et al. TxGemma: efficient and agentic LLMs for therapeutics. Preprint at https://
+doi.org/10.48550/arxiv.2504.06196 (2025).
+3. 
+Gottweis, J. et al. Towards an AI co-scientist. Preprint at https://doi.org/10.48550/
+arxiv.2502.18864 (2025).
+4. 
+Fleckenstein, M., Schmitz-Valckenberg, S. & Chakravarthy, U. Age-related macular 
+degeneration: a review. JAMA 331, 147–157 (2024).
+5. 
+Rein, D. B. et al. Forecasting age-related macular degeneration through the year 2050: 
+the potential impact of new treatments. Arch. Ophthalmol. 127, 533–540 (2009).
+6. 
+Stephens, Z. D. et al. Big data: astronomical or genomical? PLoS Biol. 13, e1002195 (2015).
+7. 
+Nurse, P. Biology must generate ideas as well as data. Nature 597, 305 (2021).
+8. 
+Cheng, F., Ma, Y., Uzzi, B. & Loscalzo, J. Importance of scientific collaboration in 
+contemporary drug discovery and development: a detailed network analysis. BMC Biol. 
+18, 138 (2020).
+9. 
+Ingersoll, M. A. et al. BRAF inhibition protects against hearing loss in mice. Sci. Adv. 6, 
+eabd0561 (2020).
+10. Ingersoll, M. A. et al. Dabrafenib protects from cisplatin-induced hearing loss in a 
+clinically relevant mouse model. JCI Insight 8, e171140 (2023).
+11. 
+GlaxoSmithKline. Clinical trial results: a phase II (BRF113710) single-arm, open-label study 
+of dabrafenib (GSK2118436) in previously treated BRAF mutant metastatic melanoma. 
+EU Clinical Trials Register https://www.clinicaltrialsregister.eu/ctr-search/trial/2009- 
+015297-36/results (2017).
+12. 
+US National Library of Medicine. ClinicalTrials.gov https://clinicaltrials.gov/study/
+NCT01153763 (2017).
+13. 
+Ribas, A. & Flaherty, K. T. BRAF targeted therapy changes the treatment paradigm in 
+melanoma. Nat. Rev. Clin. Oncol. 8, 426–433 (2011).
+14. 
+Lahne, M. & Gale, J. E. Damage-induced activation of ERK1/2 in cochlear supporting cells 
+is a hair cell death-promoting signal that depends on extracellular ATP and calcium.  
+J. Neurosci. 28, 4918–4928 (2008).
+15. 
+Berman, R. M. et al. Antidepressant effects of ketamine in depressed patients.  
+Biol. Psychiatry 47, 351–354 (2000).
+16. 
+Petersen, R. C. & Stillman, R. C. (eds) Phencyclidine (PCP) Abuse: an Appraisal (National 
+Institute on Drug Abuse, 1978).
+17. 
+Frye, R. E., Sequeira, J. M., Quadros, E. V., James, S. J. & Rossignol, D. A. Cerebral folate 
+receptor autoantibodies in autism spectrum disorder. Mol. Psychiatry 18, 369–381 
+(2013).
+18. 
+Ramaekers, V. T., Blau, N., Sequeira, J. M., Nassogne, M.-C. & Quadros, E. V. Folate 
+receptor autoimmunity and cerebral folate deficiency in low-functioning autism with 
+neurological deficits. Neuropediatrics 38, 276–281 (2008).
+19. 
+Sauerberg, P. et al. Novel functional M1 selective muscarinic agonists. Synthesis  
+and structure-activity relationships of 3-(1,2,5-thiadiazolyl)-1,2,5,6-tetrahydro-
+1-methylpyridines. J. Med. Chem. 35, 2274–2283 (1992).
+20. Karuna Therapeutics, Inc. Form 10-K: annual report for the fiscal year ended December 31, 
+2019. U.S. Securities and Exchange Commission https://www.sec.gov/Archives/edgar/
+data/1771917/000156459020012311/krtx-10k_20191231.htm (2020).
+21. 
+Taylor, R. et al. Galactica: a large language model for science. Preprint at https://doi.org/ 
+10.48550/arxiv.2211.09085 (2022).
+22. Giglou, H. B., D'Souza, J., & Auer, S. LLMs4Synthesis: Leveraging large language models 
+for scientific synthesis. In Proc. 24th ACM/IEEE Joint Conference on Digital Libraries 
+(JCDL) https://doi.org/10.1145/3677389.3702565 (Association for Computing Machinery, 
+2025).
+23. Agarwal, S. et al. LitLLM: a toolkit for scientific literature review. Preprint at https://doi.
+org/10.48550/arxiv.2402.01788 (2025).
+24. Wang, Z. P., Bhandary, P., Wang, Y. & Moore, J. H. Using GPT-4 to write a scientific review 
+article: a pilot evaluation study. BioData Min. 17, 16 (2024).
+25. Skarlinski, M. D. et al. Language agents achieve superhuman synthesis of scientific 
+knowledge. Preprint at https://doi.org/10.48550/arxiv.2409.13740 (2024).
+26. Huang, K. et al. Automated hypothesis validation with agentic sequential falsifications. In 
+Proc. 42nd International Conference on Machine Learning (ICML) Vol. 267 (eds Singh, A. 
+et al.) 25372–25437 (PMLR, 2025).
+27. 
+Lu, C. et al. Towards end-to-end automation of AI research. Nature 651, 914–919 (2026).
+28. Ifargan, T., Hafner, L., Kern, M., Alcalay, O. & Kishony, R. Autonomous LLM-driven research — 
+from data to human-verifiable research papers. NEJM AI https://doi.org/10.1056/
+AIoa2400555 (2024).
+29. Yamada, Y. et al. The AI Scientist-v2: workshop-level automated scientific discovery via 
+agentic tree search. Preprint at https://doi.org/10.48550/arxiv.2504.08066 (2025).
+30. Chaves, J. M. Z. et al. Tx-LLM: a large language model for therapeutics. Preprint at  
+https://doi.org/10.48550/arxiv.2406.06316 (2024).
+31. 
+Mitchener, L. et al. Bixbench: a comprehensive benchmark for LLM-based agents in 
+computational biology. Preprint at https://doi.org/10.48550/arxiv.2503.00096 (2025).
+32. Buniello, A. et al. Open Targets Platform: facilitating therapeutic hypotheses building in 
+drug discovery. Nucleic Acids Res. 53, D1467–D1475 (2024).
+33. Narayanan, S. et al. Aviary: training language agents on challenging scientific tasks. 
+Preprint at https://doi.org/10.48550/arxiv.2412.21154 (2024).
+34. Nandrot, E. F. et al. Essential role for MFG-E8 as ligand for αvβ5 integrin in diurnal retinal 
+phagocytosis. Proc. Natl Acad. Sci. USA 104, 12005–12010 (2007).
+35. Mao, Y. & Finnemann, S. C. Acute RhoA/Rho kinase inhibition is sufficient to restore 
+phagocytic capacity to retinal pigment epithelium lacking the engulfment receptor 
+MerTK. Cells 10, 1927 (2021).
+36. Müller, C., Charniga, C., Temple, S. & Finnemann, S. C. Quantified F-actin morphology  
+is predictive of phagocytic capacity of stem cell-derived retinal pigment epithelium. 
+Stem Cell Rep. 10, 1075–1087 (2018).
+37. 
+Kozyrina, A. N. et al. Laminin-defined mechanical status modulates retinal pigment 
+epithelium phagocytosis. EMBO Rep. 26, 3357–3383 (2025).
+38. Malek, G. et al. Apolipoprotein E allele-dependent pathogenesis: a model for age-related 
+retinal degeneration. Proc. Natl Acad. Sci. USA 102, 11900–11905 (2005).
+39. Klaver, C. C. et al. Genetic association of apolipoprotein E with age-related macular 
+degeneration. Am. J. Hum. Genet. 63, 200–206 (1998).
+40. McKay, G. J. et al. Evidence of association of APOE with age-related macular 
+degeneration—a pooled analysis of 15 studies. Hum. Mutat. 32, 1407–1416 (2011).
+41. 
+Blenkinsop, T. A. et al. Human adult retinal pigment epithelial stem cell-derived RPE 
+monolayers exhibit key physiological characteristics of native tissue. Invest. Ophthalmol. 
+Vis. Sci. 56, 7085–7099 (2015).
+42. Croze, R. H. et al. ROCK inhibition extends passage of pluripotent stem cell-derived 
+retinal pigmented epithelium. Stem Cells Transl. Med. 3, 1066–1078 (2014).
+43. Lieffrig, S. A., Gyimesi, G., Mao, Y. & Finnemann, S. C. Clearance phagocytosis by the 
+retinal pigment epithelial during photoreceptor outer segment renewal: molecular 
+mechanisms and relation to retinal inflammation. Immunol. Rev. 319, 81–99 (2023).
+44. Halasz, E. & Townes-Anderson, E. Rock inhibitors in ocular disease. ADMET DMPK 4, 
+280–301 (2016).
+45. Inana, G. et al. RPE phagocytic function declines in age-related macular degeneration 
+and is rescued by human umbilical tissue derived cells. J. Transl. Med. 16, 63 (2018).
+46. Si, Z., Zheng, Y. & Zhao, J. The role of retinal pigment epithelial cells in age-related 
+macular degeneration: phagocytosis and autophagy. Biomolecules 13, 901 (2023).
+47. 
+Kaarniranta, K. et al. Autophagy and heterophagy dysregulation leads to retinal pigment 
+epithelium dysfunction and development of age-related macular degeneration. Autophagy 
+9, 973–984 (2013).
+48. Gregoire, J. M., Zhou, L. & Haber, J. A. Combinatorial synthesis for AI-driven materials 
+discovery. Nat. Synth. 2, 493–504 (2023).
+
+PAGE 9
+Nature | 卷655 | 9 2026年7月| 505
+49. Baedeker, M., Ringel, M. S. & Möller, C. C. 2024 FDA approvals exceed average number 
+but have lower sales projections. Nat. Rev. Drug Discov. 24, 85–85 (2025).
+50. Tenopir, C., King, D. W., Christian, L. & Volentine, R. Scholarly article seeking, reading, and 
+use: a continuing evolution from print to electronic in the sciences and social sciences. 
+Learn. Publ. 28, 93–105 (2015).
+51. 
+Hippel, T. V. & Hippel, C. V. To apply or not to apply: a survey analysis of grant writing costs 
+and benefits. PLoS ONE 10, e0118494 (2015).
+52. Sboner, A., Mu, X. J., Greenbaum, D., Auerbach, R. K. & Gerstein, M. B. The real cost of 
+sequencing: higher than you think! Genome Biol. 12, 125 (2011).
+53. Anaconda. State of data science 2024 report. Anaconda https://www.anaconda.com/
+resources/report/state-of-data-science-report-2024 (2024).
+Publisher’s note Springer Nature remains neutral with regard to jurisdictional claims in 
+published maps and institutional affiliations.
+开放获取本文依据《知识共享署名‑非商业性使用‑禁止演绎4.0国际许可协议》
+授权，该许可允许在任何媒介或
+只要你给予原作者和来源的适当署名、提供指向知识共享许可协议的链接，并说明是否对许可材
+料进行了修改，即可采用该格式。根据本许可，你无权分享源自本文或其部分内容的改编材料。
+本文中的图片或其他第三方材料包含在本文的知识共享许可中，除非在材料的署名行中另有说明。
+如果某项材料不包含在本文的知识共享许可内，且你的预期使用不受法定规定许可或超出许可使
+用范围，则需要直接向版权持有人取得许可。要查看本许可的副本，请访问
+http://creativecommons.org/licenses/by‑nc‑nd/4.0/。
+©作者2026
+
+PAGE 10
+文章
+方法
+Robin实现
+Robin以Jupyter笔记本实现，使用Aviary框架来实例化并调用
+agent33。Robin利用OpenAI的o4‑mini模型来综合文献并生成假
+设，使用Anthropic的Claude3.7Sonnet模型作为成对比较的评审
+者以对假设进行排序。用于Robin中agent和调用的大型语言模型的
+提示见补充图2–11。
+值得注意的是，尽管本文的实验使用了具代理性的Robin实现，
+但我们观察到Robin几乎总是以相同顺序调用工具，导致工作流程具
+有确定性。因此，我们将Robin转换为精简的Jupyter笔记本，以提
+高稳定性和易用性。
+假设的排序是通过一系列由大模型（LLM）裁定的两两比较计算
+的。当排序不超过25个假设时，所有可能的对都在循环赛中进行比较。
+超过25个假设时，随机选择300个两两比较，以在合理的计算和时间
+约束内实现全面评估。这些比较的结果用于通过Bradley–Terry–
+Luce(BTL)模型估计强度参数，进而确定每个假设的相对排名54。尽
+管对于基于LLM裁判的排名没有明确共识，我们选择了两两比较而非
+逐点评分。有文献55,56 表明，两两比较比逐点评分更稳健，因为逐点评
+分可能无法区分相似项之间的细微差异。为应对两两比较中的位置偏
+差，我们采用高度分布的锦标赛并结合BTL模型，而不是依赖易受位
+置偏差影响的简单胜负统计。为了为该LLM裁判生成提示，领域专家
+被要求对Robin中的治疗候选假设进行两两比较。将这些专家评估结
+果交给Google的Gemini2.5ProPreview模型，以生成Robin中
+LLM裁判的提示。此方法旨在促使LLM裁判按照专家的偏好和标准
+做出决策。
+在将LLM评审的偏好与专家的偏好进行比较时，LLM评审表现出
+与专家偏好的高度一致性，其前10个假设中平均有7.25个与专家的前
+10相匹配（补充图20a）。这一一致性是随机选择预期值的两倍多。此
+外，LLM评审展示出比人类专家更高的内部评分者一致性（补充图
+20b）。在面对相同的成对比较时，LLM评审在88%的比较中选择了
+相同的假设，而人类专家在61%的情况下选择了相同的假设。
+Finch实现
+Finch是一个自主的、Jupyter原生的数据分析代理，基于Aviary框
+架设计33。Finch根据提供的数据集和研究问题，有条不紊地处理生物
+信息学工作流，例如RNA‑seq差异表达分析或流式细胞术。
+代理不是从代码库中检索静态模板，而是作为一个生成式推理引
+擎，实时逐行编写原创且可执行的Python或R代码，确保分析逻辑
+能够根据数据分布动态调整，而不受硬编码子例程的限制。该代理在
+Aviary框架提供的结构化执行环境中运行；Aviary是为语言代理评估
+和迭代问题求解定制的可扩展试验平台33。Aviary之所以被选中，是
+因为其受控环境支持通过标准化软件环境、统一的工具访问和结构化
+的多步推理来实现可重复的评估。
+Finch采用基于ReAct方法的代理式提示策略，有效平衡逻辑推
+理与实际执行57。每个Finch轨迹都在预构建的Docker容器（
+BixBench‑env:v1.0）中展开，容器内包含大量针对生物信息学的
+Python、R和Bash库。该标准化容器确保了可重复性，并将评估严
+格限定为Finch的分析能力，而非软件安装或依赖管理。不过，
+Finch在需要时能够安装新依赖，并能胜任地完成该操作。
+工具与环境。Finch仅通过Aviary框架启用的两种工具进行交互：
+• edit_cell：代理可以在Jupyter笔记本中选择、修改并执行单元格。
+• submit_answer：代理用于最终确定并提交分析结论。
+对提示工程进行了全面探索，以优化Finch的初始指令，补充图
+10中给出了示例。所有Finch路径都可通过FutureHouse平台获取。
+Finch评估。我们在来自BixBench生物信息学基准的170个与药物
+发现相关的问题上评估了Finch及其无代理功能的基础模型（
+Claude3.7Sonnet）31。在排除低质量类别和与人体药物发现无关的
+类别后，保留了来自38个数据胶囊的170个问题，并将其分为两类：
+生物信息学（n= 131 问题），包括RNA‑seq、基因组学、表观基因
+组学、功能富集和序列分析任务；以及生物统计学（n= 39 问题），
+包括图像分析任务和一般统计分析任务。为避免在多标签分配中重复
+计数，每个问题均分配到BixBench类别映射中列出的第一个类别。
+Finch和基础大语言模型均以三次重复运行。按类别按重复计算平均
+准确率，误差条表示重复间均值的标准误。对于故障模式分析，所有
+不正确的Finch响应按以下类别分类：错误答案（代理给出具体错误
+值）、干扰项匹配（响应与提供的干扰项相符）、格式错误（正确值
+格式不正确）、不确定（代理拒绝回答）或空/失败（未产生响应），
+并汇总至所有三次重复。
+每个BixBench问题都包含一个自然语言提示，该提示引用封装
+在capsule（ZIP存档）中的数据文件、一个预期答案、三个干扰选项
+以及指定的评估方法。Finch可以同时收到问题和对capsule数据的
+访问权限，并可在最多十个步骤内编写并执行代码（Python或R）以
+生成答案。基础大模型仅能接收问题文本，无法访问数据或执行代码。
+针对每个问题，使用三种评估方法之一对回答进行评估：精确匹配
+（字符串或数值相等）、区间匹配（数值答案落在指定区间内）或由
+另一个模型对自由文本答案进行语义等价判断的LLM裁判。只有当回
+答通过其指定的评估时，才记为正确；所有其他结果——包括得出了错
+误数值的有效分析、格式不匹配以及拒绝回答——都被记为不正确。
+Robin验证
+Crow和Falcon消融实验。对FutureHouse平台代理Crow和
+Falcon的调用被替换为通过OpenAIAPI使用相同的系统和用户提示
+调用o4‑mini。在人工参考核查中，一位对来源不知情的科学家被提
+供了来自野生型和消融版Robin的十个随机选取的提案。每当在提案
+中遇到引文或参考文献时，科学家都会尝试在线查找原始文章。如果
+无法从引文
+
+PAGE 11
+或参考（包括提案中提供的可用上下文）中有把握地识别出原始文章，
+该参考即被标注为杜撰。否则，该参考被标注为合法。
+在LLM评判对比中，向ClaudeSonnet3.7提交了50份野生型和
+50份消融（ablated）提案，进行一对一的锦标赛裁决，并基于这些比
+较结果通过BTL模型（在Robin内部排序系统中的实现）生成提案排名。
+组间平均排名差异的统计显著性使用置换检验评估。观测到的检验统
+计量为消融组与野生型组平均排名之差（消融的平均排名减去野生型
+的平均排名）。在组间无差异的原假设下，通过随机置换组标签
+10,000次并为每次置换重新计算检验统计量来生成原假设分布。P值计
+算为置换后差异大于或等于观测差异的比例（单尾检验）。所有分析
+均使用Python(v3.12.10)并配合NumPy和pandas完成。
+与OpenAI的DeepResearch的比较。为与DeepResearch比较，我
+们通过ChatGPT用户界面向DeepResearch提供了补充图8中所示的
+系统与用户提示。在这些查询提交给DeepResearch时（2025年6月），
+DeepResearch通常会在用户提示后提出2–3个问题，目的是澄清和
+界定检索查询。我们针对每个查询尽可能提供了有帮助的回答。一旦
+获得18个完整查询，我们对药物进行了订购并配制了药物储备，详细
+信息见补充表1。吞噬作用（phagocytosis）测定在同一次实验中于
+RPE‑SCs上进行，该实验用于验证Robin的发现。
+成本分析。我们通过litellm(https://docs.litellm.ai/docs/providers/github)
+跟踪了LLM调用的成本，并计算了Crow和Falcon的平均成本（分别为
+0.0963美元和0.2142美元；n= 52次运行）。典型Robin运行的成本CRobin通过
+假定45次Crow和30次Falcon运行来估算：
+C
+C
+C
+= 45(
+) + 30(
+)
+(1)
+Robin
+Crow
+Falcon
+Finch未被纳入此估算，因为它每次迭代只运行一次，其成本贡
+献可忽略不计。
+细胞培养
+ARPE‑19细胞购自美国典型培养物保藏中心（CRL‑2302），传代扩
+增三次后分装并冷冻。这些分装样品用于本文中所有ARPE‑19实验。
+在培养过程中，ARPE‑19细胞在37°C、5%CO2环境下，于
+DMEM/F12（15‑090‑CV，Corning）培养基中维持，培养基含10%
+胎牛血清（FBS；10082‑147，Gibco）、2mMl‑谷氨酰胺（
+25030‑081，Gibco）、1mM丙酮酸钠（11360‑070，Gibco）和1%
+青霉素–链霉素（15140‑122，Gibco）。用于吞噬实验时，细胞以
+1 × 104 个/孔的密度接种于96孔组织培养板（10861‑666，VWR），
+每孔加入100μl完整培养基。细胞培养至汇合后继续孵育7天，期间
+不更换培养基。此时，细胞已形成单层并出现分化迹象（黑褐色颗粒
+表达和砌石状形态）58。
+来自无已知眼疾、年龄超过60岁的单一供体的原代RPE干细胞由
+SightRestoration眼库采集。RPE干细胞按照先前描述的协议59解冻、
+接种和培养。简言之，患者RPE干细胞在到达后立即解冻并接种于经
+SynthemaxII(3535,Corning)涂层的24孔组织培养塑料板(3470,
+Corning)上，在含10%热灭活FBS的细胞培养基中孵育5小时。7天后，
+培养基更换为含2%热灭活FBS的培养基。
+作为对Fernandes等人方案的修订59, ，培养基在每周一、三、五更换
+三次，每次去除三分之二的培养基并用新鲜培养基替换。接种4周后
+将细胞分种到96孔板或Transwell插入物（3470，Corning），随
+后继续培养4周以进一步成熟，然后进行ELISA。
+RPE‑SC培养基由基础培养基DMEM/F12(D8062,
+Sigma‑Aldrich)与αMEM(M4526,Sigma‑Aldrich)按1:1混合制成。
+培养基中补充了1X青霉素‑链霉素（15140‑163，LifeTechnologies）、
+1XGlutamax（35050‑079，LifeTechnologies）、1X非必需氨基酸
+（11140‑076，LifeTechnologies）和1X丙酮酸钠（11360‑070，Life
+Technologies）。额外补充物包括2%或10%(v/v)热灭活胎牛血清（
+F4135，Sigma‑Aldrich）、10mM烟酰胺（N5535，Sigma‑Aldrich）、
+按厂商推荐浓度50%的N1培养基补充液（N6530，Sigma‑Aldrich）、
+0.25mgml−1 牛磺酸（T0625，Sigma‑Aldrich）、0.02μgml−1 氢化可
+的松（H4001，Sigma‑Aldrich）和0.013ngml−1 33′,5‑三碘‑L‑甲状腺
+原氨酸（T5516，Sigma‑Aldrich）59。所有细胞系经检测均为阴性，无支
+原体污染。
+吞噬作用药物筛选
+药物库制备。Robin提出的药物在文献中查找到了最佳细胞培养浓度，
+若文献给出多个浓度，则在吞噬实验中选择使用最高浓度。于吞噬实
+验当天，使用药物原液在完全培养基中配制为2X工作浓度的工作液。
+pHrodo颗粒制备。为特异性检测被吞噬的颗粒，我们使用了
+pHrodo颗粒（A10010，ThermoFisher），该颗粒仅在溶酶体的低
+pH下发荧光。深红色大肠杆菌pHrodo颗粒按厂家说明解冻并在2
+mlPBS中重悬。重悬后的颗粒在室温水浴中超声10分钟，随后加入
+细胞培养板。
+牛视杆细胞外段（ROS）制备。在RPE‑SC验证实验中，使用牛
+ROS代替pHrodo颗粒。牛ROS由InvisionBioResources（
+98740）提供，以冷冻颗粒形式收到。该颗粒在冷无菌PBS中重悬，
+浓度为每100μl1 × 107 ROS，并分装后存储于−80 °C。实验当天，将
+ROS试剂在冰上解冻并与pHrodo红色染料SE（P36600，
+ThermoFisher）偶联。按厂家说明将pHrodo红色染料在DMSO
+中配制至10mM。将ROS在4°C下以6,500g离心7分钟，然后重
+悬于冷无菌偶联缓冲液（0.2mM碳酸氢钠缓冲液，pH9.2），使浓
+度为每100μl1 × 106ROS（为原始分装液的十倍稀释）。每100μl稀
+释后的ROS（1 × 106 ROS）加入1μl的10mMpHrodoSE并通过
+移液混匀。随后将ROS在避光条件下于21°C、500rpm的振荡珠浴
+中孵育。孵育后，通过离心并在冷无菌PBS中重悬洗去多余染料以获
+得pHrodo红色偶联的ROS。在将偶联后的ROS加入细胞前，将其
+在细胞培养基中重悬至每100μl1 × 107 ROS，并向96孔板的每孔加
+入4μl（每细胞10个ROS）。通过移液将ROS分布于孔内，并目视
+检查以确保覆盖均匀。
+吞噬作用测定。对于吞噬作用测定，在加入微粒之前，细胞以含有试
+验化合物或对照溶剂（0.5%DMSO）的完全培养基处理60分钟，
+37°C，5%CO2 ，方法是向细胞中加入100μl的2X药物储备液于完全
+培养基中。在60分钟孵育后，向每孔加入10μl的1μgμl−1 pHrodo微
+粒。加入微粒后，培养板于37°C孵育3小时。然后用TrypLE
+Express(12604‑013,Gibco)重悬细胞10分钟，并稀释于
+
+PAGE 12
+文章
+FACS缓冲液（1%牛血清白蛋白（BSA）和含有500ngml−14′,6‑二
+脒基‑2‑苯基吲哚（DAPI）或5μMHoechst33342的不含钙镁的
+PBS），以得到适合流式细胞术的细胞悬液。
+在RPE‑SC验证实验中，我们用标记有pHrodoredSE（
+ThermoFisher）的牛来源ROSs（InvisionBioResources）替换了
+pHrodo微球，并用Hoechst33342 （BP‑42012，Broad‑Pharm ）
+替换了DAPI。此外，在加入细胞之前，先将ROSs重悬于细胞培养基
+中。由于有额外的供体细胞可用，RPE‑SC筛选进行了四个技术重复
+（比ARPE‑19筛选多一个）。除此之外，RPE‑SC药物筛选的执行方
+式与ARPE‑19筛选相同。
+流式细胞术。将悬浮在FACS缓冲液中的ARPE‑19或RPE‑SC置于
+96孔细胞培养板后，立即转移至配备自动采样器的AttuneNxT流式
+细胞仪（A24858，ThermoFisher）。在ARPE‑19实验中，
+pHrodo微球和DAPI的荧光分别用637nm和405nm激光激发，
+并分别用670/14和450/40滤光片检测。在RPE‑SC实验中，
+pHrodored染料和Hoechst33342分别用532nm和405nm激光
+激发，并分别用585/16和450/40滤光片检测。先从试验孔确定细胞
+群体，然后使用细胞门将每孔的细胞群体限制为5,000个事件。这是
+必要的，因为检测到的大多数事件是牛源ROSs。
+RNA‑seq。将ARPE‑19细胞按三份接种于24孔组织培养板中，按制造商
+指南使用MaxwellRSC48(AS8500,Promega)和MaxwellRSC
+SimplyTissue试剂盒(AS1340,Promega)裂解细胞并提取RNA。使用
+Qubit仪器(Q33327,ThermoFisher)和Qubit高灵敏度RNA试剂盒
+(Q10210,ThermoFisher)对总RNA进行定量。以1μg总RNA为输入，
+使用NEBNextPoly(A)mRNAMagneticIsolationModule(E7490,
+NewEnglandBiolabs)富集带polyA的mRNA，随后使用NEBNext
+UltraIIDirectionalRNALibraryPrepKitforIllumina(E7760,
+NewEnglandBiolabs)构建测序文库。使用Agilent生物分析仪进行质
+量控制。文库（加入1%PhiX）在IlluminaNextSeq2000上使用P3流
+动池以75bp的双端读长进行测序。
+免疫细胞化学。细胞用4%多聚甲醛在室温下固定25分钟，随后用
+PBS洗涤三次，每次5分钟。通过用封闭缓冲液（1%BSA和22.52
+mgml−1甘氨酸溶于PBST（PBS+ 0·1%Tween20））孵育30分钟来
+阻断非特异性抗体结合。然后将细胞在4°C下与稀释于1%BSA的
+PBST中的一抗孵育过夜。之后，细胞在室温、避光条件下用稀释于1
+%BSA的二抗孵育1小时，最后在最终洗涤步骤前用DAPI孵育。补充
+表2列出了本研究中使用的抗体。
+ELISA。将RPE‑SCs以每个插膜15,000个细胞接种于带0.4μm孔聚酯
+膜的6.5mm反插入培养膜（3470，Corning）上，并继续培养4周。
+VEGF的ELISA使用InvitrogenNovexVEGFHumanELISAKit
+（KHG0111，ThermoFisher）进行。培养基在换液后48小时从顶层
+和基底层取样，并在进行ELISA前按说明书将样品以1:10稀释于样品稀
+释缓冲液中。
+LDH测定。来自RPE‑SC剂量反应实验的上清液在实验结束后立即以
+−80 °C储存。LDH测定按照试剂盒说明书使用LDH‑Glo细胞毒性检
+测试剂盒（J2381，Promega）进行。为了测量最大LDH活性，对照
+组通过裂解细胞来制备正对照，使用
+TritonX‑100（X100，Sigma‑Aldrich），从而可计算相对细胞毒性。
+数据分析
+流式细胞术。数据分析代理Finch对我们的流式细胞术数据进行了端
+到端分析。基于前向散射和侧向散射参数，分析中排除了碎片和细胞
+聚集体。一般而言，Finch使用R语言的flowMeans包对前向散射
+与侧向散射图进行聚类，先应用k‑means聚类，然后选择最有可能包
+含主要细胞群的簇。对于后续的门控，Finch生成散点图并据此定义
+门。单细胞基于脉冲宽度和面积参数进行门控。为评估吞噬作用的程
+度，对每孔的pHrodo信号的平均荧光强度进行了量化。
+流式细胞术数据也由人工科学家分析（补充图13、15和16）。人
+工分析与Finch类似，但额外增加了一步：使用无珠对照去除
+Alexa647通道的背景信号，且该背景被证明很小。人工分析从在前向
+与侧向散射图中识别主要细胞群开始。接着识别单细胞。然后使用
+DAPI通道去除死细胞，最后通过无珠对照去除Alexa647的背景信号。
+RNA‑seq。读序列去重分样和比对由人工完成，随后由Finch进行差
+异基因表达分析（代码可在Robin的GitHub仓库获得；参见“代码
+可用性”）。
+读序列比对与处理。12个样本的原始成对末端RNA‑seq读序列（
+2 × 150 bp）（包括Y27632处理组、载体对照组和珠子处理组）使用
+自定义Bash管道进行处理。测序文件（*_R1_001.fastq.gz和*_R
+2_001.fastq.gz）从FASTQ目录中检索，并使用HISAT2（构建于
+GENCODEv44的GRCh38人类参考基因组索引）逐一比对，使用‑‑
+dta标志以保留剪接位点信息供下游转录组组装使用。比对使用八个
+CPU线程（‑p8）并以SAM格式输出。每个SAM文件使用
+samtoolsview‑bS转换为BAM，然后进行排序（samtoolssort）
+并建立索引（samtoolsindex），以生成压缩的坐标排序BAM文件。
+为节省磁盘空间，已删除中间的SAM和未排序的BAM文件。该流程
+确保所有比对均经过统一处理并可用于定量分析。
+基因水平定量。基因计数使用Subread软件包中的featureCounts
+工具获得，采用GENCODEv44GTF注释文件。指定了成对末端模式
+（‑p）以正确处理片段计数，并使用了八个线程（‑T8）以加速处理。
+所有已建立索引并排序的BAM文件被同时提供，读取分配到基因是根
+据提供的外显子特征执行的。生成的原始基因水平计数矩阵被写入
+gene_counts.txt，作为后续归一化和差异表达分析的输入。该工作流
+程为从原始测序读段到基因水平定量的高通量RNA‑seq数据处理提供
+了可重复的框架。
+差异基因表达分析。原始基因计数导入R(v4.2.0)，并滤除非计数列，
+得到一个包含两种条件（Y‑27632和未处理）的六个样本的矩阵。计
+数矩阵和元数据封装在一个DESeqDataSet对象中（DESeq2
+v1.36.0）60。进行了归一化、离散度估计和Wald检验以检测差异表
+达。转录本标识符被映射到基因符号
+
+PAGE 13
+使用biomaRt，并定义了一个成对比较（Y‑27632对未处理）61。结果按
+调整后的P值排序，导出为CSV，并使用EnhancedVolcano(v1.14.0)
+生成火山图，阈值为|log2FC| > 1 和调整后P< 0.05（参考文献62）。
+RPE‑SCRNA‑seq验证。此次实验旨在验证来自ARPE‑19R
+NA‑seq实验的ABCA1发现，总RNA使用MaxwellRSC
+simplyRNACellsKit(AS1390,Promega)提取，并提交给
+Plasmidsaurus(plasmidsaurus.com)进行文库构建与测序，采用
+其超快速RNA‑seq服务。文库构建采用高通量3′末端计数策略，针
+对有polyA尾的转录本。简要来说，从总RNA输入中富集polyA+
+mRNA，并使用含有样品特异性条形码、唯一分子标识符（UMI）和
+Illuminaread1序列的寡聚dT引物逆转录为cDNA。经第二链合成
+后，cDNA进行tagmentation，以同时将分子片段化并引入read2
+序列。通过扩增完成文库以连接P5/P7接头和唯一双索引（i5和i7）。
+测序在Illumina平台上进行，测序深度约为每个样品1000万去重复
+读数（原始读数约2000万）。原始读数通过聚类唯一分子标识符序列
+以去除PCR重复，然后从去重复并比对的读段生成基因计数。
+报告摘要
+有关研究设计的更多信息，请参见链接到本文的Nature资料库报告
+摘要。
+数据可用性
+本研究生成的原始RNA‑seq数据已存入NCBI序列读取存档（
+SequenceReadArchive），BioProject登记号为PRJNA1464762。
+代码可用性
+示例轨迹及Robin（https://github.com/Future‑House/robin）和Finch
+代码（https://github.com/Future‑House/finch）可在GitHub上获取。
+54.Bradley,R.A.&Terry,M.E.不完全区组设计的秩分析：I.配对比较法。Biometrika
+39,324–345(1952)。
+55. Zheng, L. et al. Judging LLM-as-a-judge with MT-Bench and Chatbot Arena. In Advances in 
+Neural Information Processing Systems (NeurIPS) (eds Oh, A. et al.) 46595–46623 (Curran 
+Associates, 2023).
+56. Liu, Y. et al. Aligning with human judgement: the role of pairwise preference in large 
+language model evaluators. Preprint at https://doi.org/10.48550/arxiv.2403.16950 
+(2025).
+57. 
+Yao, S. et al. ReAct: synergizing reasoning and acting in language models. In Proc. 11th 
+International Conference on Learning Representations (ICLR) (2023).
+58. Dunn, K. C., Aotaki-Keen, A. E., Putkey, F. R. & Hjelmeland, L. M. ARPE-19, a human retinal 
+pigment epithelial cell line with differentiated properties. Exp. Eye Res. 62, 155–169 
+(1996).
+59. Fernandes, M., McArdle, B., Schiff, L. & Blenkinsop, T. A. Stem cell-derived retinal pigment 
+epithelial layer model from adult human globes donated for corneal transplants.  
+Curr. Protoc. Stem Cell Biol. 45, e53 (2018).
+60. Love, M. I., Huber, W. & Anders, S. Moderated estimation of fold change and dispersion 
+for RNA-seq data with DESeq2. Genome Biol. 15, 550 (2014).
+61. 
+Durinck, S., Spellman, P. T., Birney, E. & Huber, W. Mapping identifiers for the integration of 
+genomic datasets with the R/Bioconductor package biomaRt. Nat. Protoc. 4, 1184–1191 
+(2009).
+62. EnhancedVolcano: publication-ready volcano plots with enhanced colouring and 
+labeling. Bioconductor https://bioconductor.org/packages/release/bioc/vignettes/
+EnhancedVolcano/inst/doc/EnhancedVolcano.html (2026).
+致谢我们感谢L.McCoy、M.Skarlinski、M.Caldas、T.Nadolski、J.Braza和S.
+Narayanan在支持本研究和审阅稿件方面的帮助；感谢FutureHouse和EdisonScientific
+的所有同事提供支持；以及感谢D.Steel和M.Lako提供的宝贵建议。
+作者贡献A.E.G.、S.C.F.、M.M.H.和S.G.R.构思了项目并设计了
+实验
+. B.C., A.E.G. 并且
+M
+.T.R.
+开发了Robin架构，编写了代码并实现了AI代理。L.M.和A.Y.开发了Finch数据分析
+代理。A.E.G.、C.J.S.和M.M.H.进行了细胞培养、吞噬作用测定和RNA‑seq准备工作。
+A.E.G.、A.Y.、D.S.和G.J.G.分析了实验数据，验证了Finch的输出并执行了人工分析工作流
+程。S.M.W.和J.M.L.在BixBench上对Finch进行了基准测试。A.E.G.进行了Robin的验
+证。A.E.G.撰写了手稿的初稿。A.E.G.、B.C.、L.M.、A.Y.、C.J.S.、D.S.、G.J.G.、J.M.L.、
+S.M.W.、M.T.R.、A.D.W.、S.C.F.、M.M.H.和S.G.R.讨论了结果，提供了关键反馈并编辑
+了手稿。S.G.R.为该项目获得了资金支持。A.D.W.、M.M.H.和S.G.R.共同监督了这项工作。
+A.E.G.和B.C.对该项目贡献相同。
+ 
+资金来源我们感谢Eric和WendySchmidt的慷慨支持。
+利益冲突A.E.G.、L.M.、A.Y.、C.J.S.、J.M.L.、S.M.W.、A.D.W.、M.M.H.和S.G.R.均
+持有EdisonScientific（FutureHouse的衍生公司）的股份。其余作者声明无竞争性利益。
+附加信息
+补充信息在线版本包含可在https://doi.org/10.1038/s41586‑026‑10652‑y获取的补充材料。
+通信与材料请求请联系AndrewD.White、MichaelaM.Hinks或SamuelG.
+Rodriques。
+同行评审信息《Nature》感谢OlivierElemento及其他匿名审稿人对本工作的审稿贡献。
+同行评审者的报告可供查阅。
+转载与权限信息可通过http://www.nature.com/reprints获取。
+
+PAGE 14
+文章
+扩展数据图1 | RPE‑SC和ARPE‑19表达经典的视网膜色素上皮（RPE）标志物和
+吞噬机械。图像为免疫染色（Cy5，红色），针对经典RPE标志物MiTF、
+OTX2、RPE65和BEST1以及吞噬
+机械Integrinαvβ5 及MER原癌基因酪氨酸激酶（MERTK）。细胞核
+用DAPI染色。
+
+PAGE 15
+ExtendedDataFig.2 | RPE‑SC和ARPE‑19视网膜色素上皮表型的功能验证。
+(a)RPE‑SC细胞和生长至融合的ARPE‑19细胞的明场图像，显示出更为规则
+的
+卵石样形态在RPE‑SC细胞中。(b)在Transwell插入器上培养1个月的
+RPE‑SC细胞将VEGF的分泌极化至基底侧室（基底），这是人类RPE细胞的一
+个特征。
+
+PAGE 16
+文章
+扩展数据图3 | RPE‑SC中Y‑27632和ripasudil的细胞毒性测定。(a)
+Y‑27632剂量与LDH释放之间无关联（n= 4 孔；单因素方差分析：F= 2.07，
+p= 0.12）。(b)LDH释放随
+ripasudil剂量增加而降低（n= 4 孔；单因素方差分析：F= 3.10，p= 0.038；
+Spearman相关（对数剂量vsLDH）：ρ = −0.73，p= 0.0002）。误差线表示标准误。
+
+PAGE 17
+ExtendedDataFig.4 | Crow和Falcon剔除实验。（a）参考文献真实性的人类
+评估。柱状图显示来自10个随机选择的野生型或剔除后药物候选提案中被判定为
+虚构的参考文献的平均百分比。图表标题显示被剔除的代理名称。（b）由野生型
+Robin或被剔除Crow的Robin生成的测定方案中参考文献的人类评估。（c）
+箱线图显示在由大语言模型评判的对比中，野生型（蓝色）
+和被剔除（红色）Robin的表现（较低排名表示更好表现）。直方图显示均值排
+名差异（被剔除排名减去野生型排名）的置换检验零分布（n= 10,000次置换）。
+红色虚线表示观察到的差异。所有三种被剔除的条件均表现出显著更差的性能
+（显示单侧p值）。误差线表示标准误。
+
+PAGE 18
+文章
+扩展数据图5 | Finch分析的准确性。(a)在使用Robin工作流程的提示时，
+Finch在第2轮dAMD药物筛选的RNA‑seq和流式细胞术分析任务上对专家编制
+评分量表的遵从性（n= 3 个答案）。(b)使用了一部分与药物发现最相关的
+BixBench问题（n= 170 个问题）来测试Finch的能力。BixBench问题由撰写
+它们的专家赋予主题标签。
+我们将其中170个问题分为两组：生物信息学和生物统计学。(c)Finch与
+ClaudeSonnet3.7（无套件对照）在各种具有挑战性的生物信息学和生物统计学
+任务上的准确性比较（n= 3）。误差线表示均值的标准误。(D)Finch在来自
+BixBench的生物信息学和生物统计学问题上的失败模式（针对170个问题执行
+3次重复）。
+
+PAGE 19
+扩展数据图6 | 与OpenAIDeepResearch的比较。Robin生成的所有19个候选
+药物以及OpenAIDeepResearch生成的17个独特候选药物的表现（Deep
+Research建议了白藜芦醇
+在使用RPE‑SC细胞的吞噬作用测定中（以及两次使用GW3965）。误差线
+表示标准误（n= 4）。
+
+PAGE 20
+1
+Corresponding author(s):
+双盲同行评审投稿：在此处写上DAPR及您的稿
+件编号
+而不是作者姓名。
+Last updated by author(s): YYYY-MM-DD
+报告摘要
+Nature期刊组希望提升所发表工作的可重复性。本表格为报告提供结构化的格式，以便在一致性和透明度方面有所保证。有关Nature期刊组政策的更多信
+息，请参阅我们的编辑政策和编辑政策检查表。
+Statistics
+对于所有统计分析，请确认下列内容已在图例、表注、正文或方法部分中出现。
+n/a
+已确认
+每个实验组/条件的精确样本量(n)，以离散数字和计量单位表示
+说明所测量的是来自不同样本，还是对同一样本进行重复测量
+所使用的统计检验以及这些检验是单侧还是双侧
+仅常见检验可仅用名称描述；对于更复杂的方法，请在“方法”部分详细说明。
+对所有检验协变量的描述
+对任何假设或校正的描述，例如正态性检验和多重比较的校正
+对统计参数的完整描述，包括集中趋势（例如均值）或其他基本估计（例如回归系数）
+以及变异程度（例如标准差）或相关的不确定性估计（例如置信区间）
+对于零假设检验，提供检验统计量（例如F、t、r）及其置信区间、效应量、自由度和P值；在适当情况下尽可能给出精确的P值。
+对于贝叶斯分析，说明先验选择及马尔可夫链蒙特卡洛（MCMC）的设置。
+对于分层或复杂设计，明确适用于检验的层级并完整报告结果。
+效应量估计（例如Cohen的d、Pearson的r），并说明其计算方法。
+我们为生物学家整理的统计学在线文集包含了上述许多要点的相关文章。
+软件与代码
+Policy information about availability of computer code
+Data collection
+Paper retrieval relies on FutureHouse's PaperQA2: https://github.com/Future-House/paper-qa.  
+The commercial Large Language Models (LLMs) and their versions used in this study are: 
+OpenAI 04-mini 
+Anthropic Claude 3.7 Sonnet 
+Google's Gemini 2.5 Pro Preview 
+ 
+数据分析
+自主数据分析由我们内部代理Finch执行。代码公开托管于此：https://github.com/Future‑
+House/finch。
+对于使用自定义算法或软件且这些算法或软件对研究至关重要但尚未在已发表文献中描述的手稿，必须向编辑和审稿人提供软件。我们强烈建议将代码存放在社区仓库（例如GitHub）。有关提交
+代码和软件的更多信息，请参阅Nature出版群的相关指南。
+
+PAGE 21
+2
+Data
+关于数据可用性的政策信息
+All manuscripts must include a data availability statement. This statement should provide the following information, where applicable: 
+‑公共可用数据集的登录号、唯一标识符或网页链接
+‑对数据可用性的任何限制的说明
+‑对于临床数据集或第三方数据，请确保该声明符合我们的政策
+"Robin和Finch的示例轨迹，以及Robin和其删减版本的代码，将在https://github.com/Future‑House/robin提供"
+涉及人类参与者、其数据或生物材料的研究
+关于涉及人类参与者或人类数据的研究的政策信息。另请参阅关于性别、性别认同/表达和性取向以及种族、族裔和种族主义的政策信息。
+关于性别和性别报道
+以下信息由纽约视力恢复眼库（EyeBankforSightRestoration）提供，关于用于本研究的单一患者：
+贡献用于本研究的组织包括：
+性别、年龄、种族、病史、吸烟史、死亡的日期和时间、组织保存的日期和时间。
+在我们的手稿中报告的关于该患者的信息如下：“原代RPE‑SC细胞取自一名年长供体（>60 岁），据知无已知眼部疾病，由
+Eye‑
+BankforSightRestoration,Inc提供. （纽约）."
+关于种族、族裔或
+其他具有社会相关性的
+群体的报道
+我们使用“老年”一词，并将其定义为>60 岁。来自较年长患者的样本是必要的，因为我们在本文中研究的是一种
+与年龄相关的疾病（年龄相关性黄斑变性）。
+人群特征
+在研究与年龄相关的黄斑变性时，最重要的变量是年龄。其次最重要的是遗传背景（具体为补体因子H，CF
+H，以及ARMS2/HTRA1基因）。其他被认为在发病机制中起作用的变量有：吸烟状况、肥胖、高血压。
+招募
+我们收到了一份可用组织样本清单，除了年龄外没有病人信息。我们仅根据病人的年龄选择了该样本。
+伦理监督
+该项目在样本获准运送之前，已由纽约视力恢复眼库（EyeBankForSightRestoration）的科学委员会审查。
+请注意，论文中也必须提供有关研究方案批准的完整信息。
+领域特定报告
+请选择下方最适合您研究的一项。如果不确定，请在做出选择前阅读相应部分。
+生命科学
+行为与社会科学
+生态学、进化与环境科学
+有关包含所有章节的文档的参考副本，请参见nature.com/documents/nr‑reporting‑summary‑flat.pdf
+生命科学研究设计
+即便披露为否定，所有研究也必须在这些方面进行说明。
+样本量
+样本量是基于试点研究确定的，试点研究表明3次重复能够可靠地区分阳性对照（MFGE8）与
+载体对照。在RPE‑SC吞噬筛选中，为了最大限度地利用可用的临床材料，选择了4的样本量。
+数据排除
+未排除任何数据。
+重复性
+我们在ARPE‑19细胞中的初步结果（包括吞噬功能筛选和剂量反应）通过在原代
+人视网膜色素上皮细胞系（RPE‑SC）中
+重复实验得到了验证。
+随机化
+N/A
+盲法
+在人类参考检查中（参见第3.3.1节“乌鸦与猎鹰消融实验”），我们将一位科学家对起源提案（野生型知更鸟与消融知更鸟）进行了
+盲法处理。
+针对特定材料、系统与方法的报告
+
+PAGE 22
+3
+我们要求作者提供有关某些类型的材料、实验系统和方法的信息，这些内容在许多研究中都会使用。在此处请指出列出的每种材料、系统或方法是否与您的研究
+相关。如果您不确定某项是否适用于您的研究，请在选择回答前阅读相应部分。
+材料与实验系统
+n/a
+参与本研究
+抗体
+真核细胞系
+古生物学与考古学
+动物及其他生物
+临床数据
+引起关注的双重用途研究
+植物
+方法
+n/a
+参与研究
+ChIP‑seq
+流式细胞术
+基于MRI的神经影像学
+抗体
+使用的抗体
+Bestrophin‑1单克隆抗体；靶点：BEST1；供应商：Proteintech；目录号：60326‑1‑Ig；稀释度：1:200。MERTK多克隆抗体；靶点：
+MERTK；供应商：Proteintech；目录号：27900‑1‑AP；稀释度：1:200。抗IntegrinalphaBeta5抗体，克隆EM09902，ZooMAb®兔单
+克隆；靶点：$\\alpha$V$\\beta$5；供应商：Sigma‑
+Aldrich ; 目录g 编号：ZRB1191 -25UL; 稀释倍数：1:100 .
+抗RPE65兔多克隆抗体；靶点：RPE65；供应商：Proteintech；货号：17939‑1‑AP；稀释倍数：1:100。抗MiTF抗体\[
+EPR26363‑10\]；靶点：MiTF；供应商：Abcam；货号：ab303530；稀释倍数：1:50。
+Otx2多克隆抗体；靶点：OTX2；供应商：ThermoFisherScientific；货号：PA5
+-39887；稀释倍数：1:20
+.
+驴源抗小鼠IgGH\&L（AlexaFluor647）；靶标：小鼠IgG；供应商：Abcam；货号：ab150107；稀释度：1:500。山
+羊抗兔IgGH\&L（AlexaFluor647）；靶标：兔IgG；供应商：Abcam；货号：ab150079；稀释度：1:500。驴源抗山
+羊IgGH\&L（AlexaFluor647），预吸附；靶标：山羊IgG；供应商：Abcam；货号：ab150135；稀释度：1:500。
+验证
+**Bestrophin-1 Monoclonal antibody** (Proteintech, catalog no. 60326-1-Ig): According to the manufacturer's website and online 
+antibody databases, this antibody is validated for use in Western Blot, ELISA, Immunocytochemistry, Immunoprecipitation, and 
+Immunohistochemistry, demonstrating cross-reactivity with human, mouse, rat, and canine samples (such as positive Western blot 
+detection in human Y79 cells). 
+ 
+**MERTK Polyclonal antibody** (Proteintech, catalog no. 27900-1-AP): Proteintech validates this antibody for Western Blot, 
+Immunohistochemistry, Immunofluorescence, Intracellular Flow Cytometry, and ELISA across human, mouse, and rat tissues. It is 
+widely cited in peer-reviewed literature, including recent 2024 studies characterizing MERTK expression in hepatocellular carcinoma 
+mouse models. 
+ 
+**Anti-Integrin αVβ5 Antibody, clone EM09902, ZooMAb® Rabbit Monoclonal** (Sigma-Aldrich, catalog no. ZRB1191-25UL): The 
+manufacturer's profile states this recombinant antibody is validated for Flow Cytometry, Immunocytochemistry, 
+Immunohistochemistry, and Western Blot. Sigma-Aldrich specifically notes its high affinity for human Integrin αVβ5 (EC50 = 5 ng/mL) 
+and heavily enhanced validation for specificity, showing low cross-reactivity to the closely related αVβ3 integrin. 
+ 
+**Anti-RPE65 Rabbit Polyclonal Antibody** (Proteintech, catalog no. 17939-1-AP): The manufacturer verifies this antibody for 
+Western Blot, Immunohistochemistry, Immunofluorescence, and ELISA in human, mouse, and rat models. It is well-documented in 
+the SciCrunch research resource registry (RRID:AB_2285290) and features dozens of literature citations validating its use in retinal 
+pigment epithelium studies. 
+ 
+**Anti-MiTF antibody [EPR26363-10]** (Abcam, catalog no. ab303530): Abcam's database highlights that this rabbit monoclonal 
+antibody has undergone strict knockout (KO) validation. It is validated for Immunocytochemistry/Immunofluorescence, 
+Immunohistochemistry, Western Blot, Immunoprecipitation, and Flow Cytometry in human, mouse, and rat samples, and appears 
+frequently in recent proteogenomic literature. 
+ 
+**Otx2 Polyclonal Antibody** (Thermo Fisher Scientific, catalog no. PA5-39887): Thermo Fisher and online registries (such as 
+SciCrunch RRID:AB_2556436) indicate this antibody is validated for Immunocytochemistry/Immunofluorescence, 
+Immunohistochemistry, and Western Blot targeting human, mouse, and rat OTX2. It has been actively cited in recent 2024 and 2025 
+publications, including benchmark studies utilizing human cerebellar organoids.
+真核细胞系
+关于细胞系以及研究中的性别和性别认同的政策信息
+细胞系来源
+ARPE‑19‑ATCC
+RPE‑SC‑供SightRestoration新纽约眼库
+认证
+ARPE‑19细胞‑免疫细胞化学，明场
+RPE‑SC‑免疫细胞化学，明场，VEGF极化测定
+支原体污染
+所有细胞系的支原体检测均为阴性。
+
+PAGE 23
+4
+Commonly misidentified lines
+(See ICLAC register)
+无。
+新型植物基因型
+N/A
+种子库
+N/A
+鉴定
+N/A
+植物
+流式细胞术
+图像
+请确认：
+坐标轴标签说明所用的标记和荧光染料（例如CD4‑FITC）。
+坐标轴刻度清晰可见。仅在每组的左下方图显示坐标轴数字（“组”指对相同标记的分析）。
+所有图均为等高线图（含离群点）或伪彩色图。
+提供细胞数或百分比的数值（含统计信息）。
+方法学
+样品制备
+用于流式细胞术的样品制备如下：1.药物处理：将ARPE‑19细胞或RPE‑SC用测试化合物或载体对照孵育60分钟。
+2.加入微球：加入pHrodo微球或ROS，并将孔板孵育3小时。3.解离：用TrypLEExpress处理细胞10分钟以
+使其脱附。4.悬浮：细胞洗涤后重悬于FACS缓冲液（1%BSA和500ng/mlDAPI或1µg/mlHoechst33342于
+PBS中），然后转移到流式细胞仪进行检测。
+仪器
+配有自动进样器的AttuneNxT流式细胞仪
+软件
+要么Finch（代理分析），要么FlowJo（人工分析）。
+细胞群体丰度
+在通过所有门控后，最终群体中有约2000到6000个细胞（除了细胞骨架抑制剂CytochalasinD阴性对照和4‑苯
+基丁酸测试条件显示出一定细胞毒性且在最终群体中有<1000 个细胞）。
+门控策略
+带pHrodo微珠的ARPE‑19：(i)在FSC与SSC图上对细胞群体进行门控，(ii)单细胞门，(iii)使用DAPI进行活/死细胞
+门控，(iv)使用无微珠对照去除Alexa647的背景信号，(v)取pHrodo荧光的几何平均值。
+带pHrodo标记外节（ROS）的RPE‑SC：(i)在FSC与SSC图上对细胞群体进行门控，(ii)使用Hoechst33342信号的
+直方图排除牛源视杆外节（ROS），因其为Hoechst阴性，(iii)测量Hoechst阳性群体的几何平均值。
+勾选此框以确认在补充信息中提供了用于说明门控策略的图示。

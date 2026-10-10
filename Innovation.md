@@ -58,6 +58,25 @@ The next test of the interaction hypothesis should therefore start from an endpo
 reference ceiling clears the gate. Building more model capacity for an endpoint whose ceiling
 fails cannot help.
 
+## Measure or predict (block K, 2026-10-10)
+
+The interaction is now a three-way decision. For a later-fate endpoint the agent compares two
+estimates, each scored on reference units in the decision's own assay or platform:
+* what the world model's forecast of an early state adds to the cheap prior;
+* what *measuring* that state adds.
+
+The agent then consults the model, measures, uses the prior, or abstains until more reference
+units exist.
+
+The first test located the failure. STATE's line-specific knowledge did not transport to an
+independent platform, even though basal profiles aligned 18 of 18. Measuring at 24 h did not beat
+a strong DepMap-scale prior on 48 lines; the informative state appeared at 24-48 h. The gate's
+point-estimate MEASURE call was wrong, and its own interval had straddled the threshold.
+
+A dual-core advantage therefore needs either a world model qualified inside the decision's
+platform, or later or richer early states. It also needs gate intervals narrow enough to act on.
+Combining a forecaster with an acquisition rule is not enough.
+
 ## What would establish the claim
 
 A positive result must preserve independent-source selection value with fewer

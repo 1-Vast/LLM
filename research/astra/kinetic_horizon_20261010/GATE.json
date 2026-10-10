@@ -1,0 +1,106 @@
+{
+ "config": {
+  "mix_late_endpoint": "secondary_mean",
+  "mix_prior": {
+   "kind": "ridge",
+   "n_pc": 50,
+   "alpha": 100.0
+  },
+  "tahoe_late_endpoint": "primary_2p5",
+  "tahoe_prior": {
+   "kind": "kernel",
+   "tau": 0.1,
+   "top_m": 20
+  },
+  "tahoe_bridge_coef_s24_k24": [
+   -0.1575,
+   -0.1965
+  ],
+  "projection_variant": "v1",
+  "top_k": 10,
+  "mub": 0.05
+ },
+ "mix_24h_to_5d": {
+  "endpoint": "PRISM secondary_mean (5 day), across lines per drug",
+  "n_dev_lines": 24,
+  "per_drug": {
+   "Trametinib": {
+    "B": 0.4774869935140995,
+    "oracle_B_plus_Rmag": 0.5491216843012044,
+    "R_mag": 0.4443305113737977,
+    "wm_B_plus_Smag": 0.1378652271528475
+   },
+   "Afatinib": {
+    "B": 0.44372934830010974,
+    "oracle_B_plus_Rmag": 0.7011469259938268,
+    "R_mag": 0.5047343969807234,
+    "wm_B_plus_Smag": 0.08898627588815597
+   },
+   "Everolimus": {
+    "B": -0.1107744814636739,
+    "oracle_B_plus_Rmag": 0.013278426174568385,
+    "R_mag": 0.1094894034128578,
+    "wm_B_plus_Smag": 0.02728972211291283
+   },
+   "Gemcitabine": {
+    "B": 0.35914623506984855,
+    "oracle_B_plus_Rmag": 0.5658326778469532,
+    "R_mag": 0.28055902191404103,
+    "wm_B_plus_Smag": 0.3144778610550544
+   },
+   "Taselisib": {
+    "B": 0.37331918980159684,
+    "oracle_B_plus_Rmag": 0.47013473032467507,
+    "R_mag": 0.46842679769377643
+   },
+   "JQ1": {
+    "B": 0.30176387694402723,
+    "oracle_B_plus_Rmag": 0.3788841317672822,
+    "R_mag": 0.22025663840640977
+   }
+  },
+  "B_mean": 0.30744519369433465,
+  "oracle_mean": 0.44639976273475174,
+  "ceiling": 0.1389545690404171,
+  "forecast_increment": -0.15024225230285332,
+  "state_rna_context_r_dev": {
+   "Trametinib": 0.0674,
+   "Afatinib": -0.0254,
+   "Everolimus": -0.0079,
+   "Gemcitabine": -0.011
+  },
+  "state_rna_ceiling_dev": {
+   "Trametinib": 0.7916,
+   "Afatinib": 0.4142,
+   "Everolimus": 0.4918,
+   "Gemcitabine": 0.6642
+  },
+  "decision": "MEASURE_EARLY",
+  "reasons": [
+   "WM_TRANSPORT_UNQUALIFIED"
+  ]
+ },
+ "tahoe_24h_to_5d": {
+  "endpoint": "PRISM primary_2p5 (5 day) within-line selectivity",
+  "n_dev_lines": 15,
+  "B_mean": 0.6732356731786364,
+  "R_dyn_mean": 0.029370772058795833,
+  "oracle_mean": 0.49081309809110146,
+  "ceiling": -0.18242257508753495,
+  "forecast_increment": null,
+  "decision": "USE_PRIOR",
+  "reasons": [
+   "WM_FORECAST_NOT_EVALUATED",
+   "WM_CEILING_BELOW_MUB"
+  ],
+  "note": "STATE forecasts of the Tahoe 24 h state exist only for the five zero-shot lines; with the ceiling below MUB no forecast can be admitted."
+ },
+ "tahoe_24h_survival_same_unit": {
+  "source": "research/astra/phenotype_anchor_20261010/GATE.json",
+  "decision": "USE_PRIOR",
+  "reasons": [
+   "WM_CEILING_BELOW_MUB"
+  ],
+  "ceiling": 0.003
+ }
+}

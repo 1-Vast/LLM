@@ -1,5 +1,73 @@
 # Evidence Register
 
+## Measure or predict across platform and time — 2026-10-10
+
+**Primary results:**
+
+* A frozen STATE forecast of the 24 h state does not transport to an independent platform.
+* The development gate's call to measure early instead was a false positive.
+* For one time-course drug, information about 5-day fate appeared at 24-48 h.
+
+Block K asked whether a virtual cell's forecast of the early (24 h) cell state can replace
+measuring it for a 5-day viability decision. The decision is three-way:
+
+* `ADMIT_WORLD_MODEL` if adding the forecast to the best cheap prior gains at least the minimum
+  useful benefit (0.05 r);
+* `MEASURE_EARLY` if only the measured early state does;
+* `USE_PRIOR` otherwise.
+
+**MIX-Seq** (pooled scRNA-seq, 24 h, a platform STATE never saw; 5-day PRISM outcome;
+DepMap-scale CCLE prior):
+
+* On 24 development lines: measurement +0.139, forecast -0.150, so the gate said MEASURE_EARLY.
+* On 48 confirmation lines: measurement -0.021 [-0.109, +0.078] (M1 fails) and forecast -0.091
+  [-0.182, -0.005] (transport refusal confirmed).
+* Top-10 line selection: measurement policy minus prior -0.061 [-0.165, +0.169] (M3 fails).
+* A post hoc paired re-analysis that corrects an unpaired estimand found by verification leaves
+  every verdict unchanged.
+* STATE's line-specific RNA skill is about 0; trametinib reaches 0.059 [0.032, 0.082], against a
+  split-half ceiling of 0.35-0.79.
+* Observed Tahoe and MIX-Seq responses of the same lines agree at r of 0.13 or less. The same
+  MIX-Seq lines agree across two MIX-Seq experiments at r 0.65.
+
+So the learned line-specific response is bound to its platform.
+
+**Trametinib time course** (24 lines):
+
+* Response magnitude predicts 5-day viability at r 0.21 (3 h), 0.25 (6 h), 0.31 (12 h), 0.56 (24 h)
+  and 0.68 (48 h).
+* Only the 48 h measurement adds to the prior (+0.16 [0.01, 0.36]).
+* STATE's 24 h forecast best matches the observed 12 h response.
+* A phase-snapshot kinetic readout does not predict the next interval's abundance change (r 0.11
+  [-0.04, 0.24]).
+
+**Tahoe 24 h to PRISM 5-day:**
+
+* The early state does not add to the CCLE prior (-0.107 [-0.155, -0.059]; USE_PRIOR confirmed).
+* G1 accumulation marks relative sparing for the top-variance drugs (+0.136 [+0.002, +0.254]). For
+  trametinib it marks sensitivity (r -0.59 at 24 h).
+
+**Post hoc:** the development gate's interval was [-0.049, +0.298]. The promoted
+`maestro.world_model_value.plan_measure_or_predict` therefore acts only on interval lower bounds
+and otherwise returns `ABSTAIN`. This is a conservative correction motivated by one failure, not a
+validated improvement. Cross-time and cross-assay bridges are no longer refused outright. They are
+admitted only through this interval rule, with the late endpoint measured in its own assay on
+reference units.
+
+Also promoted:
+* `tools.evaluation.increment.paired_increment`, which computes the paired estimand by
+  construction;
+* `tools.analysis.platform_identity.identity_test`. In this block it passed 18 of 18 lines while
+  responses did not transport, so passing it does not imply response transport.
+
+**Limits:**
+* six drugs, one time-course drug, and 35-60 cells per line and condition;
+* PRISM is a different assay from both single-cell platforms;
+* the STATE gene order is supported, not certified by lineage;
+* the Tahoe zero-shot PRISM tier was not opened.
+
+Packet: `research/astra/kinetic_horizon_20261010/`. Receipt: `log/20261010/KINETIC_HORIZON.json`.
+
 ## Phenotype-anchored dual core — 2026-10-10
 
 **Primary result: null for STATE on Tahoe relative-survival selectivity; the cheap basal-context
@@ -54,6 +122,7 @@ This is the canonical cross-study result table. [REPORT.md](REPORT.md) states cu
 | Informative paired-axis recovery P0.5R | `VERIFIED_RECONSTRUCTION; AXIS_BLOCKED` | Can expression-guided source conditions make all 39 coordinates uniquely identifiable in c44/c45? | First pool lacks support; supplement screens 3,354 QC cells and reads 74 paired cells. All endpoints meet two/one nonzeros, but only 16/39 c44 and 23/39 c45 uniquely match. Combined calibration 24,533,272 known body bytes. | Remaining trajectories are nonunique, not contradicted names. Adaptive cell-level holdout is not culture independence; no gate relaxation or P0.6 release. | `research/decision_value/axis_recovery_20261010/calibration_v2/`; independent `design/CALIBRATION_V2_VERIFIED.json`; `log/20261010/AXIS_RECOVERY.json`. |
 | Direct-name control observation P0.5R | `VERIFIED_EXPLORATORY_CHANNEL` | What does gene covariance do to a separately named 39-gene control scalar? | 224 retained c44 controls, 28 groups, actual n=8; full/diagonal variance ratio median 1.473, range 0.709–3.731; independent vectors/bootstrap reproduced. | Only one unadjusted interval wholly exceeds one; no culture-level noise, old endpoint equivalence, treated reliability or decision gain. | `research/decision_value/axis_recovery_20261010/named_channel/`; independent `design/NAMED_VERIFIED.json`. |
 | Axis selection diagnostic | `OFFLINE_DIAGNOSTIC; NOT_CERTIFICATION` | Did positive-coverage allocation omit identifying zero contrasts? | Full retained support patterns are unique for all 39 genes per file; a heuristic adds 11 discovery rows per file, with fixed holdout and projected paired cost 340,068 bytes. | Binary presence need not equal numerical nonzero; this closed diagnostic reads no extra RNA, its numerical gate remains failed, and its row count is not proven minimal. | `research/decision_value/axis_recovery_20261010/calibration_v2/diagnosis/`; separate post-result freeze. |
+| Measure or predict (block K) | `CONFIRMATORY; M1_M3_FAILED; TRANSPORT_REFUSAL_CONFIRMED` | Can a frozen virtual cell's 24 h forecast replace measurement for a 5-day decision, and is any failure a ceiling, transport or timing failure? | MIX-Seq, 48 lines: measurement over the DepMap prior -0.021 [-0.109, +0.078]; STATE -0.091 [-0.182, -0.005]. Same-line cross-platform response r 0.13 or less versus within-platform 0.65. Trametinib 5-day information appears at 24-48 h (+0.16 at 48 h). Tahoe early state below the prior (USE_PRIOR confirmed). | Six drugs; one time-course drug; small cell counts; unpaired evaluator estimand (verdicts unchanged when paired); candidate gene order supported, not certified. | `research/astra/kinetic_horizon_20261010/`; `log/20261010/KINETIC_HORIZON.json`; `run_sealed.sh` then `verify.py`. |
 | Historical union and targeted axis extension | `VERIFIED_FILE_LOCAL_ENDPOINT39; P06_UNFROZEN` | Can exposed c44 bytes and eleven explicitly discriminating c45 rows complete the data-coordinate gate cheaply? | Both files pass 39/39 unique matches among all 62,710 genes at 1e-5. c44 adds 0 bytes; c45 receives exactly 133,564. Separate logical-slice/blockwise reconstruction agrees; 3,334 protected old files unchanged. | Historical/adaptive coordinate evidence; exposed consistency is not fresh validation. Initial parser failure preserved with a zero-download offline amendment. Full 2,000/checkpoint axes and P06/P2 execution remain unqualified. | `research/decision_value/axis_extension_20261010/QUALIFIED_CERTIFICATE.json`; canonical receipt `log/20261010/P05R_EXTENSION.json`; standalone offline replay. |
 
 ## Interpretation and audit rules

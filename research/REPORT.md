@@ -14,6 +14,24 @@ This scoped result does not establish apoptosis, mechanism or general decision v
 [canonical evidence](EVIDENCE.md#phenotype-anchored-dual-core--2026-10-10) and
 [study packet](astra/phenotype_anchor_20261010/README.md).
 
+Block K (2026-10-10) asked when a virtual cell's forecast of the early state can replace measuring
+it for a later-fate decision. It separated three possible failures: no ceiling, no transport and
+wrong timing. All three appeared.
+
+* **Transport.** On 48 MIX-Seq lines unseen by STATE, the forecast harmed a DepMap-scale prior
+  for 5-day PRISM viability (-0.091 [-0.182, -0.005]). Its line-specific RNA skill was about 0.
+  The same lines' observed Tahoe and MIX-Seq responses agreed at r of 0.13 or less, while two
+  MIX-Seq experiments agreed at 0.65. What STATE learned about lines is bound to its platform.
+* **Measurement.** The development gate's MEASURE_EARLY call (+0.139 on 24 lines) did not confirm
+  (-0.021 [-0.109, +0.078]). Its post hoc interval was [-0.049, +0.298].
+* **Timing.** In a trametinib time course, 5-day information appeared at 24-48 h; only 48 h added
+  to the prior. STATE's 24 h forecast matched the 12 h response best.
+* **Prior wins.** For Tahoe, the early state did not add to the CCLE prior.
+
+Gate decisions now use interval lower bounds (`plan_measure_or_predict`, which can abstain). See
+the [block K evidence](EVIDENCE.md#measure-or-predict-across-platform-and-time--2026-10-10) and
+[packet](astra/kinetic_horizon_20261010/README.md).
+
 A forecast may influence endpoint selection only after a same-unit readout-to-endpoint bridge
 (same culture unit, dose and time) and a reference ceiling pass: substitute observed responses
 for forecasts, score leave-one-context-out, and beat the best cheap prior by the declared minimum

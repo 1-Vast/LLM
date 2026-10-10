@@ -39,6 +39,12 @@ RNA proxy gains cannot validate the broader mechanism claim.
   same-unit pairs; cross-assay, cross-dose or cross-time pairings are refused
   (`BRIDGE_NOT_SAME_UNIT`). Contexts below a declared count are refused
   (`CONTEXT_UNDERCOUNTED`), not down-weighted.
+- For a later-time or other-assay decision endpoint, the measure-or-predict planner
+  (`plan_measure_or_predict`) decides from interval estimates on reference units in the
+  decision's own domain. ADMIT_WORLD_MODEL and MEASURE_EARLY each require the relevant lower bound
+  to clear the MUB. An interval straddling the MUB returns ABSTAIN. A world model is fed another
+  platform's cells only after an axis identity check (`tools.analysis.platform_identity`);
+  passing that check does not show that responses transport.
 - A required input that is missing triggers refusal or an explicitly supported
   backend switch. Public basal reference data is not the target culture's measured
   decision-time state.
@@ -84,7 +90,7 @@ new rule version without declaring the change.
 |---|---|
 | Engineering correctness | Identity/refusal/condition/budget tests, idempotency, concurrency, restart and audit lineage |
 | Predictive validity | Declared endpoint and supported conditions, independent units, error/calibration/refusal and distribution-shift evaluation |
-| World-model admission | Before a forecast may influence selection for an endpoint: a same-unit bridge (readout and endpoint measured in one culture unit, dose and time) and a reference ceiling, where the observed response substitutes for the forecast, scored leave-one-context-out, beating the best cheap prior by the declared minimum useful benefit (`maestro.world_model_value`). Admission licenses evaluating the forecast; it does not certify it |
+| World-model admission | Before a forecast may influence selection for an endpoint: a same-unit bridge (readout and endpoint measured in one culture unit, dose and time) and a reference ceiling, where the observed response substitutes for the forecast, scored leave-one-context-out, beating the best cheap prior by the declared minimum useful benefit (`maestro.world_model_value`). Admission licenses evaluating the forecast; it does not certify it. For later-fate endpoints, `plan_measure_or_predict` must return ADMIT_WORLD_MODEL on interval lower bounds; a point estimate is never sufficient |
 | Decision value | Same legal inputs, menu, cost and deadline; independently observed final value against strong simple/deterministic policies |
 | Agent-specific contribution | Same tools/information, actual semantic choices, provider cost/latency and invalid-action accounting |
 | Mechanistic conclusion | Qualified intervention-realisation and proximal/phenotypic evidence; transcript forecasts alone are insufficient |

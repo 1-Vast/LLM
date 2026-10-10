@@ -10,6 +10,7 @@ Read [REPORT.md](REPORT.md) for current conclusions, [EVIDENCE.md](EVIDENCE.md) 
 | Observation reliability next step | [P0.6 readiness](decision_value/axis_extension_20261010/P06_READINESS.md) | New source/control/reference/cost freeze required; expression execution unreleased |
 | Active procurement P2 | [V3 protocol](decision_value/pairwise_v3/PROTOCOL.json) | Closed pending independent transfer, decision and cost gates |
 | Reusable offline observation checks | `tools.analysis.observation_audit` | Engineering-only promotion; no feedback model promotion |
+| Measure or predict across platform and time | [Block K](astra/kinetic_horizon_20261010/README.md) | STATE transport refused (48 MIX-Seq lines); measurement gate false positive; interval planner, paired increment and platform identity check promoted |
 
 ## Frozen and diagnostic studies
 

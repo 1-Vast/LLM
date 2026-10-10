@@ -13,6 +13,18 @@ independent biological replication. Their frozen sources are the P0.5R
 extension matching and observation-reliability projection routines; validation
 and remaining limits are in [research/INDEX.md](../research/INDEX.md).
 
+`tools.analysis.platform_identity.identity_test(reference, query)` checks a cross-platform feature
+axis before a world model is fed another platform's cells. Every shared line must be most
+similar to itself, above a permuted-axis null; otherwise it refuses with `AXIS_IDENTITY_FAILED`
+or `TOO_FEW_SHARED_LINES`.
+
+`tools.evaluation.increment.paired_increment(prior, extra, outcome)` returns the paired gain
+`r(prior + extra) - r(prior)` on common units with a unit bootstrap, ready for
+`maestro.world_model_value.IncrementEstimate`.
+
+Both come from `research/astra/kinetic_horizon_20261010`. There, identity passed 18 of 18 lines
+while responses did not transport, so a passing identity check is not transport evidence.
+
 `python -m tools.research_inventory --workspace . --out research/RESEARCH_INVENTORY.json`
 rebuilds the static path/hash/import inventory. Identical bytes and ASTs are
 cleanup candidates only; this command never deletes files or runs studies.

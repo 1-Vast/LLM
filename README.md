@@ -48,6 +48,15 @@ similarity transfer beat STATE (delta r -0.23) and generic ranking (top-10 +0.56
 registered world-model value gate refused STATE from reference data alone, and held-out lines
 confirmed the refusal. The gate, same-unit bridge rule and basal transfer are promoted with scope.
 
+The 2026-10-10 block K asked whether STATE's forecast of the 24 h state can replace measuring it
+for a 5-day viability decision.
+* On 48 MIX-Seq lines unseen by STATE, the forecast harmed a DepMap-scale prior (-0.09 [-0.18,
+  -0.005]). Its line-specific skill does not leave its training platform.
+* The development gate's alternative, measuring at 24 h, failed confirmation (-0.02 [-0.11,
+  0.08]).
+* For trametinib, 5-day information appeared only at 24-48 h.
+* Gate decisions now require interval lower bounds and can abstain (`plan_measure_or_predict`).
+
 Software checks and replay receipts establish engineering behaviour, not independent
 scientific benefit. STATE remains the pretrained world-model foundation; decision
 benefit, LLM advantage and functional or causal claims remain unestablished.

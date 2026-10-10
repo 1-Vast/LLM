@@ -6,9 +6,11 @@ import math
 import pytest
 
 from maestro.world_model_value import (
+    IncrementEstimate,
     PhenotypeBridge,
     ValueCeiling,
     admit_world_model,
+    plan_measure_or_predict,
     realised_fraction,
 )
 
@@ -57,3 +59,42 @@ def test_realised_fraction_reports_recovered_headroom_and_refuses_without_headro
     assert realised_fraction(0.30, 0.25, 0.20) == pytest.approx(0.5)
     assert realised_fraction(0.30, 0.10, 0.20) == pytest.approx(-1.0)
     assert realised_fraction(0.20, 0.25, 0.20) is None
+
+
+def est(point, lower, upper, units=48, domain="mixseq_10x_24h_to_prism_5d"):
+    return IncrementEstimate(point, lower, upper, units, domain)
+
+
+def test_a_forecast_whose_lower_bound_clears_the_mub_is_admitted():
+    plan = plan_measure_or_predict(est(0.1, -0.2, 0.3), est(0.12, 0.07, 0.2), minimum_useful_benefit=0.05)
+    assert plan.action == "ADMIT_WORLD_MODEL" and plan.reasons == ()
+
+
+def test_measure_early_needs_the_measurement_lower_bound_and_names_the_failed_transport():
+    plan = plan_measure_or_predict(est(0.2, 0.08, 0.3), est(-0.09, -0.18, -0.005), minimum_useful_benefit=0.05)
+    assert plan.action == "MEASURE_EARLY" and plan.reasons == ("WM_TRANSPORT_UNQUALIFIED",)
+
+
+def test_the_block_k_development_point_estimate_would_now_abstain():
+    # development: ceiling +0.139 [-0.049, +0.298]; forecast -0.150 [-0.326, +0.064]
+    plan = plan_measure_or_predict(est(0.139, -0.049, 0.298, units=24), est(-0.150, -0.326, 0.064, units=24), minimum_useful_benefit=0.05)
+    assert plan.action == "ABSTAIN"
+    assert set(plan.reasons) == {"FORECAST_INCONCLUSIVE", "MEASUREMENT_INCONCLUSIVE"}
+
+
+def test_use_prior_only_when_every_interval_is_wholly_below_the_mub():
+    plan = plan_measure_or_predict(est(-0.107, -0.155, -0.059, units=16), None, minimum_useful_benefit=0.05)
+    assert plan.action == "USE_PRIOR"
+    assert plan.reasons == ("WM_FORECAST_NOT_EVALUATED", "WM_CEILING_BELOW_MUB")
+    assert plan_measure_or_predict(None, None, minimum_useful_benefit=0.05).action == "USE_PRIOR"
+
+
+def test_too_few_reference_units_abstains_and_bad_estimates_are_rejected():
+    plan = plan_measure_or_predict(est(0.3, 0.2, 0.4, units=6), None, minimum_useful_benefit=0.05)
+    assert plan.action == "ABSTAIN" and plan.reasons == ("INSUFFICIENT_REFERENCE_UNITS_MEASUREMENT",)
+    with pytest.raises(ValueError):
+        est(0.1, 0.2, 0.3)
+    with pytest.raises(ValueError):
+        est(math.nan, 0.0, 0.1)
+    with pytest.raises(ValueError):
+        plan_measure_or_predict(None, None, minimum_useful_benefit=0.0)

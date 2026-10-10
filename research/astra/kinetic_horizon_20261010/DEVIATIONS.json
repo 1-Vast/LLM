@@ -1,0 +1,30 @@
+[
+ {
+  "id": "D1",
+  "when": "after the confirmatory run (verify.py)",
+  "what": "Independent arithmetic check failed (max abs error 0.10). The frozen evaluator computed r(prior) on every confirmation line with a 5-day outcome but r(prior + R_mag) only on lines with >= 10 treated cells, so M1 compared correlations on different line sets. The M3 measurement policy could not select lines too depleted to measure (trametinib: 5 such lines, mean 5-day LFC -1.07 versus -0.61 for measured lines).",
+  "handling": "Frozen files and RESULTS.json were not edited. posthoc/paired_reanalysis.py recomputes M1, M2 and M3 on the common line set per drug, with the same predictions, seed and resample count. Conclusions are unchanged: M1 -0.018 [-0.107, +0.082] (4/6 drugs); M3 P2-P0 -0.030 [-0.162, +0.191] (2/6); M2 -0.098 [-0.188, -0.006] (0/4). The promoted tools.evaluation.increment computes the paired estimand by construction.",
+  "affects_claims": "Registered M1 and M3 verdicts (fail) stand under both estimands."
+ },
+ {
+  "id": "D2",
+  "when": "before freeze, after the last dry run",
+  "what": "evaluate.py stopped storing the 5-day oracle policy's selections in PREDICTIONS.npz (they depend on outcomes by definition and failed the dry-run poisoning check by construction). development/dry_run.log predates this edit.",
+  "handling": "The frozen evaluate.py includes the edit; verify.py poisoning passed on the stored predictions and non-oracle selections.",
+  "affects_claims": "None."
+ },
+ {
+  "id": "D3",
+  "when": "by design (protocol section 3)",
+  "what": "The PRISM values of the three Tahoe STATE zero-shot lines (Hs 766T, PANC-1, C32) were not extracted.",
+  "handling": "The development gate for the Tahoe 24 h to 5-day domain was USE_PRIOR even for a perfect early state, so no forecast could be admitted; the tier stays sealed (VERIFIED.json freeze check).",
+  "affects_claims": "No STATE claim on Tahoe 5-day outcomes is made."
+ },
+ {
+  "id": "D4",
+  "when": "result, not a procedural deviation",
+  "what": "The development gate's MEASURE_EARLY decision (point estimate +0.139) did not confirm (-0.021). Post hoc, its development interval was [-0.049, +0.298] (posthoc/gate_uncertainty.json).",
+  "handling": "Recorded as a failed admission; the promoted planner (maestro.world_model_value.plan_measure_or_predict) requires interval lower bounds and would have abstained. That rule is a correction motivated by this failure, not an independently validated improvement.",
+  "affects_claims": "The measure-or-predict admission branch is unvalidated; its refusal branches (USE_PRIOR, WM_TRANSPORT_UNQUALIFIED) confirmed."
+ }
+]
