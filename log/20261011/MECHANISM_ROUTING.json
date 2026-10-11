@@ -1,0 +1,1286 @@
+{
+ "study": "research/astra/mechanism_routing_20261011",
+ "question": "Where does an LLM add value to a virtual cell that predicts which cancer lines a compound kills (PRISM 19Q4 selective profile) from its L1000 response, beyond target, chemical and partial-screen baselines?",
+ "data": {
+  "perturbation_response": "GSE92742 LINCS L1000 Level 5, 978 landmark genes, 9 lines x {6 h, 24 h}, 10 uM (block M extraction)",
+  "outcome": "PRISM Repurposing 19Q4 primary screen, replicate-collapsed log fold change at 2.5 uM, 578 lines; secondary screen at the dose closest to 2.5 uM",
+  "features": "CCLE 19Q4 expression (SD > 0.5) and damaging/hotspot mutations",
+  "annotations": "Drug Repurposing Hub 2020-03-24 (non-commercial use)",
+  "units": {
+   "reference": 701,
+   "development": 281,
+   "confirmation": 421
+  },
+  "tier_receipt": {
+   "open": {
+    "file": "block_n_prism_open.npz",
+    "sha256": "e116e4964bb44baf4c25055935f629af518442c3e394d4cafe3566d51ba7c8ec",
+    "n_drugs": 982,
+    "n_with_secondary": 342
+   },
+   "sealed": {
+    "file": "block_n_prism_sealed.npz",
+    "sha256": "7b94a73502d2833563ff7369549aaf00bc6cba9a6ebbff852e3f4537b3cd9b37",
+    "n_drugs": 421,
+    "n_with_secondary": 125
+   }
+  }
+ },
+ "frozen_utc": "2026-10-10T18:02:47Z",
+ "frozen_files": 755,
+ "pre_freeze_agent_outputs": 1408,
+ "protocol_config_sha256": "0f37ab1eb86095f0e87a8a893454f2f9a33c275f27919443a2470594d23ea6e6",
+ "confirmation": {
+  "n_reference": 982,
+  "n_queries": 421,
+  "n_killers": 101,
+  "seconds": 285.2
+ },
+ "decisions": {
+  "V1": {
+   "name": "virtual cell beats target transfer for an unseen mechanism class",
+   "family": "vc",
+   "estimate": 0.11573313238904004,
+   "ci_family": [
+    0.05344536325468827,
+    0.18149802228639048
+   ],
+   "verdict": "PASS",
+   "predicted": "PASS",
+   "prediction_held": true
+  },
+  "V2": {
+   "name": "virtual cell beats chemical transfer for an unseen mechanism class",
+   "family": "vc",
+   "estimate": 0.10029523146093886,
+   "ci_family": [
+    0.030071729094003293,
+    0.17746860864354091
+   ],
+   "verdict": "PASS",
+   "predicted": "PASS",
+   "prediction_held": true
+  },
+  "V3": {
+   "name": "virtual cell alone beats the non-LLM ensemble of L, T and C for an unseen class",
+   "family": "vc",
+   "estimate": 0.03872660826075071,
+   "ci_family": [
+    0.002267218044195794,
+    0.07793601029668293
+   ],
+   "verdict": "PASS",
+   "predicted": "PASS",
+   "prediction_held": true
+  },
+  "V4": {
+   "name": "virtual cell adds to the annotated class mean when the class is known",
+   "family": "vc",
+   "estimate": 0.03823196379876115,
+   "ci_family": [
+    0.00732302037336012,
+    0.07628733006538542
+   ],
+   "verdict": "PASS",
+   "predicted": "NOT_SUPPORTED",
+   "prediction_held": false
+  },
+  "V5": {
+   "name": "unseen-class virtual cell beats ridge on a 40-line partial screen of the drug itself",
+   "family": "vc",
+   "estimate": 0.05942456284925236,
+   "ci_family": [
+    -0.023023114602794457,
+    0.14767041125603034
+   ],
+   "verdict": "NOT_SUPPORTED",
+   "predicted": "NOT_SUPPORTED",
+   "prediction_held": true
+  },
+  "V6": {
+   "name": "unseen-class virtual cell adds to ridge on a 160-line partial screen",
+   "family": "vc",
+   "estimate": 0.04891833910679844,
+   "ci_family": [
+    0.0036768112275458575,
+    0.09718775335991446
+   ],
+   "verdict": "PASS",
+   "predicted": "PASS",
+   "prediction_held": true
+  },
+  "V7": {
+   "name": "virtual cell beats target transfer on the independent secondary screen (unseen class)",
+   "family": "vc",
+   "estimate": 0.10280365640270894,
+   "ci_family": [
+    0.0487902203876411,
+    0.160322153415305
+   ],
+   "verdict": "PASS",
+   "predicted": "PASS",
+   "prediction_held": true
+  },
+  "V8": {
+   "name": "the virtual cell's own neighbour similarity selects its better predictions (top 25%)",
+   "family": "vc",
+   "estimate": 0.09723881178029312,
+   "ci_family": [
+    0.04193244548275616,
+    0.14979082102454772
+   ],
+   "verdict": "PASS",
+   "predicted": "PASS",
+   "prediction_held": true
+  },
+  "A1": {
+   "name": "agent forecaster beats target transfer for an unseen class",
+   "family": "agent",
+   "estimate": 0.011354724750968541,
+   "ci_family": [
+    -0.03203970445973487,
+    0.0549586403006457
+   ],
+   "verdict": "NOT_SUPPORTED",
+   "predicted": "NOT_SUPPORTED",
+   "prediction_held": true
+  },
+  "A2": {
+   "name": "agent forecaster adds to the virtual cell",
+   "family": "agent",
+   "estimate": -0.024920642351302518,
+   "ci_family": [
+    -0.05107672631036852,
+    -0.003093776016552507
+   ],
+   "verdict": "HARM",
+   "predicted": "NOT_SUPPORTED",
+   "prediction_held": false
+  },
+  "A3": {
+   "name": "retrieved literature improves the forecaster",
+   "family": "agent",
+   "estimate": -0.009366264873804294,
+   "ci_family": [
+    -0.02272224439686885,
+    0.006114276792195411
+   ],
+   "verdict": "NOT_SUPPORTED",
+   "predicted": "NOT_SUPPORTED",
+   "prediction_held": true
+  },
+  "A4": {
+   "name": "agent critic of the virtual cell's neighbours beats the virtual cell",
+   "family": "agent",
+   "estimate": -0.05180801045827655,
+   "ci_family": [
+    -0.09115363157315001,
+    -0.016812109679234504
+   ],
+   "verdict": "HARM",
+   "predicted": "HARM",
+   "prediction_held": true
+  },
+  "A5": {
+   "name": "agent explainer beats top-5 mining on the same 40 lines",
+   "family": "agent",
+   "estimate": -0.01230884963676859,
+   "ci_family": [
+    -0.0436922666180306,
+    0.0175807284319551
+   ],
+   "verdict": "NOT_SUPPORTED",
+   "predicted": "NOT_SUPPORTED",
+   "prediction_held": true
+  },
+  "A6": {
+   "name": "agent explainer adds to the unseen-class virtual cell",
+   "family": "agent",
+   "estimate": -0.019606889528969544,
+   "ci_family": [
+    -0.04814990123317835,
+    0.012494773452027187
+   ],
+   "verdict": "NOT_SUPPORTED",
+   "predicted": "NOT_SUPPORTED",
+   "prediction_held": true
+  },
+  "A7": {
+   "name": "agent judgement improves the virtual cell's trust ranking",
+   "family": "agent",
+   "estimate": 0.006522015406717721,
+   "ci_family": [
+    -0.006773975082623008,
+    0.026539051529389335
+   ],
+   "verdict": "NOT_SUPPORTED",
+   "predicted": "NOT_SUPPORTED",
+   "prediction_held": true
+  },
+  "headline": {
+   "vc_value_confirmed": true,
+   "agent_value_shown": false,
+   "agent_harm": [
+    "A2",
+    "A4"
+   ]
+  }
+ },
+ "contrasts": {
+  "V1": {
+   "n": 101,
+   "estimate": 0.11573313238904004,
+   "share_positive": 0.6336633663366337,
+   "share_negative": 0.36633663366336633,
+   "ci95": [
+    0.06989006805663857,
+    0.1634227393226612
+   ],
+   "ci_family": [
+    0.05344536325468827,
+    0.18149802228639048
+   ]
+  },
+  "V2": {
+   "n": 101,
+   "estimate": 0.10029523146093886,
+   "share_positive": 0.6237623762376238,
+   "share_negative": 0.37623762376237624,
+   "ci95": [
+    0.049357856749996695,
+    0.15392669941300036
+   ],
+   "ci_family": [
+    0.030071729094003293,
+    0.17746860864354091
+   ]
+  },
+  "V3": {
+   "n": 101,
+   "estimate": 0.03872660826075071,
+   "share_positive": 0.5742574257425742,
+   "share_negative": 0.42574257425742573,
+   "ci95": [
+    0.012427928377269522,
+    0.06475876173727795
+   ],
+   "ci_family": [
+    0.002267218044195794,
+    0.07793601029668293
+   ]
+  },
+  "V4": {
+   "n": 101,
+   "estimate": 0.03823196379876115,
+   "share_positive": 0.48514851485148514,
+   "share_negative": 0.5148514851485149,
+   "ci95": [
+    0.01571927378509399,
+    0.06413491586580707
+   ],
+   "ci_family": [
+    0.00732302037336012,
+    0.07628733006538542
+   ]
+  },
+  "V5": {
+   "n": 101,
+   "estimate": 0.05942456284925236,
+   "share_positive": 0.5643564356435643,
+   "share_negative": 0.43564356435643564,
+   "ci95": [
+    7.531139702827104e-05,
+    0.11794327373421477
+   ],
+   "ci_family": [
+    -0.023023114602794457,
+    0.14767041125603034
+   ]
+  },
+  "V6": {
+   "n": 101,
+   "estimate": 0.04891833910679844,
+   "share_positive": 0.6138613861386139,
+   "share_negative": 0.38613861386138615,
+   "ci95": [
+    0.016011440398651666,
+    0.08097020190588254
+   ],
+   "ci_family": [
+    0.0036768112275458575,
+    0.09718775335991446
+   ]
+  },
+  "V7": {
+   "n": 89,
+   "estimate": 0.10280365640270894,
+   "share_positive": 0.6741573033707865,
+   "share_negative": 0.3258426966292135,
+   "ci95": [
+    0.0634538713254967,
+    0.14421797398529865
+   ],
+   "ci_family": [
+    0.0487902203876411,
+    0.160322153415305
+   ]
+  },
+  "V8": {
+   "n": 421,
+   "estimate": 0.09723881178029312,
+   "ci95": [
+    0.054769267387666944,
+    0.1356150790928045
+   ],
+   "ci_family": [
+    0.04193244548275616,
+    0.14979082102454772
+   ]
+  },
+  "A1": {
+   "n": 101,
+   "estimate": 0.011354724750968541,
+   "share_positive": 0.504950495049505,
+   "share_negative": 0.46534653465346537,
+   "ci95": [
+    -0.02010770279932748,
+    0.04372204555033474
+   ],
+   "ci_family": [
+    -0.03203970445973487,
+    0.0549586403006457
+   ]
+  },
+  "A2": {
+   "n": 101,
+   "estimate": -0.024920642351302518,
+   "share_positive": 0.38613861386138615,
+   "share_negative": 0.6138613861386139,
+   "ci95": [
+    -0.04348429914602801,
+    -0.007611417481947155
+   ],
+   "ci_family": [
+    -0.05107672631036852,
+    -0.003093776016552507
+   ]
+  },
+  "A3": {
+   "n": 101,
+   "estimate": -0.009366264873804294,
+   "share_positive": 0.21782178217821782,
+   "share_negative": 0.42574257425742573,
+   "ci95": [
+    -0.019685266234548034,
+    0.0018556251132402122
+   ],
+   "ci_family": [
+    -0.02272224439686885,
+    0.006114276792195411
+   ]
+  },
+  "A4": {
+   "n": 101,
+   "estimate": -0.05180801045827655,
+   "share_positive": 0.39603960396039606,
+   "share_negative": 0.6039603960396039,
+   "ci95": [
+    -0.07915297757165611,
+    -0.025682109822573244
+   ],
+   "ci_family": [
+    -0.09115363157315001,
+    -0.016812109679234504
+   ]
+  },
+  "A5": {
+   "n": 101,
+   "estimate": -0.01230884963676859,
+   "share_positive": 0.4158415841584158,
+   "share_negative": 0.5841584158415841,
+   "ci95": [
+    -0.0351138862023027,
+    0.008495961763157119
+   ],
+   "ci_family": [
+    -0.0436922666180306,
+    0.0175807284319551
+   ]
+  },
+  "A6": {
+   "n": 101,
+   "estimate": -0.019606889528969544,
+   "share_positive": 0.33663366336633666,
+   "share_negative": 0.6633663366336634,
+   "ci95": [
+    -0.03972006736246212,
+    0.003117059058200955
+   ],
+   "ci_family": [
+    -0.04814990123317835,
+    0.012494773452027187
+   ]
+  },
+  "A7": {
+   "n": 421,
+   "estimate": 0.006522015406717721,
+   "ci95": [
+    -0.003413644419309235,
+    0.02066646313437514
+   ],
+   "ci_family": [
+    -0.006773975082623008,
+    0.026539051529389335
+   ]
+  }
+ },
+ "means": {
+  "known_class:A": {
+   "n": 101,
+   "estimate": 0.18580592310188804,
+   "share_positive": 0.6831683168316832,
+   "share_negative": 0.18811881188118812,
+   "ci95": [
+    0.11067199550970235,
+    0.25846707899279364
+   ]
+  },
+  "known_class:L": {
+   "n": 101,
+   "estimate": 0.20477780403053314,
+   "share_positive": 0.801980198019802,
+   "share_negative": 0.19801980198019803,
+   "ci95": [
+    0.14161561263079775,
+    0.2662483873659808
+   ]
+  },
+  "known_class:T": {
+   "n": 101,
+   "estimate": 0.16883767220584264,
+   "share_positive": 0.6831683168316832,
+   "share_negative": 0.2376237623762376,
+   "ci95": [
+    0.10595069830316695,
+    0.2325937154852117
+   ]
+  },
+  "known_class:C": {
+   "n": 101,
+   "estimate": 0.15000338502027272,
+   "share_positive": 0.7029702970297029,
+   "share_negative": 0.297029702970297,
+   "ci95": [
+    0.0904357624303152,
+    0.21127829682602392
+   ]
+  },
+  "known_class:E": {
+   "n": 101,
+   "estimate": 0.22113765164807486,
+   "share_positive": 0.7920792079207921,
+   "share_negative": 0.2079207920792079,
+   "ci95": [
+    0.15633565792512702,
+    0.28618482157290115
+   ]
+  },
+  "novel_class:L": {
+   "n": 101,
+   "estimate": 0.15322475179118863,
+   "share_positive": 0.7623762376237624,
+   "share_negative": 0.2376237623762376,
+   "ci95": [
+    0.09968488259854484,
+    0.2072998143617532
+   ]
+  },
+  "novel_class:T": {
+   "n": 101,
+   "estimate": 0.037491619402148575,
+   "share_positive": 0.504950495049505,
+   "share_negative": 0.4158415841584158,
+   "ci95": [
+    0.004275850181249861,
+    0.07815906243132983
+   ]
+  },
+  "novel_class:C": {
+   "n": 101,
+   "estimate": 0.05292952033024978,
+   "share_positive": 0.5841584158415841,
+   "share_negative": 0.4158415841584158,
+   "ci95": [
+    0.022853178326826096,
+    0.08686698410650473
+   ]
+  },
+  "novel_class:E": {
+   "n": 101,
+   "estimate": 0.11449814353043793,
+   "share_positive": 0.7425742574257426,
+   "share_negative": 0.25742574257425743,
+   "ci95": [
+    0.07425944416624067,
+    0.15865279244103786
+   ]
+  },
+  "known_class:A+L": {
+   "n": 101,
+   "estimate": 0.22403788690064924,
+   "share_positive": 0.8316831683168316,
+   "share_negative": 0.16831683168316833,
+   "ci95": [
+    0.1556131173801348,
+    0.291090630958396
+   ]
+  },
+  "agent:route_lit": {
+   "n": 101,
+   "estimate": 0.0488463441531171,
+   "share_positive": 0.3564356435643564,
+   "share_negative": 0.22772277227722773,
+   "ci95": [
+    0.014867367404935685,
+    0.09241135870277613
+   ]
+  },
+  "agent:route_nolit": {
+   "n": 101,
+   "estimate": 0.058212609026921415,
+   "share_positive": 0.42574257425742573,
+   "share_negative": 0.1782178217821782,
+   "ci95": [
+    0.023762969580425133,
+    0.10402878794459973
+   ]
+  },
+  "agent:L+route_lit": {
+   "n": 101,
+   "estimate": 0.1283041094398861,
+   "share_positive": 0.7425742574257426,
+   "share_negative": 0.25742574257425743,
+   "ci95": [
+    0.08157278896396383,
+    0.17833315600438623
+   ]
+  },
+  "agent:adjudicate_lit": {
+   "n": 101,
+   "estimate": 0.10141674133291208,
+   "share_positive": 0.43564356435643564,
+   "share_negative": 0.13861386138613863,
+   "ci95": [
+    0.05541422435535846,
+    0.15113736124819996
+   ]
+  },
+  "own:L_test": {
+   "n": 101,
+   "estimate": 0.19498092025397065,
+   "share_positive": 0.7326732673267327,
+   "share_negative": 0.26732673267326734,
+   "ci95": [
+    0.13156510666041607,
+    0.25589273654465694
+   ]
+  },
+  "own:Lnovel_test": {
+   "n": 101,
+   "estimate": 0.1437843250069742,
+   "share_positive": 0.693069306930693,
+   "share_negative": 0.3069306930693069,
+   "ci95": [
+    0.09112209687563255,
+    0.1965727819468771
+   ]
+  },
+  "own:top5@40": {
+   "n": 101,
+   "estimate": 0.04604702387200283,
+   "share_positive": 0.6633663366336634,
+   "share_negative": 0.33663366336633666,
+   "ci95": [
+    0.026192346814779176,
+    0.06834585819115314
+   ]
+  },
+  "own:ridge@40": {
+   "n": 101,
+   "estimate": 0.0843597621577218,
+   "share_positive": 0.7821782178217822,
+   "share_negative": 0.21782178217821782,
+   "ci95": [
+    0.05963248553688749,
+    0.11229709174693646
+   ]
+  },
+  "own:L+ridge@40": {
+   "n": 101,
+   "estimate": 0.18796594959618085,
+   "share_positive": 0.8316831683168316,
+   "share_negative": 0.16831683168316833,
+   "ci95": [
+    0.13903425704609987,
+    0.23745699541595328
+   ]
+  },
+  "own:Lnovel+ridge@40": {
+   "n": 101,
+   "estimate": 0.15479611208097155,
+   "share_positive": 0.8316831683168316,
+   "share_negative": 0.16831683168316833,
+   "ci95": [
+    0.11594555890596818,
+    0.19263656472728732
+   ]
+  },
+  "agent:explain@40": {
+   "n": 101,
+   "estimate": 0.033738174235234245,
+   "share_positive": 0.6039603960396039,
+   "share_negative": 0.39603960396039606,
+   "ci95": [
+    0.013640937649181588,
+    0.05828588614514732
+   ]
+  },
+  "agent:L+explain@40": {
+   "n": 101,
+   "estimate": 0.1593743792485753,
+   "share_positive": 0.7722772277227723,
+   "share_negative": 0.22772277227722773,
+   "ci95": [
+    0.10931608718630649,
+    0.2084424374977782
+   ]
+  },
+  "agent:Lnovel+explain@40": {
+   "n": 101,
+   "estimate": 0.12417743547800462,
+   "share_positive": 0.7326732673267327,
+   "share_negative": 0.26732673267326734,
+   "ci95": [
+    0.08296612499948489,
+    0.16468885756402513
+   ]
+  },
+  "own:top5@160": {
+   "n": 101,
+   "estimate": 0.09298991854796676,
+   "share_positive": 0.7821782178217822,
+   "share_negative": 0.21782178217821782,
+   "ci95": [
+    0.06226285685691881,
+    0.12778671628932356
+   ]
+  },
+  "own:ridge@160": {
+   "n": 101,
+   "estimate": 0.14478770830864077,
+   "share_positive": 0.900990099009901,
+   "share_negative": 0.09900990099009901,
+   "ci95": [
+    0.11248826388767291,
+    0.18080146310122513
+   ]
+  },
+  "own:L+ridge@160": {
+   "n": 101,
+   "estimate": 0.22436194595213652,
+   "share_positive": 0.8514851485148515,
+   "share_negative": 0.1485148514851485,
+   "ci95": [
+    0.17104217106695338,
+    0.2774584691624774
+   ]
+  },
+  "own:Lnovel+ridge@160": {
+   "n": 101,
+   "estimate": 0.1937060474154393,
+   "share_positive": 0.8415841584158416,
+   "share_negative": 0.15841584158415842,
+   "ci95": [
+    0.14946598233708513,
+    0.2369542779615603
+   ]
+  },
+  "secondary:L": {
+   "n": 89,
+   "estimate": 0.14756210568876188,
+   "share_positive": 0.797752808988764,
+   "share_negative": 0.20224719101123595,
+   "ci95": [
+    0.0944770120986948,
+    0.20877266488887594
+   ]
+  },
+  "secondary:T": {
+   "n": 89,
+   "estimate": 0.04475844928605294,
+   "share_positive": 0.5280898876404494,
+   "share_negative": 0.39325842696629215,
+   "ci95": [
+    0.0023923544816344027,
+    0.09799964705271375
+   ]
+  },
+  "secondary:C": {
+   "n": 89,
+   "estimate": 0.050914619065002976,
+   "share_positive": 0.5730337078651685,
+   "share_negative": 0.42696629213483145,
+   "ci95": [
+    0.021536368691017636,
+    0.08337753758807848
+   ]
+  },
+  "secondary:ceiling": {
+   "n": 89,
+   "estimate": 0.3203001643569241,
+   "share_positive": 0.8651685393258427,
+   "share_negative": 0.1348314606741573,
+   "ci95": [
+    0.2559472626130443,
+    0.3819694820087781
+   ]
+  }
+ },
+ "trust_metrics": {
+  "mean_utility": 0.07438595216164676,
+  "oracle": {
+   "spearman": 1.0,
+   "top25": 0.2562825474625489,
+   "top50": 0.16035435195605835,
+   "aucc": 0.18154292051289017
+  },
+  "top_sim": {
+   "spearman": 0.2729216152019002,
+   "top25": 0.17162476394193987,
+   "top50": 0.11645401646639539,
+   "aucc": 0.1253375640087479
+  },
+  "mean5_sim": {
+   "spearman": 0.2782641838354371,
+   "top25": 0.17932611116905037,
+   "top50": 0.11857004789660552,
+   "aucc": 0.12627348040743835
+  },
+  "moa_agree5": {
+   "spearman": 0.2090113525028117,
+   "top25": 0.12212488161407722,
+   "top50": 0.09439209661641956,
+   "aucc": 0.10475448227958006
+  },
+  "l1000_norm": {
+   "spearman": 0.11414097716852385,
+   "top25": 0.08952702333078338,
+   "top50": 0.08606317659336868,
+   "aucc": 0.09040673029891984
+  },
+  "vc": {
+   "spearman": 0.2565123334658545,
+   "top25": 0.16741221222516572,
+   "top50": 0.11748065675757201,
+   "aucc": 0.12306808739778223
+  },
+  "keep": {
+   "spearman": 0.36174108299805363,
+   "top25": 0.16040591484433794,
+   "top50": 0.11019105139800062,
+   "aucc": 0.12293508112639558
+  },
+  "kill": {
+   "spearman": 0.20851905574037793,
+   "top25": 0.1311211314654433,
+   "top50": 0.10228853504863852,
+   "aucc": 0.11647355203934698
+  },
+  "kill_prior": {
+   "spearman": 0.23672945381836125,
+   "top25": 0.14030563750554592,
+   "top50": 0.10111830044205786,
+   "aucc": 0.1164879277954299
+  },
+  "agent": {
+   "spearman": 0.26223818318156616,
+   "top25": 0.17128554108415417,
+   "top50": 0.10354089173353018,
+   "aucc": 0.12363640257611208
+  },
+  "vc+agent": {
+   "spearman": 0.2765292586961199,
+   "top25": 0.17789045640954101,
+   "top50": 0.11409165359591658,
+   "aucc": 0.12959010280449995
+  }
+ },
+ "verification": {
+  "all_ok_frozen": false,
+  "checks": {
+   "frozen_files_unchanged": true,
+   "pre_freeze_agent_outputs_unchanged": true,
+   "tiers_match_receipt": true,
+   "results_identity": true,
+   "recomputed_contrasts_match": false,
+   "confirmation_agent_outputs": true,
+   "literature_leak_scan": true,
+   "ledger_within_ceiling": true,
+   "outcome_poisoning_sealed": true
+  },
+  "failed_check_note": "recomputed_contrasts_match failed on A3 share_negative (one CSV-precision tie); see DEVIATIONS.json D1",
+  "supplement": {
+   "post_freeze": true,
+   "reason": "frozen check recomputed_contrasts_match failed on a descriptive share field",
+   "max_abs_numeric_deviation": 8.326672684688674e-17,
+   "numeric_ok": true,
+   "verdicts_match": true,
+   "headline_match": true,
+   "share_mismatches": {
+    "A3:share_negative": {
+     "recomputed": 0.4158415841584158,
+     "results": 0.42574257425742573,
+     "drugs_moved": 1.0,
+     "exact_ties_in_csv": 37
+    }
+   },
+   "shares_explained_by_csv_ties": true,
+   "ok": true
+  },
+  "agent_call_status": {
+   "adjudicate_lit": {
+    "ok": 421
+   },
+   "route_lit": {
+    "ok": 421
+   },
+   "route_nolit": {
+    "ok": 101
+   },
+   "explain_full": {
+    "ok": 101
+   }
+  },
+  "sealed_poisoning": {
+   "ok": true,
+   "verdicts": {
+    "V1": "NOT_SUPPORTED",
+    "V2": "NOT_SUPPORTED",
+    "V3": "NOT_SUPPORTED",
+    "V4": "NOT_SUPPORTED",
+    "V5": "NOT_SUPPORTED",
+    "V6": "NOT_SUPPORTED",
+    "V7": "NOT_SUPPORTED",
+    "V8": "NOT_SUPPORTED"
+   },
+   "estimates": {
+    "V1": -0.0026,
+    "V2": -0.0032,
+    "V3": -0.0016,
+    "V4": -0.0003,
+    "V5": 0.0033,
+    "V6": 0.0009,
+    "V7": -0.0153,
+    "V8": 0.0023
+   }
+  }
+ },
+ "development": {
+  "pilot_paired": {
+   "ADJ - L": [
+    -0.0597,
+    -0.1039,
+    -0.0202,
+    69
+   ],
+   "ADJ - E": [
+    -0.0013,
+    -0.0369,
+    0.033,
+    69
+   ],
+   "ADJ_neighbours_only - L": [
+    -0.0685,
+    -0.1045,
+    -0.0356,
+    69
+   ],
+   "L+R_lit - L": [
+    -0.0143,
+    -0.0301,
+    0.0016,
+    69
+   ],
+   "R_route_lit - T": [
+    0.0159,
+    -0.0359,
+    0.0599,
+    69
+   ],
+   "R_route_lit - C": [
+    0.0154,
+    -0.0352,
+    0.0615,
+    69
+   ],
+   "R_route_lit - L": [
+    -0.1022,
+    -0.1526,
+    -0.0534,
+    69
+   ],
+   "R_route_lit - R_route_nolit": [
+    -0.0039,
+    -0.0193,
+    0.0132,
+    69
+   ],
+   "R_route_nolit - R_masked_nolit": [
+    -0.0081,
+    -0.0304,
+    0.017,
+    69
+   ],
+   "BM - B0": [
+    -0.0002,
+    -0.0173,
+    0.0179,
+    69
+   ],
+   "R_lit+BM - R_route_lit": [
+    0.0015,
+    -0.0089,
+    0.0124,
+    69
+   ],
+   "ADJ+BM - ADJ": [
+    -0.0045,
+    -0.0162,
+    0.007,
+    69
+   ],
+   "L+BM - L": [
+    -0.0053,
+    -0.0182,
+    0.0087,
+    69
+   ],
+   "L - T": [
+    0.1181,
+    0.0678,
+    0.1696,
+    69
+   ],
+   "L - C": [
+    0.1176,
+    0.0591,
+    0.1741,
+    69
+   ],
+   "E - L": [
+    -0.0584,
+    -0.0958,
+    -0.024,
+    69
+   ]
+  },
+  "capability_paired": {
+   "flash:route - T": [
+    0.0159,
+    -0.0359,
+    0.0599,
+    69
+   ],
+   "flash:route - L": [
+    -0.1022,
+    -0.1526,
+    -0.0534,
+    69
+   ],
+   "flash:adjudicate - L": [
+    -0.0597,
+    -0.1039,
+    -0.0202,
+    69
+   ],
+   "flash:L+route - L": [
+    -0.0143,
+    -0.0301,
+    0.0016,
+    69
+   ],
+   "flash:explain - mine_top5": [
+    -0.0274,
+    -0.0544,
+    -0.0045,
+    69
+   ],
+   "flash:explain - mine_ridge": [
+    -0.0536,
+    -0.0802,
+    -0.0282,
+    69
+   ],
+   "flash:L_test+explain - L_test": [
+    -0.034,
+    -0.0567,
+    -0.009,
+    69
+   ],
+   "flash_think:route - T": [
+    0.0295,
+    -0.0099,
+    0.0718,
+    69
+   ],
+   "flash_think:route - L": [
+    -0.0887,
+    -0.1298,
+    -0.0474,
+    69
+   ],
+   "flash_think:adjudicate - L": [
+    -0.0429,
+    -0.0714,
+    -0.014,
+    69
+   ],
+   "flash_think:L+route - L": [
+    -0.0064,
+    -0.0213,
+    0.0094,
+    69
+   ],
+   "flash_think:explain - mine_top5": [
+    -0.0294,
+    -0.057,
+    -0.0059,
+    69
+   ],
+   "flash_think:explain - mine_ridge": [
+    -0.0557,
+    -0.0855,
+    -0.0281,
+    69
+   ],
+   "flash_think:L_test+explain - L_test": [
+    -0.0345,
+    -0.0601,
+    -0.0083,
+    69
+   ],
+   "flash_think:route - flash:route": [
+    0.0136,
+    -0.0064,
+    0.0378,
+    69
+   ],
+   "flash_think:adjudicate - flash:adjudicate": [
+    0.0168,
+    -0.0115,
+    0.05,
+    69
+   ],
+   "flash_think:explain - flash:explain": [
+    -0.002,
+    -0.0199,
+    0.0155,
+    69
+   ],
+   "pro:route - T": [
+    0.0229,
+    -0.0274,
+    0.0669,
+    69
+   ],
+   "pro:route - L": [
+    -0.0953,
+    -0.1491,
+    -0.045,
+    69
+   ],
+   "pro:adjudicate - L": [
+    -0.0073,
+    -0.0716,
+    0.0464,
+    14
+   ],
+   "pro:L+route - L": [
+    -0.0066,
+    -0.0224,
+    0.0116,
+    69
+   ],
+   "pro:route - flash:route": [
+    0.007,
+    -0.0192,
+    0.0344,
+    69
+   ],
+   "pro:adjudicate - flash:adjudicate": [
+    0.0951,
+    0.0093,
+    0.2162,
+    14
+   ]
+  },
+  "trust_dev_paired_aucc": {
+   "vc+agent - vc": [
+    0.0044,
+    -0.0047,
+    0.0191
+   ],
+   "agent - vc": [
+    -0.0028,
+    -0.0174,
+    0.0158
+   ],
+   "vc+kill_prior - vc": [
+    0.0012,
+    -0.0091,
+    0.0123
+   ],
+   "keep - top_sim": [
+    -0.0083,
+    -0.0318,
+    0.0041
+   ]
+  }
+ },
+ "posthoc": {
+  "agent_failure_modes": {
+   "n_killers": 101,
+   "label": "post hoc, not registered",
+   "forecaster": {
+    "share_no_route_lit": 0.4158415841584158,
+    "share_no_route_nolit": 0.39603960396039606,
+    "expected_killing_lit": {
+     "weak": 31,
+     "selective": 28,
+     "none": 27,
+     "broad": 15
+    },
+    "share_with_abstracts": 0.9702970297029703,
+    "routed_only_route_lit_minus_T": {
+     "n": 59,
+     "mean": 0.035734263611850677,
+     "ci95": [
+      -0.012596681969877024,
+      0.08458467468163682
+     ]
+    },
+    "routed_only_route_lit_minus_L": {
+     "n": 59,
+     "mean": -0.12976655676470114,
+     "ci95": [
+      -0.18487070600336553,
+      -0.07456621034182849
+     ]
+    }
+   },
+   "critic": {
+    "mean_kept_of_10": 1.118811881188119,
+    "share_keep_none": 0.6336633663366337,
+    "share_keep_all": 0.0,
+    "adjudicate_minus_L_by_kept": {
+     "0-0": {
+      "n": 64,
+      "mean": -0.07240864061457675
+     },
+     "1-3": {
+      "n": 23,
+      "mean": -0.0362257849266223
+     },
+     "4-6": {
+      "n": 12,
+      "mean": 0.014419707941709867
+     },
+     "7-10": {
+      "n": 2,
+      "mean": 0.0308502505293876
+     }
+    }
+   },
+   "trust_restated": {
+    "top_sim": {
+     "spearman": 0.2729216152019002,
+     "top25": 0.17162476394193987,
+     "top50": 0.11645401646639539,
+     "aucc": 0.1253375640087479
+    },
+    "vc": {
+     "spearman": 0.2565123334658545,
+     "top25": 0.16741221222516572,
+     "top50": 0.11748065675757201,
+     "aucc": 0.12306808739778223
+    },
+    "keep": {
+     "spearman": 0.36174108299805363,
+     "top25": 0.16040591484433794,
+     "top50": 0.11019105139800062,
+     "aucc": 0.12293508112639558
+    },
+    "agent": {
+     "spearman": 0.26223818318156616,
+     "top25": 0.17128554108415417,
+     "top50": 0.10354089173353018,
+     "aucc": 0.12363640257611208
+    },
+    "vc+agent": {
+     "spearman": 0.2765292586961199,
+     "top25": 0.17789045640954101,
+     "top50": 0.11409165359591658,
+     "aucc": 0.12959010280449995
+    }
+   }
+  },
+  "missing_value_rule": {
+   "label": "post hoc, not registered",
+   "n_killers": 101,
+   "known_class": {
+    "skip_mean": 0.20522405087605433,
+    "frozen_mean": 0.20477780403053314,
+    "skip_minus_frozen": 0.0004462468455211973,
+    "ci95": [
+     -0.0015050197633027702,
+     0.0027576936963107416
+    ],
+    "max_abs_drug_difference": 0.04225001966040597
+   },
+   "novel_class": {
+    "skip_mean": 0.15222364772236643,
+    "frozen_mean": 0.15322475179118863,
+    "skip_minus_frozen": -0.0010011040688221748,
+    "ci95": [
+     -0.003491081239475942,
+     0.0020004571788561996
+    ],
+    "max_abs_drug_difference": 0.04225001966040597
+   },
+   "own160": {
+    "skip_mean": 0.193038296938192,
+    "frozen_mean": 0.1937060474154393,
+    "skip_minus_frozen": -0.0006677504772472447,
+    "ci95": [
+     -0.002363324425043514,
+     0.0011999500571809676
+    ],
+    "max_abs_drug_difference": 0.032743633688283535
+   }
+  }
+ },
+ "spend": {
+  "provider_usd_total": 7.4575,
+  "ceiling_usd": 10.0,
+  "before_freeze_usd": 6.2169,
+  "confirmation_usd": 1.2406,
+  "lab_units": 0
+ },
+ "promotion": "V1 and V6 passed (headline: VC value confirmed). The transcriptional transfer and its top-similarity trust score were promoted to src/virtual_cell/transcriptional_transfer.py with contract tests (tests/test_transcriptional_transfer.py) and a parity test here. Difference from the frozen arithmetic: missing reference values are skipped instead of counted as zero with full weight; post hoc effect on confirmation killers at most 0.001 in mean selective r (posthoc/missing_value_rule.json). No agent arm was promoted.",
+ "reproduction": [
+  "python research/astra/mechanism_routing_20261011/freeze.py",
+  "python -W ignore research/astra/mechanism_routing_20261011/evaluate.py --tier sealed",
+  "python -W ignore research/astra/mechanism_routing_20261011/verify.py",
+  "python -W ignore research/astra/mechanism_routing_20261011/verify_supplement.py"
+ ]
+}

@@ -1,5 +1,73 @@
 # Evidence Register
 
+## Where an LLM adds value to a virtual cell: selective killing profiles — 2026-10-11
+
+**Primary results:**
+* The virtual cell's transcriptional transfer predicts which cancer lines an unseen-mechanism
+  compound kills better than curated targets or chemistry. It adds to a partial screen of the
+  compound itself.
+* No LLM role (forecaster, critic, explainer, trust judge) added value. The critic and the
+  forecaster-plus-VC harmed the VC.
+
+Block N predicted PRISM Repurposing 19Q4 selective killing profiles:
+* 578 lines, 2.5 uM;
+* score: Pearson r after removing the generic killing profile;
+* inputs: GSE92742 L1000 responses (9 lines x 6/24 h, 10 uM) and CCLE features;
+* units: 421 sealed confirmation drugs, 101 of them killers;
+* reference pool: 982 drugs;
+* statistics: mechanism-class cluster bootstrap, Bonferroni within the 8 VC and 7 agent
+  contrasts.
+
+**Results** (family-wise intervals):
+
+* **Virtual cell (L1000 kNN transfer):**
+  * Unseen class, vs Hub target kNN: +0.116 [+0.053, +0.181] (V1 PASS).
+  * Vs Morgan chemical kNN: +0.100 [+0.030, +0.177] (V2 PASS).
+  * Vs the L+T+C ensemble: +0.039 [+0.002, +0.078] (V3 PASS).
+  * Same contrast vs targets on the independent secondary screen (n 89): +0.103
+    [+0.049, +0.160] (V7 PASS).
+  * Added to ridge on a 160-line partial screen: +0.049 [+0.004, +0.097] (V6 PASS).
+  * Vs ridge on 40 lines alone: +0.059 [-0.023, +0.148] (V5 NOT_SUPPORTED).
+  * Known class, added to the annotated class mean: +0.038 [+0.007, +0.076] (V4 PASS; predicted
+    NOT_SUPPORTED).
+  * Its top neighbour similarity selects better predictions: top quarter +0.097 [+0.042, +0.150]
+    over the mean (V8 PASS).
+* **Agent** (deepseek-flash, frozen prompts, unseen-class regime):
+  * Forecaster vs targets: +0.011 [-0.032, +0.055] (A1). Literature vs none: -0.009 (A3).
+  * Forecaster added to the VC: -0.025 [-0.051, -0.003] (**A2 HARM**).
+  * Critic of the VC's neighbours vs the VC: -0.052 [-0.091, -0.017] (**A4 HARM**). Post hoc, it
+    kept none of 10 neighbours for 64% of killers.
+  * Explainer vs top-5 mining on the same 40 lines: -0.012 (A5). Added to the VC: -0.020 (A6).
+  * Agent judgement added to the VC's trust ranking: AUCC +0.007 [-0.007, +0.027] (A7).
+* **Headline:** VC value confirmed (V1, V6); agent value not shown. 13 of 15 power-based
+  predictions held.
+
+Development capability ablations (69 killers) found no forecaster or explainer gain from thinking
+mode or the pro model. The pro critic lead (14 drugs) is unresolved for budget reasons.
+
+**Verification.** Eight of nine frozen checks pass:
+* freeze and tier hashes;
+* 1,044 confirmation calls, all ok, all after the freeze;
+* leak rescan;
+* ledger;
+* sealed outcome poisoning, all VC contrasts null.
+
+The recomputation check failed on one CSV-precision tie in a descriptive share (D1). A labelled
+supplementary check matches every registered number within 8.3e-17.
+
+**Promoted:** `src/virtual_cell/transcriptional_transfer.py`, with contract and parity tests.
+Missing reference values are skipped (effect ≤ 0.001).
+
+**Limits:**
+* one assay and dose;
+* class-level unseen-class definition;
+* 101 killers;
+* memorised PRISM knowledge cannot be excluded (it could only inflate agent scores);
+* L1000 phase 1 was used by earlier blocks for other estimands.
+
+Provider spend $7.46 of the $10 ceiling ($1.24 for confirmation). Packet:
+`research/astra/mechanism_routing_20261011/`. Receipt: `log/20261011/MECHANISM_ROUTING.json`.
+
 ## Calibrated falsification of mechanism hypotheses — 2026-10-10
 
 **Primary results:**
@@ -200,6 +268,7 @@ This is the canonical cross-study result table. [REPORT.md](REPORT.md) states cu
 | Axis selection diagnostic | `OFFLINE_DIAGNOSTIC; NOT_CERTIFICATION` | Did positive-coverage allocation omit identifying zero contrasts? | Full retained support patterns are unique for all 39 genes per file; a heuristic adds 11 discovery rows per file, with fixed holdout and projected paired cost 340,068 bytes. | Binary presence need not equal numerical nonzero; this closed diagnostic reads no extra RNA, its numerical gate remains failed, and its row count is not proven minimal. | `research/decision_value/axis_recovery_20261010/calibration_v2/diagnosis/`; separate post-result freeze. |
 | Measure or predict (block K) | `CONFIRMATORY; M1_M3_FAILED; TRANSPORT_REFUSAL_CONFIRMED` | Can a frozen virtual cell's 24 h forecast replace measurement for a 5-day decision, and is any failure a ceiling, transport or timing failure? | MIX-Seq, 48 lines: measurement over the DepMap prior -0.021 [-0.109, +0.078]; STATE -0.091 [-0.182, -0.005]. Same-line cross-platform response r 0.13 or less versus within-platform 0.65. Trametinib 5-day information appears at 24-48 h (+0.16 at 48 h). Tahoe early state below the prior (USE_PRIOR confirmed). | Six drugs; one time-course drug; small cell counts; unpaired evaluator estimand (verdicts unchanged when paired); candidate gene order supported, not certified. | `research/astra/kinetic_horizon_20261010/`; `log/20261010/KINETIC_HORIZON.json`; `run_sealed.sh` then `verify.py`. |
 | Mechanism falsification (block M) | `CONFIRMATORY; H1_FAILED_ON_ACTIVE_TIER; AGENT_CONTRIBUTION_NOT_SUPPORTED` | Can an LLM agent plus a world model falsify mechanism hypotheses with calibrated error, design falsifying observations and detect inadequate hypothesis sets? | 502 sealed L1000 drugs, 424 classes, four profiles: coverage 0.892 [0.862, 0.917] but 0.776 in the most active tier (n 49). Class content -19.0 [-29.2, -8.6] survivors. Every knowledge, design, identifiability and adequacy test not supported. Agent alone coverage 0.00; credible sets 0.217. | Four profiles at one dose; class-level labels; 49-drug active tier; set-size knowledge contrasts nearly permutation-invariant; 100-drug LLM arms; L1000 exposed in earlier blocks for other estimands. | `research/astra/mechanism_falsification_20261010/`; `log/20261010/MECHANISM_FALSIFICATION.json`; `run_sealed.sh` (freeze, evaluate, verify, receipt). |
+| Mechanism routing of killing profiles (block N) | `CONFIRMATORY; VC_VALUE_CONFIRMED; AGENT_VALUE_NOT_SHOWN; CRITIC_AND_FORECASTER_HARM` | Does an LLM add value to a virtual cell that predicts which lines an unseen compound kills, beyond target, chemical and partial-screen baselines? | 421 sealed drugs (101 killers): VC transfer beats targets +0.116 [+0.053, +0.181] and chemistry +0.100 for unseen classes, replicates on the secondary screen (+0.103), adds to a 160-line screen +0.049; trust by similarity +0.097. Agent forecaster, critic, explainer and trust judge: no gain; critic -0.052 and forecaster+VC -0.025 harm. | One assay/dose; class-level novelty; 101 killers; memorised PRISM knowledge not excludable; one frozen check failed on a CSV tie (no verdict change). | `research/astra/mechanism_routing_20261011/`; `log/20261011/MECHANISM_ROUTING.json`; `src/virtual_cell/transcriptional_transfer.py`. |
 | Historical union and targeted axis extension | `VERIFIED_FILE_LOCAL_ENDPOINT39; P06_UNFROZEN` | Can exposed c44 bytes and eleven explicitly discriminating c45 rows complete the data-coordinate gate cheaply? | Both files pass 39/39 unique matches among all 62,710 genes at 1e-5. c44 adds 0 bytes; c45 receives exactly 133,564. Separate logical-slice/blockwise reconstruction agrees; 3,334 protected old files unchanged. | Historical/adaptive coordinate evidence; exposed consistency is not fresh validation. Initial parser failure preserved with a zero-download offline amendment. Full 2,000/checkpoint axes and P06/P2 execution remain unqualified. | `research/decision_value/axis_extension_20261010/QUALIFIED_CERTIFICATE.json`; canonical receipt `log/20261010/P05R_EXTENSION.json`; standalone offline replay. |
 
 ## Interpretation and audit rules

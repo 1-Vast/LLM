@@ -1,0 +1,57 @@
+{
+ "block": "N (research/astra/mechanism_routing_20261011)",
+ "frozen_utc": "2026-10-10T18:02:47Z",
+ "deviations": [
+  {
+   "id": "D1",
+   "kind": "verification",
+   "what": "VERIFIED.json reports all_ok false: the frozen check recomputed_contrasts_match failed.",
+   "cause": "verify.py compares every field of every contrast with tolerance 1e-9, including the descriptive share of drugs with a negative difference. ROWS_killers.csv stores floats to about 16 significant digits. In A3 (route_lit vs route_nolit), 37 killers have identical routes in both arms, and one pair differed only in its last bits in memory, so after the round trip one drug moved from 'negative' to 'tie' (share_negative 0.4257 -> 0.4158).",
+   "effect": "None on any registered quantity. Every estimate, 95% and family-wise interval matches RESULTS.json within 8.3e-17, every verdict and the headline match (VERIFIED_SUPPLEMENT.json). The other eight frozen checks pass.",
+   "handling": "verify.py and VERIFIED.json are left as written. A labelled post-freeze script, verify_supplement.py, recomputes with numeric tolerance on registered quantities and explains each share mismatch by ties in the CSV."
+  }
+ ],
+ "post_freeze_additions": [
+  {
+   "file": "verify_supplement.py",
+   "label": "post-freeze verification",
+   "purpose": "see D1; writes VERIFIED_SUPPLEMENT.json"
+  },
+  {
+   "file": "posthoc/agent_failure_modes.py",
+   "label": "post hoc",
+   "purpose": "forecaster abstention, routed-only view of A1, critic keep counts and the critic-minus-VC gap by keep count; reads confirmation outputs only, no provider call"
+  },
+  {
+   "file": "posthoc/missing_value_rule.py",
+   "label": "post hoc",
+   "purpose": "effect of skipping missing reference values (promoted rule) instead of the frozen nansum-over-total-weight rule, on confirmation killers"
+  },
+  {
+   "file": "test_promotion_parity.py",
+   "label": "promotion",
+   "purpose": "parity of src/virtual_cell/transcriptional_transfer.py with the frozen predictors on complete profiles, and the recorded missing-value effect"
+  },
+  {
+   "file": "README.md",
+   "label": "summary",
+   "purpose": "study summary written from RESULTS.json, VERIFIED.json, VERIFIED_SUPPLEMENT.json and posthoc/"
+  },
+  {
+   "file": "DEVIATIONS.json",
+   "label": "record",
+   "purpose": "this file"
+  },
+  {
+   "file": "SEALED_RUN.log, VERIFY.log, verify_poison/",
+   "label": "run output",
+   "purpose": "stdout of the single sealed run and of verify.py; verify_poison/ holds the sealed outcome-poisoning run written by verify.py"
+  }
+ ],
+ "disclosures": [
+  "The prediction for V4 (VC adds to the class mean when the class is known) was NOT_SUPPORTED by projected power (P(PASS) 0.41); it PASSED. The prediction for A2 (forecaster added to the VC) was NOT_SUPPORTED (P(HARM) 0.28); it was HARM. 13 of 15 predictions held. Predictions are forecasts, not decision rules.",
+  "test_block_n.py::test_sealed_tier_is_refused_before_the_freeze skips once FREEZE.json exists, by design.",
+  "All 1,044 confirmation agent calls returned status ok (421 adjudicate_lit, 421 route_lit, 101 route_nolit, 101 explain_full); none was refused by the ledger."
+ ],
+ "promotion": "V1 and V6 passed (headline: VC value confirmed). The transcriptional transfer and its top-similarity trust score were promoted to src/virtual_cell/transcriptional_transfer.py with contract tests (tests/test_transcriptional_transfer.py) and a parity test here. Difference from the frozen arithmetic: missing reference values are skipped instead of counted as zero with full weight; post hoc effect on confirmation killers at most 0.001 in mean selective r (posthoc/missing_value_rule.json). No agent arm was promoted."
+}

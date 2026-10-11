@@ -67,6 +67,16 @@ drugs and four profiles each.
 * Agent literature, critique, analogies, observation choice and p-value reading added nothing
   beyond controls. The test never flagged an inadequate hypothesis set. Nothing was promoted.
 
+The 2026-10-11 block N asked where the LLM adds value to the virtual cell. The task was predicting
+which of 578 cancer lines a compound kills (PRISM 19Q4) from its L1000 response, on 421 sealed
+drugs.
+* For mechanisms with no screened member, the virtual cell's transfer from transcriptionally
+  similar drugs beat curated targets and chemistry (+0.12 and +0.10). It replicated on an
+  independent re-screen and added to a 160-line partial screen.
+* The LLM as forecaster, critic, explainer or trust judge added nothing; as critic it harmed the
+  virtual cell.
+* The transfer is promoted as `virtual_cell.transcriptional_transfer`.
+
 Software checks and replay receipts establish engineering behaviour, not independent
 scientific benefit. STATE remains the pretrained world-model foundation; decision
 benefit, LLM advantage and functional or causal claims remain unestablished.

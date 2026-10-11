@@ -57,6 +57,29 @@ Nothing was promoted. See the
 [block M evidence](EVIDENCE.md#calibrated-falsification-of-mechanism-hypotheses--2026-10-10) and
 [packet](astra/mechanism_falsification_20261010/README.md).
 
+Block N (2026-10-11) asked **where an LLM adds value to a virtual cell**, on a task that needs
+knowledge: predicting which of 578 cancer lines a compound kills (PRISM 19Q4) from its L1000
+response. It used 421 sealed drugs, 101 of them killers. Two findings:
+
+* **The virtual cell is the source of value.**
+  * For a mechanism with no screened member, transfer from transcriptionally similar drugs beats
+    curated targets by +0.116 and chemistry by +0.100 (family-wise intervals exclude 0). It
+    replicates on the independent secondary screen.
+  * It adds to a 160-line partial screen of the compound itself (+0.049).
+  * Its neighbour similarity tells when to trust it.
+  * It does not replace a 40-line screen.
+* **The LLM did not add value in any of four roles.**
+  * Forecaster from literature; critic of the virtual cell's neighbours; post-screen biomarker
+    explainer; trust judge.
+  * The critic harmed the virtual cell (-0.052): it rejected every neighbour for 64% of killers,
+    judging by annotated mechanism where the virtual cell's information is cross-mechanism.
+  * Adding the forecaster's routes harmed it as well (-0.025).
+  * Development capability ablations (thinking mode, pro) changed nothing.
+
+The transfer was promoted to `src/virtual_cell/transcriptional_transfer.py`. See the
+[block N evidence](EVIDENCE.md#where-an-llm-adds-value-to-a-virtual-cell-selective-killing-profiles--2026-10-11)
+and [packet](astra/mechanism_routing_20261011/README.md).
+
 A forecast may influence endpoint selection only after a same-unit readout-to-endpoint bridge
 (same culture unit, dose and time) and a reference ceiling pass: substitute observed responses
 for forecasts, score leave-one-context-out, and beat the best cheap prior by the declared minimum
