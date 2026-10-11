@@ -42,7 +42,20 @@ summaries retain their source identity. The core does not import research or too
 
 ## Current evidence
 
-The latest [scientific decision interface study](research/dual_core_scientific_20261011/README.md)
+The latest [fixed-probe context diagnostic](research/context_probe_20261011/README.md)
+tests eight shared probes after masking a target context's response row. An exact-dose
+rebuild avoids older mixed-dose groups, but feedback still fails to improve top-10
+drug selection; a conditional model improves MSE without decision gain. The empirical
+branch stops before KG/Agent expansion. This is exposed retrospective data, with
+publisher preprocessing and incomplete endpoints explicitly retained as limitations.
+
+The [budgeted feedback study](research/budgeted_feedback_20261011/README.md)
+tests at most two rounds under a common total resource cap. A stop gate saves declared
+resources but does not establish better decisions over the strongest batch (+0.00082,
+cluster CI [-0.01102, +0.01290]); selected-path reliability and secondary confirmation
+fail. Budget accounting is promoted; the empirical policy remains in research.
+
+The [scientific decision interface study](research/dual_core_scientific_20261011/README.md)
 promotes opt-in terminal-value authorization with frozen hypothesis, interpretation and
 condition bindings, scoped backend routing and paired utility/cost reporting. Its 421-compound
 retrospective replay supports the contents of L1000 and real feedback, but does not establish

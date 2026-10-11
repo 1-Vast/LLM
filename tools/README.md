@@ -1,5 +1,25 @@
 # Tools
 
+## Campaign resources and terminal utility
+
+`python -m tools.evaluation.decision_report` reports paired terminal utility and
+utility-unit measurement/turnaround prices. Supply `--resource-budget budget.json`
+to also enforce the same hard total resource cap for both arms. For example:
+
+```json
+{"total": 18, "measurement_cost": 1, "turnaround_cost": 2, "unit": "read-equivalent scenario"}
+```
+
+This permits 16 measurements in one round or 14 in two rounds. The source contract
+`maestro.campaign_budget.CampaignBudget.require_feasible` also checks cumulative
+proposed expenditure before execution. Campaign records accept `other_resource_cost`
+and `other_utility_cost` for API, compute and overhead, declared separately in their
+respective units; omitted values retain the legacy zero. Prices are declarations,
+not authenticated invoices. Without a resource-budget argument, the legacy report
+does not establish equivalence of total resource allowances. The tested prototype
+and scientific limitations are in
+[the budgeted feedback study](../research/budgeted_feedback_20261011/README.md).
+
 ## Offline observation and maintenance checks
 
 `python -m tools.analysis.observation_audit axis input.npz` compares each target

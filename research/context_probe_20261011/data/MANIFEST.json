@@ -1,0 +1,340 @@
+{
+  "schema": "maestro.context_probe.exactdose_data.v1",
+  "status": "EXPOSED_RETROSPECTIVE_ALGORITHM_DIAGNOSTIC",
+  "endpoint": {
+    "name": "PRISM primary HTS replicate-collapsed log2-fold-change relative to negative controls",
+    "dose_um": 2.5,
+    "dose_filter": "Strict numeric equality; no tolerance",
+    "screen_id": "HTS",
+    "platform": "Pooled barcoded cell lines; Luminex fluorescence readout",
+    "direction": "Lower log2-fold-change indicates lower relative viability; no absolute death/apoptosis claim",
+    "time_hours": null,
+    "time_limitation": "No per-treatment exposure-time field in local collapsed metadata; nominal publication protocol needs separate verification",
+    "publisher_preprocessing": "Control normalization, QC, ComBat, median collapse; see hashed primary readme",
+    "preprocessing_limitation": "Publisher normalization/ComBat may use joint plate or pool information. Raw culture-level preprocessing was not reconstructed or held out.",
+    "replicate_plate_culture_ids_available": false
+  },
+  "context_roles": {
+    "salt": "maestro-context-probe-20261011-v1",
+    "algorithm": "sha256(salt + '|' + identity_key) / 2**256; <0.6 reference, <0.8 development, otherwise evaluation",
+    "identity_key": "Nonempty sample_info RRID; otherwise DepMap ID. Shared RRID keeps only the lexicographically first eligible DepMap ID.",
+    "training": "Reference outcomes only; development for selection; evaluation never fitted",
+    "claim": "Known drugs, unseen response context; lineages overlap and are not held out",
+    "calibration": "No independent calibration role is reserved in this initial information diagnostic; no coverage guarantee is claimed",
+    "counts": {
+      "development": 99,
+      "evaluation": 106,
+      "reference": 356
+    },
+    "lineage_by_role": {
+      "bile_duct": {
+        "development": 2,
+        "evaluation": 1,
+        "reference": 4
+      },
+      "bone": {
+        "development": 2,
+        "evaluation": 4,
+        "reference": 13
+      },
+      "breast": {
+        "development": 6,
+        "evaluation": 6,
+        "reference": 14
+      },
+      "central_nervous_system": {
+        "development": 7,
+        "evaluation": 4,
+        "reference": 30
+      },
+      "colorectal": {
+        "development": 5,
+        "evaluation": 10,
+        "reference": 20
+      },
+      "esophagus": {
+        "development": 1,
+        "evaluation": 11,
+        "reference": 12
+      },
+      "fibroblast": {
+        "development": 1,
+        "evaluation": 0,
+        "reference": 0
+      },
+      "gastric": {
+        "development": 2,
+        "evaluation": 6,
+        "reference": 13
+      },
+      "kidney": {
+        "development": 3,
+        "evaluation": 4,
+        "reference": 13
+      },
+      "liver": {
+        "development": 5,
+        "evaluation": 6,
+        "reference": 10
+      },
+      "lung": {
+        "development": 23,
+        "evaluation": 13,
+        "reference": 73
+      },
+      "ovary": {
+        "development": 5,
+        "evaluation": 7,
+        "reference": 26
+      },
+      "pancreas": {
+        "development": 8,
+        "evaluation": 7,
+        "reference": 22
+      },
+      "peripheral_nervous_system": {
+        "development": 2,
+        "evaluation": 3,
+        "reference": 7
+      },
+      "prostate": {
+        "development": 1,
+        "evaluation": 1,
+        "reference": 2
+      },
+      "skin": {
+        "development": 8,
+        "evaluation": 8,
+        "reference": 26
+      },
+      "soft_tissue": {
+        "development": 2,
+        "evaluation": 5,
+        "reference": 14
+      },
+      "thyroid": {
+        "development": 2,
+        "evaluation": 0,
+        "reference": 8
+      },
+      "upper_aerodigestive": {
+        "development": 3,
+        "evaluation": 4,
+        "reference": 20
+      },
+      "urinary_tract": {
+        "development": 8,
+        "evaluation": 4,
+        "reference": 12
+      },
+      "uterus": {
+        "development": 3,
+        "evaluation": 2,
+        "reference": 17
+      }
+    },
+    "excluded_alias_contexts": []
+  },
+  "eligibility": {
+    "context": "Response row with passing STR mapped identity, sample metadata and at least one finite basal value; no response completeness or response magnitude filter",
+    "drug": "Metadata alias group representative with >=95% finite reference outcomes only",
+    "reference_min_observed_fraction": 0.95,
+    "target_missingness": "Preserved; may cause failed probe or unscorable committed selection. It must not alter fitted features, probes, decisions, drug pool or context inclusion.",
+    "drug_identity": "Connected components sharing NFKC/casefold/whitespace-normalized name OR Broad compound prefix; metadata-only conservative alias blocking",
+    "duplicate_rule": "Lexicographically first exact-dose HTS treatment column per component; no outcome-based choice, averaging, missing-value substitution or cross-dose aggregation",
+    "chemical_identity_limitation": "Equal names/prefixes are not independently verified chemical identity. Conflicting metadata structures are flags, not filtered with target outcomes."
+  },
+  "counts": {
+    "raw_response_contexts": 578,
+    "eligible_contexts": 561,
+    "excluded_contexts": 17,
+    "exactdose_treatment_columns": 3939,
+    "metadata_identity_groups": 3860,
+    "eligible_drugs": 3621,
+    "basal_genes": 19144,
+    "basal_nonfinite_values": 0,
+    "identity_groups_multiple_columns": 76,
+    "identity_groups_multiple_broad_prefixes": 11,
+    "identity_groups_multiple_metadata_structures": 82,
+    "old_mixed_dose_groups": 36
+  },
+  "missingness_eligible_drugs_by_role": {
+    "development": {
+      "shape": [
+        99,
+        3621
+      ],
+      "observed": 353690,
+      "missing": 4789,
+      "observed_fraction": 0.986640779515676,
+      "complete_contexts": 69,
+      "complete_drugs": 900,
+      "observed_fraction_per_context_quantiles": [
+        0.39823253244959955,
+        0.9997238331952499,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "evaluation": {
+      "shape": [
+        106,
+        3621
+      ],
+      "observed": 378751,
+      "missing": 5075,
+      "observed_fraction": 0.9867778628857868,
+      "complete_contexts": 75,
+      "complete_drugs": 883,
+      "observed_fraction_per_context_quantiles": [
+        0.6525821596244131,
+        0.9997238331952499,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "reference": {
+      "shape": [
+        356,
+        3621
+      ],
+      "observed": 1259829,
+      "missing": 29247,
+      "observed_fraction": 0.9773116557906594,
+      "complete_contexts": 267,
+      "complete_drugs": 0,
+      "observed_fraction_per_context_quantiles": [
+        0.08423087544877106,
+        0.9999309582988125,
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "missingness_all_metadata_drugs_by_role": {
+    "development": {
+      "shape": [
+        99,
+        3860
+      ],
+      "observed": 376009,
+      "missing": 6131,
+      "observed_fraction": 0.9839561417281625,
+      "complete_contexts": 32,
+      "complete_drugs": 900,
+      "observed_fraction_per_context_quantiles": [
+        0.3870466321243523,
+        0.9968911917098445,
+        0.9994818652849741,
+        1.0,
+        1.0
+      ]
+    },
+    "evaluation": {
+      "shape": [
+        106,
+        3860
+      ],
+      "observed": 402219,
+      "missing": 6941,
+      "observed_fraction": 0.9830359761462508,
+      "complete_contexts": 20,
+      "complete_drugs": 883,
+      "observed_fraction_per_context_quantiles": [
+        0.6295336787564767,
+        0.9968911917098445,
+        0.9994818652849741,
+        0.9996761658031088,
+        1.0
+      ]
+    },
+    "reference": {
+      "shape": [
+        356,
+        3860
+      ],
+      "observed": 1338600,
+      "missing": 35560,
+      "observed_fraction": 0.97412237294056,
+      "complete_contexts": 74,
+      "complete_drugs": 0,
+      "observed_fraction_per_context_quantiles": [
+        0.07979274611398963,
+        0.9968911917098445,
+        0.9992227979274612,
+        0.9997409326424871,
+        1.0
+      ]
+    }
+  },
+  "basal": "All source columns and source values retained as float32; no fitted scaling, feature selection or imputation. These must use reference inputs only downstream.",
+  "array_schema": {
+    "context_id": "[N] DepMap ID strings",
+    "lineage": "[N] sample_info lineage strings",
+    "identity_key": "[N] role grouping identity strings",
+    "role": "[N] reference/development/evaluation strings",
+    "basal": "[N,G] float32 source expression values; no learned transform",
+    "gene_id": "[G] source expression column names",
+    "drug_id": "[D] minimum Broad compound prefix in the alias component",
+    "drug_name": "[D] representative treatment metadata name",
+    "y": "[N,D] float64 source log2-fold-change; NaN retained",
+    "available": "[N,D] boolean finite response mask; evaluator bookkeeping only",
+    "metadata": "scalar JSON string with schema and manifest filename"
+  },
+  "sources": [
+    {
+      "name": "treatments",
+      "path": "data/external/prism_19q4/raw/primary-screen-replicate-collapsed-treatment-info.csv",
+      "bytes": 1185606,
+      "sha256": "d649f207a437c9e9910572c5023d02f68a77c946f6e972c998b057160a3505e6"
+    },
+    {
+      "name": "responses",
+      "path": "data/external/prism_19q4/raw/primary-screen-replicate-collapsed-logfold-change.csv",
+      "bytes": 41254209,
+      "sha256": "25efc741b372b30d38629cb139a388e989663fba597e55fff5f6c2bb7cdeb75a"
+    },
+    {
+      "name": "prism_contexts",
+      "path": "data/external/prism_19q4/raw/primary-screen-cell-line-info.csv",
+      "bytes": 46849,
+      "sha256": "c17174f48264fea0adb3eb4b2b1f2daf61b83999b0db6e4965338e3bd6a9fde2"
+    },
+    {
+      "name": "prism_readme",
+      "path": "data/external/prism_19q4/raw/primary-screen-readme.txt",
+      "bytes": 5919,
+      "sha256": "309310719fd96580d8f211ca12d501f6624c245b268aa29d8a5286b411f0c63f"
+    },
+    {
+      "name": "basal",
+      "path": "data/external/depmap_19q4/CCLE_expression.csv",
+      "bytes": 300483142,
+      "sha256": "3bafab8bbe2343b3b8ab131957eac7808682d59e7fdee2dbc8a9f6b0f421ff35"
+    },
+    {
+      "name": "contexts",
+      "path": "data/external/depmap_19q4/sample_info.csv",
+      "bytes": 350874,
+      "sha256": "995d71d2cdcb50dec798f979f1316c64ae3d2e4ab5a43643a3196e3ac78d8d07"
+    },
+    {
+      "name": "old_split_for_dose_audit_only",
+      "path": "research/astra/mechanism_routing_20261011/SPLIT.json",
+      "bytes": 229840,
+      "sha256": "efbeb79e24b93bb475d653e4946d4acacd96e385fb91c37b4f2d678dd0cdae2b"
+    }
+  ],
+  "prepare_sha256": "22e95fe2af511e85e34482d4504225a46ea6606a1e7345b4de2efe7d66f9a65d",
+  "output_npz_sha256": "fb1222bb9790078a44c1a570ed87598001909215892c057957a7fc1eb2ce0577",
+  "derived_file_sha256": {
+    "contexts.csv": "26d5c6386952b56d1ab806bebab6c69dab3a7851e36a90a7f4bd958914327063",
+    "context_missingness.csv": "dc1fa35c5dadaf9325df3985f958b6426b6354b079d3342b86f7192abfac1220",
+    "drug_groups.json": "58c6e6dd04c17b0c130e5c0cb5e05e8d5b955460672f604e6eb7a7d03513c631",
+    "excluded_contexts.json": "abd99c0dc2a9d0756ef1c629d8acd68f3aec4a9703b79b9a09c5ed161c5091cb",
+    "old_mixed_dose_groups.json": "d1ecf2540f93cb9b47659d7a42341134dba9ba174005a362a54195e4b56bc0ce"
+  }
+}

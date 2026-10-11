@@ -1,0 +1,269 @@
+{
+  "schema": "maestro.next_round_review.v1",
+  "review_date_client_timezone": "2026-10-11 Asia/Shanghai",
+  "generated_at_utc": "2026-10-11T09:11:58.440120+00:00",
+  "repository_head": "76605db12876ab07405f95445f0d5bcfe97321a6",
+  "authorized_scope": "Review existing results and suggestions; give next-round plan only.",
+  "status": "REVIEW_COMPLETE; NO_NEW_SCIENTIFIC_VALIDATION",
+  "review_roles": [
+    "architecture_audit: accounting/runtime integration and small report-contract reproductions",
+    "experiment: independent existing-row arithmetic and task/data feasibility",
+    "literature: claim/guarantee and closest-prior-work review"
+  ],
+  "checks": {
+    "existing_engineering_receipt_file_hashes": {
+      "matched": 14,
+      "mismatches": []
+    },
+    "local_plan_links": "PASS",
+    "fresh_biological_benchmarks_run": 0,
+    "default_test_suite_rerun": false,
+    "historical_suite_status": "780 passes and one pre-existing Innovation.md repository-shape failure, as recorded in supplied study; not rerun here.",
+    "production_code_changed_by_this_review": false,
+    "existing_experiment_or_receipts_rewritten": false,
+    "fresh_llm_provider_calls": 0
+  },
+  "existing_evidence": {
+    "n_exposed_replay_compounds": 421,
+    "stop_episodes": 234,
+    "continuation_episodes": 187,
+    "resource_saving_fraction": 0.3705463182897862,
+    "measurement_saving_fraction": 0.4723871733966746,
+    "turnaround_increase_fraction": 0.4441805225653206,
+    "raw_terminal_utility_increment": -0.005848248122695965,
+    "scenario_net_increment": 0.0008215856065202175,
+    "scenario_cluster_ci95": [
+      -0.011024442595345508,
+      0.0129016256651586
+    ],
+    "descriptive_break_even_price": 0.000876820676515314,
+    "price_basis": "Utility per read equivalent under fixed 2:1 turnaround/read tariff; sample mean sensitivity, not a valid price estimate or inferential threshold",
+    "selected_path_covered": 370,
+    "selected_path_n": 421,
+    "active_covered": 68,
+    "active_n": 101,
+    "paired_secondary_n": 120,
+    "paired_secondary_missing_or_ineligible": 301,
+    "scientific_verdict_unchanged": "NOT_SUPPORTED_EXPOSED_DEVELOPMENT"
+  },
+  "review_findings": [
+    {
+      "id": "context_response_access",
+      "type": "new_task_design_requirement",
+      "detail": "Cold-start target context outcomes for all drugs must be masked before fitting statistics/features; current transfer uses measured reference outcomes at every target column."
+    },
+    {
+      "id": "dose_purity",
+      "type": "new_task_data_requirement",
+      "detail": "Read-only metadata audit: 3,939 unique HTS dose=2.5 treatment columns; 561 overall primary-line/CCLE-ID overlaps are not complete candidate eligibility. The old 1,403-drug split averages mixed-dose columns for 36 compounds; construct an exact-dose matrix for the new task.",
+      "source_method": "primary treatment-info screen_id/dose/column_name; SPLIT.json prism_columns; tiers.py mean(axis=1); CCLE first-column ID intersection.",
+      "audit_role": "experiment; read-only metadata/header/ID inspection, not a new response benchmark",
+      "dose_filter": "Strict numeric equality dose == 2.5 and screen_id == HTS; no dose tolerance",
+      "response_completeness_or_expression_quality_checked": false,
+      "source_file_hashes": [
+        {
+          "path": "data/external/prism_19q4/raw/primary-screen-replicate-collapsed-treatment-info.csv",
+          "sha256": "d649f207a437c9e9910572c5023d02f68a77c946f6e972c998b057160a3505e6"
+        },
+        {
+          "path": "data/external/prism_19q4/raw/primary-screen-replicate-collapsed-logfold-change.csv",
+          "sha256": "25efc741b372b30d38629cb139a388e989663fba597e55fff5f6c2bb7cdeb75a"
+        },
+        {
+          "path": "data/external/depmap_19q4/CCLE_expression.csv",
+          "sha256": "3bafab8bbe2343b3b8ab131957eac7808682d59e7fdee2dbc8a9f6b0f421ff35"
+        },
+        {
+          "path": "research/astra/mechanism_routing_20261011/SPLIT.json",
+          "sha256": "efbeb79e24b93bb475d653e4946d4acacd96e385fb91c37b4f2d678dd0cdae2b"
+        },
+        {
+          "path": "research/astra/mechanism_routing_20261011/split.py",
+          "sha256": "7af7e3a580e183d34c120603a05150ce795b6308870033b0b87dad2383b95ed3"
+        }
+      ],
+      "biological_population_or_new_holdout_claim": false
+    },
+    {
+      "id": "rank_invariance",
+      "type": "new_task_design_requirement",
+      "detail": "A constant offset and positive global scale preserve fixed-context mean top-k; require drug-dependent residual transfer."
+    },
+    {
+      "id": "guarantee_scope",
+      "type": "literature_interpretation",
+      "detail": "Frozen max-path replay is not automatically selection-conditional coverage; distinguish marginal path event, JOMI single-selected-unit condition and FCR."
+    },
+    {
+      "id": "runtime_budget",
+      "type": "engineering_prerequisite",
+      "detail": "CampaignBudget is opt-in arithmetic/report verification; purchase reservation of complete batch/turnaround/API cost is not integrated."
+    },
+    {
+      "id": "mixed_endpoints",
+      "type": "bounded_report_defect",
+      "path": "tools/evaluation/decision_report.py",
+      "line": 85,
+      "reproduction": "Two correctly paired campaigns using viability and RNA-correlation endpoints accepted as pooled gain0.55. Current uniform-endpoint study unaffected."
+    },
+    {
+      "id": "derived_overflow",
+      "type": "bounded_report_defect",
+      "path": "tools/evaluation/decision_report.py",
+      "line": 88,
+      "reproduction": "Finite inputs +/-1e308 produce infinite increment and exact p=0. Current modest-scale study unaffected."
+    }
+  ],
+  "proposed_first_experiment": {
+    "task": "Known-drug selection in a masked target cell-response context; retrospective diagnosis first",
+    "fixed_shared_probe_batch_candidate": 8,
+    "candidate_terminal_top_k": 10,
+    "adaptive_acquisition_or_agent_in_first_diagnostic": false,
+    "confirmation_mub_or_noninferiority_margin": "Not yet registered; must be justified and frozen before new evaluation",
+    "promotion": "No empirical model/policy promotion from reviewed results"
+  },
+  "reading_scope": {
+    "existing_cross_field_source_records": 13,
+    "new_closest_prior_checks": [
+      {
+        "doi": "10.1093/bioinformatics/btu464",
+        "scope": "Primary model/prediction sections"
+      },
+      {
+        "doi": "10.1021/ci500152b",
+        "scope": "Publisher/indexed abstract"
+      },
+      {
+        "doi": "10.1038/s42256-026-01202-2",
+        "scope": "Publisher abstract"
+      },
+      {
+        "doi": "10.1021/acs.jcim.5c02453",
+        "scope": "Publisher abstract"
+      },
+      {
+        "doi": "10.1093/bioadv/vbag246",
+        "scope": "Publisher abstract"
+      }
+    ],
+    "selection_conditional_primary_theorem": "Jin and Ren JOMI, https://arxiv.org/html/2403.03868v3, Theorem1; primary text checked by literature audit",
+    "novelty_search": "Targeted, not exhaustive; full wet-lab experiments of abstract-only additions not reviewed"
+  },
+  "reviewed_files": [
+    {
+      "path": "research/budgeted_feedback_20261011/README.md",
+      "sha256": "82d091e4ce845f5a6c55d1d299370faebb738d3fdcf4095f735401c8114b62e4",
+      "bytes": 6639
+    },
+    {
+      "path": "research/budgeted_feedback_20261011/DESIGN.md",
+      "sha256": "82e5eee3db35d922a0a6e0eef7727b16d611958053aa05b2c394ef4509a1fd43",
+      "bytes": 10890
+    },
+    {
+      "path": "research/budgeted_feedback_20261011/ENGINEERING_RECEIPT.json",
+      "sha256": "5149f2ddcb668c340716d1e4cdc93979f6c3ff7387d85af06e53c93b466ce899",
+      "bytes": 2871
+    },
+    {
+      "path": "research/budgeted_feedback_20261011/experiment/PROTOCOL.json",
+      "sha256": "212be42aa97ade52913fadc299abdfee046700520977080380312eb743f27f19",
+      "bytes": 4029
+    },
+    {
+      "path": "research/budgeted_feedback_20261011/experiment/RESULTS.json",
+      "sha256": "4c0c63124b79881dfb2f61e73a3bba5192dba29ee38eb0fef934dde6ccd675fa",
+      "bytes": 11944
+    },
+    {
+      "path": "research/budgeted_feedback_20261011/experiment/RELIABILITY.json",
+      "sha256": "80e1f1e9ef1f038896c1a96559871cf86755dfec8f89a2b683329799e86df3a8",
+      "bytes": 3308
+    },
+    {
+      "path": "research/budgeted_feedback_20261011/experiment/RECEIPT.json",
+      "sha256": "dfe1b6d527ed6fec8b82a9820cd74dffd4d6ca3331538e38dd2fdb75cd90c8ef",
+      "bytes": 278
+    },
+    {
+      "path": "research/budgeted_feedback_20261011/experiment/VERIFIED.json",
+      "sha256": "08e0d027e737d8c1e9e38c6fe1b3d977866617bc7e97be9bcfe1db31b01839b3",
+      "bytes": 6551
+    },
+    {
+      "path": "research/budgeted_feedback_20261011/experiment/GATE_FREEZE.json",
+      "sha256": "3a0a0c8e732385a9b3848ba6d41b88c7a3f32c366dabbb7a2f0a5e9d76614a41",
+      "bytes": 1439
+    },
+    {
+      "path": "research/budgeted_feedback_20261011/experiment/ROWS.csv",
+      "sha256": "d2f3abf142d4fce75d70482424d8c3f579aaa5ece332ba2a7587e58084e1c6c9",
+      "bytes": 2792776
+    },
+    {
+      "path": "research/budgeted_feedback_20261011/experiment/study.py",
+      "sha256": "9bc9f7c9003830cd4bb22a68b8f5981483c1ae2c28d9355dd8c7447305eacbeb",
+      "bytes": 18999
+    },
+    {
+      "path": "research/budgeted_feedback_20261011/literature/sources.json",
+      "sha256": "dcf4da265864deb4d361843d9d19045d1912d9aea72157be74b59396764bd63b",
+      "bytes": 49144
+    },
+    {
+      "path": "research/budgeted_feedback_20261011/literature/REVIEW.md",
+      "sha256": "c55acca996d3cd4bd9d9dc4987af30ada74e954dda685e5dd2a517e03a4a8cff",
+      "bytes": 17248
+    },
+    {
+      "path": "research/budgeted_feedback_20261011/data/DATA_STRATEGY.md",
+      "sha256": "6a123f93d9b20a9feb37b608b9980fad7fb32b3ab103d44e889d0d748333be70",
+      "bytes": 22270
+    },
+    {
+      "path": "research/budgeted_feedback_20261011/data/ASSET_AUDIT.json",
+      "sha256": "e4bf5771344e83ceaa12ff082024c989bb69e08fccb3d6785d5710a6b79d35ad",
+      "bytes": 7912
+    },
+    {
+      "path": "research/targeted_review_20261011.md",
+      "sha256": "1dea1da358229b9ef87b5814786a84542eb431e8a8e3671a5b6a5e73ff0127bd",
+      "bytes": 9966
+    },
+    {
+      "path": "research/decision_value/pairwise_v3/README.md",
+      "sha256": "8b92a99d3f634f171f0cfa846e069b1b0c3a4501fa5680fdfa06f872b1f8cb04",
+      "bytes": 3925
+    },
+    {
+      "path": "research/astra/mechanism_routing_20261011/tiers.py",
+      "sha256": "1edee6143eb12d64a4991571b8b4eb0500717028179e524a87df12d94b971e28",
+      "bytes": 4577
+    },
+    {
+      "path": "src/maestro/campaign_budget.py",
+      "sha256": "ac89fffaa0818318cf7a0539a9289194b8cb267114e838a428e276ef810591a2",
+      "bytes": 2179
+    },
+    {
+      "path": "tools/evaluation/decision_report.py",
+      "sha256": "a45bf3398e7b7103a1efcf10f4df688e4f0fb4d2bade6551828402da1d272613",
+      "bytes": 9164
+    },
+    {
+      "path": "src/virtual_cell/transcriptional_transfer.py",
+      "sha256": "3a764131f07ba1735515474d489bdc6b561f67d903e4be715b598249854dba34",
+      "bytes": 5847
+    },
+    {
+      "path": "src/virtual_cell/context_transfer.py",
+      "sha256": "f10762768c32738b11180d83426b5b5b802ed6e96ac301476f34762550a86cb1",
+      "bytes": 2896
+    }
+  ],
+  "plan": {
+    "path": "research/next_round_review_20261011/README.md",
+    "sha256": "9fe5cb2dcdce5cb4669f82877f78a2ecc7ac28327e57416920764f51cc1cbd4c",
+    "bytes": 26636
+  }
+}

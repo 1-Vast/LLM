@@ -1,0 +1,20 @@
+{
+  "study_id": "budgeted_feedback_20261011",
+  "scope": "RETROSPECTIVE_DEVELOPMENT_ONLY: all 702 query compounds were exposed previously. No fresh confirmation or prospective biological evidence; zero LLM/API calls.",
+  "reference": "Reuse the 701 source-only reference compounds and exact mechanism exclusion in dual_core_scientific_20261011. Reuse frozen tau=.05, sigma=2. These were tuned on the old 281 development compounds, so reliability is a diagnostic, not newly independent conformal certification.",
+  "split": "Sort old development compounds by sha256(seed:drug); first 141 fit gate/baseline, remaining 140 calibrate reliability. All 421 previously exposed confirmation compounds form an exposed replay report. Do not retune on replay results.",
+  "seed": 20261011,
+  "resource_budget": 18,
+  "turnaround_read_equivalents": 2,
+  "read_utility_price": 0.001,
+  "cost_semantics": "Declared scenarios, not authenticated monetary or procurement prices. Resource = reads + 2*rounds. A batch may buy 16 reads in 1 round. Two-stage design buys 4 then 10 in 2 rounds. Stopping saves resources; unused budget is allowed. All L1000/source costs are common historical input, not a free prospective assay.",
+  "baseline_family": ["source_only", "batch_gp_ivr_4", "batch_gp_ivr_14", "batch_gp_ivr_16", "batch_gp_kg_4", "batch_gp_kg_14", "batch_gp_kg_16"],
+  "baseline_selection": "Largest fit mean net utility; lexical tie-break. Report all candidates on replay, including old strongest batch_gp_ivr_16.",
+  "two_stage": "Gaussian posterior identical to Gaussian batch comparator. First 4 actions are initial KG batch plan; after real feedback, plan 10 KG actions with covariance-only fantasies before purchasing them together. Also replay a fixed original KG plan split 4+10 (same posterior, reads, and rounds), and shuffled-feedback control.",
+  "gate": "Two bins divided by fit median predicted sum of remaining KG values after first 4. In each bin obtain 5th percentile of 4000 drug bootstrap means of observed incremental two_stage-vs-stop utility. Continue only if this lower estimate strictly exceeds 12*read_utility_price; otherwise stop at 4. This is an exploratory group-average lower estimate, not per-campaign certified EVSI.",
+  "reliability": "On calibration compounds compute max |prediction-truth|/posterior_sd over every selected top10 candidate at all allowed decision snapshots (after4 and final for two-stage), with sigma floor 1e-6. Calibrate order statistic ceil((n+1)*.9), globally and in two observable risk bins defined by fit median max absolute standardized innovation of the first purchased batch. Report frozen selected-path coverage, active-drug subgroup coverage, widths and subgroup counts. No hidden activity label enters actions or bins.",
+  "primary_development_contrast": "gated_two_stage vs fit-selected strongest batch: net utility at shared resource cap18; report paired drug bootstrap and exact-mechanism cluster bootstrap. Prespecified same-budget adaptation contrast two_stage_kg_14 minus fixed_split_kg_14. All inference is exploratory after prior dataset exposure.",
+  "secondary": "Original independently measured PRISM secondary screen is scored only, never used for decisions, gate fitting or reliability calibration. Paired available intersection and selected-target counts must be reported; selection-dependent missingness precludes confirmation.",
+  "success_gate": "Do not claim scientific confirmation or promote predictive policy to src/tools. An exploratory promising signal requires positive lower cluster CI on primary net utility, selected-path and active-drug coverage >=.9, and positive secondary cluster CI. Absence of support is a valid result.",
+  "audit": ["No terminal-truth-dependent action", "No duplicate or terminal purchases", "Resource cap <=18", "At most2 rounds", "Full batch planned before any batch outcome is revealed", "Decision and stop ledger", "Frozen code/source hashes", "All queried compounds retained, hidden active labels only for reporting"]
+}

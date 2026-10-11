@@ -6,6 +6,8 @@ Read [REPORT.md](REPORT.md) for current conclusions, [EVIDENCE.md](EVIDENCE.md) 
 
 | Route | Canonical entry | State |
 |---|---|---|
+| Fixed probes in a masked response context | [Context-probe diagnostic](context_probe_20261011/README.md) | Exact-dose matrix rebuilt; 8 shared probes fail to improve later top-10 drug selection over strong prior; 106 exposed contexts, 5 incomplete endpoints; model-side isolation and arithmetic verified |
+| Sparse feedback with a common total budget | [Budgeted feedback study](budgeted_feedback_20261011/README.md) | Two-round exposed replay remains NOT_SUPPORTED; budget checks promoted, empirical gate retained in research; cross-field literature and official data audit included |
 | Scientific decision interface and adaptive replay | [Dual-core interface study](dual_core_scientific_20261011/README.md) | Frozen receipt, opt-in authorization, scoped routing and paired cost reporting promoted; 421-drug replay does not confirm adaptation over batch; active-subgroup calibration fails; experimental models remain in research |
 | Adaptive investigation feasibility | [Block O environment](astra/adaptive_investigation_20261011/environment.py), [headroom results](astra/adaptive_investigation_20261011/feasibility/headroom.json) | Exploratory feasibility only; no registered freeze, sealed confirmation or independent verification; not promotion or confirmatory evidence |
 | Literature and distinct measured endpoint sources | [Verified review](dual_core_scientific_20261011/literature/REVIEW.md), [CXCL9 audit](dual_core_scientific_20261011/literature/DATASET.md) | 16 references; new small official CXCL9 packet is audited data, not new scientific confirmation |

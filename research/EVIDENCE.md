@@ -1,5 +1,63 @@
 # Evidence Register
 
+## Fixed eight probes in a masked response context - 2026-10-11
+
+**Verdict: `NOT_ESTABLISHED`; exposed retrospective diagnostic.** The
+[packet](context_probe_20261011/README.md) rebuilds PRISM HTS exactly 2.5 uM data,
+avoiding the 36 mixed-dose groups in the older extraction. Its 561 contexts and
+3,621 reference-qualified drug groups split into 356 reference, 99 development
+and 106 evaluation contexts. The task fixes a context and selects ten known drugs
+after eight common probes; it differs from the earlier per-drug cell-line task.
+
+Reference-only fitting, crossfit features and probe selection, followed by development
+model selection, produce a frozen ridge prior and residual corrections. Target basal
+input and purchased probes are allowed; all other target responses are excluded from
+model fitting and commitment. The published ComBat/replicate preprocessing was not
+reconstructed, so masking is a model-side guarantee after source preprocessing.
+
+On 101 complete paired contexts, low rank minus paid no update is -0.0119328
+(nominal lineage-cluster CI [-0.0353000, +0.0102526]). Conditional residual transfer
+reduces available-terminal MSE from 0.3097335 to 0.2787412 but top-10 utility changes
+by -0.0058181 (CI [-0.0315242, +0.0220592]). Low rank beats shuffled identities by
++0.0309152, which does not establish benefit over the prior. Offset changes no ranks.
+At the declared 0.001 utility/read-equivalent price, low rank minus zero purchase is
+-0.0219328 (CI [-0.0453000, +0.0002526]). Eight probes plus one round cost 10 declared
+read equivalents, not authenticated laboratory expenditure.
+
+Six missing-probe contexts fall back while retaining all attempted charges; five
+contexts lack a full selected endpoint and remain in the ledger. No full-population
+or reliability guarantee follows. Independent audit reconstructs 636 arm/context
+records and nine contrasts. The tested complex feedback branch stops before KG or
+Agent expansion; empirical models remain research-only. Report endpoint-pooling and
+derived-overflow guards are the only new formal engineering fixes.
+
+## Sparse feedback at a common total resource cap - 2026-10-11
+
+**Verdict: `NOT_SUPPORTED`; exposed retrospective development only.** The
+[study packet](budgeted_feedback_20261011/README.md) reuses 701 reference, 281 exposed
+development and 421 exposed replay compounds. It fixes a drug and selects terminal
+cell backgrounds. A cap of 18 declared read equivalents permits batch16/one round
+or adaptive14/two rounds. A fit-only gate stops after four reads in 55.58% of episodes.
+The strongest fit-selected comparator remains Gaussian IVR batch16.
+
+- Net utility increment: +0.0008216, mechanism-string cluster 95% CI
+  [-0.0110244, +0.0129016]. Raw utility decreases by 0.0058482 while declared resource
+  use decreases 37.05%; no superiority, noninferiority or monetary claim follows.
+- Adaptive versus same-resource fixed split: +0.0018944, cluster CI
+  [-0.0070071, +0.0101716]. Correct feedback helps against shuffling but does not
+  establish adaptive gain over batch.
+- Selected-path coverage: 87.89%; active-drug episodes: 67.33% (n=101). This is a
+  different endpoint from the prior all-terminal coverage. Model tuning already used
+  the old development population, and reliability is an audit rather than a purchase gate.
+- Secondary paired n=120, effect -0.0177205, cluster CI [-0.0563981, +0.0157481];
+  301 missing/ineligible episodes prevent a whole-population confirmation claim.
+
+Cluster intervals are dependence sensitivity checks, not independent culture evidence.
+All statistics remain exploratory after exposure. The core budget checker and optional
+total-cap report are engineering promotions; the empirical policy remains in research.
+The independent audit reconstructs all 8,424 arm/episode ledgers. Thirteen verified
+cross-field paper records and 17 official data sources supplement the earlier review.
+
 ## Frozen scientific decision interface and adaptive observation replay — 2026-10-11
 
 **Verdict: `NOT_CONFIRMED`; engineering contracts promoted, empirical prediction and acquisition remain in research.**

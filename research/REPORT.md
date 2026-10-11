@@ -4,7 +4,24 @@ As of 2026-10-11, MAESTRO has a verified operational agent–decision–virtual-
 
 The [evidence register](EVIDENCE.md) owns cross-study numerical results. The [research index](INDEX.md) routes to detailed protocols and frozen receipts, and [scientific status](SCIENTIFIC_STATUS.json) records units, limitations and gates. Generated assets may be absent from a clean checkout. `python -m tools.research_validation --verify` must report missing or mismatched assets rather than substitute outcomes.
 
-The new [dual-core scientific interface study](dual_core_scientific_20261011/README.md)
+The latest [fixed-probe context diagnostic](context_probe_20261011/README.md) rebuilds
+exactly 2.5 uM HTS data and masks entire target response contexts at model fit. Eight
+common probes fail to improve subsequent top-10 drug selection over a development-
+selected strong prior. Conditional residual transfer improves MSE by about 10% but
+does not improve selection. Five of 106 evaluation contexts lack complete selected
+endpoints; publisher ComBat and culture-level independence remain limitations. The
+prespecified diagnostic therefore stops this branch before KG/Agent expansion.
+
+The [budgeted feedback study](budgeted_feedback_20261011/README.md) compares
+at most two feedback rounds under a common total resource cap. Its exposed replay
+stops after four reads in 55.58% of episodes and spends 37.05% fewer declared resources,
+but net gain over the strongest batch remains unsupported (+0.00082, cluster interval
+[-0.01102, +0.01290]). Selected-path and active-drug coverage fail, as does secondary
+confirmation. It promotes budget arithmetic and report checks only. Its literature
+and source audits support scoped context transfer and graph-prior ablations as next
+tests, not established scientific innovations.
+
+The [dual-core scientific interface study](dual_core_scientific_20261011/README.md)
 evaluates feedback-directed selection on 421 previously exposed Block N compounds. At 16
 recorded readouts, adaptation adds +0.00217 terminal utility over the strongest
 calibration-selected Gaussian batch design, 95% CI [-0.01562, +0.01970], Holm p=0.40643.
