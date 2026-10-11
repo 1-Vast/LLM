@@ -1,0 +1,63 @@
+{
+  "study_id": "dual_core_scientific_20261011_profile_campaign",
+  "status": "ALGORITHM_PROTOCOL_FROZEN_BEFORE_NEW_CAMPAIGN_OUTCOMES",
+  "scope": "Retrospective replay on previously exposed public data. Old Block N confirmation drugs are new algorithm-test units, not untouched biological data. No LLM is called by these deterministic policies.",
+  "question": "Does observation-dependent scientific planning improve terminal selective-cell-line decisions over a strong equal-budget batch design, and does transcriptional evidence contribute independently?",
+  "seed": 20261011,
+  "source_roles": {
+    "training": "Block N reference drugs only (701)",
+    "calibration": "Block N development drugs only (281)",
+    "algorithm_test": "Block N confirmation drugs only (421)",
+    "reference_exclusion": "Exclude the query and every reference drug with its exact annotated mechanism string; never add other query outcomes to references."
+  },
+  "population": "All algorithm-test drugs with a measured L1000 input, at least 16 finite buyable discovery-line outcomes and at least 50 finite terminal-line outcomes. No filtering by hidden killing activity.",
+  "geometry": {
+    "line_split": "Seeded permutation of all PRISM line identifiers; discovery first floor(n/2), terminal remainder. This source-only split is fixed before query outcomes are scored.",
+    "menu": "64 discovery lines with largest reference-only selective residual variance and at least 90% reference measurement availability; every arm has the same query-specific finite subset.",
+    "action": "Reveal one recorded primary PRISM log-fold-change value for the query at a buyable discovery line.",
+    "budgets": [2, 4, 8, 16],
+    "primary_budget": 16,
+    "terminal_action": "Select the 10 terminal lines with smallest predicted selective residual, among lines with recorded primary outcomes. Terminal outcomes are never purchasable. Availability is public, values are hidden.",
+    "cost_unit": "One line-compound measurement. Adaptive policies take up to 16 sequential turnarounds; batch policies one. A source-only policy purchases zero measurements. Existing 18-option L1000 input cost is shared and separately disclosed; cross-assay procurement costs are not inferred."
+  },
+  "algorithm": {
+    "world_model": "Reference-profile library mixture with L1000 cosine prior and two integrated Gaussian nuisance coefficients (offset and reference-derived generic sensitivity). Primary observations update reference-particle weights by their marginal conditional likelihood; selective target means are weighted reference residuals. This is a probabilistic empirical surrogate, not a foundation-model forecast or mechanism-causal claim.",
+    "planner": "One-step Gaussian-moment approximation to expected improvement in terminal top-10 mean selective utility (knowledge gradient), recomputed after actual observations. Gaussian nodes are fixed quantiles. No candidate-specific hidden outcome enters action valuation.",
+    "fixed_designs": "A batch Gaussian knowledge-gradient design and a batch Gaussian integrated-variance design, using the same initial transcriptional mean and reference-only covariance. Both receive their selected measurements, then condition their prediction. A fixed-panel library-mixture model is also evaluated.",
+    "strong_baseline_selection": "Best calibration mean terminal selective utility among the fixed Gaussian designs and fixed library design; ties break lexicographically. The winner is frozen before algorithm-test execution.",
+    "tau_grid": [0.05, 0.1, 0.2],
+    "noise_sigma_grid": [0.5, 1.0, 2.0],
+    "global_covariance_fraction": 0.2,
+    "prior_floor_fraction": 0.1,
+    "nuisance_covariance_floor": 0.05,
+    "quadrature_nodes": 9,
+    "calibration_parameters": "Choose tau by calibration source-only terminal utility; choose sigma by calibration fixed_library@16 terminal utility. No adaptive algorithm-test metrics are used for fitting.",
+    "primary_metrics": ["terminal_mean_selective_utility", "top10_precision"],
+    "top10_precision_truth": "Membership among the lowest 10% observed terminal selective residuals; descriptive rank endpoint, not a mechanistic or clinical hit definition.",
+    "source_only": "Mean of the 5 strongest positive-cosine transcriptional neighbors, matching the established simple transfer as closely as possible. Zero purchased observations."
+  },
+  "arms": ["source_only", "batch_gp_kg", "batch_gp_ivr", "fixed_library", "adaptive_dual", "adaptive_without_l1000", "adaptive_feedback_shuffle", "adaptive_signature_shuffle", "random_library"],
+  "primary_contrasts": [
+    {"id": "adaptation", "a": "adaptive_dual", "b": "frozen_best_fixed", "metric": "terminal_mean_selective_utility"},
+    {"id": "transcription", "a": "adaptive_dual", "b": "adaptive_without_l1000", "metric": "terminal_mean_selective_utility"},
+    {"id": "feedback", "a": "adaptive_dual", "b": "adaptive_feedback_shuffle", "metric": "terminal_mean_selective_utility"}
+  ],
+  "statistics": {
+    "paired_unit": "Drug campaign",
+    "primary": "Seeded paired bootstrap 95% interval (4000 draws), paired sign-flip randomization (20000 draws), Holm correction across three primary contrasts. Primary PASS requires positive effect and corrected one-sided p <= 0.05.",
+    "dependence_sensitivity": "Mechanism-string cluster bootstrap intervals. Exact annotation strings can be imperfect clusters; drug-level p-values are not independent biological replication.",
+    "secondary": "Repeat terminal selection utility, precision and selective correlation on independently measured secondary-screen values at the dose nearest 2.5 uM, for compounds/lines with observations. Secondary values never feed selection or calibration. Report availability and missingness.",
+    "dual_core_gate": "All three primary contrasts PASS; terminal precision does not decline by more than 0.02 versus the frozen best fixed; independent secondary adaptation effect has a positive interval lower bound. Otherwise report individual gains and failures without declaring dual-core superiority."
+  },
+  "controls": {
+    "feedback_shuffle": "Pre-frozen per-drug permutation of candidate-line feedback values. Scoring truth is unchanged; the policy sees only purchased (misassigned) values.",
+    "signature_shuffle": "Pre-frozen permutation of query L1000 inputs, preserving viability and query identities; only source prior is changed.",
+    "leakage_checks": ["query-outcome poisoning leaves initial predictions/actions identical", "terminal-outcome poisoning leaves full action trace identical", "changing a purchased value can change subsequent actions", "reference/calibration/test identifiers disjoint", "no duplicate purchase or terminal-line purchase", "source and execution hash verification"],
+    "outcome_shuffle": "Paired outcome association-shuffle analysis is a diagnostic on frozen selected-line predictions, not a replacement test dataset."
+  },
+  "reliability": {
+    "calibration": "For frozen policies, development campaigns calibrate a simultaneous absolute-error bound across all terminal predicted selective coordinates at budget 16 using the finite-sample conformal order statistic. Report test simultaneous coverage, width, and active-compound subgroup coverage, without adjusting the test threshold.",
+    "limit": "Marginal exchangeability is an assumption; previously exposed data, exact mechanism exclusion and subgroup coverage limit biological certification. No LLM self-confidence is used."
+  },
+  "efficiency": "Set BLAS thread pools to one; retain action traces, per-arm wall time, costs, model-call count (zero actual API calls), and source-only acquisition cost. No optional advanced architecture is promoted merely by this replay."
+}

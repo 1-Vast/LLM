@@ -5,6 +5,7 @@ from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Mapping, Protocol, Sequence
 from .interface import ModelCapabilities, PredictionRequest, QueryAssessment, QuerySupport, StatePrediction, safe_predict
+from .routing import BackendRoutingPolicy
 from .state_adapter import DEFAULT_MODEL_VERSION, StateAdapterConfig, StateCapabilityAdapter
 
 
@@ -45,7 +46,8 @@ class SimulationCostLedger:
             self.contract_violations[name] = self.contract_violations.get(name, 0) + 1
 
     def total_cost(self) -> float:
-        return sum(self.cost_per_call.get(name, 1.0) * count for name, count in self.calls.items())
+        return sum(self.cost_per_call.get(name, 0.0 if name == "none" else 1.0) * count
+                   for name, count in self.calls.items())
 
     def summary(self) -> dict[str, object]:
         return {
@@ -57,7 +59,7 @@ class SimulationCostLedger:
 
 
 class CompositeWorldModel:
-    """Try rungs in ladder order; never let a broken prediction leak through."""
+    """Route a supported query by frozen reference preferences, or refuse ambiguity."""
 
     def __init__(
         self,
@@ -65,6 +67,7 @@ class CompositeWorldModel:
         *,
         ledger: SimulationCostLedger | None = None,
         enforce_contract: bool = True,
+        routing_policy: BackendRoutingPolicy | None = None,
     ):
         if not rungs:
             raise ValueError("A composite world model needs at least one rung.")
@@ -85,6 +88,11 @@ class CompositeWorldModel:
             seen.add(name)
         self._rungs = tuple(rungs)
         self._ledger = ledger or SimulationCostLedger()
+        if routing_policy is not None:
+            unknown = {p.backend for p in routing_policy.preferences} - seen
+            if unknown:
+                raise ValueError("routing policy names unregistered backends: " + ",".join(sorted(unknown)))
+        self._routing_policy = routing_policy
         if not enforce_contract:
             raise ValueError("World-model contracts cannot be disabled.")
         self.last_rung: str | None = None
@@ -97,7 +105,8 @@ class CompositeWorldModel:
     def name(self) -> str:
         """A composite is itself a rung, so it carries a name of its own."""
 
-        return "composite[" + ",".join(rung.name for rung in self._rungs) + "]"
+        name = "composite[" + ",".join(sorted(rung.name for rung in self._rungs)) + "]"
+        return name if self._routing_policy is None else name + ":routing:" + self._routing_policy.identity
 
     def capabilities(self) -> ModelCapabilities:
         """The first rung's declaration, kept for the single-backend contract.
@@ -147,14 +156,33 @@ class CompositeWorldModel:
                     *assessment.limitations,
                     *(f"missing_input:{item}" for item in assessment.missing_inputs),
                 ] or [assessment.support.value]
+        selected, reason, preference = self._selection(request, eligible)
         return {
             "requested_readouts": list(request.readouts),
             "registered_backends": [rung.name for rung in self._rungs],
             "eligible": eligible,
             "ineligible": rejected,
-            "selected": eligible[0] if eligible else None,
-            "selection_rule": "first eligible backend in registration order",
+            "selected": selected,
+            "selection_rule": ("frozen reference support, compute cost, backend name"
+                               if self._routing_policy is not None else "unique eligible backend; otherwise abstain"),
+            "selection_reason": reason,
+            "routing_policy_id": self._routing_policy.identifier if self._routing_policy else None,
+            "routing_source_sha256": self._routing_policy.source_sha256 if self._routing_policy else None,
+            "selected_calibration_id": preference.calibration_id if preference else None,
+            "selected_reference_units": preference.reference_units if preference else None,
         }
+
+    def _selection(self, request: PredictionRequest, eligible: Sequence[str]):
+        if not eligible:
+            return None, "no_supported_rung", None
+        if self._routing_policy is not None:
+            preferences = self._routing_policy.ranked(request, set(eligible))
+            if not preferences:
+                return None, "routing_policy_out_of_scope", None
+            return preferences[0].backend, "reference_policy", preferences[0]
+        if len(eligible) == 1:
+            return eligible[0], "unique_supported_rung", None
+        return None, "ambiguous_backend_routing", None
 
     def predict_all(self, request: PredictionRequest) -> tuple[tuple[str, StatePrediction], ...]:
         """Every eligible backend's prediction, kept separate.
@@ -179,21 +207,24 @@ class CompositeWorldModel:
         return tuple(results)
 
     def assess_query(self, request: PredictionRequest) -> QueryAssessment:
-        for rung in self._rungs:
-            if rung.capabilities().model_version != request.model_version:
-                continue
-            assessment = rung.assess_query(request)
-            if assessment.support is QuerySupport.SUPPORTED:
-                return assessment
+        eligible = self.eligible_backends(request)
+        selected, reason, _ = self._selection(request, [rung.name for rung in eligible])
+        if selected is not None:
+            return next(rung for rung in eligible if rung.name == selected).assess_query(request)
         return QueryAssessment(
             QuerySupport.UNSUPPORTED,
             (),
-            ("no_rung_supports_this_query",),
-            self._rungs[-1].capabilities(),
+            (reason,),
+            min((rung for rung in self._rungs if rung.capabilities().model_version == request.model_version),
+                key=lambda rung: rung.name, default=self._rungs[0]).capabilities(),
         )
 
     def predict(self, request: PredictionRequest) -> StatePrediction:
-        for rung in self.eligible_backends(request):
+        self.last_rung = None
+        eligible = self.eligible_backends(request)
+        selected, reason, _ = self._selection(request, [rung.name for rung in eligible])
+        if selected is not None:
+            rung = next(rung for rung in eligible if rung.name == selected)
             _, prediction = safe_predict(rung, request)
             self.last_rung = rung.name
             violation = prediction.abstain_reason == "contract_violation"
@@ -204,12 +235,12 @@ class CompositeWorldModel:
             applicable=False,
             state_change=None,
             uncertainty=None,
-            limitations=("No registered world-model rung supports this query.",),
+            limitations=(reason,),
             request_id=request.request_id,
             model_version=request.model_version,
             confidence=None,
             in_distribution=False,
-            abstain_reason="no_supported_rung",
+            abstain_reason=reason,
             compute_cost=0.0,
         )
 

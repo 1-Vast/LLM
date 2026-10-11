@@ -1,8 +1,30 @@
 # MAESTRO Research Report
 
-As of 2026-10-11, MAESTRO has a verified operational agent–decision–virtual-cell loop and reproducible development experiments. **The virtual cell now has confirmed decision value for one thing: finding selective killers whose mechanism class is not already known to work (block P, +17 unexpected hits on 975 untouched compounds, p 0.00098).** Independent scientific decision gain from the agent loop, from knowledge feedback or from an LLM policy remains unestablished, and the proposed agent architecture did not beat a conventional agent-with-tool loop. The latest advance qualifies the 39 endpoint coordinates in two source files; it does not validate feedback or release active procurement.
+As of 2026-10-11, MAESTRO has a verified operational agent–decision–virtual-cell loop and reproducible development experiments. **The virtual cell has confirmed decision value for finding selective killers whose mechanism class is not already known to work (block P, +17 unexpected hits on 975 untouched compounds, p 0.00098).** Independent scientific decision gain from the agent loop, from knowledge feedback or from an LLM policy remains unestablished, and the proposed agent architecture did not beat a conventional agent-with-tool loop. The latest work adds a frozen scientific decision interface and a controlled adaptive-observation replay; it promotes engineering contracts, while its predictive policy fails the comparison gate.
 
 The [evidence register](EVIDENCE.md) owns cross-study numerical results. The [research index](INDEX.md) routes to detailed protocols and frozen receipts, and [scientific status](SCIENTIFIC_STATUS.json) records units, limitations and gates. Generated assets may be absent from a clean checkout. `python -m tools.research_validation --verify` must report missing or mismatched assets rather than substitute outcomes.
+
+The new [dual-core scientific interface study](dual_core_scientific_20261011/README.md)
+evaluates feedback-directed selection on 421 previously exposed Block N compounds. At 16
+recorded readouts, adaptation adds +0.00217 terminal utility over the strongest
+calibration-selected Gaussian batch design, 95% CI [-0.01562, +0.01970], Holm p=0.40643.
+A separately frozen same-particle-posterior batch comparator gives +0.00840
+[-0.00412, +0.02094]. The registered verdict is `NOT_CONFIRMED`. Removing L1000
+information or shuffling real purchased feedback lowers utility significantly within this
+replay, but this does not demonstrate an adaptive or LLM advantage. Overall 90% simultaneous
+coverage is 90.74%; coverage on active drugs is only 62.38%, and the secondary screen does
+not confirm the utility gain. Sequential adaptation needs 16 turnarounds instead of one.
+
+Promoted engineering changes bind endpoint, hypothesis definitions, interpretation rules and
+settings, source/model revisions and action conditions to an external evaluation receipt.
+The opt-in deterministic gate controls measurement authorization, refuses nonpositive value
+without a purchase fallback, and rechecks repaired actions. Composite prediction routes now
+require a scoped frozen preference when multiple backends are eligible; registration order
+cannot choose the response. A paired campaign report exposes measurement and turnaround
+prices with whole-cluster uncertainty. Sixteen verified literature records and a small new
+CXCL9 source audit constrain novelty and future experiments. The empirical particle model
+and adaptive acquisition remain in research. Four real API requests test synthetic engineering
+compatibility only; final rule-bound checks use preserved responses offline.
 
 The 2026-10-10 phenotype-anchored study evaluated Tahoe relative-survival selectivity and phase
 shift on five checkpoint-held-out lines, using phenotypes measured in the same spheroids as RNA.
@@ -112,7 +134,7 @@ for forecasts, score leave-one-context-out, and beat the best cheap prior by the
 useful benefit. Passing admits evaluation; it does not certify the forecast. Unsupported
 cross-assay, cross-dose or cross-time bridges and undercounted contexts are refused.
 
-The current endpoint is a signed 39-gene RNA response. It does not establish functional phenotype, protein activity, causal mechanism, clinical efficacy or the value of an experiment. Five target cell backgrounds in the current STATE studies were previously exposed, and reference contexts overlap STATE pretraining.
+The historical STATE/MAP endpoint is a signed 39-gene RNA response. It does not establish functional phenotype, protein activity, causal mechanism, clinical efficacy or the value of an experiment. Five target cell backgrounds in those STATE studies were previously exposed, and reference contexts overlap STATE pretraining. PRISM and phenotype-anchored studies have separately defined measured endpoints and retain their own transport and independence limits.
 
 ## What has passed
 
@@ -138,4 +160,9 @@ Original P0.5/P0.5R failures remain frozen: control-only matching was 27/39 c40 
 
 The next eligible research task is a **new frozen P0.6 observation-reliability protocol**. Bind exact source revision, endpoint coordinates, exclusions, treated/control rows, actual group sizes, reference weights, shared-control uncertainty, source-repeat estimands and exact acquisition costs before reading expression. The proposed 24 line/plate treatment strata represent **12 pooled samples**, not 24 independent cultures. Source-wide 24-hour exposure is documented; per-sample timestamps and a third confirmation source remain absent. See [P0.6 readiness](decision_value/axis_extension_20261010/P06_READINESS.md).
 
-P0.6 execution is not released, P2 remains closed, and experimental feedback stays in research. Stable A-to-B transfer, beneficial final selection, harms, authenticated costs and untouched qualifying biological units are separate future gates. The endpoint remains an equal positive `+1/39` RNA expression-change mean, not viability, apoptosis, protein engagement or mechanism causality.
+P0.6 execution is not released, P2 remains closed, and experimental feedback stays in research. Stable A-to-B transfer, beneficial final selection, harms, authenticated costs and untouched qualifying biological units are separate future gates. That source-reliability endpoint remains an equal positive `+1/39` RNA expression-change mean, not viability, apoptosis, protein engagement or mechanism causality.
+
+The new campaign policy has a separate failed gate. Its next qualifying study requires distinct
+measured data, a predeclared useful net-benefit threshold, same-posterior batch controls,
+selection-relevant reliability and actual turnaround costs. A synthetic provider audit or
+downloaded dataset cannot release either scientific gate.

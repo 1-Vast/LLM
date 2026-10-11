@@ -1,5 +1,71 @@
 # Evidence Register
 
+## Frozen scientific decision interface and adaptive observation replay — 2026-10-11
+
+**Verdict: `NOT_CONFIRMED`; engineering contracts promoted, empirical prediction and acquisition remain in research.**
+
+The [study packet](dual_core_scientific_20261011/README.md) separates real-observation replay,
+software contracts and synthetic API compatibility. Reference 701, calibration 281 and
+algorithm-test 421 are old Block N compounds, previously exposed biological data. Every
+input-qualified test compound is included. The policy may buy 16 PRISM discovery-menu values
+and selects ten lines from a disjoint, unpurchasable terminal menu. L1000 and reference data
+provide the initial empirical prior; no LLM or new STATE checkpoint inference is used in this
+replay. The endpoint is negative mean terminal selective residual, not causal mechanism.
+
+| Contrast at 16 measurements | Utility increment | Nominal 95% drug-bootstrap CI | Holm one-sided p |
+|---|---:|---|---:|
+| Adaptive minus strongest calibration-selected Gaussian batch | +0.0021701 | [-0.0156195, +0.0196972] | 0.40643 |
+| Adaptive minus no-L1000 adaptive policy | +0.0315567 | [+0.0097526, +0.0538751] | 0.00690 |
+| Adaptive minus shuffled-feedback policy | +0.0733459 | [+0.0490015, +0.0995738] | 0.000150 |
+
+The three corresponding mechanism-string cluster intervals are [-0.01760, +0.02022],
+[+0.00269, +0.06511], and [+0.04481, +0.10664], over 211 clusters. They are dependence
+sensitivity checks, not culture independence or simultaneous intervals. The registered
+gate requires adaptation, information and feedback contrasts, no more than 0.02 precision
+decline, and a positive secondary-screen adaptation interval lower bound; it fails.
+A same-particle-posterior batch comparator was separately frozen before reading test results:
+utility +0.0083965 [-0.0041235, +0.0209354], secondary p=0.09615. Adaptive minus fixed
+library gives +0.0091009 [-0.0029863, +0.0216723]. Neither replaces or passes the primary gate.
+
+Frozen 90% simultaneous coverage is 0.90736 overall but 0.62376 on 101 descriptively identified
+active compounds; interval width is 5.44993. Marginal calibration does not qualify the active
+selection regime. Independently measured secondary values do not confirm adaptive benefit:
+paired utility delta -0.0546815 [-0.1248689, +0.0111080], n=116, and selective-r delta
+-0.0428180 [-0.0678735, -0.0207327]. Secondary measurement availability is incomplete,
+selection-dependent and at a different dose-selection protocol.
+
+Adaptive and batch each buy 16 values, with 16 versus 1 simulated turnarounds. Declared utility
+prices of 0.001/0.01 per turnaround give adaptive-minus-Gaussian net differences
+-0.0128299/-0.1478299. These are price sensitivities, not laboratory invoices. Calibration,
+primary and same-posterior replay took 178.0/579.3/285.6 seconds. No experimental measurement
+was newly procured.
+
+**Verification.** All 3,789 primary and 702 supplementary terminal ledgers reconstruct within
+2.22e-16; 320 sampled full-policy budget rows reconstruct within 8.88e-16. Terminal-truth
+poisoning preserves actions and predictions; changing a purchased observation changes 7/8
+next actions. Source and executable hashes match. Lossless ledgers total 18.87 MB; four
+ignored NPZ inputs total 87.43 MB and require staged recovery for clean-checkout replay.
+Public source URLs and hashes are retained, but raw-to-derived restoration is not automated.
+
+**Promoted contracts.** External frozen evaluation binds endpoint, hypotheses, complete
+interpretation rules/settings, source/model revision and action conditions before optional
+terminal-value authorization. Repaired plans cannot override the refusal. Composite routing
+uses scoped preferences rather than registration order, and paired utility reporting includes
+whole-cluster inference and explicit costs. The failed empirical model supplies no production
+admission receipt. A hash authenticates declared identity, not the calibration claim itself.
+
+Four real provider requests used 4,896 reported tokens; six preserved-response replays include
+the final interpretation-bound schema. Synthetic scenarios passed with no measurement spend
+or scientific result. Monetary API cost is unavailable. The targeted review contains 16
+verified citations, and a 5.36 MB official CXCL9 packet was downloaded only for source audit.
+Its model-time grid and placeholder protein fields are not measured outcomes. Novel adaptive
+or LLM superiority remains unestablished.
+
+Canonical results: [TEST_RESULTS.json](dual_core_scientific_20261011/experiment/TEST_RESULTS.json),
+[SUPPLEMENT_RESULTS.json](dual_core_scientific_20261011/experiment/SUPPLEMENT_RESULTS.json),
+[VERIFIED.json](dual_core_scientific_20261011/experiment/VERIFIED.json),
+[engineering receipt](dual_core_scientific_20261011/ENGINEERING_RECEIPT.json).
+
 ## Where an LLM adds value to a virtual cell: selective killing profiles — 2026-10-11
 
 **Primary results:**

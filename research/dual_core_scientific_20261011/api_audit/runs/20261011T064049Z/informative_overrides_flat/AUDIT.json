@@ -1,0 +1,134 @@
+{
+  "scenario": "informative_overrides_flat",
+  "status": "pass",
+  "failure": null,
+  "checks": {
+    "actual_planner_requested_flat": true,
+    "expected_action_selection": true,
+    "registered_hypotheses_preserved": true,
+    "spent_unchanged": true,
+    "remaining_budget_unchanged": true,
+    "no_measurement_results": true,
+    "no_terminal_evidence": true,
+    "no_measured_profile_fields": true,
+    "execution_gate_matches": true,
+    "selection_gate_present": true,
+    "no_fallback": true,
+    "no_llm_repair": true,
+    "shift_refused_before_forecast": true
+  },
+  "raw_planner_proposal": {
+    "identifier": "mechanism_diagnosis_fixture_flat",
+    "hypotheses": [
+      {
+        "identifier": "a",
+        "description": "The synthetic intervention's observed viability effect in cell-a is attributable to incomplete perturbation of SYNTHETIC_TARGET, such that residual target activity sustains the phenotype.",
+        "proposed_action": "continue",
+        "causal_factor": "incomplete_perturbation"
+      },
+      {
+        "identifier": "b",
+        "description": "The synthetic intervention's observed viability effect in cell-a is attributable to multi-target activity, such that engagement of targets beyond SYNTHETIC_TARGET contributes to the phenotype.",
+        "proposed_action": "preserve_multi_target_activity",
+        "causal_factor": "multi_target_activity"
+      }
+    ],
+    "differing_assumptions": [
+      "Hypothesis a assumes the intervention engages SYNTHETIC_TARGET but does not fully suppress its activity; hypothesis b assumes the intervention engages additional targets that contribute to viability.",
+      "Hypothesis a treats residual SYNTHETIC_TARGET activity as sufficient to sustain viability; hypothesis b treats off-target engagement as a necessary contributor to the viability phenotype.",
+      "The two hypotheses make different predictions about whether increasing target engagement alone would alter viability versus whether altering the multi-target profile would alter viability."
+    ],
+    "action_identifier": "flat",
+    "outcome_categories": [
+      "a",
+      "b"
+    ],
+    "interpretation_boundaries": [
+      "The planned flat synthetic assay is an engineering fixture and cannot establish any biological mechanism, regulatory edge, causal effect, or efficacy claim.",
+      "The planned result cannot distinguish whether any observed response reflects incomplete perturbation, multi-target activity, or another unmeasured process; it can only return the registered outcome categories a or b.",
+      "No biological proof is established by this fixture; any interpretation beyond the synthetic outcome category is outside the scope of the planned result."
+    ]
+  },
+  "selected_action_ids": [
+    "useful"
+  ],
+  "case_before": {
+    "case_id": "informative_overrides_flat",
+    "state": "intake",
+    "plan_version": 0,
+    "budget": 10.0,
+    "spent": 0.0,
+    "remaining_budget": 10.0,
+    "stop_reason": null
+  },
+  "case_after": {
+    "case_id": "informative_overrides_flat",
+    "state": "awaiting_result",
+    "plan_version": 1,
+    "budget": 10.0,
+    "spent": 0.0,
+    "remaining_budget": 10.0,
+    "stop_reason": null
+  },
+  "repair_stop_reason": "ready",
+  "forecaster_calls": 1,
+  "selection_gates": [
+    {
+      "authority": "external independent evaluation; hash verifies identity, not scientific validity",
+      "chosen": "useful",
+      "defer_loss": 1.0,
+      "endpoint": "viability",
+      "evaluations": {
+        "flat": {
+          "action_identifier": "flat",
+          "admissible": false,
+          "cost": 0.1,
+          "decision_sensitivity": 0.0,
+          "expected_loss_after": 1.0,
+          "expected_loss_before": 1.0,
+          "expected_value": 0.0,
+          "expected_wrong_decision": 0.0,
+          "net_value": -0.1,
+          "reason": "non_positive_net_value"
+        },
+        "useful": {
+          "action_identifier": "useful",
+          "admissible": true,
+          "cost": 0.1,
+          "decision_sensitivity": 1.0,
+          "expected_loss_after": 0.040000000000000036,
+          "expected_loss_before": 1.0,
+          "expected_value": 0.96,
+          "expected_wrong_decision": 0.010000000000000009,
+          "net_value": 0.86,
+          "reason": "admissible"
+        }
+      },
+      "measurement_costs": {
+        "flat": 0.1,
+        "useful": 0.1
+      },
+      "minimum_branch_support": 10,
+      "minimum_reference_units": 10,
+      "reason": null,
+      "receipt_sha256": "a7f298a0f59b72f99518811d517d1dbbd9adff0a8300d416b032e76b89b12195",
+      "status": "selected",
+      "utility_scope": "myopic hypothesis decision loss; does not license a development verdict",
+      "wrong_decision_loss": 4.0
+    }
+  ],
+  "execution_gates": [
+    {
+      "approved_action_ids": [
+        "useful"
+      ],
+      "receipt_sha256": "a7f298a0f59b72f99518811d517d1dbbd9adff0a8300d416b032e76b89b12195",
+      "rejected": {},
+      "submitted_action_ids": [
+        "useful"
+      ]
+    }
+  ],
+  "receipt_sha256": "a7f298a0f59b72f99518811d517d1dbbd9adff0a8300d416b032e76b89b12195",
+  "scope": "Engineering compatibility and authority only; synthetic calibration is not scientific certification."
+}

@@ -11,12 +11,13 @@ from typing import TYPE_CHECKING, Callable, Mapping, Sequence
 if TYPE_CHECKING:
     from maestro.hypothesis_forecast import UserStateContext
 from maestro.contrast import MAESTROAgent
-from maestro.acquisition import DiscriminationPlan, OutcomeForecaster, outcome_consequences, select_discriminating_action, select_expected_coverage
+from maestro.acquisition import DecisionValuePlan, DiscriminationPlan, OutcomeForecaster, outcome_consequences, select_discriminating_action, select_expected_coverage
+from maestro.decision_value_policy import FrozenDecisionValuePolicy, decision_action_binding
 from maestro.decision import DecisionEngine, DevelopmentDecision
 from maestro.handoff import ComparabilityStatus, DecisionLayer, EvidenceLayer, ExecutionLayer, RoundRecord, WorldModelLayer, rejected_from_selection, review_run
 from maestro.outcome import EvidenceState, InterpretationTable, MeasuredPremise, OutcomeRule, ValidatedEvidenceUpdate, admit_evidence, default_rules_for, scope_rank
 from maestro.handoff import SourceClusterIndex
-from maestro.composition import ActionTopology
+from maestro.composition import ActionTopology, BudgetedEvidencePlan
 from maestro.judgment import PredictionReliabilityLedger, ScoredPrediction
 from maestro.repair import RepairController, RepairLedger, RepairRecord
 from .case_store import CaseSnapshot, CaseState, CaseStore, MeasurementResult, ResultImport
@@ -136,6 +137,7 @@ class MAESTROOrchestrator:
         discrimination_selection: bool = False,
         selection_strategy: str | None = None,
         forecast_failure_policy: str = "stop",
+        decision_value_policy: FrozenDecisionValuePolicy | None = None,
     ):
         if selection_strategy is not None and (power_aware_selection or discrimination_selection):
             raise ValueError("Use selection_strategy or legacy flags, not both.")
@@ -143,12 +145,18 @@ class MAESTROOrchestrator:
             "discrimination" if discrimination_selection else
             "expected_coverage" if power_aware_selection else "budgeted_coverage"
         )
-        if strategy not in ("budgeted_coverage", "expected_coverage", "discrimination"):
+        if strategy not in ("budgeted_coverage", "expected_coverage", "discrimination", "decision_value"):
             raise ValueError("Unknown selection_strategy.")
         if strategy == "discrimination" and outcome_forecaster is None:
             raise ValueError("discrimination_selection requires an outcome_forecaster.")
         if forecast_failure_policy not in ("stop", "coverage"):
             raise ValueError("Unknown forecast_failure_policy.")
+        if strategy == "decision_value" and (outcome_forecaster is None or decision_value_policy is None):
+            raise ValueError("decision_value requires an outcome_forecaster and a frozen decision_value_policy.")
+        if strategy == "decision_value" and forecast_failure_policy != "stop":
+            raise ValueError("decision_value cannot fall back to coverage.")
+        if decision_value_policy is not None and (strategy != "decision_value" or not isinstance(decision_value_policy, FrozenDecisionValuePolicy)):
+            raise ValueError("A frozen decision_value_policy requires selection_strategy='decision_value'.")
         self._interpreter = interpreter
         self._context_builder = context_builder
         self._planner = planner
@@ -179,6 +187,7 @@ class MAESTROOrchestrator:
         self._reconciliation_by_action: dict[str, tuple["MAESTROTurn", EvidenceAction] | None] = {}
         self._selection_strategy = strategy
         self._forecast_failure_policy = forecast_failure_policy
+        self._decision_value_policy = decision_value_policy
         self._predictions = PredictionCoordinator(
             virtual_cell, logger,
             cache=prediction_cache if prediction_cache is not None else PredictionCache() if reuse_predictions else None,
@@ -270,6 +279,7 @@ class MAESTROOrchestrator:
         discrimination_selection: bool = False,
         selection_strategy: str | None = None,
         forecast_failure_policy: str = "stop",
+        decision_value_policy: FrozenDecisionValuePolicy | None = None,
     ) -> "MAESTROOrchestrator":
         """Create a controller; evaluations may supply an isolated state directory.
 
@@ -305,6 +315,7 @@ class MAESTROOrchestrator:
             selection_strategy=selection_strategy if selection_strategy is not None else (
                 "discrimination" if discrimination_selection else "expected_coverage"),
             forecast_failure_policy=forecast_failure_policy,
+            decision_value_policy=decision_value_policy,
             case_store=None if disable_case_store else case_store if case_store is not None else CaseStore(runtime_directory / "cases.sqlite"),
             enable_llm_repair=True,
             virtual_cell=(
@@ -367,6 +378,12 @@ class MAESTROOrchestrator:
             or not math.isfinite(budget) or budget < 0
         ):
             raise ValueError("Budget must be finite and nonnegative.")
+        if self._selection_strategy == "decision_value" and expected_hypotheses:
+            problem = self._decision_value_policy.hypotheses_refusal_reason(expected_hypotheses)
+            if problem:
+                raise ValueError(problem)
+            if not expected_hypothesis_identifiers:
+                expected_hypothesis_identifiers = tuple(item.identifier for item in expected_hypotheses)
         session_id = session_id or str(uuid.uuid4())
         if user_state is not None:
             from maestro.hypothesis_forecast import UserStateContext
@@ -404,9 +421,11 @@ class MAESTROOrchestrator:
         self._logger.event(
             "runtime_contract",
             {"selection_strategy": self._selection_strategy,
-             "selection_parameters": {"forecast_failure_policy": self._forecast_failure_policy},
-             "prediction_use": "outcome_selection" if self._selection_strategy == "discrimination" else "response_advisory",
-             "response_priority_use": "diagnostic" if self._selection_strategy == "expected_coverage" else "last_tiebreak",
+             "selection_parameters": {"forecast_failure_policy": self._forecast_failure_policy,
+                                      **({"decision_value_policy": self._decision_value_policy.payload()}
+                                         if self._selection_strategy == "decision_value" else {})},
+             "prediction_use": "outcome_selection" if self._selection_strategy in ("discrimination", "decision_value") else "response_advisory",
+             "response_priority_use": "diagnostic" if self._selection_strategy in ("expected_coverage", "decision_value") else "last_tiebreak",
              "rule_contract": "registered_interpretation_table_or_default_rules_for_contrast",
              "registered_rules": [json.loads(json.dumps(asdict(rule), default=sorted)) for rule in self._interpretation_table.rules],
              "action_menu": [asdict(action) for action in available_actions], "budget": budget,
@@ -544,9 +563,13 @@ class MAESTROOrchestrator:
             action_predictions=action_predictions, action_requests=action_requests, case_id=case_id,
             prior_evidence=prior_evidence,
             user_state=user_state,
+            decision_endpoint=intent.phenotype_endpoint,
         )
         acquisition_stop = self._acquisition_stop_reason(session_id)
-        if selection is not None and selection.actions and ((self._selection_strategy == "discrimination") or not selection.uncovered):
+        approved_bindings = ({action.identifier: decision_action_binding(action, intervention_profile, self._decision_value_policy.endpoint)
+                              for action in selection.actions} if self._selection_strategy == "decision_value" and selection else {})
+        valued_hypotheses = contrast.hypotheses
+        if selection is not None and selection.actions and ((self._selection_strategy in ("discrimination", "decision_value")) or not selection.uncovered):
             contrast = replace(
                 contrast,
                 plan=selection.actions[0],
@@ -570,6 +593,22 @@ class MAESTROOrchestrator:
         if self._selection_strategy in ("expected_coverage", "discrimination") and selection is not None:
             allowed = {action.identifier for action in selection.actions}
             execution_actions = tuple(action for action in execution_actions if action.identifier in allowed)
+        if self._selection_strategy == "decision_value":
+            rejected = {action.identifier: "action_changed_after_value_selection" for action in execution_actions
+                        if approved_bindings.get(action.identifier) != decision_action_binding(
+                            action, intervention_profile, self._decision_value_policy.endpoint)}
+            if contrast.hypotheses != valued_hypotheses:
+                rejected.update({action.identifier: "hypotheses_changed_after_value_selection" for action in execution_actions})
+            if len(execution_actions) > len(approved_bindings):
+                rejected.update({action.identifier: "action_bundle_changed_after_value_selection" for action in execution_actions})
+            execution_actions = tuple(action for action in execution_actions if action.identifier not in rejected)
+            if rejected:
+                acquisition_stop = "acquisition_final_plan_refused: " + ", ".join(sorted(set(rejected.values())))
+            if not execution_actions:
+                repair_stop_reason = acquisition_stop or "decision_value_action_not_executable"
+            self._logger.event("decision_value_execution_gate",
+                               {"approved_action_ids": list(approved_bindings), "submitted_action_ids": [a.identifier for a in execution_actions],
+                                "rejected": rejected, "receipt_sha256": self._decision_value_policy.receipt_sha256}, session_id=session_id)
         execution_stop = None
         remaining = case.remaining_budget if case and case.remaining_budget is not None else budget
         if remaining is not None and sum(action.cost for action in execution_actions) > remaining:
@@ -604,7 +643,7 @@ class MAESTROOrchestrator:
                  else "diagnostic_only"
              ),
              "outcome_forecast_use": (
-                 "selection" if (self._selection_strategy == "discrimination") and selection is not None
+                 "selection" if (self._selection_strategy in ("discrimination", "decision_value")) and selection is not None
                  else "shadow" if self._outcome_forecaster is not None and selection is not None
                  else "not_used"
              ),
@@ -663,6 +702,8 @@ class MAESTROOrchestrator:
             response=(
                 "This case is awaiting measurements for its current plan; import those results before submitting a new execution plan."
                 if awaiting_current_plan
+                else "No measurement was authorized: " + (repair_stop_reason or execution_stop or "decision_value_action_not_executable")
+                if self._selection_strategy == "decision_value" and not execution_actions
                 else self._decision_response(contrast, check, repair, visual_inspections, tool_executions)
             )
             + summarize_world_model(briefing_rows),
@@ -1552,9 +1593,10 @@ class MAESTROOrchestrator:
         case_id: str | None = None,
         prior_evidence: Sequence[MeasuredPremise] = (),
         user_state: UserStateContext | None = None,
+        decision_endpoint: str | None = None,
     ):
         remaining = case.remaining_budget if case and case.remaining_budget is not None else budget
-        if remaining is None:
+        if remaining is None and self._selection_strategy != "decision_value":
             return None
         needed = {name for action in available_actions for name in action.required_premises}
         satisfied = {
@@ -1572,11 +1614,15 @@ class MAESTROOrchestrator:
                 prediction, prediction_request, available_actions,
                 action_predictions=action_predictions, action_requests=action_requests,
             )
-            discriminating = self._discriminating_selection(
+            discriminating = None if self._selection_strategy == "decision_value" else self._discriminating_selection(
                 contrast, available_actions, profile, remaining, priorities, case_id, session_id, user_state=user_state,
             )
             path = "budgeted"
-            if discriminating is not None and (self._selection_strategy == "discrimination"):
+            if self._selection_strategy == "decision_value":
+                selection = self._decision_value_selection(contrast, available_actions, profile, remaining,
+                                                           case_id, session_id, decision_endpoint, user_state)
+                path = "decision_value"
+            elif discriminating is not None and (self._selection_strategy == "discrimination"):
                 # The forecast-driven choice replaces the coverage choice only when a caller asked
                 # for it; the coverage path below is then not consulted.
                 selection = discriminating.plan
@@ -1640,7 +1686,7 @@ class MAESTROOrchestrator:
                 # Which selector chose, and whether the priorities could move its choice: never on
                 # the power-aware coverage path; as the last tie-break of the other two.
                 "selection_path": path,
-                "prediction_priorities_used": bool(priorities) and path != "expected_coverage",
+                "prediction_priorities_used": bool(priorities) and path not in ("expected_coverage", "decision_value"),
             },
             session_id=session_id,
         )
@@ -1748,11 +1794,45 @@ class MAESTROOrchestrator:
         )
         return plan
 
+    def _decision_value_selection(self, contrast, actions, profile, remaining, case_id, session_id, endpoint, user_state):
+        """An externally admitted likelihood may buy an observation; never a mechanism verdict."""
+        evidence = self._evidence_states.get(case_id) if case_id else None
+        candidates = contrast.identifiers() & evidence.candidates if evidence is not None else contrast.identifiers()
+        try:
+            if remaining is None:
+                raise ValueError("decision_value_budget_required")
+            problem = self._decision_value_policy.hypotheses_refusal_reason(contrast.hypotheses)
+            rules = self._interpretation_rules(contrast)
+            table = self._interpretation_table if self._interpretation_table.rules else InterpretationTable(rules)
+            settings = {"time_tolerance_hours": table.time_tolerance_hours,
+                        "require_context_match": table.require_context_match}
+            problem = problem or self._decision_value_policy.interpretation_refusal_reason(rules, **settings)
+            if problem:
+                raise ValueError(problem)
+            eligible = tuple(action for action in actions if action.cost <= remaining
+                             and not profile.unmeasured(action.prerequisites)
+                             and self._decision_value_policy.refusal_reason(action, profile, endpoint, None) == "no_outcome_forecast")
+            forecasts = (dict(self._outcome_forecaster.forecast(contrast, eligible, evidence, user_state=user_state)
+                              if user_state is not None else self._outcome_forecaster.forecast(contrast, eligible, evidence))
+                         if eligible else {})
+            plan = self._decision_value_policy.select(frozenset(candidates), actions, profile, remaining, forecasts,
+                                                       outcome_consequences(rules), endpoint=endpoint,
+                                                       hypotheses=contrast.hypotheses, interpretation_rules=rules, **settings)
+        except Exception as error:
+            plan = DecisionValuePlan(None, (), "forecast_failed", f"{type(error).__name__}:{error}")
+        self.__dict__.setdefault("_decision_value_plans", {})[session_id] = plan
+        self._logger.event("decision_value_selection_computed", {**self._decision_value_policy.payload(), **plan.payload()}, session_id=session_id)
+        chosen = tuple(action for action in actions if plan.chosen and action.identifier == plan.chosen.action_identifier)
+        covered = frozenset(candidates & set(chosen[0].distinguishes)) if chosen else frozenset()
+        return BudgetedEvidencePlan(chosen, covered, frozenset(candidates) - covered, sum(a.cost for a in chosen), (),
+                                    {item.action_identifier: item.reason for item in plan.evaluations if not item.admissible})
+
     def _acquisition_stop_reason(self, session_id: str) -> str | None:
         """A named reason to defer when forecast-driven selection found nothing admissible."""
 
-        plan = self.__dict__.get("_discrimination_plans", {}).pop(session_id, None)
-        if plan is None or not (self._selection_strategy == "discrimination") or plan.status == "selected":
+        key = "_decision_value_plans" if self._selection_strategy == "decision_value" else "_discrimination_plans"
+        plan = self.__dict__.get(key, {}).pop(session_id, None)
+        if plan is None or self._selection_strategy not in ("discrimination", "decision_value") or plan.status == "selected":
             return None
         return f"acquisition_{plan.status}: {plan.reason}"
 

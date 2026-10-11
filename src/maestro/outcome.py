@@ -372,6 +372,14 @@ class InterpretationTable:
     def rules(self) -> tuple[OutcomeRule, ...]:
         return self._rules
 
+    @property
+    def time_tolerance_hours(self) -> float:
+        return self._time_tolerance
+
+    @property
+    def require_context_match(self) -> bool:
+        return self._require_context_match
+
     def interpret(
         self,
         observation: ObservationRecord,

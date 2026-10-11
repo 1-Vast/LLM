@@ -292,6 +292,8 @@ class OutcomeForecast:
     evidence_kind: EvidenceKind = EvidenceKind.MODEL_PREDICTION
     outcome_mode: str = "attempted_experiment"
     """valid_readout is conditional on successful measurement, not a complete planning forecast."""
+    provenance: Mapping[str, str] = field(default_factory=dict)
+    """External calibration/source bindings; required only by the opt-in decision-value gate."""
 
     def branch_for(self, hypothesis: str) -> OutcomeBranch | None:
         return next((branch for branch in self.branches if branch.hypothesis == hypothesis), None)

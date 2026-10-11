@@ -42,6 +42,15 @@ summaries retain their source identity. The core does not import research or too
 
 ## Current evidence
 
+The latest [scientific decision interface study](research/dual_core_scientific_20261011/README.md)
+promotes opt-in terminal-value authorization with frozen hypothesis, interpretation and
+condition bindings, scoped backend routing and paired utility/cost reporting. Its 421-compound
+retrospective replay supports the contents of L1000 and real feedback, but does not establish
+adaptation over the strongest batch design (+0.00217, CI [-0.01562, +0.01970]). Active-drug
+calibration and secondary confirmation also fail; its empirical model and policy remain in
+research. The packet includes 16 verified references, a new CXCL9 source audit and four real
+provider compatibility calls, with no claim of incremental LLM scientific benefit.
+
 The 2026-10-10 phenotype-anchored study tested STATE on a functional endpoint measured in the
 same spheroids as its RNA: Tahoe relative-survival selectivity on five held-out lines. Basal-
 similarity transfer beat STATE (delta r -0.23) and generic ranking (top-10 +0.56 log2, 5/5). A

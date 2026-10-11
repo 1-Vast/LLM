@@ -6,6 +6,9 @@ Read [REPORT.md](REPORT.md) for current conclusions, [EVIDENCE.md](EVIDENCE.md) 
 
 | Route | Canonical entry | State |
 |---|---|---|
+| Scientific decision interface and adaptive replay | [Dual-core interface study](dual_core_scientific_20261011/README.md) | Frozen receipt, opt-in authorization, scoped routing and paired cost reporting promoted; 421-drug replay does not confirm adaptation over batch; active-subgroup calibration fails; experimental models remain in research |
+| Adaptive investigation feasibility | [Block O environment](astra/adaptive_investigation_20261011/environment.py), [headroom results](astra/adaptive_investigation_20261011/feasibility/headroom.json) | Exploratory feasibility only; no registered freeze, sealed confirmation or independent verification; not promotion or confirmatory evidence |
+| Literature and distinct measured endpoint sources | [Verified review](dual_core_scientific_20261011/literature/REVIEW.md), [CXCL9 audit](dual_core_scientific_20261011/literature/DATASET.md) | 16 references; new small official CXCL9 packet is audited data, not new scientific confirmation |
 | File-local endpoint qualification | [P0.5R extension](decision_value/axis_extension_20261010/README.md) | Completed c44/c45 39/39; historical/adaptive evidence only |
 | Observation reliability next step | [P0.6 readiness](decision_value/axis_extension_20261010/P06_READINESS.md) | New source/control/reference/cost freeze required; expression execution unreleased |
 | Active procurement P2 | [V3 protocol](decision_value/pairwise_v3/PROTOCOL.json) | Closed pending independent transfer, decision and cost gates |

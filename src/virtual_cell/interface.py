@@ -760,8 +760,8 @@ def safe_predict(
         return reject("invalid_request", errors)
     try:
         declared = model.capabilities()
-        if callable(getattr(model, "catalog", None)):
-            declared = next((item for item in model.catalog() if item.model_version == request.model_version), declared)
+        catalog = tuple(model.catalog()) if callable(getattr(model, "catalog", None)) else (declared,)
+        declared = next((item for item in catalog if item.model_version == request.model_version), declared)
         errors = _capability_errors(declared)
         if errors:
             return reject("invalid_capabilities", errors)
@@ -781,8 +781,13 @@ def safe_predict(
             or _capability_errors(assessment.capabilities)
         ):
             return reject("invalid_assessment")
-        if assessment.capabilities != capabilities:
+        if (assessment.capabilities not in catalog
+                or assessment.capabilities.model_version != request.model_version):
             return reject("assessment_model_mismatch")
+        # A composite can route to any declared member with the requested
+        # version. Its selected assessment, rather than catalog order, binds
+        # the serving backend; an undeclared identity is still refused.
+        capabilities = assessment.capabilities
         if assessment.support is not QuerySupport.SUPPORTED:
             return reject(
                 f"query_{assessment.support.value}",
