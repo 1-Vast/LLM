@@ -235,3 +235,68 @@ Prepared on 2026-10-11 from the machine records:
 
 No number in this record was typed independently of those records. Frozen files were not edited
 after the freeze.
+
+## Additional 2026-10-11 record: block P, selective discovery
+
+Block P (`research/astra/selective_discovery_20261011/`) is a separate study recorded on the same
+date. It asks whether the dual core helps a *campaign*: given a compound library profiled only by
+L1000 and a screening budget, find compounds that selectively kill one tumour lineage. Receipt:
+`20261011/SELECTIVE_DISCOVERY.json`.
+
+**Record control.** Registered in the block's `PROTOCOL.md`, frozen `2026-10-11T04:32:30Z`
+(67 files and 2,920 pre-freeze LLM prior records hashed), run once on a sealed tier of **975 PRISM
+compounds that appear in GSE70138 and in no earlier block**, then verified from the campaign
+ledgers. Pre-freeze disclosure: one sealed-tier statistic had been seen (325 of 987 candidates kill
+at least 5% of lines), recorded in `EXTRACT_RECEIPT.json`.
+
+**Design.** 38 campaigns = 3 disjoint libraries of 325 x the lineages with a reachable hit. Every
+arm received the same library, budget (32 screens, 10%), batch size (5) and menu: 1,216
+compound-screens each. The primary endpoint is the **unexpected hit**, a hit whose annotated
+mechanism class has no selective member for that lineage among the 1,403 reference compounds.
+Verdicts come from an exact cluster sign-flip test over the 14 lineages.
+
+**Results.** Headline `NOT_CONFIRMED`: the registered rule required H1, H2 and H6, and H2 failed.
+
+* **H1 PASS.** The virtual cell adds unexpected hits: **+17** [+11, +23], p = 0.00098. Ten lineages
+  favoured it, three tied, none opposed, so the p-value is at the floor this design can reach.
+* **H2 NOT_SUPPORTED.** The agent loop adds +14 total hits over the one-shot virtual cell
+  (141 vs 127) at p = 0.075 against a 0.025 bar, and it spends **266 plate turnarounds instead of
+  38** for the same wells. On the primary endpoint the one-shot virtual cell is level (66 vs 69) and
+  better on the strictest novelty count (37 vs 31).
+* **H4 NOT_SUPPORTED, as predicted.** A conventional LLM-agent-with-tool loop matched the proposed
+  system: 136 hits and 72 unexpected against 141 and 69. The architectural elaboration is not
+  justified by its own evidence.
+* H3 PASS (+46 unexpected over a fixed workflow), H6 PASS (not inferior to the deterministic
+  planner), H7 PASS (+28 hits confirmed on the independent secondary screen).
+* H5, H8, H9 NOT_SUPPORTED, all as predicted: feedback is directionally positive (+12 [+4, +20]) but
+  fails family-wise; the conventional agent's feedback sensitivity is weaker (+8); the two-stream
+  portfolio adds nothing (-1).
+* Seven of nine registered predictions were correct; the single miss is H2.
+
+**Controls.** Zero arm 18 of 210 reachable hits. Outcome permutation collapses every arm
+(maestro 141 to 20, virtual cell 127 to 31, random 18 to 12). Feedback-permutation twins are
+registered arms. The LLM prior scores the same with compound names withheld (AUROC 0.803 against
+0.792), so its signal is annotation rather than recall of PRISM. **No refusal code fired in 418
+campaign runs**, including the stopping rule, so those paths are tested but unexercised.
+
+**Verification.** 418 campaign ledgers recomputed from the recorded selections: 0 mismatches on
+hits, unexpected hits and verified hits, and 0 integrity violations. Both primary contrasts
+reproduce to 0.0 with identical verdicts. `ok` is false only for three declared file-hash
+mismatches, recorded as deviations D1 (a two-line plumbing fix after the run crashed on its first
+LLM campaign, both hashes recorded), D2 (the freeze wrongly hashed its own deviations log) and D3 (a
+tie tolerance added to the sign-flip test after a parity test caught a last-bit disagreement;
+recomputation showed all nine verdicts bit-identical).
+
+**Cost.** 1,216 compound-screens per arm, 13,376 across the 11 arms; 38 turnarounds for one-shot
+arms and 266 for adaptive ones. Provider USD 1.32 of a USD 10 ceiling over 3,261 deepseek-flash
+calls, of which USD 1.03 and 2,920 calls were the pre-freeze priors. No other model was used.
+
+**Promotion.** Only `tools.evaluation.scoring.cluster_signflip_test`, beside the existing
+`cluster_bootstrap_interval`, with parity tests. The campaign agent is **not** promoted, because H2
+and H4 leave its contribution unestablished.
+
+**Another session's block on this date.** `research/astra/adaptive_investigation_20261011/` belongs
+to the block N session, which left it running. It completed unattended and **reversed its own 8-unit
+smoke result**: adaptive viability acquisition beats a fixed panel on 247 units (0.210 against 0.169
+at budget 16). Read-only copies and provenance are in the block P packet's `preserved/`. Block P
+neither designed nor registered it.

@@ -1,0 +1,92 @@
+{
+ "pre_freeze": [
+  {
+   "id": "P1",
+   "found_utc": "2026-10-11T04:25:00Z",
+   "where": "maestro_agent.Maestro.run",
+   "what": "The explore stream's ranking was hardcoded to the virtual-cell sources, so an arm constructed without virtual-cell predictions (agent_novc, the H1 comparator) would still have used them for its explore seats.",
+   "why_it_matters": "H1 asks what the virtual cell contributes. A comparator that keeps the virtual cell in two of five seats per batch understates that contribution.",
+   "fix": "Maestro now derives explore_sources from its own source list: the virtual-cell kernels when it has them, otherwise its own sources. Verified by construction for all three source sets.",
+   "effect_on_recorded_development_results": "CORRECTED 2026-10-11T05:00Z after direct testing, replacing an earlier claim written from assumption. F9 does not use maestro_agent at all: it runs a plain pooled-stack loop with no explore stream, so no F9 arm could be contaminated, and F9 is in fact the rehearsal of the registered configuration (explore_seats = 0): H1 = +7 [+1, +14]. F12 does use maestro_agent, with explore_seats = 2 and the pre-fix explore ranking, so its agent_novc kept virtual-cell access in 2 of 5 seats per batch; its H1 = +2 [0, +5] is therefore a contaminated rehearsal of the secondary arm A7, not of the registered A6.",
+   "status": "fixed before the freeze",
+   "effect_on_registered_run": "None on the primary family. The registered primary agent runs with explore_seats = 0 (F10), so no arm in H1 or H2 has an explore stream and the bug cannot apply. It applies only to the secondary arm maestro_explore (H9), which now ranks its explore seats with its own sources.",
+   "how_corrected": "Replaying three lib-0 campaigns with explore_sources forced each way reproduced F9's recorded rows (9, 3, 7 hits) with own-source explore and F12's (7, 4, 6) with virtual-cell explore. The arms are deterministic within a process (three identical replays)."
+  },
+  {
+   "id": "P2",
+   "found_utc": "2026-10-11T04:05:00Z",
+   "where": "evaluate.py arm seeding",
+   "what": "Per-arm seeds were derived from Python's builtin hash(), which is salted per process.",
+   "why_it_matters": "The registered run would not have been reproducible across processes.",
+   "fix": "Seeds now come from a sha256 digest of the campaign and arm names.",
+   "status": "fixed before the freeze"
+  },
+  {
+   "id": "P3",
+   "found_utc": "2026-10-11T04:00:00Z",
+   "where": "module name",
+   "what": "The agent module was named agent.py, which shadowed the repository's src/agent package on sys.path and broke every LLM import.",
+   "fix": "Renamed to maestro_agent.py.",
+   "status": "fixed before the freeze"
+  },
+  {
+   "id": "P4",
+   "found_utc": "2026-10-11T03:30:00Z",
+   "where": "test_block_p.test_permutation_control_changes_beliefs_not_truth",
+   "what": "The test assumed seed 0 permutes a two-element batch; it is the identity, so the test failed.",
+   "fix": "The test now checks the invariants across eight seeds and requires at least one to differ. The permutation code was not changed.",
+   "status": "fixed before the freeze"
+  },
+  {
+   "id": "P5",
+   "found_utc": "2026-10-11T04:40:00Z",
+   "where": "feasibility/f11_agent.py",
+   "what": "Written as a development rehearsal of the assembled agent, but never run.",
+   "why": "F10 moved the registered agent to explore_seats = 0, for which feasibility F3/F8 already provide an uncontaminated development rehearsal (the pooled refit stack against the same stack without any virtual-cell source, +13 [+3, +25] on unexpected hits at a 10% budget). F11 would have repeated that at batch 5 while competing for the CPU that F10 and F12 were using.",
+   "status": "kept unrun and frozen with the block, so the packet shows what was built but not used"
+  },
+  {
+   "id": "P6",
+   "found_utc": "2026-10-11T05:00:00Z",
+   "what": "Two development rehearsals of nominally the same contrast disagreed: F9 gave H1 = +7 [+1, +14] and F12 gave +2 [0, +5].",
+   "investigated": "Determinism was tested first (three replays of one campaign are identical, so the arms are not run-to-run unstable). The disagreement is a configuration difference, not noise: F9 has no explore stream and a clean comparator; F12 has an explore stream and, pre-fix, a comparator that kept virtual-cell access.",
+   "why_it_matters": "The registered prediction for H1 must rest on rehearsals of the registered configuration. It does: F8 (+13 [+3, +25], no LLM prior in either arm) and F9 (+7 [+1, +14], LLM prior in both arms, no explore stream). F12's +2 is evidence about the secondary arm A7 with a contaminated comparator and is reported as such, not as a weaker estimate of H1.",
+   "status": "explained; no code change needed"
+  }
+ ],
+ "post_freeze": [
+  {
+   "id": "D1",
+   "found_utc": "2026-10-11T04:35:00Z",
+   "detected_how": "the registered confirmation run crashed on its first conventional-agent campaign (lib0/skin/conv)",
+   "where": "evaluate.py, the ledger call",
+   "what": "conv_agent.run returns its per-round LLM records as a list, while maestro_agent.run returns a dict; the ledger call unpacked extra with ** and raised TypeError: 'list' object is not a mapping.",
+   "fix": "a two-line normalisation: a list extra is wrapped as {'llm_calls': [...]} before the ledger is written.",
+   "scope": "result plumbing only. It does not touch any arm's selection logic, the hit or unexpected-hit definitions, the budget, the statistics or the verdict rules. The eight deterministic ledgers already written before the crash (lib0/skin) are byte-identical and were reused by the rerun.",
+   "evaluate_py_sha256_at_freeze": "951da4d47dfa1bcaeacff6b8554cb550f8699663422785eba993afaa9bd0e47e",
+   "evaluate_py_sha256_after_fix": "54d5b61c2fb51613851a540e3c97d99f45d1ab6e68ef43d78d4e6d716d0f77cc",
+   "note": "FREEZE.json is left exactly as written, so its evaluate.py hash will not match the file on disk. That mismatch is this entry. verify.py reports it rather than hiding it.",
+   "no_outcome_seen_before_fix": "The crash happened before any contrast, total or verdict existed. Two ledgers (vc_only and agent_novc on lib0/skin) had been inspected while checking the ledger format; their per-arm hit counts were seen. No registered quantity was computed or seen.",
+   "status": "fixed, run restarted"
+  },
+  {
+   "id": "D2",
+   "found_utc": "2026-10-11T05:30:00Z",
+   "what": "freeze.py hashes every .md and .json in the block, including DEVIATIONS.json itself and the feasibility README. Both must be writable after a freeze: the deviations log exists to record post-freeze events, and the feasibility README had to be corrected (entry P6). So verify.py reports three file mismatches (evaluate.py from D1, DEVIATIONS.json, feasibility/README.md) and sets ok=false.",
+   "why_it_matters": "A freeze whose own audit log is inside the hashed set can never verify clean. This is a design flaw in this block's freeze, not evidence of tampering.",
+   "what_was_not_affected": "418 campaign ledgers recomputed from the recorded selections: 0 mismatches on hits, unexpected hits and verified hits; 0 integrity violations (no duplicate purchase, nothing outside a library, none over budget, prediction order consistent with the screened order). Both primary contrasts reproduce to 0.0 with identical verdicts.",
+   "fix": "not applied in this block, to leave the frozen record untouched. A future freeze should exclude its own deviations log and any file whose purpose is to be appended after the freeze.",
+   "status": "recorded; FREEZE.json and the mismatching files are all left as they are"
+  },
+  {
+   "id": "D3",
+   "found_utc": "2026-10-11T05:45:00Z",
+   "detected_how": "test_promotion_parity.py, written to hold the promoted statistic to exact agreement with the frozen one, failed on a synthetic non-integer case: the two disagreed on 1 of 16,384 sign patterns.",
+   "what": "Both implementations decided 'is this pattern as extreme as the observed total' with exact floating-point comparison. The frozen copy sums with a numpy matrix product and the promoted copy with a Python loop, so a pattern whose total should be exactly +/- the observed value can land either side of the boundary.",
+   "fix": "both now compare against a magnitude-scaled tolerance (1e-9 * max(1, |observed|)), so a tie counts toward the p-value, which is the conservative permutation convention.",
+   "effect_on_the_registered_result": "None, and this was checked rather than assumed. The registered differences are counts of hits, so every sum is an exact integer in floating point and no pattern sits within the tolerance. Recomputing all nine contrasts from results/confirm/ROWS.csv gives bit-identical p-values (H1 0.00098, H2 0.07471) and identical verdicts for all nine.",
+   "status": "fixed in both copies; stats.py now differs from its frozen hash, which is covered by D2"
+  }
+ ],
+ "note": "Pre-freeze entries are recorded for the audit trail; only post_freeze entries are deviations from a registered protocol."
+}

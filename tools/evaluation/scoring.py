@@ -798,6 +798,73 @@ def cluster_bootstrap_interval(
     return (round(low, 6), round(high, 6))
 
 
+SIGNFLIP_MAX_EXACT_CLUSTERS = 20
+SIGNFLIP_DRAWS = 20000
+
+
+def cluster_signflip_test(
+    differences: Sequence[float],
+    clusters: Sequence[str],
+    *,
+    draws: int = SIGNFLIP_DRAWS,
+    seed: int = BOOTSTRAP_SEED,
+    max_exact: int = SIGNFLIP_MAX_EXACT_CLUSTERS,
+) -> dict[str, object]:
+    """Paired test for two arms on the same units, flipping the sign of whole clusters.
+
+    ``differences[i]`` is arm A minus arm B on unit ``i``, and ``clusters[i]`` names the group it
+    belongs to; units in one group share difficulty and are not independent. Under the null that the
+    arms are exchangeable within a cluster, each cluster's summed difference is symmetric about zero,
+    so its sign may be flipped. With at most ``max_exact`` clusters every pattern is enumerated and
+    the p-values are exact; beyond that ``draws`` random patterns are drawn.
+
+    Use this rather than ``cluster_bootstrap_interval`` when the clusters are few: a one-sided
+    p-value cannot fall below ``2 ** -n`` for ``n`` clusters, which states the design's power limit
+    honestly instead of hiding it in a wide interval.
+    """
+
+    values = [float(x) for x in differences]
+    labels = [str(c) for c in clusters]
+    if len(values) != len(labels):
+        raise ValueError("differences and clusters must have the same length")
+    if not values:
+        raise ValueError("no differences given")
+    names = sorted(set(labels))
+    sums = [sum(v for v, c in zip(values, labels) if c == name) for name in names]
+    observed = sum(sums)
+    count = len(names)
+    if count <= max_exact:
+        patterns = range(1 << count)
+        totals = []
+        for mask in patterns:
+            total = 0.0
+            for index, value in enumerate(sums):
+                total += -value if (mask >> index) & 1 else value
+            totals.append(total)
+        exact = True
+    else:
+        rng = Random(seed)
+        totals = [sum(value if rng.random() < 0.5 else -value for value in sums) for _ in range(draws)]
+        exact = False
+    size = len(totals)
+    # A pattern exactly as extreme as the observed total counts toward the p-value, the conservative
+    # permutation convention. The tolerance keeps that decision from turning on the last bit of a
+    # floating-point sum, which differs with the summation order. For integer-valued differences, such
+    # as counts of hits, it changes nothing.
+    tol = 1e-9 * max(1.0, abs(observed))
+    return {
+        "estimate": observed,
+        "n_clusters": count,
+        "n_units": len(values),
+        "exact": exact,
+        "n_patterns": size,
+        "p_greater": sum(1 for t in totals if t >= observed - tol) / size,
+        "p_less": sum(1 for t in totals if t <= observed + tol) / size,
+        "p_two_sided": sum(1 for t in totals if abs(t) >= abs(observed) - tol) / size,
+        "min_attainable_one_sided_p": 2.0 ** -count,
+    }
+
+
 def _value(entry: object) -> str | None:
     """A decision or verdict as plain text, whether it arrived as an enum or from JSON."""
 

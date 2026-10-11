@@ -1,6 +1,6 @@
 # MAESTRO Research Report
 
-As of 2026-10-10, MAESTRO has a verified operational agent–decision–virtual-cell loop and reproducible development experiments. **Independent scientific decision gain from knowledge feedback or an LLM policy is not established.** The latest advance qualifies the 39 endpoint coordinates in two source files; it does not validate feedback or release active procurement.
+As of 2026-10-11, MAESTRO has a verified operational agent–decision–virtual-cell loop and reproducible development experiments. **The virtual cell now has confirmed decision value for one thing: finding selective killers whose mechanism class is not already known to work (block P, +17 unexpected hits on 975 untouched compounds, p 0.00098).** Independent scientific decision gain from the agent loop, from knowledge feedback or from an LLM policy remains unestablished, and the proposed agent architecture did not beat a conventional agent-with-tool loop. The latest advance qualifies the 39 endpoint coordinates in two source files; it does not validate feedback or release active procurement.
 
 The [evidence register](EVIDENCE.md) owns cross-study numerical results. The [research index](INDEX.md) routes to detailed protocols and frozen receipts, and [scientific status](SCIENTIFIC_STATUS.json) records units, limitations and gates. Generated assets may be absent from a clean checkout. `python -m tools.research_validation --verify` must report missing or mismatched assets rather than substitute outcomes.
 
@@ -79,6 +79,32 @@ response. It used 421 sealed drugs, 101 of them killers. Two findings:
 The transfer was promoted to `src/virtual_cell/transcriptional_transfer.py`. See the
 [block N evidence](EVIDENCE.md#where-an-llm-adds-value-to-a-virtual-cell-selective-killing-profiles--2026-10-11)
 and [packet](astra/mechanism_routing_20261011/README.md).
+
+Block P (2026-10-11) asked the decision version of block N's question: given a library profiled
+only by L1000 and a screening budget, can the dual core **find compounds that selectively kill one
+tumour lineage**? It ran 38 campaigns on **975 PRISM compounds that appear in GSE70138 and in no
+earlier block**, 1,216 compound-screens per arm, with the same library, budget, batch and menu in
+every arm. The primary endpoint was the *unexpected* hit, whose annotated mechanism class has no
+selective member for that lineage among the 1,403 reference compounds.
+
+* **The virtual cell's discovery contribution is confirmed.** It added **+17 unexpected hits**
+  [+11, +23], p 0.00098, over the identical agent denied its transcriptional sources; ten informative
+  lineages favoured it and none opposed. It added +46 over a fixed annotation workflow and +28 hits
+  confirmed on the independent secondary screen.
+* **The agent loop's contribution is not established.** +14 total hits over the one-shot virtual cell
+  (141 against 127) at p 0.075, bought with **266 plate turnarounds instead of 38**. On the primary
+  endpoint the one-shot virtual cell is level, and better on the strictest novelty count.
+* **The proposed integration gave no gain over a conventional agent.** A plain LLM-with-tool loop
+  matched it (136 hits, 72 unexpected against 141 and 69). This was the registered prediction, and it
+  held.
+* Feedback is directionally positive (+12 [+4, +20]) but fails family-wise; the two-stream portfolio
+  adds nothing. Per-lineage model arbitration and the LLM prior as a selector were rejected on
+  development evidence before the freeze.
+
+The headline verdict is `NOT_CONFIRMED`, because the registered rule required the agent contribution
+too. Only `tools.evaluation.scoring.cluster_signflip_test` was promoted; the campaign agent was not.
+See the [block P evidence](EVIDENCE.md#selective-discovery-campaigns-what-each-core-contributes-to-buying-compounds--2026-10-11)
+and [packet](astra/selective_discovery_20261011/README.md).
 
 A forecast may influence endpoint selection only after a same-unit readout-to-endpoint bridge
 (same culture unit, dose and time) and a reference ceiling pass: substitute observed responses

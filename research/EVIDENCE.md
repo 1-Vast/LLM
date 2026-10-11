@@ -68,6 +68,67 @@ Missing reference values are skipped (effect ≤ 0.001).
 Provider spend $7.46 of the $10 ceiling ($1.24 for confirmation). Packet:
 `research/astra/mechanism_routing_20261011/`. Receipt: `log/20261011/MECHANISM_ROUTING.json`.
 
+## Selective discovery campaigns: what each core contributes to buying compounds — 2026-10-11
+
+Block P asked the decision version of block N's question. Given a library profiled only by L1000 and
+a screening budget, find compounds that **selectively kill one tumour lineage**. Registered, frozen
+`2026-10-11T04:32:30Z`, run once on **975 PRISM compounds that appear in GSE70138 and in no earlier
+block**, then verified from the campaign ledgers.
+
+38 campaigns (3 disjoint libraries of 325 x the lineages with a reachable hit), 1,216
+compound-screens per arm, identical library, budget, batch and menu in every arm. Primary endpoint:
+the **unexpected hit**, whose annotated mechanism class has no selective member for that lineage
+among the 1,403 reference compounds. Verdicts by exact cluster sign-flip test over the 14 lineages.
+
+**Headline `NOT_CONFIRMED`:** the registered rule required H1, H2 and H6; H2 failed.
+
+**What the virtual cell contributes (confirmed).**
+* **+17 unexpected hits** [+11, +23], p = 0.00098, over the identical agent denied the transcriptional
+  sources (69 against 52). Ten informative lineages favoured it, three tied, **none opposed**, so the
+  p-value is at this design's floor.
+* +46 unexpected hits over a fixed annotation workflow (69 against 23).
+* +28 hits confirmed on the independent PRISM secondary screen over that workflow (116 against 88).
+
+**What the agent loop contributes (not established).**
+* +14 total hits over the one-shot virtual cell (141 against 127) at p = 0.075 against a 0.025 bar,
+  and it spends **266 plate turnarounds instead of 38** for the same wells.
+* On the primary endpoint the one-shot virtual cell is level (66 against 69) and better on the
+  strictest novelty count (37 against 31).
+* A conventional LLM-agent-with-tool loop matched the proposed system (136 hits, 72 unexpected), so
+  the architecture adds nothing over the standard pattern. This was the registered prediction.
+* Real against permuted feedback is +12 [+4, +20], which fails family-wise; the conventional agent's
+  is +8 (p 0.139). Consistent with Gupta et al. 2025 on LLM feedback insensitivity.
+* The two-stream portfolio adds nothing (-1), as development had already found.
+
+**Rejected before the freeze, on development evidence:** per-lineage model arbitration (three
+arbiters all lost; the reference likelihood is so sharp the mixture collapses onto one family), the
+LLM prior as a selector (hit AUROC 0.762 against 0.868 for an annotation lookup; null in the loop),
+and the two-stream portfolio.
+
+**Controls.** Zero arm 18 of 210 reachable hits. Outcome permutation collapses every arm (141 to 20,
+127 to 31, random 18 to 12). The LLM prior scores the same with names withheld (AUROC 0.803 against
+0.792), so its signal is annotation, not recall. **No refusal code fired in 418 campaign runs**,
+including the stopping rule, so those paths are tested but unexercised.
+
+**Verification.** 418 ledgers recomputed from the recorded selections: 0 endpoint mismatches, 0
+integrity violations, both primary contrasts reproduced to 0.0. `ok` is false only for three declared
+file-hash mismatches (deviations D1, D2, D3); D3's tie tolerance was shown to leave all nine verdicts
+bit-identical.
+
+**Limits:**
+* one assay, dose and platform;
+* novelty is relative to Repurposing Hub annotation, not biological novelty, and no mechanism is
+  claimed for any hit;
+* lineage is a crude proxy for the genetic context that drives selectivity;
+* verification is conditioned on the activity-enriched subset the secondary screen followed up
+  (every hit found had secondary data);
+* at 20-30% of the library every arm converges on the ceiling, so no planner can show value there.
+
+**Promoted:** `tools.evaluation.scoring.cluster_signflip_test` only, with parity tests. The campaign
+agent is **not** promoted. Provider spend $1.32 of a $10 ceiling over 3,261 deepseek-flash calls.
+Packet: `research/astra/selective_discovery_20261011/`. Receipt:
+`log/20261011/SELECTIVE_DISCOVERY.json`.
+
 ## Calibrated falsification of mechanism hypotheses — 2026-10-10
 
 **Primary results:**
@@ -268,6 +329,7 @@ This is the canonical cross-study result table. [REPORT.md](REPORT.md) states cu
 | Axis selection diagnostic | `OFFLINE_DIAGNOSTIC; NOT_CERTIFICATION` | Did positive-coverage allocation omit identifying zero contrasts? | Full retained support patterns are unique for all 39 genes per file; a heuristic adds 11 discovery rows per file, with fixed holdout and projected paired cost 340,068 bytes. | Binary presence need not equal numerical nonzero; this closed diagnostic reads no extra RNA, its numerical gate remains failed, and its row count is not proven minimal. | `research/decision_value/axis_recovery_20261010/calibration_v2/diagnosis/`; separate post-result freeze. |
 | Measure or predict (block K) | `CONFIRMATORY; M1_M3_FAILED; TRANSPORT_REFUSAL_CONFIRMED` | Can a frozen virtual cell's 24 h forecast replace measurement for a 5-day decision, and is any failure a ceiling, transport or timing failure? | MIX-Seq, 48 lines: measurement over the DepMap prior -0.021 [-0.109, +0.078]; STATE -0.091 [-0.182, -0.005]. Same-line cross-platform response r 0.13 or less versus within-platform 0.65. Trametinib 5-day information appears at 24-48 h (+0.16 at 48 h). Tahoe early state below the prior (USE_PRIOR confirmed). | Six drugs; one time-course drug; small cell counts; unpaired evaluator estimand (verdicts unchanged when paired); candidate gene order supported, not certified. | `research/astra/kinetic_horizon_20261010/`; `log/20261010/KINETIC_HORIZON.json`; `run_sealed.sh` then `verify.py`. |
 | Mechanism falsification (block M) | `CONFIRMATORY; H1_FAILED_ON_ACTIVE_TIER; AGENT_CONTRIBUTION_NOT_SUPPORTED` | Can an LLM agent plus a world model falsify mechanism hypotheses with calibrated error, design falsifying observations and detect inadequate hypothesis sets? | 502 sealed L1000 drugs, 424 classes, four profiles: coverage 0.892 [0.862, 0.917] but 0.776 in the most active tier (n 49). Class content -19.0 [-29.2, -8.6] survivors. Every knowledge, design, identifiability and adequacy test not supported. Agent alone coverage 0.00; credible sets 0.217. | Four profiles at one dose; class-level labels; 49-drug active tier; set-size knowledge contrasts nearly permutation-invariant; 100-drug LLM arms; L1000 exposed in earlier blocks for other estimands. | `research/astra/mechanism_falsification_20261010/`; `log/20261010/MECHANISM_FALSIFICATION.json`; `run_sealed.sh` (freeze, evaluate, verify, receipt). |
+| Selective discovery campaigns (block P) | `CONFIRMATORY; VC_DISCOVERY_VALUE_CONFIRMED; AGENT_CONTRIBUTION_NOT_SUPPORTED; NO_GAIN_OVER_CONVENTIONAL_AGENT` | Given a library profiled only by L1000 and a screening budget, does the virtual cell contribute selective-killer discoveries annotation cannot anticipate, and does the agent loop contribute yield the virtual cell alone cannot reach? | 38 campaigns on 975 sealed compounds, 1,216 screens per arm: virtual cell +17 unexpected hits [+11, +23] p 0.00098 (10 of 10 informative lineages, none opposed), +46 over a fixed workflow, +28 verified on the secondary screen; agent loop +14 total hits p 0.075 at 7x the turnaround, level on novelty, and matched by a conventional agent-with-tool loop (136 vs 141 hits); feedback +12 fails family-wise; portfolio -1. | One assay/dose/platform; novelty is annotation-relative; no mechanism claimed; verification conditioned on the activity-enriched secondary subset; no refusal path exercised. | `research/astra/selective_discovery_20261011/`; `log/20261011/SELECTIVE_DISCOVERY.json`; `tools/evaluation/scoring.py`. |
 | Mechanism routing of killing profiles (block N) | `CONFIRMATORY; VC_VALUE_CONFIRMED; AGENT_VALUE_NOT_SHOWN; CRITIC_AND_FORECASTER_HARM` | Does an LLM add value to a virtual cell that predicts which lines an unseen compound kills, beyond target, chemical and partial-screen baselines? | 421 sealed drugs (101 killers): VC transfer beats targets +0.116 [+0.053, +0.181] and chemistry +0.100 for unseen classes, replicates on the secondary screen (+0.103), adds to a 160-line screen +0.049; trust by similarity +0.097. Agent forecaster, critic, explainer and trust judge: no gain; critic -0.052 and forecaster+VC -0.025 harm. | One assay/dose; class-level novelty; 101 killers; memorised PRISM knowledge not excludable; one frozen check failed on a CSV tie (no verdict change). | `research/astra/mechanism_routing_20261011/`; `log/20261011/MECHANISM_ROUTING.json`; `src/virtual_cell/transcriptional_transfer.py`. |
 | Historical union and targeted axis extension | `VERIFIED_FILE_LOCAL_ENDPOINT39; P06_UNFROZEN` | Can exposed c44 bytes and eleven explicitly discriminating c45 rows complete the data-coordinate gate cheaply? | Both files pass 39/39 unique matches among all 62,710 genes at 1e-5. c44 adds 0 bytes; c45 receives exactly 133,564. Separate logical-slice/blockwise reconstruction agrees; 3,334 protected old files unchanged. | Historical/adaptive coordinate evidence; exposed consistency is not fresh validation. Initial parser failure preserved with a zero-download offline amendment. Full 2,000/checkpoint axes and P06/P2 execution remain unqualified. | `research/decision_value/axis_extension_20261010/QUALIFIED_CERTIFICATE.json`; canonical receipt `log/20261010/P05R_EXTENSION.json`; standalone offline replay. |
 
