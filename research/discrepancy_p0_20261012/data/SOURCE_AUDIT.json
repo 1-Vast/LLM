@@ -1,0 +1,318 @@
+{
+  "schema": "maestro.discrepancy_p0.source_audit.v1",
+  "scope": "P0a metadata, conditions and repeat design only; no model fitting, outcome scoring or LLM calls",
+  "prism": {
+    "primary_collapsed": {
+      "metadata_rows": 4686,
+      "exactdose_HTS_columns": 3939,
+      "unique_exactdose_HTS_columns": 3939
+    },
+    "primary_replicates": {
+      "columns": [
+        "column_name",
+        "broad_id",
+        "name",
+        "dose",
+        "perturbation_type",
+        "screen_id",
+        "detection_plate",
+        "compound_plate",
+        "well",
+        "detection_plate_scan_time",
+        "vendor_id",
+        "purity",
+        "moa",
+        "target",
+        "disease.area",
+        "indication",
+        "smiles",
+        "phase"
+      ],
+      "exactdose_experimental_rows": 11841,
+      "condition_groups": 3947,
+      "distinct_broad_ids": 3939,
+      "condition_group_keys": [
+        "broad_id",
+        "dose",
+        "screen_id",
+        "compound_plate"
+      ],
+      "groups_with_different_recorded_wells": 0,
+      "well_interpretation": "MTS010 replicate records can have different well positions; well is not part of the shared treatment-condition key",
+      "detection_plates": 39,
+      "compound_plates": 13,
+      "groups_with_multiple_detection_plates": 3947,
+      "metadata_rows_per_group": {
+        "3": 3947
+      },
+      "encoded_plate_time_tokens": {
+        "NOT_ENCODED": 11841
+      },
+      "time_interpretation": "Identifier tokens only; not an independently validated elapsed-treatment-time field",
+      "independent_culture_ids": false,
+      "biological_repeat_count": null,
+      "repeat_interpretation": "Treatment-plate repeats are supported by the paper; distinct detection-plate IDs alone do not prove independent culture starts",
+      "detection_scan_time_nonempty": 11841,
+      "detection_scan_time_interpretation": "Instrument scan timestamp, not seeding/date/culture identity"
+    },
+    "secondary_replicates": {
+      "columns": [
+        "column_name",
+        "broad_id",
+        "dose",
+        "perturbation_type",
+        "screen_id",
+        "detection_plate",
+        "compound_plate",
+        "well",
+        "name",
+        "moa",
+        "target",
+        "disease.area",
+        "indication",
+        "smiles",
+        "phase"
+      ],
+      "exactdose_experimental_rows": 4466,
+      "condition_groups": 1489,
+      "distinct_broad_ids": 1378,
+      "condition_group_keys": [
+        "broad_id",
+        "dose",
+        "screen_id",
+        "compound_plate"
+      ],
+      "groups_with_different_recorded_wells": 134,
+      "well_interpretation": "MTS010 replicate records can have different well positions; well is not part of the shared treatment-condition key",
+      "detection_plates": 132,
+      "compound_plates": 44,
+      "groups_with_multiple_detection_plates": 1489,
+      "metadata_rows_per_group": {
+        "2": 1,
+        "3": 1488
+      },
+      "encoded_plate_time_tokens": {
+        "NOT_ENCODED": 4065,
+        "120": 401
+      },
+      "time_interpretation": "Identifier tokens only; not an independently validated elapsed-treatment-time field",
+      "independent_culture_ids": false,
+      "biological_repeat_count": null,
+      "repeat_interpretation": "Treatment-plate repeats are supported by the paper; distinct detection-plate IDs alone do not prove independent culture starts"
+    },
+    "primary_pool": {
+      "columns": [
+        "row_name",
+        "screen_id",
+        "analyte_id",
+        "detection_pool",
+        "minipool_id",
+        "pool_id",
+        "passed_str_profiling"
+      ],
+      "metadata_rows": 2637,
+      "rows_by_screen": {
+        "HTS": 578,
+        "MTS004": 562,
+        "HTS002": 499,
+        "MTS005": 499,
+        "MTS006": 499
+      },
+      "distinct_row_ids_by_screen": {
+        "HTS": 578,
+        "HTS002": 499,
+        "MTS004": 562,
+        "MTS005": 499,
+        "MTS006": 499
+      },
+      "interpretation": "Line/pool availability metadata; not finite outcome availability or culture replication"
+    },
+    "secondary_pool": {
+      "columns": [
+        "row_name",
+        "depmap_id",
+        "passed_str_profiling",
+        "ccle_name",
+        "screen_id",
+        "analyte_id",
+        "detection_pool",
+        "minipool_id",
+        "pool_id"
+      ],
+      "metadata_rows": 3135,
+      "rows_by_screen": {
+        "HTS": 578,
+        "MTS004": 562,
+        "MTS005": 499,
+        "HTS002": 499,
+        "MTS006": 499,
+        "MTS010": 498
+      },
+      "distinct_row_ids_by_screen": {
+        "HTS": 578,
+        "HTS002": 499,
+        "MTS004": 562,
+        "MTS005": 499,
+        "MTS006": 499,
+        "MTS010": 498
+      },
+      "interpretation": "Line/pool availability metadata; not finite outcome availability or culture replication"
+    },
+    "cross_screen": {
+      "secondary_exactdose_columns": 1489,
+      "secondary_exactdose_columns_by_screen": {
+        "HTS002": 1280,
+        "MTS010": 134,
+        "MTS006": 73,
+        "MTS005": 2
+      },
+      "exact_full_broad_id_overlap": 1281,
+      "same_drug_dose_multiple_secondary_screens": 102,
+      "cell_metadata_row_id_overlap": 578,
+      "identity_caveat": "ID equality only; compound salts/structures and cell culture continuity not independently resolved",
+      "cell_drug_complete_pairs": null,
+      "matching_time_culture_and_QC_complete_pairs": null
+    },
+    "published_protocol": {
+      "paper_path": "research/discrepancy_p0_20261012/literature/raw/prism_paper_methods.body",
+      "nominal_time_hours": 120,
+      "paper_excerpts": {
+        "assay_repeats": "e DMSO-normalized and pooling artifacts are corrected using ComBat to generate the log fold-change data matrix. Up to 3 independently treated plates (range 1\u20133 based QC filtering) in one screen are median-collapsed to generate the collapsed log fold-change data matrix. Extended Data Fig. 2. Outlier pool QC filter to detect pool-level failures. Open in a new tab a , Primary screen QC pass rate by pool. The fraction of treated assay plate-wells that pass the outlier filter is indicated. Cell line log MFI data are med",
+        "seeding": "time and frozen into assay-ready vials. Vials were thawed, and one pool was immediately plated per 384 well assay plate at 1,250 cells/well in triplicate. Cells were either treated the following morning with compounds by pin transfer (Repurposing primary and secondary HTS screens) or plated directly onto assay-ready plates containing compounds (used for follow-up in the lower scale MTS004 and MTS006 screens). After a five-day incubation, cells were lysed. Lysate plates containing one pool of 25 cell lines each were",
+        "duration": "irectly onto assay-ready plates containing compounds (used for follow-up in the lower scale MTS004 and MTS006 screens). After a five-day incubation, cells were lysed. Lysate plates containing one pool of 25 cell lines each were then further pooled together to yield one (in the secondary screen) or two (in the primary screen) final detection pools for amplification and barcode measurement. For the secondary screen, a set of ten unique barcodes were spiked-in to each well prior to PCR to control for variation in PCR "
+      },
+      "assay_plate_repeat_design": "Up to three independently treated assay plates per screen; one to three retained after QC",
+      "independent_culture_start_ids_verified": false,
+      "interpretation": "The publication supports repeated plate treatments and five-day incubation. Missing culture-start IDs limit hierarchy/variance claims, not the existence of assay repeats."
+    },
+    "primary_replicate_outcomes_local": false,
+    "primary_MFI_local": false,
+    "secondary_replicate_outcomes_local": true,
+    "readme": [
+      {
+        "path": "data/external/prism_19q4/raw/primary-screen-readme.txt",
+        "ComBat": true,
+        "median_collapse": true,
+        "MTS010_technical_redos": false
+      },
+      {
+        "path": "data/external/prism_19q4/raw/secondary-screen-readme.txt",
+        "ComBat": true,
+        "median_collapse": true,
+        "MTS010_technical_redos": true
+      }
+    ],
+    "qualification": {
+      "collapsed_functional_replay": "QUALIFIED_RETROSPECTIVE_POST_PUBLISHER_ENDPOINT",
+      "repeat_assay_plate_design": "QUALIFIED_BY_PUBLISHED_METHODS",
+      "primary_repeat_response_validation": "NOT_EVALUABLE_UNTIL_REPEAT_OUTCOMES_AND_QC_ARE_ADMITTED",
+      "secondary_repeat_response_validation": "CONDITIONALLY_QUALIFIED_RETROSPECTIVE_ASSAY_REPEAT_REPLAY",
+      "cross_screen_response_agreement": "CONDITIONALLY_QUALIFIED_ID_DOSE_NOMINAL_PROTOCOL_MATCH",
+      "independent_culture_start_hierarchy": "UNRESOLVED",
+      "biological_vs_technical_cause": "NON_IDENTIFIABLE",
+      "reason": "Published independently treated assay plates support measurement repeats. Complete outcome/QC pairs remain unaudited; culture starts, drug-specific batch effects and target engagement are not independently identified; raw primary normalization isolation is unavailable"
+    }
+  },
+  "cxcl9": {
+    "endpoint": "24-hour culture-supernatant CXCL9 secretion measured by LEGENDplex capture-bead sandwich immunoassay and FACS PE",
+    "historical_terminology_correction": "The old dataset card says intracellular and single-cell; original Methods identify secreted cytokine and capture-bead events. Old receipts are preserved.",
+    "paper_path": "research/dual_core_scientific_20261011/literature/raw/active_mechanistic_2026.html",
+    "paper_excerpts": {
+      "supernatant": "is defined as having no cytokines or inhibitors. Seeded cells were kept in an incubator (37 \u2070C, 5% CO\u2082) for 24 h before retrieving the supernatant for the CXCL9 assay. We used the LEGENDplex\u2122 HU Proinflam. Chemokine Panel 1 Standard Kit from BioLegend containing Human CXCL9 (MIG) Capture Beads B3, 13X (Reagent and Tool Table). This kit measures CXCL9 response through the formation of a sandwich assay complex consisting of the analyte, beads pre-coated with antibodies (diluted to 1X), biotinylated antibodies and str",
+      "capture_beads": "ant for the CXCL9 assay. We used the LEGENDplex\u2122 HU Proinflam. Chemokine Panel 1 Standard Kit from BioLegend containing Human CXCL9 (MIG) Capture Beads B3, 13X (Reagent and Tool Table). This kit measures CXCL9 response through the formation of a sandwich assay complex consisting of the analyte, beads pre-coated with antibodies (diluted to 1X), biotinylated antibodies and streptavidin-phycoerythrin (SA-PE). We kept a 1:1 ratio between all assay components. The PE fluorescence was measured with the FACS Symphony A3 t",
+      "biological_replicates": " from wet lab screenings for all screened conditions, reported as Mean Fluorescent Intensity (MFI), averaged across two independent biological replicates with technical duplicates. ( C ) Statistical analysis of IFN\u03b3 and TNF\u03b1 synergy. A Wilcoxon rank-sum test compared measured values of the IFN\u03b3 + TNF\u03b1 condition from the wet lab with additive values, calculated as the sum of CXCL9 responses from IFN\u03b3 and TNF\u03b1 only conditions (result either not significant ( p > 0.05) or significant ( p < 0.05 and p > 0.01)). Each da",
+      "screenings": "ll lines We quantified CXCL9 protein levels using a bead-based sandwich immunoassay with flow cytometry readout, across two independent wet lab screenings with duplicates per cell line (see Methods). Replicates showed on average high correlations ( R > 0.80; Appendix Fig. S2C,D ). AsPC1 and BxPC3 displayed similar patterns of CXCL9 regulation in response to perturbations, with some notable cell line-specific differences (Fig. 1B ; Appendix Table S1 ; Appendix Fig. S2A ). BxPC3 consistently showed higher CXCL9 expre",
+      "context_specific_cytokine_doses": "the CXCL9 assays containing RPMI-1640 medium with 1E6 cells seeded per microwell. The cytokines IFN\u03b3 and TNF\u03b1 were used at 10 and 1 ng/mL for AsPC1 and BxPC3, respectively. Different cytokine concentrations were used due to the higher sensitivity of BxPC3 to CXCL9 inducement. Inhibitors were selected based on two criteria: (1) inhibitor targets a protein that could be of interest potentially for CXCL9 regulation and (2) prior studies have demonstrated clinical relevance of the inhibitor for (pancreatic) cancer trea",
+      "Cas3_assay": "nzChek\u2122 Caspase-3 Activity Assay Kit from ThermoFisher, which includes cell lysis and quantification of Caspase-3 using Z-DEVD-R110 substrates. The fluorescent signals emitted by these substrates upon cleavage by Caspase-3 is measured with the BioTek Synergy H1 Microplate Reader set at measuring fluorescence at excitation/emission ~496/520 nm. Preparation of the samples in a 96-well plate is performed according to the protocol supplied for this kit. We corrected for apoptosis by summing the normalized CXCL9 and Cas"
+    },
+    "raw_files": [
+      {
+        "file": "E3CA",
+        "rows": 52298,
+        "columns": [
+          "Cell line",
+          "Sample",
+          "Cytokines",
+          "Cytokine concentration (ng/mL)",
+          "Inhibitors",
+          "Inhibitor concentration (uM)",
+          "Condition",
+          "Fluorescent intensity (PE)"
+        ],
+        "outcome_columns_read": [],
+        "passage": "P12",
+        "Cas3_channel": false
+      },
+      {
+        "file": "E3CB",
+        "rows": 47230,
+        "columns": [
+          "Cell line",
+          "Sample",
+          "Cytokines",
+          "Cytokine concentration (ng/mL)",
+          "Inhibitors",
+          "Inhibitor concentration (uM)",
+          "Condition",
+          "Fluorescent intensity (PE)"
+        ],
+        "outcome_columns_read": [],
+        "passage": "P14",
+        "Cas3_channel": false
+      }
+    ],
+    "local_raw_contexts": [
+      "BxPC3"
+    ],
+    "paper_reported_biological_screenings": 2,
+    "screen_file_candidates": 2,
+    "sample_condition_records": 96,
+    "conditions_per_file_duplicate": {
+      "E3CA|Sample1": 24,
+      "E3CA|Sample2": 24,
+      "E3CB|Sample1": 24,
+      "E3CB|Sample2": 24
+    },
+    "cytokines": [
+      "IFNG",
+      "IFNG_TNFA",
+      "None",
+      "TNFA"
+    ],
+    "inhibitors": [
+      "BMS-345541",
+      "Momelotinib",
+      "None",
+      "Salirasib",
+      "Taselisib",
+      "Trametinib"
+    ],
+    "cytokine_doses_recorded_ng_ml": [
+      "0",
+      "1"
+    ],
+    "inhibitor_doses_recorded_um": [
+      "0",
+      "5"
+    ],
+    "unit_interpretation": "source_file/passage candidates correspond to biological screenings; Condition Sample1/Sample2 are technical-duplicate candidates. Sample labels encode treatments, not independent units; bead events are nested.",
+    "source_to_paper_repeat_mapping": "Supported by two source files, two documented passages and the paper's repeat definition; no explicit seeding/well/day key is supplied in the cached raw tables",
+    "Cas3_condition_pairing": "NOT_EVALUABLE_IN_CACHED_RAW_FILES",
+    "qualification": {
+      "small_repeated_CXCL9_assay": "CONDITIONALLY_QUALIFIED_RETROSPECTIVE_BxPC3_REPLAY",
+      "mechanism_discrimination_cell_loss_vs_signaling": "NOT_EVALUABLE_WITHOUT_PAIRED_Cas3_OR_VIABILITY",
+      "general_context_transport": "NOT_ESTABLISHED_BY_SINGLE_RAW_CONTEXT_TWO_SCREENINGS",
+      "reason": "A repeated measured secretion endpoint and factorial interventions exist; independently matched apoptosis/viability outcomes and broad context replication do not follow from this cache"
+    },
+    "legal_menu": "Reveal condition-level CXCL9 summaries from one declared screening; score commitments on the other screening. Preserve technical nesting; use fixed/raw-log scaling, never full-condition min-max input.",
+    "limits": [
+      "No response values were scored here",
+      "No new external response file was downloaded",
+      "A target annotation or the supplied logic-ODE network is a prior, not mechanism truth",
+      "The inactive/positive-control condition cannot identify drug-specific target engagement by itself"
+    ]
+  },
+  "script_sha256": "919e7916f1c08aaf31d960f43033c0c756d1565f19915ba2e0267c4fae72e320",
+  "llm_api_calls": 0,
+  "interpretation": "Source qualification is not a positive biological result or a deployment guarantee"
+}

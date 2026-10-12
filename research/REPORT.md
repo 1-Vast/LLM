@@ -1,8 +1,21 @@
 # MAESTRO Research Report
 
-As of 2026-10-11, MAESTRO has a verified operational agent–decision–virtual-cell loop and reproducible development experiments. **The virtual cell has confirmed decision value for finding selective killers whose mechanism class is not already known to work (block P, +17 unexpected hits on 975 untouched compounds, p 0.00098).** Independent scientific decision gain from the agent loop, from knowledge feedback or from an LLM policy remains unestablished, and the proposed agent architecture did not beat a conventional agent-with-tool loop. The latest work adds a frozen scientific decision interface and a controlled adaptive-observation replay; it promotes engineering contracts, while its predictive policy fails the comparison gate.
+As of 2026-10-12, MAESTRO has a verified operational agent–decision–virtual-cell loop and reproducible development experiments. **The virtual cell has confirmed decision value for finding selective killers whose mechanism class is not already known to work (block P, +17 unexpected hits on 975 untouched compounds, p 0.00098).** Independent scientific decision gain from the agent loop, from knowledge feedback or from an LLM policy remains unestablished, and the proposed agent architecture did not beat a conventional agent-with-tool loop. The latest P0 work qualifies evidence sources and diagnoses archived selection errors; it retains the fixed-eight-probe stop and promotes no model or policy.
 
 The [evidence register](EVIDENCE.md) owns cross-study numerical results. The [research index](INDEX.md) routes to detailed protocols and frozen receipts, and [scientific status](SCIENTIFIC_STATUS.json) records units, limitations and gates. Generated assets may be absent from a clean checkout. `python -m tools.research_validation --verify` must report missing or mismatched assets rather than substitute outcomes.
+
+The [executed P0 diagnosis](discrepancy_p0_20261012/README.md) reconstructs all 636
+archived fixed8 records. Conditional residual updating reduces global MSE by
+10.01% and prior-boundary absolute MSE by 21.55%, but top-10 versus next-10
+response-difference MSE by only 0.34%; selection utility still declines. Exact
+realized regret remains 0.63699 above the prior in 75 fully measured menus,
+showing opportunity on the published endpoint rather than useful purchasable
+information. PRISM original methods qualify repeated assay plates and five-day
+exposure, while independent culture starts and full repeat/QC pairs remain
+unverified. A dated source correction identifies CXCL9 as 24-hour supernatant
+secretion measured with capture beads; its Cas3 pairing remains unresolved.
+The next prerequisite is repeat stability and a qualified distinct evidence
+channel, before a new functional policy or Agent study.
 
 The latest [fixed-probe context diagnostic](context_probe_20261011/README.md) rebuilds
 exactly 2.5 uM HTS data and masks entire target response contexts at model fit. Eight

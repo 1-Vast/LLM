@@ -1,5 +1,45 @@
 # Evidence Register
 
+## Discrepancy P0 qualification and archived diagnosis - 2026-10-12
+
+**Verdict: P0 complete; fixed8 stop retained; no new scientific confirmation.**
+The [packet](discrepancy_p0_20261012/README.md) diagnoses immutable commitments
+from all 106 exposed contexts and six arms, using a fixed 3,613-drug terminal
+menu. Five incomplete selections remain missing; selection means use 101 pairs.
+No model is refitted, no newly considered response panel is scored, and no new
+inference interval or superiority test is constructed.
+
+Conditional updating reduces context-averaged global MSE by 10.006%, prior
+ranks 11-30 absolute MSE by 21.552%, and prior-top-10 versus next-10 pairwise
+difference MSE by only 0.337%. Its utility increment remains -0.0058181, with
+44 improvements, 45 harms and 12 unchanged contexts; 37 contexts improve
+global MSE while harming selection. Low-rank utility remains -0.0119328.
+At the declared 0.001/read-equivalent price, conditional versus zero purchase
+is -0.0158181 and low rank is -0.0219328; actual costs are unestablished.
+
+The prior has mean exact realized regret 0.6369931 in 75 fully measured fixed
+menus. Exact oracles for the other 31 remain null. On 101 complete committed
+selections, observed-subset hindsight supplies mean regret lower bound
+0.7193264; this differs in population from the exact mean and is not an upper
+bound, EVSI or legal paid policy. No saturation or exploitable-feedback claim
+follows from these retrospective outcome references.
+
+Two official metadata downloads (5,322,352 bytes) and original PRISM methods
+qualify five-day assay exposure and up to three independently treated plates.
+Primary exact-dose metadata contain 3,947 repeated treatment groups; secondary
+contain 1,489. Culture-start hierarchy, complete response/QC pairs and raw
+normalization isolation remain unresolved. A dated correction identifies
+CXCL9 as supernatant secretion measured on capture beads, with a small BxPC3
+two-screening design. Matched apoptosis/viability pairing remains unverified;
+source-access failures do not establish absence. Mechanism-cause attribution
+is non-identifiable in the current audited menu.
+
+[Independent verification](discrepancy_p0_20261012/review/VERIFICATION.json)
+rebuilds all 636 records and metadata groups without producer arithmetic helpers.
+Eleven safety tests and thirteen metadata checks pass. The first next commitment
+is a frozen repeat-stability qualification; no empirical model, acquisition or
+Agent module is promoted.
+
 ## Fixed eight probes in a masked response context - 2026-10-11
 
 **Verdict: `NOT_ESTABLISHED`; exposed retrospective diagnostic.** The
