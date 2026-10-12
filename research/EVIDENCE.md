@@ -1,5 +1,44 @@
 # Evidence Register
 
+## Processed same-plate assay-repeat reliability - 2026-10-12
+
+**Verdict: limited prerequisite complete; no policy/Agent release.** The
+[packet](replicate_stability_20261012/README.md) carries forward the unchanged
+uploaded recommendation and qualifies repeat reliability after discrepancy P0.
+All 106 exposed contexts and 10,600 prior-top10 versus next10 comparisons remain
+fixed. Only exact representative full-Broad-ID HTS002 treatments at 2.5 uM and
+shared actual detection plates within one compound plate qualify. MTS010 redos,
+missing drugs and absent columns cannot replace the intended choices.
+
+There are 292 metadata-eligible pairs in 91 contexts, reusing 32 distinct directed
+drug pairs and 11 compound plates. Only 126 have all three expected differences
+finite, in 58 contexts: 54 support prior order, 19 oppose it and 53 conflict across
+repeats. This is 1.19% complete coverage of the intended same-plate comparison
+menu. The 166 incomplete eligible pairs retain 84 two-repeat, 57 one-repeat and
+25 zero-repeat cases. Of 876 expected repeat-pair comparisons, 414 are missing;
+130 of 462 observed nonzero comparisons disagree. Context-macro discordance is
+26.95% across 79 contributing contexts, distinct from the 53/126 complete-case
+conflict fraction.
+
+Fifty-five complete comparisons oppose prior order in the published primary
+collapsed endpoint; seven oppose it in all secondary repeats. Pair-level 7/55 and
+context-macro 10.36% across 37 contexts are different descriptive estimands. One
+complete secondary comparison lacks a primary contrast. Source/culture/processing
+differences prevent causal interpretation of cross-screen nonreplication.
+
+The same-plate restriction drives sparse coverage; all prior top10 identities have
+secondary treatment metadata. Complete-menu policy utility and cross-plate
+contrasts were not evaluated. Released condition-wise ComBat couples repeats,
+and pair/plate/pool dependencies preclude independent raw/culture confirmation.
+No inferential interval, efficacy threshold or new model is introduced. The next
+evidence task is original primary-condition repeat qualification with full-menu
+and QC accounting; fixed8 remains stopped.
+
+[Independent verification](replicate_stability_20261012/review/VERIFICATION.json)
+reconstructs all 10,600 records and context ledgers. Eighteen safety tests pass,
+with metadata/source checks and a pre-outcome source/menu freeze. Research code
+is not promoted to `src` or `tools`.
+
 ## Discrepancy P0 qualification and archived diagnosis - 2026-10-12
 
 **Verdict: P0 complete; fixed8 stop retained; no new scientific confirmation.**

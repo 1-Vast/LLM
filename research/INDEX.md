@@ -6,6 +6,7 @@ Read [REPORT.md](REPORT.md) for current conclusions, [EVIDENCE.md](EVIDENCE.md) 
 
 | Route | Canonical entry | State |
 |---|---|---|
+| Assay-repeat reliability prerequisite | [Repeat-stability diagnosis](replicate_stability_20261012/README.md) | All 10,600 intended comparisons retained; 292 same-plate metadata matches, 126 complete, 53 repeat-direction conflicts; processed-source reliability only, no policy/Agent release |
 | Discrepancy evidence qualification and decision diagnosis | [Executed P0](discrepancy_p0_20261012/README.md), [prior review](discrepancy_investigation_20261011/README.md) | 636 archived records independently reconstructed; ranking-pair MSE improves only 0.34% despite 10% global MSE gain; fixed8 stop retained; repeated assay design qualified, mechanism causes unresolved |
 | Fixed probes in a masked response context | [Context-probe diagnostic](context_probe_20261011/README.md) | Exact-dose matrix rebuilt; 8 shared probes fail to improve later top-10 drug selection over strong prior; 106 exposed contexts, 5 incomplete endpoints; model-side isolation and arithmetic verified |
 | Sparse feedback with a common total budget | [Budgeted feedback study](budgeted_feedback_20261011/README.md) | Two-round exposed replay remains NOT_SUPPORTED; budget checks promoted, empirical gate retained in research; cross-field literature and official data audit included |

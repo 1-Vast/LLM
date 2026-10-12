@@ -4,6 +4,16 @@ As of 2026-10-12, MAESTRO has a verified operational agent–decision–virtual-
 
 The [evidence register](EVIDENCE.md) owns cross-study numerical results. The [research index](INDEX.md) routes to detailed protocols and frozen receipts, and [scientific status](SCIENTIFIC_STATUS.json) records units, limitations and gates. Generated assets may be absent from a clean checkout. `python -m tools.research_validation --verify` must report missing or mismatched assets rather than substitute outcomes.
 
+The latest [assay-repeat prerequisite](replicate_stability_20261012/README.md)
+retains 10,600 fixed prior-boundary comparisons across 106 exposed contexts.
+Only 292 have qualified same-compound-plate secondary observations, and 126 have
+all three differences finite. Of these, 53 have conflicting repeat directions;
+seven of 55 primary wrong-order comparisons remain wrong-order in every secondary
+repeat. Shared publisher ComBat, plate/pool dependencies and narrow same-plate
+coverage prevent raw independent validation or a biological-cause verdict. This
+does not release a new functional policy or Agent study. Qualify original primary
+repeat endpoints and the full decision menu before pursuing correction value.
+
 The [executed P0 diagnosis](discrepancy_p0_20261012/README.md) reconstructs all 636
 archived fixed8 records. Conditional residual updating reduces global MSE by
 10.01% and prior-boundary absolute MSE by 21.55%, but top-10 versus next-10
