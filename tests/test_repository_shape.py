@@ -89,9 +89,6 @@ def test_source_is_separated_by_core_agent_and_virtual_cell_responsibility():
     assert (ROOT / "tools" / "evaluation" / "__init__.py").is_file()
     assert (ROOT / "src" / "maestro" / "contrast.py").is_file()
     assert not (ROOT / "src" / "maestro" / "planning.py").exists()
-    assert (ROOT / "research/astra/state_readout_repair_20261009/verify.py").is_file()
-    assert (ROOT / "research/astra/state_feedback_repair_20261009/verify.py").is_file()
-    assert (ROOT / "research/decision_value/verify.py").is_file()
     assert not (ROOT / "src" / "maestro" / "agent.py").exists()
     assert (ROOT / "src" / "agent" / "orchestrator.py").is_file()
     assert (ROOT / "src" / "virtual_cell" / "interface.py").is_file()
@@ -99,8 +96,6 @@ def test_source_is_separated_by_core_agent_and_virtual_cell_responsibility():
     assert not (ROOT / "results").exists()
     assert (ROOT / "src/agent/case_store.py").is_file()
     assert "CaseStore" in (ROOT / "src/agent/memory.py").read_text(encoding="utf-8")
-    assert len(list((ROOT / "research/astra").glob("state_*_repair_20261009"))) == 2
-    assert (ROOT / "research/decision_value/verify.py").is_file()
     assert not any((ROOT / "research/identifiability_audit").rglob("*.py"))
     assert not any((ROOT / "research/dual_core_live").rglob("*.py"))
     assert not any((ROOT / "research/dual_core_followup").rglob("*.py"))
@@ -271,55 +266,13 @@ def test_python_sources_are_english_only():
     assert not offenders, "Chinese found in Python sources:\n" + "\n".join(offenders)
 
 
-LOG_ROOT = ROOT / "log"
-LOG_DAY_NAME = re.compile(r"^\d{8}$")
-LOG_DAY_ROW = re.compile(r"^\| (\d{8}) \|", re.MULTILINE)
-LOG_RECORD_FIELDS = ("> - **Path**:", "> - **Purpose**:", "> - **Core points**:")
-
-
-def _log_day_directories():
-    return sorted(
-        path for path in LOG_ROOT.iterdir()
-        if path.is_dir() and (path / "README.md").is_file()
-    )
-
-
-def test_log_is_compact_dated_release_record():
-    """Each retained date has a compact summary and canonical receipts."""
-
-    assert LOG_ROOT.is_dir(), LOG_ROOT
-    assert (LOG_ROOT / "INDEX.md").is_file()
-    strays = sorted(
-        path.name for path in LOG_ROOT.iterdir()
-        if path.is_file() and path.name not in {"INDEX.md", "MANIFEST.json"}
-    )
-    assert not strays, f"unexpected files at log/ top level: {strays}"
-    assert (LOG_ROOT / "MANIFEST.json").is_file()
-
-    days = _log_day_directories()
-    assert days, "log/ has no day folders"
-    for day in days:
-        assert LOG_DAY_NAME.match(day.name), f"day folder is not named YYYYMMDD: {day.name}"
-        record = day / "README.md"
-        assert record.is_file(), f"{day.name} holds no day record"
-        text = record.read_text(encoding="utf-8")
-        iso_date = f"{day.name[:4]}-{day.name[4:6]}-{day.name[6:]}"
-        titles = [line for line in text.split("\n") if line.startswith("# ")]
-        assert titles, f"{day.name} record has no title"
-        assert iso_date in titles[0], f"{day.name} title does not carry its date: {titles[0]}"
-        assert all(field in text for field in LOG_RECORD_FIELDS), f"{day.name} lacks its compact summary"
-
-
-def test_log_manifest_tracks_every_dated_file_and_hash():
-    """The machine manifest, not the reading index, owns the file inventory."""
-    from tools.log_manifest import build_manifest
-
-    recorded = json.loads((LOG_ROOT / "MANIFEST.json").read_text(encoding="utf-8"))
-    assert recorded == build_manifest()
-    index = (LOG_ROOT / "INDEX.md").read_text(encoding="utf-8")
-    assert "| Date | Topic | Canonical receipt |" in index
-    listed_days = set(LOG_DAY_ROW.findall(index))
-    assert listed_days == {day.name for day in _log_day_directories()}
+def test_repository_has_one_scientific_report_and_no_retired_release_tree():
+    assert {path.name for path in (ROOT / "research").iterdir()} == {"REPORT.md", "EVIDENCE.md"}
+    for name in ("log", "cleanup", "Innovation.md", "task.md", "RELEASE_CHECK.md",
+                 "RELEASE_STATS.json", "CURRENT_REPOSITORY_STATS.json", "BLOCKED_ASSETS.md"):
+        assert not (ROOT / name).exists(), name
+    assert not list(ROOT.glob(".build-*"))
+    assert not list(ROOT.glob("output-*"))
 
 
 def test_no_test_module_imports_another_test_module():
@@ -395,3 +348,22 @@ def test_package_imports_form_a_layered_acyclic_graph():
                 if site.split(" <- ")[0] not in allowed
             )
     assert not violations, "package import layering violated:\n" + "\n".join(violations)
+
+
+def test_case_memory_audit_help_needs_no_scientific_dependencies():
+    script = """
+import importlib.abc
+import runpy
+import sys
+class NoScientificPackages(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in {'numpy', 'pandas', 'matplotlib', 'torch'}:
+            raise ImportError('Optional dependency loaded during help: ' + fullname)
+sys.meta_path.insert(0, NoScientificPackages())
+sys.argv = ['tools.case_memory.audit', '--help']
+runpy.run_module('tools.case_memory.audit', run_name='__main__')
+"""
+    result = subprocess.run([sys.executable, "-B", "-c", script], cwd=ROOT,
+                            capture_output=True, text=True, timeout=30)
+    assert result.returncode == 0, result.stderr
+    assert "--protocol-freeze" in result.stdout

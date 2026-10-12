@@ -3,19 +3,20 @@ name = "maestro"
 version = "0.2.0"
 description = "Mechanism-Aware Evidence-driven Scientific Agent for Therapeutic Reasoning and Optimization."
 requires-python = ">=3.11"
-dependencies = []
+dependencies = ["numpy"]
 
 [project.scripts]
 maestro = "agent.cli:main"
 
 [project.optional-dependencies]
-test = ["pytest==9.1.1", "numpy"]
-research = ["numpy", "scipy", "pandas", "h5py", "scikit-learn", "torch", "rdkit"]
+test = ["pytest==9.1.1"]
+research = ["scipy", "pandas", "h5py", "scikit-learn", "torch", "rdkit"]
 
 [tool.pytest.ini_options]
 testpaths = [
     "tests/test_observation_audit.py",
     "tests/test_research_inventory.py",
+    "tests/test_dataset_hash_consolidation.py",
     "tests/test_handoff.py",
     "tests/test_restart_contract.py",
     "tests/test_research_validation.py",
@@ -96,39 +97,11 @@ tools = "tools"
 tools = ["registry.yaml", "*/*.json"]
 
 [tool.maestro.test_scopes]
-# New tests in tests/ or maintained ASTRA must be assigned explicitly.
+# Maintained tests must be assigned explicitly.
 regression = []
+# Explicit asset-dependent suites are retained; missing assets are blockers.
 research = [
-    "research/astra/phenotype_anchor_20261010/test_phenotype_anchor.py",
-    "research/astra/phenotype_anchor_20261010/test_promotion_parity.py",
-    "research/astra/kinetic_horizon_20261010/test_kinetic_horizon.py",
-    "research/astra/mechanism_falsification_20261010/test_block_m.py",
-    "research/astra/mechanism_routing_20261011/test_block_n.py",
-    "research/astra/selective_discovery_20261011/test_block_p.py",
-    "research/astra/selective_discovery_20261011/test_promotion_parity.py",
-    "research/astra/mechanism_routing_20261011/test_promotion_parity.py",
-    "research/decision_value/axis_extension_20261010/test_extension.py",
-    "research/decision_value/axis_recovery_20261010/design/test_diagnosis_verify.py",
-    "research/decision_value/axis_recovery_20261010/design/test_calibration_v2_verify.py",
-    "research/decision_value/axis_recovery_20261010/design/test_calibration_verify.py",
-    "research/decision_value/axis_recovery_20261010/design/test_named_verify.py",
-    "research/decision_value/observation_reliability/test_reliability.py",
-    "research/decision_value/pairwise_v3/test_v3.py",
-    "research/decision_value/pairwise_20261009/test_pairwise.py",
-    "research/map_module_replacement_20261009/agent_trial/test_offline_guard.py",
-    "research/map_module_replacement_20261009/agent_trial/test_hard_trial.py",
-    "research/map_module_replacement_20261009/test_scarcity.py",
-    "research/map_module_replacement_20261009/test_replacement.py",
-    "research/map_module_replacement_20261009/agent_trial/test_source_contract.py",
-    "research/knowledge_layer_validation_20261009/test_benchmark.py",
-    "research/decision_value/test_utility.py",
-    "research/astra/state_feedback_repair_20261009/test_posterior.py",
-    "research/astra/state_readout_repair_20261009/test_readout.py",
-]
-# These suites require source or data fixtures excluded from the release checkout.
-archive = [
     "tests/test_combination_screens.py",
-    "tests/test_dataset_hash_consolidation.py",
     "tests/test_evaluation_isolation.py",
     "tests/test_evaluation_protocol.py",
 ]

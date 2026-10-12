@@ -5,24 +5,22 @@ import argparse
 import json
 import sys
 from pathlib import Path
-import numpy as np
-import matplotlib
 
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from tools.datasets import lincs_pack as XD  # noqa: E402
 from tools.case_memory import sha256
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
 
 def _sha(path: Path) -> str:
     return sha256(path)
 
 
-def quality_audit() -> int:
+def quality_audit(protocol_freeze: Path) -> int:
+    import numpy as np
+    from tools.datasets import lincs_pack as XD
+
     failures: list[str] = []
     pack, arrays = XD.load_pack()
     units = pack["units"]
@@ -92,7 +90,7 @@ def quality_audit() -> int:
     # 5. replay results: every reported metric is finite and the item count matches
     results_path = ROOT / "outputs/case_memory_integration/results.json"
     if not results_path.is_file():
-        failures.append("missing:results.json (run research.case_memory_integration.external_replay replay first)")
+        failures.append("missing:results.json (supply an explicitly generated replay results file)")
     else:
         results = json.loads(results_path.read_text())
         for arm, m in results["forecast_metrics"].items():
@@ -104,7 +102,7 @@ def quality_audit() -> int:
             failures.append("metric:empty_forecast_population")
 
     # 6. frozen protocol hash
-    freeze = json.loads((ROOT / "research/case_memory_integration/freeze_protocol.json").read_text())
+    freeze = json.loads(protocol_freeze.read_text())
     if _sha(ROOT / freeze["protocol"]["path"]) != freeze["protocol"]["sha256"]:
         failures.append("freeze:protocol_hash_mismatch")
 
@@ -119,7 +117,6 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 
-matplotlib.use("Agg")
 
 
 FIGDIR = ROOT / "outputs/case_memory_integration/figures"
@@ -136,11 +133,18 @@ def _save(fig, name: str) -> str:
     FIGDIR.mkdir(parents=True, exist_ok=True)
     path = FIGDIR / name
     fig.savefig(path, dpi=140, bbox_inches="tight")
+    import matplotlib.pyplot as plt
     plt.close(fig)
     return sha256(path)
 
 
 def visual_verify() -> int:
+    import numpy as np
+    from tools.datasets import lincs_pack as XD
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
     pack, arrays = XD.load_pack()
     results = json.loads((ROOT / "outputs/case_memory_integration/results.json").read_text())
     records = _records()
@@ -296,8 +300,11 @@ def visual_verify() -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=("quality", "figures"))
+    parser.add_argument("--protocol-freeze", type=Path, help="Explicit frozen protocol for quality mode")
     args = parser.parse_args()
-    return quality_audit() if args.mode == "quality" else visual_verify()
+    if args.mode == "quality" and args.protocol_freeze is None:
+        parser.error("quality requires --protocol-freeze PATH")
+    return quality_audit(args.protocol_freeze) if args.mode == "quality" else visual_verify()
 
 
 if __name__ == "__main__":

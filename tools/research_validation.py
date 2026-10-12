@@ -1,34 +1,26 @@
-"""Checkout-local entry point for the three maintained research test suites.
+"""Explicit checkout-local research tests and read-only frozen-input preflight.
 
-The production test target remains ``pytest`` (core testpaths in ``pyproject.toml``). Research
-tests depend on optional scientific packages and are intentionally run explicitly.
+No active scientific protocol is released. Preflight authenticates supplied bytes;
+it never executes study code or establishes a scientific claim.
 """
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
-import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
-
-DEFAULT_TARGETS = (
-    "research/astra/state_readout_repair_20261009/test_readout.py",
-    "research/astra/state_feedback_repair_20261009/test_posterior.py",
-    "research/decision_value/test_utility.py",
-)
 ROOT = Path(__file__).resolve().parents[1]
-STUDIES = (
-    ("research/astra/state_readout_repair_20261009", "outputs/paper_01286/state_readout_repair/RESULTS.json"),
-    ("research/astra/state_feedback_repair_20261009", "outputs/paper_01286/state_feedback_repair/RESULTS.json"),
-    ("research/decision_value", "outputs/decision_value_validation_20261009/RESULTS.json"),
-)
+DEFAULT_TARGETS = ()
+STUDIES = ()
 
 
-def blocked_assets(root: Path = ROOT) -> list[str]:
-    """Return absent or hash-mismatched frozen inputs and missing result outputs."""
+def blocked_assets(root: Path = ROOT, studies=None) -> list[str]:
+    """Return absent or hash-mismatched inputs, verifier pins and outputs."""
     blocked = []
-    for study, result in STUDIES:
+    for study, result in STUDIES if studies is None else studies:
         freeze_path = root / study / "FREEZE.json"
         if not freeze_path.is_file():
             blocked.append(f"{study}/FREEZE.json")
@@ -38,8 +30,11 @@ def blocked_assets(root: Path = ROOT) -> list[str]:
             path = root / relative
             if not path.is_file():
                 blocked.append(relative)
-            elif hashlib.sha256(path.read_bytes()).hexdigest() != expected:
-                blocked.append(f"{relative} (SHA256_MISMATCH)")
+            else:
+                with path.open("rb") as stream:
+                    digest = hashlib.file_digest(stream, "sha256").hexdigest()
+                if digest != expected:
+                    blocked.append(f"{relative} (SHA256_MISMATCH)")
         verifier_freeze = root / study / "VERIFY_FREEZE.json"
         verifier = root / study / "verify.py"
         if verifier_freeze.is_file():
@@ -54,36 +49,45 @@ def blocked_assets(root: Path = ROOT) -> list[str]:
 
 
 def main() -> int:
-    """Run the opt-in research tests and return pytest's process-style exit code."""
-    if (
-        Path.cwd().resolve() != ROOT
-        or not (ROOT / "pyproject.toml").is_file()
-        or not (ROOT / "research").is_dir()
-    ):
-        raise SystemExit(
-            "The research test runner is checkout-local. Run `python -m tools.research_validation` "
-            f"from the MAESTRO repository root: {ROOT}"
-        )
-    args = sys.argv[1:]
-    if args == ["--verify"]:
-        blocked = blocked_assets()
+    if Path.cwd().resolve() != ROOT or not (ROOT / "pyproject.toml").is_file():
+        raise SystemExit("The research runner is checkout-local; run from the MAESTRO repository root")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--verify", action="store_true")
+    parser.add_argument("--study", type=Path, help="Explicit study directory containing FREEZE.json")
+    parser.add_argument("--result", type=Path, help="Explicit required result artifact")
+    parser.add_argument("--tests", nargs="+", help="Explicit registered research test paths")
+    parser.add_argument("--collect-only", action="store_true")
+    args = parser.parse_args()
+    if args.verify:
+        if args.tests or args.collect_only:
+            parser.error("--verify cannot be combined with research test execution")
+        if (args.study is None) != (args.result is None):
+            parser.error("--study and --result must be supplied together")
+        studies = [(str(args.study), str(args.result))] if args.study is not None else STUDIES
+        if not studies:
+            print("BLOCKED/ASSET_MISSING")
+            print("No active frozen research protocol is released; supply --study PATH --result PATH.")
+            return 2
+        blocked = blocked_assets(ROOT, studies)
         if blocked:
             print("BLOCKED/ASSET_MISSING")
             print("\n".join(blocked))
             return 2
-        for study, _ in STUDIES:
-            result = subprocess.run(
-                [sys.executable, str(ROOT / study / "verify.py")], cwd=ROOT, check=False
-            )
-            if result.returncode:
-                return result.returncode
+        print("ENGINEERING_ONLY: supplied frozen inputs and result presence match; no scientific verifier executed")
         return 0
-    try:
-        import pytest
-    except ImportError as exc:  # pragma: no cover - exercised by an environment, not a test
-        raise SystemExit("Install the test dependency before running this research test command") from exc
-    return int(pytest.main([str(ROOT / target) for target in DEFAULT_TARGETS] + args))
+    if args.study or args.result:
+        parser.error("--study and --result require --verify")
+    targets = args.tests or DEFAULT_TARGETS
+    if not targets:
+        print("BLOCKED/ASSET_MISSING: no active research suite selected; use --tests PATH")
+        return 2
+    policy = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    registered = set(policy["tool"]["maestro"]["test_scopes"]["research"])
+    if not set(targets) <= registered:
+        parser.error("--tests requires registered research test paths")
+    import pytest
+    return int(pytest.main([str(ROOT / target) for target in targets] + (["--collect-only"] if args.collect_only else [])))
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__":
     raise SystemExit(main())

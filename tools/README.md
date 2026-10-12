@@ -18,7 +18,7 @@ respective units; omitted values retain the legacy zero. Prices are declarations
 not authenticated invoices. Without a resource-budget argument, the legacy report
 does not establish equivalence of total resource allowances. The tested prototype
 and scientific limitations are in
-[the budgeted feedback study](../research/budgeted_feedback_20261011/README.md).
+[the historical evidence register](../research/EVIDENCE.md).
 
 ## Offline observation and maintenance checks
 
@@ -31,7 +31,7 @@ and explicit `weights`, retains gene covariance and uses actual cell count.
 Neither command authenticates source identity, the STATE output axis or
 independent biological replication. Their frozen sources are the P0.5R
 extension matching and observation-reliability projection routines; validation
-and remaining limits are in [research/INDEX.md](../research/INDEX.md).
+and remaining limits are in [research/EVIDENCE.md](../research/EVIDENCE.md).
 
 `tools.analysis.platform_identity.identity_test(reference, query)` checks a cross-platform feature
 axis before a world model is fed another platform's cells. Every shared line must be most
@@ -45,7 +45,7 @@ or `TOO_FEW_SHARED_LINES`.
 Both come from `research/astra/kinetic_horizon_20261010`. There, identity passed 18 of 18 lines
 while responses did not transport, so a passing identity check is not transport evidence.
 
-`python -m tools.research_inventory --workspace . --out research/REFACTOR_INVENTORY.json`
+`python -m tools.research_inventory --workspace . --out EXTERNAL_TEMP_PATH/inventory.json`
 rebuilds the static path/hash/import inventory. Identical bytes and ASTs are
 cleanup candidates only; this command never deletes files or runs studies.
 
@@ -74,7 +74,7 @@ registered LINCS inputs; a missing pack is an asset blocker, not an empty datase
 python -m tools.case_memory.workflow sources
 python -m tools.case_memory.workflow pack
 python -m tools.case_memory.workflow graphs
-python -m tools.case_memory.audit quality
+python -m tools.case_memory.audit quality --protocol-freeze PATH
 python -m tools.case_memory.audit figures
 ```
 
@@ -101,15 +101,15 @@ ALMANAC outcomes are readable only through `open_vault` against an intact freeze
 `evaluation.discovery_replay` runs every arm at equal budget, one campaign per target line,
 and branches each campaign into exploit and certify variants. It uses
 `virtual_cell.combination_world`, `maestro.certification` and the loop in `agent.discovery`.
-The library builder and replay entry points are retained. Their historical parity suite is
-archived because its `research/certified_discovery` source package is not in this release;
+The library builder and replay entry points are retained. Historical comparisons against the retired research implementation are removed.
+The explicit synthetic ALMANAC vault test retains identity/sealing behavior;
 asset-free combination-world contracts remain in the default suite.
 
 Run evaluation through `python -m tools.evaluation.cli` and
 `python -m tools.evaluation.construction build|screen`. Only `maestro` is an installed command.
 The checkout-local research test
 runner is `python -m tools.research_validation` from the repository root; it runs only the
-three current study contract suites and does not imply that a research claim is validated.
+explicitly selected registered research suites and does not imply that a research claim is validated.
 Historical suites and their required data are not part of default collection.
 
 Synthetic biological, virtual-cell, and provider-client fixtures are test-only and live in
@@ -120,12 +120,12 @@ Synthetic biological, virtual-cell, and provider-client fixtures are test-only a
 The maintained research test suites are explicitly opt-in:
 
 ```bash
-python -m tools.research_validation
-python -m tools.research_validation --verify
+python -m tools.research_validation --help
+python -m tools.research_validation --verify --study STUDY_PATH --result RESULT_PATH
 ```
 
-The first command runs contract tests. The second checks frozen inputs and generated outputs
-before invoking study verifiers. Missing assets produce `BLOCKED/ASSET_MISSING`. Historical
+No active study is currently released. Select registered asset-dependent tests explicitly.
+The verification command checks supplied frozen inputs and generated outputs without executing study code. Missing assets produce `BLOCKED/ASSET_MISSING`. Historical
 dataset audit commands and older ASTRA drivers are recoverable from Git history, not current
 release entry points. Case-memory builders and audits likewise require their declared local
 assets and do not replace missing values with zeros.

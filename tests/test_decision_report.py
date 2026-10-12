@@ -106,11 +106,7 @@ def test_total_budget_and_other_costs_reject_invalid_declarations(invalid):
         replace(rows()[0], other_utility_cost=invalid)
 
 
-def test_production_budget_preserves_checked_research_prototype():
-    from pathlib import Path
-    root = Path(__file__).resolve().parents[1]
-    assert (root / "src/maestro/campaign_budget.py").read_bytes() == (
-        root / "research/budgeted_feedback_20261011/contract/budget.py").read_bytes()
+def test_production_budget_preserves_fractional_and_boolean_contract():
     budget = CampaignBudget(0.3, 0.1, 0, "declared units")
     assert budget.require_feasible(3, 0) == pytest.approx(0.3)
     with pytest.raises(ValueError):

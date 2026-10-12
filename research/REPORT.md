@@ -1,39 +1,61 @@
-# MAESTRO Research Report
+# MAESTRO Repository Consolidation Report
 
-As of 2026-10-12, MAESTRO maintains a scientific agent and a virtual-cell world model with typed evidence, prediction identity, applicability checks and refusal boundaries. The operational loop is covered by software contracts; those checks do not establish biological validity or scientific decision gain.
+## 1. Final architecture
 
-## Current conclusions
+Agent owns plans, actions, bounded memory, CaseStore, execution, budget and restart. Maestro owns the evidence/decision contract between the two cores. Virtual Cell owns model/source/condition/axis identity, prediction, uncertainty, applicability and refusal. Tools own explicit reusable offline checks and evaluation. Research owns historical scientific evidence and future explicitly frozen protocols. Tests own software behavior and architecture boundaries.
 
-| Status | Conclusion | Evidence |
-|---|---|---|
-| `SUPPORTED` | For selective-killer discovery among compounds without an annotated selective mechanism, virtual-cell transfer contributed 17 unexpected hits (95% interval 11 to 23, p=0.00098) across 38 campaigns. This is annotation-relative discovery evidence on one assay and platform. | [Block P](astra/selective_discovery_20261011/README.md); [evidence register](EVIDENCE.md) |
-| `SUPPORTED` | Transcriptional transfer predicts selective killing profiles for unseen mechanism classes and adds to a partial screen. Scope is limited to the evaluated PRISM task. | [Block N](astra/mechanism_routing_20261011/README.md); [evidence register](EVIDENCE.md) |
-| `ENGINEERING_ONLY` | Typed prediction identity, applicability/refusal, decision authorization, budget accounting, receipts and restart contracts are implemented and tested. | [Core tests](../tests/); [promoted APIs](../src/) |
-| `NOT_SUPPORTED` | The agent loop has not shown useful yield beyond a conventional agent-with-tool loop. Feedback adaptation has not beaten the strongest batch design; LLM forecaster, critic, explainer and trust-judge roles add no demonstrated benefit. | [Blocks N and P](EVIDENCE.md) |
-| `NOT_SUPPORTED` | STATE does not improve the evaluated Tahoe relative-survival selectivity endpoint over the basal-context prior; the registered gate correctly refuses this use. | [Phenotype-anchored study](astra/phenotype_anchor_20261010/README.md) |
-| `EXPLORATORY` | Archived P0 diagnosis improves global prediction error, but not selection utility. It does not release a new feedback policy or Agent study. | [P0 diagnosis](discrepancy_p0_20261012/README.md) |
-| `BLOCKED` | Fresh source-repeat qualification, a distinct qualified evidence channel, full data/checkpoint axes, and a newly frozen P0.6 protocol remain prerequisites for further reliability experiments. | [P0 studies](EVIDENCE.md); [blocked assets](../BLOCKED_ASSETS.md) |
+## 2. Retained production capabilities
 
-## Retained and promoted
+NumPy is now declared as the existing required runtime dependency; isolated installed import exposed the previous missing declaration. Heavy research/plotting packages remain optional.
 
-The only promoted scientific model capability is scoped `virtual_cell.transcriptional_transfer`. Promoted engineering contracts include condition and source binding, typed authorization, refusal on unsupported scope, bounded execution and receipt-backed audit. Experimental policies and fitted models remain in `research/`.
+Typed evidence and measurement authorization; source/condition binding; prediction caching and refusal; scoped memory; durable reservation, actual-spend accounting, idempotency and restart; handoff/repair; receipts; paired terminal evaluation. These are ENGINEERING_ONLY until independently qualified biological and decision endpoints support a narrower claim.
 
-## Structure change
+## 3. Promoted research capabilities
 
-This refactor created the sole repository inventory at [REFACTOR_INVENTORY.json](REFACTOR_INVENTORY.json), consolidated this file as the cross-study conclusion entry point and kept frozen protocols, study results and dated receipts.
+No new scientific policy or fitted model is promoted. Existing scoped transcriptional transfer remains in virtual_cell; campaign budgets, decision receipts, interval-based measure-or-predict, platform identity, paired increments, exact cluster sign-flip and coordinate/variance diagnostics remain tested production capabilities. Their engineering admission does not certify cross-platform transport or new biological validity. Duplicate completed research implementations have been retired.
 
-| Decision | Result |
-|---|---|
-| `KEEP` | Core packages, tools, tests, study evidence, frozen assets and canonical receipts remain in their existing ownership areas. |
-| `PROMOTE` | 0 new research capabilities promoted; existing scoped transcriptional transfer remains tested in `src/virtual_cell/`. |
-| `MERGE` | README and this report now route to concise project/current conclusions; detailed numerical findings remain in EVIDENCE. The duplicate legacy inventory was replaced. |
-| `DELETE` | Removed `Innovation.md`, the unreferenced `targeted_review_20261011.md`, and `RESEARCH_INVENTORY.json`. |
-| `BLOCKED` | Data, outputs, temporary research ledgers and tracked presentation files have unresolved experiment/receipt dependencies. Cache/build removal was rejected by the local execution policy. |
+## 4. Research conclusions
 
-The inventory records 18 root directories before and after, and a research-file scope change from 13,405 files / 580,183,721 bytes to 13,404 / 580,160,029 bytes. Its current worktree snapshot contains 26,909 files and 135,068,132,112 bytes; `src/` has 201 files, `tools/` 164, `research/` 13,404 in the non-cache inventory scope, and `tests/` 592. It identifies 706 byte-identical groups and 100 duplicate-function candidates; neither implies semantic redundancy. Of 100 research Markdown links, five point to files absent from retained third-party source copies and remain `BLOCKED`. No experiment was rerun or scientific claim promoted in this refactor.
+SUPPORTED: Block P virtual-cell contribution +17 unexpected hits, interval [+11,+23], p=.00098, 38 campaigns/975 sealed compounds/1,216 screens per arm, annotation-relative novelty. Block N unseen-class transcriptional transfer +.116 against targets, +.100 against chemistry, secondary replication +.103, increment over 160-line partial screen +.049. Both remain assay/source/endpoint limited. All other historical results, controls and limitations are in [EVIDENCE.md](EVIDENCE.md).
 
-## Verification and next gate
+## 5. Failed, unsupported and blocked claims
 
-`compileall` and all 785 default tests pass; the core shape/integration subset passes. `python -m agent --help` passes. Research preflight is `BLOCKED/ASSET_MISSING` for `data/virtual_cell/tahoe_c39_x_hvg_feature_names.json`. Import took 0.707 seconds and the default suite took 69.84 seconds on this checkout; no comparable pre-refactor timing was measured. Before/after counts and unresolved links are in `REFACTOR_INVENTORY.json`. The next minimum gate is to qualify primary repeat endpoints and the full decision menu, then freeze a P0.6 protocol with independent units, controls, exclusions and acquisition costs before execution.
+NOT_SUPPORTED: independent Agent/LLM yield beyond conventional tool loops; STATE relative-survival improvement; active-tier mechanism coverage; adaptive/feedback superiority and fixed8 selection gain. EXPLORATORY: processed repeat audit, retrospective diagnostics and Block O feasibility reversal. ENGINEERING_ONLY: software tests and coordinate reconstruction.
 
-Detailed numerical results and reproduction paths are in [EVIDENCE.md](EVIDENCE.md); study procedures, limitations and receipts are linked from [INDEX.md](INDEX.md). Scientific conclusions remain separate from software behavior, numerical replay, prediction performance, decision gain and causal claims.
+BLOCKED: full2000 and STATE checkpoint output axes; independent original primary repeat/QC/culture units and complete decision menu; new P0.6 protocol and distinct measured channel; authentic costs; external STATE/Tahoe, MAP and LINCS assets. Historical readout also lacks tahoe_c39_x_hvg_feature_names.json and had preexisting protocol-pin mismatches. Removing an old executable packet does not repair these gaps. Minimum release requires authenticated assets plus a fresh frozen protocol; no automatic download or paid execution is authorized here.
+
+## 6. Removed and merged content
+
+README, REPORT and EVIDENCE own usage, current conclusions and 32 compact historical evidence rows. Original unique tracked protocols, amendments and observations remain identified by their historical Git commit, without a replacement archive. No science was rerun. The read-only inventory tool shrank from 336 to 134 lines; hardcoded refactor history, speculative classifications and the full-worktree scanner were removed. Case-memory audit takes an explicit protocol freeze and defers optional scientific/plotting dependencies. Research preflight streams hashes, retains input/verifier pin refusal and never runs a scientific verifier implicitly.
+
+The prior deletion-policy failure was resolved by individual file removal: each Remove-Item receives one file, without force or recursive deletion, and its result is checked. All 13,787 audited tracked candidates were deleted. One additional source module, agent/model_audit.py, had no import, CLI, manifest or test consumer and was deleted after reverse-reference inspection. Budget behavior and synthetic ALMANAC vault/hash checks remain; obsolete comparisons against retired research implementations were removed. Streaming SHA256/MD5 and content-change tests now target surviving reusable hash functions and enter the default suite.
+
+| Category | Count | Meaning |
+|---|---:|---|
+| Retained | 177 | Remaining tracked source, configuration, test and document files |
+| Newly promoted | 0 | No newly admitted scientific algorithm or policy |
+| Merged | 3 | README, REPORT and EVIDENCE are the revised authoritative documents |
+| Deleted | 13,788 | Tracked files removed from the 13,965-file baseline |
+| Blocked scientific prerequisite areas | 6 | Section 5; no file-deletion blockage remains |
+
+Research now contains only REPORT and EVIDENCE. Six ignored derived study outputs, 539 study bytecode files and regenerable root build/installation metadata were also removed individually. Empty study/build/log directories were removed after checking emptiness. An orphaned Bash shell from October 10 held one empty study directory; it had no scientific computation child, and closing it released the lock.
+
+Counts concern the tracked code checkout. Ignored local data/reference assets, outputs and temporary source ledgers were not treated as newly deletable observations; they are not shipped by Git and do not load on production import/help. Local user configuration and ignored credentials were not copied into the isolated checkout or printed. The tracked release structure is distinct from this populated scientific workspace. External audit/install material was removed file by file, followed by its empty directories; no audit inventory, test XML, backup or archive remains from this task. Obsolete research-specific Git attributes were removed; current text and binary rules remain.
+
+## 7. Validation results
+
+Baseline: 785 default tests passed. Final default suite: 791 passed in 56.26 s, including final repository shape and scientific boundaries. Shape/integration subset: 63 passed. Explicit synthetic ALMANAC vault suite: 1 passed. Compileall, Agent/research/audit help, core/tools imports and git diff --check pass. Hash and sealed-vault tests preserve actual behavior rather than requiring a retired study directory. Reference checks find no broken tracked Markdown links, stale registered test paths, forbidden production imports or empty code directories.
+
+The final fresh tracked-file checkout passed all 791 default tests in 58.46 s. Fresh offline installation and isolated installed imports/Agent help pass with the existing local NumPy distribution supplied; the installed package also verifies absence of the retired module. NumPy is declared as a runtime dependency. This is an offline local-dependency check, not fresh dependency resolution or biological validation. Research --verify remains BLOCKED/ASSET_MISSING without an explicit current frozen protocol; input/verifier hash tampering remains refused.
+
+## 8. Efficiency results
+
+Measured process times on this Windows checkout: core/tools import .7816 s, Agent help .8427 s, research help .2369 s, case-memory audit help .2562 s; all exit 0. No comparable speedup is claimed. Inventory scans are explicit. Plotting loads only for figures, with protocol input explicit rather than hidden in research.
+
+Tracked working-tree content decreased from 490,668,246 bytes to approximately 2.58 MB. These are code-checkout measurements, excluding ignored scientific assets. The remaining tree has 155 Python files; source deletion does not imply a new algorithmic or biological performance gain.
+
+## 9. Remaining risks and minimum next gate
+
+REFACTOR_COMPLETE for the tracked release checkout: individual cleanup, final structure, package boundaries, default tests, explicit research refusal, fresh installation/import/help, references and temporary cleanup passed. No commit or push was performed. Scientific qualification remains BLOCKED where listed in section 5.
+
+Qualify original primary repeated endpoints and the entire legal decision menu, then freeze independent units, controls, exclusions, source/model axes, acquisition costs and useful net benefit before any P0.6 or Agent-benefit experiment. Historical summaries are evidence records rather than immediately reproducible research packages. The three explicitly registered research suites comprise one synthetic ALMANAC construction/vault test and two evaluation suites requiring external source fixtures. Historical parity against retired research code is removed. Missing assets are never represented as scientific success.
