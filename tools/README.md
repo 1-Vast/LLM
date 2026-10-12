@@ -45,7 +45,7 @@ or `TOO_FEW_SHARED_LINES`.
 Both come from `research/astra/kinetic_horizon_20261010`. There, identity passed 18 of 18 lines
 while responses did not transport, so a passing identity check is not transport evidence.
 
-`python -m tools.research_inventory --workspace . --out research/RESEARCH_INVENTORY.json`
+`python -m tools.research_inventory --workspace . --out research/REFACTOR_INVENTORY.json`
 rebuilds the static path/hash/import inventory. Identical bytes and ASTs are
 cleanup candidates only; this command never deletes files or runs studies.
 

@@ -4,7 +4,7 @@ Reviewed 2026-10-12, Asia/Shanghai. This is a prerequisite audit of **retrospect
 
 ## Attachment comparison
 
-The earlier and reattached reports, titled “MAESTRO：对上传研究报告的进一步审查与研究建议”, are byte-identical: each contains 17,342 bytes, SHA256 `0fd78bbd06164a3c52859580c6686a9a4b19572b7d155dc7dbf8589741230594`. Their exact paths and the current read date are recorded in `SOURCE_READ_RECEIPTS.json`. Reattachment supplies no changed Experiment Q design. The report calls Experiment Q a candidate name, requires matched observation permissions, budgets and menus for B2/B3, and reserves independent confirmation for a suitable extra source or independent experiment after freezing the method.
+The earlier and reattached reports, titled `MAESTRO：对上传研究报告的进一步审查与研究建议`, are byte-identical: each contains 17,342 bytes, SHA256 `0fd78bbd06164a3c52859580c6686a9a4b19572b7d155dc7dbf8589741230594`. Their exact paths and the current read date are recorded in `SOURCE_READ_RECEIPTS.json`. Reattachment supplies no changed Experiment Q design. The report calls Experiment Q a candidate name, requires matched observation permissions, budgets and menus for B2/B3, and reserves independent confirmation for a suitable extra source or independent experiment after freezing the method.
 
 ## What the source methods support
 

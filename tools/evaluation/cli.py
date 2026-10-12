@@ -250,8 +250,7 @@ def main() -> int:
         "prediction_shuffled": ShuffledPredictionValuePolicy(),
         "prediction_removed": RemovedPredictionValuePolicy(),
         "maestro": MAESTROCorePolicy(),
-        # Innovation.md section 9.3 ablations: is the gain from the repair, or from
-        # simply being allowed to edit the plan several times?
+        # Ablate repair to separate its contribution from repeated plan edits.
         "repair_disabled": RepairDisabledPolicy(),
         "random_legal_edit": RandomLegalEditPolicy(),
         # Strongest honest alternative to directed repair: read the same public

@@ -1,118 +1,37 @@
 # MAESTRO
 
-MAESTRO combines a scientific decision agent with a virtual-cell world model.
-The agent chooses admissible evidence and experiments under a resource limit;
-the world model predicts supported intervention responses. Qualified observations,
-not predictions, determine scientific conclusions.
+MAESTRO is a dual-core scientific system: an Agent manages questions, evidence, decisions, budgets and execution; a virtual-cell world model predicts responses within a declared model, source, condition and feature-axis scope. Typed contracts connect the cores. Unsupported predictions must be refused, and predictions remain distinct from observations.
 
-The world-model foundation is the official pretrained **STATE `final.ckpt`**.
-Condition, source, feature-axis and model identity are checked before use.
-A transcript forecast does not establish protein activity, apoptosis function,
-causal mechanism or the value of an experiment.
-
-## Run
+## Install and run
 
 ```bash
 python -m pip install -e ".[test]"
-python -m pytest
 maestro --help
-python -m tools.datasets.catalog --help
-python -m tools.evaluation.cli --help
+python -m pytest -q
+python -m tools.research_validation --verify
 ```
 
-Default tests cover asset-free production contracts. Research test groups are explicitly scoped: `python -m tools.research_validation`. Frozen studies
-require their listed packet and outputs. Run `python -m tools.research_validation --verify`
-for a hash and asset preflight; missing files are reported as `BLOCKED/ASSET_MISSING`.
-Passing contract tests does not mean a research experiment was rerun.
+The research verifier checks frozen inputs and outputs. Missing or mismatched assets are reported as `BLOCKED/ASSET_MISSING`; passing software tests is not a scientific result.
 
-## Ownership
+## Structure
 
 | Path | Responsibility |
 |---|---|
-| `src/agent/` | Planning, execution coordination, providers, context and persistence |
-| `src/maestro/` | Evidence admission, scientific decision and repair contracts |
-| `src/virtual_cell/` | Prediction identity, applicability, adapters and refusal |
-| `tools/` | Reusable acquisition, provenance, analysis and evaluation |
-| `research/` | Experimental fitting, policies, protocols and evaluation assets |
-| `log/` | Dated experiment records, verification and publication receipts |
-| `tests/` | Behavioural contracts and explicitly scoped research checks |
+| `src/agent/` | Planning, tool execution, scoped memory, restart and audit |
+| `src/maestro/` | Evidence, decisions, authorization, risk and repair contracts |
+| `src/virtual_cell/` | Model identity, applicability, prediction, uncertainty and refusal |
+| `tools/` | Reusable offline tools with stable inputs and outputs |
+| `research/` | Experimental code, protocols, frozen inputs, results and limits |
+| `tests/` | Core contracts and regression checks; research tests run explicitly |
 
-CaseStore owns plans, attempts, results and budget facts. Predictions and derived
-summaries retain their source identity. The core does not import research or tools.
+Minimal command examples:
 
-## Current evidence
+```bash
+python -m tools.datasets.catalog --help
+python -m tools.evaluation.cli --help
+python -m tools.research_validation --collect-only
+```
 
-The latest [fixed-probe context diagnostic](research/context_probe_20261011/README.md)
-tests eight shared probes after masking a target context's response row. An exact-dose
-rebuild avoids older mixed-dose groups, but feedback still fails to improve top-10
-drug selection; a conditional model improves MSE without decision gain. The empirical
-branch stops before KG/Agent expansion. This is exposed retrospective data, with
-publisher preprocessing and incomplete endpoints explicitly retained as limitations.
+## Scientific boundary
 
-The [budgeted feedback study](research/budgeted_feedback_20261011/README.md)
-tests at most two rounds under a common total resource cap. A stop gate saves declared
-resources but does not establish better decisions over the strongest batch (+0.00082,
-cluster CI [-0.01102, +0.01290]); selected-path reliability and secondary confirmation
-fail. Budget accounting is promoted; the empirical policy remains in research.
-
-The [scientific decision interface study](research/dual_core_scientific_20261011/README.md)
-promotes opt-in terminal-value authorization with frozen hypothesis, interpretation and
-condition bindings, scoped backend routing and paired utility/cost reporting. Its 421-compound
-retrospective replay supports the contents of L1000 and real feedback, but does not establish
-adaptation over the strongest batch design (+0.00217, CI [-0.01562, +0.01970]). Active-drug
-calibration and secondary confirmation also fail; its empirical model and policy remain in
-research. The packet includes 16 verified references, a new CXCL9 source audit and four real
-provider compatibility calls, with no claim of incremental LLM scientific benefit.
-
-The 2026-10-10 phenotype-anchored study tested STATE on a functional endpoint measured in the
-same spheroids as its RNA: Tahoe relative-survival selectivity on five held-out lines. Basal-
-similarity transfer beat STATE (delta r -0.23) and generic ranking (top-10 +0.56 log2, 5/5). A
-registered world-model value gate refused STATE from reference data alone, and held-out lines
-confirmed the refusal. The gate, same-unit bridge rule and basal transfer are promoted with scope.
-
-The 2026-10-10 block K asked whether STATE's forecast of the 24 h state can replace measuring it
-for a 5-day viability decision.
-* On 48 MIX-Seq lines unseen by STATE, the forecast harmed a DepMap-scale prior (-0.09 [-0.18,
-  -0.005]). Its line-specific skill does not leave its training platform.
-* The development gate's alternative, measuring at 24 h, failed confirmation (-0.02 [-0.11,
-  0.08]).
-* For trametinib, 5-day information appeared only at 24-48 h.
-* Gate decisions now require interval lower bounds and can abstain (`plan_measure_or_predict`).
-
-The 2026-10-10 block M tested whether the agent and a world model can falsify mechanism
-hypotheses (424 Repurposing Hub classes) with a calibrated error rate. It used 502 sealed L1000
-drugs and four profiles each.
-* A conformal test covered the true mechanism in 0.892 of drugs. It failed its registered rule on
-  the most active drugs (0.776).
-* The agent alone covered 0.00, and likelihood credible sets 0.22.
-* Class content falsifies.
-* Agent literature, critique, analogies, observation choice and p-value reading added nothing
-  beyond controls. The test never flagged an inadequate hypothesis set. Nothing was promoted.
-
-The 2026-10-11 block N asked where the LLM adds value to the virtual cell. The task was predicting
-which of 578 cancer lines a compound kills (PRISM 19Q4) from its L1000 response, on 421 sealed
-drugs.
-* For mechanisms with no screened member, the virtual cell's transfer from transcriptionally
-  similar drugs beat curated targets and chemistry (+0.12 and +0.10). It replicated on an
-  independent re-screen and added to a 160-line partial screen.
-* The LLM as forecaster, critic, explainer or trust judge added nothing; as critic it harmed the
-  virtual cell.
-* The transfer is promoted as `virtual_cell.transcriptional_transfer`.
-
-Software checks and replay receipts establish engineering behaviour, not independent
-scientific benefit. STATE remains the pretrained world-model foundation; decision
-benefit, LLM advantage and functional or causal claims remain unestablished.
-
-The separate P0.5R-Extension qualifies the specified **39 endpoint coordinates** in
-c44 and c45 against all 62,710 source genes. It reuses exposed c44 data and acquires
-133,564 new c45 expression bytes. This is file-local data identity evidence, not a
-fresh biological holdout. The full 2,000-gene and STATE checkpoint output axes
-remain uncertified. P0.6 needs a new execution freeze; P2 and production promotion
-remain closed. Historical failures are preserved.
-
-Read [the research index](research/INDEX.md) for navigation,
-[the report](research/REPORT.md) for current conclusions and next gates,
-[the evidence register](research/EVIDENCE.md) for numerical results and replay
-paths, and [the experiment log](log/INDEX.md) for dated receipts.
-[Blocked assets](BLOCKED_ASSETS.md) distinguishes locally retained evidence from
-what a clean checkout can reproduce.
+The model predicts within qualified scope; it does not establish functional endpoints, mechanism, causality or experiment value by itself. The Agent selects and audits evidence and actions; it does not turn language-model output into scientific fact. Current conclusions and the next verification gate are in [research/REPORT.md](research/REPORT.md), with numerical results in [research/EVIDENCE.md](research/EVIDENCE.md) and study navigation in [research/INDEX.md](research/INDEX.md). Missing assets are listed in [BLOCKED_ASSETS.md](BLOCKED_ASSETS.md).

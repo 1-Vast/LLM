@@ -1,6 +1,6 @@
 # Research Index
 
-Read [REPORT.md](REPORT.md) for current conclusions, [EVIDENCE.md](EVIDENCE.md) for cross-study results, and [SCIENTIFIC_STATUS.json](SCIENTIFIC_STATUS.json) for machine-readable gates. [RESEARCH_INVENTORY.json](RESEARCH_INVENTORY.json) records actual files and static dependencies; [REFACTOR_REPORT.md](REFACTOR_REPORT.md) records consolidation and engineering promotion. Execution receipts belong in [log/INDEX.md](../log/INDEX.md). Study READMEs own local methods and commands; protocols, freezes, amendments and failures remain immutable evidence rather than duplicate summary reports.
+Read [REPORT.md](REPORT.md) for current conclusions, [EVIDENCE.md](EVIDENCE.md) for cross-study results, [SCIENTIFIC_STATUS.json](SCIENTIFIC_STATUS.json) for machine-readable gates, and [REFACTOR_INVENTORY.json](REFACTOR_INVENTORY.json) for repository structure and static references. Execution receipts belong in [log/INDEX.md](../log/INDEX.md). Study READMEs own local methods and commands; protocols, freezes, amendments and failures remain immutable evidence rather than duplicate summary reports.
 
 ## Current research route
 
