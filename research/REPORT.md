@@ -1,6 +1,27 @@
 # MAESTRO Repository Consolidation Report
 
-## Current research update: 2026-10-13
+## Current research update: evidence-conditioned GCP transfer, 2026-10-13
+
+The English [evidence-conditioned histone transfer report](evidence_transfer_20261013/README.md)
+tests a new measured proteomic source with connectivity-separated 66/27/20
+reference/development/test compounds. Source-aware normalization uses LVL3 and
+same-plate DMSO controls, avoiding held-out-treatment dependence in LVL4 medians.
+The development-selected deterministic blend finds 14/20 directional hits; the
+integrated evidence agent and matched conventional agent each find 12/20, and the
+agent-only donor method finds 10/20. Integrated-minus-deterministic is -10 percentage
+points (paired bootstrap 95% CI [-30, +10]); integrated-minus-conventional is zero
+(CI [-15, +15]). The predeclared synergy gate fails. The new scientific selector
+remains in research, and the existing RNA RKT certificate is not extended to GCP.
+
+The production profiling runner now supports opt-in CaseStore persistence with
+condition/model/source/axis binding, exact accepted-receipt recovery and refusal
+to repeat unresolved actions. These are engineering improvements only. All 815
+default tests pass in the requested maestro environment; both earlier frozen study verifications pass. Python file count
+remains 189 after consolidating related transfer-metric tests. The 120-call source
+qualification experiment preserves raw usage, source receipts, frozen choices,
+negative results and deterministic replay checks.
+
+## Previous research update: context discrimination, 2026-10-13
 
 The English [context-discrimination report](context_discrimination_20261013/README.md)
 audits Block Q and tests a new decision endpoint on development-exposed GSE70138 data.

@@ -1,0 +1,52 @@
+{
+  "key": "492979851d55c23a3c6c50915b6d2b654b68efe43b4931208ac61df2125b3484",
+  "specification": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a scientific agent. Form competing pharmacological explanations for model disagreement. Identify the missing evidence, retrieve relevant donor descriptions, and revise donor support using attributed evidence. You may select measured reference donors, never fabricate response values. Drug descriptions are pharmacology, not proof of context-specific response. The fixed external decoder transfers donor target-minus-A375 responses, then selects one target cell/feature/sign. Aim for a reproducible histone perturbation (>0.5 log2 vs vehicle). No viability or causal claim. Return JSON only."
+      },
+      {
+        "role": "user",
+        "content": "{\"query\": {\"id\": \"BRD-A14634327\", \"name\": \"gsk126\", \"dose_uM\": 1.0, \"exposure_hours\": 24, \"anchor_line\": \"A375\", \"anchor_features\": [{\"id\": \"BI10087\", \"histone_mark\": \"H3K27me0K36me3\", \"standardized\": 2.8377}, {\"id\": \"BI10086\", \"histone_mark\": \"H3K27me0K36me2\", \"standardized\": 2.4001}, {\"id\": \"BI10044\", \"histone_mark\": \"H3K27me3K36me1\", \"standardized\": -1.9961}, {\"id\": \"BI10085\", \"histone_mark\": \"H3K27me0K36me1\", \"standardized\": 1.8463}, {\"id\": \"BI10040\", \"histone_mark\": \"H3K27me2K36me1\", \"standardized\": -1.6792}, {\"id\": \"BI10049\", \"histone_mark\": \"H3K27ac1K36me2\", \"standardized\": 1.655}]}, \"query_sources\": [{\"source_id\": \"pubchem:68210102:description:1\", \"text\": \"GSK126 is a member of the class of methylindoles that is 1H-indole substituted by (2S)-butan-2-yl, methyl, N-[(4,6-dimethyl-2-oxo-1,2-dihydropyridin-3-yl)methyl]acetamide, and 6-(piperazin-1-yl)pyridin-3-yl groups at positions 1, 3, 4, and 6, respectively. It is a potent and highly selective inhibitor of EZH2 methyltransferase (IC50 = 9.9 nM). It has a role as an antiatherosclerotic agent, an EC 2.1.1.43 (enhancer of zeste homolog 2) inhibitor, an antineoplastic agent, an angiogenesis inhibitor, a neuroprotective agent and an anti-obesity agent. It is a secondary carboxamide, a member of pyridines, a pyridone, a methylindole and a N-arylpiperazine.\", \"provider\": null, \"url\": \"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:124921\"}], \"candidate_donors\": [{\"id\": \"BRD-A09533288\", \"name\": \"Verapamil\", \"dose_uM\": 0.2, \"anchor_similarity\": 0.4157, \"structure_similarity\": 0.0917}, {\"id\": \"BRD-A36536537\", \"name\": \"SCH 900776\", \"dose_uM\": 5.5, \"anchor_similarity\": 0.4031, \"structure_similarity\": 0.1193}, {\"id\": \"BRD-A48881734\", \"name\": \"CPI-169\", \"dose_uM\": 1.0, \"anchor_similarity\": 0.7489, \"structure_similarity\": 0.3143}, {\"id\": \"BRD-K13662825\", \"name\": \"Dinaciclib\", \"dose_uM\": 4.5, \"anchor_similarity\": -0.2618, \"structure_similarity\": 0.1795}, {\"id\": \"BRD-K16730910\", \"name\": \"Regorafenib\", \"dose_uM\": 1.0, \"anchor_similarity\": 0.4804, \"structure_similarity\": 0.1217}, {\"id\": \"BRD-K31406481\", \"name\": \"VU0155056\", \"dose_uM\": 1.0, \"anchor_similarity\": -0.0787, \"structure_similarity\": 0.1792}, {\"id\": \"BRD-K49328571\", \"name\": \"Dasatinib\", \"dose_uM\": 0.1, \"anchor_similarity\": 0.0328, \"structure_similarity\": 0.1913}, {\"id\": \"BRD-K56195681\", \"name\": \"losmapimod\", \"dose_uM\": 0.25, \"anchor_similarity\": 0.4498, \"structure_similarity\": 0.1698}, {\"id\": \"BRD-K56343971\", \"name\": \"vemurafenib\", \"dose_uM\": 10.0, \"anchor_similarity\": -0.1962, \"structure_similarity\": 0.1696}, {\"id\": \"BRD-K70301465\", \"name\": \"Ibrutinib\", \"dose_uM\": 1.0, \"anchor_similarity\": 0.4416, \"structure_similarity\": 0.1176}, {\"id\": \"BRD-K78431006\", \"name\": \"Crizotinib\", \"dose_uM\": 0.25, \"anchor_similarity\": 0.2906, \"structure_similarity\": 0.1892}, {\"id\": \"BRD-K83144676\", \"name\": \"Olmesartan\", \"dose_uM\": 1.0, \"anchor_similarity\": 0.3852, \"structure_similarity\": 0.1207}, {\"id\": \"BRD-K87737963\", \"name\": \"momelotinib\", \"dose_uM\": 1.0, \"anchor_similarity\": -0.3699, \"structure_similarity\": 0.1759}, {\"id\": \"BRD-K90860366\", \"name\": \"1271738-62-5\", \"dose_uM\": 12.0, \"anchor_similarity\": 0.5457, \"structure_similarity\": 0.1226}], \"model_diagnostics\": {\"ridge\": {\"line\": \"MCF7\", \"feature\": \"BI10041\", \"histone_mark\": \"H3K27me2K36me2\", \"sign\": -1, \"value\": -2.4857732650321642}, \"phenotype\": {\"line\": \"YAPC\", \"feature\": \"BI10086\", \"histone_mark\": \"H3K27me0K36me2\", \"sign\": 1, \"value\": 2.8977968544933077}, \"chemical\": {\"line\": \"MCF7\", \"feature\": \"BI10087\", \"histone_mark\": \"H3K27me0K36me3\", \"sign\": 1, \"value\": 3.2277080971125613}}, \"task\": \"Choose at most five donor IDs whose pharmacology descriptions should be retrieved. Return {requests:[id,...],donors:[{id:...}],hypotheses:[...],evidence_gap:string}. Initial donors are optional source-free choices; <=5.\"}"
+      }
+    ],
+    "arm": "integrated:acquire",
+    "query_id": "BRD-A14634327",
+    "donor_ids": [
+      "BRD-A09533288",
+      "BRD-A36536537",
+      "BRD-A48881734",
+      "BRD-K13662825",
+      "BRD-K16730910",
+      "BRD-K31406481",
+      "BRD-K49328571",
+      "BRD-K56195681",
+      "BRD-K56343971",
+      "BRD-K70301465",
+      "BRD-K78431006",
+      "BRD-K83144676",
+      "BRD-K87737963",
+      "BRD-K90860366"
+    ],
+    "source_ids": [],
+    "model": "deepseek-flash",
+    "max_tokens": 900,
+    "stage": "acquire",
+    "model_freeze_sha256": "2e7377bc4f71f5a1e3f0957dd8dad5f93e796f50c3c9641202c2a8e297e25924"
+  },
+  "object": null,
+  "error": "unparseable_content",
+  "usage": {
+    "prompt_tokens": 1679,
+    "completion_tokens": 900,
+    "total_tokens": 2579,
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 1679,
+    "calls": 1,
+    "model": "deepseek-flash"
+  },
+  "response": null,
+  "started_at": "2026-10-13T02:44:09.232618+00:00",
+  "finished_at": "2026-10-13T02:44:14.381554+00:00"
+}

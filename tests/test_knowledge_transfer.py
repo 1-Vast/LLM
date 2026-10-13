@@ -1,11 +1,16 @@
 """Contracts of routed knowledge transfer (virtual cell), its profiling designs and the campaign runner."""
+import json
 import numpy as np
 import pytest
 
-from agent.profiling import ProfilingSpec, run_profiling
+from agent.case_store import CaseStore, MeasurementResult
+from agent.profiling import ProfilingPersistence, ProfilingSpec, run_profiling
 from maestro.transfer_value import plan_batch, profiling_value, sparse_transfer_design
+from maestro.models import EvidenceKind
 from virtual_cell.knowledge_transfer import (NO_TRANSFER_ROUTE, SPECIFIC_DIRECTION_UNSUPPORTED, Certifier,
                                              TransferAtlas, expected_cosine, predict, transfer_table, unit_rows)
+from tools.evaluation.transfer_metrics import (aurc, aurc_difference, centred_cosine, map_utility,
+                                               paired_cluster_test, specific_cosine)
 
 
 class _Constant:
@@ -163,6 +168,16 @@ def _library_world(seed=0):
     return atlas, library, hidden, measure, requested
 
 
+def _persistence(tmp_path, library, *, model_version="model-v1", dose="10 uM"):
+    return ProfilingPersistence(
+        store=CaseStore(tmp_path / "cases.sqlite"), case_id="campaign-case", campaign_id="campaign-1",
+        model_version=model_version, source_id="screen-release-1", reference_id="reference-atlas-1",
+        assay="l1000", dose=dose, time="24 h", endpoint="l1000_landmark_response",
+        compound_ids=tuple(f"compound-{i}" for i in range(len(library))),
+        line_ids=("line-a", "line-b", "line-c"), gene_ids=tuple(f"gene-{i}" for i in range(12)),
+    )
+
+
 @pytest.mark.parametrize("planner,turnarounds", [("sparse_transfer", 1), ("value_of_information", 4)])
 def test_campaign_spends_the_budget_and_reads_only_what_it_profiles(planner, turnarounds):
     atlas, library, hidden, measure, requested = _library_world()
@@ -192,3 +207,207 @@ def test_campaign_refuses_visible_library_responses_references_and_unknown_plann
         ProfilingSpec(2, planner="llm")
     with pytest.raises(ValueError, match="AXIS_MISMATCH"):
         run_profiling(atlas, _certifier(), library, grid[:, :2], measure, ProfilingSpec(2))
+
+
+def test_persistent_campaign_restores_receipts_without_remeasuring(tmp_path):
+    atlas, library, hidden, measure, requested = _library_world()
+    grid = np.ones((len(library), 3), bool)
+    persistence = _persistence(tmp_path, library)
+    spec = ProfilingSpec(3)
+    first = run_profiling(atlas, _certifier(), library, grid, measure, spec, seed=4, persistence=persistence)
+    assert first.wells == 3 and len(requested) == 3
+    measured = {tuple(cell): hidden[library[cell[0]], cell[1]] for cell in requested}
+
+    resumed_atlas, resumed_library, _, _, _ = _library_world()
+    resumed = run_profiling(resumed_atlas, _certifier(), resumed_library, grid,
+                            lambda _: pytest.fail("accepted campaign cells must not be measured twice"),
+                            spec, seed=4, persistence=persistence)
+    assert resumed.wells == 3 and resumed.turnarounds == 1
+    assert set(map(tuple, np.argwhere(resumed.profiled))) == set(measured)
+    for (row, line), values in measured.items():
+        np.testing.assert_allclose(resumed_atlas.Yc[resumed_library[row], line],
+                                   values - resumed_atlas.mu[line])
+    assert len(requested) == 3
+
+
+def test_persistent_campaign_rejects_changed_scope_without_measurement(tmp_path):
+    atlas, library, _, _, _ = _library_world()
+    grid = np.ones((len(library), 3), bool)
+    persistence = _persistence(tmp_path, library)
+    run_profiling(atlas, _certifier(), library, grid, lambda cells: np.ones((len(cells), 12)),
+                  ProfilingSpec(2), persistence=persistence)
+
+    resumed_atlas, resumed_library, _, _, _ = _library_world()
+    changed = _persistence(tmp_path, library, dose="5 uM")
+    with pytest.raises(ValueError, match="PERSISTENT_CAMPAIGN_IDENTITY_MISMATCH"):
+        run_profiling(resumed_atlas, _certifier(), resumed_library, grid,
+                      lambda _: pytest.fail("scope mismatch must be refused before measurement"),
+                      ProfilingSpec(2), persistence=changed)
+    assert not np.isfinite(resumed_atlas.Yc[resumed_library, :, 0]).any()
+
+
+def test_persistent_campaign_refuses_pending_and_invalid_receipts_without_mutation(tmp_path):
+    atlas, library, _, _, _ = _library_world()
+    grid = np.ones((len(library), 3), bool)
+    persistence = _persistence(tmp_path, library)
+    with pytest.raises(ValueError, match=r"measure\(\) must return"):
+        run_profiling(atlas, _certifier(), library, grid,
+                      lambda cells: np.full((len(cells), 12), np.nan), ProfilingSpec(1),
+                      persistence=persistence)
+    assert not np.isfinite(atlas.Yc[library, :, 0]).any()
+    pending = persistence.store.pending_actions(persistence.case_id)
+    assert len(pending) == 1 and pending[0]["status"] == "started"
+    with pytest.raises(ValueError, match="PERSISTENT_CAMPAIGN_PENDING_RECEIPT_RECOVERY_REQUIRED"):
+        run_profiling(atlas, _certifier(), library, grid,
+                      lambda _: pytest.fail("started action must never be re-executed"),
+                      ProfilingSpec(1), persistence=persistence)
+
+    conditions = pending[0]["expected_conditions"]
+    action_id = pending[0]["action_identifier"]
+    bad = MeasurementResult(action_identifier=action_id, statement="malformed persisted vector",
+                            source_id="screen-release-1", context_identifier=conditions["line_id"],
+                            time_hours=None, independent_units=None, quality_passed=True,
+                            conditions=conditions, metrics={"response_vector": "[NaN]"},
+                            evidence_kind=EvidenceKind.RETRIEVED_SOURCE)
+    persistence.store.import_measurement(persistence.case_id, bad)
+    with pytest.raises(ValueError, match="PERSISTENT_CAMPAIGN_INVALID_RESULT_RECEIPT"):
+        run_profiling(atlas, _certifier(), library, grid,
+                      lambda _: pytest.fail("invalid receipt must not trigger measurement"),
+                      ProfilingSpec(1), persistence=persistence)
+    assert not np.isfinite(atlas.Yc[library, :, 0]).any()
+
+
+def test_persistent_campaign_keeps_independent_units_unknown_and_reads_only_selected_cells(tmp_path):
+    atlas, library, hidden, measure, requested = _library_world()
+    persistence = _persistence(tmp_path, library)
+    grid = np.zeros((len(library), 3), bool)
+    grid[0, 1] = True
+    grid[2, 0] = True
+    report = run_profiling(atlas, _certifier(), library, grid, measure, ProfilingSpec(2), persistence=persistence)
+    assert set(requested) == {(0, 1), (2, 0)} == set(map(tuple, np.argwhere(report.profiled)))
+    for item in persistence.store.result_identities(persistence.case_id):
+        result = persistence.store.measurement(persistence.case_id, item["result_id"])
+        assert result.independent_units is None and result.quality_passed
+        assert result.evidence_kind is EvidenceKind.RETRIEVED_SOURCE
+        assert "external assay QC is not attested" in result.limitations[0]
+        np.testing.assert_allclose(np.asarray(json.loads(result.metrics["response_vector"])),
+                                   hidden[library[int(result.conditions["compound_id"].split("-")[1])],
+                                          ("line-a", "line-b", "line-c").index(result.conditions["line_id"])])
+
+
+@pytest.mark.parametrize("changed_asset", ["kappa", "query_knowledge"])
+def test_persistent_campaign_scope_binds_planning_assets_with_same_model_version(tmp_path, changed_asset):
+    atlas, library, _, _, _ = _library_world()
+    grid = np.ones((len(library), 3), bool)
+    kappa = transfer_table(atlas)
+    persistence = _persistence(tmp_path, library)
+    run_profiling(atlas, _certifier(), library, grid, lambda cells: np.ones((len(cells), 12)),
+                  ProfilingSpec(2), kappa=kappa, persistence=persistence)
+
+    resumed_atlas, resumed_library, _, _, _ = _library_world()
+    changed_kappa = kappa.copy()
+    if changed_asset == "kappa":
+        changed_kappa[0, 1] += 0.01
+    else:
+        resumed_atlas.know[resumed_library[0], 0] = ~resumed_atlas.know[resumed_library[0], 0]
+    with pytest.raises(ValueError, match="PERSISTENT_CAMPAIGN_IDENTITY_MISMATCH"):
+        run_profiling(resumed_atlas, _certifier(), resumed_library, grid,
+                      lambda _: pytest.fail("changed planning inputs must be refused"), ProfilingSpec(2),
+                      kappa=changed_kappa, persistence=_persistence(tmp_path, library))
+
+
+def test_persistent_adaptive_campaign_resumes_after_external_pending_receipt_recovery(tmp_path):
+    atlas, library, hidden, _, _ = _library_world()
+    grid = np.ones((len(library), 3), bool)
+    persistence = _persistence(tmp_path, library)
+    spec = ProfilingSpec(4, planner="value_of_information", rounds=4)
+    attempted = []
+
+    def interrupted_measure(cells):
+        attempted.extend(map(tuple, cells.tolist()))
+        if len(attempted) == 2:
+            raise RuntimeError("worker interrupted after acquiring the second cell")
+        return hidden[library[cells[:, 0]], cells[:, 1]]
+
+    with pytest.raises(RuntimeError, match="worker interrupted"):
+        run_profiling(atlas, _certifier(), library, grid, interrupted_measure, spec, persistence=persistence)
+    pending = persistence.store.pending_actions(persistence.case_id)
+    assert len(pending) == 1 and pending[0]["status"] == "started"
+    conditions = pending[0]["expected_conditions"]
+    row = int(conditions["compound_id"].split("-")[-1])
+    line = ("line-a", "line-b", "line-c").index(conditions["line_id"])
+    persistence.store.import_measurement(persistence.case_id, MeasurementResult(
+        action_identifier=pending[0]["action_identifier"], statement="recovered retrieved-source vector",
+        source_id="screen-release-1", context_identifier=conditions["line_id"], time_hours=None,
+        independent_units=None, quality_passed=True, conditions=conditions,
+        metrics={"response_vector": json.dumps(hidden[library[row], line].tolist(), allow_nan=False)},
+        evidence_kind=EvidenceKind.RETRIEVED_SOURCE,
+        limitations=("External receipt recovered by caller; independent units remain unknown.",),
+    ))
+
+    resumed_atlas, resumed_library, _, _, _ = _library_world()
+    resume_attempts = []
+    def remaining_measure(cells):
+        resume_attempts.extend(map(tuple, cells.tolist()))
+        return hidden[resumed_library[cells[:, 0]], cells[:, 1]]
+
+    report = run_profiling(resumed_atlas, _certifier(), resumed_library, grid, remaining_measure, spec,
+                           persistence=persistence)
+    assert report.wells == 4 and report.turnarounds == 4
+    assert len(set(attempted + resume_attempts)) == 4
+    assert not (set(attempted[:1]) & set(resume_attempts))
+    assert len(resume_attempts) == 2
+    assert persistence.store.snapshot(persistence.case_id).spent == 4
+
+
+def test_specific_cosine_gives_no_credit_for_the_generic_direction():
+    rng = np.random.default_rng(0)
+    g = np.zeros(20); g[0] = 1.0
+    truth = rng.normal(size=(50, 20)) + 3 * g
+    generic_only = np.repeat(g[None], 50, 0)
+    assert centred_cosine(generic_only, truth).mean() > 0.5
+    assert np.allclose(specific_cosine(generic_only, truth, np.repeat(g[None], 50, 0)), 0.0)
+    assert np.allclose(specific_cosine(truth, truth, np.repeat(g[None], 50, 0)), 1.0)
+
+
+def test_zero_prediction_scores_zero():
+    assert centred_cosine(np.zeros((3, 4)), np.ones((3, 4))).tolist() == [0.0, 0.0, 0.0]
+
+
+def test_aurc_rewards_confidence_that_ranks_errors():
+    loss = np.array([0.0, 0.1, 0.9, 1.0])
+    assert aurc(-loss, loss) < aurc(loss, loss)
+    assert aurc(np.zeros(4), loss) == pytest.approx(aurc(np.zeros(4), loss))
+    with pytest.raises(ValueError):
+        aurc(np.array([]), np.array([]))
+
+
+def test_paired_cluster_test_uses_cluster_means():
+    clusters = np.repeat(np.arange(30), 5)
+    a = np.ones(150) * 0.6
+    b = np.ones(150) * 0.5
+    out = paired_cluster_test(a, b, clusters, draws=2000)
+    assert out["n_clusters"] == 30 and out["favour"] == 30
+    assert out["estimate"] == pytest.approx(0.1)
+    assert out["p_greater"] < 0.001
+    null = paired_cluster_test(b, b, clusters, draws=2000)
+    assert null["p_two_sided"] == pytest.approx(1.0)
+
+
+def test_aurc_difference_is_positive_when_a_ranks_better():
+    rng = np.random.default_rng(1)
+    loss = rng.random(200)
+    clusters = np.arange(200) // 4
+    out = aurc_difference(-loss, rng.random(200), loss, clusters, resamples=200)
+    assert out["estimate"] > 0 and out["p_le_zero"] < 0.05
+
+
+def test_map_utility_counts_only_active_cells():
+    truth = np.zeros((2, 2, 3)); truth[0, 0] = [1, 0, 0]; truth[1, 1] = [0, 1, 0]
+    active = np.array([[True, False], [False, True]])
+    fills = np.zeros((2, 2, 3)); fills[1, 1] = [0, 1, 0]
+    profiled = np.array([[True, False], [False, False]])
+    out = map_utility(profiled, fills, truth, active)
+    assert out["utility"] == pytest.approx(1.0) and out["n_active"] == 2 and out["wells"] == 1
+    none = map_utility(profiled, fills, truth, np.zeros((2, 2), bool))
+    assert none["refusal"] == "NO_ACTIVE_CELLS"

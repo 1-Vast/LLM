@@ -1,6 +1,20 @@
 # Evidence Register
 
-Current addition (2026-10-13): [context-discrimination research report](context_discrimination_20261013/README.md).
+Latest addition (2026-10-13): [evidence-conditioned GCP transfer](evidence_transfer_20261013/README.md).
+Fresh assay source, retrospective public-data study; connectivity-separated 66/27/20
+reference/development/test compounds and 34 reference-supported histone features.
+LVL3 is centered only on same-plate vehicle controls. Strongest development-selected
+deterministic policy: 14/20 directional hits; integrated source-qualified agent:
+12/20; conventional agent with the same model/source access: 12/20; agent-only: 10/20.
+Integrated-minus-deterministic: -10 percentage points, paired bootstrap 95% CI
+[-30, +10], exact paired p=.625. Integrated-minus-conventional: 0 points, CI [-15, +15].
+Status: EXPLORATORY; positive dual-core synergy NOT_DEMONSTRATED; no scientific
+promotion. Culture independence, mechanism specificity and functional efficacy
+are not established. Source disclosure uses a shared live PubChem cache, not an
+autonomous new-corpus search. Production campaign persistence passes engineering
+checks; it does not establish cross-case learning. Default suite: 815 passed.
+
+Previous addition (2026-10-13): [context-discrimination research report](context_discrimination_20261013/README.md).
 On 702 development-exposed GSE70138 compounds, two-slot RKT acquisition finds 158
 activity-discordant compounds versus 133 for the reference-derived fixed pair
 (+3.56 percentage points, paired exploratory 95% CI [0.28, 6.84]); strict-margin
