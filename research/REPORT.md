@@ -1,6 +1,38 @@
 # MAESTRO Repository Consolidation Report
 
-## Current research update: selective hit triage and decision review, 2026-10-13
+## Current research update: knowledge reality, 2026-10-13
+
+The English [knowledge-reality report](knowledge_reality_20261013/README.md) asks whether
+provenance-qualified, relation-typed, biological-context-conditioned knowledge adds
+drug-specific information for strict cold-start compounds (T0: no response of the compound in
+any input). The outcome is the selective killing profile in PRISM 19Q4 viability, not
+expression.
+
+On 1,460 active compounds in MoA-family folds, chemistry plus knowledge raised the
+per-compound selective-profile r from 0.0786 to 0.0842 (+0.0056 [+0.0028, +0.0085],
+p < 0.0001). The gain beats all 40 degree-preserving and set-permuted null graphs, so the
+true drug-target pairings carry information.
+
+The registered gate still FAILED (G2). Relabelling the genes within degree, expression-variance
+and mutation strata keeps which drugs share a target but destroys the targets' biology, and it
+reproduces the gain exactly (null mean +0.0057, empirical p 0.95). The signal is
+mechanism-class membership, already captured by plain Hub-annotation neighbours (0.0836) and
+block Q's RKT route (0.0839). The new elements add nothing: relation typing, provenance
+weighting, the target-context route (r 0.009 alone) and cell-engagement (T1) edges. There is
+also no gain for compounds whose targets are new (26 compounds, p 0.39). After a primary
+screen on a quarter of the lines (r 0.20), knowledge adds +0.0004 (p 0.063).
+
+The confirmatory protocol on sealed PRISM 24Q2 REP.1M (1,229 compounds new by core, name and
+connectivity; time-matched Hub 2020 snapshot) is frozen but not run. The gate failed, and the
+tier would give about 52% power: 762 active compounds needed, about 396 expected.
+
+Recommendation: NO-GO for confirmation, for promoting the knowledge routes and for any LLM
+layer, under the brief's stop rule. Promoted: `maestro.information_tier` only, a contract that
+refuses T1 or outcome-proximal inputs under a T0 claim. The study's verification passes a
+123-claim audit. Cost: 0 wells, 0 provider calls and 2.4 MB of metadata; the 24Q2 outcome file
+has not been downloaded. Default suite: 848 passed.
+
+## Previous research update: selective hit triage and decision review, 2026-10-13
 
 The English [selective hit triage report](selective_hit_triage_20261013/README.md) is the
 first drug-discovery decision study. PRISM 19Q4 primary screen hits were triaged for
@@ -25,7 +57,7 @@ succeeded, negative, failed and excluded runs) and `maestro.hit_triage`. The LLM
 frozen but NOT_RUN pending authorisation (about 0.47 USD). Cost: 0 wells, 0 provider calls.
 Default suite: 843 passed; the study's verification passes its 82-claim audit.
 
-## Previous research update: collaboration limits, 2026-10-13
+## Earlier research update: collaboration limits, 2026-10-13
 
 The English [collaboration-limits report](collaboration_limits_20261013/README.md)
 examines why the Scientific Agent and the Virtual Cell have not yet produced measurable

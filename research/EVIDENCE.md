@@ -1,6 +1,27 @@
 # Evidence Register
 
-Latest addition (2026-10-13): [selective hit triage and decision review](selective_hit_triage_20261013/README.md).
+Latest addition (2026-10-13): [knowledge reality](knowledge_reality_20261013/README.md).
+Exploratory gate on exposed PRISM 19Q4. Setup: 4,528 compounds in 5 MoA-family folds, 1,460
+active; T0 strict cold start; endpoint the per-compound r of the selective profile; 20 seeds of
+each knowledge control.
+- G1: know_full - chem_full +0.0056 [+0.0028, +0.0085], p < 1e-4, passes.
+- G3: specificity +0.0056, passes.
+- G2: fails. The gain is above every degree and set-permutation null (gain -0.0001), but equal
+  to the gene-relabelling null (+0.0057, empirical p 0.95).
+- Reading: the gain is mechanism-class membership, not target biology in context.
+- No measurable gain from typing, provenance, context or T1 engagement edges:
+  - know_full vs rkt_full +0.0003 (p 0.27), vs annot_full +0.0007 (p 0.20);
+  - target-context route alone r 0.009;
+  - strict new targets +0.0007 (p 0.39);
+  - after a primary screen +0.0004 (p 0.063), on r 0.20.
+- Decisions, descriptive: 143 vs 142 selective events per 1,000 nominations; 141 vs 108
+  secondary-confirmed; annot_full 161 / 154.
+Sealed PRISM 24Q2 REP.1M protocol (1,229 compounds) frozen, not run: gate FAIL, and power 52%
+(762 actives needed, about 396 expected). Status: knowledge biology NOT_SUPPORTED; confirmation
+NOT_RUN; LLM layer not built (stop rule). Promoted: `maestro.information_tier` only.
+0 wells, 0 provider calls; the 24Q2 outcome file has not been downloaded. Default suite: 848 passed.
+
+Previous addition (2026-10-13): [selective hit triage and decision review](selective_hit_triage_20261013/README.md).
 PRISM 19Q4 primary screen triaged at 16 CTRP v2 confirmation curves and 4 PRISM secondary
 dose-responses per 16-compound campaign; 128 sealed test compounds in 8 campaigns, split by
 mechanism family; frozen and run once; validated selective hit = CTRP AUC robust z <= -2 and
@@ -16,7 +37,7 @@ secondaries but booked 0. Status: retrospective independent-platform confirmatio
 exposed sources; agentic advantage NOT_SUPPORTED. Promoted contracts only. 0 wells, 0
 provider calls; LLM arms NOT_RUN. Default suite: 843 passed.
 
-Previous addition (2026-10-13): [collaboration limits](collaboration_limits_20261013/README.md).
+Earlier addition (2026-10-13): [collaboration limits](collaboration_limits_20261013/README.md).
 Frozen before the fresh GCP lines (A549, NPC, Astrocyte) were downloaded and run once:
 65 references, 47 queries, 141 (query, line) decisions, A375 anchor. Ranking follow-ups by
 calibrated P(hit) instead of the largest standardised prediction raised per-line hits from
