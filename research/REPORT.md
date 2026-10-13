@@ -1,6 +1,34 @@
 # MAESTRO Repository Consolidation Report
 
-## Current research update: evidence-conditioned GCP transfer, 2026-10-13
+## Current research update: collaboration limits, 2026-10-13
+
+The English [collaboration-limits report](collaboration_limits_20261013/README.md)
+examines why the Scientific Agent and the Virtual Cell have not yet produced measurable
+synergy. It was frozen before three never-opened GCP target lines (A549, NPC, Astrocyte)
+were downloaded, and run once. The largest defect sat in the decision layer between the
+two cores: the frozen decoder ranked follow-ups by the largest standardised prediction,
+while a hit needs a raw 0.5 log2 mean with every replicate agreeing. Ranking by calibrated
+P(hit) on the same forecast raised per-line hits from 55/141 to 77/141 (+15.6 points
+[+9.2, +22.7], p 5e-5), and calibrated P(hit) at least 0.5 hit 81% of the time against
+38% below it. Most of the gain is the raw scale (+20); the uncertainty model adds
+calibrated abstention. `maestro.endpoint_decision` is promoted with seven contract tests
+and decision-for-decision parity with the frozen code.
+
+The other questions resolve into measured limits. The earlier 14-versus-12 agent gap
+reversed on the fresh lines (no-agent 7/20, integrated 9/20), so it was decoder instability
+and sampling noise. Agent-selected pharmacological donors carried less response
+information than anchor-phenotype similarity on every tier (fresh differences negative,
+intervals include zero). On the exposed L1000 tier, the same compound measured in
+another line carries specific cosine 0.81, against 0.48 for rare close structural
+analogues and 0.13 for shared targets: without an anchor, transfer hits an
+identifiability ceiling. Production memory has no outcome-to-reference pathway. In
+simulation, single-line sparse measurements cannot feed cross-line transfer (map utility
+exactly 0). One campaign is worth at most +0.003 to +0.005 cosine, and self-training
+improves zero-shot agreement while lowering decision utility. No agent role or memory
+loop is promoted. Cost: 0 wells and 0 provider calls. The default suite passes 822
+tests, and both study verifications reproduce every recorded result.
+
+## Previous research update: evidence-conditioned GCP transfer, 2026-10-13
 
 The English [evidence-conditioned histone transfer report](evidence_transfer_20261013/README.md)
 tests a new measured proteomic source with connectivity-separated 66/27/20
@@ -21,7 +49,7 @@ remains 189 after consolidating related transfer-metric tests. The 120-call sour
 qualification experiment preserves raw usage, source receipts, frozen choices,
 negative results and deterministic replay checks.
 
-## Previous research update: context discrimination, 2026-10-13
+## Earlier research update: context discrimination, 2026-10-13
 
 The English [context-discrimination report](context_discrimination_20261013/README.md)
 audits Block Q and tests a new decision endpoint on development-exposed GSE70138 data.
@@ -51,7 +79,7 @@ Typed evidence and measurement authorization; source/condition binding; predicti
 
 ## 3. Promoted research capabilities
 
-Consolidation promoted no new scientific policy or fitted model. Block Q (2026-10-12, routed knowledge transfer) then promoted three modules, with no fitted weights shipped. `virtual_cell.knowledge_transfer` is the RKT virtual cell. It keeps four typed routes: context ridge maps, phenotypic, structural and knowledge analogues. Each route carries its own certificate of expected specific cosine; the routes are pooled; refusals are named (`NO_TRANSFER_ROUTE`, `SPECIFIC_DIRECTION_UNSUPPORTED`); `VALIDATED_SCOPE` is L1000 landmark responses at 10 uM / 24 h. `maestro.transfer_value` holds the confirmed fixed coverage design (`sparse_transfer_design`, the default) and the secondary certificate value-of-information planner. `agent.profiling.run_profiling` is the measure-only campaign runner, reporting wells and turnarounds. `tools.evaluation.transfer_metrics` holds specific cosine, AURC and compound-clustered tests. Parity with the frozen study code is float32 rounding for predictions and identical cell selections for the design (12 of 12 campaign-budget pairs). Existing scoped transcriptional transfer remains in virtual_cell; campaign budgets, decision receipts, interval-based measure-or-predict, platform identity, paired increments, exact cluster sign-flip and coordinate/variance diagnostics remain tested production capabilities. Their engineering admission does not certify cross-platform transport or new biological validity. Duplicate completed research implementations have been retired.
+Consolidation promoted no new scientific policy or fitted model. Block Q (2026-10-12, routed knowledge transfer) then promoted three modules, with no fitted weights shipped. `virtual_cell.knowledge_transfer` is the RKT virtual cell. It keeps four typed routes: context ridge maps, phenotypic, structural and knowledge analogues. Each route carries its own certificate of expected specific cosine; the routes are pooled; refusals are named (`NO_TRANSFER_ROUTE`, `SPECIFIC_DIRECTION_UNSUPPORTED`); `VALIDATED_SCOPE` is L1000 landmark responses at 10 uM / 24 h. `maestro.transfer_value` holds the confirmed fixed coverage design (`sparse_transfer_design`, the default) and the secondary certificate value-of-information planner. `agent.profiling.run_profiling` is the measure-only campaign runner, reporting wells and turnarounds. `tools.evaluation.transfer_metrics` holds specific cosine, AURC and compound-clustered tests. Parity with the frozen study code is float32 rounding for predictions and identical cell selections for the design (12 of 12 campaign-budget pairs). The 2026-10-13 collaboration-limits study promoted `maestro.endpoint_decision`. It ranks a follow-up by its calibrated probability of meeting a raw-threshold, replicate-agreement hit, and refuses by name below a caller's threshold (`HIT_PROBABILITY_BELOW_THRESHOLD`). Its `VALIDATED_SCOPE` is GCP histone peptides at 24 h with an A375 anchor. Existing scoped transcriptional transfer remains in virtual_cell; campaign budgets, decision receipts, interval-based measure-or-predict, platform identity, paired increments, exact cluster sign-flip and coordinate/variance diagnostics remain tested production capabilities. Their engineering admission does not certify cross-platform transport or new biological validity. Duplicate completed research implementations have been retired.
 
 ## 4. Research conclusions
 
