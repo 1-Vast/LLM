@@ -1,6 +1,31 @@
 # MAESTRO Repository Consolidation Report
 
-## Current research update: collaboration limits, 2026-10-13
+## Current research update: selective hit triage and decision review, 2026-10-13
+
+The English [selective hit triage report](selective_hit_triage_20261013/README.md) is the
+first drug-discovery decision study. PRISM 19Q4 primary screen hits were triaged for
+selective (compound, line) sensitivities, at 16 confirmation curves and 4 follow-up
+dose-responses per 16-compound campaign, and scored against sealed CTRP v2 dose-response
+outcomes on 128 test compounds split by mechanism family. The protocol and choices were
+frozen before opening; the claim level is retrospective independent-platform
+confirmation. MAESTRO's context-aware triage beat the strongest deterministic rule (P1:
+22 vs 12 validated selective hits, +10 [+4, +18], p 0.004), but its closed loop did not beat
+a conventional two-stage workflow (P2: 23 vs 18, p 0.18), and a gradient-boosted
+classifier on screen and context features found 38 hits without buying any follow-up
+(post hoc +15 over MAESTRO_LOOP, p 0.004). The success criterion (beat strong non-agentic
+workflows at equal or lower cost) is NOT met. Development had misled the design: one
+56-compound kinase-inhibitor family held 82% of its validated signal. A Scientific Decision
+Review inspired by Co-Scientist added no hits, but its evidence rule mattered: admitting
+virtual-cell predictions as measured evidence produced 15 false NO-GOs against 3 (R2
+CONFIRMED); measured-evidence vetoes were directionally right but not significant (R1).
+The frozen outcome reader divided test viabilities by 100 (a unit guess); the registered
+endpoint was restored after opening and disclosed. Promoted contracts only:
+`maestro.decision_review`, `maestro.claim_audit` (claims checked against a manifest of
+succeeded, negative, failed and excluded runs) and `maestro.hit_triage`. The LLM arms are
+frozen but NOT_RUN pending authorisation (about 0.47 USD). Cost: 0 wells, 0 provider calls.
+Default suite: 843 passed; the study's verification passes its 82-claim audit.
+
+## Previous research update: collaboration limits, 2026-10-13
 
 The English [collaboration-limits report](collaboration_limits_20261013/README.md)
 examines why the Scientific Agent and the Virtual Cell have not yet produced measurable
@@ -28,7 +53,7 @@ improves zero-shot agreement while lowering decision utility. No agent role or m
 loop is promoted. Cost: 0 wells and 0 provider calls. The default suite passes 822
 tests, and both study verifications reproduce every recorded result.
 
-## Previous research update: evidence-conditioned GCP transfer, 2026-10-13
+## Earlier research update: evidence-conditioned GCP transfer, 2026-10-13
 
 The English [evidence-conditioned histone transfer report](evidence_transfer_20261013/README.md)
 tests a new measured proteomic source with connectivity-separated 66/27/20
@@ -79,7 +104,7 @@ Typed evidence and measurement authorization; source/condition binding; predicti
 
 ## 3. Promoted research capabilities
 
-Consolidation promoted no new scientific policy or fitted model. Block Q (2026-10-12, routed knowledge transfer) then promoted three modules, with no fitted weights shipped. `virtual_cell.knowledge_transfer` is the RKT virtual cell. It keeps four typed routes: context ridge maps, phenotypic, structural and knowledge analogues. Each route carries its own certificate of expected specific cosine; the routes are pooled; refusals are named (`NO_TRANSFER_ROUTE`, `SPECIFIC_DIRECTION_UNSUPPORTED`); `VALIDATED_SCOPE` is L1000 landmark responses at 10 uM / 24 h. `maestro.transfer_value` holds the confirmed fixed coverage design (`sparse_transfer_design`, the default) and the secondary certificate value-of-information planner. `agent.profiling.run_profiling` is the measure-only campaign runner, reporting wells and turnarounds. `tools.evaluation.transfer_metrics` holds specific cosine, AURC and compound-clustered tests. Parity with the frozen study code is float32 rounding for predictions and identical cell selections for the design (12 of 12 campaign-budget pairs). The 2026-10-13 collaboration-limits study promoted `maestro.endpoint_decision`. It ranks a follow-up by its calibrated probability of meeting a raw-threshold, replicate-agreement hit, and refuses by name below a caller's threshold (`HIT_PROBABILITY_BELOW_THRESHOLD`). Its `VALIDATED_SCOPE` is GCP histone peptides at 24 h with an A375 anchor. Existing scoped transcriptional transfer remains in virtual_cell; campaign budgets, decision receipts, interval-based measure-or-predict, platform identity, paired increments, exact cluster sign-flip and coordinate/variance diagnostics remain tested production capabilities. Their engineering admission does not certify cross-platform transport or new biological validity. Duplicate completed research implementations have been retired.
+Consolidation promoted no new scientific policy or fitted model. Block Q (2026-10-12, routed knowledge transfer) then promoted three modules, with no fitted weights shipped. `virtual_cell.knowledge_transfer` is the RKT virtual cell. It keeps four typed routes: context ridge maps, phenotypic, structural and knowledge analogues. Each route carries its own certificate of expected specific cosine; the routes are pooled; refusals are named (`NO_TRANSFER_ROUTE`, `SPECIFIC_DIRECTION_UNSUPPORTED`); `VALIDATED_SCOPE` is L1000 landmark responses at 10 uM / 24 h. `maestro.transfer_value` holds the confirmed fixed coverage design (`sparse_transfer_design`, the default) and the secondary certificate value-of-information planner. `agent.profiling.run_profiling` is the measure-only campaign runner, reporting wells and turnarounds. `tools.evaluation.transfer_metrics` holds specific cosine, AURC and compound-clustered tests. Parity with the frozen study code is float32 rounding for predictions and identical cell selections for the design (12 of 12 campaign-budget pairs). The 2026-10-13 collaboration-limits study promoted `maestro.endpoint_decision`. It ranks a follow-up by its calibrated probability of meeting a raw-threshold, replicate-agreement hit, and refuses by name below a caller's threshold (`HIT_PROBABILITY_BELOW_THRESHOLD`). Its `VALIDATED_SCOPE` is GCP histone peptides at 24 h with an A375 anchor. The 2026-10-13 selective-hit-triage study promoted three engineering contracts with no fitted model or scientific rule: `maestro.decision_review` (competing falsifiable explanations, measured-only evidence admission, GO/NO_GO/NEED_MORE_EVIDENCE with named reasons and digests, exploration rankings that refuse probability use, human approval for experiments), `maestro.claim_audit` (report claims against a manifest of succeeded, negative, failed and excluded runs) and `maestro.hit_triage` (compound identity, assay-context binding, curve QC admission, budget ledger, outcome seal, split-leak refusal). Existing scoped transcriptional transfer remains in virtual_cell; campaign budgets, decision receipts, interval-based measure-or-predict, platform identity, paired increments, exact cluster sign-flip and coordinate/variance diagnostics remain tested production capabilities. Their engineering admission does not certify cross-platform transport or new biological validity. Duplicate completed research implementations have been retired.
 
 ## 4. Research conclusions
 
@@ -87,7 +112,7 @@ SUPPORTED: Block P virtual-cell contribution +17 unexpected hits, interval [+11,
 
 ## 5. Failed, unsupported and blocked claims
 
-NOT_SUPPORTED: independent Agent/LLM yield beyond conventional tool loops; STATE relative-survival improvement; active-tier mechanism coverage; adaptive/feedback superiority and fixed8 selection gain. Block Q decision claim NOT_CONFIRMED. The certificate planner lost to the fixed sparse design at one well per compound (-.044, 0/11), and did not beat a ReAct agent given the same virtual cell at the family-wise level (+.024, p=.029). A bounded LLM override did not help (-.014). The planner wins only at two wells per compound (+.053, 10/11, secondary). Pooling did not beat the context route when all lines were visible. EXPLORATORY: processed repeat audit, retrospective diagnostics and Block O feasibility reversal. ENGINEERING_ONLY: software tests and coordinate reconstruction.
+NOT_SUPPORTED: independent Agent/LLM yield beyond conventional tool loops; STATE relative-survival improvement; active-tier mechanism coverage; adaptive/feedback superiority and fixed8 selection gain. Block Q decision claim NOT_CONFIRMED. The certificate planner lost to the fixed sparse design at one well per compound (-.044, 0/11), and did not beat a ReAct agent given the same virtual cell at the family-wise level (+.024, p=.029). A bounded LLM override did not help (-.014). The planner wins only at two wells per compound (+.053, 10/11, secondary). Pooling did not beat the context route when all lines were visible. EXPLORATORY: processed repeat audit, retrospective diagnostics and Block O feasibility reversal. ENGINEERING_ONLY: software tests and coordinate reconstruction. Selective hit triage (2026-10-13): MAESTRO's closed loop over a conventional two-stage workflow NOT_CONFIRMED (P2, +5, p 0.18); the agentic success criterion against strong non-agentic workflows NOT met (a context-aware learner with no follow-up found 38 hits against MAESTRO_LOOP's 23, post hoc); measured-evidence vetoes NOT_CONFIRMED (R1, p 0.045); decision-aware acquisition and re-ranking added no hits; LLM agent and debate arms NOT_RUN.
 
 BLOCKED: full2000 and STATE checkpoint output axes; independent original primary repeat/QC/culture units and complete decision menu; new P0.6 protocol and distinct measured channel; authentic costs; external STATE/Tahoe, MAP and LINCS assets. Historical readout also lacks tahoe_c39_x_hvg_feature_names.json and had preexisting protocol-pin mismatches. Removing an old executable packet does not repair these gaps. Minimum release requires authenticated assets plus a fresh frozen protocol; no automatic download or paid execution is authorized here.
 

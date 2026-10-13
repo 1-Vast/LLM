@@ -1,6 +1,22 @@
 # Evidence Register
 
-Latest addition (2026-10-13): [collaboration limits](collaboration_limits_20261013/README.md).
+Latest addition (2026-10-13): [selective hit triage and decision review](selective_hit_triage_20261013/README.md).
+PRISM 19Q4 primary screen triaged at 16 CTRP v2 confirmation curves and 4 PRISM secondary
+dose-responses per 16-compound campaign; 128 sealed test compounds in 8 campaigns, split by
+mechanism family; frozen and run once; validated selective hit = CTRP AUC robust z <= -2 and
+top-dose viability <= 0.5. P1 MAESTRO 22 vs D3 12 (+10 [+4, +18], p 0.004) CONFIRMED; P2
+MAESTRO_LOOP 23 vs CONV_LOOP 18 (p 0.18) NOT_CONFIRMED; post hoc ML+context 38 hits with 0
+secondaries (+15 over MAESTRO_LOOP, p 0.004). Decision review: R2 CONFIRMED (predictions
+admitted as evidence: 15 vs 3 false NO-GOs; 13 of 29 prediction vetoes confirmable); R1
+NOT_CONFIRMED (vetoed 3/23 vs 15/42 confirmable, p 0.045); acquisition +1, re-rank -1.
+Development was dominated by one 56-compound kinase family (82% of validated signal; pairs
+with z_r <= -3 validated 30% vs 9% on test). Post-opening correction: the frozen reader
+divided test viabilities by 100; registered endpoint restored and disclosed; VC+S read 98
+secondaries but booked 0. Status: retrospective independent-platform confirmation on
+exposed sources; agentic advantage NOT_SUPPORTED. Promoted contracts only. 0 wells, 0
+provider calls; LLM arms NOT_RUN. Default suite: 843 passed.
+
+Previous addition (2026-10-13): [collaboration limits](collaboration_limits_20261013/README.md).
 Frozen before the fresh GCP lines (A549, NPC, Astrocyte) were downloaded and run once:
 65 references, 47 queries, 141 (query, line) decisions, A375 anchor. Ranking follow-ups by
 calibrated P(hit) instead of the largest standardised prediction raised per-line hits from
@@ -14,7 +30,7 @@ self-training raises zero-shot +0.014 but lowers map utility -0.0029. Status: P1
 CONFIRMED on the GCP tier; agent benefit NOT_SUPPORTED; memory learning NOT_SUPPORTED.
 Promoted `maestro.endpoint_decision`. 0 wells, 0 provider calls. Default suite: 822 passed.
 
-Previous addition (2026-10-13): [evidence-conditioned GCP transfer](evidence_transfer_20261013/README.md).
+Earlier addition (2026-10-13): [evidence-conditioned GCP transfer](evidence_transfer_20261013/README.md).
 Fresh assay source, retrospective public-data study; connectivity-separated 66/27/20
 reference/development/test compounds and 34 reference-supported histone features.
 LVL3 is centered only on same-plate vehicle controls. Strongest development-selected

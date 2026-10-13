@@ -1,0 +1,80 @@
+{
+ "label": "Deviations and disclosures; this file is deliberately not hashed by FREEZE.json",
+ "entries": [
+  {
+   "when": "2026-10-13T06:03Z",
+   "before_outcomes": true,
+   "what": "DESIGN_LOCK re-issued (first lock 06:00:04Z). features.npz held line names as an object array that np.load(allow_pickle=False) refused; rebuilt with a string dtype. No CTRP response value had been read."
+  },
+  {
+   "when": "2026-10-13",
+   "before_outcomes": "development only",
+   "what": "Development outcomes (125 compounds) were opened for design: DEVELOPMENT.json, DEV_EXPLORE.json, DEV_EXPLORE2.json, DEV_EXPLORE3.json, DEV_REVIEW.json. Every design choice they drove is listed in PROTOCOL.md section 8; development gaps are optimistic."
+  },
+  {
+   "when": "2026-10-13",
+   "before_outcomes": true,
+   "what": "The CTRP v2 archive lives under tmp/gdsc_transport_sources_v5/ (downloaded 2026-10-02 by an earlier block); it is verified by SHA256 on every outcome read (CTRP_ARCHIVE_MISMATCH)."
+  },
+  {
+   "when": "2026-10-13",
+   "before_outcomes": true,
+   "what": "census.py's docstring and CENSUS.json's 'family' field describe components over shared target genes or MoA strings; the split (split.py, SPLIT.json) uses MoA strings only, because target genes chain most kinase inhibitors into one 122-member component. CENSUS.json 'family' is unused."
+  },
+  {
+   "when": "2026-10-13",
+   "before_outcomes": true,
+   "what": "Scope extended at the owner's request (Scientific Decision Review brief) after the hit-triage design was complete but before FREEZE: review.py, dev_review.py, agent_review.py, src/maestro/decision_review.py, src/maestro/claim_audit.py, src/maestro/hit_triage.py, PROTOCOL.md section 7b (family R). The sealed test split is opened once for families P and R together."
+  },
+  {
+   "when": "2026-10-13",
+   "before_outcomes": true,
+   "what": "R3 (SDR_veto hits non-inferior to MAESTRO_LOOP) was demoted from confirmatory to descriptive before opening, because the frozen choices show the two arms differ in 1 of 128 nominations at b = 1; a near-certain test is not informative."
+  },
+  {
+   "when": "2026-10-13",
+   "before_outcomes": true,
+   "what": "FREEZE.json hashes the study files, src/maestro/decision_review.py (tournament used by the debate arm) and tools/evaluation/scoring.py (the sign-flip test). Enum-only dependencies (maestro.models, maestro.case_memory, maestro.campaign_budget) are not hashed, so routine edits there do not lock the study."
+  },
+  {
+   "when": "2026-10-13",
+   "before_outcomes": true,
+   "what": "LLM arms (AGENT_conventional, AGENT_maestro, SDR_debate) are frozen and tested offline with scripted completers but NOT_RUN: paid API calls need the owner's authorisation (estimated 0.47 USD with deepseek-flash)."
+  },
+  {
+   "when": "2026-10-13",
+   "before_outcomes": true,
+   "what": "Literature: arXiv:2608.26701 read from the arXiv HTML (first 200k of 398k characters: methods, results 3.1-3.4, limitations); the Nature Co-Scientist paper (doi 10.1038/s41586-026-10644-y) read from the Europe PMC open-access full text (PMC13345910) because nature.com redirected to a login. Numbers not found in those texts are not quoted."
+  },
+  {
+   "when": "2026-10-13",
+   "before_outcomes": true,
+   "what": "Repurposing Hub annotations (names, MoA, targets, phase, SMILES) are used for identity, families and context; only identifiers and derived features are stored in this folder."
+  },
+  {
+   "when": "2026-10-13T07:10Z",
+   "before_outcomes": false,
+   "what": "Implementation error found after the one-shot opening: outcomes.qualified_outcomes guesses the unit of CTRP v2 pred_pv_high_conc per split (percent if any value > 2). The test split holds 4 overgrowth curves (max 2.66), so every test viability was divided by 100: the registered 'top-dose viability <= 50%' condition always passed and all 128 test compounds read PAN_ACTIVE (development, max 1.93, was read correctly; 77/125 pan-active). TEST_RESULTS.json is kept as run and describes an AUC-z-only endpoint. evaluate_registered.py (new, not frozen) restores the fraction scale with no free choice, recomputes VALIDATED and PAN_ACTIVE with the frozen ENDPOINT thresholds, and runs the frozen evaluate.build unchanged into TEST_RESULTS_REGISTERED.json. The registered-endpoint results were computed after the as-run results had been seen; both are reported, and any verdict that differs between them is reported as endpoint-sensitive."
+  },
+  {
+   "when": "2026-10-13T07:40Z",
+   "before_outcomes": false,
+   "what": "Cost-accounting error found after opening: the static VC+S arm (test_choose.py) uses sec_auc_z and sec_slope wherever they exist, so it reads the PRISM secondary of all 98 test compounds that have one, but its record books 'bought': [] and TEST_RESULTS*.json report 0 secondaries. VC+S is a full-cost arm (98 secondaries, like CONV_ALL and MAESTRO_ALL). No registered verdict depends on it; it enters only the descriptive S2 contrast VC+S - MAESTRO_LOOP, which compares 98 secondaries with 32. README states the corrected cost."
+  },
+  {
+   "when": "2026-10-13T07:45Z",
+   "before_outcomes": false,
+   "what": "Post hoc analyses (posthoc.py -> POSTHOC.json, no confirmatory claim), run after the as-run and registered-endpoint results had been seen: (1) strong learners ML, VC and ML+context against MAESTRO and MAESTRO_LOOP, because the brief's success criterion names strong non-agentic workflows while the registered primaries used D3; (2) per-split PRISM-to-CTRP transfer and MoA-family concentration, to explain the development-to-test drop; (3) a compound identity audit of census names against CTRP names. A compound-identity error was considered and ruled out (structure-matched, no duplicate ids)."
+  },
+  {
+   "when": "2026-10-13T07:50Z",
+   "before_outcomes": false,
+   "what": "src/maestro/claim_audit.py (not hashed by FREEZE.json) now lets a FAILED run carry an empty digest, because a refused or crashed run often leaves no artifact; every other status still needs a sha256, and FAILED and EXCLUDED runs still need a reason. Tested in tests/test_claim_audit.py. claims.py, verify.py, CLAIMS.json and RUNS.json were written after opening."
+  },
+  {
+   "when": "2026-10-13T08:20Z",
+   "before_outcomes": false,
+   "what": "The first claim audit of the README failed on two malformed claims of the author's own (C42, C51): each compared a count with a JSON list in LEAKAGE.json. src/maestro/claim_audit.py gained a 'count' relation (length of a list or object; a list is never equal to a number), tested in tests/test_claim_audit.py; the two claims now use it and CLAIMS.json was regenerated before any audit had passed. No claimed value changed. CLAIMS.json was regenerated once more, after the first passing audit and before release, to add C54 and C55 for two README results that had been quoted without a claim tag."
+  }
+ ]
+}
