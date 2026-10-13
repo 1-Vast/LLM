@@ -1,0 +1,154 @@
+{
+  "arm": "E_integrated",
+  "batch": 9,
+  "indices": [
+    441,
+    569,
+    71,
+    13,
+    337,
+    77,
+    535
+  ],
+  "second": [
+    3,
+    1,
+    5,
+    6,
+    6,
+    4,
+    5
+  ],
+  "fallbacks": [],
+  "initial": {
+    "key": "06d1124130330586e9f5faa2e8eee78d2645882181ef49c7040ca200b15c449e",
+    "object": {
+      "hypotheses": [
+        "H1: Second-line activity is driven by lineage-specific target dependence; e.g., MCF7/PC3 may differ for nafamostat (protease/ASIC) or refametinib (MAP2K) because pathway wiring differs by tissue.",
+        "H2: Second-line activity is mostly a shared L1000 systematic response plus vehicle-norm threshold, so line choice changes little; apparent differences reflect assay noise or source-specific transfer rather than mechanism."
+      ],
+      "evidence_gaps": [
+        "No measured second-line activity yet; first_line A375 fixed by transfer coverage.",
+        "Target expression/activity per line is not provided; tissue labels alone do not establish dependence.",
+        "MOA annotations are incomplete (AT-13387 moa empty) and Repurposing Hub/MAP annotations are weaker than measured responses.",
+        "Activity is a vehicle-norm threshold in L1000, not viability; two labels do not establish mechanism.",
+        "Source choice and shared systematic response may inflate transfer quality."
+      ],
+      "memory": "Batch: 7 compounds, first_line A375. Need one different second line per compound to maximize compounds with one active and one inactive line across two retrievals. Competing: lineage-specific target dependence vs shared systematic response/noise. Gaps: no second-line outcomes, no per-line target evidence, weak annotations, activity != viability. Next: after feedback, choose second lines that discriminate H1 vs H2, avoiding lines likely to share systematic response."
+    },
+    "error": null,
+    "usage": {
+      "prompt_tokens": 1107,
+      "completion_tokens": 307,
+      "total_tokens": 1414,
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 211,
+      "model": "deepseek-flash"
+    }
+  },
+  "revision": {
+    "key": "2af421d6ecfad1f55121e582dd0c08a0e09cd0360df440845e13ea80587b6d32",
+    "object": {
+      "choices": [
+        {
+          "id": "441",
+          "line": "HT29",
+          "reason": "Lowest norm-neighbour and empirical p; best chance of inactive second line.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "569",
+          "line": "HA1E",
+          "reason": "Lowest norm-neighbour and rkt p; likely inactive counterpart.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "71",
+          "line": "PC3",
+          "reason": "Active first line; PC3 has lowest rkt p, best inactive contrast.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "13",
+          "line": "YAPC",
+          "reason": "Lowest empirical and rkt p; likely inactive second line.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "337",
+          "line": "YAPC",
+          "reason": "Lowest rkt p; inactive contrast to A375.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "77",
+          "line": "MCF7",
+          "reason": "Lowest rkt p; likely inactive second line.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "535",
+          "line": "PC3",
+          "reason": "Active first line; PC3 rkt p lowest, best inactive contrast.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        }
+      ],
+      "revised_memory": "A375 outcomes: 71 and 535 active; 441,569,13,337,77 inactive. For inactive-first compounds, choose second lines with lowest inactive probabilities (HT29, HA1E, YAPC, MCF7). For active-first compounds, choose lines with lowest rkt p (PC3) to seek inactive contrast. Activity is vehicle-norm threshold, not viability; source choice and shared systematic response may inflate transfer. No causal claims.",
+      "unresolved": [
+        "Whether chosen second lines yield the needed opposite activity label.",
+        "Whether observed differences reflect lineage-specific target dependence or shared systematic response/noise.",
+        "Per-line target expression/activity evidence is absent.",
+        "MOA for AT-13387 is empty; annotations are weak."
+      ]
+    },
+    "error": null,
+    "usage": {
+      "prompt_tokens": 5080,
+      "completion_tokens": 480,
+      "total_tokens": 5560,
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 4056,
+      "model": "deepseek-flash"
+    }
+  },
+  "hits": [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "margin_hits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "spent_slots": 14.0
+}

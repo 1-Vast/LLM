@@ -1,5 +1,23 @@
 # MAESTRO Repository Consolidation Report
 
+## Current research update: 2026-10-13
+
+The English [context-discrimination report](context_discrimination_20261013/README.md)
+audits Block Q and tests a new decision endpoint on development-exposed GSE70138 data.
+With two recorded profiles per compound, RKT follow-up finds 158/702 transcriptional
+activity discordances versus 133 for a reference-derived fixed pair; strict-margin
+counts are only 38 versus 35. In a matched 84-compound DeepSeek pilot, the integrated
+agent finds 10 discordances, versus 16 fixed, 15 deterministic RKT, 14 agent without
+RKT and 12 conventional LLM with RKT. Operational interaction is -11.90 percentage
+points; agent benefit and dual-core synergy are not demonstrated. No new scientific
+component is promoted and no fresh confirmation is claimed. Source hashes, protocols,
+negative results, cached reasoning and replay verification are retained in that study.
+
+Research folders are now explicitly registered in `STUDIES.json`; the historical
+two-document-only shape assertion has been replaced by registration checks. The
+default suite passes 808 tests. The earlier consolidation inventory below describes
+its historical revision, not the current research-folder count.
+
 ## 1. Final architecture
 
 Agent owns plans, actions, bounded memory, CaseStore, execution, budget and restart. Maestro owns the evidence/decision contract between the two cores. Virtual Cell owns model/source/condition/axis identity, prediction, uncertainty, applicability and refusal. Tools own explicit reusable offline checks and evaluation. Research owns historical scientific evidence and future explicitly frozen protocols. Tests own software behavior and architecture boundaries.

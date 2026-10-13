@@ -1,0 +1,33 @@
+Traceback (most recent call last):
+  File "D:\MAESTRO\research\context_discrimination_20261013\experiment.py", line 194, in <module>
+    prepare()
+    ~~~~~~~^^
+  File "D:\MAESTRO\research\context_discrimination_20261013\experiment.py", line 117, in prepare
+    pred = kt.predict(atlas, certifier, inp.library[ids], t, visible[ids])
+  File "D:\MAESTRO\src\virtual_cell\knowledge_transfer.py", line 342, in predict
+    s, cert = certifier.certify({r: routes[r].pred for r in ROUTES}, Gq, F, {r: routes[r].available for r in ROUTES},
+              ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                atlas.gamma)
+                                ^^^^^^^^^^^^
+  File "D:\MAESTRO\src\virtual_cell\knowledge_transfer.py", line 323, in certify
+    s, rho_r, agree = self.combine(preds, G, F, av)
+                      ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\MAESTRO\src\virtual_cell\knowledge_transfer.py", line 310, in combine
+    rho_r = self.route_rho(F, av)
+  File "D:\MAESTRO\src\virtual_cell\knowledge_transfer.py", line 299, in route_rho
+    return {r: np.where(av[r], np.clip(m.predict(F), -0.2, 0.95) if (m := self.route_models.get(r)) is not None else 0.0, 0.0)
+                                       ~~~~~~~~~^^^
+  File "C:\Users\59964\AppData\Roaming\Python\Python314\site-packages\sklearn\ensemble\_hist_gradient_boosting\gradient_boosting.py", line 1824, in predict
+    return self._loss.link.inverse(self._raw_predict(X).ravel())
+                                   ~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\59964\AppData\Roaming\Python\Python314\site-packages\sklearn\ensemble\_hist_gradient_boosting\gradient_boosting.py", line 1314, in _raw_predict
+    X = self._preprocess_X(X, reset=False)
+  File "C:\Users\59964\AppData\Roaming\Python\Python314\site-packages\sklearn\ensemble\_hist_gradient_boosting\gradient_boosting.py", line 266, in _preprocess_X
+    return validate_data(self, X, reset=False, **check_X_kwargs)
+  File "C:\Users\59964\AppData\Roaming\Python\Python314\site-packages\sklearn\utils\validation.py", line 2902, in validate_data
+    out = check_array(X, input_name="X", **check_params)
+  File "C:\Users\59964\AppData\Roaming\Python\Python314\site-packages\sklearn\utils\validation.py", line 1097, in check_array
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Found array with 0 sample(s) (shape=(0, 25)) while a minimum of 1 is required by HistGradientBoostingRegressor.

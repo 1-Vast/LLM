@@ -1,5 +1,18 @@
 # Evidence Register
 
+Current addition (2026-10-13): [context-discrimination research report](context_discrimination_20261013/README.md).
+On 702 development-exposed GSE70138 compounds, two-slot RKT acquisition finds 158
+activity-discordant compounds versus 133 for the reference-derived fixed pair
+(+3.56 percentage points, paired exploratory 95% CI [0.28, 6.84]); strict-margin
+counts are 38 versus 35 (+0.43 points, CI [-1.57, 2.42]). The matched 84-compound
+agent pilot finds 10 hits for integrated reasoning, 16 fixed, 15 deterministic RKT,
+14 agent-only and 12 conventional LLM+VC. Operational interaction is -11.90 points
+(98.75% prompt-batch CI [-26.19, 0.00], Holm p=1). Status: EXPLORATORY; agent benefit
+and positive synergy NOT_DEMONSTRATED; independent confirmation NOT_RUN; no promotion.
+71 DeepSeek Flash requests, usage-priced estimate USD 0.03996, conservative reservations
+USD 0.71, no new laboratory experiments. Source/protocol pins and replay verification
+pass. Below are the previously registered historical summaries.
+
 These are historical evidence summaries, not results rerun during consolidation. Completed, failed and source-audit packets were retired from the executable tree after consolidation. Original protocols, amendments, receipts and tracked observations remain addressable in Git at `ef49d423fcaa13134dfa1a34b5a7a48c38c70e5b`; retrieve a cited entry with `git show COMMIT:PATH`. This requires repository history and is not a clean-checkout research execution path. No archive or replacement data bundle was created.
 
 | Research question | Data and units | Training/test isolation | Main control | Metric and effect/interval | Status | Limits | Entry |

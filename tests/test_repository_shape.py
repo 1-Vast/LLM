@@ -267,7 +267,20 @@ def test_python_sources_are_english_only():
 
 
 def test_repository_has_one_scientific_report_and_no_retired_release_tree():
-    assert {path.name for path in (ROOT / "research").iterdir()} == {"REPORT.md", "EVIDENCE.md"}
+    research = ROOT / "research"
+    registry = json.loads((research / "STUDIES.json").read_text(encoding="utf-8"))
+    studies = registry["studies"]
+    names = {study["path"] for study in studies}
+    assert len(names) == len(studies), "Study paths must be unique"
+    assert {path.name for path in research.iterdir()} == {"REPORT.md", "EVIDENCE.md", "STUDIES.json"} | names
+    for study in studies:
+        assert Path(study["path"]).name == study["path"]
+        assert study["status"] in {"exploratory", "frozen", "completed"}
+        folder = research / study["path"]
+        assert (folder / study["protocol"]).is_file()
+        assert (folder / study["verification"]).is_file()
+        if study["status"] == "frozen":
+            assert (folder / "FREEZE.json").is_file()
     for name in ("log", "cleanup", "Innovation.md", "task.md", "RELEASE_CHECK.md",
                  "RELEASE_STATS.json", "CURRENT_REPOSITORY_STATS.json", "BLOCKED_ASSETS.md"):
         assert not (ROOT / name).exists(), name

@@ -1,0 +1,135 @@
+{
+  "arm": "D_conventional",
+  "batch": 3,
+  "indices": [
+    161,
+    48,
+    526,
+    68,
+    279,
+    513,
+    386
+  ],
+  "second": [
+    6,
+    4,
+    3,
+    3,
+    4,
+    6,
+    6
+  ],
+  "fallbacks": [],
+  "initial": {
+    "key": "914b7a3adbdda0f6fb77c20b38e083893e6e17efceabff482a837d288e52d665",
+    "object": {
+      "hypotheses": [
+        "H1: The fixed first line A375 yields one activity label per compound; choosing a second line with distinct tissue context (e.g., PC3 for AR-related compounds, MCF7 for ER+ context) may produce discordant activity labels, increasing compounds with one active and one inactive line.",
+        "H2: Activity labels may be dominated by shared systematic response or vehicle-norm thresholds rather than tissue-specific target dependence, so second-line choice may not reliably create discordance."
+      ],
+      "evidence_gaps": [
+        "No measured activity outcomes are provided for any compound-line pair.",
+        "Target dependence by tissue is not established for these compounds.",
+        "Whether A375 first-line labels are active or inactive is unknown.",
+        "Repurposing Hub/MAP annotations are weaker than measured responses and do not establish mechanism.",
+        "No causal or viability claims can be made from L1000 activity labels."
+      ],
+      "memory": "Batch: 7 compounds, all first_line A375. Need one different second line per compound to seek one active and one inactive label in two retrievals. Prioritize tissue diversity and target-context plausibility, but avoid claiming mechanism or viability. Track only recorded activity labels."
+    },
+    "error": null,
+    "usage": {
+      "prompt_tokens": 1143,
+      "completion_tokens": 244,
+      "total_tokens": 1387,
+      "prompt_cache_hit_tokens": 128,
+      "prompt_cache_miss_tokens": 1015,
+      "model": "deepseek-flash"
+    }
+  },
+  "revision": {
+    "key": "c93f7dc7c4919f03d4b34daa360b8e15f925c63b78e423b1ed4c399bffd1b823",
+    "object": {
+      "choices": [
+        {
+          "id": "161",
+          "line": "YAPC",
+          "reason": "Lowest empirical and rkt activity probabilities; tissue-distinct from A375.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "48",
+          "line": "MCF7",
+          "reason": "Lowest rkt activity probability; distinct ER+ context.",
+          "source_ids": [
+            "S1",
+            "S4"
+          ]
+        },
+        {
+          "id": "526",
+          "line": "HT29",
+          "reason": "Lowest empirical and rkt activity probabilities among candidates.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "68",
+          "line": "HT29",
+          "reason": "Lowest rkt activity probability; may yield discordant label.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "279",
+          "line": "MCF7",
+          "reason": "Lowest rkt activity probability; distinct tissue context.",
+          "source_ids": [
+            "S1",
+            "S4"
+          ]
+        },
+        {
+          "id": "513",
+          "line": "YAPC",
+          "reason": "Lowest empirical and rkt activity probabilities among candidates.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "386",
+          "line": "YAPC",
+          "reason": "Lowest empirical and rkt activity probabilities; distinct tissue.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        }
+      ],
+      "revised_memory": "A375 first-line labels: 68 and 513 active; 161, 48, 526, 279, 386 inactive. For inactive compounds, choose second lines with low predicted activity probability to seek discordance. For active compounds, choose lower-probability lines to seek an inactive label. Activity is vehicle-norm threshold, not viability. No mechanism or causality claimed.",
+      "unresolved": [
+        "Whether chosen second lines will actually record the opposite activity label.",
+        "Tissue-specific target dependence remains unestablished.",
+        "Shared systematic response may inflate prediction quality.",
+        "No causal or viability interpretation is supported."
+      ]
+    },
+    "error": null,
+    "usage": {
+      "prompt_tokens": 4920,
+      "completion_tokens": 439,
+      "total_tokens": 5359,
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 3896,
+      "model": "deepseek-flash"
+    }
+  }
+}

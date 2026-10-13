@@ -1,0 +1,37 @@
+{
+  "key": "75243f1a8baf41b52c8f533202859be6506714a0d111018526a4205922bdcd9f",
+  "object": {
+    "hypotheses": [
+      "H1: Second-line activity is driven by lineage-specific target dependence; e.g., MTOR/MAPKAP1 (AZD-2014) and TYR (rucinol) may differ across melanoma A375 versus kidney/breast/prostate lines, so choosing a line with divergent pathway wiring increases discordance.",
+      "H2: Second-line activity is dominated by shared systematic response and assay/vehicle-threshold effects, so most lines will agree with A375 regardless of target; discordance is mostly noise or L1000 activity-threshold variation."
+    ],
+    "evidence_gaps": [
+      "No measured second-line activity labels are provided; only first_line A375 is fixed.",
+      "Targets/MOA are sparse and database-derived (S3, S4), not causal.",
+      "Tissue-specific target dependence is not established (S4).",
+      "Activity is vehicle-norm threshold, not viability (S5).",
+      "Whether shared systematic response inflates agreement is untested here (S2).",
+      "Transfer reliability across systems is source-dependent (S1)."
+    ],
+    "memory": "Batch: 7 compounds, first_line A375. Need one different second line per compound to maximize compounds with one active and one inactive line. Competing drivers: lineage-specific target dependence vs shared systematic/vehicle-threshold response. Key gaps: no second-line labels, sparse targets, activity != viability. Next: after feedback, choose second lines that discriminate H1 vs H2, prioritizing lines with divergent lineage/pathway context and avoiding redundant shared-response lines."
+  },
+  "error": null,
+  "usage": {
+    "prompt_tokens": 1016,
+    "completion_tokens": 320,
+    "total_tokens": 1336,
+    "prompt_cache_hit_tokens": 768,
+    "prompt_cache_miss_tokens": 248,
+    "model": "deepseek-flash"
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a scientific research agent. Form competing biological explanations, identify evidence gaps and source IDs. After observed feedback, revise your hypotheses and select discriminating observations. Treat VC disagreement as a question, not a cause. Preserve a concise research memory. Objective: maximize the number of compounds with one recorded active and one inactive line in two profile retrievals each. The first line is fixed by transfer coverage. Choose exactly one different available second line per compound after the first observation. All numeric optimization, outcome scoring and budgets are external. Never claim viability or causality. Return JSON only."
+    },
+    {
+      "role": "user",
+      "content": "{\"sources\": {\"S1\": \"PRESAGE doi:10.1101/2025.06.03.657653: measured cross-system perturbations can transfer; source choice matters.\", \"S2\": \"Systema doi:10.1038/s41587-025-02777-8: shared systematic response may inflate prediction quality.\", \"S3\": \"GeneAgent doi:10.1038/s41592-025-02748-6: database verification supports functional descriptions, not causal proof.\", \"S4\": \"Repurposing Hub/MAP annotations are weaker than measured responses; tissue-specific target dependence is not established here.\", \"S5\": \"Activity is a vehicle-norm threshold in L1000, NOT viability. Two different activity labels do not establish a mechanism.\"}, \"tissues\": {\"A375\": \"melanoma\", \"HA1E\": \"immortalized kidney\", \"HELA\": \"cervical cancer\", \"HT29\": \"colorectal cancer\", \"MCF7\": \"breast cancer, ER+\", \"PC3\": \"prostate cancer, AR-\", \"YAPC\": \"pancreatic cancer\"}, \"compounds\": [{\"id\": \"85\", \"key\": \"azd-2014\", \"name\": \"AZD-2014\", \"targets\": [\"MTOR\", \"MAPKAP1\"], \"moa\": [], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"206\", \"key\": \"dideoxyadenosine\", \"name\": \"dideoxyadenosine\", \"targets\": [], \"moa\": [\"nucleoside reverse transcriptase inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"255\", \"key\": \"favipiravir\", \"name\": \"favipiravir\", \"targets\": [], \"moa\": [\"rna polymerase inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"607\", \"key\": \"tak-875\", \"name\": \"TAK-875\", \"targets\": [\"FFAR1\"], \"moa\": [\"insulin secretagogue\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"624\", \"key\": \"tedizolid\", \"name\": \"tedizolid\", \"targets\": [], \"moa\": [\"bacterial 50s ribosomal subunit inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"558\", \"key\": \"rucinol\", \"name\": \"rucinol\", \"targets\": [\"TYR\"], \"moa\": [\"tyrosinase inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"295\", \"key\": \"gsk-j2\", \"name\": \"GSK-J2\", \"targets\": [], \"moa\": [\"histone demethylase inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HT29\", \"MCF7\", \"PC3\"], \"first_line\": \"A375\"}], \"task\": \"Before seeing feedback, give two competing explanations for this batch and note evidence gaps. Return {hypotheses: [...], evidence_gaps: [...], memory: string}. Maximum 250 words.\"}"
+    }
+  ]
+}
