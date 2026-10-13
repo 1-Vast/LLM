@@ -1,6 +1,67 @@
 # MAESTRO Repository Consolidation Report
 
-## Current research update: knowledge reality, 2026-10-13
+## Current research update: orbit-contrast evidence admission, 2026-10-13
+
+The English [orbit-contrast report](orbit_contrast_20261013/README.md) answers Brief 6. The
+question: is there a general inference rule that credits and uses knowledge only for what it says
+about an entity's identity? The candidate is OCEA. It splits each knowledge route's prediction
+into its mean over 16 stratum-preserving relabellings of the knowledge (generic) and the residual
+(identity), and admits the residual per query through a gate trained on held-out identity
+contrasts.
+
+The study was pre-registered and frozen (21 files). It was then validated once on two exposed
+L1000 tasks: cold-start compound responses (A′: 392 compounds, 805 active cells) and unseen-gene
+shRNA knockdowns (B: 3,481 genes).
+
+* **Controls.** The self-knockdown positive control is detected (+0.0998, p < 0.0001). End-to-end
+  relabelled knowledge earns nothing (mean −0.0002 in both tasks).
+* **A′ (H1 passes).** Knowledge carries identity-specific value: Δ_id +0.0104 [+0.0074,
+  +0.0140], p < 0.0001.
+  * Its orbit-mean (generic) part adds only +0.0010.
+  * The value is mechanism-class membership: removing `know` loses +0.0099. Removing the signed
+    knockdown route loses +0.0005 (CI includes 0).
+  * Flipping target signs reverses the knockdown route's identity contrast (+0.0291 → −0.0303).
+    That signal is real but redundant with mechanism class.
+* **B (H1 fails at power 1.00).** Pharmacology, co-targeting and ESM knowledge carry no identity
+  value (+0.0005, p 0.15).
+* **The rule.** It is worse than the unconditional residual in A′ (−0.0045 [−0.0071, −0.0019])
+  and equal to an accuracy-trained gate (+0.0001). The identity gate predicts the realised
+  contrast no better than the accuracy gate on any route.
+
+**Frozen verdict: IDENTITY_WITHOUT_METHOD, so there is no methodological originality.** The
+functional-genetic claim is MECHANISM_CLASS_ONLY.
+
+**Task C** (exploratory, hashed addendum) was target triage at 10 assays per compound on 1,148
+compounds. It is NOT_SUPPORTED.
+
+* Signature-to-knockdown connectivity is near random: 0.017 hits@10 against 0.012.
+* Orbit calibration adds nothing.
+* Training-annotation degree reaches 0.43, and chemical-neighbour target transfer 0.98.
+
+**Integrity work, kept separate from the science:**
+
+* The freeze validator now authenticates the `sha256` and `files` schemas, which it had silently
+  skipped, and refuses others.
+* An asset-free CI workflow (Python 3.11–3.13) was added but not pushed.
+* An [evaluator audit](evaluator_audit_20261013/README.md) of the frozen knowledge-reality
+  confirmation evaluator found test-batch normalisation, outcome-derived eligibility and
+  unfrozen identity metadata. It proposes corrections C1–C7.
+
+**Deviation D4.** The frozen S2 entry crashed in its controls step before writing anything. A
+one-call wrapper reran it, deterministically.
+
+**Recommendation.**
+
+* NO-GO for OCEA as a method, and for any agent or LLM layer on it.
+* Keep the orbit decomposition as an evaluation device.
+* Brief 5's M3 − M1 question is INSUFFICIENT EVIDENCE: it needs the 218.3 MB DepMap Achilles
+  file, not authorised. Confirmation on sealed PRISM 24Q2 is NO-GO until a protocol adopts
+  C1–C7.
+
+**Status.** Nothing promoted. Cost: 0 wells, 0 provider calls, no downloads. Default suite: 858
+passed. The study's verification passes a 73-claim audit.
+
+## Previous research update: knowledge reality, 2026-10-13
 
 The English [knowledge-reality report](knowledge_reality_20261013/README.md) asks whether
 provenance-qualified, relation-typed, biological-context-conditioned knowledge adds
@@ -32,7 +93,7 @@ refuses T1 or outcome-proximal inputs under a T0 claim. The study's verification
 123-claim audit. Cost: 0 wells, 0 provider calls and 2.4 MB of metadata; the 24Q2 outcome file
 has not been downloaded. Default suite: 848 passed.
 
-## Previous research update: selective hit triage and decision review, 2026-10-13
+## Earlier research update: selective hit triage and decision review, 2026-10-13
 
 The English [selective hit triage report](selective_hit_triage_20261013/README.md) is the
 first drug-discovery decision study. PRISM 19Q4 primary screen hits were triaged for

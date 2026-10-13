@@ -1,6 +1,35 @@
 # Evidence Register
 
-Latest addition (2026-10-13): [knowledge reality](knowledge_reality_20261013/README.md).
+Latest addition (2026-10-13): [orbit-contrast evidence admission](orbit_contrast_20261013/README.md).
+Pre-registered, frozen (21 files) and validated once on exposed L1000 GSE92742, outer folds 1-4;
+exploratory replication grade. A': cold-start compounds, 392 compounds / 805 active cells. B:
+unseen-gene shRNA knockdowns, 3,481 genes. Identity-attributable accuracy is
+Delta_id = score - score(null-invariant orbit model).
+- V1 self-knockdown +0.0998 [+0.0884, +0.1114] PASS; V2 relabelled Delta_id -0.0002 (A' and B)
+  PASS.
+- H1-A' +0.0104 [+0.0074, +0.0140], p < 1e-4, PASS. The orbit-mean part adds +0.0010; know
+  ablation +0.0099; genetic ablation +0.0005 [-0.0001, +0.0011] -> MECHANISM_CLASS_ONLY.
+- Sign flip reverses the genetic identity contrast (+0.0291 -> -0.0303): real, but redundant.
+- H1-B +0.0005 (p 0.15, power 1.00) FAIL.
+- H2a F - R: A' -0.0045 [-0.0071, -0.0019] (significantly negative), B -0.0001.
+- H2b F - C': A' +0.0001, B -0.0001. Both FAIL.
+- Identity-gate Spearman equals the accuracy gate's (know 0.139 / 0.129; genetic -0.021 / -0.007).
+Verdict IDENTITY_WITHOUT_METHOD: no methodological originality.
+Task C (exploratory, hashed addendum D5), target triage at 10 assays per compound, 1,148
+compounds, hits@10:
+- random 0.012, degree prior 0.434, chemical-neighbour transfer 0.984;
+- raw connectivity 0.017, CMap z 0.017, orbit-contrast 0.019, OCEA-admitted 0.186 (via the
+  prior fallback); F - P -0.247.
+Task C: NOT_SUPPORTED.
+Deviation D4: the frozen S2 entry crashed in controls before any output; reran via a one-call
+wrapper, deterministic. Also added: freeze-schema validator fix with regression tests, an
+asset-free CI workflow (not pushed), and an [evaluator audit](evaluator_audit_20261013/README.md)
+(corrections C1-C7).
+Status: OCEA NO-GO; Brief 5's M3 - M1 INSUFFICIENT EVIDENCE (DepMap Achilles 218.3 MB not
+authorised); PRISM 24Q2 stays sealed. Nothing promoted. 0 wells, 0 provider calls, no
+downloads. Default suite: 858 passed.
+
+Previous addition (2026-10-13): [knowledge reality](knowledge_reality_20261013/README.md).
 Exploratory gate on exposed PRISM 19Q4. Setup: 4,528 compounds in 5 MoA-family folds, 1,460
 active; T0 strict cold start; endpoint the per-compound r of the selective profile; 20 seeds of
 each knowledge control.
@@ -21,7 +50,7 @@ Sealed PRISM 24Q2 REP.1M protocol (1,229 compounds) frozen, not run: gate FAIL, 
 NOT_RUN; LLM layer not built (stop rule). Promoted: `maestro.information_tier` only.
 0 wells, 0 provider calls; the 24Q2 outcome file has not been downloaded. Default suite: 848 passed.
 
-Previous addition (2026-10-13): [selective hit triage and decision review](selective_hit_triage_20261013/README.md).
+Earlier addition (2026-10-13): [selective hit triage and decision review](selective_hit_triage_20261013/README.md).
 PRISM 19Q4 primary screen triaged at 16 CTRP v2 confirmation curves and 4 PRISM secondary
 dose-responses per 16-compound campaign; 128 sealed test compounds in 8 campaigns, split by
 mechanism family; frozen and run once; validated selective hit = CTRP AUC robust z <= -2 and

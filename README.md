@@ -11,7 +11,19 @@ python -m pytest -q
 python -m tools.research_validation --verify
 ```
 
-The research verifier checks explicitly supplied frozen inputs and outputs. No active study is currently released. Missing or mismatched assets are reported as `BLOCKED/ASSET_MISSING`; passing software tests is not a scientific result.
+The research preflight checks explicitly supplied frozen inputs and outputs. No active study is currently released.
+
+* It authenticates every file a study's `FREEZE.json` lists under its `inputs`, `sha256` or `files` mapping.
+* Missing or mismatched assets are reported as `BLOCKED/ASSET_MISSING`.
+* Any other freeze schema is refused as `BLOCKED/FREEZE_SCHEMA_UNSUPPORTED`; it is never skipped.
+
+Three levels stay separate:
+
+1. **Software tests** (`pytest`, the CI workflow) show that code and contracts run.
+2. **Research verification** is each study's own verifier: replays, provenance and claim audit. The preflight is an engineering check below this level.
+3. **The scientific verdict** is the study's predeclared hypothesis outcome.
+
+Passing software tests is not a scientific result.
 
 ## Structure
 
