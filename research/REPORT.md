@@ -1,6 +1,30 @@
 # MAESTRO Repository Consolidation Report
 
-## Current research update: orbit-contrast evidence admission, 2026-10-13
+## Current research update: scientific-contract repair and mechanism-falsification feasibility, 2026-10-14
+
+The [mechanism-falsification study](mechanism_falsification_20261014/README.md) is a repair-first audit, not an
+experiment. No confirmatory run, download, paid call, sealed PRISM 24Q2 read or commit took place.
+
+* **Contract defects reproduced and fixed.** On the unchanged historical `decision_review`, an unauthenticated
+  `no_signal` returns NO_GO, a GO is issued with a required prediction untested, a 64-character digest admits a
+  file that does not exist, the `independent` flag is never read, and a prediction relabelled as an analysis
+  decides. New opt-in modules (`evidence_registry`, `strict_decision_review`, `evaluation_contract`; policy
+  `strict-review-1`) bind receipts to re-read bytes, compute independence from upstream experiments, require every
+  required prediction, a measured exclusion of competitors and a human approval bound to the evidence digest, and
+  encode the evaluator-audit rules C1-C7. 35 new tests; a 13-point mutation check (3 survivors fixed). Frozen files
+  untouched. Open and unfixed: tier declaration, endpoint scope and legacy-independence defaults in promoted modules.
+* **A0 census: INSUFFICIENT_MECHANISM_TRUTH.** 61,413 annotation-only compound-gene-line pairs exist, but 0 measured
+  positive and 0 measured negative mechanism references, Hub and MAP-KG share upstream sources, and exposure times
+  (6/24 h versus 96 h+) and plates do not match. Algorithm development was stopped as the brief requires.
+* **Conformal triage (exploratory, exposed data).** BH on conformal p-values had observed FDP 0.26-0.70 against
+  nominal 0.1-0.3 in three regimes and rejects nothing useful at this scale (about 5 x 10^5 calibration units
+  needed). The simulation shows the same breakage under clustering and conditional shift.
+* **Benchmark.** 21 provider-free tasks: strict policy 21/21, historical review 6/21 (specification conformance, not
+  scientific validity).
+* **Verdict: ASSET_BLOCKED.** Conformity of the new contracts is not evidence that they make scientific decisions
+  better.
+
+## Previous research update: orbit-contrast evidence admission, 2026-10-13
 
 The English [orbit-contrast report](orbit_contrast_20261013/README.md) answers Brief 6. The
 question: is there a general inference rule that credits and uses knowledge only for what it says

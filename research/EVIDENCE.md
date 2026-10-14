@@ -1,6 +1,11 @@
 # Evidence Register
 
-Latest addition (2026-10-13): [orbit-contrast evidence admission](orbit_contrast_20261013/README.md).
+Latest addition (2026-10-14): [mechanism-falsification feasibility and contract repair](mechanism_falsification_20261014/README.md).
+Not an experiment: ASSET_BLOCKED (A0 INSUFFICIENT_MECHANISM_TRUTH; 0 measured mechanism references locally).
+Strict decision contracts reproduce-and-fix five P0/P1 defects (35 tests); a 21-task benchmark is specification
+conformance only; conformal selection FDR was exceeded on exposed data (exploratory).
+
+Previous addition (2026-10-13): [orbit-contrast evidence admission](orbit_contrast_20261013/README.md).
 Pre-registered, frozen (21 files) and validated once on exposed L1000 GSE92742, outer folds 1-4;
 exploratory replication grade. A': cold-start compounds, 392 compounds / 805 active cells. B:
 unseen-gene shRNA knockdowns, 3,481 genes. Identity-attributable accuracy is
