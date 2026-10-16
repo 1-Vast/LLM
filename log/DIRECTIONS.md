@@ -1,19 +1,19 @@
-# 方向决策
+# Research Directions
 
-## 继续
+## Continue
 
-1. 在声明的 assay/source/endpoint 范围内做 scoped response transfer，并加入独立 anchor。
-2. 以 measured endpoint 为中心做 calibrated ranking 和显式 abstention。
-3. 保持 evidence registry、source-byte verification、lineage、outcome seal、approval boundary。
-4. Auto-Research 薄循环：竞争假设、范围化预测、按信息量/成本选实验、预算、失败/QC/unknown 保留、可回放 digest。先做 dependency、forecast、ledger 三组消融。
+1. Study scoped response transfer within declared assay/source/endpoint limits, with an independent anchor.
+2. Center work on measured endpoints, calibrated ranking, and explicit abstention.
+3. Preserve the evidence registry, source-byte verification, lineage, outcome seal, and approval boundary.
+4. Build a thin Auto-Research loop with competing hypotheses, scoped predictions, information-per-cost experiment selection, budgets, retained failures/QC/unknowns, and replayable digests. Start with dependency, forecast, and ledger ablations.
 
-## 暂缓
+## Defer
 
-- learned triage、正交 follow-up、outcome-fed line priors：必须在未见化合物集上预注册并与强 deterministic baseline 比较。
-- LLM debate/agent arms：只有在授权预算、独立 sealed outcome 和 false-NO-GO 指标就绪后再运行。
+- Learned triage, orthogonal follow-up, and outcome-fed line priors require preregistration on unseen compounds and comparison with strong deterministic baselines.
+- LLM debate/agent arms require an authorized budget, independent sealed outcomes, and false-NO-GO metrics.
 
-## 停止
+## Stop
 
-- 增加 agent、debate、memory 或 knowledge gate 仅为增加框架复杂度。
-- 把 prediction、annotation 或 LLM 输出当作 measurement。
-- 在没有 mechanism truth、独立 endpoint 和可审计成本时继续 mechanism algorithm development。
+- Adding agents, debate, memory, or knowledge gates only to increase framework complexity.
+- Treating predictions, annotations, or LLM output as measurements.
+- Continuing mechanism algorithm development without mechanism truth, an independent endpoint, and auditable costs.
