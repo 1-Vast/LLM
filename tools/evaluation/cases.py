@@ -1,17 +1,6 @@
 """Leakage-bounded public cases, private outcomes, and internal scoring contracts.
 
-File summary
-- Path: tools/evaluation/cases.py
-- Purpose: Define frozen public cases, hidden outcomes, and evaluator-only scoring.
-- Core points:
-  - `ReplayView` exposes only policy-allowed state; scoring answers stay hidden.
-  - `CaseRepository` loads public cases plus evaluator-only result and scoring files.
-  - A revealed record is a real measurement result gated by validation and context.
-  - `PublicCase.untyped_premises` and `unsited_engagement_premises` report premises whose
-    typing leaves admission to a name or lets a lysate grant stand in for an intact-cell one.
-- Interfaces: `CaseRepository`, `ReplayEnvironment`, `ReplayView`, `PublicCase`, `EvidenceMenuItem`, `InitialEvidence`, `RevealedEvidence`, `ScoringSpec`, `ReplayCase`, `DecisionRule`, `measurement_result_from_reveal`
-- Depends on: maestro.models
-"""
+Policies see public cases and purchased evidence; hidden outcomes and scoring stay evaluator-only."""
 from __future__ import annotations
 
 import json

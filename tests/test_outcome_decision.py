@@ -1,14 +1,4 @@
-"""Outcome interpretation rules (rho), set-based updates, and the decision layer.
-
-File summary
-- Path: tests/test_outcome_decision.py
-- Purpose: Test outcome interpretation, set-based evidence updates, and the decision layer.
-- Core points:
-  - Asserts only a real measurement can constrain a mechanism contrast.
-  - A condition-matched rule, not budget exhaustion, licenses a development decision.
-- Interfaces: `test_*` functions
-- Depends on: agent.memory, maestro
-"""
+"""Outcome interpretation rules (rho), set-based updates, and the decision layer."""
 from dataclasses import replace
 
 from agent.memory import MeasurementResult

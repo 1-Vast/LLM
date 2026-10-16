@@ -1,14 +1,4 @@
-"""Exercise the SQLite-backed case lifecycle across plan and result states.
-
-File summary
-- Path: tests/test_case_lifecycle.py
-- Purpose: Exercise the SQLite-backed case lifecycle across plan and result states.
-- Core points:
-  - Checks `CaseStore` plan-versioning, budget, and result idempotency boundaries.
-  - A real measurement result must pass condition and replicate checks.
-- Interfaces: `test_*` functions, `StubClient`
-- Depends on: agent.memory, agent.memory, agent.context, agent.knowledge, agent.memory, agent.orchestrator, agent.planner, agent.llm, maestro
-"""
+"""Exercise the SQLite-backed case lifecycle across plan and result states."""
 from pathlib import Path
 import sqlite3
 from concurrent.futures import ThreadPoolExecutor

@@ -1,12 +1,4 @@
-"""Core contract: the combination world model and the certified discovery loop.
-
-File summary
-- Path: tests/test_combination_world.py
-- Purpose: the promoted world model cannot learn from the target line except through purchased
-  measurements, its fast posterior equals a dense Gaussian process, it refuses by name, and the
-  discovery loop spends exactly its budget and never reports a prediction as a measured hit.
-- Depends on: numpy (synthetic screens only; asset-free).
-"""
+"""Core contract: the combination world model and the certified discovery loop."""
 from __future__ import annotations
 
 import numpy as np

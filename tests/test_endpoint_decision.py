@@ -2,8 +2,9 @@
 import numpy as np
 import pytest
 
-from maestro.endpoint_decision import (HIT_PROBABILITY_BELOW_THRESHOLD, EndpointModel, choose, fit_endpoint_model,
-                                       pooled_replicate_sd, signed_hits)
+from maestro.endpoint_decision import (ABSTENTION_THRESHOLD_REQUIRED, HIT_PROBABILITY_BELOW_THRESHOLD, SCOPE_NOT_VALIDATED,
+                                       VALIDATED_SCOPE, EndpointModel, ScopeRefused, choose, choose_validated,
+                                       fit_endpoint_model, pooled_replicate_sd, signed_hits)
 
 
 def _model(sigma=0.1, tau=0.1, targets=2, features=3, platt=(0.0, 1.0)):
@@ -89,3 +90,22 @@ def test_fit_recovers_shrinkage_spread_and_a_finite_recalibration():
     assert np.all(np.diff(q) > 0) and np.all((q > 0) & (q < 1))
     with pytest.raises(ValueError, match="AXIS_MISMATCH"):
         fit_endpoint_model(forecast, truth[:, :1], hits, tau, np.full((R, T), 3))
+
+
+def test_a_reported_decision_needs_the_validated_scope_and_an_abstention_rule():
+    model = _model()
+    forecast, replicates = np.full((1, 2, 3), 0.9), np.full((1, 2), 3)
+    ok = choose_validated(model, forecast, replicates, scope=VALIDATED_SCOPE, abstain_below=0.5)
+    assert [d.refusal for d in ok] == [d.refusal for d in choose(model, forecast, replicates, abstain_below=0.5)]
+    for scope in ("l1000_6h_prism", "", VALIDATED_SCOPE + "_extra"):
+        with pytest.raises(ScopeRefused, match=SCOPE_NOT_VALIDATED):
+            choose_validated(model, forecast, replicates, scope=scope, abstain_below=0.5)
+    for bad in (None, True, 0.0, 1.0, 1.5, "0.5"):
+        with pytest.raises(ScopeRefused, match=ABSTENTION_THRESHOLD_REQUIRED):
+            choose_validated(model, forecast, replicates, scope=VALIDATED_SCOPE, abstain_below=bad)
+
+
+def test_the_guarded_entry_point_still_abstains_by_name_below_the_threshold():
+    model = _model(platt=(-20.0, 1.0))
+    decisions = choose_validated(model, np.full((1, 2, 3), 0.9), np.full((1, 2), 3), scope=VALIDATED_SCOPE, abstain_below=0.5)
+    assert decisions and all(d.refusal == HIT_PROBABILITY_BELOW_THRESHOLD for d in decisions)

@@ -13,7 +13,7 @@ FDR control on this pool. These are three different statements and are not avera
 | Claim | Status | Where |
 |---|---|---|
 | The historical decision review returns NO_GO on an unauthenticated flag, GO with a required prediction untested, and admits a digest of the right length for a file that does not exist | **Reproduced** on unchanged code | [INTEGRITY_AUDIT.md](INTEGRITY_AUDIT.md), `reproduce_defects.py` |
-| A strict, versioned policy closes those defects and the independence, lineage, unit and approval defects, without altering any frozen file | **Implemented and tested** (35 new tests, 13-point mutation check, all mutants killed) | [EVIDENCE_CONTRACT.md](EVIDENCE_CONTRACT.md) |
+| A strict, versioned policy closes those defects and the independence, lineage, unit and approval defects, without altering any frozen file | **Implemented and tested** (35 new tests plus 10 for D5, D7, D8; 13-point mutation check, all mutants killed) | [EVIDENCE_CONTRACT.md](EVIDENCE_CONTRACT.md) |
 | The evaluator-audit findings C1-C7 hold as executable contracts | Implemented | `evaluation_contract.py` |
 | The strict policy and the old review differ on the benchmark (21 of 21 against 6 of 21) | **Specification conformance only**; expected outcomes were written with the strict code | [BENCHMARK_SPEC.md](BENCHMARK_SPEC.md) |
 | No local asset holds independent mechanism truth (0 measured positive, 0 negative references); Hub and MAP-KG are not independent; exposure times and plates do not match | **Census, metadata only** | [DATA_FEASIBILITY.md](DATA_FEASIBILITY.md) |
@@ -35,7 +35,7 @@ FDR control on this pool. These are three different statements and are not avera
 
 | Gate | Result |
 |---|---|
-| P0 contract repair | **PASS** for the defects reproduced; D5, D7, D8 remain open in promoted modules, with reasons |
+| P0 contract repair | **PASS** for all eight defects reproduced; D5, D7, D8 are repaired as opt-in strict entry points, and the permissive defaults are not switched over (see INTEGRITY_AUDIT section 4) |
 | A0 feasibility | **INSUFFICIENT_MECHANISM_TRUTH** (also INSUFFICIENT_CONTEXT_MATCHING) |
 | A1 algorithm | **NOT RUN** (A0 gate) |
 | B benchmark | built; **PASS** on specification conformance; no scientific claim |

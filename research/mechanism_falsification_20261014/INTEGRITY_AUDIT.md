@@ -20,10 +20,10 @@ study; every fix is therefore a new, separately versioned module.
 | D3b | `EvidenceItem.independent`, [decision_review.py:111](../../src/maestro/decision_review.py) | A field that nothing reads. Two items with `independent=True` and different digests for one upstream run both count. | P1 |
 | D3c | `DECIDING_KINDS` | `DERIVED_ANALYSIS` is admitted with no named parent. The kind is the caller's word, so a prediction relabelled as an analysis decides. | P0 |
 | D4 | `DECIDING_STATUSES`, [decision_review.py:54](../../src/maestro/decision_review.py) | `UNDETECTED` is decisive for **any** observable, with whatever numeric value the caller attaches. | P1 |
-| D5 | `_dependence_groups`, [acquisition.py:63](../../src/maestro/acquisition.py) | "Actions without provenance retain the legacy independent-trial assumption": unknown provenance is treated as independent. Unknown should be dependent until shown otherwise. | P1 |
+| D5 | `_dependence_groups`, [acquisition.py:63](../../src/maestro/acquisition.py) | "Actions without provenance retain the legacy independent-trial assumption": unknown provenance is treated as independent. Unknown should be dependent until shown otherwise. The assumption was named in `assumptions`, not silent. | P1 (**repaired, opt-in**) |
 | D6 | no unit field anywhere in `EvidenceItem`; frozen reader [outcomes.py:79](../selective_hit_triage_20261013/outcomes.py) | The percent-or-fraction guess `scale = 100 if max > 2` divided every CTRP viability by 100 once overgrowth reached 2.66. It was corrected after opening (see that study's DEVIATIONS.json). The contract layer has no unit at all. | P0 (evaluator) |
-| D7 | `information_tier.admit`, [information_tier.py:82](../../src/maestro/information_tier.py) | Tiers are the caller's declaration. A T1 input declared T0 is admitted unless the caller also passes a registry. Same class as D3. Not changed (open, below). | P1 |
-| D8 | `endpoint_decision.choose` | `VALIDATED_SCOPE` (GCP histone peptides, 24 h, A375 anchor) is a constant that is never enforced; `abstain_below=None` by default means no abstention. A forecast outside that scope is ranked without refusal. Not changed (open, below). | P1 |
+| D7 | `information_tier.admit`, [information_tier.py:82](../../src/maestro/information_tier.py) | Tiers are the caller's declaration. A T1 input declared T0 is admitted unless the caller also passes a registry. Same class as D3. | P1 (**repaired in a new module**) |
+| D8 | `endpoint_decision.choose` | `VALIDATED_SCOPE` (GCP histone peptides, 24 h, A375 anchor) is a constant that is never enforced; `abstain_below=None` by default means no abstention. A forecast outside that scope is ranked without refusal. | P1 (**repaired, guarded entry point**) |
 | E1-E7 | frozen `knowledge_reality_20261013/confirm.py` | See `research/evaluator_audit_20261013`. The evaluator never ran; findings are converted to tests in section 3. | as audited |
 
 **What was not a defect.** `claim_audit.audit` re-reads artifact bytes and recomputes the digest, so its
@@ -72,14 +72,25 @@ check, normaliser authorisation, `/100` replaced by `*0.01`, cross-screen collis
 Three mutants initially survived (competitor exclusion, hand-built automated approval, the `*0.01` product); tests
 were added and all 13 are now killed. The mutation harness is a one-off script, not a committed test.
 
-## 4. Open findings not fixed here, with reasons
+## 4. Later repairs (D5, D7, D8) and findings that remain open
 
-* **D7, D8** change promoted, evidence-bearing modules (`information_tier`, `endpoint_decision`) whose behaviour
-  other studies rely on. A scope guard for `endpoint_decision` and a tier-registry requirement for
-  `information_tier` should be added as new versions with their own tests when a study needs them.
-* **D5** is in `acquisition.py`, which is promoted and widely used; the strict ledger does not call it. The registry's
-  rule (unknown provenance is one shared `UNATTRIBUTED` group) is the intended replacement. Switching
-  `acquisition` over would change historical plans.
+Each repair keeps every existing caller's behaviour and adds a stricter, named entry point, because the three
+modules are promoted and relied on by other studies. None of the modules is hash-frozen except
+`information_tier`, so that one is left byte-identical and the strict gate is a new file.
+
+| Id | Repair | Where | Test |
+|---|---|---|---|
+| D5 | `select_expected_coverage(..., unattributed_dependent=True)`: actions with no source ids share one dependent component, the assumption is renamed `unattributed_actions_treated_as_one_dependent_component`. Default unchanged (`False`), so recorded plans do not move. | [acquisition.py](../../src/maestro/acquisition.py) | `test_unattributed_actions_are_independent_trials_only_when_the_legacy_assumption_is_kept`, `test_attributed_independent_sources_stay_independent_under_the_strict_flag` |
+| D7 | `tier_gate.strict_admit` (`tier-gate-1`): a registry is mandatory (`REGISTRY_REQUIRED`); every input needs provenance that names a registered source whose bytes still match; a T0 claim must be checked against the observed-response sets (`COLD_START_VIOLATION`, `COLD_START_UNCHECKED`), so a mis-declared tier cannot pass on its own say-so. | [tier_gate.py](../../src/maestro/tier_gate.py) | `tests/test_tier_gate.py` (6) |
+| D8 | `endpoint_decision.choose_validated`: refuses a scope other than `VALIDATED_SCOPE` (`SCOPE_NOT_VALIDATED`) and a missing or non-probability abstention threshold (`ABSTENTION_THRESHOLD_REQUIRED`). `choose` is unchanged for development use. | [endpoint_decision.py](../../src/maestro/endpoint_decision.py) | two tests in `tests/test_endpoint_decision.py` |
+
+Still open, with reasons:
+
+* Existing callers of the permissive entry points (`information_tier.admit`, `endpoint_decision.choose`, the default
+  `select_expected_coverage`) are not switched over: doing so would change recorded plans and frozen studies. Any new
+  reported decision or claim should use the strict entry points; switching the orchestrator is a separate, reviewed change.
+* A declaration is still the registrant's assertion. `tier_gate` makes it traceable to verified bytes and consistent
+  with the data handed in, not true.
 * **The registry proves bytes, not truth.** A receipt whose source bytes match its registered digest is only as
   good as the registration. Registering a wrong file with the right digest authenticates it. The contract binds
   claims to bytes; it does not certify that the bytes measure what the receipt says. QC provenance
@@ -96,6 +107,6 @@ were added and all 13 are now killed. The mutation harness is a one-off script, 
 Status vocabulary: `PASS`, `FAIL`, `BLOCKED/ASSET_MISSING` and a scientific `NO_GO` are kept apart.
 
 * Default asset-free suite before this work: PASS (all collected tests).
-* New tests: 35, PASS.
-* Default suite after: 893 passed ([TESTS_AND_INVARIANTS.md](TESTS_AND_INVARIANTS.md)).
+* New tests: 35 for the strict contracts plus 10 for the D5, D7 and D8 repairs, PASS.
+* Default suite after: 903 passed ([TESTS_AND_INVARIANTS.md](TESTS_AND_INVARIANTS.md)).
 * Research studies were not re-run; `research_validation` authenticates freezes only.

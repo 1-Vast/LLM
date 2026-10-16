@@ -164,3 +164,123 @@ CXCL9 source correction: DOI `10.1038/s44320-026-00221-w` measures 24-hour super
 RNA forecasts, measurements, references and derived analyses retain different origins. RNA is not viability, apoptosis, protein engagement or causal mechanism. Public processed-file replication, numerical reconstruction and repeated source copies do not create independent biological units. Declared read/turnaround prices are scenarios, not authenticated invoices. Fixed8, P2 and independent dual-core superiority remain unreleased. Missing assets are BLOCKED, distinct from a failed scientific gate.
 
 The adaptive replay had 62.38% active-drug interval coverage and failed secondary confirmation. Phenotype reference-oracle gain was .003, below MUB .05. These failures are not repaired by consolidation.
+
+
+## Temporary-history conclusions retained before disk release (2026-10-14)
+
+The user requested key experiment records rather than backups. The external
+simplification snapshot and temporary-history tree were reviewed, then designated
+for deletion in full. This section preserves additional directions, failures,
+successes and caveats found there; the numerical register above remains current
+where later evidence supersedes an older claim. This is a historical readout, not
+a rerun or new validation. Downloaded originals, old source checkouts, presentations,
+raw prediction banks, installed dependencies and caches are not preserved here.
+
+### GDSC same-plate phenotype and later-layout transport
+
+- **Question:** does cheap state information improve a decision between Afatinib
+  2 uM, PLX-4720 10 uM and PD0325901 0.25 uM beyond a simple background model?
+- **Source:** official gdscIC50 example, commit
+  `34d842254a33bd04f318449969ff9976237c9295`; RDA SHA256
+  `40bc65d4fd9cd61bb8c0faf5fa60ee32a05fccce7eb441cc74e3ed37666ef10a`.
+  873,525 native rows / 1,837 plates / 739 lines; selected layout 159.
+  Development: 617 plates, 516 donor/parent groups, 48 dates. Confirmation:
+  222 plates, 214 groups, 19 later dates, starting 2015-10-22 23:00:00.
+- **Result:** density plus background minus background alone was -0.52 ATP
+  inhibition percentage points, 97.5% interval [-1.69, +0.65]. The interval upper
+  bound was below the predeclared 2/5/10/20-point sensitivity thresholds. Stop
+  adding complexity or measurement spend to this tested density input. Background
+  alone beat the fixed action by +3.32 points (auxiliary); useful net benefit,
+  prospective molecular-state value and State-model advantage remain unknown.
+- **Reason/limits:** density did not improve action-difference prediction or
+  selected response. Fixed drug positions, later-version background annotations,
+  missing all-attempt/QC denominator and unresolved independent culture starts
+  limit interpretation. ATP inhibition is not death fraction or mechanism truth.
+  Ridge alpha 10 won development selection; random forests earned no advantage.
+  888 ledger cases reused 222 historical plates, not 888 independent experiments.
+- **Repeat diagnostic:** 43 development lines with different-date repeats had
+  +10.90 points [3.90,17.89] when the first reading selected an action evaluated
+  on the last. 37/43 reused CELL_ID expansion: assay repeatability only, not new
+  parent generalisation, and not a free pre-decision state observation.
+- **Transport follow-up:** official GDSC release contained 15,069,449 records;
+  expanded CTRPv2 archive had 545 compounds / 12,470,175 raw-well metadata rows.
+  CTRP could not supply the exact original menu (nearest 2.1/8.3 uM; no PD0325901),
+  so no dose interpolation or substitute drug was admitted. 37 HTTP attempts
+  included timeouts, invalid routes, access failures and misleading HTTP 200
+  redirects. Access failure is not a negative biological finding.
+- **Later layouts 231/284:** 992 metadata-complete scans, 694 overlapping original
+  development groups, 98 without unique annotation/identity, 200 selected scans
+  on 196 patient/parent units and 41 dates. Only exact PLX/PD pairs qualify;
+  this is two-action within-GDSC transport, not three-action independent confirmation.
+  Rebuilt original C Ridge reproduced forecasts to 8.326673e-16 without target
+  refitting. C2 beat development-fixed PD by +4.207 points (+2.509 / +4.411 by
+  layout), but lost 0.961 points to fixed PLX in the labelled post-outcome
+  diagnostic. Predictions favoured PD by +3.893 vs measured -5.168 points;
+  mean contrast error +9.061, RMSE 26.975. 113 rankings agreed, 86 disagreed,
+  one tied. This identifies calibration/transport and comparator weakness,
+  not Agent gain; no physical confidence interval or net monetary value certified.
+- **Unexecuted next direction:** randomise well positions, independent culture
+  starts and all three exact actions, include every fixed policy, and record
+  all failures/costs. Initial design: 12 lines / 24 starts / 384 basic wells;
+  later generated pilot used 336 terminal + 48 destructive sister wells on
+  eight plates across four days. All execution flags were false, outcomes/costs
+  empty. The pilot tests feasibility/repeatability, not population policy benefit.
+  No physical experiment, RNA acquisition, State forward or LLM call was performed
+  in the transport follow-up. Scoped 358-test verification was engineering-only.
+
+Sources: official [raw format](https://github.com/CancerRxGene/gdscIC50/blob/34d842254a33bd04f318449969ff9976237c9295/vignettes/gdsc_raw_data_format.Rmd),
+[GDSC protocol](https://depmap.sanger.ac.uk/documentation/datasets/drug-sensitivity/),
+and [release 8.5 identities](https://cog.sanger.ac.uk/cancerrxgene/GDSC_release8.5/screened_compounds_rel_8.5.csv).
+Temporary source reports were `gdsc_reproduction_snapshot/research/astra/GDSC_SCREEN.md`
+and `gdsc_transport_log_addendum.txt`; those copies are intentionally deleted.
+
+### Earlier research directions and their stop reasons
+
+| Direction | Historical outcome | Reason, retained lesson or next requirement |
+|---|---|---|
+| Belief planning | INCONCLUSIVE; practical +0.02 improvement not supported | Fixed order remained strong. VC changed about 1% of sequences without outcome gain; feedback changed 23% without result gain. Extra measurements/wrong decisions failed cost/safety gates. Conditional readings cannot be treated as independent. |
+| Acquisition link / two-step follow-up | Inconclusive / negative; fixed sequence won | Keep directional exclusion probabilities separate from correctness. Reference likelihoods require valid real history. One live request failed with LLMTransportError; no reply or measurement, conservative $0.01 reservation was not a confirmed charge. |
+| Early-stop sequence audit | Negative; fallback gain +0.0013 utility | Negligible terminal gain: no promotion merely because more actions changed. |
+| Sparse-reference value | Inconclusive | Parent-reference smoothing is a transfer assumption, not recovered true conditional data. QC-passing references omit the all-attempt failure denominator, so economic optimality is unqualified. |
+| Dynamic world model | Negative; transition cosine +0.283, decision +0.003 | Prediction improvement did not satisfy decision-promotion gates. |
+| Biological depth | Negative; latent model matched PCA | Structure retrieval carried the useful signal; deeper latent modelling did not earn promotion. |
+| In-context world | E-WM1/E-WM2 gates passed; promotion deferred | Shared-direction forecast success did not establish discrimination. E-DATA1 decision tier was underpowered (105/314 and 205/714 eligible units); nothing promoted. |
+| Dual-core development / protocol v2 | Negative | Selected-action risk and decision/calibration qualification failed; operational wiring does not prove scientific benefit. |
+| Dual-core v2 repairs | Engineering repairs verified, no scientific promotion | Risk controls, lineage and transfer-error contracts became research standards; no superior biology demonstrated. |
+| Viability contrast v1-v5b | Negative; realistic arms did not certify | World-model contribution was non-binding for this task-policy pair. Reformulate the task before increasing model complexity. |
+| Scientific case memory | Engineering contracts verified | Typed append-only records, scoped retrieval, hypothesis graphs and numerical parity do not establish improved terminal decisions. |
+| MAESTRO VC memory replay | Negative on 6,601 real episodes; 23/23 screens NO_DEVELOPMENT_SIGNAL | No terminal-decision or calibration improvement. Keep failure cases; adaptation and conditional forecasts help intermediate predictions only. |
+| External validation | Negative / external test blocked | MAESTRO VC rejected under frozen development gates; do not substitute exposed replays for external confirmation. |
+| Premise forecast | NOT_READY | Zero of 30 required target genes available; stop rather than fabricate an endpoint. |
+| Live dual-core API tests | Engineering execution demonstrated; biology inconclusive | Post-fix 1,621 passes still included one historical prose failure and two deselections. Provider response success is not biological efficacy. |
+| Dual-core completion | Engineering closure | 21 dataset/version checks; 1,526 passes plus an inherited prose failure. Terminal biological benefit unestablished. |
+| Dual-core follow-up | Inconclusive | 19,704 paired policy paths and 44,520 frozen queries; anchor did not establish utility above fixed. All 112 valid-readout forecasts refused without experiment-validity probability. Missing all-attempt denominator cannot be priced by invented QC probabilities. |
+| Identifiability audit | Diagnostic research, no promotion | State and case-memory targets/populations differ. Conditional prediction, source uncertainty and validator bottlenecks must be separated; unknown comparisons retain declared utility bounds. |
+| ASRG / gated plan / dataset discovery | Design only, not completed experiments | Action-supported repair and capability/menu qualification remain proposed directions. A literature review or plan is not experimental success. |
+| Scientific optimisation pilots | Exploratory and superseded | Earlier PASS labels were superseded by later dual-core audits; do not re-promote them from an old draft. |
+
+### Historical provider accounting retained as compact records
+
+| Ledger | Recorded calls | Recorded total USD | Unknown-charge counter | Entry status counts |
+|---|---:|---:|---:|---|
+| `mechanism_falsification_spend.json` | 3549 | 6.46689198 | 7 | `{"failed_unpriced": 7, "ok": 3542}` |
+| `mechanism_routing_spend.json` | 2453 | 7.45753203 | 88 | `{"failed_unpriced": 2, "killed_in_flight_unpriced": 1, "ok": 2450}` |
+| `phenotype_anchor_20261010_spend.json` | 5 | 0.0120063 | 0 | `{"ok": 5}` |
+| `selective_discovery_spend.json` | 3466 | 1.50627302 | 0 | `{"ok": 3466}` |
+
+These DeepSeek-flash totals use priced usage plus reservations for unknown charges,
+not invoices. The mechanism-routing unknown-charge counter (88) differs from its
+three failure/in-flight entry statuses; both original counters are preserved without
+claiming a reconciliation. Provider costs do not constitute assay costs or science
+success. Earlier numerical evidence and failures for Blocks M/N/P and phenotype
+anchors remain in the main register.
+
+### Disk-release boundary
+
+Only `D:/MAESTRO-retained/20261014-simplification/` is removed in this release.
+Current runtime, nine registered studies, the central evidence register and primary
+assets under the active repository remain. The retained-history material is now a
+summary record, not a complete reproducible backup. Git history is not rewritten.
+
+Deletion receipt: 4,760 files / 2,952,169,169 logical bytes removed on 2026-10-14;
+external retention target confirmed absent. No backup remains in that directory.

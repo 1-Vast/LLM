@@ -1,6 +1,6 @@
 # Tests and invariants
 
-New test files (all listed in `pyproject.toml` `testpaths`): `tests/test_evidence_registry.py` (7),
+New test files (all listed in `pyproject.toml` `testpaths`; D5, D7 and D8 are covered in `tests/test_tier_gate.py` (6) and additions to `tests/test_acquisition.py` (2) and `tests/test_endpoint_decision.py` (2)): `tests/test_evidence_registry.py` (7),
 `tests/test_strict_decision_review.py` (20), `tests/test_evaluation_contract.py` (8); fixture helper
 `tests/fixtures/strict_evidence.py`. All write temporary files under `tmp_path`, read no study data and call no provider.
 
@@ -68,7 +68,7 @@ passing one.
 |---|---|---|
 | Study verification | `python research/mechanism_falsification_20261014/verify.py` | PASS |
 | Repository shape (study registered, protocol and verifier present) | `pytest tests/test_repository_shape.py` | PASS |
-| Default asset-free suite | `python -m pytest` | PASS, 893 tests |
+| Default asset-free suite | `python -m pytest` | PASS, 903 tests |
 | Frozen files unchanged | `git diff --name-only` | only `pyproject.toml` and `research/STUDIES.json` (plus `research/REPORT.md` and `research/EVIDENCE.md` if the report entry below is made) |
 
 `tools/research_validation.py` authenticates frozen bytes and states `ENGINEERING_ONLY`; with no active protocol it
@@ -76,5 +76,5 @@ prints `BLOCKED/ASSET_MISSING`. A green software suite is not a reproduction of 
 
 ## Final default-suite result
 
-`python -m pytest` (default asset-free suite, including the 35 new tests): **893 passed in 68.7 s** on 2026-10-14,
+`python -m pytest` (default asset-free suite, including the 45 new tests): **903 passed in 79.2 s** on 2026-10-14,
 run after the last source and test edit. The suite reads no study data; it is not a reproduction of any study.

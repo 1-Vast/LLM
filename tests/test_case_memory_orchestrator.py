@@ -1,16 +1,4 @@
-"""End-to-end tests: user state -> forecasts, the gated pipeline, the orchestrator path, the tool.
-
-File summary
-- Path: tests/test_case_memory_orchestrator.py
-- Purpose: prove the case memory works through the real production seams, not only as isolated
-  modules: (1) the same action under two different user states forecasts differently when the
-  feature arm carries state; (2) the gated pipeline runs compiler -> graph -> retriever ->
-  forecaster -> decision-value ranking -> branching plan; (3) the orchestrator keeps its default
-  behaviour with the flag off and uses the case-memory forecaster through discrimination
-  selection with the flag on; (4) the runtime tool honours its contract and its typed refusals.
-- Depends on: src/maestro/*case_memory*, src/agent/{orchestrator,case_memory_wiring}.py,
-  tools/case_memory/tool.py, the fixture style of tests/test_discriminating_acquisition.py
-"""
+"""End-to-end tests: user state -> forecasts, the gated pipeline, the orchestrator path, the tool."""
 from __future__ import annotations
 
 import json

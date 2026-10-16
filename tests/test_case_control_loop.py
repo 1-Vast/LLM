@@ -1,14 +1,4 @@
-"""Verify a multi-round case loop replans only after a qualified result.
-
-File summary
-- Path: tests/test_case_control_loop.py
-- Purpose: Verify a multi-round case loop replans only after a qualified result.
-- Core points:
-  - Stops before fabricating any unavailable measurement.
-  - Asserts reflection classes and case state transitions under a fixed budget.
-- Interfaces: `test_*` functions, `StubClient`
-- Depends on: agent.memory, agent.memory, agent.context, agent.knowledge, agent.memory, agent.orchestrator, agent.planner, agent.llm, maestro
-"""
+"""Verify a multi-round case loop replans only after a qualified result."""
 from pathlib import Path
 import hashlib
 import json

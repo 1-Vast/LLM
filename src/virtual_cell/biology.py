@@ -1,28 +1,4 @@
-"""The shared biological vocabulary every backend is described in.
-
-File summary
-- Path: src/virtual_cell/biology.py
-- Purpose: give MAESTRO one typed description of observables, interventions and
-  the causal chain, so backends with different internal representations can be
-  compared and composed without being equated.
-- Core points:
-  - Three different questions are kept apart: is this the same biological
-    *quantity*, is this the same *measurement* (assay, observation function,
-    measured status, context, time), and may it be admitted as a *direct
-    measurement* of something a premise requires.
-  - A qualifier that is missing is an unresolved condition with a name, not a
-    silent pass: two records that do not say in which context or at what time
-    they were taken are not known to be comparable.
-  - Composition has three kinds. An identity preserves everything; a
-    deterministic conversion executes a registered arithmetic map and invents no
-    information; a learned or mechanistic bridge crosses quantities and needs an
-    executable mapping plus a validation receipt, and its output is always an
-    estimate.
-- Interfaces: `Observable`, `MeasurementModel`, `InterventionComponent`,
-  `CompositeIntervention`, `ChainSegment`, `ConnectorKind`, `UnitConversion`,
-  `UNIT_CONVERSIONS`, `BridgeModel`, `Connector`, `BackendDescription`
-- Depends on: maestro.models, virtual_cell.applicability
-"""
+"""The shared biological vocabulary every backend is described in."""
 from __future__ import annotations
 
 import hashlib

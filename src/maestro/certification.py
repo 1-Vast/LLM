@@ -1,29 +1,6 @@
 """Design-based certificates for claims about candidates an agent has not measured.
 
-File summary
-- Path: src/maestro/certification.py
-- Purpose: let any planner -- a fixed rule, a model-guided selector or a language model whose
-  selection probabilities cannot be written down -- make lawful claims about the untested part
-  of its own shortlist. A model ranking alone may never claim an unmeasured outcome; a ranking
-  plus a randomised measured audit may make the two claims below.
-- Core points:
-  - Protocol: fix a shortlist and a score per member from data already measured; measure an
-    audit drawn uniformly at random without replacement from the shortlist (`draw_audit`); then
-    `certify`. Conditional on everything before the draw, audit and remainder are exchangeable,
-    which is the only assumption either certificate needs.
-  - Nominations: clipped-score conformal p-values and Benjamini-Hochberg give a subset of the
-    remainder with FDR <= alpha (Jin and Candes, JMLR 2023; joint-exchangeability form, Gui,
-    Jin, Nair and Ren 2025). The guarantee is marginal: it bounds the expected false-discovery
-    proportion, not the error of one list.
-  - Yield: an exact hypergeometric lower confidence bound on hits left in the remainder.
-  - Refusals are named: AUDIT_TOO_SMALL, NO_CANDIDATE_PASSES (a valid empty selection),
-    EMPTY_SHORTLIST, AUDIT_NOT_IN_SHORTLIST.
-  - Verified on two real combination screens (research/certified_discovery, O'Neil 2016
-    development and NCI-ALMANAC 2017 confirmatory); the research copy is frozen there.
-- Interfaces: `draw_audit`, `minimum_audit`, `conformal_pvalues`, `benjamini_hochberg`,
-  `yield_lower_bound`, `certify`, `Certificate`, refusal codes.
-- Depends on: standard library only.
-"""
+Certificates require an exchangeable random measured audit. FDR is marginal, not a guarantee for one selected list."""
 from __future__ import annotations
 
 import bisect

@@ -1,25 +1,4 @@
-"""Build the smallest virtual-cell fixture the real entry point accepts.
-
-File summary
-- Path: tests/fixtures/state.py
-- Purpose: construct a registered asset, a registered model and a bound query, so an
-  admission test tests admission instead of re-deriving plumbing in every module.
-- Core points:
-  - The asset is synthetic and says so: its registration declares
-    `source="synthetic asset built by tests.fixtures.state"`, and nothing here
-    is a measurement. A fixture can make the entry point *accept* a query; it can
-    never make a claim about biology.
-  - `adapter` binds a matching coordinate identity by default, because the entry
-    point now refuses a model that declares no input basis at all. A caller that
-    wants to exercise *that* refusal passes `input_coordinate_names=()`.
-  - The asset is written once per directory. Rewriting an asset a caller has already
-    registered would change its bytes under the recorded digest, which is the defect
-    one of the tests exists to catch.
-- Interfaces: `CONTROL`, `DRUG_A`, `DRUG_B`, `SHIFT`, `DEFAULT_BASIS`, `asset_sha256`,
-  `write_asset`, `write_model`, `registration`, `adapter`, `request`, `joined`,
-  `requires_asset_runtime`
-- Depends on: virtual_cell, numpy, pytest
-"""
+"""Build the smallest virtual-cell fixture the real entry point accepts."""
 from __future__ import annotations
 
 import hashlib

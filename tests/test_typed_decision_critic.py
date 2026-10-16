@@ -1,15 +1,4 @@
-"""The typed decision model advises and is scored; it never becomes evidence.
-
-File summary
-- Path: tests/test_typed_decision_critic.py
-- Purpose: pin the TypeSafe Jev integration end to end without a network call: question
-  construction, fail-closed answer parsing, the advisory boundary, calibration revocation,
-  and the orchestrator wiring.
-- Core points: assertions here are contract tests, not biological results; each test pins one
-  boundary that must not silently move. No test makes a provider request.
-- Interfaces: pytest tests only
-- Depends on: agent, maestro, tests.fixtures
-"""
+"""The typed decision model advises and is scored; it never becomes evidence."""
 from __future__ import annotations
 
 import json

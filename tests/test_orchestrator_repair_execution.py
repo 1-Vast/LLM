@@ -1,12 +1,4 @@
-"""A ruled repair must submit an executable functional measurement.
-
-File summary
-- Path: tests/test_orchestrator_repair_execution.py
-- Purpose: A ruled repair must submit an executable functional measurement.
-- Core points: assertions here are contract tests, not biological results; each test pins one boundary that must not silently move.
-- Interfaces: `test_rule_repair_submits_an_executable_functional_measurement()`
-- Depends on: agent, maestro
-"""
+"""A ruled repair must submit an executable functional measurement."""
 from pathlib import Path
 
 from agent.memory import RunLogger

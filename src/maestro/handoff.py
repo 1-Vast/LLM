@@ -354,25 +354,6 @@ class PolicyInput:
         return self.calibrated_action_distributions.get(action_identifier)
 
 
-def make_policy_input(
-    *,
-    visible_evidence: Sequence[Any] = (),
-    legal_actions: Sequence[EvidenceAction] = (),
-    budget: float,
-    calibrated_action_distributions: Mapping[str, Mapping[str, float]] | None = None,
-    provenance: Mapping[str, str] | None = None,
-) -> PolicyInput:
-    """Build a policy input without accepting an evaluator or raw-data object."""
-
-    return PolicyInput(
-        visible_evidence=tuple(visible_evidence),
-        legal_actions=tuple(legal_actions),
-        budget=budget,
-        calibrated_action_distributions=calibrated_action_distributions or {},
-        provenance=provenance or {},
-    )
-
-
 def _finite(value: object) -> bool:
     return type(value) in (int, float) and isfinite(value)
 

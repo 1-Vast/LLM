@@ -1,20 +1,4 @@
-"""A deterministic stand-in for the language-model client.
-
-File summary
-- Path: tools/shared/stub_client.py
-- Purpose: let an offline caller drive code that expects an LLM client, without a
-  provider, a key, a network call or a paid request.
-- Core points:
-  - A sequence of responses is consumed in order; a single mapping is returned for
-    every call. Both shapes occur in practice, and one class covers them so the
-    same stand-in is not re-written per module.
-  - `calls` records `(messages, kwargs)` per call. A test asserts on it when the
-    property under test is *what the caller sent*, not what the client answered.
-  - This is not a model and not a measurement: it answers with the fixed value it
-    was constructed with, so a passing test says something about the caller only.
-- Interfaces: `StubClient`
-- Depends on: (standard library only)
-"""
+"""A deterministic stand-in for the language-model client."""
 from __future__ import annotations
 
 from typing import Any, Mapping, Sequence

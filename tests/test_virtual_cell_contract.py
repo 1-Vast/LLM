@@ -1,12 +1,4 @@
-"""Virtual-cell request, capability and prediction contract.
-
-File summary
-- Path: tests/test_virtual_cell_contract.py
-- Purpose: Virtual-cell request, capability and prediction contract.
-- Core points: assertions here are contract tests, not biological results; each test pins one boundary that must not silently move.
-- Interfaces: `test_unavailable_world_model_does_not_invent_a_state_prediction()`
-- Depends on: virtual_cell
-"""
+"""Virtual-cell request, capability and prediction contract."""
 from virtual_cell.interface import Intervention, SystemContext, UnavailableVirtualCellWorldModel
 from virtual_cell import PredictionRequest
 

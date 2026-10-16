@@ -1,14 +1,4 @@
-"""Validate budgeted orchestration, planning, and case-loop behaviour.
-
-File summary
-- Path: tests/test_budgeted_orchestration.py
-- Purpose: Validate budgeted orchestration, planning, and case-loop behaviour.
-- Core points:
-  - Exercises `MAESTROOrchestrator.run` and `run_case_loop` with stubbed LLM clients.
-  - Confirms budget, prerequisite, and mechanism-contrast scoping hold end to end.
-- Interfaces: `test_*` functions, `StubClient`
-- Depends on: agent.memory, agent.memory, agent.context, agent.knowledge, agent.memory, agent.orchestrator, agent.planner, agent.llm, maestro
-"""
+"""Validate budgeted orchestration, planning, and case-loop behaviour."""
 from pathlib import Path
 
 from agent.memory import RunLogger

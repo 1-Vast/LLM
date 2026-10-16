@@ -1,14 +1,4 @@
-"""End-to-end case loop: interpretation, set update, and a bounded development decision.
-
-File summary
-- Path: tests/test_case_decision_loop.py
-- Purpose: Drive a multi-round case loop and check set-based updates and the decision layer.
-- Core points:
-  - Exercises `run_case_loop` with stubbed clients and asserts evidence-state transitions.
-  - A qualified, condition-matched result, not budget exhaustion, licenses a decision.
-- Interfaces: `test_*` functions
-- Depends on: agent.memory, agent.memory, agent.context, agent.knowledge, agent.memory, agent.orchestrator, agent.planner, agent.llm, maestro
-"""
+"""End-to-end case loop: interpretation, set update, and a bounded development decision."""
 from pathlib import Path
 
 from maestro.models import BiologicalQuantity

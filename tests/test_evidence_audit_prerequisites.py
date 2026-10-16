@@ -1,13 +1,4 @@
-"""Two evidence-audit prerequisites: unknown source dependence, and unsited engagement premises.
-
-File summary
-- Path: tests/test_evidence_audit_prerequisites.py
-- Purpose: pin the block-4 audit rows E3 and E5 (research/gated_plan/AUDIT.md) as reported
-  properties, without changing any production default. An unregistered source is dependence-
-  unknown, not independent; an engagement premise without a sample site can be met by a lysate
-  grant of the same quantity and context, and the case lint names such premises.
-- Run: python -m pytest tests/test_evidence_audit_prerequisites.py -q
-"""
+"""Two evidence-audit prerequisites: unknown source dependence, and unsited engagement premises."""
 from __future__ import annotations
 
 

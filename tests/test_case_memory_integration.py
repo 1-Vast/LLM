@@ -1,17 +1,4 @@
-"""Integration tests for the production case-memory and conditional-forecast modules.
-
-File summary
-- Path: tests/test_case_memory_integration.py
-- Purpose: the registered test suite of the case-memory production integration: schema validation,
-  append-only storage, digest verification, policy/evaluator separation, leak refusal, gene
-  alignment, compound canonicalisation, directional features, control matching, missingness,
-  adaptation cost, retrieval reasons, hypothesis-graph validity, the conditional forecast
-  interface, history-aware cache identity, abstention, evidence-state immutability, decision-value
-  action selection, the external-study split and the case update after a new real result.
-- Depends on: src/maestro/{case_memory,directional,hypothesis_graph,adaptive_retrieval,
-  case_update,problem_compiler,hypothesis_forecast}.py, src/virtual_cell/{interface,
-  conditional_forecast}.py
-"""
+"""Integration tests for the production case-memory and conditional-forecast modules."""
 from __future__ import annotations
 
 import pytest

@@ -1,10 +1,4 @@
-"""Miniature ledgers for the strict decision and evidence-registry contracts.
-
-File summary
-- Path: tests/fixtures/strict_evidence.py
-- Purpose: build a ledger over real temporary files, so every authentication test reads actual bytes.
-- Interfaces: `PROTOCOL`, `CONTEXT`, `Lab`.
-"""
+"""Miniature ledgers for the strict decision and evidence-registry contracts."""
 from __future__ import annotations
 
 import hashlib

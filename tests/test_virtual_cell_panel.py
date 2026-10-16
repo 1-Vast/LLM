@@ -1,21 +1,4 @@
-"""Panel invocation: abstentions, artifact integrity, gene-set refusal, ranking, receipts.
-
-File summary
-- Path: tests/test_virtual_cell_panel.py
-- Purpose: pin the boundaries of the panel surface that invokes a weight-backed backend
-  for analysis: an abstention is a row, an artifact is graded only against its own digest,
-  an endpoint the coordinates cannot express is refused before scoring, a ranking never
-  silently drops a condition, and a receipt is graded only against a declared criterion.
-- Core points: assertions here are contract tests, not biological results.
-- Interfaces: `test_panel_records_abstentions_and_bills_compute_separately()`,
-  `test_artifact_reader_refuses_a_vector_that_does_not_match_its_digest()`,
-  `test_gene_set_analysis_refuses_an_endpoint_the_coordinates_cannot_express()`,
-  `test_gene_set_analysis_refuses_by_name_without_a_declared_pool()`,
-  `test_ranking_keeps_unanswered_conditions_visible()`,
-  `test_receipt_is_unscored_below_the_declared_minimum()`,
-  `test_panel_spec_executes_and_requires_a_criterion_for_observations()`
-- Depends on: virtual_cell
-"""
+"""Panel invocation: abstentions, artifact integrity, gene-set refusal, ranking, receipts."""
 import json
 from dataclasses import replace
 from pathlib import Path

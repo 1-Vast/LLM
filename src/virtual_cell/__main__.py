@@ -1,12 +1,4 @@
-"""CLI entry point for the virtual-cell layer.
-
-File summary
-- Path: src/virtual_cell/__main__.py
-- Purpose: expose `python -m virtual_cell panel` for a declared condition panel
-  behind a registered backend.
-- Interfaces: `main` (panel command).
-- Depends on: panel.py, world_model.py
-"""
+"""CLI entry point for the virtual-cell layer."""
 from __future__ import annotations
 
 import argparse

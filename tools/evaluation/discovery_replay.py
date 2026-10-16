@@ -1,25 +1,4 @@
-"""Equal-budget replay of certified discovery on a measured combination screen.
-
-File summary
-- Path: tools/evaluation/discovery_replay.py
-- Purpose: evaluate planners for certified combination discovery against a full-factorial
-  screen whose every outcome was measured, one campaign per target cell line, with the zero arm,
-  fixed rules, static retrieval, world-model variants and the oracle at equal budget.
-- Core points:
-  - Each campaign shares rounds 1..R-1, then branches: `exploit` buys the top final batch;
-    `certify` buys `audit_seeds` independent uniformly random audits from the top kappa x batch
-    shortlist and certifies the remainder with `maestro.certification`.
-  - Records carry measured hits, certificate outcomes against the hidden labels (false-discovery
-    proportion, yield-bound coverage), the world model's own claims (expected remainder hits,
-    "P(hit) >= 0.5"), laboratory cost (experiments, dose points, wells, days) and seconds.
-  - `summarise` resamples target lines (the unit) for every interval.
-  - Promoted from research/certified_discovery (agent, replay, analysis); LLM planner arms stay
-    in research.
-- Interfaces: `ARMS`, `run_campaign`, `replay_line`, `summarise`, `main` (python -m
-  tools.evaluation.discovery_replay).
-- Depends on: numpy, `maestro.certification`, `virtual_cell.combination_world`,
-  `tools.datasets.combination_screens`.
-"""
+"""Equal-budget replay of certified discovery on a measured combination screen."""
 from __future__ import annotations
 
 import argparse

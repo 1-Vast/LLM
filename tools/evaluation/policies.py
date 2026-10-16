@@ -888,14 +888,6 @@ REPAIR_PROPOSAL_PROMPT = (
 )
 
 
-class ProposalPolicy(Protocol):
-    """A replay policy that can also propose repairs before it acquires evidence."""
-
-    name: str
-
-    def propose_repairs(self, view: ReplayView) -> Sequence[Mapping[str, object]]: ...
-
-
 def _subject(view: ReplayView, premise: str) -> tuple[str, str] | None:
     """The gene and compound an engagement-style premise is declared to be about.
 

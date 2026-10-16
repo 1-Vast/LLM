@@ -1,25 +1,4 @@
-"""Functional metrics for transcriptional response transfer and profiling campaigns.
-
-File summary
-- Path: tools/evaluation/transfer_metrics.py
-- Purpose: score predicted response directions the way block Q (2026-10-12) registered them, with a
-  compound, not a cell, as the statistical unit.
-- Core points:
-  - Centred cosine: cosine of responses centred by the reference mean. A prediction equal to the
-    mean scores 0.
-  - Specific cosine: centred cosine after projecting out a line's generic active direction, so
-    reproducing the systematic response shared by most active compounds (the Systema warning)
-    earns nothing.
-  - AURC: mean selective risk when queries are accepted most-confident first. It tells a
-    certificate that ranks errors from one that does not.
-  - Compound-clustered paired comparisons: each compound contributes the mean over its active
-    cells, a sign-flip p-value and a percentile bootstrap interval.
-  - Map utility: the campaign score. A profiled active cell counts 1; an unprofiled active cell
-    counts the centred cosine of its fill; non-responsive cells do not count.
-- Interfaces: `centred_cosine`, `specific_cosine`, `aurc`, `paired_cluster_test`,
-  `aurc_difference`, `map_utility`.
-- Depends on: numpy.
-"""
+"""Functional metrics for transcriptional response transfer and profiling campaigns."""
 from __future__ import annotations
 
 import numpy as np

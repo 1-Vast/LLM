@@ -1,22 +1,6 @@
 """Validation helper executed inside MAESTRO's isolated State environment.
 
-File summary
-- Path: src/virtual_cell/state_runner.py
-- Purpose: inspect, subset and validate State input/output AnnData so the
-  controller cannot accept a fallback, a wrong context or a wrong input schema
-  as a real prediction.
-- Core points:
-  - Runs in the State environment, importing nothing from MAESTRO.
-  - Rejects a missing perturbation or control, a declared context whose rows do
-    not contain both, unmatched groups, and an input dimension the checkpoint
-    was not trained on.
-  - `subset` writes a query file holding only the declared context's control
-    rows and the requested condition's rows, with their original row
-    identifiers and digests.
-  - `validate` checks the prediction and writes the condition-level shift vector.
-- Interfaces: `inspect`, `subset`, `validate`, `main` (CLI: inspect | subset | validate).
-- Depends on: anndata, h5py, numpy, pandas, torch
-"""
+Runs inside the isolated State environment and refuses wrong contexts, controls, schemas and model dimensions."""
 from __future__ import annotations
 
 import argparse

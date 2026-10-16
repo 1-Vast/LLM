@@ -1,12 +1,4 @@
-"""Core contract: design-based certificates for an agent's untested candidates.
-
-File summary
-- Path: tests/test_certification.py
-- Purpose: the promoted `maestro.certification` is exact where it claims exactness, valid under
-  adaptive and miscalibrated selection when its audit is random, invalid when the audit is
-  hand-picked, and refuses by name.
-- Depends on: standard library and numpy (synthetic worlds only; asset-free).
-"""
+"""Core contract: design-based certificates for an agent's untested candidates."""
 from __future__ import annotations
 
 import math

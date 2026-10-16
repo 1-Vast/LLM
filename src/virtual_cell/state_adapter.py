@@ -1,30 +1,6 @@
 """Guarded adapter for invoking a pinned State checkpoint in ``maestro``.
 
-File summary
-- Path: src/virtual_cell/state_adapter.py
-- Purpose: run the pretrained Arc State checkpoint behind the shared world-model
-  contract, and refuse any query whose endpoint, context, controls, input
-  schema, data asset or model version does not match what the checkpoint and
-  the registered data actually are.
-- Core points:
-  - Every declared identifier is bound to a registered asset: a dataset id to a
-    file with a recorded size and digest, its contexts and its control label; a
-    control dataset id to the *same* asset as the treated rows, because State
-    samples its basal cells from the file it is given.
-  - Incompatible queries are rejected before any subprocess starts; the
-    selected rows are then checked inside the State environment, where the
-    declared context must contain both the perturbation and its controls.
-  - Executability and validation are different answers. A runnable query
-    reports ``UNKNOWN`` validation unless a registered receipt matches its
-    endpoint, context and model version.
-  - A prediction is a compact condition-level artifact with named or explicitly
-    unresolved coordinates, digests, query rows and provenance. A bound scale
-    calibration is applied at runtime and the raw values are kept beside it.
-- Interfaces: `DatasetRegistration`, `VirtualCellRegistry`, `load_registry`,
-  `StateAdapterConfig`, `StateCapabilityAdapter`, `file_sha256`.
-- Depends on: src/virtual_cell/interface.py, applicability.py,
-  calibration.py, artifacts.py, state_runner.py
-"""
+Runnable assets do not imply biological validation. Queries bind to model, data, control, context and output-axis identity."""
 from __future__ import annotations
 
 import hashlib

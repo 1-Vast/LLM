@@ -684,18 +684,6 @@ class RepairProposal:
             )
 
 
-@dataclass(frozen=True)
-class EvidenceObservation:
-    """A real observation whose update scope is explicit before it is interpreted."""
-
-    action_identifier: str
-    outcome: str
-    scope: EvidenceScope
-    source_ids: tuple[str, ...]
-    limitations: tuple[str, ...] = ()
-    evidence_kind: EvidenceKind = EvidenceKind.REAL_MEASUREMENT
-
-
 class DecisionStatus(str, Enum):
     DECIDED = "decided"
     NEEDS_EVIDENCE = "needs_evidence"

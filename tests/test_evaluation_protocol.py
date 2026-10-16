@@ -1,15 +1,4 @@
-"""Evaluation protocol: laboratory cost, named refusals, the hidden partition, and the score table.
-
-File summary
-- Path: tests/test_evaluation_protocol.py
-- Purpose: pin the evaluation-infrastructure contracts of the governing report's sections 26,
-  29, 36, 37 and 55: cost in wells and turnaround days, refusals with codes, a result partition
-  no policy can reach, a per-step trace of passed-over candidates, and a six-row score table.
-- Core points: assertions here are contract tests, not biological results; each test pins one
-  boundary that must not silently move.
-- Interfaces: `test_*` functions only
-- Depends on: evaluation
-"""
+"""Evaluation protocol: laboratory cost, named refusals, the hidden partition, and the score table."""
 from __future__ import annotations
 
 import hashlib

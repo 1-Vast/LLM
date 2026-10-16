@@ -1,25 +1,6 @@
 """Build the LINCS 2020 evaluation data pack per the frozen protocol.
 
-File summary
-- Path: tools/datasets/lincs_pack.py
-- Purpose: select the pool, the reference blocks and the untouched test blocks from LINCS 2020
-  metadata (protocol section 2), extract the corresponding Level 5 signature columns from the
-  registered GCTX source, compute reference centroids and the validator's reference readings, and
-  write a hashed data pack. Test-unit signatures are written to the pack but never read by any
-  fitting step; `load_pack` separates reference-side and test-side payloads.
-- Core points:
-  - Scope: trt_cp Level 5 signatures in A549, MCF7, PC3, VCAP at 24 h and 10 uM.
-  - Pool: `moa` classes with >= 12 total pool blocks and >= 3 unseen blocks (metadata-only rule).
-    The historical protocol said reference blocks; the already-recorded implementation
-    deviation is retained, without changing the frozen selection rule.
-  - Split: test = InChIKey connectivity blocks absent from GSE92742 and GSE70138 trt_cp lists;
-    reference = the remaining blocks in pool classes.
-  - The pack records the SHA-256 of every input and of itself; the protocol freeze names the code
-    version that built it.
-- Interfaces: `build_pack`, `load_pack`, `PackError`, `PACK_VERSION`
-- Depends on: data/external/lincs2020 (registered source), data/external/lincs_l1000_phase{1,2}
-  pert_info (split definition), data/external/msigdb Hallmark GMT, h5py, numpy, pandas
-"""
+Only reference blocks fit the model. The recorded metadata-only selection deviation is preserved."""
 from __future__ import annotations
 
 import hashlib

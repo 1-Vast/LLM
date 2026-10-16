@@ -42,9 +42,11 @@ There is no `RESULTS.json`: the brief permits one only for an authorised, regist
 
 ## Source added (outside this folder)
 
-`src/maestro/evidence_registry.py`, `src/maestro/strict_decision_review.py`, `src/maestro/evaluation_contract.py`;
+`src/maestro/evidence_registry.py`, `src/maestro/strict_decision_review.py`, `src/maestro/evaluation_contract.py`,
+`src/maestro/tier_gate.py`; opt-in additions to `src/maestro/acquisition.py` and `src/maestro/endpoint_decision.py`;
 tests `tests/test_evidence_registry.py`, `tests/test_strict_decision_review.py`, `tests/test_evaluation_contract.py`,
-helper `tests/fixtures/strict_evidence.py`; three paths added to `pyproject.toml` `testpaths`.
+`tests/test_tier_gate.py` and additions to `tests/test_acquisition.py`, `tests/test_endpoint_decision.py`; helper
+`tests/fixtures/strict_evidence.py`; four paths added to `pyproject.toml` `testpaths`.
 
 ## Replay
 
@@ -56,5 +58,5 @@ See [PROTOCOL.md](PROTOCOL.md) for the other scripts and which need `data/extern
 
 ## Final verification record
 
-Default asset-free suite: **893 passed** (2026-10-14, after the last source and test edit). `verify.py`: PASS.
+Default asset-free suite: **903 passed** (2026-10-14, after the last source and test edit). `verify.py`: PASS.
 Software PASS is not research reproduction; no earlier study was re-run.

@@ -1,12 +1,4 @@
-"""Regression tests for the audited evaluation-infrastructure defects.
-
-File summary
-- Path: tests/test_evaluation_integrity.py
-- Purpose: Pin the terminal-information, quantity-typing, split, reachability, cost and provenance contracts.
-- Core points: each test reproduces one independently verified defect; they are written to fail on the pre-fix code and must not be weakened to make a run pass.
-- Interfaces: `test_public_contract_survives_budget_exhaustion()`, `test_rna_record_cannot_satisfy_a_protein_prerequisite()`, `test_split_assignment_is_global_over_groups()`, `test_scorer_reachability_agrees_with_executable_search()`, `test_sole_valid_alternative_route_is_not_all_waste()`, `test_planner_enumeration_is_non_anticipative()`
-- Depends on: evaluation.cases, evaluation.scoring, evaluation.policies, evaluation.planning, evaluation.construction, evaluation.construction, maestro.models
-"""
+"""Regression tests for the audited evaluation-infrastructure defects."""
 from __future__ import annotations
 
 import json

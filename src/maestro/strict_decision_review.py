@@ -1,35 +1,6 @@
 """Strict decision review (policy `strict-review-1`): authenticated receipts, required predictions, human approval.
 
-File summary
-- Path: src/maestro/strict_decision_review.py
-- Purpose: a separately versioned progression decision for new studies. `maestro.decision_review.review`
-  keeps its historical semantics for frozen studies (a no-signal flag yields NO_GO; one supported
-  progression prediction yields GO while others are untested). This module changes neither.
-- Core points:
-  - NO_GO on absence of signal needs a receipt that authenticates against real bytes, is a qualified
-    (or undetected) measurement of a predeclared observable in the review's context, and whose value
-    satisfies a `NoSignalRule` registered in the policy. A boolean or free text authorizes nothing.
-  - Predictions are REQUIRED or SUPPORTIVE. GO needs every required prediction of the progression
-    explanation supported by at least `min_independent_groups` independent upstream groups, no
-    contradicted required prediction, no unresolved critical limitation, and, with
-    `exclude_alternatives`, at least one required prediction of every competing explanation
-    contradicted by a qualified measurement. A supportive prediction may stay untested or fail; it is
-    then listed as a limitation.
-  - Missing evidence is explicit. Untested or conflicting required predictions give
-    NEED_MORE_EVIDENCE with the cheapest discriminating experiment, or the named reason
-    `NO_DISCRIMINATING_EXPERIMENT_AVAILABLE` when the menu has none.
-  - GO needs a named human `Approval` bound to the decision basis digest. Without it the decision
-    is AWAITING_APPROVAL. Evidence changes change the basis digest and void the approval.
-  - A GO carries a binding of receipt ids to source digests. `certificate_problems` re-authenticates
-    it, so withdrawing or altering a required receipt invalidates the certificate.
-  - A receipt decides a prediction only if its `rule_id` is that prediction's key (the predefined rule).
-  - Model predictions, retrieved sources, tainted lineages and unit-incompatible receipts never decide.
-- Interfaces: `Role`, `StrictPrediction`, `StrictExplanation`, `NoSignalRule`, `Limitation`,
-  `StrictPolicy`, `StrictStatus`, `StrictDecision`, `strict_review`, `approve_basis`,
-  `certificate_problems`.
-- Depends on: maestro.decision_review (Approval, DiscriminatingExperiment, discriminating_experiments
-  reused unchanged), maestro.evidence_registry.
-"""
+Every required prediction needs authenticated measured support; progression also requires measured competitor exclusion and evidence-bound human approval."""
 from __future__ import annotations
 
 import hashlib

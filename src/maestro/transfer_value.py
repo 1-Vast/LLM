@@ -1,39 +1,4 @@
-"""Which cells to profile when a certified virtual cell fills the rest of a compound x line map.
-
-File summary
-- Path: src/maestro/transfer_value.py
-- Purpose: choose which (compound, line) cells of a library to profile, so that the completed
-  response map is as accurate as possible on the cells that respond. Unprofiled cells are filled by
-  certified transfer.
-- Core points:
-  - `sparse_transfer_design` is the default design.
-    - It profiles every compound once before any compound twice.
-    - Each compound goes into its open line with the highest mean outgoing transfer, ``kappa`` row
-      mean, which the virtual cell measures on references.
-    - It needs one turnaround.
-  - `profiling_value` and `plan_batch` are the adaptive alternative.
-    - Each open cell carries the virtual cell's certificate: ``p`` = P(active), ``e`` = expected
-      centred cosine of its fill, and ``rho`` = expected specific cosine.
-    - Profiling (i, t) gains ``p_it (1 - e_it)`` directly, plus ``sum_t' p_it' (e_after - e_it')``
-      through the context source it opens for the compound's other lines, where
-      ``e_after = sqrt(gamma^2 + max(rho, kappa[t, t'])^2 (1 - gamma^2))``.
-    - Batches are greedy, and the compound is updated after each pick.
-- Interfaces: `sparse_transfer_design`, `profiling_value`, `plan_batch`.
-- Depends on: numpy.
-
-Evidence: block Q (2026-10-12), 11 sealed GSE70138 campaigns of 63-64 compounds, equal wells.
-
-At one well per compound:
-* the sparse design beat profiling few compounds in every line by +0.181 map utility (11 of 11,
-  p 0.0005), confirming PRESAGE's "sparse across systems" claim;
-* it also beat the adaptive planner by +0.044 (11 of 11);
-* the adaptive planner beat activity-greedy (+0.034, 10 of 11) and route-blind uncertainty
-  sampling (+0.082).
-
-At two wells per compound the adaptive planner beat the sparse design by +0.053 (10 of 11). That
-budget was secondary, and the planner needs four turnarounds. Use the planner only with budgets that
-cover every compound.
-"""
+"""Which cells to profile when a certified virtual cell fills the rest of a compound x line map."""
 from __future__ import annotations
 
 import numpy as np

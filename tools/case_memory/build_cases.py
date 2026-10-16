@@ -1,15 +1,6 @@
 """Build production-schema episodes from the external pack's reference blocks.
 
-File summary
-- Path: tools/case_memory/build_cases.py
-- Purpose: turn the reference side of the untouched data pack into `scm-2` scientific episodes in
-  an append-only `EpisodeStore`, demonstrating the production schema on real data. The mechanism
-  class is stored as a curated annotation - proxy truth, never biological ground truth - and every
-  episode records `data_origin: real` with the pack checksums in provenance.
-- Performance: reference centroids and detection thresholds are indexed once and reused across
-  leave-one-unit-out episode construction and validation.
-- Run: `python -m tools.case_memory.build_cases`
-"""
+Reference annotations are proxy truth, never measured mechanism truth."""
 from __future__ import annotations
 
 import json

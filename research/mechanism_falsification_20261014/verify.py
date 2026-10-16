@@ -19,6 +19,7 @@ File summary
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -28,7 +29,7 @@ ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(HERE))
 
-ALLOWED_CHANGES = {"pyproject.toml", "research/REPORT.md", "research/STUDIES.json", "research/EVIDENCE.md"}
+_HEX64 = re.compile(r"^[0-9a-f]{64}$")
 
 
 def load(name: str):
@@ -106,22 +107,49 @@ def check_assets(fail: list) -> None:
                 fail.append(f"{name}: {row['path']} is {row['status']}")
 
 
+def frozen_paths() -> set[str]:
+    """Every repository path some study's FREEZE.json pins to a digest."""
+
+    out: set[str] = set()
+
+    def walk(node):
+        if isinstance(node, dict):
+            for key, value in node.items():
+                if isinstance(value, str) and _HEX64.match(value) and "/" in key:
+                    out.add(key)
+                walk(value)
+        elif isinstance(node, list):
+            for value in node:
+                walk(value)
+
+    for freeze in (ROOT / "research").glob("*/FREEZE.json"):
+        walk(json.loads(freeze.read_text(encoding="utf-8")))
+    return out
+
+
 def check_frozen_history(fail: list) -> None:
+    """No file pinned by any FREEZE.json differs from HEAD, and no file inside another study folder changed."""
+
     try:
-        changed = subprocess.run(["git", "diff", "--name-only"], capture_output=True, text=True, cwd=ROOT, check=True).stdout.split()
+        changed = subprocess.run(["git", "diff", "--name-only", "HEAD"], capture_output=True, text=True, cwd=ROOT, check=True).stdout.split()
     except (OSError, subprocess.CalledProcessError):
         print("git unavailable: frozen-history check skipped")
         return
+    pinned = frozen_paths()
     for path in changed:
-        if path not in ALLOWED_CHANGES:
-            fail.append(f"tracked file changed: {path}")
+        if path in pinned:
+            fail.append(f"frozen file changed: {path}")
+        parts = path.split("/")
+        if len(parts) > 2 and parts[0] == "research" and parts[1] != HERE.name:
+            fail.append(f"another study's file changed: {path}")
 
 
 def main() -> int:
     fail: list[str] = []
     for check in (check_defects, check_benchmark, check_census, check_triage, check_assets, check_frozen_history):
+        before = len(fail)
         check(fail)
-        print(f"{check.__name__}: {'FAIL' if any(check.__name__[6:] in f for f in fail) else 'done'}")
+        print(f"{check.__name__}: {'FAIL' if len(fail) > before else 'ok'}")
     for f in fail:
         print("FAIL", f)
     print("PASS" if not fail else f"{len(fail)} failure(s)")

@@ -1,28 +1,4 @@
-"""Measurement choice by predicted discrimination, and the safety semantics around it.
-
-File summary
-- Path: tests/test_discriminating_acquisition.py
-- Purpose: pin the repaired link from world-model output to the measurement MAESTRO buys. Each
-  group states one failure the 2026-09-26 audit found in the old path: the power-aware selector
-  dropped every world-model priority, per-hypothesis outcome forecasts could only reach a selector
-  as one detection probability, a per-action query borrowed the template's exposure time, and a
-  thinly supported forecast was deleted rather than discounted.
-- Core points:
-  - Counterexamples: a loud but non-separating action (magnitude trap), a costlier 72 h action that
-    alone separates (late resolver), and equal correct-elimination odds with unequal wrong risk.
-  - Runtime wiring: with power-aware selection on, changing only the action-level outcome
-    forecasts changes the chosen action when discrimination selection is enabled, and nothing else
-    about the case changes; magnitude alone still cannot move the power-aware choice (its keep
-    rule was not met on 2026-09-26) and breaks only exact forecast ties.
-  - Support: zero references refuse by name; one reference is served as visibly low-support,
-    shrunk, and discounted by its wider interval.
-  - Absence, prediction-derived records and failed QC still never remove a hypothesis.
-  - The legacy selectors are characterised in the same tests, so each counterexample shows what
-    the old path chose.
-- Interfaces: pytest test functions
-- Depends on: maestro.acquisition, maestro.outcome, maestro.composition, agent.orchestrator,
-  agent.memory, virtual_cell
-"""
+"""Measurement choice by predicted discrimination, and the safety semantics around it."""
 from __future__ import annotations
 
 import json

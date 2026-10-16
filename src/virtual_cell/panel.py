@@ -1,28 +1,6 @@
 """Declared condition panels: invoke the weights to analyse, then rank and score.
 
-File summary
-- Path: src/virtual_cell/panel.py
-- Purpose: give the world-model layer a first-class surface for *analytical* use of a
-  weight-backed backend — run a declared panel of registered conditions, score the
-  written artifacts, rank planning options, and issue a validation receipt only
-  where a pre-declared criterion was met on a declared split.
-- Core points:
-  - A panel is a declared list of registered conditions against one context. The
-    backend's own ``assess_query`` decides eligibility, so a panel cannot smuggle an
-    unregistered label past the adapter; an abstention stays visible with its reason.
-  - Every row keeps its artifact reference, digest and verification result, and is
-    labelled ``model_prediction``. A panel never produces evidence, and its ranking
-    never satisfies a prerequisite.
-  - Gene-set analysis refuses an endpoint the output coordinates cannot express
-    before scoring it, and the receipt refuses to grade itself unless the acceptance
-    criterion, split and holdout status were declared by the caller.
-- Interfaces: `PanelCondition`, `ConditionPanel`, `PanelRow`, `PanelRun`, `run_panel`,
-  `read_artifact_values`, `score_panel_gene_sets`, `rank_conditions`,
-  `score_panel_against_observations`, `PanelCriterion`, `KnowledgeAnnotation`,
-  `load_panel_spec`, `execute_spec`.
-- Depends on: interface.py, applicability.py, artifacts.py, calibration.py,
-  biology.py, applicability.py, world_model.py
-"""
+Rows remain model predictions. Validation requires a declared holdout criterion and representable endpoint."""
 from __future__ import annotations
 
 import hashlib

@@ -1,12 +1,4 @@
-"""State adapter rejects unmapped perturbations and unmatched controls.
-
-File summary
-- Path: tests/test_state_adapter.py
-- Purpose: State adapter rejects unmapped perturbations and unmatched controls.
-- Core points: assertions here are contract tests, not biological results; each test pins one boundary that must not silently move.
-- Interfaces: `test_state_adapter_rejects_unknown_perturbation_before_any_control_fallback()`
-- Depends on: virtual_cell
-"""
+"""State adapter rejects unmapped perturbations and unmatched controls."""
 from pathlib import Path
 
 from virtual_cell.interface import Intervention, QuerySupport, SystemContext

@@ -1,27 +1,6 @@
 """Build drug-combination screen libraries for certified discovery (O'Neil 2016, NCI-ALMANAC 2017).
 
-File summary
-- Path: tools/datasets/combination_screens.py
-- Purpose: turn public full-factorial combination screens into `virtual_cell.combination_world`
-  screens with one declared label rule per source, laboratory cost, and provenance; keep a
-  confirmatory screen's outcomes sealed behind a freeze-checked vault.
-- Core points:
-  - Label: Bliss excess in percentage points averaged over the experiment's combination dose
-    grid; hit = label > 10 (SynergyFinder convention). O'Neil: expected = min(rA,1)*min(rB,1) on
-    the published X/X0 scale with singles interpolated in log concentration from the same
-    batch, primary-screen batches 1-2 only. ALMANAC: NCI's own per-well SCORE averaged over all
-    combination records of a pair x line.
-  - Context (usable before buying a combination): single-agent inhibition per drug x line,
-    mean over combination doses and at the top dose.
-  - O'Neil workbooks are read with a streaming stdlib .xlsx reader (no spreadsheet dependency).
-  - `open_vault` refuses until a freeze exists and every frozen file still matches
-    (VAULT_SEALED, FREEZE_MISMATCH) and appends every opening to a log.
-  - Promoted from research/certified_discovery/screens.py and xlsx.py (frozen there).
-- Interfaces: `ScreenLibrary`, `iter_xlsx_rows`, `build_oneil`, `almanac_design`, `open_vault`,
-  `build_almanac`, `save_library`, `load_library`, `VaultRefusal`; CLI `python -m
-  tools.datasets.combination_screens {oneil,almanac-design}`.
-- Depends on: numpy; pandas for the ALMANAC CSV; `virtual_cell.combination_world`.
-"""
+Source-specific label rules remain distinct. Confirmatory outcomes require a matching frozen manifest before vault access."""
 from __future__ import annotations
 
 import argparse

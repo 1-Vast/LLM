@@ -1,29 +1,6 @@
 """A typed capability registry, and the compilation of an agent's repair proposal.
 
-File summary
-- Path: tools/evaluation/capabilities.py
-- Purpose: give the repair operator something real to propose. A registry publishes what
-  each local release *could* supply - the quantity, the entity, the context, the price and
-  the coverage - without publishing any value, and a policy proposes one capability for the
-  premise its plan is missing. The framework compiles the proposal into a typed action or
-  refuses it by name.
-- Core points:
-  - The registry is public: every arm sees the same offers, so a difference between arms is
-    which offer was proposed and when, never who was allowed to see the catalogue.
-  - Compilation never takes an outcome model from the proposal. Outcomes come from the
-    case's declared template for that premise field, so a model can choose a capability but
-    cannot invent what its result would mean.
-  - Typed admission is the framework's own: the declared grant of the offer is compared
-    against the case's premise requirement, so a lysate estimate or a foreign context is
-    refused with the same reasons the executor would give.
-  - Coverage is a property of the release, not of a result: a compound the release never
-    assayed and a protein it never quantified are refused, and a missing value is never
-    read as a negative measurement.
-- Interfaces: `CapabilityOffer`, `CapabilityRegistry`, `CompiledRepair`, `ProposalRefusal`,
-  `load_capability_registry`, `compile_proposal`, `canonical_repair_identifier`,
-  `CAPABILITY_SCHEMA`
-- Depends on: evaluation.cases (public case shape), evaluation.costs, maestro.models
-"""
+Repairs select public capabilities; outcomes come from declared case templates, never the proposing model."""
 from __future__ import annotations
 
 import hashlib

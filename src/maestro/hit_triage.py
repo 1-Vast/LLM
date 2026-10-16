@@ -1,33 +1,6 @@
 """Selective hit-triage contracts: compound identity, assay-context binding, QC admission, budgets and the outcome seal.
 
-File summary
-- Path: src/maestro/hit_triage.py
-- Purpose: the engineering contracts a phenotypic hit-triage campaign needs before any scoring rule
-  is trusted. These contracts are not a scoring rule. The rules themselves stay in
-  `research/selective_hit_triage_20261013` until independent confirmation.
-- Core points:
-  - `CompoundIdentity`: one compound is one Broad core id (BRD-X + 8 digits). Two records are the
-    same compound if they share the core, or the InChIKey connectivity block when both have one.
-    Salt forms therefore collapse, and a mismatched id is refused (`MALFORMED_IDENTITY`).
-  - `AssayContext` names platform, readout, duration, dose count and cell format. A
-    `PairMeasurement` is bound to one context, and `bind` refuses it in another
-    (`CONTEXT_MISMATCH`), so a 5-day pooled screen value can never stand in for a 72 h arrayed
-    confirmation.
-  - `admit_curves` admits a compound's confirmation curves only above a line count; otherwise the
-    status is `QC_FAILED` with `INSUFFICIENT_LINES`. Status values are the six-state
-    `ScientificMeasurementStatus`, never a silent zero.
-  - `TriageLedger` books confirmation curves, follow-up dose-responses and turnarounds against
-    `CampaignBudget`s before execution (`BUDGET_EXCEEDED`).
-  - `nominate` is order-invariant: ties break by a salted hash of (compound, line), never by input
-    order, and there is a cap per compound.
-  - `OutcomeSeal` releases sealed outcomes only after the freeze digests match and the choices are
-    locked by digest (`FREEZE_MISMATCH`, `CHOICES_NOT_LOCKED`, `CHOICES_MISMATCH`).
-    `assert_disjoint` refuses a split that shares a compound, connectivity block or family
-    (`SPLIT_LEAK`).
-- Interfaces: `CompoundIdentity`, `AssayContext`, `PairMeasurement`, `bind`, `admit_curves`, `TriageLedger`,
-  `nominate`, `OutcomeSeal`, `assert_disjoint`.
-- Depends on: maestro.campaign_budget, maestro.case_memory.
-"""
+Identity, assay context, QC and outcome seals constrain admission; this module supplies no scientific scoring rule."""
 from __future__ import annotations
 
 import hashlib

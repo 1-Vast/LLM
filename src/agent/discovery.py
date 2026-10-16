@@ -1,24 +1,6 @@
 """Certified discovery loop: the agent buys batches, learns in context, and claims only what it may.
 
-File summary
-- Path: src/agent/discovery.py
-- Purpose: run one budgeted discovery campaign in one context (e.g. a newly screened cell line)
-  with a world model and any planner, and return typed claims whose basis is explicit.
-- Core points:
-  - The agent never sees a label it did not buy: `measure(indices)` is the only route to an
-    outcome (a laboratory, or a replay of a measured screen).
-  - Rounds 1..R-1 buy the planner's batch; a planner may be a world-model ranking or any black
-    box with `choose` (an LLM, a human). The last round, by default, buys a uniformly random
-    audit from the top kappa x batch of the world model's ranking, fixed before the draw, and
-    certifies the untested remainder (`maestro.certification`).
-  - Claims: MEASURED_HIT (a bought label above threshold), CERTIFIED_NOMINATION (FDR <= alpha,
-    marginal), YIELD_BOUND (exact 1-delta lower bound on hits left in the shortlist) and
-    REFUSAL with the certificate's code. A predicted label is never reported as a hit.
-  - Laboratory cost (experiments, rounds) is reported by the caller's units; provider spend of
-    an LLM planner is the planner's own ledger, never mixed in.
-- Interfaces: `DiscoverySpec`, `WorldModelPlanner`, `Claim`, `DiscoveryReport`, `run_discovery`.
-- Depends on: numpy, `maestro.certification`, `virtual_cell.combination_world`.
-"""
+Only bought labels can be reported as measured hits; certificate claims require a random measured audit."""
 from __future__ import annotations
 
 import math

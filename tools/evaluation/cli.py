@@ -1,15 +1,4 @@
-"""CLI for isolated, resumable evidence replay evaluation.
-
-File summary
-- Path: tools/evaluation/cli.py
-- Purpose: Drive the leakage-bounded replay evaluation from the command line.
-- Core points:
-  - Loads frozen cases and runs selected baseline or MAESTRO policies to completion.
-  - Writes a hashed, resumable report without exposing private scoring answers.
-  - Optional laboratory-unit costing, a recorded pre-registration digest, and the section 37 score table with its section 29 exit verdict.
-- Interfaces: `main`
-- Depends on: agent.llm, agent.llm, agent.orchestrator, evaluation.policies, evaluation.cases, evaluation.costs, evaluation.policies, evaluation.runner, evaluation.scoring, evaluation.costs
-"""
+"""CLI for isolated, resumable evidence replay evaluation."""
 from __future__ import annotations
 
 import argparse

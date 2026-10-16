@@ -1,21 +1,6 @@
 """Registered runtime entry for the case-memory tool.
 
-File summary
-- Path: tools/case_memory/tool.py
-- Purpose: `run(parameters)` reads a typed open-problem JSON and returns the full case-memory
-  contract: retrieval explanations, adaptation differences, hypothesis-conditional forecast
-  branches with probabilities and support counts, calibration status, applicability, abstention
-  reason, a decision-valued next-action ranking and the branching interpretation plan. Every
-  forecast is a planning-only model prediction; insufficient input returns a typed refusal.
-- Core points:
-  - Production invocations require MAESTRO_CASE_MEMORY_ENABLED; with the flag unset the tool
-    refuses with `case_memory_disabled`.
-  - Research evaluation is explicit and separate: `research_mode=true` is honoured only when the
-    problem JSON declares `"evaluation": true`, and the receipt is stamped
-    `mode: research_evaluation` - it can never be mistaken for a production answer.
-- Depends on: src/maestro/{case_memory,directional,adaptive_retrieval,hypothesis_forecast,
-  case_update,models,outcome}.py
-"""
+Disabled unless MAESTRO_CASE_MEMORY_ENABLED is set; research evaluation is explicitly labelled and forecasts remain planning-only."""
 from __future__ import annotations
 
 import json

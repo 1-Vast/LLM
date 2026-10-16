@@ -1,12 +1,4 @@
-"""Package layout, tool scoping, and the English-only language rules.
-
-File summary
-- Path: tests/test_repository_shape.py
-- Purpose: Package layout, tool scoping, and the English-only language rules.
-- Core points: assertions here are contract tests, not biological results; each test pins one boundary that must not silently move.
-- Interfaces: `test_source_is_separated_by_core_agent_and_virtual_cell_responsibility()`, `test_tools_are_folder_scoped_runtime_components()`, `test_log_is_one_dated_experiment_record_per_working_day()`, `test_log_index_declares_every_file_in_the_record()`, `test_project_markdown_has_no_chinese_prose()`, `test_python_sources_are_english_only()`, `test_package_imports_form_a_layered_acyclic_graph()`
-- Depends on: maestro
-"""
+"""Package layout, tool scoping, and the English-only language rules."""
 import ast
 import json
 import os
@@ -281,7 +273,7 @@ def test_repository_has_one_scientific_report_and_no_retired_release_tree():
         assert (folder / study["verification"]).is_file()
         if study["status"] == "frozen":
             assert (folder / "FREEZE.json").is_file()
-    for name in ("log", "cleanup", "Innovation.md", "task.md", "RELEASE_CHECK.md",
+    for name in ("cleanup", "Innovation.md", "task.md", "RELEASE_CHECK.md",
                  "RELEASE_STATS.json", "CURRENT_REPOSITORY_STATS.json", "BLOCKED_ASSETS.md"):
         assert not (ROOT / name).exists(), name
     assert not list(ROOT.glob(".build-*"))

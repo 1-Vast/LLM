@@ -1,14 +1,4 @@
-"""Revocable virtual-cell dependence and source-cluster accounting.
-
-File summary
-- Path: tests/test_prediction_reliability.py
-- Purpose: Test revocable prediction dependence and source-cluster collapse.
-- Core points:
-  - `PredictionReliabilityLedger` keeps full weight on small samples and revokes on misses.
-  - A prediction is only a tie-breaker; revocation never edits the evidence ledger.
-- Interfaces: `test_*` functions
-- Depends on: maestro
-"""
+"""Revocable virtual-cell dependence and source-cluster accounting."""
 from dataclasses import replace
 
 import pytest

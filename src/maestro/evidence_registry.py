@@ -1,29 +1,6 @@
 """Verified evidence registry: receipts bound to real source bytes, with lineage and independence groups.
 
-File summary
-- Path: src/maestro/evidence_registry.py
-- Purpose: authenticate the evidence a strict decision rests on. `maestro.decision_review.EvidenceItem`
-  only checks that a digest has 64 characters and trusts a caller-supplied `independent` flag. This
-  module is the versioned replacement for strict use; the historical module is unchanged.
-- Core points:
-  - `RegisteredSource` names a file, its sha256 and the experiment or publication it came from.
-    `EvidenceLedger.verify_source` re-reads the bytes on every call, so a modified or absent file
-    is refused (`SOURCE_DIGEST_MISMATCH`, `SOURCE_MISSING`) and the refusal is not cached.
-  - `EvidenceReceipt` binds one value to its source, observable, unit, normalisation, assay context,
-    QC status, predefined decision rule, study protocol version and parent receipts.
-  - Lineage follows PROV-O's `wasDerivedFrom`. A derived analysis must name parents that exist and
-    authenticate. If any ancestor is a model prediction, the receipt is tainted and is never decisive
-    (`PREDICTION_IN_LINEAGE`), so relabelling a prediction as an analysis does not admit it.
-  - Independence is computed, never declared. Every decisive receipt maps to the set of upstream
-    groups of its measured ancestors (experiment id, else publication id, else one shared
-    `UNATTRIBUTED` group). Duplicated, reordered or repackaged records of one experiment or one
-    publication stay one group, so they cannot raise an independent-support count.
-  - `withdraw` removes a receipt. Anything that depended on it must re-verify (`binding_problems`).
-  - Units convert to one canonical unit per dimension by division, so a boundary value (50 percent
-    against 0.5 fraction) classifies identically and nothing is rounded through a product.
-- Interfaces: `RegisteredSource`, `EvidenceReceipt`, `EvidenceLedger`, `canonical_value`, `holds`.
-- Depends on: maestro.case_memory, maestro.claim_audit, maestro.models.
-"""
+Measured source bytes and upstream experiments determine admissibility and independence; predictions in lineage remain non-decisive."""
 from __future__ import annotations
 
 import hashlib

@@ -1,12 +1,4 @@
-"""Constructed multi-assay fixtures for software verification, never biological data.
-
-File summary
-- Path: tests/fixtures/biological.py
-- Purpose: Exercise the production chain with separate engagement, function and phenotype records.
-- Core points: thresholds, values and assay capabilities are declared synthetic test inputs.
-- Interfaces: contract, results, orchestrator, run_chain
-- Depends on: agent, maestro, tests.fixtures.stub_client
-"""
+"""Constructed multi-assay fixtures for software verification, never biological data."""
 from __future__ import annotations
 
 from dataclasses import replace

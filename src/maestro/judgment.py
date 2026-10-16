@@ -794,12 +794,3 @@ def effective_weight(calibration: float, stability: float) -> float:
         if not isfinite(value) or not 0.0 <= value <= 1.0:
             raise ValueError("invalid_weight:must_be_a_finite_fraction")
     return min(calibration, stability)
-
-
-def group_judgments(judgments: Sequence[TypedJudgment]) -> dict[str, list[TypedJudgment]]:
-    """Group answers to the same question about the same state, which is what repeats are."""
-
-    grouped: dict[str, list[TypedJudgment]] = {}
-    for judgment in judgments:
-        grouped.setdefault(f"{judgment.question_id}@{judgment.state_digest}", []).append(judgment)
-    return grouped

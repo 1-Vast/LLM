@@ -1,18 +1,4 @@
-"""Calibration scoring and the world-model exit conditions.
-
-File summary
-- Path: src/virtual_cell/calibration.py
-- Purpose: score prediction intervals and probabilities against real values so
-  calibration is judged before accuracy, as the reference design requires.
-- Core points:
-  - Reports interval coverage, mean width, Brier and log score.
-  - Stratifies by mode, dose and time, where extrapolation failures hide.
-  - Implements the pre-registered exit conditions for withdrawing a model.
-- Interfaces: `CalibrationPair`, `CalibrationReport`, `score`, `stratify`,
-  `compare_models`, `evaluate_exit_conditions`, `conformal_quantile`,
-  `ResidualPair`, `IntervalCalibration`, `fit_interval`.
-- Depends on: src/virtual_cell/interface.py
-"""
+"""Calibration scoring and the world-model exit conditions."""
 from __future__ import annotations
 
 import hashlib

@@ -1,19 +1,4 @@
-"""The four-layer round: structured handoffs, mandatory fields, run-level review.
-
-File summary
-- Path: tests/test_handoff.py
-- Purpose: pin the section-30 contract — layers exchange structured records, three fields
-  are mandatory, an incomplete round is refused rather than written, and a run that never
-  sets the contradiction flag reports that as a finding.
-- Core points: assertions here are contract tests, not biological results.
-- Interfaces: `test_in_distribution_is_mandatory()`, `test_abstention_must_name_a_reason()`,
-  `test_rejected_candidates_carry_reasons_and_are_never_chosen()`,
-  `test_contradiction_requires_a_belief_delta()`, `test_write_round_refuses_an_incomplete_record()`,
-  `test_review_run_reports_a_run_that_never_revised()`,
-  `test_selection_reasons_are_named_for_every_candidate()`,
-  `test_orchestrator_writes_a_plan_round_with_the_mandatory_fields()`
-- Depends on: maestro.handoff, agent
-"""
+"""The four-layer round: structured handoffs, mandatory fields, run-level review."""
 import json
 import hashlib
 from dataclasses import replace

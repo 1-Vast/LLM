@@ -55,16 +55,24 @@ def _coverage_probabilities(
     return probabilities
 
 
-def _dependence_groups(actions: Sequence[EvidenceAction], sources: Mapping[str, str]) -> dict[str, str]:
+UNATTRIBUTED_SOURCE = "UNATTRIBUTED"
+
+
+def _dependence_groups(actions: Sequence[EvidenceAction], sources: Mapping[str, str],
+                       unattributed_dependent: bool = False) -> dict[str, str]:
     """Freeze connected source clusters over the menu; shared evidence is not a new trial.
 
     Within a component, max(p) is a conservative union bound under unknown dependence.
     Distinct components still require the explicit conditional-independence assumption.
-    Actions without provenance retain the legacy independent-trial assumption.
+    Actions without provenance retain the legacy independent-trial assumption unless
+    ``unattributed_dependent`` is set; then they share one component, so unknown provenance is
+    never counted as an independent trial.
     """
     components: list[tuple[set[str], set[str]]] = []
     for action in actions:
         refs = {sources.get(ref, ref) for ref in action.source_ids}
+        if unattributed_dependent and not refs:
+            refs = {UNATTRIBUTED_SOURCE}
         members = {action.identifier}
         merged = [(ids, keys) for ids, keys in components if keys & refs]
         for ids, keys in merged:
@@ -85,6 +93,7 @@ def select_expected_coverage(
     weights: Mapping[str, float] | None = None,
     source_groups: Mapping[str, str] | None = None,
     action_priorities: Mapping[str, float] | None = None,
+    unattributed_dependent: bool = False,
 ) -> ExpectedCoveragePlan:
     """Maximise expected coverage under a budget; ties go to cost, size, priority, then label.
 
@@ -138,13 +147,14 @@ def select_expected_coverage(
         for action in executable
         if action.detection_power is None
     )
-    groups = _dependence_groups(executable, source_groups or {})
+    groups = _dependence_groups(executable, source_groups or {}, unattributed_dependent)
     if len(set(groups.values())) < len(executable):
         assumptions += ("worst_case_dependence_within_source_component",)
     if len(set(groups.values())) > 1:
         assumptions += ("conditional_independence_between_source_components",)
     if len(executable) > 1 and any(not action.source_ids for action in executable):
-        assumptions += ("unverified_independence_for_actions_without_source_ids",)
+        assumptions += (("unattributed_actions_treated_as_one_dependent_component",) if unattributed_dependent
+                        else ("unverified_independence_for_actions_without_source_ids",))
     if len(executable) > MAXIMUM_CANDIDATES:
         rejected = tuple(
             RejectedCandidate(action.identifier, "exact_candidate_limit_exceeded")

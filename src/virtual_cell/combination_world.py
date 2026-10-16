@@ -1,28 +1,4 @@
-"""Empirical-Bayes world model for drug-combination response in a newly screened cell line.
-
-File summary
-- Path: src/virtual_cell/combination_world.py
-- Purpose: the virtual-cell core of certified combination discovery. For one target line it
-  predicts each candidate pair's synergy label (Bliss excess, percentage points) with a
-  predictive variance, from three sources the agent may use before and during a campaign:
-  combinations measured in OTHER lines (history), every line's single-agent responses (the
-  cell's functional state), and the combinations the agent has bought in the target line.
-- Core points:
-  - Prior mean: ridge regression on history features, cross-fitted so a history row never sees
-    its own line and no row sees the target line. `context=False` drops the cell-state features.
-  - In-context residual r = line effect + drug effects in this line + noise. All algebra runs in
-    (drugs + 1) dimensions through the Woodbury identity; a world build is about 0.1 s and a
-    posterior update a few milliseconds on a 5,000-candidate line.
-  - Variances are fitted by marginal likelihood on history lines only (empirical Bayes), with a
-    numpy Nelder-Mead in log space, so the target line's labels never tune the model.
-  - Refusals are named (`CombinationWorldRefusal`): TARGET_LINE_UNKNOWN, NO_HISTORY,
-    MEASUREMENT_MISMATCH.
-  - Promoted from research/certified_discovery/world.py (frozen there with its development and
-    confirmatory evidence); parity with that copy is tested.
-- Interfaces: `CombinationScreen`, `CombinationWorldConfig`, `CombinationWorld`,
-  `CombinationWorldRefusal`, `normal_cdf`.
-- Depends on: numpy.
-"""
+"""Empirical-Bayes world model for drug-combination response in a newly screened cell line."""
 from __future__ import annotations
 
 import math

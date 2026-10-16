@@ -1,14 +1,4 @@
-"""Confirm replay evaluation never leaks private outcomes to policies.
-
-File summary
-- Path: tests/test_evaluation_isolation.py
-- Purpose: Confirm replay evaluation never leaks private outcomes to policies.
-- Core points:
-  - Runs baseline and MAESTRO policies over frozen cases in isolated run trees.
-  - Asserts scoring answers stay hidden from the policy-facing replay view.
-- Interfaces: `test_*` functions
-- Depends on: agent.memory, agent.memory, agent.context, agent.knowledge, agent.memory, agent.orchestrator, agent.planner, evaluation, maestro
-"""
+"""Confirm replay evaluation never leaks private outcomes to policies."""
 from dataclasses import replace
 from pathlib import Path
 

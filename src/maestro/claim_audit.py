@@ -1,32 +1,6 @@
 """Execution-grounded claim audit: every reported number is checked against an immutable run record.
 
-File summary
-- Path: src/maestro/claim_audit.py
-- Purpose: verify a report's quantitative claims deterministically before it is released. Each
-  claim is checked against the artifact of the run it cites, and the report is checked against a
-  complete manifest of successful, failed, excluded and negative runs.
-- Core points:
-  - `RunManifest` lists every run with its status, artifact path and sha256.
-    - FAILED and EXCLUDED runs must state a reason. A FAILED run may carry an empty digest,
-      because a crash often leaves no artifact.
-    - NEGATIVE runs are successful runs whose registered hypothesis was not supported; a report
-      may not drop them silently.
-  - A `Claim` cites one run and one JSON path inside its artifact, a relation and a value. The
-    relation `count` compares the length of a list or object, as in "38 compounds share a target".
-    `audit` re-reads the artifact, recomputes its digest and compares. Verdicts:
-    - SUPPORTED, CONTRADICTED;
-    - ARTIFACT_MISSING, ARTIFACT_MODIFIED, POINTER_MISSING, RUN_UNKNOWN;
-    - FROM_FAILED_RUN, FROM_EXCLUDED_RUN: a claim may not rest on a failed or excluded run.
-  - Report-level findings:
-    - OMITTED_NEGATIVE_RUN, for a negative run no claim cites;
-    - MANIFEST_INCOMPLETE, for an artifact found on disk under the declared run roots that the
-      manifest does not list.
-  - `AuditReport.passed` is true only when every claim is SUPPORTED and there is no report-level
-    finding. The check is deterministic: no model judges a claim. As the source notes, log checks
-    do not detect data leakage or post-hoc selection, so freezes and registration remain
-    separate obligations.
-- Interfaces: `RunStatus`, `RunRecord`, `RunManifest`, `Claim`, `ClaimVerdict`, `AuditReport`, `audit`.
-"""
+Claims bind to re-read run artifacts, including negative, failed and excluded runs. This audit does not establish freedom from leakage."""
 from __future__ import annotations
 
 import hashlib

@@ -262,3 +262,25 @@ def test_orchestrator_handoff_preserves_the_exact_candidate_limit(tmp_path: Path
     assert turn.selected_actions == ()
     assert len(rejected) == MAXIMUM_CANDIDATES + 1
     assert {item["reason"] for item in rejected} == {"exact_candidate_limit_exceeded"}
+
+
+def test_unattributed_actions_are_independent_trials_only_when_the_legacy_assumption_is_kept():
+    profile = FunctionalInterventionProfile(mode="inhibition")
+    first = _action("first", distinguishes=("a",), cost=1.0, power=0.5)
+    second = _action("second", distinguishes=("a",), cost=1.0, power=0.5)
+    legacy = select_expected_coverage(frozenset({"a"}), (first, second), profile, budget=2.0)
+    strict = select_expected_coverage(frozenset({"a"}), (first, second), profile, budget=2.0, unattributed_dependent=True)
+    assert legacy.probability_of("a") == pytest.approx(0.75)
+    assert "unverified_independence_for_actions_without_source_ids" in legacy.assumptions
+    assert strict.probability_of("a") == pytest.approx(0.5)
+    assert "unattributed_actions_treated_as_one_dependent_component" in strict.assumptions
+    assert "unverified_independence_for_actions_without_source_ids" not in strict.assumptions
+
+
+def test_attributed_independent_sources_stay_independent_under_the_strict_flag():
+    profile = FunctionalInterventionProfile(mode="inhibition")
+    first = EvidenceAction("first", "first assay", 1.0, ("a",), detection_power=0.5, source_ids=("s1",))
+    second = EvidenceAction("second", "second assay", 1.0, ("a",), detection_power=0.5, source_ids=("s2",))
+    plan = select_expected_coverage(frozenset({"a"}), (first, second), profile, budget=2.0,
+                                    source_groups={"s1": "g1", "s2": "g2"}, unattributed_dependent=True)
+    assert plan.probability_of("a") == pytest.approx(0.75)

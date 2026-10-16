@@ -1,15 +1,4 @@
-"""The agent corrects its own contract violations and reasons with the virtual cell's answers.
-
-File summary
-- Path: tests/test_agent_world_model_integration.py
-- Purpose: pin the agent-side and virtual-cell-integration behaviour added together:
-  bounded planner self-correction, cross-round prediction reuse, the planning-only
-  world-model briefing, registered hypotheses across a loop, and runtime configuration.
-- Core points: assertions here are contract tests, not biological results; each test pins
-  one boundary that must not silently move.
-- Interfaces: pytest tests only
-- Depends on: agent, maestro, virtual_cell, tests.fixtures
-"""
+"""The agent corrects its own contract violations and reasons with the virtual cell's answers."""
 from __future__ import annotations
 
 import json

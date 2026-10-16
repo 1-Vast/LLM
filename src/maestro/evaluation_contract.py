@@ -1,30 +1,6 @@
 """Evaluation contract v2: pre-outcome eligibility, training-side normalisation, identity, units and QC.
 
-File summary
-- Path: src/maestro/evaluation_contract.py
-- Purpose: the executable form of evaluator-audit findings E1-E7 / corrections C1-C7
-  (`research/evaluator_audit_20261013`) for a future evaluator. The frozen evaluator
-  `research/knowledge_reality_20261013/confirm.py` is not changed and was never run; this is a new
-  version, not an edit of a protocol.
-- Core points:
-  - C1 `eligible_units` reads metadata rows only and has no outcome argument, so eligibility cannot
-    depend on outcome missingness. Missingness is QC loss, reported by `settle`.
-  - C2 `nominate_wells` takes scores and a frozen candidate set, never outcomes. `settle` books a
-    nominated well that failed QC or is missing as consumed, with no hit.
-  - C3/C4 `TrainNormaliser` fits only on rows its authorised training ids contain
-    (`NORMALISER_ROW_NOT_AUTHORISED`). `hit_labels` is row-local, so another test compound cannot
-    change a label.
-  - C5 `resolve_identity` refuses duplicated identifiers, a core present in more than one screen
-    (`REP.1M` and `REP1M` are one spelling), and more than one row per core in a screen. Unmapped
-    requested cores are listed and refused unless the caller declares a loss allowance.
-  - C6 `PinnedInputs` reads a file only if its sha256 is in the manifest and matches.
-  - C7 `settle` applies the same QC and unit rules to every readout, secondary ones included.
-  - Viability units are declared, never guessed. Percent converts to a fraction by division, and
-    `viability_hit` compares with a boundary tolerance so 50 percent and 0.5 fraction classify alike.
-- Interfaces: `eligible_units`, `nominate_wells`, `settle`, `TrainNormaliser`, `hit_labels`,
-  `resolve_identity`, `PinnedInputs`, `viability_fraction`, `viability_hit`.
-- Depends on: numpy, maestro.evidence_registry.
-"""
+Eligibility is metadata-only, normalisation uses training rows, units are declared, and failed purchased wells still consume budget."""
 from __future__ import annotations
 
 import hashlib

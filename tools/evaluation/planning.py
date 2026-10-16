@@ -677,28 +677,3 @@ def solve_exact(
         scenarios=scenario_total, rejected=tuple(rejected), search_complete=True,
         stopping_reason=enumeration.stopping_reason,
     )
-
-
-def scalability_profile(public: "PublicCase", constraints: PlanConstraints) -> Mapping[str, object]:
-    """Report the instance size and whether exhaustive enumeration still applies."""
-
-    enumeration = plan_enumeration(public, limit=EXACT_ENUMERATION_LIMIT)
-    plans = enumeration.plans
-    solution = solve_exact(public, constraints)
-    return {
-        "menu_size": len(public.actions),
-        "available_actions": sum(1 for item in public.actions if item.available),
-        "legal_plans_including_empty": len(plans),
-        "enumeration_complete": enumeration.complete,
-        "enumeration_stopping_reason": enumeration.stopping_reason,
-        "declared_scenarios_evaluated": solution.scenarios,
-        "exact_enumeration_applies": enumeration.complete,
-        "solver_backend": "exhaustive_enumeration",
-        "solver_status": solution.status,
-        "runtime_seconds": round(solution.runtime_seconds, 6),
-        "escalation_threshold_plans": EXACT_ENUMERATION_LIMIT,
-        "escalation_note": (
-            "A CP-SAT or MILP formulation is warranted only above the threshold, or when "
-            "scheduling and shared-control structure no longer fit this selection model."
-        ),
-    }

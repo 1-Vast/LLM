@@ -19,8 +19,12 @@ File summary
   - `choose` returns one decision per target line or per query. A decision whose calibrated
     probability is below `abstain_below` carries the refusal `HIT_PROBABILITY_BELOW_THRESHOLD`; the
     caller may then measure an anchor or wait instead.
-- Interfaces: `EndpointModel`, `EndpointDecision`, `signed_hits`, `pooled_replicate_sd`,
-  `fit_endpoint_model`, `choose`.
+  - `choose_validated` is the guarded entry point: it refuses (`ScopeRefused`) a declared scope other
+    than `VALIDATED_SCOPE` (`SCOPE_NOT_VALIDATED`) and a missing abstention threshold
+    (`ABSTENTION_THRESHOLD_REQUIRED`). `choose` itself stays permissive for development use and is
+    unchanged, so a caller outside the validated scope must not use it to report a decision.
+- Interfaces: `EndpointModel`, `EndpointDecision`, `ScopeRefused`, `signed_hits`, `pooled_replicate_sd`,
+  `fit_endpoint_model`, `choose`, `choose_validated`.
 - Depends on: numpy.
 
 Evidence (2026-10-13, `research/collaboration_limits_20261013`): GCP histone peptides, 24 h, A375 anchor,
@@ -41,6 +45,8 @@ import numpy as np
 
 VALIDATED_SCOPE = "gcp_histone_peptides_24h_lvl3_minus_plate_dmso_a375_anchor_three_target_lines"
 HIT_PROBABILITY_BELOW_THRESHOLD = "HIT_PROBABILITY_BELOW_THRESHOLD"
+SCOPE_NOT_VALIDATED = "SCOPE_NOT_VALIDATED"
+ABSTENTION_THRESHOLD_REQUIRED = "ABSTENTION_THRESHOLD_REQUIRED"
 _CLIP = 1e-4
 
 
@@ -206,3 +212,17 @@ def choose(model: EndpointModel, forecast: np.ndarray, replicates: np.ndarray, *
             refusal = HIT_PROBABILITY_BELOW_THRESHOLD if abstain_below is not None and q < abstain_below else ""
             out.append(EndpointDecision(i, t, j, 1 if forecast[i, t, j] >= 0 else -1, p, q, refusal))
     return out
+
+
+class ScopeRefused(ValueError):
+    """A decision was requested outside the scope the model was validated on, or without an abstention rule."""
+
+
+def choose_validated(model: EndpointModel, forecast: np.ndarray, replicates: np.ndarray, *, scope: str,
+                     abstain_below: float, per: str = "line", max_replicates: int | None = None) -> list[EndpointDecision]:
+    """`choose` for a reported decision: the declared scope must be `VALIDATED_SCOPE` and abstention is mandatory."""
+    if scope != VALIDATED_SCOPE:
+        raise ScopeRefused(f"{SCOPE_NOT_VALIDATED}: {scope!r} is not {VALIDATED_SCOPE!r}")
+    if isinstance(abstain_below, bool) or not isinstance(abstain_below, (int, float)) or not 0.0 < abstain_below < 1.0:
+        raise ScopeRefused(f"{ABSTENTION_THRESHOLD_REQUIRED}: abstain_below must be a probability in (0, 1)")
+    return choose(model, forecast, replicates, per=per, abstain_below=float(abstain_below), max_replicates=max_replicates)

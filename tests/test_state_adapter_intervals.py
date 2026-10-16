@@ -1,17 +1,4 @@
-"""State adapter serves intervals when, and only when, a calibration is bound.
-
-File summary
-- Path: tests/test_state_adapter_intervals.py
-- Purpose: pin the second half of the lawful-influence channel: the STATE
-  adapter emits a coverage-claiming band for a served readout when a bound,
-  receipt-validated interval calibration exists, and nothing otherwise.
-- Core points: assertions here are contract tests, not biological results. The
-  vector is synthetic, so no number here describes the checkpoint.
-- Interfaces: `test_state_prediction_carries_a_calibrated_interval()`,
-  `test_state_prediction_without_a_validating_receipt_is_descriptive()`,
-  `test_state_prediction_without_an_interval_calibration_serves_none()`.
-- Depends on: virtual_cell
-"""
+"""State adapter serves intervals when, and only when, a calibration is bound."""
 import hashlib
 import json
 import subprocess
