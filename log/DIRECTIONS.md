@@ -40,13 +40,36 @@ scope, existing evidence, novelty boundaries, task matrix and next study gates.
      ridge plus feedback, against the ridge.
    * Confirmation needs an unexposed domain. The PRISM 24Q2 metadata check needs authorisation.
 
+9. Program revision (`research/program_revision_20261017`, method not supported):
+   * A fixed textbook library of observably gated programs improves decisions on future lines and
+     most on unseen lineages; autonomous revision, stepwise search and the LLM add nothing to it.
+   * Do not run revision against within-lineage support/query arenas: the gates that pay in new
+     lineages are rare there. A further attempt needs lineage-disjoint arenas, a pooled gate-count
+     floor, and curated (non-LLM) proposals as the comparator for any LLM role.
+   * In complete campaigns use exploit-first feedback, not up-front probes; the comparator for any
+     new library claim is the seed library, not the strong model.
+
 ## Next bounded step
 
-Use MT-P0 to qualify a compact A/B task set and procedure-value labels before
-fitting a transfer rule. Start with unseen compound groups and known contexts;
-qualify new-context and joint holdouts separately. Keep a small procedure library,
-ordinary conditional regression, unconditional residual, simple gate and standard
-design. A logged unchosen procedure has no observed counterfactual utility.
+**Programme-wide prerequisite: MT-P0.** Qualify a compact A/B task, lineage, action,
+cost and dependence manifest before fitting any cross-task procedure-value rule. Start
+with unseen compound groups and known contexts; qualify new-context and joint holdouts
+separately. Keep a small procedure library, ordinary conditional regression,
+unconditional residual, simple gate and standard design. A logged unchosen procedure has
+no observed counterfactual utility.
+
+**Next bounded analysis within the existing Beat AML question: G1.** Pre-register one
+candidate, then compare coherent-score/exploit-first choices (k ∈ {4, 8, 12}) and
+ridge-plus-feedback against the empirical item prior, drug-specific ridge and current
+two-round engine. Proceed only if its lower bound exceeds 0.05 hits per sample net of
+extra-round cost; otherwise stop the low-rank state-model branch. This is development on
+exposed data, not confirmation.
+
+**Deferred PRISM question.** Do not start another program-revision claim until the
+lineage-disjoint arena meets the pooled gate-count floor and curated non-LLM proposals
+are included. PRISM 24Q2 REP.1M remains sealed until access is authorised and
+independence is verified. These gates are independent of G1 and do not turn same-screen
+future strata into confirmation.
 
 The [synthetic loop audit](program_review_20261017/LOOP_AUDIT.json) reproduces
 static A -> B -> C ordering under opposite feedback in both HEAD and the working

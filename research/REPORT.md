@@ -26,6 +26,25 @@ tuning. It does not establish independent discovery, new model-repair value or
 Agent benefit. See the [reuse audit](../log/program_review_20261016/REVIEW.json).
 The draft indication-triage study, its results and its sealed tier are preserved.
 
+2026-10-17: [Program revision](program_revision_20261017/REPORT.md) is a pre-registered study on
+PRISM 19Q4 (freeze 12:55:48Z, future strata opened once at 13:09:54Z; `verify.py` VERIFIED). It asks
+whether MAESTRO's agent improves future decisions by revising a shared library of executable,
+observably gated response programs on top of a strong low-rank model. It does not.
+* A 10-program textbook seed library helps on 247 future lines: +0.21 hits/line with 8 probe wells
+  (H1, Holm p 0.004), +0.45 with none, +0.44 in exploit-first campaigns. The gain is largest on
+  unseen lineages (+0.25 vs +0.10 at I2).
+* Revision adds nothing: editable minus fixed library 0.000 (H4), vs stepwise search +0.008 (H2),
+  LLM vs enumeration +0.004 (H3). Programs learned from an empty start give +0.05; every
+  revision-added program has ablation value <= 0. Joint measurement edits changed nothing.
+* About 4,300 development wells per arm bought no gain over the free seed; the cost is never repaid.
+* Post hoc: the within-lineage development arena would reject most useful seed programs (6
+  BRAF-mutant query lines vs 37 in future lineages), and the LLM committed the wrong direction for
+  20-23% of its candidates (caught by the direction check).
+* Shared loadings do not transfer to unseen drug structure groups. In 28-well campaigns, 8 probes
+  lose to exploit-first feedback (-0.38). AFA beats a fixed design (+0.22) at 10 rounds.
+* No independent confirmation (same screen). Cost: 0 purchased wells (archived outcomes),
+  deepseek-flash 0.287 USD.
+
 2026-10-17: [Feedback attribution](feedback_attribution_20261017/REPORT.md) is a
 pre-registered **development** study on the same, exposed Beat AML data. Its audit is in
 `AUDIT.md`. It confirms nothing.
@@ -85,6 +104,36 @@ Updated 2026-10-17. This is the current decision summary; [EVIDENCE.md](EVIDENCE
 keeps the numerical historical register. [STUDIES.json](STUDIES.json) registers the
 retained studies. Each study keeps its protocol, results, deviations, source
 identities, paid-call records and verifier. Software tests do not establish scientific validity.
+
+## Integrated assessment and decision
+
+The strongest recent signal is **functional feedback within a defined replay**: on Beat AML,
+measuring a few high-scoring inhibitors and updating rankings improved later choices over the
+Virtual Cell alone. This supports a bounded workflow result within Beat AML, not an independent
+biological replication or an Agent/LLM advantage. The exposed-data attribution study narrows the
+interpretation: readouts carry useful drug-specific information, but the RNA prior does not beat
+the empirical item prior or same-feature drug-specific ridge; no procedure selector beats tuned
+exploit-first. Its coherent score is promising for ranking, but remains uncalibrated. The measured
+gain therefore motivates one gated development comparison, not a general state-model claim.
+
+The PRISM program-revision study is a separate result. A fixed textbook library helps on future
+lines within that screen, especially unseen lineages, but autonomous revision, conventional search,
+LLM proposals and joint measurement edits add no value; the revision cost is not recovered. This is
+prior-knowledge use, not learned discovery, and it does not transfer to unseen drug structure
+groups. Its same-screen future strata are not independent confirmation. The shared cross-study
+lesson is to test against the strongest simple comparator and align development arenas with the
+target strata; it does not make the Beat AML and PRISM effects one pooled finding.
+
+**Work order.** First, MT-P0 qualifies the compact A/B task, action, cost and dependence manifest;
+this is a programme-wide prerequisite for learning procedure value. For the already scoped Beat AML
+question, the next bounded analysis is G1: freeze one candidate, compare coherent-score/exploit-first
+choices (k ∈ {4, 8, 12}) and ridge-plus-feedback against the item prior, ridge and current two-round
+engine, then proceed only if the lower bound exceeds 0.05 hits per sample net of extra-round cost.
+Otherwise stop the low-rank state-model branch and retain only the supported feedback workflow on
+the strongest prior. PRISM lineage-disjoint revision is a separate later question: require the
+pooled gate-count floor and curated non-LLM proposal control, then do not open PRISM 24Q2 REP.1M
+until access is authorised and independence is established. Neither development analysis establishes
+confirmation; if no qualified independent domain is available, keep the broader claim blocked.
 
 ## Auto-Research infrastructure (implemented thin core, 2026-10-16)
 
@@ -158,6 +207,7 @@ budget, and a predeclared useful net-benefit threshold.
 | [Mechanism falsification](mechanism_falsification_20261014/README.md) | 61,413 annotation pairs, zero measured positive or negative mechanism references. Strict benchmark 21/21 vs historical 6/21. Exploratory conformal FDP 0.26-0.70. | ASSET_BLOCKED. Contract conformance is not scientific improvement. Stop algorithm development without measured truth. |
 | [Context transfer](context_transfer_20261017/README.md) | One-shot Beat AML 2.0: source-verified exploit-first bridging 0.850 hits/sample vs Virtual Cell alone 0.777 (+0.073, Holm p 0.0075), pilot matching 0.621, frozen lookahead 0.742. Virtual Cell prior vs item -0.008. P2 0, P5 trivial. | Keep exploit-first bridge feedback within the docstring scopes. Cell-state prior, procedure selection, LLM and cost advantage are not established (CLAIMS.json). Corrected lookahead needs a fresh confirmation; repair/averaging stopped. |
 | [Feedback attribution](feedback_attribution_20261017/README.md) | Development on exposed Beat AML. Common-probe attribution: update without RNA +0.096, RNA with feedback +0.065, structure vs overall-sensitivity update +0.081, deranged control -0.115. RNA prior vs item prior -0.017; drug-specific ridge beats the RNA prior (+0.065) and is not beaten by the two-round engine (+0.023, CI crosses 0). Coherent score +0.04 to +0.08; 8 probes beat 4 (+0.065); no selector beats tuned exploit-first. | Next: G1 development test of coherent score + probe count + ridge-plus-feedback against the ridge (REPORT.md section 6). Independent confirmation blocked: no unexposed domain; PRISM 24Q2 independence unverified. |
+| [Program revision](program_revision_20261017/README.md) | PRISM 19Q4, 247 future lines. Seed library +0.211 hits/line at I2 (Holm p .004), +0.445 at zero observation, +0.437 in exploit-first campaigns. Editable vs fixed 0.000; vs stepwise +0.008; LLM vs enumeration +0.004. No transfer to unseen drug groups. | Method not supported; revision wells never repaid. Seed library is knowledge use, not discovery. Next: lineage-disjoint revision, confirmed on PRISM 24Q2 after authorisation. |
 
 Earlier supported results remain in [EVIDENCE.md](EVIDENCE.md): Block P's +17
 unexpected hits [+11,+23], and Block N's scoped transcriptional transfer gains.

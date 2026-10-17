@@ -1,5 +1,36 @@
 # Evidence Register
 
+2026-10-17: [Program revision](program_revision_20261017/REPORT.md), **METHOD NOT SUPPORTED**
+(pre-registered on PRISM 19Q4 HTS002; freeze 12:55:48Z; future strata opened once at 13:09:54Z;
+`verify.py` VERIFIED). Not an independent confirmation: the future strata come from the same screen.
+* Design.
+  * 966 source and 322 novel drugs (held-out structure groups); 231 source lines (10 development
+    projects, support 128 / query 103), 67 future lines, 180 future-lineage lines.
+  * Decision: nominate 10 drugs per line; utility is qualified confirmed hits (mean(X2,X3) <= -1 and
+    <= drug source median - 1, every available replicate < 0; unknowns counted separately).
+  * Strong model: rank-20 ALS with feature-ridge line prior and Bayesian probe updating; beats a
+    drug-specific ridge by +0.33 [0.12, 0.52] at I2.
+  * Program language: scope (MoA/target) x observable state; loadings fitted on cross-fitted
+    residuals; capacity 12 programs, 3 atoms.
+* Registered primary (I2, 8 probe wells, Holm).
+  * H1 maestro_llm - strong: +0.211 [0.097, 0.340], p 0.004 (CONFIRMED, entirely the seed library).
+  * H2 vs stepwise search: +0.008. H3 LLM vs enumeration: +0.004. H4 editable vs fixed: 0.000.
+* Secondary.
+  * Seed at zero observation: +0.445 [0.084, 0.921]. Empty-start revision: enum +0.057
+    [0.022, 0.104], LLM +0.045 [0.000, 0.114].
+  * Ablation: MDM x TP53 +0.077 [0.025, 0.128], RAF x BRAF +0.057, PI3K x PIK3CA +0.028;
+    revision-added programs -0.004 to -0.008.
+  * Novel drug groups: libraries +0.02 to -0.04 (no transfer); strong model beats potency control
+    except future lines at I1.
+  * AFA vs fixed design +0.223 [0.104, 0.400]; library on AFA -0.012.
+* Stage C (28 wells/line). Seed + exploit-first 5.26 vs strong + exploit-first 4.83 (+0.437
+  [0.041, 0.889]); fixed probes vs exploit-first -0.381 (HARMFUL); feedback vs one-shot +0.166;
+  AFA vs fixed +0.198 at 10 rounds. Revision wells (about 4,300 per arm) are never repaid.
+* Diagnosis (post hoc, development data only): the frozen rule would accept 2/10 seed programs on
+  the development arena; BRAF/PIK3CA gates are rare there (6 and 12 query lines vs 37 and 30 in
+  future lineages). LLM: 62-73% insufficient evidence, 20-23% wrong committed direction.
+* Cost: 0 purchased wells, deepseek-flash 0.287 USD (90 calls; 0.088 pre-freeze smoke).
+
 2026-10-17: [Feedback attribution](feedback_attribution_20261017/REPORT.md), **DEVELOPMENT**
 (pre-registered; freeze 06:45:10Z; `verify.py` VERIFIED). This is not a confirmation: Beat AML
 was already exposed. The Phase 1 audit is in [AUDIT.md](feedback_attribution_20261017/AUDIT.md).
