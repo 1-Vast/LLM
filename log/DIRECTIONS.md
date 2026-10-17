@@ -1,19 +1,79 @@
 # Research Directions
 
+Revised 2026-10-17. The [research programme](RESEARCH_PROGRAM.md) defines the
+scope, existing evidence, novelty boundaries, task matrix and next study gates.
+
 ## Continue
 
-1. Study scoped response transfer within declared assay/source/endpoint limits, with an independent anchor.
-2. Center work on measured endpoints, calibrated ranking, and explicit abstention.
-3. Preserve the evidence registry, source-byte verification, lineage, outcome seal, and approval boundary.
-4. Build a thin Auto-Research loop with competing hypotheses, scoped predictions, information-per-cost experiment selection, budgets, retained failures/QC/unknowns, and replayable digests. Start with dependency, forecast, and ledger ablations.
+1. Study complete early drug-discovery campaigns: biological objective,
+   candidate/assay choices, measured feedback, bounded response-model correction,
+   functional confirmation and an evidence-qualified progression decision.
+2. Make candidate discovery/repurposing and cellular-context selection with
+   failure analysis the two primary tasks. Selectivity needs comparison assays;
+   molecular mechanism needs appropriate distinguishing measurements.
+3. Focus technical work on transfer of research methods: learn applicability,
+   negative-transfer risk, useful checks and permitted feedback-based revisions.
+   Response differences that affect decisions supply the model-level foundation.
+4. Reuse scoped RKT, conventional/context predictors, fixed designs, conditional
+   models, acquisition and evidence contracts. Audit the existing indication-
+   triage signal before implementing another low-rank model.
+5. Keep source identity, dependence, training-only fitting, unknown-result bounds,
+   outcome seals and the full campaign denominator. Separate method benefit,
+   Agent increment, cross-task experience, source transfer and confirmation.
+6. Recompute remaining predictions and action values after qualified feedback.
+   Compare with static scores and ordinary adaptive design; record model and
+   procedure versions. Heuristic label counts are not a scientific posterior.
+
+7. Context transfer with verified bridges (`research/context_transfer_20261017`,
+   confirmed once on Beat AML 2.0): keep bridge feedback (measure the model's
+   top few items, then re-rank) and source-verified procedure choice, within the
+   scope in the promoted docstrings. The basal-expression prior did not beat the
+   item prior there; a new context-transfer claim must beat `item`, not only
+   nearest-context transfer. The corrected batch lookahead needs its own fresh
+   confirmation before any claim, ideally on a domain with uneven measurement.
+
+## Next bounded step
+
+Use MT-P0 to qualify a compact A/B task set and procedure-value labels before
+fitting a transfer rule. Start with unseen compound groups and known contexts;
+qualify new-context and joint holdouts separately. Keep a small procedure library,
+ordinary conditional regression, unconditional residual, simple gate and standard
+design. A logged unchosen procedure has no observed counterfactual utility.
+
+The [synthetic loop audit](program_review_20261017/LOOP_AUDIT.json) reproduces
+static A -> B -> C ordering under opposite feedback in both HEAD and the working
+copy. It is an engineering diagnosis, not new biological evidence or a repaired
+adaptive loop. MT-P1 tests procedure transfer; MT-P2 tests dual-core contribution,
+selected-candidate risk and qualified external transfer. These stage names do not
+reopen PRESAGE P1-P3. No sealed tier is opened by this plan.
 
 ## Defer
 
-- Learned triage, orthogonal follow-up, and outcome-fed line priors require preregistration on unseen compounds and comparison with strong deterministic baselines.
-- LLM debate/agent arms require an authorized budget, independent sealed outcomes, and false-NO-GO metrics.
+- LLM-generated procedures or model changes: first show a deterministic method
+  gain, then compare with templates, simple search and text-playbook retrieval.
+  Match source experience, tools, experimental/compute budgets and legal inputs.
+  Use shared histories for component isolation and separate cost-matched closed
+  loops for total acquisition effects.
+- Mechanism inference: first obtain measured competing predictions, engagement,
+  rescue or other appropriate distinguishing evidence.
+- Dose/time or combinations: extend one supported condition axis after the main
+  tasks; compare with established batch-design methods.
+- New diseases, patient response, safety and therapeutic-window claims: qualify
+  the relevant populations, controls and functional endpoints first.
 
 ## Stop
 
-- Adding agents, debate, memory, or knowledge gates only to increase framework complexity.
-- Treating predictions, annotations, or LLM output as measurements.
-- Continuing mechanism algorithm development without mechanism truth, an independent endpoint, and auditable costs.
+- Preserve PRESAGE P0 **NO-GO**; do not restart P1-P3 or pathway tuning.
+- Preserve anchor-study **BLOCKED_INDEPENDENT_ENDPOINT**; do not generalise
+  offset-only ranking failure to every discovery task or every anchor model.
+- Keep the thin Auto-Research loop as infrastructure. Static information scores,
+  hypothesis-label counts and software receipts are not discovery utility.
+- Stop an added method that loses to simple conditional/fixed workflows; stop
+  an Agent claim that disappears under a matched no-LLM comparison.
+- Stop learned procedure-value claims if labels or action support are unqualified;
+  do not call larger memory, a programme schema or masked episodes new learning.
+- Stop covariance-inflation repair and model averaging of the bridged prior
+  (harmful or neutral in development, neutral on Beat AML) and the LLM bridge
+  picker (no gain over exploit-first or the corrected lookahead).
+- Stop additions of agents, memory, tools or datasets without a distinct,
+  testable scientific question. Predictions and annotations are not measurements.

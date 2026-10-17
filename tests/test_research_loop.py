@@ -1,5 +1,6 @@
 from maestro.research_loop import (ActionCandidate, Forecast, HypothesisPair,
                                     Observation, ResearchLoop)
+import pytest
 
 
 class Executor:
@@ -89,3 +90,60 @@ def test_unknown_outcome_is_recorded_as_invalid_without_updating_support():
     assert state.stop_reason == "invalid_observation"
     assert state.observations[0].success is False
     assert state.observations[0].detail["validation"] == "unknown_outcome"
+    assert state.observations[0].source_id == "s"
+    assert state.observations[0].context_identifier == "c"
+    assert state.observations[0].independent_units == 1
+
+
+@pytest.mark.parametrize("forecast", [
+    Forecast("other", {"a": 1}, support=2, scope="cell", basis="references"),
+    Forecast("x", {"a": 1}, support=0, scope="cell", basis="references"),
+    Forecast("x", {"a": 1}, support=2, scope="other", basis="references"),
+    Forecast("x", {"a": 1}, scope="cell", basis="references"),
+    Forecast("x", {"a": 1}, support=2, scope="cell"),
+])
+def test_scoped_action_refuses_unbound_or_unsupported_forecast_without_spending(forecast):
+    class NeverExecute:
+        def execute(self, action):
+            raise AssertionError("refused forecast spent budget")
+    action = ActionCandidate("x", 1, 1, scope="cell")
+    loop = ResearchLoop(HypothesisPair("a", "b"), (action,), {"x": forecast},
+                        NeverExecute(), budget=1)
+    state = loop.step()
+    assert state.stop_reason == "no_admissible_action"
+    assert state.remaining_budget == 1
+
+
+def test_supported_scoped_action_can_execute():
+    action = ActionCandidate("x", 1, 1, {"outcome": "a"}, scope="cell")
+    forecast = Forecast("x", {"a": 1}, support=2, scope="cell", basis="references")
+    loop = ResearchLoop(HypothesisPair("a", "b"), (action,), {"x": forecast}, Executor(), budget=1)
+    assert loop.run().selected_actions == ("x",)
+
+
+@pytest.mark.parametrize("value", [float("nan"), float("inf")])
+def test_nonfinite_acquisition_inputs_are_refused(value):
+    with pytest.raises(ValueError):
+        ActionCandidate("x", value, 1)
+    with pytest.raises(ValueError):
+        ActionCandidate("x", 1, value)
+    with pytest.raises(ValueError):
+        Forecast("x", {"a": value})
+    with pytest.raises(ValueError):
+        Forecast("x", {"a": 1}, information_gain=value)
+    with pytest.raises(ValueError):
+        ResearchLoop(HypothesisPair("a", "b"), (), {}, Executor(), budget=value)
+
+
+def test_duplicate_actions_cannot_silently_replace_menu_entries():
+    with pytest.raises(ValueError, match="duplicate_action_identifier"):
+        ResearchLoop(HypothesisPair("a", "b"), (ActionCandidate("x", 1, 1),
+                                               ActionCandidate("x", 2, 2)), {}, Executor(), budget=2)
+
+
+@pytest.mark.parametrize("support", [float("nan"), float("inf"), .5, True])
+def test_support_counts_require_integers(support):
+    with pytest.raises(ValueError):
+        Forecast("x", {"a": 1}, support=support)
+    with pytest.raises(ValueError):
+        Observation("x", "a", independent_units=support)

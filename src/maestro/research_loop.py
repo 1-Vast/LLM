@@ -8,7 +8,8 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
+from math import isfinite
 from typing import Any, Mapping, Protocol, Sequence
 
 
@@ -32,9 +33,11 @@ class ActionCandidate:
     cost: float
     expected_information: float
     payload: Mapping[str, Any] = field(default_factory=dict)
+    scope: str = ""
 
     def __post_init__(self) -> None:
-        if not self.identifier or self.cost <= 0 or self.expected_information < 0:
+        if (not self.identifier or not isfinite(self.cost) or self.cost <= 0
+                or not isfinite(self.expected_information) or self.expected_information < 0):
             raise ValueError("invalid_action_candidate")
 
     @property
@@ -55,13 +58,14 @@ class Forecast:
     def __post_init__(self) -> None:
         if not self.action_id:
             raise ValueError("forecast_requires_action_id")
-        if any(float(p) < 0 for p in self.probabilities.values()):
+        if any(not isfinite(float(p)) or float(p) < 0 for p in self.probabilities.values()):
             raise ValueError("forecast_probabilities_must_be_nonnegative")
         if self.refusal is None and not self.probabilities:
             raise ValueError("forecast_requires_outcomes_or_refusal")
-        if self.information_gain is not None and self.information_gain < 0:
+        if self.information_gain is not None and (not isfinite(self.information_gain) or self.information_gain < 0):
             raise ValueError("forecast_information_gain_must_be_nonnegative")
-        if self.support is not None and self.support < 0:
+        if self.support is not None and (isinstance(self.support, bool)
+                                         or not isinstance(self.support, int) or self.support < 0):
             raise ValueError("forecast_support_must_be_nonnegative")
 
     @property
@@ -94,7 +98,8 @@ class Observation:
     def __post_init__(self) -> None:
         if not self.action_id or not self.outcome:
             raise ValueError("observation_requires_identity_and_outcome")
-        if self.independent_units is not None and self.independent_units < 0:
+        if self.independent_units is not None and (isinstance(self.independent_units, bool)
+                or not isinstance(self.independent_units, int) or self.independent_units < 0):
             raise ValueError("independent_units_must_be_nonnegative")
         if self.evidence_kind not in {"real_measurement", "execution_failure", "qc_failure"}:
             raise ValueError("unsupported_observation_kind")
@@ -126,18 +131,25 @@ class ResearchLoop:
     def __init__(self, hypotheses: HypothesisPair, actions: Sequence[ActionCandidate],
                  forecasts: Mapping[str, Forecast], executor: Executor, *, budget: float,
                  confidence_threshold: float = 0.95):
-        if budget < 0:
+        if not isfinite(budget) or budget < 0:
             raise ValueError("budget_must_be_nonnegative")
         if not 0 < confidence_threshold <= 1:
             raise ValueError("invalid_confidence_threshold")
         self.hypotheses = hypotheses
         self.actions = {a.identifier: a for a in actions}
+        if len(self.actions) != len(actions):
+            raise ValueError("duplicate_action_identifier")
         self.forecasts = dict(forecasts)
         self.executor = executor
         self.confidence_threshold = confidence_threshold
         self.state = ResearchState(hypotheses, float(budget))
 
     def _posterior(self) -> dict[str, float]:
+        """Legacy label frequencies, not a likelihood-based or lineage-verified posterior.
+
+        Scientific inference must use the existing evidence registry and strict review.
+        This thin loop's static scores and label heuristic are replay scaffolding only.
+        """
         counts = {h: 1.0 for h in self.hypotheses.ids}
         for obs in self.state.observations:
             if obs.outcome in counts and obs.admissible:
@@ -151,7 +163,13 @@ class ResearchLoop:
             if identifier in self.state.selected_actions or action.cost > self.state.remaining_budget:
                 continue
             forecast = self.forecasts.get(identifier)
-            if forecast is None or forecast.refusal is not None:
+            if (forecast is None or forecast.refusal is not None
+                    or forecast.action_id != identifier or forecast.support == 0):
+                continue
+            # A scoped action needs an explicitly supported forecast for that scope.
+            # Unscoped historical callers retain their existing replay semantics.
+            if action.scope and (forecast.scope != action.scope
+                                 or forecast.support is None or not forecast.basis):
                 continue
             gain = action.expected_information if forecast.information_gain is None else forecast.information_gain
             available.append((gain / action.cost, identifier, action, forecast))
@@ -187,8 +205,8 @@ class ResearchLoop:
         # makes malformed/novel readouts visible in the replay receipt instead of
         # silently steering the posterior.
         if observation.outcome not in self.hypotheses.ids:
-            retained = Observation(observation.action_id, observation.outcome, False,
-                                   {**dict(observation.detail), "validation": "unknown_outcome"})
+            retained = replace(observation, success=False,
+                               detail={**dict(observation.detail), "validation": "unknown_outcome"})
             self.state = ResearchState(self.hypotheses, self.state.remaining_budget - action.cost,
                                        self.state.observations + (retained,),
                                        self.state.selected_actions + (action.identifier,),

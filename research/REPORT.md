@@ -1,21 +1,83 @@
 # MAESTRO: current evidence and repository simplification
 
-Updated 2026-10-16. This is the current decision summary; [EVIDENCE.md](EVIDENCE.md)
-keeps the numerical historical register. [STUDIES.json](STUDIES.json) registers all
-nine retained studies. Each study keeps its protocol, results, deviations, source
+Programme revision (2026-10-17): MAESTRO studies transfer of research methods
+across drugs and cellular contexts in complete early discovery campaigns.
+Candidate discovery and context selection/failure analysis are primary tasks;
+selectivity and molecular mechanism claims require their respective comparison
+and distinguishing measurements. The [research programme](../log/RESEARCH_PROGRAM.md)
+asks when a previous procedure applies, what check can reveal failed transfer,
+and whether feedback-based revision improves future decisions over strong simple
+workflows at the same total cost. Decision-relevant response correction is its
+model-level foundation. MT-P0/MT-P1/MT-P2 are new programme stages, not a revival
+of PRESAGE P1-P3. No new biological method or cross-task learning result is claimed.
+
+The [2026-10-17 synthetic audit](../log/program_review_20261017/LOOP_AUDIT.json)
+reproduces static A -> B -> C choices under opposite feedback on both committed
+HEAD and the preserved working copy. Sixteen same-label observations produce
+17/18 support share; eighteen reach 0.95. These are heuristic counts, not a
+likelihood posterior. The default loop does not automatically update future
+predictions/action values. Runtime and existing study files are preserved.
+
+The revision reconstructed the saved indication-triage development totals:
+395 vs two-stage 293 simulated matrix events, +2.615/campaign over 39 campaigns,
+saved campaign CI [1.667,3.615]. This is a development lead, with same-profile
+simulated probes, pooled assay units, separate budgets and non-nested policy
+tuning. It does not establish independent discovery, new model-repair value or
+Agent benefit. See the [reuse audit](../log/program_review_20261016/REVIEW.json).
+The draft indication-triage study, its results and its sealed tier are preserved.
+
+2026-10-17: [Context transfer with verified bridges](context_transfer_20261017/REPORT.md)
+is **CONFIRMED** once on Beat AML 2.0 primary patient samples (520 samples, 479 patients, 16
+wells). The frozen claims hold, but they are narrower than the label:
+* The gain is bridge feedback. The source-verified agent chose to measure the Virtual Cell's top
+  four inhibitors first and re-rank the rest (5/5 folds). This gave +0.073 hits per sample over
+  the Virtual Cell alone and +0.229 over pilot matching.
+* The basal-expression prior beat nearest-context transfer but not the context-free item prior.
+* The agent matched, and did not beat, the standard exploit-first design.
+* The development procedure it rejected (lookahead) carried a baseline defect that only uneven
+  measurement exposes. It is corrected post hoc in `agent.bridge_design`, as development-grade.
+* The LLM arm added nothing.
+
+2026-10-16: [Anchor-purchase qualification and development diagnostic](anchor_purchase_20261016/REPORT.md)
+completed with **BLOCKED_INDEPENDENT_ENDPOINT**. PRISM shared preprocessing and
+unqualified culture starts/bundle costs prevent Q1 confirmation; Q2 was not fit.
+On 794 selected secondary-screen drugs / 343 grouped components, inner selection
+chose context means (1,113 known top-4 technical hits). Unpriced full X1 reference
+gave 1,357 (+0.307/drug [0.231,0.385]), but missing-outcome bounds cross zero;
+this is neither small-anchor value nor independent biological confirmation.
+Offset-only information loses after cost. Keep the audit/controls, stop policy
+expansion, and preserve the original PRESAGE NO-GO. No core scientific promotion.
+
+New exposed-data development result (2026-10-16):
+[PRESAGE-inspired target-pathway transfer](presage_transfer_20261016/REPORT.md)
+fails P0. On 4,528 compound-held-out PRISM 19Q4 drugs / 568 identified lines,
+pathway fusion Pearson is 0.1161 vs chemistry 0.1450; gain over chemistry+MoA
+is +0.0028 [-0.0020,+0.0083]. Correspondence exceeds 20 stratified feature
+permutations but adds no useful improvement over strong baselines. Top-3
+nomination hits are 1,903 vs ungated neighbours 2,223. Stop P1-P3/LLM expansion;
+no scientific model promoted. Tested thin-loop scope/support/identity and
+retained-lineage-field guards are engineering repairs, not scientific gains.
+Static scores, label-count inference and absent local ledger authentication remain
+explicit limitations. Prior freezes and sealed outcomes were not changed.
+
+Updated 2026-10-17. This is the current decision summary; [EVIDENCE.md](EVIDENCE.md)
+keeps the numerical historical register. [STUDIES.json](STUDIES.json) registers the
+retained studies. Each study keeps its protocol, results, deviations, source
 identities, paid-call records and verifier. Software tests do not establish scientific validity.
 
-## Auto-Research direction (implemented thin core, 2026-10-16)
+## Auto-Research infrastructure (implemented thin core, 2026-10-16)
 
 MAESTRO now has a small replayable research loop in `maestro.research_loop`. It
-implements the proposed high-value direction as a testable engineering mechanism:
-**dependency-aware, evidence-authenticated hypothesis elimination**. The loop accepts
+implements a testable replay mechanism for supplied hypothesis/action scores.
+The loop accepts
 two competing hypotheses, scope-qualified forecasts, a costed action menu and an
 execution adapter. It selects expected information per cost, refuses forecasts outside
 scope, spends budget only on admissible actions, binds outcomes to the planned action,
-retains failures/QC failures, and serialises a deterministic receipt digest. A
-qualified outcome must identify its source and context and declare positive independent
-units; it cannot update support merely because a model predicted it. Unknown outcomes
+retains failures/QC failures, and serialises a deterministic receipt digest. Its
+admission fields require source/context and a declared positive independent-unit
+count; the thin loop does not authenticate source bytes or independence itself.
+It uses label frequencies, not model likelihoods, and does not automatically
+recompute remaining forecasts after feedback. Unknown outcomes
 stop the loop as `invalid_observation` and remain visible in the receipt.
 
 This is a thin orchestration layer, not a second agent framework: existing
@@ -25,24 +87,31 @@ coordinator/state writer, forecaster, experiment designer and auditor; no role m
 turn a forecast into evidence. High-risk execution and publication still require the
 existing approval boundary.
 
-The innovation is a **falsifiable hypothesis**, not a claimed scientific win. Required
-ablation before promotion: independent-trial assumption vs dependency groups; raw vs
+Its proposed scientific value remains a **falsifiable hypothesis**, not a claimed
+innovation or a validated discovery method. Required ablation before promotion:
+independent-trial assumption vs dependency groups; raw vs
 support/domain-shift-abstaining forecast; ledger-gated vs unconstrained update. Compare
-against fixed sequence, cost-greedy, forecast-only, agent-only and hindsight oracle on
-at least three independent tasks using the same menu, budget and seeds. Primary metrics
+against strong conventional/fixed and standard adaptive workflows on the programme's
+qualified A/B tasks, keeping menus, total cost and randomness comparable. Primary metrics
 are terminal decision utility/net benefit, false elimination, calibration and useful
 information per cost. Any failed evidence-integrity or calibration gate yields
 `NO_DEVELOPMENT_SIGNAL`; passing software tests is not an Auto-Research result.
 
 ## What deserves continued work
 
-1. **Scoped response transfer with a measured anchor.** Keep RKT, the fixed sparse
-   profiling design and their uncertainty/refusal contracts. Qualify another source
-   and endpoint before extending the L1000 certificate. Cold-start transfer remains weak.
-2. **Decisions aligned with measured endpoints.** Keep calibrated raw-threshold
-   ranking and explicit abstention within the validated GCP scope. Replicate
-   agreement, dose, time and assay context must be declared.
-3. **Authenticated evidence and honest evaluation.** Keep source-byte verification,
+1. **Transfer of research procedures across discovery tasks.** Prioritise candidate
+   discovery and context selection/failure analysis. Learn when procedures help,
+   what checks reveal negative transfer and how feedback changes the plan. Keep
+   unconditional updates, a simple gate and mature fixed/adaptive workflows as
+   baselines; frozen future-task gains must exceed raw-history/text retrieval.
+2. **Measured functional outcomes and scoped reuse.** Keep RKT, fixed sparse
+   profiling, the GCP endpoint decoder and explicit refusal within their validated
+   scopes. Their certificates do not transfer automatically to viability. Charge
+   information, comparisons and confirmation against the same experimental cap.
+3. **Dual-core contribution and honest evaluation.** Test response updates and
+   procedure revision separately, then their interaction on a frozen utility
+   scale. Separate shared-history component tests from closed-loop policy tests.
+   Keep source-byte verification,
    measured lineage, source dependence, cold-start tiers, training-only normalisation,
    outcome seals and evidence-bound experiment approval. These are engineering
    safeguards; their effect on scientific decision quality still needs testing.
@@ -66,6 +135,7 @@ budget, and a predeclared useful net-benefit threshold.
 | [Evaluator audit](evaluator_audit_20261013/README.md) | Historical confirmation evaluator has test-batch normalisation, outcome-derived eligibility and unfrozen identity metadata. | Adopt C1-C7 in a new protocol before any confirmation; do not rewrite the historical evaluator. |
 | [Orbit contrast](orbit_contrast_20261013/README.md) | Identity contrast +0.0104 in compound response; no gene-task identity value. Gate worse than unconditional residual (-0.0045); target triage unsupported. | IDENTITY_WITHOUT_METHOD / MECHANISM_CLASS_ONLY. Keep orbit decomposition as an evaluation device, not a promoted method. |
 | [Mechanism falsification](mechanism_falsification_20261014/README.md) | 61,413 annotation pairs, zero measured positive or negative mechanism references. Strict benchmark 21/21 vs historical 6/21. Exploratory conformal FDP 0.26-0.70. | ASSET_BLOCKED. Contract conformance is not scientific improvement. Stop algorithm development without measured truth. |
+| [Context transfer](context_transfer_20261017/README.md) | One-shot Beat AML 2.0: source-verified exploit-first bridging 0.850 hits/sample vs Virtual Cell alone 0.777 (+0.073, Holm p 0.0075), pilot matching 0.621, frozen lookahead 0.742. Virtual Cell prior vs item -0.008. P2 0, P5 trivial. | Keep bridge feedback and source-verified choice within the docstring scopes. Corrected lookahead needs a fresh confirmation. No LLM increment; repair/averaging stopped. |
 
 Earlier supported results remain in [EVIDENCE.md](EVIDENCE.md): Block P's +17
 unexpected hits [+11,+23], and Block N's scoped transcriptional transfer gains.

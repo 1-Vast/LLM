@@ -1,5 +1,69 @@
 # Evidence Register
 
+2026-10-17: [Context transfer with verified bridges](context_transfer_20261017/REPORT.md),
+**CONFIRMED** under the frozen claims C1-C4 (one shot; freeze 04:43:08Z; `verify.py` VERIFIED).
+* Domain: Beat AML 2.0, its first MAESTRO use. 520 primary AML RNA-seq samples from 479
+  patients x 166 inhibitors, probit-AUC selective events (no absolute gate, at least 100 measured
+  samples), 16 wells per sample, 5 patient-disjoint folds. Development was on exposed PRISM 19Q4.
+* Choice: the source-verified agent chose exploit-first bridging (4 of 16 wells) in 5/5 folds.
+* Hits per sample: `maestro` 0.850 against
+  * `vc0` 0.777 (+0.073 [+0.025, +0.127], Holm p 0.0075);
+  * `match_panel` 0.621 (+0.229 [+0.162, +0.298]);
+  * frozen lookahead 0.742 (+0.108 [+0.051, +0.172]).
+* Virtual Cell prior: `vc0` beat `knn` by +0.075 [+0.014, +0.137] but not `item`
+  (-0.008 [-0.063, +0.050]).
+* P2 = 0 (same procedure); P5 is non-inferior only trivially.
+* Expected PARTIAL (decline to bridge); got CONFIRMED.
+* LLM arm (gate open): 0.835, 520 deepseek-flash calls, 0.2768 USD; no increment over
+  `maestro` or the corrected lookahead.
+* Post hoc:
+  * The lookahead's loss is a greedy-batch baseline defect: 29% of its bridge wells were
+    measured.
+  * The corrected rule ties exploit on Beat AML (0.850). On PRISM 19Q4 the correction is neutral
+    (+0.025 line, −0.046 lineage holdout).
+  * The correction is development-grade.
+* The process report misstates `maestro`'s wasted wells (`DEVIATIONS.json`).
+* 0 wells purchased; 2 assay rounds per sample for `maestro`; about 354 MB downloaded.
+
+2026-10-17: [Research-method transfer programme](../log/RESEARCH_PROGRAM.md)
+and [thin-loop audit](../log/program_review_20261017/LOOP_AUDIT.json).
+Engineering diagnosis only: committed HEAD and current working copy both select
+A -> B -> C under all-H1 and all-H2 synthetic feedback. Smoothed same-label share
+is 17/18 after 16 observations and 0.95 after 18; it is not a calibrated scientific
+posterior. No automatic future-score update was implemented or validated.
+No new biological experiment, procedure-value fit, paid provider call or sealed
+outcome opening. Preserve previous scientific verdicts; cross-task procedure
+learning, dual-core interaction and selected-candidate reliability remain tests.
+
+2026-10-16: [Anchor-purchase study](anchor_purchase_20261016/REPORT.md),
+**BLOCKED_INDEPENDENT_ENDPOINT / DEVELOPMENT_ONLY_TECHNICAL_REPEAT**.
+794 cores, 792 connectivity identities, 343 components, five grouped folds;
+564 metadata contexts, 199,259/447,816 unknown pairs retained. Inner-selected
+context means: 1,113 known top-4 hits, 888 unknown nominations. Unpriced X1
+reference: 1,357, 855 unknown; difference +0.3073/drug [0.2309,0.3847], conservative
+missing bounds [-0.8111,+1.3841]. X1 vs shuffled +0.5050 [0.4297,0.5840].
+Scalar offset cannot change ranks; assumed information costs 1/2 reduce known
+hits to 853/605 at the same four-unit ceiling. Oracle known-hit headroom remains,
+but no scalar action achieves it and no independent endpoint or actual bundle
+price is authenticated. No residual model, selective policy or LLM run.
+0 paid calls/assays, 2,501,144 successful retrieval bytes, 29.281 evaluation CPU
+seconds. Independent trace/source reconstruction passed; verifier-only amendment
+and initial metadata failure retained. Previous PRESAGE NO-GO remains unchanged.
+
+2026-10-16: [PRESAGE-inspired pathway transfer P0](presage_transfer_20261016/REPORT.md),
+**NO_GO**, historically exposed PRISM 19Q4 development, 4,528 drugs / 568 lines /
+1,145 family-connectivity clusters, 5 outer folds, 20 correspondence permutations.
+Pathway Pearson 0.116137; chemistry 0.144958; chemistry+MoA 0.113347.
+Increment over chemistry+MoA +0.002791, clustered CI [-0.001964,+0.008300],
+below frozen 0.01 requirement. Null mean 0.111472, randomisation p=1/21;
+nominal correspondence signal does not pass the useful-increment gate.
+Top-3 historical viability hits: pathway 1,903 vs ungated neighbours 2,223 at
+13,584 slots each; diagnostic yield difference -2.36 points [-4.00,-1.12].
+P1/P2/P3/LLM/sealed confirmation NOT_RUN. 75.63 s evaluation wall, 0 provider
+calls, 0 purchased assays, 0 paid USD; public retrieval recorded separately.
+Protocol, initial failure/amendment, freeze, real predictions, source/split manifests,
+RESULTS and executable verifier retained. No previous outcome relabelled confirmation.
+
 Latest addition (2026-10-14): [mechanism-falsification feasibility and contract repair](mechanism_falsification_20261014/README.md).
 Not an experiment: ASSET_BLOCKED (A0 INSUFFICIENT_MECHANISM_TRUTH; 0 measured mechanism references locally).
 Strict decision contracts reproduce-and-fix five P0/P1 defects (35 tests); a 21-task benchmark is specification

@@ -1,0 +1,53 @@
+PIE: A model that draws on curated biological knowledge to predict responses in unseen conditions | Arc Institute
+Hani Goodarzi
+Rishi Verma
+October	5, 2026
+PIE: A model that draws on curated biological knowledge to predict responses in unseen conditions
+A truly useful virtual cell model should be able to predict how cells respond in conditions it has never seen. With
+State
+, we showed that modeling sets of cells improves perturbation prediction. With
+Stack
+, we showed that cells themselves can act as prompts, letting a model carry a response from one cell context to another. Today, we're releasing
+PIE
+(Perturbation is Everything), a model that leverages prior biological knowledge to achieve state-of-the-art generalization across unseen contexts, perturbations, and combinations of both.
+Most perturbation models try to predict individual perturbed cells, then aggregate them to see which genes changed. This is an active and challenging area of research, confounded by the fact that measuring cells both before and after a perturbation isn’t possible at scale today. PIE takes a simpler approach by predicting the population-level readouts actually used to interpret a screen, including which genes across the transcriptome are differentially expressed, which direction they move, and by how much.
+PIE does this by drawing on prior biological research from public, human-curated databases and turning that knowledge into its inputs. An experimental condition may be informed by a cell line's
+Cellosaurus
+record, a perturbed gene's
+NCBI
+entry and
+Gene Ontology
+annotations,
+DepMap
+dependency profiles, or a perturbed small molecule’s
+PubChem
+entry. Each source becomes a set of tokens, which an architecture built upon
+Perceiver IO
+ingests to predict the perturbation response across a vocabulary of genes.
+Because available biological knowledge is sparse, the architecture is built to work with a variable set of knowledge sources, both during training and at inference. Each gene in the vocabulary is represented by its natural-language description, so PIE can adapt to the different gene vocabularies used across studies and even infer outcomes for genes not seen during training. PIE also draws on evidence from observed perturbation data, such as control cells and statistics of how genes responded across the contexts and perturbations in its training set.
+The result is a model that describes a new cellular context and perturbation through what scientists collectively know about it and predicts its effects in a single forward pass without fine-tuning. It also makes PIE easy to extend. Users can swap knowledge sources, add ones that haven't been tried, and ask which kinds of biological knowledge actually help a model generalize.
+We evaluated PIE on the
+Replogle-Nadig Perturb-seq dataset
+, which spans four human cell lines. When identifying which genes respond to a perturbation, PIE achieved 1.2 to 3.2 times the AUPRC in classifying differentially expressed genes of the strongest competing method in each setting, with the largest gain for perturbations it had never seen. When both the cell line and the perturbation were new, a setting no specialized baseline could attempt, PIE still made meaningful predictions. Moreover, PIE is able to transfer learnt signals across experimental datasets. When trained on four non-overlapping public perturbation datasets and evaluated zero shot on Replogle-Nadig, PIE outperformed existing methods on most metrics.
+PIE performs best when either the context or the perturbation has been seen in training, and accuracy drops when both are new. We expect that gap to narrow as perturbation datasets grow in size and diversity. Better experimental technologies should help too as measurements that capture how individual cells within a population respond differently could give models like PIE additional signal. Richer descriptions of the system being perturbed, including its spatial and temporal context, could improve generalization across experiments.
+PIE, State, and Stack
+Arc's virtual cell models approach perturbation prediction from different directions. State learns from large-scale perturbation data to predict responses in cellular contexts that are underrepresented in training. Stack uses cells themselves as prompts, carrying known responses into new contexts from observational data such as patient samples or disease tissue. PIE grounds its predictions in curated biological knowledge, which lets it reach unseen contexts, perturbations, and datasets. Key elements of PIE, including its use of human-curated knowledge, are being built into the next version of State, which is currently in development.
+The long-term goal of this work, and
+Arc's Virtual Cell Initiative
+more generally, is to build a model that can help narrow the search for therapeutic targets, predicting which perturbations might shift a diseased cell toward a healthy state before anyone runs the experiment.
+How to use PIE
+The full codebase, including the training and evaluation pipelines, is available on
+GitHub
+, and model checkpoints and the processed public datasets needed to reproduce our results are on
+Hugging Face
+. Our analysis showed that the inputs that matter most depend on the task, with some sources driving predictions for unseen contexts and others for unseen perturbations, so we encourage users to retrain PIE with new knowledge sources and see what helps.
+Verma, R., Adduri, A., Bevilacqua, B., Eraslan, B., Burke, D. P., Goodarzi, H., & Roohani, Y. H. (2026). PIE: Generalizing perturbation effects across unseen perturbations, contexts and datasets.
+bioRxiv
+.
+https://doi.org/10.64898/2026.10.02.756297
+Rishi Verma (X:
+@i_m_rive
+) is an ML Engineer in Arc’s Computational Technology Center.
+Hani Goodarzi (X:
+@genophoria
+) is an Arc Institute Core Investigator and a Professor of Biophysics & Biochemistry at UCSF.

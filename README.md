@@ -1,8 +1,10 @@
 # MAESTRO
 
-MAESTRO is a dual-core scientific system with a thin, replayable Auto-Research loop: `maestro.research_loop` coordinates competing hypotheses, costed experiments, authenticated observations, failures and explicit stopping. It is an engineering mechanism under evaluation, not a claim of autonomous scientific discovery.
+MAESTRO is a dual-core autonomous research framework for contextual early drug discovery. It studies how research methods transfer across drugs and cellular contexts: when an existing method applies, what evidence can reveal failed transfer, and how measured feedback can improve subsequent research decisions. Current validation is mainly in oncology cell models; general autonomous discovery and clinical efficacy remain unestablished.
 
-MAESTRO is a dual-core scientific system: an Agent manages questions, evidence, decisions, budgets and execution; a virtual-cell world model predicts responses within a declared model, source, condition and feature-axis scope. Typed contracts connect the cores. Unsupported predictions must be refused, and predictions remain distinct from observations.
+The Autonomous Scientific Agent proposes and revises executable research procedures. The Virtual Cell predicts scoped functional responses, candidate differences and model mismatch, then updates supported components from feedback. Their shared task is to learn when previous research experience helps a new decision, when to check its assumptions and when to change the plan. Typed contracts separate predictions from measurements and keep costs and failures visible.
+
+The [research programme](log/RESEARCH_PROGRAM.md) defines two primary tasks: candidate discovery/repurposing and cellular-context selection with failure analysis. Selectivity needs explicit comparison measurements; mechanism confirmation needs distinguishing evidence. Dose, time and combinations are gated extensions. The programme tests method transfer, within-task feedback, dual-core contributions and selected-candidate reliability separately. The existing thin `maestro.research_loop` is static replay infrastructure; automatic feedback-based replanning and learned procedure transfer remain research goals.
 
 ## Install and run
 
@@ -50,6 +52,6 @@ python -m tools.research_validation --help
 
 ## Scientific boundary
 
-The model predicts within qualified scope; it does not establish functional endpoints, mechanism, causality or experiment value by itself. The Agent selects and audits evidence and actions; it does not turn language-model output into scientific fact. Current conclusions and the next verification gate are in [research/REPORT.md](research/REPORT.md), with numerical results in [research/EVIDENCE.md](research/EVIDENCE.md). Full checkpoint/data axes, independent repeat qualification and the next P0.6 protocol remain blocked.
+The model predicts within qualified scope; it does not establish functional endpoints, mechanism, causality or experiment value by itself. The Agent selects and audits evidence and actions; it does not turn language-model output into scientific fact. Current conclusions are in [research/REPORT.md](research/REPORT.md), with numerical results in [research/EVIDENCE.md](research/EVIDENCE.md). The [programme stages](log/RESEARCH_PROGRAM.md#validation-stages-for-research-method-transfer) separate method value, Agent value, transfer and independent confirmation. PRESAGE P0 remains NO-GO; anchor purchasing value remains blocked by independent-endpoint qualification.
 
-Nine registered studies retain their protocols, results, deviations and replay code. The current evidence, stop decisions and simplification ledger are in [research/REPORT.md](research/REPORT.md). Frozen research records are separate from the maintained runtime and default software tests.
+Registered studies retain their protocols, results, deviations and replay code. The current evidence, stop decisions and simplification ledger are in [research/REPORT.md](research/REPORT.md). Frozen research records are separate from the maintained runtime and default software tests.
