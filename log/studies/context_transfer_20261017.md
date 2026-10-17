@@ -1,7 +1,9 @@
 # Context transfer with verified bridges
 
-One shot on Beat AML 2.0 (520 primary AML samples, 479 patients, 16 wells): **CONFIRMED**
-under the frozen claims, but narrow.
+One shot on Beat AML 2.0 (520 primary AML samples, 479 patients, 16 archived AUC queries, about
+112 treatment wells): **CONFIRMED** under the frozen claims, but narrow. The label records protocol
+execution; the claims amendment (`CLAIMS.json`) supports only the functional-feedback gain under
+the replay. Attribution: `feedback_attribution_20261017`.
 
 * The source-verified agent chose exploit-first bridging in 5/5 folds: 0.850 hits per sample.
   That is +0.073 over the Virtual Cell alone (Holm p .0075), +0.229 over pilot matching and

@@ -37,6 +37,10 @@ prints `VERIFIED`. In short, per patient sample at 16 wells (520 samples, 479 pa
   defect is corrected in `src/agent/bridge_design.py`, with the frozen rule kept as
   `lookahead_v1`. The correction is development-grade.
 * **Process report.** Its `maestro` wasted-well figure is a reporting error (`DEVIATIONS.json`).
+* **Claims amendment.** `CLAIMS.json` (`claims.py`) separates the CONFIRMED protocol label from
+  what is established. Only the functional-feedback gain is supported, under the replay; C3/C4
+  as frozen do not test adaptivity or superiority. A "well" here is one archived AUC query, and the
+  analysed matrix has 165 inhibitors. Follow-up: `research/feedback_attribution_20261017`.
 
 ## Files
 
@@ -61,6 +65,7 @@ prints `VERIFIED`. In short, per patient sample at 16 wells (520 samples, 479 pa
 | `verify.py` | recomputes reported numbers from cached records and checks the freeze |
 | `REPORT.md` | results of the one-shot confirmation, secondary analyses, process report and post-hoc diagnosis |
 | `posthoc_availability.py` | post hoc: lookahead and exploit with each target's measured pairs known (`POSTHOC_AVAILABILITY.json`) |
+| `claims.py` | post-run scientific-claims amendment: evidence levels, claim-mapping audit, units (`CLAIMS.json`) |
 | `posthoc_lookahead.py` | post hoc: corrected lookahead in the promoted modules against `lookahead_v1`, with parity to the study records (`POSTHOC_LOOKAHEAD_<domain>.json`) |
 
 ## Running
@@ -80,6 +85,7 @@ python -B confirm.py --llm         # once, after FREEZE.json (the LLM arm is gat
 python -B verify.py
 python -B posthoc_availability.py      # post hoc, after the confirmation
 python -B posthoc_lookahead.py beataml|prism_line|prism_lineage
+python -B claims.py                    # CLAIMS.json, after the confirmation
 ```
 
 Caches and per-context records live in `tmp/context_transfer_20261017/`.

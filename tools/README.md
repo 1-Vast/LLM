@@ -124,7 +124,7 @@ python -m tools.evaluation.bridge_replay domain.npz --budget 16 --k-bridge 4 --o
 
 `datasets.design_census` counts contexts, dependence groups, items and measured pairs of a
 long-format screen. It reads only the declared design columns, so a census taken before a freeze
-cannot see outcomes. `evaluation.bridge_replay` is an equal-well retrospective replay on any
+cannot see outcomes. `evaluation.bridge_replay` is an equal-query retrospective replay on any
 context x item matrix (NPZ keys `Y`, `X`, `contexts`, `groups`, `items`). In every outer fold it
 selects rank and procedure on source contexts only (`agent.procedure_selection`). It then grades
 these arms on held-out contexts: no bridge, exploit-first bridge, lookahead bridge, the selected

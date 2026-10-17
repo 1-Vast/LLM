@@ -1,11 +1,13 @@
-"""Bridged context transfer: a low-rank Bayesian response model that a few measured wells can verify.
+"""Bridged context transfer: a low-rank Bayesian response model that a few measured responses can verify.
 
 File summary
 - Path: src/virtual_cell/bridged_transfer.py
 - Purpose: predict, for a new biological context (a cell line or a primary patient sample), the
   chance that each item of a screening library is a selective hit. Predictions are available
-  before any well and after a few measured "bridge" wells. Closed-form uncertainty lets an agent
-  decide which wells to measure first.
+  before any query and after a few measured "bridge" queries. Closed-form uncertainty lets an
+  agent decide which items to measure first.
+- Units: one query is one (context, item) response summary, here an archived 7-dose AUC profile.
+  The module's "well" (``wells``, ``wasted``) means one such query, not one physical well.
 - Model: fitted on source contexts only.
   - Response: ``y_c = mu + V f_c + e``, with ``e_d ~ N(0, s2_d)`` and rank r.
   - Fit: unmeasured source pairs are imputed by EM-SVD at rank r (``impute_iters`` rounds). Each
@@ -13,16 +15,27 @@ File summary
   - Prior on ``f_c``: a ridge map from basal-expression principal components, with alpha by
     leave-one-out and the leave-one-out residual covariance. A context without a basal profile
     gets the population covariance, and its state says so (``prior_source``).
-  - Measuring items updates ``f_c`` by Bayesian linear regression.
+  - Measuring items updates ``f_c`` by Bayesian linear regression; missing readouts are skipped.
   - Event thresholds per item come from source-only residual fits on the generic context profile,
     so ``event_prob`` targets the same rule as `selective_events`.
-  - ``expected_hit`` is per well: the item's source measurement rate times P(event). A well on an
-    unmeasured pair yields nothing.
+  - ``expected_hit`` is per query: the item's source archive coverage times P(event).
 - Endpoint (`selective_events`):
   - G is the context's median over items, and each item's residual on [1, G] is robust-z scored
     across contexts.
-  - An event is z <= -3, plus an optional absolute gate.
+  - An event is z <= -3, plus an optional absolute gate. It measures unusual relative
+    sensitivity, not absolute efficacy or selectivity over normal cells.
   - Items measured in fewer than ``min_measured`` contexts have no events.
+- Known approximations (audit of 2026-10-17, ``research/feedback_attribution_20261017``):
+  - `thresholds` inserts the predicted median, ``median(mean)``, into each threshold and
+    `event_prob` scores it against Var(Y_d) alone. The threshold moves with the prediction but its
+    uncertainty is ignored (the coherent variance is Var(Y_d - b_d G)). The score is therefore an
+    approximation, not the probability of one fixed event. Its expected value after a readout can
+    differ from its value before: in a one-factor, three-item counterexample it falls from 0.163
+    to 0.000178 whatever the readout. A coherent development scorer is in that study
+    (``coherent.CoherentScorer``); this module is unchanged so the confirmed records reproduce.
+  - ``measured_rate`` (q_i) is historical marginal archive coverage, ``(n_i + 0.5) / (n + 1)``. It
+    is not assay feasibility and not a per-context availability probability. In Beat AML, 94% of
+    missing pairs were never scheduled, not failed (that study's MISSINGNESS.json).
 - Refusals:
   - ``TOO_FEW_SOURCE_CONTEXTS``: fewer source contexts than the rank needs.
   - ``ITEM_AXIS_MISMATCH``: features or outcomes do not match the fitted axes.
@@ -35,30 +48,37 @@ File summary
   near-ties differently.
 
 Scope of the evidence: 2026-10-17, ``research/context_transfer_20261017``, frozen
-2026-10-17T04:43:08Z and run once on Beat AML 2.0 (`VALIDATED_SCOPE`).
+2026-10-17T04:43:08Z and run once on Beat AML 2.0 (`VALIDATED_SCOPE`). Its claims amendment
+(``CLAIMS.json``) separates the protocol label (CONFIRMED) from what is established.
 - Confirmation domain:
-  - 520 primary AML samples with RNA-seq, from 479 patients, x 166 single-agent inhibitors;
+  - 520 primary AML samples with RNA-seq, from 479 patients, x 165 analysed single-agent
+    inhibitors (166 in the release's inclusion set; one is measured only without RNA-seq);
   - probit-fit AUC from the release's paper-inclusion set, with about 62% of sample-inhibitor pairs
     measured;
   - `selective_events` with no absolute gate and at least 100 measured samples per inhibitor,
     giving 2.1 events per sample;
-  - 16 wells per sample, five patient-disjoint folds, and the rank chosen per fold by inner
-    decisions (40, 10, 20, 20, 20).
-- Supported:
+  - 16 archived AUC queries per sample (16 x 7 = 112 treatment wells if run, before controls),
+    five patient-disjoint folds, and the rank chosen per fold by inner decisions
+    (40, 10, 20, 20, 20).
+- Supported (archive-query replay):
   - The prior beat nearest-context transfer (event rate of the 10 nearest source samples by basal
     expression): +0.075 hits per sample [+0.014, +0.137], Holm p 0.017.
-  - Updated by four exploit-first bridge wells, it beat the prior alone by +0.073 [+0.025, +0.127].
+  - Updated by four exploit-first bridge readouts, it beat the prior alone by +0.073
+    [+0.025, +0.127]. That gain is positive but not shown to exceed 0.05, and it costs a second
+    assay round (about 72 h).
 - Not shown:
   - The prior alone did not beat the context-free item prior (the item's source event rate):
     -0.008 [-0.063, +0.050]. Its edge over nearest-context transfer is largely that baseline's
     weakness (nearest-context minus item: -0.083).
   - The basal profile matters against a wrong one (shuffled-context control: +0.081), but on this
     endpoint not against none.
+  - Transfer of biological knowledge: every fold refits the model on Beat AML source patients, so
+    the result is an algorithm applied within Beat AML.
 - Development only: on PRISM 19Q4 (exposed), the prior beat the item prior by +0.68 hits at 32
-  wells (line holdout) and +0.35 (lineage holdout).
+  queries (line holdout) and +0.35 (lineage holdout).
 - Not validated:
-  - other assays, endpoints, well budgets or measurement-availability structures;
-  - prospective plating.
+  - other assays, endpoints, query budgets or measurement-availability structures;
+  - prospective plating, unseen inhibitors (the loadings are inhibitor-specific).
   This is a response model, not a mechanism.
 """
 from __future__ import annotations
@@ -68,7 +88,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-VALIDATED_SCOPE = "beataml2_primary_aml_inhibitor_auc_selective_events_16_wells_patient_disjoint"
+VALIDATED_SCOPE = "beataml2_primary_aml_inhibitor_auc_selective_events_16_auc_queries_patient_disjoint"
 Z_EVENT = -3.0
 TOO_FEW_SOURCE_CONTEXTS = "TOO_FEW_SOURCE_CONTEXTS"
 ITEM_AXIS_MISMATCH = "ITEM_AXIS_MISMATCH"
@@ -319,7 +339,7 @@ class BridgedTransferModel:
         return normal_cdf((self.thresholds(st) - mean) / np.sqrt(var))
 
     def expected_hit(self, st: BridgeState) -> np.ndarray:
-        """Expected hits per well: source measurement rate x P(event | measured)."""
+        """Expected hits per query: source archive coverage x P(event | measured) (an approximation, see above)."""
 
         return self.measured_rate * self.event_prob(st)
 

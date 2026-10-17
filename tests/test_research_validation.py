@@ -77,7 +77,7 @@ def _sha256_study(root, schema="sha256"):
     return [("research/s", "research/s/RESULT.json")], protocol
 
 
-@pytest.mark.parametrize("schema", ["sha256", "files"])
+@pytest.mark.parametrize("schema", ["sha256", "files", "sha256_lf"])
 def test_sha256_and_files_freezes_are_authenticated_not_skipped(tmp_path, schema):
     studies, protocol = _sha256_study(tmp_path, schema)
     blocked, checked = research_validation.authenticate(tmp_path, studies)
@@ -97,6 +97,15 @@ def test_crlf_checkout_matches_lf_freeze_only_where_the_schema_declares_it(tmp_p
     (tmp_path / "research" / "s" / "FREEZE.json").write_text(
         json.dumps({"inputs": {"raw.txt": hashlib.sha256(b"line\n").hexdigest()}}))
     assert research_validation.blocked_assets(tmp_path, studies) == ["raw.txt (SHA256_MISMATCH)"]
+
+
+def test_sha256_lf_accepts_only_the_lf_normalised_digest(tmp_path):
+    studies, protocol = _sha256_study(tmp_path, "sha256_lf")
+    protocol.write_bytes(b"# protocol\r\n")
+    assert research_validation.blocked_assets(tmp_path, studies) == []
+    (tmp_path / "research" / "s" / "FREEZE.json").write_text(json.dumps(
+        {"sha256_lf": {"research/s/PROTOCOL.md": hashlib.sha256(b"# protocol\r\n").hexdigest()}}))
+    assert research_validation.blocked_assets(tmp_path, studies) == ["research/s/PROTOCOL.md (SHA256_MISMATCH)"]
 
 
 @pytest.mark.parametrize("freeze, reason", [

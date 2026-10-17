@@ -24,8 +24,19 @@ File summary
     - ``max``: any positive bridge gain switches, which follows inner noise.
   - With too little inner evidence (fewer than two inner records), the choice is ``vc0`` with
     basis ``NO_INNER_EVIDENCE``, never a bridge.
+- Limits of the selection statistics (audit of 2026-10-17, ``research/feedback_attribution_20261017``):
+  - `_paired` computes the inner standard error over sample rows. Inner folds are by patient
+    (``by_group=True``), but the SE still treats a patient's samples as independent.
+  - ``z > Z_BRIDGE`` is applied after choosing the rank among four and the larger of two bridge
+    z values on the same inner records. It is a heuristic threshold, not a post-selection 95%
+    guarantee.
+  - Every procedure reuses the rank chosen for ``vc0``; in the confirmation the best inner rank
+    for exploit differed from vc0's in some folds. Attribution comparisons need one fixed common
+    rank; full method comparisons need an equal tuning budget per procedure. Both, and a
+    generate-then-calibrate selector on disjoint patients, are development code in that study.
+  - `SELECTION_STATUS` states the evidence grade.
 - Interfaces: `hash_unit`, `hash_folds`, `source_replay`, `choose`, `select_procedure`,
-  `ProcedureChoice`, `PROCEDURES`, `RANKS`, `RULES`, `Z_BRIDGE`.
+  `ProcedureChoice`, `PROCEDURES`, `RANKS`, `RULES`, `Z_BRIDGE`, `SELECTION_STATUS`.
 - Depends on: numpy, `virtual_cell.bridged_transfer`, `agent.bridge_design`.
 
 Scope of the evidence: 2026-10-17, ``research/context_transfer_20261017``. One-shot Beat AML 2.0
@@ -53,6 +64,8 @@ patient.
 - The default ``lookahead_rule="lookahead"`` (corrected) has not been re-run through the selector
   on these domains, so the selector with that default is development-grade.
 - The inner standard error treats contexts as independent (520 samples from 479 patients).
+- What it does not establish: adaptivity (the same procedure in 5/5 folds) or an advantage over
+  the fixed exploit pipeline (P2 = 0). Its value here was defect detection.
 """
 from __future__ import annotations
 
@@ -71,6 +84,10 @@ ROUNDS = {"vc0": 1, "b_exploit": 2, "b_lookahead": 2}
 Z_BRIDGE = 1.645
 INNER_FOLDS = 3
 NO_INNER_EVIDENCE = "NO_INNER_EVIDENCE"
+SELECTION_STATUS = {
+    ("hybrid", "lookahead_v1"): "ran once in the confirmation; chose exploit in 5/5 folds; no selection gain shown",
+    ("hybrid", "lookahead"): "development: the corrected lookahead has not been run through the selector on held-out data",
+}
 
 
 def _h(key: str, salt: str) -> int:

@@ -1,11 +1,71 @@
 # Evidence Register
 
+2026-10-17: [Feedback attribution](feedback_attribution_20261017/REPORT.md), **DEVELOPMENT**
+(pre-registered; freeze 06:45:10Z; `verify.py` VERIFIED). This is not a confirmation: Beat AML
+was already exposed. The Phase 1 audit is in [AUDIT.md](feedback_attribution_20261017/AUDIT.md).
+* Design.
+  * Same domain, folds and model as the confirmation.
+  * All groups share four probes chosen by the population item prior. Fixed rank 20.
+  * Outcome: hits among the twelve follow-up queries per sample (520 samples, 479 patients).
+  * Parity: with vc0's probes, D and C reproduce the confirmed `b_exploit` and `vc0` exactly
+    (297 samples, rank-20 folds).
+* Registered (Holm, one-sided 0.025). All positive; none clears 0.05 at its lower bound.
+  * H1 population + update vs population state: +0.096 [+0.047, +0.155].
+  * H2 RNA + update vs population + update: +0.065 [+0.030, +0.105].
+  * H3 RNA prior vs population state: +0.073 [+0.033, +0.113].
+  * H4 low-rank vs overall-sensitivity update: +0.081 [+0.033, +0.131].
+  * The same holds at ranks 10 and 40, with vc0's probes, in the scheduled-panel `design` task and
+    on the 93-inhibitor `panel80` task.
+* Weak comparator.
+  * The model's population state under the promoted score is 0.090 below the empirical item
+    prior, because the promoted event score is incoherent.
+  * RNA prior vs item prior: -0.017 [-0.073, +0.042].
+  * A drug-specific ridge on the same 30 PCs beats the RNA prior: +0.065 [+0.023, +0.109].
+  * Post hoc: the confirmed two-round engine vs that one-round ridge is +0.023 [-0.029, +0.077].
+  * The registered label RNA_PRIOR_HAS_INDEPENDENT_VALUE is therefore not a scientific claim.
+* Readouts carry item-specific information.
+  * Deranged control: D - F +0.115 [+0.061, +0.177].
+  * An overall-sensitivity update gives +0.008 [-0.008, +0.024]. It is close to rank-neutral on
+    this G-residualised endpoint.
+* Coherent event score: +0.04 to +0.08 per group, and martingale gap about 0. It is not
+  calibrated (mean predicted 0.018 vs observed 0.021).
+* Probes.
+  * 8 coherent probes vs none: +0.158 [+0.103, +0.216]. This is the only registered contrast
+    clearing 0.05 at its lower bound, net of 0.05 per round.
+  * 8 probes vs 4: +0.065.
+  * The joint-Monte-Carlo planner chose 8 for 519-520/520 samples, with no per-sample adaptivity.
+    Its EVSI understates the realised gain 1.5-1.9x.
+* Tuned procedures (Q3). Exploit-first at its own rank gives 0.871 total hits, against:
+  * corrected lookahead 0.860;
+  * hybrid selector 0.840;
+  * calibrated selector 0.806 (bridged 2/5 folds).
+
+  Exploit-first stays the default.
+* Diagnostics.
+  * AUC variance: inhibitor mean 42%, overall sensitivity 15%, residual 43%.
+  * Replicate noise is at least 41% of the residual, and basal PCs predict about 10% of it.
+  * Scheduled profiles without a record come from more sensitive samples (G z -0.63), so failed
+    assays are informative.
+* Cost: 0 wells, 0 USD, no downloads.
+* Independent confirmation is blocked: no unexposed domain is local, and PRISM 24Q2 independence
+  is unverified (its metadata is not on disk).
+
 2026-10-17: [Context transfer with verified bridges](context_transfer_20261017/REPORT.md),
 **CONFIRMED** under the frozen claims C1-C4 (one shot; freeze 04:43:08Z; `verify.py` VERIFIED).
-* Domain: Beat AML 2.0, its first MAESTRO use. 520 primary AML RNA-seq samples from 479
-  patients x 166 inhibitors, probit-AUC selective events (no absolute gate, at least 100 measured
-  samples), 16 wells per sample, 5 patient-disjoint folds. Development was on exposed PRISM 19Q4.
-* Choice: the source-verified agent chose exploit-first bridging (4 of 16 wells) in 5/5 folds.
+That label records protocol execution. The claims amendment
+([CLAIMS.json](context_transfer_20261017/CLAIMS.json)) supports only the functional-feedback gain
+(under the replay). The cell-state prior beyond the item prior, procedure selection, the LLM,
+the repaired planner and any cost advantage are not established, and C3/C4 as frozen do not test
+adaptivity or superiority. This is workflow transfer within Beat AML, not biological knowledge
+carried from PRISM.
+* Domain: Beat AML 2.0, its first MAESTRO use.
+  * 520 primary AML RNA-seq samples from 479 patients x 165 analysed inhibitors (166 in the
+    release census).
+  * Probit-AUC selective events (no absolute gate, at least 100 measured samples).
+  * 16 archived AUC queries per sample (the frozen files call them wells; 112 treatment wells if
+    run), 5 patient-disjoint folds.
+  * Development was on exposed PRISM 19Q4.
+* Choice: the source-verified agent chose exploit-first bridging (4 of 16 queries) in 5/5 folds.
 * Hits per sample: `maestro` 0.850 against
   * `vc0` 0.777 (+0.073 [+0.025, +0.127], Holm p 0.0075);
   * `match_panel` 0.621 (+0.229 [+0.162, +0.298]);
@@ -17,13 +77,16 @@
 * LLM arm (gate open): 0.835, 520 deepseek-flash calls, 0.2768 USD; no increment over
   `maestro` or the corrected lookahead.
 * Post hoc:
-  * The lookahead's loss is a greedy-batch baseline defect: 29% of its bridge wells were
+  * The lookahead's loss is a greedy-batch baseline defect: 29% of its bridge queries were
     measured.
   * The corrected rule ties exploit on Beat AML (0.850). On PRISM 19Q4 the correction is neutral
     (+0.025 line, −0.046 lineage holdout).
   * The correction is development-grade.
 * The process report misstates `maestro`'s wasted wells (`DEVIATIONS.json`).
-* 0 wells purchased; 2 assay rounds per sample for `maestro`; about 354 MB downloaded.
+* 0 wells purchased; 2 assay rounds per sample for `maestro` (about 72 h more); about 354 MB
+  downloaded.
+* Additional events: 442 against 404 for `vc0`, about 7.3 per 100 samples under the event
+  definition; 44 samples improved, 27 worsened. This is not a 7.3% patient benefit.
 
 2026-10-17: [Research-method transfer programme](../log/RESEARCH_PROGRAM.md)
 and [thin-loop audit](../log/program_review_20261017/LOOP_AUDIT.json).

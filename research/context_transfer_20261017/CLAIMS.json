@@ -1,0 +1,303 @@
+{
+ "study": "context_transfer_20261017",
+ "kind": "post-run scientific-claims amendment",
+ "changes_frozen_results": false,
+ "strongest_wording": "Under the defined Beat AML replay endpoint and query budget, querying a small number of high-scoring inhibitors and using their measured responses to update a low-rank model improved subsequent candidate selection. The incremental value of the research-procedure selector and LLM has not been established.",
+ "scientific_claims": {
+  "protocol_execution": {
+   "status": "CONFIRMED (historical label, retained)",
+   "meaning": "the frozen decision rules returned CONFIRMED on the one-shot run"
+  },
+  "functional_feedback_gain": {
+   "status": "SUPPORTED_UNDER_REPLAY",
+   "evidence": "P1 +0.073 [+0.025, +0.127]; readouts from another patient lose 0.104",
+   "limits": "archive-query replay; positive, not shown above min_useful; no net-of-cost claim"
+  },
+  "cell_state_model_beyond_population_prior": {
+   "status": "NOT_ESTABLISHED",
+   "evidence": "vc0 - item -0.008 [-0.063, +0.050]"
+  },
+  "procedure_selection_gain": {
+   "status": "NOT_ESTABLISHED",
+   "evidence": "P2 = 0; P5 trivially non-inferior; same procedure in 5/5 folds"
+  },
+  "llm_gain": {
+   "status": "NOT_ESTABLISHED",
+   "evidence": "llm - maestro -0.015 [-0.050, +0.010]; its registered criterion was met only against the defective lookahead_v1"
+  },
+  "repaired_planner": {
+   "status": "DEVELOPMENT",
+   "evidence": "corrected lookahead - exploit 0.000 [-0.061, +0.064], post hoc on exposed data; does not inherit the confirmation"
+  },
+  "total_cost_advantage": {
+   "status": "NOT_ESTABLISHED",
+   "evidence": "equal query counts, but bridged arms need a second assay round (about 72 h more); see units"
+  },
+  "transfer_type": {
+   "status": "WORKFLOW_TRANSFER",
+   "meaning": "every outer fold refits drug means, loadings, the expression map, thresholds, rank and procedure on Beat AML source patients; the result shows an algorithm developed on PRISM applied within Beat AML, not biological knowledge carried from PRISM"
+  }
+ },
+ "claim_mapping_audit": {
+  "C1_virtual_cell_transfer": {
+   "frozen_rule": "P4 (vc0 - knn) SUPPORTED",
+   "frozen_value": true,
+   "scientific_reading": "the basal-expression prior beats nearest-sample transfer, but not the population item prior (vc0 - item -0.008 [-0.063, +0.050]); the rule does not test the strong baseline",
+   "status": "NARROW"
+  },
+  "C2_virtual_cell_beyond_pilot_matching": {
+   "frozen_rule": "P3 (maestro - match_panel) SUPPORTED",
+   "frozen_value": true,
+   "scientific_reading": "feedback re-ranking with the model beats correlation matching on a fixed panel; it does not isolate the cell-state prior",
+   "status": "SUPPORTED_AS_STATED"
+  },
+  "C3_agent_adaptivity": {
+   "frozen_rule": "P5 non-inferiority to the best fixed procedure in hindsight",
+   "frozen_value": true,
+   "scientific_reading": "a performance floor, not adaptivity: the selector picked exploit-first in every fold and matched it sample by sample (P2 = 0 exactly)",
+   "status": "NOT_ESTABLISHED"
+  },
+  "C4_agent_beats_fixed_pipelines": {
+   "frozen_rule": "any of P1, P2, P6 SUPPORTED",
+   "frozen_value": true,
+   "scientific_reading": "P1 shows that exploit-first feedback beats no feedback; P2 (against the fixed exploit pipeline) is 0; P6 beats a defective comparator, which documents defect detection and rejection, not a method advantage",
+   "status": "NOT_ESTABLISHED"
+  },
+  "min_useful": {
+   "frozen_rule": "verdict() returns SUPPORTED when Holm p < alpha and the lower bound > 0; min_useful = 0.05 only separates NOT_SUPPORTED from INCONCLUSIVE",
+   "consequence": "SUPPORTED means any positive gain; P1's lower bound (0.025) does not show a gain above 0.05. Future protocols report the three levels separately."
+  }
+ },
+ "contrasts": {
+  "P1": {
+   "contrast": "maestro-vc0",
+   "frozen_verdict": "SUPPORTED",
+   "p_holm": 0.007499250074992501,
+   "mean": 0.07307692307692308,
+   "ci95": [
+    0.025046965317919074,
+    0.12692307692307692
+   ],
+   "positive": true,
+   "exceeds_min_useful": false,
+   "net_of_costs": "NOT_EVALUABLE: no pre-declared conversion of the extra assay round into hits"
+  },
+  "P2": {
+   "contrast": "maestro-b_exploit",
+   "frozen_verdict": "NOT_SUPPORTED",
+   "p_holm": 1.0,
+   "mean": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "positive": false,
+   "exceeds_min_useful": false,
+   "net_of_costs": "NOT_EVALUABLE: no pre-declared conversion of the extra assay round into hits"
+  },
+  "P3": {
+   "contrast": "maestro-match_panel",
+   "frozen_verdict": "SUPPORTED",
+   "p_holm": 0.0005999400059994001,
+   "mean": 0.22884615384615384,
+   "ci95": [
+    0.16184971098265896,
+    0.2982791586998088
+   ],
+   "positive": true,
+   "exceeds_min_useful": true,
+   "net_of_costs": "NOT_EVALUABLE: no pre-declared conversion of the extra assay round into hits"
+  },
+  "P4": {
+   "contrast": "vc0-knn",
+   "frozen_verdict": "SUPPORTED",
+   "p_holm": 0.016798320167983202,
+   "mean": 0.075,
+   "ci95": [
+    0.013512862573556215,
+    0.13662686965519005
+   ],
+   "positive": true,
+   "exceeds_min_useful": false,
+   "net_of_costs": "NOT_EVALUABLE: no pre-declared conversion of the extra assay round into hits"
+  },
+  "P6": {
+   "contrast": "maestro-b_lookahead",
+   "frozen_verdict": "SUPPORTED",
+   "p_holm": 0.001999800019998,
+   "mean": 0.1076923076923077,
+   "ci95": [
+    0.051179983894058693,
+    0.17208570181699834
+   ],
+   "positive": true,
+   "exceeds_min_useful": true,
+   "net_of_costs": "NOT_EVALUABLE: no pre-declared conversion of the extra assay round into hits",
+   "comparator_defect": "lookahead_v1 baseline defect (REPORT.md s5)"
+  },
+  "P5": {
+   "contrast": "maestro-b_exploit (best fixed in hindsight)",
+   "frozen_verdict": "NON_INFERIOR",
+   "mean": 0.0,
+   "ci95": [
+    0.0,
+    6.938893903907228e-18
+   ],
+   "reading": "performance floor only: the selector chose the hindsight-best fixed procedure (b_exploit) in 5/5 folds, so the difference is identically 0"
+  },
+  "vc0-item": {
+   "contrast": "vc0-item",
+   "mean": -0.007692307692307693,
+   "ci95": [
+    -0.06251795977011494,
+    0.050103620558318726
+   ],
+   "positive": false,
+   "exceeds_min_useful": false,
+   "net_of_costs": "NOT_EVALUABLE: no pre-declared conversion of the extra assay round into hits"
+  },
+  "llm-maestro": {
+   "contrast": "llm-maestro",
+   "mean": -0.015384615384615385,
+   "ci95": [
+    -0.049528544113630155,
+    0.009748022015823865
+   ],
+   "positive": false,
+   "exceeds_min_useful": false,
+   "net_of_costs": "NOT_EVALUABLE: no pre-declared conversion of the extra assay round into hits"
+  },
+  "llm-b_lookahead": {
+   "contrast": "llm-b_lookahead",
+   "mean": 0.09230769230769231,
+   "ci95": [
+    0.04087950386045182,
+    0.1481587301587301
+   ],
+   "positive": true,
+   "exceeds_min_useful": false,
+   "net_of_costs": "NOT_EVALUABLE: no pre-declared conversion of the extra assay round into hits",
+   "comparator_defect": "lookahead_v1 baseline defect (REPORT.md s5)"
+  },
+  "maestro-maestro_yshuffle": {
+   "contrast": "maestro-maestro_yshuffle",
+   "mean": 0.10384615384615385,
+   "ci95": [
+    0.04798464491362764,
+    0.16603128668138223
+   ],
+   "positive": true,
+   "exceeds_min_useful": false,
+   "net_of_costs": "NOT_EVALUABLE: no pre-declared conversion of the extra assay round into hits"
+  },
+  "vc0-vc0_xshuffle": {
+   "contrast": "vc0-vc0_xshuffle",
+   "mean": 0.08076923076923077,
+   "ci95": [
+    0.031187566841877713,
+    0.13680616042441995
+   ],
+   "positive": true,
+   "exceeds_min_useful": false,
+   "net_of_costs": "NOT_EVALUABLE: no pre-declared conversion of the extra assay round into hits"
+  },
+  "b_lookahead-vc0": {
+   "contrast": "b_lookahead-vc0",
+   "mean": -0.03461538461538462,
+   "ci95": [
+    -0.06968643533796845,
+    -0.0019156172391815568
+   ],
+   "positive": false,
+   "exceeds_min_useful": false,
+   "net_of_costs": "NOT_EVALUABLE: no pre-declared conversion of the extra assay round into hits",
+   "comparator_defect": "lookahead_v1 baseline defect (REPORT.md s5)"
+  },
+  "b_lookahead-b_exploit": {
+   "contrast": "b_lookahead-b_exploit",
+   "mean": -0.1076923076923077,
+   "ci95": [
+    -0.17208570181699834,
+    -0.0511799838940587
+   ],
+   "positive": false,
+   "exceeds_min_useful": false,
+   "net_of_costs": "NOT_EVALUABLE: no pre-declared conversion of the extra assay round into hits",
+   "comparator_defect": "lookahead_v1 baseline defect (REPORT.md s5)"
+  },
+  "maestro-item (post hoc)": {
+   "contrast": "maestro-item",
+   "status": "POST_HOC: not in the frozen family; needs independent confirmation",
+   "mean": 0.06538461538461539,
+   "ci95": [
+    0.0018714011516314806,
+    0.1322992673472893
+   ],
+   "positive": true,
+   "exceeds_min_useful": false,
+   "net_of_costs": "NOT_EVALUABLE: no pre-declared conversion of the extra assay round into hits"
+  },
+  "corrected b_lookahead-b_exploit (post hoc)": {
+   "contrast": "b_lookahead_corrected-b_exploit",
+   "mean": 0.0,
+   "ci95": [
+    -0.06142329839066883,
+    0.063602406787682
+   ],
+   "status": "DEVELOPMENT: corrected rule written after the confirmation; equal means are not evidence of equivalence (interval half-width about 0.06)"
+  },
+  "corrected b_lookahead-vc0 (post hoc)": {
+   "contrast": "b_lookahead_corrected-vc0",
+   "mean": 0.07307692307692308,
+   "ci95": [
+    0.022811527825786382,
+    0.13203883495145632
+   ],
+   "status": "DEVELOPMENT: corrected rule written after the confirmation; equal means are not evidence of equivalence (interval half-width about 0.06)"
+  }
+ },
+ "per_sample": {
+  "samples": 520,
+  "patients": 479,
+  "vc0_total_hits": 404,
+  "maestro_total_hits": 442,
+  "net_additional_events": 38,
+  "additional_events_per_100_samples": 7.3076923076923075,
+  "samples_improved": 44,
+  "samples_worsened": 27,
+  "samples_unchanged": 449,
+  "wording": "about 7.3 additional replay events per 100 samples under the frozen event definition; not 7.3% of patients benefiting and not clinical benefit"
+ },
+ "units": {
+  "frozen_term": "well",
+  "meaning": "one archived probit AUC summary for a (sample, inhibitor) pair = one drug-response query",
+  "queries_per_sample": 16,
+  "physical_profile": "7-point 3-fold dilution, one well per concentration, 72 h, MTS (Tyner et al. 2018); controls (DMSO vehicle, positive-control combination) per plate",
+  "treatment_wells_per_sample_if_replicated": 112,
+  "treatment_wells_note": "16 profiles x 7 doses = 112 treatment wells before controls and replicates; equal for every arm, so paired comparisons are unaffected",
+  "assay_rounds": {
+   "random": 1,
+   "item": 1,
+   "knn": 1,
+   "vc0": 1,
+   "b_random": 2,
+   "b_exploit": 2,
+   "b_panel": 2,
+   "b_info": 2,
+   "b_lookahead": 2,
+   "match_panel": 2,
+   "vc0_xshuffle": 1,
+   "maestro_yshuffle": 2,
+   "llm": 2,
+   "maestro": 2.0
+  },
+  "extra_round": "about 72 h of culture plus re-plating; the replay assumes the banked sample keeps the same response state between rounds, which it cannot test",
+  "rna_timing": "basal RNA is pre-treatment; the replay assumes it is analysed before the first selection",
+  "api_usd": {
+   "confirmation_llm_arm": 0.276766,
+   "pilot": 0.0156
+  },
+  "wet_lab_wells_purchased": 0
+ },
+ "process_report_deviation": "DEVIATIONS.json entry 2 (maestro wasted wells 4.81 -> 2.53)"
+}

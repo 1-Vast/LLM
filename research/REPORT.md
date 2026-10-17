@@ -26,9 +26,30 @@ tuning. It does not establish independent discovery, new model-repair value or
 Agent benefit. See the [reuse audit](../log/program_review_20261016/REVIEW.json).
 The draft indication-triage study, its results and its sealed tier are preserved.
 
+2026-10-17: [Feedback attribution](feedback_attribution_20261017/REPORT.md) is a
+pre-registered **development** study on the same, exposed Beat AML data. Its audit is in
+`AUDIT.md`. It confirms nothing.
+* All groups share four population-chosen probes. With them, the low-rank update helps without RNA
+  (H1 +0.096), RNA adds once readouts arrive (H2 +0.065), and the update beats an
+  overall-sensitivity-only update (H4 +0.081). Deranged readouts are worse than none (D - F
+  +0.115). All four are Holm-positive, but none clears the 0.05 minimum useful effect at its lower
+  bound.
+* The registered "RNA prior has independent value" (H3) is against the model's own population
+  state. That comparator is broken by an incoherent event score. Against the empirical item prior
+  the RNA prior gives -0.017, and a drug-specific ridge on the same PCs beats it (-0.065).
+* The confirmed two-round engine is not shown better than that one-round ridge (+0.023
+  [-0.029, +0.077], post hoc).
+* A coherent event score adds +0.04 to +0.08 per group but is not calibrated (Gaussian tails too
+  thin). Eight probes beat four (+0.065), and the reference planner only ever chose eight.
+* Tuned exploit-first is not beaten by any selector (hybrid -0.031, calibrated -0.065).
+* Cost: 0 wells, $0.
+
 2026-10-17: [Context transfer with verified bridges](context_transfer_20261017/REPORT.md)
 is **CONFIRMED** once on Beat AML 2.0 primary patient samples (520 samples, 479 patients, 16
-wells). The frozen claims hold, but they are narrower than the label:
+archived AUC queries, about 112 treatment wells). That label records protocol execution. The
+[claims amendment](context_transfer_20261017/CLAIMS.json) supports only the functional-feedback
+gain under the replay, as workflow transfer within Beat AML. The frozen claims hold, but they are
+narrower than the label:
 * The gain is bridge feedback. The source-verified agent chose to measure the Virtual Cell's top
   four inhibitors first and re-rank the rest (5/5 folds). This gave +0.073 hits per sample over
   the Virtual Cell alone and +0.229 over pilot matching.
@@ -135,7 +156,8 @@ budget, and a predeclared useful net-benefit threshold.
 | [Evaluator audit](evaluator_audit_20261013/README.md) | Historical confirmation evaluator has test-batch normalisation, outcome-derived eligibility and unfrozen identity metadata. | Adopt C1-C7 in a new protocol before any confirmation; do not rewrite the historical evaluator. |
 | [Orbit contrast](orbit_contrast_20261013/README.md) | Identity contrast +0.0104 in compound response; no gene-task identity value. Gate worse than unconditional residual (-0.0045); target triage unsupported. | IDENTITY_WITHOUT_METHOD / MECHANISM_CLASS_ONLY. Keep orbit decomposition as an evaluation device, not a promoted method. |
 | [Mechanism falsification](mechanism_falsification_20261014/README.md) | 61,413 annotation pairs, zero measured positive or negative mechanism references. Strict benchmark 21/21 vs historical 6/21. Exploratory conformal FDP 0.26-0.70. | ASSET_BLOCKED. Contract conformance is not scientific improvement. Stop algorithm development without measured truth. |
-| [Context transfer](context_transfer_20261017/README.md) | One-shot Beat AML 2.0: source-verified exploit-first bridging 0.850 hits/sample vs Virtual Cell alone 0.777 (+0.073, Holm p 0.0075), pilot matching 0.621, frozen lookahead 0.742. Virtual Cell prior vs item -0.008. P2 0, P5 trivial. | Keep bridge feedback and source-verified choice within the docstring scopes. Corrected lookahead needs a fresh confirmation. No LLM increment; repair/averaging stopped. |
+| [Context transfer](context_transfer_20261017/README.md) | One-shot Beat AML 2.0: source-verified exploit-first bridging 0.850 hits/sample vs Virtual Cell alone 0.777 (+0.073, Holm p 0.0075), pilot matching 0.621, frozen lookahead 0.742. Virtual Cell prior vs item -0.008. P2 0, P5 trivial. | Keep exploit-first bridge feedback within the docstring scopes. Cell-state prior, procedure selection, LLM and cost advantage are not established (CLAIMS.json). Corrected lookahead needs a fresh confirmation; repair/averaging stopped. |
+| [Feedback attribution](feedback_attribution_20261017/README.md) | Development on exposed Beat AML. Common-probe attribution: update without RNA +0.096, RNA with feedback +0.065, structure vs overall-sensitivity update +0.081, deranged control -0.115. RNA prior vs item prior -0.017; drug-specific ridge beats the RNA prior (+0.065) and is not beaten by the two-round engine (+0.023, CI crosses 0). Coherent score +0.04 to +0.08; 8 probes beat 4 (+0.065); no selector beats tuned exploit-first. | Next: G1 development test of coherent score + probe count + ridge-plus-feedback against the ridge (REPORT.md section 6). Independent confirmation blocked: no unexposed domain; PRISM 24Q2 independence unverified. |
 
 Earlier supported results remain in [EVIDENCE.md](EVIDENCE.md): Block P's +17
 unexpected hits [+11,+23], and Block N's scoped transcriptional transfer gains.

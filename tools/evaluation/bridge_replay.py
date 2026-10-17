@@ -1,9 +1,10 @@
-"""Equal-well retrospective replay of bridged context transfer on any context x item matrix.
+"""Equal-query retrospective replay of bridged context transfer on any context x item matrix.
 
 File summary
 - Path: tools/evaluation/bridge_replay.py
 - Purpose: answer "would the dual core have found more selective hits in held-out contexts at
-  this well budget?" for a new domain, from a complete retrospective screen. It uses the
+  this query budget?" for a new domain, from a complete retrospective screen. One query (the
+  code's "well") is one archived response summary, such as a 7-dose AUC profile. It uses the
   promoted modules only (`virtual_cell.bridged_transfer`, `agent.bridge_design`,
   `agent.procedure_selection`).
 - Core points:
@@ -23,8 +24,11 @@ File summary
       uses the corrected rule; the confirmed study used ``lookahead_v1``);
     - ``selected``: the agent's choice;
     - ``oracle``: the ceiling.
-  - Each arm reports its mean hits, wasted wells and assay rounds.
-  - A well on an unmeasured pair is spent and is never a hit.
+  - Each arm reports its mean hits, wasted queries and assay rounds.
+  - A query on an unmeasured pair is spent and is never a hit. This is an archive-query task: the
+    model's availability weight is historical archive coverage, not assay feasibility.
+  - The selector's inner statistics are heuristics (see `agent.procedure_selection`), and the
+    lookahead and event scores are approximations (see `virtual_cell.bridged_transfer`).
   - The selected-procedure comparison is paired over the same held-out contexts. Bootstrap
     intervals are over groups.
   - This is a planning aid on exposed data, not a confirmation.

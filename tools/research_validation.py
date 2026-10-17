@@ -21,6 +21,9 @@ Supported FREEZE.json schemas (exactly one digest mapping, non-empty):
   each key resolves against the study directory first and the checkout root second.
   Either way the resolved file must match the digest; a key that resolves to no file
   is reported missing.
+- `sha256_lf`: checkout-relative path -> sha256 of the bytes with CRLF normalised to LF,
+  and only that digest (the `feedback_attribution_20261017` freeze); a raw CRLF digest
+  is refused.
 Any other schema is refused (FREEZE_SCHEMA_UNSUPPORTED), never skipped.
 """
 from __future__ import annotations
@@ -35,12 +38,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TARGETS = ()
 STUDIES = ()
-SCHEMAS = ("inputs", "sha256", "files")
+SCHEMAS = ("inputs", "sha256", "files", "sha256_lf")
 
 
-def _digests(path: Path, normalised: bool) -> set[str]:
+def _digests(path: Path, normalised: bool, raw: bool = True) -> set[str]:
     data = path.read_bytes()
-    found = {hashlib.sha256(data).hexdigest()}
+    found = {hashlib.sha256(data).hexdigest()} if raw else set()
     if normalised:
         found.add(hashlib.sha256(data.replace(b"\r\n", b"\n")).hexdigest())
     return found
@@ -88,7 +91,7 @@ def authenticate(root: Path = ROOT, studies=None) -> tuple[list[str], dict[str, 
                 blocked.append(f"{relative} (PATH_OUTSIDE_CHECKOUT)")
             elif not path.is_file():
                 blocked.append(relative)
-            elif expected not in _digests(path, normalised=schema != "inputs"):
+            elif expected not in _digests(path, normalised=schema != "inputs", raw=schema != "sha256_lf"):
                 blocked.append(f"{relative} (SHA256_MISMATCH)")
             else:
                 ok += 1

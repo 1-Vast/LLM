@@ -1,14 +1,16 @@
-"""Bridge design: which few wells to measure first in a new context, then what to nominate.
+"""Bridge design: which few items to measure first in a new context, then what to nominate.
 
 File summary
 - Path: src/agent/bridge_design.py
 - Purpose: the agent's experimental-design layer on top of the bridged-transfer Virtual Cell
-  (`virtual_cell.bridged_transfer.BridgedTransferModel`), for a fixed well budget in one new context.
+  (`virtual_cell.bridged_transfer.BridgedTransferModel`), for a fixed query budget in one new
+  context. One query (the module's "well") is one response summary, such as an archived AUC
+  profile, not one physical well.
 - Core points:
-  - A bridged campaign spends ``k_bridge`` wells first and observes them. It then nominates the
+  - A bridged campaign spends ``k_bridge`` queries first and observes them. It then nominates the
     remaining ``budget - k_bridge`` items from the updated model.
-    - Every well counts toward utility.
-    - A well on an unmeasured pair is spent and reveals nothing.
+    - Every query counts toward utility.
+    - A query on an unmeasured pair is spent and reveals nothing.
     - A bridge costs one extra assay round.
   - Bridge rules:
     - ``random``: hash-ordered random items.
@@ -20,33 +22,42 @@ File summary
       with the baseline re-scored at every greedy step (see `_lookahead`).
     - ``lookahead_v1``: the same rule as frozen in the source study, with the prior baseline kept
       after the first pick. It is kept for audit and reproduction only.
+  - `RULE_STATUS` states the evidence grade of each rule. A corrected rule does not inherit the
+    confirmation of the frozen one.
   - In ``info``, ``panel`` and ``lookahead``, an item's information is weighted by its
-    measurement rate.
+    measurement rate (historical archive coverage, not assay feasibility).
+  - Every rule scores with `BridgedTransferModel.event_prob`, an approximation whose threshold
+    moves with the prediction (see that module). ``lookahead`` computes the threshold once, before
+    the fantasy readouts, so its fantasies and a real readout are scored against different
+    events. A coherent development planner is in ``research/feedback_attribution_20261017``.
   - Verification: the bridge misfit (`BridgedTransferModel.misfit`) is reported, not acted on.
     Covariance-inflation repair and model averaging were tested in the source study and are
     not part of this module (one was harmful, the other neutral).
 - Interfaces: `nominate`, `info_gain`, `choose_bridge`, `fixed_panel`, `run_campaign`,
-  `Campaign`, `BRIDGE_RULES`.
+  `Campaign`, `BRIDGE_RULES`, `RULE_STATUS`.
 - Depends on: numpy and `virtual_cell.bridged_transfer`.
 
 Scope of the evidence: 2026-10-17, ``research/context_transfer_20261017``. One-shot Beat AML 2.0
-confirmation at 16 wells with a 4-well bridge; the domain is described in
-`virtual_cell.bridged_transfer`.
+confirmation at 16 archived AUC queries with a 4-query bridge (archive-query replay); the domain
+is described in `virtual_cell.bridged_transfer`.
 - ``exploit``:
-  - +0.073 hits per sample over no bridge [+0.025, +0.127]. This is the confirmed rule.
-  - Its four bridge wells are the prior's own top four, so the gain is the value of re-ranking
-    the other twelve wells after four readouts.
+  - +0.073 hits per sample over no bridge [+0.025, +0.127]: the confirmed functional-feedback
+    gain. It is positive but not shown to exceed 0.05, and it costs a second round (about 72 h).
+  - Its four bridge queries are the prior's own top four, so the gain is the value of re-ranking
+    the other twelve after four readouts.
   - Readouts from another patient instead lose 0.104 hits.
 - ``lookahead_v1`` (frozen):
   - −0.035 [−0.070, −0.002] against no bridge and −0.108 [−0.172, −0.051] against exploit.
-  - Only 29% of its bridge wells returned a readout (exploit: 88%).
+  - Only 29% of its bridge queries returned a readout (exploit: 88%).
   - On PRISM 19Q4 development it had been the best bridge rule by point estimate.
 - ``lookahead`` (corrected), post hoc on exposed data, not confirmatory:
   - The loss above is the baseline defect described in `_lookahead`, not the
     value-of-information design.
   - On Beat AML the corrected rule ties exploit: 0.850 against 0.850 hits, difference 0.000
-    [−0.061, +0.064], with 89% of bridge wells measured.
-  - On PRISM 19Q4 (32 wells, k 8, rank 40), where q is about 0.975 for every item, the correction
+    [−0.061, +0.064], with 89% of bridge queries measured. Equal means are not evidence that the
+    rules are equivalent. The rise from 29% to 89% mainly shows how much evaluability handling
+    moves the result.
+  - On PRISM 19Q4 (32 queries, k 8, rank 40), where q is about 0.975 for every item, the correction
     is neutral against ``lookahead_v1``: +0.025 [−0.016, +0.064] (line holdout) and −0.046
     [−0.104, +0.003] (lineage holdout).
   - Neither version beat exploit there with an interval excluding zero (development lookahead
@@ -67,6 +78,14 @@ import numpy as np
 from virtual_cell.bridged_transfer import BridgedTransferModel, BridgeState, normal_cdf
 
 BRIDGE_RULES = ("random", "exploit", "panel", "info", "lookahead", "lookahead_v1")
+RULE_STATUS = {
+    "exploit": "confirmed under the archive-query replay of research/context_transfer_20261017 (Beat AML 2.0)",
+    "lookahead_v1": "frozen in that study; rejected there by the source check (baseline defect)",
+    "lookahead": "development: post-hoc correction of lookahead_v1, not independently confirmed",
+    "info": "descriptive only (below no bridge on Beat AML)",
+    "panel": "descriptive only (below no bridge on Beat AML)",
+    "random": "control",
+}
 GH_X, GH_W = np.polynomial.hermite_e.hermegauss(12)
 GH_W = GH_W / GH_W.sum()
 LOOKAHEAD_SHORTLIST = 300
@@ -147,7 +166,10 @@ def _lookahead(model: BridgedTransferModel, st: BridgeState, k: int, budget: int
     """Greedy batch one-step value of information for the final top-K expected hits.
 
     A bridge item is observed (and informative) with probability q, its measurement rate;
-    otherwise its well is spent and it leaves the decision set.
+    otherwise its query is spent and it leaves the decision set. The thresholds ``t`` are computed
+    once from the current prediction and held fixed over the fantasies; after a real readout
+    `BridgedTransferModel.thresholds` would move them, so the planned and the executed scores
+    target different events (an approximation; see the module docstring).
 
     After the first pick the covariance is shrunk for the items already in the batch while the
     mean is held (a kriging-believer step). With ``rebase=True`` the decision items' hit chances

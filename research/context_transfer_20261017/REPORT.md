@@ -5,6 +5,25 @@ after the freeze (`FREEZE.json`, 04:43:08Z). The run took 2,209 s. `verify.py` r
 reported number from the cached records and prints `VERIFIED`. Post-hoc analyses (§5) were run
 after the confirmation, on now-exposed data, and are labelled as such.
 
+> **Amendment (2026-10-17, after the run): claims and units.**
+> * `CLAIMS.json` (`claims.py`) keeps CONFIRMED as the record of protocol execution and states what
+>   is established. Supported: the functional-feedback gain under this replay. Not established:
+>   * a cell-state model beyond the population prior;
+>   * a procedure-selection gain;
+>   * an LLM gain;
+>   * the repaired planner (development);
+>   * a total-cost advantage.
+> * As frozen, C3 (adaptivity) is decided by P5 non-inferiority. C4 (beats fixed pipelines)
+>   passes on any of P1, P2 or P6. Neither tests what its name says, and P6 beat a defective
+>   comparator. "SUPPORTED" means a positive gain; P1's lower bound (0.025) does not show a gain
+>   above the frozen minimum useful effect of 0.05.
+> * A "well" below is one archived AUC query: one 7-dose profile, 112 treatment wells for 16
+>   queries if run. Bridged arms need a second round (about 72 h). The analysed matrix has 165
+>   inhibitors (the census's 166 includes one measured only without RNA-seq).
+> * Every fold refits on Beat AML source patients. This is workflow transfer, not biological
+>   knowledge transfer from PRISM.
+> * The follow-up attribution study is `research/feedback_attribution_20261017`.
+
 ## 1. Verdict
 
 **Framework verdict: CONFIRMED** under the frozen definitions (C1–C4 all hold). The claims are

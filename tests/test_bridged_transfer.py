@@ -218,3 +218,13 @@ def test_design_census_reads_only_declared_columns(tmp_path):
 
 def json_keys(obj):
     return set(obj) | {k for v in obj.values() if isinstance(v, dict) for k in v}
+
+
+def test_every_bridge_rule_states_its_evidence_grade():
+    from agent.bridge_design import RULE_STATUS
+    from agent.procedure_selection import SELECTION_STATUS
+
+    assert set(RULE_STATUS) == set(BRIDGE_RULES)
+    assert RULE_STATUS["lookahead"].startswith("development")
+    assert "confirmed" in RULE_STATUS["exploit"]
+    assert SELECTION_STATUS[("hybrid", "lookahead")].startswith("development")

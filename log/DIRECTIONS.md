@@ -31,6 +31,14 @@ scope, existing evidence, novelty boundaries, task matrix and next study gates.
    item prior there; a new context-transfer claim must beat `item`, not only
    nearest-context transfer. The corrected batch lookahead needs its own fresh
    confirmation before any claim, ideally on a domain with uneven measurement.
+8. Feedback attribution (`research/feedback_attribution_20261017`, development):
+   * The confirmed gain is item-specific functional feedback. It is not the basal-RNA prior,
+     procedure selection or overall-sensitivity calibration.
+   * A drug-specific ridge on the same basal PCs is the strongest one-round comparator, and every
+     future feedback claim must beat it.
+   * Next is gate G1 (development, $0): coherent score, probe count chosen on source patients, and
+     ridge plus feedback, against the ridge.
+   * Confirmation needs an unexposed domain. The PRISM 24Q2 metadata check needs authorisation.
 
 ## Next bounded step
 
