@@ -85,6 +85,15 @@ scope, existing evidence, novelty boundaries, task matrix and next study gates.
    the fixed design as the reference; a future acquisition claim needs richer decisions (more adaptive steps, other utilities) and
    independent measurements, not more proposals on these ten features.
 
+12. Observable-state discovery (`research/observable_state_20261018`, development, exposed PRISM 19Q4): 136 MoA families, one typed edit per
+   family per arm, confirmed on held-out compounds x held-out lineages. Confirmation rates: random 0.051, enumerator 0.059, target-gene rule 0.088,
+   deepseek-flash agent 0.081, identity-masked agent 0.059. Agent - enumerator +0.022 [-0.022, +0.074]; agent claim and typed-edit thesis withdrawn
+   for this arena (not a project-wide STOP). Only live lead: knowledge-informed state variables (target-gene rule - random +0.037, unadjusted p 0.028).
+   Agents stated p about 0.45 against 0.08 observed. Decision-level secondary (S2) not run. See `REPORT_OBS.md`.
+   * Interpretation: this withdraws the Agent and typed-edit claims for this closed-vocabulary, one-bet-per-family arena; it does not test
+     other edit primitives or decision utility. Treat target-gene state as an unconfirmed exploratory lead only. Do not start another Agent
+     proposal search on the same exposed arena; independent, powered validation and a decision-level estimand are prerequisites for revival.
+
 ## Next bounded step
 
 **Programme-wide prerequisite: MT-P0.** Qualify a compact A/B task, lineage, action,
@@ -93,6 +102,11 @@ with unseen compound groups and known contexts; qualify new-context and joint ho
 separately. Keep a small procedure library, ordinary conditional regression,
 unconditional residual, simple gate and standard design. A logged unchosen procedure has
 no observed counterfactual utility.
+
+For the observable-state lead, do not run further proposals on exposed PRISM families. First
+qualify whether any independent, powered source can test the target-gene state and define a
+decision-level endpoint. If neither is available, retain the lead as exploratory and do not
+promote it; S2 from the current study was not run.
 
 **Beat AML question: G1 is done.** It failed and the low-rank state-model branch is stopped (see item 8).
 The only conditionally permitted continuation is a confirmation of the exploit-first feedback pattern on

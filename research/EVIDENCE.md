@@ -1,5 +1,12 @@
 # Evidence Register
 
+2026-10-18: [Observable-state bets](observable_state_20261018/REPORT_OBS.md), **AGENT CLAIM WITHDRAWN** (exposed PRISM 19Q4, internal development
+assessment; freezes FREEZE0/1, `verify.py` VERIFIED). 136 MoA families, within-family chemical split, 7 held-out lineages; one typed edit per family per arm.
+Confirmation rate: random 0.051 (test calibrated), enumerator 0.059, target-gene rule 0.088, agent 0.081, masked agent 0.059. Agent - enumerator +0.022
+[-0.022, +0.074] (upper bound < +0.10); agent - target-gene rule -0.007; agent - random +0.029 [-0.005, +0.069]. Exploratory: target-gene rule - random +0.037
+[+0.003, +0.075], unadjusted. Stated probabilities ~5x overconfident. Not tested: decision utility, other edit primitives, independent data.
+
+
 2026-10-17: [Program revision](program_revision_20261017/REPORT.md), **METHOD NOT SUPPORTED**
 (pre-registered on PRISM 19Q4 HTS002; freeze 12:55:48Z; future strata opened once at 13:09:54Z;
 `verify.py` VERIFIED). Not an independent confirmation: the future strata come from the same screen.

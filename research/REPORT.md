@@ -91,6 +91,15 @@ ridge/R1 lists gives 131 vs 100 hits (unavailable diagnostic; the old per-compou
   acquisition choice is +7% held-out (+34% in development). Lookahead probabilities rank but overstate levels about tenfold.
   Candidate failures are recorded; ridge-plus-feedback and the fixed design remain the reference.
 
+2026-10-18: [Observable-state bets](observable_state_20261018/REPORT_OBS.md) are an internal development assessment on exposed PRISM 19Q4.
+Across 136 MoA families, the held-out confirmation rate was 0.081 for the agent, 0.059 for a conventional enumerator, 0.088 for the
+non-LLM target-gene rule, 0.059 for the identity-masked agent, and 0.051 for random edits. The agent did not meet its registered margin
+against the enumerator (+0.022 [-0.022, +0.074]) or knowledge rule (-0.007 [-0.037, +0.015]); the typed-edit thesis was withdrawn for
+this arena. Agent confidence was poorly calibrated (mean stated probability 0.45 vs 0.081 observed). The target-gene rule's
++0.037 [+0.003, +0.075] vs random is exploratory and unadjusted, below the practical margin. Decision utility was not evaluated (S2 not
+run); no response state, Agent advantage, or independent transfer is established. Keep this as a bounded negative assessment and the
+target-gene rule as an unconfirmed lead only.
+
 2026-10-17: [Program revision](program_revision_20261017/REPORT.md) is a pre-registered study on
 PRISM 19Q4 (freeze 12:55:48Z, future strata opened once at 13:09:54Z; `verify.py` VERIFIED). It asks
 whether MAESTRO's agent improves future decisions by revising a shared library of executable,
@@ -173,7 +182,7 @@ retained-lineage-field guards are engineering repairs, not scientific gains.
 Static scores, label-count inference and absent local ledger authentication remain
 explicit limitations. Prior freezes and sealed outcomes were not changed.
 
-Updated 2026-10-17. This is the current decision summary; [EVIDENCE.md](EVIDENCE.md)
+Updated 2026-10-18. This is the current decision summary; [EVIDENCE.md](EVIDENCE.md)
 keeps the numerical historical register. [STUDIES.json](STUDIES.json) registers the
 retained studies. Each study keeps its protocol, results, deviations, source
 identities, paid-call records and verifier. Software tests do not establish scientific validity.
@@ -212,6 +221,16 @@ totals mostly re-read measured pairs and are not evidence of propagation. No rep
 Agent/LLM search is justified. Together with G1, the current evidence supports scoped feedback as a
 workflow component, while learned model correction, procedure selection, and autonomous revision
 remain unsupported or unconfirmed. PRISM results are exposed-data development, not confirmation.
+
+The 2026-10-18 observable-state assessment tests whether an Agent can propose typed,
+falsifiable response-state bets beyond a conventional enumerator. It did not: the
+registered Agent comparisons failed, the estimated effects were below the practical
+margin, and stated probabilities were about fivefold too high. A non-LLM target-gene
+rule showed a small exploratory signal, but it was unadjusted, below the practical
+margin, and did not establish decision value. This narrows the live question to whether
+knowledge-informed state variables can be independently and decision-relevantly
+validated; it does not support the broader Agent or typed-edit claim. The campaign-level
+decision secondary was not run, and the study used exposed PRISM data.
 
 One secondary seed-attribution interval was also too narrow because repeated lineage draws were
 collapsed in its bootstrap; the separate [erratum](seed_attribution_20261017/ERRATUM_20261018.md)
@@ -309,6 +328,7 @@ budget, and a predeclared useful net-benefit threshold.
 | [Seed attribution](seed_attribution_20261017/REPORT.md) | Development on exposed PRISM 19Q4. Contract repaired (single endpoint, out-of-sample variance, data-keyed cache); frozen bench trained on reserved query outcomes (masked bench exactly invariant). Seed minus strong: policy +0.356 [-0.088, +0.856], I2 +0.117 [-0.026, +0.248], I1 +0.283 [-0.065, +0.699]; all NOT_CONFIRMED. Seed beats all 20 matched permutations (exact p 1/21) but only I2 passes the reading rule; ridge on the same 10 features matches it (-0.004 [-0.198, +0.166]); capacity, per-drug loadings and variance add nothing. | Seed library kept as an optional scoped component, exploratory effect; comparator for any library claim is a ridge on its features. Revision, LLM proposal and grammar search stopped; opportunity diagnostic not run. |
 | [Beat AML G1](beataml_g1_20261017/REPORT.md) | Development on exposed Beat AML, frozen before the run. Candidate minus ridge +0.098 [+0.045, +0.153]; strict gate lower bound -0.005 net of a round. Probe round: +0.125 (low-rank), +0.083 (ridge); candidate minus ridge-plus-feedback +0.015 [-0.036, +0.066]; low-rank prior without observations -0.027 [-0.065, +0.011]. | G1 FAILED: stop the low-rank state-model branch; keep exploit-first feedback on the strongest prior with the ridge as comparator. No confirmation domain. |
 | [Feedback propagation](feedback_propagation_20261018/REPORT.md) | Development on exposed PRISM 19Q4 folds 2-4, frozen before the run. Ridge-plus-feedback +1.06 events/64 compounds over the structure prior on unmeasured pairs; analogue-anchored repair vs ridge +0.14 [-0.58, +0.87], vs kNN +0.08 [-0.28, +0.44]; diagnosis AUC 0.59-0.63; old triage hits are 99.7% probed pairs. | STOP: no program search; ridge-plus-feedback with kNN comparator stays the reference. |
+| [Observable-state bets](observable_state_20261018/REPORT_OBS.md) | Exposed PRISM, 136 MoA families. Confirmation rates: random 0.051, enumerator 0.059, target-gene rule 0.088, Agent 0.081, identity-masked Agent 0.059. Agent - enumerator +0.022 [-0.022, +0.074]; Agent - target-gene rule -0.007 [-0.037, +0.015]; Agent confidence 0.45 vs 0.081 observed. S2 decision utility not run. | Withdraw Agent and typed-edit claims for this arena; keep target-gene rule as an exploratory, unconfirmed lead. No project-wide STOP; no independent confirmation. |
 
 Earlier supported results remain in [EVIDENCE.md](EVIDENCE.md): Block P's +17
 unexpected hits [+11,+23], and Block N's scoped transcriptional transfer gains.
