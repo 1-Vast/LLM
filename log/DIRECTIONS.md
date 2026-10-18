@@ -36,18 +36,37 @@ scope, existing evidence, novelty boundaries, task matrix and next study gates.
      procedure selection or overall-sensitivity calibration.
    * A drug-specific ridge on the same basal PCs is the strongest one-round comparator, and every
      future feedback claim must beat it.
-   * Next is gate G1 (development, $0): coherent score, probe count chosen on source patients, and
-     ridge plus feedback, against the ridge.
-   * Confirmation needs an unexposed domain. The PRISM 24Q2 metadata check needs authorisation.
+   * Gate G1 ran (`research/beataml_g1_20261017`, development, $0) and **failed**: the frozen candidate
+     (coherent score, exploit-first probes, k chosen on source patients) beats the ridge by +0.098
+     [+0.045, +0.153], but the lower bound net of 0.05 per extra round is -0.005 (needs > 0.05). The probe
+     round adds +0.125 to the low-rank model and +0.083 to a ridge; ridge-plus-feedback is within +0.015
+     [-0.036, +0.066] of the candidate; the low-rank prior without observations is -0.027 [-0.065, +0.011]
+     against the ridge. **Stop the low-rank state-model branch** on Beat AML.
+   * Keep the feedback design pattern on the strongest prior, with the ridge as comparator (k = 8 is
+     the post hoc best). Confirmation needs an unexposed, powered domain; none is local. The PRISM 24Q2
+     metadata check needs authorisation.
 
-9. Program revision (`research/program_revision_20261017`, method not supported):
-   * A fixed textbook library of observably gated programs improves decisions on future lines and
-     most on unseen lineages; autonomous revision, stepwise search and the LLM add nothing to it.
+9. Program revision (`research/program_revision_20261017`, method not supported) and its repair
+   (`research/seed_attribution_20261017`, development):
+   * The frozen evaluation was not one contract and its development bench trained on the reserved query
+     outcomes. Corrected seed minus strong model: policy +0.356 [-0.088, +0.856], I2 +0.117 [-0.026,
+     +0.248], I1 +0.283 [-0.065, +0.699]; all NOT_CONFIRMED. The earlier +0.21/+0.45/+0.44 are superseded.
+   * A fixed textbook library of observably gated programs has a positive but unconfirmed effect on future
+     lines (concentrated in BRAF/NRAS-mutant skin lines; negative on gate-negative lines). It exceeds all 20
+     matched permutations, and a ridge on the same ten scope-by-gate features matches it: the information is
+     in the pairings, not in capacity, per-drug loadings or uncertainty estimation.
+   * Autonomous revision, stepwise search and the LLM add nothing to it. The primary LLM library equalled
+     the fixed seed library; residual-coefficient sign disagreement (20-23% of LLM candidates) is not a
+     measured biological error rate; seeded-arm ablations do not cover every empty-start program;
+     same-screen future strata are not independent confirmation.
    * Do not run revision against within-lineage support/query arenas: the gates that pay in new
      lineages are rare there. A further attempt needs lineage-disjoint arenas, a pooled gate-count
      floor, and curated (non-LLM) proposals as the comparator for any LLM role.
    * In complete campaigns use exploit-first feedback, not up-front probes; the comparator for any
-     new library claim is the seed library, not the strong model.
+     new library claim is the seed library *and* a ridge on its features, not the strong model alone.
+   * Any new replay must mask the reserved pool before every upstream fit and reveal outcomes only through
+     the acquisition interface (`replay.MaskedBench`); keep shared historical data, incremental research,
+     deployment, rounds, compute/curation and logical queries as separate cost accounts.
 
 ## Next bounded step
 
@@ -58,18 +77,20 @@ separately. Keep a small procedure library, ordinary conditional regression,
 unconditional residual, simple gate and standard design. A logged unchosen procedure has
 no observed counterfactual utility.
 
-**Next bounded analysis within the existing Beat AML question: G1.** Pre-register one
-candidate, then compare coherent-score/exploit-first choices (k ∈ {4, 8, 12}) and
-ridge-plus-feedback against the empirical item prior, drug-specific ridge and current
-two-round engine. Proceed only if its lower bound exceeds 0.05 hits per sample net of
-extra-round cost; otherwise stop the low-rank state-model branch. This is development on
-exposed data, not confirmation.
+**Beat AML question: G1 is done.** It failed and the low-rank state-model branch is stopped (see item 8).
+The only conditionally permitted continuation is a confirmation of the exploit-first feedback pattern on
+a new, independent, powered domain, with ridge-plus-feedback as comparator and the round value declared in
+advance. No such domain is local, so this is blocked, not scheduled.
 
-**Deferred PRISM question.** Do not start another program-revision claim until the
-lineage-disjoint arena meets the pooled gate-count floor and curated non-LLM proposals
-are included. PRISM 24Q2 REP.1M remains sealed until access is authorised and
-independence is verified. These gates are independent of G1 and do not turn same-screen
-future strata into confirmation.
+**PRISM question: NO-GO for autonomous applicability-boundary revision.** The opportunity gates did
+not pass (no primary seed test has a positive lower bound under the corrected contract), so no revision
+protocol is drafted and no revision, LLM-proposal or grammar-search campaign starts. A later attempt needs
+a masked replay, lineage-disjoint arenas that meet the pooled gate-count floor, curated non-LLM proposals
+as the comparator and a practical target of at least +0.10 hits per line with a positive lower bound under
+the preregistered multiplicity rule. PRISM 24Q2 REP.1M remains sealed until access is authorised and
+independence is verified; public-metadata checks may proceed within existing authorisation and must record
+access status, provenance, prior exposure, overlap and task compatibility separately. Same-screen future
+strata are not independent confirmation.
 
 The [synthetic loop audit](program_review_20261017/LOOP_AUDIT.json) reproduces
 static A -> B -> C ordering under opposite feedback in both HEAD and the working
@@ -103,6 +124,9 @@ reopen PRESAGE P1-P3. No sealed tier is opened by this plan.
   an Agent claim that disappears under a matched no-LLM comparison.
 - Stop learned procedure-value claims if labels or action support are unqualified;
   do not call larger memory, a programme schema or masked episodes new learning.
+- Stop development of the low-rank bridged state model on Beat AML (G1 failed); stop revision,
+  stepwise, LLM-proposal and grammar-search work on the PRISM seed arena; the earlier reported
+  PRISM seed gains are superseded by the corrected contract.
 - Stop covariance-inflation repair and model averaging of the bridged prior
   (harmful or neutral in development, neutral on Beat AML) and the LLM bridge
   picker (no gain over exploit-first or the corrected lookahead).

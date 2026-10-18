@@ -26,24 +26,70 @@ tuning. It does not establish independent discovery, new model-repair value or
 Agent benefit. See the [reuse audit](../log/program_review_20261016/REVIEW.json).
 The draft indication-triage study, its results and its sealed tier are preserved.
 
+2026-10-17: [Seed attribution](seed_attribution_20261017/REPORT.md) repairs the PRISM evaluation
+contract and asks what explains the fixed-seed benefit. It is **development** on the same exposed
+PRISM 19Q4 strata (`verify.py` VERIFIED; nothing frozen was edited; no sealed tier opened).
+* The earlier evaluation was not one contract: score reference `(X2+X3)/2` (NaN for single replicates) against
+  labels on the mean of available replicates, 100 source drugs with no frozen threshold (24 remain
+  undefined and are refused by name), a fit cache that ignored the data, and a Gaussian crossing score
+  that ranks well (AUROC 0.834) but is not shown to be a calibrated probability of the complete
+  qualified-hit event.
+* The frozen development bench is not a prospective replay: every fold trains on 74-101 of the 103
+  reserved query lines, and scrambling query outcomes changes the fold means, residuals, probe design,
+  proposals and diagnosis. The masked bench (`replay.MaskedBench`) is exactly invariant. Query hits
+  for the seed library fall from 4.41 to 3.87 per line (I2) once the query lines are masked.
+* **Corrected evidence statement.** Seed minus strong model: I2 +0.211 [+0.097, +0.340] frozen, **+0.117
+  [-0.026, +0.248]** repaired; I1 +0.445 -> +0.283 [-0.065, +0.699]; exploit-first campaign +0.437 ->
+  **+0.356 [-0.088, +0.856]**. All three registered primary tests are NOT_CONFIRMED (Holm p 0.29-0.31).
+  Point estimates stay positive; the gain is concentrated in skin (82% of the policy gain) and
+  BRAF/NRAS-mutant lines, with a loss of -0.32 hits/line on gate-negative lines.
+* Attribution: the seed pairing exceeds all 20 capacity- and support-matched permutations at every layer
+  (the smallest possible exact p, 1/21) but the matched contrast is only supported at I2 (lower bound
+  +0.001, Holm p 0.22). Extra capacity, per-drug loadings and uncertainty estimation add nothing; a plain
+  ridge on the same ten scope-by-gate features matches the library (B - C1 -0.004 [-0.198, +0.166]); a
+  ridge given all 72 products does not find the pairings (+0.093 [-0.018, +0.191]).
+* Cost units are now six separate accounts. Part 4 (small-menu opportunity diagnostic) was not run: no
+  primary test had a positive lower bound.
+
+2026-10-17: [Beat AML gate G1](beataml_g1_20261017/REPORT.md) (development, exposed data, frozen before
+the run, `verify.py` VERIFIED) **FAILED**. The frozen candidate (coherent score, exploit-first probes,
+k chosen on source patients) beats the ridge by +0.098 [+0.045, +0.153] total hits per sample; the
+registered gate needs the lower bound minus 0.05 per extra round to exceed 0.05 (it is -0.005).
+* The probe round, not the low-rank model, carries the gain: it adds +0.125 to the candidate and +0.083
+  to a ridge; ridge-plus-feedback is within +0.015 [-0.036, +0.066] of the candidate, and the low-rank
+  prior without observations is no better than the ridge (-0.027 [-0.065, +0.011]).
+* The confirmed two-round engine is not shown better than the one-round ridge (+0.019 [-0.033, +0.073]);
+  the candidate beats it by +0.079 [+0.032, +0.127].
+* Registered consequence: **stop the low-rank state-model branch**; keep the feedback pattern on the
+  strongest prior with the ridge as comparator. k = 8 is best post hoc (+0.131 over the ridge, not
+  passing the strict gate).
+
 2026-10-17: [Program revision](program_revision_20261017/REPORT.md) is a pre-registered study on
 PRISM 19Q4 (freeze 12:55:48Z, future strata opened once at 13:09:54Z; `verify.py` VERIFIED). It asks
 whether MAESTRO's agent improves future decisions by revising a shared library of executable,
 observably gated response programs on top of a strong low-rank model. It does not.
-* A 10-program textbook seed library helps on 247 future lines: +0.21 hits/line with 8 probe wells
-  (H1, Holm p 0.004), +0.45 with none, +0.44 in exploit-first campaigns. The gain is largest on
-  unseen lineages (+0.25 vs +0.10 at I2).
+* A 10-program textbook seed library helped on 247 future lines under the **frozen** contract: +0.21
+  hits/line with 8 probe wells (H1, Holm p 0.004), +0.45 with none, +0.44 in exploit-first campaigns.
+  **Superseded by the corrected contract above**: +0.12, +0.28 and +0.36, no interval excluding zero.
+  The gain is larger on unseen lineages (+0.25 vs +0.10 at I2, frozen).
 * Revision adds nothing: editable minus fixed library 0.000 (H4), vs stepwise search +0.008 (H2),
-  LLM vs enumeration +0.004 (H3). Programs learned from an empty start give +0.05; every
-  revision-added program has ablation value <= 0. Joint measurement edits changed nothing.
-* About 4,300 development wells per arm bought no gain over the free seed; the cost is never repaid.
+  LLM vs enumeration +0.004 (H3). The 0.000 reflects that the primary LLM library **equalled** the
+  fixed seed library (no revision-added program survived), not a measured difference between two
+  different libraries. Programs learned from an empty start give +0.05 in the seeded-arm ablations,
+  which do not cover every empty-start program; every revision-added program has ablation value <= 0.
+  Joint measurement edits changed nothing.
+* About 4,300 logical development wells per arm bought no gain over the free seed; the cost is never
+  repaid. These are per-pair logical charges, not plate wells (the cost-unit accounts are separated in the
+  seed attribution).
 * Post hoc: the within-lineage development arena would reject most useful seed programs (6
-  BRAF-mutant query lines vs 37 in future lineages), and the LLM committed the wrong direction for
-  20-23% of its candidates (caught by the direction check).
+  BRAF-mutant query lines vs 37 in future lineages). For 20-23% of the LLM's candidates the sign of the
+  residual coefficient disagreed with the stated direction; that is a sign disagreement in a fitted
+  residual, not a measured biological error rate. The development bench itself trained on the reserved
+  query outcomes (see the seed attribution above), so its development numbers were not prospective.
 * Shared loadings do not transfer to unseen drug structure groups. In 28-well campaigns, 8 probes
   lose to exploit-first feedback (-0.38). AFA beats a fixed design (+0.22) at 10 rounds.
-* No independent confirmation (same screen). Cost: 0 purchased wells (archived outcomes),
-  deepseek-flash 0.287 USD.
+* No independent confirmation: same-screen future strata are not independent. Cost: 0 purchased wells
+  (archived outcomes), deepseek-flash 0.287 USD.
 
 2026-10-17: [Feedback attribution](feedback_attribution_20261017/REPORT.md) is a
 pre-registered **development** study on the same, exposed Beat AML data. Its audit is in
@@ -113,27 +159,38 @@ Virtual Cell alone. This supports a bounded workflow result within Beat AML, not
 biological replication or an Agent/LLM advantage. The exposed-data attribution study narrows the
 interpretation: readouts carry useful drug-specific information, but the RNA prior does not beat
 the empirical item prior or same-feature drug-specific ridge; no procedure selector beats tuned
-exploit-first. Its coherent score is promising for ranking, but remains uncalibrated. The measured
-gain therefore motivates one gated development comparison, not a general state-model claim.
+exploit-first. Its coherent score is promising for ranking, but remains uncalibrated. Gate G1 then ran
+(2026-10-17) and failed: the probe round carries the gain, a ridge given the same round is within +0.015
+of the low-rank candidate, and the candidate's lead over the one-round ridge (+0.098 [+0.045, +0.153]) does
+not clear 0.05 net of a round. The functional-feedback result stands as a workflow result; the low-rank
+state model adds nothing to it on this domain.
 
 The PRISM program-revision study is a separate result. A fixed textbook library helps on future
 lines within that screen, especially unseen lineages, but autonomous revision, conventional search,
 LLM proposals and joint measurement edits add no value; the revision cost is not recovered. This is
 prior-knowledge use, not learned discovery, and it does not transfer to unseen drug structure
-groups. Its same-screen future strata are not independent confirmation. The shared cross-study
+groups. Its same-screen future strata are not independent confirmation. The seed attribution then
+showed that the frozen evaluation contract and development bench were inconsistent and non-prospective;
+under the repaired contract the seed gain is positive but unconfirmed (+0.12 to +0.36), concentrated in
+BRAF/NRAS-mutant skin lines, and matched by a ridge on the same ten features. The shared cross-study
 lesson is to test against the strongest simple comparator and align development arenas with the
 target strata; it does not make the Beat AML and PRISM effects one pooled finding.
 
 **Work order.** First, MT-P0 qualifies the compact A/B task, action, cost and dependence manifest;
-this is a programme-wide prerequisite for learning procedure value. For the already scoped Beat AML
-question, the next bounded analysis is G1: freeze one candidate, compare coherent-score/exploit-first
-choices (k ∈ {4, 8, 12}) and ridge-plus-feedback against the item prior, ridge and current two-round
-engine, then proceed only if the lower bound exceeds 0.05 hits per sample net of extra-round cost.
-Otherwise stop the low-rank state-model branch and retain only the supported feedback workflow on
-the strongest prior. PRISM lineage-disjoint revision is a separate later question: require the
-pooled gate-count floor and curated non-LLM proposal control, then do not open PRISM 24Q2 REP.1M
-until access is authorised and independence is established. Neither development analysis establishes
-confirmation; if no qualified independent domain is available, keep the broader claim blocked.
+this is a programme-wide prerequisite for learning procedure value. G1 is complete and failed: do not
+develop further variants of the low-rank state model on Beat AML; keep the exploit-first feedback pattern
+with a ridge as the mandatory comparator. **Conditionally permitted:** a confirmation of the feedback
+pattern only on a new, independent, powered domain, with ridge-plus-feedback as the comparator and the
+round value declared in advance; none is local, so it stays blocked. **NO-GO:** an autonomous
+applicability-boundary revision study on PRISM. The opportunity gates did not pass (no primary seed test
+has a positive lower bound under the corrected contract), so no such protocol is drafted here and no
+revision, LLM-proposal or grammar-search campaign is started. Any later PRISM question needs
+`replay.MaskedBench`, lineage-disjoint arenas, the pooled gate-count floor and curated non-LLM proposals as
+comparator, and PRISM 24Q2 REP.1M stays sealed until access is authorised and independence is verified.
+Public-metadata checks may proceed within existing authorisation; they must record access status,
+provenance, prior exposure, overlap and task compatibility separately and must not read sealed response
+outcomes. Neither development analysis establishes confirmation; if no qualified independent domain is
+available, keep the broader claim blocked.
 
 ## Auto-Research infrastructure (implemented thin core, 2026-10-16)
 
@@ -206,8 +263,10 @@ budget, and a predeclared useful net-benefit threshold.
 | [Orbit contrast](orbit_contrast_20261013/README.md) | Identity contrast +0.0104 in compound response; no gene-task identity value. Gate worse than unconditional residual (-0.0045); target triage unsupported. | IDENTITY_WITHOUT_METHOD / MECHANISM_CLASS_ONLY. Keep orbit decomposition as an evaluation device, not a promoted method. |
 | [Mechanism falsification](mechanism_falsification_20261014/README.md) | 61,413 annotation pairs, zero measured positive or negative mechanism references. Strict benchmark 21/21 vs historical 6/21. Exploratory conformal FDP 0.26-0.70. | ASSET_BLOCKED. Contract conformance is not scientific improvement. Stop algorithm development without measured truth. |
 | [Context transfer](context_transfer_20261017/README.md) | One-shot Beat AML 2.0: source-verified exploit-first bridging 0.850 hits/sample vs Virtual Cell alone 0.777 (+0.073, Holm p 0.0075), pilot matching 0.621, frozen lookahead 0.742. Virtual Cell prior vs item -0.008. P2 0, P5 trivial. | Keep exploit-first bridge feedback within the docstring scopes. Cell-state prior, procedure selection, LLM and cost advantage are not established (CLAIMS.json). Corrected lookahead needs a fresh confirmation; repair/averaging stopped. |
-| [Feedback attribution](feedback_attribution_20261017/README.md) | Development on exposed Beat AML. Common-probe attribution: update without RNA +0.096, RNA with feedback +0.065, structure vs overall-sensitivity update +0.081, deranged control -0.115. RNA prior vs item prior -0.017; drug-specific ridge beats the RNA prior (+0.065) and is not beaten by the two-round engine (+0.023, CI crosses 0). Coherent score +0.04 to +0.08; 8 probes beat 4 (+0.065); no selector beats tuned exploit-first. | Next: G1 development test of coherent score + probe count + ridge-plus-feedback against the ridge (REPORT.md section 6). Independent confirmation blocked: no unexposed domain; PRISM 24Q2 independence unverified. |
-| [Program revision](program_revision_20261017/README.md) | PRISM 19Q4, 247 future lines. Seed library +0.211 hits/line at I2 (Holm p .004), +0.445 at zero observation, +0.437 in exploit-first campaigns. Editable vs fixed 0.000; vs stepwise +0.008; LLM vs enumeration +0.004. No transfer to unseen drug groups. | Method not supported; revision wells never repaid. Seed library is knowledge use, not discovery. Next: lineage-disjoint revision, confirmed on PRISM 24Q2 after authorisation. |
+| [Feedback attribution](feedback_attribution_20261017/README.md) | Development on exposed Beat AML. Common-probe attribution: update without RNA +0.096, RNA with feedback +0.065, structure vs overall-sensitivity update +0.081, deranged control -0.115. RNA prior vs item prior -0.017; drug-specific ridge beats the RNA prior (+0.065) and is not beaten by the two-round engine (+0.023, CI crosses 0). Coherent score +0.04 to +0.08; 8 probes beat 4 (+0.065); no selector beats tuned exploit-first. | G1 has run and failed (see below). Independent confirmation blocked: no unexposed domain; PRISM 24Q2 independence unverified. |
+| [Program revision](program_revision_20261017/README.md) | PRISM 19Q4, 247 future lines. Seed library +0.211 hits/line at I2 (Holm p .004), +0.445 at zero observation, +0.437 in exploit-first campaigns. Editable vs fixed 0.000; vs stepwise +0.008; LLM vs enumeration +0.004. No transfer to unseen drug groups. | Method not supported; revision wells never repaid. Seed library is knowledge use, not discovery. Frozen numbers superseded by the corrected contract (next row); revision NO-GO. |
+| [Seed attribution](seed_attribution_20261017/REPORT.md) | Development on exposed PRISM 19Q4. Contract repaired (single endpoint, out-of-sample variance, data-keyed cache); frozen bench trained on reserved query outcomes (masked bench exactly invariant). Seed minus strong: policy +0.356 [-0.088, +0.856], I2 +0.117 [-0.026, +0.248], I1 +0.283 [-0.065, +0.699]; all NOT_CONFIRMED. Seed beats all 20 matched permutations (exact p 1/21) but only I2 passes the reading rule; ridge on the same 10 features matches it (-0.004 [-0.198, +0.166]); capacity, per-drug loadings and variance add nothing. | Seed library kept as an optional scoped component, exploratory effect; comparator for any library claim is a ridge on its features. Revision, LLM proposal and grammar search stopped; opportunity diagnostic not run. |
+| [Beat AML G1](beataml_g1_20261017/REPORT.md) | Development on exposed Beat AML, frozen before the run. Candidate minus ridge +0.098 [+0.045, +0.153]; strict gate lower bound -0.005 net of a round. Probe round: +0.125 (low-rank), +0.083 (ridge); candidate minus ridge-plus-feedback +0.015 [-0.036, +0.066]; low-rank prior without observations -0.027 [-0.065, +0.011]. | G1 FAILED: stop the low-rank state-model branch; keep exploit-first feedback on the strongest prior with the ridge as comparator. No confirmation domain. |
 
 Earlier supported results remain in [EVIDENCE.md](EVIDENCE.md): Block P's +17
 unexpected hits [+11,+23], and Block N's scoped transcriptional transfer gains.

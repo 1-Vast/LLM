@@ -31,6 +31,34 @@
   future lineages). LLM: 62-73% insufficient evidence, 20-23% wrong committed direction.
 * Cost: 0 purchased wells, deepseek-flash 0.287 USD (90 calls; 0.088 pre-freeze smoke).
 
+2026-10-17: [Seed attribution](seed_attribution_20261017/REPORT.md), **DEVELOPMENT** on the exposed
+PRISM 19Q4 strata; contract repair of the program-revision evaluation.
+* Defects: score reference `(X2+X3)/2` (NaN for one replicate) against labels on the available-replicate
+  mean; 100 source drugs without a frozen threshold (24 remain undefined, refused by name); thresholds
+  differ for 527 of 866 drugs; fit cache ignored the data; the Gaussian crossing score ranks (AUROC 0.834)
+  but is not a calibrated probability of the qualified-hit event.
+* The frozen development bench trained every fold on 74-101 of the 103 reserved query lines. Seed-library
+  query hits at I2: 4.41/line frozen vs 3.87 masked. The masked bench is exactly invariant.
+* Seed minus strong (247 lines, 21 lineage clusters): policy +0.356 [-0.088, +0.856] (frozen +0.437
+  [0.041, 0.889]), I2 +0.117 [-0.026, +0.248] (frozen +0.211 [0.097, 0.340]), I1 +0.283 [-0.065, +0.699]
+  (frozen +0.445). Primary family NOT_CONFIRMED (Holm p 0.29-0.31).
+* Attribution (policy / I2 / I1): B vs 20 matched permutations +0.348 / +0.140 / +0.311 (seed above all 20
+  nulls everywhere; matched contrast supported at I2 only, lower bound +0.001); capacity +0.009 / -0.023 /
+  -0.027; shared-only vs strong +0.324 / +0.093 / +0.146; per-drug loadings +0.032 / +0.024 / +0.138;
+  variance-only +0.012 (I2), +0.004 (I1); global ridge on the ten features matches B (-0.004, +0.008,
+  +0.166); ridge on all 72 products +0.093 / +0.032 / +0.008.
+* Skin carries 82% of the policy gain; gate-negative lines lose 0.32 hits/line; equal-lineage mean +0.057
+  [-0.175, +0.267]. Part 4 not run. Cost 0 wells, $0.
+
+2026-10-17: [Beat AML gate G1](beataml_g1_20261017/REPORT.md), **DEVELOPMENT** (exposed Beat AML, frozen
+before the run). Total hits over 16 queries per sample, 520 samples, 479 patients.
+* A_item 0.785, S_ridge 0.835, C0 (low-rank prior) 0.808, E (confirmed engine) 0.854, RF (ridge plus
+  feedback) 0.917, CAND (frozen candidate) 0.933; fixed k = 4/8/12 candidate 0.900/0.965/0.908.
+* Gate CAND - S_ridge +0.098 [+0.045, +0.153]; net lower bound -0.005 (< 0.05): FAILED. CAND - RF +0.015
+  [-0.036, +0.066]; CAND - C0 +0.125 [+0.074, +0.180]; RF - S_ridge +0.083 [+0.042, +0.127]; C0 - S_ridge
+  -0.027 [-0.065, +0.011]; CAND - E +0.079 [+0.032, +0.127]; E - S_ridge +0.019 [-0.033, +0.073].
+* Decision: stop the low-rank state-model branch. Cost 0 wells, $0, 43 s.
+
 2026-10-17: [Feedback attribution](feedback_attribution_20261017/REPORT.md), **DEVELOPMENT**
 (pre-registered; freeze 06:45:10Z; `verify.py` VERIFIED). This is not a confirmation: Beat AML
 was already exposed. The Phase 1 audit is in [AUDIT.md](feedback_attribution_20261017/AUDIT.md).
