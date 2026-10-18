@@ -82,6 +82,15 @@ observed feedback can identify and repair a failure in how responses propagate t
 * Value-greedy closed-loop acquisition is below the fixed A-optimal design at the same 3 pools (R1 2.25 vs
   2.78), because it measures the pairs it would nominate.
 
+2026-10-18: [Acquisition programs](acquisition_program_20261018/REPORT.md) (development, exposed PRISM 19Q4, whole-pool target set so probes never
+reveal target entries; frozen incumbents before held-out; `verify.py` VERIFIED). Predecessor hindsight clarified: campaign-level best of
+ridge/R1 lists gives 131 vs 100 hits (unavailable diagnostic; the old per-compound selector chose by squared error).
+* Held-out (folds 2-4, five fresh paired noise draws, events per 64 compounds): fixed design 1.822; one-step posterior lookahead 1.717
+  (−0.106 [−0.262, +0.022]); agent-search incumbent 1.725 (+0.008 [−0.033, +0.054] over the lookahead); conventional random search
+  accepted nothing in 12 proposals. A development lead (+0.100 [−0.003, +0.199]) did not transfer; the unavailable ceiling of the
+  acquisition choice is +7% held-out (+34% in development). Lookahead probabilities rank but overstate levels about tenfold.
+  Candidate failures are recorded; ridge-plus-feedback and the fixed design remain the reference.
+
 2026-10-17: [Program revision](program_revision_20261017/REPORT.md) is a pre-registered study on
 PRISM 19Q4 (freeze 12:55:48Z, future strata opened once at 13:09:54Z; `verify.py` VERIFIED). It asks
 whether MAESTRO's agent improves future decisions by revising a shared library of executable,

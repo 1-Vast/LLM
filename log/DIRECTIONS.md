@@ -79,6 +79,12 @@ scope, existing evidence, novelty boundaries, task matrix and next study gates.
      costed measurements (plate/well map, real replicates). Greedy value-based acquisition loses to the
      fixed A-optimal design on this utility.
 
+11. Acquisition programs (`research/acquisition_program_20261018`, development): with probes unable to reveal target entries, a one-step
+   posterior lookahead and an agent-searched value program do not beat the fixed A-optimal second pool on held-out groups (−0.106
+   [−0.262, +0.022]; agent vs lookahead +0.008). The choice has only +7% hindsight headroom held-out. Keep ridge-plus-feedback with
+   the fixed design as the reference; a future acquisition claim needs richer decisions (more adaptive steps, other utilities) and
+   independent measurements, not more proposals on these ten features.
+
 ## Next bounded step
 
 **Programme-wide prerequisite: MT-P0.** Qualify a compact A/B task, lineage, action,

@@ -51,6 +51,15 @@ PRISM 19Q4 strata; contract repair of the program-revision evaluation.
   [-0.206, +0.355] (corrected 2026-10-18: the saved [-0.175, +0.267] dropped lineage multiplicity in the bootstrap; see
   [seed_attribution_20261017/ERRATUM_20261018.md](seed_attribution_20261017/ERRATUM_20261018.md); primary tests unchanged). Part 4 not run. Cost 0 wells, $0.
 
+2026-10-18: [Acquisition programs](acquisition_program_20261018/REPORT.md), **DEVELOPMENT** (exposed PRISM 19Q4; two-stage freeze; `verify.py`
+VERIFIED). Whole-pool target set; second-pool choice; 3 pools per compound.
+* Clarification: predecessor `D_hindsight` selected by squared error; campaign-level best of ridge/R1 lists = 131 vs R1 100 (ridge 95).
+* Development (20 cells): fixed 305, lookahead 337, agent incumbent 343, hindsight ceiling 410. Searches (12 proposals each): conventional 0
+  accepted; agent 1 accepted, 1 no-op, 10 rejected.
+* Held-out (30 cells, per 64 compounds): fixed 1.822, lookahead 1.717 (−0.106 [−0.262, +0.022]), conventional = lookahead, agent 1.725
+  (−0.097 [−0.232, +0.026] vs fixed; +0.008 [−0.033, +0.054] vs lookahead); R1 1.922, gated 2.083, prior 0.931; hindsight ceiling 704 vs 656.
+* Decision: no acquisition program improves on the fixed design here; no project-wide stop is inferred. Cost 0 wells; DeepSeek flash 34k tokens.
+
 2026-10-18: [Feedback propagation](feedback_propagation_20261018/REPORT.md), **DEVELOPMENT** (exposed
 PRISM 19Q4 folds 2-4; freeze before the comparison; `verify.py` VERIFIED). Corrected audit: the old
 indication-triage hits (395, 293) are 99.7% / 100% on pairs the arm probed.

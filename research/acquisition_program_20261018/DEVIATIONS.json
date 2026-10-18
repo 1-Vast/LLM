@@ -1,0 +1,32 @@
+[
+ {
+  "stage": "development build",
+  "what": "The first parallel build (24 workers) failed for the fold-1 dev jobs with a Windows paging-file error; rebuilt with 10 single-thread workers. Scenario builds are deterministic (keyed noise, keyed Monte Carlo), so the cached cells do not depend on the worker count.",
+  "effect": "none"
+ },
+ {
+  "stage": "lookahead",
+  "what": "Event estimates use 32 posterior profile draws per sampled outcome; the top-3 selection on noisy estimates is optimistic (selection bias) and the probabilities are unvalidated. Calibration by quintile is reported in RESULTS.json.",
+  "effect": "affects interpretation of `la`, not grading"
+ },
+ {
+  "stage": "agent search",
+  "what": "Agent proposal 3 (`gain`) is algebraically identical to the incumbent `la` (gain = la - ev0 with ev0 constant per compound): a no-op that consumed one of the 12 proposals. Proposals were not edited or replaced.",
+  "effect": "none"
+ },
+ {
+  "stage": "tests",
+  "what": "The first draft of the feature-leak test was vacuous (features_for takes no hidden side); replaced by a test that scrambles every non-seed cell of the hidden matrix and shows identical features but a different counterfactual table.",
+  "effect": "none"
+ },
+ {
+  "stage": "freeze",
+  "what": "ap_build.py was edited once after FREEZE1 (worker count) and reverted before the held-out build; FREEZE1 matches the reverted file.",
+  "effect": "none"
+ },
+ {
+  "stage": "held-out build",
+  "what": "`import seal` inside the frozen ap_build.py/evaluate.py resolves to the predecessor study's seal.py (ap_task puts that study first on sys.path), which made the first held-out build fail at its freeze check before any scenario was built. The frozen files were not edited: the unhashed launcher launch.py registers this study's seal first.",
+  "effect": "none on any number; no held-out outcome was read by the failed attempt"
+ }
+]

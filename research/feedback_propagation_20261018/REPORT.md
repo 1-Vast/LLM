@@ -106,3 +106,13 @@ Registered contrasts (family-cluster bootstrap 95%, one-sided family sign-flip; 
 
 ``python -B verify.py`` (freeze, wiring, δ\*, recomputation of RESULTS.json from `records/`); ``python -B -m pytest research/feedback_propagation_20261018``.
 Amendment to `PROTOCOL.md` section 1.3: the first run of the old-loop audit mixed local and global indices (1.5% on probed pairs); see `DEVIATIONS.json`.
+
+## 8. Clarification appended 2026-10-18 (hindsight diagnostics)
+
+`D_hindsight` in `compare.py` selects between rules **per compound by squared error on unmeasured cells**, a model-fit
+criterion that reads the hidden side. It is not terminal decision utility, so its "hindsight gate" (+0.528) and "best-of
+rules" figures are not ceilings on nomination hits. Recomputed from the public records
+(`research/acquisition_program_20261018/hindsight_clarification.py`): choosing, per complete campaign, the better of the
+ridge and R1 nomination lists by realised hits gives **131 hits versus R1's 100 (ridge 95) across 36 campaigns**. This
+is an unavailable hindsight diagnostic (it reads the outcome), never a policy; it shows that campaign-level list
+variation is large relative to the mean difference. The registered decision (STOP at P1) is unchanged.
