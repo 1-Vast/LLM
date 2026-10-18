@@ -64,6 +64,24 @@ registered gate needs the lower bound minus 0.05 per extra round to exceed 0.05 
   strongest prior with the ridge as comparator. k = 8 is best post hoc (+0.131 over the ridge, not
   passing the strict gate).
 
+2026-10-18: [Feedback propagation](feedback_propagation_20261018/REPORT.md) (development, exposed folds
+2-4 of PRISM 19Q4; frozen before the comparison; `verify.py` VERIFIED; no sealed tier opened) asks whether
+observed feedback can identify and repair a failure in how responses propagate to *unmeasured* pairs.
+**STOP; no program search.**
+* Audit: the saved indication-triage totals reproduce (395 vs 293) and 394 of 395 (and 293 of 293) of those
+  hits are pairs the arm itself probed, so that task never tested propagation. Unmeasured-pair nominations
+  are the primary utility here; pool wells (about 24 lines) are the physical read unit and costs stay
+  hypothetical (no plate/well map). Secondary equal-lineage seed-attribution interval corrected (erratum).
+* Ridge-plus-feedback does propagate at pool cost: +1.056 [+0.626, +1.526] events per 64 compounds over the
+  structure prior (2.64 vs 1.58), not at 16 logical lines (+0.167 [-0.108, +0.451]).
+* The registered repair (kNN-analogue prior plus ridge residual update) is not distinguishable from
+  ridge-plus-feedback (+0.139 [-0.579, +0.870]; development had +0.81) or from kNN (+0.083 [-0.279, +0.437]);
+  its prediction error is lower in every fold (0.265/0.296/0.243 vs 0.287/0.327/0.255) without a decision
+  gain. A leave-one-pool-out diagnosis identifies the better rule per compound only weakly (AUC 0.59-0.63);
+  a perfect choice would add +0.53 [+0.06, +1.05]. A second noise draw gives +0.86 for the same contrast.
+* Value-greedy closed-loop acquisition is below the fixed A-optimal design at the same 3 pools (R1 2.25 vs
+  2.78), because it measures the pairs it would nominate.
+
 2026-10-17: [Program revision](program_revision_20261017/REPORT.md) is a pre-registered study on
 PRISM 19Q4 (freeze 12:55:48Z, future strata opened once at 13:09:54Z; `verify.py` VERIFIED). It asks
 whether MAESTRO's agent improves future decisions by revising a shared library of executable,
@@ -176,6 +194,20 @@ BRAF/NRAS-mutant skin lines, and matched by a ridge on the same ten features. Th
 lesson is to test against the strongest simple comparator and align development arenas with the
 target strata; it does not make the Beat AML and PRISM effects one pooled finding.
 
+The 2026-10-18 feedback-propagation study further separates **feedback value** from **learning a
+better update rule**. On exposed PRISM folds, ridge-plus-feedback improves nominations of unmeasured
+pairs over the structure prior at a hypothetical pool-read cost, but the analogue-anchored repair is
+not distinguishable from ridge-plus-feedback or kNN; a feedback-only diagnosis identifies the better
+rule weakly, and value-greedy closed loops lose to fixed A-optimal design. The old indication-triage
+totals mostly re-read measured pairs and are not evidence of propagation. No reproducible repair or
+Agent/LLM search is justified. Together with G1, the current evidence supports scoped feedback as a
+workflow component, while learned model correction, procedure selection, and autonomous revision
+remain unsupported or unconfirmed. PRISM results are exposed-data development, not confirmation.
+
+One secondary seed-attribution interval was also too narrow because repeated lineage draws were
+collapsed in its bootstrap; the separate [erratum](seed_attribution_20261017/ERRATUM_20261018.md)
+corrects the interval without changing the registered primary tests or decisions.
+
 **Work order.** First, MT-P0 qualifies the compact A/B task, action, cost and dependence manifest;
 this is a programme-wide prerequisite for learning procedure value. G1 is complete and failed: do not
 develop further variants of the low-rank state model on Beat AML; keep the exploit-first feedback pattern
@@ -267,6 +299,7 @@ budget, and a predeclared useful net-benefit threshold.
 | [Program revision](program_revision_20261017/README.md) | PRISM 19Q4, 247 future lines. Seed library +0.211 hits/line at I2 (Holm p .004), +0.445 at zero observation, +0.437 in exploit-first campaigns. Editable vs fixed 0.000; vs stepwise +0.008; LLM vs enumeration +0.004. No transfer to unseen drug groups. | Method not supported; revision wells never repaid. Seed library is knowledge use, not discovery. Frozen numbers superseded by the corrected contract (next row); revision NO-GO. |
 | [Seed attribution](seed_attribution_20261017/REPORT.md) | Development on exposed PRISM 19Q4. Contract repaired (single endpoint, out-of-sample variance, data-keyed cache); frozen bench trained on reserved query outcomes (masked bench exactly invariant). Seed minus strong: policy +0.356 [-0.088, +0.856], I2 +0.117 [-0.026, +0.248], I1 +0.283 [-0.065, +0.699]; all NOT_CONFIRMED. Seed beats all 20 matched permutations (exact p 1/21) but only I2 passes the reading rule; ridge on the same 10 features matches it (-0.004 [-0.198, +0.166]); capacity, per-drug loadings and variance add nothing. | Seed library kept as an optional scoped component, exploratory effect; comparator for any library claim is a ridge on its features. Revision, LLM proposal and grammar search stopped; opportunity diagnostic not run. |
 | [Beat AML G1](beataml_g1_20261017/REPORT.md) | Development on exposed Beat AML, frozen before the run. Candidate minus ridge +0.098 [+0.045, +0.153]; strict gate lower bound -0.005 net of a round. Probe round: +0.125 (low-rank), +0.083 (ridge); candidate minus ridge-plus-feedback +0.015 [-0.036, +0.066]; low-rank prior without observations -0.027 [-0.065, +0.011]. | G1 FAILED: stop the low-rank state-model branch; keep exploit-first feedback on the strongest prior with the ridge as comparator. No confirmation domain. |
+| [Feedback propagation](feedback_propagation_20261018/REPORT.md) | Development on exposed PRISM 19Q4 folds 2-4, frozen before the run. Ridge-plus-feedback +1.06 events/64 compounds over the structure prior on unmeasured pairs; analogue-anchored repair vs ridge +0.14 [-0.58, +0.87], vs kNN +0.08 [-0.28, +0.44]; diagnosis AUC 0.59-0.63; old triage hits are 99.7% probed pairs. | STOP: no program search; ridge-plus-feedback with kNN comparator stays the reference. |
 
 Earlier supported results remain in [EVIDENCE.md](EVIDENCE.md): Block P's +17
 unexpected hits [+11,+23], and Block N's scoped transcriptional transfer gains.

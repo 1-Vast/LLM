@@ -68,6 +68,17 @@ scope, existing evidence, novelty boundaries, task matrix and next study gates.
      the acquisition interface (`replay.MaskedBench`); keep shared historical data, incremental research,
      deployment, rounds, compute/curation and logical queries as separate cost accounts.
 
+10. Feedback propagation (`research/feedback_propagation_20261018`, development, exposed PRISM folds 2-4):
+   * The indication-triage utility is a re-read of probed cells (394/395 and 293/293 hits on probed pairs);
+     grade only nominated unmeasured pairs. Use pool wells as the read unit and keep costs hypothetical.
+   * Ridge-plus-feedback adds +1.06 events per 64 compounds over the structure prior at 3 pools (none at
+     16 logical lines). The kNN-analogue repair (+0.14 [-0.58, +0.87]) and a leave-one-pool-out diagnosis
+     (AUC 0.59-0.63; gate +0.28 [-0.17, +0.78]) add nothing reproducible; a second synthetic-noise draw moves
+     the contrast by six-fold. **Do not launch a program search for the update rule.**
+   * Any new claim must beat ridge-plus-feedback *and* kNN on unmeasured pairs, from independent, physically
+     costed measurements (plate/well map, real replicates). Greedy value-based acquisition loses to the
+     fixed A-optimal design on this utility.
+
 ## Next bounded step
 
 **Programme-wide prerequisite: MT-P0.** Qualify a compact A/B task, lineage, action,

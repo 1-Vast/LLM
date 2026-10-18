@@ -1,0 +1,23 @@
+[
+ {
+  "stage": "audit (before PROTOCOL.md)",
+  "what": "audit_task.oldloop first compared campaign-local pick indices with global probe indices and reported 6 of 395 hits on probed pairs (1.5%).",
+  "correction": "picks mapped to global indices; rerun gives 394 of 395 (MAESTRO loop) and 293 of 293 (two-stage) on probed pairs.",
+  "scientific_effect": "reverses a reading of the old triage utility (it is a noisy re-read of the graded cell); the uncorrected value was never used in a decision."
+ },
+ {
+  "stage": "development",
+  "what": "Exploratory scripts explore1-5 (session scratchpad, not frozen) ran rule variants on folds 0 and 1 before develop.py was written.",
+  "scientific_effect": "development folds only; the selection reported in DEVELOPMENT.json was made by develop.py with the rules written in its header."
+ },
+ {
+  "stage": "design",
+  "what": "Phase D trains each development fold on the other development fold only (strict nesting); Phase E trains each estimation fold on the other four folds (the setting of the old triage).",
+  "scientific_effect": "hyper-parameters (K = 10, lam = 1.0) were chosen with a ~1,000-compound training set and are not re-tuned for the ~3,300-compound training set of Phase E; this can favour or disfavour any analogue-based rule."
+ },
+ {
+  "stage": "tests",
+  "what": "test_science.py: the first draft of the repair gate test referenced a parameter that does not exist; rewritten to test reduction to the base update (gate closed, lam = 0) and the gate's independence from the hidden side.",
+  "scientific_effect": "none"
+ }
+]

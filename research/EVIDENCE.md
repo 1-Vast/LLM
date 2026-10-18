@@ -48,7 +48,23 @@ PRISM 19Q4 strata; contract repair of the program-revision evaluation.
   variance-only +0.012 (I2), +0.004 (I1); global ridge on the ten features matches B (-0.004, +0.008,
   +0.166); ridge on all 72 products +0.093 / +0.032 / +0.008.
 * Skin carries 82% of the policy gain; gate-negative lines lose 0.32 hits/line; equal-lineage mean +0.057
-  [-0.175, +0.267]. Part 4 not run. Cost 0 wells, $0.
+  [-0.206, +0.355] (corrected 2026-10-18: the saved [-0.175, +0.267] dropped lineage multiplicity in the bootstrap; see
+  [seed_attribution_20261017/ERRATUM_20261018.md](seed_attribution_20261017/ERRATUM_20261018.md); primary tests unchanged). Part 4 not run. Cost 0 wells, $0.
+
+2026-10-18: [Feedback propagation](feedback_propagation_20261018/REPORT.md), **DEVELOPMENT** (exposed
+PRISM 19Q4 folds 2-4; freeze before the comparison; `verify.py` VERIFIED). Corrected audit: the old
+indication-triage hits (395, 293) are 99.7% / 100% on pairs the arm probed.
+* Utility: events among nominated unmeasured pairs per 64 compounds, B = 3 pool reads (hypothetical units),
+  2,398 compounds, 36 complete campaigns; delta* = 0.1875 from the cost of one more pool for the baseline
+  (minimum detectable gain about 0.7-0.9).
+* Prior 1.58, ridge-plus-feedback 2.64, kNN10 2.69, R1 (kNN-analogue prior plus ridge residual) 2.78, gated
+  3.06, mixture mean 2.67, empirical covariance 2.61, forest 2.39; oracle 32.
+* P1 R1 - ridge +0.139 [-0.579, +0.870] (Holm 0.75; development +0.81); P2 R1 - kNN10 +0.083 [-0.279,
+  +0.437]; P3 gated - R1 +0.278 [-0.165, +0.775]. Ridge - prior +1.056 [+0.626, +1.526]; at 16 logical
+  lines +0.167 [-0.108, +0.451]. Item-specific (own vs deranged histories +2.361). Second noise draw: R1 -
+  ridge +0.861 [0.000, +1.690].
+* Closed loops (3 pools): loop-R1 2.25, loop-ridge 1.33, below the fixed design (2.78 / 2.64).
+* Decision: STOP at P1; no program search. Cost 0 wells, $0.
 
 2026-10-17: [Beat AML gate G1](beataml_g1_20261017/REPORT.md), **DEVELOPMENT** (exposed Beat AML, frozen
 before the run). Total hits over 16 queries per sample, 520 samples, 479 patients.
