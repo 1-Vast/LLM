@@ -1,5 +1,13 @@
 # Evidence Register
 
+2026-10-19: [Kinobeads substitution test](kinobeads_substitution_20261019/REPORT.md), **NOT_SUPPORTED** (the action-substitution study's Level M falsifier; Klaeger 2017
+kinobeads Kd from ChEMBL CHEMBL3991601, downloaded 2026-10-19 with approval; exposed Jaaks 2022 interaction endpoint; protocol frozen before any binding correlation; run once;
+`verify.py` VERIFY OK). 31 of 64 Jaaks drugs map; 20 of the 27 phase-2 implementations have a binding profile (Dactolisib has none). A B5-form kernel on kinobeads correlation
+is worse than the functional kernel (MSE_B5 - MSE_K -0.000059 [-0.000115, -0.000010]) though better than sibling copy (+0.000197 [+0.000027, +0.000404]); binding similarity
+does not rank substitution failures (AUROC 0.635 [0.476, 0.738]) and is no better than Jaccard (-0.024) or functional similarity (-0.041). It recovers the motivating EGFR/HER2
+(0.51-0.61) vs Sorafenib/Dasatinib (0.15-0.19) contrast but not other families (mTOR 0.07 rarely fails; IGF1R 0.31 fails half the time; Alisertib/Tozasertib asymmetric). Profiles
+are thin (median ~15 measured binders). Level M branch closed; action substitution stays NARROW. Development evidence only.
+
 2026-10-19: [Conditional pharmacological action units](action_substitution_20261019/REPORT.md), **NARROW** (programme as briefed STOP; exposed Jaaks 2022 GDSC anchored
 combination screen, downloaded 2026-10-19 with approval; gate plan written before responses were read, phase 2 and phase 3 frozen before prediction; `verify.py` ALL OK).
 Gate CONDITIONALLY QUALIFIED: same-target swap contrasts reproduce across seeding dates (interaction r 0.31 [0.23, 0.51]), but the reproducible variance is partner-specific
