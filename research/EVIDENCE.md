@@ -1,5 +1,14 @@
 # Evidence Register
 
+2026-10-19: [P0 Biological Residual Information Gate](biological_residual_gate_20261019/REPORT.md), **UNDERPOWERED** by the frozen rule; for this action space the evidence
+supports STOP (exposed Jaaks 2022; frozen before the run; B5 recomputed from raw cells to 1e-16; `verify.py` ALL OK). Gate 1 UNDERPOWERED: target annotation adds +2.8% MSE
+beyond the functional kernel (family CI -0.9%, +7.7%; real vs pathway-shuffled targets p 0.010) and lowers balanced accuracy (0.619 -> 0.605); without a functional panel,
+annotations beat the identity-free partner mean by only 3%. Gate 2 UNDERPOWERED: leave-family-out AUROC for B5 consequential errors 0.45-0.48 (all feature sets below chance);
+residual correction worsens MSE; kinobeads worse than B5 (sibling study). Gate 3 FAIL: reproducible opportunity among same-family alternatives 0.012 ECB-like units
+(< 0.02 minimum; only 5 families form choice sets); F captures +0.008, target information adds -0.0005. Feedback on the B5 prior: MSE -16%, balanced accuracy +0.028.
+Audit corrections to `action_substitution_20261019`: B5 includes target Jaccard; the agent-value bound holds only for w about 0.2 at epsilon 0.03 (flip needs |Delta| > 0.15);
+accuracy hid 75% prevalence (balanced accuracy of all methods about 0.60); replicate dates share one cell stock in 100/123 lines. Development evidence only.
+
 2026-10-19: [Kinobeads substitution test](kinobeads_substitution_20261019/REPORT.md), **NOT_SUPPORTED** (the action-substitution study's Level M falsifier; Klaeger 2017
 kinobeads Kd from ChEMBL CHEMBL3991601, downloaded 2026-10-19 with approval; exposed Jaaks 2022 interaction endpoint; protocol frozen before any binding correlation; run once;
 `verify.py` VERIFY OK). 31 of 64 Jaaks drugs map; 20 of the 27 phase-2 implementations have a binding profile (Dactolisib has none). A B5-form kernel on kinobeads correlation

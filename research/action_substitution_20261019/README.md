@@ -58,4 +58,4 @@ Source files are in `data/external/gdsc_combinations/jaaks2022_figshare/`: the o
 raw-data zip and the glossary. They were downloaded 2026-10-19 with the user's approval, about 271 MB. The original
 fitted file's MD5 is `786589e5eb556670cc7d24356487f8fd`.
 
-No LLM or paid call, no sealed tier, nothing committed.
+No LLM or paid call, no sealed tier. (Amended 2026-10-19: the package was committed in `9bb87d1`; the reassessment is in `../biological_residual_gate_20261019`.)

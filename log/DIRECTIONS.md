@@ -186,3 +186,11 @@ reopen PRESAGE P1-P3. No sealed tier is opened by this plan.
   picker (no gain over exploit-first or the corrected lookahead).
 - Stop additions of agents, memory, tools or datasets without a distinct,
   testable scientific question. Predictions and annotations are not measurements.
+- Stop same-family drug-substitution work on Jaaks 2022 (2026-10-19: `action_substitution_20261019`
+  NARROW, `kinobeads_substitution_20261019` NOT_SUPPORTED, `biological_residual_gate_20261019`
+  UNDERPOWERED with Gate 3 FAIL): learned action units, target-annotation or binding features beyond
+  functional similarity, and Agent/Virtual Cell layers on this task. The reproducible selection
+  opportunity among alternatives (0.012 ECB-like units) is below the useful minimum (0.02). Keep the
+  functional-similarity kernel as reference and feedback on the strongest prior. A new attempt needs a
+  different action space; the AstraZeneca 2024 matrix screen (figshare 163378, unopened) is the only
+  qualified candidate and needs approval plus a protocol whose first endpoint is the reproducible opportunity.

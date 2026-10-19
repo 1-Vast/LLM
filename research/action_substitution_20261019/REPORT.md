@@ -2,7 +2,7 @@
 
 2026-10-19. Mandate: "Counterexample-Driven Discovery and Compositional Synthesis of Pharmacological Action Units". Data:
 Jaaks et al. 2022 GDSC anchored combination screen (CC BY 4.0, figshare). This dataset was exposed by MAESTRO in October,
-so **all evidence here is development evidence**. No LLM or paid call, no sealed tier opened, nothing committed.
+so **all evidence here is development evidence**. No LLM or paid call, no sealed tier opened. (Amended 2026-10-19: committed in `9bb87d1`; see `../biological_residual_gate_20261019/REPORT.md` for the audit, which corrects the reading of B5, the agent-value bound and the replicate independence.)
 
 ## Decision: NARROW
 
