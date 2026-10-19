@@ -6,9 +6,10 @@ Usage (maestro environment, from the repository root or this folder):
                                              the exposed 0.625 and 10 uM reads (primary) and 2.5 uM (secondary); write-once)
   python -B dc_run.py confirm             -> refuses: no unopened arena is authorised (PROTOCOL.md section 9)
 
-The layer under test ("dec"): decisions D1 and D2 rank by the frozen Gaussian RSD posterior mean; value claims and
-predictive intervals for the chosen pairs come from the compound-level Student-t noise model of the heavy-tail study
-(`ht_core.ht_posterior(level="compound")`), fitted to the same read A. Nothing here changes a decision.
+The layer under test ("dec"): decisions D1 and D2 rank by the frozen Gaussian RSD posterior mean, and the claimed value
+of a chosen pair stays that mean; only the noise term of its predictive interval for a new read is replaced by the
+compound's posterior noise scale under the compound-level Student-t model of the heavy-tail study
+(`ht_core.ht_posterior(level="compound")`), fitted to the same read A. Nothing here changes a decision or a claim.
 
 Arms per (dose, query block); one read A (20 pool wells per compound) unless stated:
   raw          selective read A; interval: flat-prior replicate noise, T - A ~ N(0, 2 n1) (zero-method arm)
@@ -19,9 +20,12 @@ Arms per (dose, query block); one read A (20 pool wells per compound) unless sta
   ht_compound  compound-level Student-t posterior (heavy-tail `ht_compound` rule: geometry from the frozen Gaussian inner
                choice, nu = best compound candidate by the frozen reference-only utility, scale s by reference ML); ranks
                and claims with its own posterior
-  dec          ranks with rsd; claims and intervals from ht_compound's predictive (method under test)
-  dec_noise    ranks with rsd; Gaussian signal posterior (rsd) plus ht_compound's compound noise scale for the new read
-  dec_ml       ranks with rsd; claims and intervals from the compound-level model with nu = nu_ML (reference likelihood)
+  dec          ranks and claims with rsd; predictive = rsd's Gaussian signal posterior plus ht_compound's compound noise
+               scale for the new read (method under test)
+  dec_full     ranks with rsd; claims and intervals from ht_compound's own predictive (centre and spread; secondary)
+  dec_ml       as dec, with the compound noise scale from the compound-level model at nu = nu_ML (reference likelihood)
+  rsd_wm       width-matched control: ranks and claims with rsd; rsd's Gaussian predictive with its SD scaled per unit by
+               one constant so that its mean SD over rsd's D2 picks equals dec's (uses no outcome)
 Policies read only A (and B for raw2) through the frozen Acquisition; only the frozen Evaluator holds T.
 Reads come only from the heavy-tail study's existing read caches; this module refuses to run if a cache is missing and
 checks that the cache folder is unchanged afterwards (it never writes outside this folder). No LLM or paid call.
@@ -53,13 +57,14 @@ import rsd_run as R  # noqa: E402  (frozen RSD; imported, never modified)
 BLOCKS = ("search", "selection", "evaluation")
 PRIMARY_DOSES = (0.625, 10.0)          # pre-registered development readout (exposed by the heavy-tail test stage)
 SECONDARY_DOSES = (2.5,)               # development dose (exposed by RSD; this study's smoke run used its search block)
-ARMS = ("raw", "raw2", "shrink", "rsd", "ht_compound", "dec", "dec_noise", "dec_ml")
+ARMS = ("raw", "raw2", "shrink", "rsd", "ht_compound", "dec", "dec_full", "dec_ml", "rsd_wm")
 RANK_BY = dict(raw="raw", raw2="raw2", shrink="shrink", rsd="rsd", ht_compound="ht_compound",
-               dec="rsd", dec_noise="rsd", dec_ml="rsd")
-DECOUPLED = ("dec", "dec_noise", "dec_ml")
+               dec="rsd", dec_full="rsd", dec_ml="rsd", rsd_wm="rsd")
+DECOUPLED = ("dec", "dec_full", "dec_ml", "rsd_wm")
 CONTRASTS = (("rsd", "raw"), ("raw2", "raw"), ("shrink", "raw"), ("ht_compound", "raw"), ("ht_compound", "rsd"),
              ("dec", "raw"), ("dec", "rsd"), ("dec", "ht_compound"), ("dec", "raw2"))
-COV_CONTRASTS = (("dec", "rsd"), ("dec", "ht_compound"), ("dec_noise", "rsd"), ("dec_ml", "rsd"), ("ht_compound", "rsd"))
+COV_CONTRASTS = (("dec", "rsd"), ("dec", "rsd_wm"), ("dec", "dec_full"), ("dec", "ht_compound"), ("dec_full", "rsd"),
+                 ("dec_ml", "rsd"), ("ht_compound", "rsd"))
 LEVELS = (0.5, 0.8, 0.9)
 LEVEL = 0.8
 N_BOOT = 4000
@@ -107,6 +112,17 @@ def coverage_rows(F, cid, n_cl):
     return out
 
 
+def scores_gaussian(y, m, var, level=LEVEL):
+    """Proper scores of a Gaussian predictive N(m, var) for outcome y: the central-interval score at `level` (width plus
+    2 / alpha times the miss distance; Gneiting and Raftery 2007; lower is better) and the log predictive density."""
+    alpha = 1.0 - level
+    sd = np.sqrt(var)
+    half = norm.ppf(1.0 - alpha / 2) * sd
+    lo, hi = m - half, m + half
+    iscore = (hi - lo) + (2 / alpha) * np.clip(lo - y, 0, None) + (2 / alpha) * np.clip(y - hi, 0, None)
+    return iscore, norm.logpdf(y, m, sd)
+
+
 # ----------------------------------------------------------------------------- one (dose, block)
 def run_block(blk, dose):
     t0 = time.time()
@@ -151,6 +167,12 @@ def run_block(blk, dose):
     p_c = H.ht_posterior(fvc, mu_f, A, tier, nu_c, s_c, level="compound")
     p_ml = H.ht_posterior(fvc, mu_f, A, tier, nu_ml, s_ml, level="compound")
     scores = dict(raw=sA, raw2=s2, shrink=shr, rsd=m_g, ht_compound=p_c["mean"])
+    # width-matched control: one per-unit constant on rsd's predictive SD, matching dec's mean SD over rsd's D2 picks
+    ch_g = C.d2_choose(m_g)
+    li_g = np.tile(np.arange(m_g.shape[1]), (ch_g.shape[0], 1))
+    sd_dec = np.sqrt(v_g + p_c["pred_sig2"])[ch_g, li_g]
+    sd_rsd = np.sqrt(v_g + n1_g)[ch_g, li_g]
+    wm = float(np.mean(sd_dec) / np.mean(sd_rsd))
     # predictive for the truth read T: (centre, signal variance, new-read noise scale^2, noise tail)
     pred = dict(
         raw=(sA, n1_s, n1_s, np.inf),
@@ -158,9 +180,10 @@ def run_block(blk, dose):
         shrink=(shr, rel[tier][:, None] * n1_s, n1_s, np.inf),
         rsd=(m_g, v_g, n1_g, np.inf),
         ht_compound=(p_c["mean"], p_c["var"], p_c["pred_sig2"], p_c["pred_nu"]),
-        dec=(p_c["mean"], p_c["var"], p_c["pred_sig2"], p_c["pred_nu"]),
-        dec_noise=(m_g, v_g, p_c["pred_sig2"], p_c["pred_nu"]),
-        dec_ml=(p_ml["mean"], p_ml["var"], p_ml["pred_sig2"], p_ml["pred_nu"]),
+        dec=(m_g, v_g, p_c["pred_sig2"], p_c["pred_nu"]),
+        dec_full=(p_c["mean"], p_c["var"], p_c["pred_sig2"], p_c["pred_nu"]),
+        dec_ml=(m_g, v_g, p_ml["pred_sig2"], p_ml["pred_nu"]),
+        rsd_wm=(m_g, wm * wm * v_g, wm * wm * n1_g, np.inf),
     )
     sT = ev._sT                                                   # evaluator-side grading only
     L = sT.shape[1]
@@ -169,7 +192,7 @@ def run_block(blk, dose):
                compound_cluster=inv.tolist(), cfg_gauss=cfg, inner_gauss=inner_g,
                tail_compound={k: v for k, v in tail.items()}, inner_ht_compound=inner_h,
                interval_model=dict(ht_compound=dict(level="compound", nu=nu_c, s=s_c),
-                                   dec_ml=dict(level="compound", nu=nu_ml, s=s_ml)),
+                                   dec_ml=dict(level="compound", nu=nu_ml, s=s_ml), rsd_wm_sd_factor=wm),
                reliability_shrink=rel.tolist(), alpha=vc.alpha.tolist(), beta=vc.beta.tolist(),
                tier_counts_query=np.bincount(tier, minlength=3).tolist(),
                reads=dict(one_read=int(acq.reads), two_reads=int(acq.reads + acq2.reads)),
@@ -198,11 +221,15 @@ def run_block(blk, dose):
         ok_all = np.isfinite(sT) & np.isfinite(m)                 # pairs with a known truth read and a defined claim
         ii_all = rows[ok_all]
         Fa = H.predictive_cdf((sT - m)[ok_all], v[ok_all], sg2[ok_all], nu)
+        if np.isfinite(nu):
+            raise ValueError("proper scores are implemented for Gaussian predictives only")
+        isc, lpd = scores_gaussian(sT[ch, li][ok], m[ch, li][ok], v[ch, li][ok] + sg2[ch, li][ok])
         rec["calibration"][a] = dict(
             **{k + "_sel": x for k, x in coverage_rows(Fs, cid_s, n_cl).items()},
             n_sel=HR._bin(cid_s, np.ones(ok.sum()), n_cl),
             z_sel=HR._bin(cid_s, norm.ppf(np.clip(Fs, 1e-12, 1 - 1e-12)), n_cl),
             width80_sel=HR._bin(cid_s, 2 * norm.ppf(0.9) * np.sqrt(v[ch, li][ok] + sg2[ch, li][ok]), n_cl),
+            iscore80_sel=HR._bin(cid_s, isc, n_cl), logscore_sel=HR._bin(cid_s, lpd, n_cl),
             cov80_d1=HR._bin(inv[r1[ok1]], np.abs(F1 - 0.5) <= LEVEL / 2, n_cl),
             n_d1=HR._bin(inv[r1[ok1]], np.ones(ok1.sum()), n_cl),
             cov80_all=HR._bin(inv[ii_all], np.abs(Fa - 0.5) <= LEVEL / 2, n_cl),
@@ -295,14 +322,17 @@ def pool(records, n_boot=N_BOOT, seed=SEED, th=THRESHOLDS):
         eb, bb = ratio(sb["num"], sb["den"])
         con[f"{a}-{b}"] = dict(D1=summ(e1, b1), D2=summ(ea - eb, ba - bb))
     out["contrasts"] = con
-    cal, draws = {}, {}
+    cal, draws, sdraws = {}, {}, {}
     for a in ARMS:
         s = sums("calibration", a, ("cov50_sel", "cov80_sel", "cov90_sel", "n_sel", "z_sel", "width80_sel",
-                                    "cov80_d1", "n_d1", "cov80_all", "n_all"))
+                                    "iscore80_sel", "logscore_sel", "cov80_d1", "n_d1", "cov80_all", "n_all"))
         e80, b80 = ratio(s["cov80_sel"], s["n_sel"])
         ed1, bd1 = ratio(s["cov80_d1"], s["n_d1"])
         eal, bal = ratio(s["cov80_all"], s["n_all"])
+        eis, bis = ratio(s["iscore80_sel"], s["n_sel"])
+        els, bls = ratio(s["logscore_sel"], s["n_sel"])
         draws[a] = b80
+        sdraws[a] = dict(iscore80=(eis, bis), logscore=(els, bls))
         cal[a] = dict(coverage80_selected=dict(estimate=e80, ci95=_ci(b80)),
                       coverage50_selected=float(s["cov50_sel"].sum() / s["n_sel"].sum()),
                       coverage90_selected=float(s["cov90_sel"].sum() / s["n_sel"].sum()),
@@ -310,13 +340,18 @@ def pool(records, n_boot=N_BOOT, seed=SEED, th=THRESHOLDS):
                       coverage80_all=dict(estimate=eal, ci95=_ci(bal)),
                       mean_pit_z_selected=float(s["z_sel"].sum() / s["n_sel"].sum()),
                       mean_width80_selected=float(s["width80_sel"].sum() / s["n_sel"].sum()),
+                      interval_score80_selected=dict(estimate=eis, ci95=_ci(bis)),
+                      log_score_selected=dict(estimate=els, ci95=_ci(bls)),
                       n_selected=int(s["n_sel"].sum()))
-    cov_con = {}
+    cov_con, score_con = {}, {}
     for a, b in COV_CONTRASTS:
         cov_con[f"{a}-{b}"] = summ(cal[a]["coverage80_selected"]["estimate"] - cal[b]["coverage80_selected"]["estimate"],
                                    draws[a] - draws[b])
+        score_con[f"{a}-{b}"] = {k: summ(sdraws[a][k][0] - sdraws[b][k][0], sdraws[a][k][1] - sdraws[b][k][1])
+                                 for k in ("iscore80", "logscore")}
     out["calibration"] = cal
     out["coverage_contrasts"] = cov_con
+    out["score_contrasts"] = score_con
     opt, odraws = {}, {}
     for a in ARMS:
         s = sums("optimism", a, ("claimed", "observed", "n"))

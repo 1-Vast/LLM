@@ -1,5 +1,15 @@
 # Evidence Register
 
+2026-10-19: [Conditional pharmacological action units](action_substitution_20261019/REPORT.md), **NARROW** (programme as briefed STOP; exposed Jaaks 2022 GDSC anchored
+combination screen, downloaded 2026-10-19 with approval; gate plan written before responses were read, phase 2 and phase 3 frozen before prediction; `verify.py` ALL OK).
+Gate CONDITIONALLY QUALIFIED: same-target swap contrasts reproduce across seeding dates (interaction r 0.31 [0.23, 0.51]), but the reproducible variance is partner-specific
+(0.00052) not partner x line (0.00007, CI crosses 0; share 0.08 < 0.25); interaction swaps are not potency (R^2 0.015), efficacy swaps mostly are (0.49). Phase 2, leave one
+implementation out (27 drugs, 1,950 partner units): interaction NOT_BEYOND_BASELINE (learned substitution model -49% vs functional-similarity kernel; partner features nil);
+efficacy INCONCLUSIVE (+11.5% [-15%, +30%] vs cold-start ridge; potency matching AUROC 0.85). Post hoc: same-target sibling copy is beaten by the functional kernel
+(+0.00025 [+0.00011, +0.00042]) and ties the identity-free partner mean; it is best only in tight families (EGFR/HER2), worst in multi-kinase ones. Phase 3: one same-partner
+counterexample cuts interaction error 17% (PARTNER_SPECIFIC_REFINEMENT; a different-partner probe hurts) but moves no equivalence decision at epsilon 0.03, even with every unit
+probed, so agent value is bounded at zero; efficacy refinement adds nothing beyond potency matching. Independent confirmation BLOCKED. Development evidence only.
+
 2026-10-19: [Heavy-tail RSD](heavy_tail_rsd_20261019/REPORT.md), **HEAVY_TAIL_DOES_NOT_FIX_D2** (test of RSD's REVISE; exposed PRISM 19Q4 HTS002 compounds, 0.625 and 10 uM reads
 opened once after the freeze; development on the exposed 2.5 uM reads only; `verify.py` VERIFY OK). Student-t noise (pair-level or compound-level multivariate t; scale ML-fitted
 on reference replicate differences, (level, nu) chosen by RSD's reference-only replicate-split utility) on the frozen RSD signal geometry. Pooled 1,715 compound-doses, 250 clusters:

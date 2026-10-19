@@ -1,11 +1,13 @@
 # Decoupled calibration protocol: Gaussian ranking with compound-level Student-t intervals
 
-Status: pre-freeze protocol draft. `freeze.py` has not been run and `FREEZE.json` does not yet exist. The protocol follows a
-development smoke run on the exposed 2.5 uM search block and precedes the proposed development readout. **Development-only
-study.** Every read it proposes to use was already opened by the RSD study
-(2.5 uM) or by the heavy-tail test stage (0.625 and 10 uM). No unopened arena is authorised, so the confirmatory stage
-(section 9) is blocked and nothing here can be an independent confirmation. Development steps and what they saw:
-`DEVELOPMENT_LOG.md`.
+Status: frozen by `freeze.py` (`FREEZE.json`), after three development smoke runs on the exposed 2.5 uM search block
+and before the pre-registered development readout (`DEV_RESULT.json`).
+
+**Development-only study.** Every read it uses was already opened, by the RSD study (2.5 uM) or by the heavy-tail test
+stage (0.625 and 10 uM). No unopened arena is authorised, so the confirmatory stage (section 9) is blocked, and nothing
+here can be an independent confirmation.
+
+Development steps and what they saw: `DEVELOPMENT_LOG.md`.
 
 ## 1. Question
 
@@ -27,20 +29,26 @@ coverage on D2-selected pairs reach [0.70, 0.90], with selected-pair optimism wi
 - **Ranking (unchanged, frozen).** Per (dose, block), the frozen Gaussian RSD inner selection
   (`rsd_core.inner_select`, frozen grid and folds) chooses (q, rho, prior). The frozen `VirtualCell.posterior` mean of
   read A ranks D1 (top 10 lines per compound) and D2 (top 16 compounds per line).
-- **Calibration layer (the addition).** The heavy-tail compound-level model is fitted to the same read A, with the
-  frozen `ht_core` functions imported and never modified:
+- **Claims (unchanged, frozen).** The claimed value of a chosen pair is the Gaussian posterior mean m_g, as in `rsd`.
+- **Calibration layer (the addition).** Only the noise term of the predictive interval changes. The heavy-tail
+  compound-level model is fitted to the same read A, with the frozen `ht_core` functions imported and never modified:
   - geometry (q, prior) from the Gaussian inner choice, rho = 0;
   - nu = the best compound candidate (nu in {2, 3, 4, 6, 10, 20}) by the frozen reference-only replicate-split utility
     (`ht_core.ht_inner_select`); this is the heavy-tail `ht_compound` rule;
   - scale s = maximum likelihood on the reference replicate differences (`ht_core.fit_tail_compound`);
-  - posterior: `ht_core.ht_posterior(level="compound")`.
+  - posterior: `ht_core.ht_posterior(level="compound")`. It gives each compound i a posterior noise scale for a new
+    read: sigma2_c[i, j] = s^2 beta_k n0_j E[1 / lam_i].
 
-  For every pair the Gaussian posterior selects, the layer reports two things from that model:
-  - the claimed value, its posterior mean;
-  - the predictive distribution of a new read: the signal posterior plus the compound's posterior noise scale
-    (`ht_core.predictive_cdf`).
-- **Decision invariance.** Nothing in the layer feeds back into a decision. K1 (section 6) checks that the D1 and D2
-  picks are identical to `rsd` in every unit.
+  The predictive distribution of a new read at a chosen pair is N(m_g, v_g + sigma2_c), where v_g is the Gaussian
+  posterior signal variance. Compared with `rsd` (N(m_g, v_g + beta_k n0_j)), the layer gives more width to compounds
+  whose read A looks noisy and less to compounds that look quiet.
+- **Decision and claim invariance.** Nothing in the layer feeds back into a decision or a claim. K1 (section 6) checks
+  that the D1 and D2 picks are identical to `rsd` in every unit. The `dec` and `rsd` claims, and hence their optimism,
+  are identical by construction.
+- **Changed after the development smoke run.** The first design took the claim and the interval from the compound model
+  (now arm `dec_full`). It was changed to the design above after the 2.5 uM search-block smoke run, and before any
+  primary-dose outcome of either variant was computed. The reasons and the smoke numbers are in `DEVELOPMENT_LOG.md`
+  entry 6.
 - No outcome of a query compound is used to fit anything. The truth read T is graded only by the frozen `Evaluator`.
 
 ## 3. Arena (exposed; development only)
@@ -59,7 +67,7 @@ coverage on D2-selected pairs reach [0.70, 0.90], with selected-pair optimism wi
   clusters as the heavy-tail test stage (1,715 compound-doses, 250 block-clusters; the composition is copied into
   `FREEZE.json`). These reads were opened by the heavy-tail test stage. The decoupled layer's outcomes on them have not
   been computed before this freeze.
-- **Secondary readout.** 2.5 uM, all three blocks. Its search block was used by this study's smoke run.
+- **Secondary readout.** 2.5 uM, all three blocks. Its search block was used by this study's smoke runs.
 
 ## 4. Arms (`dc_run.py`; one read = 20 pool wells per compound)
 
@@ -70,9 +78,10 @@ coverage on D2-selected pairs reach [0.70, 0.90], with selected-pair optimism wi
 | `shrink` | 20 | A x per-tier replicate reliability r_k | r_k A; N(r_k A, (1 + r_k) n1) |
 | `rsd` | 20 | frozen Gaussian posterior mean | frozen Gaussian predictive (signal variance + one-read noise) |
 | `ht_compound` | 20 | compound-level t posterior mean | its own predictive (as in the heavy-tail study) |
-| **`dec`** | 20 (+0) | **frozen Gaussian posterior mean** | **`ht_compound`'s mean and predictive** |
-| `dec_noise` | 20 (+0) | frozen Gaussian posterior mean | Gaussian signal posterior (mean, variance) + `ht_compound`'s compound noise scale for the new read (secondary) |
-| `dec_ml` | 20 (+0) | frozen Gaussian posterior mean | compound-level model with nu = nu_ML (reference likelihood), not utility-selected (secondary) |
+| **`dec`** | 20 (+0) | **frozen Gaussian posterior mean** | **claim m_g; N(m_g, v_g + sigma2_c), sigma2_c = `ht_compound`'s compound noise scale for a new read** |
+| `dec_full` | 20 (+0) | frozen Gaussian posterior mean | `ht_compound`'s own mean and predictive (the first design; secondary) |
+| `dec_ml` | 20 (+0) | frozen Gaussian posterior mean | as `dec`, with sigma2_c from the compound model at nu = nu_ML (reference likelihood), not utility-selected (secondary) |
+| `rsd_wm` | 20 (+0) | frozen Gaussian posterior mean | width-matched control: claim m_g; rsd's Gaussian predictive with its SD multiplied by one per-unit constant so that the mean predictive SD over rsd's D2 picks equals `dec`'s. It uses no outcome. It separates "more width" from "width placed on noisy compounds" (secondary) |
 
 Notes on the arms:
 - **Fixed-definition baselines.** n1 and r_k for `raw`, `raw2` and `shrink` come from the fixed-definition VC (q = 0,
@@ -89,10 +98,16 @@ Notes on the arms:
   - Hits are -s_T >= 1; false progression is s_T > 0. Unknown T is excluded and counted.
 - **Calibration (primary).** 80% central predictive coverage of T on each arm's own D2-selected pairs. A pair is covered
   when |F(T) - 1/2| <= 0.4, with F the arm's predictive CDF.
-  - For `dec`, `dec_noise` and `dec_ml`, the selected pairs are rsd's D2 picks.
+  - For `dec`, `dec_full`, `dec_ml` and `rsd_wm`, the selected pairs are rsd's D2 picks.
   - Pairs without a defined claim or a known T are excluded.
 - **Calibration (secondary).** 50% and 90% coverage on D2-selected pairs; 80% coverage on D1-selected pairs; 80%
   coverage on all pairs; mean PIT z; mean 80% interval width on selected pairs.
+- **Proper scores on D2-selected pairs (secondary; added before the freeze, `DEVELOPMENT_LOG.md` entry 8).**
+  - The 80% central-interval score: (u - l) + 10 (l - T)+ + 10 (T - u)+, lower is better (Gneiting and Raftery 2007).
+  - The Gaussian log predictive density of T, higher is better.
+
+  Every predictive here is Gaussian: the compound-level model's new-read predictive is Gaussian given its posterior
+  noise scale.
 - **Selected-pair optimism.** Claimed minus observed killing on the arm's own D2-selected pairs. The claim is -(the arm's
   centre).
 
@@ -104,8 +119,8 @@ Primary (pooled over the 6 primary units; Holm over P1-P3 at alpha 0.05; one-sid
 |---|---|---|---|
 | P1 | coverage80_sel(`dec`) - coverage80_sel(`rsd`) | > 0 | the layer improves selected-pair coverage on the same picks |
 | P2 | coverage80_sel(`dec`) | inside [0.70, 0.90], two one-sided tests: p = max(p(<= 0.70), p(>= 0.90)) | selected-pair coverage in the band |
-| P3 | selected optimism(`dec`) | inside [-0.15, +0.15], two one-sided tests | value claims of chosen pairs nearly unbiased |
-| K1 | D1 and D2 picks of `dec`, `dec_noise`, `dec_ml` vs `rsd` | identical in every unit, so `dec - rsd` D1 = D2 = 0 exactly | decisions kept (a structural check, not a test) |
+| P3 | selected optimism(`dec`) | inside [-0.15, +0.15], two one-sided tests | value claims of chosen pairs nearly unbiased (the layer keeps rsd's claims, so this tests them on the readout) |
+| K1 | D1 and D2 picks of `dec`, `dec_full`, `dec_ml`, `rsd_wm` vs `rsd` | identical in every unit, so `dec - rsd` D1 = D2 = 0 exactly | decisions kept (a structural check, not a test) |
 
 Bootstrap p values:
 - `p(<= x) = (number of draws <= x, plus 1) / (draws + 1)`;
@@ -123,7 +138,11 @@ Secondary (unadjusted, labelled):
   - `rsd - raw`, `raw2 - raw` (value of a second read; delta = 0.5 x this, for context), `shrink - raw`;
   - `ht_compound - raw`, `ht_compound - rsd`;
   - `dec - raw`, `dec - rsd` (identically 0), `dec - ht_compound` (ranking cost avoided), `dec - raw2`.
-- Coverage contrasts: `dec - ht_compound`, `dec_noise - rsd`, `dec_ml - rsd`, `ht_compound - rsd`.
+- Coverage contrasts, plus interval-score and log-score contrasts on the same pairs:
+  - `dec - rsd_wm` (does the placement of width matter, beyond its amount?);
+  - `dec - rsd`, `dec - dec_full`, `dec - ht_compound`, `dec_full - rsd`, `dec_ml - rsd`, `ht_compound - rsd`.
+
+  The `ht_compound` comparisons use different pairs (its own picks).
 - All-pair coverage of `dec` in [0.75, 0.85] (descriptive).
 - Every arm's calibration and optimism; everything per dose; the 2.5 uM readout.
 
@@ -174,7 +193,22 @@ bootstrap and verdict rule stay as above, with the label `grade = CONFIRMATORY`.
 
 ## 10. Expectations recorded before the readout
 
-(Filled in after the smoke run, before the freeze; see `DEVELOPMENT_LOG.md`.)
+Sources: the frozen heavy-tail pooled record (0.625 + 10 uM) and the smoke runs (2.5 uM search block).
+
+- **K1 holds by construction.** `dec - rsd` is exactly 0 for D1 and D2.
+- **P1 expected SUPPORTED.** rsd's selected-pair coverage was 0.698 pooled in the heavy-tail record: 0.695 at 0.625 uM
+  and 0.701 at 10 uM. `dec` added +0.040 on the smoke block, so 0.72-0.75 pooled is expected.
+- **P2 expected SUPPORTED, but it is the most fragile test.** It needs the lower 95% bound above 0.70, and a gain of
+  half the smoke size would leave it near the edge.
+- **P3 expected SUPPORTED.** `dec`'s claims are rsd's, whose pooled optimism was +0.030 [-0.001, +0.059].
+- **Expected overall:** DECOUPLED_CALIBRATION_HOLDS (development grade).
+- **Expected secondary results:**
+  - `dec - rsd_wm` coverage <= 0;
+  - `dec - rsd_wm` interval score < 0 and log score > 0 (placement of width matters);
+  - `dec_full` claims pessimistic (optimism below rsd's).
+- **What would falsify the layer's rationale on the readout:**
+  - `dec` coverage not above rsd's, or below 0.70;
+  - `dec` no better than `rsd_wm` on both proper scores.
 
 ## 11. Versions
 

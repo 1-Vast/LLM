@@ -92,6 +92,8 @@ if res and fz:
         for a in DC.DECOUPLED:
             check(r["d1"][a] == r["d1"]["rsd"] and r["d2"][a] == r["d2"]["rsd"],
                   f"record {r['dose']} {r['block']}: {a} decision outcomes identical to rsd")
+        for a in ("dec", "dec_ml", "rsd_wm"):
+            check(r["optimism"][a] == r["optimism"]["rsd"], f"record {r['dose']} {r['block']}: {a} claims identical to rsd")
     rep = DC.reproduction(recs)
     check(close(rt(rep), res["reproduction_of_heavy_tail"]), "reproduction table recomputed")
     check(len(rep) == 6 and all(v["max_abs_diff"] <= 1e-9 and v["cfg_equal"] and v["nu_equal"] and v["s_abs_diff"] <= 1e-9

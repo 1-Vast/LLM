@@ -35,6 +35,17 @@ def test_flat_prior_raw_and_raw2_intervals_are_calibrated_under_gaussian_replica
     assert abs(np.mean(np.abs(F2 - 0.5) <= 0.4) - 0.8) < 0.005
 
 
+def test_interval_score_is_proper_and_matches_its_definition():
+    isc, lpd = DC.scores_gaussian(np.array([0.0, 3.0]), np.zeros(2), np.ones(2))
+    w = 2 * 1.2815515655446004
+    assert isc[0] == pytest.approx(w)
+    assert isc[1] == pytest.approx(w + 10 * (3.0 - w / 2))
+    assert lpd[0] == pytest.approx(-0.5 * np.log(2 * np.pi))
+    y = np.random.default_rng(1).normal(0, 1.5, 400000)
+    mean_is = {f: DC.scores_gaussian(y, 0.0, (1.5 * f) ** 2)[0].mean() for f in (0.7, 1.0, 1.3)}
+    assert mean_is[1.0] < mean_is[0.7] and mean_is[1.0] < mean_is[1.3]
+
+
 def test_bootstrap_p_values_and_holm():
     bs = np.linspace(0.0, 1.0, 1001)
     assert DC.p_le(bs, 0.5) == pytest.approx(502 / 1002)

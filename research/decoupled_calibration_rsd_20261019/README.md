@@ -1,10 +1,10 @@
 # Decoupled calibration RSD, 2026-10-19
 
 Development-only test of a decoupled calibration layer for the replicate-identified Virtual Cell posterior:
-- decisions (D1 context selection, D2 candidate progression) rank with the frozen Gaussian RSD posterior
-  (`../replicate_decisions_20261019`);
-- value claims and 80% predictive intervals for the chosen pairs come from the compound-level Student-t model of
-  `../heavy_tail_rsd_20261019`.
+- decisions (D1 context selection, D2 candidate progression) and value claims come from the frozen Gaussian RSD
+  posterior (`../replicate_decisions_20261019`);
+- the noise term of each chosen pair's 80% predictive interval is the compound's posterior noise scale under the
+  compound-level Student-t model of `../heavy_tail_rsd_20261019`.
 
 Arena: the exposed HTS002 reads (0.625 and 10 uM primary, 2.5 uM secondary). No unopened arena is authorised, so the
 confirmatory stage is blocked pending the owner's decision.
@@ -16,7 +16,7 @@ confirmatory stage is blocked pending the owner's decision.
 | `DEVELOPMENT_LOG.md` | Every pre-freeze step and what it saw (2.5 uM search block only) |
 | `FREEZE.json` | Hashes (study files, imported frozen RSD and heavy-tail files, read caches, metadata), thresholds, composition |
 | `DEV_RESULT.json` | Write-once development readout: per-unit records, pooled and per-dose aggregates, verdict |
-| `dev/` | Write-once development record of the smoke run (2.5 uM search block) |
+| `dev/` | Write-once development records of three smoke runs (2.5 uM search block): v1 first design, v2 final arms, v3 final code with proper scores |
 
 Code (maestro conda env; run from this folder):
 
