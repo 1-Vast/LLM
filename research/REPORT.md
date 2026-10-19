@@ -182,7 +182,7 @@ retained-lineage-field guards are engineering repairs, not scientific gains.
 Static scores, label-count inference and absent local ledger authentication remain
 explicit limitations. Prior freezes and sealed outcomes were not changed.
 
-Updated 2026-10-18. This is the current decision summary; [EVIDENCE.md](EVIDENCE.md)
+Updated 2026-10-19. This is the current decision summary; [EVIDENCE.md](EVIDENCE.md)
 keeps the numerical historical register. [STUDIES.json](STUDIES.json) registers the
 retained studies. Each study keeps its protocol, results, deviations, source
 identities, paid-call records and verifier. Software tests do not establish scientific validity.
@@ -231,6 +231,17 @@ margin, and did not establish decision value. This narrows the live question to 
 knowledge-informed state variables can be independently and decision-relevantly
 validated; it does not support the broader Agent or typed-edit claim. The campaign-level
 decision secondary was not run, and the study used exposed PRISM data.
+
+The 2026-10-19 [EG-RPT protocol](eg_rpt_20261019/PROTOCOL.md) is **DRAFT, not frozen, and not run**.
+Its initial audit finds that the acquisition study's 131-versus-100 campaign-level best-of figure is
+not evidence of selectable policy headroom: the mean absolute ridge/R1 difference (1.86 hits) is
+consistent with the 1.95 expected under Gaussian noise with the observed spread, and their campaign
+hit counts correlate only 0.27. The 13 prior study-level records span four dependence groups and six
+incommensurable utility units, so they cannot train a policy-transfer model; at most they support
+careful case retrieval. The proposed first gate is therefore a split-noise reliability test. Only if
+policy differences prove reproducible does the draft proceed to non-LLM selectors, Virtual Cell
+reliability features, and then an Agent comparison. This is protocol/scaffolding progress, not an
+EG-RPT result or a new scientific finding.
 
 One secondary seed-attribution interval was also too narrow because repeated lineage draws were
 collapsed in its bootstrap; the separate [erratum](seed_attribution_20261017/ERRATUM_20261018.md)
@@ -329,6 +340,7 @@ budget, and a predeclared useful net-benefit threshold.
 | [Beat AML G1](beataml_g1_20261017/REPORT.md) | Development on exposed Beat AML, frozen before the run. Candidate minus ridge +0.098 [+0.045, +0.153]; strict gate lower bound -0.005 net of a round. Probe round: +0.125 (low-rank), +0.083 (ridge); candidate minus ridge-plus-feedback +0.015 [-0.036, +0.066]; low-rank prior without observations -0.027 [-0.065, +0.011]. | G1 FAILED: stop the low-rank state-model branch; keep exploit-first feedback on the strongest prior with the ridge as comparator. No confirmation domain. |
 | [Feedback propagation](feedback_propagation_20261018/REPORT.md) | Development on exposed PRISM 19Q4 folds 2-4, frozen before the run. Ridge-plus-feedback +1.06 events/64 compounds over the structure prior on unmeasured pairs; analogue-anchored repair vs ridge +0.14 [-0.58, +0.87], vs kNN +0.08 [-0.28, +0.44]; diagnosis AUC 0.59-0.63; old triage hits are 99.7% probed pairs. | STOP: no program search; ridge-plus-feedback with kNN comparator stays the reference. |
 | [Observable-state bets](observable_state_20261018/REPORT_OBS.md) | Exposed PRISM, 136 MoA families. Confirmation rates: random 0.051, enumerator 0.059, target-gene rule 0.088, Agent 0.081, identity-masked Agent 0.059. Agent - enumerator +0.022 [-0.022, +0.074]; Agent - target-gene rule -0.007 [-0.037, +0.015]; Agent confidence 0.45 vs 0.081 observed. S2 decision utility not run. | Withdraw Agent and typed-edit claims for this arena; keep target-gene rule as an exploratory, unconfirmed lead. No project-wide STOP; no independent confirmation. |
+| [EG-RPT policy transfer](eg_rpt_20261019/PROTOCOL.md) | DRAFT, not frozen or run. Historical best-of policy diagnostic is consistent with noise; 13 study-level records cover four dependence groups and six non-poolable utility units. | First gate: split-noise reliability of policy-selection headroom. Do not train a transfer model from study-level records or claim method value from the scaffold. |
 
 Earlier supported results remain in [EVIDENCE.md](EVIDENCE.md): Block P's +17
 unexpected hits [+11,+23], and Block N's scoped transcriptional transfer gains.

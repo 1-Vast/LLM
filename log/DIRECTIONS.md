@@ -94,6 +94,11 @@ scope, existing evidence, novelty boundaries, task matrix and next study gates.
      other edit primitives or decision utility. Treat target-gene state as an unconfirmed exploratory lead only. Do not start another Agent
      proposal search on the same exposed arena; independent, powered validation and a decision-level estimand are prerequisites for revival.
 
+13. EG-RPT policy transfer (`research/eg_rpt_20261019`, DRAFT protocol, no result): first gate is a split-noise reliability test of policy-selection headroom,
+   because the campaign-level best-of figure (131 vs 100) is what Gaussian noise of the observed SD would produce (mean |d| 1.86 vs 1.95; predictor hit counts correlate 0.27).
+   Only if headroom is reproducible are non-LLM meta-selectors, a Virtual Cell reliability gate and then an agent compared on a generated PRISM task panel. The 13
+   study-level records (4 dependence groups, 6 units) cannot train a transfer model. Not frozen; needs review.
+
 ## Next bounded step
 
 **Programme-wide prerequisite: MT-P0.** Qualify a compact A/B task, lineage, action,
