@@ -99,6 +99,24 @@ scope, existing evidence, novelty boundaries, task matrix and next study gates.
    Only if headroom is reproducible are non-LLM meta-selectors, a Virtual Cell reliability gate and then an agent compared on a generated PRISM task panel. The 13
    study-level records (4 dependence groups, 6 units) cannot train a transfer model. Not frozen; needs review.
 
+14. MAESTRO-FAR (`research/maestro_far_20261019`, ran 2026-10-19): FAR_NOT_SUPPORTED in the PRISM x L1000 x ECFP arena. Failure signatures AUROC ~0.5 (select/test/vault);
+   FAR slice choice does not beat exploit-first (test +0.006 [-0.003, +0.018], threshold 0.010); assay + repair itself helps (+0.04) but not FAR-specifically. Reproducible slice value
+   exists (split-line oracle +0.059 over random) but nothing pre-assay predicts it. Agent/2x2/transfer phases not run per frozen rule. Next only with a new frozen protocol and fresh
+   data: what predicts slice value (MoA/target knowledge is the untested information source).
+   Audit (`research/maestro_far_20261019/audit_20261019/REPORT.md`): original-environment replay matches, but search/select/test references are not strictly isolated,
+   four slices have unequal drug counts, and secondary MoA labels cross folds. Correct these contracts and pin runtime dependencies before opening a new feature branch.
+   Working entry: `research/maestro_far_20261019/README.md`; redundant driver code/duplicate files removed, read-only verification and early overwrite guards tested.
+
+15. RSD (`research/replicate_decisions_20261019`, ran 2026-10-19): REVISE. A Virtual Cell posterior whose signal/noise geometry is identified from replicate plates
+   of reference compounds (Noise2Noise-style cross-replicate covariance, reference-only selection) improves within-compound context selection on new classes
+   (+0.118, equals a second read at half the wells, holds on the primary-screen run) and removes 94% of selected-candidate optimism, but does not improve
+   cross-compound progression, its selected-pair intervals are too narrow (0.675 at 80%), KG escalation ties exploit-first and the chemistry prior hurts.
+   Next: heavy-tailed pair-noise posterior, frozen on this arena, then tested on an unopened tier (other HTS002 doses for development; PRISM 24Q2 needs authorisation).
+
+16. Decoupled RSD calibration (`research/decoupled_calibration_rsd_20261019`): pre-freeze exploration. It keeps the frozen Gaussian RSD rankings for D1/D2 and tests whether
+   compound-level heavy-tailed predictive intervals improve calibration without changing decisions. A smoke run and protocol draft exist; `FREEZE.json` and `DEV_RESULT.json` do not.
+   Do not treat it as evidence or open a confirmatory arena; review and freeze the protocol before the planned development readout.
+
 ## Next bounded step
 
 **Programme-wide prerequisite: MT-P0.** Qualify a compact A/B task, lineage, action,

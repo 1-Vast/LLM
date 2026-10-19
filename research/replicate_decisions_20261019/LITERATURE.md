@@ -1,0 +1,47 @@
+# Literature and prior-art table (searched 2026-10-19)
+
+Access levels: **M** = methods/experiments read (arXiv HTML), **A** = official abstract / proceedings page, **S** = search
+snippet only (full text not retrieved; bioRxiv returned HTTP 429). Preprints are marked. Earlier programme reviews
+(`log/RESEARCH_PROGRAM.md`: Robin, Co-Scientist, AssayLoop, MDA, LACE, ACE, GOLLuM, MAP, PIE, TxPert, BATCHIE, ReDRAW,
+Token-World, R-IDeA ...) are not repeated here.
+
+## A. Drug discovery, perturbation modelling, Virtual Cells, experimental design, evaluation
+
+| Work | Venue / date | Access | Claim relevant here | Transfer / overlap |
+|---|---|---|---|---|
+| [Zrnic & Candès, Active Statistical Inference](https://proceedings.mlr.press/v235/zrnic24a.html) ([arXiv](https://arxiv.org/abs/2403.03208)) | ICML 2024 | M | AIPW estimator `f(X) + (Y - f(X)) xi / pi(X)`; optimal `pi ∝ sqrt(E[(Y - f)^2 | X])`; tau-mixture with uniform; 80% label savings vs classical, 20-60% vs uniform on survey/census/AlphaFold data; asymptotic guarantees | Design-based validity for audit measurements (fallback B). Gains require uncertainty that tracks error - the condition MAESTRO repeatedly failed |
+| [Li, Zrnic, Candès, Robust Sampling for Active Statistical Inference](https://arxiv.org/abs/2511.08991) | NeurIPS 2025 (arXiv Nov 2025) | A | Poor uncertainty makes active sampling worse than uniform; robust mixing is never worse than uniform | Predicts the FAR/VOI failures; any audit design must mix in uniform sampling |
+| [Rubbi et al., Many Needles in a Haystack: Active Hit Discovery](https://arxiv.org/abs/2605.10196) | ICML 2026 (preprint May 2026) | M | Probability-of-Hit acquisition (Gaussian closed form), asymptotic optimality; MC-dropout MLP on GeneDisco screens; up to +6.4% vs Thompson-Hit; needs calibrated uncertainty; single perturbations; replicate noise not treated | Closest hit-discovery acquisition. Our escalation (D3) compares KG/uncertainty/exploit-first under replicate-identified uncertainty |
+| [Zhang et al., Temporal Difference Active Learning for Perturbation Discovery](https://arxiv.org/abs/2610.22122) | preprint Oct 2026 (v2) | A | Learns the acquisition function online by TD from one trajectory; 8 screens, average rank 1.63 of 11 | Learned-acquisition competitor; not reproduced (no code listed) |
+| [Are Current AI Virtual Cell Models Useful for Scientific Discovery? (PerturbHD)](https://www.biorxiv.org/content/10.64898/2026.04.23.719015v1) | bioRxiv preprint Apr 2026 | S | Evaluates perturbation models by hit discovery: prioritisation recall at budget and simulation recall at empirical FDR on four CRISPRi Perturb-seq screens; models beat the mean baseline | Decision-level VC evaluation already exists. Difference here: grading against a replicate read no policy used, and noise identified from replicates |
+| [Mao et al., Benchmarking virtual cell models for in-the-wild perturbation response](https://arxiv.org/abs/2604.27646) | preprint Apr 2026 | A | Common setups overestimate performance; linear models capture global trends but miss perturbation-specific effects; metrics change rankings | Matches the finding here that reference geometry captures generic axes, not novel-class selectivity |
+| [Roohani et al., BioDiscoveryAgent](https://proceedings.iclr.cc/paper_files/paper/2025/hash/4252dc94531833029000f85dc5fac792-Abstract-Conference.html) | ICLR 2025 | A | LLM agent designs genetic perturbation experiments without an acquisition model | Agent-design competitor; MAESTRO's matched LLM arms were null, so no LLM arm here |
+| [Jin & Candès, Selection by Prediction with Conformal p-values](https://jmlr.org/papers/v24/22-1176.html); [weighted, under covariate shift](https://arxiv.org/abs/2307.09291) | JMLR 2023; Biometrika/arXiv 2023 | A | FDR-controlled selection from any predictor; density-ratio weighting under covariate shift; drug-discovery motivation | Closest competitor to selection-aware risk control (fallback B); MAESTRO certified discovery already used it |
+| [Revamping Conformal Selection (Neyman-Pearson)](https://arxiv.org/abs/2502.16513) | preprint Feb 2025 | S | Power-optimal conformal selection incl. covariate shift | Same family as above |
+| [Breaking the Winner's Curse with Bayesian Hybrid Shrinkage](https://arxiv.org/abs/2603.12867) | preprint Mar 2026 | A | Empirical Bayes with an experiment-specific shrinkage factor; selection bias grows with sampling variability and threshold | Winner's-curse correction by EB shrinkage exists (A/B testing) |
+| [Bayesian hierarchical HTS hit selection with shrunken variances](https://doi.org/10.1186/1471-2105-10-5) | BMC Bioinformatics 2009 | A | HTS rarely has more than 3 replicates; shrink variances, then Storey's optimal discovery procedure | Replicate-based shrinkage in screening is established |
+| [Neufeld et al., count splitting](https://arxiv.org/abs/2307.12985); data thinning (Neufeld, Dharamshi, Gao, Witten) | JMLR 2024 / arXiv 2023 | S | Split one noisy observation into independent folds to avoid double dipping in scRNA-seq | Same "independent noise splits for honest selection and evaluation" mechanism already exists in genomics |
+| [Corsello et al., PRISM repurposing](https://pmc.ncbi.nlm.nih.gov/articles/PMC7328899) | Nature Cancer 2020 | A | 4,518 drugs x 578 lines at 2.5 uM; 1,448 retested at 8 doses x 489 lines; pooled barcoded lines (25 per pool) | Data source; the secondary screen's replicate plates are the units here |
+| [Huang et al., sequential optimal design of perturbation screens with multi-modal priors](https://www.biorxiv.org/content/10.1101/2023.12.12.571389v1) | bioRxiv 2023 (RECOMB 2024) | S | Iterative design of Perturb-seq screens with priors | Background for adaptive screening |
+
+## B. Computer vision, NLP, robotics
+
+| Work | Venue / date | Access | Mechanism | Transfer and why direct transfer fails in biology |
+|---|---|---|---|---|
+| [Lehtinen et al., Noise2Noise](https://proceedings.mlr.press/v80/lehtinen18a.html) | ICML 2018 | A | Train restoration on pairs of independently corrupted copies; clean targets unnecessary because independent noise cancels in expectation | **Borrowed core.** Cross-replicate covariance identifies reproducible signal geometry without clean data. Fails directly: pooled replicate plates share compound plate and pool, decisions are discrete selections, noise is heteroscedastic by activity |
+| [Batson & Royer, Noise2Self](https://proceedings.mlr.press/v97/batson19a.html) | ICML 2019 | A | J-invariant denoisers can be calibrated from noisy data alone; applied to single-cell counts | Closest biological use (denoiser calibration). Here the same principle selects the denoiser on reference compounds and grades decisions, not pixels |
+| [Kossen et al., Active Testing](https://proceedings.mlr.press/v139/kossen21a.html); [Active Surrogate Estimators](https://neurips.cc/virtual/2022/poster/54273) | ICML 2021; NeurIPS 2022 | A | Unbiased, label-efficient estimates of model risk by importance-weighted label acquisition | Audit design for decision risk (fallback B) |
+| [Lekeufack et al., Conformal Decision Theory](https://arxiv.org/abs/2310.05921) | ICRA 2024 | A | Calibrate decisions (risk) directly, online, without iid assumptions | Progression thresholds under shift (fallback B); outcomes arrive only for measured candidates (selective labels) |
+| [Ren et al., Robots That Ask For Help (KnowNo)](https://proceedings.mlr.press/v229/ren23a.html) | CoRL 2023 | A | Conformal sets decide when a planner asks a human | Analogue of "escalate to an assay"; requires exchangeable calibration that new compound classes break |
+| [Coste et al., Reward Model Ensembles Help Mitigate Overoptimization](https://proceedings.iclr.cc/paper_files/paper/2024/hash/dda7f9378a210c25e470e19304cce85d-Abstract-Conference.html) (after Gao et al. 2023) | ICLR 2024 | A | Selecting by a proxy inflates proxy scores of the selected; conservative ensembles remove most overoptimisation for best-of-n | The VC's selected-candidate optimism is the same failure; here the correction comes from replicate-identified noise |
+| [Grimm et al., Value equivalence / Proper VE](https://proceedings.nips.cc/paper_files/paper/2021/file/400e5e6a7ce0c754f281525fae75a873-Paper.pdf) | NeurIPS 2020/2021 | A | Models need only be correct for the decisions/value functions used | Motivates decision-level (not reconstruction) selection of the denoiser |
+| [Lakkaraju et al., The Selective Labels Problem](https://www.cs.cornell.edu/home/kleinber/kdd17-selective.pdf) | KDD 2017 | A | Outcomes observed only for chosen units bias evaluation | Progression decisions: only progressed candidates get confirmation data |
+| [Liang et al., Test-time adaptation survey](https://arxiv.org/abs/2303.15361) | arXiv (rev. 2024) | A | Taxonomy of test-time adaptation | Background for the agent's posterior-predictive check of purchased replicates |
+
+## Same mechanism under other names (novelty check)
+
+Cross-replicate covariance as reproducible-signal covariance is Spearman-style disattenuation / reliability analysis;
+replicate-split honest evaluation is data thinning / count splitting; EB shrinkage of screen reads is standard HTS practice;
+Gaussian conditioning on a low-rank line covariance was already in MAESTRO (program revision's Bayesian probe updating
+used per-drug replicate variance). The novelty claim in `CANDIDATES.md` is therefore restricted to the combination tested
+here and is stated as such.

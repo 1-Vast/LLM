@@ -1,5 +1,37 @@
 # Evidence Register
 
+2026-10-19: [Heavy-tail RSD](heavy_tail_rsd_20261019/REPORT.md), **HEAVY_TAIL_DOES_NOT_FIX_D2** (test of RSD's REVISE; exposed PRISM 19Q4 HTS002 compounds, 0.625 and 10 uM reads
+opened once after the freeze; development on the exposed 2.5 uM reads only; `verify.py` VERIFY OK). Student-t noise (pair-level or compound-level multivariate t; scale ML-fitted
+on reference replicate differences, (level, nu) chosen by RSD's reference-only replicate-split utility) on the frozen RSD signal geometry. Pooled 1,715 compound-doses, 250 clusters:
+`ht - raw` D2 +0.015 [-0.014, +0.046] (delta 0.080); `ht - rsd` D2 -0.007 [-0.011, -0.003]; `ht - raw` D1 +0.043 [+0.003, +0.076], Holm p 0.060; D1 non-inferior to rsd
+(-0.015); selected-pair 80% coverage 0.690 (rsd 0.698). The reference utility preferred the Gaussian over every heavy-tail candidate in all 6 test units and all 3 development blocks.
+Compound-level noise alone restores selected-pair coverage (0.749) and optimism (-0.003) but costs D2 -0.048. Secondary: frozen RSD D1 gain replicates in sign at both doses (+0.057
+[+0.026, +0.085]), about half its 2.5 uM size and below half a second read (0.078); a second read gives +0.16 on both decisions. Development evidence only.
+
+2026-10-19: [Replicate-identified VC decisions (RSD)](replicate_decisions_20261019/REPORT.md), **REVISE** (exposed PRISM 19Q4 secondary HTS002 2.5 uM, 1,283 audited
+compounds x 480 informative lines; all-label/name/Tanimoto families, edge-purged references; replicate plates assigned A = screening read, B = purchasable,
+T = sealed truth, plus the primary-screen run; search/freeze/selection/evaluation once; `verify.py` VERIFY OK). Evaluation (423 compounds, 130 clusters):
+H1-D1 context selection `rsd - raw` +0.118 [+0.084, +0.157], Holm p 0.0005, above delta 0.067 (SUPPORTED); equals two raw reads at half the wells (-0.023 [-0.071,
++0.021]); cross-run +0.090 [+0.062, +0.116]; false progression 0.251 -> 0.170. H1-D2 progression -0.008 [-0.037, +0.025] (NOT_SUPPORTED; never above delta in
+any block). Selected-candidate optimism +0.07 (raw +1.08, two raw reads +0.80) but selected-pair 80% coverage 0.675. Chemistry prior hurts new classes (-0.050);
+PCA denoising below raw; KG escalation = exploit-first (+0.001) and the posterior adds nothing to the raw re-read rule (-0.006). Exploratory diagnosis: heavy-tailed
+pair-level noise (kurtosis 3.2) dominates the extreme pairs D2 picks; geometry transfer is not the bottleneck. Development evidence only.
+
+2026-10-19 maintenance: [FAR working entry point](maestro_far_20261019/README.md). Removed duplicate discarded-run files and redundant non-frozen driver code;
+verification is now read-only and stage/model writers refuse existing outputs before data access. Seven regression tests pass; all 118 contrasts and 54 replay combinations
+still match in the original environment. Frozen core, models, decision gates and original study results are unchanged; FAR_NOT_SUPPORTED remains the scoped verdict.
+
+2026-10-19 audit: [FAR reproduction and design audit](maestro_far_20261019/audit_20261019/REPORT.md).
+All 118 saved contrasts recompute; select/test records and atlases reproduce exactly in the original base environment. `maestro` has model/version incompatibilities.
+Keep FAR_NOT_SUPPORTED, with corrected scope: search uses select outcomes as references, test folds train on each other, and four slices are not exactly equal drug-count cost.
+These are exposed-data cross-validation results; the audit does not establish strictly isolated search/select/test or independent future-task headroom. Original frozen files/results preserved.
+
+2026-10-19: [MAESTRO-FAR dev arena](maestro_far_20261019/REPORT.md), **FAR NOT SUPPORTED** (exposed PRISM 19Q4 x L1000 x ECFP4, 848 dev drugs, 242 families, 5 family
+folds; search/select/freeze/test once; reused-vault check is not independent; `verify.py` VERIFIED). Failure signatures AUROC 0.47-0.52 in select, test and vault (0 of 3
+above 0.60). FAR - exploit-first: test +0.006 [-0.003, +0.018], select -0.013 [-0.028, -0.004]; FAR-v2 (benefit model) test -0.000 [-0.007, +0.006]; threshold 0.010 not met.
+Assay + gate repair - no assay: test +0.039 [+0.009, +0.085], vault +0.047 [+0.009, +0.095] (not FAR-specific). Line-agnostic hindsight slice choice - random: test +0.059
+[+0.015, +0.113] (reproducible slice value that no pre-assay feature predicts). Agent, 2x2, transfer, EG-RPT and external phases not run (frozen rule).
+
 2026-10-18: [Observable-state bets](observable_state_20261018/REPORT_OBS.md), **AGENT CLAIM WITHDRAWN** (exposed PRISM 19Q4, internal development
 assessment; freezes FREEZE0/1, `verify.py` VERIFIED). 136 MoA families, within-family chemical split, 7 held-out lineages; one typed edit per family per arm.
 Confirmation rate: random 0.051 (test calibrated), enumerator 0.059, target-gene rule 0.088, agent 0.081, masked agent 0.059. Agent - enumerator +0.022
