@@ -1,39 +1,39 @@
-# MAESTRO-FAR：开发实验、复现与审计
+# MAESTRO-FAR: Development Study, Reproduction, and Audit
 
-**当前结论：`FAR_NOT_SUPPORTED`。** 当前 kernel/kNN + L1000 transfer 实现未证明 FAR slice 选择优于 exploit-first；不等于证伪整个 Agent + Virtual Cell 研究方向。
+**Current verdict: `FAR_NOT_SUPPORTED`.** The current kernel/kNN + L1000 transfer implementation did not show that FAR slice selection outperforms exploit-first. This does not falsify the broader Agent + Virtual Cell research direction.
 
-先读 [复现与方法审计](audit_20261019/REPORT.md)，再读 [原实验结果](REPORT.md) 和 [冻结决策](DECISION.json)。原报告中的“严格三阶段隔离”“所有策略严格等药物数成本”和“future-task headroom”须结合审计修正理解。
+Read the [reproduction and methods audit](audit_20261019/REPORT.md) first, then the [original study results](REPORT.md) and [frozen decision](DECISION.json). Claims in the original report about strict three-stage isolation, exactly equal drug-count costs, and future-task headroom must be interpreted in light of the audit.
 
-## 文件用途
+## Files
 
-| 类别 | 文件 | 状态与用途 |
+| Category | Files | Status and use |
 |---|---|---|
-| 冻结核心 | `far_core.py`, `far_data.py`, `MODEL.json`, `VALUE_MODEL.pkl`, `FREEZE_PROTOCOL.md` | 由 `FREEZE.json` 锁定，整理不改动 |
-| 已完成实验 | `records_*.npz`, `ATLAS_*.json`, `CONTRASTS_*.json`, `DECISION.json`, `V2_SEARCH.json` | 原始结果保留；vault 为已曝光数据复用 |
-| 只读验证 | `verify.py`, `far_decide.decide()` | 校验 freeze、重算原门槛、检查保存记录的一项主对比；不写回结果、不训练模型 |
-| 深度复现 | `audit_20261019/audit.py` | 独立重算 118 项对比、重建 select/test 的 54 个策略组合、检查数据和阶段依赖；只写审计子目录 |
-| 历史生成器 | `far_run.py`, `far_v2_search.py`, `far_vault.py`, `far_analyse.py`, `qualify_edges.py` | 保留复现来源；已有阶段/模型的生成命令会提前拒绝覆盖。分析和 metadata 生成命令仍会写回对应 JSON，日常检查使用只读入口 |
-| 早期方案 | `AUDIT.md`, `PROTOCOL.md`, `EDGES.json` | Phase 0 审计和初稿；其中“尚未运行”仅指当时状态。实际执行定义以 `FREEZE_PROTOCOL.md` 为准 |
-| 研究轨迹 | `DEVIATIONS.json`, `discarded_run0/` | 保留偏差与被丢弃的 unequal-cost 记录；完全相同的 atlas/model 副本已去重 |
-| 整理回归 | `test_maintenance.py`, `CLEANUP.json` | 记录非冻结脚本整理及只读/防覆盖回归检查 |
+| Frozen core | `far_core.py`, `far_data.py`, `MODEL.json`, `VALUE_MODEL.pkl`, `FREEZE_PROTOCOL.md` | Pinned by `FREEZE.json`; not changed during cleanup |
+| Completed study | `records_*.npz`, `ATLAS_*.json`, `CONTRASTS_*.json`, `DECISION.json`, `V2_SEARCH.json` | Original results retained; the vault reuses already exposed data |
+| Read-only verification | `verify.py`, `far_decide.decide()` | Checks the freeze, recomputes the original gate and one primary contrast from saved records; writes no results and trains no model |
+| Deep reproduction | `audit_20261019/audit.py` | Independently recomputes 118 contrasts, rebuilds 54 select/test policy combinations, and checks data and stage dependencies; writes only in the audit directory |
+| Historical runners | `far_run.py`, `far_v2_search.py`, `far_vault.py`, `far_analyse.py`, `qualify_edges.py` | Retained as reproduction sources; commands that generate existing stages/models refuse to overwrite them. Analysis and metadata commands still write their JSON outputs, so use the read-only entry point for routine checks. |
+| Earlier drafts | `AUDIT.md`, `PROTOCOL.md`, `EDGES.json` | Phase 0 audit and draft. “Not yet run” describes the earlier state; the executed study is defined by `FREEZE_PROTOCOL.md`. |
+| Study history | `DEVIATIONS.json`, `discarded_run0/` | Retains deviations and the discarded unequal-cost run; identical atlas/model copies were deduplicated |
+| Cleanup regression | `test_maintenance.py`, `CLEANUP.json` | Records cleanup checks for non-frozen scripts, read-only behavior, and overwrite guards |
 
-## 日常检查
+## Routine Checks
 
-在 `D:/MAESTRO` 的 PowerShell 执行：
+From `D:/MAESTRO` in PowerShell:
 
 ```powershell
 & 'D:\anaconda\envs\maestro\python.exe' -B research/maestro_far_20261019/verify.py
 & 'D:\anaconda\envs\maestro\python.exe' -B -m pytest research/maestro_far_20261019/test_maintenance.py -p no:cacheprovider
 ```
 
-需要完整策略复现时，使用原依赖环境；当前 `maestro` 中 sklearn 1.9.0 不能直接加载原 sklearn 1.6.1 pickle：
+For a full strategy reproduction, use the original dependency environment. The current `maestro` environment uses scikit-learn 1.9.0, which cannot directly load the pickle created with scikit-learn 1.6.1:
 
 ```powershell
 & 'D:\anaconda\python.exe' -B -c 'import os,runpy; h=os.add_dll_directory("D:/anaconda/Library/bin"); runpy.run_path("research/maestro_far_20261019/audit_20261019/audit.py",run_name="__main__")' --original-env
 ```
 
-深度复现会更新对应审计结果 JSON。单线程、原默认线程和 `maestro` 的不同环境结果包含不同的兼容性/敏感性证据，均保留。历史审计结果的 `predecessor_sha256` 描述当次运行的文件版本；非冻结 driver 的后续整理见 `CLEANUP.json`，不应把历史 hash 当成当前代码 hash。
+The deep reproduction updates the corresponding audit result JSON. Results from the single-threaded, original default-thread, and `maestro` environments are retained as compatibility and sensitivity evidence. Historical `predecessor_sha256` values identify the file version used in that run; later cleanup of non-frozen drivers is recorded in `CLEANUP.json`, so those historical hashes must not be treated as hashes of the current code.
 
-## 下一步边界
+## Next Steps
 
-重新研究 MoA/靶点能否预测 assay 价值之前，先确定严格隔离的 references、完整 MoA/结构身份分组、精确成本和 evaluator 访问边界，再冻结新协议。当前 test/vault 都已曝光，重新拆分仍是开发证据。Agent、2×2、transfer 不满足原前置门槛，本次未运行。
+Before revisiting whether MoA or target knowledge predicts assay value, define isolated references, complete MoA and structural identity groups, exact costs, and evaluator access boundaries, then freeze a new protocol. The current test and vault data are exposed; repartitioning them would still provide development evidence. Agent, 2x2, and transfer phases did not pass their prerequisites and were not run.
