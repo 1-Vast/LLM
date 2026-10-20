@@ -54,4 +54,8 @@ python -m tools.research_validation --help
 
 The model predicts within qualified scope; it does not establish functional endpoints, mechanism, causality or experiment value by itself. The Agent selects and audits evidence and actions; it does not turn language-model output into scientific fact. Current conclusions are in [research/REPORT.md](research/REPORT.md), with numerical results in [research/EVIDENCE.md](research/EVIDENCE.md). The [programme stages](log/RESEARCH_PROGRAM.md#validation-stages-for-research-method-transfer) separate method value, Agent value, transfer and independent confirmation. PRESAGE P0 remains NO-GO; anchor purchasing value remains blocked by independent-endpoint qualification.
 
+### Latest Research Update (2026-10-20)
+
+The latest implementation-identifiability source audit found no condition-matched, quantitative, lineage-qualified unit in the public records. The research verdict remains `ASSET_BLOCKED`; biological discrimination is not established, and G2-G5 were not run. See the [current evidence summary](research/REPORT.md#evidence-and-stop-decisions) and [audit 1 amendment](research/implementation_identifiability_v1_audit1/AMENDMENT.md) for the findings and the specific missing source data.
+
 Registered studies retain their protocols, results, deviations and replay code. The current evidence, stop decisions and simplification ledger are in [research/REPORT.md](research/REPORT.md). Frozen research records are separate from the maintained runtime and default software tests.
