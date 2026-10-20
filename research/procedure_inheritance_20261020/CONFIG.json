@@ -1,0 +1,20 @@
+{
+ "study": "procedure_inheritance_20261020",
+ "status": "synthetic methodology development; drug-discovery effectiveness NOT_TESTED",
+ "streams": {"kinds": ["alias", "chain", "novel", "null"], "seeds": [71001, 71002], "n_streams": 8, "partner_rule": "same kind, the other seed (transplant arm)"},
+ "task": {"pairs": 66, "shortlist_k": 5, "budgets": [3, 4], "anchor_budget": 4, "later_batches": [2, 3, 4], "tasks_per_batch": 4, "released_history": 8, "generations": 4},
+ "budget": {"cap_candidates_per_generation": 12, "numerical_threads": 1, "elapsed_minutes": 30, "max_streams": 8},
+ "lifecycle": {"eps_val": 0.004, "library_rule": "gain>=0.004, wins>losses, wins>=2 (leave-one-background-out replay of fresh Kg1)", "plan_rule": "gain>=0.004, wins>losses, wins>=1 on the newest batch (4 backgrounds)", "ties_never_promote": true, "rollback": "deployed plan must not be worse than the default planner by more than 0.004 on the validation batch"},
+ "response_model": {"family": "regime mixture (null + <=learned profiles) + unexplained U", "pu": 0.05, "tau": 0.3, "measurement_sd": 0.02, "unknown_exit_posterior_u": 0.5, "kg_stop": 0.0003, "quadrature_nodes": {"kg1": 5, "kg2": 3}},
+ "arms": {"static": ["prior", "exploit"], "conventional": ["f0_kg1", "f1_kg1", "f1_kg2", "f1_distill"], "plan": ["f0_plan", "f1_plan", "f1_plan_re"], "ablation": ["f1_plan_nobranch", "f1_plan_xplant"]},
+ "primary_estimand": {"id": "assay_units", "text": "mean later-task shortlist utility of f1_plan with query budget 3, minus the pre-registered reference f1_kg2 (two-step lookahead, same library) with budget 4: does the learned procedure keep reference quality with one fewer assay unit (25 percent)?", "holds_if": "pooled mean >= -0.01", "uniqueness": "plan minus max(f1_kg2, f1_distill) at the same budget must be >= +0.01 pooled and >= 0 in at least 6 of 8 streams"},
+ "secondary_resource": "process CPU seconds (one thread): shared factor learning + arm-specific learning/validation/distillation + invocation over all 16 task backgrounds; break-even reuse count reported against fresh Kg1 and fresh Kg2",
+ "practical_margin": {"delta": 0.01, "rationale": "predecessor margin (commensurable with the closed studies); about 1.3 percent of the mean later-task utility; eight streams cannot resolve it statistically, so it only defines the development decision rule"},
+ "decision_rule": {"ADVANCE_TO_POWERED_INDEPENDENT_DESIGN": "uniqueness holds at B=3 AND plan minus nobranch and minus xplant >= 0.005 pooled at B=3 AND worst anchor (plan - fresh Kg1) >= -0.01 AND worst stream (plan - fresh Kg1) >= -0.01",
+                   "CLOSE_NO_PRACTICAL_BENEFIT_OVER_FRESH_ONE_STEP_PLANNING": "plan minus fresh f1_kg1 < 0.01 pooled at both budgets",
+                   "CLOSE_EXPLAINED_BY_CONVENTIONAL_LOOKAHEAD_OR_DISTILLATION": "plan beats fresh Kg1 by >= 0.01 but not the best of Kg2/distillation by >= 0.01 at both budgets",
+                   "INCONCLUSIVE_DEVELOPMENT": "anything else"},
+ "no_labels": "no confidence interval, significance test or SUPPORT label is produced from eight streams",
+ "api": "not used (optional proposer control omitted by design)",
+ "real_data": "not opened; see INVENTORY_CHECK.json"
+}

@@ -1,186 +1,69 @@
-# MAESTRO: current evidence and repository simplification
+# MAESTRO research decisions
 
-Programme revision (2026-10-17): MAESTRO studies transfer of research methods
-across drugs and cellular contexts in complete early discovery campaigns.
-Candidate discovery and context selection/failure analysis are primary tasks;
-selectivity and molecular mechanism claims require their respective comparison
-and distinguishing measurements. The [research programme](../log/RESEARCH_PROGRAM.md)
-asks when a previous procedure applies, what check can reveal failed transfer,
-and whether feedback-based revision improves future decisions over strong simple
-workflows at the same total cost. Decision-relevant response correction is its
-model-level foundation. MT-P0/MT-P1/MT-P2 are new programme stages, not a revival
-of PRESAGE P1-P3. No new biological method or cross-task learning result is claimed.
+2026-10-20 self-repair qualification: [self_repair_qualification_20261020](self_repair_qualification_20261020/QUALIFICATION.md) finds
+NO_UNIT_QUALIFIES_FOR_SELF_REPAIR_BEYOND_REFITTING. On exposed Beat AML 2.0 the Waves1+2 -> Waves3+4 drug-response shift is real (split-half corr 0.78) and
+decision-relevant (chronological per-drug offset +0.370 [0.257, 0.497] over the frozen model), but composition, run-time trend, drug family and potency explain
+none of its decision-relevant part, one observation cannot separate the explanations (per-drug d' 0.16), and the offset is ordinary drift repair. Exposed
+development only; no experiment proposed; closed studies unchanged.
 
-The [2026-10-17 synthetic audit](../log/program_review_20261017/LOOP_AUDIT.json)
-reproduces static A -> B -> C choices under opposite feedback on both committed
-HEAD and the preserved working copy. Sixteen same-label observations produce
-17/18 support share; eighteen reach 0.95. These are heuristic counts, not a
-likelihood posterior. The default loop does not automatically update future
-predictions/action values. Runtime and existing study files are preserved.
+2026-10-20 procedure inheritance audit: [procedure_inheritance_20261020_audit1](procedure_inheritance_20261020_audit1/REPORT.md)
+retains the original bounded CLOSE decision: ordinary lookahead and distillation largely match the executable plan's utility.
+The eight synthetic condition streams share two independent seed blocks. Supplemental replay checks every behavior field on all
+3,840 archived rows. Cost accounting and the missing primary ADVANCE gate are corrected separately; mostly-zero, quantized timings
+do not establish precise amortization counts. The novel regime appears only in the final batch, so its detection-revision-later-benefit
+loop was not tested; all 112 transplants rejected, leaving content transfer untested. Measured drug-discovery utility remains NOT_TESTED.
+No qualified independent validation asset is identified, but exposed measured development is not ruled out merely by missing regime
+labels, monetary prices or independent hit confirmation. Qualify one real observation/decision unit before another architecture;
+the [original frozen package](procedure_inheritance_20261020/REPORT.md) remains unchanged.
 
-The revision reconstructed the saved indication-triage development totals:
-395 vs two-stage 293 simulated matrix events, +2.615/campaign over 39 campaigns,
-saved campaign CI [1.667,3.615]. This is a development lead, with same-profile
-simulated probes, pooled assay units, separate budgets and non-nested policy
-tuning. It does not establish independent discovery, new model-repair value or
-Agent benefit. See the [reuse audit](../log/program_review_20261016/REVIEW.json).
-The draft indication-triage study, its results and its sealed tier are preserved.
+2026-10-20 audit amendment: [innovation_validation_repair1_20261020](innovation_validation_repair1_20261020/REPORT.md)
+supersedes the implementation and attribution claims below, while preserving the original measured results.
+The legacy H1 negative result remains valid for the implementation that ran; an equal-resource H2 was NOT_TESTED.
+The original acquisition sampler was inconsistent, deployment could silently drop a fitted program, and archive/diagnostic-plan
+reuse was not implemented. Strict replay reproduces all 27,648 archived decisive task nominations but fails one checkpoint
+(eight anchor rows); unarchived anchor models are NOT_REPLAYABLE. The isolated repair and bounded synthetic diagnostics
+establish engineering contracts only. Measured pharmacological utility and innovation effectiveness remain NOT_ESTABLISHED.
 
-2026-10-17: [Seed attribution](seed_attribution_20261017/REPORT.md) repairs the PRISM evaluation
-contract and asks what explains the fixed-seed benefit. It is **development** on the same exposed
-PRISM 19Q4 strata (`verify.py` VERIFIED; nothing frozen was edited; no sealed tier opened).
-* The earlier evaluation was not one contract: score reference `(X2+X3)/2` (NaN for single replicates) against
-  labels on the mean of available replicates, 100 source drugs with no frozen threshold (24 remain
-  undefined and are refused by name), a fit cache that ignored the data, and a Gaussian crossing score
-  that ranks well (AUROC 0.834) but is not shown to be a calibrated probability of the complete
-  qualified-hit event.
-* The frozen development bench is not a prospective replay: every fold trains on 74-101 of the 103
-  reserved query lines, and scrambling query outcomes changes the fold means, residuals, probe design,
-  proposals and diagnosis. The masked bench (`replay.MaskedBench`) is exactly invariant. Query hits
-  for the seed library fall from 4.41 to 3.87 per line (I2) once the query lines are masked.
-* **Corrected evidence statement.** Seed minus strong model: I2 +0.211 [+0.097, +0.340] frozen, **+0.117
-  [-0.026, +0.248]** repaired; I1 +0.445 -> +0.283 [-0.065, +0.699]; exploit-first campaign +0.437 ->
-  **+0.356 [-0.088, +0.856]**. All three registered primary tests are NOT_CONFIRMED (Holm p 0.29-0.31).
-  Point estimates stay positive; the gain is concentrated in skin (82% of the policy gain) and
-  BRAF/NRAS-mutant lines, with a loss of -0.32 hits/line on gate-negative lines.
-* Attribution: the seed pairing exceeds all 20 capacity- and support-matched permutations at every layer
-  (the smallest possible exact p, 1/21) but the matched contrast is only supported at I2 (lower bound
-  +0.001, Holm p 0.22). Extra capacity, per-drug loadings and uncertainty estimation add nothing; a plain
-  ridge on the same ten scope-by-gate features matches the library (B - C1 -0.004 [-0.198, +0.166]); a
-  ridge given all 72 products does not find the pairings (+0.093 [-0.018, +0.191]).
-* Cost units are now six separate accounts. Part 4 (small-menu opportunity diagnostic) was not run: no
-  primary test had a positive lower bound.
+Updated 2026-10-20. The bounded O'Neil execution brief ([NEXT_RESEARCH_PROMPT](../log/20261020/NEXT_RESEARCH_PROMPT.md)) has now been executed:
+**[functional_rule_revision_20261020](functional_rule_revision_20261020/REPORT.md) is UNSUPPORTED** - one bounded, evidence-driven revision of conditional
+functional transfer rules did not beat same-data fixed-structure refitting (-0.0005 [-0.0008, +0.0005] shortlist utility, margin 0.005), the full-dictionary or conventional
+comparators; every candidate failed the single G retention query; the task is nearly saturated by the single-agent reference plus drug and drug-by-cell effects
+(remaining regret 0.0076). Policy comparison NOT_RUN (no recoverable bundle/cost records); a one-request API proposer added nothing. Exposed internal development only.
+The self-improving follow-up ([NEXT_SELF_IMPROVING_RESEARCH_PROMPT](../log/20261020/NEXT_SELF_IMPROVING_RESEARCH_PROMPT.md)) was executed as a development prototype:
+**[self_improving_virtual_cell_20261020](self_improving_virtual_cell_20261020/REPORT.md)** - the typed-program loop is executable, serialisable and verified, but no effectiveness claim is
+supported on the real data (transfer-contract primary evo_full - refit -0.0009 against a useful-gain criterion of 0.00645; end-to-end contract has no decision opportunity beyond direct
+confirmation). Independent confirmation is not available.
+The innovation-validation follow-up ([NEXT_INNOVATION_VALIDATION_PROMPT](../log/20261020/NEXT_INNOVATION_VALIDATION_PROMPT.md)) was executed:
+**[innovation_validation_20261020](innovation_validation_20261020/REPORT.md)** - competing-program probe selection and an inherited gate library are executable and verified, but on synthetic
+streams they do not beat latent-factor A-optimal acquisition (+0.0017 vs margin 0.01), inheritance adds nothing over a restart control, and measured utility is not tested.
+O'Neil is exposed internal development data; source availability is not scientific feasibility.
+The broader [research programme](../log/archive/HISTORY.md) remains historical scope,
+not an instruction to restart stopped PRISM, Beat AML or Jaaks branches.
 
-2026-10-17: [Beat AML gate G1](beataml_g1_20261017/REPORT.md) (development, exposed data, frozen before
-the run, `verify.py` VERIFIED) **FAILED**. The frozen candidate (coherent score, exploit-first probes,
-k chosen on source patients) beats the ridge by +0.098 [+0.045, +0.153] total hits per sample; the
-registered gate needs the lower bound minus 0.05 per extra round to exceed 0.05 (it is -0.005).
-* The probe round, not the low-rank model, carries the gain: it adds +0.125 to the candidate and +0.083
-  to a ridge; ridge-plus-feedback is within +0.015 [-0.036, +0.066] of the candidate, and the low-rank
-  prior without observations is no better than the ridge (-0.027 [-0.065, +0.011]).
-* The confirmed two-round engine is not shown better than the one-round ridge (+0.019 [-0.033, +0.073]);
-  the candidate beats it by +0.079 [+0.032, +0.127].
-* Registered consequence: **stop the low-rank state-model branch**; keep the feedback pattern on the
-  strongest prior with the ridge as comparator. k = 8 is best post hoc (+0.131 over the ridge, not
-  passing the strict gate).
+## Research map by question and final decision
 
-2026-10-18: [Feedback propagation](feedback_propagation_20261018/REPORT.md) (development, exposed folds
-2-4 of PRISM 19Q4; frozen before the comparison; `verify.py` VERIFIED; no sealed tier opened) asks whether
-observed feedback can identify and repair a failure in how responses propagate to *unmeasured* pairs.
-**STOP; no program search.**
-* Audit: the saved indication-triage totals reproduce (395 vs 293) and 394 of 395 (and 293 of 293) of those
-  hits are pairs the arm itself probed, so that task never tested propagation. Unmeasured-pair nominations
-  are the primary utility here; pool wells (about 24 lines) are the physical read unit and costs stay
-  hypothetical (no plate/well map). Secondary equal-lineage seed-attribution interval corrected (erratum).
-* Ridge-plus-feedback does propagate at pool cost: +1.056 [+0.626, +1.526] events per 64 compounds over the
-  structure prior (2.64 vs 1.58), not at 16 logical lines (+0.167 [-0.108, +0.451]).
-* The registered repair (kNN-analogue prior plus ridge residual update) is not distinguishable from
-  ridge-plus-feedback (+0.139 [-0.579, +0.870]; development had +0.81) or from kNN (+0.083 [-0.279, +0.437]);
-  its prediction error is lower in every fold (0.265/0.296/0.243 vs 0.287/0.327/0.255) without a decision
-  gain. A leave-one-pool-out diagnosis identifies the better rule per compound only weakly (AUC 0.59-0.63);
-  a perfect choice would add +0.53 [+0.06, +1.05]. A second noise draw gives +0.86 for the same contrast.
-* Value-greedy closed-loop acquisition is below the fixed A-optimal design at the same 3 pools (R1 2.25 vs
-  2.78), because it measures the pairs it would nominate.
+Detailed estimates and uncertainty live in [EVIDENCE](EVIDENCE.md) and linked original records.
+The registry's `status` describes record lifecycle, not scientific support. Every study keeps
+its original layout, protocols, code, records, deviations and freezes because cross-study
+imports/hash pins make partial archival unsafe without redesign.
 
-2026-10-18: [Acquisition programs](acquisition_program_20261018/REPORT.md) (development, exposed PRISM 19Q4, whole-pool target set so probes never
-reveal target entries; frozen incumbents before held-out; `verify.py` VERIFIED). Predecessor hindsight clarified: campaign-level best of
-ridge/R1 lists gives 131 vs 100 hits (unavailable diagnostic; the old per-compound selector chose by squared error).
-* Held-out (folds 2-4, five fresh paired noise draws, events per 64 compounds): fixed design 1.822; one-step posterior lookahead 1.717
-  (−0.106 [−0.262, +0.022]); agent-search incumbent 1.725 (+0.008 [−0.033, +0.054] over the lookahead); conventional random search
-  accepted nothing in 12 proposals. A development lead (+0.100 [−0.003, +0.199]) did not transfer; the unavailable ceiling of the
-  acquisition choice is +7% held-out (+34% in development). Lookahead probabilities rank but overstate levels about tenfold.
-  Candidate failures are recorded; ridge-plus-feedback and the fixed design remain the reference.
+| Question and study closure | Data, exposure and unit | Strong comparison and final decision | Reusable closure |
+|---|---|---|---|
+| Scoped molecular transfer: knowledge_transfer, context_discrimination, evidence_transfer, collaboration_limits, selective_hit_triage | GSE92742/70138 and GCP; historical sealed slices now evaluated; compounds/campaigns/plate records | Fixed sparse design, deterministic decoder/blend and conventional agents. Scoped RNA transfer and GCP endpoint ranking survive; Agent synergy and general viability transfer do not. | Study README/protocol, frozen source receipts, saved forecasts, claims, verifiers; typed QC/measurement admission. |
+| Biological information beyond class: knowledge_reality, evaluator_audit, orbit_contrast, mechanism_falsification | Exposed LINCS/PRISM annotations and response records; compound/class units | Gene-relabelling null, unconditional residual, corrected evaluation contract. Mechanism-class confounding; no measured mechanism truth. STOP or ASSET_BLOCKED. | C1-C7 evaluator audit, orbit decomposition, provenance/refusal contracts. |
+| Feedback vs model or policy: indication_triage, context_transfer, feedback_attribution, beataml_g1 | Exposed PRISM or Beat AML 2.0; compound-line campaigns or patient groups | Ridge plus feedback, item prior, exploit-first. Beat AML feedback survives as within-domain workflow; low-rank model branch stopped after failed G1. Triage's measured-pair counting is not propagation. | CLAIMS/AUDIT/DEVIATIONS and saved campaign records; corrected lookahead remains unconfirmed. |
+| Knowledge library vs revision: program_revision, seed_attribution | Exposed PRISM 19Q4; lineages/compound groups | Ridge on identical seed features and masked replay. Early seed positives superseded by corrected unconfirmed estimates; autonomous revision/LLM/search NO-GO. | Seed attribution ERRATUM and masked bench; optional seed features only. |
+| Better propagation/acquisition: feedback_propagation, acquisition_program, observable_state, eg_rpt, maestro_far | Exposed PRISM/L1000; compound families/campaigns, not independent paper records | Ridge-plus-feedback, kNN, fixed design, conventional enumerator/target rule, exploit-first. No repair/Agent/FAR advantage. EG-RPT is a draft scaffold, not fitted evidence. | FAR audit supersedes strict-isolation/equal-cost narrative; preserve discarded run, failure records and all study-specific ledgers. |
+| Functional anchors vs independent confirmation: presage_transfer, anchor_purchase | Exposed PRISM 19Q4; held-out compounds/components | Chemistry+MoA, ungated neighbours, context means. PRESAGE P0 NO-GO; anchor BLOCKED_INDEPENDENT_ENDPOINT. | Complete frozen negative record; no P1-P3 restart. |
+| Replicate noise vs decisions: replicate_decisions, heavy_tail_rsd, decoupled_calibration_rsd | Exposed HTS002 2.5/0.625/10 uM; compound clusters/doses and replicate plates | Gaussian RSD, scalar shrinkage, raw read and raw re-read. D1 scope survives; D2 unsupported; Student-t branch closed. Decoupled package actually HAS FREEZE.json and DEV_RESULT.json (old direction note was stale); no unopened confirmation. | Original per-unit results and shared RSD/HT imports retained. Decoupled result is development-only; see its DEV_RESULT.json, not a fabricated missing-report link. |
+| Same-target drug substitution: action_substitution, kinobeads_substitution, biological_residual_gate | Exposed Jaaks 2022 plus Klaeger ChEMBL; held-out implementations/partner units/families; dates often share cell stock | Functional kernel and same-partner feedback. STOP for this action space; biological residual underpowered and decision-opportunity gate fails. | Later P0 audit corrects B5 (function x target Jaccard), prevalence and the threshold/update-specific Agent bound; unique unit tables/deviations retained. |
+| Molecular implementation identifiability: implementation_identifiability_v1 and audit1 | Designer-exposed AURKA papers/supplements; condition/endpoint/lineage units | Inhibitor/degrader/CRBN-null binder contrasts. Engineering logic only; ASSET_BLOCKED biologically; G2-G5 NOT_RUN. | Audit1 AMENDMENT supersedes source-completeness narrative. No matched quantitative lineage-qualified terminal unit; preserve exact source extracts and mutation tests. |
 
-2026-10-18: [Observable-state bets](observable_state_20261018/REPORT_OBS.md) are an internal development assessment on exposed PRISM 19Q4.
-Across 136 MoA families, the held-out confirmation rate was 0.081 for the agent, 0.059 for a conventional enumerator, 0.088 for the
-non-LLM target-gene rule, 0.059 for the identity-masked agent, and 0.051 for random edits. The agent did not meet its registered margin
-against the enumerator (+0.022 [-0.022, +0.074]) or knowledge rule (-0.007 [-0.037, +0.015]); the typed-edit thesis was withdrawn for
-this arena. Agent confidence was poorly calibrated (mean stated probability 0.45 vs 0.081 observed). The target-gene rule's
-+0.037 [+0.003, +0.075] vs random is exploratory and unadjusted, below the practical margin. Decision utility was not evaluated (S2 not
-run); no response state, Agent advantage, or independent transfer is established. Keep this as a bounded negative assessment and the
-target-gene rule as an unconfirmed lead only.
-
-2026-10-17: [Program revision](program_revision_20261017/REPORT.md) is a pre-registered study on
-PRISM 19Q4 (freeze 12:55:48Z, future strata opened once at 13:09:54Z; `verify.py` VERIFIED). It asks
-whether MAESTRO's agent improves future decisions by revising a shared library of executable,
-observably gated response programs on top of a strong low-rank model. It does not.
-* A 10-program textbook seed library helped on 247 future lines under the **frozen** contract: +0.21
-  hits/line with 8 probe wells (H1, Holm p 0.004), +0.45 with none, +0.44 in exploit-first campaigns.
-  **Superseded by the corrected contract above**: +0.12, +0.28 and +0.36, no interval excluding zero.
-  The gain is larger on unseen lineages (+0.25 vs +0.10 at I2, frozen).
-* Revision adds nothing: editable minus fixed library 0.000 (H4), vs stepwise search +0.008 (H2),
-  LLM vs enumeration +0.004 (H3). The 0.000 reflects that the primary LLM library **equalled** the
-  fixed seed library (no revision-added program survived), not a measured difference between two
-  different libraries. Programs learned from an empty start give +0.05 in the seeded-arm ablations,
-  which do not cover every empty-start program; every revision-added program has ablation value <= 0.
-  Joint measurement edits changed nothing.
-* About 4,300 logical development wells per arm bought no gain over the free seed; the cost is never
-  repaid. These are per-pair logical charges, not plate wells (the cost-unit accounts are separated in the
-  seed attribution).
-* Post hoc: the within-lineage development arena would reject most useful seed programs (6
-  BRAF-mutant query lines vs 37 in future lineages). For 20-23% of the LLM's candidates the sign of the
-  residual coefficient disagreed with the stated direction; that is a sign disagreement in a fitted
-  residual, not a measured biological error rate. The development bench itself trained on the reserved
-  query outcomes (see the seed attribution above), so its development numbers were not prospective.
-* Shared loadings do not transfer to unseen drug structure groups. In 28-well campaigns, 8 probes
-  lose to exploit-first feedback (-0.38). AFA beats a fixed design (+0.22) at 10 rounds.
-* No independent confirmation: same-screen future strata are not independent. Cost: 0 purchased wells
-  (archived outcomes), deepseek-flash 0.287 USD.
-
-2026-10-17: [Feedback attribution](feedback_attribution_20261017/REPORT.md) is a
-pre-registered **development** study on the same, exposed Beat AML data. Its audit is in
-`AUDIT.md`. It confirms nothing.
-* All groups share four population-chosen probes. With them, the low-rank update helps without RNA
-  (H1 +0.096), RNA adds once readouts arrive (H2 +0.065), and the update beats an
-  overall-sensitivity-only update (H4 +0.081). Deranged readouts are worse than none (D - F
-  +0.115). All four are Holm-positive, but none clears the 0.05 minimum useful effect at its lower
-  bound.
-* The registered "RNA prior has independent value" (H3) is against the model's own population
-  state. That comparator is broken by an incoherent event score. Against the empirical item prior
-  the RNA prior gives -0.017, and a drug-specific ridge on the same PCs beats it (-0.065).
-* The confirmed two-round engine is not shown better than that one-round ridge (+0.023
-  [-0.029, +0.077], post hoc).
-* A coherent event score adds +0.04 to +0.08 per group but is not calibrated (Gaussian tails too
-  thin). Eight probes beat four (+0.065), and the reference planner only ever chose eight.
-* Tuned exploit-first is not beaten by any selector (hybrid -0.031, calibrated -0.065).
-* Cost: 0 wells, $0.
-
-2026-10-17: [Context transfer with verified bridges](context_transfer_20261017/REPORT.md)
-is **CONFIRMED** once on Beat AML 2.0 primary patient samples (520 samples, 479 patients, 16
-archived AUC queries, about 112 treatment wells). That label records protocol execution. The
-[claims amendment](context_transfer_20261017/CLAIMS.json) supports only the functional-feedback
-gain under the replay, as workflow transfer within Beat AML. The frozen claims hold, but they are
-narrower than the label:
-* The gain is bridge feedback. The source-verified agent chose to measure the Virtual Cell's top
-  four inhibitors first and re-rank the rest (5/5 folds). This gave +0.073 hits per sample over
-  the Virtual Cell alone and +0.229 over pilot matching.
-* The basal-expression prior beat nearest-context transfer but not the context-free item prior.
-* The agent matched, and did not beat, the standard exploit-first design.
-* The development procedure it rejected (lookahead) carried a baseline defect that only uneven
-  measurement exposes. It is corrected post hoc in `agent.bridge_design`, as development-grade.
-* The LLM arm added nothing.
-
-2026-10-16: [Anchor-purchase qualification and development diagnostic](anchor_purchase_20261016/REPORT.md)
-completed with **BLOCKED_INDEPENDENT_ENDPOINT**. PRISM shared preprocessing and
-unqualified culture starts/bundle costs prevent Q1 confirmation; Q2 was not fit.
-On 794 selected secondary-screen drugs / 343 grouped components, inner selection
-chose context means (1,113 known top-4 technical hits). Unpriced full X1 reference
-gave 1,357 (+0.307/drug [0.231,0.385]), but missing-outcome bounds cross zero;
-this is neither small-anchor value nor independent biological confirmation.
-Offset-only information loses after cost. Keep the audit/controls, stop policy
-expansion, and preserve the original PRESAGE NO-GO. No core scientific promotion.
-
-New exposed-data development result (2026-10-16):
-[PRESAGE-inspired target-pathway transfer](presage_transfer_20261016/REPORT.md)
-fails P0. On 4,528 compound-held-out PRISM 19Q4 drugs / 568 identified lines,
-pathway fusion Pearson is 0.1161 vs chemistry 0.1450; gain over chemistry+MoA
-is +0.0028 [-0.0020,+0.0083]. Correspondence exceeds 20 stratified feature
-permutations but adds no useful improvement over strong baselines. Top-3
-nomination hits are 1,903 vs ungated neighbours 2,223. Stop P1-P3/LLM expansion;
-no scientific model promoted. Tested thin-loop scope/support/identity and
-retained-lineage-field guards are engineering repairs, not scientific gains.
-Static scores, label-count inference and absent local ledger authentication remain
-explicit limitations. Prior freezes and sealed outcomes were not changed.
+Names above abbreviate the dated folders in [STUDIES.json](STUDIES.json). The table below
+retains study-specific stop decisions; all numerical details remain in their original records.
+Removed one-page log summaries and duplicate opening chronology are recoverable in the
+[cleanup manifest](../log/20261020/PREPARATION.md). They added no unique results; several repeated
+withdrawn PRISM positives or obsolete proposed continuations. Later audits take precedence.
 
 Updated 2026-10-19. This is the current decision summary; [EVIDENCE.md](EVIDENCE.md)
 keeps the numerical historical register. [STUDIES.json](STUDIES.json) registers the

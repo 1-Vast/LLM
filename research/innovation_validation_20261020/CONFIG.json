@@ -1,0 +1,92 @@
+{
+ "protocol": "innovation_validation_20261020 v1",
+ "streams": {
+  "kinds": [
+   "null",
+   "lowrank",
+   "alias",
+   "compose"
+  ],
+  "decoupled_kinds": [
+   "alias",
+   "compose"
+  ],
+  "eval_seeds": [
+   1,
+   24
+  ],
+  "dev_seeds": [
+   9001,
+   9004
+  ],
+  "generators": "iv_worlds.make_stream (N_DRUGS=28, 8 H0 + 4x4 task cells + 4 A_old + 4 A_new; nuisance 0.01 drug-cell, 0.01 read noise, 0.02 pair mean; gate amplitude 0.14-0.24)"
+ },
+ "task": {
+  "budget": 4,
+  "shortlist_k": 5,
+  "primary_contract": "E",
+  "gen_min": 2,
+  "curve_budgets": [
+   2,
+   8
+  ],
+  "fo_probe_rule": "seeded random stratified-free draw from the legal probe half",
+  "transfer_mask": "every second pair within each class is a legal probe; the rest is the target pool"
+ },
+ "margin": {
+  "value": 0.01,
+  "kind": "engineering threshold on absolute shortlist utility (mean realized activity of the 5 nominated pairs)",
+  "rationale": "Chosen before scoring as the smallest gain that would justify maintaining a program library and a decision-value acquisition rule: about one read-noise standard deviation (0.01-0.014) of the synthetic measurements and about 0.3x the dev-measured no-probe-to-oracle gap. It is not a fraction of oracle headroom and was not tuned on evaluation streams."
+ },
+ "stats": {
+  "unit": "independent stream",
+  "bootstrap": 20000,
+  "primary_ci_level": 0.98333,
+  "secondary_ci_level": 0.95,
+  "rule": "SUPPORT if lower bound >= margin; NO_SUPPORT if upper bound < margin; else INCONCLUSIVE",
+  "primary_group": "mechanism conditions pooled (alias + compose, 48 streams)"
+ },
+ "comparators": {
+  "H1_primary": "lat_aopt",
+  "H1a_policy_arm": "inh_exploit",
+  "H3_comparator": "inh_kg",
+  "chosen_on": "dev streams 9001-9004 (E contract, alias+compose mean utility): strongest conventional pipeline lat_aopt 0.8325; GBM best 0.827; same-library exploit 0.833 is used for the acquisition-rule isolation"
+ },
+ "arms": {
+  "common": [
+   "inh_kg",
+   "inh_pol",
+   "rst_kg",
+   "fix_kg",
+   "fix_pol",
+   "inh_bald",
+   "inh_var",
+   "inh_rand",
+   "inh_exploit",
+   "inh_del_all",
+   "inh_del_old",
+   "prior",
+   "direct",
+   "lat_aopt",
+   "lat_var",
+   "broadcap_bald",
+   "broadcap_transplant",
+   "gbm_var",
+   "gbm_ucb",
+   "gbm_exploit"
+  ]
+ },
+ "ceilings": {
+  "generations": 4,
+  "candidates_per_generation": 12,
+  "compute_minutes": 180,
+  "api_attempts": 6,
+  "api_tokens": 30000
+ },
+ "lifecycle": {
+  "eps_val": 0.004,
+  "deploy_max_gates": 4,
+  "archive_max": 3,
+  "promotion": "gain >= eps_val and wins > losses and wins >= 2 on cells not used in the candidate fit"
+ }
+}

@@ -4,15 +4,31 @@ MAESTRO is a dual-core autonomous research framework for contextual early drug d
 
 The Autonomous Scientific Agent proposes and revises executable research procedures. The Virtual Cell predicts scoped functional responses, candidate differences and model mismatch, then updates supported components from feedback. Their shared task is to learn when previous research experience helps a new decision, when to check its assumptions and when to change the plan. Typed contracts separate predictions from measurements and keep costs and failures visible.
 
-The [research programme](log/RESEARCH_PROGRAM.md) defines two primary tasks: candidate discovery/repurposing and cellular-context selection with failure analysis. Selectivity needs explicit comparison measurements; mechanism confirmation needs distinguishing evidence. Dose, time and combinations are gated extensions. The programme tests method transfer, within-task feedback, dual-core contributions and selected-candidate reliability separately. The existing thin `maestro.research_loop` is static replay infrastructure; automatic feedback-based replanning and learned procedure transfer remain research goals.
+The [research programme](log/archive/HISTORY.md) defines two primary tasks: candidate discovery/repurposing and cellular-context selection with failure analysis. Selectivity needs explicit comparison measurements; mechanism confirmation needs distinguishing evidence. Dose, time and combinations are gated extensions. The programme tests method transfer, within-task feedback, dual-core contributions and selected-candidate reliability separately. The existing thin `maestro.research_loop` is static replay infrastructure; automatic feedback-based replanning and learned procedure transfer remain research goals.
 
 ## Install and run
 
-```bash
-python -m pip install -e ".[test]"
-maestro --help
-python -m pytest -q
-python -m tools.research_validation --verify
+```powershell
+Set-Location D:\MAESTRO
+& 'D:\anaconda\envs\maestro\python.exe' -m venv .venv
+& 'D:\MAESTRO\.venv\Scripts\python.exe' -m pip install -r requirements-preparation.lock
+& 'D:\MAESTRO\.venv\Scripts\python.exe' -m pip install --no-deps --no-build-isolation -e '.[test,preparation]'
+& 'D:\MAESTRO\.venv\Scripts\Activate.ps1'
+& 'D:\MAESTRO\.venv\Scripts\maestro.exe' --help
+& 'D:\MAESTRO\.venv\Scripts\python.exe' -m pytest
+```
+
+The supported CPU preparation environment is local `.venv`, built from the existing
+`maestro` Python 3.11.16. The pinned Windows/Python-3.11 specification is
+[requirements-preparation.lock](requirements-preparation.lock). See
+[preparation checks and limitations](log/20261020/PREPARATION.md), the
+[actual data inventory](data/INVENTORY.md), [cleanup/recovery](log/20261020/PREPARATION.md)
+and the [next English execution prompt](log/20261020/NEXT_RESEARCH_PROMPT.md).
+The legacy conda environment is retained for historical compatibility and requested tests;
+its incomplete arc-state installation is not part of the clean CPU environment.
+
+```powershell
+& 'D:\MAESTRO\.venv\Scripts\python.exe' -m tools.research_validation --verify
 ```
 
 The research preflight checks explicitly supplied frozen inputs and outputs. No active study is currently released.
@@ -52,7 +68,7 @@ python -m tools.research_validation --help
 
 ## Scientific boundary
 
-The model predicts within qualified scope; it does not establish functional endpoints, mechanism, causality or experiment value by itself. The Agent selects and audits evidence and actions; it does not turn language-model output into scientific fact. Current conclusions are in [research/REPORT.md](research/REPORT.md), with numerical results in [research/EVIDENCE.md](research/EVIDENCE.md). The [programme stages](log/RESEARCH_PROGRAM.md#validation-stages-for-research-method-transfer) separate method value, Agent value, transfer and independent confirmation. PRESAGE P0 remains NO-GO; anchor purchasing value remains blocked by independent-endpoint qualification.
+The model predicts within qualified scope; it does not establish functional endpoints, mechanism, causality or experiment value by itself. The Agent selects and audits evidence and actions; it does not turn language-model output into scientific fact. Current conclusions are in [research/REPORT.md](research/REPORT.md), with numerical results in [research/EVIDENCE.md](research/EVIDENCE.md). The [programme stages](log/archive/HISTORY.md#validation-stages-for-research-method-transfer) separate method value, Agent value, transfer and independent confirmation. PRESAGE P0 remains NO-GO; anchor purchasing value remains blocked by independent-endpoint qualification.
 
 ### Latest Research Update (2026-10-20)
 

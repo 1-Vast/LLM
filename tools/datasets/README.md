@@ -32,3 +32,21 @@ default asset-free test suite.
 
 Other historical dataset auditors and benchmark builders are recoverable from Git history; they
 are not current release commands. Large scientific data and generated outputs are not bundled.
+
+## Verified O'Neil originals
+
+Use the project-local Python from `log/20261020/PREPARATION.md`:
+
+```powershell
+& 'D:\MAESTRO\.venv\Scripts\python.exe' -m tools.datasets.oneil_sources
+& 'D:\MAESTRO\.venv\Scripts\python.exe' -m tools.datasets.oneil_sources --verify-only
+```
+
+Acquisition uses three official AACR/Figshare article/file identities, bounded public GET retries,
+complete byte size and published MD5, ZIP integrity and SHA-256 receipts. Existing mismatched
+files are refused, never overwritten. Interrupted `.part` files are retained for inspection;
+verify their identity before removing or renaming them. `curl.exe` is required for public range GETs.
+The combination's `.xls` extension contains OOXML. Read [the structural receipt](../../data/ONEIL_STRUCTURE.json)
+and [source receipts](../../data/ONEIL_SOURCES.json) before selecting a research observation unit.
+The historical builder merges batches and can use cross-batch monotherapy fallback; its cell-target
+replay does not implement the new pair-level protocol. No cache was rebuilt during preparation.

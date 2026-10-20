@@ -1,5 +1,69 @@
 # Evidence Register
 
+2026-10-20 self-repair qualification: [self_repair_qualification_20261020](self_repair_qualification_20261020/QUALIFICATION.md) finds
+NO_UNIT_QUALIFIES_FOR_SELF_REPAIR_BEYOND_REFITTING. On exposed Beat AML 2.0 the Waves1+2 -> Waves3+4 drug-response shift is real (split-half corr 0.78) and
+decision-relevant (chronological per-drug offset +0.370 [0.257, 0.497] over the frozen model), but composition, run-time trend, drug family and potency explain
+none of its decision-relevant part, one observation cannot separate the explanations (per-drug d' 0.16), and the offset is ordinary drift repair. Exposed
+development only; no experiment proposed; closed studies unchanged.
+
+2026-10-20 [procedure_inheritance_20261020_audit1](procedure_inheritance_20261020_audit1/REPORT.md) amends the
+[frozen procedure-inheritance result](procedure_inheritance_20261020/REPORT.md), preserving its CLOSE decision and source.
+The plan gives +0.007550 over fresh one-step KG at 3 reads, but only +0.000955 over fixed lookahead and +0.000153 over fixed distillation.
+The prespecified per-stream best-conventional envelope is -0.001092 at B=3; it is not a deployable baseline selector. Primary plan@3 minus
+lookahead@4 is -0.009028 pooled, or -0.011934 without null conditions (post hoc descriptive only). Eight condition streams share two seed blocks.
+All 3,840 archived rows pass expanded behavior replay. UNKNOWN missed four distinct novel backgrounds (32 arm/budget campaigns; plan alone 8);
+all 112 transplants were rejected, so content transfer was NOT_EXERCISED. No learning or later task follows novel-regime introduction in batch 4.
+Corrected full-16-task total CPU is 1.873047 / 2.324219 seconds for the plan and 2.160156 / 2.230469 for lookahead at B=3/4. Aggregate break-even
+projections are 13.26 / 16.87 uses, not validated amortization: 1,998 of 2,560 task timings are zero and positive times have 1/64-second resolution.
+The corrected ADVANCE rule also requires its primary goal; the actual CLOSE label is unchanged. Measured utility remains NOT_TESTED; no raw data
+were opened. Independent validation assets are not qualified, while eligibility for bounded exposed-data development remains to be assessed.
+No confidence interval, significance test or SUPPORT label is added.
+
+2026-10-20 [innovation_validation_repair1_20261020](innovation_validation_repair1_20261020/REPORT.md): audit amendment
+to the next paragraph, not a replacement evaluation. The old H1 remains NO_SUPPORT for the old implementation;
+its stratified 98.333% interval is [-0.001951, +0.005671]. H2 equal resources was NOT_TESTED (restart had a larger
+candidate envelope); H3 was a conditional gain, with a post hoc factorial interaction of -0.000758 (95% interval
+[-0.002646, +0.000789]). The decoupled manipulation cannot identify a witness-specific contribution. All 27,648
+archived decisive task nominations replay exactly, but one checkpoint contradicts eight anchor rows; strict legacy
+status is INVALID_LEGACY_CHECKPOINT, and anchor models were not archived. KG mathematics, executable identity,
+deployment snapshots and inflated archive accounting are repaired in an isolated package. Archive reuse and branching
+diagnostic programs remain NOT_IMPLEMENTED. New small synthetic runs are engineering development only. No new real
+outcomes or API were used; no innovation or pharmacological-utility claim is established. The earlier 12-background
+procurement suggestion is withdrawn for lack of a supported sampling-unit/power argument.
+
+2026-10-20 [innovation_validation_20261020](innovation_validation_20261020/REPORT.md): bounded validation of competing numerical response programs with decision-value (knowledge-gradient) probe
+selection and an inherited gate library, with nine predecessor comparison defects reproduced and repaired. Synthetic only (96 evaluation + 48 decoupled streams; planted generators; margin 0.01 absolute
+shortlist utility) plus a development replay on the 18 already-released O'Neil backgrounds; no independent measured source qualified (BATCHIE judged from public summaries only). Executable, verified
+(`iv_verify.py` OK, 21 tests). Diagnostic acquisition vs latent-factor + A-optimal: **+0.0017** (98.3 % CI -0.0020, +0.0056) NO_SUPPORT; inheritance vs restart **-0.0000** NO_SUPPORT (computational
+reuse only); joint NO_SUPPORT; bounded capability growth NO_SUPPORT (library value on A_new 0.0037 -> 0.0086, below margin); measured utility NOT_TESTED. It beats GBM, broad-capacity and direct measurement
+by 0.015-0.033 but not the strongest ordinary comparator; the advantage does not vanish on witness-decoupled streams.
+
+2026-10-20 [self_improving_virtual_cell_20261020](self_improving_virtual_cell_20261020/REPORT.md): bounded prototype of typed experimental/state programs
+(measurement plan Q, state map phi, response model f, applicability Omega) with a diagnose-propose-test-nominate-inherit-retire library, on exposed O'Neil 2016
+(S pairs + the 60 acquired C panel pairs, 39 cell backgrounds, 15 fixed test backgrounds, 3 seeds). Executable and serialisable (27 tests, `svc_verify.py` OK). Source-side
+headroom: end-to-end contract has none beyond direct confirmation (0.0047 / 0.0015); transfer contract 0.0258 at 16 units, so delta_use = 0.00645. Primary
+evo_full - refit **-0.0009** (0 wins / 5 losses / 10 ties of 15 cells): NOT_SUPPORTED; no baseline or evolved arm beats the zero-probe prior in the transfer contract;
+inheritance, procedure and representation ablations all null; anchor-only control null. Synthetic compositional control: +0.009 over the refit but below A-optimal
+matrix completion and a BATCHIE-inspired rule. API proposer (3 requests, 3,046 tokens) declined or was rejected by the registered rule. Internal development only.
+
+2026-10-20 [functional_rule_revision_20261020](functional_rule_revision_20261020/REPORT.md): bounded evidence-driven revision of conditional
+functional transfer rules on exposed O'Neil 2016 (raw route, 88 held-out F pairs x 39 cells, top-5 per cell, margin 0.005, ESTIMATION_PILOT).
+Verdict **UNSUPPORTED**: revision candidate (E13, one added module-class component) minus same-data refit -0.0005 [-0.0008, +0.0005] shortlist
+utility; every candidate (revision, full dictionary, conventional boosted trees, one-request DeepSeek proposer, E14) was rejected at the single G
+query, so deployed contrasts are 0 by construction; refit minus frozen S model +0.0009 [-0.0005, +0.0020]. Remaining headroom after refit 0.0076
+(Bliss reference 0.0125 vs oracle). Policy comparison NOT_RUN (no recoverable bundles/costs). Verified by `verify.py`; internal development only.
+
+2026-10-20 preparation reconciliation (no new experiment): the [decoupled calibration saved readout](decoupled_calibration_rsd_20261019/DEV_RESULT.json)
+exists with FREEZE.json, despite the old direction ledger calling it unrun. Its frozen primary verdict is
+`DECOUPLED_CALIBRATION_HOLDS`, **DEVELOPMENT_ONLY** on exposed HTS002. Selected-pair coverage estimate
+0.7611 [0.7526, 0.7685], improvement over Gaussian RSD 0.06345 [0.04894, 0.07639]; decisions are identical
+(D1 and D2 increments exactly zero). This is calibration-only evidence, not improved selection or independent
+confirmation; the confirmatory status is `BLOCKED_NO_AUTHORISED_UNOPENED_ARENA`. The saved JSON is the
+single authoritative numerical record; there is no REPORT.md in that study. Original records were not rewritten.
+
+The [question-organized research map](REPORT.md) resolves early-positive/later-negative narratives and lists
+all retained evidence closures. Removed log summaries repeat those records and are recoverable via the cleanup manifest.
+
 2026-10-19: [P0 Biological Residual Information Gate](biological_residual_gate_20261019/REPORT.md), **UNDERPOWERED** by the frozen rule; for this action space the evidence
 supports STOP (exposed Jaaks 2022; frozen before the run; B5 recomputed from raw cells to 1e-16; `verify.py` ALL OK). Gate 1 UNDERPOWERED: target annotation adds +2.8% MSE
 beyond the functional kernel (family CI -0.9%, +7.7%; real vs pathway-shuffled targets p 0.010) and lowers balanced accuracy (0.619 -> 0.605); without a functional panel,
@@ -238,8 +302,8 @@ carried from PRISM.
 * Additional events: 442 against 404 for `vc0`, about 7.3 per 100 samples under the event
   definition; 44 samples improved, 27 worsened. This is not a 7.3% patient benefit.
 
-2026-10-17: [Research-method transfer programme](../log/RESEARCH_PROGRAM.md)
-and [thin-loop audit](../log/program_review_20261017/LOOP_AUDIT.json).
+2026-10-17: [Research-method transfer programme](../log/archive/HISTORY.md)
+and [thin-loop audit](../log/archive/HISTORY.md).
 Engineering diagnosis only: committed HEAD and current working copy both select
 A -> B -> C under all-H1 and all-H2 synthetic feedback. Smoothed same-label share
 is 17/18 after 16 observations and 0.95 after 18; it is not a calibrated scientific
