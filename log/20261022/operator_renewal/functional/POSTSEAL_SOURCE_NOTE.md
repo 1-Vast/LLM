@@ -1,0 +1,5 @@
+# Postseal bounded source metadata note
+
+2026-10-22. After independent original seal, existing publisher HTML was parsed for author-linked supplementary/source-data links only. check_anchor_metadata.py saved existing_author_links.json. It lists Supplementary Information PDF, Reporting Summary PDF, and the already acquired Supplementary Tables XLSX; no link labeled Source Data was found by that exact link-text filter. This does **not** prove no numerical pooled anchor exists in the paper or supplements. No external request, new source file or assay-scalar read occurred. Single-KO/NTC imaging validation will not be substituted for a same-pool/time/condition absolute total-survival anchor.
+
+An initial inline Python HTMLParser command failed with an unterminated string from shell quoting. It made no source request or output file. The small saved Python script subsequently succeeded. The prior bs4 import failure remains in the original failure receipt. No package was installed. Original sealed artifacts were not rewritten.

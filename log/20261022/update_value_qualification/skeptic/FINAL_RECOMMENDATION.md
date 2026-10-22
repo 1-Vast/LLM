@@ -1,0 +1,14 @@
+# 反方最终建议：先停止错误论据，再限定可检验问题
+
+2026-10-22。依据先封存独立稿、4GET的一手证据、历史输出独立重算和实际双方问答。**没有新核心通过。历史两噪声outcome-argmax诊断未过冻结门；PRISM最多支持继续限定任务合同/来源资格，尚未授权新拟合或目标打开。** 这不结束用户总目标。
+
+1. **历史结果已经补齐、且应局部STOP。** 独立重算3161项与根结果一致，maxdiff1.11e-16。36完整64compoundcampaign，1→2对evaluation-hindsightbestfixed−.361111hits/64，2→1+.222222；冻结双方向均≥.1875门FAIL。strict非tie24中13同号11反转，6ties/draw。LOFO收益0/+ .222222、对称+.111111不能替换事前对照救门。不报混合familycampaign的伪iidCI。
+2. **该失败不是selector不可能定理。** noisyoutcomeargmax读隐藏终点评分，是不可部署诊断且非真实value上界；合法descriptor+shrinkage可能更好。停止的是凭此诊断支持该chooser扩展，不能否定二update所有策略、所有functionalworld或RSI。新descriptor假设需独立明确证据，不能回选噪声/方向/threshold改写本次FAIL。
+3. **新颖性仍NO_NEW_CORE。** 已有SATzilla、MELEE、DAC、learnedoptimization、GLISTER/GRAD-MATCH/Task2Vec（后三由advocate精读承担）等普通近邻。自己新全文核到Fannjiang/Park2503.20767v2的生物designmenu可靠选择/预测偏误纠正/FWER/abstain，以及2602.05340v1的decision-focused sequentialdesign，进一步排除高层命名首创。广义meta可表达不是精确等价；若具体生物结构在同信息预算下提供实际transport/样本效率可保留，当前尚未给出该结构。
+4. **PRISM新方向只可写成明确conditionalreleasedprofile任务。** 数据方核到最多1279个exact2.5HTS002完整headertriples、481STR/pooljoincontext，但finitecoverage和依赖功效未核。X2/X3是实际released测量profile，区别syntheticnoise；共享controls/ComBat甚至可能使supportrelease通过共同处理依赖audittarget，故不叫严格prospective或独立raw生物重复。没有真实replicate仍允许静态catalog预测、heldoutintervention/compoundgeneralization和计算C4，结论不能超出scope。
+5. **合同不能混用。** root的targetcompound“X1部分wholepools支持→其余poolsX2/X3”是compoundprofiletask；数据稿“feedbackcompound→differentauditcompound”是另一种transfer。先确定任务/终点/允许披露/原始processing依赖，再定更新菜单和δ_app。compoundprofile的taskaxis是化学条目，cell/pool/replicate嵌套；不把481context或1279×481×3当独立taskN。family/plate/controls/ComBat依赖未证时不虚构独立CI。
+6. **历史sourceSTOP与曝光必须保留。** 根通报旧anchor_purchase同rawsource已有independentendpointFAIL；1279/481新metadatajoin不是自动修复，旧correlation/unknown不直接移作新finitequalification。它仅可成为同exposedsource上的新限定estimand，不是freshconfirmation。预训练/primarylabel用途需查明，不能假定targetchemical在共同起点不可见。
+
+若根后续决定注册最小新计算门，优先三问分开：同合法history下有限普通更新是否有有用value差异；仅决策前信息的小ordinaryselector是否在完整未参与训练/选参的taskgroup上胜source-selectedfixed/检索/强rawvaluepredictor；特定功能表示是否有额外贡献。actualutilitygain和成本应为主，rankcorrelation仅诊断；δ_app用具体新用途单位预定，不能搬AZ.02或旧.1875到别的终点。MSE的scalar校准不等于固定topk决策适配。无明确有用差异、合法features不预测、强普通方法匹配或taskprecision不足，就停止该配置扩展，不加复杂agent救exposedtest。
+
+只有这些事实支持时，才另行设计world/policy、solver/policy继承与joint评价，以及同起点old/newimprover的后续C4。静态world合法；C4不要求无限加速；joint不要求superadditive。当前这些贡献均未建立。首次独立审计路径失败、修正、数值摘要在cross期间披露，以及各来源实际核读级别均完整保留。

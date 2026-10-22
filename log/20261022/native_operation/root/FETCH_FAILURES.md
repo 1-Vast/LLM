@@ -1,0 +1,3 @@
+# Root primary retrieval failures
+
+2026-10-22. Two initial Python invocations of fetch_papers.py (network_algorithm_world and autonovo) exited1before executing any HTTP request or writing a receipt: `from bs4 import BeautifulSoup` raised `ModuleNotFoundError: No module named 'bs4'`. Both tool outputs retain the identical traceback at script line9. Root had assumed an optional parser dependency without checking it. Corrected to the standard-library HTMLParser rather than changing the environment; the subsequent explicitly named attempts are the first actual fulltext network requests. No source or API call is counted for these import failures. Metadata queries already completed independently and remain unchanged.

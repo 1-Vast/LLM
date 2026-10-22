@@ -1,0 +1,17 @@
+# Pre-audit protocol: proposed functional-scale operator
+
+Written after retaining the mechanism DeepSeek proposal and before running this audit. No new biological responses are accessed. Generated source is not executed. Code will be independently written in research/intervention_program_renewal_20261022/. This is a mathematical/implementation audit, not a drug-screen experiment or performance gate.
+
+Candidate source: mechanism/RESPONSE.md, SHA256901264267c1f355ac7cde3a1027bf9920af5d6516dda1993b85a6ebda1e9fd07. It predicts yhat_i=s_b+f_i; selects control anchors from rank disagreement between f and g; updates controls with s←s+η(y−f), keeping theta fixed; drug feedback changes only theta. It claims plate/readout scale explains rank conflict and that routed labels identify scale versus shape.
+
+Root's concrete concerns, to be checked rather than accepted from terminology:
+
+1. A common additive board offset preserves pairwise ranks of every within-board drug pair. Test all pairwise orderings, rank-disagreement counts and hit-threshold decisions over fixed offsets. Success for the stated rank-correction rationale would require a rank effect under its own additive model; exact invariance refutes that rationale while allowing threshold-calibration value.
+2. A common positive multiplicative scale also preserves ranks. Include negative scale only as an explicitly inadmissible reversal, not a biological scale fix. Do not generalize this to drug-dependent or nonlinear/nonmonotone distortions not proposed.
+3. The written control update omits subtraction of current s. For a known constant residual delta and repeated identical controls, compare nηdelta with the fixed point delta. Separately audit the charitable residual-corrected rule s←s+η(y−s−f). Repairing this bookkeeping bug cannot by itself establish novelty.
+4. For a linear f=x·theta, compare each corrected routed step with standard squared-error gradient descent using a fixed label-type coordinate mask and matched learning-rate convention. Test controls and drug labels along deterministic sequences. Exact equality is an ordinary masked/block-gradient implementation of this update, not a universal claim about all possible biological calibration methods.
+5. Check finite-data identifiability by design rank, rather than the proposal's blanket assertion that drug-only labels identify theta. Construct a nonzero null direction when all x are identical and show same observed predictions/different theta. Holding s fixed does not manufacture full-rank features.
+
+Deterministic seed20261022, double precision, equality tolerance1e-12. Test both ordinary and tied rankings. Save inputs, all discrepancies and counterexamples in log/. No empirical drug/function, acquisition benefit, cross-task inheritance or RSI effectiveness follows from a passing algebra check. The threshold/top-k surrogate ambiguity and absence of authenticated new-board data remain separate scientific concerns for opposing reviewers.
+
+Stop the exact rank-trigger/offset rationale if invariance holds; stop the exact update as novel if the corrected operator is stepwise identical to the ordinary masked gradient and no other concrete property survives. Independent reviewers may dispute the scoped conclusion or identify another precise non-equivalent mechanism. They may not silently replace additive scale/rank trigger with a new outcome-driven algorithm.

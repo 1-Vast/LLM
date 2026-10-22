@@ -1,0 +1,5 @@
+# Root operational corrections
+
+2026-10-22. A few bounded PowerShell reads initially used a phase-root filename instead of its `sources/` location, or attempted to read a review/protocol not yet written by a running agent. They returned path-not-found and were corrected by `rg --files`; no data was altered. One combined patch failed because its decision-paragraph context omitted the start of the line. Verified it applied no change, then reapplied exact context successfully. These are operational failures, not experimental results.
+
+Root reviewed the actual finite-screen implementation before freeze, caught its omitted S0/oracle continuation condition and imprecise numerical-contact seal, and requested correction. The independent skeptic also caught the11candidate permutation issue and metadata binding gap. Changes preceded the retained execution freeze. The postrun missing S0 feedback was repaired only through a separately labeled eight-fit audit replay; frozen scientific outputs were preserved.

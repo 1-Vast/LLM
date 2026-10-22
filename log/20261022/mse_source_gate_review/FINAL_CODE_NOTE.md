@@ -1,0 +1,7 @@
+# Final predecode code binding after the biological review seal
+
+2026-10-22. The root's final-code notification arrived immediately after PREDECODE_REVIEW.md was sealed. That review and seal remain unchanged.
+
+I read the final changed code/test sections and SYNTHETIC_TESTS_READY.txt. The transcript binds gate.py SHA256 08c04624160e9e78f98eceb11285b50cb5099ed18a372052e9caa740d604a170 and test_gate.py SHA256 7fec1c0a63e0492fed6d68725e647b5ea58c32db8e0b29384b986a5992541613, matching my direct filesystem hashes. It records six passing synthetic tests. Added cases preserve an exact decimal below .20 and exact rational rate ties at the shortlist cutoff; the reader retains original numeric tokens. Decimal controls eligibility/hits and Fraction controls patient rates, lexical ties and gate comparison. I inspected this transcript and code; I did not independently re-execute those tests or open source numerical values.
+
+The auditor directly reported its final predecode PASS sealed in mse_source_gate_audit/PREDECODE_REVIEW_SEAL.json, no remaining static blocker, and preservation of our exchange in BIOLOGICAL_EXCHANGE.md. This satisfies the outstanding code-audit condition in my biological review. **ACCEPT final frozen source-only execution with the reviewed protocol, schema, manifest and code bindings; no remaining biological review blocker.** This is an authorization-boundary review, not an executed outcome or information-value result. No predecessor artifact or earlier seal was modified.

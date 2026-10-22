@@ -1,0 +1,9 @@
+# Correction received after the two bounded model calls
+
+2026-10-22. Root relayed a new metadata correction after both authorized calls had completed: the checkpoint state is the **10** terminal/subtype categories in `Cell_type_abundance_raw`, not 13 overlapping raw categories. The **13** parent/subtype columns belong to `Cell_types_normalized` and contain overlapping normalized fractions. No numerical values were read for this correction.
+
+I checked the retained `biological_decision_scout/sources/MSE_INITIAL_SCHEMA.json` header projection: `xl/worksheets/sheet2.xml` is A:K (SampleID plus 10 terminal labels), while `sheet1.xml` is A:N (SampleID plus 13 parent/subtype labels). Sheet order is not semantic sheet identity. Root/auditor authenticated the workbook name-to-relationship mapping. The raw10 labels are Lymphocyte_act, Lymphocyte_conv, Macrophage_round, Macrophage_stretched, Malignant_adherent, Malignant_colony, Malignant_single, Malignant_spheroid, Other, Unassigned.
+
+This supersedes the composition-dimension statements in this phase's initial PROTOCOL and exact model prompts, and the older scout reports. Those historical records and responses remain unchanged. Any admissible proposal now uses charged continuous raw10 composition at the common 24-hour checkpoint; binary indicators are not authenticated. No claim about observed sums or numerical ranges was checked.
+
+Both model calls used the prior 13-category description and must be read with that limitation. The candidate's nonzero-probability/signed-mean defect, constant-subtraction ranking invariance, absence of a defined joint terminal utility and absence of a learned improver are independent of whether the continuous state has 10 or 13 coordinates. Replacing 13 by 10 cannot repair those failures. No third call, numerical data access or biological fit is authorized or performed.

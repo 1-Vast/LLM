@@ -1,0 +1,9 @@
+# Evidence-producing continuation
+
+Current phase is closed as a source/model configuration, full goal active. Do not rerun completed mathematical checks, biological-fitting shortcuts, the same manifest read or blocked fulltext routes. Do not rescue historical negatives by adjusting their gates.
+
+A separate agent is checking a distinct public intervention/function asset in `research/next_asset_20261022/` and `log/20261022/next_asset/`. Its first apparent2026 melanoma lead doi10.1038/s43856-026-01583-w / Zenodo18962045 was correctly recognized as previously authenticated in intervention_dynamics_renewal; it is not promoted as a new asset and was not redownloaded. BESTDR similarly duplicates a previously studied object by hash. These exclusions prevent source-renaming from masquerading as new evidence.
+
+Next qualify one finite real feedback unit before an architecture: cell system, treatment inputs, measured state and scoped function, run/replicate identifiers, source/later task support, exact available response menu and exposed vs unread labels. Static intervention worlds are allowed; trajectory, RNA or same-cell function are not universal requirements. Do not manufacture schedules, independent tasks or unobserved feedback. A distinct small discriminating test may fail and still be useful.
+
+Only a candidate with a substantive rule beyond conventional predictive/refit/search methods merits new independent constructive, skeptical and application reviews plus actual reciprocal exchange. Freeze its application-relevant success/stop criteria and comparison budget before numerical evaluation. If the cheap headroom/mechanism gate fails, stop that exact expansion while retaining measured evidence; do not spend RSI labels on an unsupported world/agent route. Preserve separate world, agent, inheritance, joint and same-improver C4 claims.

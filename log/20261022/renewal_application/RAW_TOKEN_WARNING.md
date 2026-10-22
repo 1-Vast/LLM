@@ -1,0 +1,7 @@
+# Barcode semantics found by support audit
+
+The frozen support script ran successfully, but its 'lineage' counts must be treated as **exact released annotation-token counts**, not yet biological lineage counts. The permitted structural-format inspection found comma-separated values of lengths61,92,...619 alongside single30nt barcodes. Exact equality of a multi-barcode annotation string is not an authenticated clone-resolution rule. Therefore the minimal support flags in LINEAGE_SUPPORT_RESULT.json are computational token-support flags only; they do not yet qualify a lineage pilot. This limitation was identified before any expression or per-gate target was read.
+
+The audit also found20,626 repeated full_cell_barcode strings across samples. A10xcell barcode is not globally unique across libraries; any downstream join must use sample_id+barcode or an authenticated unique row identifier. The audit does not yet say whether within-sample duplicates exist. No biological deduplication or barcode expansion is allowed until an explicit identity rule is frozen.
+
+Next action: read the already-listed author barcode-processing code blob and exact full-text lineage methods; then freeze a conservative single30nt barcode-only sensitivity audit, with all ambiguous multi-barcode rows excluded rather than split into imagined independent cells/lineages. Never merge them ad hoc to make support pass. Preserve the original token result unchanged.

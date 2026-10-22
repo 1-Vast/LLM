@@ -1,0 +1,5 @@
+# Outer fit economy resolved
+
+2026-10-22. After CROSS_REVIEW_SKEPTIC.md was sealed, the implementer reported root's final choice: fit only the seven inner-selected ordinary family configurations and three inner-selected conditional variants in each outer fold. All 34 configurations remain in inner CV. I inspected probe.py and verified that selected_configs is derived from choice["families"] and supplied to outer fold_predictions, while all_configs is used for inner CV. This resolves the optional compute objection in favor of the simpler selected-only outer execution. The retained all_candidate_predictions field now contains only these ten preselected outputs. No outer result selects them. The earlier cross-review note remains a truthful historical exchange, and its conditional acceptance of a larger audit does not prescribe that audit.
+
+I also inspected expanded required FREEZE membership for test_boundaries.py and predecessor input/artifact seals. Final root freeze still must bind final versions. NO_BLOCKING_DESIGN_OBJECTION remains unchanged; no numerical biological arrays or fits were accessed by this reviewer.

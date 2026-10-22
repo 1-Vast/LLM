@@ -1,7 +1,7 @@
 # Verified local dataset inventory
 
-Observed 2026-10-20. This replaces the stale September size/existence claims.
-[ASSETS.json](ASSETS.json) contains every file path/size, small-file hashes, source registrations, receipt locations and retained code/study references. Hashes not recorded there were not verified. No sealed outcome payload was read.
+Base inventory observed 2026-10-20; the PTV-1 source set below was separately inventoried on 2026-10-21.
+[ASSETS.json](ASSETS.json) records the 2026-10-20 inventory's file paths/sizes, small-file hashes, source registrations, receipt locations and retained code/study references. Hashes not recorded there were not verified. The later PTV-1 source files are listed in that study's `SOURCE_MANIFEST.json`; no sealed outcome payload was read.
 
 | Local dataset/version | Files | Bytes | State | Exposure |
 |---|---:|---:|---|---|
@@ -32,6 +32,7 @@ Observed 2026-10-20. This replaces the stale September size/existence claims.
 | `data/external/nyman2020` | 0 | 0 | EMPTY_DIRECTORY_NOT_DATA | unknown; do not treat as unexposed |
 | `data/external/pisa_living_cells` | 0 | 0 | EMPTY_DIRECTORY_NOT_DATA | unknown; do not treat as unexposed |
 | `data/external/prism_19q4` | 15 | 399715262 | present | exposed internal development |
+| `data/external/ptv1_proteintalks_20261021` | 31 | 776565501 | present; local source, code snapshot and regenerable feature cache | exposed public published-label replay; dataset licence not stated by host |
 | `data/external/public_checks_20260929` | 0 | 0 | EMPTY_DIRECTORY_NOT_DATA | unknown; do not treat as unexposed |
 | `data/external/sciplex_family` | 0 | 0 | EMPTY_DIRECTORY_NOT_DATA | unknown; do not treat as unexposed |
 | `data/external/tahoe_phenotype_20261010` | 1001 | 4941501014 | present | exposed internal development |
@@ -76,6 +77,7 @@ Observed 2026-10-20. This replaces the stale September size/existence claims.
 | sciPlex3 | Figshare 24681285 file 43381398; transcriptomic perturbations; recorded source SHA in catalog. Raw source absent, pilot v1/v2 are derived versions. | Ladder/State history; gene-label offset and mapping limits remain. Source absence is not invalidity. Reacquire exact source hash if historical replay is needed. |
 | MIX-seq / Tahoe | `mixseq_scperturb`, `kinetic_horizon_20261010`, `tahoe_phenotype_20261010`; molecular/pseudobulk/relative-survival derived endpoints. | Prior exposed development; Tahoe spheroid proportions do not identify absolute survival. State predictions and snapshots are model-predicted, not new measurements. |
 | ARC State / MAP | `arc_state`, `map_module_replacement_20261009`, `mapkg_20261009`; checkpoints, model outputs and annotation resources. | Retain historical assets; no GPU inference required for preparation. Heavy adapters require their own original environment. Annotation/prediction is not measured mechanism. |
+| PTV-1 / ProteinTalks | `external/ptv1_proteintalks_20261021`; 7 public drug-pair files, upstream code/checkpoint snapshot and `expr.npy` / `pert.npy` cache. The exact files and hashes are in the 2026-10-21 study's `SOURCE_MANIFEST.json`. | Exposed public published-label task; pair-label tasks are not testable from the available split. Retained for replay and audit; the dataset host does not state a licence. The local source directory is git-ignored. |
 | GDSC2 / CTRP / PISA / Nyman / Hill / CGI / kinome | Historical source identities and access failures remain in EVIDENCE and catalog. Listed directories are empty or absent as shown above. | Not restored for ONeil. CTRP historically exposed; GDSC2 fitted source absent; HTTP metadata availability does not establish response availability. No usable external September archive was found. |
 | HGNC / MSigDB / Reactome / JUMP | Identifier/pathway metadata source URLs in catalog; most registered local paths absent. | These are metadata/annotations, not response experiments. Restore exact version only for a retained consumer that needs it. |
 | Cases, pilot packs and simulations | Processed `maestro_vc_v1`, `model_experiment_v1`, `case_memory_integration`, `sciplex_pilot_v1/v2`; evaluation directories empty. | Derived or simulated fixtures must retain that status. No default core restoration required. Historical evaluation suites remain asset-blocked where source cases are missing. |

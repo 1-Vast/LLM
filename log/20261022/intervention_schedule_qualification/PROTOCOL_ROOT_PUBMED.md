@@ -1,0 +1,7 @@
+# Complementary PubMed source search after Europe PMC access failures
+
+2026-10-22, registered before these requests. The independent broad search returned service errors, not absence of sequential-intervention datasets. Use the official PubMed Entrez service, which already returned the exact Lee→GEO link, for one fixed complementary query and its returned primary abstracts. At most two new HTTP requests and 1 MB body; no retry, no expression/phenotypic matrices. This changes the source service, not a scientific success criterion. Do not infer a dataset exists from its abstract.
+
+Fixed query combines sequential drug / drug sequence / time-staggered / order-dependent with transcriptomics / proteomics / high-throughput / screening. Publication date <=2026-10-22; return newest20 IDs then fetch those primary article records. Save raw responses, status/hash/bytes/failure and a title/abstract/identifier projection under root_sources/. Exclude already known Lee2012 manually from candidate promotion, not by silently deleting its record. All new code in research/intervention_schedule_qualification_20261022/. No numeric drug response inspection, modeling or architecture.
+
+Success is one more exact primary-source lead with a concrete molecular+functional intervention menu and data accession, or a precise limited-source conclusion. A failed HTTP call or no exact candidate is not a broad negative scientific result.

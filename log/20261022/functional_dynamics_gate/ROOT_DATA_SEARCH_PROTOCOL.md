@@ -1,0 +1,5 @@
+# Root complementary functional-data search
+
+2026-10-22. Complement the independent STACK/live-death scout with longitudinal organoid/live-cell perturbation sources. Exactly2GET: PubMed ESearch, then EFetch for the returned <=10IDs. Query `(drug[tiab]) AND ("time-resolved"[tiab] OR longitudinal[tiab] OR kinetic*[tiab]) AND (organoid*[tiab] OR "live-cell"[tiab]) AND (screen*[tiab] OR dataset[tiab]) AND (2024:2026[dp]) NOT review[pt]`. Search may miss qualifying older or differently described sources; no completeness claim. No exact dataset, fit, API call, author contact or response-array access in this block.
+
+Preserve bodies, HTTP status, URL, SHA256, decoded body bytes and UTC. No redirect/retry, timeout25, cap3MB. Save under root_scout. Select at most one explicit primary lead afterward under another protocol; do not read arbitrary linked assets by default. Public abstract numerical claims are designer-exposed literature, not our performance evidence. Source helper uses exclusive output guards. All scripts research/functional_dynamics_gate_20261022/.

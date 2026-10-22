@@ -1,0 +1,5 @@
+# Offline partial metadata recovery, before recovery execution
+
+The first exact official GEO MINiML request returned HTTP 200 but reached the shared 2,000,000-byte cap. Its partial bytes are sealed; no second request was sent and no response values or XML rows were exported. The initial worker deliberately did not parse a truncated payload. This is an access-format/size result, not absence of sample metadata or study data.
+
+Without new network access, a separate worker may locate the first XML Data-Table opening marker at the byte level and parse only the preceding prefix. It must stop before that marker, export only the existing approved sample/series identities and protocol text, and clearly mark incompleteness. It may not decode, print or search measurement table content, repair missing molecular/functional observations, or infer drug schedules from paper conclusions. No measurement data may leave the worker. The original eight-file pre-request freeze remains unchanged; new recovery code is later code and will record its own/input hashes.

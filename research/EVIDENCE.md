@@ -1,5 +1,21 @@
 # Evidence Register
 
+2026-10-21 repair and interpretation amendment: [dual_core_innovation_validation_20261021_repair1](dual_core_innovation_validation_20261021_repair1/REPORT.md).
+The executable query -> PPODE update -> next decision loop and DGM-inspired non-winner ancestry now work.
+No evolved program was promoted: innovation remains unestablished on exposed replay. Fixed/adaptive PPODE
+confirmed 2.571/2.714 hits; B1 kernel 3.429; conventional PPODE-B1 blend 3.714 on seven regression backgrounds
+with a different 20-drug pool. The blend's positive development signal is not agent-evolution evidence.
+The [historical amendment](dual_core_innovation_validation_20261021_repair1/AMENDMENT.md) supersedes the earlier claims that molecular feedback could not
+change probabilities, that the ablation isolated the trajectory, and that absent headroom caused failure.
+89 repair tests pass; repository 1066 pass / 1 existing shape failure. Original 161 frozen files pass;
+whole-directory preservation fails after documented concurrent nonfrozen cleanup, explicitly retained as verifier exit 2.
+
+2026-10-21 dual-core innovation validation: [dual_core_innovation_validation_20261021](dual_core_innovation_validation_20261021/REPORT.md) decides
+STOP_THIS_TASK_CONFIGURATION on the PTV-1/ProteinTalks public-data replay (published-label task, 7 final lineages, estimation pilot). The re-implemented ppODE world model is worse than
+the strongest conventional score (precision@5 -0.229 [-0.286, -0.200]; as a confirmation score -1.14 [-1.43, -1.00] hits), the trajectory pathway does not help (M1 - M2 -0.171), real functional or
+molecular feedback adds nothing over ordinary updating, no LLM program edit was accepted (6 requests, 16,782 tokens; A1 = A2 = A0), the conventional edit is INCONCLUSIVE (+0.14 [-0.57, +0.86] hits),
+and the combined claim is NOT_TESTED. Local negative on one exposed release; pair-label tasks NOT_TESTABLE_ON_THIS_ASSET; final outcomes are now exposed.
+
 2026-10-20 self-repair qualification: [self_repair_qualification_20261020](self_repair_qualification_20261020/QUALIFICATION.md) finds
 NO_UNIT_QUALIFIES_FOR_SELF_REPAIR_BEYOND_REFITTING. On exposed Beat AML 2.0 the Waves1+2 -> Waves3+4 drug-response shift is real (split-half corr 0.78) and
 decision-relevant (chronological per-drug offset +0.370 [0.257, 0.497] over the frozen model), but composition, run-time trend, drug family and potency explain

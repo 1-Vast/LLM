@@ -1,0 +1,35 @@
+# Actual reciprocal exchanges after sealed opposing reviews
+
+All messages below were actually sent or received through collaboration tools after the relevant seals. Text is transcribed with spacing normalized for readability; message content is not represented as independent empirical evidence. The earlier outgoing stencil question is retained in PROPOSER_EXCHANGE.md. Both original opposing critiques remain unchanged.
+
+## Stencil proposer response to my challenge
+
+The proposer states there is no stated finite prediction/acquisition/update difference once the conventional endpoint signature learner receives identical stencil/covariance/constraints, expansion/rejection and proposal scorer. They accept STOP novel-core promotion and distinguish their29-case exact audit from biological failure. symmetric_multiset_prediction was not a fully specified estimator, so they restrict the executable scientific claim to local same-multiset relative-order observable contrasts; absolute terminal utility/world planning is not implemented. They agree mean-state closure is additionally required to interpret fitted mean biomarkers as an autonomous reusable vector field.
+
+Their reciprocal question: with randomized common initial law and smooth hidden flow/readout H, the narrower second-order contrast can estimate E[DH(x)[fa,fb](x)] without mean-state closure. Is that measurement meaningful while transfer/world closure remains unproved?
+
+My actual reply: agreed, with a fixed smooth readout, integrability/uniform remainder sufficient to exchange expectation and expansion, the contrast estimates E[DH(x)[fa,fb](x)]+O(h). Autonomous closure of the mean observable is unnecessary for that narrower contrast. This retains meaningful local order response while reusable field, long-schedule transfer and absolute utility remain unproved. No same-cell reset is demanded. I accept the narrower claim and estimator-completeness disclosure.
+
+## Stencil proposer's opposing gradient question
+
+They ask whether actual top-k drug utility is nonsmooth, so a nonzero derivative usually differentiates a surrogate rather than directly measured utility; whether two finite-difference scores must charge actual newly nominated drug/control bundles rather than two nominal calls; whether source-label reuse and later masking are equal for both improvers; and whether two directional scores fail to recover a full M-dimensional gradient.
+
+My actual reply: agreed on all boundaries. The executed audit uses only an exact derivative of a constructed quadratic synthetic oracle, never an assay gradient. For top-k actual utility, differentiating a smooth predictor/surrogate is not differentiating measured discovery value. A pair of finite differences gives a directional estimate, not a full M-gradient; full coordinate differences may require2Mscore evaluations and other stochastic estimators need their own assumptions. In real replay, two scores reuse legal source labels and are not two independent experiments. If policies nominate different drugs for fresh feedback, charge the union of all actual drug/control/replicate bundles plus separate evaluation/search costs, not merely two calls. No unobserved scalar can be created by differentiation. Both later improvers require identical masks, oracles, starts and feedback budgets. No assay-based gradient advantage or rule beyond the same-information bilevel control has been established.
+
+This clarifies the initial fallback's short wording 'two validations': it describes two score evaluations for one finite direction, not two independent biological experiments, a full-gradient oracle or an upper bound on actual assay cost. The original sealed initial remains unchanged.
+
+## Biological reviewer question and my reply
+
+The biological reviewer sealed CROSS_CRITIQUE_SEAL.json before their question (reported SHA256b7239655eaeaef551c781a85fb914ea93428fa1aca71d39304eed33a5e7b3326). They ask which of derivative through a surrogate, reuse of measured source functional labels and fresh biological feedback my rule actually requires; how two finite-difference validations avoid implying independent experiments; and what later grouping is defensible without donor/run metadata. They note survivor-expression shifts are not killing evidence and real functional utility can suffice without within-cell trajectories.
+
+My actual reply: the executed operation uses only an exact synthetic-quadratic derivative, none of those biological evidence types. A future fitted-surrogate derivative is model-based and must be validated against functional utility; permitted fully observed source labels can score alternative updates but their reuse is correlated meta-training, not new experiments; fresh feedback requires paid actual assay bundles. Two score calls are not two independent experiments: charge the union of nominated drug/control/replicate bundles plus computational/search costs. A two-score perturbation estimates one direction, not a full M-gradient. Without donor/run authentication there is no independent donor/run later-task claim; at most an honestly scoped conditional held-out-intervention/source-screen evaluation with dependence disclosed. Functional utility can suffice without same-cell trajectories, while survivor-expression change alone is insufficient.
+
+## My biological challenge and their actual reply
+
+After sealing OPPOSING_BIOLOGY_INITIAL.md, I ask whether the surviving explicit operation is conventional conditional functional prediction/refit/acquisition without a presently distinct estimator or rule; whether it is genetic target prioritization rather than evidence for CD58inhibition; and whether independent later patient/context groups remain unauthenticated. I distinguish meaningful normalized relative fitness from a uniquely isolated immune-killing rate.
+
+The biological reviewer agrees with each scope correction. They provide no distinct estimator/decision rule. CD58loss causing evasion warns against loss/inhibition in that context; agonism/restoration is a different untested intervention. KO-to-drug translation needs signed action, engagement and effector-context validation. Released pooled contrasts identify relative fitness under their normalization; direct-imaging captions establish measurements occurred but the numeric export/joins have not been qualified. Independent later groups remain unauthenticated. They retain the exposed author-reported surrogate-failure witness and stop numerical expansion pending a different explicit operator. They explicitly reject interpreting agreement as a blanket information-theoretic or novel-world impossibility result.
+
+## Remaining uncertainty
+
+No substantive disagreement remains about the stated operations. Their real biological finite-budget utility and the usefulness of other not-yet-specified methods remain open, not refuted. Agreement and exact synthetic identities do not establish empirical transfer, genetic-to-drug equivalence or a universal limitation. No new assay decode, fit, source search or API call occurred during these exchanges.

@@ -1,0 +1,19 @@
+# Actual predecode biological exchange
+
+2026-10-22. This records an actual exchange after both reviewers sealed their independent initial opinions. No response/composition values were decoded. The questions below are a faithful paraphrase of my earlier outgoing questions; the received reply and my confirmation are transcribed from the messages available in this chat.
+
+## Questions and correction sent
+
+I asked the biological reviewer to confirm raw versus normalized composition sheet semantics and stored units, noting that General number format does not prove percentages or fractions. I also asked whether the fixed RCN0.50/RCF0.20 research utility and descriptive oracle-opportunity gate were scientifically acceptable without claiming learnability. After metadata reconstruction I directly notified the reviewer that raw is ten leaf fields while normalized is thirteen parent/subtype fields, correcting our previous raw13 interpretation before freeze.
+
+## Biological reviewer reply
+
+> Actual metadata-only confirmation completed in research/mse_source_gate_review_20261022/inspect_composition_schema.py; output COMPOSITION_SCHEMA_INSPECTION.json. Resolved workbook relationships prove normalized13 is sheet1/rId1; raw10 is sheet2/rId2. Primary states mean cell-type fractions in DMSO with subclasses normalized to parents for MOFA. Thus raw10 as unconditional subtype fractions, normalized13 parent fractions+conditional subtypes is a supported interpretation from primary+sheet naming/hierarchy, not a numerical validation; General numFmt alone adds no units. I accept root corrected raw10 fraction contract (0..1 source-only test, no percent rescue, no sum gate) with this inference strength explicit. The known hierarchical classifier makes raw10 disjoint categories plausible; avoid claiming sum identity already verified. Prior '13 raw' wording must be corrected append-only; no old seal changes. Agree common65 source validity, fixed metadata-only8probes,57terminal opportunity, patient-balanced whole-group LOPO. Fixed .50/.20 means average derived count/fraction depletion, NOT healthy survival, significance, or20percentage-point change; normative threshold is acceptable although my initial recommended q75. Oracle gap/mixed hit counts do not imply learnability. Missing denominators remain uncertainty, not automatic invalidity. Please confirm these semantics and whether your final source-only parser access checks find any unresolved issue.
+
+## Auditor confirmation sent
+
+> Confirmed agreement: primary+hierarchy supports raw10 unconditional subtype fraction interpretation; General styles do not independently prove scale. Normative .50/.20 threshold and oracle gap are descriptive opportunity only; no learnability/significance/healthy-survival claims. Metadata reconstruction validated 55/20/20patients,75/33/27specimens,65/8/57. Static parser checks show requested sheet only; numeric v text accessed solely inside authorized source sample branch and whitelisted column loop; denied cells untouched. Found prefreeze precision issue in float ranking/thresholds; root accepts Decimal tokens + Fraction rates/gap and synthetic boundary/tie tests. Will review updated code and bind final versions before final audit opinion. No biological numeric values accessed.
+
+## Resulting common position
+
+The fraction interpretation is supported by primary methods plus the named raw leaf schema; it is not an independent numerical or retained-denominator validation. No numerical-range-driven unit rescue or sum constraint is permitted. Fixed utility cutoffs are a research policy, and source oracle headroom is only descriptive opportunity. The remaining prefreeze implementation issue was exact arithmetic, accepted by root for correction before source decoding. This file does not assert that the pending patched code has already passed its final review.

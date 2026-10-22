@@ -1,0 +1,11 @@
+# Root independent starting position
+
+Saved before reading any new API prompt, response or peer draft. Prior context is shared. The most defensible research opportunity may be a specific, reproducible state/function feedback property rather than a new general optimizer. The goal still requires a distinctive core with useful controlled performance, not just ordinary components or an arbitrary statistical difference.
+
+The last round established an actionable information distinction: observations that are sufficient for reporter-gate prediction need not identify selection versus transition. This is a reason to test decision-relevant world uncertainty, but 'Bayesian experimental design on an equivalence class' and 'task-sufficient latent state' are ordinary predecessors; no novelty is assigned to those names. A promising candidate would have to specify an actual extra measured cellular structure and show that feedback updates a later useful research rule beyond ordinary refit, AL or equal-budget search.
+
+TG-GATEs offers47declared-positive3dose dual-assay labels with2hRNA→24hfunction as a possible source. It has prescreened high doses, donor/lot and preprocessing restrictions and a limited chemical population. More tasks than2cultures is helpful, but neither source availability nor more compound labels establishes independent later tasks or effect headroom. The prior scalar-clock operator remains stopped. A learned residual kernel is ordinary unless a specific, falsifiable transfer property creates a substantive scientific/technical contribution. Source/dev headroom and stronger direct baselines precede an agent stack.
+
+Watermelon is an unusually concrete proliferation reporter source, but the currently authenticated release supplies sorting-design-conditional targets and limited culture units. A full 'selective removal of cycling reservoir' application needs weighted/absolute outcomes. Do not force the existing source to answer a stronger function question or build RSI on clone pseudoreplication.
+
+The direct-API batch is experimental ideation with explicit cost/failure receipts. Model agreement is not verification, and different role prompts to one provider are not independent biological evidence. Once drafts are sealed, root will require opposing constructive criticism and an executed check that can actually alter the next action.

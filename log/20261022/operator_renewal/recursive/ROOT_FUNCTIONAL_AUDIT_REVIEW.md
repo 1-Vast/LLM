@@ -1,0 +1,7 @@
+# Opposing check of root exact pooled-moment audit
+
+Read root FUNCTIONAL_AUDIT_PROTOCOL, FUNCTIONAL_AUDIT_RESULT and audit_functional.py after sealing my functional independent review. No root code imported or rerun. Independent90attaining-measure check already verified the original anchored and unanchored witnesses.
+
+Code inspection and algebra support the sharp fixture claim10919/143748>11841/170368. The lower dual for A and upper dual for B are both valid on all z in[0,1] through the displayed nonnegative polynomial factorizations. Their difference is affine in the same c2. The saved slope-625450/691757 is negative, so its minimum lies at high C2. The constructed A/B distributions attain both duals simultaneously there, and the third distribution satisfies the same gauge and pool-normalization constraints. This proves the fixture's continuous global optimum, beyond a grid check. No generic all-pair formula or computational speed claim is established.
+
+Direct challenge sent to root: .75/.5 anchor alternatives are hypothetical different exact anchors, not observed calibration confidence intervals; using them to reject real anchor usefulness would overreach. Conversely sharper exact certificate is conventional joint moment optimization, not empirical runtime/statistical superiority over optimized baseline. Keep true-anchor no-reversal justified by dual proof, not merely21point stress grid. Await actual root response in separate exchange addendum.

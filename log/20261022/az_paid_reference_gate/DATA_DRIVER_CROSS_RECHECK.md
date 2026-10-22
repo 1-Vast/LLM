@@ -1,0 +1,13 @@
+# Actual driver boundary recheck
+
+2026-10-22. Functional auditor. Static review only; no real input, target, fit or network access.
+
+After the initial metric-return mismatch was reported, I read the revised driver.py. `metric` now obtains MAE from forecast.mae and utility/regret from recommendation; the primary bootstrap gate uses `lower`, matching metrics.py. The temporary integration blocker is closed in the revision reviewed. Root owns the synthetic full-driver integration and experiment execution; this static check does not replace it.
+
+I checked local adaptation and inherited information boundaries: offset_values rejects duplicate paid source keys, gives each unique training matrix one entry, uses train priors for validation and train+validation priors for test, and subtracts those priors from only an episode's own two paid witness residuals. The model is refitted globally once per selected (base,config), then each episode receives only its own offset; no episode-updated weights or another episode's query history are carried onward. Physical reuse of a paid source row remains possible but logical two-bundle cost is retained in EPISODE_META. This is ordinary context calibration rather than RSI or inherited episode adaptation.
+
+I checked the sealing sequence: all endpoint policies' nominal actions are generated from forecast and paid effects; TEST_PREDICTIONS.npz, TEST_ACTIONS.json, and SELECTION.json are written and hashed in PREDICTIONS_SEAL.json. prepare.verify_predictions and driver.evaluate_stage verify the same three names/fields. Preparation additionally binds original input row maps and protocol/design/schema/code before target conversion. Altered actions/selection are now synthetically rejected before source opening. Test prediction arrays place NaN on all non-test or input-invalid rows; test targets are not available to selection.
+
+The skeptic independently read the latest all_mono_doses_finite condition, partner-mono failure synthetic branch, run04 passing log, and three-file seal checks, and reported no remaining preparation blocker. I accepted its full paid-partner missing-dose objection and root made it a common abstention before any real numeric access. We also resolved the recommendation policy selection concern with symmetric endpoint-specific selection and actual deduplicated refit costs, and kept explicit episode-balanced training versus cell-macro evaluation.
+
+No new blocker was found in these requested data/offset/seal boundaries. All scientific identity limitations remain: conditional source retrospective pilot; no new world-model/agent/inheritance/RSI mechanism or prospective utility claim.

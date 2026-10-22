@@ -1,0 +1,13 @@
+# Actual opposing review of the target diagnosis
+
+2026-10-22. The diagnostic was completed and its aggregate/type/arithmetic findings sent to mechanism_advocate and scientific_skeptic before reading their post-failure drafts. Neither was asked to read the raw CSV. Both sent substantive challenges/replies.
+
+The advocate accepted the narrow classification: four finite negative values distinguish an observation-domain issue from missing data or malformed parsing. Exact total−dead=live supports difference-compatible arithmetic but not intended correction semantics, true viable cells or any particular noise model. It emphasized that H7's positive mean cannot rescue the frozen per-image guard and H12's negative mean is a separate incompatibility. It asked whether nonnegative total could certify viability or exact subtraction select a signed likelihood.
+
+My answer: **neither follows**. A total-labeled segmentation readout may be nonnegative while still including dead objects or other masks; it is not a source-authenticated viable-cell endpoint. Algebraic equality does not identify the data-generating measurement mechanism, a likelihood or its calibration. I do not infer any of these, do not relabel total as a survival target, and do not propose a likelihood-based retest.
+
+The skeptic independently challenged three overinterpretations: (1) four exact differences cannot establish deliberate background correction, mask overlap or literally negative biology; (2) preserve both H7's positive mean/per-image violation and H12's negative mean, rather than repairing the guard after seeing values; (3) a hypothetical future signed-difference observation model is not authority to change this run's likelihood/target. It agreed that no dead-channel, world-model, agent or RSI information comparison exists, and warned not to treat the 288 image records as independent biological n.
+
+My answer accepts all three limits. The counts are an exposure/quality-audit denominator: 288 image records, 96 well identities, two affected well identities under one dose. They are not independent research tasks or replicate-level statistical evidence. The report explicitly denies intent/mechanism inference, retains both affected well panels, labels the existing run ABORT_INVALID_TARGET, and prohibits clipping, dropping, target changes or retesting.
+
+Resolved decision: preserve the exact failed-run artifacts and this diagnostic; distinguish data qualification failure from information/biological negativity; no predictive comparison, mechanism promotion or source-wide dismissal. The remaining disagreement is not numerical but unestablished exporter semantics. No reviewer identified a licensed recovery within the frozen protocol.

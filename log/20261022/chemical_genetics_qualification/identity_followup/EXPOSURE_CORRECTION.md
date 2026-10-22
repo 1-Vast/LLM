@@ -1,0 +1,7 @@
+# Qualitative-outcome exposure correction
+
+The broad projection deliberately retained nonnumeric unknown strings and the protocol warned that author grouping might leak. In MOESM7, **I1=Validated, J1=Bi-directional, K1=Monochromatic**, and Yes/No body cells in these columns were exported and seen by both auditor and root. These are published qualitative results, not merely neutral sample identities. F=Previously measured also exposes author membership/selection. Therefore it is incorrect to describe this block as withholding all categorical outcomes or as sealed confirmation.
+
+XR/CS/neutral and equivalent categorical cells remain filtered; numeric cells, numeric strings, formulas/caches and numeric measurement text remain unexported. No Yes/No outcome frequencies, models or performance comparisons were computed. All broad output is design/schema-exposed, including these known qualitative outcomes.
+
+The first `EXACT_IDENTITY_UNITS.json` used an ambiguous claim-limit sentence about no response classes evaluated. It is retained unchanged. The post-freeze string-only helper now writes `EXACT_IDENTITY_UNITS_CORRECTED.json` with explicit exposure wording; no source parser/guard, frozen input or source workbook is changed. Root also identified that Fig5a F1 names a general resistance fold-change and does not by itself identify its drug. Its target remains unresolved by literal header; G1 explicitly names azithromycin. Captions establish the experiment covers both drugs but are not substituted for a precise column-level assignment.

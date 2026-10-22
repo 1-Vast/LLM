@@ -1,0 +1,552 @@
+建设方：从已失败方向以外寻找至多一个最小机制。必须给精确定义/方程、普通解释最强版本及一个能区分两者的反例或可测预测。只依据所附已存证据，最多2000中文字符。当前RNA实验仍未有结果，不能预测/捏造结果、改阈值、重跑停止分支、开启later14/AZ413reserve，也不能把待采集观测当已有数据。目标仍是有生物实质差异的虚拟细胞+研究程序改进机制，而非重命名标准算法。无可信候选是允许的结论。先列排除的最邻近历史失败或文献，再给机制、具体应用、可获得数据与缺口、可证伪创新主张、最小成功/停止条件。逐一说明world/agent/继承/联合/C4如何独立归因；可以指出本轮不应测试其中某项，但不得把它写成完成。必须面对强同信息直接预测/普通重训/CL/AL/简单混合/等预算搜索，不以通用逼近能力代替实际等价论证；也不以模块名字制造新颖性。文献链接仅是前轮审查记录；未提供原文的细节标未核实，不编造新引用。不要给任意临床阈值或未验证样本量。本轮是独立首评，没有其他评审输出；后续会真正交换原文交叉质疑。
+
+
+--- research/REPORT.md ---
+# MAESTRO research decisions
+
+2026-10-22 TG-GATEs RNA feedback pilot in progress: [frozen protocols, opposing reviews and live execution decision](../log/20261022/tggates_rna_feedback_pilot/REVIEW_DECISION.md) starts official31archive acquisition and exact172CEL conversion. Single-array MAS5 with unchanged manufacturer CDF environment passes source benchmark (54,675finiteprobesets,16.484s,633MiBsampledpeak) after an original retained QC-accessor failure.32synthetic tests include a full24source/7development run with developmentHigh absent, actual4336coefficientfits/1552pipelines. Eight fixed families/64configurations cover constrained/joint feedback, strong direct/KRR, true no-observedRNA, four-gene prior art and ordinary weighted refit; mixture and original utility threshold retained. Independent first opinions, actual bilateral replies and actual-code audit are in log. A verified one-shot process waits for all172, then projects inputs, freezes code/data, selects on source, seals predictions and separately scores development. This phase has no real predictive result yet and clears no novel core, agent, inheritance or RSI. Later14 and AZ413reserve remain untouched; full goal active. Code/tests: tggates_rna_feedback_pilot_20261022/; authoritative current counts/handles: linked phase checkpoints/.
+
+2026-10-22 TG-GATEs functional-headroom experiment: [frozen real-data result and opposing decision](../log/20261022/tggates_feedback_headroom/DECISION.md) completes705pipelineevaluations/580predictorfitcalls on24source/7development labels with all14later labels numerically unopened. MiddlecopybestdevelopmentDNA-MAE.02335714passes only the>.02necessaryheadroom route; useful>.02gain would require<.00335714error on thisdevsample. Keep originalgate and allow one minimalRNAfalsification, without agent/RSI expansion.1,800independentmanifestchecks and2,792numericcomparisonsPASS;372uniqueassayvalues/93conditionmeans, all169finiteout-of-range records retained. Elevenplusfive synthetictestsPASS. ComparisonKeyError/same-pathreviewoverwrite and exactreviewrecovery are preserved. No RNA/CEL or world/agent/inheritance/joint/C4 performance yet;1,340completed files unchanged, goal active. Code/tests in tggates_feedback_headroom_20261022/, all evidence/failures in linked log.
+
+2026-10-22 direct-API innovation tests: [three independent API proposals, actual opposing review and routing decision](../log/20261022/api_evidence_innovation/DECISION.md) select a fixed-M molecular/conditional-functional innovation hypothesis for real source/dev screening, without promoting a new operator. ThreeDeepSeekcalls/43,483tokens yielded proposals whose schema, feedback-cost andC4 errors were corrected before any generated-code execution.8hdual-assay complete menu remains47labels; only that expansion shortcut stops.47primaryPubChemGETs give45proxystructures/39dependencygroups;748independentchecksPASS. Proxy identities do not prove sample material/donor independence. Next separately frozen functional-headroom experiment preserves later responses before anyRNA/agentinvestment. No biological fits or world/agent/inheritance/joint/C4 benefit yet;1,186completed files preserved, full goal active. Code/tests in api_evidence_innovation_20261022/, all evidence/failures in linked log.
+
+2026-10-22 application renewal: [opposing review, source masks and structural decision](../log/20261022/renewal_application/DECISION.md) clears no new core but authenticates a narrow Watermelon sampled-gate prediction source. PC9 design56,419cells/11samples; conservative single30nt-call day3→bothday14 support482barcodes(309/84/89fixedsource/dev/test), not482independenttasks. Independent named-field design/key/curve audits exactly match. Original cell-keyguardFAIL is preserved and fully explained by20,627missingkeys; nonmissing keys and all rownames are unique. A frozen selection/state-change observation-equivalence construction passes6checks/3tests and13independentfounderchecks, rejecting identification from those endpoint/global summaries without claiming biological performance or denying actual lineage information. Do not build that unqualified world/agent; retain a separately scoped conditional pilot and continue direct-API multi-agent innovation exploration. No expression/clone_size/per-gate lineage targets or biological fits;1DeepSeekcall14,166tokens;1,037priorfiles preserved. Overall goal active. Code/tests in renewal_application_20261022/, all evidence/failures in linked log.
+
+2026-10-22 fixed PRISM profile opportunity: [registered finite-only experiment and opposing decision](../log/20261022/prism_profile_opportunity/DECISION.md) stops the exact two-paid-pool/most-of-panel configuration before fitting. Of565source/211development/255test compounds,54/0/33qualify; all5coverage floors fail, with only1of7testplates nonempty. The frozen28-file task uses48paidX1slots to forecast433unpaid contexts; conversion saves only bool masks/counts. Independent execution sealed before root results matches50,575exactchecks,0mismatch. This is coverage failure, not predictor/RSI performance evidence or universal partial-catalog impossibility. No pool/seed/threshold rescue, new fits, provider or HTTP calls;984completed files preserved. All old source/exposure/endpoint STOPs remain; overall goal active. Code/tests are in prism_profile_opportunity_20261022/, records in linked log.
+
+2026-10-22 update-value qualification: [measured historical audit, primary sources and actual opposing decision](../log/20261022/update_value_qualification/DECISION.md) adds a frozen exported-score audit without new fits. Across36complete64-compound campaigns, cross-noise chooser gains versus evaluation-best fixed are -.361111 /+.222222 hits; the two-direction screen fails. Independent3,161comparisons pass. Stop relying on this diagnostic to expand; no universal selector impossibility follows. New primary review clears no novel core. PRISM's1274chemistry-resolved/header-complete treatments and481contexts offer only an exposed, shared-normalization-conditional catalog task; finite coverage is unmeasured and parent/scaffold/plate links form one giant component. Old anchor independent-endpoint STOP remains. Next requires one separately frozen ordinary-update task, whole-pool costs and coverage/utility gates; no World/Agent/inheritance/joint/C4 result. All888prior inventoried files preserved; overall goal active. Code/tests are in update_value_qualification_20261022/, evidence and failures in linked log.
+
+2026-10-22 paid-reference functional transport: [measured results, independent opposing decision and costs](../log/20261022/az_paid_reference_gate/DECISION.md) complete 53 real pipelines /215 internal fits, with forecasts/actions/selection sealed before test-label conversion. On 96 MASTERs /644 eligible episodes /30,212 rows, effect-coordinate MAE .077667654 loses to full direct .066206799 (gain -.011460855, 95% CI [-.012786525,-.010023394]); U .048597279 loses to without-mono direct .098467776 (gain -.049870497, CI [-.057802529,-.041956936]). Coverage 100%; both primary gates fail. Same-capacity effect-vs-dose advantages and cheap small-model compute are retained, but this exact agent/RSI expansion stops. Mono-package intervals cross zero; chemistry remains unresolved, not proved leakage. Independent selection/result/data audits and actual bilateral reviews pass; the initial auditor ordering FAIL and correction remain. No agent/inheritance/joint/RSI success; 413 reserve contexts numerically unopened; overall goal active. All 460 historical inventoried files are verified at finalization. New code/tests in az_paid_reference_gate_20261022/, evidence/failures in linked log.
+
+2026-10-22 latest primary-source/later-task audit: [independent sources, actual cross-debate and decision](../log/20261022/rsi_later_task_literature/DECISION.md) reviews six work families per reviewer, with one overlap. Generic editable improvers, diagnostic revision, memory, inheritance and common-start evaluation have close precedents; no new core is cleared. Static functional worlds, finite common-start improver gain and non-superadditive joint benefit remain legitimate scoped goals. Current CellScientist source is commit-bound, but later-task population/feedback qualification remains; two paid matrices cannot supply eight new hidden-target feedback rounds. All retained sources/reviews pass64integrity checks; this is literature/metadata work with zero new biological fits or reserve conversion. The separate AZ performance experiment has now completed with both primary gates failing, as recorded above.
+
+2026-10-22 intervention/program renewal: [independent reviews, actual cross-debate and design decision](../log/20261022/intervention_program_renewal/DECISION.md) stop the current FSI rank/scale rationale and CCIP failure-certificate novelty claim using two registered algebra audits, retaining their precise limits. Two DeepSeek proposals used32,518tokens. A pinned AZ2024functional ZIP and target-blind21-column census qualify3,915,245well rows/84,055matrices/68,816pair-cell units; independent recount resolves actual25/35/49well geometry. A separately registered source-IDedge-cover gate finds50,687same-plate target matrices with exact-dose reference coverage from two other paid bundles; chemical/fit/numeric qualification remains. No biological fit, numeric target use or world/agent/inheritance/joint/RSI gain. A paid-monotherapy-coordinate residual transport pilot is a concrete ordinary empirical opportunity, not a promoted core. All337previous inventoried files are preserved; overall goal remains active. New code/tests are in intervention_program_renewal_20261022/, all records/failures in the linked log.
+
+2026-10-22 STACK conditional information: [registered75-fit experiment and opposing decision](../log/20261022/stack_conditional_information/DECISION.md) completes a qualified fixed-dose24→72h marker forecast on1,098test rows. Full SG history MAE0.219490 versus strong live-only0.227450 gains0.007960(3.50%); all three screens improve and conditional entry-bootstrap interval is positive, but the preregistered0.05/10% usefulness gate fails. Joint endpoints MAE0.222698 leave only1.44% further history gain. Stop this exact configuration as a basis for world/agent/RSI expansion; retain the small predictive difference, qualified source and every failure. Five matched model grids, complete forecasts sealed before test targets, independent implementation/output audits and real opposing exchanges are retained. No new core or world/agent/inheritance/joint/RSI contribution is established; the overall goal remains active. Code/tests are in stack_conditional_information_20261022/, all evidence in the linked log. Prior279inventoried files remain unchanged.
+
+2026-10-22 STACK raw qualification: [exact objects, paired-row schema and independent decision](../log/20261022/stack_raw_qualification/DECISION.md) acquires all four v1 workbooks (11,559,238bytes), matching manifest sizes/SHA256s. All three screens contain the same1,833 named entries with exact unique library joins plus87 unidentified #N/A rows; SG and NLS/mKate2 blocks pair by exported row and time. Independent source/skeptic drafts and actual cross-debate permit limited marker forecasting while preserving unknown well/run/replicate/control identity and a conflicting SMILES annotation. Responses/QC masks remain numerically unopened; no fits, novel core or World/Agent/inheritance/RSI gain. Next is a newly registered conditional-information gate; all earlier stops remain. Code/tests are in stack_raw_qualification_20261022/, evidence/failures in the linked log; broader goal active.
+
+2026-10-22 dead-stock information gate: [registered attempt, target diagnosis and opposing decision](../log/20261022/dead_stock_information_gate/DECISION.md) stops this HCT116 observation/transform configuration as TARGET_QUALIFICATION_ABORT, not a channel-information negative. All 192 prefix fits completed, but four negative 72h image values include one negative well mean, making the frozen log target undefined; zero direct fits or performance scores exist. Independent drafts and actual cross-examination reject clipping, target substitution and rerun. No algorithmic novelty, World/Agent/inheritance/joint/RSI gain is established. Valid STACK v1 metadata corrects the v2 soft404; exact raw manifest remains next. All 124 prior-phase inventoried files are unchanged; code/tests are in dead_stock_information_gate_20261022/, evidence and failures in the linked log. Broader goal remains active.
+
+2026-10-22 functional-dynamics gate: [primary sources, independent debate and measured decision](../log/20261022/functional_dynamics_gate/DECISION.md) authenticate HTS001 and two HCT116 live/dead-stock CSVs. One preregistered drug-grouped HTS001 prefix forecast fails its useful-gain gate: inherited updater MAE0.230026, full refit0.229256, strong direct0.179086; fixed50/50mixture and equal-budget search exactly reproduce the inherited updater. Common-start update gain0.073564(24.2%) is retained as a limited conventional observation, below the absolute0.10margin;3testdrugs do not establish cross-run generalization. Stop this simple net-growth/shrinkage configuration and exact EB novelty claim; retain qualified data. Full World/Agent/CL/AL/joint/RSI contributions remain unestablished; broader goal remains active. Code/tests are in functional_dynamics_gate_20261022/, evidence and failures in the linked log.
+
+2026-10-22 intervention-dynamics renewal: [source and mechanism decision](../log/20261022/intervention_dynamics_renewal/DECISION.md) retains authentic AP-1 reporter pairs, WM1366 same-well drug-sequence trajectories and Pseudomonas step-response assets within their actual scopes. Bounded identity audits do not establish independent framework/RSI tasks; AP-1 source47 vs reported46 tracks remains unresolved. Two rounds of independent positions and actual cross-debate find no current new core: semigroup consistency has a direct precedent, ADCC endpoint factorization is an ordinary predictor, and lineage selection bounds are standard marginal feasibility. Exact binary/categorical/joint logical audits pass; no new biological model fit or World/Agent/inheritance/joint/RSI benefit was tested. All source receipts, exposures, corrections and failures are retained; broader goal remains active.
+
+2026-10-22 E.faecalis continuation: [source, opposing reviews and measured decision](../log/20261022/efaecalis_dynamic_qualification/DECISION.md) authenticates the official temporal-function workbook and original dynamic-MDP assumptions. A preregistered 10-development/10-test population rank-allocation gate fails: six-day ridge utility0.600 vs day6 controls0.589, gain0.011 below0.10; conditional bootstrap sensitivity[-0.161,+0.172], simple prefix mean0.650. Twelve synthetic checks and11 frozen inputs pass;240 finite responses are now exposed. Stop framework expansion on this configuration. Independent actual debate also stops DeepSeek's known-membership-cost and turning-point constructs as novelty cores. World/Agent/inheritance/joint/RSI effects remain NOT_TESTED; the broader goal remains active.
+
+2026-10-22 chemical-genetics continuation: [current source and mechanism decision](../log/20261022/chemical_genetics_qualification/DECISION.md) authenticates the 3,904×40 static intervention axes, 70 aggregate drug pairs and twelve TET lineages over five functional dates; published figures genuinely supply three genomic observation dates. Exact numerical state recovery remains unresolved. Independent drafts and actual cross-examination stop two explicit constructs (Gaussian gene writeback equals same-information kernel conditioning; the proposed forward equation is ordinary mutation-selection with unqualified haplotype/calibration assumptions). A preregistered 12-case/24-order algebra audit passes below 7e-13; it is not biological/Agent/RSI evidence. Public qualitative outcomes/figures are designer-exposed. The broader goal remains active.
+
+2026-10-22 serial-antibiotic continuation: [LIST public-asset decision](../log/20261022/antibiotic_schedule_qualification/DECISION.md) authenticates the paper/repo/image-version chain and projects the small growth table's identities, but stops this complete-replay configuration because real treatment/state/function and independent-run joins remain unestablished. [Independent review and actual cross-debate](../log/20261022/antibiotic_state_refinement_review/DECISION.md) stop the proposed history-counterexample state-refinement novelty core: a same-information MDL split implements its stated operation, and the registered exhaustive logic example gives MSE 0.25/0/0 for current-only/refined/direct-history. This is no biological, Agent, inheritance or RSI performance result. [Tripartite Loops current decision](../log/20261022/serial_antibiotic_alternatives/DECISION.md) confirms public per-strain MIC and author-labelled early genomic samples (six nominal selected chains, eighteen stage samples plus three unjoined fourth-stage samples); exact culture/figure/genome joins remain unresolved. Narrow retrospective studies remain possible; no model/Agent/RSI result follows.
+
+2026-10-22 TG-GATEs continuation: [the authoritative log decision](../log/20261022/tggates_functional_qualification/DECISION.md) verifies functional identity/missingness without response-value export (2,606 human functional records; 23 synthetic tests and 5,282 integrity/aggregation checks). Independent review and a five-test constructive observability audit stop the single-eta time-warp core candidate as ordinary system identification with insufficient general diagnostic identification. The temporal asset is retained with dose-prescreen, concentration and lot qualifications; numerical world/Agent/inheritance/RSI contributions remain NOT_TESTED. New code is in `tggates_functional_qualification_20261022/`, `tggates_method_audit_20261022/`, `tggates_mechanism_review_20261022/` and `tggates_clock_observability_20261022/`; all evidence/decisions are in the linked log.
+
+2026-10-22 continuation: new experiment code is in `oasis_dev_g0_20261022/`; the authoritative protocol, numerical evidence, independent debate, failures and current decision are all in [the log record](../log/20261022/oasis_dev_g0/REPORT.md). Historical study decisions below remain unchanged.
+
+2026-10-21 repair and interpretation amendment: [dual_core_innovation_validation_20261021_repair1](dual_core_innovation_validation_20261021_repair1/REPORT.md).
+The executable query -> PPODE update -> next decision loop and DGM-inspired non-winner ancestry now work.
+No evolved program was promoted: innovation remains unestablished on exposed replay. Fixed/adaptive PPODE
+confirmed 2.571/2.714 hits; B1 kernel 3.429; conventional PPODE-B1 blend 3.714 on seven regression backgrounds
+with a different 20-drug pool. The blend's positive development signal is not agent-evolution evidence.
+The [historical amendment](dual_core_innovation_validation_20261021_repair1/AMENDMENT.md) supersedes the earlier claims that molecular feedback could not
+change probabilities, that the ablation isolated the trajectory, and that absent headroom caused failure.
+89 repair tests pass; repository 1066 pass / 1 existing shape failure. Original 161 frozen files pass;
+whole-directory preservation fails after documented concurrent nonfrozen cleanup, explicitly retained as verifier exit 2.
+
+2026-10-21 dual-core innovation validation: [dual_core_innovation_validation_20261021](dual_core_innovation_validation_20261021/REPORT.md) decides
+STOP_THIS_TASK_CONFIGURATION on the PTV-1/ProteinTalks public-data replay (published-label task, 7 final lineages, estimation pilot). The re-implemented ppODE world model is worse than
+the strongest conventional score (precision@5 -0.229 [-0.286, -0.200]; as a confirmation score -1.14 [-1.43, -1.00] hits), the trajectory pathway does not help (M1 - M2 -0.171), real functional or
+molecular feedback adds nothing over ordinary updating, no LLM program edit was accepted (6 requests, 16,782 tokens; A1 = A2 = A0), the conventional edit is INCONCLUSIVE (+0.14 [-0.57, +0.86] hits),
+and the combined claim is NOT_TESTED. Local negative on one exposed release; pair-label tasks NOT_TESTABLE_ON_THIS_ASSET; final outcomes are now exposed.
+
+2026-10-20 self-repair qualification: [self_repair_qualification_20261020](self_repair_qualification_20261020/QUALIFICATION.md) finds
+NO_UNIT_QUALIFIES_FOR_SELF_REPAIR_BEYOND_REFITTING. On exposed Beat AML 2.0 the Waves1+2 -> Waves3+4 drug-response shift is real (split-half corr 0.78) and
+decision-relevant (chronological per-drug offset +0.370 [0.257, 0.497] over the frozen model), but composition, run-time trend, drug family and potency explain
+none of its decision-relevant part, one observation cannot separate the explanations (per-drug d' 0.16), and the offset is ordinary drift repair. Exposed
+development only; no experiment proposed; closed studies unchanged.
+
+2026-10-20 procedure inheritance audit: [procedure_inheritance_20261020_audit1](procedure_inheritance_20261020_audit1/REPORT.md)
+retains the original bounded CLOSE decision: ordinary lookahead and distillation largely match the executable plan's utility.
+The eight synthetic condition streams share two independent seed blocks. Supplemental replay checks every behavior field on all
+3,840 archived rows. Cost accounting and the missing primary ADVANCE gate are corrected separately; mostly-zero, quantized timings
+do not establish precise amortization counts. The novel regime appears only in the final batch, so its detection-revision-later-benefit
+loop was not tested; all 112 transplants rejected, leaving content transfer untested. Measured drug-discovery utility remains NOT_TESTED.
+No qualified independent validation asset is identified, but exposed measured development is not ruled out merely by missing regime
+labels, monetary prices or independent hit confirmation. Qualify one real observation/decision unit before another architecture;
+the [original frozen package](procedure_inheritance_20261020/REPORT.md) remains unchanged.
+
+2026-10-20 audit amendment: [innovation_validation_repair1_20261020](innovation_validation_repair1_20261020/REPORT.md)
+supersedes the implementation and attribution claims below, while preserving the original measured results.
+The legacy H1 negative result remains valid for the implementation that ran; an equal-resource H2 was NOT_TESTED.
+The original acquisition sampler was inconsistent, deployment could silently drop a fitted program, and archive/diagnostic-plan
+reuse was not implemented. Strict replay reproduces all 27,648 archived decisive task nominations but fails one checkpoint
+(eight anchor rows); unarchived anchor models are NOT_REPLAYABLE. The isolated repair and bounded synthetic diagnostics
+establish engineering contracts only. Measured pharmacological utility and innovation effectiveness remain NOT_ESTABLISHED.
+
+Updated 2026-10-20. The bounded O'Neil execution brief ([NEXT_RESEARCH_PROMPT](../log/20261020/NEXT_RESEARCH_PROMPT.md)) has now been executed:
+**[functional_rule_revision_20261020](functional_rule_revision_20261020/REPORT.md) is UNSUPPORTED** - one bounded, evidence-driven revision of conditional
+functional transfer rules did not beat same-data fixed-structure refitting (-0.0005 [-0.0008, +0.0005] shortlist utility, margin 0.005), the full-dictionary or conventional
+comparators; every candidate failed the single G retention query; the task is nearly saturated by the single-agent reference plus drug and drug-by-cell effects
+(remaining regret 0.0076). Policy comparison NOT_RUN (no recoverable bundle/cost records); a one-request API proposer added nothing. Exposed internal development only.
+The self-improving follow-up ([NEXT_SELF_IMPROVING_RESEARCH_PROMPT](../log/20261020/NEXT_SELF_IMPROVING_RESEARCH_PROMPT.md)) was executed as a development prototype:
+**[self_improving_virtual_cell_20261020](self_improving_virtual_cell_20261020/REPORT.md)** - the typed-program loop is executable, serialisable and verified, but no effectiveness claim is
+supported on the real data (transfer-contract primary evo_full - refit -0.0009 against a useful-gain criterion of 0.00645; end-to-end contract has no decision opportunity beyond direct
+confirmation). Independent confirmation is not available.
+The innovation-validation follow-up ([NEXT_INNOVATION_VALIDATION_PROMPT](../log/20261020/NEXT_INNOVATION_VALIDATION_PROMPT.md)) was executed:
+**[innovation_validation_20261020](innovation_validation_20261020/REPORT.md)** - competing-program probe selection and an inherited gate library are executable and verified, but on synthetic
+streams they do not beat latent-factor A-optimal acquisition (+0.0017 vs margin 0.01), inheritance adds nothing over a restart control, and measured utility is not tested.
+O'Neil is exposed internal development data; source availability is not scientific feasibility.
+The broader [research programme](../log/archive/HISTORY.md) remains historical scope,
+not an instruction to restart stopped PRISM, Beat AML or Jaaks branches.
+
+## Research map by question and final decision
+
+Detailed estimates and uncertainty live in [EVIDENCE](EVIDENCE.md) and linked original records.
+The registry's `status` describes record lifecycle, not scientific support. Every study keeps
+its original layout, protocols, code, records, deviations and freezes because cross-study
+imports/hash pins make partial archival unsafe without redesign.
+
+| Question and study closure | Data, exposure and unit | Strong comparison and final decision | Reusable closure |
+|---|---|---|---|
+| Dual-core innovation validation: dual_core_innovation_validation_20261021 | Exposed PTV-1 / ProteinTalks published labels and proteomes; 7 held-out lineages | Re-implemented ppODE loses to the strongest conventional predictor; trajectory and feedback add no demonstrated value; LLM edits are identical to the incumbent. STOP_THIS_TASK_CONFIGURATION; combined Agent-World claim NOT_TESTED. | Full frozen replay, source receipts, final outcomes and verifier retained. This does not establish a universal negative for autonomous discovery. |
+| Scoped molecular transfer: knowledge_transfer, context_discrimination, evidence_transfer, collaboration_limits, selective_hit_triage | GSE92742/70138 and GCP; historical sealed slices now evaluated; compounds/campaigns/plate records | Fixed sparse design, deterministic decoder/blend and conventional agents. Scoped RNA transfer and GCP endpoint ranking survive; Agent synergy and general viability transfer do not. | Study README/protocol, frozen source receipts, saved forecasts, claims, verifiers; typed QC/measurement admission. |
+| Biological information beyond class: knowledge_reality, evaluator_audit, orbit_contrast, mechanism_falsification | Exposed LINCS/PRISM annotations and response records; compound/class units | Gene-relabelling null, unconditional residual, corrected evaluation contract. Mechanism-class confounding; no measured mechanism truth. STOP or ASSET_BLOCKED. | C1-C7 evaluator audit, orbit decomposition, provenance/refusal contracts. |
+| Feedback vs model or policy: indication_triage, context_transfer, feedback_attribution, beataml_g1 | Exposed PRISM or Beat AML 2.0; compound-line campaigns or patient groups | Ridge plus feedback, item prior, exploit-first. Beat AML feedback survives as within-domain workflow; low-rank model branch stopped after failed G1. Triage's measured-pair counting is not propagation. | CLAIMS/AUDIT/DEVIATIONS and saved campaign records; corrected lookahead remains unconfirmed. |
+| Knowledge library vs revision: program_revision, seed_attribution | Exposed PRISM 19Q4; lineages/compound groups | Ridge on identical seed features and masked replay. Early seed positives superseded by corrected unconfirmed estimates; autonomous revision/LLM/search NO-GO. | Seed attribution ERRATUM and masked bench; optional seed features only. |
+| Better propagation/acquisition: feedback_propagation, acquisition_program, observable_state, eg_rpt, maestro_far | Exposed PRISM/L1000; compound families/campaigns, not independent paper records | Ridge-plus-feedback, kNN, fixed design, conventional enumerator/target rule, exploit-first. No repair/Agent/FAR advantage. EG-RPT is a draft scaffold, not fitted evidence. | FAR audit supersedes strict-isolation/equal-cost narrative; preserve discarded run, failure records and all study-specific ledgers. |
+| Functional anchors vs independent confirmation: presage_transfer, anchor_purchase | Exposed PRISM 19Q4; held-out compounds/components | Chemistry+MoA, ungated neighbours, context means. PRESAGE P0 NO-GO; anchor BLOCKED_INDEPENDENT_ENDPOINT. | Complete frozen negative record; no P1-P3 restart. |
+| Replicate noise vs decisions: replicate_decisions, heavy_tail_rsd, decoupled_calibration_rsd | Exposed HTS002 2.5/0.625/10 uM; compound clusters/doses and replicate plates | Gaussian RSD, scalar shrinkage, raw read and raw re-read. D1 scope survives; D2 unsupported; Student-t branch closed. Decoupled package actually HAS FREEZE.json and DEV_RESULT.json (old direction note was stale); no unopened confirmation. | Original per-unit results and shared RSD/HT imports retained. Decoupled result is development-only; see its DEV_RESULT.json, not a fabricated missing-report link. |
+| Same-target drug substitution: action_substitution, kinobeads_substitution, biological_residual_gate | Exposed Jaaks 2022 plus Klaeger ChEMBL; held-out implementations/partner units/families; dates often share cell stock | Functional kernel and same-partner feedback. STOP for this action space; biological residual underpowered and decision-opportunity gate fails. | Later P0 audit corrects B5 (function x target Jaccard), prevalence and the threshold/update-specific Agent bound; unique unit tables/deviations retained. |
+| Molecular implementation identifiability: implementation_identifiability_v1 and audit1 | Designer-exposed AURKA papers/supplements; condition/endpoint/lineage units | Inhibitor/degrader/CRBN-null binder contrasts. Engineering logic only; ASSET_BLOCKED biologically; G2-G5 NOT_RUN. | Audit1 AMENDMENT supersedes source-completeness narrative. No matched quantitative lineage-qualified terminal unit; preserve exact source extracts and mutation tests. |
+
+Names above abbreviate the dated folders in [STUDIES.json](STUDIES.json). The table below
+retains study-specific stop decisions; all numerical details remain in their original records.
+Removed one-page log summaries and duplicate opening chronology are recoverable in the
+[cleanup manifest](../log/20261020/PREPARATION.md). They added no unique results; several repeated
+withdrawn PRISM positives or obsolete proposed continuations. Later audits take precedence.
+
+Updated 2026-10-21. This is the current decision summary; [EVIDENCE.md](EVIDENCE.md)
+keeps the numerical historical register. [STUDIES.json](STUDIES.json) registers the
+retained studies. Each study keeps its protocol, results, deviations, source
+identities, paid-call records and verifier. Software tests do not establish scientific validity.
+
+## Integrated assessment and decision
+
+The strongest recent signal is **functional feedback within a defined replay**: on Beat AML,
+measuring a few high-scoring inhibitors and updating rankings improved later choices over the
+Virtual Cell alone. This supports a bounded workflow result within Beat AML, not an independent
+biological replication or an Agent/LLM advantage. The exposed-data attribution study narrows the
+interpretation: readouts carry useful drug-specific information, but the RNA prior does not beat
+the empirical item prior or same-feature drug-specific ridge; no procedure selector beats tuned
+exploit-first. Its coherent score is promising for ranking, but remains uncalibrated. Gate G1 then ran
+(2026-10-17) and failed: the probe round carries the gain, a ridge given the same round is within +0.015
+of the low-rank candidate, and the candidate's lead over the one-round ridge (+0.098 [+0.045, +0.153]) does
+not clear 0.05 net of a round. The functional-feedback result stands as a workflow result; the low-rank
+state model adds nothing to it on this domain.
+
+The PRISM program-revision study is a separate result. A fixed textbook library helps on future
+lines within that screen, especially unseen lineages, but autonomous revision, conventional search,
+LLM proposals and joint measurement edits add no value; the revision cost is not recovered. This is
+prior-knowledge use, not learned discovery, and it does not transfer to unseen drug structure
+groups. Its same-screen future strata are not independent confirmation. The seed attribution then
+showed that the frozen evaluation contract and development bench were inconsistent and non-prospective;
+under the repaired contract the seed gain is positive but unconfirmed (+0.12 to +0.36), concentrated in
+BRAF/NRAS-mutant skin lines, and matched by a ridge on the same ten features. The shared cross-study
+lesson is to test against the strongest simple comparator and align development arenas with the
+target strata; it does not make the Beat AML and PRISM effects one pooled finding.
+
+The 2026-10-21 PTV-1 / ProteinTalks replay is a separate negative result on a public,
+exposed published-label task. The re-implemented ppODE trails the strongest conventional
+predictor, the trajectory pathway adds no demonstrated value, feedback does not improve
+over ordinary updating, and the LLM search accepts no program change. The study therefore
+stops this task configuration; its seven held-out lineages and limited model capacity do
+not support a universal conclusion about autonomous research systems. These results do not
+change the narrower Beat AML workflow finding or establish an Agent-World joint benefit.
+
+The 2026-10-18 feedback-propagation study further separates **feedback value** from **learning a
+better update rule**. On exposed PRISM folds, ridge-plus-feedback improves nominations of unmeasured
+pairs over the structure prior at a hypothetical pool-read cost, but the analogue-anchored repair is
+not distinguishable from ridge-plus-feedback or kNN; a feedback-only diagnosis identifies the better
+rule weakly, and value-greedy closed loops lose to fixed A-optimal design. The old indication-triage
+totals mostly re-read measured pairs and are not evidence of propagation. No reproducible repair or
+Agent/LLM search is justified. Together with G1, the current evidence supports scoped feedback as a
+workflow component, while learned model correction, procedure selection, and autonomous revision
+remain unsupported or unconfirmed. PRISM results are exposed-data development, not confirmation.
+
+The 2026-10-18 observable-state assessment tests whether an Agent can propose typed,
+falsifiable response-state bets beyond a conventional enumerator. It did not: the
+registered Agent comparisons failed, the estimated effects were below the practical
+margin, and stated probabilities were about fivefold too high. A non-LLM target-gene
+rule showed a small exploratory signal, but it was unadjusted, below the practical
+margin, and did not establish decision value. This narrows the live question to whether
+knowledge-informed state variables can be independently and decision-relevantly
+validated; it does not support the broader Agent or typed-edit claim. The campaign-level
+decision secondary was not run, and the study used exposed PRISM data.
+
+The 2026-10-19 [EG-RPT protocol](eg_rpt_20261019/PROTOCOL.md) is **DRAFT, not frozen, and not run**.
+Its initial audit finds that the acquisition study's 131-versus-100 campaign-level best-of figure is
+not evidence of selectable policy headroom: the mean absolute ridge/R1 difference (1.86 hits) is
+consistent with the 1.95 expected under Gaussian noise with the observed spread, and their campaign
+hit counts correlate only 0.27. The 13 prior study-level records span four dependence groups and six
+incommensurable utility units, so they cannot train a policy-transfer model; at most they support
+careful case retrieval. The proposed first gate is therefore a split-noise reliability test. Only if
+policy differences prove reproducible does the draft proceed to non-LLM selectors, Virtual Cell
+reliability features, and then an Agent comparison. This is protocol/scaffolding progress, not an
+EG-RPT result or a new scientific finding.
+
+One secondary seed-attribution interval was also too narrow because repeated lineage draws were
+collapsed in its bootstrap; the separate [erratum](seed_attribution_20261017/ERRATUM_20261018.md)
+corrects the interval without changing the registered primary tests or decisions.
+
+**Work order.** First, MT-P0 qualifies the compact A/B task, action, cost and dependence manifest;
+this is a programme-wide prerequisite for learning procedure value. G1 is complete and failed: do not
+develop further variants of the low-rank state model on Beat AML; keep the exploit-first feedback pattern
+with a ridge as the mandatory comparator. **Conditionally permitted:** a confirmation of the feedback
+pattern only on a new, independent, powered domain, with ridge-plus-feedback as the comparator and the
+round value declared in advance; none is local, so it stays blocked. **NO-GO:** an autonomous
+applicability-boundary revision study on PRISM. The opportunity gates did not pass (no primary seed test
+has a positive lower bound under the corrected contract), so no such protocol is drafted here and no
+revision, LLM-proposal or grammar-search campaign is started. Any later PRISM question needs
+`replay.MaskedBench`, lineage-disjoint arenas, the pooled gate-count floor and curated non-LLM proposals as
+comparator, and PRISM 24Q2 REP.1M stays sealed until access is authorised and independence is verified.
+Public-metadata checks may proceed within existing authorisation; they must record access status,
+provenance, prior exposure, overlap and task compatibility separately and must not read sealed response
+outcomes. Neither development analysis establishes confirmation; if no qualified independent domain is
+available, keep the broader claim blocked.
+
+## Auto-Research infrastructure (implemented thin core, 2026-10-16)
+
+MAESTRO now has a small replayable research loop in `maestro.research_loop`. It
+implements a testable replay mechanism for supplied hypothesis/action scores.
+The loop accepts
+two competing hypotheses, scope-qualified forecasts, a costed action menu and an
+execution adapter. It selects expected information per cost, refuses forecasts outside
+scope, spends budget only on admissible actions, binds outcomes to the planned action,
+retains failures/QC failures, and serialises a deterministic receipt digest. Its
+admission fields require source/context and a declared positive independent-unit
+count; the thin loop does not authenticate source bytes or independence itself.
+It uses label frequencies, not model likelihoods, and does not automatically
+recompute remaining forecasts after feedback. Unknown outcomes
+stop the loop as `invalid_observation` and remain visible in the receipt.
+
+This is a thin orchestration layer, not a second agent framework: existing
+`CaseStore`, `run_case_loop`, `select_expected_coverage`, evidence registry and strict
+review remain the production paths. Multi-agent roles are therefore typed and narrow:
+coordinator/state writer, forecaster, experiment designer and auditor; no role may
+turn a forecast into evidence. High-risk execution and publication still require the
+existing approval boundary.
+
+Its proposed scientific value remains a **falsifiable hypothesis**, not a claimed
+innovation or a validated discovery method. Required ablation before promotion:
+independent-trial assumption vs dependency groups; raw vs
+support/domain-shift-abstaining forecast; ledger-gated vs unconstrained update. Compare
+against strong conventional/fixed and standard adaptive workflows on the programme's
+qualified A/B tasks, keeping menus, total cost and randomness comparable. Primary metrics
+are terminal decision utility/net benefit, false elimination, calibration and useful
+information per cost. Any failed evidence-integrity or calibration gate yields
+`NO_DEVELOPMENT_SIGNAL`; passing software tests is not an Auto-Research result.
+
+## What deserves continued work
+
+1. **Transfer of research procedures across discovery tasks.** Prioritise candidate
+   discovery and context selection/failure analysis. Learn when procedures help,
+   what checks reveal negative transfer and how feedback changes the plan. Keep
+   unconditional updates, a simple gate and mature fixed/adaptive workflows as
+   baselines; frozen future-task gains must exceed raw-history/text retrieval.
+2. **Measured functional outcomes and scoped reuse.** Keep RKT, fixed sparse
+   profiling, the GCP endpoint decoder and explicit refusal within their validated
+   scopes. Their certificates do not transfer automatically to viability. Charge
+   information, comparisons and confirmation against the same experimental cap.
+3. **Dual-core contribution and honest evaluation.** Test response updates and
+   procedure revision separately, then their interaction on a frozen utility
+   scale. Separate shared-history component tests from closed-loop policy tests.
+   Keep source-byte verification,
+   measured lineage, source dependence, cold-start tiers, training-only normalisation,
+   outcome seals and evidence-bound experiment approval. These are engineering
+   safeguards; their effect on scientific decision quality still needs testing.
+
+Do not add another agent, debate, memory or knowledge gate merely to increase
+framework sophistication. The retained studies have not established Agent/LLM
+incremental benefit over strong conventional workflows. A new experiment first
+needs measured truth, a strong baseline, independent units, a frozen endpoint and
+budget, and a predeclared useful net-benefit threshold.
+
+## Evidence and stop decisions
+
+| Study | Result worth preserving | Operating decision |
+|---|---|---|
+| [RKT / Block Q](knowledge_transfer_20261012/README.md) | On 702 sealed compounds, one-anchor pooled centred cosine 0.529 vs generic 0.287; gain over best single route +0.033. Fixed sparse design beat exhaustive design +0.181 (11/11 campaigns). | Keep scoped transfer and fixed design. Decision-planner superiority was not confirmed; no LLM override benefit. |
+| [Context discrimination](context_discrimination_20261013/README.md) | RKT follow-up 158/702 discordances vs fixed 133. Matched 84-compound LLM pilot: integrated 10 vs fixed 16; interaction -11.90 percentage points. | No Agent synergy or fresh confirmation. Keep source receipts and negative results. |
+| [GCP evidence transfer](evidence_transfer_20261013/README.md) | Deterministic blend 14/20 hits; integrated and conventional agents each 12/20; integrated-minus-deterministic CI [-30, +10] percentage points. | Synergy gate failed. No extension of the RNA certificate to GCP. |
+| [Collaboration limits](collaboration_limits_20261013/README.md) | Same-forecast endpoint ranking raised hits 55/141 to 77/141 (+15.6 points, p=5e-5). P(hit) >=0.5 hit 81% vs 38% below. | Keep GCP endpoint ranking within its declared scope. Agent donor selection and simulated memory transfer did not earn promotion. |
+| [Selective hit triage](selective_hit_triage_20261013/README.md) | Context triage 22 vs deterministic 12 hits; closed loop 23 vs conventional 18 (p=0.18); post-hoc non-agent classifier 38. Predictions admitted as measurements caused 15 false NO-GOs vs 3. | Agent success criterion not met. Keep identity/QC/seal and measured-evidence contracts. Disclose the post-opening unit correction; LLM arms remain NOT_RUN. |
+| [Knowledge reality](knowledge_reality_20261013/README.md) | Chemistry+knowledge r 0.0842 vs 0.0786, but gene relabelling reproduces the gain (p=0.95). Novel biology/context/provenance routes add nothing. | G2 failed: mechanism-class membership only. No sealed PRISM 24Q2 confirmation or LLM layer. |
+| [Evaluator audit](evaluator_audit_20261013/README.md) | Historical confirmation evaluator has test-batch normalisation, outcome-derived eligibility and unfrozen identity metadata. | Adopt C1-C7 in a new protocol before any confirmation; do not rewrite the historical evaluator. |
+| [Orbit contrast](orbit_contrast_20261013/README.md) | Identity contrast +0.0104 in compound response; no gene-task identity value. Gate worse than unconditional residual (-0.0045); target triage unsupported. | IDENTITY_WITHOUT_METHOD / MECHANISM_CLASS_ONLY. Keep orbit decomposition as an evaluation device, not a promoted method. |
+| [Mechanism falsification](mechanism_falsification_20261014/README.md) | 61,413 annotation pairs, zero measured positive or negative mechanism references. Strict benchmark 21/21 vs historical 6/21. Exploratory conformal FDP 0.26-0.70. | ASSET_BLOCKED. Contract conformance is not scientific improvement. Stop algorithm development without measured truth. |
+| [Context transfer](context_transfer_20261017/README.md) | One-shot Beat AML 2.0: source-verified exploit-first bridging 0.850 hits/sample vs Virtual Cell alone 0.777 (+0.073, Holm p 0.0075), pilot matching 0.621, frozen lookahead 0.742. Virtual Cell prior vs item -0.008. P2 0, P5 trivial. | Keep exploit-first bridge feedback within the docstring scopes. Cell-state prior, procedure selection, LLM and cost advantage are not established (CLAIMS.json). Corrected lookahead needs a fresh confirmation; repair/averaging stopped. |
+| [Feedback attribution](feedback_attribution_20261017/README.md) | Development on exposed Beat AML. Common-probe attribution: update without RNA +0.096, RNA with feedback +0.065, structure vs overall-sensitivity update +0.081, deranged control -0.115. RNA prior vs item prior -0.017; drug-specific ridge beats the RNA prior (+0.065) and is not beaten by the two-round engine (+0.023, CI crosses 0). Coherent score +0.04 to +0.08; 8 probes beat 4 (+0.065); no selector beats tuned exploit-first. | G1 has run and failed (see below). Independent confirmation blocked: no unexposed domain; PRISM 24Q2 independence unverified. |
+| [Program revision](program_revision_20261017/README.md) | PRISM 19Q4, 247 future lines. Seed library +0.211 hits/line at I2 (Holm p .004), +0.445 at zero observation, +0.437 in exploit-first campaigns. Editable vs fixed 0.000; vs stepwise +0.008; LLM vs enumeration +0.004. No transfer to unseen drug groups. | Method not supported; revision wells never repaid. Seed library is knowledge use, not discovery. Frozen numbers superseded by the corrected contract (next row); revision NO-GO. |
+| [Seed attribution](seed_attribution_20261017/REPORT.md) | Development on exposed PRISM 19Q4. Contract repaired (single endpoint, out-of-sample variance, data-keyed cache); frozen bench trained on reserved query outcomes (masked bench exactly invariant). Seed minus strong: policy +0.356 [-0.088, +0.856], I2 +0.117 [-0.026, +0.248], I1 +0.283 [-0.065, +0.699]; all NOT_CONFIRMED. Seed beats all 20 matched permutations (exact p 1/21) but only I2 passes the reading rule; ridge on the same 10 features matches it (-0.004 [-0.198, +0.166]); capacity, per-drug loadings and variance add nothing. | Seed library kept as an optional scoped component, exploratory effect; comparator for any library claim is a ridge on its features. Revision, LLM proposal and grammar search stopped; opportunity diagnostic not run. |
+| [Beat AML G1](beataml_g1_20261017/REPORT.md) | Development on exposed Beat AML, frozen before the run. Candidate minus ridge +0.098 [+0.045, +0.153]; strict gate lower bound -0.005 net of a round. Probe round: +0.125 (low-rank), +0.083 (ridge); candidate minus ridge-plus-feedback +0.015 [-0.036, +0.066]; low-rank prior without observations -0.027 [-0.065, +0.011]. | G1 FAILED: stop the low-rank state-model branch; keep exploit-first feedback on the strongest prior with the ridge as comparator. No confirmation domain. |
+| [Feedback propagation](feedback_propagation_20261018/REPORT.md) | Development on exposed PRISM 19Q4 folds 2-4, frozen before the run. Ridge-plus-feedback +1.06 events/64 compounds over the structure prior on unmeasured pairs; analogue-anchored repair vs ridge +0.14 [-0.58, +0.87], vs kNN +0.08 [-0.28, +0.44]; diagnosis AUC 0.59-0.63; old triage hits are 99.7% probed pairs. | STOP: no program search; ridge-plus-feedback with kNN comparator stays the reference. |
+| [Observable-state bets](observable_state_20261018/REPORT_OBS.md) | Exposed PRISM, 136 MoA families. Confirmation rates: random 0.051, enumerator 0.059, target-gene rule 0.088, Agent 0.081, identity-masked Agent 0.059. Agent - enumerator +0.022 [-0.022, +0.074]; Agent - target-gene rule -0.007 [-0.037, +0.015]; Agent confidence 0.45 vs 0.081 observed. S2 decision utility not run. | Withdraw Agent and typed-edit claims for this arena; keep target-gene rule as an exploratory, unconfirmed lead. No project-wide STOP; no independent confirmation. |
+| [EG-RPT policy transfer](eg_rpt_20261019/PROTOCOL.md) | DRAFT, not frozen or run. Historical best-of policy diagnostic is consistent with noise; 13 study-level records cover four dependence groups and six non-poolable utility units. | First gate: split-noise reliability of policy-selection headroom. Do not train a transfer model from study-level records or claim method value from the scaffold. |
+| [Implementation identifiability G0/G1](implementation_identifiability_v1/REPORT.md) | Known-case AURORA-A (alisertib, JB170, JB211, CCT400028), two open papers, designer-exposed. Three level-2 units, zero level 3; no cell context carries inhibitor, degrader and CRBN-null binder on one terminal endpoint; JB211 is a CRBN-null AURKA binder, not an inactive control. Isolated replay on the legal menu ends `still_indistinguishable` between protein loss and catalytic inhibition. 24 engineering tests pass. | G0 QUALIFIED_FOR_LOGIC_TEST (research level ASSET_BLOCKED); G1 ENGINEERING_LOGIC_PASS, biology NOT_ESTABLISHED. G2-G5 not run. Collect matched alisertib arm, JB211 engagement, numbers, lineage and a second target family before any information-value claim. |
+| [Implementation identifiability audit 1](implementation_identifiability_v1_audit1/AMENDMENT.md) | Post hoc source-completion audit of the two papers' supplements (S1 TMT, S2 Kelly proteomics, HiBiT SEM recovered; S1 Supp Table 1 and Data Sets 1 and 4 not served). Units: Level 1 x1, Level 2 x3, Level 3 x0, Level 4 x0. JB211 catalytic inhibition unresolved; compound 57 has no terminal result; CCT400028 has no inhibitor or genetic terminal comparator. 10 mutation checks behave as stated; 13 audit tests pass. | G0 QUALIFIED_FOR_LOGIC_TEST (research level ASSET_BLOCKED) unchanged; G1 engineering pass, biology NOT_ESTABLISHED unchanged. G2-G5 not run. Next: obtain S1 Supp Table 1, Data Sets 1 and 4 and Fig 6/ED7 numeric values with lineage, then re-run as audit2. |
+
+Earlier supported results remain in [EVIDENCE.md](EVIDENCE.md): Block P's +17
+unexpected hits [+11,+23], and Block N's scoped transcriptional transfer gains.
+These are source/assay/endpoint-limited results, not a general drug-discovery claim.
+
+## Smallest maintained architecture
+
+| Area | Responsibility and retained boundary |
+|---|---|
+| `src/agent/` | Planning, tool execution, budget, durable CaseStore and restart. Model advice never becomes a measurement. |
+| `src/maestro/` | Shared evidence types, admission, decisions, acquisition, repair and experiment authority. |
+| `src/virtual_cell/` | Scoped prediction, model/data/axis identity, applicability, uncertainty and named refusal. |
+| `tools/` | Explicit offline data preparation, audit and evaluation. No production dependency on study code. |
+| `research/` | Registered immutable scientific records and replay code, separate from default software tests. |
+| `tests/` | Behavior and regression protection; asset-dependent suites run only when explicitly requested. |
+
+Heavy scientific libraries remain optional; the runtime dependency is NumPy.
+Existing orchestration, budgets, restart, scoped memory and evaluation behavior stay
+covered by the same default test cases. Unused fitting helpers with scientific
+value are retained: absence of a current caller alone is not sufficient to discard
+model fitting or frozen replay support.
+
+Strict scientific reporting uses `evidence_registry`, `strict_decision_review` and
+`evaluation_contract`. The additional acquisition dependence flag, `tier_gate` and
+`endpoint_decision.choose_validated` are opt-in repairs from the pre-existing work.
+Permissive historical defaults have not been switched globally; using them is not
+an authenticated strict decision.
+
+## Actual cleanup on 2026-10-14
+
+- Removed the entirely unreferenced `maestro.licence` (309 lines) and
+  `maestro.pharmacology` (390 lines). Their useful concepts remain in the typed
+  premise/admission contracts; exact original implementations remain in Git history. Neither module had source, tool, test, research or CLI consumers.
+- Removed unused `make_policy_input`, `group_judgments`, `EvidenceObservation`,
+  `scalability_profile` and `ProposalPolicy`. Direct typed construction and the
+  current evaluator remain the active interfaces.
+- Replaced generated module path/API/dependency inventories with concise purposes
+  and scientific boundaries. No function bodies or test assertions were changed
+  by this documentation cleanup. Frozen source files were excluded.
+- Replaced the repeated list of default test filenames with automatic `tests/`
+  discovery. Explicit asset-dependent scope declarations remain checked for
+  missing files and overlap. New core tests are now discovered automatically.
+- Moved the ignored `tmp/` tree (3,728 files, 2,916,446,727 bytes) out of the active
+  repository, then deleted after reviewing its records. Experiment directions,
+  outcomes, limitations and provider accounting are retained in EVIDENCE; raw
+  temporary copies and presentation drafts are discarded.
+- Moved 16 regenerable cache directories (309 files, 10,328,708 bytes) out of
+  the active repository; the temporary retention area was subsequently deleted.
+- Condensed this report and corrected README's obsolete claim that all completed
+  study implementations had been retired. Detailed study reports and EVIDENCE
+  remain authoritative for scientific records.
+
+Maintained Python source and tests decreased from 56,503 to 54,922 lines
+(1,581 lines removed), before configuration and report condensation. This is a maintenance reduction, not an algorithmic speedup.
+There is no claim that the framework has become a new minimal scientific method:
+its surviving contracts are consumed by tested execution paths or retained replay.
+
+The temporary snapshot and all moved historical/cache material were deleted on
+2026-10-14 after the user explicitly requested key experiment records without
+backups. Additional historical directions, GDSC success/failure reasons, source
+identity, unexecuted next steps and provider accounting were consolidated in
+[EVIDENCE.md](EVIDENCE.md) before deletion. The external retention directory no
+longer exists. Removed: 4,760 files, 2,952,169,169 logical bytes (about 2.75 GiB).
+This is file-content size, not a measured filesystem allocation delta. Git history
+was not rewritten, and active repository data and registered studies remain.
+
+Content-pinned production files (`knowledge_transfer`, `profiling`,
+`information_tier`, `decision_review`, evaluation `scoring`) remain byte-identical
+to the starting checkout. All registered study files except this summary remain
+byte-identical to the starting checkout. No freezes, outcomes or sealed files were
+rewritten, and no study, download or provider call was run.
+
+## Verification and remaining limits
+
+Baseline before the Auto-Research loop: **903 default tests passed** in 60.21 seconds.
+After adding the thin loop and seven contract tests: **910 passed** (the focused
+repository-shape and loop subset passes 33 tests). The unconfigured research
+preflight still refuses with `BLOCKED/ASSET_MISSING`; these are software checks,
+not scientific validation. The three explicit research suites still collect 32
+cases when named.
+All maintained Python sources parse; `git diff --check` passes. The research
+preflight correctly refuses with `BLOCKED/ASSET_MISSING` (exit 2).
+No registered study result was rewritten by the Auto-Research change. No scientific
+result was revalidated.
+Default software success, explicit research asset verification and scientific
+verdicts remain separate.
+
+Full State/checkpoint output axes, independent repeated primary endpoints,
+mechanism truth, complete legal decision menus and authenticated operating costs
+remain unresolved where the studies report them. Source data, outputs, paid-call
+caches, prediction arrays, frozen protocols and negative results are retained.
+A historical freeze is not automatically a currently qualified release.
+
+
+--- log/20261022/api_evidence_innovation/DECISION.md ---
+# Direct API proposals, opposing review and empirical routing decision
+
+2026-10-22. Overall goal **ACTIVE / NOT_ACHIEVED**. This phase is **PROGRESS**: three actual provider calls were reviewed against real schemas, an executed8hmenu audit ruled out one expansion shortcut, and47primary chemical API requests plus748independent checks established a usable exploratory blocking proxy. The next action is a frozen real source/development functional-headroom experiment, not another architecture naming round.
+
+**Select the fixed-M two-innovation feedback hypothesis for a minimal empirical screen; do not promote a new core or implement its agent/RSI yet.** A predicted early molecular-state error may help repair High-dose state; a functional error remaining after actual MiddleRNA may provide different cross-dose correction information. This is a falsifiable empirical transfer/regularization question. In the linear case it expands exactly into an ordinary full-history direct/joint-innovation predictor, even without Gaussian assumptions. Identical programs are merged, and full joint/cross-block-shrink alternatives receive the same labels/history/budget. A useful finite-sample cross-block restriction could be a substantive result only if validated against those controls; current novelty and performance are unproven.
+
+All three independent drafts were sealed before new-peer reading: mechanism219b9ebc8e91bb454296e7835d6474c5df485818334399bb5c9440b43da89cad; skeptic5425f81e3ce2305f5a901da957085bd317d674aa9d320db39f50f41ad1b68460; data693e769ab26a39b085cc9095c9a95d87388d00deaf0bb6b30176d9e95aa96147. Shared historical context is disclosed. Actual opposing challenges and replies are in mechanism/CROSS.md, skeptic/CROSS.md and data/CROSS_*/REPLIES_AND_RECOMMENDATION.md. Different prompts to one provider are not independent biological evidence.
+
+## What the API tests eliminated
+
+The mechanism response invented early continuous mCherry/division history absent from the authenticated Watermelon release, degenerated binary channels into complements, charged individual clone labels as assays and allowed target-test program search. These specific operations were rejected. A repaired late-state decoder hypothesis remains scientifically open, but its proposed clone-gate repeatability check is not a necessary test of decoder portability. Watermelon is deferred; its repeatability protocol remains an unexecuted draft and no raw gate target/RNA was opened.
+
+The data response treatedDNA/LDH as interchangeable same-scale biology and queried singleLDHscalars despite complete bundles. Its repaired prediction-disagreement policy is a close ordinary multi-outputAL/value-learning control, not a separate novel core. Every ordinary control must receive the same source group-out counterfactualΔloss training labels, joint covariance and search budget. Query choice before purchase cannot use the newly purchased actual assay; update choice after purchase is a different contrast.
+
+The skeptic response added unsupported logits, two-support information for one-support cost, ineffective rotation nulls and incorrectC4. Those were rejected. Its repaired proposal first fixes Middle feedback, uses group-out state and conditional-function errors, linear readout to avoid Jensen explanations, and tests state/function/both2×2. Residual function is predictive error including readout/measurement/lot effects, not an identified RNA-independent biological mechanism. Inherited shrinkage selection alone is ordinary tuning; C4 later swaps the same improver's checkpoints into a common solver/history/permissions/search budget. Exhaustive finite program search can remove final priority advantages.
+
+## Executed source and API checks
+
+Three retained DeepSeek calls, all terminal exit0/deepseek-flash: mechanism15,128tokens, skeptic16,775, data11,580; total43,483tokens/3logical and3maintained-client calls. Transport attempt counts are not exposed. Generated code execution0, new biological fits0. Exact prompts/input hashes/responses/receipts remain beside drafts.
+
+Data's preregistered8hmetadata extension reproduces2h51LDH/47dual-assay three-positive-dose labels.8h has71LDH but still47dual-assay labels, failing that local≥60extension routing choice. This only rejects that expansion shortcut; it does not invalidate a47-label scoped pilot, estimate effect power or test biological performance.
+
+Root made47exact-name primary PubChem requests:46HTTP200,1HTTP404,11,905bodybytes.45names yield one parsable carbon-containing proxy structure and39parent/scaffold-linked components; no-ring Murcko keys stay parent-specific. Naphthylisothiocyanate exact name returned404, with no alpha/beta substitution. Adapin returned200 but postprocessing hit RDKitRingInfo RuntimeError; original code/result/failure stay untouched, no rescue/retry. Its extraEXCEPTIONcounter is a processing error, not a48thHTTP. Independent data audit rehashes every body and rebuilds the chemistry graph with748checksPASS.
+
+These are **PubChem name-resolved proxy structures**, not independently authenticated TG sample-material/salt/stereo identities or39independent donors. OriginalTGmetadata exposes name/abbreviation/compound number, not an authenticatedCAS mapping in the files reviewed; do not infer global absence from unreviewed supplements. This scoped exploratory blocking proxy is sufficient to freeze a released-catalog source/dev screen with the uncertainty disclosed. It cannot prove broad chemically independent confirmation. No numerical function/RNA/future outcomes were opened here.
+
+## Concrete next experiment and full-goal limits
+
+Next phase tggates_feedback_headroom uses45proxy labels/39blocks, deterministic24source/7development/8later block allocation, complete prelisted24hL/M/H sample keys, DNA as primary linear published-assay target andLDH complete secondary. It first compares prescreen constants, Middlecopy/offset, chemical-neighbor transfer and strong same-M ridge/kernel direct baselines. Onlysource/dev values are numerically converted; later all-dose outcomes stay sealed. Finite negative/>100percentages are retained and flagged on the defined linear target, not clipped or interpreted as true probabilities. Missing/unparsable/nonfinite required values retain an abort rather than silently changing the sample.
+
+If development baseline DNA-MAE is≤0.02percentage/100units, even perfect prediction cannot provide a strictly>0.02absolute improvement on that development sample: stop this exact utility/configuration beforeRNAinvestment. The2percentage-point/10%future improvement requirement is an engineering routing target, not clinical safety or a validated assay-noise limit. An error>0.02only leaves numerical room; it does not show state information or guarantee a candidate can achieve useful gain. Source/dev estimates and small proxy-block uncertainty are not final confirmation.
+
+Only after that screen meritsRNAcost should a separately frozen true state/function feedback experiment compare ordinaryjoint/strongauxiliarydirect, ordinaryretraining/CL, simplemixtures and equal-budget search, with state/function feedback ablations. A fixed-updater source/dev oracle Low/Middle choice ceiling should precede any queryagent. Inheritance/model/program contrasts, joint gain and common-start old/new-improverC4 remain separate required tests; none has been shown. Do not count doses, cells, folds or calls as new research tasks. The full user goal remains intact.
+
+All implementation/tests are research/api_evidence_innovation_20261022/; records, source evidence, errors and decisions are here. Previous1,186completed inventoried files are preserved. A separate next-phase draft/code is preparation only until reviewed and frozen; this decision does not grant an unlogged raw-target read.
+
+
+--- log/20261022/rsi_later_task_literature/DECISION.md ---
+# Primary-literature and later-task mechanism decision
+
+2026-10-22. Overall goal ACTIVE / NOT_ACHIEVED. This review ran while the separate AZ experiment completed its frozen baseline search. It used no AZ model scores, no hidden test targets or reserve contexts, and performed no new biological fits. It changes neither that experiment's success criteria nor any historical STOP.
+
+Three saved independent drafts precede actual bilateral questions and replies: [constructive improver review](advocate/INDEPENDENT.md), [scientific skeptic](skeptic/INDEPENDENT.md), [data and functional-endpoint audit](data/INDEPENDENT.md). Each reviewed six substantive work families; the RSI evaluation audit overlaps between two reviewers. This is a bounded primary-source review, not exhaustive novelty certification or independent reproduction of the papers' results. Full source bodies, versions, HTTP receipts, failures and cross-debate are retained. Root's actual scope questions and accepted replies are in [ROOT_CROSS_POSITION.md](ROOT_CROSS_POSITION.md).
+
+## What the primary sources rule out as a new core
+
+AlphaEvolve already evolves meta prompts and search programs; ShinkaEvolve learns model-routing statistics and meta-scratchpad suggestions; SEAL learns self-edits that improve subsequent adaptation; DGM and Hyperagents edit agent/meta-agent procedures. [SpecRSI](https://arxiv.org/html/2610.16491v1) already reports a same-released-artifact improver comparison. [Recursia](https://arxiv.org/html/2610.24464v1) already uses functional failure diagnosis to repair shared executable skills/contracts and inherit a frozen stack. MaD-RSI, Épi and ordinary learned optimization further occupy failure-contrast, research-memory and small learned-update territory. Thus generic feedback→diagnosis→local revision→memory/inheritance, editable improvers, and proposing a common-start test are **NO-GO as novelty claims**.
+
+These sources do not prove that a virtual-cell application cannot contribute. They do require a specific biological/functional representation or update mechanism, a substantiated difference from existing work, and a result that strong ordinary explanations cannot reproduce. No such new mechanism is cleared by this review. The [RSI evaluation audit](https://arxiv.org/html/2610.27610v1) is empirical meta-research with its own search-frame/coding limits; its reported fractions are not universal impossibility or replication-failure rates.
+
+## Substantive agreements and unresolved questions
+
+The advocate challenged whether an ordinary bandit succeeding only with a validated world representation would erase the representation's contribution. The skeptic accepted that it would not: a real inductive-bias, sample-efficiency or update-value transport result can remain, even when the controller is ordinary. The data reviewer challenged whether a failed policy-isolation test negates total inheritance, and whether a summary must be reversible. The skeptic accepted separate total-system/2×2 inheritance results and transparent equal source-information/cost comparisons without a reversibility requirement. These were actual exchanged questions, not invented opposing positions; see each reviewer's CROSS.md.
+
+Root additionally challenged overstrong requirements. Static action-conditioned functional models are legitimate world components; molecular/temporal claims require corresponding observations but are not universal entry requirements. The current user requires a later improver to produce more effective subsequent improvements from a common start (C4), not proof of unlimited or continually increasing acceleration (C5). Joint gain need not be superadditive unless synergy is claimed. These clarifications prevent a stricter invented standard from blocking a valid scoped study.
+
+The unresolved scientific hypothesis is narrow: can measured intervention-response geometry and model mismatch predict which ordinary updates are valuable across new cell contexts better than full same-information raw-feature strategies? This might be ordinary contextual meta-learning. It could still yield a useful structural result, but no concrete sufficient representation, distinctive operator, necessary module or empirical advantage has yet been demonstrated. Current pilot performance is not an input to this source decision.
+
+## Data and feedback qualification
+
+State/CellFlow/Tahoe/VCC provide genuine expression-response modeling assets, not automatically independent efficacy rewards or live-cell trajectories. CellFlow has a 12-donor×90-cytokine asset and a five-time-point genetic-perturbation asset; the latter is destructive population RNA sampling. Tahoe's mixed-spheroid sample is a shared experimental unit, not fifty independent feedback purchases. VCC2025 files are listed; VCC2026's announced six-line study lacks a qualified downloadable asset in this audit (HTTP200 dataset page contains a 404 payload). Biomni-R0 has author-released weights/model card, while its linked technical report returned404; unverified training-budget/performance details are not accepted.
+
+CellScientist is a close program-revision baseline. Its current source is pinned to commit `e27a5941378e8259cbeca7d336a26f52a09f7cc4`; five inspected blobs match. The controller deterministically ranks diagnostic addresses, offers at most two canonical edits to an LLM or uses fixed top1, with config10evaluations/5seeds. The nominal768configuration space is not a free768-way choice at each step. These are current-public-controller facts, not replication of the differently titled v1 paper or its scores. Global plate/SMILES/scaffold separation, independent later-task population/power and reference-morphology provenance remain unqualified. Morphology/RNA endpoints retain value as proxies; they are not measured viability or clinical efficacy.
+
+An important execution objection changed the tentative later-task idea: two paid AC/BD observations with sealed AB do not furnish eight new feedback rounds. Repeated fits are computations. A source-trained improver can use only its permitted paid observations and source-learned update values, seal its trajectory, then receive one terminal AB audit. Genuine later interaction requires a newly specified charged feedback menu and separate audit. Existing static measured response catalogs can support clearly labelled retrospective query oracles; pre-existing public adaptive histories are not mandatory. No new query experiment, sample-size claim, illustrative threshold or reserve opening follows from this review.
+
+## Decision and next evidence
+
+**NO-GO for a generic RSI/core novelty claim. CONDITIONAL-GO only for source/metadata qualification and a minimal ordinary later-task capability study.** Do not download multi-GB expression assets merely to attach a world-model label. Do not add agents, memory, code rewriting or extra search to rescue an exposed negative configuration. The advocate's example .01/5%,8updates,60MASTER×3 figures are explicitly unregistered illustrations, not a protocol or verified power calculation.
+
+First complete the separately frozen paid-reference experiment, including all strong direct configurations, prediction/action sealing, target qualification, one audit and independent opposing interpretation. If its registered gate fails, retain any smaller accuracy/compute observation and stop that exact expansion. If there is substantive structural evidence, specify a distinct minimal update-value transport mechanism, review exact biological/meta-learning predecessors, qualify a new task population/feedback contract, and preregister thresholds and full costs before any new numerical task. Compare fixed research procedures, strong direct prediction, ordinary retraining/CL/AL, same-information bandit/meta-learning, simple mixtures and all-in equal-budget search. Isolate world, policy, inherited solver, inherited policy and their joint product effects; use common-start old/new improver swaps for C4. Claim positive interaction or continued acceleration only if separately tested.
+
+No novel core, world/agent contribution, inheritance, joint benefit or RSI success is established by this literature subphase. All prior stopped configurations remain stopped. No user action or new permission is needed to finish the already registered running experiment.
+
+
+--- log/20261022/tggates_functional_qualification/clock_observability/REPORT.md ---
+# 时钟修正代数审计：一般诊断不可识别，有限模型预测仍可检验
+
+2026-10-22。先写 `PROTOCOL.md`，然后执行5项数学不变量测试（全通过），再执行拒绝覆盖的 `audit.py`，结果及3输入hash存 `RESULT.json`。无真实药物响应，无CEL、DNA/LDH数值，无训练/API调用。该审计是构造反例，不是生物实验。
+
+`T(exp(eta)*t)` 在线性状态轨迹上就是相对于初始状态的幅度放缩，最大浮点误差2.22e-16；幂律输出 `b+a*t^p` 上等于 `a'=a*exp(p*eta)`，误差3.64e-11。单幂律 clock/amplitude 切向量矩阵秩1。双输出使用不同幂次时，clock与**一个共同**amplitude可有秩2，因此不能说clock总与幅度相同；给两个输出各自amplitude后，clock重新落在其span（加clock前后秩均2）。可分辨性取决于公开且预定的替代更新族及约束，不是命名。
+
+更强的三切面反例在整个[2,24]单调：
+
+`fA(t)=t/24`
+
+`fB(t)=t/24+0.02*(t-2)*(t-8)*(t-24)*(t-4)/(-3840)`
+
+二者在2/8/24h完全同值；导数在各切面均不同。对固定warp=1/2，已付费8h支持映射到4h，两者预测都为1/6；未付费24h目标映射到12h，两者预测分别0.50和0.52。全区间导数最小分别1/24和0.005，第二曲线的单调性由导数临界点与端点计算，不只查离散网格。分歧发生在观测时间范围内部，无需36h外推或剧烈非单调振荡。
+
+所以三固定时间及一个相同支持值不能在不限制连续曲线族时确定时间导数或唯一的withheld预测。不同可逆潜坐标也可保持输出完全相同；但**潜坐标自由本身不取消一个固定可观测时间放缩的预测定义**。更具体的问题是有限观测无法证明修复的是真实生物速度而非head/shape偏差；足够灵活的head也能在有限状态点复制输出修正。
+
+该结果关闭的是未经限制的诊断/因果识别主张，**不反驳预先固定的非线性动力学族可在低样本下凭归纳偏置获得实用预测增量**。例如饱和指数曲线在两个时间下的clock/amplitude通常可区分；这仍需真实噪声/heldout检验。实用比较应把clock明确列为标准time-warp/system-ID基线，不能以预测有益反推其新颖性、世界模型必要性、Agent或RSI。
+
+命令与已观察结果：
+
+```powershell
+& 'D:/anaconda/envs/maestro/python.exe' -B -m pytest research/tggates_clock_observability_20261022/test_audit.py -q -o cache_dir=log/20261022/tggates_functional_qualification/clock_observability/pytest_cache
+# ..... [100%], exit 0
+& 'D:/anaconda/envs/maestro/python.exe' -B research/tggates_clock_observability_20261022/audit.py
+# RESULT.json created; exit 0
+```
+
+可复核代数预期与断言均在代码/测试。没有把5项软件测试计作5次科学验证，没有从任意合成误差推导真实药物效用差阈值。
+
+
+--- log/20261022/tggates_rna_feedback_pilot/REVIEW_DECISION.md ---
+# Independent opinions, cross-debate, and continuation decision
+
+Status: GO to the frozen empirical falsification only. No novel algorithm core cleared. Full goal remains NOT_ACHIEVED.
+
+Evidence: independent Astra numerical and preprocessing drafts preceded real RNA. Two direct DeepSeek first opinions and actual bilateral cross replies are retained in api_reviews/*_v2 and *_cross. These are separate-context roles on the same provider/model, not independent biological replication or different-model consensus. The first two empty length-truncated calls are failed reviews, not supporting votes.
+
+Supporting rationale: early observed state and conditional readout error could supply distinct predictive information across dose; single-array preprocessing avoids reference leakage; nested group ownership and direct/source-High auxiliary competitors make the hypothesis falsifiable. No observed numerical predictive benefit yet.
+
+Opposition: the proposed linear state/function correction is constructively an ordinary constrained joint predictor. No algorithmic novelty follows from its names. MAS5 is relative expression, not absolute RNA per cell; predictive residuals need not identify biological mechanisms. N24 source and seven historically exposed development groups cannot establish sample-efficiency, donor generalization, inheritance or RSI. Useful-gain threshold remains exceptionally demanding. If the gate fails, stop this configuration; do not open later to rescue it.
+
+Cross-debate corrections accepted: recompute all h targets and b features after weighted b update; literal source1/queryw WLS with row-count penalty; shared strict inner/outer nuisance exclusions; separate no-observedRNA family; double-map coefficient fits counted separately. Root rejected erroneous alternative-count explanations, ridge-duplication invariance and sign-dependent SVD prediction claims. Reviewers largely conceded them. Some cross-reply disagreements are rhetorical rather than scientific; they do not count as evidence.
+
+Implementation closure: (1) b/f/h are the three estimators, g=b+h is composed; (2) four-gene uses the same shared base alpha, same nuisance bank and same source folds, but uses only the b predictions from that bank; (3) rho0 keeps zero columns and the same two-block normalization; (4) weighted refit retains original source block means/RMS and internally computes weighted centers/intercepts, recomputing all targets with b_new; (5) all developmentMiddle deployment refits finish before prediction seal; (6) null refits reuse existing nuisance bank, accounting exactly three extra estimators; (7) mixture is prediction-space arithmetic mean, no search. No model-selection rule changed after RNA contact.
+
+Validation so far: 10 acquisition fault/identity tests, seven estimator numerical tests, seven full comparator/owner/sentinel tests and one functional projection guard pass (re-run exact code before final numerical freeze). Held-out High sentinels change no comparator forecasts; true noRNA forecasts ignore changed queried actualRNA; affine g derivative agrees with explicit sequential evaluation; weighted dual matches independent primal WLS. Implementation audit and final frozen-source hash check remain necessary before execution.
+
+Technical failure: first source MAS5 computed but QC ExpressionSet accessor failed; no signal file was written. Kept original scripts/freeze/logs/receipt; revision2 changes only QC accessor and output directory. Same source barcode passed with54,675 finite probe signals,16.484s,663,453,696B sampled peak RSS. Comparing nonexistent attempt1 signal hashes is impossible and is not claimed; identical CEL/CDF hashes and exact one-accessor diff are the available evidence. Both reviewers accept this as technical repair, not a biological negative.
+
+Next: complete exact172 arrays, verify fixed coordinates and matched controls, finish independent actual-code audit, freeze code/data, execute source-only selection then seal development predictions before separate scoring. No agent/CL/AL/RSI stack unless empirical headroom survives; a later candidate will need new opposing novelty review and common-start old/new improver comparisons.
+
+
+--- log/20261022/tggates_rna_feedback_pilot/APPLICATION_SCOPE_NOTE.md ---
+# Primary-method scope revalidation while the frozen experiment runs
+
+This rechecks evidence already established in DOSE_LINEAGE_REPORT.md of the earlier functional qualification phase. It is not a new literature discovery or permission to change the running pilot. No new RNA, functional endpoint, later value, or HTTP response was opened for this check.
+
+The exact retained original paper is Igarashi et al., DOI10.1093/nar/gku955. Its in-vitro highest concentration targets80–90%relative survival, with maximum-solubility exceptions. The paper does not authenticate which prescreen assay, time, or cell lot was used or its independence from released DNA/LDH. Thus dose choice carries prior functional-screening information, but it neither forces currentHigh outcomes to85% nor proves the present31-label outcome variance/noise floor. The frozen constant85% baseline and all actual observed baselines remain as registered.
+
+Application remains confirmation within an already pre-screened, continuously exposed menu, using Middle2h molecular state and Middle24h functional feedback to forecast High24h published DNA/LDH survival assays. It is not unknown-compound safe-dose discovery, clinical hepatotoxicity prediction, withdrawal/rescue optimization, secretory liver function, or same-cell tracking. Microarray2h sampling does not certify2h result availability or a cost advantage over24h functional assays.
+
+The six human hepatocyte lots in the original project do not establish sample-to-lot identities or independent donor tasks for this split. Compound/proxy grouping is the current unit; donor/culture generalization remains untested. Relative MAS5 signals also do not identify absolute RNA/cell under toxicity, as already recorded in preprocessing.
+
+Conditional dose selection may limit the value of a later result for de-novo discovery, but cannot by itself predict this pilot's error or establish zero RNA information. Report continuous differences, the fixed mixture gate's geometric limitation, historical development exposure and all technical failures. Keep every source/development sample, target, model, comparator and threshold unchanged; later14 and AZ413 reserve remain unopened.
+
+Locator failures retained: the initial broad local search included a nonexistent log/20261022/tggates_method_audit directory (the research directory exists under that name); XML stored as long lines made its display excessive. Follow-up used the actual existing dose-lineage report and XML paragraph parsing. These are retrieval limitations, not negative scientific evidence.
+
+
+--- log/20261022/tggates_rna_feedback_pilot/STATE_CONTRIBUTION_READING_RULE.md ---
+# Reading state and world contributions in this pilot
+
+2026-10-22. Outcome-free interpretation note from the existing frozen implementation. No experiment, threshold, comparator, search allowance or acquisition permission changes.
+
+`pilot_core.py::feature_blocks(..., 'no_rna')` removes actual query Middle RNA, but retains f_M, f_H, b_M/b_H, g(predicted Middle RNA), g(predicted High RNA), and the functional residual against the predicted Middle state. Base f/h are trained using source RNA. Thus this family is a **no-observed-query-Middle-RNA** comparator, not a world-free or RNA-training-free comparator. A candidate advantage over it can support deployment measurement information within this model family; it cannot by itself establish the full objective's world-model contribution.
+
+The direct/rbf auxiliary competitors also retain predictions from that shared source-trained world pack. They test whether the proposed routing restriction offers finite-sample functional prediction value over these ordinary uses of the same purchased information. The exact affine collapse and the rho0 ordinary copy already preclude a new-operator claim. A route mask comparison removes one fitted correction from the same selected model; it tests dependence of its functional forecasts on that route, not biological mediation, causal state identification, or measured state fidelity.
+
+`run_pilot.py` records fixed-configuration source High-state MSE with source-group exclusion. These are source crossfit diagnostics. Its selected configurations are chosen on the same source groups' functional scores, so a state statistic for a selected configuration is selection-exposed even though state MSE is not the selection objective. Report the chosen configuration and that dependence. Development High RNA is absent by design: **there is no development High-state accuracy measurement**, and no selected-source statistic supplies independent confirmation of one.
+
+For the root's result review, keep these three questions separate:
+
+1. Does measured Middle RNA improve functional forecasts over the genuine no-observed-query-RNA comparator? Report actual contrasts and the frozen decision.
+2. Does the fitted state-correction route change functional error, and how do source High-state errors change? Report these as distinct diagnostics with their selection/exposure limits.
+3. Has a world model, an agent, inheritance, their joint use, or an improved improver earned an independently matched benefit? This pilot alone does not complete those requirements. The pending broader comparisons must preserve information and budgets, and genuine RSI still requires old/new improvers from a common solver/history on later tasks.
+
+Do not add a new ablation or refit after seeing pilot outcomes to repair this boundary. If the original empirical gate fails, stop this exact configuration's expansion as registered. If it passes, the next scientific design must state which broader contribution remains to be tested; no automatic promotion follows.

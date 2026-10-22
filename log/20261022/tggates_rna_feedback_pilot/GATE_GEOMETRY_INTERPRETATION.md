@@ -1,0 +1,11 @@
+# Pre-result mathematical qualification of the fixed mixed comparator
+
+This is an interpretation audit, not a protocol or code amendment. Download/array conversion remain live; no real fitted predictions or new development target scoring has occurred. Keep the original gate unchanged.
+
+Let C and D denote the candidate and source-selected direct predictions, with equal-compound MAEs c and d on any target vector. Let m be the MAE of the frozen50/50 prediction mixture. Triangle inequality gives m≤(c+d)/2, hence m−c≤(d−c)/2. Because the strongest alternative has error at most m, exceeding it by strictly .02 requires d−c>.04. In particular if d≤.04 the absolute gate is impossible even for a perfect candidate. This is conditional, not a universal impossibility: c=.001,d=.05 and same-sign errors give m=.0255 and m−c=.0245, though other alternatives and ablations can still stop the configuration.
+
+This clarifies why a failed utility gate does not prove absent RNA information, useless measured states, or invalid virtual-cell modeling. The ordinary pure-direct, no-observedRNA, route and fixed-mixture continuous errors must all be reported. The historical Middle-copy error .02335714 independently already forces candidate error<.00335714 for absolute utility; the mixed comparator imposes an additional necessary condition. These are demanding practical requirements chosen in the frozen study, not null hypotheses of zero effect.
+
+The fixed mixture includes the candidate and requires its source selection plus the selected direct component. It has no extra observations or tuned mixing weight; its program/computation cost is the disclosed sum/reuse of its two components. Do not claim it is a standalone eight-configuration family or a compute-matched single model. The current RNA pilot tests predictive headroom, not a completed equal-budget program-search/CL/AL/agent/RSI benchmark. Those remain obligations of the full goal if a suitable core is later found.
+
+No threshold, comparator inclusion, fitted method, representation, endpoint, sample selection, or later-set access changes. A conditional structural difficulty discovered in the gate must be preserved alongside any negative outcome. It may guide the design of a genuinely separate future preregistration, not rescue this one.

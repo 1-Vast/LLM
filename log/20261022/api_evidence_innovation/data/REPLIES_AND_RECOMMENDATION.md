@@ -1,0 +1,27 @@
+# 双方质疑后的实际回应与推荐
+
+2026-10-22。data首稿保持不改。已分别向mechanism与skeptic发送正式cross并收到实际逐条回复；此文件补足我对对方质疑的回应。无新增生物值/HTTP/fit。
+
+## 回应skeptic的OOF与特权价值标签挑战
+
+接受。DNA/LDH预测分歧必须以source化学组外的预测误差及assay噪声/协方差标定；不能只把两个均值作差再称“生物不一致”。凡用source伪episode计算“买bundle后High的真实Δloss”的标签，ordinary multi-output AL、value predictor、metaselector及等预算程序search均得到同一标签、完整状态/输出协方差、同history和候选更新器。若普通方法匹配，不再保留候选独有的query价值机制。query-by-committee/disagreement/多输出AL是明确的近邻，后续需要一手文献核查，当前没有排除。
+
+我对skeptic的挑战及其回复已实际交换：它承认Bx/By只是blockcrosscovariance受限的jointinnovation；有限样本理由只可能来自crossblock近稀疏/低rank的variance下降，须给generaljoint与crossblockshrink完整对照；训练f/g/innovation/B采用chemical/proxyblock nestedOOF；v只叫predictiveconditionalerror；最初用线性g排除Jensen解释；普通meta/search同history。以上修正支持只到冻结source/devfunctionalheadroom的conditionalGO，不支持新operator、RNA必要性或RSI已成功。
+
+## 回应mechanism四个具体问题
+
+1. **query前后诊断不同。** 买一次bundle前，只能用source模型对未买Low/Middle的预测DNA/LDH、预测state及uncertainty产生query价值；不得偷看新药真实assaydiscordance。买到一份bundle后，实际两个assay及RNA可以用于选择更新，但若总预算仅一份，就不能再借此选择下一份query。必须将“query choice”和“update choice”分别固定另一部分作对照；若先买M再选L，就是另一个两bundle成本合同，不可沿用一次预算。
+
+2. **ordinaryvalue享有完整反事实训练标签。** 它得到相同source OOF counterfactualΔloss、两输出联合covariance及所有features，搜索预算一致。完全相同计算合并同一方法。普通value模型匹配时，可以保留“跨assay分歧与反馈价值在此目录有重复统计关系”的狭义事实（前提是关联/条件消融实测成立），但不能声称新query/update算法、世界模型独有能力或独立RSI核心。
+
+3. **先固定Middle并估计诚实二元动作headroom。** 同意。最初以固定M支持检验state/function两创新结构，比同时调selector更直接；source组外同时模拟Low和Middle，得到oracle二元动作上界对最好固定动作的增益，是后续agent是否值得做的门。实用门需开值前冻结并扣除extraquery/计算代价。上界不足则停这个agent配置，不影响固定M候选能否有收益；上界足够也不表示可观测diagnostic能选对。不能用sourceoracle当后来agent实现。
+
+4. **支持crossassay事实但拒operator/RSI的结果。** 例如，source/dev及未参与选择的化学组上，校准分歧仍关联真实High误差下降，适当置乱破坏关联；但同信息ordinarymulti-outputvalue或jointconditioning给出同样性能。此结果支持一个有界预测关系/普通多输出学习效用，拒独立算子新颖性。若只继承更好predictor而old/newimprover common-start无差异，或者字典穷举解释全部，则RSI不成立。若分歧仅反映剂量/assay噪声且分层后消失，则连crossassay价值解释也失败。
+
+## 当前推荐与实际附加核查
+
+同意root优先深入skeptic“分子创新+条件功能创新”经验候选；data分歧方案暂作为ordinary multi-outputAL/value对照，不另造core。下一项应是root冻结的、仅45nameproxy已解析标签中source/dev功能headroom；保留其proxy身份和小目录限制。8h≥60label门只停我那条扩大完整菜单的快捷路，不禁止47label或45proxylabel做窄性能pilot。
+
+独立化学核查已执行：CHEMICAL_PROXY_AUDIT_PROTOCOL.md先冻结，data_chemical_proxy_audit.py只读47responses、45结果结构和旧safe菜单。748checks PASS，47HTTPreceipt/47body，46×200+1×404，11,905bytes，全部bodySHA/bytes吻合。adapin RuntimeError是已记录200响应之后postprocessing异常，不是额外HTTP；保留unresolved不rescue。独立RDKit重算45parent和scaffold，pairwiseadjacency+BFS复现45parent/39parentscaffoldcomponents；空Murcko均parent-specific，未把acyclic药全并组。该审计证明内部proxy输出一致，不认证真实源试剂、盐/立体型、donor或独立生物任务。新HTTP0/newfit0，root旧结果不改。
+
+补充来源边界：后来重读旧TG REPORT已明确欧洲PMCsupplementaryZIP只有8图/schema附件，未得S1/S2，不需要再开图像寻找CAS。sourceREADME/CEL已查字段无CAS，PubChem只能proxy。所有目录/文件猜测失败与截断搜索已在CROSS_MECHANISM披露；没有据此得出全球无CAS或文献穷尽结论。

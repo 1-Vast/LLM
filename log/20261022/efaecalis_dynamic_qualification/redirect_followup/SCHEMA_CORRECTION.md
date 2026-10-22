@@ -1,0 +1,5 @@
+# Exact sheet and panel correction
+
+The initial short progress message mentioned a possible separate Fig4C sheet before the complete inventory was inspected. The authenticated workbook has exactly eleven sheets and **no Fig4C sheet**: Fig1B, Fig2ABC, Fig3BC, Fig4B, Fig5ABC, S1, S2, S3, S4, S5, S6ABCD. Fig4B contains embedded Days/AUC/strain/IC50 regions; their original code/figure mapping remains a separate provenance question. Do not invent a Fig4C source.
+
+The top Fig4B raw-OD layout has seven explicit string day panels at days2/4/6/8/10/12/14. Numeric replicate positions are twenty rows per panel, not two. This position count does not itself certify ID values or same-population equality; the separately preregistered numerical identity census will do so. The previously proposed odd-day evaluation gate has not been run numerically and must be re-registered before any response access if limited to these even-day raw panels. Daily metadata may exist in the embedded IC50 region or official code; no response values are opened to resolve that design.

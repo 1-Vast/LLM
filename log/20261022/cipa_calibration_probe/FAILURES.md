@@ -1,0 +1,6 @@
+# Retained operational failures and limits
+
+- After launching separate scoring, root attempted a read-only scoreboard command before that running process completed. It raised FileNotFoundError for TERMINAL_SCORES.json. No scores were invented, no model or scoring process was restarted, and no artifact was changed. The original scoring session subsequently completed with exit0; root then reread its saved results.
+- The frozen source-CV and acquired-control portfolio ledger retains scores, choices and fit costs, but not every held-out prediction. Independent postrun reconstruction can verify their aggregation and selection; it cannot reconstruct those omitted predictions without additional fits. This limitation is not retroactively repaired by changing the frozen outputs.
+- The downloaded workbook and author supplement were already designer-exposed. Later-site computational withholding is not global human blindness. Sites8/9 and excluded sequential site10 outcomes are not decoded by this experiment.
+- This is an ordinary two-development-site known-drug calibration screen. Query-order seeds are not independent biological tasks; benchmark bundle costs and the combined score are conventions, not measured assay cost or clinical utility.
