@@ -401,3 +401,4 @@ mechanism truth, complete legal decision menus and authenticated operating costs
 remain unresolved where the studies report them. Source data, outputs, paid-call
 caches, prediction arrays, frozen protocols and negative results are retained.
 A historical freeze is not automatically a currently qualified release.
+Exploratory script snapshots cited below are archived under `../log/YYYYMMDD/research_code/` by study name; registered studies remain under this directory.

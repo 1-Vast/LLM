@@ -168,7 +168,7 @@ CJK_PATTERN = re.compile(r"[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]")
 INLINE_CODE = re.compile(r"`[^`]*`")
 MARKDOWN_LINK_DESTINATION = re.compile(r"\]\([^()]*\)")
 PATH_LIKE_GROUP = re.compile(r"\([^()]*/[^()]*\)")
-THIRD_PARTY = ("reference/paper/", "data/external/", ".pytest_cache/", "__pycache__/", ".workbuddy/", ".workbuddy-ai/", "outputs/")
+THIRD_PARTY = ("reference/paper/", "data/external/", ".pytest_cache/", "__pycache__/", ".workbuddy/", ".workbuddy-ai/", "outputs/", "log/20261021/", "log/20261022/")
 
 
 def _project_markdown():
@@ -190,6 +190,7 @@ def _project_markdown():
             ROOT / name
             for name in listed.stdout.split("\0")
             if name and (ROOT / name).is_file()
+            and not any(part in name for part in THIRD_PARTY)
         )
     # Without git, fall back to the working tree minus the directories a checkout does not own.
     excluded = THIRD_PARTY
