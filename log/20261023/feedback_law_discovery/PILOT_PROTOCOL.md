@@ -1,0 +1,31 @@
+# Bounded functional falsifier: does consistency training help a learned updater?
+
+2026-10-23. This is a new component-level, exposed-source exploratory test, not a world-model/agent/RSI demonstration or new confirmation split. Opposing reviews permit testing the finite-budget hypothesis; they do not establish novelty. No AUC values were loaded this turn before this protocol. A ZIP header attempt failed due a removed private NumPy function, before any Y payload decoding. Preserve that failure. Historical BeatAML data are fully exposed development information (520 samples/479patient groups); prior low-rank branch STOP remains. No old low-rank model or old final gate is reopened.
+
+## Question and scope
+
+For one fixed digital package of measured drug/AUC records, does explicit output consistency improve held-out functional completion beyond training the identical nonlinear updater on random order/package views? All records/identities are retained. We do not infer physical simultaneity, growth kinetics, clinical effectiveness, or new real experiments from reordering arrays. Actual history/time, if available, must never be replaced by shuffled indices. This cache contains baseline sample/drug IDs/AUC, not a physical exposure sequence; we do not supply chronological semantics to its column order.
+
+Read only Y,groups,contexts,items from existing tmp/context_transfer_20261017/beataml_domain.npz; no expression payload, derived events, G, protected pool or new dataset. Reuse historical patient salt context-transfer-subject, fold0 for inspected development queries, folds1–4 source. New shuffle seeds do not create new biological tasks. Keep drug columns with >=100 finite source entries, based on source availability only; source means/scales only. Keep contexts with >=16 finite retained drugs. Reveal8 measured assays, evaluate remaining finite drugs. Source episodes use seeded random support; development support uses outcome-independent SHA256 of sample/drug IDs. Missingness availability is shared by every method; no full-panel summary/target-state features are inputs.
+
+## Frozen minimal model and comparisons
+
+Source standardize each drug by source mean/SD, SD floor1e-6. Fast state h in R16 starts0. A learned drug embedding E predicts standardized responses as E*tanh(h). One update on package S is h' = h - softplus(step)*grad_h[sum_(o in S)(prediction_o-y_o)^2/(2*8)]. Source parameters are E and16step logits; fast h resets every context. They are trained from actual source query outcomes. This is an ordinary meta-learned response updater, not a new cell world. Retaining these source parameters can be a future updater object, but this pilot does not test later-task inheritance.
+
+Each support8 is partitioned A4/B4; evaluate AB, BA and union from the same h0 (2+2+1 fast gradient evaluations). Three arms use identical initialization, source episode draws and120Adam outer steps, batch16, learning rate.01:
+
+- fixed: source query loss averaged over AB, a separately recomputed AB, and union;
+- augmented: same mean query loss over AB, BA, union;
+- consistent: identical augmented query loss plus gamma1 times mean squared prediction differences AB–BA and AB–union on source query actions only.
+
+Thus augmented and consistent have identical unrolls/label exposures; only the penalty differs. This strengthens the original single-view query objective before any AUC run; it is not a post-result rescue. No early stopping or hyperparameter sweep. Use CPU,2threads, float32, seeds0/1/2. For development all updaters predict from AB; also save BA/union to measure order/partition differences. A perfectly invariant identity update is not success.
+
+Strong inexpensive stopping sentinels: frozen source mean; full-rank empirical covariance conditional prediction with source-centered missing entries filled0 and fixed ridge1, conditioning on exactly the8 purchased outcomes; a DeepSets support-to-query predictor with learned drug/value embeddings, sum aggregation and nonlinear decoder (width32), same120source episodes/steps/batch and mean3identical query evaluations. Its exact invariance and count-aware union input provide a strong ordinary alternative. DeepSets need not match parameter count; report parameters, actual walltime and work. A cheaper sentinel that matches performance defeats this instantiated advantage. A positive result cannot claim fair superiority over all direct/refit/CL/AL/search methods from this limited screen; later full-budget tests remain required.
+
+## Metrics, decision, and cost
+
+Primary: patient-cluster-averaged raw AUC MSE on unpurchased finite query drugs. Secondary: within-panel top3 raw-AUC shortlist regret (mean AUC of predicted3 minus mean of true best3, lower better). Drug panels/assay concentration conventions bound interpretation; this is retrospective ex-vivo shortlist utility, not a clinical cross-drug efficacy statement. Multiple samples share patient clusters. Save every prediction, split/drug/support identity, source scales, train loss, parameter count, runtime and source evaluation counts, plus per-context and patient metrics. Report standardized consistency sensitivity separately; do not rank a no-update model as useful just because it is consistent.
+
+Necessary pilot continuation: consistent beats augmented on both functional metrics in all3seeds, and beats each ordinary sentinel on seed-average both metrics. This is a directional screening requirement, NOT an assay-calibrated practical margin or external confirmation. Otherwise STOP_EXPANDING_THIS_FIXED_CONSISTENCY_CONFIGURATION; no gamma/width/seed/subgroup/search rescue. A positive only nominates a bounded subsequent full-comparison study with meaningful assay/decision margins, state/no-state controls and independent later tasks. No five-way core contribution follows here.
+
+Charge preprocessing/support selection/model work and all source query evaluations. Three seeds are robustness checks, not independent tasks. Never count repeated rollout predictions as new experimental feedback. Freeze protocol/code/cache hash and independent pre-execution reviews before the first run. Any implementation defect requires append-only failure/correction and a new explicitly bound run; preserve all attempted artifacts.

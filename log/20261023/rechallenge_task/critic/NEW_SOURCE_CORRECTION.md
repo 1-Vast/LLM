@@ -1,0 +1,5 @@
+# Correction after actual opposing source review
+
+2026-10-23. My sealed NEW_SOURCE_ADDENDUM described the author's PSM2D as coupling modules without re-estimating numerical parameters, reflecting the README. Source challenged this against the actual primary Results. I independently reread the original and confirmed its explicit statement: “We selected the coupled model with the lowest RMSE (Fig. EV6B) and estimated the reset speed and sensitivity rate of αTSN when activated by TRAIL.”
+
+The earlier wording was too strong. Correct interpretation: partial reuse of PSM1D parameters, target-outcome topology selection, AND additional estimation of reset speed/sensitivity for the activated transition. The primary's later caption/README reuse descriptions do not justify erasing that explicit estimation statement. This reinforces the existing conclusion that published PSM2D is not an untouched zero-fit forecast. No author method was reproduced or numerically refuted. Original sealed report remains unchanged; this append-only correction governs the interpretation.

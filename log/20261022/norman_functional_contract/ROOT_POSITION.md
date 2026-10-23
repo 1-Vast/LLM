@@ -1,0 +1,17 @@
+# Root pre-cross position
+
+2026-10-22. Full goal ACTIVE / NOT_ACHIEVED. This turn is PROGRESS: acquired a different, concretely named independent functional dataset and raw state; avoided substitution into preceding stopped endpoint.
+
+Supported finite next step: GO_NUMERICAL_INPUT_QUALIFICATION_THEN_BASELINE_CALIBRATION, conditional on explicit missing/zero masks, raw QC reconstruction and fixed small hyperparameter costs. No requirement of a new primitive to run a small useful capability experiment. No new candidate algorithm has passed novelty review; no method, WM, agent, inheritance, joint or RSI benefit is established. Baseline reproduction is preparation toward the full goal, not its replacement or completion.
+
+Primary Norman2019 DOI10.1126/science.aax4438 (PMC6746554) confirms independent start→10day pooled growth and original Fig6 RNA-side-information constrained matrix completion. Author predictor first fits single-growth quadratic expectation to observed pair feedback, then Maxide residual completion and add-back. Existing comparison sources include other completion methods. Original single-RNA eligibility also uses transcriptional-effect screening; 105 identifier matches do not reproduce the final eligible set. Source/feature availability choices must be fixed before functional access.
+
+Actual assets: four pinned author fitness/GI tables, exact official GEO identities and complete raw RNA/genes/barcodes. All114870 raw identity barcodes match the5898240 raw matrix barcodes; no numerical expression entry or function-table value has been converted/inspected. Dimensions and membership are not evidence of complete phenotype coverage or QC success. Fitness113axis includes controls, not113target genes. Potential105choose2=5460 does not mean5460 measured eligible outcomes.
+
+Published code source defines single_cell as number_of_cells==1 AND good_coverage AND guide_identity!='*', after raw matrix UMI threshold2000. Source implementation, not field-name guessing, supplies this definition. New raw download needs no matrix completion assumption. Gzip matrix has442237190 declared entries; preprocess in streaming chunks rather than materializing a 33694×5898240 dense array.
+
+Pairs frozen by target strings before functional values: source3286,development1091,protected1083 potential pairs. Downstream eligibility can remove unavailable observations without resplitting or protected-value examination. Proposed primary is gene-average double growth MSE. Defer any not-yet-specified GI decision metric to separately prospective work rather than selecting after values. Single-guide-matched endpoint is distinct sensitivity, never silently mixed.
+
+Strongest objection: the obvious mechanism already exists, and one K562 map cannot establish useful inherited rules across independent biological tasks. Response: retain it as a baseline/functional capability asset only. Frontier reviewer found no substantively novel current update candidate; no new name changes this. Later functional error analysis may motivate a mechanism but cannot certify novelty. Novelty search and broader drug-discovery/agent/RSI objectives remain outstanding.
+
+Next bounded work is executable input qualification and baseline calibration; no repeated unavailable-source search is needed. Preserve all prior scoped stops/protected outcomes, including Replogle2022 NOT_RUN. Global provenance issues remain unresolved despite local checks.

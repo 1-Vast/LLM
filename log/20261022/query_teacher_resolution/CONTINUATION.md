@@ -1,0 +1,11 @@
+# Continue from the resolved objective-level precedent
+
+Full objective ACTIVE / NOT_ACHIEVED. Read DECISION, ROOT_FINDINGS, all three independent and cross records and VERIFICATION before further work.
+
+SIB arXiv2004.12696v1 now has authenticated body and exact objective(7)/finite recurrence(10) analysis. It directly uses outer query-label objective to train synthetic gradients without true-gradient imitation; stop the broad objective-only novelty claim. Its query-input transduction and classifier/posterior adaptation differ from this support-residual hidden update. Do not assert whole-formula published identity; do not repeat target/gradient renaming as precedence proof. No useful technical advantage of the remaining arbitrary parameterization is demonstrated. NO_PROMOTION, no large biological pilot justified by this difference alone.
+
+One bounded actual numpy check confirms teacher outer derivative and fixed-key reachability; no need to rerun that toy. Orthogonal single-step query output matches head-only. This does not refute multistep head channels/learned keys/all teachers. A globally detached target would erase the intended P path; direct explicit recurrence preserves it.
+
+User-pasted advice's CDK-unexecuted statement is stale: exact functional prefix KRR already failed/was nonestimable as documented. Preserve that STOP and all other historical scoped STOPs, protected partitions and unresolved historical provenance drift. No new labels or new API-model requests in this phase. root metadata request timed out, no response; frontier200/429/404 receipts retained.
+
+Next work should establish a concrete recurring functional error of a strong legal baseline and a finite-cost/statistical hypothesis that can repair it. Capability inheritance and algorithm novelty are separate axes: small useful experiments need not wait for a new primitive, but the full goal still requires both useful evidence and a clear contribution. Require source-trained same-information residual covariance/ridge/head-only and query-trained local-update controls with all source costs counted. Do not resume old stopped configurations under a new name, add teacher/editor layers, or open protected labels merely to manufacture a target for RSI. Actual WM/agent/inheritance/joint/improved-improver advantages all remain unestablished.

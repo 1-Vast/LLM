@@ -1,0 +1,11 @@
+# Frozen exact diagnostic: added observations can hurt with unchanged response law
+
+2026-10-23. Execute only this predeclared hand example from the independently sealed report. No biological performance, experimental data, numerical optimizer, source API or old experiment import.
+
+Action space x in{-1,+1}; stationary noiseless response law y=x for every observation and query. Predictor class is intercept-only f_theta(x)=theta, fitted by exact unweighted empirical squared loss. Initial history is one(+1,+1) and one(-1,-1). Add exactly eight further(-1,-1)observations. Target/query input distribution is pointmass at+1; risk is the expected squared error under this stipulated law/distribution, here(theta-1)^2. Source-to-target conditional law never changes; only action frequencies change. These histories are fixed mathematical designs, not counts of actual independent assays.
+
+Compute exact minimizers from arithmetic means and verify the zero derivative of each empirical objective. Expected values before execution: old theta0/risk1; expanded theta-4/5/risk81/25. An ordinary oracle importance-weighted refit uses the declared expanded empirical design probabilities P_H(+1)=1/10,P_H(-1)=9/10 and target Q(+1)=1,Q(-1)=0, so positive-row weight10, negative-row weights0. Its normalized weighted intercept is1 and query risk0. Verify weights sum to10. No query outcome enters this fitting equation; the declared deterministic response law supplies analytic evaluation truth.
+
+The oracle-weight comparator is a competent ordinary control under known stipulated design probabilities, not a demonstration that the proposed approximate moment-matching QP estimates these weights or passes its own gate. No estimated density ratio, conditional shift detector, source grouping or clinical effect is inferred. The purpose is only to falsify the inference “more-data worsening entails a changed conditional biological/measurement response.” All counts, models and risk are fixed here before the one Fraction execution; do not change the example after output.
+
+Save script/protocol SHA256 in MATH_FREEZE.json before running. Preserve exact fractions and input designs in MATH_RESULT.json, then write independent result interpretation. Any error gets an append-only failure record; no silent rerun.

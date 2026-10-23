@@ -1,0 +1,1485 @@
+Learning turbulent transport via Mori–Zwanzig graph neural networks
+// Restore the saved color scheme preference, or
+// enact the browser preference if "automatic",
+// without expecting DOM load to have completed.
+//
+// Also restore any saved readingmode and ToC display preferences.
+function initializeReadingPreferences() {
+let saved_theme = localStorage.getItem("ar5iv_theme") || "automatic";
+if (saved_theme === "automatic") {
+if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+saved_theme = "dark";
+}
+}
+if (saved_theme == "dark") {
+document.documentElement.setAttribute("data-theme", "dark");
+} else {
+document.documentElement.setAttribute("data-theme", "light");
+}
+const tocDisplay = localStorage.getItem('arxiv_html_paper_toc_display');
+if (tocDisplay) {
+document.documentElement.setAttribute("data-toc-display", tocDisplay);
+}
+const readingMode = localStorage.getItem('arxiv_html_paper_reading_mode');
+if (readingMode) {
+document.documentElement.setAttribute("data-reading-mode", readingMode);
+}
+// Pre-apply spinout-banner dismissal here, before the banner paints, so it
+// never flashes in only to be hidden later by the deferred arxiv-header.js.
+// Key matches arxiv-header.js: "arxiv-banner-dismissed:" + data-banner-name.
+if (localStorage.getItem('arxiv-banner-dismissed:spinout-nonprofit')) {
+document.documentElement.setAttribute("data-banner-dismissed", "");
+}
+}
+// Run as soon as JS starts, to minimize repainting
+initializeReadingPreferences();
+/* Banner pre-dismissal (set above before paint -> no flash-then-hide) and
+reading-mode chrome hiding. */
+html[data-banner-dismissed] .ds-announcement { display: none; }
+html[data-reading-mode="enabled"] .ds-announcement,
+html[data-reading-mode="enabled"] .ds-site-footer { display: none; }
+/* Keep the announcement text dark on the Open-Blue band in both colour themes
+(otherwise it inherits the paper's warm-wash text in dark mode and washes out). */
+.ds-announcement-text { color: var(--arxiv-ink, #1c1a17); }
+Report GitHub Issue
+×
+Title:
+Content selection saved. Describe the issue below:
+Description:
+Submit without GitHub
+Submit in GitHub
+arXiv is now an independent nonprofit!
+Learn more
+×
+Back to arXiv
+Why HTML?
+Report Issue
+Back to Abstract
+Download PDF
+Abstract
+References
+A Spatial receptive field
+B Effect of memory on multi-particle statistics
+License: arXiv.org perpetual non-exclusive license
+arXiv:2606.14918v1 [physics.flu-dyn] 12 Jun 2026
+Learning turbulent transport via Mori–Zwanzig graph neural networks
+André Freitas
+Email: andre.freitas@roma2.infn.it
+Affiliation: Department of Physics and INFN, University of Rome “Tor Vergata”, Rome, Italy
+Affiliation: Information Processing and Communications Laboratory, Télécom Paris, Institut Polytechnique de Paris, Palaiseau, France
+Xander M. de Wit
+Affiliation: Fluids and Flows Group and J.M. Burgers Center for Fluid Mechanics, Eindhoven University of Technology, Eindhoven, The Netherlands
+Alessandro Gabbana
+Affiliation: Department of Physics and Earth Sciences, University of Ferrara and INFN Ferrara, Ferrara, Italy
+Michael Woodward
+Affiliation: Computational Physics and Methods Group (CAI-2), Los Alamos National Laboratory, Los Alamos, NM, USA
+Federico Toschi
+Affiliation: Fluids and Flows Group and J.M. Burgers Center for Fluid Mechanics, Eindhoven University of Technology, Eindhoven, The Netherlands
+Affiliation: CNR-IAC, I-00185 Rome, Italy
+Yen Ting Lin
+Affiliation: Information Science Group (CAI-3), Los Alamos National Laboratory, Los Alamos, NM, USA
+Daniel Livescu
+Affiliation: Computational Physics and Methods Group (CAI-2), Los Alamos National Laboratory, Los Alamos, NM, USA
+August 24, 2026
+Abstract
+We introduce a Mori–Zwanzig graph neural network (MZ–GNN) framework for learning reduced-order Lagrangian dynamics of tracer particles in homogeneous isotropic turbulence. The model represents particle acceleration as a finite-memory expansion over present and delayed particle-neighborhood graphs, with each memory contribution parameterized by an equivariant message-passing graph neural network. By construction, the architecture respects the relevant physical symmetries of the problem, including permutation equivariance, Galilean invariance, and equivariance under rotations and reflections. Trained on direct numerical simulation data, the model is rolled out autoregressively and evaluated on observables that are not imposed during training. We show that memory is essential for recovering the intermittent, heavy-tailed acceleration statistics, and that the learned dynamics accurately reproduce single-particle dispersion, pair-dispersion statistics, and four-particle tetrad geometry. Our results establish a physically structured, scalable route to data-driven multi-particle simulation of turbulent transport, and a template for learning reduced dynamics of correlated, symmetry-rich particle systems.
+Introduction
+Predicting the transport of material particles in turbulent flows remains a central challenge in fluid
+dynamics [107, 22], with applications ranging from atmospheric pollutant and aerosol
+dispersion [98], droplet growth in warm clouds [48], and fuel-air mixing in
+combustion [85], to ocean mixing and climate dynamics [59].
+Despite decades of progress, a first-principles understanding of turbulent transport remains elusive because turbulence
+is intrinsically multiscale, chaotic, and intermittent [39, 3, 12, 104]: particle
+trajectories are shaped by velocity fluctuations spanning many decades, from the integral length scale down to the
+smallest dynamically active scales, the Kolmogorov length scales [35, 4], with
+associated timescales ranging from the large-eddy turnover time to the fastest dissipative
+times [87, 118, 36, 107].
+The Lagrangian viewpoint, in which idealized massless particles are transported by the flow and tracked along their trajectories, provides a natural
+framework for studying turbulent transport [14].
+Even at the single-particle level, turbulent dynamics exhibit striking signatures of intermittency.
+In particular, tracer accelerations display extreme fluctuations, with probability density functions characterized by heavy
+non-Gaussian tails [110, 58, 112, 97, 75, 16].
+These rare events reflect encounters with intense vortical and straining structures across the hierarchy of
+turbulent scales [8, 7, 107]. There have been many attempts to describe Lagrangian intermittency, with
+multifractal models arguably the most popular [21, 28]. Other approaches include stochastic Langevin/Fokker-Plank models [86], superstatistics [74], conditioning on coarse-grained dissipation or acceleration [11], etc.
+The phenomenology becomes richer in the multi-particle setting, where spatial correlations of the turbulent velocity field
+play a central role. Pair dispersion quantifies how quickly turbulence separates initially close
+particles [15, 6] and provides a direct measure of turbulent mixing across
+scales; four-particle clusters, or tetrads, additionally probe the deformation of material volumes by the local strain
+field [27, 89, 13]. A faithful reduced model of
+Lagrangian turbulence should therefore reproduce not only single-particle statistics but also pair and multi-particle
+observables. Fig. 1 illustrates the complexity of this transport problem. A puff
+of tracer particles is released at very small separations and is subsequently stretched, folded, and dispersed across
+scales by the turbulent flow, until its extent reaches the integral scale. The accompanying statistical diagnostics
+highlight the range of observables that any successful reduced-order model must reproduce.
+Figure 1:
+Problem setup.
+Turbulent transport.
+A puff of passive tracers in homogeneous isotropic turbulence, dispersed throughout the turbulent flow across increasingly larger scales.
+The surrounding panels summarize key challenges for reduced-order Lagrangian modelling: intermittency, evidenced by the increasing non-Gaussianity of temporal velocity-increment probability density functions (PDFs) at decreasing time lags; rare extreme events in pair dispersion, where some particle pairs separate much faster than the median; superdiffusive separation; and non-trivial multi-particle correlations, illustrated by the deformation of a tetrad.
+Particle trajectories.
+Representative Lagrangian trajectories coloured by acceleration magnitude comparing Eulerian–Lagrangian direct numerical simulation (DNS) ground truth with autoregressive graph neural network (GNN) rollouts, illustrating the complexity of tracer dynamics.
+Method.
+Schematic of the Mori–Zwanzig graph neural network (MZ–GNN).
+Particles are represented as nodes of a graph, with edges encoding local particle neighborhoods defined by a cutoff radius.
+The highlighted red edges illustrate, for a given particle, the neighbours contained within the corresponding spherical interaction region.
+The particle acceleration is modelled through a finite-memory expansion over present and delayed graph states,
+𝒂in=∑k=0K𝛀θ(k)​(𝒢n−k​s,𝒗n−k​s)i\bm{a}_{i}^{n}=\sum_{k=0}^{K}\bm{\Omega}^{(k)}_{\theta}\left(\mathcal{G}^{\,n-ks},\bm{v}^{\,n-ks}\right)_{i}.
+The k=0k=0 contribution is Markovian, whereas the k>0k>0 terms encode non-Markovian memory effects.
+Each operator 𝛀θ(k)\bm{\Omega}^{(k)}_{\theta} is parameterized by an equivariant message-passing graph neural network.
+Direct numerical simulation (DNS), which solves the full Navier–Stokes equations and integrates tracer trajectories without
+modelling assumptions, remains the reference approach for Lagrangian turbulence [92, 114, 103, 117, 107].
+Its cost, however, grows as NDOF∼R​e9/4N_{\mathrm{DOF}}\sim Re^{9/4} with the Reynolds number R​e=U​L/νRe=UL/\nu (LL a characteristic scale, UU a
+characteristic velocity, and ν\nu the kinematic viscosity), and quickly becomes prohibitive for the particle counts
+demanded by realistic applications [116, 53]. This has motivated decades of work on reduced-order descriptions
+of particle transport. Classical probability density function methods [86, 87, 96] represent turbulent transport
+through ensembles of stochastic particles, governed by Langevin-type equations whose drift and diffusion terms
+are modelled to reproduce selected turbulence statistics,
+with extensions incorporating intermittency [113, 61, 111], synthetic velocity
+fields from kinematic simulations [41, 77], and cascade-inspired shell
+models [19]. Such models typically
+rely on phenomenological assumptions and tunable closures, and they do not provide a general multi-particle dynamical
+system for tracer transport. The growing availability of high-resolution DNS
+databases [55, 116, 115] and experimental particle-tracking
+data [101, 102] has opened a complementary route: learning reduced-order models directly
+from data. Machine learning, and deep learning in particular [47], has achieved notable success in
+Eulerian turbulence modelling, particularly in closure problems such as subgrid-scale modelling for large-eddy
+simulation [71, 68, 10, 79, 38]. In the Lagrangian setting,
+generative models [44, 26, 1] such as diffusion model-based
+approaches [49] have recently produced synthetic single-particle trajectories with realistic
+multiscale statistics, outperforming traditional stochastic models in statistical
+fidelity [62, 63]. Such generative samplers, however, synthesize trajectories rather than
+learning an explicit time-evolution law, which limits their use as autoregressive dynamical models for online coupling
+with simulations, control, or prediction. While this strategy has been extended to particle
+pairs [81], scaling it to a complete multi-particle setting remains a
+major challenge, since all spatial correlations must then be captured explicitly.
+The definition of a reduced multi-particle surrogate for turbulent transport raises a closure problem. In DNS, tracer
+trajectories are generated by the fully resolved Eulerian velocity field, whose state contains a very large number of degrees of freedom.
+In contrast, the reduced model considered here has access only to the local information—such as positions, velocities, and accelerations—of a
+finite number (NpN_{p}) of tracer particles, with NpN_{p} much smaller than the number of degrees of freedom of the underlying
+turbulent flow. These particle variables therefore do not define a closed Markovian state: the unresolved Eulerian
+modes, together with flow structures and particles not represented in the reduced state, continue to influence the
+future particle dynamics.
+The Mori–Zwanzig formalism [76, 119] provides a principled description of
+this situation: projecting the full dynamics onto the resolved observables yields an exact reduced equation containing a
+Markovian term, a history-dependent memory term, and an orthogonal-dynamics term associated with the unresolved degrees
+of freedom [29, 52, 64, 65, 82, 46, 66, 67, 37].
+Importantly, the memory term and the orthogonal dynamics are not independent: they satisfy a self-consistent relation termed as the Generalized Fluctuation-Dissipation Relation (GFD) [120, 29].
+Recent data-driven approaches have shown that the Markov and memory operators can be learned from time series of resolved
+observables, with the learned memory constrained by the GFD [66, 67]. This framework was recently applied to single-particle Lagrangian
+turbulence [32], where the reduced dynamics of individual trajectories was learned using memory
+operators augmented with time-delay embeddings. Because a single trajectory carries no information about its spatial
+surroundings, that model had to incorporate the local flow structure explicitly: alongside the acceleration, it incorporated
+velocity-gradient tensor at the particle’s location as part of the reduced state (i.e., observables), as the velocity gradient is a proxy that encodes nearby strain and
+vorticity that strongly shape tracer acceleration. This is an effective but indirect approach, reconstructing local spatial
+information along a single trajectory at a time. Consequently, the model lacks the capability to represent and predict the joint spatial organization of many tracers whose
+velocities and accelerations are correlated through the underlying velocity field.
+A multi-particle surrogate must learn not only temporal memory but also how information is shared across particles in
+physical space, a task for which geometric graph neural networks (GNNs) are naturally
+suited [99, 43, 94, 23].
+It has been shown that geometric GNNs, which build in physical symmetries such as permutation, translational, and rotational invariance and equivariance [23], can serve as powerful tools for learning complex interactions in physical systems such as molecular dynamics, granular media, and continuum mechanics [94, 83]. Within the geometric GNN framework, we represent the particles as nodes of a graph embedded in continuous space, with local neighborhoods defining
+edges and information exchanged through learned messages. The Mori–Zwanzig memory operators then act on present and
+delayed particle-neighborhood graphs, so that temporal memory accounts for unresolved degrees of freedom while message
+passing provides a learned, coarse representation of the local spatial structure of the flow. Spatial information is now
+obtained directly from relative particle positions and velocities, hence the model no longer requires the
+velocity-gradient tensor as an auxiliary input. To ensure that the learned representation is consistent with the underlying physics, we construct the graph encoding and message-passing architecture from relative particle states and symmetry-preserving geometric features. Because particle labels are arbitrary, predictions must be i)
+permutation equivariant; ii) since the flow is homogeneous, they must depend only on relative positions; iii) adding a
+constant velocity is a change of inertial frame, hence they must be Galilean invariant and depend only on relative velocities;
+and iv) because the flow is isotropic, vector-valued accelerations must transform equivariantly under rotations and reflections. By
+building messages from relative positions, relative velocities, and scalar invariants, equivariant GNNs enforce all of
+these constraints by construction [105, 40, 95].
+Figure 2:
+Results.
+Single-particle, pair, and tetrad statistics from MZ–GNN rollouts compared with DNS ground truth.
+(a) Mean-square single-particle displacement, showing the transition from ballistic scaling, ∼t2\sim t^{2}, to long-time diffusive scaling, ∼t\sim t.
+(b) PDF of the acceleration, normalized by its standard deviation, for memory depths K=0K=0, K=3K=3, and K=5K=5.
+Increasing the memory depth progressively partially recovers the non-Gaussian tails of the DNS.
+(c) Mean-square pair separation, with a Richardson-like ∼t3\sim t^{3} superdiffusive scaling.
+(d) PDFs of pair separation at different times, comparing MZ–GNN predictions and DNS.
+(e) Mean eigenvalues ⟨gi⟩\langle g_{i}\rangle of the tetrad gyration tensor.
+(f) Mean tetrad shape indices ⟨Ii⟩\langle I_{i}\rangle, with Ii=gi/(g1+g2+g3)I_{i}=g_{i}/(g_{1}+g_{2}+g_{3}).
+Solid lines denote MZ–GNN predictions and dashed lines denote DNS ground truth unless otherwise indicated.
+Unless explicitly varied, MZ–GNN results correspond to the full memory model with K=5K=5.
+In panels (e) and (f), shaded bands denote the estimated standard deviation.
+In this work, we introduce a Mori–Zwanzig graph neural network (MZ–GNN) for tracer dynamics in homogeneous isotropic
+turbulence. The method extends data-driven MZ modeling from single-particle Lagrangian dynamics to a genuine
+multi-particle setting. Its novelty is the combination of three ingredients: a finite-memory MZ expansion that closes
+the dynamics of a sparse set of resolved particles; a graph-based representation that learns spatial correlations
+directly from particle configurations; and exact physical symmetries enforced by construction. The acceleration of each particle is represented as a sum
+of Markovian and memory contributions over present and delayed particle-neighborhood graphs. Each contribution is
+parameterized by an equivariant message-passing GNN and trained sequentially in a residual fashion, following the
+regression-based data-driven MZ paradigm developed in [67]. Representative DNS and model trajectories, together with a schematic of the
+learning framework, are shown in Fig. 1. The model is then rolled out autoregressively and evaluated
+on a broad set of Lagrangian observables: single-particle absolute dispersion, the heavy-tailed acceleration
+distribution, pair-separation statistics, and four-particle tetrad geometry.
+The learned dynamics reproduces all of these observables, and we show that the non-Markovian terms are essential to
+recover Lagrangian intermittency. Together, these results establish finite-memory, graph-based surrogates as a
+physically structured and scalable route to data-driven multi-particle modeling of turbulent transport and a template
+for learning reduced dynamics of correlated, symmetry-rich particle systems more broadly.
+Results
+We assess the learned dynamics through rollouts of the trained graph neural network model. Unless stated otherwise,
+“GNN” denotes the full model composed of one Markovian operator and five memory operators, i.e. K=5K=5. A complete
+detailed description of our approach is provided in the Methods. To assess whether the model has learned the
+true underlying turbulent dynamics, the evaluation is deliberately performed on observables that are not imposed as
+losses during training: single-particle dispersion and acceleration statistics, pair-dispersion statistics, and the
+geometry of four-particle clusters. These observables probe increasingly stringent aspects of Lagrangian turbulence,
+from one-particle temporal dynamics to multi-particle spatial correlations and deformation. All rollouts at evaluation
+time are performed in the periodic domain for a duration Tinf=100​τηT_{\mathrm{inf}}=100\tau_{\eta}, where τη\tau_{\eta} is the Kolmogorov time scale. During the GNN evolution,
+particle positions are wrapped periodically and graph edges are constructed using the minimum-image convention at each
+time step based on a fixed cutoff radius. For displacement-based observables, such as absolute dispersion, pair
+separation, and tetrad growth, the corresponding unwrapped displacements are reconstructed by accumulating the
+minimum-image increments along the trajectories. Unless otherwise specified, rollouts use 80008000 particles. For PDF
+estimates, where substantially larger statistical samples are required, we use ensembles containing up to 8×1068\times 10^{6}
+particles. Owing to memory constraints, these large ensembles are not evolved in a single GNN rollout but are split
+into independent batches of particles, keeping the number of nodes fixed. For single-particle statistics, particles are
+initialized uniformly at random in the periodic cube. For pair statistics, one particle is placed uniformly at random
+in the domain and the second is initialized at a fixed separation 2​η2\eta along the xx direction, with periodic
+wrapping applied if necessary. For tetrad statistics, a random centre is selected in the domain and four particles are
+placed at alternating vertices of a cube, (a,a,a)(a,a,a), (a,−a,−a)(a,-a,-a), (−a,a,−a)(-a,a,-a), and (−a,−a,a)(-a,-a,a), relative to this centre.
+With a=ℓ0/2a=\ell_{0}/\sqrt{2} and ℓ0=2​η\ell_{0}=2\eta, this gives a regular tetrahedron with edge length
+ℓ=2​2​a=2​ℓ0=4​η\ell=2\sqrt{2}a=2\ell_{0}=4\eta.
+Single-particle statistics.
+We first consider one-particle observables, which test whether the learned dynamics reproduces the temporal statistics of individual tracer trajectories.
+For a tracer initially at position 𝒙⁡(0)\bm{x}(0), the absolute displacement is
+Δ​𝒙​(t)=𝒙⁡(t)−𝒙⁡(0),\Delta\bm{x}(t)=\bm{x}(t)-\bm{x}(0),
+and the corresponding mean-square displacement is
+D⁡(t)=⟨|Δ​𝒙​(t)|2⟩.D(t)=\left\langle|\Delta\bm{x}(t)|^{2}\right\rangle.
+The largest contribution to the absolute tracer velocity comes from the velocity fluctuations at the integral scale. Hence, at short times and until the Lagrangian velocity has decorrelated, the displacement is approximately
+Δ​𝒙​(t)≃𝒗⁡(0)​t\Delta\bm{x}(t)\simeq\bm{v}(0)t, leading to the ballistic regime
+D⁡(t)≃⟨|𝒗|2⟩​t2.D(t)\simeq\left\langle|\bm{v}|^{2}\right\rangle t^{2}.
+Around the integral timescale, the motion becomes diffusive and
+D⁡(t)∼t.D(t)\sim t.
+Figure 2(a) shows that the GNN reproduces both regimes and the crossover between them, despite being trained only on short rollouts (spanning a fraction of τη\tau_{\eta}) with a mean-squared-error loss on the predicted acceleration. We then examine the acceleration statistics. Tracer acceleration directly probes the small-scale and intermittent structures encountered along particle trajectories. In Fig. 2(b), we show the PDF of the acceleration, normalized by its standard deviation, for different memory depths. A model without memory, K=0K=0, strongly underestimates the probability of extreme acceleration events. Adding memory terms broadens the distribution and progressively partially restores the heavy non-Gaussian tails characteristic of Lagrangian intermittency [58, 97, 16]. For K=5K=5, the predicted PDF is in close agreement with the DNS over several decades of probability. This shows that the non-Markovian terms in the Mori–Zwanzig expansion are essential for capturing the extreme events experienced by tracer particles.
+Pair dispersion.
+We next turn to pair statistics, which probe whether the model has learned the spatial correlations of the underlying velocity field.
+For two tracers ii and jj, we define the relative separation and relative velocity as
+𝒓i​j​(t)=𝒙i​(t)−𝒙j​(t),δ​𝒗i​j​(t)=𝒗i​(t)−𝒗j​(t),\bm{r}_{ij}(t)=\bm{x}_{i}(t)-\bm{x}_{j}(t),\qquad\delta\bm{v}_{ij}(t)=\bm{v}_{i}(t)-\bm{v}_{j}(t),
+(1)
+so that
+dd​t​𝒓i​j​(t)=δ​𝒗i​j​(t).\frac{\mathrm{d}}{\mathrm{d}t}\bm{r}_{ij}(t)=\delta\bm{v}_{ij}(t).
+(2)
+Unlike absolute dispersion, which is controlled by the temporal decorrelation of the single-particle velocity, relative dispersion is controlled by velocity differences at the instantaneous pair separation.
+It therefore probes the spatial structure of turbulence and is sensitive to the intermittent nature of the cascade, with some pairs remaining close for long times while others undergo rapid separation events.
+The classical description of turbulent relative dispersion goes back to Richardson [91], who proposed that pair separation behaves as a non-Fickian diffusion process with a scale-dependent eddy diffusivity.
+In isotropic turbulence, the radial separation PDF can then be modelled by a scale-dependent Fokker–Planck equation,
+∂tp⁡(r,t)=1r2​∂r[r2​𝒟​(r)​∂rp⁡(r,t)],\partial_{t}p(r,t)=\frac{1}{r^{2}}\partial_{r}\left[r^{2}\mathcal{D}(r)\partial_{r}p(r,t)\right],
+(3)
+where 𝒟⁡(r)\mathcal{D}(r) is the turbulent eddy diffusivity.
+Richardson’s empirical 4/34/3 law, later connected to Kolmogorov–Obukhov dimensional arguments [57, 78], gives
+𝒟⁡(r)∼ε1/3​r4/3,\mathcal{D}(r)\sim\varepsilon^{1/3}r^{4/3},
+(4)
+with ε\varepsilon the mean energy-dissipation rate.
+Indeed, using the inertial-range estimates
+δ​v​(r)∼(ε​r)1/3\delta v(r)\sim(\varepsilon r)^{1/3} and
+τ(r)∼r/δv(r)∼ε−1/3r2/3\tau(r)\sim r/\delta v(r)\sim\varepsilon^{-1/3}r^{2/3},
+one obtains
+𝒟⁡(r)∼τ⁡(r)​δ​v​(r)2∼ε1/3​r4/3\mathcal{D}(r)\sim\tau(r)\delta v(r)^{2}\sim\varepsilon^{1/3}r^{4/3}.
+This leads to the Richardson–Obukhov law
+R2​(t)=⟨|𝒓i​j​(t)|2⟩∼g​ε​t3,R^{2}(t)=\left\langle|\bm{r}_{ij}(t)|^{2}\right\rangle\sim g\,\varepsilon\,t^{3},
+(5)
+where gg is the Richardson constant.
+The same phenomenology predicts a self-similar radial separation PDF of the form
+p⁡(r,t)∼r2(ε1/3​t)9/2​exp⁡[−C​r2/3ε1/3​t],p(r,t)\sim\frac{r^{2}}{(\varepsilon^{1/3}t)^{9/2}}\exp\left[-C\frac{r^{2/3}}{\varepsilon^{1/3}t}\right],
+(6)
+corresponding to explosive, superdiffusive separation.
+The Richardson–Obukhov picture is based on a non-intermittent inertial-range scaling and therefore predicts a self-similar separation PDF.
+In real turbulence this ideal self-similarity is modified primarily by intermittency: velocity increments fluctuate more strongly at smaller separation scales, producing rare pairs that separate much faster, or much slower, than typical pairs. These effects are most visible in the tails of the separation distribution [80, 20, 54, 15, 100, 18].
+Finite-Reynolds-number effects further complicate this picture by limiting the extent of the inertial range and introducing dissipative- and integral-scale cutoffs, as well as sensitivity to the initial separation.
+Figure 2(c) shows the mean-square pair separation.
+The GNN follows the DNS from the initial stage to the rapid superdiffusive regime, consistent with Richardson-like growth.
+This agreement indicates that the learned dynamics captures the correlated relative motion of nearby particles, rather than only the one-particle statistics.
+A more challenging test is provided by the full radial separation PDF in Fig. 2(d).
+We show p⁡(r/η,t)p(r/\eta,t) at
+t=10​τη,20​τη,…,60​τηt=10\tau_{\eta},20\tau_{\eta},\ldots,60\tau_{\eta}, all within the time range where the mean-square separation displays Richardson-like growth.
+As time increases, the distributions broaden and shift towards larger separations, reflecting the explosive character of turbulent relative dispersion.
+The GNN reproduces this evolution with high accuracy, including the rare-event tails associated with pairs that separate much faster than typical ones.
+At the latest times, in particular around t=60​τηt=60\tau_{\eta}, the model slightly overestimates the far tails, indicating a mild excess of very rapidly separating pairs.
+Overall, the agreement of the PDFs shows that the learned dynamics captures not only the average Richardson-like growth, but also much of the distribution of extreme dispersion events driven by intermittent, history-dependent relative motion.
+To further assess the learned relative dynamics, we examine the distribution of pair relative velocities.
+For a particle pair, we decompose the relative velocity into components parallel and perpendicular to the instantaneous separation vector,
+𝒓^i​j=𝒓i​j|𝒓i​j|,u∥,ij=δ𝒗i​j⋅𝒓^i​j.\hat{\bm{r}}_{ij}=\frac{\bm{r}_{ij}}{|\bm{r}_{ij}|},\qquad u_{\parallel,ij}=\delta\bm{v}_{ij}\cdot\hat{\bm{r}}_{ij}.
+(7)
+The perpendicular contribution is obtained by projecting out the longitudinal part,
+δ𝒗⟂,i​j=δ𝒗i​j−u∥,ij𝒓^i​j.\delta\bm{v}_{\perp,ij}=\delta\bm{v}_{ij}-u_{\parallel,ij}\hat{\bm{r}}_{ij}.
+(8)
+For the transverse PDF, we consider the signed components of δ​𝒗⟂,i​j\delta\bm{v}_{\perp,ij} along two orthonormal directions perpendicular to 𝒓^i​j\hat{\bm{r}}_{ij} and pool both components.
+The longitudinal component u∥u_{\parallel} controls the instantaneous growth of the pair separation, since
+dd​t|𝒓i​j|=u∥,ij.\frac{\mathrm{d}}{\mathrm{d}t}|\bm{r}_{ij}|=u_{\parallel,ij}.
+(9)
+It is therefore directly sensitive to stretching and compression events along the pair axis.
+At early times, the pairs are initialized at small separations, so positive longitudinal relative velocities correspond to particles that rapidly move apart, whereas negative values correspond to pairs moving even closer together.
+Because the initial separation is already near the dissipative scale, there is more room for explosive separation than for further approach, leading to a strongly skewed longitudinal PDF.
+This asymmetry is related to the irreversibility of turbulent pair dispersion and the associated breaking of time-reversal symmetry.
+As time increases and the pairs sample larger separations, the longitudinal distribution becomes progressively less skewed.
+The transverse components instead describe the relative motion responsible for pair rotation and reorientation.
+At early times, they probe small-scale turbulent velocity differences and therefore display strongly non-Gaussian tails.
+As the pair separation grows, the transverse relative velocity samples increasingly larger scales, where fluctuations are less intermittent, and the PDF correspondingly becomes closer to Gaussian.
+Figure 3 shows the PDFs of the longitudinal and transverse relative velocities at different times.
+The MZ–GNN captures the overall evolution of both distributions, including the skewness of the longitudinal component and the progressive change in tail behaviour with time.
+The agreement is particularly good for the transverse components, although the model slightly overestimates rare extreme events in both the longitudinal and transverse tails.
+For the longitudinal component, this corresponds to a mild over-amplification of strong separation events, which is consistent across the times shown.
+This local excess in positive relative velocity helps explain the overprediction of rapidly separating pairs observed at late times in the pair-separation PDFs of Fig. 2(d).
+Thus, the relative-velocity statistics provide a more direct diagnostic of the same effect: the model learns the pair relative dynamics well overall, but slightly over-amplifies rare strong stretching and rotational events.
+Figure 3:
+Pair relative-velocity statistics from MZ–GNN rollouts and DNS ground truth.
+(a) PDF of the longitudinal relative velocity u∥=δ​𝒗i​j⋅𝒓^i​ju_{\parallel}=\delta\bm{v}_{ij}\cdot\hat{\bm{r}}_{ij}, normalized by its standard deviation.
+(b) PDF of the signed transverse relative-velocity components, obtained by projecting δ​𝒗i​j\delta\bm{v}_{ij} onto the plane perpendicular to 𝒓^i​j\hat{\bm{r}}_{ij} and pooling the two transverse components, normalized by their standard deviation.
+Colours denote different times, t=5​τηt=5\tau_{\eta}, 10​τη10\tau_{\eta}, and 70​τη70\tau_{\eta}.
+Solid lines with circular markers denote MZ–GNN predictions, while dashed lines with square markers denote DNS ground truth.
+The effect of memory on a higher-order pair-dispersion statistic is reported in Appendix B.
+Tetrad geometry.
+Finally, we examine four-particle clusters, or tetrads.
+Tetrads provide a higher-order test of the learned multi-particle dynamics because they probe the deformation of an extended material element, rather than only the separation of a pair.
+While pair dispersion measures the growth of a single distance, tetrads also encode the shape of a material volume and therefore provide direct information on the geometry of turbulent deformation [27, 89, 13, 51, 33].
+In turbulent flows, such clusters evolve both in size and in shape: their overall extent grows as particles separate, whereas the initially isotropic configuration is distorted by the local velocity-gradient field.
+Given four particle positions {𝒙a}a=14\{\bm{x}_{a}\}_{a=1}^{4}, we define the tetrad centroid as
+𝒙c=14​∑a=14𝒙a,\bm{x}_{c}=\frac{1}{4}\sum_{a=1}^{4}\bm{x}_{a},
+(10)
+and the centroid-relative coordinates
+𝝆a=𝒙a−𝒙c.\bm{\rho}_{a}=\bm{x}_{a}-\bm{x}_{c}.
+(11)
+The tetrad geometry is characterized by the gyration tensor
+𝖦=14​∑a=14𝝆a​𝝆a⊤.\mathsf{G}=\frac{1}{4}\sum_{a=1}^{4}\bm{\rho}_{a}\bm{\rho}_{a}^{\top}.
+(12)
+Let g1≥g2≥g3g_{1}\geq g_{2}\geq g_{3} be its eigenvalues.
+Their sum,
+r2=Tr​𝖦=g1+g2+g3,r^{2}=\mathrm{Tr}\,\mathsf{G}=g_{1}+g_{2}+g_{3},
+(13)
+measures the overall tetrad size, while the normalized shape indices
+Ii=gig1+g2+g3,∑i=13Ii=1,I_{i}=\frac{g_{i}}{g_{1}+g_{2}+g_{3}},\qquad\sum_{i=1}^{3}I_{i}=1,
+(14)
+describe the tetrad shape independently of its size.
+For a regular tetrad, the three eigenvalues are equal and I1=I2=I3=1/3I_{1}=I_{2}=I_{3}=1/3.
+A flattened pancake-shaped configuration corresponds to g1∼g2≫g3g_{1}\sim g_{2}\gg g_{3}, while an elongated needle-shaped configuration corresponds to g1≫g2,g3g_{1}\gg g_{2},g_{3}.
+The shape indices therefore provide a compact diagnostic of the anisotropic stretching and compression induced by turbulence.
+The physical picture is as follows.
+At very small separations, the velocity field can be linearized around the tetrad centroid, so that the centroid-relative coordinates evolve approximately as
+dd​t​𝝆a≃𝖠​𝝆a,𝖠=∇𝒖​(𝒙c,t).\frac{\mathrm{d}}{\mathrm{d}t}\bm{\rho}_{a}\simeq\mathsf{A}\bm{\rho}_{a},\qquad\mathsf{A}=\nabla\bm{u}(\bm{x}_{c},t).
+(15)
+This gives
+dd​t​𝖦≃𝖠𝖦+𝖦𝖠⊤.\frac{\mathrm{d}}{\mathrm{d}t}\mathsf{G}\simeq\mathsf{A}\mathsf{G}+\mathsf{G}\mathsf{A}^{\top}.
+(16)
+The antisymmetric part of 𝖠\mathsf{A} mainly rotates the tetrad, while the symmetric strain-rate tensor controls stretching and compression.
+Because the flow is incompressible, the strain has zero trace, so extension along one direction must be accompanied by compression or weaker extension in the others.
+Initially regular tetrads are therefore rapidly distorted by the eigenstructure of the local strain field.
+As the tetrad grows beyond the dissipative range, the relevant deformation is no longer controlled by the infinitesimal velocity gradient alone, but by a scale-dependent, coarse-grained strain over the size of the cluster.
+The shape dynamics then reflects a balance between coherent straining at the tetrad scale, which promotes anisotropic deformation, and incoherent relative motion from smaller scales, which tends to randomize the particle positions [27, 89].
+Previous studies showed that inertial-range tetrads approach a statistically non-trivial shape distribution, with a preference for elongated and nearly coplanar configurations rather than uniformly distributed particle positions [13, 51, 33].
+In analogy with Richardson pair dispersion, the overall tetrad size is expected to grow approximately as
+⟨Tr​𝖦⟩∼ε​t3,\left\langle\mathrm{Tr}\,\mathsf{G}\right\rangle\sim\varepsilon t^{3},
+(17)
+with the individual eigenvalues following the same growth up to shape-dependent prefactors in a self-similar regime.
+The mean eigenvalues are shown in Fig. 2(e).
+Starting from regular tetrads, the DNS displays rapid growth of the cluster size together with a strong splitting of the three eigenvalues.
+The largest eigenvalue grows fastest, while the smallest remains much smaller, showing that the initially isotropic material element is stretched along a dominant principal direction and compressed or weakly stretched in the transverse plane.
+The GNN reproduces the DNS evolution of all three eigenvalues, indicating that it captures not only the growth rate of the cluster, but also the anisotropic deformation of its principal axes.
+The shape indices in Fig. 2(f) isolate the geometry of the tetrad independently of its overall size.
+The increase of ⟨I1⟩\langle I_{1}\rangle and the simultaneous decrease of ⟨I2⟩\langle I_{2}\rangle and ⟨I3⟩\langle I_{3}\rangle show that initially regular tetrads evolve towards strongly distorted configurations.
+The GNN follows this anisotropization process and the subsequent time evolution with good accuracy.
+This agreement at the level of tetrad geometry provides strong evidence that the model has learned the strain-mediated, multi-particle deformation dynamics of the turbulent flow, rather than only matching scalar dispersion measures.
+Discussion and conclusion
+In this work, we have introduced a physics-structured surrogate model for multi-particle Lagrangian turbulence, combining the Mori–Zwanzig formalism [76, 119, 67, 66] with equivariant graph neural networks [43, 105, 40, 95]. The central idea is to represent tracer acceleration as a finite-memory expansion, where each memory contribution is parameterized by a message-passing GNN acting on present or delayed particle-neighborhood graphs, fully respecting the physical symmetries of the system. This construction yields an explicit autoregressive dynamical system for tracer particles, rather than a purely generative model for trajectory statistics.
+The key result of this reduced-order model is the accurate reproduction of multi-particle statistics. While single-particle observables probe the temporal dynamics along individual trajectories, pair and tetrad statistics test whether the model has learned the spatially correlated structure of the turbulent velocity field. The GNN reproduces the growth of pair separations, the evolution of the full pair-separation PDFs, and the rare-event tails associated with rapidly separating pairs. The agreement extends to four-particle tetrads, where the model captures the growth of the gyration-tensor eigenvalues and the evolution of the normalized shape indices. This is a demanding test: tetrad geometry depends not only on the overall rate of dispersion, but also on the anisotropic deformation of material elements by the turbulent strain field [27, 89, 13, 51, 33]. The fact that the model recovers these observables indicates that it has learned non-trivial multi-particle Lagrangian dynamics, beyond matching scalar one-particle statistics.
+The results also highlight the importance of memory. In the absence of memory, the model significantly underestimates the heavy tails of the acceleration distribution, failing to reproduce one of the defining signatures of Lagrangian intermittency [58, 112, 97, 75, 16]. Adding Mori–Zwanzig memories progressively restores the non-Gaussian acceleration tails and leads to close agreement with DNS. This supports the physical interpretation that unresolved turbulent degrees of freedom leave a measurable imprint on the resolved particle dynamics through history dependence. Consistent with recent data-driven Mori–Zwanzig approaches [67, 66] and their application to single-particle statistics in turbulence [32], our results show that short-time supervised learning can yield stable long-time statistical predictions when the reduced dynamics are equipped with an appropriate memory structure. The symmetry properties of the architecture are equally important. The model is permutation equivariant with respect to particle labels, Galilean invariant because it depends on relative velocities, and O⁡(3)O(3)-equivariant because vector messages are built from equivariant bases with scalar coefficients depending only on invariant quantities. These constraints encode the geometric and kinematic structure of homogeneous isotropic turbulence directly into the model class. As a consequence, the network does not need to learn these symmetries from data, reducing the risk of orientation-dependent or frame-dependent artifacts and improving its ability to generalize to particle configurations not encountered during training.
+More broadly, this work provides a route towards data-driven Lagrangian turbulence modelling in which the surrogate is both dynamical and multi-particle.
+Unlike purely generative approaches, the model advances the particle state step by step and can therefore be used in autonomous rollouts, coupled simulations [50], or control-oriented settings [30, 24].
+Unlike single-particle closures, the graph formulation explicitly represents spatial correlations.
+In this sense, the MZ–GNN can combine spatial and temporal information in a controlled way.
+If all spatial degrees of freedom of the turbulent flow were resolved, the dynamics could in principle be represented by a Markovian evolution of the full state, as in DNS.
+At the opposite extreme, a model based only on local single-particle information, such as Ref. [32], must rely on memory over extremely long times to account for correlations mediated by the unresolved flow.
+The present approach bridges between these two extremes.
+Spatial correlations that are resolved by the particle cloud are represented explicitly through graph interactions, with the largest accessible scales set by the graph receptive field.
+Unresolved spatial information, including small-scale structures that would require a much denser particle sampling, is instead represented through a limited MZ memory.
+This provides a natural division of labor: graph message passing captures the resolved spatial organization of the particles, while memory accounts for the unresolved degrees of freedom. The combination of memory, graph-based spatial interactions, and exact symmetries therefore appears to be a natural structure for reduced-order models of turbulent transport.
+This perspective also connects the present framework to particle-based discretizations of continuum fluid dynamics.
+Although the model is trained only on tracer trajectories and does not explicitly evolve an Eulerian velocity field, increasing the particle density would make the graph state a progressively richer representation of the underlying flow.
+This places the approach close in spirit to smoothed particle hydrodynamics (SPH), where continuum fields are represented and evolved through particle degrees of freedom [72, 73], and suggests extensions towards graph-based Mori–Zwanzig surrogates or closures for particle methods, in the spirit of recent neural SPH approaches [108].
+The versatility of the approach presented here opens many new opportunities across a wide range of domains. The framework can be applied in many engineering settings where prediction or control of turbulent transport of passive tracers is of interest, yet where performing DNS is computationally prohibitive. It can also be extended to more complex forms of turbulent transport, such as inertial particles, where preferential concentration, caustics, and finite response times introduce additional complications [34, 9, 25, 6, 31], making a robust data-driven approach such as that presented here even more valuable. Furthermore, coupling the learned Lagrangian surrogate with large-eddy simulations could provide a practical route to subgrid particle modelling [88, 70, 106], where unresolved turbulent fluctuations must be represented without resolving the full Eulerian field. Finally, the graph-based formulation opens the possibility of learning reduced dynamics for more complex particle systems, including active particles [90, 2], droplets [45], or particles in inhomogeneous and anisotropic turbulent flows [17, 84].
+Methods
+We describe the construction of the MZ–GNN model used to learn reduced-order tracer dynamics from DNS data.
+We build on the regression-based data-driven Mori–Zwanzig framework developed in Refs. [66, 67] and recently applied to single-particle Lagrangian turbulence in Ref. [32].
+In this approach, the Markovian and memory operators of the Mori–Zwanzig expansion are learned from trajectory data, with regression defining an empirical projection onto the chosen resolved variables and function class.
+The residuals left by this projection are associated with the orthogonal dynamics, and consistency of the learned memory terms is connected to the generalized fluctuation–dissipation relation, which links memory to correlations of the orthogonal dynamics.
+Here, we extend this data-driven MZ construction to a multi-particle setting by representing each memory operator with a symmetry-preserving message-passing graph neural network acting on particle-neighborhood graphs.
+The method therefore has three main components: first, the Mori–Zwanzig formalism motivates a finite-memory representation of the tracer acceleration; second, each memory operator is parameterized by an equivariant graph neural network; third, the memory operators are trained sequentially in a residual fashion and then rolled out autonomously to generate particle trajectories.
+We first introduce the Mori–Zwanzig formalism and our data-driven formulation, then describe the graph neural architecture and its symmetry properties, and finally give the DNS and training details.
+The Mori–Zwanzig framework
+The Mori–Zwanzig formalism [76, 119] provides a systematic way of deriving closed, non-Markovian equations for a reduced set of observables of a high-dimensional dynamical system. Let 𝒑∈ℝN\bm{p}\in\mathbb{R}^{N} denote the full state and let 𝒈⁡(𝒑)∈ℝM\bm{g}(\bm{p})\in\mathbb{R}^{M}, with M≪NM\ll N, be the resolved observables. A projection operator 𝒫\mathcal{P} maps functions of the full state onto functions of the resolved variables alone. Applying the Mori–Zwanzig projection formalism yields the generalized Langevin equation (GLE)
+dd​t​𝒈​(t)=𝑴⁡(𝒈⁡(t))−∫0t𝑲⁡(t−s,𝒈⁡(s))​𝑑s+𝑭⁡(t),\frac{\mathrm{d}}{\mathrm{d}t}\bm{g}(t)=\bm{M}(\bm{g}(t))-\int_{0}^{t}\bm{K}(t-s,\bm{g}(s))\,\mathrm{d}s+\bm{F}(t),
+(18)
+where 𝑴\bm{M} is the Markovian contribution, 𝑲\bm{K} is the memory kernel, and 𝑭\bm{F} is the orthogonal-dynamics term. The latter represents the part of the full dynamics that is not determined instantaneously by the resolved variables. Equation (18) is exact for a given choice of observables and projection operator, but it is not directly usable as a reduced model because the memory kernel and the orthogonal dynamics are generally unknown.
+In discrete time, the projected dynamics can be written as a non-Markovian autoregressive model,
+𝒈n+1=𝛀0​(𝒈n)+∑k=1n𝛀k​(𝒈n−k)+𝑾n,\bm{g}_{n+1}=\bm{\Omega}_{0}(\bm{g}_{n})+\sum_{k=1}^{n}\bm{\Omega}_{k}(\bm{g}_{n-k})+\bm{W}_{n},
+(19)
+where 𝛀0\bm{\Omega}_{0} is the Markovian operator, 𝛀k\bm{\Omega}_{k} are discrete memory operators, and 𝑾n\bm{W}_{n} is the discrete orthogonal-dynamics contribution. The data-driven Mori–Zwanzig approximation consists of replacing the formally exact but unknown operators by learned regression functions and truncating the memory to a finite length KK. Neglecting the explicit orthogonal-dynamics term then gives the closed truncated model
+𝒈n+1≈𝛀0​(𝒈n)+∑k=1K𝛀k​(𝒈n−k).\bm{g}_{n+1}\approx\bm{\Omega}_{0}(\bm{g}_{n})+\sum_{k=1}^{K}\bm{\Omega}_{k}(\bm{g}_{n-k}).
+(20)
+This approximation should not be interpreted as assuming that the unresolved dynamics are absent.
+Rather, their systematic influence on the resolved variables is represented through the learned memory operators.
+In the MZ–GNN, the regression is performed over the class of equivariant graph functions, so that the empirical projection is restricted to functions of the resolved particle graph that satisfy the required physical symmetries.
+The residual errors generated during learning play the role of the unresolved orthogonal dynamics, and the consistency of the learned memory terms is connected to the generalized fluctuation–dissipation relation [67, 66].
+In the present work, the resolved variables are the positions and velocities of a set of tracer particles,
+𝒈n={(𝒙in,𝒗in)}i=1Np.\bm{g}_{n}=\left\{\left(\bm{x}_{i}^{n},\bm{v}_{i}^{n}\right)\right\}_{i=1}^{N_{p}}.
+(21)
+Rather than learning a direct map for the full next state, we parameterize the Mori–Zwanzig closure at the level of the particle acceleration. The learned acceleration is written as a finite-memory expansion over present and delayed particle states,
+𝒂in=∑k=0K𝛀θ(k)​(𝒢n−k​s,𝒗n−k​s)i,\bm{a}_{i}^{n}=\sum_{k=0}^{K}\bm{\Omega}^{(k)}_{\theta}\left(\mathcal{G}^{\,n-ks},\bm{v}^{\,n-ks}\right)_{i},
+(22)
+where 𝒢n−k​s\mathcal{G}^{\,n-ks} is the particle graph constructed from the positions at the delayed time n−k​sn-ks, 𝒗n−k​s\bm{v}^{\,n-ks} denotes the corresponding velocities, ss is the memory stride, and KK is the maximum memory depth. The term k=0k=0 is the Markovian contribution, while k>0k>0 terms encode non-Markovian corrections arising from unresolved degrees of freedom.
+Once the acceleration is predicted, the particle state is advanced explicitly via Euler as
+𝒗in+1\displaystyle\bm{v}_{i}^{n+1}
+=𝒗in+Δ​t​𝒂in,\displaystyle=\bm{v}_{i}^{n}+\Delta t\,\bm{a}_{i}^{n},
+(23a)
+𝒙in+1\displaystyle\bm{x}_{i}^{n+1}
+=𝒙in+Δ​t​𝒗in.\displaystyle=\bm{x}_{i}^{n}+\Delta t\,\bm{v}_{i}^{n}.
+(23b)
+with positions wrapped periodically when constructing the graph. The DNS acceleration provides the supervised target for training the learned closure.
+Each operator 𝛀θ(k)\bm{\Omega}^{(k)}_{\theta} in Eq. (22) is represented by a message-passing graph neural network. This is the main extension relative to single-particle data-driven Mori–Zwanzig models: instead of applying neural networks independently to individual trajectories, the memory operators act on a graph of particles and therefore encode spatial correlations between tracers. This construction allows the same framework to describe single-particle, pair, and multi-particle observables.
+GNN architecture and symmetries
+Message-passing graph neural networks provide a natural representation for multi-particle Lagrangian dynamics. At each time, particles are represented as nodes of a graph and local interactions are encoded through edges. A message-passing layer updates the state of each node by aggregating information from its neighbours, using the same learnable function on every edge. This weight sharing makes the architecture permutation equivariant: relabeling the particles relabels the outputs in the same way. The learned dynamics should also respect the geometric and kinematic symmetries of the underlying Navier–Stokes equations. In homogeneous isotropic turbulence, the acceleration of a tracer particle is invariant under global translations, invariant under Galilean transformations, and equivariant under rotations and reflections of space. We therefore construct each learned operator so that it depends only on relative positions and relative velocities, and so that vector-valued messages are built from equivariant vector bases with scalar coefficients depending only on invariant quantities.
+The model parameterizes the discrete GLE using a family of equivariant message-passing GNNs.
+For a given memory lag, each particle ii is a node.
+The graph edge displacement 𝒓i​j\bm{r}_{ij} is defined as the shortest periodic displacement from particle ii to particle jj, i.e. the minimum-image version of 𝒙j−𝒙i\bm{x}_{j}-\bm{x}_{i}.
+Directed edges are introduced for j∈𝒩⁡(i)j\in\mathcal{N}(i) whenever j≠ij\neq i and ‖𝒓i​j‖<rc\|\bm{r}_{ij}\|<r_{c}, where rcr_{c} is the graph cutoff radius and 𝒩⁡(i)\mathcal{N}(i) denotes the set of neighbours of particle ii.
+We also define the Galilean-invariant edge velocity difference as 𝒗i​j=𝒗j−𝒗i\bm{v}_{ij}=\bm{v}_{j}-\bm{v}_{i}.
+The GNN takes the particle configuration and velocities as input and returns a vector contribution to the particle acceleration.
+The total acceleration is obtained by summing the contributions from the present and delayed graph states.
+For a single memory operator, the latent vector feature of node ii at message-passing layer ℓ\ell is denoted by 𝒉i(ℓ)\bm{h}_{i}^{(\ell)}.
+The latent vectors are initialized as
+𝒉i(0)=𝟎,\bm{h}_{i}^{(0)}=\mathbf{0},
+(24)
+and updated over NMPN_{\mathrm{MP}} message-passing layers.
+At each layer, we form the relative latent vector
+𝒉i​j(ℓ)=𝒉j(ℓ)−𝒉i(ℓ).\bm{h}_{ij}^{(\ell)}=\bm{h}_{j}^{(\ell)}-\bm{h}_{i}^{(\ell)}.
+(25)
+The scalar edge features are chosen to be invariant under rotations and reflections:
+si​j(ℓ)=(CLOSE\displaystyle s_{ij}^{(\ell)}=\bigl(
+‖𝒓i​j‖2,⟨𝒓i​j,𝒗i​j⟩,‖𝒗i​j‖2,\displaystyle\|\bm{r}_{ij}\|^{2},\;\langle\bm{r}_{ij},\bm{v}_{ij}\rangle,\;\|\bm{v}_{ij}\|^{2},\;
+OPEN⟨𝒓i​j,𝒉i​j(ℓ)⟩,⟨𝒗i​j,𝒉i​j(ℓ)⟩,‖𝒉i​j(ℓ)‖2).\displaystyle\langle\bm{r}_{ij},\bm{h}_{ij}^{(\ell)}\rangle,\;\langle\bm{v}_{ij},\bm{h}_{ij}^{(\ell)}\rangle,\;\|\bm{h}_{ij}^{(\ell)}\|^{2}\bigr).
+(26)
+A shared multilayer perceptron (MLP) [47] ϕℓ\phi_{\ell} maps these invariant scalars to scalar coefficients,
+(αi​j(ℓ),βi​j(ℓ),γi​j(ℓ))=ϕℓ​(si​j(ℓ)).\left(\alpha_{ij}^{(\ell)},\beta_{ij}^{(\ell)},\gamma_{ij}^{(\ell)}\right)=\phi_{\ell}\left(s_{ij}^{(\ell)}\right).
+(27)
+The vector message from node jj to node ii is then constructed as a linear combination of equivariant vector bases,
+𝒎i​j(ℓ)=αi​j(ℓ)​𝒓i​j+βi​j(ℓ)​𝒗i​j+γi​j(ℓ)​𝒉i​j(ℓ).\bm{m}_{ij}^{(\ell)}=\alpha_{ij}^{(\ell)}\bm{r}_{ij}+\beta_{ij}^{(\ell)}\bm{v}_{ij}+\gamma_{ij}^{(\ell)}\bm{h}_{ij}^{(\ell)}.
+(28)
+Node features are updated by mean aggregation of incoming messages,
+𝒉i(ℓ+1)=𝒉i(ℓ)+1|𝒩⁡(i)|​∑j∈𝒩⁡(i)𝒎i​j(ℓ).\bm{h}_{i}^{(\ell+1)}=\bm{h}_{i}^{(\ell)}+\frac{1}{|\mathcal{N}(i)|}\sum_{j\in\mathcal{N}(i)}\bm{m}_{ij}^{(\ell)}.
+(29)
+The acceleration contribution of this memory operator is read out from the final latent vector,
+𝒂i(k)=𝒉i(NMP).\bm{a}_{i}^{(k)}=\bm{h}_{i}^{(N_{\mathrm{MP}})}.
+(30)
+The spatial receptive field of each memory operator is controlled by the cutoff radius rcr_{c} and the message-passing depth NMPN_{\mathrm{MP}}.
+The cutoff defines the one-hop neighborhood, while after ℓ\ell message-passing layers node ii can depend on particles within at most ℓ\ell graph hops.
+Increasing NMPN_{\mathrm{MP}} therefore expands the receptive field at fixed cutoff, but very deep message passing can lead to oversmoothing or oversquashing of long-range information [93, 5].
+A more detailed discussion of the effective receptive field and the choice of rcr_{c} and NMPN_{\mathrm{MP}} is given in Appendix A.
+The symmetry properties follow directly from this construction.
+Since the same functions ϕℓ\phi_{\ell} are applied on every edge and the neighbour aggregation is independent of the ordering of neighbours, the model is permutation equivariant.
+Since only relative positions enter, it is invariant under global translations.
+Since only relative velocities enter, it is invariant under Galilean transformations.
+Finally, for any orthogonal transformation Q∈O⁡(3)Q\in O(3), including rotations and reflections, the vectors
+𝒓i​j\bm{r}_{ij}, 𝒗i​j\bm{v}_{ij}, and 𝒉i​j(ℓ)\bm{h}_{ij}^{(\ell)} transform as
+𝒓i​j↦Q​𝒓i​j,𝒗i​j↦Q​𝒗i​j,𝒉i​j(ℓ)↦Q​𝒉i​j(ℓ),\bm{r}_{ij}\mapsto Q\bm{r}_{ij},\qquad\bm{v}_{ij}\mapsto Q\bm{v}_{ij},\qquad\bm{h}_{ij}^{(\ell)}\mapsto Q\bm{h}_{ij}^{(\ell)},
+(31)
+while all scalar products and norms in si​j(ℓ)s_{ij}^{(\ell)} remain unchanged.
+Therefore the coefficients αi​j(ℓ)\alpha_{ij}^{(\ell)}, βi​j(ℓ)\beta_{ij}^{(\ell)}, and γi​j(ℓ)\gamma_{ij}^{(\ell)} are invariant, whereas each message transforms as
+𝒎i​j(ℓ)↦Q​𝒎i​j(ℓ)\bm{m}_{ij}^{(\ell)}\mapsto Q\bm{m}_{ij}^{(\ell)}.
+By induction over message-passing layers, the acceleration contribution satisfies
+𝒂i(k)​(Q​𝒙,Q​𝒗)=Q​𝒂i(k)​(𝒙,𝒗),\bm{a}_{i}^{(k)}(Q\bm{x},Q\bm{v})=Q\bm{a}_{i}^{(k)}(\bm{x},\bm{v}),
+(32)
+so each learned memory operator is O⁡(3)O(3)-equivariant.
+The full Mori–Zwanzig model preserves the same symmetries, because the total acceleration is a sum of such equivariant GNN operators applied to present and delayed graph states.
+DNS data
+The training and evaluation data are obtained from direct numerical simulations of incompressible homogeneous isotropic turbulence.
+The carrier flow evolves according to the Navier–Stokes equations
+∂t𝒖+𝒖⋅∇𝒖\displaystyle\partial_{t}\bm{u}+\bm{u}\cdot\nabla\bm{u}
+=−∇p+ν​∇2𝒖+𝒇,\displaystyle=-\nabla p+\nu\nabla^{2}\bm{u}+\bm{f},
+(33a)
+∇⋅𝒖\displaystyle\nabla\cdot\bm{u}
+=0,\displaystyle=0,
+(33b)
+in a triply periodic cubic domain of side 2​π2\pi.
+Here 𝒖⁡(𝒙,t)\bm{u}(\bm{x},t) is the fluid velocity, pp is the pressure divided by the density, ν\nu is the kinematic viscosity, and 𝒇\bm{f} is a large-scale forcing that maintains a statistically stationary turbulent state by imposing a constant energy-injection rate ε\varepsilon on the low-wavenumber modes, with
+𝒇^​(𝒌)=ε​𝒖^​(𝒌)/∑kf≤|𝒌|<kf+1|𝒖^​(𝒌)|2\hat{\bm{f}}(\bm{k})=\varepsilon\hat{\bm{u}}(\bm{k})/\sum_{k_{f}\leq|\bm{k}|<k_{f}+1}|\hat{\bm{u}}(\bm{k})|^{2} for kf≤|𝒌|<kf+1k_{f}\leq|\bm{k}|<k_{f}+1 [60].
+The equations are solved with a standard pseudo-spectral method with 2/32/3 dealiasing at resolution N3=2563N^{3}=256^{3}, so that the maximum resolved wavenumber is kmax=N/3k_{\max}=N/3.
+The simulation is fully resolved at the smallest scales, with kmax​η≳3k_{\max}\eta\gtrsim 3, and reaches a Taylor-scale Reynolds number R​eλ≃87Re_{\lambda}\simeq 87. A second-order accurate Adams–Bashforth scheme is used for time integration.
+We consider passive tracers, corresponding to the zero-inertia, one-way-coupled limit of the Maxey–Riley–Gatignol equations [69, 42].
+In this limit, particles are point-like and exactly follow the local fluid velocity,
+d​𝒙id​t\displaystyle\frac{\mathrm{d}\bm{x}_{i}}{\mathrm{d}t}
+=𝒗i,\displaystyle=\bm{v}_{i},
+(34a)
+𝒗i​(t)\displaystyle\bm{v}_{i}(t)
+=𝒖​(𝒙i​(t),t).\displaystyle=\bm{u}(\bm{x}_{i}(t),t).
+(34b)
+The tracers do not exert feedback on the fluid and do not interact directly with one another.
+The fluid velocity is interpolated to the particle positions using B-spline interpolation [109].
+The dataset contains particle positions, velocities, and accelerations for approximately 3.2×1043.2\times 10^{4} tracers over 2.5×1042.5\times 10^{4} stored time steps, corresponding to a total duration T=250​τηT=250\tau_{\eta}.
+The DNS integration time step is Δ​tDNS=5×10−3​τη\Delta t_{\mathrm{DNS}}=5\times 10^{-3}\tau_{\eta}, while particle data are stored every two DNS steps.
+The effective time step used by the MZ–GNN model is therefore
+Δ​t=10−2​τη.\Delta t=10^{-2}\tau_{\eta}.
+The dataset is split into training and testing subsets, using 80%80\% of the trajectories for training and 20%20\% for testing.
+During training, the stored trajectories are further arranged into short temporal windows, so that the model can be optimized through unrolled predictions over finite rollout horizons.
+Training details
+The model is trained on short trajectory windows extracted from the DNS dataset.
+Each training sample consists of a time origin nn, a batch of NpN_{p} particles, and the delayed particle states required by the finite-memory expansion.
+At every time in the window, a periodic radius graph is built from the wrapped particle positions.
+The graph cutoff is set to one third of the longitudinal integral length scale, rc=L0/3r_{c}=L_{0}/3, with
+L0=(3​π/4)​∫E⁡(k)​k−1​𝑑k/∫E⁡(k)​𝑑kL_{0}=(3\pi/4)\int E(k)k^{-1}\,\mathrm{d}k/\int E(k)\,\mathrm{d}k [87], computed from the dataset.
+The GNN therefore acts on periodic particle configurations, while unwrapped displacements are reconstructed only for diagnostics such as the ones shown in the results section.
+For a given memory level mm, the model receives the delayed graph states
+{(𝒢n−k​s,𝒗n−k​s)}k=0m\{(\mathcal{G}^{n-ks},\bm{v}^{n-ks})\}_{k=0}^{m}, where ss is the memory stride.
+The acceleration is predicted by the partial memory model containing the Markovian operator and the mm memory operators.
+This predicted acceleration is integrated forward with Eq. (23) over a short rollout horizon RR, rebuilding the graph after each position update.
+The loss is the mean-squared error between the predicted and DNS accelerations over the rollout,
+ℒm=1R​Np​∑q=0R−1∑i=1Np‖𝒂i,mn+q−𝒂i,DNSn+q‖2,\mathcal{L}_{m}=\frac{1}{RN_{p}}\sum_{q=0}^{R-1}\sum_{i=1}^{N_{p}}\left\|\bm{a}_{i,m}^{\,n+q}-\bm{a}_{i,\mathrm{DNS}}^{\,n+q}\right\|^{2},
+(35)
+where 𝒂i,mn+q\bm{a}_{i,m}^{\,n+q} denotes the acceleration predicted by the model at rollout step qq.
+The memory operators are trained sequentially in a residual fashion.
+First, the Markovian operator 𝛀θ(0)\bm{\Omega}^{(0)}_{\theta} is trained using only the current graph state.
+After convergence, it is frozen.
+For m>0m>0, all previously trained operators
+𝛀θ(0),…,𝛀θ(m−1)\bm{\Omega}^{(0)}_{\theta},\ldots,\bm{\Omega}^{(m-1)}_{\theta}
+are kept fixed, and only the new memory operator 𝛀θ(m)\bm{\Omega}^{(m)}_{\theta} is optimized.
+Thus, each additional operator learns the residual acceleration not captured by the lower-order memory model.
+Optimization is performed with Adam [56].
+The procedure is summarized in Algorithm Training details, and the main hyperparameters are reported in Table 1.
+After all memory operators are trained, the full model is rolled out autoregressively and evaluated on the single-particle, pair, and tetrad statistics reported above.
+{algorithm}
+[t]
+Training of the MZ–GNN
+1:
+DNS trajectories {𝒙n,𝒗n,𝒂n}\{\bm{x}^{n},\bm{v}^{n},\bm{a}^{n}\}, memory depth KK, stride ss, rollout horizon RR
+2:
+for m=0,…,Km=0,\ldots,K do
+3:
+Initialise 𝛀θ(m)\bm{\Omega}^{(m)}_{\theta}
+4:
+Freeze 𝛀θ(0),…,𝛀θ(m−1)\bm{\Omega}^{(0)}_{\theta},\ldots,\bm{\Omega}^{(m-1)}_{\theta}
+5:
+for each minibatch do
+6:
+Roll out the partial memory model up to level mm for RR steps
+7:
+Update only 𝛀θ(m)\bm{\Omega}^{(m)}_{\theta} by minimizing ℒm\mathcal{L}_{m}
+8:
+end for
+9:
+end for
+Table 1: Main training and architecture hyperparameters.
+Quantity
+Value
+Memory depth
+K=5K=5
+Memory stride
+s=5s=5 Δ​t\Delta t
+Time step
+Δ​t=10−2​τη\Delta t=10^{-2}\tau_{\eta}
+Graph cutoff
+rc=L0/3r_{c}=L_{0}/3
+Message-passing layers
+NMP=5N_{\mathrm{MP}}=5
+Hidden dimension
+256256
+MLP layers
+1010
+Total # parameters
+≈107\approx 10^{7}
+Aggregation
+Mean
+Rollout horizon during training
+R=5R=5
+Learning rate
+5×10−45\times 10^{-4}
+Particles per graph batch
+80008000
+Data availability
+The data developed and used in this work are available from the corresponding author upon reasonable request.
+Acknowledgements
+A.F. acknowledges useful discussions with Luca Biferale, Michele Buzzicotti and Maurizio Carbone. This research was supported in part by the European Union’s HORIZON MSCA Doctoral Networks programme under Grant Agreement
+No. 101072344, project AQTIVATE (Advanced computing, QuanTum algorIthms and data-driVen Approaches for science,
+Technology and Engineering), the European Research Council (ERC) under the European Union’s Horizon 2020 research and
+innovation programme Smart-TURB (Grant Agreement No. 882340). This work is supported by the Netherlands Organization for
+Scientific Research (NWO) through the use of supercomputer facilities (Snellius) under Grant No. 2025.008. This
+publication is part of the project “Shaping turbulence with smart particles” with Project No. OCENW.GROOT.2019.031 of
+the research program Open Competitie ENW XL which is (partly) financed by the Dutch Research Council (NWO). This work
+has been co-authored by employees of Triad National Security, LLC which operates Los Alamos National Laboratory (LANL)
+under Contract No. 89233218CNA000001 with the U.S. Department of Energy/National Nuclear Security Administration. We
+acknowledge support from LANL’s Laboratory Directed Research and development (LDRD) program, project number 20240318ER
+and U.S. Department of Energy, Office of Science, Office of Advanced Scientific Computing Research’s Applied Mathematics
+Competitive Portfolios program.
+Author contributions
+A.F. developed the code, generated the training and testing datasets, and performed the numerical analysis.
+All authors contributed to the conception of the research, interpretation of the results, and writing and revision of the manuscript.
+References
+[1]
+M. Albergo, N. M. Boffi, and E. Vanden-Eijnden (2025)
+Stochastic interpolants: a unifying framework for flows and diffusions.
+Journal of Machine Learning Research 26 (209), pp. 1–80.
+External Links: Link
+Cited by: Introduction.
+[2]
+R. Alert, J. Casademunt, and J. Joanny (2022)
+Active turbulence.
+Annual Review of Condensed Matter Physics 13 (1), pp. 143–170.
+External Links: Link
+Cited by: Discussion and conclusion.
+[3]
+A. Alexakis and L. Biferale (2018)
+Cascades and transitions in turbulent flows.
+Physics Reports 767-769.
+External Links: ISSN 0370-1573,
+Link
+Cited by: Introduction.
+[4]
+A. Arnèodo, R. Benzi, J. Berg, L. Biferale, E. Bodenschatz, A. Busse, E. Calzavarini, B. Castaing, M. Cencini, L. Chevillard, R.T. Fisher, R. Grauer, H. Homann, D. Lamb, A. S. Lanotte, E. Lévèque, B. Lüthi, J. Mann, N. Mordant, W.-C. Müller, S. Ott, N. T. Ouellette, J.-F. Pinton, S. B. Pope, S. G. Roux, F. Toschi, H. Xu, and P. K. Yeung (2008)
+Universal Intermittent Properties of Particle Trajectories in Highly Turbulent Flows.
+Phys. Rev. Lett. 100 (25), pp. 254504.
+External Links: ISSN 0031-9007, 1079-7114,
+Document
+Cited by: Introduction.
+[5]
+A. Arroyo, A. Gravina, B. Gutteridge, F. Barbero, C. Gallicchio, X. Dong, M. Bronstein, and P. Vandergheynst (2025)
+On vanishing gradients, over-smoothing, and over-squashing in GNNs: bridging recurrent and graph learning.
+In Advances in Neural Information Processing Systems,
+Vol. 38, pp. 74356–74393.
+External Links: Link
+Cited by: Appendix A,
+GNN architecture and symmetries.
+[6]
+J. Bec, L. Biferale, A. Lanotte, A. Scagliarini, and F. Toschi (2010)
+Turbulent pair dispersion of inertial particles.
+Journal of Fluid Mechanics 645, pp. 497–528.
+External Links: Link
+Cited by: Introduction,
+Discussion and conclusion.
+[7]
+J. Bec, L. Biferale, G. Boffetta, M. Cencini, S. Musacchio, and F. Toschi (2006)
+Lyapunov exponents of heavy particles in turbulence.
+Phys. Fluids 18 (9), pp. 091702.
+External Links: Document
+Cited by: Introduction.
+[8]
+J. Bec, L. Biferale, M. Cencini, A. S. Lanotte, and F. Toschi (2006)
+Effects of vortex filaments on the velocity of tracers and heavy particles in turbulence.
+Physics of Fluids 18 (8).
+External Links: Link
+Cited by: Introduction.
+[9]
+J. Bec, L. Biferale, G. Boffetta, A. Celani, M. Cencini, A. Lanotte, S. Musacchio, and F. Toschi (2006)
+Acceleration statistics of heavy particles in turbulence.
+Journal of Fluid Mechanics 550, pp. 349–358.
+External Links: Link
+Cited by: Discussion and conclusion.
+[10]
+A. Beck, D. Flad, and C. Munz (2019)
+Deep neural networks for data-driven LES closure models.
+J. Comput. Phys. 398, pp. 108910.
+External Links: Document
+Cited by: Introduction.
+[11]
+L. Bentkamp, C. C. Lalescu, and M. Wilczek (2019)
+Persistent accelerations disentangle lagrangian turbulence.
+Nature Communications 10, pp. 3550.
+Cited by: Introduction.
+[12]
+R. Benzi and F. Toschi (2023)
+Lectures on turbulence.
+Physics Reports 1021, pp. 1–106.
+Note: Lectures on turbulence
+External Links: ISSN 0370-1573,
+Document
+Cited by: Introduction.
+[13]
+L. Biferale, G. Boffetta, A. Celani, B. Devenish, A. Lanotte, and F. Toschi (2005)
+Multiparticle dispersion in fully developed turbulence.
+Physics of Fluids 17 (11).
+External Links: Link
+Cited by: Introduction,
+Tetrad geometry. ,
+Tetrad geometry. ,
+Discussion and conclusion.
+[14]
+L. Biferale, G. Boffetta, A. Celani, A. Lanotte, and F. Toschi (2006)
+Lagrangian statistics in fully developed turbulence.
+Journal of Turbulence 7 (), pp. N6.
+External Links: Link
+Cited by: Introduction.
+[15]
+L. Biferale, G. Boffetta, A. Celani, B. Devenish, A. Lanotte, and F. Toschi (2005)
+Lagrangian statistics of particle pairs in homogeneous isotropic turbulence.
+Physics of Fluids 17 (11).
+External Links: Link
+Cited by: Introduction,
+Pair dispersion. .
+[16]
+L. Biferale, G. Boffetta, A. Celani, A. Lanotte, and F. Toschi (2005)
+Particle trapping in three-dimensional fully developed turbulence.
+Phys. Fluids 17 (2), pp. 021701.
+External Links: Document
+Cited by: Introduction,
+Single-particle statistics. ,
+Discussion and conclusion.
+[17]
+L. Biferale, F. Bonaccorso, I. M. Mazzitelli, M. A. van Hinsberg, A. S. Lanotte, S. Musacchio, P. Perlekar, and F. Toschi (2016)
+Coherent structures and extreme events in rotating multiphase turbulent flows.
+Physical Review X 6 (4), pp. 041036.
+External Links: Link
+Cited by: Discussion and conclusion.
+[18]
+L. Biferale, A. S. Lanotte, R. Scatamacchia, and F. Toschi (2014)
+Intermittency in the relative separations of tracers and of heavy particles in turbulent flows.
+Journal of fluid mechanics 757, pp. 550–572.
+External Links: Link
+Cited by: Pair dispersion. .
+[19]
+L. Biferale (2003)
+Shell models of energy cascade in turbulence.
+Annu. Rev. Fluid Mech. 35 (1), pp. 441–468.
+External Links: Document
+Cited by: Introduction.
+[20]
+G. Boffetta and I. M. Sokolov (2002)
+Relative dispersion in fully developed turbulence: the Richardson’s law and intermittency corrections.
+Phys. Rev. Lett. 88 (9), pp. 094501.
+External Links: Document
+Cited by: Pair dispersion. .
+[21]
+M. S. Borgas (1993)
+The multifractal Lagrangian nature of turbulence.
+Phil. Trans. R. Soc. Lond. A 342, pp. 379–411.
+External Links: Link
+Cited by: Introduction.
+[22]
+L. Brandt and F. Coletti (2022)
+Particle-laden turbulence: progress and perspectives.
+Annu. Rev. Fluid Mech. 54 (Volume 54, 2022), pp. 159–189.
+External Links: Document,
+ISSN 1545-4479
+Cited by: Introduction.
+[23]
+M. M. Bronstein, J. Bruna, T. Cohen, and P. Veličković (2021)
+Geometric deep learning: grids, groups, graphs, geodesics, and gauges.
+arXiv preprint arXiv:2104.13478.
+External Links: Document
+Cited by: Introduction.
+[24]
+C. Calascibetta, L. Biferale, F. Borra, A. Celani, and M. Cencini (2023)
+Taming lagrangian chaos with multi-objective reinforcement learning.
+The European Physical Journal E 46 (3), pp. 9.
+External Links: Link
+Cited by: Discussion and conclusion.
+[25]
+E. Calzavarini, M. Cencini, D. Lohse, and F. Toschi (2008)
+Quantifying turbulence-induced segregation of inertial particles.
+Phys. Rev. Lett. 101, pp. 084504.
+External Links: Document,
+Link
+Cited by: Discussion and conclusion.
+[26]
+M. Carbone, V. J. Peterhans, A. S. Ecker, and M. Wilczek (2024)
+Tailor-designed models for the turbulent velocity gradient through normalizing flow.
+Physical Review Letters 133 (18), pp. 184001.
+External Links: Link
+Cited by: Introduction.
+[27]
+M. Chertkov, A. Pumir, and B. I. Shraiman (1999)
+Lagrangian tetrad dynamics and the phenomenology of turbulence.
+Physics of fluids 11 (8), pp. 2394–2410.
+External Links: Link
+Cited by: Introduction,
+Tetrad geometry. ,
+Tetrad geometry. ,
+Discussion and conclusion.
+[28]
+L. Chevillard, S. G. Roux, E. Lévêque, N. Mordant, J. Pinton, and A. Arneodo (2003)
+Lagrangian velocity statistics in turbulent flows: effects of dissipation.
+Phys. Rev. Lett. 91 (21), pp. 214502.
+External Links: Document
+Cited by: Introduction.
+[29]
+A. J. Chorin, O. H. Hald, and R. Kupferman (2000)
+Optimal prediction and the Mori–Zwanzig representation of irreversible processes.
+Proceedings of the National Academy of Sciences 97 (7), pp. 2968–2973.
+External Links: Document
+Cited by: Introduction.
+[30]
+S. Colabrese, K. Gustavsson, A. Celani, and L. Biferale (2017)
+Flow navigation by smart microswimmers via reinforcement learning.
+Phys. Rev. Lett. 118, pp. 158004.
+External Links: Document,
+Link
+Cited by: Discussion and conclusion.
+[31]
+X. M. de Wit, H. J. Adelerhof, A. Freitas, R. P. J. Kunnen, H. J. H. Clercx, and F. Toschi (2026)
+Dynamics of small bubbles in turbulence in non-dilute conditions.
+Phys. Rev. Fluids 11 (2), pp. 024602.
+External Links: Document
+Cited by: Discussion and conclusion.
+[32]
+X. M. de Wit, A. Gabbana, M. Woodward, Y. T. Lin, F. Toschi, and D. Livescu (2026)
+Data-driven mori–zwanzig modeling of lagrangian particle dynamics in turbulent flows.
+Proceedings of the National Academy of Sciences 123 (13), pp. e2525390123.
+External Links: Document
+Cited by: Introduction,
+Discussion and conclusion,
+Discussion and conclusion,
+Methods.
+[33]
+B. Devenish (2013)
+Geometrical properties of turbulent dispersion.
+Physical Review Letters 110 (6), pp. 064504.
+External Links: Link
+Cited by: Tetrad geometry. ,
+Tetrad geometry. ,
+Discussion and conclusion.
+[34]
+J. K. Eaton and J. Fessler (1994)
+Preferential concentration of particles by turbulence.
+International Journal of Multiphase Flow 20, pp. 169–209.
+External Links: Link
+Cited by: Discussion and conclusion.
+[35]
+G. Falkovich, K. Gawedzki, and M. Vergassola (2001)
+Particles and fields in fluid turbulence.
+Reviews of Modern Physics 73 (4), pp. 913–975.
+External Links: ISSN 0034-6861, 1539-0756,
+Document
+Cited by: Introduction.
+[36]
+G. Falkovich, A. Fouxon, and M. G. Stepanov (2002)
+Acceleration of rain initiation by cloud turbulence.
+Nature 419 (6903), pp. 151–154.
+External Links: Document
+Cited by: Introduction.
+[37]
+A. Freitas, L. Biferale, M. Desbrun, G. Eyink, A. A. Mailybaev, and K. Um (2026)
+On the importance of stochasticity in closures of turbulence.
+Europhysics Letters 154 (2), pp. 23002.
+External Links: Link
+Cited by: Introduction.
+[38]
+A. Freitas, K. Um, M. Desbrun, M. Buzzicotti, and L. Biferale (2025)
+Solver-in-the-loop approach to closure of shell models of turbulence.
+Phys. Rev. Fluids 10, pp. 044602.
+External Links: Document,
+Link
+Cited by: Introduction.
+[39]
+U. Frisch (1995)
+Turbulence: the legacy of A. N. Kolmogorov.
+Cambridge University Press.
+External Links: Link
+Cited by: Introduction.
+[40]
+F. B. Fuchs, D. E. Worrall, V. Fischer, and M. Welling (2020)
+SE(3)-transformers: 3D roto-translation equivariant attention networks.
+In Adv. Neural Inf. Process. Syst.,
+Vol. 33.
+External Links: Document
+Cited by: Introduction,
+Discussion and conclusion.
+[41]
+J. C. H. Fung, J. C. R. Hunt, N. A. Malik, and R. J. Perkins (1992)
+Kinematic simulation of homogeneous turbulence by unsteady random Fourier modes.
+J. Fluid Mech. 236, pp. 281–318.
+External Links: Document
+Cited by: Introduction.
+[42]
+R. Gatignol (1983)
+The Faxén formulae for a rigid particle in an unsteady non-uniform Stokes flow.
+Journal de Mécanique Théorique et Appliquée 1 (2), pp. 143–160.
+Cited by: DNS data.
+[43]
+J. Gilmer, K. T. Schütt, P. F. Riley, O. Vinyals, and G. Dahl (2017)
+Neural message passing for quantum chemistry.
+In Proc. ICML,
+External Links: Document
+Cited by: Introduction,
+Discussion and conclusion.
+[44]
+W. Gilpin (2024)
+Generative learning for nonlinear dynamics.
+Nat. Rev. Phys. 6, pp. 194–206.
+External Links: Document
+Cited by: Introduction.
+[45]
+I. Girotto, A. Scagliarini, R. Benzi, and F. Toschi (2024)
+Lagrangian statistics of concentrated emulsions.
+Journal of Fluid Mechanics 986, pp. A33.
+External Links: Link
+Cited by: Discussion and conclusion.
+[46]
+D. González, F. Chinesta, and E. Cueto (2020)
+Learning non-Markovian physics from data.
+J. Comput. Phys., pp. 109982.
+External Links: Document
+Cited by: Introduction.
+[47]
+I. Goodfellow, Y. Bengio, and A. Courville (2016)
+Deep learning.
+MIT Press.
+External Links: Link
+Cited by: Introduction,
+GNN architecture and symmetries.
+[48]
+W. W. Grabowski and L. Wang (2013)
+Growth of cloud droplets in a turbulent environment.
+Annu. Rev. Fluid Mech. 45, pp. 293–324.
+External Links: Document
+Cited by: Introduction.
+[49]
+L. Guastoni and R. Vinuesa (2025)
+A new perspective on the simulation of stochastic problems in fluid mechanics with diffusion models.
+Nature Machine Intelligence 7, pp. 816–817.
+External Links: Document,
+Link
+Cited by: Introduction.
+[50]
+F. Guglietta, M. A. Scarpolini, F. Viola, and L. Biferale (2026)
+Lagrangian analysis of turbulent blood flow in the human left heart.
+Phys. Rev. Fluids, pp. .
+External Links: Document,
+Link
+Cited by: Discussion and conclusion.
+[51]
+J. F. Hackl, P. K. Yeung, and B. L. Sawford (2011)
+Multi-particle and tetrad statistics in numerical simulations of turbulent relative dispersion.
+Physics of Fluids 23 (6), pp. 065103.
+External Links: ISSN 1070-6631,
+Link
+Cited by: Tetrad geometry. ,
+Tetrad geometry. ,
+Discussion and conclusion.
+[52]
+C. Hijón, P. Español, E. Vanden-Eijnden, and R. Delgado-Buscalioni (2010)
+Mori–zwanzig formalism as a practical computational tool.
+Faraday Discuss. 144, pp. 301–322.
+External Links: Document
+Cited by: Introduction.
+[53]
+T. Ishihara, Y. Kaneda, and J. C. R. Hunt (2013)
+Thin shear layers in high Reynolds number turbulence – DNS results.
+Flow Turbul. Combust. 91, pp. 895–929.
+External Links: Document
+Cited by: Introduction.
+[54]
+T. Ishihara and Y. Kaneda (2002)
+Relative diffusion of a pair of fluid particles in the inertial subrange of turbulence.
+Phys. Fluids 14 (11), pp. L69–L72.
+External Links: Document
+Cited by: Pair dispersion. .
+[55]
+Y. Kaneda, T. Ishihara, M. Yokokawa, K. Itakura, and A. Uno (2003)
+Energy dissipation rate and energy spectrum in high resolution direct numerical simulations of turbulence.
+Phys. Fluids 15 (2), pp. L21–L24.
+External Links: Document
+Cited by: Introduction.
+[56]
+D. P. Kingma and J. Ba (2014)
+Adam: a method for stochastic optimization.
+arXiv preprint arXiv:1412.6980.
+External Links: Document
+Cited by: Training details.
+[57]
+A. N. Kolmogorov (1941)
+The local structure of turbulence in incompressible viscous fluid for very large reynolds number.
+Cr Acad. Sci. USSR 30, pp. 301.
+Cited by: Pair dispersion. .
+[58]
+A. La Porta, G. A. Voth, A. M. Crawford, J. Alexander, and E. Bodenschatz (2001)
+Fluid particle accelerations in fully developed turbulence.
+Nature 409 (6823), pp. 1017–1019.
+External Links: Document
+Cited by: Introduction,
+Single-particle statistics. ,
+Discussion and conclusion.
+[59]
+J. H. LaCasce (2008)
+Statistics from Lagrangian observations.
+Prog. Oceanogr. 77, pp. 1–29.
+External Links: Document
+Cited by: Introduction.
+[60]
+A. G. Lamorgese, D. A. Caughey, and S. B. Pope (2004)
+Direct numerical simulation of homogeneous turbulence with hyperviscosity.
+Physics of Fluids 17 (1), pp. 015106.
+External Links: ISSN 1070-6631,
+Document
+Cited by: DNS data.
+[61]
+A. G. Lamorgese, S. B. Pope, P. K. Yeung, and B. L. Sawford (2007)
+A conditionally cubic-Gaussian stochastic Lagrangian model for acceleration in isotropic turbulence.
+J. Fluid Mech. 582, pp. 423–448.
+External Links: Document
+Cited by: Introduction.
+[62]
+T. Li, L. Biferale, F. Bonaccorso, M. A. Scarpolini, and M. Buzzicotti (2024)
+Synthetic Lagrangian turbulence by generative diffusion models.
+Nat. Mach. Intell. 6 (4), pp. 393–403.
+External Links: Document
+Cited by: Introduction.
+[63]
+T. Li, S. Tommasi, M. Buzzicotti, F. Bonaccorso, and L. Biferale (2024)
+Generative diffusion models for synthetic trajectories of heavy and light particles in turbulence.
+Int. J. Multiph. Flow 181, pp. 104980.
+External Links: Document
+Cited by: Introduction.
+[64]
+Z. Li, X. Bian, X. Li, and G. E. Karniadakis (2015)
+Incorporation of memory effects in coarse-grained modeling via the Mori-Zwanzig formalism.
+J. Chem. Phys. 143 (24), pp. 243128.
+External Links: Document
+Cited by: Introduction.
+[65]
+Z. Li, X. Bian, X. Li, and G. E. Karniadakis (2017)
+Computing the non-Markovian coarse-grained interactions derived from the Mori–Zwanzig formalism in molecular systems.
+J. Chem. Phys. 146, pp. 014104.
+External Links: Document
+Cited by: Introduction.
+[66]
+Y. T. Lin, Y. Tian, D. Livescu, and M. Anghel (2021)
+Data-driven learning for the Mori–Zwanzig formalism: a generalization of the Koopman learning framework.
+SIAM J. Appl. Dyn. Syst. 20 (4), pp. 2558–2601.
+External Links: Document
+Cited by: Introduction,
+Discussion and conclusion,
+Discussion and conclusion,
+The Mori–Zwanzig framework,
+Methods.
+[67]
+Y. T. Lin, Y. Tian, D. Perez, and D. Livescu (2023)
+Regression-based projection for learning Mori-Zwanzig operators.
+SIAM J. Appl. Dyn. Syst. 22 (4), pp. 2890–2926.
+External Links: Document
+Cited by: Introduction,
+Introduction,
+Discussion and conclusion,
+Discussion and conclusion,
+The Mori–Zwanzig framework,
+Methods.
+[68]
+R. Maulik, O. San, A. Rasheed, and P. Vedula (2019)
+Subgrid modelling for two-dimensional turbulence using neural networks.
+J. Fluid Mech. 858, pp. 122–144.
+External Links: Document
+Cited by: Introduction.
+[69]
+M. R. Maxey and J. J. Riley (1983)
+Equation of motion for a small rigid sphere in a nonuniform flow.
+Phys. Fluids 26 (4), pp. 883–889.
+External Links: ISSN 0031-9171,
+Document
+Cited by: DNS data.
+[70]
+I. M. Mazzitelli, F. Toschi, and A. S. Lanotte (2014)
+An accurate and efficient lagrangian sub-grid model.
+Physics of Fluids 26 (9), pp. 095101.
+External Links: ISSN 1070-6631,
+Link
+Cited by: Discussion and conclusion.
+[71]
+C. Meneveau and J. Katz (2000)
+Scale-invariance and turbulence models for large-eddy simulation.
+Annual Review of Fluid Mechanics.
+External Links: Link
+Cited by: Introduction.
+[72]
+J. J. Monaghan (2005)
+Smoothed particle hydrodynamics.
+Reports on Progress in Physics 68 (8), pp. 1703.
+External Links: Document,
+Link
+Cited by: Discussion and conclusion.
+[73]
+J.J. Monaghan (2012)
+Smoothed particle hydrodynamics and its diverse applications.
+Annual Review of Fluid Mechanics 44 (Volume 44, 2012), pp. 323–346.
+External Links: Document,
+Link,
+ISSN 1545-4479
+Cited by: Discussion and conclusion.
+[74]
+N. Mordant, A.M. Crawford, and E. Bodenschatz (2004)
+Experimental Lagrangian acceleration probability density function measurement.
+Physica D: Nonlinear Phenomena 193, pp. 245–251.
+Cited by: Introduction.
+[75]
+N. Mordant, A. M. Crawford, and E. Bodenschatz (2004)
+Experimental Lagrangian acceleration probability density function measurement.
+Physica D 193 (1–4), pp. 245–251.
+External Links: Document
+Cited by: Introduction,
+Discussion and conclusion.
+[76]
+H. Mori (1965)
+Transport, collective motion, and Brownian motion.
+Prog. Theor. Phys. 33, pp. 423–455.
+External Links: Document
+Cited by: Introduction,
+Discussion and conclusion,
+The Mori–Zwanzig framework.
+[77]
+S. Murray, M. F. Lightstone, and S. Tullis (2016)
+Single-particle Lagrangian and structure statistics in kinematically simulated particle-laden turbulent flows.
+Phys. Fluids 28 (3), pp. 033302.
+External Links: Document
+Cited by: Introduction.
+[78]
+A. Obukhov (1941)
+Spectral energy distribution in a turbulent flow.
+Izv. Akad. Nauk. SSSR. Ser. Geogr. i. Geofiz 5, pp. 453–466.
+Cited by: Pair dispersion. .
+[79]
+G. Ortali, A. Gabbana, N. Demo, G. Rozza, and F. Toschi (2025)
+Kinetic data-driven approach to turbulence subgrid modeling.
+Phys. Rev. Res. 7, pp. 013202.
+External Links: Document,
+Link
+Cited by: Introduction.
+[80]
+S. Ott and J. Mann (2000)
+An experimental investigation of the relative diffusion of particle pairs in three-dimensional turbulent flow.
+J. Fluid Mech. 422, pp. 207–223.
+External Links: Document
+Cited by: Pair dispersion. .
+[81]
+A. Pantea, L. Biferale, M. Buzzicotti, G. Charpiat, S. Chibbaro, and T. Li (2026)
+Turbulent pair dispersion with stochastic generative diffusion models.
+External Links: 2604.12932,
+Link
+Cited by: Introduction.
+[82]
+E. J. Parish and K. Duraisamy (2017)
+Non-Markovian closure models for large eddy simulations using the Mori-Zwanzig formalism.
+Phys. Rev. Fluids 2, pp. 014604.
+External Links: Document
+Cited by: Introduction.
+[83]
+T. Pfaff, M. Fortunato, A. Sanchez-Gonzalez, and P. Battaglia (2021)
+Learning mesh-based simulation with graph networks.
+In Proc. ICLR,
+External Links: Document
+Cited by: Introduction.
+[84]
+E. Pitton, C. Marchioli, V. Lavezzo, A. Soldati, and F. Toschi (2012)
+Anisotropy in pair dispersion of inertial particles in turbulent channel flow.
+Physics of Fluids 24 (7), pp. 073305.
+External Links: ISSN 1070-6631,
+Link
+Cited by: Discussion and conclusion.
+[85]
+S. B. Pope (1985)
+PDF methods for turbulent reactive flows.
+Prog. Energy Combust. Sci. 11, pp. 119–192.
+External Links: Document
+Cited by: Introduction.
+[86]
+S. B. Pope (1994)
+Lagrangian PDF methods for turbulent flows.
+Annu. Rev. Fluid Mech. 26 (1), pp. 23–63.
+External Links: Document
+Cited by: Introduction,
+Introduction.
+[87]
+S. B. Pope (2000)
+Turbulent flows.
+Cambridge University Press.
+External Links: Document
+Cited by: Introduction,
+Introduction,
+Training details.
+[88]
+J. Pozorski and S. V. Apte (2009)
+Filtered particle tracking in isotropic turbulence and stochastic modelling of subgrid-scale dispersion.
+Int. J. Multiph. Flow 35, pp. 118–128.
+External Links: Document
+Cited by: Discussion and conclusion.
+[89]
+A. Pumir, B. I. Shraiman, and M. Chertkov (2000)
+Geometry of Lagrangian dispersion in turbulence.
+Phys. Rev. Lett. 85, pp. 5324.
+External Links: Document
+Cited by: Introduction,
+Tetrad geometry. ,
+Tetrad geometry. ,
+Discussion and conclusion.
+[90]
+S. Ramaswamy (2010)
+The mechanics and statistics of active matter.
+Annu. Rev. Condens. Matter Phys. 1 (1), pp. 323–345.
+External Links: Link
+Cited by: Discussion and conclusion.
+[91]
+L. F. Richardson (1926)
+Atmospheric diffusion shown on a distance-neighbour graph.
+Proceedings of the Royal Society of London. Series A, Containing Papers of a Mathematical and Physical Character 110 (756), pp. 709–737.
+External Links: ISSN 0950-1207,
+Document
+Cited by: Pair dispersion. .
+[92]
+J. J. Riley and G. S. Patterson (1974)
+Diffusion experiments with numerically integrated isotropic turbulence.
+Phys. Fluids 17 (2), pp. 292–297.
+External Links: Document
+Cited by: Introduction.
+[93]
+T. K. Rusch, M. M. Bronstein, and S. Mishra (2023)
+A survey on oversmoothing in graph neural networks.
+arXiv preprint arXiv:2303.10993.
+External Links: Link
+Cited by: Appendix A,
+GNN architecture and symmetries.
+[94]
+A. Sanchez-Gonzalez, J. Godwin, T. Pfaff, R. Ying, J. Leskovec, and P. Battaglia (2020)
+Learning to simulate complex physics with graph networks.
+In Proc. ICML,
+External Links: Document
+Cited by: Introduction.
+[95]
+V. G. Satorras, E. Hoogeboom, and M. Welling (2021)
+E(n) equivariant graph neural networks.
+In Proc. ICML,
+External Links: Document
+Cited by: Introduction,
+Discussion and conclusion.
+[96]
+B. L. Sawford (1991)
+Reynolds number effects in Lagrangian stochastic models of turbulent dispersion.
+Phys. Fluids A 3 (6), pp. 1577–1586.
+External Links: Document
+Cited by: Introduction.
+[97]
+B. L. Sawford, P. K. Yeung, M. S. Borgas, P. Vedula, A. La Porta, A. M. Crawford, and E. Bodenschatz (2003)
+Conditional and unconditional acceleration statistics in turbulence.
+Phys. Fluids 15 (11), pp. 3478–3489.
+External Links: Document
+Cited by: Introduction,
+Single-particle statistics. ,
+Discussion and conclusion.
+[98]
+B. Sawford (2001)
+Turbulent relative dispersion.
+Annu. Rev. Fluid Mech. 33 (1), pp. 289–317.
+External Links: Document
+Cited by: Introduction.
+[99]
+F. Scarselli, M. Gori, A. C. Tsoi, M. Hagenbuchner, and G. Monfardini (2009)
+The graph neural network model.
+IEEE Trans. Neural Netw. 20, pp. 61–80.
+External Links: Document
+Cited by: Introduction.
+[100]
+R. Scatamacchia, L. Biferale, and F. Toschi (2012)
+Extreme events in the dispersions of two neighboring particles under the influence of fluid turbulence.
+Physical review letters 109 (14), pp. 144501.
+External Links: Link
+Cited by: Pair dispersion. .
+[101]
+D. Schanz, S. Gesemann, and A. Schröder (2016)
+Shake-the-box: Lagrangian particle tracking at high particle image densities.
+Exp. Fluids 57, pp. 1–27.
+External Links: Document
+Cited by: Introduction.
+[102]
+A. Schröder and D. Schanz (2023)
+3D Lagrangian particle tracking in fluid mechanics.
+Annu. Rev. Fluid Mech. 55, pp. 511–540.
+External Links: Document
+Cited by: Introduction.
+[103]
+K. D. Squires and J. K. Eaton (1991)
+Lagrangian and Eulerian statistics obtained from direct numerical simulations of homogeneous turbulence.
+Phys. Fluids A 3 (1), pp. 130–143.
+External Links: Document
+Cited by: Introduction.
+[104]
+K. R. Sreenivasan and J. Schumacher (2025)
+What is the turbulence problem, and when may we regard it as solved?.
+Annual Review of Condensed Matter Physics 16 (Volume 16, 2025), pp. 121–143.
+External Links: Document,
+ISSN 1947-5462
+Cited by: Introduction.
+[105]
+N. Thomas, T. E. Smidt, S. Kearnes, L. Yang, L. Li, K. Kohlhoff, and P. Riley (2018)
+Tensor field networks: rotation- and translation-equivariant neural networks for 3D point clouds.
+External Links: 1802.08219,
+Document
+Cited by: Introduction,
+Discussion and conclusion.
+[106]
+Y. Tian, M. Woodward, M. Stepanov, C. Fryer, C. Hyett, D. Livescu, and M. Chertkov (2023)
+Lagrangian large eddy simulations via physics-informed machine learning.
+PNAS 120 (34), pp. e2213638120.
+External Links: Link
+Cited by: Discussion and conclusion.
+[107]
+F. Toschi and E. Bodenschatz (2009)
+Lagrangian properties of particles in turbulence.
+Annu. Rev. Fluid Mech. 41 (1), pp. 375–404.
+External Links: Document
+Cited by: Introduction,
+Introduction,
+Introduction.
+[108]
+A. Toshev, J. A. Erbesdobler, N. A. Adams, and J. Brandstetter (2024)
+Neural SPH: improved neural modeling of Lagrangian fluid dynamics.
+In ICLR 2024 Workshop on AI4DifferentialEquations In Science,
+External Links: Link
+Cited by: Discussion and conclusion.
+[109]
+M. A. T. van Hinsberg, J. H. M. ten Thije Boonkkamp, F. Toschi, and H. J. H. Clercx (2013)
+Optimal interpolation schemes for particle tracking in turbulence.
+Phys. Rev. E 87, pp. 043307.
+External Links: Document
+Cited by: DNS data.
+[110]
+P. Vedula and P. K. Yeung (1999)
+Similarity scaling of acceleration and pressure statistics in numerical simulations of isotropic turbulence.
+Phys. Fluids 11 (5), pp. 1208–1220.
+External Links: Link
+Cited by: Introduction.
+[111]
+B. Viggiano, J. Friedrich, R. Volk, M. Bourgoin, R. B. Cal, and L. Chevillard (2020)
+Modelling Lagrangian velocity and acceleration in turbulent flows as infinitely differentiable stochastic processes.
+J. Fluid Mech. 900, pp. A27.
+External Links: Document
+Cited by: Introduction.
+[112]
+G. A. Voth, A. La Porta, A. M. Crawford, J. Alexander, and E. Bodenschatz (2002)
+Measurement of particle accelerations in fully developed turbulence.
+J. Fluid Mech. 469, pp. 121–160.
+External Links: Document
+Cited by: Introduction,
+Discussion and conclusion.
+[113]
+J. D. Wilson and B. L. Sawford (1996)
+Review of Lagrangian stochastic models for trajectories in the turbulent atmosphere.
+Boundary-Layer Meteorol. 78, pp. 191–210.
+External Links: Document
+Cited by: Introduction.
+[114]
+P. K. Yeung and S. B. Pope (1989)
+Lagrangian statistics from direct numerical simulations of isotropic turbulence.
+J. Fluid Mech. 207, pp. 531–586.
+External Links: Document
+Cited by: Introduction.
+[115]
+P. K. Yeung and K. Ravikumar (2020)
+Advancing understanding of turbulence through extreme-scale computation.
+Phys. Rev. Fluids 5 (11), pp. 110517.
+External Links: Document
+Cited by: Introduction.
+[116]
+P. K. Yeung, X. M. Zhai, and K. R. Sreenivasan (2015)
+Extreme events in computational turbulence.
+Proc. Natl Acad. Sci. USA 112 (41), pp. 12633–12638.
+External Links: Document
+Cited by: Introduction.
+[117]
+P. K. Yeung (2001)
+Lagrangian characteristics of turbulence and scalar transport in direct numerical simulations.
+J. Fluid Mech. 427, pp. 241–274.
+External Links: Document
+Cited by: Introduction.
+[118]
+P. K. Yeung (2002)
+Lagrangian investigations of turbulence.
+Annu. Rev. Fluid Mech. 34 (1), pp. 115–142.
+External Links: Document
+Cited by: Introduction.
+[119]
+R. Zwanzig (1960)
+Ensemble method in the theory of irreversibility.
+The Journal of Chemical Physics 33 (5), pp. 1338–1341.
+External Links: ISSN 0021-9606,
+Link
+Cited by: Introduction,
+Discussion and conclusion,
+The Mori–Zwanzig framework.
+[120]
+R. Zwanzig (2001)
+Nonequilibrium statistical mechanics.
+Oxford University Press, Oxford ; New York.
+External Links: ISBN 978-0-19-514018-7,
+LCCN QC174.86.N65 Z93 2001
+Cited by: Introduction.
+Appendix A Spatial receptive field
+The spatial information available to the MZ–GNN is controlled primarily by the graph cutoff radius rcr_{c} and the number of message-passing layers NMPN_{\mathrm{MP}}.
+The cutoff radius defines the one-hop neighborhood, while NMPN_{\mathrm{MP}} determines how many graph hops information can travel before the acceleration is read out.
+A simple geometric estimate of the maximum receptive field is
+ℓeff∼NMP​rc.\ell_{\mathrm{eff}}\sim N_{\mathrm{MP}}r_{c}.
+Writing rc=α​L0r_{c}=\alpha L_{0}, with L0L_{0} the longitudinal integral length scale, gives
+ℓeff/L0∼α​NMP.\ell_{\mathrm{eff}}/L_{0}\sim\alpha N_{\mathrm{MP}}.
+This should be interpreted only as an upper bound, since the actual information flow also depends on the instantaneous particle density and graph connectivity.
+Figure 4 shows this estimate as a function of α=rc/L0\alpha=r_{c}/L_{0} and NMPN_{\mathrm{MP}}.
+The star marks the configuration used in this work, rc=L0/3r_{c}=L_{0}/3 and NMP=5N_{\mathrm{MP}}=5, corresponding to a receptive field of order the integral scale.
+This choice balances two routes for increasing spatial information.
+A larger cutoff gives direct access to a wider neighborhood, but increases graph density, computational cost, and may reduce locality, especially at high particle density.
+Increasing the message-passing depth expands the receptive field at fixed local cutoff, but very deep GNNs can suffer from oversmoothing, where node features become less distinguishable, and from oversquashing, where long-range information is compressed into finite-dimensional node states [93, 5].
+The residual message-passing updates used here partially mitigate this issue, since each layer adds an incremental correction rather than replacing the node representation.
+Higher-hop information therefore enters residually, supplementing shorter-range information rather than overwriting it.
+Nevertheless, the choice of rcr_{c}, NMPN_{\mathrm{MP}}, and particle density remains an important modelling decision: too small a receptive field limits the spatial correlations available to the model, whereas too large a graph may increase cost and degrade the learned local representation.
+A systematic optimization over these parameters would require training many models and is left for future work.
+Here, the chosen configuration should be understood as a physically motivated compromise between spatial coverage, locality, stability, and computational cost.
+Figure 4:
+Effective spatial receptive field estimated as ℓeff/L0∼α​NMP\ell_{\mathrm{eff}}/L_{0}\sim\alpha N_{\mathrm{MP}}, with α=rc/L0\alpha=r_{c}/L_{0}.
+The dash-dotted and dashed lines indicate ℓeff=L0\ell_{\mathrm{eff}}=L_{0} and ℓeff=Lbox/2\ell_{\mathrm{eff}}=L_{\mathrm{box}}/2, respectively.
+The star marks the configuration used in this work, rc=L0/3r_{c}=L_{0}/3 and NMP=5N_{\mathrm{MP}}=5.
+Appendix B Effect of memory on multi-particle statistics
+As a complementary assessment of memory effects beyond the single-particle acceleration PDF discussed in the main text, we consider the flatness of the pair-separation distribution,
+Fr​(t)=⟨|𝒓⁡(t)|4⟩⟨|𝒓⁡(t)|2⟩2.F_{r}(t)=\frac{\left\langle|\bm{r}(t)|^{4}\right\rangle}{\left\langle|\bm{r}(t)|^{2}\right\rangle^{2}}.
+(36)
+This quantity provides a measure of the tails of the separation PDF.
+For a self-similar separation process, FrF_{r} would remain approximately constant in time.
+Changes in FrF_{r} therefore indicate that the relative weight of typical and rare separation events is dynamical.
+Figure 5 shows Fr​(t)F_{r}(t) for different memory depths.
+Starting from the initially fixed pair separation, the DNS flatness increases after the dissipative stage, reaches a maximum during the superdiffusive regime, and then decreases as pairs approach the large-scale diffusive regime.
+At the present Reynolds number, these deviations from Gaussian-like behaviour are moderate, but they are still sensitive to the memory depth.
+The Markovian model (K=0K=0) strongly underestimates the growth of FrF_{r}, showing that memory is needed to capture the broadening of the pair-separation distribution.
+Including memory substantially improves the agreement: both K=3K=3 and K=5K=5 reproduce the overall evolution, with K=5K=5 giving the closest match to DNS.
+The remaining differences are consistent with the slight overprediction of rapidly separating pairs discussed in the main text.
+Overall, this confirms that memory improves not only single-particle statistics, but also higher-order multi-particle statistics of turbulent dispersion.
+Figure 5:
+Flatness of the pair-separation distribution,
+Fr=⟨|𝒓|4⟩/⟨|𝒓|2⟩2F_{r}=\langle|\bm{r}|^{4}\rangle/\langle|\bm{r}|^{2}\rangle^{2},
+for MZ–GNN models with different memory depths and DNS ground truth.
+Experimental support, please
+view the build logs
+for errors. Generated by
+L
+A
+T
+E
+xml
+.
+Instructions for reporting errors
+We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+methods listed below:
+Click the "Report Issue" (
+) button, located in the page header.
+Tip: You can select the relevant text first, to include it in your report.
+Our team has already identified the following issues. We appreciate your time reviewing and reporting rendering errors we
+may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+all.
+Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a list of packages that need conversion, and welcome developer contributions.
+We gratefully acknowledge support from
+our major funders,
+member institutions, ,
+and all contributors.
+About
+·
+Help
+·
+Contact
+·
+Subscribe
+·
+Copyright
+·
+Privacy
+·
+Accessibility
+·
+Operational Status (opens in new tab)
+Major funding support from

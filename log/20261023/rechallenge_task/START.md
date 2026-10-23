@@ -1,0 +1,9 @@
+# History-dependent rechallenge: task and mechanism qualification
+
+2026-10-23. Full goal reread; ACTIVE / NOT_ACHIEVED. Previous goal turn is PROGRESS: one frozen archived-assay execution, independent raw reconstruction and reciprocal result critique changed the next research action. No global blocker. HEAD47a0e2dea5a7dd42379fa17eb3621caf6bd0114c. Preexisting tracked additions in log/README.md and research/REPORT.md remain14 lines each.
+
+Do not refit the exposed four-condition CTG panel. Its first-cycle recurrence beat latest-week repetition on the frozen gate but failed against persistence in V600E Intermittent. Its nonstationary group response factors suggest an application question, not a new mechanism: predict functional response to rechallenge from lawful treatment history. Need actual independent trajectory/condition units and observable challenge outcomes. Do not join original Fig2, Fig3 and PI assays or treat shared baselines as independent.
+
+This phase first qualifies original repository schemas and searches current primary evidence for an actual history-to-functional-response task. In parallel assess whether any concise computational contribution remains beyond ordinary hidden-state estimation, direct history regression and refitting. No numerical outcomes are parsed before a new protocol, no author contact, no protected reserves, no arbitrary editor expansion. Two existing reviewers work independently and seal reports before reciprocal cross. Source acquisition code and future tests stay research/rechallenge_task_20261023/; all evidence here.
+
+Keep historical CDK, BeatAML consistency, VUScope midpoint, NK death and source-specific STOPs. Ordinary preliminary predictors remain legitimate, but cannot satisfy novel core, world/agent/inheritance/joint/improved-improver requirements by themselves. New mechanism worth pursuing must undergo opposing independent novelty/biology/simplicity review before numerical work.

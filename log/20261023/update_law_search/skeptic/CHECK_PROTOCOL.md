@@ -1,0 +1,5 @@
+# Frozen mathematical gate (not a biological experiment)
+
+2026-10-23. Before execution. Test the proposed transfer of normalized Fisher parameter-decoupling to arbitrary learned latent cell coordinates. No current peer report has been read.
+
+Use an exactly specified linear two-parameter observable model y=J theta, J=diag(10,1), unit isotropic observation noise. Reparameterize theta=Q eta by the fixed 45-degree orthogonal rotation. Derive Fisher F=J'J, F_eta=Q'FQ. Compute the paper's pure decoupling ratio d_i=1/(F_ii (F^-1)_ii), equivalent to Schur-complement/F_ii. Check observable predictions, A-optimal trace(F^-1), D-optimal determinant and eigenvalues invariant under this rotation, while the per-coordinate ratio changes. This tests whether a naive decoupling gate is an intrinsic property of a latent world model. It does not refute IDTD, whose coordinates represent named physical parameters, nor establish any biological performance or original algorithm. Fixed no RNG, no data/outcome reads.

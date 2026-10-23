@@ -1,0 +1,5 @@
+# Function replicate qualification and source-only diagnostic
+
+2026-10-22. Full objective ACTIVE / NOT_ACHIEVED. Prior turn PROGRESS36fits+independentcrossreview. HEAD47a0e2dea5a7dd42379fa17eb3621caf6bd0114c; dirtyglobalindexes preserved. No livePythonjob. New concrete authorobjects are filter15replicate1/2 andreplicateAverage ABBAaveraged phenotype matrices from pinnedoriginalNormanrepo. Acquisition and stringschema only first. No protectedlabel numericalaccess; no inference ofnoisecause/oracleceiling. Existingstrongconventionalbaselines andallscopedSTOPs retained. Allcode research/,records/data log/.
+
+Intended unit is unordered targetpair with underlying guide×guide×replicate observations. Need confirm source-only reconstructedreplicateAverage geneaggregation matches existing permitted endpoint before linking residuals. No expressionmatrix/NAIADfit rerun. Once qualified, predefine a source-only crossfitdiagnostic to distinguish reproducible modelerror from simple replicate disagreement; two replicates do not supply fullnoisevariance identification or biologicalcausality.

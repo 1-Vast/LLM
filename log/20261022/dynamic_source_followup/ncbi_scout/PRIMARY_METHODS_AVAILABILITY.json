@@ -1,0 +1,216 @@
+{
+  "headings": [
+    {
+      "title": "Introduction",
+      "type": "intro"
+    },
+    {
+      "title": "Results",
+      "type": "results"
+    },
+    {
+      "title": "Collateral effects are temporally dynamic",
+      "type": null
+    },
+    {
+      "title": "Collateral effects are initially dominated by resistance but shift toward sensitivity with further adaptation",
+      "type": null
+    },
+    {
+      "title": "Temporally dynamic collateral effects are difficult to predict at the level of individual drugs",
+      "type": null
+    },
+    {
+      "title": "Collateral effects are dynamic within individual populations",
+      "type": null
+    },
+    {
+      "title": "Simple model highlights potential trade-offs of multi-drug sequences when collateral profiles are dynamic",
+      "type": null
+    },
+    {
+      "title": "Success of switching to a second antibiotic is contingent on temporally dynamic collateral effects",
+      "type": null
+    },
+    {
+      "title": "Dynamic collateral profiles require dynamic treatments to optimally constrain resistance",
+      "type": null
+    },
+    {
+      "title": "Discussion",
+      "type": "conclusions"
+    },
+    {
+      "title": "Materials and methods",
+      "type": "materials|methods"
+    },
+    {
+      "title": "Strains, antibiotics, and media",
+      "type": null
+    },
+    {
+      "title": "Laboratory evolution experiments",
+      "type": null
+    },
+    {
+      "title": "Measuring drug resistance and sensitivity",
+      "type": null
+    },
+    {
+      "title": "Logistic regressions for estimating frequency trends",
+      "type": null
+    },
+    {
+      "title": "MDP models",
+      "type": null
+    },
+    {
+      "title": "Supporting information",
+      "type": "supplementary-material"
+    }
+  ],
+  "methods": [
+    {
+      "title": "Materials and methods",
+      "paragraphs": []
+    },
+    {
+      "title": "Strains, antibiotics, and media",
+      "paragraphs": [
+        "All resistance evolution lineages were derived from an  E. faecalis  V583 ancestor, a fully sequenced clinical isolate with vancomycin resistance [ 77 ]. The 5 antibiotics used in this study and their mechanisms of action are listed in  Table 1 . Antibiotics were prepared from powder stock and stored at an appropriate temperature. Evolution and IC 50  measurements were conducted in brain heart infusion (BHI)."
+      ]
+    },
+    {
+      "title": "Laboratory evolution experiments",
+      "paragraphs": [
+        "Evolution experiments were performed in replicates of four. Daily serial passage evolutions were conducted in 1 mL BHI medium in 96-well plates with a maximum volume of 2 mL. Each day populations were grown in three antibiotic concentrations spanning sub- and super-MIC doses. After approximately 16  of incubation at 37 °C, the well with the highest drug concentration that contained visible growth was propagated into three new concentrations (typically one-half, 2×, and 4× the highest concentration that had visible growth). A 1/200 dilution was used as an inoculum for the next day’s evolution plate. This process was repeated for 8 days for the multi-drug study and 14 days for the CRO/DOX study. All strains were stocked in 30% glycerol and subsequently plated on pure BHI plates for further experimentation. A single colony was selected for IC 50  determination. To help ensure no contamination occurred, cells were regularly plated and visualized using DIC microscopy to ensure  E. faecalis  morphology."
+      ]
+    },
+    {
+      "title": "Measuring drug resistance and sensitivity",
+      "paragraphs": [
+        "IC 50  determination experiments were performed in 96-well plates by exposing each strain to a drug gradient consisting of between 6 and 14 concentrations, typically in linear dilution series prepared in BHI medium with a total volume of 205 µL (200 µL BHI, 5 µL of 1.5 OD cells) in each well. After 20 h, we measured the OD at 600 nm via an Enspire Multi-modal Plate Reader (Perkin Elmer) with an automated plate stacker. OD measurements for each drug were normalized by the OD600 in the absence of drug.",
+        "In order to quantify resistance to each drug, the OD600-generated dose–response curve was fit to a Hill-like function  f x = 1 + x K h − 1  using a non-linear least square fitting.  K  is the IC 50  and  h  is a Hill coefficient that represents the steepness of the dose–response curve. Strains were deemed “collaterally resistant” or “collaterally sensitive” if its IC 50  had increased or decreased by more than three times the standard error of the wild-type mean IC 50 . In previous work, we chose this threshold because it minimized the number of false positives (e.g., all measurements of IC 50  in the ancestor strains, across all drugs, fell within this ± 3σ WT  window) [ 41 , 45 ]. All dose–response curves were measured in technical replicates of 3 or 4."
+      ]
+    },
+    {
+      "title": "Logistic regressions for estimating frequency trends",
+      "paragraphs": [
+        "To characterize trends in the frequency of resistance (CR) or sensitivity (CS), we used standard logistic regression. Specifically, we assume the classic logit model where  ln p 1 − p = c 1 + c 2 X  with  p  the probability of CR (or CS),  c 1  and  c 2  regression coefficients, and  X  the predictor variable of interest (either resistance to the selecting drug, as in  Fig 2 , or time, as in  Fig 3 . An increasing trend corresponds to  c 2  > 0 and a decreasing trend to  c 2  < 0.  P -values ( p value ) are given for each regression in the corresponding figure caption."
+      ]
+    },
+    {
+      "title": "MDP models",
+      "paragraphs": [
+        "The MDP models consist of a finite set of states ( S , resistance profile), a finite set of actions ( A , antibiotics), a conditional probability ( P a ( s ʹ| s , a )) describing (action-dependent) Markovian transitions between these states, and an instantaneous reward function ( R a ( s )) associated with each state and action combination. The state of the system  s  ∈   S  is an  n d -dimensional vector, with  n d  indicating the number of drugs and each component  s i \n ∈   { r min ,  r min  + 1, …,  r max } indicating the level of resistance to antibiotic  i . The action  a  ∈  A  ≡  {1, 2, …,  n d } is the choice of antibiotic at the current step.",
+        "In previous work, we considered a system described by a static collateral profile derived from experimental measurements after eight days of evolution. In the non-dynamic MDP, we take the reward function  R a ( s ) to be the (negative of the) resistance level to the currently applied drug (i.e., the  a -th component of  s ). The optimal policy is chosen to maximize a cumulative reward function  R c = ∑ t = 0 ∞ γ t R π s t , where  t  is the time step,  s t  is the state of the system at time  t ,  R π ( s t ) is a random variable describing the instantaneous reward assuming that the actions are chosen according to policy  π , and brackets indicate an expectation value. The parameter  γ  ( 0 ≤  γ <  1 ) is a discount factor that determines the relative importance of instantaneous versus long-term optimization. Each MDP was solved using value iteration, a standard dynamic programming algorithm used in MDP models. Once the optimal policy is found, the system is reduced to a Markov chain with transition matrix  T π * = P π * s s ′ s , π * s , where the subscript  π * means that the decision in each state is determined by the policy  π * (i.e., that  a  =   π *( s ) for a system in state  s ).",
+        "In this work, we consider a system described by a dynamic collateral profile derived from experimental measurements every two days of evolution (days 2, 4, 6, and 8). Initially, one might apply the previous MDP model on each of the four static collateral profiles independently and subsequently apply the day 2 optimal initially, followed by the day 4 optimal, and so on. However, this solution fails to converge to a true long-term optimal. This is because the day 2 optimal has no information on the collateral profiles (or transition matrix) that describe the day 2–day 4 evolution and as a result may leave the system in a non-optimal state to begin the day 4–day 6 evolution. In the most extreme case, a policy may be optimal for that transient evolutionary period, but leave the system trapped in a high resistance state space as the collateral profiles dynamically switch.",
+        "To combat this, there are two important changes. First, we must include in our cumulative reward function a reward that is connected to the value of that state in future collateral profiles, not just the current collateral profile. However, for this to be accurate, we must know what the future reward values are. Therefore, the second change is to calculate the time-dependent optimal in reverse order, beginning with the day 6–day 8 period. The d-MDP solution can be outlined as follows:",
+        "Finally, we note that this process can be generalized to any discreditable set of collateral profiles or desired reward objective. For example, if evolution happens on a faster timescale, one can add more frequent experimental collateral profile measurements. If one prefers to minimize the total resistance state of the system, one can do that, rather than focus on maintaining sensitivity to at least one drug as we do here. More importantly, we propose a model capable of calculating optimal policies to reach some objective, given a stochastic evolving system with temporally dynamic transition matrices."
+      ]
+    }
+  ],
+  "availability": [
+    {
+      "tag": "custom-meta",
+      "label": "Data Availability",
+      "text": "Data Availability Relevant data are found within the paper and its  Supporting information  files or archived at  https://doi.org/10.5281/zenodo.14064963 .",
+      "links": [
+        {
+          "{http://www.w3.org/1999/xlink}href": "https://doi.org/10.5281/zenodo.14064963",
+          "ext-link-type": "uri"
+        }
+      ]
+    },
+    {
+      "tag": "notes",
+      "label": "Data Availability",
+      "text": "Data Availability Relevant data are found within the paper and its  Supporting information  files or archived at  https://doi.org/10.5281/zenodo.14064963 .",
+      "links": [
+        {
+          "{http://www.w3.org/1999/xlink}href": "https://doi.org/10.5281/zenodo.14064963",
+          "ext-link-type": "uri"
+        }
+      ]
+    }
+  ],
+  "supplementary_manifest": [
+    {
+      "id": "pbio.3002970.s001",
+      "label": "S1 Data",
+      "caption": "Supplemental raw data. (EXCEL)",
+      "attributes": {
+        "id": "pbio.3002970.s001",
+        "position": "float",
+        "content-type": "local-data",
+        "orientation": "portrait"
+      },
+      "media": [
+        {
+          "{http://www.w3.org/1999/xlink}href": "pbio.3002970.s001.xlsx",
+          "position": "float",
+          "orientation": "portrait"
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "pbio.3002970.s002",
+      "label": "S1 Text",
+      "caption": "Supplementary text. Fig A. Cumulative collateral effects exhibit early resistance but trend toward sensitivity with adaptation. Fig B. Collateral resistance decreases as resistance to selecting drug increases. Fig C. Modulating threshold value does not change qualitative features of collateral effects. Fig D. Correlation between collateral effects between different testing antibiotics. Fig E. Frequency trends within individual populations do not depend sensitively on threshold criteria for defining collateral effects changes. Fig F. Simulations suggest optimal dosing can be aided or hindered by temporally resolved collateral profiles. (PDF)",
+      "attributes": {
+        "id": "pbio.3002970.s002",
+        "position": "float",
+        "content-type": "local-data",
+        "orientation": "portrait"
+      },
+      "media": [
+        {
+          "{http://www.w3.org/1999/xlink}href": "pbio.3002970.s002.pdf",
+          "position": "float",
+          "orientation": "portrait"
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "pbio.3002970.s003",
+      "label": "Attachment",
+      "caption": "Submitted filename:  2024_ResponseToReviewersEditors.docx",
+      "attributes": {
+        "id": "pbio.3002970.s003",
+        "position": "float",
+        "content-type": "local-data",
+        "orientation": "portrait"
+      },
+      "media": [
+        {
+          "{http://www.w3.org/1999/xlink}href": "pbio.3002970.s003.docx",
+          "position": "float",
+          "orientation": "portrait"
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "pbio.3002970.s004",
+      "label": "Attachment",
+      "caption": "Submitted filename:  2024_finalrevision_response_to_reviewers.pdf",
+      "attributes": {
+        "id": "pbio.3002970.s004",
+        "position": "float",
+        "content-type": "local-data",
+        "orientation": "portrait"
+      },
+      "media": [
+        {
+          "{http://www.w3.org/1999/xlink}href": "pbio.3002970.s004.pdf",
+          "position": "float",
+          "orientation": "portrait"
+        }
+      ],
+      "links": []
+    }
+  ],
+  "response_table_arrays_projected": false
+}

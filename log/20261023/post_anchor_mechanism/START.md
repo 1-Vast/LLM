@@ -1,0 +1,7 @@
+# Continue full mechanism discovery after the fixed anchor STOP
+
+2026-10-23. Previous goal turn PROGRESS: first EmeraldBay development response diagnostic actually executed, all3240inner scores and72outer predictions independently reconstructed,48-file seal plus prior84-file seal clean. Full objective read in this turn; ACTIVE / NOT_ACHIEVED, no global blocker. HEAD47a0e2dea5a7dd42379fa17eb3621caf6bd0114c; preexisting tracked log/README.md and research/REPORT.md edits preserved.
+
+Do not reopen fixed44single+oneanchor menu, old16lineRNA menu, CDK, Jaaks/AZ substitution, old mathematical equivalents or reserved labels. Seek at most one new explicit biological/computational restriction and one executable minimal falsifier on genuinely separate information. Novelty can be a specific finite-resource advantage of conventional components; an ordinary family name is not a rejection. Exact same-operation opposition remains required.
+
+Three reused roles independently examine one precise mechanism and lawful data, nearest strong alternatives, and measurement/task feasibility. No source outcomes may be decoded or fitted without a new explicit frozen contract. Seal first opinions before cross. Primary-source queries and all failures retained here; all code research/post_anchor_mechanism_20261023/ or role subdirectories. No production changes. Local seals do not fix historical global provenance drift; native exact models/usage unattested.

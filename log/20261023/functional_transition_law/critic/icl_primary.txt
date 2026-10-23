@@ -1,0 +1,5880 @@
+In-Context Learning for System Identification: Probabilistic Formulation, Long-Sequence Handling, and Benchmark Validation
+Skip to main content
+Report GitHub Issue
+×
+Title:
+Content selection saved. Describe the issue below:
+Description:
+Submit without GitHub
+Submit in GitHub
+Why HTML?
+Report Issue
+Back to Abstract
+Download PDF
+Contents
+Reading mode
+Colour theme
+Abstract
+1
+Introduction
+1.1
+System identification and meta learning
+1.2
+Related Literature
+1.3
+Paper Contribution
+2
+Notation
+3
+Meta learning framework
+3.1
+System Class
+3.2
+Classic system identification
+vs
+meta modeling
+3.3
+Probabilistic Prediction
+3.4
+Meta model architecture and training
+4
+Handling long sequences
+4.1
+Patching
+4.2
+Ensembling
+5
+Synthetic data generation for system identification
+5.1
+Deterministic regularization
+5.2
+Maximum-likelihood based regularization
+6
+Examples
+6.1
+Meta model training
+6.1.1
+System class
+6.1.2
+Meta model architecture
+6.2
+Meta model testing
+6.2.1
+In-distribution test data
+6.2.2
+Benchmarks
+6.2.3
+Model adaptation and fine-tuning
+6.3
+Synthetic data generation for CED benchmark
+7
+Conclusions
+References
+A
+Minimum-variance weights for ensembling
+License: CC Zero
+arXiv:2610.13411v1 [cs.LG] 09 Oct 2026
+In-Context Learning for System Identification: Probabilistic Formulation, Long-Sequence
+Handling, and Benchmark Validation
+Thanks:
+This work was partly supported by the Hasler Foundation project “FALCON - Foundation models for zero-shot adaptive control and prediction for dynamical systems” and as a part of NCCR Automation, a National Centre of Competence in Research, funded by the Swiss National Science Foundation (grant number 51NF40_225155).
+Matteo Rufolo
+Affiliation:
+SUPSI, IDSIA - Dalle Molle Institute for Artificial Intelligence, Lugano, Switzerland
+Affiliation:
+USI, Faculty of Informatics, Lugano, Switzerland
+Email:
+matteo.rufolo@supsi.ch
+Dario Piga
+Affiliation:
+SUPSI, IDSIA - Dalle Molle Institute for Artificial Intelligence, Lugano, Switzerland
+Email:
+dario.piga@supsi.ch
+Filippo Pura
+Affiliation:
+SUPSI, IDSIA - Dalle Molle Institute for Artificial Intelligence, Lugano, Switzerland
+Email:
+filippo.pura@supsi.ch
+Marco Forgione
+Affiliation:
+SUPSI, IDSIA - Dalle Molle Institute for Artificial Intelligence, Lugano, Switzerland
+Email:
+marco.forgione@supsi.ch
+Abstract
+Traditional system identification typically involves two steps: initially, training data is processed to estimate a model of the system of interest; then, the model is used to predict outputs for new input queries.
+In contrast, recent in-context learning approaches learn a meta model that maps directly from training data and query inputs to outputs in a zero-shot fashion, bypassing explicit model estimation. This approach leverages a meta model trained offline, on large sets of synthetically generated data, to emulate the behavior of a system identification algorithm. In this work, we advance this meta-learning framework for system identification in three directions. First, we develop a unified probabilistic meta-identification architecture that combines a Transformer-based encoder–decoder with tailored mechanisms for handling long training sequences, enabling calibrated predictions over long horizons. Second, we show how a pre-trained meta model can act as an uncertainty-aware synthetic data generator for classical system identification, providing task-specific data that regularize parametric models when real data are scarce. Third, we systematically evaluate the framework on standard nonlinear system identification benchmarks and on a challenging out-of-distribution scenario, demonstrating competitive accuracy with state-of-the-art methods and strong generalization, including cases where input-only adaptation is sufficient to handle significant distribution shifts.
+Please cite this version of the paper:
+M. Rufolo, D. Piga, F. Pura and M. Forgione “In-Context Learning for System Identification: Probabilistic Formulation, Long-Sequence Handling, and Benchmark Validation," in
+Automatica
+,
+2026. In press.
+You may use the following bibtex entry:
+@article{rufolo2026incontext,
+  title={In-Context Learning for System Identification: Probabilistic Formulation,
+  Long-Sequence Handling, and Benchmark Validation},
+  author={Rufolo, Matteo and  Piga, Dario and Pura, Filippo and Forgione, Marco},
+    journal={Automatica},
+  year={2026},
+  note={in press}
+}
+Keywords:
+Meta learning; Artificial neural networks; System identification; Synthetic data.
+1
+Introduction
+1.1
+System identification and meta learning
+System identification (SYSID) provides data-driven methods to construct mathematical models of dynamical systems from measured input–output data. Given a dataset, the goal is to estimate a model that captures the underlying behavior with sufficient accuracy for tasks such as simulation, prediction, and control design. Over the past decades, a broad range of identification techniques has been developed, ranging from prediction-error and subspace methods for linear to deep-learning-based approaches for nonlinear model learning; see, e.g.,
+Forgione and Piga (2021a)
+;
+Zhou et al. (2022)
+;
+Beintema et al. (2021)
+;
+Masti and Bemporad (2021)
+;
+Schoukens et al. (2014)
+;
+Paduart et al. (2010)
+.
+In the classical setting, each identification task is posed for a single system, and a model is fitted using exclusively the data available for that system.
+Traditional identification limitations
+In standard practice, the estimation pipeline relies heavily on expert intervention. The practitioner must select a suitable model structure (e.g., linear
+vs
+nonlinear, time-invariant
+vs
+time-varying, state-space
+vs
+input/output representation, etc.), choose an identification approach (e.g., prediction error methods, subspace methods, kernel-based approaches, etc.), and tune hyper-parameters in the numerical optimization routines used to solve the identification problem (e.g., learning rate in gradient-based methods, regularization weights, stopping criteria to prevent overfitting, etc.). These design and tuning choices are typically repeated from scratch for each new system of interest.
+In many applications, however, the goal is not to model a single isolated plant, but to repeatedly identify
+related systems (for example, members of a given benchmark family or class of processes). In such settings, traditional pipelines treat each system independently: for every new dataset, the modeling and tuning steps described above are repeated, and a separate model is estimated from scratch. This per-system workflow does not exploit information gained from previously identified systems and can be computationally demanding when many systems must be modeled. Moreover, classical approaches typically yield a different model for each system, which complicates downstream tasks such as deploying a shared controller across a fleet of systems or transferring prior knowledge to new tasks. While uncertainty-aware identification methods and advanced long-sequence models exist, they are not generally designed to provide class-level, zero-shot predictions for new systems from a short context trajectory.
+Proposed meta-learning approach
+To address these challenges, we adopt a meta-learning viewpoint in which the basic object of interest is a
+class
+of dynamical systems rather than a single plant. Building on the in-context system identification paradigm introduced in
+Forgione et al. (2023)
+, this paper presents a
+novel
+SYSID paradigm inspired by meta learning techniques
+Hospedales et al. (2021)
+. We consider a meta model that is trained once, offline, on a large synthetic corpus generated from a distribution over systems. At inference time, this pre-trained meta model receives a context input–output sequence from a new system and a query input, and directly predicts the corresponding output in a zero-shot fashion eliminating the need to implement any system identification algorithm and avoiding the selection of model structure and hyper-parameters.
+This class-level meta-modeling addresses the limitations discussed above in the following ways:
+•
+Reuse of knowledge across systems:
+a single meta model is shared by all systems in the class, so information gained during offline training is amortized across tasks instead of being discarded after each identification.
+•
+Reduced per-system design effort:
+architecture and training hyper-parameters are chosen once at the class level. For a new system, the meta model is applied without revisiting model-structure selection or hyper-parameter tuning for each trajectory.
+•
+Zero-shot prediction from short contexts:
+given a limited context from a new system, the meta model can produce output predictions for new inputs without any task-specific gradient-based adaptation, in contrast to classical pipelines that require solving a new optimization problem per system.
+This enables knowledge reuse across systems and reduces the need to repeatedly perform full identification procedures—including structure and hyper-parameter selection—for every new trajectory.
+We emphasize that addressing the above limitations comes at its own cost.
+In particular, the proposed meta-learning paradigm relies on a substantial offline pre-training phase on synthetic data, and a performance gap with carefully tuned classical system identification methods may still appear when abundant task-specific data are available or when strict requirements on parsimonious models for control design are imposed.
+These trade-offs, and the regimes in which the meta-modeling approach is most advantageous, are examined in detail in the subsequent sections.
+The proposed meta learning approach is analogous to
+Large Language Models
+(LLMs) like GPT-4, LLaMA, Gemini, and DeepSeek, which are pre-trained on vast text corpora to understand and generate text. Similarly, our meta learning approach enables users to generate output predictions by providing context and a related query, leveraging knowledge acquired in pre-training to efficiently handle various system identification tasks.
+1.2
+Related Literature
+Meta learning, also referred to as learning to learn, is a branch of machine learning introduced in the late 1980s
+Schmidhuber (1987)
+that has gained significant momentum in recent years. In a broad sense, the goal of meta learning is to enhance model and algorithm efficiency by leveraging experience from multiple related tasks. While standard machine learning trains models for a single task, meta learning approaches aim to capture common patterns and similarities across tasks, enabling rapid adaptation to new ones with minimal data and computational resources.
+One of the most popular meta learning algorithms is
+Model-Agnostic Meta Learning
+(MAML)
+Finn et al. (2017)
+, which aims to find model parameters that can quickly adapt to new tasks. MAML has proven particularly effective in few-shot learning scenarios across various domains and applications, including computer vision for few-shot image classification tasks
+Antoniou et al. (2019)
+, reinforcement learning to accelerate policy learning in new environments
+Finn et al. (2017)
+, materials science for predicting material properties and accelerating materials discovery
+Zuo and others (2021)
+, as well as in system identification, optimization and control
+Kaushik et al. (2020)
+;
+Chakrabarty et al. (2023)
+;
+Richards et al. (2021)
+;
+Chakrabarty et al. (2025)
+.
+Another instance of meta learning is represented by in-context learning, where large models
+are trained on diverse and extensive datasets, enabling them to process a context–a demonstration of the task at hand–along with a query input, and directly predict the corresponding output without further training
+Kirsch et al. (2022)
+;
+Dong et al. (2024)
+. In this framework, zero-shot prediction emerges as a powerful feature of in-context learning, where models leverage their extensive pre-training on diverse datasets to adapt to new tasks without requiring additional fine-tuning or retraining. Typical application of in-context learning include Natural Language Processing
+Zhu et al. (2023)
+, vision
+Zhou et al. (2024)
+, speech recognition
+Chen et al. (2024)
+, and robotics
+Zhu et al. (2024)
+, just to cite a few. In the field of system identification, in-context learning has recently demonstrated promising results for zero-shot prediction, leveraging knowledge gained from estimating the behavior of systems similar to the target one
+Forgione et al. (2023)
+;
+Rufolo et al. (2025a)
+;
+Du et al. (2023)
+.
+1.3
+Paper Contribution
+This paper builds upon the preliminary work on in-context learning for system identification introduced in
+Forgione et al. (2023)
+and further developed in
+Piga et al. (2024b)
+;
+Rufolo et al. (2025b)
+.
+The aim is to provide a unified framework that integrates and extends these previous contributions, establishing a comprehensive and probabilistic formulation of in-context learning for system identification.
+Within this unified setting, the present work introduces the following technical contributions:
+•
+Extended methods for long-context processing:
+A novel ensemble-based strategy with probabilistic weighting is proposed to efficiently handle long input–output context sequences.
+Compared with the patching approach of
+Rufolo et al. (2025b)
+, the new method achieves higher in-distribution accuracy and reduced meta-training time, at the cost of a slight increase in meta-inference time.
+•
+Probabilistic synthetic data generation:
+The data generation strategy of
+Piga et al. (2024b)
+is reformulated within the probabilistic framework, enabling the production of uncertainty-aware synthetic datasets for training classical system identification algorithms.
+•
+Benchmark validation:
+Where
+Forgione et al. (2023)
+;
+Rufolo et al. (2025b)
+focused mainly on simulated scenarios, we systematically evaluate the full proposed architecture on multiple nonlinear system identification benchmarks from the nonlinear benchmark initiative
+[
+27
+]
+, demonstrating robustness and generalization on real experimental data.
+•
+Model adaptation study:
+We assess the framework in an out-of-distribution (OOD) scenario in which both the dynamical systems and the input signals differ from those used during meta model training. We show that fine-tuning by matching only the inputs, while keeping the family of training systems fixed, achieves performance comparable to full adaptation. This result is practically relevant for scenarios where the system dynamics are uncertain but the excitation signals, chosen by the user, are known in advance.
+Taken together, these contributions go beyond our previous works
+Forgione et al. (2023)
+;
+Piga et al. (2024b)
+;
+Rufolo et al. (2025b)
+in several ways. First, the probabilistic formulation of synthetic data generation yields uncertainty-aware synthetic datasets and a principled mechanism to down-weight unreliable synthetic samples, addressing the growing need for more reliable synthetic data in machine learning. Second, the adaptation study shows that fine-tuning only the input side of the meta model can already recover most of the benefits of full adaptation, which is particularly relevant in applications where excitation signals can be designed but the system dynamics remain uncertain. Finally, by combining these elements with long-context processing in a single architecture and by carrying out a systematic evaluation on standard nonlinear benchmarks, including systems that differ from the WH training class, the paper validates the sim-to-real capabilities of the in-context approach and provides some of the first concrete tools for using meta-learning in system identification, considering the emerging interested in this research direction.
+The rest of the paper is organized as follows. In Section
+3
+, we review the meta modeling framework originally introduced in
+Forgione et al. (2023)
+. We first formulate a point estimation problem of system outputs as in
+Forgione et al. (2023)
+, and then extend this formulation to the more general case of probabilistic predictions. Model architectures and training algorithms are discussed in Section
+4
+, followed by novel approaches to manage long context sequences. The first one is based on sequence patching and inspired by the Vision Transformer
+Dosovitskiy et al. (2020)
+for image classification. The second one relies on an ensembling of the meta model predictions associated with different (short) context sequences. Section
+5
+details how the pre-trained meta model can generate synthetic data useful for classical system identification to estimate a parametric model of a dynamical system of interest when the training data are scarce or insufficiently informative. Examples showcasing the effectiveness of the meta learning paradigm are reported in Section
+6
+, including benchmark performance and model adaptation analyses. Concluding remarks are drawn in Section
+7
+, along with directions for future research.
+2
+Notation
+Vectors are denoted by lowercase letters (e.g.,
+u
+u
+). Subscripts indicate the time index (e.g.,
+u
+i
+u_{i}
+). For compactness,
+u
+a
+:
+b
+u_{a:b}
+denotes the sequence
+{
+u
+a
+,
+u
+a
++
+1
+,
+…
+,
+u
+b
+}
+\{u_{a},u_{a+1},\ldots,u_{b}\}
+. A superscript in parentheses, such as
+u
+(
+i
+)
+u^{(i)}
+, denotes the
+i
+i
+-th sample drawn from a dataset or distribution. A superscript without parentheses, such as
+u
+i
+u^{i}
+, denotes the
+i
+i
+-th subsequence extracted from a longer sequence. The same notation applies to the corresponding model outputs associated with each subsequence or sample.
+𝔼
+p
+​
+[
+⋅
+]
+\mathbb{E}_{p}[\cdot]
+denotes the expectation with respect to a probability distribution
+p
+p
+. The Euclidean-norm of a vector
+u
+u
+is denoted as
+∥
+u
+∥
+\|u\rVert
+. Estimated quantities are indicated by a hat, e.g.,
+y
+^
+\hat{y}
+is an estimate of
+y
+y
+.
+𝒩
+⁡
+(
+⋅
+,
+μ
+,
+σ
+2
+)
+\mathcal{N}(\cdot;\mu,\sigma^{2})
+denotes a Gaussian probability density function with mean
+μ
+\mu
+and variance
+σ
+2
+\sigma^{2}
+.
+3
+Meta learning framework
+3.1
+System Class
+Let us consider a class
+𝒮
+\mathcal{S}
+of dynamical systems. This class could correspond, for example, to Linear Time-Invariant (LTI) systems, fading memory nonlinear systems, or a more restricted subset of dynamics describing specific real-world systems. Examples of such restricted classes include the set of all robotic manipulators with a maximum number of degrees of freedom or the set of all vehicles with specific characteristics, to name just a few.
+We assume to have access to a (potentially infinite) stream of input/output datasets generated by different systems
+{
+S
+(
+i
+)
+,
+i
+=
+1
+,
+2
+,
+…
+}
+\{{S}^{(i)},i=1,2,\dots\}
+extracted from a probability distribution
+p
+⁡
+(
+S
+)
+p(S)
+defined over the class
+𝒮
+\mathcal{S}
+.
+For each system
+S
+(
+i
+)
+S^{(i)}
+, a context dataset
+(
+u
+1
+:
+m
+(
+i
+)
+,
+y
+1
+:
+m
+(
+i
+)
+)
+(u_{1:m}^{(i)},y_{1:m}^{(i)})
+and a query dataset
+(
+u
+~
+1
+:
+n
+(
+i
+)
+,
+y
+~
+1
+:
+n
+(
+i
+)
+)
+(\tilde{u}_{1:n}^{(i)},\tilde{y}_{1:n}^{(i)})
+are available, with
+u
+k
+,
+u
+~
+k
+∈
+ℝ
+n
+u
+u_{k},\tilde{u}_{k}\in\mathbb{R}^{n_{u}}
+,
+y
+k
+,
+y
+~
+k
+∈
+ℝ
+n
+y
+y_{k},\tilde{y}_{k}\in\mathbb{R}^{n_{y}}
+.
+These two datasets are obtained by processing two randomly generated input sequences
+u
+1
+:
+m
+(
+i
+)
+,
+u
+~
+1
+:
+n
+(
+i
+)
+u_{1:m}^{(i)},\tilde{u}_{1:n}^{(i)}
+through the same system
+S
+(
+i
+)
+{S}^{(i)}
+, starting from different random initial conditions.
+The systems
+S
+(
+i
+)
+{S}^{(i)}
+may be instances of a high-fidelity simulator of a process of interest, with physical parameter randomly distributed according to domain knowledge.
+Overall, we assume there is an underlying
+distribution
+p
+⁡
+(
+D
+)
+p(D)
+of datasets generated by the system distribution
+p
+⁡
+(
+S
+)
+p(S)
+and the random input distribution. The distribution
+p
+⁡
+(
+D
+)
+p(D)
+may not be explicitly known, but samples
+{
+D
+(
+i
+)
+=
+(
+u
+1
+:
+m
+(
+i
+)
+,
+y
+1
+:
+m
+(
+i
+)
+)
+,
+(
+u
+~
+1
+:
+n
+(
+i
+)
+,
+y
+~
+1
+:
+n
+(
+i
+)
+)
+,
+i
+=
+1
+,
+2
+,
+…
+}
+\{D^{(i)}=(u_{1:m}^{(i)},y_{1:m}^{(i)}),(\tilde{u}_{1:n}^{(i)},\tilde{y}_{1:n}^{(i)}),i=1,2,\dots\}
+can be drawn from
+p
+⁡
+(
+D
+)
+p(D)
+.
+3.2
+Classic system identification
+vs
+meta modeling
+Classic system identification aims to estimate a different model for each system
+S
+(
+i
+)
+{S}^{(i)}
+based on the available dataset
+D
+(
+i
+)
+D^{(i)}
+. A classic approach might require choosing a model structure and a learning algorithm, using the context data
+(
+u
+1
+:
+m
+(
+i
+)
+,
+y
+1
+:
+m
+(
+i
+)
+)
+(u_{1:m}^{(i)},y_{1:m}^{(i)})
+. Then, the system state at a time step
+c
+<
+n
+c<n
+of the query may be estimated from the input/output samples
+(
+u
+~
+1
+:
+c
+(
+i
+)
+,
+y
+~
+1
+:
+c
+(
+i
+)
+)
+(\tilde{u}_{1:c}^{(i)},\tilde{y}_{1:c}^{(i)})
+up to time
+c
+c
+. By simulating the identified system model starting from the estimated initial condition and for the remaining query input sequence
+u
+~
+c
++
+1
+:
+n
+(
+i
+)
+\tilde{u}_{c+1:n}^{(i)}
+, one could make predictions
+y
+^
+c
++
+1
+:
+n
+(
+i
+)
+\hat{y}_{c+1:n}^{(i)}
+of the output
+y
+c
++
+1
+:
+n
+(
+i
+)
+y_{c+1:n}^{(i)}
+:
+y
+^
+c
++
+1
+:
+n
+(
+i
+)
+=
+ℳ
+(
+u
+~
+c
++
+1
+:
+n
+(
+i
+)
+,
+u
+~
+1
+:
+c
+(
+i
+)
+,
+y
+~
+1
+:
+c
+(
+i
+)
+,
+u
+1
+:
+m
+(
+i
+)
+,
+y
+1
+:
+m
+(
+i
+)
+)
+,
+\hat{y}_{c+1:n}^{(i)}=\mathcal{M}(\tilde{u}_{c+1:n}^{(i)},\tilde{u}_{1:c}^{(i)},\tilde{y}_{1:c}^{(i)},u_{1:m}^{(i)},y_{1:m}^{(i)}),
+(1)
+where
+ℳ
+\mathcal{M}
+represents the combined identification, system state estimation, and simulation procedure applied to the dataset
+D
+(
+i
+)
+D^{(i)}
+.
+In the meta learning approach discussed in this paper, a single meta model is estimated for all systems in the class
+𝒮
+\mathcal{S}
+. Given a context dataset generated by a specific system
+S
+(
+i
+)
+{S}^{(i)}
+and a query input, the meta model directly provides an estimate of the corresponding query output.
+Specifically, we introduce a (black-box) map
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+, parameterized by
+ϕ
+\phi
+, which processes the same inputs as in (
+1
+):
+y
+^
+c
++
+1
+:
+n
+(
+i
+)
+=
+ℳ
+ϕ
+(
+u
+~
+c
++
+1
+:
+n
+(
+i
+)
+,
+u
+~
+1
+:
+c
+(
+i
+)
+,
+y
+~
+1
+:
+c
+(
+i
+)
+,
+u
+1
+:
+m
+(
+i
+)
+,
+y
+1
+:
+m
+(
+i
+)
+)
+.
+\hat{y}_{c+1:n}^{(i)}=\mathcal{M}_{\phi}(\tilde{u}_{c+1:n}^{(i)},\tilde{u}_{1:c}^{(i)},\tilde{y}_{1:c}^{(i)},u_{1:m}^{(i)},y_{1:m}^{(i)}).
+(2)
+The map
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+is trained to behave as a meta model for the system class
+𝒮
+\mathcal{S}
+by minimizing the expected simulation error over the dataset distribution
+p
+⁡
+(
+D
+)
+p(D)
+in an end-to-end supervised manner, i.e.,
+ϕ
+^
+=
+arg
+min
+ϕ
+𝔼
+p
+⁡
+(
+D
+)
+[
+∥
+y
+~
+c
++
+1
+:
+n
+−
+ℳ
+ϕ
+(
+X
+)
+∥
+2
+]
+⏞
+=
+J
+⁡
+(
+ϕ
+)
+,
+\hat{\phi}=\arg\min_{\phi}\overbrace{\mathbb{E}_{p(D)}\left[\lVert\tilde{y}_{c+1:n}-\mathcal{M}_{\phi}(X)\rVert^{2}\right]}^{=J(\phi)},
+(3)
+where
+J
+⁡
+(
+ϕ
+)
+J(\phi)
+is the loss function, and
+X
+=
+(
+u
+~
+c
++
+1
+:
+n
+,
+u
+~
+1
+:
+c
+,
+y
+~
+1
+:
+c
+,
+u
+1
+:
+m
+,
+y
+1
+:
+m
+)
+X=(\tilde{u}_{c+1:n},\tilde{u}_{1:c},\\
+\tilde{y}_{1:c},u_{1:m},y_{1:m})
+is introduced to compact the notation and represents all the input variables to the meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+.
+The expectation over
+p
+⁡
+(
+D
+)
+p(D)
+is approximated by a Monte Carlo average over
+b
+b
+system instances from the class
+𝒮
+\mathcal{S}
+and corresponding measured context
+(
+u
+1
+:
+m
+(
+i
+)
+,
+y
+1
+:
+m
+(
+i
+)
+)
+(u_{1:m}^{(i)},y_{1:m}^{(i)})
+and query sequences
+(
+u
+~
+1
+:
+n
+(
+i
+)
+,
+y
+~
+1
+:
+n
+(
+i
+)
+)
+(\tilde{u}_{1:n}^{(i)},\tilde{y}_{1:n}^{(i)})
+, i.e.,
+J
+(
+ϕ
+)
+≈
+1
+b
+∑
+i
+=
+1
+b
+∥
+y
+~
+c
++
+1
+:
+n
+(
+i
+)
+−
+ℳ
+ϕ
+(
+X
+(
+i
+)
+)
+∥
+2
+.
+J(\phi)\approx\frac{1}{b}\sum_{i=1}^{b}\lVert\tilde{y}_{c+1:n}^{(i)}-\mathcal{M}_{\phi}(X^{(i)})\rVert^{2}.
+(4)
+3.3
+Probabilistic Prediction
+The meta model in (
+2
+) provides point estimates of the future outputs.
+While informative, these estimates lack the expressiveness of a full probabilistic description, which would also quantify predictive uncertainty.
+To address this limitation, the meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+is modified to output, at each time step, the parameters of a probability distribution over future outputs.
+Training of the meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+is then performed with the aim of approximating the unknown conditional probability distribution
+p
+(
+y
+~
+c
++
+1
+:
+n
+|
+X
+)
+p(\tilde{y}_{c+1:n}|X)
+with a parameterized distribution
+q
+ϕ
+(
+y
+~
+c
++
+1
+:
+n
+|
+X
+)
+q_{\phi}(\tilde{y}_{c+1:n}|X)
+. To this aim, we introduce the Kullback-Leibler (KL) divergence
+KL
+(
+p
+∥
+q
+ϕ
+)
+\text{KL}(p\parallel q_{\phi})
+between
+p
+p
+and
+q
+ϕ
+q_{\phi}
+:
+KL
+(
+p
+∥
+q
+ϕ
+)
+=
+𝔼
+p
+(
+y
+~
+c
++
+1
+:
+n
+|
+X
+)
+[
+log
+p
+(
+y
+~
+c
++
+1
+:
+n
+|
+X
+)
+q
+ϕ
+(
+y
+~
+c
++
+1
+:
+n
+|
+X
+)
+]
+.
+\text{KL}(p\parallel q_{\phi})=\mathbb{E}_{p(\tilde{y}_{c+1:n}|X)}\left[\log\frac{p(\tilde{y}_{c+1:n}|X)}{q_{\phi}(\tilde{y}_{c+1:n}|X)}\right].
+(5)
+The parameters
+ϕ
+\phi
+defining
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+(and hence
+q
+ϕ
+q_{\phi}
+) are chosen to minimize the expected KL divergence over the conditioning variables
+X
+X
+:
+𝔼
+p
+⁡
+(
+X
+)
+[
+KL
+(
+p
+∥
+q
+ϕ
+)
+]
+=
+𝔼
+p
+⁡
+(
+D
+)
+[
+log
+p
+(
+y
+~
+c
++
+1
+:
+n
+|
+X
+)
+q
+ϕ
+(
+y
+~
+c
++
+1
+:
+n
+|
+X
+)
+]
+=
+𝔼
+p
+⁡
+(
+D
+)
+[
+−
+log
+q
+ϕ
+(
+y
+~
+c
++
+1
+:
+n
+|
+X
+)
+]
+⏞
+J
+⁡
+(
+ϕ
+)
++
+K
+,
+\mathbb{E}_{p(X)}\big[\text{KL}(p\parallel q_{\phi})\big]=\mathbb{E}_{p(D)}\left[\log\frac{p(\tilde{y}_{c+1:n}|X)}{q_{\phi}(\tilde{y}_{c+1:n}|X)}\right]\\
+=\overbrace{\mathbb{E}_{p(D)}[-\log q_{\phi}(\tilde{y}_{c+1:n}|X)]}^{J(\phi)}+K,
+(6)
+where
+J
+⁡
+(
+ϕ
+)
+J(\phi)
+is the loss function minimized with respect to
+ϕ
+\phi
+, and
+K
+K
+is a constant independent of
+ϕ
+\phi
+.
+As in the point-estimate formulation, the expected loss
+J
+⁡
+(
+ϕ
+)
+J(\phi)
+is approximated by a Monte Carlo average:
+J
+(
+ϕ
+)
+≈
+1
+b
+∑
+i
+=
+1
+b
+−
+log
+q
+ϕ
+(
+y
+~
+c
++
+1
+:
+n
+(
+i
+)
+|
+X
+(
+i
+)
+)
+,
+J(\phi)\approx\frac{1}{b}\sum_{i=1}^{b}-\log q_{\phi}(\tilde{y}_{c+1:n}^{(i)}|X^{(i)}),
+(7)
+where
+y
+~
+c
++
+1
+:
+n
+(
+i
+)
+\tilde{y}_{c+1:n}^{(i)}
+and
+X
+(
+i
+)
+X^{(i)}
+(with
+i
+=
+1
+,
+…
+,
+b
+i=1,\dots,b
+) are samples from
+p
+⁡
+(
+D
+)
+p(D)
+associated with the system
+S
+(
+i
+)
+{S}^{(i)}
+.
+In this paper, we parameterize the distribution
+q
+ϕ
+q_{\phi}
+as a multivariate Gaussian with a diagonal covariance matrix. For notation simplicity, we present the case of single-output systems (i.e.,
+n
+y
+=
+1
+n_{y}=1
+). Thus,
+q
+ϕ
+q_{\phi}
+is factorized as:
+q
+ϕ
+(
+y
+~
+c
++
+1
+:
+n
+|
+X
+)
+\displaystyle q_{\phi}(\tilde{y}_{c+1:n}|X)
+=
+∏
+k
+=
+c
++
+1
+n
+q
+ϕ
+​
+(
+y
+~
+k
+|
+X
+)
+,
+\displaystyle=\prod_{k=c+1}^{n}q_{\phi}(\tilde{y}_{k}|X),
+(8a)
+q
+ϕ
+​
+(
+y
+~
+k
+|
+X
+)
+\displaystyle q_{\phi}(\tilde{y}_{k}|X)
+=
+𝒩
+⁡
+(
+y
+~
+k
+,
+μ
+k
+​
+(
+X
+,
+ϕ
+)
+,
+σ
+k
+​
+(
+X
+,
+ϕ
+)
+2
+)
+\displaystyle=\mathcal{N}(\tilde{y}_{k};\,\mu_{k}(X,\phi),\sigma_{k}(X,\phi)^{2})
+(8b)
+The vectors of means
+μ
+c
++
+1
+:
+n
+\mu_{c+1:n}
+and standard deviations
+σ
+c
++
+1
+:
+n
+\sigma_{c+1:n}
+, both of dimension
+n
+−
+c
+n-c
+, are the outputs of the meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+when fed by the query input
+u
+c
++
+1
+:
+n
+u_{c+1:n}
+, initial input/output measurements
+u
+~
+1
+:
+c
+,
+y
+~
+1
+:
+c
+\tilde{u}_{1:c},\tilde{y}_{1:c}
+, and context data
+u
+1
+:
+m
+,
+y
+1
+:
+m
+u_{1:m},y_{1:m}
+:
+μ
+c
++
+1
+:
+n
+,
+σ
+c
++
+1
+:
+n
+=
+ℳ
+ϕ
+(
+u
+~
+c
++
+1
+:
+n
+,
+u
+~
+1
+:
+c
+,
+y
+~
+1
+:
+c
+,
+u
+1
+:
+m
+,
+y
+1
+:
+m
+)
+.
+\mu_{c+1:n},\sigma_{c+1:n}=\mathcal{M}_{\phi}(\tilde{u}_{c+1:n},\tilde{u}_{1:c},\tilde{y}_{1:c},u_{1:m},y_{1:m}).
+(9)
+Here,
+μ
+c
++
+1
+:
+n
+\mu_{c+1:n}
+corresponds to the previous point estimate
+y
+^
+c
++
+1
+:
+n
+\hat{y}_{c+1:n}
+, while
+σ
+c
++
+1
+:
+n
+\sigma_{c+1:n}
+quantifies the associated predictive uncertainty.
+Intuitively, the meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+acts as a system identification algorithm that infers the dynamics of each system
+S
+(
+i
+)
+{S}^{(i)}
+from its input/output context
+(
+u
+1
+:
+m
+(
+i
+)
+,
+y
+1
+:
+m
+(
+i
+)
+)
+(u_{1:m}^{(i)},y_{1:m}^{(i)})
+.
+Using this inferred knowledge, it generates predictions and corresponding uncertainty estimates
+(
+μ
+c
++
+1
+:
+n
+,
+σ
+c
++
+1
+:
+n
+)
+(\mu_{c+1:n},\sigma_{c+1:n})
+for the query sequence.
+Once trained,
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+can produce predictions for previously unseen systems using only an input/output context and a query input
+u
+~
+c
++
+1
+:
+n
+\tilde{u}_{c+1:n}
+, without the need to identify a dedicated model for each system.
+3.4
+Meta model architecture and training
+The meta model is implemented using an encoder-decoder Transformer architecture similar to the one introduced in
+Vaswani et al. (2017)
+for language translation, see Fig.
+1
+for a visual representation.
+With respect to
+Vaswani et al. (2017)
+, a recurrent patching network, described in details in Section
+4.1
+, transforms the context data
+(
+u
+1
+:
+m
+,
+y
+1
+:
+m
+)
+(u_{1:m},y_{1:m})
+into a shorter sequence
+p
+1
+:
+M
+p_{1:M}
+, with
+p
+i
+∈
+ℝ
+d
+model
+p_{i}\in\mathbb{R}^{d_{\rm model}}
+and
+M
+=
+m
+L
+M=\frac{m}{L}
+, where
+L
+L
+is an integer greater than
+1
+1
+.
+The encoder backbone then processes
+p
+1
+:
+M
+p_{1:M}
+and maps it into
+ζ
+1
+:
+M
+\zeta_{1:M}
+, with
+ζ
+i
+∈
+ℝ
+d
+model
+\zeta_{i}\in\mathbb{R}^{d_{\rm model}}
+(left side of Fig.
+1
+).
+Then, the decoder processes the query input
+u
+~
+c
++
+1
+:
+n
+\tilde{u}_{c+1:n}
+causally in time through masked self-attention, to generate the estimated distribution parameter
+μ
+c
++
+1
+:
+n
+,
+σ
+c
++
+1
+:
+n
+\mu_{c+1:n},\sigma_{c+1:n}
+, incorporating the knowledge of
+ζ
+1
+:
+M
+\zeta_{1:M}
+through a cross-attention mechanism. Conceptually, the encoder can be interpreted as a system identification module, where
+ζ
+1
+:
+M
+\zeta_{1:M}
+is an implicit representation of the system, and the decoder is a simulator.
+Before the decoder block (right side of Fig.
+1
+), the initial conditions (namely, initial input/output measurements) are processed by a linear layer that maps each time step from
+ℝ
+n
+u
++
+n
+y
+\mathbb{R}^{n_{u}+n_{y}}
+to
+ℝ
+d
+model
+\mathbb{R}^{d_{\rm model}}
+. Similarly, the query input
+u
+~
+c
++
+1
+:
+n
+\tilde{u}_{c+1:n}
+undergoes a separate transformation from
+ℝ
+n
+u
+\mathbb{R}^{n_{u}}
+to
+ℝ
+d
+model
+\mathbb{R}^{d_{\rm model}}
+(bottom-right blocks in Fig.
+1
+). These processed sequences are concatenated to form a unique sequence of length
+n
+n
+, with each element having dimension
+d
+model
+d_{\rm model}
+. Then, a positional encoding is performed to preserve the temporal structure before the sequence enter the decoder backbone of the Transformer. The final layer of the decoder (upper-right block in Fig.
+1
+) outputs both the mean
+μ
+c
++
+1
+:
+n
+\mu_{c+1:n}
+and standard deviation
+σ
+c
++
+1
+:
+n
+\sigma_{c+1:n}
+of the probability distribution of the system output at each future time step
+c
++
+1
+,
+…
+,
+n
+c+1,\ldots,n
+.
+Training of
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+is performed via stochastic (or mini-batch) gradient-descent, minimizing the loss
+J
+⁡
+(
+ϕ
+)
+J(\phi)
+in (
+7
+). At each iteration, a batch of
+b
+b
+systems
+S
+(
+i
+)
+{S}^{(i)}
+(with
+i
+=
+1
+,
+…
+,
+b
+i=1,\ldots,b
+) is drawn from the class
+p
+⁡
+(
+S
+)
+p(S)
+and the corresponding dataset
+D
+(
+i
+)
+D^{(i)}
+is generated to compute the loss.
+Figure 1
+:
+Encoder-decoder Transformer for in-context system identification. The main differences with respect to the original Transformer architecture
+Vaswani et al. (2017)
+are highlighted in blue and pink. Additionally, an extra layer preceding the encoder backbone, referred to as recurrent patching neural network and highlighted in green, is incorporated to manage long context sequences.
+4
+Handling long sequences
+An intrinsic limitation of the Transformer architecture is that the attention mechanism has a computational complexity that grows quadratically with the sequence length.
+This results in a limitation on the length of context sequences that the meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+can efficiently handle. In this section, we propose two different approaches to address these limitations: one is applied during training, and the other during inference.
+4.1
+Patching
+The patching approach, originally introduced in
+Dosovitskiy et al. (2020)
+for image processing, was later adapted for time series data in
+Nie et al. (2023)
+. This method partitions the context sequence into smaller sub-sequences, referred to as
+patches
+, which are individually processed by a
+patching network
+to reduce the time dimensionality. This approach significantly reduces the computational cost of training by shortening the sequence length before processing by the Transformer. Specifically, the input/output context sequence
+(
+u
+1
+:
+m
+,
+y
+1
+:
+m
+)
+(u_{1:m},y_{1:m})
+is divided into
+M
+M
+non-overlapping patches,
+1
+1
+1
+For simplicity, we assume
+m
+m
+is a multiple of
+M
+M
+.
+each of length
+L
+=
+m
+M
+L=\frac{m}{M}
+and dimension
+n
+u
++
+n
+y
+n_{u}+n_{y}
+. These patches are then processed by a recurrent neural network (RNN), which maps each patch to a single vector of dimension
+d
+model
+{d_{\rm model}}
+. The resulting
+patch embedding
+sequence,
+p
+1
+:
+M
+p_{1:M}
+, is enriched with positional encoding to take into account temporal order information before being passed to the encoder backbone (bottom-left green block in Fig.
+1
+). A visual representation of this approach is shown in Fig.
+2
+.
+This approach reduces the sequence length processed by the multi-head attention mechanism by a factor of
+L
+L
+, leading to a computational complexity reduction of a factor
+L
+2
+L^{2}
+for the training of the meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+.
+Figure 2
+:
+Visual representation of the implemented patching approach. For clarity, a single-input (
+n
+u
+=
+1
+n_{u}=1
+, blue) single-output (
+n
+y
+=
+1
+n_{y}=1
+, red) system is depicted
+4.2
+Ensembling
+Differently from the patching strategy, the ensembling method described in this section is applied only during the inference phase, i.e., after meta model training.
+The approach is based on averaging multiple predictions to improve robustness.
+This idea builds on the well-established principle that predictive performance can often be improved through ensembling, which combines the outputs of multiple models rather than relying on a single one
+(
+Bishop, 2006
+, Chapter 14)
+.
+We consider the case where the Transformer has been trained on context sequences of length
+m
+m
+, but a longer sequence
+(
+u
+1
+:
+m
+′
+,
+y
+1
+:
+m
+′
+)
+(u_{1:m^{\prime}},y_{1:m^{\prime}})
+with
+m
+′
+>
+m
+m^{\prime}>m
+is available from the real system at inference time.
+From this longer sequence, we extract shorter overlapping subsequences
+{
+(
+u
+1
+:
+m
+i
+,
+y
+1
+:
+m
+i
+)
+}
+i
+=
+1
+s
+\{(u_{1:m}^{i},y_{1:m}^{i})\}_{i=1}^{s}
+of length
+m
+m
+.
+Considering all overlapping sub-sequences,
+s
+=
+m
+′
+−
+m
++
+1
+s=m^{\prime}-m+1
+. Each subsequence
+(
+u
+1
+:
+m
+i
+,
+y
+1
+:
+m
+i
+)
+(u_{1:m}^{i},y_{1:m}^{i})
+is provided as context to the pre-trained Transformer, along with a fixed query input, to generate multiple predictions for the same query output, i.e.,
+μ
+c
++
+1
+:
+n
+i
+,
+σ
+c
++
+1
+:
+n
+i
+=
+ℳ
+ϕ
+(
+u
+~
+c
++
+1
+:
+n
+,
+u
+~
+1
+:
+c
+,
+y
+~
+1
+:
+c
+,
+u
+1
+:
+m
+i
+,
+y
+1
+:
+m
+i
+)
+,
+i
+=
+1
+,
+…
+,
+s
+,
+\mu_{c+1:n}^{i},\sigma_{c+1:n}^{i}=\\
+\mathcal{M}_{\phi}(\tilde{u}_{c+1:n},\tilde{u}_{1:c},\tilde{y}_{1:c},u_{1:m}^{i},y_{1:m}^{i}),\,i=1,\dots,s,
+(10)
+where
+μ
+c
++
+1
+:
+n
+i
+\mu_{c+1:n}^{i}
+and
+σ
+c
++
+1
+:
+n
+i
+\sigma_{c+1:n}^{i}
+represent the predicted mean and uncertainty for the query output based on the
+i
+i
+-th context subsequence
+(
+u
+1
+:
+m
+i
+,
+y
+1
+:
+m
+i
+)
+(u_{1:m}^{i},y_{1:m}^{i})
+.
+A single prediction is then obtained by combining the
+s
+s
+predictions through a weighted average. Specifically, at a generic query time step
+k
+k
+, the ensembled prediction is computed as:
+μ
+k
+=
+∑
+i
+=
+1
+s
+ω
+k
+i
+​
+μ
+k
+i
+.
+\mu_{k}=\sum_{i=1}^{s}\omega_{k}^{i}\mu_{k}^{i}.
+(11)
+where
+ω
+k
+i
+\omega_{k}^{i}
+are non-negative weights that determine the contribution of each prediction.
+The goal is to select the weights to obtain an unbiased estimate of
+y
+~
+k
+\tilde{y}_{k}
+with minimum variance.
+From (
+8b
+), we may interpret
+μ
+k
+i
+\mu_{k}^{i}
+as a “noisy” estimate of the true unknown output
+y
+~
+k
+\tilde{y}_{k}
+:
+p
+⁡
+(
+μ
+k
+i
+)
+=
+𝒩
+⁡
+(
+μ
+k
+i
+,
+y
+~
+k
+,
+(
+σ
+k
+i
+)
+2
+)
+.
+p(\mu_{k}^{i})=\mathcal{N}(\mu^{i}_{k};\,\tilde{y}_{k},(\sigma^{i}_{k})^{2}).
+(12)
+Consequently, the ensembled mean
+μ
+k
+\mu_{k}
+in (
+11
+) is also Gaussian, with mean
+μ
+¯
+k
+=
+y
+~
+k
+​
+∑
+i
+=
+1
+s
+ω
+k
+i
+\bar{\mu}_{k}=\tilde{y}_{k}\sum_{i=1}^{s}\omega_{k}^{i}
+.
+To ensure that
+μ
+k
+\mu_{k}
+is an unbiased estimator of
+y
+~
+k
+\tilde{y}_{k}
+, the weights must satisfy the constraint:
+∑
+i
+=
+1
+s
+ω
+k
+i
+=
+1
+.
+\sum_{i=1}^{s}\omega_{k}^{i}=1.
+(13)
+Furthermore, assuming that
+μ
+k
+i
+\mu_{k}^{i}
+are independent of each others for all
+i
+=
+1
+,
+…
+,
+s
+i=1,\dots,s
+, the variance
+σ
+μ
+k
+2
+\sigma_{\mu_{k}}^{2}
+of
+μ
+k
+\mu_{k}
+can be written:
+σ
+μ
+k
+2
+=
+∑
+i
+=
+1
+s
+(
+ω
+k
+i
+​
+σ
+k
+i
+)
+2
+.
+\sigma_{\mu_{k}}^{2}=\sum_{i=1}^{s}(\omega_{k}^{i}\sigma_{k}^{i})^{2}.
+(14)
+Under constraint (
+13
+), it can be proven that the variance
+σ
+μ
+k
+2
+\sigma_{\mu_{k}}^{2}
+in (
+14
+) is minimized by the weights:
+ω
+k
+i
+=
+(
+σ
+k
+i
+)
+−
+2
+∑
+j
+=
+1
+s
+(
+σ
+k
+j
+)
+−
+2
+.
+\omega_{k}^{i}=\frac{(\sigma_{k}^{i})^{-2}}{\sum_{j=1}^{s}(\sigma_{k}^{j})^{-2}}.
+(15)
+A detailed derivation of (
+15
+) is reported in the appendix.
+Note that, in the case of
+σ
+k
+i
+\sigma^{i}_{k}
+equal to each other for all
+i
+=
+1
+,
+…
+,
+s
+i=1,\dots,s
+, then
+ω
+k
+i
+=
+1
+s
+\omega_{k}^{i}=\frac{1}{s}
+and
+μ
+k
+\mu_{k}
+in (
+11
+) is given by an unweighted ensemble average.
+5
+Synthetic data generation for system identification
+In this section, we discuss how the pre-trained meta model can be leveraged for classical system identification, where the goal is to estimate a (parsimonious) model
+G
+G
+of a dynamical system
+S
+0
+S_{0}
+based on observed data.
+The use of synthetic data in this context is motivated by regimes in which the available real training dataset
+D
+tr
+D_{\text{tr}}
+is small or weakly informative (e.g., limited excitation bandwidth or short experiments). In such cases, flexible parametric models
+G
+G
+trained only on
+D
+tr
+D_{\text{tr}}
+tend to overfit and extrapolate poorly. The pre-trained meta model provides a class-level prior over plausible input–output trajectories, which we exploit to generate synthetic data conditioned on
+D
+tr
+D_{\text{tr}}
+that enrich the training set and act as a regularizer for
+G
+G
+.
+This strategy rests on one key assumption:
+S
+o
+S_{o}
+can be reasonably well described
+by
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+, i.e.,
+𝒟
+t
+​
+r
+\mathcal{D}_{tr}
+, used as context, allows the meta
+model to meaningfully predict the trajectories of
+S
+o
+S_{o}
+.
+In this setting, the meta model does not replace classical system identification but complements it. By generating synthetic trajectories conditioned on the same training data
+D
+tr
+D_{\text{tr}}
+, it creates additional scenarios tailored to the specific system of interest, rather than generic WH realizations. The resulting two-step pipeline, “generate context-aware synthetic data
+→
+\rightarrow
+estimate a parametric model”, therefore trains
+G
+G
+on a richer dataset composed of
+D
+tr
+D_{\text{tr}}
+together with synthetic trajectories adapted to the target system, instead of training
+G
+G
+directly on
+D
+tr
+D_{\text{tr}}
+combined with unconditioned WH simulations.
+Let us consider an observed input/output data sequence
+(
+u
+1
+:
+m
+,
+y
+1
+:
+m
+)
+(u_{1:m},y_{1:m})
+(referred so far as context sequence) generated by system of interest
+𝒮
+o
+\mathcal{S}_{\text{o}}
+. Since this dataset represents the available information about
+𝒮
+o
+\mathcal{S}_{\text{o}}
+, it can be used either as a context for the meta model or as a training dataset for estimating a model
+𝔾
+\mathbb{G}
+of the system
+𝒮
+o
+\mathcal{S}_{\text{o}}
+, or both. For this reason,
+(
+u
+1
+:
+m
+,
+y
+1
+:
+m
+)
+(u_{1:m},y_{1:m})
+will be interchangeably referred to as the “context dataset” or “training dataset”, and will be denoted as
+D
+tr
+D_{\text{tr}}
+.
+We consider a parametric model
+𝔾
+\mathbb{G}
+characterized by a parameter vector
+θ
+\theta
+, where
+y
+^
+t
+​
+(
+θ
+)
+\hat{y}_{t}(\theta)
+represents the output of
+𝔾
+\mathbb{G}
+for a given input sequence up to time
+t
+t
+, i.e.,
+y
+^
+t
+(
+θ
+)
+=
+𝔾
+(
+u
+1
+:
+t
+;
+θ
+)
+.
+\hat{y}_{t}(\theta)=\mathbb{G}(u_{1:t};\theta).
+(16)
+For simplicity of exposition, we assume a single-output system.
+According to classical parametric system identification, the model parameters
+θ
+\theta
+are typically obtained by minimizing an average loss function
+ℓ
+\ell
+over the training dataset
+D
+tr
+D_{\text{tr}}
+, i.e.,
+θ
+^
+=
+arg
+⁡
+min
+θ
+​
+1
+m
+​
+∑
+t
+=
+1
+m
+ℓ
+⁡
+(
+y
+t
+,
+y
+^
+t
+​
+(
+θ
+)
+)
+.
+\hat{\theta}=\arg\min_{\theta}\frac{1}{m}\sum_{t=1}^{m}\ell(y_{t},\hat{y}_{t}(\theta)).
+(17)
+To enrich the training set
+D
+tr
+D_{\text{tr}}
+, we aim to generate an additional, potentially infinite, set of
+synthetic
+input/output sequences
+u
+~
+i
+1
+:
+T
+~
+,
+y
+~
+i
+1
+:
+T
+~
+\tilde{u}^{i}_{1:\tilde{T}},\tilde{y}^{i}_{1:\tilde{T}}
+where
+i
+=
+1
+,
+2
+,
+…
+i=1,2,\ldots
+is used to represent the
+i
+i
+-th synthetic trajectory and
+T
+~
+\tilde{T}
+is the length of the synthetic trajectories, that for simplicity of notation, is assumed to be the same for all synthetic datasets. The synthetic trajectories are drawn from a common probability distribution
+p
+(
+u
+~
+1
+:
+T
+~
+,
+y
+~
+1
+:
+T
+~
+)
+p(\tilde{u}_{1:\tilde{T}},\tilde{y}_{1:\tilde{T}})
+, ideally matching the one underlying
+D
+tr
+D_{\text{tr}}
+.
+The main idea behind the data augmentation strategy proposed in the paper is to use the pre-trained meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+to generate the synthetic input/output trajectories. Indeed, the meta model has the ability to infer the behavior of the specific query system
+𝒮
+o
+\mathcal{S}_{\text{o}}
+directly from the training (or, equivalently, context) dataset
+D
+tr
+D_{\text{tr}}
+, which implicitly encodes key characteristics of the system
+𝒮
+o
+\mathcal{S}_{\text{o}}
+. This trained meta model can then predict the output
+y
+~
+1
+:
+T
+~
+\tilde{y}_{1:\tilde{T}}
+for any synthetic input sequence
+u
+~
+1
+:
+T
+~
+\tilde{u}_{1:\tilde{T}}
+, thereby facilitating generation of a potentially infinite dimensional set of synthetic data, by implicitly transferring knowledge across systems within the same class.
+The following sections discuss two approaches for combining the training dataset
+D
+tr
+D_{\text{tr}}
+with synthetic data generated by the pre-trained meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+. These approaches are related, as both incorporate the synthetic dataset as an additional regularization term in the original loss function in (
+17
+). However, they differ in how this regularization term is constructed. In the first approach, discussed in Section
+5.1
+and originally introduced in
+Piga et al. (2024b)
+, equal weights in the regularization term are assigned to all synthetic samples. In contrast, the second approach, presented in Section
+5.2
+, derives the regularization term based on a maximum-likelihood formulation and considers the uncertainty of the synthetic samples in constructing the training loss.
+5.1
+Deterministic regularization
+The parameters
+θ
+\theta
+that define the model
+𝔾
+⁡
+(
+⋅
+,
+θ
+)
+\mathbb{G}(\cdot,\theta)
+of the system
+𝒮
+o
+\mathcal{S}_{\text{o}}
+are estimated by minimizing an expected loss that incorporates both the real data
+D
+tr
+D_{\text{tr}}
+generated by the system
+𝒮
+o
+\mathcal{S}_{\text{o}}
+and synthetic data generated by the pre-trained meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+, i.e.,
+θ
+^
+=
+arg
+⁡
+min
+θ
+\displaystyle\hat{\theta}=\arg\min_{\theta}
+1
+m
+​
+∑
+t
+=
+1
+m
+ℓ
+⁡
+(
+y
+t
+,
+y
+^
+t
+​
+(
+θ
+)
+)
++
+\displaystyle\frac{1}{m}\sum_{t=1}^{m}\ell(y_{t},\hat{y}_{t}(\theta))+
++
+λ
+𝔼
+p
+(
+u
+~
+1
+:
+T
+~
+,
+y
+~
+1
+:
+T
+~
+)
+[
+1
+T
+~
+∑
+k
+=
+1
+T
+~
+ℓ
+(
+y
+~
+k
+,
+y
+~
+^
+k
+(
+θ
+)
+)
+]
+,
+\displaystyle+\lambda\,\mathbb{E}_{p(\tilde{u}_{1:\tilde{T}},\tilde{y}_{1:\tilde{T}})}\left[\frac{1}{\tilde{T}}\sum_{k=1}^{\tilde{T}}\ell(\tilde{y}_{k},\hat{\tilde{y}}_{k}(\theta))\right],
+(18)
+where
+y
+~
+^
+k
+​
+(
+θ
+)
+\hat{\tilde{y}}_{k}(\theta)
+is the model’s estimation output for a synthetic input sequence
+u
+~
+1
+:
+k
+\tilde{u}_{1:k}
+, i.e.,
+y
+~
+^
+k
+(
+θ
+)
+=
+𝔾
+(
+u
+~
+1
+:
+k
+,
+θ
+)
+\hat{\tilde{y}}_{k}(\theta)=\mathbb{G}(\tilde{u}_{1:k},\theta)
+.
+The regularization hyper-parameter
+λ
+≥
+0
+\lambda\geq 0
+controls the relative importance of real versus synthetic data. Setting
+λ
+=
+0
+\lambda=0
+results in training on real data only, which may cause overfitting, particularly with complex models or limited datasets. A higher
+λ
+\lambda
+value emphasizes synthetic data, which can introduce distributional biases from the synthetic data generation process. Thus,
+λ
+\lambda
+should be chosen based on the quantity of real training data and on the quality of the synthetic data.
+In this work,
+λ
+\lambda
+is chosen via hold-out validation. Early stopping over a validation set is used to prevent overfitting, which may occur in case of small-size
+D
+tr
+D_{\text{tr}}
+and when synthetic data are not employed. To not use additional data beyond what is already used for model estimation with early stopping, the same validation set can also be used for tuning
+λ
+\lambda
+.
+The expected value in (
+18
+) is approximated with a sample average, by applying
+q
+q
+synthetic input sequences
+u
+~
+i
+1
+:
+T
+~
+\tilde{u}^{i}_{1:\tilde{T}}
+(for
+i
+=
+1
+,
+…
+,
+q
+i=1,\ldots,q
+) as input in the decoder, generating the corresponding outputs
+y
+~
+i
+1
+:
+T
+~
+\tilde{y}^{i}_{1:\tilde{T}}
+2
+2
+2
+As initial conditions in the generation of the output trajectory
+y
+~
+i
+1
+:
+T
+~
+\tilde{y}^{i}_{1:\tilde{T}}
+we can consider the last
+c
+c
+samples of the context
+D
+tr
+D_{\text{tr}}
+.
+. Consequently, the estimation problem becomes:
+θ
+^
+=
+arg
+⁡
+min
+θ
+\displaystyle\hat{\theta}=\arg\min_{\theta}
+1
+m
+​
+∑
+t
+=
+1
+m
+ℓ
+⁡
+(
+y
+t
+,
+y
+^
+t
+​
+(
+θ
+)
+)
++
+\displaystyle\frac{1}{m}\sum_{t=1}^{m}\ell(y_{t},\hat{y}_{t}(\theta))+
++
+λ
+1
+q
+1
+T
+~
+∑
+i
+=
+1
+q
+∑
+k
+=
+1
+T
+~
+ℓ
+(
+y
+~
+k
+i
+,
+y
+~
+^
+k
+i
+(
+θ
+)
+)
+.
+\displaystyle+\lambda\frac{1}{q}\frac{1}{\tilde{T}}\sum_{i=1}^{q}\sum_{k=1}^{\tilde{T}}\ell(\tilde{y}^{i}_{k},\hat{\tilde{y}}^{i}_{k}(\theta)).
+(19)
+The optimization problem (
+19
+) can solved using mini-batch stochastic gradient descent, with
+q
+q
+new synthetic input/output sequences generated at each iteration.
+5.2
+Maximum-likelihood based regularization
+In this section, we present an alternative approach based on maximum likelihood for integrating real training data
+D
+tr
+D_{\text{tr}}
+and synthetic data into a unified loss function for estimating the parameters
+θ
+\theta
+of the model
+𝔾
+\mathbb{G}
+.
+We assume that there exists an unknown “true” parameter
+θ
+o
+\theta^{o}
+such that, for any given input sequence
+u
+1
+:
+t
+u_{1:t}
+, the true system output
+y
+t
+o
+y_{t}^{\rm o}
+at time
+t
+t
+is given by:
+y
+t
+o
+=
+𝔾
+(
+u
+1
+:
+t
+,
+θ
+o
+)
+.
+\displaystyle y_{t}^{\rm o}=\mathbb{G}(u_{1:t},\theta^{o}).
+(20)
+The measured training output is then modeled as:
+y
+t
+=
+𝔾
+(
+u
+1
+:
+t
+,
+θ
+o
+)
+⏟
+y
+t
+o
++
+e
+t
+,
+t
+=
+1
+,
+…
+,
+m
+,
+\displaystyle y_{t}=\underset{y_{t}^{\rm o}}{\underbrace{\mathbb{G}(u_{1:t},\theta^{o})}}+e_{t},\quad t=1,\ldots,m,
+(21)
+where
+e
+t
+e_{t}
+is
+independent and identically distributed
+(i.i.d.) Gaussian noise, i.e.,
+e
+t
+∼
+𝒩
+⁡
+(
+0
+,
+σ
+e
+2
+)
+e_{t}\sim\mathcal{N}(0,\sigma^{2}_{e})
+.
+Thus, the likelihood function of the model parameters
+θ
+\theta
+given the training dataset
+D
+tr
+D_{\text{tr}}
+can be factorized as:
+p
+(
+y
+1
+:
+m
+|
+u
+1
+:
+m
+,
+θ
+)
+=
+∏
+t
+=
+1
+m
+𝒩
+(
+y
+t
+;
+𝔾
+(
+u
+1
+:
+t
+,
+θ
+)
+,
+σ
+e
+2
+)
+.
+\displaystyle p(y_{1:m}|u_{1:m},\theta)=\prod_{t=1}^{m}\mathcal{N}(y_{t};\mathbb{G}(u_{1:t},\theta),\sigma^{2}_{e}).
+(22)
+The predicted mean provided by the meta model is used as synthetic output
+y
+~
+k
+\tilde{y}_{k}
+, namely:
+y
+~
+k
+(
+u
+~
+1
+:
+k
+,
+D
+tr
+)
+=
+μ
+k
+(
+u
+~
+1
+:
+k
+,
+D
+tr
+)
+,
+k
+=
+1
+,
+…
+,
+T
+~
+,
+\displaystyle\tilde{y}_{k}(\tilde{u}_{1:k},D_{\text{tr}})=\mu_{k}(\tilde{u}_{1:k},D_{\text{tr}}),\ \ k=1,\ldots,\tilde{T},
+(23)
+where we emphasize the dependence of
+μ
+k
+\mu_{k}
+(and consequently
+y
+~
+k
+\tilde{y}_{k}
+) on the training dataset
+D
+tr
+D_{\text{tr}}
+(or, equivalently, the context).
+According to the meta modeling assumption in (
+8
+), the true output
+y
+~
+k
+o
+=
+𝔾
+(
+u
+~
+1
+:
+k
+,
+θ
+o
+)
+\tilde{y}_{k}^{\rm o}=\mathbb{G}(\tilde{u}_{1:k},\theta^{o})
+of the system of interest
+𝒮
+o
+\mathcal{S}_{o}
+for a query input
+u
+~
+1
+:
+k
+\tilde{u}_{1:k}
+follows a Gaussian distribution:
+p
+(
+y
+~
+k
+o
+|
+u
+~
+1
+:
+k
+,
+D
+tr
+)
+=
+𝒩
+(
+y
+~
+k
+o
+;
+μ
+k
+,
+σ
+k
+2
+)
+,
+\displaystyle p(\tilde{y}_{k}^{\rm o}|\tilde{u}_{1:k},D_{\text{tr}})=\mathcal{N}(\tilde{y}_{k}^{\rm o};\mu_{k},\sigma^{2}_{k}),
+(24)
+and
+p
+(
+y
+~
+1
+:
+T
+~
+o
+|
+u
+~
+1
+:
+T
+~
+,
+D
+tr
+)
+=
+∏
+k
+=
+1
+T
+~
+𝒩
+(
+y
+~
+k
+o
+;
+μ
+k
+,
+σ
+k
+2
+)
+.
+\displaystyle p(\tilde{y}_{1:\tilde{T}}^{\rm o}|\tilde{u}_{1:\tilde{T}},D_{\text{tr}})=\prod_{k=1}^{\tilde{T}}\mathcal{N}(\tilde{y}_{k}^{\rm o};\mu_{k},\sigma^{2}_{k}).
+(25)
+In the above equations, the dependence of
+μ
+k
+\mu_{k}
+and
+σ
+k
+2
+\sigma^{2}_{k}
+is omitted not to burden the notation.
+From the choice of the synthetic output
+y
+~
+k
+\tilde{y}_{k}
+in (
+23
+), and due to the symmetry of the Gaussian distribution, the likelihood function of the model parameters
+θ
+\theta
+given the single synthetic output sequence
+y
+~
+1
+:
+k
+\tilde{y}_{1:k}
+and the training dataset
+D
+tr
+D_{\text{tr}}
+is:
+p
+(
+y
+~
+1
+:
+T
+~
+|
+u
+~
+1
+:
+T
+~
+,
+D
+tr
+,
+θ
+)
+=
+\displaystyle p(\tilde{y}_{1:\tilde{T}}|\tilde{u}_{1:\tilde{T}},D_{\text{tr}},\theta)=
+∏
+k
+=
+1
+T
+~
+1
+2
+​
+π
+​
+σ
+k
+2
+exp
+(
+−
+(
+μ
+k
+−
+𝔾
+(
+u
+~
+1
+:
+k
+,
+θ
+)
+)
+2
+2
+​
+σ
+k
+2
+)
+.
+\displaystyle\quad\quad\prod_{k=1}^{\tilde{T}}\frac{1}{\sqrt{2\pi\sigma_{k}^{2}}}\exp\left(-\frac{(\mu_{k}-\mathbb{G}(\tilde{u}_{1:k},\theta))^{2}}{2\sigma_{k}^{2}}\right).
+(26)
+Thus, the joint likelihood function of the model parameters
+θ
+\theta
+given both the training and synthetic output is:
+p
+(
+y
+1
+:
+m
+,
+y
+~
+1
+:
+T
+~
+|
+u
+1
+:
+m
+,
+u
+~
+1
+:
+T
+~
+,
+θ
+)
+=
+\displaystyle p(y_{1:m},\tilde{y}_{1:\tilde{T}}|u_{1:m},\tilde{u}_{1:\tilde{T}},\theta)=
+p
+(
+y
+1
+:
+m
+|
+u
+1
+:
+m
+,
+θ
+)
+p
+(
+y
+~
+1
+:
+T
+~
+|
+u
+~
+1
+:
+T
+~
+,
+u
+1
+:
+m
+,
+y
+1
+:
+m
+⏟
+D
+tr
+,
+θ
+)
+=
+\displaystyle p(y_{1:m}|u_{1:m},\theta)p(\tilde{y}_{1:\tilde{T}}|\tilde{u}_{1:\tilde{T}},\underset{D_{\text{tr}}}{\underbrace{u_{1:m},y_{1:m}}},\theta)=
+∏
+t
+=
+1
+m
+𝒩
+(
+y
+t
+;
+𝔾
+(
+u
+1
+:
+t
+,
+θ
+)
+,
+σ
+e
+2
+)
+∏
+k
+=
+1
+T
+~
+𝒩
+(
+y
+~
+k
+;
+𝔾
+(
+u
+~
+1
+:
+k
+,
+θ
+)
+,
+σ
+k
+2
+)
+=
+\displaystyle\prod_{t=1}^{m}\mathcal{N}(y_{t};\mathbb{G}(u_{1:t},\theta),\sigma^{2}_{e})\prod_{k=1}^{\tilde{T}}\mathcal{N}(\tilde{y}_{k};\mathbb{G}({\tilde{u}}_{1:k},\theta),\sigma_{k}^{2})=
+∏
+t
+=
+1
+m
+1
+2
+​
+π
+​
+σ
+e
+2
+exp
+(
+−
+(
+y
+t
+−
+𝔾
+(
+u
+1
+:
+t
+,
+θ
+)
+)
+2
+2
+​
+σ
+e
+2
+)
+×
+\displaystyle\prod_{t=1}^{m}\frac{1}{\sqrt{2\pi\sigma_{e}^{2}}}\exp\left(-\frac{(y_{t}-\mathbb{G}(u_{1:t},\theta))^{2}}{2\sigma_{e}^{2}}\right)\times
+∏
+k
+=
+1
+T
+~
+1
+2
+​
+π
+​
+σ
+k
+2
+exp
+(
+−
+(
+μ
+k
+−
+𝔾
+(
+u
+~
+1
+:
+k
+,
+θ
+)
+)
+2
+2
+​
+σ
+k
+2
+)
+.
+\displaystyle\prod_{k=1}^{\tilde{T}}\frac{1}{\sqrt{2\pi\sigma_{k}^{2}}}\exp\left(-\frac{(\mu_{k}-\mathbb{G}(\tilde{u}_{1:k},\theta))^{2}}{2\sigma_{k}^{2}}\right).
+(27)
+Thus, the log-likelihood function is given by:
+log
+p
+(
+y
+1
+:
+m
+,
+y
+~
+1
+:
+T
+~
+|
+u
+1
+:
+m
+,
+u
+~
+1
+:
+T
+~
+,
+θ
+)
+=
+\displaystyle\log p(y_{1:m},\tilde{y}_{1:\tilde{T}}|u_{1:m},\tilde{u}_{1:\tilde{T}},\theta)=
+−
+∑
+t
+=
+1
+m
+(
+y
+t
+−
+𝔾
+(
+u
+1
+:
+t
+,
+θ
+)
+)
+2
+2
+​
+σ
+e
+2
+−
+∑
+k
+=
+1
+T
+~
+(
+μ
+k
+−
+𝔾
+(
+u
+~
+1
+:
+k
+,
+θ
+)
+)
+2
+2
+​
+σ
+k
+2
++
+C
+,
+\displaystyle-\sum_{t=1}^{m}\frac{(y_{t}-\mathbb{G}(u_{1:t},\theta))^{2}}{2\sigma_{e}^{2}}-\sum_{k=1}^{\tilde{T}}\frac{(\mu_{k}-\mathbb{G}(\tilde{u}_{1:k},\theta))^{2}}{2\sigma_{k}^{2}}+C,
+(28)
+where
+C
+C
+is a constant term that does not depend on the model parameters
+θ
+\theta
+.
+Maximizing the log-likelihood with respect to
+θ
+\theta
+is equivalent to solving the following optimization problem:
+min
+θ
+∑
+t
+=
+1
+m
+(
+y
+t
+−
+𝔾
+(
+u
+1
+:
+t
+,
+θ
+)
+)
+2
+2
+​
+σ
+e
+2
++
+∑
+k
+=
+1
+T
+~
+(
+μ
+k
+−
+𝔾
+(
+u
+~
+1
+:
+k
+,
+θ
+)
+)
+2
+2
+​
+σ
+k
+2
+.
+\displaystyle\min_{\theta}\sum_{t=1}^{m}\frac{(y_{t}-\mathbb{G}(u_{1:t},\theta))^{2}}{2\sigma_{e}^{2}}+\sum_{k=1}^{\tilde{T}}\frac{(\mu_{k}-\mathbb{G}(\tilde{u}_{1:k},\theta))^{2}}{2\sigma_{k}^{2}}.
+(29)
+Since the noise variance
+σ
+e
+2
+\sigma_{e}^{2}
+is constant (and might also be unknown), problem (
+29
+) is equivalently rewritten by introducing a hyper-parameter
+λ
+\lambda
+that weighs the second summation, i.e.,
+min
+θ
+∑
+t
+=
+1
+m
+(
+y
+t
+−
+𝔾
+(
+u
+1
+:
+t
+,
+θ
+)
+)
+2
++
+λ
+∑
+k
+=
+1
+T
+~
+(
+μ
+k
+−
+𝔾
+(
+u
+~
+1
+:
+k
+,
+θ
+)
+)
+2
+σ
+k
+2
+,
+\displaystyle\min_{\theta}\sum_{t=1}^{m}(y_{t}-\mathbb{G}(u_{1:t},\theta))^{2}+\lambda\sum_{k=1}^{\tilde{T}}\frac{(\mu_{k}-\mathbb{G}(\tilde{u}_{1:k},\theta))^{2}}{\sigma_{k}^{2}},
+(30)
+with
+λ
+\lambda
+tuned through cross-validation to balance the contribution of the synthetic data term, as also discussed in Section
+5.1
+.
+The extension to the case of multiple synthetic sequences is straightforward, leading to:
+min
+θ
+∑
+t
+=
+1
+m
+(
+y
+t
+−
+𝔾
+(
+u
+1
+:
+t
+,
+θ
+)
+)
+2
++
+λ
+∑
+i
+=
+1
+q
+∑
+k
+=
+1
+T
+~
+(
+μ
+k
+i
+−
+𝔾
+(
+u
+~
+1
+:
+k
+i
+,
+θ
+)
+)
+2
+(
+σ
+k
+i
+)
+2
+.
+\displaystyle\min_{\theta}\sum_{t=1}^{m}(y_{t}-\mathbb{G}(u_{1:t},\theta))^{2}+\lambda\sum_{i=1}^{q}\sum_{k=1}^{\tilde{T}}\frac{(\mu_{k}^{i}-\mathbb{G}(\tilde{u}_{1:k}^{i},\theta))^{2}}{(\sigma_{k}^{i})^{2}}.
+(31)
+Summarizing, the optimization problem (
+31
+) aims at minimizing the sum of squared errors, where the first term accounts for the discrepancy between the model predictions and the observed real data, while the second term incorporates synthetic data. The synthetic data contributions are weighted inversely to their associated uncertainty, as reflected by the variance terms
+(
+σ
+k
+i
+)
+2
+(\sigma_{k}^{i})^{2}
+. Consequently, synthetic samples with high uncertainty have a lower influence on the loss, ensuring that the estimation process prioritizes more reliable data points.
+The effectiveness of synthetic data is therefore not assumed a priori, but controlled at the point of use through this uncertainty weighting. The probabilistic meta model provides a per-sample uncertainty
+σ
+k
+\sigma_{k}
+, and the maximum-likelihood loss weights synthetic contributions inversely to
+σ
+k
+2
+\sigma_{k}^{2}
+, so that synthetic samples deemed uncertain have limited impact on the estimation of
+G
+G
+, while high-confidence synthetic predictions carry more weight. In addition, before relying heavily on synthetic trajectories, the practitioner can perform simple consistency checks on their distribution (e.g., input spectrum, amplitude range, operating region) relative to the available real data, and restrict the use of synthetic data to regimes where the meta model is both confident and the synthetic inputs remain within the domain explored by the real system.
+6
+Examples
+In this section, we demonstrate the capabilities of the meta modelling paradigm through several simulation examples, as well as system identification benchmarks using real data.
+Trainings and inferences are performed using an Nvidia RTX 4090 GPU with 24GB of RAM. To ensure the reproducibility of all experiments, the complete codebase, including dataset generation, training routines, and trained meta models, has been made publicly accessible in a GitHub repository
+Pura et al. (2024)
+.
+6.1
+Meta model training
+6.1.1
+System class
+The meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+is trained on synthetic datasets generated by simulating Wiener-Hammerstein (WH) systems characterized by the structure
+G
+1
+−
+F
+−
+G
+2
+G_{1}\!-\!F\!-\!G_{2}
+, where
+F
+F
+represents a static nonlinearity positioned between two LTI blocks,
+G
+1
+G_{1}
+and
+G
+2
+G_{2}
+. The discrete-time LTI blocks
+G
+1
+G_{1}
+and
+G
+2
+G_{2}
+are randomly generated, with their orders uniformly sampled in the range
+[
+1
+,
+10
+]
+[1,10]
+, ensuring variability in their dynamic behavior. The pole locations of
+G
+1
+G_{1}
+and
+G
+2
+G_{2}
+are parameterized by magnitudes and phases, which are independently drawn from uniform distributions over the intervals
+(
+0.5
+,
+0.97
+)
+(0.5,0.97)
+and
+(
+0
+,
+π
+/
+2
+)
+(0,\pi/2)
+, respectively. The nonlinear function
+F
+F
+is implemented as a feedforward neural network with a single hidden layer that contains
+32
+32
+hidden units. The network weights are drawn from a Gaussian distribution with Kaiming scaling
+He et al. (2015)
+.
+This choice of training class is principled rather than arbitrary.
+Any fading-memory nonlinear system admits an arbitrarily close approximation
+by a finite-order Volterra series
+Boyd and Chua (1985)
+, and parallel
+Wiener–Hammerstein structures can exactly represent finite-order Volterra
+kernels
+Billings and Fakhouri (1982)
+.
+As a result, the WH-based synthetic corpus spans a rich family of nonlinear
+dynamics and provides a domain-informed pre-training distribution, rather than
+a system-specific simulator.
+The inputs
+u
+1
+:
+m
+u_{1:m}
+, used as context signals, are discrete multisine signals of length
+m
+m
+, with unitary amplitude and random phase, resulting in a flat spectral density. The active frequency components are constrained within a passband defined by the spectral index range
+[
+f
+min
+,
+f
+max
+]
+[f_{\text{min}},f_{\text{max}}]
+, with
+f
+min
+≥
+1
+f_{\text{min}}\geq 1
+and
+f
+max
+≤
+⌈
+m
+/
+2
+⌉
+f_{\text{max}}\leq\lceil m/2\rceil
+, with
+⌈
+⋅
+⌉
+\lceil\cdot\rceil
+denoting the ceiling operator, and
+⌈
+m
+/
+2
+⌉
+\lceil m/2\rceil
+corresponding to the Nyquist frequency for a discrete signal. The upper bound
+f
+max
+f_{\text{max}}
+is randomly selected from a uniform distribution over the range
+[
+1
+,
+⌈
+m
+/
+2
+⌉
+]
+[1,\lceil m/2\rceil]
+. The lower bound
+f
+min
+f_{\text{min}}
+is then assigned based on the following scheme:
+•
+with probability
+0.5
+0.5
+, we set
+f
+min
+=
+1
+f_{\text{min}}=1
+, enforcing a low-pass filtering effect;
+•
+with probability
+0.5
+0.5
+, we sample
+f
+min
+f_{\text{min}}
+from a uniform distribution over
+[
+1
+,
+f
+max
+]
+[1,f_{\text{max}}]
+.
+The signals are synthesized in the frequency domain and transformed into the time domain using an inverse Discrete Fourier Transform. Finally, they are normalized to maintain zero mean and unit standard deviation. Query input signals
+u
+~
+1
+:
+n
+\tilde{u}_{1:n}
+are constructed similarly.
+To simulate measurement errors coming from sensors, white Gaussian noise with a standard deviation of
+σ
+noise
+=
+0.01
+\sigma_{\text{noise}}=0.01
+is added to the outputs.
+In the experiments presented here, the WH-based synthetic corpus is generated by a parametric model. In practice, the same meta-learning framework can be instantiated using any available simulator or physics-based model of a target application domain (e.g., robotics, powertrain, process control). The essential requirement is access to a simulator that captures a class of plausible systems, not necessarily a perfect representation of the specific plant of interest. As we will discuss in Section
+6.2.3
+, discrepancies between the simulator and the real system can be compensated by lightweight adaptation using a relatively small amount of data.
+Remark 1
+.
+In contrast to large-scale foundation models trained on heterogeneous data with billions of parameters, the proposed meta model has a modest parameter count and is trained on synthetic trajectories drawn from a physically motivated class of systems. The WH-based design leverages existing knowledge on universal approximation for fading-memory nonlinear systems, rather than relying solely on brute-force scale.
+6.1.2
+Meta model architecture
+The Transformer architecture representing the meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+comprises
+n
+layers
+=
+12
+n_{\rm layers}=12
+layers, each with
+d
+model
+=
+128
+{d_{\rm model}}=128
+hidden units. Attention mechanisms are implemented with
+n
+heads
+=
+4
+n_{\rm heads}=4
+in both the encoder and decoder. The query input/output sequences consists
+n
+=
+130
+n=130
+samples, with the initial
+c
+=
+30
+{c}=30
+samples used as initial conditions.
+To assess performance across different context sequence complexities, two meta models are trained: one for a context length of
+m
+=
+400
+m=400
+and another for
+m
+=
+16000
+m=16000
+. This setup enables exploration of how the length of the context sequence affects model accuracy and computational efficiency. For the extended context length of
+m
+=
+16000
+m=16000
+, the Transformer architecture incorporates the recurrent patching approach described in Section
+4.1
+. The context is divided into
+M
+=
+400
+M=400
+patches, each of length
+L
+=
+m
+/
+M
+=
+40
+L=m/M=40
+. These patches are sequentially processed by a vanilla RNN with a single hidden layer with
+d
+model
+=
+128
+{d_{\rm model}}=128
+units. The final hidden state of each patch is further transformed through a square linear layer of size
+d
+model
+{d_{\rm model}}
+, producing a sequence
+p
+1
+:
+M
+p_{1:M}
+. This sequence is then used as input to the Transformer’s encoder backbone. Conversely, for the shorter context length of
+m
+=
+400
+m=400
+, the recurrent patching method is not employed. Instead, the encoder input sequence
+p
+1
+:
+M
+p_{1:M}
+, where
+M
+=
+m
+M=m
+, is directly obtained by processing the input/output samples,
+u
+1
+:
+m
+u_{1:m}
+and
+y
+1
+:
+m
+y_{1:m}
+, through a linear layer that maps
+n
+u
++
+n
+y
+n_{u}+n_{y}
+inputs to
+d
+model
+{d_{\rm model}}
+outputs. In both scenarios, the Transformer architecture is described by approximately
+5.5
+5.5
+million parameters, with additional
+16896
+16896
+parameters for the RNN layer used in the patching strategy.
+The meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+is trained to minimize the negative log-likelihood loss
+J
+ϕ
+J_{\phi}
+defined in (
+7
+) across
+3
+3
+million epochs, utilizing the AdamW optimizer
+Loshchilov and Hutter (2019)
+with minibatches of size
+b
+=
+32
+b=32
+. The training times for the meta models with context lengths of
+m
+=
+400
+m=400
+and
+m
+=
+16000
+m=16000
+are
+28
+28
+and
+50
+50
+hours, respectively.
+6.2
+Meta model testing
+The predictive performance of the pre-trained meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+is assessed not only across realizations of WH systems belonging to the same class used for meta model training,
+but also on simulated systems from a different class excited with non multisine input signals, as well as on
+real
+datasets from the nonlinear system identification benchmarks
+[
+27
+]
+.
+For the meta model handling a long context length (
+m
+=
+16000
+m=16000
+), the patching-based approach is adopted, while ensembling is used when the meta model handling a shorter context (
+m
+=
+400
+m=400
+) is considered. This allows us to leverage the full context data, in case the available training dataset, at inference, is larger than
+400
+400
+samples.
+6.2.1
+In-distribution test data
+First, the performance of the pre-trained meta model is evaluated on test samples drawn from the same distribution as the training data. To this aim,
+320
+320
+random realizations of simulated WH systems are generated for testing.
+Table
+1
+reports the mean and standard deviation of the Root Mean Squared Error (RMSE) achieved over the 320 realizations, along with average inference times to predict the output on a query window of length
+n
+−
+c
+=
+100
+n-c=100
+. The patching and ensembling approaches achieve similar predictive performance, with the patching approach being approximately 2 times faster in making inferences.
+Figure
+3
+illustrates the performance of the trained meta model. For visualization purposes, only results from the patching approach are displayed. The top panel shows the aggregated simulation results over the 320 randomly sampled Wiener–Hammerstein systems from the same distribution used for meta model training, highlighting the consistency of the model predictions across systems.  The bottom panel provides a detailed view of a single WH realization, showing the true output
+y
+~
+c
++
+1
+:
+n
+\tilde{y}_{c+1:n}
+, the predicted mean output
+μ
+c
++
+1
+:
+n
+\mu_{c+1:n}
+, the corresponding prediction error
+y
+~
+c
++
+1
+:
+n
+−
+μ
+c
++
+1
+:
+n
+\tilde{y}_{c+1:n}-\mu_{c+1:n}
+, and the uncertainty intervals computed as
+μ
+c
++
+1
+:
+n
+±
+3
+σ
+c
++
+1
+:
+n
+\mu_{c+1:n}\pm 3\sigma_{c+1:n}
+. The tight uncertainty bounds and low error in the figure demonstrate that the meta model accurately captures the system dynamics and provides well-calibrated uncertainty estimates
+Table 1
+:
+In-distribution systems: Root Mean Square Error (RMSE) and inference time for patching-based and ensembling approach.
+Method
+RMSE mean (std)
+Inference time [s]
+Patching
+0.048 (0.044)
+0.019
+Ensembling
+0.038 (0.050)
+0.039
+Figure 3
+:
+In-distribution test results obtained using the patching-based meta model.
+Top:
+aggregated prediction results over 320 WH systems, highlighting the consistency and stability of the predictions across many system realizations.
+Bottom:
+representative WH system showing the true output
+y
+y
+, the predicted mean
+μ
+\mu
+, the prediction error
+y
+−
+μ
+y-\mu
+, and the uncertainty band
+μ
+±
+3
+​
+σ
+\mu\pm 3\sigma
+.
+The narrow confidence intervals and low error illustrate accurate prediction.
+6.2.2
+Benchmarks
+The pre-trained meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+is further evaluated on publicly available nonlinear system identification benchmarks, namely the WH
+Schoukens et al. (2009)
+, cascaded tanks with overflow
+Schoukens et al. (2016)
+, and coupled electric drives (CED)
+Wigren and Schoukens (2017)
+, with CED consisting of 2 input/output trajectories.
+The adopted benchmarks consist of
+real
+datasets and thus allow us to investigate the meta model’s ability to generalize beyond its training domain. Notably, these datasets are used solely for testing, with no additional training performed on the benchmark-specific training data. The available training datasets serve only as context for the pre-trained meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+. In our analysis, we prioritize demonstrating the zero-shot capabilities of the meta modeling paradigm, rather than directly comparing predictive performance with existing system identification methodologies.
+The benchmark systems are chosen to span a spectrum of structural proximity to the synthetic training distribution, in order to stress-test the framework under varying degrees of distribution shift:
+•
+Wiener–Hammerstein (WH) benchmark.
+This is an
+in-distribution
+test: the synthetic pre-training data are WH systems, so performance here validates that the framework correctly exploits the pre-training prior on systems drawn from the same class but generated in an experimental setup.
+•
+Coupled Electric Drives (CED).
+The CED system is structurally close to a WH model: it consists of a linear dynamical core followed by a static nonlinearity, which matches the WH cascade structure.
+Good zero-shot performance on CED therefore confirms that the learned prior transfers to near-distribution systems with similar compositional structure.
+•
+Cascaded tanks with overflow.
+This system exhibits a piecewise-linear overflow nonlinearity embedded in a nonlinear state-space model that does not factorize as a WH cascade, making it a genuinely out-of-distribution test for the meta model.
+The cascaded tanks benchmark is also characterized by a particularly small real training dataset, a regime where classical identification methods are prone to overfitting and struggle to generalize.
+In this setting, the inductive bias acquired during WH meta-training acts as a strong regularizer, enabling the framework to achieve competitive, and in some cases state-of-the-art, performance despite the distributional mismatch.
+These observations highlight a regime where the proposed meta-modeling framework is particularly effective: when real training data per system are limited, the class-level prior learned from WH-based synthetic data provides a strong regularization effect and improves generalization. Conversely, on benchmarks with abundant task-specific data (e.g., systems with very long and informative training records), carefully tuned classical identification methods can still achieve higher asymptotic accuracy, whereas the meta model primarily offers the advantage of zero-shot prediction with modest performance gaps.
+According to the benchmark guidelines, the first
+50
+50
+,
+5
+5
+, and
+4
+4
+samples of the test data can be used as initial conditions for assessing predictive performance on the WH, cascaded tank, and CED benchmarks, respectively. As outlined in the previous section, the meta model is trained to utilize
+c
+=
+30
+c=30
+initial conditions for inference. For the WH benchmark where
+50
+50
+initial conditions are provided, only the last
+30
+30
+samples are used. Conversely, for the cascade tank benchmark, zero-padding is applied to construct the sequence of initial conditions fed to the meta model. For the CED benchmark, where the training and test sequences are known to be contiguous, the sequence of initial conditions is constructed by concatenating the final
+26
+26
+samples of the training data with the first
+4
+4
+samples of the test.
+Since the meta model is able to simulate the output over a query window of size
+100
+100
+, in order to accommodate the varying test sequence lengths in the benchmarks, an iterative inference approach is adopted. For the first inference step, the initial conditions provided by the benchmark dataset are used. In subsequent iterations, the
+c
+c
+final simulated output samples serve as initial conditions for the next test sub-sequence. This iterative approach, combined with the weighted ensembling strategy, significantly increases the computational time required for inference. To address this limitation, the following strategies are implemented:
+•
+parallelization
+: the predictions for the same inference window across all
+400
+400
+-length context sub-sequences, used for the ensembling, are computed in parallel.
+•
+pre-computation of encoder output
+: during each inference iteration, only the decoder inputs change across different iterations. Consequently, the encoder output remains constant, allowing the encoder output to be computed only once for all the inference iterations.
+Figure 4
+:
+Prediction results on the CED benchmark for the second output signal.
+Comparison between true output
+y
+y
+(black) and meta model’s predicted mean
+μ
+\mu
+(blue), along with simulation error
+y
+−
+μ
+y-\mu
+(red) and uncertainty region
+μ
+±
+3
+​
+σ
+\mu\pm 3\sigma
+(shaded blue area). Most predictions lie within the confidence bounds, demonstrating robust zero-shot generalization to real data.
+Table 2
+:
+Benchmarks: RMSEs and inference time over the test datasets for multiple methods.
+Benchmark
+Method
+RMSE
+Training/Meta-
+inference time
+WH
+In-context
+0.0014
+5.91 s
+dynoNet
+Forgione and Piga (2021b)
+0.0017
+1-60 min
+LSTM
+Champneys et al. (2024)
+0.0015
+1-24 hr
+ARX
+Champneys et al. (2024)
+0.0434
+1-60 min
+Cascaded
+Tanks
+In-context
+0.429
+0.22 s
+dynoNet
+Forgione and Piga (2021b)
+0.421
+1-60 min
+LSTM
+Champneys et al. (2024)
+0.452
+1-24 hr
+ARX
+Champneys et al. (2024)
+0.697
+1-60 min
+CED
+In-context
+[0.068, 0.055]
+0.17 s
+dynoNet
+Forgione and Piga (2021b)
+[0.062, 0.047]
+1-60 min
+LSTM
+Champneys et al. (2024)
+[0.139, 0.111]
+1-24 hr
+ARX
+Champneys et al. (2024)
+[0.433, 0.179]
+1-60 min
+Table
+2
+reports the RMSE values obtained on the test datasets for the three considered benchmarks, comparing the proposed approach with several baseline methods.
+It is important to note that the last column of the table compares the training time of the classical system identification baselines with the
+meta-inference
+time of the proposed approach, rather than its meta-training time.
+As discussed in Section
+3
+, the proposed meta model is trained exclusively on synthetic data and does not use benchmark data during training.
+Consequently, the only stage in which benchmark data are employed is during inference.
+For this reason, the comparison between baseline training time and meta-inference time provides a fairer assessment of computational efficiency, while the meta-training time, already reported in the paper, represents an offline cost incurred only once.
+It is worth noting that, although the main advantage of the proposed meta modeling paradigm is its ability to perform prediction in a zero-shot learning fashion, the predictive performance is also in line with state-of-the-art system identification algorithms (see leaderboard in
+Noël et al. (2025)
+).
+Figure
+4
+shows the second output trajectory of the CED benchmark, where we can see the true output
+y
+~
+c
++
+1
+:
+n
+\tilde{y}_{c+1:n}
+of the test dataset, the predicted mean output
+μ
+c
++
+1
+:
+n
+\mu_{c+1:n}
+generated by the meta model; the associated prediction error
+y
+~
+c
++
+1
+:
+n
+−
+μ
+c
++
+1
+:
+n
+\tilde{y}_{c+1:n}-\mu_{c+1:n}
+; and the
+99.7
+%
+99.7\%
+uncertainty interval computed as
+μ
+c
++
+1
+:
+N
+±
+3
+σ
+c
++
+1
+:
+N
+\mu_{c+1:N}\pm 3\sigma_{c+1:N}
+. 
+The simulation error
+y
+−
+μ
+y-\mu
+(red) remains small and within the uncertainty band for most time steps, indicating reliable generalization to real-world data despite the model being trained solely on simulated systems.
+This result highlights the zero-shot learning capability of the pre-trained meta model.
+6.2.3
+Model adaptation and fine-tuning
+The performance of the pre-trained meta model is also evaluated in an out-of-distribution scenario characterized by shifts in both the input signals and the system class compared to those used for meta model training. To this end, we employed a simulator of a
+continuous stirred tank reactor
+(CSTR) with jacket cooling, where a first-order irreversible reaction,
+A
+→
+B
+A\xrightarrow{}B
+, occurs. The physical dynamics of the system are detailed in
+(
+Luyben, 2007
+, Chapter 3)
+. In our analysis, the input variable is the flow rate of the cooling medium within the jackets, while the output is the concentration of reactant
+A
+A
+in the reactor. The output is normalized to have
+0
+0
+mean and unitary standard deviation. The reactor temperature and the temperature of the cooling medium are considered as system states.
+The input to these systems is a
+random binary signal
+(RBS), used to control the flow of the cooling medium inside the jackets. The context sequence length is set to
+m
+=
+16000
+m=16000
+, leveraging the recurrent patching-based approach, while the number of initial conditions is set to
+c
+=
+30
+c=30
+. To emulate realistic operating conditions, white Gaussian noise with a standard deviation of
+σ
+noise
+=
+0.1
+\sigma_{\text{noise}}=0.1
+is added to the normalized outputs.
+The analysis is conducted both in
+zero-shot
+learning and in
+few-shot
+adaptation setting. In the zero-shot setting, the pre-trained meta model is directly applied to predict the CSTR output. In the
+few-shot
+setting, a lightweight fine-tuning phase is introduced following the methodology in
+Piga et al. (2024a)
+, allowing the meta model to adjust to new conditions with minimal computational effort.
+Two distinct fine-tuning scenarios are investigated:
+•
+Scenario 1: Input adaptation only.
+The pre-trained meta model, originally trained on WH systems, is adapted by changing only the excitation signal from multisine to RBS, while keeping the same system class.
+Fine-tuning is performed for 1000 epochs.
+•
+Scenario 2: Input and system adaptation.
+Adaptation data are generated by simulating CSTR systems with randomly perturbed physical parameters and using RBS inputs.
+To mimic a realistic few-shot setting, fine-tuning is carried out over a small set of
+25
+25
+batches, each containing
+32
+32
+systems, for a total of 1000 training epochs.
+Although the optimization runs for multiple epochs, the model repeatedly sees the same limited set of systems, making the adaptation effectively few-shot.
+While the second scenario allows adaptation to both the excitation signal and the system class, the first corresponds to a more practical situation in which the user may not know the exact class of dynamical systems but does have control over the excitation signals.
+To evaluate all the cases, 320 distinct CSTR realizations were generated by randomly perturbing selected physical parameters.
+The results, summarized in Table
+3
+, show that the proposed lightweight fine-tuning procedure markedly improves the generalization capability of the pre-trained meta model.
+In the zero-shot setting, the WH-trained meta model is applied directly to the CSTR without any adaptation, resulting in a relatively large RMSE of
+1.249
+1.249
+.
+In Scenario 1, we keep the WH training class fixed and adapt only the excitation class from multisine to RBS, which yields a fivefold reduction in RMSE to
+0.242
+0.242
+compared to the zero-shot setting.
+In Scenario 2, where both the input and the system class are adapted via CSTR simulations, the RMSE further decreases to
+0.115
+0.115
+, which is close to the noise floor
+σ
+noise
+=
+0.1
+\sigma_{\rm noise}=0.1
+.
+It is worth noting, however, that the performance achieved in Scenario 1 is already remarkably close to this lower bound, despite adapting only the excitation input while keeping the meta-training system class unchanged.
+This indicates that a simple input-matching step can close a substantial portion of the sim-to-real gap, while the remaining gap can be bridged by a few-shot adaptation of the system class.
+Overall, the two scenarios highlight that, in certain practical situations, adapting the input representation alone is sufficient to recover most of the performance gains achievable through full adaptation, offering a practical and computationally efficient solution when the system dynamics are unknown but the input signal can be designed by the user.
+Table 3
+:
+CSTR case study: RMSE without and with fine-tuning where only the input class changes (Scenario 1) and where both input and system class change (Scenario 2) during fine-tuning.
+Setting
+Zero-shot
+Scenario 1
+Scenario 2
+RMSE
+1.249
+0.242
+0.115
+For comparison, an additional analysis is conducted, with a meta model trained from scratch directly on the CSTR system class. To ensure fairness, the training process utilized the same number of system realizations used for fine-tuning previously (namely,
+25
+25
+batches of
+32
+32
+systems). As shown in Figure
+5
+, this model overfits the small CSTR training set, and the best validation model achieves a test RMSE of 0.136, slightly worse than the fine-tuned meta model. Moreover, training from scratch requires about 4000 iterations to reach its best validation performance, compared to 1000 iterations for fine-tuning. This comparison highlights a practical advantage of the proposed approach: even when the simulator used for pre-training does not perfectly match the target system, a small amount of real or simulator data in the new domain can be used to adapt the pre-trained meta model more efficiently and effectively than training a new meta model from scratch.
+Figure 5
+:
+Training and validation curves for the meta model trained from scratch on the CSTR system class.
+The plot shows the evolution of the negative log-likelihood loss over training iterations for both the training (blue) and validation (red) datasets. A divergence between the training and validation losses is observed after approximately 4000 iterations, indicating overfitting.
+6.3
+Synthetic data generation for CED benchmark
+Figure 6
+:
+Performance comparison on the CED benchmark when training a dynoNet model with and without synthetic data generated by the pre-trained meta model.
+Boxplots report the distribution of the
+R
+2
+R^{2}
+index over 100 Monte Carlo runs for both benchmark outputs.
+Using only real data (left) leads to higher variance and lower median
+R
+2
+R^{2}
+, while augmenting the training set (right) with meta model-generated synthetic trajectories significantly improves accuracy.
+In this section, we consider the CED benchmark to demonstrate the capabilities of the pre-trained meta model in generating synthetic data, as discussed in Section
+5
+. This benchmark is known to be challenging because of the small size of the training dataset, which consists of only
+400
+400
+samples.
+Since the deterministic and the maximum-likelihood-based formulations achieved similar results, we only report the ones achieved with the maximum-likelihood approach.
+3
+3
+3
+Results related to the determinist formulation for synthetic data generation are reported on a simulation example over the WH systems in the conference paper
+Piga et al. (2024b)
+.
+As a parametric model
+𝔾
+\mathbb{G}
+to describe the CED system, a dynoNet neural network
+Forgione and Piga (2021b)
+is employed. Its architecture comprises
+LTI layers, which process input sequences through filtering operations, combined with memoryless nonlinear components. Training is performed over
+6000
+6000
+iterations of AdamW. To mitigate overfitting, early stopping is utilized, where the first
+300
+300
+samples of the training set are used to train the dynoNet, and the remaining
+100
+100
+samples are used for validation. The same validation dataset is also employed to tune the regularization parameter
+λ
+\lambda
+in the loss function (
+31
+). The same
+300
+300
+training samples serve as a context for the pre-trained meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+to generate additional
+200
+200
+synthetic samples, using a multisine signal as a query input. A Monte Carlo simulation with
+100
+100
+runs is conducted, where at each run, the initial weights of the dynoNet are randomly initialized, and a new synthetic query input sequence is considered. We remark that the synthetic data was generated by the meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+, which was pre-trained on simulated WH models without any further fine-tuning or prior knowledge of the target system.
+Results on the test dataset are reported in Figure
+6
+, which shows a boxplot of the
+R
+2
+R^{2}
+index on the two outputs of the test data over the
+100
+100
+Monte Carlo runs, with and without using synthetic data. These results highlight the potential of synthetic data to enhance model robustness and performance, with a median
+R
+2
+R^{2}
+index of
+0.70
+0.70
+on the first output (
+0.88
+0.88
+on the second one) without synthetic data, and a median of
+0.88
+0.88
+on the first output (
+0.93
+0.93
+on the second one) when the synthetic dataset is used. It is also noteworthy to observe the variability of the results across the Monte Carlo runs. Indeed, when no synthetic data is used, variability is solely due to the initial condition of the dynoNet weights. On the other hand, when using synthetic data, variability arises from the initial condition of the dynoNet weights, the selected hyper-parameter
+λ
+\lambda
+, and the generated synthetic data. Nevertheless, less variability is observed on the achieved
+R
+2
+R^{2}
+when synthetic data is used.
+7
+Conclusions
+In this paper, we presented novel developments on in-context learning for system identification, which enables zero-shot prediction of a system of interest without the need to estimate a model for that specific system. This approach eliminates the necessity to implement traditional system identification algorithms, thereby bypassing the need to select hyper-parameters typically chosen by system identification experts, such as model type, model order, training algorithm, etc. Indeed, the meta model is trained offline using a large set of synthetic data and has the capability to directly infer the behavior of the system of interest based on the available context (namely, available training data) and then predict the system’s output for any query input.
+New developments based on sequence patching and ensembling also allow us to process long context sequences, circumventing the quadratic complexity of the attention mechanism of Transformers. Moreover, the meta model can generate synthetic data that can be used for data augmentation in classic system identification. This synthetic data allows to leverage information from systems in the class, as well as efficient processing of training data, implicitly learned by the encoder during the pre-training of the meta model.
+Numerical results demonstrate how training a meta model with simulated data allows it to generalize well to real data or systems from a different class, potentially with quick adaptation.
+Current research activities are focused on two distinct and seemingly opposite directions. On one hand, we aim at scaling to very large-scale meta models, characterized by billions of parameters. These models are expected to describe very broad classes of dynamic systems, pushing the boundaries of what dynamics meta models can comprehend and predict. On the other hand, research is also focusing on creating distilled architectures. These lighter models aims to enhance computational efficiency and accessibility, making advanced meta models techniques more feasible for real-time applications and edge devices with limited processing capabilities.
+Limitations
+The estimated meta model
+ℳ
+ϕ
+\mathcal{M}_{\phi}
+is able to predict, in a zero-shot learning fashion, the output of a given system of interest based on its context input/output sequence and for any possible query input. However, this predictive meta model also comes with limitations. First, meta training requires a substantial offline computational effort on a large synthetic corpus, which is not needed by classical system identification tools when they are applied to a single system with an ad hoc model structure
+Pillonetto et al. (2023)
+. Second, the meta model is relatively heavy at inference time, making it less suitable for embedded or resource-constrained implementations compared to parsimonious parametric models. Third, while the meta model achieves competitive accuracy in regimes where per-system data are scarce or weakly informative, classical identification methods trained directly on abundant, high-quality data for a specific system can still reach higher asymptotic accuracy. Finally, the meta model provides predictions rather than an immediately interpretable parametric representation, which can be a drawback when frequency-response analysis, sensitivity studies, or control design require a compact and structured model of the system of interest, although recent works on transformer-based model predictive control
+Chen and Cannon (2026)
+indicate that such applications are possible but currently more specialized and computationally demanding.
+Further developments in the field are expected to draw inspiration from advancements in Natural Language Generation algorithms, exploring the use of alternative architectures beyond Transformers, like Structured State Space and diffusion models. Additionally, there is potential to leverage open models like LLaMA or DeepSeek, applying low-rank adaptations to their weights to tailor them for the specific meta modeling challenges of dynamical systems.
+References
+[1]
+A. Antoniou, H. Edwards, and A. J. Storkey
+(2019)
+How to train your MAML
+.
+In
+Proceedings of the 36th International Conference on Machine Learning
+,
+pp. 300–309
+.
+Cited by:
+§1.2
+.
+[2]
+G. Beintema, R. Toth, and M. Schoukens
+(2021)
+Nonlinear state-space identification using deep encoder networks
+.
+In
+Learning for dynamics and control
+,
+pp. 241–250
+.
+Cited by:
+§1.1
+.
+[3]
+S. A. Billings and S. Fakhouri
+(1982)
+Identification of systems containing linear dynamic and static nonlinear elements
+.
+Automatica
+18
+(
+1
+),
+pp. 15–26
+.
+Cited by:
+§6.1.1
+.
+[4]
+C. M. Bishop
+(2006)
+Pattern recognition and machine learning (information science and statistics)
+.
+Springer-Verlag
+,
+Berlin, Heidelberg
+.
+External Links:
+ISBN 0387310738
+Cited by:
+§4.2
+.
+[5]
+S. Boyd and L. Chua
+(1985)
+Fading memory and the problem of approximating nonlinear operators with volterra series
+.
+IEEE Transactions on circuits and systems
+32
+(
+11
+),
+pp. 1150–1161
+.
+Cited by:
+§6.1.1
+.
+[6]
+A. Chakrabarty, G. Wichern, V. M. Deshpande, A. P. Vinod, K. Berntorp, and C. R. Laughman
+(2025)
+Meta-learning for physically-constrained neural system identification
+.
+Neurocomputing
+651
+,
+pp. 130945
+.
+Cited by:
+§1.2
+.
+[7]
+A. Chakrabarty, G. Wichern, and C. R. Laughman
+(2023)
+Meta-learning of neural state-space models using data from similar systems
+.
+In
+World Congress of the International Federation of Automatic Control (IFAC)
+,
+Cited by:
+§1.2
+.
+[8]
+M. Champneys, G. I. Beintema, M. Schoukens, and T. J. Rogers
+(2024)
+Baseline results for selected nonlinear system identification benchmarks
+.
+IFAC-PapersOnLine
+58
+(
+15
+),
+pp. 474–479
+.
+Cited by:
+Table 2
+,
+Table 2
+,
+Table 2
+,
+Table 2
+,
+Table 2
+,
+Table 2
+.
+[9]
+X. Chen and M. Cannon
+(2026)
+Successive convex optimization for transformer encoder model predictive control
+.
+arXiv preprint arXiv:2605.14846
+.
+Cited by:
+§7
+.
+[10]
+Z. Chen, H. Huang, A. Andrusenko, O. Hrinchuk, K. C. Puvvada, J. Li, S. Ghosh, J. Balam, and B. Ginsburg
+(2024)
+Salm: speech-augmented language model with in-context learning for speech recognition and translation
+.
+In
+IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)
+,
+pp. 13521–13525
+.
+Cited by:
+§1.2
+.
+[11]
+Q. Dong, L. Li, D. Dai, C. Zheng, J. Ma, R. Li, H. Xia, J. Xu, Z. Wu, B. Chang,
+et al.
+(2024)
+A survey on in-context learning
+.
+In
+Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing
+,
+pp. 1107–1128
+.
+Cited by:
+§1.2
+.
+[12]
+A. Dosovitskiy, L. Beyer, A. Kolesnikov, D. Weissenborn, X. Zhai, T. Unterthiner, M. Dehghani, M. Minderer, G. Heigold, S. Gelly, J. Uszkoreit, and N. Houlsby
+(2020)
+An image is worth 16x16 words: transformers for image recognition at scale
+.
+In
+The Eighth International Conference on Learning Representations
+,
+Cited by:
+§1.3
+,
+§4.1
+.
+[13]
+Z. Du, H. Balim, S. Oymak, and N. Ozay
+(2023)
+Can transformers learn optimal filtering for unknown systems?
+.
+IEEE Control Systems Letters
+7
+(
+),
+pp. 3525–3530
+.
+Cited by:
+§1.2
+.
+[14]
+C. Finn, P. Abbeel, and S. Levine
+(2017)
+Model-agnostic meta-learning for fast adaptation of deep networks
+.
+In
+International conference on machine learning
+,
+pp. 1126–1135
+.
+Cited by:
+§1.2
+.
+[15]
+M. Forgione and D. Piga
+(2021)
+Continuous-time system identification with neural networks: model structures and fitting criteria
+.
+European Journal of Control
+59
+,
+pp. 69–81
+.
+Cited by:
+§1.1
+.
+[16]
+M. Forgione and D. Piga
+(2021)
+dynoNet: A neural network architecture for learning dynamical systems
+.
+International Journal of Adaptive Control and Signal Processing
+35
+(
+4
+),
+pp. 612–626
+.
+Cited by:
+§6.3
+,
+Table 2
+,
+Table 2
+,
+Table 2
+.
+[17]
+M. Forgione, F. Pura, and D. Piga
+(2023)
+From system models to class models: an in-context learning paradigm
+.
+IEEE Control Systems Letters
+7
+(
+),
+pp. 3513–3518
+.
+Cited by:
+3rd item
+,
+§1.1
+,
+§1.2
+,
+§1.3
+,
+§1.3
+,
+§1.3
+.
+[18]
+K. He, X. Zhang, S. Ren, and J. Sun
+(2015)
+Delving deep into rectifiers: surpassing human-level performance on imagenet classification
+.
+In
+Proceedings of the IEEE international conference on computer vision
+,
+pp. 1026–1034
+.
+Cited by:
+§6.1.1
+.
+[19]
+T. Hospedales, A. Antoniou, P. Micaelli, and A. Storkey
+(2021)
+Meta-learning in neural networks: a survey
+.
+IEEE transactions on pattern analysis and machine intelligence
+44
+(
+9
+),
+pp. 5149–5169
+.
+Cited by:
+§1.1
+.
+[20]
+R. Kaushik, T. Anne, and J.-B. Mouret
+(2020)
+Fast online adaptation in robotics through meta-learning embeddings of simulated priors
+.
+In
+2020 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)
+,
+pp. 5269–5276
+.
+Cited by:
+§1.2
+.
+[21]
+L. Kirsch, J. Harrison, J. Sohl-Dickstein, and L. Metz
+(2022)
+General-purpose in-context learning by meta-learning transformers
+.
+arXiv preprint arXiv:2212.04458
+.
+Cited by:
+§1.2
+.
+[22]
+I. Loshchilov and F. Hutter
+(2019)
+Decoupled weight decay regularization
+.
+In
+International Conference on Learning Representations
+,
+Cited by:
+§6.1.2
+.
+[23]
+W.L. Luyben
+(2007)
+Chemical reactor design and control
+.
+Wiley Interscience
+.
+Cited by:
+§6.2.3
+.
+[24]
+D. Masti and A. Bemporad
+(2021)
+Learning nonlinear state–space models using autoencoders
+.
+Automatica
+129
+,
+pp. 109666
+.
+Cited by:
+§1.1
+.
+[25]
+Y. Nie, N. H. Nguyen, P. Sinthong, and J. Kalagnanam
+(2023)
+A time series is worth 64 words: long-term forecasting with transformers
+.
+In
+The Eleventh International Conference on Learning Representations
+,
+Cited by:
+§4.1
+.
+[26]
+J. P. Noël, M. Schoukens, and K. Tiels
+(2025)
+Nonlinear system identification benchmarks: result reporting
+.
+Note:
+https://www.nonlinearbenchmark.org/results-reporting
+Visited on Februray 14, 2025
+Cited by:
+§6.2.2
+.
+[27]
+Nonlinear benchmarks
+.
+Note:
+https://www.nonlinearbenchmark.org/
+Cited by:
+3rd item
+,
+§6.2
+.
+[28]
+J. Paduart, L. Lauwers, J. Swevers, K. Smolders, J. Schoukens, and R. Pintelon
+(2010)
+Identification of nonlinear systems using polynomial nonlinear state space models
+.
+Automatica
+46
+(
+4
+),
+pp. 647–656
+.
+Cited by:
+§1.1
+.
+[29]
+D. Piga, F. Pura, and M. Forgione
+(2024)
+On the adaptation of in-context learners for system identification
+.
+In
+Proceedings of the IFAC Symposium on System Identification
+,
+Cited by:
+§6.2.3
+.
+[30]
+D. Piga, M. Rufolo, G. Maroni, M. Mejari, and M. Forgione
+(2024)
+Synthetic data generation for system identification: leveraging knowledge transfer from similar systems
+.
+In
+2024 IEEE 63rd Conference on Decision and Control (CDC)
+,
+pp. 6383–6388
+.
+Cited by:
+2nd item
+,
+§1.3
+,
+§1.3
+,
+§5
+,
+footnote 3
+.
+[31]
+G. Pillonetto, A. Aravkin, D. Gedon, L. Ljung, A. H. Ribeiro, and T. B. Schön
+(2023)
+Deep networks for system identification: a survey
+.
+arXiv preprint arXiv:2301.12832
+.
+Cited by:
+§7
+.
+[32]
+F. Pura, M. Rufolo, M. Forgione, and D. Piga
+(2024)
+Sysid-meta-dist with patching
+.
+Note:
+https://github.com/PuraFilippo/sysid_benchmarks
+Cited by:
+§6
+.
+[33]
+S. M. Richards, N. Azizan, J. E. Slotine, and M. Pavone
+(2021)
+Adaptive-control-oriented meta-learning for nonlinear systems
+.
+Proceedings of the Robotics: Science and Systems (RSS)
+.
+External Links:
+Link
+Cited by:
+§1.2
+.
+[34]
+M. Rufolo, D. Piga, and M. Forgione
+(2025)
+Distributionally robust minimization in meta-learning for system identification
+.
+IEEE Control Systems Letters
+.
+Cited by:
+§1.2
+.
+[35]
+M. Rufolo, D. Piga, G. Maroni, and M. Forgione
+(2025)
+Enhanced transformer architecture for in-context learning of dynamical systems
+.
+In
+Proceedings of the 2025 European Control Conference
+,
+Cited by:
+1st item
+,
+3rd item
+,
+§1.3
+,
+§1.3
+.
+[36]
+J. Schmidhuber
+(1987)
+Evolutionary principles in self-referential learning, or on learning how to learn: the meta-meta-… hook
+.
+Ph.D. Thesis
+,
+Technische Universität München
+.
+Cited by:
+§1.2
+.
+[37]
+J. Schoukens, J. Suykens, and L. Ljung
+(2009)
+Wiener-hammerstein benchmark
+.
+In
+Proceedings of the 15th IFAC Symposium on System Identification
+,
+Cited by:
+§6.2.2
+.
+[38]
+M. Schoukens, P. Mattsson, T. Wigren, and J. Noël
+(2016)
+Cascaded tanks benchmark combining soft and hard nonlinearities
+.
+In
+Workshop on Nonlinear System Identification Benchmarks
+,
+pp.
+.
+Cited by:
+§6.2.2
+.
+[39]
+M. Schoukens, R. Pintelon, and Y. Rolain
+(2014)
+Identification of wiener–hammerstein systems by a nonparametric separation of the best linear approximation
+.
+Automatica
+50
+(
+2
+),
+pp. 628–634
+.
+Cited by:
+§1.1
+.
+[40]
+A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin
+(2017)
+Attention is all you need
+.
+Advances in neural information processing systems
+30
+.
+Cited by:
+Figure 1
+,
+Figure 1
+,
+§3.4
+.
+[41]
+T. Wigren and M. Schoukens
+(2017)
+Coupled electric drives data set and reference models
+.
+Cited by:
+§6.2.2
+.
+[42]
+H. Zhou, C. Ibrahim, W. X. Zheng, and W. Pan
+(2022)
+Sparse bayesian deep learning for dynamic system identification
+.
+Automatica
+144
+,
+pp. 110489
+.
+Cited by:
+§1.1
+.
+[43]
+Y. Zhou, X. Li, Q. Wang, and J. Shen
+(2024)
+Visual in-context learning for large vision-language models
+.
+In
+ACL (Findings)
+,
+Cited by:
+§1.2
+.
+[44]
+J. Y. Zhu, C. G. Cano, D. V. Bermudez, and M. Drozdzal
+(2024)
+InCoRo: In-Context Learning for Robotics Control with Feedback Loops
+.
+arXiv preprint arXiv:2402.05188
+.
+Cited by:
+§1.2
+.
+[45]
+W. Zhu, H. Liu, Q. Dong, J. Xu, S. Huang, L. Kong, J. Chen, and L. Li
+(2023)
+Multilingual machine translation with large language models: empirical results and analysis
+.
+arXiv preprint arXiv:2304.04675
+.
+Cited by:
+§1.2
+.
+[46]
+Y. Zuo
+et al.
+(2021)
+Accelerating materials discovery with machine learning: a review of applications and challenges
+.
+Nature Reviews Materials
+.
+Cited by:
+§1.2
+.
+Appendix
+Appendix A
+Minimum-variance weights for ensembling
+In this appendix section we show that the variance
+σ
+μ
+k
+2
+\sigma_{\mu_{k}}^{2}
+, for a specific time step
+k
+k
+, in (
+14
+) is minimized by the weights in (
+15
+), i.e.,
+ω
+k
+i
+=
+(
+σ
+k
+i
+)
+−
+2
+∑
+j
+=
+1
+s
+(
+σ
+k
+j
+)
+−
+2
+.
+\omega_{k}^{i}=\frac{(\sigma_{k}^{i})^{-2}}{\sum_{j=1}^{s}(\sigma_{k}^{j})^{-2}}.
+(32)
+The minimal ensembling uncertainty
+σ
+μ
+k
+2
+\sigma_{\mu_{k}}^{2}
+in (
+14
+) is given by the solution of the the optimization problem:
+min
+⁡
+∑
+i
+=
+1
+s
+ω
+k
+1
+,
+…
+,
+ω
+k
+s
+⁡
+(
+ω
+k
+i
+​
+σ
+k
+i
+)
+2
+.
+\min_{\omega_{k}^{1},\ldots,\omega_{k}^{s}}\sum_{i=1}^{s}(\omega_{k}^{i}\sigma_{k}^{i})^{2}.
+(33)
+subject to the constraint
+∑
+i
+=
+1
+s
+ω
+k
+i
+=
+1
+\sum_{i=1}^{s}\omega_{k}^{i}=1
+. Using the method of Lagrange multipliers, the augmented Lagrangian is:
+ℒ
+⁡
+(
+ω
+k
+,
+γ
+)
+=
+∑
+i
+=
+1
+s
+(
+ω
+k
+i
+​
+σ
+k
+i
+)
+2
++
+γ
+⁡
+(
+∑
+i
+=
+1
+s
+ω
+k
+i
+−
+1
+)
+.
+\mathcal{L}(\omega_{k},\gamma)=\sum_{i=1}^{s}(\omega_{k}^{i}\sigma_{k}^{i})^{2}+\gamma\left(\sum_{i=1}^{s}\omega_{k}^{i}-1\right).
+(34)
+Setting the partial derivatives of
+ℒ
+⁡
+(
+ω
+k
+,
+γ
+)
+\mathcal{L}(\omega_{k},\gamma)
+to zero, we obtain:
+∂
+ℒ
+∂
+ω
+k
+i
+\displaystyle\frac{\partial\mathcal{L}}{\partial\omega_{k}^{i}}
+=
+2
+​
+ω
+k
+i
+​
+(
+σ
+k
+i
+)
+2
++
+γ
+=
+0
+⟹
+ω
+k
+i
+=
+−
+γ
+2
+​
+(
+σ
+k
+i
+)
+2
+,
+\displaystyle=2\omega_{k}^{i}(\sigma_{k}^{i})^{2}+\gamma=0\implies\omega_{k}^{i}=\frac{-\gamma}{2(\sigma_{k}^{i})^{2}},
+(35)
+∂
+ℒ
+∂
+γ
+\displaystyle\frac{\partial\mathcal{L}}{\partial\gamma}
+=
+∑
+i
+=
+1
+s
+ω
+k
+i
+−
+1
+=
+0
+⟹
+γ
+=
+−
+∑
+i
+=
+1
+s
+2
+(
+σ
+k
+i
+)
+2
+.
+\displaystyle=\sum_{i=1}^{s}\omega_{k}^{i}-1=0\implies\gamma=-\sum_{i=1}^{s}2(\sigma_{k}^{i})^{2}.
+(36)
+Substituting the expression for
+γ
+\gamma
+from (
+36
+) into (
+35
+), we obtain the optimal weights in (
+15
+):
+ω
+k
+i
+=
+(
+σ
+k
+i
+)
+−
+2
+∑
+j
+=
+1
+s
+(
+σ
+k
+j
+)
+−
+2
+,
+i
+=
+1
+,
+…
+,
+s
+.
+\omega_{k}^{i}=\frac{(\sigma_{k}^{i})^{-2}}{\sum_{j=1}^{s}(\sigma_{k}^{j})^{-2}},\quad i=1,\dots,s.
+(37)
+Experimental support, please
+view the build logs
+for errors. Generated by
+L
+A
+T
+E
+xml
+.
+Instructions for reporting errors
+We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+      support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+      methods listed below:
+Click the "Report Issue"
+(
+)
+button, located in the page header.
+Tip:
+You can select the relevant text first, to include it in your report.
+Our team has already identified
+the following issues
+. We appreciate your time reviewing and reporting rendering errors we
+      may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+      should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+      all.
+Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a
+list of packages that need conversion
+, and welcome
+developer contributions
+.
+We gratefully acknowledge support from our
+major funders
+,
+member institutions
+,
+,
+        and all contributors.
+About
+·
+Help
+·
+Contact
+·
+Subscribe
+·
+Copyright
+·
+Privacy
+·
+Accessibility
+·
+Operational Status
+(opens in new tab)

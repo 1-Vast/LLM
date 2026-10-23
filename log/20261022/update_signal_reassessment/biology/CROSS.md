@@ -1,0 +1,40 @@
+# PLK1 来源交叉：保留条件性能力问题，收窄 accession 与选择边界
+
+2026-10-22。保留旧INDEPENDENT.md及SOURCE_INDEPENDENT.md不变。在source独立稿封存后，实际读frontier/SOURCE_INDEPENDENT.md、skeptic/SOURCE_INDEPENDENT.md、ROOT_SOURCE_POSITION.md、root_sources/GEO203240_METADATA.json及geo203240.receipt.json。曾尝试不存在的GEO203240_METADATA.receipt.json，随后rg定位实际receipt；不将失败读取当证据。无新增HTTP、数值数组、补表数值或fit。
+
+## 新metadata真实角色
+
+Root的GEO203240 metadata HTTP200/3383bytes，SHA256 e0d86e9739e7fbc4e1971c24b169806be80c46249b869b390d3970ce183e6606。Series title含[PooledCRISPR]，overall_design明确为“Pooled in vivo CRISPR knock-out screen”，列18个GSM及唯一supplement GSE203240_Raw_read_counts_matrix.txt.gz，并关联PRJNA839376。这增强了具体判定：该accession不是已认证的MCF7 Perturb-seq expression+guide payload。
+
+其generic summary复用论文摘要包含Perturb-seq，不能盖过specific overall_design。18GSM不是18个独立细胞背景，也未在本次读取中逐样本认证其全部角色。没有下载read-count值，不能凭文件名重构终点或推断raw counts含RNA gene expression。也不据此声称MCF7数据在全网不存在；只是所指accession与需要的state角色未接上。GSE203237的CEL仍是shRNA gDNA barcode hybridization，不是表达state。
+
+随后实际读root新增GEO203242_METADATA.json与geo203242.receipt.json：SuperSeries HTTP200/2470bytes/SHA256 070d6c9bd9e874f4cdb64915ada0e4e29b1fccb4537a6e6499f413cb4472a09c；仅列GSE203237/GSE203240两个subseries、31GSM及RAW.tar，overall_design指向individual Series。未下载tar、未查tar成员，不将一个泛名archive当expression已可得，也不据此证明所有accession缺MCF7。
+
+## 与 skeptic 的实际问答与独立稿收窄
+
+Skeptic对本角色最强挑战是：功能预选65genes限制了目标人口，却不自动禁止在这个固定人口内研究连续HCI功能；gene split不能取消selection，但可在明确conditional estimand下评估有限泛化。本角色实际答复同意。独立稿中恢复库外/未过筛选择机制的要求，只适用于声称unbiased全库发现或外推105/960/18000；不是所有条件性能力实验的硬门。NO_CANDIDATE/未配齐合同不等于无生物研究价值，普通小实验无需原创primitive。
+
+本角色反问skeptic：若仅定义65条件人口、一个连续HCI endpoint，完整105gene数值不是必要前提；最低需要固定65名单、对应endpoint完整性与缺失说明、选择历史/基因映射。更完整105/960有利于selection审计，但不应免费升级成此人口内实验的硬门。Skeptic实际答复明确同意，其独立稿complete105是待核artifact范围，不是所有conditional pilot前置要求；原sealed稿不改。
+
+## 与 frontier 的双向质询
+
+已实际读frontier source稿；其同样保留条件于65的cross-context能力问题，并拒绝把single-cell capture或PLK1-high cluster减少当独立viability。本角色向其提出最强公平性质询：即便pair齐了，所有目标query的MCF7 RNA仍是付费干预状态测量，不能当未知gene的免费embedding；prior-screen/annotation/direct prediction及same-RNA对照都必须得到相同信息。跨gene holdout是该selected population内预测，不是跨独立cell-task的更新规律继承。
+
+同时提出与skeptic相同的最小范围：不为65条件连续endpoint强制恢复全库，但必须披露结果选择、六inefficient-KO及survivor/QC缺失。不能根据可见状态/功能删除难预测候选再声称完整人口收益。
+
+Frontier实际答复接受query RNA付费、所有对手同信息、geneholdout非cell-task inheritance及不强制恢复库外的范围；反向质询本角色“尚无独立later campaign轴”是否被当普通能力试验前置。本角色明确接受修正：该缺失只阻断inheritance/improved-improver主张，不阻断selected65中state→连续function贡献检验；完整RSI轴无需在这个小能力问题之前具备。双方同意GEO有限metadata不是全网数据缺失证明。
+
+## 最小实验前仍缺的具体文件，而非无限扩大资格门
+
+只选一个独立功能endpoint即可，不要求同时拿in vitro和in vivo、更多癌种或完整动态世界模型。针对明确的65条件人口，至少尚未认证：
+
+- MCF7表达counts/processed矩阵及其gene/barcode轴，cell-to-guide assignment、guide-to-target序列/ID表；若仅raw reads，需先明确样本身份及可恢复这两部分的文件。
+- MCF7 sample/batch/replicate与准确post-selection时间manifest，解决正文4days/Methods2days；全部预定target/control与QC失败/缺失名单。三batch不能自动当生物独立task。
+- 同一预定target列表的一个HCI-010连续功能endpoint文件，带gene/guide映射、±Cas9/control及baseline/终点定义。可用已发布aggregate时须承认无独立noise分解；缺失不能按“nonhit=0”填充。完整105gene值不是65条件估计的硬门。
+- 固定候选产生/65名单与使用过的prior-screen/annotation字段，让普通对手控制同样selection信息；这些字段不能被包装为未参与过选库的独立外部确认。
+
+以上是可执行能力问题的最小payload与身份合同，当前尚无全部确切public file路径/内容认证。没有要求获取所有原始图像或完整多癌种矩阵才允许小测试，也不以方法原创性未证作为阻止能力实验的理由。
+
+若这些文件齐全，第一问题应先冻结“在作者预选65中，MCF7扰动state对HCI连续功能是否有超出prior-screen/annotation与普通direct的增量信息”；目标RNA测量预算和cross-context必须同场披露。只有进一步指定相同common start、合法support/hidden-function split，才可检验feedback更新，而另需真正later tasks才能检验继承/improved-improver。三者不混成一个成功称号。
+
+当前状态SOURCE_QUALIFICATION_PENDING / NOT_RUN，不是performanceFAIL或全网数据缺失断言。本角色不新增HTTP、数值读取、fit或作者联系；完整world/agent/inheritance/joint/improved-improver目标仍ACTIVE / NOT_ACHIEVED。

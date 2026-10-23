@@ -1,0 +1,287 @@
+[
+  {
+    "tag": "p",
+    "id": "abstract1.1",
+    "text": "Improving an agent through successive revisions requires balancing exploration and evaluation under a limited budget. A narrow search can miss useful sequences of edits, while fully evaluating every intermediate version can exhaust the budget before those sequences yield a verified improvement. We introduce Spec ulative R ecursive S elf- I mprovement ( SpecRSI ), which drafts executable successor agents before their predecessors are fully evaluated, while requiring complete verification before adoption. Verification-Aware Tree Search (VATS) allocates the budget between further edits and outstanding checks using the predicted verified return of a continuation. Group Verification Optimization (GVO) learns the improver from completed searches while keeping the real evaluator fixed. In the main scientific comparison, terminal gains exceed Janus by 33.3%–40.0%. Additional evaluations show that SpecRSI outperforms Janus in all 50 scientific backbone–task pairs and exceeds MetaRSI-v1 by 1.85%–2.38% in macro-average system score across twenty backbones. Coding-validation success reaches 69.4% versus HGM’s 64.3% at a 20.8% lower target-cost index."
+  },
+  {
+    "tag": "p",
+    "id": "S1.p1.1",
+    "text": "Agent systems can be improved through successive revisions to their prompts, tools, and workflows. Each round proposes executable changes and then evaluates whether they improve task performance, and both consume time and computation. This raises a central question: how should an agent allocate its limited budget between exploring new revisions and verifying their benefits? Successful revisions can make later ones easier, but the evaluations that identify them are often far more expensive than proposing another edit ( Zhang et al., 2026a ; Wang et al., 2026b ; Liu et al., 2026 ) . The difficulty is not a shortage of candidates. It is turning exploration into verified progress before time or computation runs out."
+  },
+  {
+    "tag": "p",
+    "id": "S1.p3.1",
+    "text": "Once successors can be drafted ahead, where should we spend the budget next? A candidate that looks strong may still need several checks before it can be adopted, while a child that repairs an unhelpful parent may need only one remaining check. A scorer that only asks How good does this version look?” therefore misses the cost of making it usable. What governs the budget is not a candidate but a continuation , a sequence of further edits and checks from the current state, and the operative question becomes What verified improvement can this continuation still deliver with the remaining budget?” This quantity must be estimated before the checks that would reveal it are paid, and a wrong estimate wastes irreversible budget; this pre-verification estimate under a hard budget, not the drafting of successors, is what makes the problem hard. It shifts the scoring target from candidate quality to the marginal verified return of further editing and checking."
+  },
+  {
+    "tag": "p",
+    "id": "S1.p4.1",
+    "text": "However, the drafting–confirmation idea cannot be transferred unchanged from tokens to agent revisions. (1) Revisions are revisable programs, not accepted prefixes. A successor may repair or build on a parent that is not yet admissible. (2) Verification consists of paid, complementary checks. External evaluations are not supplied by one target-model pass: checks have heterogeneous costs and dependencies, and several may be jointly required for adoption. (3) Progress is verified improvement under a budget. Search outcomes depend on realized gains and all incurred costs, including failed and unfinished work, rather than proposal or acceptance counts."
+  },
+  {
+    "tag": "p",
+    "id": "S1.I1.i1.p1.1",
+    "text": "A Two-Level Framework for Speculative Self-Improvement. To address (1), inner loop searches extend incompletely evaluated versions but adopt only fully evaluated, admissible ones. The improver remains frozen within each search and learns from complete-search feedback between rounds."
+  },
+  {
+    "tag": "p",
+    "id": "S1.I1.i2.p1.1",
+    "text": "Verification-Aware Tree Search (VATS). To address (2), the Solver preserves affordable completion bundles, including individually low-value checks; the Scorer predicts verified gains from further edits and checks, net of subsequent costs; and the Policy selects the next draft or verification plan under the remaining budget."
+  },
+  {
+    "tag": "p",
+    "id": "S1.I1.i3.p1.1",
+    "text": "Group Verification Optimization (GVO). To address (3), GVO uses independent complete searches from the same start as its unit of credit. Verified gains minus all search costs provide delayed credit to sampled edits and work choices, training the Drafter and Policy. Realized suffix returns and paid same-state comparisons train the Scorer."
+  },
+  {
+    "tag": "p",
+    "id": "S2.SS1.p1.1",
+    "text": "An agent version c c comprises executable code and persistent prompts, tools, and workflows. Recursive self-improvement (RSI) revises these artifacts to support later improvement rounds. With retained versions 𝒱 t \\mathcal{V}_{t} and evaluation history H t H_{t} , an improver Propose Θ t \\operatorname{Propose}_{\\Theta_{t}} selects and revises a version:"
+  },
+  {
+    "tag": "h3",
+    "id": null,
+    "text": "2.2 Evaluators and Verified Improvement"
+  },
+  {
+    "tag": "p",
+    "id": "S2.SS2.p1.2",
+    "text": "where n n counts attempts, not computation or monetary cost. A proxy evaluator cheaply prioritizes real evaluations; Janus admits only real-valid candidates to its population or incumbent. SpecRSI preserves this separation between prediction and validation, but allocates individual checks and scores further edits and checks by their eventual verified return. Section 3.2 defines its state and evidence; Appendix A provides extended comparisons."
+  },
+  {
+    "tag": "p",
+    "id": "S3.SS1.p1.1",
+    "text": "Accurate benefit evaluation is central to guiding RSI toward better agents. It informs which revisions and checks deserve further work, guiding the direction of improvement. Inaccurate evaluation can overlook useful revisions or waste resources on candidates that cannot be adopted. Therefore, evaluation should reflect the verified improvement that further work can deliver."
+  },
+  {
+    "tag": "p",
+    "id": "S3.SS1.p2.1",
+    "text": "However, accurate benefit evaluation is non-trivial: a candidate’s current quality does not determine the value of continuing from it. This difficulty stems from two key challenges. 1 Benefit evaluation should reflect downstream verified improvement. Intermediate revisions may enable later gains, but establishing them requires subsequent edits and real checks. 2 Benefit evaluation should account for completion costs. Complementary checks, planning, and failed attempts consume the same limited budget; even promising gains may be unaffordable to verify. Together, these challenges create a performance–cost trade-off: a useful continuation must promise sufficient verified improvement while remaining affordable to complete. Figure 2 illustrates the resulting trade-off empirically."
+  },
+  {
+    "tag": "p",
+    "id": "S3.SS2.p1.3",
+    "text": "where F F is observed adoption-ready gain, not a learned value; the eligible root ensures F ≥ 0 F\\geq 0 . The fixed contract Γ \\Gamma and execution interface Acquire Γ \\operatorname{Acquire}_{\\Gamma} form the real evaluator : Γ \\Gamma specifies valid evidence; VERIFY invokes Acquire Γ \\operatorname{Acquire}_{\\Gamma} to run selected real checks. Complete admissible evidence determines J Γ ​ ( c ) J_{\\Gamma}(c) and ACCEPT eligibility. The learned Scorer Q ^ ϕ ​ ( S , ω ) \\widehat{Q}_{\\phi}(S,\\omega) is the score evaluator ; it predicts expected verified gain net of subsequent expense and elapsed-time costs (Equation ( 6 )), guiding expenditure without supplying evidence. DRAFT generates successor edits and assigns no evaluation score."
+  },
+  {
+    "tag": "p",
+    "id": "S3.SS2.p2.2",
+    "text": "At round k k , c k c_{k} is the agent and Θ k = ( θ k , ψ k , ϕ k , ν ) \\Theta_{k}=(\\theta_{k},\\psi_{k},\\phi_{k},\\nu) the improver: drafter, work-selection policy, continuation-value scorer, and fixed menu settings. Collection freezes all four, with scorer snapshot ϕ ¯ k = ϕ k \\bar{\\phi}_{k}=\\phi_{k} . Independent searches from the same root supply agents and logs for the outer update:"
+  },
+  {
+    "tag": "p",
+    "id": "S3.SS2.p2.3",
+    "text": "where G ≥ 2 G\\geq 2 counts independent searches, not shared-tree leaves. Figure 3 connects VATS inner searches and GVO outer updates. Carry/reset selects the next root separately from within-search acceptance, isolating learning from artifact retention. Contract Γ \\Gamma and the outer update rule remain fixed (Appendix F.1 )."
+  },
+  {
+    "tag": "h3",
+    "id": null,
+    "text": "3.3 Inner-loop Search with VATS"
+  },
+  {
+    "tag": "p",
+    "id": "S3.SS3.p1.1",
+    "text": "Verification-Aware Tree Search (VATS) selects bounded work ω \\omega : DRAFT ​ ( P , h ) \\textsc{DRAFT}(P,h) or VERIFY ​ ( 𝒥 ) \\textsc{VERIFY}(\\mathcal{J}) , where P = ( P a ) a = 1 | P | P=(P_{a})_{a=1}^{|P|} tags existing parents, h ≥ 1 h\\geq 1 bounds edit depth, and 𝒥 \\mathcal{J} lists existing-version jobs. Expense and attempt caps are enforced. Either action may repeat; ACCEPT terminates search. Complementary checks require more than token-confidence ranking: Solver constructs completion options, Scorer refines scope, and Policy selects work (Algorithm 2 ). Execution updates state before replanning under the frozen improver (Algorithm 1 , Appendix F )."
+  },
+  {
+    "tag": "p",
+    "id": "S3.SS3.SSS4.p2.1",
+    "text": "VERIFY. For requested jobs Jobs ⁡ ( ω ) \\operatorname{Jobs}(\\omega) , Acquire Γ \\operatorname{Acquire}_{\\Gamma} reads valid identical records or executes real checks. The core is direct-only; checked reuse imports results after scoped equality checks through the backend shared with compatible controls. Forecasts never create evidence. VATS selects branches; the executor obtains records and updates state before replanning (Appendix F.4 ). Acquired records alone authorize adoption."
+  },
+  {
+    "tag": "h3",
+    "id": null,
+    "text": "3.4 Outer-loop Learning with GVO"
+  },
+  {
+    "tag": "p",
+    "id": "S3.SS4.p1.1",
+    "text": "Group Verification Optimization (GVO) updates the learned components between search rounds while the verification contract stays fixed."
+  },
+  {
+    "tag": "p",
+    "id": "S3.SS4.p4.4",
+    "text": "Regression anchors the mean ( Gneiting, 2011 ) . Difference-based training targets relative values ( Bertsekas, 1997 ) ; here, pair differences alone leave the common offset undetermined. Both train one Scorer through ℒ Q + β pair ​ ℒ pair \\mathcal{L}_{Q}+\\beta_{\\rm pair}\\mathcal{L}_{\\rm pair} , β pair ≥ 0 \\beta_{\\rm pair}\\geq 0 . Forced continuations train only the Scorer, never actor likelihood; copies and rollout costs remain charged."
+  },
+  {
+    "tag": "p",
+    "id": "S3.SS4.p5.2",
+    "text": "No new complete improvement earns no gain, but costs remain charged. Intermediate edits receive delayed credit through verified descendants without themselves qualifying for adoption. A g A_{g} compares whole searches, without a learned baseline. Only sampled edit tokens and plan choices update θ , ψ \\theta,\\psi through the clipped objective (Equation ( 20 ); Schulman et al., 2017 ; Ahmadian et al., 2024 )."
+  },
+  {
+    "tag": "p",
+    "id": "S3.SS4.p6.1",
+    "text": "After collection, GVO updates Θ k + 1 \\Theta_{k+1} and freezes it for the next round. Actor updates change the continuation law, requiring fresh searches to recalibrate the Scorer (Algorithm 3 ). These updates guarantee neither per-edit causal attribution nor monotonic improvement; Γ \\Gamma remains unchanged."
+  },
+  {
+    "tag": "p",
+    "id": "S4.SS1.p3.1",
+    "text": "Reproducibility. The reference reproduction configuration uses official BF16 Qwen3.5-35B-A3B with a frozen text backbone and rank-16 Drafter LoRA. SFT uses AdamW ( 2 × 10 − 5 2\\times 10^{-5} ; component minibatch 1; one epoch); GVO uses two frozen collection/update rounds (group 3; actor/Scorer SGD rates 10 − 3 / 5 × 10 − 4 10^{-3}/5\\times 10^{-4} ; at most one joint update per complete collection). Training uses 2,048-token sequences and one H20 per scientific domain; a separate H20 serves 32,768-token inference. Other evaluated backbones use provider APIs. The repository specifies 14 versioned data pools and 42 exact member lists, model/checkpoint identities, simulator parameters, seeds, and separate training/serving software versions."
+  },
+  {
+    "tag": "h3",
+    "id": null,
+    "text": "4.4 Improver Learning"
+  },
+  {
+    "tag": "p",
+    "id": "S4.SS4.p1.1",
+    "text": "RQ3: Is improvement learned by the improver, or merely retained in a stronger task agent?"
+  },
+  {
+    "tag": "p",
+    "id": "S4.SS4.p2.1",
+    "text": "Artifact controls. Improver updates raise reset/carry gains from 4.1 ± 0.18 4.1\\pm 0.18 to 5.2 ± 0.21 5.2\\pm 0.21 pp and from 4.8 to 6.2 pp, respectively. Original/updated improvers yield 5.7/6.9 pp from the same released artifact (Table 2 (a)), , showing gains beyond simply retaining a stronger task agent."
+  },
+  {
+    "tag": "p",
+    "id": "S4.SS4.p4.1",
+    "text": "Repeated rounds. Updated SpecRSI reaches 21.7 pp by round 5, exceeding updated Meta by 3.9 pp (17.8 pp) and original-improver SpecRSI by 7.9 pp (13.8 pp; Table 2 (c)). All reported rounds continue to yield positive incremental gains, from 8.5 pp in round 2 to 2.1 pp in round 5."
+  },
+  {
+    "tag": "p",
+    "id": "S5.p1.1",
+    "text": "SpecRSI’s two-level loop extends incompletely evaluated parents but adopts only complete, admissible versions. VATS allocates edits and complementary checks by predicted net verified return; GVO updates the improver from completed searches under a fixed verification contract. SpecRSI outperforms Janus in all 50 scientific backbone–task pairs and MetaRSI-v1 by 1.85–2.38 pp in four-task macro-average score across twenty backbones. Full planning achieves the highest mean verified gain and lowest total-cost index among tested planning conditions at all eight budget caps. Starting-artifact controls support gains from improver updates beyond retaining stronger task agents. Learned allocation thus turns speculation into verified agent improvement under limited budgets."
+  },
+  {
+    "tag": "p",
+    "id": "A1.SS0.SSS0.Px1.p1.1",
+    "text": "Unlike within-task reasoning search or adaptive inference compute ( Yao et al., 2023 ; Snell et al., 2025 ) , agent improvement persistently revises task solvers and their improvers. DGM, SICA, ADAS, AFlow and GEPA iteratively revise and evaluate code, workflows, or prompts ( Zhang et al., 2026a ; Robeyns et al., 2025 ; Hu et al., 2025 ; Zhang et al., 2025b ; Agrawal et al., 2026 ) ; MemEvolve co-evolves experience and memory programs, while Hyperagents and MetaRSI adapt improvement generation or scheduling ( Zhang et al., 2025a ; Zhang et al., 2026b ; Tan et al., 2026 ) . HGM separates lineage-metaproductivity-guided expansion from agent–task evaluation ( Wang et al., 2026b ) ; Janus co-evolves programs and proxies but retains real promotion checks ( Liu et al., 2026 ) . SpecRSI uses VATS to connect exploration to evaluation completion, jointly selecting branches and outstanding-check bundles by attainable verified improvement under the remaining budget."
+  },
+  {
+    "tag": "p",
+    "id": "A1.SS0.SSS0.Px3.p1.1",
+    "text": "Process supervision learns step evaluators; hierarchical agent RL learns long-horizon values and policies ( Lightman et al., 2024 ; Zhou et al., 2024 ) . GRPO estimates relative advantages for same-prompt responses ( Shao et al., 2024 ) ; DVI trains token drafters from verifier feedback; GTO targets expected tree acceptance length ( Bhansali & Heck, 2025 ; Hu et al., 2026a ) ; MAS 2 trains meta-agents with value-weighted preferences from cost-sensitive terminal outcomes ( Wang et al., 2026a ) . GVO instead credits independent complete successor searches from identical starting conditions, not responses or shared-tree leaves. Only complete admissible versions earn improvement; computation, elapsed time, failed and unfinished work remain charged. Established leave-one-out baselines and clipped updates train the drafter and work-selection policy ( Ahmadian et al., 2024 ; Schulman et al., 2017 ) ; observed-return regression trains the scorer, with paid alternative continuations supplying scorer-only labels. These updates improve later searches while the evaluator stays fixed. The contribution is this verification-grounded, cost-sensitive learning unit integrated with successor search, not a new policy-gradient estimator."
+  },
+  {
+    "tag": "p",
+    "id": "A3.SS1.p2.1",
+    "text": "With summaries only, permitting bundles raises mean verified gain by 0.9 pp (3.2 to 4.1), compared with 1.5 pp under full-state information. At both information levels, bundles yield higher mean gain and lower total cost than the corresponding one-check controller. These fixed-information comparisons support completion-aware work scope as a contributor to VATS’s performance beyond richer inputs alone. The larger gain contrast under full state is consistent with complementarity between information and work scope; the 0.6 pp difference is descriptive rather than a significance-tested interaction. Appendix G.5 complements this empirical comparison with an exact, output-matched analysis of how permitting verification blocks can reduce dispatch cost under fixed information and explicit dispatch-cost assumptions."
+  },
+  {
+    "tag": "h2",
+    "id": null,
+    "text": "Appendix D Learning the Improver Across Rounds"
+  },
+  {
+    "tag": "p",
+    "id": "A4.SS1.p1.1",
+    "text": "Reset controls return the task agent to the registered starting version while changing the improver. Carry controls retain the stronger task agent. The released-artifact fork is a third comparison: both continuations start from the same already released version, but use original or updated improvers. Comparing across these three starting conditions without holding the starting artifact fixed would conflate learning with artifact retention."
+  },
+  {
+    "tag": "p",
+    "id": "A4.SS1.p2.1",
+    "text": "In the reset condition, frozen and all-role-updated improvers obtain 4.1 ± 0.18 4.1\\pm 0.18 and 5.2 ± 0.21 5.2\\pm 0.21 pp; in the carry condition, they obtain 4.8 ± 0.20 4.8\\pm 0.20 and 6.2 ± 0.24 6.2\\pm 0.24 pp (Figure S7 a). The difference of update effects is 0.3 pp, but paired runs would be needed for an interaction test."
+  },
+  {
+    "tag": "p",
+    "id": "A4.SS1.p3.1",
+    "text": "Starting from the same released artifact, updating the improver raises the mean gain from 5.7 to 6.9 pp and lowers the reported cost index from 54.2 to 50.8 (Table S12 ). This is stronger evidence for improver transfer than merely carrying a higher-scoring task agent forward."
+  },
+  {
+    "tag": "p",
+    "id": "A4.SS2.p1.1",
+    "text": "Figure S7 b shows the role study, which changes the updated parts of the improver: drafter (D), scorer (Sc), policy (P), and the separately permitted shared-backbone extension (Sh). In the supplied science/code/agent aggregates, scorer-only updating has the largest single-role means, 5.2/5.4/5.3 pp; drafter-only gives 4.7/4.9/4.8 and policy-only gives 5.0/5.2/5.1. Updating all three gives 6.1/6.3/6.2."
+  },
+  {
+    "tag": "p",
+    "id": "A4.SS3.p2.1",
+    "text": "The earlier acquisition-control record reports reset gain, not the supervision study’s Gain endpoint (Table S14 ). The same-arm means and means-plus-pair rows give 4.8 and 5.3 pp; the extra ordinary-search row gives 4.5 pp."
+  },
+  {
+    "tag": "p",
+    "id": "A4.SS4.p1.1",
+    "text": "The multi-round study starts at round 1 and reports rounds 2–5. All four method/improver conditions carry the agent forward; “original” versus “updated” refers to the improver, not whether the task agent is reset. Table 2 (c) gives the raw increments and cumulative gains. For updated SpecRSI, the increments 8.5, 6.4, 4.7, and 2.1 pp accumulate to 21.7 pp. Updated Meta accumulates 17.8 pp, while original-improver SpecRSI accumulates 13.8 pp. Figure S8 separates the gains from improver updates from the differences between methods. Updating the improver raises SpecRSI’s gain in every evaluated round, with cumulative advantages reaching 7.9 pp over its original-improver control and 3.9 pp over updated MetaRSI by round 5. Figure S9 reports seed-level mean increments with task agents carried forward and the real evaluator fixed. Updated SpecRSI leads the other three conditions in every evaluated round across all five training seeds, supporting the consistency of its multi-round advantage."
+  },
+  {
+    "tag": "p",
+    "id": "A5.p1.1",
+    "text": "This appendix expands Section 4.5 . Each intervention changes a different resource: planning effort, committed verification work, or worker count. These are kept separate from repeated improver updates in Appendix D ."
+  },
+  {
+    "tag": "p",
+    "id": "A5.SS1.p1.1",
+    "text": "The menu-cap study supports the use of a bounded planning menu in VATS (Table 3 (a); Figure S10 (a)). Increasing the cap from 8 to 32 raises mean gain from 5.2 to 6.3 percentage points and net return from 3.9 to 4.7, while reducing the missing-option percentage from 8.6% to 3.1%. Among the tested caps, 32 plans achieve the highest net return: compared with 64 plans, they yield higher net return (4.7 versus 4.5) and lower overhead (3.9 versus 5.6), while mean gain is only 0.2 percentage points lower (6.3 versus 6.5)."
+  },
+  {
+    "tag": "p",
+    "id": "A5.SS1.p2.1",
+    "text": "The menu-construction study further shows the value of completion seeds and bounded growth (Table S15 ; Figure S10 (b)). Adding completion seeds raises Final from 3.7 to 5.1, and seeded growth further raises it to 5.9. Compared with exhaustive construction, seeds plus growth achieve higher mean Final (5.9 versus 5.8) with 56.2% lower planning cost (3.9 versus 8.9), while approaching the highest Final of 6.0 obtained with the larger menu. Together, these results support VATS’s completion-seed and bounded-growth design: effective verification options can be constructed without exhaustively enumerating all combinations. Figure S10 (c) shows that Final minus Forecast decreases from − 0.1 -0.1 for singleton and seed-only menus to − 0.9 -0.9 for exhaustive construction."
+  },
+  {
+    "tag": "p",
+    "id": "A5.SS2.p2.1",
+    "text": "Figure S11 reports the associated cost components and execution conditions. Separately, the output-matched two-check analysis in Appendix G .3.1 characterizes when dispatch savings outweigh batch-construction cost and checks made unnecessary by early failure. This trade-off motivates VATS’s state-dependent work selection: it retains feasible singleton checks and completion bundles, evaluates their downstream verified return net of cost, and replans after each executed block updates the search state. Complementary evidence in Appendix C.1 shows that, at fixed full-state information, permitting bundles raises verified gain from 4.8 to 6.3 pp while reducing the total-cost index from 63.1 to 59.2."
+  },
+  {
+    "tag": "p",
+    "id": "A6.p1.1",
+    "text": "GVO calls the complete-search procedure, which invokes VATS whenever it needs a new work plan. Parameters change only after collection; versions, evidence and budgets change during search."
+  },
+  {
+    "tag": "p",
+    "id": "A6.SS1.p1.1",
+    "text": "Equation ( 4 ) separates the per-search agent outputs from the group-level parameter update. Algorithm 3 collects independent complete searches before each improver update. Table S20 specifies the permitted writes; the verification contract Γ \\Gamma and outer update rule remain protected."
+  },
+  {
+    "tag": "p",
+    "id": "A6.SS1.p2.1",
+    "text": "Reset controls fix the starting task agent while changing the improver checkpoint. They test transfer beyond artifact retention, not improvement of every individual surface or modification of the verification contract Γ \\Gamma ."
+  },
+  {
+    "tag": "p",
+    "id": "A6.SS2.p1.1",
+    "text": "An agent action solves a task; an improvement action modifies the agent that will solve later tasks. A version-tree node is therefore not a step in one task rollout. Each node freezes prompts, tools, code, and runtime dependencies; a permitted task-weight update also creates a new immutable node. Old artifacts are not mutated when the improver’s parameters change."
+  },
+  {
+    "tag": "p",
+    "id": "A6.SS3.SSS0.Px2.p2.3",
+    "text": "Equation ( 14 ) specifies the minimizing objective; Equation ( 15 ) specifies the required feasibility of every returned seed, including a timeout incumbent. An infeasible target returns no seed, not an unverified optimum."
+  },
+  {
+    "tag": "p",
+    "id": "A6.SS5.SSS0.Px1.p2.1",
+    "text": "The scorer , value model , and critic all denote the single action-value model Q ^ ϕ ​ ( S , ω ) \\widehat{Q}_{\\phi}(S,\\omega) . Its input is a search state and proposed work plan; its scalar output predicts future verified improvement minus resource costs. It is not a model of an agent’s current task score. The policy’s scalar logit z ψ ​ ( S , ℛ , ω ) z_{\\psi}(S,\\mathcal{R},\\omega) instead defines a choice distribution. These are separate value and preference branches, not two value models."
+  },
+  {
+    "tag": "p",
+    "id": "A6.SS5.SSS0.Px3.p1.3",
+    "text": "The edit likelihood is the product of its autoregressive token probabilities, including a sampled end token. Its logarithm is their sum, not an additional second likelihood. Each expectation denotes an empirical mean over the specified dataset. Equation ( 11 ) separately initializes the scorer from executed returns. These losses formalize the stated warm-up roles; they do not create missing demonstration or rollout records."
+  },
+  {
+    "tag": "p",
+    "id": "A6.SS5.SSS0.Px4.p1.1",
+    "text": "GVO groups independent searches conditional on the same root, contract, budgets, workers, and collection snapshot. A leaf inside a shared tree is not a group member. Set ϑ = ( θ , ψ ) \\vartheta=(\\theta,\\psi) ; this parameter vector excludes ϕ \\phi and ν \\nu . Index genuinely sampled controlled choices in search g g by j = 1 , … , J g j=1,\\ldots,J_{g} , where J g J_{g} is their count, y g , j y_{g,j} is the sampled token or plan, H g , j H_{g,j} is its logged conditioning context, and 𝒴 g , j \\mathcal{Y}_{g,j} is its sampling support. In this paragraph j j indexes model choices, not verification jobs. Write their typed probabilities as"
+  },
+  {
+    "tag": "p",
+    "id": "A6.SS5.SSS0.Px6.p1.1",
+    "text": "On a prespecified development subset, restore identical paid states S S . Let 𝒲 S \\mathcal{W}_{S} be the finite set of legal first plans to compare, drawn from that saved menu. Each arm a ∈ 𝒲 S a\\in\\mathcal{W}_{S} uses a prospectively fixed number n a ≥ 1 n_{a}\\geq 1 of independently seeded suffix rollouts under the same frozen Θ k \\Theta_{k} . Define G a , s G_{a,s} as the realized suffix return of repetition s = 1 , … , n a s=1,\\ldots,n_{a} , from forced plan a a to termination, excluding the already paid initial menu. Every later menu and failed action is charged. Unsuccessful but fully logged rollouts stay in the average; absent logs cannot be replaced by invented zeros."
+  },
+  {
+    "tag": "p",
+    "id": "A6.SS5.SSS0.Px6.p1.2",
+    "text": "Here σ a 2 = Var ⁡ ( G a , s ∣ S , a , Θ k ) \\sigma_{a}^{2}=\\operatorname{Var}(G_{a,s}\\mid S,a,\\Theta_{k}) ; the last equality assumes independent repetitions and independent arms conditional on the state and snapshot. For coupled arms, subtract 2 ​ Cov ⁡ ( G ¯ a , G ¯ b ∣ S ) 2\\operatorname{Cov}(\\overline{G}_{a},\\overline{G}_{b}\\mid S) instead. Matching the initial state alone does not guarantee smaller variance. Copies and all branch rollouts are charged to acquisition, without subtracting clone acquisition a second time from the suffix’s counterfactual decision budget."
+  },
+  {
+    "tag": "p",
+    "id": "A6.SS5.SSS0.Px6.p2.1",
+    "text": "The empirical dataset 𝒟 Q \\mathcal{D}_{Q} contains fully logged tuples ( S , a , G ) (S,a,G) from ordinary plan starts and paid forced rollouts with a matched continuation snapshot. 𝒟 pair \\mathcal{D}_{\\rm pair} contains ( S , a , b , G ¯ a , G ¯ b ) (S,a,b,\\overline{G}_{a},\\overline{G}_{b}) from the same arm records. Labels collected under different continuation policies must not silently be treated as observations of one Q π Q^{\\pi} ; policy IDs are retained. At a fixed state write e a = Q ^ ϕ ​ ( S , a ) − G ¯ a e_{a}=\\widehat{Q}_{\\phi}(S,a)-\\overline{G}_{a} . The pair penalty is ( e a − e b ) 2 (e_{a}-e_{b})^{2} : it reweights differences but cannot identify a common offset. Thus the single scorer minimizes"
+  },
+  {
+    "tag": "p",
+    "id": "A6.SS5.SSS0.Px7.p1.1",
+    "text": "An ordinary Algorithm 1 call initializes the root. A matched continuation instead restores the complete paid state, sets its suffix log empty and clock to zero, fixes ω 0 = a \\omega_{0}=a , and enters after the solver. It does not reset the tree, reacquire an already paid menu, or resample the forced first choice. Later decisions use normal paid preparation. Entire forced continuations are excluded from actor updates; they supply critic targets only. The return goes back to the external training caller."
+  },
+  {
+    "tag": "p",
+    "id": "A6.SS5.SSS0.Px7.p2.3",
+    "text": "∇ \\nabla denotes differentiation with respect to the subscripted parameters; all returns, advantages, logged contexts, old probabilities, and reference distributions are constants in these derivatives. Registered minibatches may repeat update steps over the frozen collection. The fitted ϕ k + 1 \\phi_{k+1} uses returns under the collection procedure π k \\pi_{k} . Updating the actors changes the continuation law to π k + 1 \\pi_{k+1} , so the refreshed scorer is an approximation there, not an exact new-policy value obtained merely by copying parameters. Fresh collection supplies calibration for the next round. Parameters refresh only for subsequent collection. Deployment chooses the largest preference rather than sampling, so its calibration and quality need direct evaluation. Resetting the task agent while holding allowed histories and budgets fixed tests whether the updated improver transfers. Task-family and model-backbone transfer are separate settings. No reporting audit is used to select a training epoch, and no indefinite recursive acceleration follows from a finite number of rounds."
+  },
+  {
+    "tag": "p",
+    "id": "A7.SS2.SSS1.p1.1",
+    "text": "Let a positively improving candidate require two remaining records a , b a,b . For a subset A ⊆ { a , b } A\\subseteq\\{a,b\\} , let v ⁡ ( A ) v(A) be the newly selectable verified gain after obtaining exactly A A , with other evidence fixed. Then v ⁡ ( ∅ ) = v ⁡ ( { a } ) = v ⁡ ( { b } ) = 0 v(\\varnothing)=v(\\{a\\})=v(\\{b\\})=0 while v ⁡ ( { a , b } ) = g > 0 v(\\{a,b\\})=g>0 . Additivity would imply g = 0 g=0 ; submodularity would require the marginal of b b at the empty set to be at least its positive marginal after a a . ∎"
+  }
+]

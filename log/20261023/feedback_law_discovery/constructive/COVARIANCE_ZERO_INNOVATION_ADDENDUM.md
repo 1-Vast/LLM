@@ -1,0 +1,7 @@
+# Exact same-solver scope for the ordinary feedback positive
+
+2026-10-23. Append-only precision after RESULT_CROSS. Root and source supplied an exact algorithmic fact: fixing the purchased identities S, query mask and source covariance, the ordinary predictor is mu+scale*Sigma[:,S]*(Sigma[S,S]+I)^(-1)*z_S. Setting support numerical deviations z_S=0 makes the correction exactly zero for any S. Thus source mean is also this identical conditional solver's source-expectation/zero-innovation prediction, not merely a different-capacity program.
+
+Consequently the observed23.49% MSE and15.07% regret improvements can legitimately be called the utility of using the eight actual numerical support deviations versus zero innovation in this fixed exposed-panel replay. My earlier concern that the entire comparison might merely be a mask/capacity difference was too broad for this explicit solver. Mask/selection still restricts the replay population and external interpretation; it does not by itself generate a correction at zero innovation in this algorithm. This is algebra, requiring no new data experiment, and is not a randomized measurement-purchase causal effect or universal information-value claim.
+
+Source actually confirmed the same narrower statement and sealed its own COVARIANCE_SCOPE_ADDENDUM. No disagreement remains on this exact point. The failed consistency-configuration gate is unchanged.

@@ -1,0 +1,5 @@
+# Correction to sealed independent source interpretation
+
+2026-10-23. Critic independently challenged root's statement that the primary explicitly reports no animal randomization. Root reread the actual In vivo treatment paragraph. It says: “Tumor-bearing NSG mice were randomized into control and treatment groups when the tumor width reached 3 to 5 mm for drug treatment.” The Quantification and statistical analysis paragraph instead says “experiments were not randomized” and investigators were not blinded, without resolving the apparent conflict.
+
+The correct report is **internally inconsistent randomization reporting**, not a definite finding of either randomized or nonrandomized allocation across the experiments. Blinding and sample-power statements retain their reported scope. The sealed INDEPENDENT.md remains unchanged as the original erroneous interpretation; this addendum supersedes that specific sentence. No source data, outcomes, task or fitting configuration is changed. Neither choosing a preferred paragraph nor the correction establishes a valid linked organoid regrowth dataset or causal identification.

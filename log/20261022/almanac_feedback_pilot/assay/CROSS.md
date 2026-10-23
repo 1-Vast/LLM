@@ -1,0 +1,13 @@
+# 实际交叉评审
+
+2026-10-22。先封存自己的INDEPENDENT和CODE_REVIEW，再实际阅读全文 `skeptic/INDEPENDENT.md`；双方通过协作消息实际交换质疑。本文件记录交叉结论，不是声称多代理投票证明方法正确。
+
+接受skeptic对自己的三项修正：全ALMANAC跨cell plate结论不能外推FF资格集；普通B1胜B0即可构成反馈价值，不须胜过自己；outer20fit覆盖条件不能在inner剩19cell时机械重复套用。CODE_REVIEW已落实。
+
+接受skeptic补充：强直接基线不一定强制GBDT；合法核回归/岭结合非线性核及Gaussian条件化可以构成有限强菜单，避免无谓参数搜索。固定fit/tune/dev的source-only选择是合法设计；nestedLOO是可选估计方式，不是所有实验的先决条件。
+
+对skeptic的实质质疑已发出：物理plate依赖检查须先用(lab,Study,Plate)，不能把numericcell预先放进物理plate身份再宣称跨cell不共享，否则把待检测依赖按定义消除。本次root正确使用三元键，实际检查结果单cell，因此无当前阻断。
+
+特别采纳skeptic对目标信息池的限制：每个pair独立B1只给该pair一条anchor；不能暗中收集同cell/plate全部pair的anchors学习校准再仍称单条反馈。如果定义全catalog anchors共同已知，需要记录所有唯一揭示条目并给所有baseline相同context。本pilot优先禁止跨pair目标anchor池化以维持最简信息合同。
+
+共同结论：支持FF-only已知样本药对/实际剂量的新cell普通功能反馈pilot；冻结source及菜单之后只开开发cell。此阶段不提出世界模型、agent或RSI新机制。依赖/方向/重复处理有明确元数据证据；方法培养时长与生物学重复仍未认证，不将预测增益解读为实验/临床节约。

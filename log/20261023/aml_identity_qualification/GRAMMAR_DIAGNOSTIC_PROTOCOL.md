@@ -1,0 +1,5 @@
+# Diagnose the stopped first-record grammar, without adapting its result
+
+The frozen identity probe stopped at the first complete record in each retained prefix. Preserve IDENTITY_PROBE.json and identity_probe.py hashes in PROBE_SEAL.json before this diagnostic. The seven underscore fields were present, but nucleotide/length or numeric syntax failed. No subsequent records may be inspected or direct join tested in this diagnostic.
+
+For exactly that first record per prefix, export only: header/row field counts, underscore field count, second-field character length and uppercase ACGTN-syntax boolean, third-field integer-syntax boolean. No readName string, nucleotide sequence, count value, remaining field values or founder information exported. This can identify a wrong assumption in the qualification contract; it cannot make the frozen original probe pass or establish sample identity. No HTTP. Any later revised parsing contract must be grounded in this diagnostic and author source, scoped as a new qualification (not a performance confirmation).

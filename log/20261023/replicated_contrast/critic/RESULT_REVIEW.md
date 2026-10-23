@@ -1,0 +1,27 @@
+# Independent interpretation: the measurement gate passed; transport is untested
+
+2026-10-23. Read saved CONTRAST_RESULT.json only after the single execution; no raw count file,saved count array,lung outcomes,new model fit or peer result report read before this seal. Root's headline was supplied before assignment. This is independent scientific interpretation,not independent reconstruction of endpoint arithmetic; source owns that numerical audit.
+
+The registered descriptive gate passes:345repeat1discoveries,288confirmations,confirmation fraction0.8347826087. Of512fixedcontrasts,408have matching signs;Pearson0.7979371515andSpearman0.7851500362. Do not change the gate or call this merely a negative/no-progress outcome. It establishes substantial repeat-labeled agreement for the prespecified differentialmeanlog(count+1)statistic on these fixed actions/contexts.
+
+It does not establish within-context ranking reversals. The gate comparesDelta=(m_Ap-m_Aq)-(m_Bp-m_Bq);Delta can be stable even when both contexts give the same action order. It does not establish calibrated biological uncertainty,independent cultures,GI,raw growth,drug response or an inherited updater. Both repeats were in memory when the fixed discovery rule ran;this is programmatic held-repeat selection,not analyst/sampling blindness.
+
+## Strongest competing explanations
+
+Same-guide repeatability can preserve context-specific guide efficacy,off-target effects,library representation or culture/processing effects as well as on-target response. The shared terminal assay system does not distinguish them. Shared plasmid measurement error is not a direct numerical cause here because plasmid counts were not used;one must not reintroduce that discarded endpoint's objection as a reason to deny this pass. Initial representation and systematic guide/library contributions can still remain.
+
+Pseudocount1breaks exact multiplicative-depth cancellation. However,the saved per-column fraction of counts<=5is onlyabout0.40–1.88%,and zerosabout0.10–0.21%. These summaries do not prove depth effects are negligible:which constructs contribute influential contrasts and moderate-depth differences are not resolved. They also do not justify declaring low-count artifacts the main explanation. No posthoc low-count exclusion,pseudocount sweep or normalization rescue is warranted.
+
+T9is a shared column token,not authenticated equal elapsed duration,population doublings or independent biological preparation. Differential endpoint agreement can therefore be conditional on repeat-labeled screening rather than a generic intrinsic cell interaction law. Conversely these limitations do not erase the observed repeatability or demand a complete mechanistic model before ordinary predictive use can be tested.
+
+With two repeats and shared genes,guides,cultures and action comparisons,the512contrast count is not biologicalN. The0.8348fraction is the registered descriptive reliability statistic,not a validated probability for arbitrary future cell tasks. Discovery selection on repeat1can produce regression-to-the-mean;the unchanged repeat2rule and full345denominator are essential. Correlation and confirmation are different summaries,not independent replications of the same claim.
+
+## One necessary next discriminator
+
+Before updater learning is justified by this result,show **support-to-unobserved-action contrast prediction**,not further same-action repeat agreement. A separately motivated restriction must specify how a small legal target-support package changes predictions for previously unobserved target actions. Freeze its action-heldout split,source-only features,common initial predictor/support and same endpoint before values;measure its predictions against repeat2query outcomes,without using those queries' repeat1target outcomes as input or feature selection. Compare with frozen source prediction,positive scalar calibration and a competent same-information ordinary conditional/refit model under the same source/search/feedback cost. A gain must improve the prespecified action contrast or nomination endpoint beyond these controls,not merely reconstruct the repeat1Delta already observed for that action.
+
+This is one falsifiable transport condition,not a request for an unlimited raw-data audit. If there is no independently specified transport restriction or no legal observation split that avoids query-label recycling,stop at the present measurement positive. If the condition fails,do not learn/edit an updater merely because the endpoint repeats. If it succeeds,it supports bounded predictive capability;new-core novelty,independent later-taskUinheritance andG1/G0improved-improver still require separate evidence. The old failed published-GI endpoint-sharing recipe is not automatically reopened by moving to these new read counts.
+
+This condition can use familiar mathematics and does not require unique latent biology. The current result alone is insufficient to promote updater learning because it says nothing about whether feedback on one action forecasts another. Root's scoped measurementpass/no-updater-GO interpretation is therefore scientifically appropriate.
+
+Record: one saved JSON read and this report;zero raw/saved count access,fit,download,API or additional statistical computation. Preserve successful measurement evidence and all original freezes;no numerical rerun requested. Full goal remains active/not achieved. Actual peer result cross follows separately.

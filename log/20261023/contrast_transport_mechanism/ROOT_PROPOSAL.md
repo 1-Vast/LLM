@@ -1,0 +1,17 @@
+# Root proposal before new numerical computation
+
+The verified repeatability does not tell us whether combinations contain signal beyond ordinary gene main effects. Use a bounded, standard linear-projection diagnostic on the already saved 512 contrasts to ask this question. This is neither a transport algorithm nor revival of the stopped published-GI prediction experiment; there is no support/query prediction, parameter inheritance or model-selection sweep.
+
+Let X be the 1024-by-G unsigned pair incidence matrix (two ones per gene pair). Let C subtract each consecutive pair of rows, exactly the prior 512 contrasts. Z=[1,CX] is a fixed nuisance design, derived only from identities. A constant contrast offset is allowed so means are removed from both correlation components. Compute an orthonormal basis Q of col(Z), rank chosen by standard float64 SVD tolerance max(shape)*eps*smax. P=QQ^T. For the previously defined Delta columns v1,v2, write a_r=P v_r, e_r=(I-P)v_r. Report the design rank and residual dimension. A component is additive in this fixed design, not intrinsically a gene-level biological effect.
+
+Because P includes the constant vector, e_r is centered. The centered empirical cross-repeat covariance numerator has an exact orthogonal decomposition:
+
+  <v1-mean(v1),v2-mean(v2)> = <a1-mean(a1),a2-mean(a2)> + <e1,e2>.
+
+This separates repeatable structure representable by the gene-additive nuisance design from its complement. Report both cross-products, their signed fractions of the total if nonzero, component correlations (null if undefined), RMS and all projected/residual values. Fractions may be negative or exceed one; do not clip or call them causal variance explained. Full-data least-squares projection is descriptive, not heldout prediction; it must not be advertised as an ordinary baseline's generalization result. Dependent residual coordinates are not new biological replicates.
+
+Root proposes a deliberately bounded development screening rule: only if residual Pearson>=0.5 AND signed residual covariance fraction>=0.25 will this screen support further inquiry into nonadditive read-statistic transport. These are pragmatic development thresholds, not biological significance criteria. A failure retires this particular positive repeatability result as evidence motivating a combination-specific updater; it does not declare all nonlinear or biological interaction impossible. A pass only shows repeatable structure beyond this specific additive design. It still permits guide-pair/library effects, nonlinear gene marginal transformations, compositional artifacts or omitted context effects. It does not establish GI, a novel operator or unobserved-action utility.
+
+No fitted predictive method or updated gate will follow automatically. The actual candidate still needs a scientifically motivated cross-action transport restriction distinct from ordinary refitting. No control/other-timepoint/lung/raw count values will be read. Inputs are solely the previously exposed CONTRAST_ARRAYS.npz Delta, fixed selected IDs and bound metadata. This screen has no new independent confirmation status.
+
+Before execution: independent role reports and actual cross-questioning, static review of final diagnostic code, synthetic pure-additive/pure-residual/mixed decomposition tests, and external hash freeze. One execution only; preserve any failure. No alternative projection, gene grouping, threshold or contrast re-pairing to rescue its outcome.

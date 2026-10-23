@@ -1,0 +1,13 @@
+# Post-seal review of root PROPOSAL
+
+Read PROPOSAL.md only after independent report and SEAL.json were written. No fit or dataset access.
+
+The common quadratic q_E and later-only kernel residual estimator are a valid narrow comparison. q_E may legally use all E because Eselect is held out only during hyperparameter calibration; deployment refits the shared base using E. This is conventional training/validation/refit. Make the calibration residuals explicit: q_Efit must be fitted only on Efit, and Eselect prediction is q_Efit plus a kernel update trained on Efit residuals. Deployment uses q_E and only later residuals. Different residual distributions across those stages are a limitation, not leakage.
+
+The symmetric tensor pair kernel from L_w is PSD and conventional. Mixing the gene kernel before forming a pair kernel is not identical to mixing RNA and identity pair kernels, because cross terms occur; preserve the proposed equation rather than describing these as identical estimators.
+
+Resolve grids by retaining the matched fixedRNA3 subset with exactly {.001,.1,10}, plus fixedRNA9 if desired. U1 selection can legitimately benefit from geometry-plus-regularization model selection. It does not isolate geometry alone. A supplementary fixed-penalty eta contrast isolates that narrower factor without inventing a prerequisite. Nine versus nine candidates matches count, not compute or regularization opportunity. Root's three later budgets are a small curve; a single 512-pair later batch suffices if minimizing execution.
+
+Register union-refit candidate calibration precisely before execution: use q_Efit trained on Efit, train each ordinary residual model on Efit, score Eselect, select without development, then refit quadratic and residual model using E+later. Also run the same U1-selected kernel/penalty on the union to distinguish refit training from selection. Nuclear completion can use its existing three penalties calibrated only on Efit/Eselect, then train on the same union. Do not present a development-selected minimum as deployed comparator performance; an envelope there is explicitly descriptive only.
+
+GO for one finite exploratory run after these literal schedule/grid clarifications are incorporated. Failure against matched fixed geometry or the registered ordinary-refit comparator stops this finite rule. Success supports only within-map conventional adaptation and remains a development signal. No protected numerical access is needed. Independent-task U learning, novelty and improved-improver inheritance remain unidentified even if all registered controls lose.

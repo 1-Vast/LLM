@@ -1,0 +1,19 @@
+# Actual result cross review: interpretation versus audit
+
+2026-10-23. After completing my independent result review, read `reviews/result_audit_independent.md` and `DECISION.md`, and exchanged direct messages with matched_audit. No models rerun and no held-out labels read.
+
+The audit's independently recomputed scores agree with mine. We agree that the frozen fixed-recipe directional rule is satisfied (+1.9022 percentage points), that RNA improves over identity in both endpoints in 5/5 folds, and that the cross-endpoint difference is positive only in 4/5 folds. No independent-task replication or significance claim follows. We also agree that chosen labels cannot be described as generally easier: their own quadratic-normalized RNA error is higher, and target/prior distributions differ.
+
+## Strongest criticism and response
+
+The audit identifies ten RNA nuclear inner candidates at penalty 0.0005 that reach 2,000 iterations without meeting the objective-change heuristic. All are unselected; selected inner candidates and outer refits meet the heuristic. I accept this correction to any broad convergence narrative. In my message to the auditor I stressed the remaining limitation: unselected candidates still participate in argmin selection, so their finite optimization can affect selection. The output is evidence for this bounded implementation and menu, not for an exactly optimized candidate family. It is nevertheless legitimate to retain the predeclared descriptive sign from the saved OOF predictions. These flags do not justify outcome-driven extra optimization or rerunning the experiment. The auditor asked whether I agree to retaining the finite-recipe direction without rerunning; my explicit response was yes, with these limitations.
+
+The audit reports RNA nuclear fit time 71.08 seconds versus identity nuclear 7.28 seconds (about 9.77 times). I agree that same labels and menu size are not a total-compute match. This phase cannot exclude a stronger direct predictor or additional ordinary fitting/search at the same total cost. Thus it cannot establish world-model necessity, algorithmic superiority at equal resources, or a justified complexity premium. The measured finite-run cost ratio is descriptive for this implementation and hardware, not a universal complexity law.
+
+The auditor questioned my phrase that larger absolute improvement means the relative-gain increase is not solely a denominator phenomenon. I clarified directly: this is only the narrow arithmetic observation that the absolute numerator is not constant while the denominator changes. It does not exclude target scaling, prior changes, residual structure or other joint estimand effects as a complete explanation. It provides no causal evidence for guide alignment. The independent review's broader causal restrictions remain essential.
+
+## Decision review
+
+`DECISION.md` appropriately retains the endpoint asset, reports the frozen directional outcome, preserves historical STOPs, and rejects new-method/RSI promotion. It already distinguishes exploratory OOF from independent confirmation and explicitly notes that computational cost is unequal. I recommended making both outstanding quantitative limits explicit there: the ten unselected inner stop failures and the 9.77-fold RNA-versus-identity fit-time ratio, rather than allowing the accurate statement about outer refits to be read as all-fit convergence.
+
+No unresolved numeric disagreement remains. The unresolved scientific issue is explanatory, not arithmetic: endpoint, matched priors, efficacy and measurement structure vary together. A new reusable feedback-update mechanism, agent decision benefit and independently later tasks are still absent. Stop further endpoint-comparison tuning and apply the distinct-mechanism gate before any WM/agent/RSI expansion.

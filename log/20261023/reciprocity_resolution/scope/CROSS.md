@@ -1,0 +1,11 @@
+# Actual cross review after independent seals
+
+Read identity/INDEPENDENT.md after scope/INDEPENDENT_SEAL.json was saved. Exchanged direct messages with /root/reciprocity_identity, asking whether the historical stronger-effect assignment risks being misrepresented as independent validation and whether the raw-first alternative should be run. Peer independently asked the same historical-response-informed question and requested evidence requiring raw RHOXF2 instead of canonical RHOXF2B.
+
+Response: no primary evidence inspected requires selecting rawRHOXF2feature14112 for the author's intended-label coordinate contract. The population source's explicit relabeling instead supports canonicalBfeature14109. The raw-first alternative is a different conditional estimand; its strict universal raw-exact form fails for three nomenclature changes. Do not run both and select reciprocity-favorable output.
+
+Agreement: historical author's stronger-effect choice itself was response-informed and cannot constitute independent blind biological validation. Its prior existence and fixed intended-label use mean the current team is not choosing a row based on newly viewed responses. Both propositions must be reported together. A bounded diagnostic conditional on that named coordinate contract remains legitimate. Symbols do not establish guide specificity, force amplitude/conjugacy or potential validity. Failure tests only the saved finite endpoint interface; pass offers necessary compatibility only.
+
+Strongest unresolved issue remains physical interpretation, not metadata indexing. Neither reviewer supplies evidence overcoming between-gene guide action or observation-transform/nonlinear finite-force limitations. These limitations do not require delaying this limited algebra gate, but prevent any immediate physiological law or constrained-predictor promotion. Old stopped gate remains stopped. All future function/decision/agent/RSI claims require separate experiments.
+
+Static code review aligns with peer scope and permits the one frozen run. No substantive inter-reviewer disagreement remains; agreement is not empirical evidence for the mechanism. No real RNA values read in this cross review.

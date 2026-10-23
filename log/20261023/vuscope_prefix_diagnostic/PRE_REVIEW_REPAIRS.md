@@ -1,0 +1,5 @@
+# Repairs before freeze and outcomes
+
+Critic's concrete review found that excluded-prefix groups would only have been persisted in a final run receipt after outcome parsing. Added PREFIX_ELIGIBILITY.json before prediction seal/outcome reads, and an explicit four-nonempty-cell assertion to prevent empty/NaN completion. Added literal protocol gate/paired-win computation and saved GATE.json. Added requested-time/well/row-length uniqueness assertions and six-unique-dose group assertion. These are contract/accounting corrections; no model, endpoint, parameter, start, selection budget or outcome changed.
+
+Source review warned that a numerically nested7parameter fit may have worse prefix SSE than the6parameter fit within finite optimization. Final reporting must disclose how often that happens, convergence statuses and computational differences. Do not add rescue starts or infer a general lack of value for moving midpoints from a solver-limited failure. Primary is N120/N6; absolute count MSE is secondary.

@@ -1,0 +1,27 @@
+# Source independent least-squares audit: fixed residual screen failed
+
+2026-10-23. ARRAY_AUDIT.json records10110checks PASS, zero failures; maximum numeric discrepancy4.55e-13. Counts mainly concern9306identity mappings and729balanced guide columns, not10110scientific experiments. Source independently reconstructed the fixed identity-weighted nuisance design and used np.linalg.lstsq rather than importing root's decomposition. This is an independent descriptive least-squares arithmetic reproduction, not predictive model training. No raw counts, new endpoints, fitted prediction, threshold or alternate nuisance design was acquired.
+
+Root supplied the headline fractions/failure before this assignment. No peer result report was read before this seal. Critic sent its matching result summary and interpretation after source audit execution but before this report/seal; independence is therefore scoped and this report is not summary-blind. Source's numerical audit preceded the peer summary. Original independent/cross/preflight/execution freezes remain unchanged.
+
+## What was audited
+
+Verified execution-freeze local file bindings and saved-array hash; saved construct metadata order matches prior construct IDs and every pair_rowmatches its selected canonical action. Rebuilt role-gene and role-guide frequency matrices by integer accumulation then action-row normalization, independently of export's repeated fractional additions. Reconfirmed3guide balance/parent mapping, same243role-gene column family and fixed512adjacent differences plus constant. Every reconstructed identity matrix/design matches saved data within roundoff. Prior saved delta exactly matches projection input; prior count keys were not decoded. Whole-file hashes bind saved inputs but are not independent raw count extraction.
+
+Least-squares reconstruction reproduces additive/residual arrays, rank242and residual dimension270, singular values, basis orthonormality/design span, residual orthogonality and centering, all cross-products/fractions/correlations/RMS and the gate. Numerical tolerances account only for independent floating arithmetic. No SVD vector equality is required because bases are nonunique; fitted vectors/subspaces are the audited objects.
+
+## Result and interpretation
+
+The prespecified development screen fails both requirements. Residual correlation is0.11876617(<.5), and signed residual cross-product share0.01743912(<.25). Additive share is0.98256088. Total centered cross-repeat inner product is581.78706, with571.64121in the fixed additive subspace and10.14585in its orthogonal complement. Additive correlation is0.88831591; residual RMS remains0.40382/0.41318for the two repeats.
+
+These are full-sample projection/cross-product quantities, not causal percentages or held-action prediction scores.98.256%does not mean98.256%of biological function is caused by gene main effects, and1.744%does not mean1.744%of interactions exist. Projection can absorb genuine interaction signal if it aligns with this design over observed contrasts. Residual magnitude and weak residual repeat correlation also do not prove every residual is noise or irreproducible in all contexts. This selected endpoint/test simply provides little repeated cross-product in the complement of the frozen additive role family under its fixed gate.
+
+Because the identity balance proves position-guide and position-gene column spaces coincide after the actual averaging, this result is stronger than the original unsigned symmetric proposal against these specific additive coordinate nuisances. It still does not remove anchor-varying slopes, nonadditive guide-pair/library effects or pseudocount/measurement nonlinearity. Neither projected nor residual components are authenticated author GI or raw fitness, and no culture/time independence is added. Fixed in-sample rank242is descriptive capacity, not evidence that this nuisance family predicts held actions well.
+
+The earlier345/288conditional read-statistic repeatability positive remains valid. The new failed discriminator narrows its interpretation: that positive alone is insufficient motivation for a combination-specific updater beyond this strong additive coordinate baseline. It does not overturn the measurement pass, refute all biological interaction, or prohibit a separately motivated ordinary functional prediction task. No world/agent/inheritance/joint/improved-improver benefit has appeared.
+
+## Disposition and resource record
+
+Stop this fixed read-positive-to-combination-specific-updater lead under the registered screen. Do not try an alternative projection, basis, guide subgroup, threshold, pair ordering, context, pseudocount or endpoint to rescue it. Do not open lung or revive the failed published-GI predictor. Any future candidate requires distinct support for a lawful cross-action transport restriction and matched ordinary controls, not renaming the same residuals.
+
+One new saved-input audit execution with descriptive least squares; zero HTTP/model API/new count extraction/predictive fits or production edits. Source's earlier two identity-only executions are recorded separately, not hidden from phase resource accounting. Audit code is research/contrast_transport_mechanism_20261023/source/audit_projection.py; result artifacts are this source log directory. Root's reported0.381sprojection time is not independently timed total research/assay cost. Full goal ACTIVE / NOT_ACHIEVED.

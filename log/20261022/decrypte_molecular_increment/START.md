@@ -1,0 +1,9 @@
+# Conditional molecular information pilot — 2026-10-22
+
+Full objective ACTIVE / NOT_ACHIEVED. Previous turn PROGRESS: actual conventional functional-feedback benefit and independent audit, plus authentic molecular download inventory. This phase tests whether the published high-dose protein state adds functional predictive information once high-dose functional feedback is already given. It does not promote a novel world model or revive old profileMAP/OED novelty claims.
+
+Application remains intermediate-dose Jurkat metabolic endpoint prediction (published 18h treatment plus functional-assay readout), not clinical efficacy or validated safety. Frozen 48/48/48 partition and42development scaffold groups from decrypte_feedback_pilot apply. Only48development molecular files may be downloaded. Other96drug molecular/functional values, primaryTfunctional and historical TG/AZ/CiPA/MSE/PTPC reserves remain untouched.
+
+Download raw bytes before numerical analysis if useful, but decode only header identities until the numerical protocol is reviewed and frozen. Reuse the existing JQ1 body. Exclude manualVincristine and historical copy paths. Process only identifier/drug text and Normalized_Intensity_10000 numerical payloads after freeze. All other molecular values/peptide masks, classes and fit-derived quantities remain unextracted. ALL row inclusion/upstream normalization may depend on unobserved doses; this is a published processed-endpoint task, not a verified local laboratory assay budget.
+
+All experiments/test code research/decrypte_molecular_increment_20261022 or explicitly assigned research subdirectories. All downloads, receipts, tests/results, decisions and failures log/20261022/decrypte_molecular_increment. HEAD47a0e2dea5a7dd42379fa17eb3621caf6bd0114c. Existing dirty navigation files preserved; src/tools not modified.

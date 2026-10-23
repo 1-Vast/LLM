@@ -1,0 +1,7 @@
+你是独立算法研究者。MAESTRO寻求虚拟细胞世界模型+药物发现科研智能体的可迁移更新规律，最终测试RSI。请给至多一个真正具体的新操作，或明确NO_CANDIDATE，限中文1800字，必须给公式/有限伪代码、真实信息合同、最强普通对手、可能错误和一个最小证伪。不虚构已查文献、已训练或数据结果，引用只作待核线索。
+
+现有事实：ALMANAC新cell中六单药+B1高高角组合反馈，普通RBF表面预测MSE约改善10%，主排序也改善；排除同study源条目后MSE改善6%但top89药对选择regret轻微恶化。精确分解显示centered pairmean误差在两套配置10/10cell都改善且贡献55%/69%净MSE收益，不能归因主要globaloffset或shape-only。top89只交换每cell1-7pair。现在需要合法观察的信息来预测有益的模型修订，不要用未测query真值当门。没有证据表明必须worldmodel/agent。
+
+大量历史STOP必须保留：ALMANACanchortransport创新/RSI扩张已停，不得拟合另一个corrector/gate；decryptE蛋白增量纠正identifier后失败；CDK固定prefixMiddle功能KRR失败/不可估；旧profileMAP/OED、固定nuisance约束ridge、revision value contrast=pairedDR、pairwise residual sign gate校准失败；不重启这些路线。SIB2004.12696已具体用query外目标训synthetic gradient不模仿真实梯度，故query-trainedteacher原则不新。tanh teacher A+=η e r kᵀ形式未证明完全已有，但没有特殊优势且固定key限制传播到supportspan，不能仅换参数化/域宣称新。
+
+不要提新的benchmark、更多agent、信息论口号、普通decision-focusedloss/activelearning/learnedoptimizer/混合Bayes改名，不要列候选菜单。需要一个能由可得功能反馈验证、可继承、在有限成本或有限样本上有实质区别的操作。允许改变任务/世界模型架构，但指定公开可获得的数据类型及区分状态预测和药物决策的实际端点。不要求每个组件全新，但明确额外贡献在哪。若最有希望方案只是具体已有算法，也请诚实说明而不是拼装。

@@ -1,0 +1,7622 @@
+
+
+
+
+
+
+Informationally Decoupled Trajectory Design for Sim-to-Real System Identification
+
+
+
+
+
+
+
+
+ 
+
+
+
+  // Restore the saved color scheme preference, or
+  // enact the browser preference if "automatic", 
+  // without expecting DOM load to have completed.
+  //
+  // Also restore any saved readingmode and ToC display preferences.
+  function initializeReadingPreferences() {
+    let saved_theme = localStorage.getItem("ar5iv_theme") || "automatic";
+    if (saved_theme === "automatic") {
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        saved_theme = "dark";
+      }
+    }
+    if (saved_theme == "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+
+    const tocDisplay = localStorage.getItem('arxiv_html_paper_toc_display');
+    if (tocDisplay) {
+      document.documentElement.setAttribute("data-toc-display", tocDisplay);
+    }
+    const readingMode = localStorage.getItem('arxiv_html_paper_reading_mode');
+    if (readingMode) {
+      document.documentElement.setAttribute("data-reading-mode", readingMode);
+    }
+    // Pre-apply spinout-banner dismissal here, before the banner paints, so it
+    // never flashes in only to be hidden later by the deferred arxiv-header.js.
+    // Key matches arxiv-header.js: "arxiv-banner-dismissed:" + data-banner-name.
+    if (localStorage.getItem('arxiv-banner-dismissed:spinout-nonprofit')) {
+      document.documentElement.setAttribute("data-banner-dismissed", "");
+    }
+  }
+  // Run as soon as JS starts, to minimize repainting
+  initializeReadingPreferences();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /* Banner pre-dismissal (set above before paint -> no flash-then-hide) and
+     reading-mode chrome hiding. */
+  html[data-banner-dismissed] .ds-announcement { display: none; }
+  html[data-reading-mode="enabled"] .ds-announcement,
+  html[data-reading-mode="enabled"] .ds-site-footer { display: none; }
+  /* Print keeps the reader header's logo, not its controls: the theme's own print rule
+     (header, nav { display: none }) sits in a layer that its header layer outranks. */
+  @media print { .arxiv-html-header .html-header-nav { display: none; } }
+  /* Keep the announcement text dark on the Open-Blue band in both colour themes
+     (otherwise it inherits the paper's warm-wash text in dark mode and washes out). */
+  .ds-announcement-text { color: var(--arxiv-ink, #1c1a17); }
+
+
+
+
+
+
+
+
+
+
+  
+
+    
+
+      
+Report GitHub Issue
+
+      
+×
+
+    
+
+
+    
+
+      
+Title:
+
+      
+
+
+      
+Content selection saved. Describe the issue below:
+
+
+      
+Description:
+
+      
+
+    
+
+
+    
+
+      
+Submit without GitHub
+
+      
+Submit in GitHub
+
+    
+
+  
+
+
+
+    
+
+    
+arXiv is now an independent nonprofit!
+
+    
+Learn more
+
+    
+×
+
+  
+
+
+
+
+  
+
+    
+
+      
+Back to arXiv
+
+    
+
+  
+
+  
+
+  
+
+    
+Why HTML?
+
+    
+
+      
+
+        
+
+      
+
+      
+Report Issue
+
+    
+
+    
+
+      
+
+        
+
+        
+
+      
+
+      
+Back to Abstract
+
+    
+
+    
+
+    
+
+      
+
+        
+
+      
+
+      
+Download PDF
+
+    
+
+    
+
+      
+
+        
+
+        
+
+      
+
+    
+
+    
+
+    
+
+      
+
+        
+
+      
+
+    
+
+    
+
+    
+
+      
+
+        
+
+          
+
+          
+
+        
+
+      
+
+      
+
+        
+
+          
+
+          
+
+        
+
+      
+
+      
+
+        
+
+          
+
+          
+
+        
+
+      
+
+    
+
+  
+
+
+
+
+
+
+
+
+Abstract
+
+
+I 
+Introduction
+
+
+II 
+Related Works
+
+
+
+
+II-A
+ 
+Sim-to-Real Transfer and System Identification
+
+
+II-B
+ 
+Active Exploration and Optimal Experimental Design
+
+
+
+
+III 
+Preliminaries
+
+
+
+
+III-A
+ 
+Sampling-Based System Identification
+
+
+III-B
+ 
+Fisher Information for Trajectory Design
+
+
+III-C
+ 
+Problem Statement
+
+
+
+
+IV 
+Methods
+
+
+
+
+IV-A
+ 
+Motivation: Parameter Coupling in System Identification
+
+
+IV-B
+ 
+Per-Parameter Decoupling Factor
+
+
+IV-C
+ 
+Two Normalizations for Faithful Decoupling
+
+
+IV-D
+ 
+Segment-Wise Decoupling Coverage
+
+
+
+
+V 
+Experiments
+
+
+
+
+V-A
+ 
+Linear-Dynamics System
+
+
+V-B
+ 
+Physics-Based Simulation
+
+
+V-C
+ 
+Real-world Experiments
+
+
+
+
+VI 
+Conclusion
+
+
+References
+
+
+A 
+Implementation Details
+
+
+
+
+A-A
+ 
+Trajectory Optimization
+
+
+A-B
+ 
+Fisher-Information Estimation
+
+
+A-C
+ 
+Decoupling Exponents
+
+
+A-D
+ 
+Finite-Difference Perturbations
+
+
+A-E
+ 
+Real-World K1 Experiment
+
+
+
+
+
+
+
+
+
+
+
+  
+
+    License: CC BY 4.0
+  
+
+  
+
+arXiv:2610.10905v1 [cs.RO] 07 Oct 2026
+
+
+
+
+
+
+
+Informationally Decoupled Trajectory Design for Sim-to-Real System Identification
+
+
+
+
+
+
+
+Sangwoo Shin
+*
+, Ashvin Anilkumar, Ryan Gao, Josiah P. Hanna
+
+
+
+Affiliation: 
+University of Wisconsin–Madison
+
+sshin237@cs.wisc.edu
+
+*
+Corresponding author.
+
+
+
+
+Abstract
+
+    
+
+Sampling-based system identification estimates physically meaningful parameters by tuning a simulator to reproduce the target system dynamics, providing an interpretable approach to improving sim-to-real transfer.
+Yet when the collected trajectories do not distinguish the effects of different parameters, multiple parameter combinations can reproduce those trajectories, leading to unreliable parameter estimates.
+To address this challenge, we introduce an Informationally Decoupled Trajectory Design framework (
+IDTD
+),
+which formulates the objective for the exploration policy built on the Schur complement score derived from the Fisher information matrix.
+To faithfully reflect parameter separability in the exploration objective, 
+IDTD
+ normalizes the score against the per-parameter information,
+selects the most favorable trajectory segment for each parameter, and aggregates the resulting scores logarithmically.
+The optimized trajectory is therefore composed of complementary intervals, each exposing a distinct subset of parameters whose contribution to the motion over that interval can be attributed unambiguously.
+Across diverse simulation environments, ranging from a linear-dynamics system to the Go2 quadruped, G1 humanoid, and Crazyflie quadrotor, 
+IDTD
+ reduces the parameter identification error by 
+39.6
+%
+39.6\%
+ on average relative to the strongest prior active-exploration baseline and attains improved downstream policy transfer.
+Furthermore, we validate the proposed trajectory design on a real K1 humanoid, demonstrating that the resulting identified parameters accurately capture the real-system dynamics.
+
+  
+
+
+
+
+
+I 
+Introduction
+
+
+
+
+
+Reinforcement learning (RL) in massively parallel simulation has become
+a widely adopted approach
+for learning-based robot control, yet policies trained in simulation degrade on hardware whenever the simulated dynamics deviate from the target physical system 
+[
+1
+, 
+2
+]
+.
+A common remedy is domain randomization, which trains a policy over a distribution of physical parameters, such as inertial properties, actuator gains, and friction, so that the real system falls within its support 
+[
+3
+, 
+4
+]
+.
+This approach, however, requires covering a wide range of parameters, which tends to produce conservative policies that sacrifice performance for robustness.
+
+
+
+
+
+
+System identification (SysID) offers an alternative approach.
+Rather than training against a broad range of possible dynamics, SysID explicitly estimates the physical parameters that make the simulator reproduce the target system dynamics.
+Within SysID, sampling-based methods have recently gained traction 
+[
+5
+, 
+6
+]
+, as massively parallel GPU simulation makes black-box search over physical parameters practical.
+These methods evaluate candidate parameter vectors through forward dynamics simulation and search for the parameters under which the simulated trajectories best match the recorded real-world trajectories.
+By avoiding differentiation through the simulator, sampling-based SysID can directly leverage modern physics simulators with contact and actuator dynamics 
+[
+7
+, 
+8
+, 
+9
+, 
+10
+]
+ while retaining physically interpretable parameters.
+
+
+
+
+
+
+While sampling-based approaches make the parameter search practical, their success depends critically on solving the complementary problem of determining 
+which trajectories should be collected from the target system for reliable identification.
+
+Prior work addresses this question by seeking informative trajectories, where informativeness is quantified through the Fisher Information Matrix (FIM), whose inverse lower-bounds the covariance of the parameter estimate 
+[
+11
+]
+.
+Based on this bound, active exploration methods search for a policy that collects trajectories minimizing the trace of the inverse FIM, aggregating the estimation uncertainty across all parameters into a single objective 
+[
+6
+, 
+5
+]
+.
+However, this criterion does not treat the amount of information and the separability of the parameters as distinct quantities, so increased excitation can improve the aggregate criterion even when some parameter effects become less distinguishable.
+Consequently, errors in different parameters can compensate for one another, allowing simulations using the identified parameters to closely match the real-world trajectories even when the individual parameters differ substantially from their true values.
+For instance, consider identifying the mass 
+m
+m
+ and the damping 
+c
+c
+ of a one-dimensional system, where a force is applied to a point mass.
+A trace-based excitation makes the mass move faster and more abruptly, since larger, more energetic motion carries more total information about the parameters.
+Under such motion, however, the sensitivities to 
+m
+m
+ and 
+c
+c
+ stay nearly collinear, so increasing the mass while reducing the damping produces nearly the same trajectory under the same control input.
+The criterion therefore keeps improving even though the two parameters remain difficult to tell apart.
+In this simple example, the excitation can be manually designed to alternate between acceleration-dominant (
+c
+​
+x
+˙
+≈
+0
+c\dot{x}\approx 0
+) and velocity-dominant (
+m
+​
+x
+¨
+≈
+0
+m\ddot{x}\approx 0
+) phases to distinguish the mass from the damping.
+Extending such parameter-specific excitation to the dozens of coupled parameters in modern robot models, however, is highly challenging, as each parameter may require a different excitation regime.
+
+
+
+
+
+
+To address this challenge, we present 
+I
+nformationally 
+D
+ecoupled 
+T
+rajectory 
+D
+esign (
+IDTD
+), which searches for motions under which every parameter leaves a unique effect on the trajectory that no other parameter can reproduce.
+Specifically,
+
+IDTD
+ builds on a per-parameter score derived from the Schur complement of the Fisher information, which measures how much of a parameter’s effect on the motion remains after the effects of all other parameters are accounted for.
+A parameter whose effect can be reproduced by the others scores near zero, while a parameter with a distinct effect scores high; a high score thus means the parameter is cleanly distinguishable, or decoupled, from the rest.
+Furthermore, to prevent the objective from being improved through excitation alone, for instance by moving a few responsive joints more aggressively without better separating their parameter effects, 
+IDTD
+ normalizes each score by the information carried by the corresponding parameter.
+It then evaluates the normalized scores across multiple trajectory segments to encourage complementary excitation of different parameters throughout the trajectory.
+As a result, 
+IDTD
+ designs trajectories that expose every parameter somewhere along the motion rather than accumulating information for only a small subset.
+
+
+
+
+
+
+We evaluate 
+IDTD
+ in simulation on a linear-dynamics system, Unitree Go2, Unitree G1, and Crazyflie, demonstrating improved parameter identification, target-system prediction, and downstream policy transfer.
+We further validate 
+IDTD
+ on a real Booster K1 humanoid, where the identified parameters more accurately capture the target-system dynamics.
+
+
+
+
+
+
+The main contributions of our work are as follows.
+
+(i)
+ We address the challenging yet practical problem of designing exploration trajectories that distinguish the effects of physical parameters, enabling reliable sampling-based system identification.
+
+(ii)
+ We propose 
+IDTD
+, a trajectory design framework that explicitly balances information quantity with parameter distinguishability through a normalized Schur-complement score and parameter-wise trajectory coverage.
+
+(iii)
+ We demonstrate that 
+IDTD
+ improves parameter identification accuracy and downstream policy transfer across simulated Unitree Go2, Unitree G1, and Crazyflie platforms, and better captures real-world dynamics on a Booster K1 humanoid.
+
+
+
+
+
+
+
+
+II 
+Related Works
+
+
+
+
+
+II-A
+ 
+Sim-to-Real Transfer and System Identification
+
+
+
+
+
+Reducing the sim-to-real gap has been approached from two complementary directions.
+Domain randomization exposes the policy to a wide distribution of dynamics so that the real system falls within the training support 
+[
+3
+, 
+4
+]
+; the resulting robustness, however, comes at the cost of conservative behavior, and the randomization ranges themselves require tuning.
+
+
+
+
+
+
+System identification instead estimates the physical parameters of the specific robot and its environment from real-world data.
+Classical approaches exploit the linearity of rigid-body dynamics in the inertial parameters and estimate them by least squares over hand-designed excitation 
+[
+12
+, 
+13
+]
+, but they require an explicit structured dynamics model and do not scale to the contact-rich, hard-to-model effects of real robots.
+
+
+
+
+
+
+As massively parallel simulation has become fast and reliable, system identification is increasingly performed by tuning simulator parameters until simulated trajectories match real trajectories.
+One line of work makes the forward dynamics differentiable with respect to the parameters, so the identification objective can be minimized by backpropagating gradients directly through the simulation 
+[
+14
+, 
+15
+]
+. Its reliance on smoothed contact models, however, limits its scalability to contact-rich tasks.
+Recent work therefore favors sampling-based identification, which pairs the simulator with a black-box search algorithm and sidesteps differentiation while keeping the estimated parameters physically interpretable 
+[
+5
+, 
+6
+]
+.
+
+
+
+
+
+
+Our work follows the sampling-based paradigm but addresses the complementary question of how exploration should be designed so that every parameter leaves a distinct effect on the resulting trajectory, enabling reliable system identification.
+
+
+
+
+
+
+
+
+II-B
+ 
+Active Exploration and Optimal Experimental Design
+
+
+
+
+
+The choice of excitation has long been recognized as central to identification quality.
+In the classical context, exciting trajectories are optimized offline against criteria defined on the regressor matrix, which linearly relates the unknown dynamic parameters to the measured forces for a given trajectory.
+A common objective is to minimize the condition number of the regressor, producing excitations that yield parameter estimates more robust to measurement noise 
+[
+16
+, 
+13
+]
+.
+The objective is inherently coupling-aware, since an ill-conditioned regressor indicates that different parameters influence the measurements along nearly identical directions.
+
+
+
+
+
+
+For policy-driven system identification, where the excitation is produced by a closed-loop policy, 
+SPI-Active
+ and ASID 
+[
+5
+, 
+6
+]
+ optimize the A-optimal Fisher-information criterion 
+tr
+⁡
+(
+F
+−
+1
+)
+\operatorname{tr}(F^{-1})
+ to encourage informative trajectories.
+Contact-implicit trajectory optimization likewise maximizes 
+tr
+⁡
+(
+F
+)
+\operatorname{tr}({F})
+ over excited contact modes 
+[
+15
+]
+.
+Optimal experimental design offers related criteria, including D-optimality (
+log
+det
+(
+F
+)
+\log\det(F)
+) for reducing the overall uncertainty of the parameter estimate and E-optimality (
+λ
+min
+​
+(
+F
+)
+\lambda_{\min}(F)
+, the smallest eigenvalue of 
+F
+F
+) for improving the least informative direction 
+[
+17
+, 
+18
+]
+.
+In the transition from regressor-based trajectory design to sampling-based identification, the Fisher information has been carried over as the measure of a trajectory,
+whereas parameter separation is addressed only implicitly through aggregate objectives.
+The Schur complement provides an explicit characterization of parameter separation by quantifying the information that remains for a parameter subset after accounting for correlations with the remaining parameters 
+[
+19
+]
+.
+QOED 
+[
+20
+]
+ leverages this quantity to improve the distinguishability of a subset of task-relevant parameters, leading to improved sim-to-real policy transfer.
+However, system identification requires all physical parameters to be identifiable, rather than only a selected subset.
+
+
+
+
+
+
+To the best of our knowledge, 
+IDTD
+ is the first exploration objective for sampling-based system identification that uses per-parameter separability to enforce coverage of all physical parameters.
+
+
+
+
+
+
+
+
+
+
+III 
+Preliminaries
+
+
+
+
+
+III-A
+ 
+Sampling-Based System Identification
+
+
+
+
+
+Let 
+θ
+∈
+ℝ
+N
+\theta\in\mathbb{R}^{N}
+ denote the vector of parameters to identify (e.g., base inertial properties, per-joint PD gains, and friction coefficients), and let 
+π
+\pi
+ be a policy pretrained in simulation, conditioned on a command 
+c
+t
+c_{t}
+ (e.g., base velocity and gait parameters).
+A dataset 
+𝒟
+=
+{
+τ
+=
+(
+s
+0
+,
+a
+0
+,
+s
+1
+,
+⋯
+)
+}
+\mathcal{D}=\{\tau=(s_{0},a_{0},s_{1},\cdots)\}
+ of trajectories is collected on the target system by rolling out 
+π
+\pi
+ under a command sequence 
+𝐜
+=
+(
+c
+1
+,
+…
+,
+c
+T
+)
+\mathbf{c}=(c_{1},\ldots,c_{T})
+, recording states and executed actions.
+In this paper, we focus on a floating-base robot policy 
+π
+\pi
+, where the state 
+s
+t
+s_{t}
+ comprises measurable proprioceptive signals, including IMU readings, joint positions and velocities from the encoders, and, when available, joint torques.
+Sampling-based system identification then solves
+
+
+
+
+
+
+
+
+
+θ
+^
+=
+argmin
+θ
+⁡
+∑
+τ
+∈
+𝒟
+∑
+t
+=
+1
+T
+‖
+f
+⁡
+(
+s
+t
+,
+a
+t
+,
+θ
+)
+−
+s
+t
++
+1
+‖
+2
+,
+\hat{\theta}=\mathop{\textnormal{argmin}}_{\theta}\;\sum_{\tau\in\mathcal{D}}\sum_{t=1}^{T}\big\|f(s_{t},a_{t};\theta)-s_{t+1}\big\|^{2},\vskip-4.0pt
+
+
+
+
+(1)
+
+
+
+
+where 
+f
+⁡
+(
+⋅
+,
+θ
+)
+f(\cdot\,;\theta)
+ denotes a forward simulation step under parameters 
+θ
+\theta
+, and 
+a
+t
+a_{t}
+ is the action recorded in trajectory 
+τ
+\tau
+.
+For parameter estimation, we treat the simulator as a black box and optimize Eq. (
+1
+) with CMA-ES 
+[
+21
+]
+.
+
+
+
+
+
+
+Fig. 1: 
+Overview of 
+IDTD
+. (1) A command sequence is rolled out in simulation over 
+M
+M
+ segments. (2) Each segment yields a Fisher information 
+F
+(
+s
+)
+F^{(s)}
+, from which the per-parameter decoupling factor 
+d
+i
+​
+(
+F
+(
+s
+)
+,
+α
+i
+)
+d_{i}(F^{(s)};\alpha_{i})
+ follows through the Schur complement and the normalization of Sec. 
+IV-B
+. (3) Each parameter takes the score 
+c
+i
+c_{i}
+ of its best segment, and 
+IDTD
+ optimizes the logarithmic sum of these scores.
+
+
+
+
+
+
+
+
+III-B
+ 
+Fisher Information for Trajectory Design
+
+
+
+
+
+The informativeness of a trajectory is measured by the Fisher Information Matrix (FIM). By the Cramér–Rao bound 
+[
+11
+]
+, the covariance of unbiased estimator 
+θ
+^
+\hat{\theta}
+ of the true parameters 
+θ
+⋆
+\theta^{\star}
+ is lower-bounded by the inverse of the FIM,
+
+
+
+
+
+
+
+
+
+𝔼
+s
+1
+:
+T
+∼
+p
+(
+⋅
+∣
+θ
+⋆
+)
+[
+(
+θ
+^
+−
+θ
+⋆
+)
+(
+θ
+^
+−
+θ
+⋆
+)
+⊤
+]
+⪰
+F
+(
+θ
+⋆
+)
+−
+1
+.
+\mathbb{E}_{s_{1:T}\sim p(\cdot\mid\theta^{\star})}\big[(\hat{\theta}-\theta^{\star})(\hat{\theta}-\theta^{\star})^{\top}\big]\succeq F(\theta^{\star})^{-1}.\vskip-2.0pt
+
+
+
+
+(2)
+
+
+
+
+This bound provides a classical interpretation of the FIM as a measure of parameter identifiability and motivates its use as a trajectory-design criterion.
+
+
+
+
+
+
+Assuming the stochastic dynamics
+
+s
+t
++
+1
+=
+f
+⁡
+(
+s
+t
+,
+a
+t
+,
+θ
+)
++
+w
+t
+s_{t+1}=f(s_{t},a_{t};\theta)+w_{t}
+ with additive Gaussian process noise 
+w
+t
+∼
+𝒩
+⁡
+(
+0
+,
+σ
+2
+​
+I
+)
+w_{t}\sim\mathcal{N}(0,\sigma^{2}I)
+,
+the FIM of a trajectory is approximated as 
+[
+5
+]
+:
+
+
+
+
+
+
+
+
+
+F
+⁡
+(
+θ
+,
+𝐜
+)
+=
+σ
+−
+2
+​
+∑
+t
+=
+1
+T
+J
+t
+⊤
+​
+J
+t
+,
+J
+t
+=
+∂
+f
+⁡
+(
+s
+t
+,
+a
+t
+,
+θ
+)
+∂
+θ
+,
+F(\theta,\mathbf{c})=\sigma^{-2}\sum_{t=1}^{T}J_{t}^{\top}J_{t},\qquad J_{t}=\frac{\partial f(s_{t},a_{t};\theta)}{\partial\theta},\vskip-1.0pt
+
+
+
+
+(3)
+
+
+
+
+where 
+J
+t
+J_{t}
+ is the sensitivity of the simulation dynamics to the parameters along the trajectory induced by the policy under the exploration command sequence 
+𝐜
+\mathbf{c}
+.
+Because evaluating FIM in Eq. (
+2
+) requires the true parameter 
+θ
+⋆
+\theta^{\star}
+, which is unavailable in practice,
+we instead evaluate the FIM at a nominal parameter value 
+θ
+0
+\theta_{0}
+.
+To avoid altering the behavior of the pretrained policy for safe data collection on the target system, we optimize the command sequence while keeping the policy fixed.
+Active exploration 
+[
+6
+, 
+5
+]
+ searches for a command that minimizes the aggregate uncertainty,
+
+
+
+
+
+
+
+
+
+𝐜
+⋆
+=
+argmin
+𝐜
+⁡
+tr
+⁡
+(
+F
+​
+(
+θ
+0
+,
+𝐜
+)
+−
+1
+)
+.
+\mathbf{c}^{\star}=\mathop{\textnormal{argmin}}_{\mathbf{c}}\;\operatorname{tr}\big(F(\theta_{0},\mathbf{c})^{-1}\big).
+
+
+
+
+(4)
+
+
+
+
+The command sequence 
+𝐜
+⋆
+\mathbf{c}^{\star}
+ optimized in simulation is then executed on the target system to collect a trajectory, from which the parameters are estimated through Eq. (
+1
+).
+
+
+
+
+
+
+
+
+III-C
+ 
+Problem Statement
+
+
+
+
+
+Given a command-conditioned pretrained policy 
+π
+\pi
+, a nominal parameter estimate 
+θ
+0
+\theta_{0}
+, and a fixed data-collection time budget, our goal is to design an exploration objective, in place of the criterion of Eq. (
+4
+), that enables accurate recovery of all physical parameters.
+
+
+
+
+
+
+
+
+
+
+IV 
+Methods
+
+
+
+
+
+IV-A
+ 
+Motivation: Parameter Coupling in System Identification
+
+
+
+
+
+We analyze a two-parameter linear system to illustrate how parameter
+coupling allows estimation errors in one parameter to be absorbed by
+another, motivating an explicit characterization of parameter separability.
+Consider a scalar state governed by a discrete-time mass-damper system, in which the control input 
+u
+t
+u_{t}
+ drives the state through a compliance 
+θ
+⋆
+\theta^{\star}
+ and the velocity 
+x
+˙
+t
+\dot{x}_{t}
+ resists it through a damping 
+ϕ
+⋆
+\phi^{\star}
+,
+
+
+
+
+
+
+
+
+
+x
+t
++
+1
+=
+x
+t
++
+θ
+⋆
+​
+u
+t
+−
+ϕ
+⋆
+​
+x
+˙
+t
++
+w
+t
+,
+w
+t
+∼
+𝒩
+⁡
+(
+0
+,
+σ
+2
+)
+,
+\vskip-1.0ptx_{t+1}=x_{t}+\theta^{\star}u_{t}-\phi^{\star}\dot{x}_{t}+w_{t},\qquad w_{t}\sim\mathcal{N}(0,\sigma^{2}),\vskip-1.0pt
+
+
+
+
+(5)
+
+
+
+
+where 
+w
+t
+w_{t}
+ is i.i.d. Gaussian noise.
+By Eq. (
+3
+), the Fisher information matrix 
+ℐ
+\mathcal{I}
+ for the two parameters has entries
+
+
+
+
+
+
+
+
+
+ℐ
+θ
+​
+θ
+=
+1
+σ
+2
+∑
+t
+u
+t
+2
+,
+ℐ
+ϕ
+​
+ϕ
+=
+1
+σ
+2
+∑
+t
+x
+˙
+t
+2
+,
+ℐ
+θ
+​
+ϕ
+=
+−
+1
+σ
+2
+∑
+t
+u
+t
+x
+˙
+t
+,
+\mathcal{I}_{\theta\theta}=\frac{1}{\sigma^{2}}\sum_{t}u_{t}^{2},\ \mathcal{I}_{\phi\phi}=\frac{1}{\sigma^{2}}\sum_{t}\dot{x}_{t}^{2},\ \mathcal{I}_{\theta\phi}=-\frac{1}{\sigma^{2}}\sum_{t}u_{t}\dot{x}_{t},
+
+
+
+
+(6)
+
+
+
+
+where 
+ℐ
+θ
+​
+θ
+\mathcal{I}_{\theta\theta}
+ and 
+ℐ
+ϕ
+​
+ϕ
+\mathcal{I}_{\phi\phi}
+ measure the information about each parameter individually, while the off-diagonal 
+ℐ
+θ
+​
+ϕ
+\mathcal{I}_{\theta\phi}
+ measures their coupling along the trajectory.
+To understand how an error in one parameter propagates to another, suppose that the damping parameter has been estimated as 
+ϕ
+^
+\hat{\phi}
+.
+Instantiating Eq. (
+1
+) and conditioning on 
+ϕ
+^
+\hat{\phi}
+, the least-squares estimate of 
+θ
+\theta
+ has the closed form
+
+
+
+
+
+
+
+
+
+θ
+^
+=
+∑
+t
+u
+t
+​
+(
+x
+t
++
+1
+−
+x
+t
++
+ϕ
+^
+​
+x
+˙
+t
+)
+∑
+t
+u
+t
+2
+.
+\hat{\theta}=\frac{\sum_{t}u_{t}(x_{t+1}-x_{t}+\hat{\phi}\dot{x}_{t})}{\sum_{t}u_{t}^{2}}.\vskip-2.0pt
+
+
+
+
+(7)
+
+
+
+
+Substituting the true dynamics for 
+x
+t
++
+1
+x_{t+1}
+ in Eq. (
+5
+) gives
+
+
+
+
+
+
+
+
+
+θ
+^
+=
+θ
+⋆
++
+(
+ϕ
+^
+−
+ϕ
+⋆
+)
+​
+∑
+t
+u
+t
+​
+x
+˙
+t
+∑
+t
+u
+t
+2
++
+∑
+t
+u
+t
+​
+w
+t
+∑
+t
+u
+t
+2
+.
+\hat{\theta}=\theta^{\star}+(\hat{\phi}-\phi^{\star})\,\frac{\sum_{t}u_{t}\dot{x}_{t}}{\sum_{t}u_{t}^{2}}+\frac{\sum_{t}u_{t}w_{t}}{\sum_{t}u_{t}^{2}}.
+
+
+
+
+(8)
+
+
+
+
+Taking the expectation over the noise eliminates the last term, and the remaining ratio equals 
+−
+ℐ
+θ
+​
+ϕ
+/
+ℐ
+θ
+​
+θ
+-\mathcal{I}_{\theta\phi}/\mathcal{I}_{\theta\theta}
+ by Eq. (
+6
+), so
+
+
+
+
+
+
+
+
+
+𝔼
+[
+θ
+^
+]
+−
+θ
+⋆
+=
+−
+(
+ϕ
+^
+−
+ϕ
+⋆
+)
+⋅
+ℐ
+θ
+​
+ϕ
+ℐ
+θ
+​
+θ
+.
+\mathbb{E}[\hat{\theta}]-\theta^{\star}=-\,(\hat{\phi}-\phi^{\star})\cdot\frac{\mathcal{I}_{\theta\phi}}{\mathcal{I}_{\theta\theta}}.\vskip-2.0pt
+
+
+
+
+(9)
+
+
+
+
+For 
+θ
+^
+\hat{\theta}
+ to recover 
+θ
+⋆
+\theta^{\star}
+, Eq. (
+9
+) requires either (i) the nuisance estimate to be exact, 
+ϕ
+^
+=
+ϕ
+⋆
+\hat{\phi}=\phi^{\star}
+, or (ii) the coupling ratio 
+ℐ
+θ
+​
+ϕ
+/
+ℐ
+θ
+​
+θ
+\mathcal{I}_{\theta\phi}/\mathcal{I}_{\theta\theta}
+ to vanish. Since 
+ϕ
+\phi
+ is itself estimated and cannot be assumed to match 
+ϕ
+⋆
+\phi^{\star}
+, the only quantity under control is the coupling ratio.
+Reducing this ratio requires suppressing the off-diagonal term 
+ℐ
+θ
+​
+ϕ
+\mathcal{I}_{\theta\phi}
+, not merely enlarging the diagonal information 
+ℐ
+θ
+​
+θ
+\mathcal{I}_{\theta\theta}
+.
+The smaller the off-diagonal coupling, the less the error in 
+ϕ
+^
+\hat{\phi}
+ leaks into 
+θ
+^
+\hat{\theta}
+, and the more accurately 
+θ
+\theta
+ is identified.
+This coupling can be characterized through the Schur complement of the Fisher information, which measures the information about 
+θ
+\theta
+ that remains after accounting for the effect of 
+ϕ
+\phi
+,
+
+
+
+
+
+
+
+
+
+S
+θ
+=
+ℐ
+θ
+​
+θ
+−
+ℐ
+θ
+​
+ϕ
+​
+ℐ
+ϕ
+​
+ϕ
+−
+1
+​
+ℐ
+ϕ
+​
+θ
+.
+S_{\theta}=\mathcal{I}_{\theta\theta}-\mathcal{I}_{\theta\phi}\,\mathcal{I}_{\phi\phi}^{-1}\,\mathcal{I}_{\phi\theta}.\vskip-2.0pt
+
+
+
+
+(10)
+
+
+
+
+The Schur complement 
+S
+θ
+S_{\theta}
+ reflects both the information about 
+θ
+\theta
+ and its separability from 
+ϕ
+\phi
+, with the latter directly related to the bias that causes the error absorption in Eq. (
+9
+).
+
+
+
+
+
+
+
+
+IV-B
+ 
+Per-Parameter Decoupling Factor
+
+
+
+
+
+We now extend the two-parameter analysis to the full parameter vector 
+θ
+=
+(
+θ
+1
+,
+⋯
+,
+θ
+N
+)
+∈
+ℝ
+N
+\theta=(\theta_{1},\cdots,\theta_{N})\in\mathbb{R}^{N}
+. For each parameter 
+θ
+i
+\theta_{i}
+, we partition 
+θ
+=
+(
+θ
+i
+,
+θ
+∖
+i
+)
+\theta=(\theta_{i},\theta_{\setminus i})
+ into the target 
+θ
+i
+\theta_{i}
+
+and the remaining parameters 
+θ
+∖
+i
+\theta_{\setminus i}
+,
+and partition the Fisher information 
+F
+F
+ accordingly into the blocks
+
+F
+i
+​
+i
+∈
+ℝ
+1
+×
+1
+F_{ii}\in\mathbb{R}^{1\times 1}
+,
+
+F
+i
+,
+∖
+i
+∈
+ℝ
+1
+×
+(
+N
+−
+1
+)
+F_{i,\setminus i}\in\mathbb{R}^{1\times(N-1)}
+,
+and
+
+F
+∖
+i
+,
+∖
+i
+∈
+ℝ
+(
+N
+−
+1
+)
+×
+(
+N
+−
+1
+)
+F_{\setminus i,\setminus i}\in\mathbb{R}^{(N-1)\times(N-1)}
+.
+The information about 
+θ
+i
+\theta_{i}
+ that remains after accounting for the remaining parameters is given by the Schur complement
+
+
+
+
+
+
+
+
+
+S
+i
+​
+(
+F
+)
+=
+F
+i
+​
+i
+−
+F
+i
+,
+∖
+i
+​
+F
+∖
+i
+,
+∖
+i
+−
+1
+​
+F
+∖
+i
+,
+i
+∈
+ℝ
+.
+S_{i}(F)=F_{ii}-F_{i,\setminus i}\,F_{\setminus i,\setminus i}^{-1}\,F_{\setminus i,i}\;\in\;\mathbb{R}.\vskip-2.0pt
+
+
+
+
+(11)
+
+
+
+
+A parameter whose sensitivity is orthogonal to the remaining parameters attains 
+S
+i
+=
+F
+i
+​
+i
+S_{i}=F_{ii}
+, while a parameter fully absorbed by the others has 
+S
+i
+→
+0
+S_{i}\to 0
+.
+
+
+
+
+
+
+The Schur complement also clarifies the relation to the A-optimal
+criterion of Eq. (
+4
+), since
+
+tr
+⁡
+(
+F
+−
+1
+)
+=
+∑
+i
+=
+1
+N
+1
+/
+S
+i
+​
+(
+F
+)
+\operatorname{tr}(F^{-1})=\sum_{i=1}^{N}1/S_{i}(F)
+.
+Although A-optimal design is not formulated in terms of parameter
+separability, its aggregate uncertainty criterion implicitly reflects
+parameter coupling.
+In contrast, 
+IDTD
+ explicitly uses the Schur complement to quantify
+the separability of each parameter, and introduces mechanisms to
+control its dependence on information quantity and ensure coverage
+across parameters.
+We next describe how these mechanisms are incorporated into our exploration objective.
+
+
+
+
+
+
+
+
+IV-C
+ 
+Two Normalizations for Faithful Decoupling
+
+
+
+
+
+Sensitivity normalization.
+
+Computing the Schur complement requires the Fisher information 
+F
+F
+, which by Eq. (
+3
+) is built from the sensitivity of the forward dynamics to the parameters, 
+J
+t
+=
+∂
+f
+⁡
+(
+s
+t
+,
+a
+t
+,
+θ
+)
+/
+∂
+θ
+J_{t}=\partial f(s_{t},a_{t};\theta)/\partial\theta
+.
+In simulation this derivative is unavailable in closed form and is estimated by finite differences, perturbing each parameter by a step 
+δ
+​
+θ
+i
+\delta\theta_{i}
+ and measuring the resulting change in the predicted next state.
+The parameters, however, span several orders of magnitude in natural scale, so a single shared step distorts the resulting sensitivities.
+With an absolute step 
+δ
+​
+θ
+fric
+=
+δ
+​
+θ
+k
+p
+=
+10
+−
+3
+\delta\theta_{\text{fric}}=\delta\theta_{k_{p}}=10^{-3}
+, for example, the friction coefficient is perturbed by roughly 
+0.2
+%
+0.2\%
+ of its value while the proportional gain is perturbed by only 
+0.001
+%
+0.001\%
+, so the finite-difference FIM overstates the information about friction and understates it for the gain purely as an artifact of the step size.
+We therefore scale the step of each parameter to its search range, 
+δ
+​
+θ
+i
+∝
+range
+​
+(
+θ
+i
+)
+\delta\theta_{i}\propto\text{range}(\theta_{i})
+, so that every parameter is perturbed by a comparable relative amount and every column of 
+J
+t
+J_{t}
+ is evaluated consistently.
+
+
+
+
+
+
+Decoupling normalization.
+
+The raw Schur complement combines two quantities that should be treated separately. Specifically, factoring Eq. (
+11
+),
+
+
+
+
+
+
+
+
+
+S
+i
+​
+(
+F
+)
+=
+F
+i
+​
+i
+⏟
+information quantity
+​
+(
+1
+−
+F
+i
+,
+∖
+i
+​
+F
+∖
+i
+,
+∖
+i
+−
+1
+​
+F
+∖
+i
+,
+i
+F
+i
+​
+i
+)
+⏟
+decoupling ratio
+,
+S_{i}(F)=\underbrace{F_{ii}}_{\text{information quantity}}\underbrace{\left(1-\frac{F_{i,\setminus i}\,F_{\setminus i,\setminus i}^{-1}\,F_{\setminus i,i}}{F_{ii}}\right)}_{\text{decoupling ratio}},\vskip-4.0pt
+
+
+
+
+(12)
+
+
+
+
+splits it into the diagonal information 
+F
+i
+​
+i
+F_{ii}
+, which measures excitation
+strength, and the parenthesized decoupling ratio in 
+[
+0
+,
+1
+]
+[0,1]
+, which measures
+the fraction of information about 
+θ
+i
+\theta_{i}
+ that remains after accounting
+for the other parameters and corresponds to the classical inverse variance
+inflation factor 
+1
+/
+VIF
+i
+1/\mathrm{VIF}_{i}
+ 
+[
+22
+]
+.
+However, the magnitude of 
+F
+i
+​
+i
+F_{ii}
+ varies by orders of magnitude across parameters, so a large 
+F
+i
+​
+i
+F_{ii}
+ can yield a large 
+S
+i
+S_{i}
+ even when the decoupling ratio remains small.
+Consequently, maximizing 
+∑
+i
+S
+i
+\sum_{i}S_{i}
+ can favor strongly excited parameters even when their effects remain poorly separated.
+We therefore damp the diagonal factor using a parameter-specific exponent 
+α
+i
+\alpha_{i}
+ and define the decoupling factor
+
+
+
+
+
+
+
+
+
+d
+i
+​
+(
+F
+,
+α
+i
+)
+=
+S
+i
+​
+(
+F
+)
+F
+i
+​
+i
+α
+i
+=
+F
+i
+​
+i
+1
+−
+α
+i
+​
+(
+1
+−
+F
+i
+,
+∖
+i
+​
+F
+∖
+i
+,
+∖
+i
+−
+1
+​
+F
+∖
+i
+,
+i
+F
+i
+​
+i
+)
+.
+d_{i}(F;\alpha_{i})=\frac{S_{i}(F)}{F_{ii}^{\alpha_{i}}}=F_{ii}^{1-\alpha_{i}}\left(1-\frac{F_{i,\setminus i}F_{\setminus i,\setminus i}^{-1}F_{\setminus i,i}}{F_{ii}}\right).
+
+
+
+
+(13)
+
+
+
+
+The exponent 
+α
+i
+\alpha_{i}
+ controls how much of the diagonal magnitude is removed. At 
+α
+i
+=
+1
+\alpha_{i}=1
+, the diagonal factor cancels and 
+d
+i
+∈
+[
+0
+,
+1
+]
+d_{i}\in[0,1]
+ becomes the pure decoupling ratio, independent of excitation strength.
+At 
+α
+i
+=
+0
+\alpha_{i}=0
+, no damping is applied and 
+d
+i
+=
+S
+i
+d_{i}=S_{i}
+ reverts to the diagonal-dominated regime above.
+In our experiments, we use parameter-specific 
+α
+i
+≥
+0.7
+\alpha_{i}\geq 0.7
+.
+
+
+
+
+
+
+Algorithm 1
+ 
+Trajectory design in 
+IDTD
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    
+0:
+
+                    
+                   policy 
+π
+\pi
+, initial 
+θ
+0
+∈
+ℝ
+N
+\theta_{0}\in\mathbb{R}^{N}
+, segments 
+M
+M
+, exponents 
+α
+i
+\alpha_{i}
+
+
+
+
+
+
+                    
+0:
+
+                    
+                   optimized excitation command 
+𝐜
+⋆
+\mathbf{c}^{\star}
+
+
+
+
+
+
+                    
+1:
+
+                    
+                   
+while
+ CMA-ES not converged 
+do
+
+
+
+
+
+
+
+
+                    
+2:
+
+                    
+                     sample population 
+{
+𝐜
+(
+p
+)
+}
+p
+=
+1
+P
+\{\mathbf{c}^{(p)}\}_{p=1}^{P}
+
+
+
+
+
+
+                    
+3:
+
+                    
+                     
+for
+ each candidate 
+𝐜
+(
+p
+)
+\mathbf{c}^{(p)}
+ 
+do
+
+
+
+
+
+
+
+
+                    
+4:
+
+                    
+                      trajectory 
+τ
+∼
+π
+(
+⋅
+∣
+𝐜
+(
+p
+)
+)
+\tau\sim\pi(\cdot\mid\mathbf{c}^{(p)})
+ at 
+θ
+0
+\theta_{0}
+
+
+
+
+
+
+                    
+5:
+
+                    
+                      
+for
+ 
+i
+=
+1
+i=1
+ to 
+N
+N
+ 
+do
+
+
+
+
+
+
+
+
+                    
+6:
+
+                    
+                       trajectory 
+τ
+i
+∼
+π
+(
+⋅
+∣
+𝐜
+(
+p
+)
+)
+\tau_{i}\sim\pi(\cdot\mid\mathbf{c}^{(p)})
+ at 
+θ
+0
++
+δ
+​
+θ
+i
+​
+𝐞
+i
+\theta_{0}+\delta\theta_{i}\mathbf{e}_{i}
+
+
+
+
+
+
+                    
+7:
+
+                    
+                       
+J
+(
+i
+)
+←
+(
+τ
+i
+−
+τ
+)
+/
+δ
+​
+θ
+i
+J^{(i)}\leftarrow(\tau_{i}-\tau)/\delta\theta_{i}
+
+
+
+
+
+
+                    
+8:
+
+                    
+                      
+end
+ 
+for
+
+
+
+
+
+                    
+9:
+
+                    
+                      
+J
+t
+⟵
+[
+J
+t
+(
+1
+)
+,
+…
+,
+J
+t
+(
+N
+)
+]
+J_{t}\longleftarrow[J^{(1)}_{t},\dots,J^{(N)}_{t}]
+ for each timestep 
+t
+t
+ in 
+τ
+\tau
+
+
+
+
+
+
+                    
+10:
+
+                    
+                      
+F
+(
+s
+)
+⟵
+σ
+−
+2
+​
+∑
+t
+∈
+seg 
+​
+s
+J
+t
+⊤
+​
+J
+t
+F^{(s)}\longleftarrow\sigma^{-2}\sum_{t\in\text{seg }s}J_{t}^{\top}J_{t}
+ for each segment 
+s
+s
+
+
+
+
+
+
+                    
+11:
+
+                    
+                      
+c
+i
+←
+max
+s
+⁡
+S
+i
+​
+(
+F
+(
+s
+)
+)
+/
+[
+F
+i
+​
+i
+(
+s
+)
+]
+α
+i
+c_{i}\leftarrow\max_{s}\,S_{i}(F^{(s)})/[F_{ii}^{(s)}]^{\alpha_{i}}
+ for all 
+i
+i
+
+
+
+
+
+
+                    
+12:
+
+                    
+                      
+𝒥
+(
+p
+)
+←
+∑
+i
+log
+⁡
+(
+c
+i
++
+ε
+)
+\mathcal{J}^{(p)}\leftarrow\sum_{i}\log(c_{i}+\varepsilon)
+
+
+
+
+
+
+                    
+13:
+
+                    
+                     
+end
+ 
+for
+
+
+
+
+
+                    
+14:
+
+                    
+                     update CMA-ES with 
+{
+𝒥
+(
+p
+)
+}
+\{\mathcal{J}^{(p)}\}
+
+
+
+
+
+
+                    
+15:
+
+                    
+                   
+end
+ 
+while
+
+
+
+
+
+                    
+16:
+
+                    
+                   
+return
+ 
+𝐜
+⋆
+←
+arg
+⁡
+max
+p
+⁡
+𝒥
+(
+p
+)
+\mathbf{c}^{\star}\leftarrow\arg\max_{p}\mathcal{J}^{(p)}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+IV-D
+ 
+Segment-Wise Decoupling Coverage
+
+
+
+
+
+Different parameters often require different excitation regimes, making it difficult for a single motion to decouple all parameters simultaneously.
+We therefore partition the exploration trajectory into 
+M
+M
+ equal-length segments.
+For each segment 
+s
+∈
+{
+1
+,
+⋯
+,
+M
+}
+s\in\{1,\cdots,M\}
+, we compute the corresponding FIM 
+F
+(
+s
+)
+F^{(s)}
+ and the associated decoupling factor.
+
+
+
+
+
+
+Coverage score.
+
+We assign each parameter the highest decoupling score across all segments,
+
+
+
+
+
+
+
+
+
+c
+i
+=
+max
+s
+∈
+{
+1
+,
+…
+,
+M
+}
+⁡
+d
+i
+​
+(
+F
+(
+s
+)
+,
+α
+i
+)
+.
+c_{i}=\max_{s\in\{1,\ldots,M\}}d_{i}(F^{(s)};\alpha_{i}).\vskip-4.0pt
+
+
+
+
+(14)
+
+
+
+
+The 
+max
+\max
+ over segments assigns each parameter to the segment in which it is most cleanly separated, which allows different segments to specialize in different subsets of parameters.
+
+
+
+
+
+
+IDTD objective.
+
+In place of Eq. (
+4
+), 
+IDTD
+ maximizes the logarithmic sum of the per-parameter coverage scores defined in Eq. (
+14
+),
+
+
+
+
+
+
+
+
+
+𝐜
+⋆
+=
+arg
+⁡
+max
+⁡
+∑
+i
+=
+1
+N
+𝐜
+⁡
+log
+⁡
+(
+c
+i
++
+ε
+)
+,
+\mathbf{c}^{\star}=\arg\max_{\mathbf{c}}\;\sum_{i=1}^{N}\log\big(c_{i}+\varepsilon\big),\vskip-4.0pt
+
+
+
+
+(15)
+
+
+
+
+with a small 
+ε
+\varepsilon
+ for numerical stability.
+Under the logarithm, a parameter with 
+c
+i
+→
+0
+c_{i}\to 0
+, meaning that 
+θ
+i
+\theta_{i}
+ is not decoupled in any segment, drives the objective toward 
+−
+∞
+-\infty
+.
+This formulation emphasizes poorly covered parameters while still rewarding improvements across all parameters.
+The objective therefore encourages different trajectory segments to provide complementary information, such that every parameter is well identified in at least one segment.
+The complete trajectory-design pipeline of 
+IDTD
+ is summarized in Fig. 
+1
+, and the corresponding optimization procedure is given in Algorithm 
+1
+.
+
+
+
+
+
+
+
+
+
+
+V 
+Experiments
+
+
+
+
+
+We evaluate 
+IDTD
+ on the linear-dynamics system, in physics-based simulation, and on a real Booster K1 robot.
+
+
+
+
+
+
+V-A
+ 
+Linear-Dynamics System
+
+
+
+
+
+To validate the analysis of Sec. 
+IV-A
+, we manually construct two excitation trajectories on the mass-damper system that differ in how strongly the two parameters are coupled.
+Specifically, we collect sequences of states 
+x
+t
+x_{t}
+ and inputs 
+u
+t
+u_{t}
+ following the dynamics in Eq. (
+5
+).
+The 
+coupled
+ trajectory applies a sustained positive input, producing large 
+∑
+t
+u
+t
+2
+\sum_{t}u_{t}^{2}
+ and 
+∑
+t
+x
+˙
+t
+2
+\sum_{t}\dot{x}_{t}^{2}
+ while also inducing strong coupling through the cross term 
+∑
+t
+u
+t
+​
+x
+˙
+t
+\sum_{t}u_{t}\dot{x}_{t}
+.
+The 
+decoupled
+ trajectory alternates between high- and low-input phases, maintaining strong excitation while suppressing 
+∑
+t
+u
+t
+​
+x
+˙
+t
+\sum_{t}u_{t}\dot{x}_{t}
+ by alternating between excitation regimes that predominantly excite 
+θ
+\theta
+ and 
+ϕ
+\phi
+, respectively.
+
+
+
+
+
+
+Figure 
+2
+ plots the trajectory matching costs and the absolute parameter-estimation errors over CMA-ES iterations.
+Both trajectories converge to a matching cost close to the noise floor on the identification data, indicating that the observed trajectory can be reproduced almost equally well in both cases.
+However, the coupled trajectory retains large parameter-estimation errors and exhibits substantially higher prediction error on the held-out trajectory, whereas the decoupled trajectory accurately recovers both parameters and predicts the held-out trajectory close to the noise floor.
+This result shows that a strongly coupled trajectory can be explained by an incorrect parameter combination, making a low trajectory matching cost insufficient evidence of accurate system identification and confirming the importance of suppressing parameter coupling for accurate identification.
+
+
+
+
+
+
+Fig. 2: 
+Trajectory matching loss and parameter estimation error over CMA-ES iterations.
+Shaded regions indicate 
+95
+%
+95\%
+ confidence intervals.
+
+
+
+
+
+
+
+
+V-B
+ 
+Physics-Based Simulation
+
+
+
+
+
+Environments and parameters.
+
+We evaluate in Newton simulation 
+[
+9
+]
+, where the ground-truth parameters are available.
+This setting enables direct measurement of identification accuracy and isolates the effect of trajectory design from real-world uncertainties.
+We use the Unitree Go2 quadruped, the Unitree G1 humanoid, and the Crazyflie quadrotor.
+
+
+
+
+
+
+For the Go2, we identify 50 parameters comprising the base inertial parameters in a log-Cholesky parameterization 
+[
+23
+, 
+5
+, 
+24
+]
+, per-joint proportional and derivative gains, per-joint Coulomb friction torques, and per-foot contact friction coefficients.
+For the G1, we identify 68 parameters comprising the base inertial parameters and per-joint gains.
+For the Crazyflie, we identify 17 parameters comprising thrust coefficients, moment coefficients, motor time constants, diagonal inertia terms, and center-of-mass offsets.
+
+
+
+
+
+
+Baselines.
+
+We compare 
+IDTD
+ against four trajectory-design methods that differ in the command sequences used for data collection.
+
+SPI-Active
+ 
+[
+5
+]
+, which minimizes 
+tr
+⁡
+(
+F
+−
+1
+)
+\operatorname{tr}(F^{-1})
+ as defined in Eq. (
+4
+);
+
+E-Optimal
+, which maximizes the minimum eigenvalue 
+λ
+min
+​
+(
+F
+)
+\lambda_{\min}(F)
+ of the FIM;
+
+QOED
+ 
+[
+20
+]
+, which selects a subset of identifiable parameters through an eigenspace analysis of the FIM, treats the remaining parameters as nuisance variables, and maximizes the trace of the Schur complement of the selected block;
+
+Passive
+, which reuses the nominal commands, moving in each direction for a fixed duration without active trajectory optimization.
+For all methods, the collected trajectories are passed to the same CMA-ES-based system identification procedure, which minimizes Eq. (
+1
+).
+
+
+
+
+
+
+IDTD
+ Implementation.
+
+Since optimizing the command at every timestep using Eq. (
+15
+) is intractable, we optimize a small set of control points and recover the command sequence by resampling a degree-
+5
+5
+ Bézier curve fitted through them, following 
+[
+5
+]
+.
+Each data collection episode lasts 
+10
+10
+ seconds and is divided into 
+M
+=
+5
+M=5
+ segments of 
+2
+2
+ seconds, and a separate set of control points is optimized for each segment, so that different segments are free to specialize in different subsets of parameters.
+The command space of the pretrained policy bounds the range of motions over which the trajectory design can search.
+For the Go2, we therefore adopt the multiplicity-of-behavior formulation of Walk These Ways 
+[
+25
+]
+ and train a policy conditioned on base velocity together with gait frequency, gait phase, foot swing height, and body height, so that varying the command yields qualitatively distinct locomotion behaviors.
+For the G1 and the CrazyFlie we keep the standard command spaces, a velocity-tracking policy conditioned on the base linear and angular velocity for the G1 and a position-tracking policy conditioned on a target position for the CrazyFlie.
+
+
+
+
+
+
+For trajectory optimization, we use CMA-ES with an initial standard
+deviation of 
+0.25
+0.25
+ and optimize for at most 
+3000
+3000
+ generations, with
+early stopping when the objective variation falls below 
+10
+−
+3
+10^{-3}
+.
+The population sizes are 
+20
+20
+, 
+12
+12
+, and 
+20
+20
+ for Go2, G1, and
+Crazyflie, respectively.
+For finite-difference sensitivity estimation, we evaluate eight
+parallel groups for each candidate and periodically synchronize the
+perturbed environments with the nominal environment every five
+simulation steps.
+We regularize the Fisher submatrices used in the Schur complement by
+
+10
+−
+6
+​
+I
+10^{-6}I
+ and use 
+ε
+=
+10
+−
+6
+\varepsilon=10^{-6}
+ in
+Eq. (
+15
+).
+Additional implementation details, including parameter-specific
+perturbation steps and decoupling exponents, are provided in the
+Appendix.
+
+
+
+
+
+
+TABLE I: 
+Normalized parameter-identification error (%). 
+
+Mean 
+±
+\pm
+ 
+95
+%
+95\%
+ confidence interval, darker = higher rank.
+
+
+
+
+
+
+Group
+
+
+IDTD
+
+
+SPI-Active
+
+
+E-Opt
+
+
+QOED
+
+
+Passive
+
+
+
+
+Go2 (50D)
+
+
+
+
+k
+p
+k_{p}
+
+
+5.23
+\mathbf{5.23}
+ 
+±
+0.7
+\pm 0.7
+
+
+6.41
+6.41
+ 
+±
+0.4
+\pm 0.4
+
+
+9.07
+9.07
+ 
+±
+0.8
+\pm 0.8
+
+
+10.38
+10.38
+ 
+±
+0.6
+\pm 0.6
+
+
+9.19
+9.19
+ 
+±
+0.6
+\pm 0.6
+
+
+
+
+k
+d
+k_{d}
+
+
+6.71
+6.71
+ 
+±
+0.7
+\pm 0.7
+
+
+6.55
+\mathbf{6.55}
+ 
+±
+0.4
+\pm 0.4
+
+
+12.00
+12.00
+ 
+±
+1.0
+\pm 1.0
+
+
+113.48
+113.48
+ 
+±
+36.9
+\pm 36.9
+
+
+7.79
+7.79
+ 
+±
+0.5
+\pm 0.5
+
+
+
+
+Joint
+
+
+10.99
+\mathbf{10.99}
+ 
+±
+1.4
+\pm 1.4
+
+
+16.89
+16.89
+ 
+±
+1.1
+\pm 1.1
+
+
+26.43
+26.43
+ 
+±
+3.1
+\pm 3.1
+
+
+34.67
+34.67
+ 
+±
+2.5
+\pm 2.5
+
+
+21.06
+21.06
+ 
+±
+0.9
+\pm 0.9
+
+
+
+
+Foot
+
+
+5.90
+5.90
+ 
+±
+0.9
+\pm 0.9
+
+
+8.69
+8.69
+ 
+±
+0.9
+\pm 0.9
+
+
+7.75
+7.75
+ 
+±
+1.3
+\pm 1.3
+
+
+5.18
+5.18
+ 
+±
+0.5
+\pm 0.5
+
+
+5.09
+\mathbf{5.09}
+ 
+±
+0.3
+\pm 0.3
+
+
+
+
+Base
+
+
+7.71
+\mathbf{7.71}
+ 
+±
+1.3
+\pm 1.3
+
+
+12.85
+12.85
+ 
+±
+1.4
+\pm 1.4
+
+
+12.44
+12.44
+ 
+±
+2.2
+\pm 2.2
+
+
+19.51
+19.51
+ 
+±
+1.0
+\pm 1.0
+
+
+12.86
+12.86
+ 
+±
+1.1
+\pm 1.1
+
+
+
+
+All
+
+
+7.31
+\mathbf{7.31}
+ 
+±
+0.6
+\pm 0.6
+
+
+10.28
+10.28
+ 
+±
+0.6
+\pm 0.6
+
+
+13.54
+13.54
+ 
+±
+1.1
+\pm 1.1
+
+
+36.65
+36.65
+ 
+±
+7.4
+\pm 7.4
+
+
+11.20
+11.20
+ 
+±
+0.6
+\pm 0.6
+
+
+
+
+G1 (68D)
+
+
+
+
+k
+p
+k_{p}
+
+
+1.11
+\mathbf{1.11}
+ 
+±
+0.2
+\pm 0.2
+
+
+3.50
+3.50
+ 
+±
+0.2
+\pm 0.2
+
+
+4.05
+4.05
+ 
+±
+0.4
+\pm 0.4
+
+
+2.64
+2.64
+ 
+±
+0.3
+\pm 0.3
+
+
+5.16
+5.16
+ 
+±
+0.9
+\pm 0.9
+
+
+
+
+k
+d
+k_{d}
+
+
+2.60
+\mathbf{2.60}
+ 
+±
+0.5
+\pm 0.5
+
+
+4.89
+4.89
+ 
+±
+0.4
+\pm 0.4
+
+
+7.88
+7.88
+ 
+±
+1.2
+\pm 1.2
+
+
+4.17
+4.17
+ 
+±
+1.0
+\pm 1.0
+
+
+23.82
+23.82
+ 
+±
+6.0
+\pm 6.0
+
+
+
+
+Base
+
+
+0.11
+\mathbf{0.11}
+ 
+±
+0.0
+\pm 0.0
+
+
+2.76
+2.76
+ 
+±
+0.4
+\pm 0.4
+
+
+3.52
+3.52
+ 
+±
+1.5
+\pm 1.5
+
+
+0.19
+0.19
+ 
+±
+0.1
+\pm 0.1
+
+
+2.54
+2.54
+ 
+±
+1.4
+\pm 1.4
+
+
+
+
+All
+
+
+1.28
+\mathbf{1.28}
+ 
+±
+0.2
+\pm 0.2
+
+
+3.72
+3.72
+ 
+±
+0.3
+\pm 0.3
+
+
+5.15
+5.15
+ 
+±
+0.5
+\pm 0.5
+
+
+2.33
+2.33
+ 
+±
+0.4
+\pm 0.4
+
+
+10.50
+10.50
+ 
+±
+2.6
+\pm 2.6
+
+
+
+
+Crazyflie (17D)
+
+
+
+
+k
+f
+k_{f}
+
+
+2.14
+2.14
+ 
+±
+0.2
+\pm 0.2
+
+
+1.34
+1.34
+ 
+±
+0.2
+\pm 0.2
+
+
+1.48
+1.48
+ 
+±
+0.5
+\pm 0.5
+
+
+2.34
+2.34
+ 
+±
+0.1
+\pm 0.1
+
+
+1.30
+\mathbf{1.30}
+ 
+±
+0.2
+\pm 0.2
+
+
+
+
+k
+m
+k_{m}
+
+
+3.44
+3.44
+ 
+±
+0.6
+\pm 0.6
+
+
+6.13
+6.13
+ 
+±
+1.3
+\pm 1.3
+
+
+2.64
+\mathbf{2.64}
+ 
+±
+1.4
+\pm 1.4
+
+
+8.15
+8.15
+ 
+±
+0.1
+\pm 0.1
+
+
+5.73
+5.73
+ 
+±
+1.1
+\pm 1.1
+
+
+
+
+τ
+\tau
+
+
+0.84
+0.84
+ 
+±
+0.1
+\pm 0.1
+
+
+0.90
+0.90
+ 
+±
+0.1
+\pm 0.1
+
+
+0.72
+\mathbf{0.72}
+ 
+±
+0.2
+\pm 0.2
+
+
+1.24
+1.24
+ 
+±
+0.1
+\pm 0.1
+
+
+0.91
+0.91
+ 
+±
+0.1
+\pm 0.1
+
+
+
+
+I
+d
+I_{d}
+
+
+2.04
+2.04
+ 
+±
+0.3
+\pm 0.3
+
+
+2.80
+2.80
+ 
+±
+0.4
+\pm 0.4
+
+
+1.50
+\mathbf{1.50}
+ 
+±
+0.5
+\pm 0.5
+
+
+4.27
+4.27
+ 
+±
+0.3
+\pm 0.3
+
+
+2.68
+2.68
+ 
+±
+0.3
+\pm 0.3
+
+
+
+
+All
+
+
+2.11
+2.11
+ 
+±
+0.2
+\pm 0.2
+
+
+2.79
+2.79
+ 
+±
+0.4
+\pm 0.4
+
+
+1.59
+\mathbf{1.59}
+ 
+±
+0.5
+\pm 0.5
+
+
+4.00
+4.00
+ 
+±
+0.1
+\pm 0.1
+
+
+2.66
+2.66
+ 
+±
+0.4
+\pm 0.4
+
+
+
+
+
+
+
+
+Fig. 3: 
+(a) Overall identification error on each platform. (b) Error ratio of each baseline to 
+IDTD
+, where values above the dotted line indicate higher error than 
+IDTD
+. Shaded bands show 
+95
+%
+95\%
+ confidence intervals.
+
+
+
+
+
+
+Main results.
+
+Table 
+I
+ compares parameter identification accuracy against the ground-truth parameters on Go2, G1, and Crazyflie.
+For each method, we optimize exploration commands for 
+2
+2
+ pretrained policies and run system identification with 
+5
+5
+ seeds each, yielding 
+10
+10
+ runs in total.
+We report the absolute parameter error normalized by its search range as a percentage (mean 
+±
+\pm
+ 95% confidence interval), with shading indicating the top three methods within each parameter group.
+
+
+
+
+
+
+Across Go2 and G1, 
+IDTD
+ achieves the lowest overall identification error, reducing the error from 
+10.28
+%
+10.28\%
+ to 
+7.31
+%
+7.31\%
+ on the Go2 and from 
+3.72
+%
+3.72\%
+ to 
+1.28
+%
+1.28\%
+ on the G1 compared with 
+SPI-Active
+.
+The improvements are particularly pronounced for 
+k
+p
+k_{p}
+, 
+k
+d
+k_{d}
+, joint friction, and base inertial parameters, which are easily entangled during locomotion because different combinations of actuator gains, friction, and inertial parameters can produce similar joint motions.
+On the Crazyflie, 
+IDTD
+ remains competitive at 
+2.11
+%
+2.11\%
+ overall error, while E-Optimal achieves the lowest error at 
+1.59
+%
+1.59\%
+.
+Figure 
+3
+ further highlights the stronger relative advantage of 
+IDTD
+ on the higher-dimensional identification problems, except against QOED on the G1, whose subset-selection strategy leads to less consistent performance across morphologies.
+These results demonstrate that the per-parameter decoupling objective in 
+IDTD
+ improves parameter identifiability during the trajectory design stage, enabling reliable estimation across systems with different morphologies and parameter dimensions.
+
+
+
+
+
+
+Forward-dynamics fidelity.
+
+To assess how faithfully the identified parameters reproduce the target system dynamics, we set each method’s estimate in simulation and measure forward-dynamics prediction error.
+Since a low prediction error on identification trajectories does not necessarily imply accurate identification (Sec. 
+V-A
+), we evaluate on held-out trajectories that span a broad range of the robot’s operating space.
+Figure 
+4
+ shows the open-loop joint-position and joint-velocity prediction errors as the rollout horizon increases.
+
+IDTD
+ achieves the lowest prediction error across rollout horizons, providing further evidence that its estimates describe the target system rather than only the identification trajectories.
+
+
+
+
+
+
+Fig. 4: 
+Forward-dynamics prediction error versus rollout horizon on the Go2. Shaded bands show 
+95
+%
+95\%
+ confidence intervals.
+
+
+
+
+
+
+TABLE II: 
+Downstream transfer performance on the Go2.
+
+Mean 
+±
+\pm
+ 95% confidence interval, darker = higher rank.
+
+
+
+
+
+
+Method
+
+
+Lin. (m/s)
+
+
+Ang. (rad/s)
+
+
+Fall (%)
+
+
+Energy (J/m)
+
+
+
+
+IDTD
+
+
+0.159
+\mathbf{0.159}
+ 
+±
+.001
+\pm.001
+
+
+0.177
+\mathbf{0.177}
+ 
+±
+.002
+\pm.002
+
+
+0.71
+\mathbf{0.71}
+ 
+±
+0.26
+\pm 0.26
+
+
+242.8
+\mathbf{242.8}
+ 
+±
+2.7
+\pm 2.7
+
+
+
+
+SPI-Active
+
+
+0.186
+0.186
+ 
+±
+.002
+\pm.002
+
+
+0.187
+0.187
+ 
+±
+.002
+\pm.002
+
+
+1.81
+1.81
+ 
+±
+0.41
+\pm 0.41
+
+
+255.4
+255.4
+ 
+±
+2.7
+\pm 2.7
+
+
+
+
+Passive
+
+
+0.190
+0.190
+ 
+±
+.002
+\pm.002
+
+
+0.234
+0.234
+ 
+±
+.003
+\pm.003
+
+
+2.59
+2.59
+ 
+±
+0.49
+\pm 0.49
+
+
+270.2
+270.2
+ 
+±
+3.1
+\pm 3.1
+
+
+
+
+Zero-shot
+
+
+0.364
+0.364
+ 
+±
+.004
+\pm.004
+
+
+0.433
+0.433
+ 
+±
+.006
+\pm.006
+
+
+22.35
+22.35
+ 
+±
+1.26
+\pm 1.26
+
+
+547.9
+547.9
+ 
+±
+7.4
+\pm 7.4
+
+
+
+
+
+
+
+
+Downstream transfer.
+
+
+To evaluate whether improved identification leads to better policy performance under the target dynamics, we conduct a transfer experiment on the Go2.
+Specifically, for each method, we retrain a policy under the identified dynamics and evaluate the resulting policy on the ground-truth target dynamics.
+As the identification errors of E-Optimal and QOED are substantially larger on the Go2 (Table 
+I
+), policy training under their identified dynamics does not yield stable policies, so we exclude them from the transfer evaluation.
+We additionally include a zero-shot baseline that directly deploys a policy trained with the nominal simulator parameters.
+As shown in Table 
+II
+, 
+IDTD
+ achieves the lowest linear and angular velocity tracking errors, fall rate, and energy consumption among all methods.
+The lower energy consumption is consistent with improved PD-gain identification reducing unnecessary corrective actuation.
+These results show that the parameters identified by 
+IDTD
+ translate into better downstream policy transfer to the target dynamics.
+
+
+
+
+
+
+Parameter coupling under each objective.
+
+To analyze parameter coupling, we examine the FIM induced by each exploration method on G1.
+Specifically, for the 
+(
+k
+p
+,
+k
+d
+)
+(k_{p},k_{d})
+ pair of the wrist-pitch joint, we visualize the 
+95
+%
+95\%
+ confidence ellipse from the corresponding block 
+C
+=
+(
+F
+−
+1
+)
+i
+​
+j
+C=(F^{-1})_{{ij}}
+, which the Cramér–Rao bound gives as a lower bound on their covariance.
+We additionally report the normalized Fisher correlation 
+ρ
+i
+​
+j
+=
+F
+i
+​
+j
+/
+F
+i
+​
+i
+​
+F
+j
+​
+j
+\rho_{ij}=F_{ij}/\sqrt{F_{ii}F_{jj}}
+ between 
+k
+p
+k_{p}
+ and 
+k
+d
+k_{d}
+ across G1 joints.
+
+
+
+
+
+
+In Figure 
+5
+, 
+IDTD
+ produces a substantially more isotropic ellipse, while 
+SPI-Active
+ and 
+E-Optimal
+ yield highly elongated ellipses.
+An elongated ellipse indicates strong parameter coupling because its major axis represents a direction of high uncertainty along which changes in one parameter can be compensated by changes in the other.
+Consequently, one parameter can be overestimated while the other is underestimated without being well distinguished by the observed trajectory.
+In contrast, the more isotropic ellipse of 
+IDTD
+ indicates weaker coupling and therefore constrains the individual parameters to a more localized region.
+The same trend holds across the G1 joints, where 
+IDTD
+ yields larger 
+1
+−
+|
+ρ
+i
+​
+j
+|
+1-|\rho_{ij}|
+ overall for the 
+(
+k
+p
+,
+k
+d
+)
+(k_{p},k_{d})
+ pairs beyond the representative example.
+Although the A-optimal criterion of 
+SPI-Active
+ also implicitly penalizes this correlation, it does not separate this effect from information quantity, resulting in weaker parameter separation in practice.
+This confirms that the decoupling objective of 
+IDTD
+ suppresses the parameter correlation responsible for error absorption between parameters, providing a mechanistic explanation for the improved identification accuracy.
+
+
+
+
+
+
+Fig. 5: 
+
+Left: covariance ellipse for the 
+(
+k
+p
+,
+k
+d
+)
+(k_{p},k_{d})
+ pair of the wrist-pitch joint.
+Right: 
+1
+−
+|
+ρ
+i
+​
+j
+|
+1-|\rho_{ij}|
+ for the 
+(
+k
+p
+,
+k
+d
+)
+(k_{p},k_{d})
+ pair of all G1 joints.
+
+
+
+
+
+
+Excitation allocation.
+
+To characterize how different objectives allocate excitation, we train the full G1 policy, rather than optimizing its commands, using each method’s objective as the policy reward.
+In Figure 
+6
+, the left panel reports the excitation of each kinematic channel relative to 
+SPI-Active
+, and the right panel reports the decoupling factor 
+d
+i
+d_{i}
+ from Eq. (
+13
+).
+
+
+
+
+
+
+Compared with 
+SPI-Active
+, 
+IDTD
+ produces substantially stronger limb motion, increasing arm and leg joint velocities to 
+1.95
+×
+1.95\times
+ and 
+1.44
+×
+1.44\times
+, respectively, while expanding the arm-angle range to 
+1.30
+×
+1.30\times
+.
+
+E-Optimal
+ instead falls below 
+SPI-Active
+ on every channel, which suggests that its minimum-eigenvalue objective provides little incentive to increase excitation in already informative directions.
+
+SPI-Active
+, on the other hand, induces the strongest base and waist motion among the three methods, consistent with its objective, which can favor aggressive base motion as an easy way to lower the aggregate estimation uncertainty even when the parameter effects remain coupled.
+The right panel shows that 
+IDTD
+ achieves substantially higher decoupling factors across all three parameter groups.
+
+E-Optimal
+ also improves 
+d
+i
+d_{i}
+ over 
+SPI-Active
+, but, as shown in the left panel, does so under weaker excitation.
+Together, the two panels show that 
+IDTD
+ combines targeted excitation with strong parameter decoupling, whereas 
+SPI-Active
+ favors strong excitation with weak decoupling and 
+E-Optimal
+ improves decoupling but with limited excitation.
+
+
+
+
+
+
+Fig. 6: 
+Left: the excitation of each kinematic channel relative to 
+SPI-Active
+ on a 
+log
+2
+\log_{2}
+ scale. Right: the per-group mean of the decoupling factor 
+d
+i
+d_{i}
+.
+
+
+
+
+
+
+TABLE III: 
+Ablation of 
+IDTD
+ design choices on the Go2 (50D). 
+
+Mean 
+±
+\pm
+ 95% confidence interval, darker = higher rank.
+
+
+
+
+
+
+Group
+
+
+IDTD
+
+
+Mean agg.
+
+
+Unidelta
+
+
+𝜶
+=
+𝟎
+\boldsymbol{\alpha=0}
+
+
+
+
+k
+p
+k_{p}
+
+
+5.23
+\mathbf{5.23}
+ 
+±
+0.7
+\pm 0.7
+
+
+8.18
+8.18
+ 
+±
+1.0
+\pm 1.0
+
+
+7.39
+7.39
+ 
+±
+0.4
+\pm 0.4
+
+
+16.30
+16.30
+ 
+±
+0.9
+\pm 0.9
+
+
+
+
+k
+d
+k_{d}
+
+
+6.71
+\mathbf{6.71}
+ 
+±
+0.7
+\pm 0.7
+
+
+11.72
+11.72
+ 
+±
+1.5
+\pm 1.5
+
+
+9.05
+9.05
+ 
+±
+0.7
+\pm 0.7
+
+
+14.85
+14.85
+ 
+±
+1.8
+\pm 1.8
+
+
+
+
+Joint
+
+
+10.99
+\mathbf{10.99}
+ 
+±
+1.4
+\pm 1.4
+
+
+19.63
+19.63
+ 
+±
+1.5
+\pm 1.5
+
+
+11.03
+11.03
+ 
+±
+0.7
+\pm 0.7
+
+
+51.41
+51.41
+ 
+±
+2.7
+\pm 2.7
+
+
+
+
+Foot
+
+
+5.90
+5.90
+ 
+±
+0.9
+\pm 0.9
+
+
+7.31
+7.31
+ 
+±
+1.0
+\pm 1.0
+
+
+4.29
+\mathbf{4.29}
+ 
+±
+0.5
+\pm 0.5
+
+
+15.09
+15.09
+ 
+±
+0.8
+\pm 0.8
+
+
+
+
+Base
+
+
+7.71
+7.71
+ 
+±
+1.3
+\pm 1.3
+
+
+5.51
+\mathbf{5.51}
+ 
+±
+2.3
+\pm 2.3
+
+
+9.81
+9.81
+ 
+±
+1.2
+\pm 1.2
+
+
+15.77
+15.77
+ 
+±
+1.9
+\pm 1.9
+
+
+
+
+All
+
+
+7.31
+\mathbf{7.31}
+ 
+±
+0.6
+\pm 0.6
+
+
+10.47
+10.47
+ 
+±
+0.9
+\pm 0.9
+
+
+8.31
+8.31
+ 
+±
+0.4
+\pm 0.4
+
+
+22.68
+22.68
+ 
+±
+0.9
+\pm 0.9
+
+
+
+
+
+
+
+
+Ablation.
+
+In Table 
+III
+, we ablate three design choices on the Go2.
+
+Mean agg.
+ replaces the 
+max
+\max
+ over segments in Eq. (
+14
+) and the logarithmic sum over parameters in Eq. (
+15
+) with plain averages, removing mechanisms that promote coverage of weakly covered parameters.
+
+Unidelta
+ removes the sensitivity normalization of Sec. 
+IV-C
+ and perturbs every parameter by a common absolute step.
+
+𝜶
+=
+𝟎
+\boldsymbol{\alpha=0}
+ removes the decoupling normalization, so the score reverts to the raw Schur complement.
+
+
+
+
+
+
+Mean agg.
+ increases the overall error from 
+7.31
+%
+7.31\%
+ to 
+10.47
+%
+10.47\%
+ and particularly degrades joint-friction identification, as weaker coverage pressure concentrates excitation on the base.
+
+Unidelta
+ overweights the foot-friction parameters under a common perturbation scale, increasing the overall error from 
+7.31
+%
+7.31\%
+ to 
+8.31
+%
+8.31\%
+.
+
+𝜶
+=
+𝟎
+\boldsymbol{\alpha=0}
+ is most damaging, raising the error to 
+22.68
+%
+22.68\%
+, as the objective becomes dominated by absolute information magnitude rather than parameter decoupling.
+These results clarify the role of each component under uneven parameter coverage, sensitivity, and information magnitude.
+
+
+
+
+
+
+
+
+V-C
+ 
+Real-world Experiments
+
+
+
+
+
+Setup.
+
+We deploy 
+IDTD
+ on a real Booster K1 humanoid to validate its effectiveness for real-world system identification.
+Our hardware setup uses onboard proprioceptive sensing from joint encoders and an IMU, without external motion capture.
+We therefore focus on actuator- and joint-level parameters rather than floating-base inertial properties such as the CoM and body inertia.
+Specifically, we identify a 60-dimensional parameter space consisting of actuator torque-lag time constants (8D), which capture first-order torque-response delay; velocity-dependent actuator gains (8D), which model transmission losses during joint motion; joint-friction coefficients (22D); and joint armatures (22D), which represent reflected rotor inertia.
+For the actuator parameters, we group corresponding left- and right-side joints by motor class and limb segment, resulting in eight groups for both torque lag and dynamic gain.
+We use the Newton physics simulator 
+[
+9
+]
+ for forward simulation and parameter identification.
+The state components used in the identification objective in Eq. (
+1
+) are the base orientation and angular velocity from the onboard IMU and the joint positions and velocities from the encoders.
+
+
+
+
+
+
+TABLE IV: 
+Open-loop prediction on real-world K1 trajectories. 
+
+Mean 
+±
+\pm
+ 95% confidence interval; darker = higher rank.
+
+
+
+
+
+
+Method
+
+
+Cost
+
+
+q
+q
+ (deg)
+
+
+q
+˙
+\dot{q}
+ (rad/s)
+
+
+ω
+\omega
+ (rad/s)
+
+
+Orient. (deg)
+
+
+
+
+Nominal
+
+
+2.291
+2.291
+
+
+1.146
+1.146
+
+
+0.519
+0.519
+
+
+0.322
+0.322
+
+
+1.247
+1.247
+
+
+
+
+Passive
+
+
+2.018
+2.018
+±
+.003
+\pm.003
+
+
+1.095
+1.095
+±
+.001
+\pm.001
+
+
+0.482
+0.482
+±
+.001
+\pm.001
+
+
+0.314
+0.314
+±
+.001
+\pm.001
+
+
+1.242
+1.242
+±
+.004
+\pm.004
+
+
+
+
+SPI-Active
+
+
+2.061
+2.061
+±
+.005
+\pm.005
+
+
+1.108
+1.108
+±
+.004
+\pm.004
+
+
+0.489
+0.489
+±
+.001
+\pm.001
+
+
+0.312
+\mathbf{0.312}
+±
+.001
+\pm.001
+
+
+1.252
+{1.252}
+±
+.003
+\pm.003
+
+
+
+
+IDTD
+
+
+1.961
+\mathbf{1.961}
+±
+.005
+\pm.005
+
+
+1.074
+\mathbf{1.074}
+±
+.002
+\pm.002
+
+
+0.473
+\mathbf{0.473}
+±
+.001
+\pm.001
+
+
+0.314
+0.314
+±
+.001
+\pm.001
+
+
+1.233
+\mathbf{1.233}
+±
+.005
+\pm.005
+
+
+
+
+
+
+
+
+Results.
+
+We evaluate the identified parameters by measuring open-loop prediction error on held-out trajectories that were not used for identification.
+Table 
+IV
+ reports the weighted prediction cost from Eq. (
+1
+), together with the prediction errors for joint position 
+q
+q
+, joint velocity 
+q
+˙
+\dot{q}
+, base angular velocity 
+ω
+\omega
+, and base orientation.
+All three methods improve over the nominal model, showing that system identification recovers parameters that better capture real-world dynamics.
+
+IDTD
+ attains the largest cost reduction at 
+14.4
+%
+14.4\%
+, compared with 
+11.9
+%
+11.9\%
+ for 
+Passive
+ and 
+10.0
+%
+10.0\%
+ for 
+SPI-Active
+, and achieves the lowest error on most state components.
+Together, these results demonstrate the applicability of 
+IDTD
+ to real-world system identification on humanoid hardware.
+Real-world exploration videos are provided in the supplementary video.
+
+
+
+
+
+
+
+
+
+
+VI 
+Conclusion
+
+
+
+
+
+We presented 
+IDTD
+, a trajectory design framework for reliable sampling-based system identification that explicitly accounts for parameter separability during data collection.
+
+IDTD
+ combines a normalized Schur-complement score with segment-wise coverage and logarithmic aggregation to balance parameter separability and information quantity.
+Across simulated Go2, G1, and Crazyflie platforms, 
+IDTD
+ improved identification accuracy, dynamics prediction, and parameter decoupling, while on the Booster K1 humanoid the identified parameters predicted unseen real trajectories more accurately.
+
+
+
+
+
+
+Limitations and future work.
+
+While 
+IDTD
+ improves forward-dynamics prediction on the real K1, downstream control improvements remain limited, possibly due to the restricted parameter space identifiable from onboard sensing.
+Future work could use more accurate state estimation, such as external motion capture, to identify a broader parameter set and improve downstream transfer.
+
+
+
+
+
+
+
+
+References
+
+
+
+
+
+[1]
+
+
+J. Lee, A. Dosovitskiy, D. Bellicoso, V. Tsounis, V. Koltun, and M. Hutter
+ (2019)
+
+
+
+
+Learning agile and dynamic motor skills for legged robots
+.
+
+
+
+Sci. Robotics
+ 
+4
+ (
+26
+).
+
+
+
+Cited by: 
+§I
+.
+
+
+
+[2]
+
+
+W. Zhao, J. P. Queralta, and T. Westerlund
+
+
+
+
+Sim-to-real transfer in deep reinforcement learning for robotics: a survey
+.
+
+
+
+In 
+2020 IEEE Symposium Series on Computational Intelligence, SSCI
+2020
+,
+
+
+
+Cited by: 
+§I
+.
+
+
+
+[3]
+
+
+J. Tobin, R. Fong, A. Ray, J. Schneider, W. Zaremba, and P. Abbeel
+
+
+
+
+Domain randomization for transferring deep neural networks from simulation to the real world
+.
+
+
+
+In 
+2017 IEEE/RSJ International Conference on Intelligent Robots and
+Systems, IROS 2017
+,
+
+
+
+Cited by: 
+§I
+,
+
+§II-A
+.
+
+
+
+[4]
+
+
+X. B. Peng, M. Andrychowicz, W. Zaremba, and P. Abbeel
+
+
+
+
+Sim-to-real transfer of robotic control with dynamics randomization
+.
+
+
+
+In 
+2018 IEEE International Conference on Robotics and Automation, ICRA
+2018
+,
+
+
+
+Cited by: 
+§I
+,
+
+§II-A
+.
+
+
+
+[5]
+
+
+N. Sobanbabu, G. He, T. He, Y. Yang, and G. Shi
+ (2025)
+
+
+
+
+Sampling-based system identification with active exploration for legged robot sim2real learning
+.
+
+
+
+CoRR
+ 
+abs/2505.14266
+.
+
+
+
+Cited by: 
+§I
+,
+
+§I
+,
+
+§II-A
+,
+
+§II-B
+,
+
+§III-B
+,
+
+§III-B
+,
+
+§V-B
+,
+
+§V-B
+,
+
+§V-B
+.
+
+
+
+[6]
+
+
+M. Memmel, A. Wagenmaker, C. Zhu, D. Fox, and A. Gupta
+
+
+
+
+ASID: active exploration for system identification in robotic manipulation
+.
+
+
+
+In 
+The Twelfth International Conference on Learning Representations,
+ICLR 2024
+,
+
+
+
+Cited by: 
+§I
+,
+
+§I
+,
+
+§II-A
+,
+
+§II-B
+,
+
+§III-B
+.
+
+
+
+[7]
+
+
+E. Todorov, T. Erez, and Y. Tassa
+ (2012)
+
+
+
+
+MuJoCo: a physics engine for model-based control
+.
+
+
+
+In 
+2012 IEEE/RSJ International Conference on Intelligent Robots and Systems
+,
+
+
+
+Vol. 
+, 
+pp. 5026–5033
+.
+
+
+
+External Links: 
+Document
+
+
+
+
+Cited by: 
+§I
+.
+
+
+
+[8]
+
+
+V. Makoviychuk, L. Wawrzyniak, Y. Guo, M. Lu, K. Storey, M. Macklin, D. Hoeller, N. Rudin, A. Allshire, A. Handa, and G. State
+
+
+
+
+Isaac gym: high performance GPU based physics simulation for robot learning
+.
+
+
+
+In 
+Proceedings of the Neural Information Processing Systems Track on
+Datasets and Benchmarks 1, NeurIPS Datasets and Benchmarks 2021
+,
+
+
+
+Cited by: 
+§I
+.
+
+
+
+[9]
+
+
+The Newton Developers
+ (2026)
+
+
+
+
+Newton physics documentation
+.
+
+
+
+Note: 
+https://newton-physics.github.io/newton/
+
+
+
+
+Cited by: 
+§I
+,
+
+§V-B
+,
+
+§V-C
+.
+
+
+
+[10]
+
+
+G. A. Team
+ (2026)
+
+
+
+
+The role of simulation in scalable robotics, genesis world 1.0, and the path forward
+.
+
+
+
+Genesis AI Blog
+.
+
+
+
+Cited by: 
+§I
+.
+
+
+
+[11]
+
+
+C. R. Rao 
+et al.
+ (1945)
+
+
+
+
+Information and the accuracy attainable in the estimation of statistical parameters
+.
+
+
+
+Bull. Calcutta Math. Soc
+ 
+37
+ (
+3
+), 
+pp. 81–91
+.
+
+
+
+Cited by: 
+§I
+,
+
+§III-B
+.
+
+
+
+[12]
+
+
+C. G. Atkeson, C. H. An, and J. M. Hollerbach
+ (1986)
+
+
+
+
+Estimation of inertial parameters of manipulator loads and links
+.
+
+
+
+The International Journal of Robotics Research
+ 
+5
+ (
+3
+), 
+pp. 101–119
+.
+
+
+
+Cited by: 
+§II-A
+.
+
+
+
+[13]
+
+
+M. Gautier and W. Khalil
+ (1992)
+
+
+
+
+Exciting trajectories for the identification of base inertial parameters of robots
+.
+
+
+
+The International journal of robotics research
+ 
+11
+ (
+4
+), 
+pp. 362–375
+.
+
+
+
+Cited by: 
+§II-A
+,
+
+§II-B
+.
+
+
+
+[14]
+
+
+S. Chen, K. Werling, A. Wu, and C. K. Liu
+ (2023)
+
+
+
+
+Real-time model predictive control and system identification using differentiable simulation
+.
+
+
+
+IEEE Robotics Autom. Lett.
+ 
+8
+ (
+1
+), 
+pp. 312–319
+.
+
+
+
+Cited by: 
+§II-A
+.
+
+
+
+[15]
+
+
+H. Sathyanarayan and I. Abraham
+ (2024)
+
+
+
+
+Exciting contact modes in differentiable simulations for robot learning
+.
+
+
+
+CoRR
+ 
+abs/2411.10935
+.
+
+
+
+Cited by: 
+§II-A
+,
+
+§II-B
+.
+
+
+
+[16]
+
+
+J. Swevers, C. Ganseman, D. B. Tükel, J. D. Schutter, and H. V. Brussel
+ (1997)
+
+
+
+
+Optimal robot excitation and identification
+.
+
+
+
+IEEE Trans. Robotics Autom.
+ 
+13
+ (
+5
+), 
+pp. 730–740
+.
+
+
+
+Cited by: 
+§II-B
+.
+
+
+
+[17]
+
+
+F. Pukelsheim
+ (2006)
+
+
+
+
+Optimal design of experiments
+.
+
+
+
+ 
+SIAM
+.
+
+
+
+Cited by: 
+§II-B
+.
+
+
+
+[18]
+
+
+E. Dozzi, T. Oomen, and R. A. González
+ (2026)
+
+
+
+
+D-optimized sampling design for system identification
+.
+
+
+
+arXiv preprint arXiv:2605.13120
+.
+
+
+
+Cited by: 
+§II-B
+.
+
+
+
+[19]
+
+
+A. Simpkins
+ (2012)
+
+
+
+
+System identification: theory for the user, 2nd edition (ljung, l.; 1999) [on the shelf]
+.
+
+
+
+IEEE Robotics & Automation Magazine
+ 
+19
+ (
+2
+), 
+pp. 95–96
+.
+
+
+
+External Links: 
+Document
+
+
+
+
+Cited by: 
+§II-B
+.
+
+
+
+[20]
+
+
+Y. Yu, J. Wang, Z. Yu, W. Wang, and L. Liu
+ (2026)
+
+
+
+
+Learning what matters: adaptive information-theoretic objectives for robot exploration
+.
+
+
+
+CoRR
+ 
+abs/2605.12084
+.
+
+
+
+Cited by: 
+§II-B
+,
+
+§V-B
+.
+
+
+
+[21]
+
+
+N. Hansen and A. Ostermeier
+ (2001)
+
+
+
+
+Completely derandomized self-adaptation in evolution strategies
+.
+
+
+
+Evol. Comput.
+.
+
+
+
+Cited by: 
+§III-A
+.
+
+
+
+[22]
+
+
+D. W. Marquaridt
+ (1970)
+
+
+
+
+Generalized inverses, ridge regression, biased linear estimation, and nonlinear estimation
+.
+
+
+
+Technometrics
+ 
+12
+.
+
+
+
+Cited by: 
+§IV-C
+.
+
+
+
+[23]
+
+
+C. Rucker and P. M. Wensing
+ (2022)
+
+
+
+
+Smooth parameterization of rigid-body inertia
+.
+
+
+
+IEEE Robotics and Automation Letters
+.
+
+
+
+Cited by: 
+§V-B
+.
+
+
+
+[24]
+
+
+C. D. Sousa and R. Cortesao
+ (2019)
+
+
+
+
+Inertia tensor properties in robot dynamics identification: a linear matrix inequality approach
+.
+
+
+
+IEEE/ASME Transactions on Mechatronics
+ 
+24
+ (
+1
+), 
+pp. 406–411
+.
+
+
+
+Cited by: 
+§V-B
+.
+
+
+
+[25]
+
+
+G. B. Margolis and P. Agrawal
+ (2023)
+
+
+
+
+Walk these ways: tuning robot control for generalization with multiplicity of behavior
+.
+
+
+
+In 
+Conference on Robot Learning
+,
+
+
+
+pp. 22–31
+.
+
+
+
+Cited by: 
+§V-B
+.
+
+
+
+
+
+
+
+
+
+Appendix A 
+Implementation Details
+
+
+
+
+
+A-A
+ 
+Trajectory Optimization
+
+
+
+
+
+For all platforms, we optimize the exploration command sequence using
+CMA-ES. Each trajectory is divided into 
+M
+=
+5
+M=5
+ segments of 
+2
+2
+ seconds,
+and the command within each segment is represented by a degree-
+5
+5
+
+Bézier curve with six control points per command channel.
+CMA-ES is initialized with 
+σ
+0
+=
+0.25
+\sigma_{0}=0.25
+ and run for at most 
+3000
+3000
+
+generations, with early stopping when the objective variation falls
+below 
+10
+−
+3
+10^{-3}
+.
+The initial mean is obtained by fitting the Bézier control points to
+the center of the admissible command range.
+The population sizes are 
+20
+20
+, 
+12
+12
+, and 
+20
+20
+ for the Go2, G1, and
+Crazyflie, respectively.
+The corresponding command dimensions are 
+9
+9
+, 
+3
+3
+, and 
+2
+2
+.
+Table 
+V
+ summarizes the optimization
+settings.
+
+
+
+
+
+
+TABLE V: 
+Trajectory-optimization settings used in the simulation experiments.
+
+
+
+
+
+
+Setting
+
+
+Go2
+
+
+G1
+
+
+Crazyflie
+
+
+
+
+SysID dimension 
+P
+P
+
+
+50
+
+
+68
+
+
+17
+
+
+
+
+Command dimension 
+C
+C
+
+
+9
+
+
+3
+
+
+2
+
+
+
+
+CMA-ES population
+
+
+20
+
+
+12
+
+
+20
+
+
+
+
+Maximum generations
+
+
+3000
+
+
+3000
+
+
+3000
+
+
+
+
+Initial 
+σ
+0
+\sigma_{0}
+
+
+0.25
+
+
+0.25
+
+
+0.25
+
+
+
+
+Segments 
+M
+M
+
+
+5
+
+
+5
+
+
+5
+
+
+
+
+Bézier degree
+
+
+5
+
+
+5
+
+
+5
+
+
+
+
+Segment duration (s)
+
+
+2.0
+
+
+2.0
+
+
+2.0
+
+
+
+
+Control timestep (s)
+
+
+0.02
+
+
+0.02
+
+
+0.01
+
+
+
+
+Parallel groups
+
+
+8
+
+
+8
+
+
+8
+
+
+
+
+Synchronization interval
+
+
+5
+
+
+5
+
+
+5
+
+
+
+
+Schur regularization
+
+
+10
+−
+6
+10^{-6}
+
+
+10
+−
+6
+10^{-6}
+
+
+10
+−
+6
+10^{-6}
+
+
+
+
+Coverage 
+ε
+\varepsilon
+
+
+10
+−
+6
+10^{-6}
+
+
+10
+−
+6
+10^{-6}
+
+
+10
+−
+6
+10^{-6}
+
+
+
+
+
+
+
+
+
+
+A-B
+ 
+Fisher-Information Estimation
+
+
+
+
+
+We estimate parameter sensitivities by finite differences using one
+nominal rollout and one perturbed rollout for each SysID parameter.
+For each trajectory candidate, we evaluate eight parallel groups, each
+containing the nominal environment and the 
+P
+P
+ parameter-perturbed
+environments.
+All eight groups share the same parameter vector used for Fisher
+information evaluation, providing repeated estimates of the
+finite-difference sensitivities.
+To limit divergence between the nominal and perturbed rollouts, the
+perturbed environments are synchronized with the nominal environment
+every five simulation steps.
+The resulting sensitivities are accumulated within each trajectory
+segment to construct the segment-wise Fisher information matrices
+
+F
+(
+s
+)
+F^{(s)}
+ used by 
+IDTD
+.
+
+
+
+
+
+
+For numerical stability, when computing the Schur complement in
+Eq. (
+11
+), we regularize the nuisance-parameter
+block as
+
+
+
+
+
+
+
+
+
+S
+i
+​
+(
+F
+)
+=
+F
+i
+​
+i
+−
+F
+i
+,
+∖
+i
+​
+(
+F
+∖
+i
+,
+∖
+i
++
+λ
+Schur
+​
+I
+)
+−
+1
+​
+F
+∖
+i
+,
+i
+,
+S_{i}(F)=F_{ii}-F_{i,\setminus i}\left(F_{\setminus i,\setminus i}+\lambda_{\mathrm{Schur}}I\right)^{-1}F_{\setminus i,i},
+
+
+
+
+(16)
+
+
+
+
+where 
+λ
+Schur
+=
+10
+−
+6
+\lambda_{\mathrm{Schur}}=10^{-6}
+.
+We additionally use 
+ε
+=
+10
+−
+6
+\varepsilon=10^{-6}
+ in the logarithmic coverage
+objective of Eq. (
+15
+).
+
+
+
+
+
+
+
+
+A-C
+ 
+Decoupling Exponents
+
+
+
+
+
+The decoupling exponent 
+α
+i
+\alpha_{i}
+ in
+Eq. (
+13
+) is assigned by parameter group and
+held fixed throughout each experiment.
+As discussed in Sec. 
+IV-C
+, larger values of
+
+α
+i
+\alpha_{i}
+ more strongly remove the contribution of absolute
+information magnitude and place greater emphasis on the pure
+decoupling ratio, whereas smaller values retain more dependence on
+excitation strength.
+Across all experiments, we use 
+α
+i
+∈
+[
+0.7
+,
+1.0
+]
+\alpha_{i}\in[0.7,1.0]
+.
+The values used for each parameter group are reported in
+Table 
+VI
+.
+
+
+
+
+
+
+TABLE VI: 
+Decoupling exponents 
+α
+i
+\alpha_{i}
+ used for each parameter group.
+
+
+
+
+
+
+Platform
+
+
+Parameter group
+
+
+α
+i
+\alpha_{i}
+
+
+
+
+Go2
+
+
+Base mass/inertial
+
+
+1.00
+
+
+
+
+Actuator PD
+
+
+0.90
+
+
+
+
+Foot friction
+
+
+0.70
+
+
+
+
+Contact
+
+
+0.75
+
+
+
+
+G1
+
+
+Base inertial
+
+
+0.80
+
+
+
+
+k
+p
+k_{p}
+
+
+1.00
+
+
+
+
+k
+d
+k_{d}
+
+
+0.75
+
+
+
+
+Crazyflie
+
+
+Motor
+
+
+1.00
+
+
+
+
+Inertial
+
+
+0.85
+
+
+
+
+CoM 
+x
+,
+y
+x,y
+
+
+0.70
+
+
+
+
+
+
+
+
+
+
+A-D
+ 
+Finite-Difference Perturbations
+
+
+
+
+
+We use parameter-group-specific finite-difference perturbations
+
+δ
+​
+θ
+i
+\delta\theta_{i}
+ according to the numerical scale of each physical
+parameter.
+The perturbation values are fixed within each parameter group and are
+used consistently throughout trajectory optimization.
+Table 
+VII
+ reports the parameter ranges and finite-difference
+steps used for all three simulated platforms.
+
+
+
+
+
+
+TABLE VII: 
+Parameter ranges and finite-difference perturbations used in simulation.
+
+
+
+
+
+
+Platform
+
+
+Parameter
+
+
+Dim.
+
+
+Range
+
+
+δ
+​
+θ
+i
+\delta\theta_{i}
+
+
+
+
+Go2
+
+
+Base inertial
+
+
+10
+
+
+Nominal 
+±
+\pm
+ margin
+
+
+0.10
+
+
+
+
+k
+p
+k_{p}
+ (N m/rad)
+
+
+12
+
+
+[
+5.0,100.0
+]
+[5.0,100.0]
+
+
+2.00
+
+
+
+
+k
+d
+k_{d}
+ (N m s/rad)
+
+
+12
+
+
+[
+0.1
+,
+10.0
+]
+[0.1,10.0]
+
+
+0.10
+
+
+
+
+Joint friction (N m)
+
+
+12
+
+
+[
+0.0
+,
+5.0
+]
+[0.0,5.0]
+
+
+0.05
+
+
+
+
+Foot friction
+
+
+4
+
+
+[
+0.1
+,
+2.0
+]
+[0.1,2.0]
+
+
+0.05
+
+
+
+
+G1
+
+
+Base inertial
+
+
+10
+
+
+Nominal 
+±
+\pm
+ margin
+
+
+0.10
+
+
+
+
+k
+p
+k_{p}
+ (N m/rad)
+
+
+29
+
+
+[
+8.0,110.0
+]
+[8.0,110.0]
+
+
+2.00
+
+
+
+
+k
+d
+k_{d}
+ (N m s/rad)
+
+
+29
+
+
+[
+0.3
+,
+10.0
+]
+[0.3,10.0]
+
+
+0.10
+
+
+
+
+Crazyflie
+
+
+k
+f
+k_{f}
+ (
+10
+−
+10
+10^{-10}
+ N/rpm
+2
+)
+
+
+4
+
+
+[
+2.2
+,
+4.1
+]
+[2.2,4.1]
+
+
+0.08
+
+
+
+
+k
+m
+k_{m}
+ (
+10
+−
+12
+10^{-12}
+ N m/rpm
+2
+)
+
+
+4
+
+
+[
+4.0
+,
+16.0
+]
+[4.0,16.0]
+
+
+0.25
+
+
+
+
+τ
+\tau
+ (
+10
+−
+2
+10^{-2}
+ s)
+
+
+4
+
+
+[
+2.0
+,
+15.0
+]
+[2.0,15.0]
+
+
+0.40
+
+
+
+
+I
+diag
+I_{\mathrm{diag}}
+ (
+10
+−
+5
+10^{-5}
+ kg m
+2
+)
+
+
+3
+
+
+[
+0.5
+,
+4.5
+]
+[0.5,4.5]
+
+
+0.05
+
+
+
+
+CoM 
+(
+x
+,
+y
+)
+(x,y)
+
+
+2
+
+
+[
+−
+8.0
+,
+8.0
+]
+[-8.0,8.0]
+
+
+0.40
+
+
+
+
+
+
+
+
+
+
+A-E
+ 
+Real-World K1 Experiment
+
+
+
+
+
+For the real-world Booster K1 experiments, we identify a
+
+60
+60
+-dimensional parameter vector consisting of 
+8
+8
+ torque-lag time
+constants, 
+8
+8
+ velocity-dependent actuator gains, 
+22
+22
+ joint-friction
+coefficients, and 
+22
+22
+ joint-armature parameters.
+Table 
+VIII
+ summarizes the parameter ranges,
+finite-difference perturbations, and decoupling exponents used for
+trajectory design and system identification.
+Parameter fitting is performed using CMA-ES with a population size of
+
+100
+100
+, an initial standard deviation of 
+0.5
+0.5
+, and a function-tolerance
+stopping criterion of 
+10
+−
+6
+10^{-6}
+.
+The identification objective additionally includes a MAP-style
+regularization term that penalizes deviations from the nominal
+parameters, with parameter-group-specific regularization strengths
+ranging from 
+10
+−
+3
+10^{-3}
+ to 
+5
+×
+10
+−
+2
+5\times 10^{-2}
+.
+
+
+
+
+
+
+TABLE VIII: 
+Parameterization and optimization settings for the real Booster K1.
+
+
+
+
+
+
+Parameter
+
+
+Dim.
+
+
+Range
+
+
+δ
+​
+θ
+i
+\delta\theta_{i}
+
+
+α
+i
+\alpha_{i}
+
+
+
+
+Torque lag (
+10
+10
+ ms)
+
+
+8
+
+
+[
+0
+,
+15
+]
+[0,15]
+
+
+0.50
+
+
+0.80
+
+
+
+
+Dynamic gain
+
+
+8
+
+
+[
+0.1
+,
+1.0
+]
+[0.1,1.0]
+
+
+0.02
+
+
+0.70
+
+
+
+
+Joint friction
+
+
+22
+
+
+[
+0
+,
+0.8
+]
+[0,0.8]
+
+
+0.02
+
+
+0.70
+
+
+
+
+Armature (
+10
+−
+2
+10^{-2}
+)
+
+
+22
+
+
+[
+0.05
+,
+15
+]
+[0.05,15]
+
+
+0.10
+
+
+1.00
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+    Experimental support, please
+    
+view the build logs
+
+    for errors. Generated by
+    
+
+      
+
+        L
+        
+A
+
+        T
+        
+E
+
+      
+
+      
+xml
+
+      
+
+    
+.
+  
+
+  
+
+    
+Instructions for reporting errors
+
+    
+We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+      support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+      methods listed below:
+
+    
+
+      
+Click the "Report Issue" 
+(
+
+            
+
+          
+)
+ button, located in the page header.
+
+    
+
+    
+Tip:
+ You can select the relevant text first, to include it in your report.
+
+    
+Our team has already identified 
+the following issues
+. We appreciate your time reviewing and reporting rendering errors we
+      may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+      should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+      all.
+
+    
+Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a 
+list of packages that need conversion
+, and welcome 
+developer contributions
+.
+
+  
+
+
+
+  
+
+    
+
+      
+
+        We gratefully acknowledge support from
+        our 
+major funders
+,
+        
+member institutions
+, 
+,
+        and all contributors.
+      
+
+      
+
+        
+About
+
+        
+·
+
+        
+Help
+
+        
+·
+
+        
+Contact
+
+        
+·
+
+        
+Subscribe
+
+        
+·
+
+        
+Copyright
+
+        
+·
+
+        
+Privacy
+
+        
+·
+
+        
+Accessibility
+
+        
+·
+
+        
+Operational Status
+ (opens in new tab)
+
+      
+
+    
+
+
+    
+
+      
+Major funding support from
+
+      
+
+        
+
+          
+
+        
+
+        
+
+          
+
+        
+
+        
+
+          
+
+        
+
+      
+
+    
+
+  
+
+
+
+  
+
+    
+
+      
+
+    
+
+  
+
+
+
+
+

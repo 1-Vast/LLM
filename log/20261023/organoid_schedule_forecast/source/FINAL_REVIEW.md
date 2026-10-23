@@ -1,0 +1,11 @@
+# Final pre-response code approval
+
+GO for one fixed ordinary endpoint-feedback diagnostic after final SHA freeze, actual reciprocal review and external execution receipt. Initial independently sealed PRE_REVIEW remains preserved. No real cv response was read, main/test executed or critic result inspected by source during this approval.
+
+Reviewed the amended metric finite-value guard and FORECASTS/RESULT strict JSON allow_nan=False. A nonfinite score now raises and preserves failure artifacts; no response/prediction clipping, model repair, transformation or change to the formulas/gate occurs. This resolves the sole minor numerical-record recommendation in source PRE_REVIEW. Root reports the same two synthetic isolation tests passed again; source did not independently rerun them.
+
+Current forecast_campaign is the actual main orchestration, enforces initial gen0, strict history gen<g and action-only current queries. Revised synthetic future-label perturbation exercises this function. G1 equality, fixedG0 scaler, exact ridge/mean/NN definitions, same-information within feedback arm, campaign/batch score alignment and post-forecast scoring remain correct. No need for an additional mocked main test or further schema qualification to allow the scoped anonymous-coordinate regression.
+
+Approval means code/protocol eligibility only. The frozen-versus-cumulative contrast changes label amount and design coverage; it does not isolate an advanced updater at equal history. Three informative adaptive batches are not independent biological tasks. Raw coordinate/category interpretation supplies no physical cell dynamics. Both positive and negative outcomes must retain secondary-MSE and simple-control counterexamples. The gate cannot promote a new world model, agent, U inheritance or improved improver; failure stops expansion of this fixed ridge configuration without searching or rescuing it on these responses.
+
+Bound version hashes are recorded in FINAL_REVIEW_SEAL.json. A changed formula, preprocessing, dataset or gate requires a separate version review; hashes must be checked before decoding the real response tables. Existing pilot/partial artifacts must not be deleted to rerun. No blocking issue remains in reviewed predictor/parser/tests.

@@ -1,0 +1,3 @@
+# Local verifier path-schema correction
+
+2026-10-23. Initial verify.py execution:188checks,1failure,75files. The failed binding was critic/HISTORY_SCOPE_CORRECTION_SEAL.json, whose `path` is the seal-local filename HISTORY_SCOPE_CORRECTION.md. The generic verifier incorrectly resolved all relative paths against the workspace root. Corrected only path resolution: a one-component filename is relative to its seal directory; workspace paths remain workspace-relative. No review/source file, seal or scientific conclusion changed. Final verification is separate from this retained initial failure. A local checker bug is not scientific evidence of review tampering or biological failure.

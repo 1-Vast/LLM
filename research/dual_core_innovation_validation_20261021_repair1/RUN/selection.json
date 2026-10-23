@@ -1,0 +1,103 @@
+{
+  "inherit": {
+    "deployed_id": "p0",
+    "ancestry": [
+      "p0"
+    ],
+    "retained": 4,
+    "attempts": [
+      {
+        "generation": 0,
+        "parent_id": "p0",
+        "origin": "conventional_fallback",
+        "proposal_status": "failure",
+        "fallback_reason": "no_api_program",
+        "archive_status": "added",
+        "node_id": "p1",
+        "mean_yield": 2.6666666666666665,
+        "accepted": false,
+        "rationale": ""
+      },
+      {
+        "generation": 1,
+        "parent_id": "p1",
+        "origin": "api",
+        "proposal_status": "ok",
+        "fallback_reason": null,
+        "archive_status": "added",
+        "node_id": "p2",
+        "mean_yield": 2.1666666666666665,
+        "accepted": false,
+        "rationale": "This policy uses a molecular query only at step 0 to calibrate the model, then relies on a trust-aware scoring function that balances predicted probability with disagreement from prior and nn baselines, while penalizing similarity to already queried drugs. This encourages exploration of uncertain or divergent predictions after feedback, and falls back to molecular queries or stopping when functional budget is exhausted."
+      },
+      {
+        "generation": 2,
+        "parent_id": "p2",
+        "origin": "api",
+        "proposal_status": "ok",
+        "fallback_reason": null,
+        "archive_status": "added",
+        "node_id": "p3",
+        "mean_yield": 2.0,
+        "accepted": false,
+        "rationale": "Adds a targeted recovery step: after a failed functional query (label 0), if the same drug is available for a molecular query, query it to update the shared trajectory with real 24h data, potentially correcting the model before further functional exploration. This directly addresses observed failures where zero-label functional queries wasted budget. The scoring function also slightly increases weight on model disagreement and uncertainty while reducing redundancy penalty, preserving the parent's exploration-exploitation balance but making it more responsive to negative feedback."
+      }
+    ],
+    "episode_evaluations_including_root": 24,
+    "candidate_slots": 3,
+    "deployment_selection_mean": 3.0
+  },
+  "restart": {
+    "deployed_id": "p0",
+    "ancestry": [
+      "p0"
+    ],
+    "retained": 4,
+    "attempts": [
+      {
+        "generation": 0,
+        "parent_id": "p0",
+        "origin": "api",
+        "proposal_status": "ok",
+        "fallback_reason": null,
+        "archive_status": "added",
+        "node_id": "p1",
+        "mean_yield": 2.1666666666666665,
+        "accepted": false,
+        "rationale": "This policy compares the best affordable functional candidate and the best affordable molecular candidate using current predictions, prior baseline, and a small exploration bonus for functional queries early on. Molecular queries are only used when their predicted probability is competitive and they haven't been queried yet, and budget constraints force a choice when only one action remains affordable. This balances the confirmed-hit objective with occasional low-cost molecular updates."
+      },
+      {
+        "generation": 1,
+        "parent_id": "p0",
+        "origin": "api",
+        "proposal_status": "ok",
+        "fallback_reason": null,
+        "archive_status": "added",
+        "node_id": "p2",
+        "mean_yield": 2.3333333333333335,
+        "accepted": false,
+        "rationale": "This policy explicitly compares the best affordable functional candidate and the best affordable molecular candidate using current predictions, prior baseline, and a small exploration bonus for functional queries early on. Molecular queries are only used when their predicted probability is competitive and they haven't been queried yet, and budget constraints force a choice when only one action remains affordable. This balances the confirmed-hit objective with occasional low-cost molecular updates."
+      },
+      {
+        "generation": 2,
+        "parent_id": "p0",
+        "origin": "api",
+        "proposal_status": "ok",
+        "fallback_reason": null,
+        "archive_status": "added",
+        "node_id": "p3",
+        "mean_yield": 2.1666666666666665,
+        "accepted": false,
+        "rationale": "Retains the parent's greedy functional-query mechanism (pick highest predicted probability among unqueried drugs) but adds three general improvements: (1) an uncertainty bonus based on model-vs-prior disagreement to avoid over-exploiting confidently predicted drugs, (2) a similarity-weighted neighbor bonus from already-confirmed functional positives so exploration follows structural neighborhoods rather than raw prediction alone, and (3) a budget-aware molecular query option that only fires when the cheaper molecular cost still leaves room for a functional query and the best functional candidate is not already very confident. A floor on expected value prevents wasting the last functional query on a hopeless candidate. All decisions derive from the current observation only."
+      }
+    ],
+    "episode_evaluations_including_root": 24,
+    "candidate_slots": 3,
+    "deployment_selection_mean": 3.0
+  },
+  "conventional_candidates": 3,
+  "conventional_episode_evaluations_including_root": 24,
+  "api_enabled": true,
+  "selection_seconds_this_invocation": 66.8582493000431,
+  "resumed": true
+}

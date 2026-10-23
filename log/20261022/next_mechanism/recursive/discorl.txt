@@ -1,0 +1,1845 @@
+Discovering state-of-the-art reinforcement learning algorithms | Nature
+function hasConnection() {
+                return navigator.connection || navigator.mozConnection || navigator.webkitConnection || navigator.msConnection;
+            }
+
+            function createLink(src) {
+                var preloadLink = document.createElement("link");
+                preloadLink.rel = "preload";
+                preloadLink.href = src;
+                preloadLink.as = "font";
+                preloadLink.type = "font/woff2";
+                preloadLink.crossOrigin = "";
+                document.head.insertBefore(preloadLink, document.head.firstChild);
+            }
+
+            var connectionDetail = {
+                saveDataEnabled: false,
+                slowConnection: false
+            };
+
+            var connection = hasConnection();
+            if (connection) {
+                connectionDetail.saveDataEnabled = connection.saveData;
+                if (/\slow-2g|2g/.test(connection.effectiveType)) {
+                    connectionDetail.slowConnection = true;
+                }
+            }
+
+            if (!(connectionDetail.saveDataEnabled || connectionDetail.slowConnection)) {
+                createLink("/oscar-static/fonts/HardingText-Regular-Web-cecd90984f.woff2");
+            } else {
+                document.documentElement.classList.add('save-data');
+            }
+window.dataLayer = [{"content":{"category":{"legacy":{"webtrendsPrimaryArticleType":"research","webtrendsSubjectTerms":"computer-science;computational-science","webtrendsContentCategory":null,"webtrendsContentCollection":null,"webtrendsContentGroup":"Nature","webtrendsContentGroupType":null,"webtrendsContentSubGroup":"Article","status":null},"contentType":"article"},"article":{"doi":"10.1038/s41586-025-09761-x"},"attributes":{"cms":null,"deliveryPlatform":"oscar","copyright":{"open":true,"legacy":{"webtrendsLicenceType":"http://creativecommons.org/licenses/by-nc-nd/4.0/"}},"articleInPress":"false"},"contentInfo":{"authors":["Junhyuk Oh","Gregory Farquhar","Iurii Kemaev","Dan A. Calian","Matteo Hessel","Luisa Zintgraf","Satinder Singh","Hado van Hasselt","David Silver"],"publishedAt":1761091200,"publishedAtString":"2025-10-22","title":"Discovering state-of-the-art reinforcement learning algorithms","legacy":null,"publishedAtTime":null,"documentType":"aplusplus","subjects":"Computer science,Computational science"},"journal":{"pcode":"nature","title":"nature","volume":"648","issue":"8093","id":41586,"publishingModel":"Hybrid Access"},"authorization":{"status":true},"features":[],"collection":null},"page":{"category":{"pageType":"article"},"attributes":{"template":"mosaic","featureFlags":[{"name":"ab_subjects_position","active":false},{"name":"shared_article_layout","active":false},{"name":"chat_with_paper_nature","active":false}],"testGroup":null},"search":null},"privacy":{},"version":"1.0.0","product":null,"session":null,"user":null,"backHalfContent":true,"country":"CN","hasBody":true,"uneditedManuscript":false,"twitterId":["o3xnx","o43y9","o3ef7"],"baiduId":"d38bce82bcb44717ccc29a90c4b781ea","newApp":true,"japan":false}];
+    window.dataLayer.push({
+        ga4MeasurementId: 'G-ERRNTNZ807',
+        ga360TrackingId: 'UA-71668177-1',
+        twitterId: ['3xnx', 'o43y9', 'o3ef7'],
+        baiduId: 'd38bce82bcb44717ccc29a90c4b781ea',
+        ga4ServerUrl: 'https://sgtm.nature.com',
+        imprint: 'nature'
+    });
+(function(w, d) {
+        w.config = w.config || {};
+        w.config.mustardcut = false;
+
+        
+        if (w.matchMedia && w.matchMedia('only print, only all and (prefers-color-scheme: no-preference), only all and (prefers-color-scheme: light), only all and (prefers-color-scheme: dark)').matches) {
+            w.config.mustardcut = true;
+            d.classList.add('js');
+            d.classList.remove('grade-c');
+            d.classList.remove('no-js');
+        }
+    })(window, document.documentElement);
+@media only print, only all and (prefers-color-scheme: no-preference), only all and (prefers-color-scheme: light), only all and (prefers-color-scheme: dark) {  html{line-height:1.15;text-size-adjust:100%;height:100%;overflow-y:scroll;font-size:100%}body{margin:0;min-height:100%;font-size:1.125rem;color:#222;background:#fff;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;line-height:1.8}details,main{display:block}h1{margin:.67em 0;-webkit-font-smoothing:antialiased;font-size:clamp(1.75rem,4vw,2.25rem)}a{background-color:transparent;color:#424d61;text-decoration:underline .0625rem;text-decoration-skip-ink:auto;text-underline-offset:.25rem}b{font-weight:bolder}sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline;top:-.5em}img{border:0;max-width:100%;height:auto;vertical-align:middle}button,input,select{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button,input{overflow:visible}button,select{text-transform:none}[type=submit],button{appearance:button}[type=checkbox]{box-sizing:border-box;padding:0}summary{display:list-item}[hidden]{display:none}button{cursor:pointer}h2{font-size:clamp(1.5rem,4vw,1.75rem)}h3{font-size:clamp(1.25rem,4vw,1.5rem)}h2,h3{-webkit-font-smoothing:antialiased}h3{font-size:1.25rem}*,html *,html :after,html :before{box-sizing:inherit}p{margin-top:0;margin-bottom:2rem;overflow-wrap:break-word;word-break:break-word}p:last-of-type{margin-bottom:0}.eds-c-status-message{display:flex;gap:.5rem;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;font-size:1rem;position:relative;box-sizing:border-box;border-radius:8px;background-color:#fff;border:1px solid #d5d5d5;line-height:1.4;padding:16px 16px 12px}.c-article-editorial-summary__container .c-article-editorial-summary__content p:last-child,.eds-c-status-message :last-child{margin-bottom:0}.eds-c-status-message__message a{color:inherit}.eds-c-status-message__text{padding-right:12px;margin-top:2px}.eds-c-status-message__text h5{margin-top:0}.eds-c-status-message__icon{fill:currentcolor;transform:translate(0);display:inline-block;vertical-align:text-top;width:24px;height:24px;flex:0 0 auto;margin-right:8px}.eds-c-status-message__icon--top{align-self:flex-start}.eds-c-status-message__dismiss-button{position:absolute;border:0;background:0 0;right:8px;cursor:pointer}.eds-c-status-message__dismiss-icon{fill:currentcolor;transform:translate(0);display:inline-block;vertical-align:text-top;width:24px;height:24px;color:#555}.eds-c-status-message__title{font-weight:700;margin-bottom:8px}.eds-c-status-message--info .eds-c-status-message__icon{color:#17758c}.eds-c-status-message--info{border-bottom:4px solid #17758c}.eds-c-status-message--error .eds-c-status-message__icon{color:#be1818}.eds-c-status-message--error{border-bottom:4px solid #be1818}.eds-c-status-message--success .eds-c-status-message__icon{color:#007a4b}.eds-c-status-message--success{border-bottom:4px solid #007a4b}.eds-c-status-message--warning .eds-c-status-message__icon{color:#daa520}.eds-c-status-message--warning{border-bottom:4px solid #daa520}.c-ad{text-align:center}@media only screen and (min-width:480px){.c-ad{padding:8px}}.c-ad--728x90{display:none;background-color:#ccc}.c-ad--728x90 .c-ad__inner{min-height:calc(1.5em + 94px)}@media only screen and (min-width:876px){.js .c-ad--728x90{display:none}.js .u-show-following-ad+.c-ad--728x90{display:block}}.app-author-list,.c-ad__label{font-size:.875rem;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;line-height:1.5}.c-ad__label{font-weight:400;margin-bottom:4px;color:#333}.app-author-list{color:#6f6f6f;list-style:none;margin:0;padding:0}.app-author-list>li,.js .app-author-list{display:inline}.app-author-list>li:not(:first-child):not(:last-child):before{content:", "}.app-author-list>li:not(:only-child):last-child:before{content:" & "}.app-author-list--small{font-size:.875rem}.app-author-list--compact{line-height:1.4;font-size:.875rem}.app-author-list--truncated>li:not(:only-child):last-child:before{content:" ... "}.js .app-author-list__hide{display:none;visibility:hidden}.js .app-author-list__hide:first-child+*{margin-block-start:0}.c-article-header{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;margin-bottom:40px}.c-article-identifiers{list-style:none;font-size:1rem;line-height:1.3;display:flex;flex-wrap:wrap;color:#6f6f6f;padding:0}.c-article-identifiers__item{margin-right:8px;padding-right:8px;list-style:none}.c-article-identifiers__item:last-child{margin-right:0;padding-right:0}.c-article-title{font-size:1.5rem;line-height:1.25;margin:0 0 16px}@media only screen and (min-width:876px){.c-article-title{font-size:1.875rem;line-height:1.2}}.c-article-author-list{width:100%;margin:0 8px 0 0;padding:0;display:inline;list-style:none;font-size:1rem}.c-article-author-list__item{display:inline;padding-right:0}.c-article-author-list svg{margin-left:4px}.c-article-author-list__show-more{display:none;margin-right:4px}.c-article-author-list__button,.js .c-article-author-list__item--hide,.js .c-article-author-list__show-more{display:none}.js .c-article-author-list--long .c-article-author-list__show-more,.js .c-article-author-list--long+.c-article-author-list__button{display:inline}@media only screen and (max-width:767px){.js .c-article-author-list__item--hide-small-screen{display:none}.js .c-article-author-list--short .c-article-author-list__show-more,.js .c-article-author-list--short+.c-article-author-list__button{display:inline}}#uptodate-client,.js .c-article-author-list--expanded .c-article-author-list__show-more{display:none!important}.js .c-article-author-list--expanded .c-article-author-list__item--hide-small-screen{display:inline!important}.c-article-author-list__button,.c-button-author-list{background:#ebf1f5;border:4px solid #ebf1f5;border-radius:20px;color:#666;font-size:.875rem;line-height:1.4;padding:2px 11px 2px 8px;text-decoration:none}.c-article-author-list__button svg,.c-button-author-list svg{margin:1px 4px 0 0}.c-article-author-list__button:hover,.c-button-author-list:hover{background:#069;border-color:transparent;color:#fff}.c-article-info-details{font-size:1rem;margin-bottom:8px;margin-top:16px}.c-article-info-details__cite-as{border-left:1px solid #6f6f6f;margin-left:8px;padding-left:8px}.c-article-metrics-bar{display:flex;flex-wrap:wrap;line-height:1.3;font-size:1rem}.c-article-metrics-bar__wrapper{margin:16px 0}.c-article-metrics-bar__item{align-items:baseline;border-right:1px solid #6f6f6f;margin-right:8px}.c-article-metrics-bar__item:last-child{border-right:0}.c-article-metrics-bar__count{font-weight:700;margin:0}.c-article-metrics-bar__label{color:#626262;font-weight:400;font-style:normal;margin:0 10px 0 5px}.c-article-metrics-bar__details{margin:0}.c-article-main-column{font-family:Harding,Palatino,serif;margin-right:8.6%;width:60.2%}@media only screen and (max-width:1023px){.c-article-main-column{margin-right:0;width:100%}}.c-article-associated-content__container .c-article-associated-content__title,.c-article-section__title{border-bottom:2px solid #d5d5d5;font-size:1.25rem;padding-bottom:8px;margin:0}@media only screen and (min-width:876px){.c-article-associated-content__container .c-article-associated-content__title,.c-article-section__title{font-size:1.5rem;line-height:1.24}}.c-article-associated-content__container .c-article-associated-content__title{margin-bottom:8px}.c-article-body p{margin-top:0;margin-bottom:24px}.c-article-section{clear:both}.c-article-section__content{padding-top:8px;margin-bottom:40px}@media only screen and (max-width:1023px){.c-article-section__content{padding-left:0}}.c-article-authors-search{margin-top:0;margin-bottom:24px}.c-article-authors-search__item,.c-article-authors-search__title{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif}.c-article-authors-search__title{color:#626262;font-weight:700;margin:0;padding:0;font-size:1.05rem}.c-article-authors-search__item{font-size:1rem}.c-article-authors-search__text{margin:0}.c-code-block{padding:20px;margin:0 0 24px;border:1px solid #fff;font-family:monospace}.c-code-block__heading{margin-bottom:16px;font-weight:400}.c-code-block__line{overflow-wrap:break-word;white-space:pre-wrap;display:block}.c-article-share-box__no-sharelink-info{font-size:.813rem;font-weight:700;padding-top:4px;margin-bottom:24px}.c-article-share-box__only-read-input{border:1px solid #d5d5d5;display:inline-block;box-sizing:content-box;height:24px;margin-bottom:8px;font-size:.875rem;font-weight:700;padding:8px 10px}.c-article-share-box__button--link-like{background-color:transparent;border:0;color:#069;cursor:pointer;font-size:.875rem;margin-bottom:8px;margin-left:10px}.c-article-editorial-summary__container{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;font-size:1rem}.c-article-editorial-summary__container .c-article-editorial-summary__article-title{font-family:Harding,Palatino,serif;font-weight:700;line-height:1.2;-webkit-font-smoothing:antialiased;font-size:clamp(1.25rem,4vw,1.5rem)}.c-article-editorial-summary__container .c-article-editorial-summary__content--less{max-height:9.5rem;overflow:hidden}.c-article-editorial-summary__container .c-article-editorial-summary__button.active,.c-article-editorial-summary__container .c-article-editorial-summary__button.hover,.c-article-editorial-summary__container .c-article-editorial-summary__button:active,.c-article-editorial-summary__container .c-article-editorial-summary__button:hover{text-decoration:underline;text-decoration-skip-ink:auto}.c-article-editorial-summary__container .c-article-editorial-summary__button{background-color:#fff;border:0;color:#069;font-size:.875rem;margin-bottom:16px}.c-article-associated-content__container .c-article-associated-content__collection-label{font-size:.875rem;line-height:1.4}.c-article-associated-content__container .c-article-associated-content__collection-title{line-height:1.3}.c-reading-companion{clear:both;min-height:389px}.c-reading-companion__sticky{max-width:389px}.c-reading-companion__scroll-pane{overflow:hidden auto;margin:0 -4px;min-height:200px;padding-left:4px;padding-right:4px}.c-reading-companion__tabs{font-size:1rem;list-style:none;display:flex;flex-flow:row;margin:0 0 8px;padding:0}.c-reading-companion__tabs>li{flex-grow:1}.c-reading-companion__tab{color:#0067c5;border-style:solid;border-color:#d5d5d5;border-image:initial;border-width:1px 1px 1px 0;background-color:#eee;padding:8px 8px 8px 15px;text-align:left;font-size:1rem;width:100%}.c-reading-companion__tabs li:first-child .c-reading-companion__tab{border-left-width:1px}.c-reading-companion__tab--active{color:#222;background-color:#fff;border-bottom:1px solid #fff;font-weight:700}.c-reading-companion__sections-list{list-style:none;padding:0}.c-reading-companion__figures-list,.c-reading-companion__references-list{list-style:none;padding:0;min-height:389px}.c-reading-companion__references-list--numeric{list-style:decimal inside}.c-reading-companion__sections-list{margin:0 0 8px;min-height:50px}.c-reading-companion__section-item{font-size:1rem;padding:0}.c-reading-companion__section-item a{display:block;padding:8px 0 8px 16px;line-height:1.5;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;outline-offset:-4px}.c-reading-companion__figure-item{padding:16px 8px 16px 0;border-top:1px solid #d5d5d5;font-size:1rem}.c-reading-companion__figure-item:first-child{border-top:none;padding-top:8px}.c-reading-companion__reference-item{padding:8px 8px 8px 16px;border-top:1px solid #d5d5d5;font-size:1rem}.c-reading-companion__reference-item:first-child{border-top:none}.c-reading-companion__reference-item a{word-break:break-word}.c-reading-companion__reference-citation{display:inline}.c-reading-companion__reference-links{list-style:none;text-align:right;margin:8px 0 0;padding:0;font-weight:700;font-size:.813rem}.c-reading-companion__reference-links>a{display:inline-block;margin-left:8px}.c-reading-companion__reference-links>a:first-child{display:inline-block}.c-reading-companion__figure-title{font-family:Harding,Palatino,serif;font-weight:700;line-height:1.2;-webkit-font-smoothing:antialiased;font-size:1.25rem;display:block;margin:0 0 8px}.c-reading-companion__figure-links{margin:8px 0 0;display:flex;justify-content:space-between}.c-reading-companion__figure-links>a{display:flex;align-items:center}.c-reading-companion__figure-full-link svg{height:.8em;margin-left:2px}.c-reading-companion__panel{display:none;border-top:none;margin-top:0;padding-top:0}.c-cod,.c-reading-companion__panel--active{display:block}.c-cod{font-size:1rem;width:100%}.c-cod__form{background:#ebf0f3}.c-cod__prompt{margin:0 0 24px;font-size:1.125rem;line-height:1.3}.c-cod__label{display:block;margin:0 0 4px}.c-cod__row{display:flex;margin:0 0 16px}.c-cod__row:last-child{margin:0}.c-cod__input{padding:13px;margin:0;border:1px solid #d5d5d5;border-radius:2px;flex:1 1 auto}.c-cod__input--submit{margin-left:8px;flex-shrink:1;background-color:#069;color:#fff;border:1px solid #069;transition:background-color .2s ease-out,color .2s ease-out}.c-cod__input--submit-single{margin:0;flex-shrink:0;flex-basis:100%}.c-cod__input--submit:focus,.c-cod__input--submit:hover{color:#069;background-color:#fff}.c-pdf-download__link .u-icon{padding-top:2px}.c-pdf-download{display:flex;margin-bottom:24px;max-height:48px}@media only screen and (min-width:768px){.c-pdf-download{max-height:none}}@media only screen and (min-width:1024px){.c-pdf-download{max-height:48px}}.c-pdf-download__link{display:flex;flex:1 1 0%}.c-pdf-download__link:hover{text-decoration:none}.c-pdf-download__text{padding-right:4px}@media only screen and (max-width:767px){.c-pdf-download__text{text-transform:capitalize}}@media only screen and (min-width:768px){.c-pdf-download__text{padding-right:8px}}.c-context-bar--sticky .c-pdf-download{margin-bottom:0;display:block;white-space:nowrap}@media only screen and (max-width:767px){.c-pdf-download .u-sticky-visually-hidden{border:0;clip:rect(0,0,0,0);clip-path:inset(50%);height:1px;overflow:hidden;padding:0;white-space:nowrap;width:1px;position:absolute!important}}.c-pdf-container{display:flex;justify-content:flex-end}@media only screen and (max-width:767px){.c-pdf-container .c-pdf-download{display:flex;flex-basis:100%}}.c-pdf-container .c-pdf-download+.c-pdf-download{margin-left:16px}.c-article-extras .c-pdf-container .c-pdf-download{width:100%}.c-article-extras .c-pdf-container .c-pdf-download+.c-pdf-download{margin-left:0}@media only screen and (min-width:768px){.c-context-bar--sticky .c-pdf-download__link{flex:1 1 183px;align-items:center}}@media only screen and (max-width:320px){.c-context-bar--sticky .c-pdf-download__link{padding:16px}}.article-page--commercial .c-article-main-column .c-pdf-button__container .c-pdf-download{display:none}@media only screen and (max-width:1023px){.article-page--commercial .c-article-main-column .c-pdf-button__container .c-pdf-download{display:block}}.c-recommendations-column-switch .c-meta{margin-top:auto}.c-context-bar{position:relative;width:100%;box-shadow:0 0 10px 0 rgba(51,51,51,.2)}.c-context-bar__container{margin:0 auto;max-width:1280px;padding:0 16px}.c-context-bar__title{display:none}.app-researcher-popup__link.hover,.app-researcher-popup__link.visited,.app-researcher-popup__link:hover,.app-researcher-popup__link:visited,.c-article-metrics__heading a,.c-article-metrics__posts .c-card__title a{color:inherit}.c-article-authors-search__list{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center}@media only screen and (min-width:480px){.c-article-authors-search__list{justify-content:normal}}.c-article-authors-search__text{display:flex;align-items:center;flex-flow:column wrap;justify-content:center;font-size:14px}@media only screen and (min-width:480px){.c-article-authors-search__text{font-size:16px;flex-direction:row}}.c-article-authors-search__links-text{font-weight:700;margin-right:8px;text-align:center}@media only screen and (min-width:480px){.c-article-authors-search__links-text{text-align:left}}.c-article-authors-search__list-item--left{flex:1 1 100%}@media only screen and (min-width:480px){.c-article-authors-search__list-item--left{flex-basis:auto}}.c-article-authors-search__list-item--right{flex:1 1 auto}.c-article-identifiers{margin:0}.c-article-identifiers__item{color:#222;border-right:2px solid #c5e0f4;font-size:14px}@media only screen and (min-width:480px){.c-article-identifiers__item{font-size:16px}}.c-article-identifiers__item:last-child{border-right:none}.eds-l-with-sidebar{display:flex;flex-wrap:wrap}.eds-l-with-sidebar>*{margin:0}.eds-l-with-sidebar__sidebar{flex-grow:1;min-width:var(--eds-l-with-sidebar--min-width,400px);flex-basis:var(--eds-l-with-sidebar--basis,400px)}.eds-l-with-sidebar>:not(.eds-l-with-sidebar__sidebar){flex-basis:0px;flex-grow:999;min-width:var(--eds-l-with-sidebar--min,50%)}.eds-l-with-sidebar>:first-child{padding-right:4rem}@supports (gap:1em){.eds-l-with-sidebar>:first-child{padding-right:0}.eds-l-with-sidebar{gap:var(--eds-l-with-sidebar--gap,4rem)}}.c-article-metrics__posts .c-card__title{font-size:1.05rem}.c-article-metrics__posts .c-card__title+span{color:#6f6f6f;font-size:1rem}.c-status-message{display:flex;align-items:center;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;font-size:1rem;position:relative;width:100%;box-sizing:border-box}.c-card__summary>p:last-child,.c-status-message :last-child{margin-bottom:0}.c-status-message--boxed{background-color:#fff;border-radius:2px;border:1px solid #eee;line-height:1.5;padding:16px}.c-status-message__heading{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;font-size:1rem;font-weight:700}.c-status-message__icon{fill:currentcolor;transform:translate(0);display:inline-block;vertical-align:text-top;width:1.5em;height:1.5em;flex:0 0 auto;margin-right:8px}.c-status-message__icon--top{align-self:flex-start}.c-status-message--info .c-status-message__icon{color:#17758c}.c-status-message--boxed.c-status-message--info{border-bottom:4px solid #17758c}.c-status-message--error .c-status-message__icon{color:#be1818}.c-status-message--boxed.c-status-message--error{border-bottom:4px solid #be1818}.c-status-message--success .c-status-message__icon{color:#007a4b}.c-status-message--boxed.c-status-message--success{border-bottom:4px solid #007a4b}.c-status-message--warning .c-status-message__icon{color:#daa520}.c-status-message--boxed.c-status-message--warning{border-bottom:4px solid #daa520}.c-breadcrumbs{list-style:none;margin:0;padding:0;font-size:1rem;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;color:#000}.c-breadcrumbs>li{display:inline}.c-breadcrumbs__link{color:#666}svg.c-breadcrumbs__chevron{margin:4px 4px 0;fill:#666;width:10px;height:10px}@media only screen and (max-width:767px){.c-breadcrumbs .c-breadcrumbs__item{display:none}.c-breadcrumbs .c-breadcrumbs__item:last-child,.c-breadcrumbs .c-breadcrumbs__item:nth-last-child(2){display:inline}}.c-card{display:flex;background-color:transparent;flex-direction:column;font-size:.875rem;min-width:0;padding:0;position:relative;border:0;box-shadow:none;overflow:hidden}.c-card--no-shape{border:0;box-shadow:none;background:0 0}.c-card__image{position:relative;display:flex;justify-content:center;overflow:hidden;padding-bottom:56.25%}@supports (aspect-ratio:1/1){.c-card__image{padding-bottom:0;aspect-ratio:var(--card--image-aspect-ratio,16/9)}}.c-card__image img{position:absolute;left:0;min-width:100%;min-height:100%}@supports ((-o-object-fit:cover) or (object-fit:cover)){.c-card__image img{width:100%;height:100%;object-fit:cover}}.c-card__body{padding:16px;flex:1 1 auto}.c-card--no-shape .c-card__body{padding:0}.c-card--no-shape .c-card__body:not(:first-child){padding-top:16px}.c-card__title{font-family:Harding,Palatino,serif;font-weight:700;-webkit-font-smoothing:antialiased;font-size:clamp(1.25rem,4vw,1.5rem);margin-top:0;margin-bottom:8px;letter-spacing:-.01875rem}[lang=de] .c-card__title{hyphens:auto}.c-card__summary{line-height:1.4}.c-card__summary>p{margin-bottom:5px}.c-card__summary a{text-decoration:underline}.c-card__link:not(.c-card__link--no-block-link):before{content:"";position:absolute;inset:0}.c-card--flush .c-card__body{padding:0}.c-card--major{font-size:1rem}.c-card--major .c-card__title{font-family:Harding,Palatino,serif;font-weight:700;line-height:1.2;-webkit-font-smoothing:antialiased;font-size:clamp(1.5rem,4vw,1.75rem)}.c-card--dark{background-color:#29303c;color:#e3e4e5;border-width:0}.c-card--dark .c-card__title,.c-footer{color:#fff}.c-card--dark .c-card__link,.c-card--dark .c-card__summary a,.c-meta{color:inherit}.c-meta{list-style:none;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;font-size:.875rem;line-height:1.4}.c-meta--large{font-size:1rem}.c-meta--large .c-meta__item{margin-bottom:8px}.c-meta__item{display:inline-block;margin-bottom:4px}.c-meta__item:not(:last-child){border-right:1px solid #f3f3f3;padding-right:4px;margin-right:4px}@media only screen and (max-width:767px){.c-meta__item--block-sm-max{display:block}.c-meta__item--block-sm-max:not(:last-child){border-right:none;margin-right:0;padding-right:0}}@media only screen and (min-width:1024px){.c-meta__item--block-at-lg{display:block}.c-meta__item--block-at-lg:not(:last-child){border-right:none;margin-right:0;padding-right:0}}.c-meta__type{text-transform:none;font-weight:700}.c-skip-link{background:#069;color:#fff;font-size:.875rem;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;text-align:center;padding:8px;position:absolute;inset:0 0 auto;z-index:9999;transform:translateY(-100%)}@media (prefers-reduced-motion:reduce){.c-skip-link{transition:top .3s ease-in-out}}@media print{.c-skip-link{display:none}}.c-skip-link:link{color:#fff}.c-nature-box{background-color:#fff;border-radius:2px;box-shadow:0 0 5px 0 rgba(51,51,51,.1);border:1px solid #d5d5d5;line-height:1.3;padding:16px 16px 3px;margin-bottom:24px}.c-nature-box__text{font-size:1rem;margin-top:0;margin-bottom:16px!important}.c-nature-box--access-to-pdf{display:none}@media only screen and (min-width:1024px){.c-nature-box--mobile{display:none}}.c-nature-box .c-pdf-download{margin-bottom:16px!important}.c-nature-box svg+.c-article__button-text{margin-left:8px}.c-nature-box--version{background-color:#eee}.c-nature-box:not(:has(*)),.js-context-bar-sticky-point-desktop:not(:has(*)){display:none}.app-masthead-save-research,.app-save-research-buttons{display:flex;gap:8px;align-items:flex-start;flex-direction:column;text-wrap:balance}@media only screen and (min-width:768px){.app-masthead-save-research,.app-save-research-buttons{align-items:center;flex-direction:row;text-align:start}}.app-masthead-save-research__hide-on-lg{display:block;visibility:visible}@media only screen and (min-width:758px){.app-masthead-save-research__hide-on-lg{display:none;visibility:hidden}.app-masthead-save-research__hide-on-lg:first-child+*{margin-block-start:0}}.article-page--news .app-masthead-save-research__hide-on-lg{display:block;visibility:visible}@media only screen and (min-width:768px){.article-page--news .app-masthead-save-research__hide-on-lg{display:none;visibility:hidden}.article-page--news .app-masthead-save-research__hide-on-lg:first-child+*{margin-block-start:0}}.app-masthead-save-research__action-button{cursor:pointer;border:0;background-color:transparent;font-weight:inherit;padding:0;color:#424d61;text-decoration:underline .0625rem;text-decoration-skip-ink:auto;text-underline-offset:.25rem;display:inline-block;font-size:clamp(.875rem,.625rem + 1.25vw,1rem);line-height:2;text-align:left}@media only screen and (min-width:1024px){.app-masthead-save-research__action-button{text-align:center}}.app-masthead-save-research__action-button:hover{color:#29303c;text-decoration-thickness:.25rem;text-underline-offset:.25rem}.app-masthead-save-research__action-link{display:inline-block;font-size:clamp(.875rem,.625rem + 1.25vw,1rem);line-height:2}.app-masthead-save-research__icon{fill:currentcolor;transform:translate(0);display:inline-block;width:24px;height:24px;flex:0 0 auto;vertical-align:middle}*+.app-masthead-save-research__icon,.app-masthead-save-research .app-masthead-save-research__icon+*{margin-left:4px}@media only screen and (min-width:480px){*+.app-masthead-save-research__icon,.app-masthead-save-research .app-masthead-save-research__icon+*{margin-left:8px}}.app-masthead-save-research__icon--small{fill:currentcolor;transform:translate(0);display:inline-block;width:16px;height:16px}.app-journal-saved-research-status-container .eds-c-status-message{background-color:inherit;border:0;border-radius:0;padding:16px 0;gap:10px}.app-journal-saved-research-status-container .eds-c-status-message--success{border-bottom:none}.app-journal-saved-research-status-container .eds-c-status-message__dismiss-button{right:0;padding:0}.app-journal-saved-research-status-container .eds-c-status-message__icon{margin-right:0}.app-journal-saved-research-status-container .eds-c-status-message__message span{font-weight:700;border-right:2px solid #c5e0f4;margin-right:8px;padding-right:8px}.c-meta__link{color:#000}.sans-serif{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif}.article-page{background:#fff}.c-header{background-color:#fff;border-bottom:5px solid #000;font-size:1rem;margin-bottom:16px;line-height:1.4}.c-header__row{position:relative;padding:0}.c-header__row:not(:last-child){border-bottom:1px solid #eee}.c-header__split{display:flex;align-items:center;justify-content:space-between}.c-header__logo-container{flex:1 1 0px;margin:8px 24px 8px 0;line-height:0}.c-header__logo{transform:translateZ(0)}.c-header__logo img{max-height:32px}.c-header__container{margin:0 auto;max-width:1280px}@media print{.c-header__menu{display:none}}.c-header__menu{list-style:none;padding:0;display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex:0 1 auto;font-weight:700;line-height:1.4;margin:0 -4px}@media only screen and (max-width:1023px){.c-header__menu--hide-lg-max{display:none;visibility:hidden}}.c-header__menu--global{font-weight:400;justify-content:flex-end}.c-header__menu--global svg{display:none;visibility:hidden}.c-header__menu--global svg:first-child+*{margin-block-start:0}@media only screen and (min-width:768px){.c-header__menu--global svg{display:block;visibility:visible}}.c-header__menu--journal{font-size:.875rem;margin:8px 0 8px -8px}@media only screen and (min-width:768px){.c-header__menu--journal{flex-wrap:nowrap;font-size:1rem}}.c-header__item{position:static;padding-top:0;padding-bottom:0}.c-header__item--pipe{border-left:2px solid #eee;padding-left:8px}.c-header__item--padding{padding-top:8px;padding-bottom:8px}@media only screen and (min-width:768px){.c-header__item--dropdown-menu{position:relative}}@media only screen and (min-width:1024px){.c-header__item--hide-lg{display:none;visibility:hidden}}@media only screen and (max-width:875px){.c-header__item--hide-md-max{display:none;visibility:hidden}.c-header__item--hide-md-max:first-child+*{margin-block-start:0}}.c-header__link{color:inherit;padding:8px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.c-header__link svg{transition-duration:.2s}.c-header__show-text{display:none;visibility:hidden}.has-tethered .c-header__heading--js-hide:first-child+*{margin-block-start:0}@media only screen and (min-width:768px){.c-header__show-text{display:inline;visibility:visible}}.c-header__show-text-sm{display:inline;visibility:visible}@media only screen and (min-width:768px){.c-header__show-text-sm{display:none;visibility:hidden}.c-header__show-text-sm:first-child+*{margin-block-start:0}}@media print{.c-header__dropdown{display:none}}.c-header__dropdown{background-color:#000;border-bottom:1px solid #2f2f2f;color:#eee;padding:16px 0;font-size:.875rem;line-height:1.2}.c-header__heading{display:inline-block;line-height:1.4;font-size:1.25rem;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;font-weight:400;margin-bottom:8px}.c-header__heading--keyline{border-top:1px solid;border-color:#2f2f2f;padding-top:16px;margin-top:16px;width:100%}.c-header__list{list-style:none;display:flex;flex-wrap:wrap;gap:0 16px;margin:0 -8px}.c-header__flush{margin:0 -8px}.c-header__visually-hidden{border:0;clip:rect(0,0,0,0);clip-path:inset(50%);height:1px;overflow:hidden;padding:0;white-space:nowrap;width:1px;position:absolute!important}.c-header__search-form{margin-bottom:8px}.c-header__search-layout{display:flex;gap:16px;flex-wrap:wrap}.c-header__search-layout>:first-child{flex:999 1 auto}.c-header__search-layout>*{flex:1 1 auto}.c-header__search-layout--max-width{max-width:720px}.c-header__search-button{align-items:center;cursor:pointer;display:flex;width:100%;margin:0;position:relative;text-decoration:none;font-size:1rem;line-height:1.15;justify-content:center;padding:8px 16px;transition:background-color .2s ease-in-out,border-color .2s ease-in-out,color .2s ease-in-out;border-radius:2px;border:1px solid #fff;color:#fff;background-color:transparent;background-image:none}.c-header__input,.c-header__select{padding:8px 16px;border:1px solid;border-radius:3px;font-size:1rem;width:100%;box-sizing:border-box}.c-header__select{display:block;min-width:150px;max-width:100%;margin:0;box-shadow:0 1px 0 1px rgba(0,0,0,.04);appearance:none;background-image:url("data:image/svg+xml,%3Csvg height='16' viewBox='0 0 16 16' width='16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m5.58578644 3-3.29289322-3.29289322c-.39052429-.39052429-.39052429-1.02368927 0-1.41421356s1.02368927-.39052429 1.41421356 0l4 4c.39052429.39052429.39052429 1.02368927 0 1.41421356l-4 4c-.39052429.39052429-1.02368927.39052429-1.41421356 0s-.39052429-1.02368927 0-1.41421356z' fill='%23333' fill-rule='evenodd' transform='matrix(0 1 -1 0 11 3)'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .7em top 50%;background-size:1em}.u-button svg,.u-button--primary svg{fill:currentcolor}@media only screen and (min-width:768px){.c-header__menu--journal .c-header__item--dropdown-menu:last-child .c-header__dropdown.has-tethered{left:auto;right:0}}@media only screen and (min-width:876px){.c-header__menu--journal .c-header__item--dropdown-menu:last-child .c-header__dropdown.has-tethered{left:0;right:auto}}.c-header__dropdown.has-tethered{position:absolute;top:100%;transform:translateY(5px);z-index:2;left:0;width:100%;border-radius:0 0 2px 2px;border-bottom:0}@media only screen and (min-width:768px){.c-header__dropdown.has-tethered{transform:translateY(8px);width:auto}}@media only screen and (min-width:876px){.c-header__dropdown.has-tethered{min-width:225px}}.c-header__dropdown--full-width.has-tethered{width:100%;padding:32px 0 24px;transform:none}.has-tethered .c-header__heading--js-hide{display:none;visibility:hidden}.has-tethered .c-header__list--js-stack{flex-direction:column}.has-tethered .c-header__item--keyline,.has-tethered .c-header__list~.c-header__list .c-header__item:first-child{border-top:1px solid #f3f3f3;padding-top:8px;margin-top:8px}.c-header__item--snid-account-widget{display:flex}.c-header__container{padding:0 4px}.c-header__list{padding:0 12px}.c-header__menu .c-header__link{font-size:14px}.c-header__item--snid-account-widget .c-header__link{padding:8px}.c-header__menu--journal{margin-left:0}@media only screen and (min-width:768px){.c-header__container{padding:0 16px}.c-header__menu--journal{margin-left:-8px}.c-header__menu .c-header__link{font-size:16px}.c-header__link--search{gap:13px}}.u-button{align-items:center;cursor:pointer;display:inline-flex;margin:0;position:relative;text-decoration:none;width:auto;font-family:sans-serif;font-size:1rem;line-height:1.3;justify-content:center;padding:8px;transition:.25s,color .25s,border-color .25s;border-radius:2px;background-color:transparent;background-image:none;color:#069;border:1px solid #069}.u-button--primary{color:#fff;background-color:#069;background-image:none;border:1px solid #069}.u-button--full-width{display:flex;width:100%}.u-container{margin:0 auto;max-width:1280px;padding:0 16px}.u-justify-content-space-between{justify-content:space-between}.u-display-none{display:none}.js .u-js-hide,.u-hide{display:none;visibility:hidden}.u-hide:first-child+*{margin-block-start:0}.u-visually-hidden{border:0;clip:rect(0,0,0,0);clip-path:inset(50%);height:1px;overflow:hidden;padding:0;white-space:nowrap;width:1px;position:absolute!important}@media print{.u-hide-print{display:none}}@media only screen and (min-width:1024px){.u-hide-at-lg{display:none;visibility:hidden}.u-hide-at-lg:first-child+*{margin-block-start:0}}.u-icon{fill:currentcolor;transform:translate(0);display:inline-block;vertical-align:text-top;width:1em;height:1em}.u-full-height{height:100%}.u-list-reset{list-style:none;margin:0;padding:0}.c-reading-companion__figure-item figure{margin:0}.u-mt-8{margin-top:8px}.u-mt-24{margin-top:24px}.u-mb-8{margin-bottom:8px}.u-mb-16{margin-bottom:16px}.u-mb-24{margin-bottom:24px}.u-mb-32{margin-bottom:32px}.u-mb-48{margin-bottom:48px}.u-pa-16{padding:16px}.u-h3{font-size:clamp(1.25rem,4vw,1.5rem)}.u-h3,.u-h4{-webkit-font-smoothing:antialiased;font-size:1.25rem}.app-feedback .app-feedback__message--success .eds-c-status-message__icon{color:#007a4b}.u-h3,.u-h4,h1,h2,h3{font-family:Harding,Palatino,serif;font-weight:700;line-height:1.2}h1{letter-spacing:min(max(-.0117156rem,4vw),-.0390625rem)}.u-h3,.u-h4,h2,h3{letter-spacing:-.0117156rem}.c-article-section__title,.c-article-title{font-weight:700}.c-card__title{line-height:1.4em}.c-article-associated-content__container .c-card__title{font-size:min(max(1.125rem,3vw),1.25rem)}.c-article__button{background-color:#069;border:1px solid #069;border-radius:2px;color:#fff;font-size:.875rem;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;line-height:1.4;margin-bottom:16px;padding:13px;transition:background-color .2s ease-out,color .2s ease-out;display:flex}.c-article__button,.c-article__button:hover{text-decoration:none}.c-article__button--inverted,.c-article__button:hover{background-color:#fff;color:#069}.c-article__button--inverted:hover{background-color:#069;color:#fff}.grade-c-hide{display:block}.c-pdf-download__link{padding:13px 24px}.u-color-open-access{color:#b74616}.c-article-sidebar{display:none}@media only screen and (min-width:1024px){.c-article-sidebar{display:block;margin-top:8px}} }
+(function () {
+        if ( typeof window.CustomEvent === "function" ) return false;
+        function CustomEvent ( event, params ) {
+            params = params || { bubbles: false, cancelable: false, detail: null };
+            var evt = document.createEvent( 'CustomEvent' );
+            evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+            return evt;
+        }
+
+        CustomEvent.prototype = window.Event.prototype;
+
+        window.CustomEvent = CustomEvent;
+    })();
+window.initGTM = function() {
+        if (window.config.mustardcut) {
+            (function (w, d, s, l, i) {
+                w[l] = w[l] || [];
+                w[l].push({'gtm.start': new Date().getTime(), event: 'gtm.js'});
+                var f = d.getElementsByTagName(s)[0],
+                        j = d.createElement(s),
+                        dl = l != 'dataLayer' ? '&l=' + l : '';
+                j.async = true;
+                j.src = 'https://sgtm.nature.com/gtm.js?id=' + i + dl;
+                f.parentNode.insertBefore(j, f);
+            })(window, document, 'script', 'dataLayer', 'GTM-MRVXSHQ');
+        }
+    }
+(function(w,d,t) {
+        function cc() {
+            var h = w.location.hostname;
+            if (h === 'preview-www.nature.com') return;
+            var e = d.createElement(t),
+                s = d.getElementsByTagName(t)[0];
+            e.setAttribute('crossorigin', 'anonymous');
+            if (h === 'nature.com' || h.endsWith('.nature.com')) {
+                e.src = 'https://cmp.nature.com/production_live/en/compact/consent-bundle-8-latest.js';
+                
+                    e.setAttribute('onload', "initGTM(window,document,'script','dataLayer','GTM-MRVXSHQ')");
+                
+            } else {
+                e.src = '/oscar-static/js/cookie-consent-es5-bundle-c7e13f01d7.js';
+                e.setAttribute('data-consent', h);
+            }
+            s.insertAdjacentElement('afterend', e);
+        }
+        cc();
+    })(window,document,'script');
+(function(w, d) {
+        var moduleSupport = (function() {
+            return 'noModule' in d.createElement('script');
+        })();
+
+        if (w.config.mustardcut === true) {
+            w.loader = {
+                index: 0,
+                registered: [],
+                scripts: [
+                    
+                        {src: '/oscar-static/js/global-article-es6-bundle-084e92310b.js', test: 'global-article-js', module: true},
+                        {src: '/oscar-static/js/global-article-es5-bundle-e615f0aae0.js', test: 'global-article-js', nomodule: true},
+                        {src: '/oscar-static/js/shared-es6-bundle-269e7f3e90.js', test: 'shared-js', module: true},
+                        {src: '/oscar-static/js/shared-es5-bundle-88de4f3978.js', test: 'shared-js', nomodule: true},
+                        {src: '/oscar-static/js/header-150-es6-bundle-8395667412.js', test: 'header-150-js', module: true},
+                        {src: '/oscar-static/js/header-150-es5-bundle-95c03c3888.js', test: 'header-150-js', nomodule: true}
+                    
+                ].filter(function (s) {
+                    if (s.src === null) return false;
+                    if (moduleSupport && s.nomodule) return false;
+                    return !(!moduleSupport && s.module);
+                }),
+
+                register: function (value) {
+                    this.registered.push(value);
+                },
+
+                ready: function () {
+                    if (this.registered.length === this.scripts.length) {
+                        this.registered.forEach(function (fn) {
+                            if (typeof fn === 'function') {
+                                setTimeout(fn, 0); 
+                            }
+                        });
+                        this.ready = function () {};
+                    }
+                },
+
+                insert: function (s) {
+                    var t = d.getElementById('js-position' + this.index);
+                    if (t && t.insertAdjacentElement) {
+                        t.insertAdjacentElement('afterend', s);
+                    } else {
+                        d.head.appendChild(s);
+                    }
+                    ++this.index;
+                },
+
+                createScript: function (script, beforeLoad) {
+                    var s = d.createElement('script');
+                    s.id = 'js-position' + (this.index + 1);
+                    s.setAttribute('data-test', script.test);
+                    if (beforeLoad) {
+                        s.defer = 'defer';
+                        s.onload = function () {
+                            if (script.noinit) {
+                                loader.register(true);
+                            }
+                            if (d.readyState === 'interactive' || d.readyState === 'complete') {
+                                loader.ready();
+                            }
+                        };
+                    } else {
+                        s.async = 'async';
+                    }
+                    s.src = script.src;
+                    return s;
+                },
+
+                init: function () {
+                    this.scripts.forEach(function (s) {
+                        loader.insert(loader.createScript(s, true));
+                    });
+
+                    d.addEventListener('DOMContentLoaded', function () {
+                        loader.ready();
+                        var conditionalScripts;
+                        
+                            conditionalScripts = [
+                                {match: 'div[data-pan-container]', src: '/oscar-static/js/pan-zoom-es6-bundle-1a117d29d6.js', test: 'pan-zoom-js',  module: true },
+                                {match: 'div[data-pan-container]', src: '/oscar-static/js/pan-zoom-es5-bundle-1a117d29d6.js', test: 'pan-zoom-js',  nomodule: true },
+                                {match: 'math,span.mathjax-tex', src: '/oscar-static/js/math-es6-bundle-8da0cf81d9.js', test: 'math-js', module: true},
+                                {match: 'math,span.mathjax-tex', src: '/oscar-static/js/math-es5-bundle-8da0cf81d9.js', test: 'math-js', nomodule: true}
+                            ];
+                        
+
+                        if (conditionalScripts) {
+                            conditionalScripts.filter(function (script) {
+                                return !!document.querySelector(script.match) && !((moduleSupport && script.nomodule) || (!moduleSupport && script.module));
+                            }).forEach(function (script) {
+                                loader.insert(loader.createScript(script));
+                            });
+                        }
+                    }, false);
+                }
+            };
+            loader.init();
+        }
+    })(window, document);
+{"mainEntity":{"headline":"Discovering state-of-the-art reinforcement learning algorithms","description":"Humans and other animals use powerful reinforcement learning (RL) mechanisms that have been discovered by evolution over many generations of trial and error. By contrast, artificial agents typically learn using handcrafted learning rules. Despite decades of interest, the goal of autonomously discovering powerful RL algorithms has proven to be elusive1–6. Here we show that it is possible for machines to discover a state-of-the-art RL rule that outperforms manually designed rules. This was achieved by meta-learning from the cumulative experiences of a population of agents across a large number of complex environments. Specifically, our method discovers the RL rule by which the agent’s policy and predictions are updated. In our large-scale experiments, the discovered rule surpassed all existing rules on the well-established Atari benchmark and outperformed a number of state-of-the-art RL algorithms on challenging benchmarks that it had not seen during discovery. Our findings suggest that the RL algorithms required for advanced artificial intelligence may soon be automatically discovered from the experiences of agents, rather than manually designed. An autonomous method discovers reinforcement learning rules from the cumulative experiences of a population of agents across a large number of complex environments, and the discovered rule achieves state-of-the-art performance on challenging benchmarks.","datePublished":"2025-10-22T00:00:00Z","dateModified":"2025-10-22T00:00:00Z","pageStart":"312","pageEnd":"319","license":"http://creativecommons.org/licenses/by-nc-nd/4.0/","sameAs":"https://doi.org/10.1038/s41586-025-09761-x","keywords":["Computer science","Computational science","Science","Humanities and Social Sciences","multidisciplinary"],"image":["https://media.springernature.com/lw1200/springer-static/image/art%3A10.1038%2Fs41586-025-09761-x/MediaObjects/41586_2025_9761_Fig1_HTML.png","https://media.springernature.com/lw1200/springer-static/image/art%3A10.1038%2Fs41586-025-09761-x/MediaObjects/41586_2025_9761_Fig2_HTML.png","https://media.springernature.com/lw1200/springer-static/image/art%3A10.1038%2Fs41586-025-09761-x/MediaObjects/41586_2025_9761_Fig3_HTML.png","https://media.springernature.com/lw1200/springer-static/image/art%3A10.1038%2Fs41586-025-09761-x/MediaObjects/41586_2025_9761_Fig4_HTML.png"],"isPartOf":{"name":"Nature","issn":["1476-4687","0028-0836"],"volumeNumber":"648","@type":["Periodical","PublicationVolume"]},"publisher":{"name":"Nature Publishing Group UK","logo":{"url":"https://www.springernature.com/app-sn/public/images/logo-springernature.png","@type":"ImageObject"},"@type":"Organization"},"author":[{"name":"Junhyuk Oh","url":"http://orcid.org/0000-0003-4383-6396","affiliation":[{"name":"Google DeepMind","address":{"name":"Google DeepMind, London, UK","@type":"PostalAddress"},"@type":"Organization"}],"email":"junhyuk@google.com","@type":"Person"},{"name":"Gregory Farquhar","affiliation":[{"name":"Google DeepMind","address":{"name":"Google DeepMind, London, UK","@type":"PostalAddress"},"@type":"Organization"}],"@type":"Person"},{"name":"Iurii Kemaev","url":"http://orcid.org/0009-0006-6804-5936","affiliation":[{"name":"Google DeepMind","address":{"name":"Google DeepMind, London, UK","@type":"PostalAddress"},"@type":"Organization"}],"@type":"Person"},{"name":"Dan A. Calian","url":"http://orcid.org/0000-0001-7283-5670","affiliation":[{"name":"Google DeepMind","address":{"name":"Google DeepMind, London, UK","@type":"PostalAddress"},"@type":"Organization"}],"@type":"Person"},{"name":"Matteo Hessel","url":"http://orcid.org/0009-0006-9946-4375","affiliation":[{"name":"Google DeepMind","address":{"name":"Google DeepMind, London, UK","@type":"PostalAddress"},"@type":"Organization"}],"@type":"Person"},{"name":"Luisa Zintgraf","url":"http://orcid.org/0009-0003-5864-7632","affiliation":[{"name":"Google DeepMind","address":{"name":"Google DeepMind, London, UK","@type":"PostalAddress"},"@type":"Organization"}],"@type":"Person"},{"name":"Satinder Singh","affiliation":[{"name":"Google DeepMind","address":{"name":"Google DeepMind, London, UK","@type":"PostalAddress"},"@type":"Organization"}],"@type":"Person"},{"name":"Hado van Hasselt","affiliation":[{"name":"Google DeepMind","address":{"name":"Google DeepMind, London, UK","@type":"PostalAddress"},"@type":"Organization"}],"@type":"Person"},{"name":"David Silver","url":"http://orcid.org/0000-0002-5197-2892","affiliation":[{"name":"Google DeepMind","address":{"name":"Google DeepMind, London, UK","@type":"PostalAddress"},"@type":"Organization"}],"email":"davidsilver@google.com","@type":"Person"}],"isAccessibleForFree":true,"@type":"ScholarlyArticle"},"@context":"https://schema.org","@type":"WebPage"}
+Skip to main content
+Thank you for visiting nature.com. You are using a browser version with limited support for CSS. To obtain
+            the best experience, we recommend you use a more up to date browser (or turn off compatibility mode in
+            Internet Explorer). In the meantime, to ensure continued support, we are displaying the site without styles
+            and JavaScript.
+Advertisement
+window.SN = window.SN || {};
+            window.SN.libs = window.SN.libs || {};
+            window.SN.libs.ads = window.SN.libs.ads || {};
+            window.SN.libs.ads.slotConfig = window.SN.libs.ads.slotConfig || {};
+            
+                window.SN.libs.ads.slotConfig['top'] = {
+                    'pos': 'top',
+                    'type': 'article',
+                    'path': 's41586-025-09761-x'
+                };
+            
+            
+            window.SN.libs.ads.slotConfig['kwrd'] = 'Computer+science,Computational+science';
+            
+            
+            window.SN.libs.ads.slotConfig['subjmeta'] = '1042,117,639,705';
+            
+            
+            window.SN.libs.ads.slotConfig['techmeta'] = '119,129';
+View all journals
+Saved research
+Search
+Log in
+Content
+Explore content
+About
+the journal
+Publish
+with us
+Sign up for alerts
+RSS feed
+nature
+articles
+article
+Discovering state-of-the-art reinforcement learning algorithms
+Download PDF
+Download PDF
+Article
+Open access
+Published:
+22 October 2025
+Discovering state-of-the-art reinforcement learning algorithms
+Junhyuk Oh
+ORCID:
+orcid.org/0000-0003-4383-6396
+1
+na1
+,
+Gregory Farquhar
+1
+na1
+,
+Iurii Kemaev
+ORCID:
+orcid.org/0009-0006-6804-5936
+1
+na1
+,
+Dan A. Calian
+ORCID:
+orcid.org/0000-0001-7283-5670
+1
+na1
+,
+Matteo Hessel
+ORCID:
+orcid.org/0009-0006-9946-4375
+1
+,
+Luisa Zintgraf
+ORCID:
+orcid.org/0009-0003-5864-7632
+1
+,
+Satinder Singh
+1
+,
+Hado van Hasselt
+1
+&
+…
+David Silver
+ORCID:
+orcid.org/0000-0002-5197-2892
+1
+Show authors
+Nature
+volume
+648
+,
+pages
+312–319 (
+2025
+)
+Cite this article
+Save article
+View saved research
+128k
+Accesses
+28
+Citations
+239
+Altmetric
+Metrics
+details
+Abstract
+Humans and other animals use powerful reinforcement learning (RL) mechanisms that have been discovered by evolution over many generations of trial and error. By contrast, artificial agents typically learn using handcrafted learning rules. Despite decades of interest, the goal of autonomously discovering powerful RL algorithms has proven to be elusive
+1
+,
+2
+,
+3
+,
+4
+,
+5
+,
+6
+. Here we show that it is possible for machines to discover a state-of-the-art RL rule that outperforms manually designed rules. This was achieved by meta-learning from the cumulative experiences of a population of agents across a large number of complex environments. Specifically, our method discovers the RL rule by which the agent’s policy and predictions are updated. In our large-scale experiments, the discovered rule surpassed all existing rules on the well-established Atari benchmark and outperformed a number of state-of-the-art RL algorithms on challenging benchmarks that it had not seen during discovery. Our findings suggest that the RL algorithms required for advanced artificial intelligence may soon be automatically discovered from the experiences of agents, rather than manually designed.
+Similar content being viewed by others
+DeepSeek-R1 incentivizes reasoning in LLMs through reinforcement learning
+Article
+Open access
+17 September 2025
+An adaptable and personalized framework for top-N course recommendations in online learning
+Article
+Open access
+06 May 2024
+Competitive swarm reinforcement learning improves stability and performance of deep reinforcement learning
+Article
+Open access
+11 December 2025
+window.dataLayer = window.dataLayer || [];
+                window.dataLayer.push({
+                    recommendations: {
+                        recommender: 'semantic',
+                        model: 'e5',
+                        policy_id: null,
+                        timestamp: 1792654782,
+                        embedded_user: 'null'
+                    }
+                });
+Explore related subjects
+Discover the latest articles and news in related subjects.
+Computational science
+Computer science
+Reinforcement Learning in Multi-Agent Systems
+Main
+The primary goal of artificial intelligence is to design agents that, like humans, can predict and act in complex environments to achieve goals. Many of the most successful agents are based on reinforcement learning (RL), in which agents learn by interacting with environments. Decades of research have produced ever more efficient RL algorithms, resulting in numerous landmarks in artificial intelligence, including the mastery of complex competitive games such as Go
+7
+, chess
+8
+,
+StarCraft
+9
+and
+Minecraft
+10
+, the invention of new mathematical tools
+11
+, or the control of complex physical systems
+12
+.
+Unlike humans, whose learning mechanism has been naturally discovered by biological evolution, RL algorithms are typically manually designed. This is usually slow and laborious, and limited by reliance on human knowledge and intuition. Although a number of attempts have been made to automatically discover learning algorithms
+1
+,
+2
+,
+3
+,
+4
+,
+5
+,
+6
+, none have proven to be sufficiently efficient and general to replace hand-designed RL systems.
+In this work, we introduce an autonomous method for discovering RL rules solely through the experience of many generations of agents interacting with various environments (Fig.
+1a
+). The discovered RL rule achieves state-of-the-art performance on a variety of challenging RL benchmarks. The success of our method contrasts previous work in two dimensions. First, whereas previous methods searched over narrow spaces of RL rules (for example, hyperparameters
+13
+,
+14
+or policy loss
+1
+,
+6
+), our method allows the agent to explore a far more expressive space of potential RL rules. Second, whereas previous work focused on meta-learning in simple environments (for example, grid-worlds
+3
+,
+15
+), our method meta-learns in complex and diverse environments at a much larger scale.
+Fig. 1: Discovering an RL rule from a population of agents.
+Full size image
+a
+, Discovery. Multiple agents, interacting with various environments, are trained in parallel according to the learning rule, defined by the meta-network. In the meantime, the meta-network is optimized to improve the agents’ collective performances.
+b
+, Agent architecture. An agent produces the following outputs: (1) a policy (
+π
+), (2) an observation-conditioned prediction vector (
+y
+), (3) action-conditioned prediction vectors (
+z
+), (4) action values (
+q
+) and (5) an auxiliary policy prediction (
+p
+). The semantics of
+y
+and
+z
+are determined by the meta-network.
+c
+, Meta-network architecture. A trajectory of the agent’s outputs is given as input to the meta-network, together with rewards and episode termination indicators from the environment (omitted for simplicity in the figure). Using this information, the meta-network produces targets for all of the agent’s predictions from the current and future time steps. The agent is updated to minimize the prediction errors with respect to their targets. LSTM, long short-term memory.
+d
+, Meta-optimization. The meta-parameters of the meta-network are updated by taking a meta-gradient step calculated from backpropagation through the agent’s update process (
+θ
+0
+→
+θ
+N
+), where the meta-objective is to maximize the collective returns of the agents in their environments.
+To choose a general space of discovery, we observe that the essential component of standard RL algorithms is a rule that updates one or more predictions, as well as the policy itself, towards targets that are functions of quantities such as future rewards and future predictions. Examples of RL rules based on different targets include temporal-difference learning
+16
+,
+Q
+-learning
+17
+, proximal policy optimization (PPO)
+18
+, auxiliary tasks
+19
+, successor features
+20
+and distributional RL
+21
+. In each case, the choice of target determines the nature of the predictions, for example, whether they become value functions, models or successor features.
+In our framework, an RL rule is represented by a meta-network that determines the targets towards which the agent should move its predictions and policy (Fig.
+1c
+). This allows the system to discover useful predictions without pre-defined semantics, as well as how they are used. The system may in principle rediscover past RL rules, but the flexible functional form also allows the agent to invent new RL rules that may be specifically adapted to environments of interest.
+During the discovery process, we instantiate a population of agents, each of which interacts with its own instance of an environment taken from a diverse set of challenging tasks. Each agent’s parameters are updated according to the current RL rule. We then use the meta-gradient method
+13
+to incrementally improve the RL rule such that it could lead to better-performing agents.
+Our large-scale empirical results show that our discovered RL rule, which we call DiscoRL, surpasses all existing RL rules on the environments in which it was meta-learned. Notably, this includes Atari games
+22
+, arguably the most established and informative of RL benchmarks. Furthermore, DiscoRL achieved state-of-the-art performance on a number of other challenging benchmarks, such as ProcGen
+23
+, that it had never been exposed to during discovery. We also show that the performance and generality of DiscoRL improves further as more diverse and complex environments are used in discovery. Finally, our analysis shows that DiscoRL has discovered unique prediction semantics that are distinct from existing RL concepts such as value functions. To the best of our knowledge, this is the empirical evidence that surpassing manually designed RL algorithms in terms of both generality and efficiency is finally within reach.
+Discovery method
+Our discovery approach involves two types of optimization: agent optimization and meta-optimization. Agent parameters are optimized by updating their policies and predictions towards the targets produced by the RL rule. Meanwhile, the meta-parameters of the RL rule are optimized by updating its targets to maximize the cumulative rewards of the agents.
+Agent network
+Much RL research considers what predictions an agent should make (for example, values), and what loss function should be used to learn those predictions (for example, temporal-difference (TD) learning) and improve the policy (for example, policy gradient). Instead of hand-crafting them, we define an expressive space of predictions without pre-defined semantics and meta-learn what the agent needs to optimize by representing it using a meta-network. It is desirable to maintain the ability to represent key ideas in existing RL algorithms, while supporting a large space of novel algorithmic possibilities.
+To this end, we let the agent, parameterized by
+θ
+, output two types of predictions in addition to a policy (
+π
+): an observation-conditioned vector prediction
+y
+(
+s
+) ∈ ℝ
+n
+of arbitrary size
+n
+and an action-conditioned vector prediction
+z
+(
+s
+,
+a
+) ∈ ℝ
+m
+of arbitrary size
+m
+, where
+s
+and
+a
+are an observation and an action, respectively (Fig.
+1b
+). The form of these predictions stems from the fundamental distinction between prediction and control
+16
+. For example, value functions are commonly divided into state-value functions
+v
+(
+s
+) (for prediction) and action-value functions
+q
+(
+s
+,
+a
+) (for control), and many other concepts in RL, such as rewards and successor features, also have an observation-conditioned version  and an action-conditioned version. Therefore, the functional form of the predictions (
+y
+,
+z
+) is general enough to represent, but is not restricted to, many existing fundamental concepts in RL.
+In addition to the predictions to be discovered, in most of our experiments the agent makes predictions with pre-defined semantics. Specifically, the agent produces an action-value function
+q
+(
+s
+,
+a
+) and an action-conditional auxiliary policy prediction
+p
+(
+s
+,
+a
+)
+8
+. This encourages the discovery process to focus on discovering new concepts through
+y
+and
+z
+.
+Meta-network
+A large proportion of modern RL rules use the forward view of RL
+16
+. In this view, the RL rule receives a trajectory from time step
+t
+to
+t
++
+n
+, and uses this information to update the agent’s predictions or policy. They typically update the predictions or policy towards bootstrapped targets, that is, towards future predictions.
+Correspondingly, our RL rule uses a meta-network (Fig.
+1c
+) as a function that determines targets towards which the agent should move its predictions and policy. To produce targets at time step
+t
+, the meta-network receives as input a trajectory of the agent’s predictions and policy as well as rewards and episode termination from time step
+t
+to
+t
++
+n
+. It uses a standard long short-term memory
+24
+to process these inputs, although other architectures may be used (Extended Data Fig.
+3
+).
+The choice of inputs and outputs to the meta-network maintains certain desirable properties of handcrafted RL rules. First, the meta-network can deal with any observation and with discrete action spaces of any size. This is possible because the meta-network does not receive the observation directly as input, but only indirectly via predictions. In addition, it processes action-specific inputs and outputs by sharing weights across action dimensions. As a result it can generalize to radically different environments. Second, the meta-network is agnostic to the design of the agent network, as it sees only the output of the agent network. As long as the agent network produces the required form of outputs (
+π
+,
+y
+,
+z
+), the discovered RL rule can generalize to arbitrary agent architectures or sizes. Third, the search space defined by the meta-network includes the important algorithmic idea of bootstrapping. Fourth, as the meta-network processes both policy and predictions together, it can not only meta-learn auxiliary tasks
+25
+but also directly use predictions to update the policy (for example, to provide a baseline for variance reduction). Finally, outputting targets is strictly more expressive than outputting a scalar loss function, as it includes semi-gradient methods such as
+Q
+-learning in the search space. While building on these properties of standard RL algorithms, the rich parametric neural network allows the discovered rule to implement algorithms with potentially much greater efficiency and contextual nuance.
+Agent optimization
+The agent’s parameters (
+θ
+) are updated to minimize the distance from its predictions and policy to the targets from the meta-network. The agent’s loss function can be expressed as:
+$$L(\theta )={{\mathbb{E}}}_{s,a\sim {{\boldsymbol{\pi }}}_{\theta }}[D(\hat{{\boldsymbol{\pi }}},{{\boldsymbol{\pi }}}_{\theta }(s))+D(\hat{{\bf{y}}},{{\bf{y}}}_{\theta }(s))+D(\hat{{\bf{z}}},{{\bf{z}}}_{\theta }(s,a))+{L}_{{\rm{a}}{\rm{u}}{\rm{x}}}]$$
+where
+s
+and
+a
+are distributed according to the policy
+π
+θ
+, and
+D
+(
+p
+,
+q
+) is a distance function between
+p
+and
+q
+. We chose the Kullback–Leibler divergence as the distance function, as it is sufficiently general and has previously been found to make meta-optimization easier
+3
+. Here
+π
+θ
+,
+y
+θ
+,
+z
+θ
+and
+\(\hat{{\boldsymbol{\pi }}}\)
+,
+\(\hat{{\bf{y}}}\)
+,
+\(\hat{{\bf{z}}}\)
+are the outputs of the agent network and the meta-network, respectively, with a softmax function applied to normalize each vector.
+The auxiliary loss
+L
+aux
+is used for predictions with pre-defined semantics: action values (
+q
+) and auxiliary policy predictions (
+p
+) as follows:
+L
+aux
+=
+D
+(
+\(\hat{{\bf{q}}}\)
+,
+q
+θ
+(
+s
+,
+a
+)) +
+D
+(
+\(\hat{{\bf{p}}}\)
+,
+p
+θ
+(
+s
+,
+a
+)), where
+\(\hat{{\bf{q}}}\)
+is an action-value target from Retrace
+26
+projected to a two-hot vector
+8
+, and
+\(\hat{{\bf{p}}}\)
+=
+π
+θ
+(
+s
+′) is the policy at the one-step future state. To be consistent with the rest of losses, we use the Kullback–Leibler divergence as the distance function
+D
+.
+Meta-optimization
+Our goal is to discover an RL rule, represented by the meta-network with meta-parameters
+η
+, that allows agents to maximize rewards in a variety of training environments. This discovery objective
+J
+(
+η
+) and its meta-gradient ∇
+η
+J
+(
+η
+) can be expressed as:
+$$J(\eta )={{\mathbb{E}}}_{{\mathcal{E}}}{{\mathbb{E}}}_{\theta }[\,J(\theta )],{\nabla }_{\eta }\,J(\eta )\approx {{\mathbb{E}}}_{{\mathcal{E}}}{{\mathbb{E}}}_{\theta }[{\nabla }_{\eta }\theta {\nabla }_{\theta }\,J(\theta )],$$
+where
+\({\mathcal{E}}\)
+indicates an environment sampled from a distribution and
+θ
+denotes agent parameters induced by an initial parameter distribution and their evolution over the course of learning with the RL rule.
+\(J(\theta )={\mathbb{E}}\left[{\sum }_{t}{{\gamma }}^{{t}}{r}_{{t}}\right]\)
+, where
+γ
+is the discount factor and
+r
+t
+is the reward at step
+t
+, is the expected discounted sum of rewards, which is the typical RL objective. The meta-parameters are optimized using gradient ascent following the above equations.
+To estimate the meta-gradient, we instantiate a population of agents that learn according to the meta-network in a set of sampled environments. To ensure this approximation is close to the true distribution of interest, we use a large number of complex environments taken from challenging benchmarks, in contrast to previous work that focused on a small number of simple environments. As a result the discovery process surfaces diverse RL challenges, such as the sparsity of rewards, the task horizon, and the partial observability or stochasticity of environments.
+Each agent’s parameters are periodically reset to encourage the update rule to make fast learning progress within a limited agent lifetime. As in previous work on meta-gradient RL
+13
+, the meta-gradient term ∇
+η
+J
+(
+η
+) can be divided into two gradient terms by the chain rule: ∇
+η
+θ
+and ∇
+θ
+J
+(
+θ
+). The first term can be understood as a gradient over the agent update procedure
+27
+, whereas the second term is the gradient of the standard RL objective. To estimate the first term, we iteratively update the agent multiple times and backpropagate through the entire update procedure, as illustrated in Fig.
+1d
+. To make it tractable, we backpropagate over 20 agent updates using a sliding window. Finally, to estimate the second term, we use the advantage actor–critic method
+28
+. To estimate the advantage, we train a meta-value function, which is a value function used only for discovery.
+Empirical result
+We implemented our discovery method with a large population of agents in a set of complex environments. We call the discovered RL rule DiscoRL. In evaluation, the aggregated performance was measured by the interquartile mean (IQM) of normalized scores for benchmarks that consist of multiple tasks, which has proven to be a statistically reliable metric
+29
+.
+Atari
+The Atari benchmark
+22
+, one of the most studied benchmarks in the history of RL, consists of 57 Atari 2600 games. They require complex strategies, planning and long-term credit assignment, making it non-trivial for AI agents to master. Hundreds of RL algorithms have been evaluated on this benchmark over the past decade, which include MuZero
+8
+and Dreamer
+10
+.
+To see how strong the rule can be when discovered directly from this benchmark, we meta-trained an RL rule, Disco57, and evaluated it on the same 57 games (Fig.
+2a
+). In this evaluation, we used a network architecture that has a number of parameters comparable to the number used by MuZero. This is a larger network than the one used during discovery; the discovered RL rule must therefore generalize to this setting. Disco57 achieved an IQM of 13.86, outperforming all existing RL rules
+8
+,
+10
+,
+14
+,
+30
+on the Atari benchmark, with a substantially higher wall-clock efficiency compared with the state-of-the-art MuZero (Extended Data Fig.
+4
+). This shows that our method can automatically discover a strong RL rule from such challenging environments.
+Fig. 2: Evaluation of DiscoRL.
+Full size image
+a
+–
+f
+, Performance of DiscoRL compared to human-designed RL rules on Atari (
+a
+), ProcGen (
+b
+), DMLab (
+c
+), Crafter (
+d
+; figure inset shows results for 1 million environment steps), NetHack (
+e
+), and Sokoban (
+f
+). The
+x
+axis represents the number of environment steps in millions. The
+y
+axis represents the human-normalized IQM score for benchmarks consisting of multiple tasks (Atari, ProcGen and DMLab-30) and average return for the rest. Disco57 (blue) is discovered from the Atari benchmark and Disco103 (orange) is discovered from Atari, ProcGen and DMLab-30 benchmarks. The shaded areas show 95% confidence intervals. The dashed lines represent manually designed RL rules such as MuZero
+8
+, efficient memory-based exploration agent (MEME)
+30
+, Dreamer
+10
+, self-tuning actor-critic algorithm (STACX)
+14
+, importance-weighted actor-learner architecture (IMPALA)
+34
+, deep Q-network (DQN)
+51
+, phasic policy gradient (PPG)
+52
+, proximal policy optimization (PPO)
+18
+, and Rainbow
+53
+.
+Generalization
+We further investigated the generality of Disco57 by evaluating it on a variety of held-out benchmarks that it was never exposed to during discovery. These benchmarks include unseen observation and action spaces, diverse environment dynamics, various reward structures and unseen agent network architectures. Meta-training hyperparameters were tuned on only training environments (that is, Atari) to prevent the rule from being implicitly optimized for held-out benchmarks.
+The result on the ProcGen
+23
+benchmark (Fig.
+2b
+and Extended Data Table
+2
+), which consists of 16 procedurally generated two-dimensional games, shows that Disco57 outperformed all existing published methods, including MuZero
+8
+and PPO
+18
+, even though it had never interacted with ProcGen environments during discovery. In addition, Disco57 achieved a competitive performance on
+Crafter
+31
+(Fig.
+2d
+and Extended Data Table
+5
+), where the agent needs to learn a wide spectrum of abilities to survive. Disco57 reached the third place on the leaderboard of NetHack NeurIPS 2021 Challenge
+32
+(Fig.
+2e
+and Extended Data Table
+4
+), where more than 40 teams participated. Unlike the top submitted agents in the competition
+33
+, Disco57 did not use any domain-specific knowledge for defining subtasks or reward shaping. For a fair comparison, we trained an agent with the importance weighted actor-learner architecture (IMPALA) algorithm
+34
+using the same settings as Disco57. IMPALA’s performance was much weaker, suggesting that Disco57 has discovered a more efficient RL rule than standard approaches. In addition to environments, Disco57 turned out to be robust to a range of agent-specific settings such as network size, replay ratio and hyperparameters in evaluation (Extended Data Fig.
+1
+).
+Complex and diverse environments
+To understand the importance of complex and diverse environments for discovery, we further scaled up meta-learning with additional environments. Specifically, we discovered another rule, Disco103, using a more diverse set of 103 environments consisting of the Atari, ProcGen and DMLab-30
+35
+benchmarks. This rule performs similarly on the Atari benchmark while improving scores on every other seen and unseen benchmark in Fig.
+2
+. In particular, Disco103 reached human-level performance on
+Crafter
+and neared MuZero’s state-of-the-art performance on
+Sokoban
+36
+. These results show that the more complex and diverse the set of environments used for discovery, the stronger and more general the discovered rule becomes, even on held-out environments that were not seen during discovery. Discovering Disco103 required no changes to the discovery method compared with Disco57 other than the set of environments. This shows that the discovery process itself is robust, scalable and general.
+To further investigate the importance of using complex environments, we ran our discovery process on 57 grid-world tasks that are extended from previous work
+3
+, using the same meta-learning settings as for Disco57. The new rule had a significantly worse performance (Fig.
+3c
+) on the Atari benchmark. This verifies our hypothesis about the importance of meta-learning directly from complex and challenging environments. While using such environments was crucial, there was no need for a careful curation of the correct set of environments; we simply used popular benchmarks from the literature.
+Fig. 3: Properties of discovery process.
+Full size image
+a
+, Discovery efficiency. The best DiscoRL was discovered within 3 simulations of the agent’s lifetimes (200 million steps) per game.
+b
+, Scalability. DiscoRL becomes stronger on the ProcGen benchmark (30 million environment steps for all methods) as the training set of environments grows.
+c
+, Ablation. The plot shows the performances of variations of DiscoRL on Atari. ‘Without auxiliary prediction’ is meta-learned without the auxiliary prediction (
+p
+). ‘Small agents’ uses a smaller agent network during discovery. ‘Without prediction’ is meta-learned without learned predictions (
+y
+,
+z
+). ‘Without value’ is meta-learned without the value function (
+q
+). ‘Toy environments’ is meta-learned from 57 grid-world tasks instead of Atari games.
+Efficiency and scalability
+To further understand the scalability and efficiency of our approach, we evaluated multiple Disco57s over the course of discovery (Fig.
+3a
+). The best rule was discovered within approximately 600 million steps per Atari game, which amounts to just 3 experiments across 57 Atari games. This is arguably more efficient than the manual discovery of RL rules, which typically requires many more experiments to be executed, in addition to the time of the human researchers.
+Furthermore, DiscoRL performed better on the unseen ProcGen benchmark as more Atari games were used for discovery (Fig.
+3b
+), showing that the resulting RL rule scales well with the number and diversity of environments used for discovery. In other words, the performance of the discovered rule is a function of data (that is, environments) and compute.
+Effect of discovering new predictions
+To study the effect of the discovered semantics of predictions (
+y
+,
+z
+in Fig.
+1b
+), we compared different rules by varying the outputs of the agent, with and without certain types of prediction. The result in Fig.
+3c
+shows that the use of a value function markedly improves the discovery process, which highlights the importance of this fundamental concept of RL. However, the result in Fig.
+3c
+also shows the importance of discovering new prediction semantics (
+y
+and
+z
+) beyond pre-defined predictions. Overall, increasing the scope of discovery compared with previous work
+1
+,
+2
+,
+3
+,
+4
+,
+5
+,
+6
+was essential. In the following section, we provide further analysis to uncover what semantics have been discovered.
+Analysis
+Qualitative analysis
+We analysed the nature of the discovered rule, using Disco57 as a case study (Fig.
+4
+). Qualitatively, the discovered predictions spike in advance of salient events such as receiving rewards or changes in the entropy of the policy (Fig.
+4a
+). We also investigated which features of the observation cause the meta-learned predictions to respond strongly, by measuring the gradient norm associated with each part of the observation. The result in Fig.
+4b
+shows that meta-learned predictions tend to pay attention to objects that may be relevant in the future, which is distinct from where the policy and the value function pay attention to. These results indicate that DiscoRL has learned to identify and predict salient events over a modest horizon, and thus complements existing concepts such as the policy and value function.
+Fig. 4: Analysis of DiscoRL.
+Full size image
+a
+, Behaviour of discovered predictions. The plot shows how the agent’s discovered prediction (
+y
+) changes along with other quantities in
+Ms Pacman
+(left) and
+Breakout
+(right). ‘Confidence’ is calculated as negative entropy. Spikes in prediction confidence are correlated with upcoming salient events. For example, they often precede large rewards in
+Ms Pacman
+and strong action preferences in
+Breakout
+.
+b
+, Gradient analysis. Each contour shows where each prediction focuses on in the observation through a gradient analysis in
+Beam Rider
+. The predictions tend to focus more on enemies at a distance, whereas the policy and the value tend to focus on nearby enemies and the scoreboard, respectively.
+c
+, Prediction analysis. Future entropy and large-reward events can be better predicted from discovered predictions. The shaded areas represent 95% confidence intervals.
+d
+, Bootstrapping horizon. The plot shows how much the prediction target produced by DiscoRL changes when the prediction at each time step is perturbed. The individual curves correspond to 16 randomly sampled trajectories and the bold curve corresponds to the average over them.
+e
+, Reliance on predictions. The plot shows the performance of the controlled DiscoRL on
+Ms Pacman
+without bootstrapping when updating predictions and without using predictions at all. The shaded areas represent 95% confidence intervals.
+Information analysis
+To confirm the qualitative findings, we further investigated what information is contained in the predictions. We first collected data from the DiscoRL agent on 10 Atari games and trained a neural network to predict quantities of interest from either the discovered predictions, the policy or the value function. The results in Fig.
+4c
+show that the discovered predictions contain greater information about upcoming large rewards and the future policy entropy, compared with the policy and value. This suggests that the discovered predictions may capture unique task-relevant information that is not well captured by the policy and value.
+Emergence of bootstrapping
+We also found evidence that DiscoRL uses a bootstrapping mechanism. When the meta-network’s prediction input at future time steps (
+z
+t
++
+k
+) is perturbed, it strongly affects the target
+\({\hat{{\bf{z}}}}_{t}\)
+(Fig.
+4d
+). This means that the future predictions are used to construct targets for the current predictions. This bootstrapping mechanism and the discovered predictions turned out to be critical for performance (Fig.
+4e
+). If the
+y
+and
+z
+inputs to the meta-network are set to zero when computing their targets
+\(\hat{{\bf{y}}}\)
+and
+\(\hat{{\bf{z}}}\)
+(thus preventing bootstrapping), performance degrades substantially. If the
+y
+and
+z
+inputs are set to zero for computing all targets including the policy target, the performance drops even further. This shows the discovered predictions are heavily used to inform the policy update, rather than just serving as auxiliary tasks.
+Previous work
+The idea of meta-learning, or learning to learn, in artificial agents dates back to the 1980s
+37
+, with proposals to train meta-learning systems with backpropagation of gradients
+38
+. The core idea of using a slower meta-learning process to meta-optimize a fast learning or adaptation process
+39
+,
+40
+has been studied for numerous applications in various contexts, including transfer learning
+41
+, continual learning
+42
+, multi-task learning
+43
+, hyperparameter optimization
+44
+and automated machine learning
+45
+.
+Early efforts to use meta-learning for RL agents comprised attempts to meta-learn information-seeking behaviours
+46
+. Many later works have focused on meta-learning a small number of hyperparameters of an existing RL algorithm
+13
+,
+14
+. Such approaches have produced promising results but cannot markedly depart from the underlying handcrafted algorithms. Another line of work has attempted to eschew inductive biases by meta-learning entirely black-box algorithms implemented, for example, as recurrent neural networks
+47
+or as a synaptic learning rule
+48
+. Although conceptually appealing, these methods are prone to overfit to tasks seen in meta-training
+49
+.
+The idea of representing knowledge using a wider class of predictions was first introduced in temporal-difference networks
+50
+but without any meta-learning mechanism. A similar idea has been explored for meta-learning auxiliary tasks
+25
+. Our work extends this idea to effectively discover an entire loss function that the agent optimizes, covering a much broader range of possible RL rules. Furthermore, unlike previous work, the discovered knowledge can generalize to unseen environments.
+Recently, there have been growing interests in discovering general-purpose RL rules
+1
+,
+3
+,
+4
+,
+5
+,
+6
+,
+15
+. However, most of them were limited to small agents and simple tasks, or the scope of discovery was limited to a partial RL rule. Therefore, their rules were not extensively compared with state-of-the-art rules on challenging benchmarks. In contrast, we search over a larger space of rules, including entirely new predictions, and scale up to a large number of complex environments for discovery. As a result, we demonstrate that it is possible to discover a general-purpose RL rule that outperforms a number of state-of-the-art rules on challenging benchmarks.
+Conclusion
+Enabling machines to discover learning algorithms for themselves is one of the most promising ideas in artificial intelligence owing to its potential for open-ended self-improvement. This work has taken a step towards machine-designed RL algorithms that can compete with and even outperform some of the best manually designed algorithms in challenging environments. We also showed that the discovered rule becomes stronger and more general as it gets exposed to more diverse environments. This suggests that the design of RL algorithms for advanced AI may in the future be led by machines that can scale effectively with data and compute.
+Methods
+Meta-network
+The meta-network maps a trajectory of agent outputs along with relevant quantities from the environment to targets:
+\({m}_{\eta }:{f}_{\theta }({s}_{t}),{f}_{{\theta }^{-}}({s}_{t}),\)
+\({a}_{t},{r}_{t},{b}_{t},\ldots ,{f}_{\theta }({s}_{t+n}),{f}_{{\theta }^{-}}({s}_{t+n}),{a}_{t+n},{r}_{t+n},{b}_{t+n}\mapsto \hat{{\boldsymbol{\pi }}},\hat{{\bf{y}}},\hat{{\bf{z}}},\)
+where
+η
+represents meta-parameters, and
+f
+θ
+= [
+π
+θ
+(
+s
+),
+y
+θ
+(
+s
+),
+z
+θ
+(
+s
+),
+q
+θ
+(
+s
+)] is the agent output with parameters
+θ
+.
+a
+,
+r
+and
+b
+are an action taken by the agent, a reward and an episode termination indicator, respectively.
+θ
+−
+is an exponential moving average of parameters
+θ
+. This functional form allows the meta-network to search over a strictly larger space of rules compared with meta-learning a scalar loss function. This is further discussed in
+Supplementary Information
+.
+The meta-network processes the inputs by unrolling a long short-term memory (LSTM) backwards in time as illustrated in Fig.
+1c
+. This allows it to take into account
+n
+-step future information to produce targets, as in multi-step RL methods such as temporal-difference methods TD(
+λ
+)
+54
+. We found that this architecture is computationally more efficient than alternatives such as transformers, while achieving a similar performance, as shown in Extended Data Fig.
+3b
+.
+The action-specific inputs and outputs are processed in the meta-network using shared weights over the action dimension, and an intermediate embedding is computed by averaging across it. This allows the meta-network to process any number of actions. More details about it can be found in
+Supplementary Information
+.
+To allow the meta-network to discover a wider class of algorithms, such as reward normalization, that require maintaining statistics over an agent’s lifetime, we add an additional recurrent neural network. This ‘meta-RNN’ is unrolled forward across agent updates (from
+θ
+i
+to
+θ
+i
++1
+), rather than across time steps in an episode. The core of the meta-RNN is another LSTM module. For each of the agent updates, the whole batch of trajectories is embedded into a single vector that is passed to this LSTM. The meta-RNN can potentially capture the learning dynamics throughout the agent’s lifetime, producing targets that are adaptive to the specific agent and the environment. The meta-RNN slightly improved the overall performance, as shown in Extended Data Fig.
+3a
+. Further details are described in
+Supplementary Information
+.
+Meta-optimization stabilization
+A number of challenges arise when we discover at a large scale, mainly because of unbalanced gradient signals coming from agents in different environments and myopic gradients caused by long lifetimes of agents. We introduce a few methods to alleviate these problems.
+First, when estimating the advantage term in the advantage actor–critic method to estimate ∇
+θ
+J
+(
+θ
+) in the meta-gradient, we normalize the advantage term as follows:
+\(\bar{A}\)
+= (
+A
+−
+μ
+)/
+σ
+, where
+\(\bar{A}\)
+is a normalized advantage and
+μ
+and
+σ
+are the exponentially moving average and standard deviation of advantages accumulated over the agent’s lifetime. We found that this makes the scale of the advantage term balanced across different environments. In addition, when aggregating the meta-gradient from the population of agents, we take the average of the meta-gradients over all agents after applying a separate Adam optimizer to the meta-gradient calculated from each agent:
+\(\eta \leftarrow \eta +\frac{1}{n}{\sum }_{i=1}^{n}\mathrm{ADAM}({g}_{i})\)
+, where
+g
+i
+is the meta-gradient estimation from the
+i
+th agent in the population. We found that this helps to normalize the magnitude of the meta-gradients from each agent.
+We add two meta-regularization losses (
+L
+ent
+and
+L
+KL
+) to the meta-objective
+J
+(
+η
+) as follows:
+\({{\mathbb{E}}}_{{\mathcal{E}}}{{\mathbb{E}}}_{\theta }[\,J(\theta )-{L}_{\mathrm{ent}}(\theta )-{L}_{\mathrm{KL}}(\theta )]\)
+.
+\({L}_{\mathrm{ent}}(\theta )=-{{\mathbb{E}}}_{s,a}\)
+\([H({{\bf{y}}}_{\theta }(s))+H({{\bf{z}}}_{\theta }({\rm{s}},a))]\)
+is an entropy regularization of predictions
+y
+and
+z
+, where
+H
+(⋅) is the entropy of the given categorical distribution. We found that this helps prevent the predictions from converging prematurely.
+\({L}_{{\rm{K}}{\rm{L}}}(\theta )={D}_{{\rm{K}}{\rm{L}}}({{\boldsymbol{\pi }}}_{{\theta }^{-}}||\hat{{\boldsymbol{\pi }}})\)
+is the Kullback–Leibler divergence between the policy of a target network with an exponential moving average of the agent parameters (
+θ
+−
+) and the meta-network’s policy target (
+\(\hat{{\boldsymbol{\pi }}}\)
+). This prevents the meta-network from proposing excessively aggressive updates that could lead to collapse.
+It is noted that these methods are used only to stabilize meta-optimization, and they do not determine how the agents are updated. The meta-learned rule still solely determines how the agents are updated.
+Implementation details
+We developed a framework that uses JAX library
+55
+,
+56
+and distributes computation across tensor processing units (TPUs)
+57
+inspired by the Podracer architectures
+58
+. In this framework, each agent is simulated independently, with the meta-gradients of all agents being calculated in parallel. The meta-parameters are updated synchronously by aggregating meta-gradients across all agents. We used MixFlow-MG
+59
+to minimize the computational cost of the runs.
+For Disco57, we instantiate 128 agents by cycling through the 57 Atari environments in lexicographic order. For Disco103, we instantiate 206 agents, with two copies of each environment from Atari, ProcGen and DMLab-30. Disco57 was discovered using 1,024 TPUv3 cores for 64 hours, and Disco103 was discovered using 2,048 TPUv3 cores for 60 hours.
+The meta-value function used to calculate the meta-gradient is updated using V-Trace
+34
+, with a discount factor of 0.997 and a TD(
+λ
+) coefficient of 0.95. The meta-value function and agent networks are optimized using an Adam optimizer with a learning rate of 0.0003. For meta-parameter updates, we use the Adam optimizer with a learning rate of 0.001 and gradient clipping of 1.0. Each agent is updated based on a batch of 96 trajectories with 29 time steps each. In each batch, on-policy trajectories and trajectories sampled from the replay buffer are mixed, with replay trajectories accounting for 90% of each batch. At each meta-step, 48 trajectories are generated to calculate the meta-gradient and update the meta-value function.
+Each agent’s parameters are reset after it has consumed its allocated experience budget. When resetting, a new experience budget is sampled from the categories (200 million, 100 million, 50 million, 20 million) with a weight inversely proportional to the budget, such that the same amount of total experience is sampled in each category. This was based on our observation that much of learning happens early in the lifetime and demonstrated a marginal improvement in our preliminary small-scale investigation.
+Hyperparameters and evaluation
+For evaluation on held-out benchmarks, we only tuned the learning rate from {0.0001, 0.0003, 0.0005}. The rest of the hyperparameters were selected based on baseline algorithms from the literature.
+The evaluation on Atari games (shown in Fig.
+2a
+and Extended Data Table
+1
+) used a version of the IMPALA
+34
+network with an increased parameter count that matches the agent network size used by MuZero
+8
+. Specifically, we used a network with 4 convolutional residual blocks with 256, 384, 384 and 256 filters, a shared fully connected final layer of 768 dimensions, and an LSTM-based action-conditional predictions component that is composed of an LSTM with a 1,024 hidden state dimension and a 1,024-dimensional fully connected layer. DMLab-30 evaluations (Fig.
+2c
+and Extended Data Table
+3
+) use the same action space discretization and agent network architecture as used in IMPALA. See Extended Data Table
+6
+for the list of hyperparameters. To verify the statistical significance of our evaluations, we used two random seeds for initialization on each environment from Atari, ProcGen and DMLab, three seeds on
+Crafter
+and NetHack, and five seeds on
+Sokoban
+.
+Analysis details
+For the prediction analysis in Fig.
+4c
+, we train multiple 3-layer perceptrons (MLPs) with 128, 64 and 32 hidden units for each layer respectively. The MLPs are trained to predict quantities such as future entropy and rewards from the outputs of an agent that has been trained on different Atari games using Disco57. We use 10 Atari games (
+Alien
+,
+Amidar
+,
+Battle Zone
+,
+Frostbite
+,
+Gravitar
+,
+Qbert
+,
+Riverraid
+,
+Road Runner
+,
+Robotank
+and
+Zaxxon
+). The values shown in Fig.
+4c
+are
+R
+2
+scores for future entropy and test accuracy for large-reward events using fivefold cross-validation. Extended Data Fig.
+2
+provides an additional prediction analysis for more quantities. For high-dimensional outputs (
+y
+,
+z
+,
+z
+a
+), we used a larger 3-layer MLP with 256 hidden units each.
+Data availability
+No external data were used for the results presented in the article.
+Code availability
+We provide the meta-training and evaluation code, with the meta-parameters of Disco103, under an open source licence at
+https://github.com/google-deepmind/disco_rl
+. All of the benchmarks presented in the article are publicly available.
+References
+Kirsch, L., van Steenkiste, S. & Schmidhuber, J. Improving generalization in meta reinforcement learning using learned objectives. In
+Proc. International Conference on Learning Representations
+(ICLR, 2020).
+Kirsch, L. et al. Introducing symmetries to black box meta reinforcement learning. In
+Proc
+.
+AAAI Conference on Artificial Intelligence
+36
+, 7202–7210 (Association for the Advancement of Artificial Intelligence, 2022).
+Oh, J. et al. Discovering reinforcement learning algorithms. In
+Proc
+.
+Adv. Neural Inf. Process. Syst.
+33
+, 1060–1070 (NeurIPS, 2020).
+Xu, Z. et al. Meta-gradient reinforcement learning with an objective discovered online. In
+Proc
+.
+Adv. Neural Inf. Process. Syst.
+33
+, 15254–15264 (NeurIPS, 2020).
+Houthooft, R. et al. Evolved policy gradients. In
+Proc
+.
+Adv. Neural Inf. Process. Syst.
+31
+, 5405–5414 (NeurIPS, 2018).
+Lu, C. et al. Discovered policy optimisation. In
+Proc
+.
+Adv. Neural Inf. Process. Syst.
+35,
+16455–16468 (NeurIPS, 2022).
+Silver, D. et al. Mastering the game of Go with deep neural networks and tree search.
+Nature
+529
+, 484–489 (2016).
+Article
+ADS
+CAS
+PubMed
+Google Scholar
+Schrittwieser, J. et al. Mastering Atari, Go, chess and shogi by planning with a learned model.
+Nature
+588
+, 604–609 (2020).
+Article
+ADS
+CAS
+PubMed
+Google Scholar
+Vinyals, O. et al. Grandmaster level in
+StarCraft II
+using multi-agent reinforcement learning.
+Nature
+575
+, 350–354 (2019).
+Article
+ADS
+CAS
+PubMed
+Google Scholar
+Hafner, D., Pasukonis, J., Ba, J. & Lillicrap, T. Mastering diverse control tasks through world models.
+Nature
+640
+, 647–653 (2025).
+Article
+ADS
+CAS
+PubMed
+PubMed Central
+Google Scholar
+Fawzi, A. et al. Discovering faster matrix multiplication algorithms with reinforcement learning.
+Nature
+610
+, 47–53 (2022).
+Article
+ADS
+CAS
+PubMed
+PubMed Central
+Google Scholar
+Degrave, J. et al. Magnetic control of tokamak plasmas through deep reinforcement learning.
+Nature
+602
+, 414–419 (2022).
+Article
+ADS
+CAS
+PubMed
+PubMed Central
+Google Scholar
+Xu, Z., van Hasselt, H. P. & Silver, D. Meta-gradient reinforcement learning. In
+Proc
+.
+Adv. Neural Inf. Process. Syst.
+31
+, 2402–2413 (NeurIPS, 2018).
+Zahavy, T. et al. A self-tuning actor–critic algorithm. In
+Proc
+.
+Adv. Neural Inf. Process. Syst.
+33
+, 20913–20924 (NeurIPS, 2020).
+Jackson, M. T. et al. Discovering general reinforcement learning algorithms with adversarial environment design. In
+Proc
+.
+Adv. Neural Inf. Process. Syst.
+36
+, 79980–79998 (NeurIPS, 2023).
+Sutton, R. S. & Barto, A. G.
+Reinforcement learning: An Introduction
+(MIT Press, 2018).
+Watkins, C. J. & Dayan, P.
+Q
+-learning.
+Mach. Learn.
+8
+, 279–292 (1992).
+Google Scholar
+Schulman, J., Wolski, F., Dhariwal, P., Radford, A. & Klimov, O. Proximal policy optimization algorithms. Preprint at
+https://arxiv.org/abs/1707.06347
+(2017).
+Jaderberg, M. et al. Reinforcement learning with unsupervised auxiliary tasks. In
+Proc
+.
+International Conference on Learning Representations
+(ICLR, 2017).
+Barreto, A. et al. Successor features for transfer in reinforcement learning. In
+Proc
+.
+Adv. Neural Inf. Process. Syst.
+30
+, 4055–4065 (NeurIPS, 2017).
+Bellemare, M. G., Dabney, W. & Munos, R. A distributional perspective on reinforcement learning. In
+Proc
+.
+International Conference on Machine Learning
+449–458 (PMLR, 2017).
+Bellemare, M. G., Naddaf, Y., Veness, J. & Bowling, M. The arcade learning environment: an evaluation platform for general agents.
+J. Artif. Intell. Res.
+47
+, 253–279 (2013).
+Article
+Google Scholar
+Cobbe, K., Hesse, C., Hilton, J. & Schulman, J. Leveraging procedural generation to benchmark reinforcement learning. In
+Proc
+.
+International Conference on Machine Learning
+2048–2056 (PMLR, 2020).
+Hochreiter, S. & Schmidhuber, J. Long short-term memory.
+Neural Comput.
+9
+, 1735–1780 (1997).
+Article
+CAS
+PubMed
+Google Scholar
+Veeriah, V. et al. Discovery of useful questions as auxiliary tasks. In
+Proc
+.
+Adv. Neural Inf. Process. Syst.
+32
+, 9306–9317 (NeurIPS, 2019).
+Munos, R., Stepleton, T., Harutyunyan, A. & Bellemare, M. Safe and efficient off-policy reinforcement learning. In
+Proc
+.
+Adv. Neural Inf. Process. Syst.
+29
+, 1054–1062 (NeurIPS, 2016).
+Finn, C., Abbeel, P. & Levine, S. Model-agnostic meta-learning for fast adaptation of deep networks. In
+Proc
+.
+International Conference on Machine Learning
+70
+, 1126–1135 (PMLR, 2017).
+Mnih, V. et al. Asynchronous methods for deep reinforcement learning. In
+Proc
+.
+International Conference on Machine Learning
+48
+, 1928–1937 (PMLR, 2016).
+Agarwal, R., Schwarzer, M., Castro, P. S., Courville, A. C. & Bellemare, M. Deep reinforcement learning at the edge of the statistical precipice. In
+Proc
+.
+Adv. Neural Inf. Process. Syst.
+34
+, 29304–29320 (NeurIPS, 2021).
+Kapturowski, S. et al. Human-level Atari 200x faster. In
+Proc
+.
+International Conference on Learning Representations
+(ICLR, 2023).
+Hafner, D. Benchmarking the spectrum of agent capabilities. In
+Proc
+.
+International Conference on Learning Representations
+(ICLR, 2022).
+Küttler, H. et al. The nethack learning environment. In
+Proc
+.
+Adv. Neural Inf. Process. Syst.
+33
+, 7671–7684 (NeurIPS, 2020).
+Hambro, E. et al. Insights from the NeurIPS 2021 NetHack challenge. In
+Proc. NeurIPS 2021 Competitions and Demonstrations Track
+41–52 (PMLR, 2022).
+Espeholt, L. et al. IMPALA: scalable distributed deep-RL with importance weighted actor-learner architectures. In
+Proc
+.
+International Conference on Learning Representations
+(ICLR, 2018).
+Beattie, C. et al. DeepMind Lab. Preprint at
+https://arxiv.org/abs/1612.03801
+(2016).
+Racanière, S. et al. Imagination-augmented agents for deep reinforcement learning. In
+Proc
+.
+Adv. Neural Inf. Process. Syst.
+30
+, 5690–5701 (NeurIPS, 2017).
+Schmidhuber, J.
+Evolutionary Principles in Self-referential Learning, or on Learning How to Learn: the Meta-meta-… Hook
+. PhD thesis, Technische Univ. München (1987).
+Schmidhuber, J. A possibility for implementing curiosity and boredom in model-building neural controllers. In
+Proc
+.
+International Conference on Simulation of Adaptive Behavior: from Animals to Animats
+222–227 (MIT Press, 1991).
+Schmidhuber, J., Zhao, J. & Wiering, M.
+Simple Principles of Metalearning
+. Report No. IDSIA-69-96 (Istituto Dalle Molle Di Studi Sull Intelligenza Artificiale, 1996).
+Thrun, S. & Pratt, L.
+Learning to Learn: Introduction and Overview
+3-17 (Springer, 1998).
+Pan, S. J. & Yang, Q. A survey on transfer learning.
+IEEE Trans. Knowl. Data Eng.
+22
+, 1345–1359 (2009).
+Article
+Google Scholar
+Parisi, G. I., Kemker, R., Part, J. L., Kanan, C. & Wermter, S. Continual lifelong learning with neural networks: a review.
+Neural Netw.
+113
+, 54–71 (2019).
+Article
+PubMed
+Google Scholar
+Caruana, R. Multitask learning.
+Mach. Learn.
+28
+, 41–75 (1997).
+Article
+Google Scholar
+Feurer, M. & Hutter, F.
+Hyperparameter Optimization
+3–33 (Springer, 2019).
+Yao, Q. et al. Taking human out of learning applications: a survey on automated machine learning. Preprint at
+https://www.arxiv.org/abs/1810.13306v3
+(2018).
+Storck, J., et al. Reinforcement driven information acquisition in non-deterministic environments. In
+International Conference on Artificial Neural Networks
+2
+, 159–164 (ICANN, 1995).
+Duan, Y. et al. RL
+2
+: fast reinforcement learning via slow reinforcement learning. Preprint at
+https://arxiv.org/abs/1611.02779
+(2016).
+Niv, Y., Joel, D., Meilijson, I. & Ruppin, E. Evolution of reinforcement learning in uncertain environments: a simple explanation for complex foraging behaviors.
+Adapt. Behav.
+10
+, 5–24 (2002).
+Xiong, Z., Zintgraf, L., Beck, J., Vuorio, R. & Whiteson, S. On the practical consistency of meta-reinforcement learning algorithms. Preprint at
+https://arxiv.org/abs/2112.00478
+(2021).
+Sutton, R. S. & Tanner, B. Temporal-difference networks. In
+Proc. Adv. Neural Inf. Process. Syst.
+17
+, 1377–1384 (NeurIPS, 2004).
+Mnih, V., Kavukcuoglu, K., Silver, D. et al. Human-level control through deep reinforcement learning.
+Nature
+518
+, 529–533 (2015).
+Cobbe, K., Hilton, J., Klimov, O., and Schulman, J. Phasic policy gradient. In
+Proc
+.
+International Conference on Machine Learning
+139
+, 2020–2027 (PMLR, 2021).
+Hessel, M. et al. Rainbow: combining improvements in deep reinforcement learning. In
+Proc
+.
+AAAI Conference on Artificial Intelligence
+32
+, 3215–3222 (Association for the Advancement of Artificial Intelligence, 2018).
+Sutton, R. S. Learning to predict by the methods of temporal differences.
+Mach. Learn.
+3
+, 9–44 (1988).
+Bradbury, J. et al. JAX: composable transformations of Python+ NumPy programs.
+http://github.com/jax-ml/jax
+(2018).
+DeepMind et al. The DeepMind JAX ecosystem.
+GitHub
+http://github.com/google-deepmind
+(2020).
+Jouppi, N. P. et al. In-datacenter performance analysis of a tensor processing unit. In
+Proc. Annual International Symposium on Computer Architecture
+1–12 (ICSA, 2017).
+Hessel, M. et al. Podracer architectures for scalable reinforcement learning. Preprint at
+https://arxiv.org/abs/2104.06272
+(2021).
+Kemaev, I., Calian, D. A., Zintgraf, L. M., Farquhar, G. & van Hasselt, H. Scalable meta-learning via mixed-mode differentiation. In
+Proc
+.
+International Conference on Machine Learning
+267
+, 29687–19605 (PMLR, 2025).
+Download references
+Acknowledgements
+We thank S. Flennerhag, Z. Marinho, A. Filos, S. Bhupatiraju, A. György and A. A. Rusu for their feedback and discussions about related ideas; B. Huergo Muñoz, M. Kroiss and D. Horgan for their help with the engineering infrastructure; R. Hadsell, K. Kavukcuoglu, N. de Freitas and O. Vinyals for their high-level feedback on the project; and S. Osindero and D. Precup for their feedback on an early version of this work.
+Author information
+Author notes
+These authors contributed equally: Junhyuk Oh, Gregory Farquhar, Iurii Kemaev, Dan A. Calian
+Authors and Affiliations
+Google DeepMind, London, UK
+Junhyuk Oh, Gregory Farquhar, Iurii Kemaev, Dan A. Calian, Matteo Hessel, Luisa Zintgraf, Satinder Singh, Hado van Hasselt & David Silver
+Authors
+Junhyuk Oh
+View author publications
+Search author on:
+PubMed
+Google Scholar
+Gregory Farquhar
+View author publications
+Search author on:
+PubMed
+Google Scholar
+Iurii Kemaev
+View author publications
+Search author on:
+PubMed
+Google Scholar
+Dan A. Calian
+View author publications
+Search author on:
+PubMed
+Google Scholar
+Matteo Hessel
+View author publications
+Search author on:
+PubMed
+Google Scholar
+Luisa Zintgraf
+View author publications
+Search author on:
+PubMed
+Google Scholar
+Satinder Singh
+View author publications
+Search author on:
+PubMed
+Google Scholar
+Hado van Hasselt
+View author publications
+Search author on:
+PubMed
+Google Scholar
+David Silver
+View author publications
+Search author on:
+PubMed
+Google Scholar
+Contributions
+J.O., I.K., G.F. and D.A.C. contributed equally. J.O., G.F., I.K., D.A.C. and L.Z. developed and analysed the method with advice from H.v.H., S.S. and D.S. J.O., G.F., M.H., D.A.C. and I.K. evaluated the method. I.K. led engineering with contributions from J.O., D.C. and G.F. J.O. and G.F. wrote the paper with contributions from L.Z. and D.A.C. H.v.H., S.S. and D.S. advised the team. J.O. and D.S. led the project.
+Corresponding authors
+Correspondence to
+Junhyuk Oh
+or
+David Silver
+.
+Ethics declarations
+Competing interests
+A patent application(s) directed to aspects of the work described has been filed and is pending as of the date of manuscript submission. Google LLC has ownership and potential commercial interests in the work described.
+Peer review
+Peer review information
+Nature
+thanks Kenji Doya, Joel Lehman and the other, anonymous, reviewer(s) for their contribution to the peer review of this work.
+Additional information
+Publisher’s note
+Springer Nature remains neutral with regard to jurisdictional claims in published maps and institutional affiliations.
+Extended data figures and tables
+Extended Data Fig. 1 Robustness of DiscoRL.
+The plots show the performance of Disco57 and Muesli on
+Ms Pacman
+by varying agent settings. ‘Discovery’ and ‘Evaluation’ represent the setting used for discovery and evaluation, respectively. (
+a
+) Each rule was evaluated on various agent network sizes. (
+b
+) Each rule was evaluated on various replay ratios, which define the proportion of replay data in a batch compared to on-policy data. (
+c
+) A sweep over optimisers (Adam or RMSProp), learning rates, weight decays, and gradient clipping thresholds was evaluated (36 combinations in total) and ranked according to the final score.
+Extended Data Fig. 2 Detailed results for the regression and classification analysis.
+Each cell represents the test score of one MLP model that has been trained to predict some quantity (columns) given the agent’s outputs (rows).
+Extended Data Fig. 3 Effect of meta-network architecture.
+(
+a
+) The x-axis represents the number of environment steps in evaluation and the y-axis the IQM on the Atari benchmark. All methods are discovered from 16 randomly selected Atari games. The meta-RNN component slightly improves performance. The shaded areas show 95% confidence intervals. (
+b
+) The x-axis represents the number of environment steps in evaluation and the y-axis the IQM on the Atari benchmark. All methods are discovered from 16 randomly selected Atari games. Each curve corresponds to a different meta-network architecture, with varying number of LSTM hidden units, or its LSTM component is replaced by a transformer. The choice of the meta-net architecture minimally affects performance. The shaded areas show 95% confidence intervals.
+Extended Data Fig. 4 Computational cost comparison.
+The x-axis represents the amount of TPU hours spent for evaluation. The y-axis represents the performance on the Atari benchmark. Each algorithm was evaluated on 57 Atari games for 200 M environment steps. DiscoRL reached MuZero’s final performance with approximately 40% less computation.
+Extended Data Table 1 Atari57 result
+Full size table
+Extended Data Table 2 ProcGen result
+Full size table
+Extended Data Table 3 DMLab-30 result
+Full size table
+Extended Data Table 4 NetHack result
+Full size table
+Extended Data Table 5 Crafter result
+Full size table
+Extended Data Table 6 Hyperparameters of agents in evaluation
+Full size table
+Supplementary information
+Supplementary Information (download PDF
+)
+This Supplementary Information file contains three sections: (1) Design of meta-learned rule; (2) Meta-network details; and (3) Meta-optimization details. It includes 4 Supplementary figures, 1 Supplementary table and Supplementary references.
+Rights and permissions
+Open Access
+This article is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License, which permits any non-commercial use, sharing, distribution and reproduction in any medium or format, as long as you give appropriate credit to the original author(s) and the source, provide a link to the Creative Commons licence, and indicate if you modified the licensed material. You do not have permission under this licence to share adapted material derived from this article or parts of it. The images or other third party material in this article are included in the article’s Creative Commons licence, unless indicated otherwise in a credit line to the material. If material is not included in the article’s Creative Commons licence and your intended use is not permitted by statutory regulation or exceeds the permitted use, you will need to obtain permission directly from the copyright holder. To view a copy of this licence, visit
+http://creativecommons.org/licenses/by-nc-nd/4.0/
+.
+Reprints and permissions
+About this article
+Cite this article
+Oh, J., Farquhar, G., Kemaev, I.
+et al.
+Discovering state-of-the-art reinforcement learning algorithms.
+Nature
+648
+, 312–319 (2025). https://doi.org/10.1038/s41586-025-09761-x
+Download citation
+Received
+:
+11 December 2024
+Accepted
+:
+15 October 2025
+Published
+:
+22 October 2025
+Version of record
+:
+26 November 2025
+Issue date
+:
+11 December 2025
+DOI
+:
+https://doi.org/10.1038/s41586-025-09761-x
+Share this article
+Anyone you share the following link with will be able to read this content:
+Get shareable link
+Sorry, a shareable link is not currently available for this article.
+Copy shareable link to clipboard
+Provided by the Springer Nature SharedIt content-sharing initiative
+Download PDF
+Associated content
+AI discovers learning algorithm that outperforms those designed by humans
+Joel Lehman
+Nature
+News & Views
+22 Oct 2025
+window.dataLayer = window.dataLayer || [];
+            window.dataLayer[0] = window.dataLayer[0] || {};
+            window.dataLayer[0].content = window.dataLayer[0].content || {};
+            window.dataLayer[0].content.associatedContentTypes = "news_and_views";
+Advertisement
+window.SN = window.SN || {};
+            window.SN.libs = window.SN.libs || {};
+            window.SN.libs.ads = window.SN.libs.ads || {};
+            window.SN.libs.ads.slotConfig = window.SN.libs.ads.slotConfig || {};
+            
+                window.SN.libs.ads.slotConfig['right'] = {
+                    'pos': 'right',
+                    'type': 'article',
+                    'path': 's41586-025-09761-x'
+                };
+            
+            
+            window.SN.libs.ads.slotConfig['kwrd'] = 'Computer+science,Computational+science';
+            
+            
+            window.SN.libs.ads.slotConfig['subjmeta'] = '1042,117,639,705';
+            
+            
+            window.SN.libs.ads.slotConfig['techmeta'] = '119,129';
+window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+        page: {
+            attributes: {
+            ai_augmented_reading:
+                
+                    'ai tools tab not present'
+                
+            }
+        }
+    });
+Explore content
+Research articles
+News
+Opinion
+Research Analysis
+Careers
+Books & Culture
+Podcasts
+Videos
+Current issue
+Browse issues
+Collections
+Subjects
+Follow us on Facebook
+Follow us on Bluesky
+Follow us on X
+Sign up for alerts
+RSS feed
+About the journal
+Journal Staff
+Research Cross-Journal Editorial Team
+Editors
+Journal Information
+Journal Metrics
+Our publishing models
+Editorial Values Statement
+Editorial policies
+Journalistic Principles
+History of Nature
+Awards
+Contact
+Send a news tip
+Publish with us
+For Authors
+For Referees
+Language editing services
+Open access funding
+Submit manuscript
+window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            page: {
+                content: {
+                    fundingWidget: "true",
+                        }
+                    }
+                });
+Search
+Search articles by subject, keyword or author
+Show results from
+All journals
+This journal
+Search
+Advanced search
+Quick links
+Explore articles by subject
+Find a job
+Guide to authors
+Editorial policies
+Nature
+(
+Nature
+)
+ISSN
+1476-4687
+(online)
+ISSN
+0028-0836
+(print)
+nature.com footer links
+About Nature Portfolio
+About us
+Press releases
+Press office
+Contact us
+Discover content
+Journals A-Z
+Articles by subject
+protocols.io
+Nature Index
+Publishing policies
+Nature portfolio policies
+Open access
+Author & Researcher services
+Reprints & permissions
+Research data
+Language editing
+Scientific editing
+Nature Masterclasses
+Research Solutions
+Libraries & institutions
+Librarian service & tools
+Librarian portal
+Open research
+Recommend to library
+Advertising & partnerships
+Advertising
+Partnerships & Services
+Media kits
+Branded
+                        content
+Professional development
+Nature Awards
+Nature Careers
+Nature
+Conferences
+Regional websites
+Nature Africa
+Nature China
+Nature India
+Nature Japan
+Nature Middle East
+Privacy
+                Policy
+Use
+                of cookies
+Your privacy choices/Manage cookies
+Legal
+                notice
+Accessibility
+                statement
+Terms & Conditions
+Your US state privacy rights
+© 2026 Springer Nature Limited
+Close banner
+Close
+Sign up for the
+Nature Briefing: AI and Robotics
+newsletter — what matters in AI and robotics research, free to your inbox weekly.
+Email address
+Sign up
+I agree my information will be processed in accordance with the
+Nature
+and Springer Nature Limited
+Privacy Policy
+.
+Close banner
+Close
+Get the most important science stories of the day, free in your inbox.
+Sign up for Nature Briefing: AI and Robotics

@@ -1,0 +1,29 @@
+# Actual cross-review: query teacher scope
+
+2026-10-22. This addendum follows sealed INDEPENDENT.md; the independent record is unchanged. Read frontier/INDEPENDENT.md, biology/INDEPENDENT.md and biology/CROSS.md, plus the authenticated SIB receipt and primary text around equations 7/10 and section 3. Actual questions and replies were exchanged with /root/post_almanac_frontier and /root/qualification_assay. No new numerical check, biological data access, model training or source request occurred.
+
+## Published mechanism versus exact formula
+
+SIB, *Empirical Bayes Transductive Meta-Learning with Synthetic Gradients*, arXiv:2004.12696v1, explicitly learns its synthetic-gradient module through the query outer objective without an additional true-gradient imitation loss. Its saved official HTML receipt reports HTTP 200, 425890 bytes, SHA256 a3737569e532f5c05b7a7a4c58f20a9193d9ad3d4c56d2bc3bca3afdc50104fe. The source says the synthetic gradient need not approximate the true gradient. Equation 10 is a finite recurrence, not merely an ideal optimization objective. This resolves the broad objective novelty question left open in my independent review: that principle has an actual published precedent.
+
+I challenged frontier to distinguish that precedent from its exact support-residual hidden update. Frontier accepted the broad claim is not novel and explained the remaining distinction: SIB updates classifier/posterior state using unlabeled query predictions and Jacobian/KL factors; the candidate writes hidden A from a labeled support residual and does not read query inputs during that write. I accept that whole-program equality has not been established. I challenged promotion from interface difference alone; frontier explicitly agreed that no finite-cost, variance or drug-decision advantage is yet demonstrated. Exact tanh parameterization and residual multiplication are not sufficient positive contributions by themselves.
+
+Frontier challenged my previous unresolved wording and any test against gradient imitation alone. Accepted: only the precise full recurrence's publication equivalence remains unresolved. Beating true-gradient imitation would not establish novelty of outer query teaching after SIB. A same-query-supervised synthetic-gradient comparator is necessary to isolate the structural difference. A locally constructed comparator can test operational necessity, but is not itself evidence of published prior art. Source pretraining, unrolling, query input availability and finite runtime/memory must be charged; no equal-cost reduction has been shown.
+
+## Differentiation and reachability
+
+Frontier and biology both accepted the distinction between a fixed target in the inner partial derivative and a globally detached target in the actual outer graph. A globally detached local target erases the P path. The explicitly specified recurrence retains a legitimate outer derivative; my analytic/finite-difference result verifies only that fixed numerical recurrence, not an autodiff implementation, meta-training success or multistep deployment.
+
+Both peers accepted the exact single-update statement: with fixed keys, an orthogonal query receives no P-dependent hidden write, and its full output equals the same-start head-only output because that step's head update uses the old support activation. They also accepted the restriction cannot be extended to arbitrary multistep total outputs: P may change later support activations and hence later head updates. Across multiple A writes, A's action on the orthogonal complement of the observed support-key span remains unchanged. Learned keys require a new analysis.
+
+I reiterated that ordinary single-sample SGD shares the right-factor/rank-one restriction; it is a path-of-information boundary, not a unique failure of this teacher. The potentially positive ability to choose a hidden direction that bypasses saturation remains a testable ordinary learned-update capability, with no demonstrated distinctive benefit here.
+
+## Biological fairness and unresolved disagreement
+
+I challenged biology's Gaussian residual-transfer example on oracle source loadings. Biology explicitly confirmed that loadings, means and noise must be learned from the same source episodes and their training cost counted; known loadings in the analytic example describe a controlled structure, not a free biological oracle. Learned key geometry, initial A/b and head updates must be shared before attributing gains to P. Biology accepted there is currently no proposed drug-specific new operation or distinctive advantage and agreed on NO_PROMOTION.
+
+There is no remaining substantive peer disagreement on this decision. Unresolved scientific questions are whether the exact residual-gated hidden rule has a useful finite-cost/statistical property, whether it improves functional prediction or decisions beyond common-information learned updates, and whether any such benefit transfers to later tasks. None was answered by these checks. No world-model necessity, agent contribution, inheritance efficiency or improved-improver effect has been established.
+
+## Decision and next evidence threshold
+
+QUERY_ONLY_TEACHER_OBJECTIVE_NOT_NEW; EXACT_FULL_RECURRENCE_PRIOR_UNRESOLVED; NO_PROMOTION. Stop novelty claims based on the local-target notation or query-only supervision. Preserve the exact recurrence as an unqualified capability hypothesis only. Before a biological pilot, state a specific differentiating advantage and falsifier, then compare at common information and total finite budget against source-learned covariance/ridge, head-only, ordinary backprop updates and query-trained synthetic-gradient controls. No proposed test is executed here. The project's full virtual-cell/agent/inheritance/RSI goal remains ACTIVE / NOT_ACHIEVED; this local decision does not replace it.

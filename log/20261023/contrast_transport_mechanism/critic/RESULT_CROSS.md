@@ -1,0 +1,13 @@
+# Actual reciprocal post-result cross-review
+
+All new records; no frozen file changed and no new projection/fit performed by critic.
+
+I challenged constructive and source that the98.256% additive-space cross-repeat share must not become a causal biological main-effect fraction, an out-of-sample prediction win or evidence of no real interactions. Rank242 full-data projection can absorb real interaction components aligned with the observed nuisance subspace. Both explicitly accepted this counterexample and retained the specific registered STOP. Constructive disclosed that my headline interpretation arrived before their result seal, and source likewise disclosed receiving my interpretation after their audit but before seal. Accordingly this cross is actual reciprocal discussion, not claimed summary-blind independent replication.
+
+Constructive's strongest return was that residual RMS about0.404/0.413 is nonzero while residual correlation is0.119: this cannot classify all residual as noise, retract the original measurement repeatability positive or eliminate every ordinary predictive use of these data. I explicitly accepted all three points and noted they were already present in my sealed independent interpretation. The screen assesses the defined stable orthogonal covariance, not every possible useful observable.
+
+Source's strongest return sharpened the same scope: no claim of all GI impossible; no held-action ordinary-baseline win; guide equality H=B/3 only removes the authenticated categorical additive family and does not cover anchor-varying slopes or nonadditive guide-pair effects. I explicitly accepted every point. Source reported10110 audit checks passing with independent least-squares/metadata reconstruction and max difference4.55e-13. That is source's verification, not a critic rerun; critic has not independently audited arrays.
+
+Consensus: original differential log-read repeatability positive stands. The one frozen stronger role-gene/guide descriptive residual screen fails both gates (share0.0174391 and correlation0.118766). Stop this specific positive as sufficient motivation for a combination-specific updater. Do not rescue with alternate nuisance design, ranks, gates, grouping, protected lung data or stopped models. No inference of biological impossibility, no automatic additional fit and no supported new core. Agent/world/inheritance/RSI claims remain untested and the overall objective unachieved.
+
+No unresolved peer disagreement requires another computation in this phase. The limitation that a high-dimensional descriptive projector may absorb true interactions is a limitation of the inference, not a post-result exemption from the declared stopping rule.

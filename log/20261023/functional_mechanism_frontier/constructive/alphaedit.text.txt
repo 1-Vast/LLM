@@ -1,0 +1,1622 @@
+AlphaEdit: Null-Space Constrained Knowledge Editing for Language Models
+Report GitHub Issue
+×
+Title:
+Content selection saved. Describe the issue below:
+Description:
+Submit without GitHub
+Submit in GitHub
+arXiv is now an independent nonprofit!
+Learn more
+×
+Back to arXiv
+Why HTML?
+Report Issue
+Back to Abstract
+Download PDF
+Abstract
+1 Introduction
+2 Preliminary
+2.1 Autoregressive Language Model
+2.2 Model Editing in LLMs
+3 Method
+3.1 Null Space
+3.2 Null Space Projecting
+3.3 Null-Space Constrained Model Editing
+4 Experiment
+4.1 Experimental Setup
+4.2 Performance on Knowledge Update and Preservation (RQ1)
+4.3 General Capability Tests (RQ2)
+4.4 Hidden Representations Analysis (RQ3)
+4.5 Performance Improvements of Baseline Methods (RQ4)
+5 Related Work
+6 Limitations & Future Discussion
+7 Conclusion
+References
+A Experimental Setup
+A.1 Datasets
+A.2 Metrics
+A.2.1 ZsRE Metrics
+A.2.2 Counterfact Metrics
+A.3 Implementation Details
+A.4 Baselines
+B Implementation Details of Current Model Editing & Related Proofs
+B.1 Model Editing
+B.2 Proof for the Shared Null Space of K0K_{0} and K0​(K0)TK_{0}(K_{0})^{T}
+B.3 Proof for Equation Δ​P​K0​(K0)T=0\Delta PK_{0}(K_{0})^{T}=0
+B.4 Derivation of AlphaEdit Perturbation
+B.5 Invertibility of (Kp​KpT​P+K1​K1T​P+α​I)(K_{p}K_{p}^{T}P+K_{1}K_{1}^{T}P+\alpha I)
+C More Experimental Results
+C.1 Case Study
+C.1.1 Case 1
+C.1.2 Case 2
+C.1.3 Case 3
+C.2 General Capability Tests
+C.3 Quantification of Distribution Shift
+C.4 Editing Facts involving Various Semantics
+C.5 Comparison between AlphaEdit and Memory-based Editing Methods
+C.6 Evaluation on Additional Base LLMs: Gemma and phi-1.5
+C.7 Evaluation on Expanding Benchmark: KnowEdit, LEME and MQUAKE
+C.8 Impact of Dataset Size on AlphaEdit’s Performance
+C.9 Runtime Evaluation of AlphaEdit
+D Visualizing the Counterfact and ZSRE Datasets Through Examples
+License: CC BY 4.0
+arXiv:2410.02355v4 [cs.CL] 22 Apr 2025
+AlphaEdit: Null-Space Constrained
+Knowledge Editing for Language Models
+Junfeng Fang
+Thanks: Equal contribution. $ˆ †$Corresponding author: {xiangwang1223, xiangnanhe}@gmail.com.
+Affiliation: University of Science and Technology of China, National University of Singaporefangjf1997@gmail.com, jianghc@mail.ustc.edu.cn
+Houcheng Jiang
+Kun Wang
+Yunshan Ma
+Affiliation: University of Science and Technology of China, National University of Singaporefangjf1997@gmail.com, jianghc@mail.ustc.edu.cn
+Jie Shi
+Affiliation: University of Science and Technology of China, National University of Singaporefangjf1997@gmail.com, jianghc@mail.ustc.edu.cn
+Xiang Wang
+Xiangnan He
+Tat-Seng Chua
+Affiliation: University of Science and Technology of China, National University of Singaporefangjf1997@gmail.com, jianghc@mail.ustc.edu.cn
+Abstract
+Large language models (LLMs) often exhibit hallucinations, producing incorrect or outdated knowledge. Hence, model editing methods have emerged to enable targeted knowledge updates. To achieve this, a prevailing paradigm is the locating-then-editing approach, which first locates influential parameters and then edits them by introducing a perturbation. While effective, current studies have demonstrated that this perturbation inevitably disrupt the originally preserved knowledge within LLMs, especially in sequential editing scenarios.
+To address this, we introduce AlphaEdit, a novel solution that projects perturbation onto the null space of the preserved knowledge before applying it to the parameters. We theoretically prove that this projection ensures the output of post-edited LLMs remains unchanged when queried about the preserved knowledge, thereby mitigating the issue of disruption.
+Extensive experiments on various LLMs, including LLaMA3, GPT2-XL, and GPT-J, show that AlphaEdit boosts the performance of most locating-then-editing methods by an average of 36.7%36.7\% with a single line of additional code for projection solely. Our code is available at: https://github.com/jianghoucheng/AlphaEdit.
+1 Introduction
+Large language models (LLMs) have demonstrated the capability to store extensive knowledge during pre-training and recall it during inference (Brown et al. 2020; Petroni et al. 2019; Roberts et al. 2020; Liu et al. 2024). Despite this, they frequently exhibit hallucinations, producing incorrect or outdated information (Cao et al. 2021; Mitchell et al. 2022a). While fine-tuning with updated knowledge offers a straightforward solution, it is often prohibitively time-consuming (Mitchell et al. 2022b). In sight of this, model editing methods have emerged, enabling updating the target knowledge while preserving other knowledge (Yao et al. 2023; Gupta et al. 2024). Broadly, model editing approaches fall into two categories: (1) parameter-modifying methods, which directly adjust a small subset of parameters (Meng et al. 2023; Jiang et al. 2025), and (2) parameter-preserving methods that integrate additional modules without altering the original parameters (Huang et al. 2023; Yu et al. 2024; Hartvigsen et al. 2023; Zheng et al. 2023).
+In this paper, we aim to explore the parameter-modifying methods for model editing. Concretely, current parameter-modifying methods typically follow the locate-then-edit paradigm (Meng et al. 2022).
+The basic idea is to first locate influential parameters 𝑾{\bm{W}} through causal tracing,
+and then edit them by introducing a perturbation 𝚫\bm{\Delta} (Li et al. 2024b).
+The common objective for solving 𝚫\bm{\Delta} is to minimize the output error on the to-be-updated knowledge, denoted as e1e_{1}.
+Additionally, the output error on the to-be-preserved knowledge, e0e_{0}, is typically incorporated into the objective function, acting as a constraint to ensure the model’s accuracy on the preserved knowledge.
+Figure 1: Comparison between the current methods and AlphaEdit. (a) and (d) exhibit the objectives, where λ\lambda is the coefficient to keep balance between e0e_{0} and e1e_{1} in the objective; (b) and (e) show the distributions of hidden representations after dimensionality reduction within the pre-edited and post-edited LLaMA3, respectively; (c) depicts the output of the post-edited LLaMA3. Best viewed in color.
+Figure 2:
+Performance of various model editing methods on LLaMA3 (8B). Results with asterisks
+in the superscript
+are from the ZsRE dataset. SST, RTE, and CoLA demonstrate the general capabilities of the post-edited LLMs. The
+experiments are conducted with 2000 edited samples for sequential editing. Detailed settings and results are provided in Section 4.2 and Table 1, respectively. Best viewed in color.
+Despite their success, the current paradigm faces a critical limitation:
+it struggles to maintain a balance between knowledge-update error e1e_{1} and knowledge-preservation error e0e_{0}. Specifically, to prioritize the success of update, prior studies focus more on minimizing e1e_{1} by assigning a larger weight, while taking insufficient control over e0e_{0}. This could make the LLMs after editing (i.e., the post-edited LLMs) overfit to the updated knowledge.
+This overfitting would introduce a distribution shift of the hidden representations within LLMs. Figure 2 (b) showcases this shift, where the hidden representations in the post-edited LLaMA-3 (8B) (Meta 2024)
+diverge from their distribution in the original LLM (i.e., the pre-edited LLM). Worse still, in sequential editing scenarios (Gupta & Anumanchipalli 2024) where the LLM undergoes multiple sequential edits, the accumulation of overfitting gradually erodes the model’s ability to preserve knowledge and generate coherent sentences, eventually leading to model forgetting and model collapse, as depicted in Figure 2 (c).
+To address these flaws, we instead remove e0e_{0} from the current objective, allowing the model to focus solely on minimizing e1e_{1} without trade-offs. To avoid overfitting to the to-be-updated knowledge, we project the solution of this new objective onto the null space (Wang et al. 2021) of the preserved knowledge before applying it to the model parameters, as shown in Figure 2 (d). By leveraging the mathematical properties of matrix projection and null space, our new objective ensures that the distribution of hidden representations within LLMs remains invariant post-edited, as shown in Figure 2 (e). This invariance enables the post-edited LLMs to reduce e1e_{1} while keeping e0e_{0} close to zero, thereby alleviating the issues of model forgetting and model collapse. A detailed theoretical proof is provided in Section 3.
+In a nutshell, we term the method as AlphaEdit, a simple yet effective editing approach with a null-space constraint for LLMs.
+To validate the effectiveness of our method, we conducted extensive experiments on multiple representative LLMs, such as GPT-2 XL (Radford et al. 2019) and LLaMA-3 (8B). The results show that, compared to the best-performing baseline methods, AlphaEdit can achieve over a 36.7% performance improvement on average by adding just one line of code to the conventional model editing method, MEMIT (Meng et al. 2023), as illustrated in Figure 2. Furthermore, we empirically verified that this simple optimization can be easily integrated into most existing model editing methods (Ma et al. 2024; Gu et al. 2024), functioning as a plug-and-play enhancement that significantly boosts their performance. This highlights AlphaEdit’s crucial role in efficient knowledge updates for LLMs, enabling broader applications and future advancements in the field.
+2 Preliminary
+2.1 Autoregressive Language Model
+An autoregressive large language model (LLM) predicts the next token 𝒙{\bm{x}} in a sequence based on the preceding tokens. Specifically, the hidden state of 𝒙{\bm{x}} at layer ll within the model, denoted as 𝒉l{\bm{h}}^{l}, can be calculated as:
+𝒉l=𝒉l−1+𝒂l+𝒎l,𝒎l=𝑾outlσ(𝑾inlγ(𝒉l−1+𝒂l)),\displaystyle{\bm{h}}^{l}={\bm{h}}^{l-1}+{\bm{a}}^{l}+{\bm{m}}^{l},\quad{\bm{m}}^{l}={\bm{W}}_{\text{out}}^{l}\,\sigma({\bm{W}}_{\text{in}}^{l}\,\gamma({\bm{h}}^{l-1}+{\bm{a}}^{l})\,),
+(1)
+where 𝒂l{\bm{a}}^{l} and 𝒎l{\bm{m}}^{l} represent the outputs of the attention block and the feed-forward network (FFN) layer, respectively; 𝑾inl{\bm{W}}_{\text{in}}^{l} and 𝑾outl{\bm{W}}_{\text{out}}^{l} are the weight matrices of the FFN layers; σ\sigma is the non-linear activation function, and γ\gamma denotes the layer normalization. Following Meng et al. 2022, we express the attention and FFN modules in parallel here.
+It is worth noting that 𝑾outl{\bm{W}}_{\text{out}}^{l} within FFN layers is often interpreted as a linear associative memory, functioning as key-value storage for information retrieval (Geva et al. 2021). Specifically, if the knowledge stored in LLMs is formalized as (s,r,o)(s,r,o) — representing subject ss, relation rr, and object oo (e.g., s=“The latest Olympic Game”s=\text{``The latest Olympic Game''}, r=“was held in”r=\text{``was held in''}, o=“Paris”o=\text{``Paris''}) — 𝑾outl{\bm{W}}_{\text{out}}^{l} associates a set of input keys 𝒌{\bm{k}} encoding (s,r)(s,r) with corresponding values 𝒗{\bm{v}} encoding (o)(o). That is,
+𝒎l⏟𝒗=𝑾outl​σ⁡(𝑾inl​γ​(𝒉l−1+𝒂l))⏟𝒌.\displaystyle\underbrace{{\bm{m}}^{l}}_{\begin{subarray}{c}{\bm{v}}\end{subarray}}={\bm{W}}_{\text{out}}^{l}\,\underbrace{\sigma({\bm{W}}_{\text{in}}^{l}\,\gamma({\bm{h}}^{l-1}+{\bm{a}}^{l})\,)}_{\begin{subarray}{c}{\bm{k}}\end{subarray}}.
+(2)
+This interpretation has inspired most model editing methods to modify the FFN layers for knowledge updates (Hase et al. 2023; Li et al. 2024a; Hu et al. 2024). For simplicity,
+we use 𝑾{\bm{W}} to refer to 𝑾outl{\bm{W}}_{\text{out}}^{l} in the following sections.
+2.2 Model Editing in LLMs
+Model editing aims to update knowledge stored in LLMs through a single edit or multiple edits (i.e., sequential editing). Each edit modifies the model parameters 𝑾{\bm{W}} by adding a perturbation 𝚫\bm{\Delta} in locate-then-edit paradigm. Specifically, suppose each edit needs to update uu pieces of knowledge in the form of (s,r,o)(s,r,o). The perturbed 𝑾{\bm{W}} is expected to associate uu new 𝒌{\bm{k}}-𝒗{\bm{v}} pairs, where 𝒌{\bm{k}} and 𝒗{\bm{v}} encode (s,r)(s,r) and (o)(o) of the new knowledge, respectively. Let 𝑾∈ℝd1×d0{\bm{W}}\in\mathbb{R}^{d_{1}\times d_{0}}, where d0d_{0} and d1d_{1} represent the dimensions of the FFN’s intermediate and output layers. Then, we can stack these keys and values into matrices following:
+𝑲1=[𝒌1​|𝒌2|​…∣𝒌u]∈ℝd0×u,𝑽1=[𝒗1​|𝒗2|​…∣𝒗u]∈ℝd1×u,{\bm{K}}_{1}=\left[{\bm{k}}_{1}\left|{\bm{k}}_{2}\right|\ldots\mid{\bm{k}}_{u}\right]\in\mathbb{R}^{d_{0}\times u},\quad{\bm{V}}_{1}=\left[{\bm{v}}_{1}\left|{\bm{v}}_{2}\right|\ldots\mid{\bm{v}}_{u}\right]\in\mathbb{R}^{d_{1}\times u},
+(3)
+where the subscripts of 𝒌{\bm{k}} and 𝒗{\bm{v}} represent the index of the to-be-updated knowledge. Based on these, the objective can be expressed as:
+𝚫=arg​min𝚫~⁡‖(𝐖+𝚫~)​𝐊1−𝐕1‖2,\begin{gathered}\bm{\Delta}=\argmin_{\bm{\tilde{\Delta}}}\left\|({{\bm{W}}}+\bm{\tilde{\Delta}}){\bm{K}}_{1}-{\bm{V}}_{1}\right\|^{2},\end{gathered}
+(4)
+where ‖⋅‖2\left\|\cdot\right\|^{2} denotes the sum of the squared elements in the matrix.
+Additionally, let 𝑲0{\bm{K}}_{0} and 𝑽0{\bm{V}}_{0} represent the matrices formed by stacking the 𝒌{\bm{k}} and 𝒗{\bm{v}} of the preserved knowledge. Current methods (Meng et al. 2023; Gu et al. 2024) typically incorporate the error involving 𝑲0{\bm{K}}_{0} and 𝑽0{\bm{V}}_{0} to preserve it, as follows:
+𝚫=arg​min𝚫~⁡(‖(𝐖+𝚫~)​𝐊1−𝐕1‖2+‖(𝐖+𝚫~)​𝐊0−𝐕0‖2).\begin{gathered}\bm{\Delta}=\argmin_{\bm{\tilde{\Delta}}}(\left\|({{\bm{W}}}+\bm{\tilde{\Delta}}){\bm{K}}_{1}-{\bm{V}}_{1}\right\|^{2}+\left\|({{\bm{W}}}+\bm{\tilde{\Delta}}){\bm{K}}_{0}-{\bm{V}}_{0}\right\|^{2}).\end{gathered}
+(5)
+Since 𝑲0{\bm{K}}_{0} and 𝑽0{\bm{V}}_{0} encode the preserved knowledge in LLMs, we have 𝑾​𝑲0=𝑽0{\bm{W}}{\bm{K}}_{0}={\bm{V}}_{0} (cf. Eqn. 2). Thus, by applying the normal equation (Lang 2012), if the closed-form solution of Eqn. 5 exists, it can be written as:
+𝚫=(𝑽1−𝑾​𝑲1)​𝑲1T​(𝑲0​𝑲0T+𝑲1​𝑲1T)−1.\bm{\Delta}=\left({\bm{V}}_{1}-{{\bm{W}}}{\bm{K}}_{1}\right){\bm{K}}_{1}^{T}\left({\bm{K}}_{0}{\bm{K}}_{0}^{T}+{\bm{K}}_{1}{\bm{K}}_{1}^{T}\right)^{-1}.
+(6)
+Although 𝑲0{\bm{K}}_{0} is difficult to obtain directly since we hardly have access to the LLM’s full extent of knowledge, it can be estimated using abundant text input (Meng et al. 2023). In practical applications, 100,000100,000 (s,r,o)(s,r,o) triplets from Wikipedia are typically randomly selected to encode 𝑲0{\bm{K}}_{0} (Meng et al. 2023), making 𝑲0{\bm{K}}_{0} a high-dimensional matrix with 100,000100,000 columns (i.e., 𝑲0∈ℝd0×100,000{\bm{K}}_{0}\in\mathbb{R}^{d_{0}\times 100,000}). See Appendix B.1 for detailed implementation steps.
+3 Method
+In this section, we first introduce the concept of the null space and its relationship to model editing (Section 3.1). Based on this, we present the method for projecting a given perturbation 𝚫\bm{\Delta} onto the null space of the matrix 𝑲0{\bm{K}}_{0}, which encodes the persevered knowledge (Section 3.2). Following that, a new editing objective that incorporates the aforementioned projection method is introduced in Section 3.3.
+3.1 Null Space
+Null space is at the core of our work. Here we first introduce the definition of the left null space (hereafter referred to simply as null space). Specifically, given two matrices 𝑨{\bm{A}} and 𝑩{\bm{B}}, 𝑩{\bm{B}} is in the null space of 𝑨{\bm{A}} if and only if 𝑩​𝑨=𝟎{\bm{B}}{\bm{A}}=\bm{0}. See Adam-NSCL (Wang et al. 2021) for more details.
+In the context of model editing, if the perturbation 𝚫\bm{\Delta} is projected into the null space of 𝑲0{\bm{K}}_{0} (i.e., 𝚫′​𝑲0=𝟎{\bm{\Delta}^{\prime}}{\bm{K}}_{0}=\bm{0}, where 𝚫​’\bm{\Delta}\textquoteright denotes the projected perturbation), adding it to the parameters 𝑾{\bm{W}} results in:
+(𝑾+𝚫​’)​𝑲0=𝑾​𝑲0=𝑽0.({\bm{W}}+{\bm{\Delta}\textquoteright}){\bm{K}}_{0}={\bm{W}}{\bm{K}}_{0}={\bm{V}}_{0}.
+(7)
+This implies that the projected 𝚫\bm{\Delta} will not disrupt the key-value associations of the preserved knowledge (i.e., {𝑲0,𝑽0}\{{\bm{K}}_{0},{\bm{V}}_{0}\}),
+ensuring that the storage of the preserved knowledge remains intact.
+Therefore, in this work, before adding perturbation 𝚫\bm{\Delta} to the model parameters 𝑾{\bm{W}}, we project it onto the null space of 𝑲0{\bm{K}}_{0} to protect the preserved knowledge. This protection allows us to remove the first term — the term focusing on protecting the preserved knowledge — from the objective in Eqn. 5.
+3.2 Null Space Projecting
+In Section 3.1, we briefly explained why 𝚫\bm{\Delta} should be projected into the null space of 𝑲0{\bm{K}}_{0}. In this part, we focus on how to implement this projection.
+As introduced at the end of Section 2.2, the matrix 𝑲0∈ℝd0×100,000{\bm{K}}_{0}\in\mathbb{R}^{d_{0}\times 100,000} has a high dimensionality with 100,000100,000 columns. Hence, directly projecting the given perturbation 𝚫\bm{\Delta} onto the null space of 𝑲0{\bm{K}}_{0} presents significant computational and storage challenges. In sight of this, we adopt the null space of the non-central covariance matrix 𝑲0​𝑲0T∈ℝd0×d0{\bm{K}}_{0}{\bm{K}}_{0}^{T}\in\mathbb{R}^{d_{0}\times d_{0}} as a substitute to reduce computational complexity, as d0d_{0} is typically much smaller than 100,000100,000. This matrix’s null space is equal to that of 𝑲0{\bm{K}}_{0} (please see Appendix B.2 for detailed proof).
+Following the existing methods for conducting null space projection (Wang et al. 2021), we first apply a Singular Value Decomposition (SVD) to 𝑲0​(𝑲0)T{\bm{K}}_{0}({\bm{K}}_{0})^{T}:
+{𝑼,𝚲,(𝑼)T}=SVD​(𝑲0​(𝑲0)T),\left\{{\bm{U}},{\bm{\Lambda}},({\bm{U}})^{T}\right\}=\text{SVD}\left({\bm{K}}_{0}({\bm{K}}_{0})^{T}\right),
+(8)
+where each column in 𝑼{\bm{U}} is an eigenvector of 𝑲0​(𝑲0)T{\bm{K}}_{0}({\bm{K}}_{0})^{T}.
+Then, we remove the eigenvectors in 𝑼{\bm{U}} that correspond to non-zero eigenvalues11
+1
+Given that eigenvalues are rarely strictly zero in practical applications, in our experiments, we remove the eigenvectors corresponding to the eigenvalues above 10−210^{-2}., and define the remaining submatrix as 𝑼^\hat{{\bm{U}}}. Based on this, the projection matrix 𝑷{\bm{P}} can be defined as follows:
+𝑷=𝑼^​(𝑼^)T.{\bm{P}}=\hat{{\bm{U}}}(\hat{{\bm{U}}})^{T}.
+(9)
+This projection matrix can map the column vectors of 𝚫\bm{\Delta} into the null space of 𝑲0​(𝑲0)T{\bm{K}}_{0}({\bm{K}}_{0})^{T}, as it satisfies the condition 𝚫​𝑷⋅𝑲0​(𝑲0)T=𝟎\bm{\Delta}{\bm{P}}\cdot{\bm{K}}_{0}({\bm{K}}_{0})^{T}=\bm{0}. The detailed derivation is exhibited in Appendix B.3.
+Since 𝑲0{\bm{K}}_{0} and 𝑲0​(𝑲0)T{\bm{K}}_{0}({\bm{K}}_{0})^{T} share the same null space, we can derive 𝚫​𝑷⋅𝑲0=𝟎\bm{\Delta}{\bm{P}}\cdot{\bm{K}}_{0}=\bm{0}. Hence, we have:
+(𝑾+𝚫​𝑷)​𝑲0=𝑾​𝑲0=𝑽0.({\bm{W}}+\bm{\Delta}{\bm{P}}){\bm{K}}_{0}={\bm{W}}{\bm{K}}_{0}={\bm{V}}_{0}.
+(10)
+This shows the projection matrix 𝑷{\bm{P}} ensures that the model edits occur without interference with the preserved knowledge in LLMs.
+3.3 Null-Space Constrained Model Editing
+Section 3.2 has provided how to apply projection to ensure that preserved knowledge is not disrupted. Here, we introduce how to leverage this projection to optimize the current model editing objective.
+Figure 3: Comparison between the paradigms of AlphaEdit and current method. Best viewed in color.
+Starting with the single-edit objective in Eqn. 5, the optimization follows three steps:
+(1) Replace 𝚫\bm{\Delta} with the projected perturbation 𝚫​𝑷\bm{\Delta}{\bm{P}}, ensuring that the perturbation would not disrupt the preserved knowledge;
+(2) Remove the first term involving 𝑲0{\bm{K}}_{0}, as Step (1) has already protected the preserved knowledge from being disrupted;
+(3) Add a regularization term ‖𝚫​𝑷‖2||\bm{\Delta}{\bm{P}}||^{2} to guarantee stable convergence.
+With these optimizations, Eqn. 5 becomes:
+𝚫=arg​min𝚫~⁡(‖(𝐖+𝚫~​𝐏)​𝐊1−𝐕1‖2+‖𝚫~​𝐏‖2),\bm{\Delta}=\argmin_{\bm{\tilde{\Delta}}}\left(\,||({\bm{W}}+\bm{\tilde{\Delta}}{\bm{P}}){\bm{K}}_{1}-{\bm{V}}_{1}||^{2}+\|\bm{\tilde{{\Delta}}}{\bm{P}}\|^{2}\right),
+(11)
+where 𝑲1{\bm{K}}_{1} and 𝑽1{\bm{V}}_{1} denote the key and value matrices of to-be-updated knowledge defined in Eqn. 3.
+In sequential editing tasks, during the current edit, we also need to add a term to the objective (cf. Eqn. 11) to prevent the perturbation from disrupting the updated knowledge in previous edits.
+Let 𝑲p{\bm{K}}_{p} and 𝑽p{\bm{V}}_{p} present the key and value matrices of the previously updated knowledge, analogous to the earlier definitions of 𝑲1{\bm{K}}_{1} and 𝑽1{\bm{V}}_{1}. This term should minimize ‖(𝑾+𝚫~​𝑷)​𝑲p−𝑽p‖2||({\bm{W}}+\bm{\tilde{\Delta}}{\bm{P}}){\bm{K}}_{p}-{\bm{V}}_{p}||^{2} to protect the association. Since the related knowledge has been updated in previous edits, we have 𝑾​𝑲p=𝑽p{\bm{W}}{\bm{K}}_{p}={\bm{V}}_{p}. Hence, this term can be simplified to ‖𝚫~​𝑷​𝑲p‖2||\bm{\tilde{\Delta}}{\bm{P}}{\bm{K}}_{p}||^{2}, and adding it to Eqn. 11 gives the new objective:
+𝚫=arg​min𝚫~⁡(‖(𝐖+𝚫~​𝐏)​𝐊1−𝐕1‖2+‖𝚫~​𝐏‖2+‖𝚫~​𝐏𝐊p‖2).\bm{\Delta}=\argmin_{\bm{\tilde{\Delta}}}\left(\,||({\bm{W}}+\bm{\tilde{\Delta}}{\bm{P}}){\bm{K}}_{1}-{\bm{V}}_{1}||^{2}+\|\bm{\tilde{\Delta}}{\bm{P}}\|^{2}+||\bm{\tilde{\Delta}}{\bm{P}}{\bm{K}}_{p}||^{2}\right).
+(12)
+To facilitate expression, we define the residual vector of the current edit as 𝑹=𝑽1−𝑾​𝑲1{\bm{R}}={\bm{V}}_{1}-{\bm{W}}{\bm{K}}_{1}. Based on this, Eqn. 12 can be solved using the normal equation (Lang 2012):
+(𝚫​𝑷​𝑲1−𝑹)​𝑲1T​𝑷+𝚫​𝑷+𝚫​𝑷​𝑲p​𝑲pT​𝑷=𝟎.(\bm{\Delta}{\bm{P}}{\bm{K}}_{1}-{\bm{R}}){\bm{K}}_{1}^{T}{\bm{P}}+\bm{\Delta}{\bm{P}}+\bm{\Delta}{\bm{P}}{\bm{K}}_{p}{\bm{K}}_{p}^{T}{\bm{P}}=\mathbf{0}.
+(13)
+Solving Eqn. 13 yields the final perturbation 𝚫AlphaEdit=𝚫​𝑷\bm{{\Delta}}_{\textbf{AlphaEdit}}=\bm{\Delta}{\bm{P}} which will be added to the model parameters 𝑾{\bm{W}}:
+𝚫AlphaEdit=𝑹​𝑲1T​𝑷​(𝑲p​𝑲pT​𝑷+𝑲1​𝑲1T​𝑷+𝑰)−1.\bm{{\Delta}}_{\textbf{AlphaEdit}}={\bm{R}}{\bm{K}}_{1}^{T}{\bm{P}}({\bm{K}}_{p}{\bm{K}}_{p}^{T}{\bm{P}}+{\bm{K}}_{1}{\bm{K}}_{1}^{T}{\bm{P}}+{\bm{I}})^{-1}.
+(14)
+The detailed derivation process and the invertibility of the term within the brackets are provided in Appendices B.4 and B.5 respectively. This solution 𝚫AlphaEdit\bm{{\Delta}}_{\textbf{AlphaEdit}} could not only store the to-be-updated knowledge in the current edit, but also ensure that both the preserved knowledge and the previously updated knowledge remain unaffected. Furthermore, for better comparison, we also present the commonly used solution in existing methods like MEMIT (Meng et al. 2023) as follows22
+2
+ΔMEMIT{{\Delta}}_{\textbf{MEMIT}} denotes the solution provided by MEMIT in sequential editing tasks.:
+𝚫MEMIT=𝑹​𝑲1T​(𝑲p​𝑲pT+𝑲1​𝑲1T+𝑲0​𝑲0T)−1.\bm{{\Delta}}_{\textbf{MEMIT}}={\bm{R}}{\bm{K}}_{1}^{T}({\bm{K}}_{p}{\bm{K}}_{p}^{T}+{\bm{K}}_{1}{\bm{K}}_{1}^{T}+{\bm{K}}_{0}{\bm{K}}_{0}^{T})^{-1}.
+(15)
+By comparing Eqn. 14 and 15, it is evident that our approach requires only a minor modification to the standard solution by incorporating the projection matrix 𝑷{\bm{P}}. This makes our method easily integrable into existing model editing algorithms.
+Figure 3 summarizes this modification from the perspective of convergence objectives. We emphasize that by adding just a single line of code for this modification, the performance of most editing methods could be significantly enhanced, as shown in Figure 2. More detailed experimental results are exhibited in Section 4.
+Furthermore, since the projection matrix 𝑷{\bm{P}} is entirely independent of the to-be-updated knowledge, it only needs to be computed once and can then be directly applied to any downstream editing tasks. Consequently, AlphaEdit introduces negligible additional time consumption compared to baselines, making it both efficient and effective.
+4 Experiment
+In this section, we conduct experiments to address the following research questions:
+•
+RQ1: How does AlphaEdit perform on sequential editing tasks compared to baseline methods? Can it mitigate the issues of model forgetting and model collapse exhibited in Figure 2?
+•
+RQ2: How does AlphaEdit-edited LLM perform on general ability evaluations? Does the post-edited LLM successfully retain its inherent capabilities?
+•
+RQ3: Can AlphaEdit effectively prevent the model from overfitting to updated knowledge? Specifically, can the post-edited LLM avoid shifts in the distribution of hidden representations?
+•
+RQ4: Can the performance of baseline methods be significantly improved with a single line of code in AlphaEdit (i.e., the code for projection)?
+Table 1: Comparison of AlphaEdit with existing methods on the sequential model editing task. Eff., Gen., Spe., Flu. and Consis. denote Efficacy, Generalization, Specificity, Fluency and Consistency, respectively. The best results are highlighted in bold, while the second-best results are underlined.
+Method
+Model
+Counterfact
+ZsRE
+Eff.↑\uparrow
+Gen.↑\uparrow
+Spe.↑\uparrow
+Flu.↑\uparrow
+Consis.↑\uparrow
+Eff.↑\uparrow
+Gen.↑\uparrow
+Spe.↑\uparrow
+Pre-edited
+LLaMA3
+7.85±\pm0.26
+10.58±\pm0.26
+89.48±\pm0.18
+635.23±\pm0.11
+24.14±\pm0.08
+36.99±\pm0.30
+36.34±\pm0.30
+31.89±\pm0.22
+FT
+83.33±\pm0.37
+67.79±\pm0.40
+46.63±\pm0.37
+233.72±\pm0.22
+8.77±\pm0.05
+30.48±\pm0.26
+30.22±\pm0.32
+15.49±\pm0.17
+MEND
+63.24±\pm0.31
+61.17±\pm0.36
+45.37±\pm0.38
+372.16±\pm0.80
+4.21±\pm0.05
+0.91±\pm0.05
+1.09±\pm0.05
+0.53±\pm0.02
+InstructEdit
+66.58±\pm0.24
+64.18±\pm0.35
+47.14±\pm0.37
+443.85±\pm0.78
+7.28±\pm0.04
+1.58±\pm0.04
+1.36±\pm0.08
+1.01±\pm0.05
+ROME
+64.40±\pm0.41
+61.42±\pm0.42
+49.44±\pm0.38
+449.06±\pm0.26
+3.31±\pm0.02
+2.01±\pm0.07
+1.80±\pm0.07
+0.69±\pm0.03
+MEMIT
+65.65±\pm0.47
+64.65±\pm0.42
+51.56±\pm0.38
+437.43±\pm1.67
+6.58±\pm0.11
+34.62±\pm0.36
+31.28±\pm0.34
+18.49±\pm0.19
+PRUNE
+68.25±\pm0.46
+64.75±\pm0.41
+49.82±\pm0.36
+418.03±\pm1.52
+5.90±\pm0.10
+24.77±\pm0.27
+23.87±\pm0.27
+20.69±\pm0.23
+RECT
+66.05±\pm0.47
+63.62±\pm0.43
+61.41±\pm0.37
+526.62±\pm0.44
+20.54±\pm0.09
+86.05±\pm0.23
+80.54±\pm0.27
+31.67±\pm0.22
+AlphaEdit
+98.90±\pm0.10
+94.22±\pm0.19
+67.88±\pm0.29
+622.49±\pm0.16
+32.40±\pm0.11
+94.47±\pm0.13
+91.13±\pm0.19
+32.55±\pm0.22
+Pre-edited
+GPT-J
+16.22±\pm0.31
+18.56±\pm0.45
+83.11±\pm0.13
+621.81±\pm0.67
+29.74±\pm0.51
+26.32±\pm037
+25.79±\pm0.25
+27.42±\pm0.53
+FT
+92.15±\pm0.27
+72.38±\pm0.38
+43.35±\pm0.37
+297.92±\pm0.77
+6.65±\pm0.10
+72.37±\pm0.29
+68.91±\pm0.32
+19.66±\pm0.23
+MEND
+46.15±\pm0.50
+46.22±\pm0.51
+53.90±\pm0.48
+242.41±\pm0.41
+3.94±\pm0.03
+0.71±\pm0.04
+0.71±\pm0.04
+0.52±\pm0.03
+InstructEdit
+50.62±\pm0.58
+51.73±\pm0.42
+56.28±\pm0.50
+245.89±\pm0.44
+4.21±\pm0.04
+0.92±\pm0.07
+0.88±\pm0.03
+0.65±\pm0.06
+ROME
+57.50±\pm0.48
+54.20±\pm0.40
+52.05±\pm0.31
+589.42±\pm0.08
+3.22±\pm0.02
+56.42±\pm0.42
+54.65±\pm0.42
+9.86±\pm0.16
+MEMIT
+98.55±\pm0.11
+95.50±\pm0.16
+63.64±\pm0.31
+546.28±\pm0.88
+34.89±\pm0.15
+94.91±\pm0.16
+90.22±\pm0.23
+30.39±\pm0.27
+PRUNE
+86.15±\pm0.34
+86.85±\pm0.29
+53.87±\pm0.35
+427.14±\pm0.53
+14.78±\pm0.11
+0.15±\pm0.02
+0.15±\pm0.02
+0.00±\pm0.00
+RECT
+98.80±\pm0.10
+86.58±\pm0.28
+72.22±\pm0.28
+617.31±\pm0.19
+41.39±\pm0.12
+96.38±\pm0.14
+91.21±\pm0.21
+27.79±\pm0.26
+AlphaEdit
+99.75±\pm0.08
+96.38±\pm0.23
+75.48±\pm0.21
+618.50±\pm0.17
+42.08±\pm0.15
+99.79±\pm0.14
+96.00±\pm0.22
+28.29±\pm0.25
+Pre-edited
+GPT2-XL
+22.23±\pm0.73
+24.34±\pm0.62
+78.53±\pm0.33
+626.64±\pm0.31
+31.88±\pm0.20
+22.19±\pm0.24
+31.30±\pm0.27
+24.15±\pm0.32
+FT
+63.55±\pm0.48
+42.20±\pm0.41
+57.06±\pm0.30
+519.35±\pm0.27
+10.56±\pm0.05
+37.11±\pm0.39
+33.30±\pm0.37
+10.36±\pm0.17
+MEND
+50.80±\pm0.50
+50.80±\pm0.48
+49.20±\pm0.51
+407.21±\pm0.08
+1.01±\pm0.00
+0.00±\pm0.00
+0.00±\pm0.00
+0.00±\pm0.00
+InstructEdit
+55.32±\pm0.58
+53.63±\pm0.42
+53.25±\pm0.62
+412.57±\pm0.15
+1.08±\pm0.03
+3.54±\pm0.03
+4.25±\pm0.02
+3.23±\pm0.04
+ROME
+54.60±\pm0.48
+51.18±\pm0.40
+52.68±\pm0.33
+366.13±\pm1.40
+0.72±\pm0.02
+47.50±\pm0.43
+43.56±\pm0.42
+14.27±\pm0.19
+MEMIT
+94.70±\pm0.22
+85.82±\pm0.28
+60.50±\pm0.32
+477.26±\pm0.54
+22.72±\pm0.15
+79.17±\pm0.32
+71.44±\pm0.36
+26.42±\pm0.25
+PRUNE
+82.05±\pm0.38
+78.55±\pm0.34
+53.02±\pm0.35
+530.47±\pm0.39
+15.93±\pm0.11
+21.62±\pm0.30
+19.27±\pm0.28
+13.19±\pm0.18
+RECT
+92.15±\pm0.26
+81.15±\pm0.33
+65.13±\pm0.31
+480.83±\pm0.62
+21.05±\pm0.16
+81.02±\pm0.31
+73.08±\pm0.35
+24.85±\pm0.25
+AlphaEdit
+99.50±\pm0.24
+93.95±\pm0.34
+66.39±\pm0.31
+597.88±\pm0.18
+39.38±\pm0.15
+94.81±\pm0.30
+86.11±\pm0.29
+25.88±\pm0.21
+4.1 Experimental Setup
+We begin by briefly outlining the evaluation metrics, datasets, and baseline methods. For more detailed descriptions of the experimental settings, please refer to Appendix A.
+Base LLMs & Baseline Methods. Our experiments are conducted on three LLMs: GPT2-XL (1.5B), GPT-J (6B), and LLaMA3 (8B). We compare our method against several model editing baselines, including Fine-Tuning (FT) (Zhu et al. 2020), MEND (Mitchell et al. 2022a), InstructEdit (Zhang et al. 2024b), ROME (Meng et al. 2022), MEMIT (Meng et al. 2023), PRUNE (Ma et al. 2024), and RECT (Gu et al. 2024). Furthermore, to further validate the generalizability of AlphaEdit, we include three memory-based editing methods (i.e., SERAC (Mitchell et al. 2022b), GRACE (Hartvigsen et al. 2023) and MELO (Yu et al. 2024)) as baselines in Appendix C.5, along with two additional base LLMs: Gemma (Mesnard et al. 2024) and phi-1.5 (Li et al. 2023) in Appendix C.6.
+Datasets & Evaluation Metrics.
+We evaluate AlphaEdit using two widely adopted benchmarks: the Counterfact dataset (Meng et al. 2022) and the ZsRE dataset (Levy et al. 2017).
+In line with prior works (Meng et al. 2022), we employ Efficacy (efficiency success), Generalization (paraphrase success), Specificity (neighborhood success), Fluency (generation entropy), and Consistency (reference score) as evaluation metrics.
+In addition, for comprehensive evaluation, Appendix C.7 presents experiments conducted on three additional datasets: LongformEvaluation (Rosati et al. 2024), MQUAKE (Zhong et al. 2023), and KnowEdit (Zhang et al. 2024d). We encourage interested readers to refer to Appendix C.7 for further details.
+4.2 Performance on Knowledge Update and Preservation (RQ1)
+To evaluate the performance of different editing methods in terms of knowledge update and retention, we conducted sequential editing on three base LLMs using AlphaEdit and the baseline methods. Table 1 presents the results under a commonly used configuration for the sequential editing task, where 2,000 samples are randomly drawn from the dataset for updates, with 100 samples per edit (i.e., a batch size of 100). For additional experimental results, such as case studies of model outputs after editing, please refer to Appendix C. Based on Table 1, we can draw the following observations:
+•
+Obs 1: AlphaEdit achieves superior performance across nearly all metrics and base models. Specifically, in terms of Efficacy and Generalization metrics, AlphaEdit provides an average improvement of 12.54% and 16.78%, respectively, over the best baseline. On LLaMA3, these performance boosts are even more remarkable (i.e., 32.85%↑32.85\%\uparrow and 30.60%↑30.60\%\uparrow). These gains arise from AlphaEdit’s ability to mitigate the trade-off between updating and preserving knowledge.
+•
+Obs 2: AlphaEdit enhances text generation fluency and coherence.
+In addition to editing capabilities, AlphaEdit also exhibits substantial improvements in Fluency and Coherence. For instance, on GPT2-XL, AlphaEdit achieves an 18.33%18.33\% improvement over the strongest baseline, demonstrating that it can preserve both the knowledge and the ability to generate fluent text.
+4.3 General Capability Tests (RQ2)
+Figure 4: F1 scores of the post-edited LLaMA3 (8B) on six tasks (i.e., SST, MRPC, CoLA, RTE, MMLU and NLI) used for general capability testing. Best viewed in color.
+To further evaluate the intrinsic knowledge of post-edited LLMs, we perform General Capability Tests using six natural language tasks from the General Language Understanding Evaluation (GLUE) benchmark (Wang et al. 2019). Specifically, the evaluation tasks include:
+1.
+SST (The Stanford Sentiment Treebank) (Socher et al. 2013) is a single-sentence classification task involving sentences from movie reviews and their corresponding human-annotated sentiment labels. The task requires classifying the sentiment into two categories.
+2.
+MRPC (Microsoft Research Paraphrase Corpus) (Dolan & Brockett 2005) is a well-known benchmark for text matching and semantic similarity assessment. In the MRPC task, the objective is to determine whether a given pair of sentences is semantically equivalent.
+3.
+MMLU (Massive Multi-task Language Understanding) (Hendrycks et al. 2021) is a comprehensive evaluation designed to measure the multi-task accuracy of text models. This assessment focuses on evaluating models under zero-shot and few-shot settings.
+4.
+RTE (Recognizing Textual Entailment) (Bentivogli et al. 2009) involves natural language inference that determines if a premise sentence logically entails a hypothesis sentence.
+5.
+CoLA (Corpus of Linguistic Acceptability) (Warstadt et al. 2019) is a single-sentence classification task, where sentences
+are annotated as either grammatically acceptable or unacceptable.
+6.
+NLI (Natural Language Inference) (Williams et al. 2018) focuses on natural language understanding, requiring the model to infer the logical relationship between pairs of sentences.
+Figure 4 illustrates the performance as the number of edited samples increases across six tasks. More results are provided in Appendix C.2. Based on Figure 4, we have the following observations:
+•
+Obs 3: AlphaEdit sustains the general capability of post-edited LLMs even after extensive editing. Specifically, AlphaEdit maintains the original model performance across all metrics, even after editing 3,000 samples,
+demonstrating that the null-space projection not only safeguards the preserved knowledge but also protects the general capability learned from this knowledge’s corpus.
+•
+Obs 4: LLMs edited with baseline methods experience significant degradation of general capability after editing 2,000 samples. Specifically, in this case, all metrics are rapidly approaching zero, confirming our theoretical analysis that the common objective are inherently flawed and fail to balance knowledge update and preservation.
+4.4 Hidden Representations Analysis (RQ3)
+Figure 5: The distribution of hidden representations of pre-edited and post-edited LLMs after dimensionality reduction.
+The top and right curve graphs display the marginal distributions for two reduced dimensions,
+where AlphaEdit consistently exhibits minimal shift. Best viewed in color.
+As discussed in previous sections, current editing methods often cause post-edited LLMs to overfit to the updated knowledge, leading to a shift in the distribution of hidden representations. Hence, here we aim to empirically verify that AlphaEdit can prevent overfitting and avoid this distributional shift. To validate it, we conducted the following steps:
+(1) We randomly select 1,000 factual prompts and extract the hidden representations within pre-edited LLMs.
+(2) Subsequently, we performed 2,000 sequential edits on the LLMs and recomputed these hidden representation.
+(3) Finally, we used t-SNE (Van der Maaten & Hinton 2008) to visualize the hidden representation before and after editing. Figure 5 exhibits them and their marginal distribution curves. Furthermore, we quantify the deviation of scatter point distributions and the differences of marginal distribution curves in Figure 5, and the results are provided in Appendix C.3. According to Figure 5 we can find that:
+•
+Obs 5: AlphaEdit maintains consistency in hidden representations after editing. Specifically, the hidden representations within LLMs edited using AlphaEdit remain consistent with the original distribution across all three base models. This stability indicates that AlphaEdit effectively mitigates overfitting, in turn explaining its superior knowledge preservation and generalization capabilities.
+•
+Obs 6: There is a significant shift in the distribution of hidden representations within baseline-edited LLMs. In some cases (e.g., RECT-edited LLaMA3), the trend of the distribution before and after editing is even completely reversed. This discrepancy becomes more pronounced as sequential editing progresses, further underscoring the importance of projection-based optimization.
+4.5 Performance Improvements of Baseline Methods (RQ4)
+Figure 6: Performance improvements of baseline editing methods (i.e., MEMIT, PRUNE and RECT) after adding a single line of code from AlphaEdit (i.e., the code used for matrix projection). The yellow bars represent the original performance of each baseline, while the blue bars represent the performance after the addition. Best viewed in color.
+Figure 7: Performance comparison before and after adding the projection code in AlphaEdit to the baselines. (a) Performance of editing methods on samples involving specific semantics, where asterisk denotes the versions added the projection; the vertical and horizontal axis represent the categories of knowledge and the accuracy of LLM responses involving this knowledge, respectively. (b) Comparison of general capabilities for PRUNE and RECT before and after adding the projection, where the underlined method represents the results of RECT. Best viewed in color.
+We conclude by evaluating whether integrating AlphaEdit’s projection strategy can comprehensively enhance current editing methods. To achieve this, we add one line of code from AlphaEdit (the code for projection) to baselines and measure their performance before and after the addition.
+Following previous works (Meng et al. 2023), we analyze (1) the average performance across all editing samples, (2) the performance on editing samples involving specific semantics and (3) the general capability of post-edited LLMs. Results are shown in Figure 6, 7 (a), and 7 (b), respectively. Note that in Figure 7 (a), the y-axis represents the knowledge belonging to different semantic categories. For instance, the labeled “language” indicates the knowledge instances related to language. Detailed experimental settings can be found in Appendix C.4. The results show that:
+•
+Obs 7: AlphaEdit seamlessly integrates with other model editing methods, significantly boosting their overall performance. The optimized baselines show an average improvement of 28.24%28.24\% on editing capability and 42.65%42.65\% on general capability, underscoring the substantial potential and broad applicability of the null-space projection in enhancing model editing methods.
+5 Related Work
+Parameter-modifying Model Editing. This approach typically employs meta-learning or locating-then-editing strategies (Zhang et al. 2024d) to conduct editing. Meta-learning, as implemented by KE (Cao et al. 2021) and MEND (Mitchell et al. 2022a), involves adapting model parameters through a hypernetwork. InstructEdit (Zhang et al. 2024b) extends MEND by designing instructions for training on different tasks. Locate-then-edit strategies, exemplified by ROME (Meng et al. 2022) and MEMIT (Meng et al. 2023), prioritize pinpointing the knowledge’s storage location before making targeted edits. GLAME (Zhang et al. 2024a) enhances ROME by leveraging knowledge graphs to facilitate the editing of related knowledge. Recent work has introduced AnyEdit (Jiang et al. 2025), a recursive approach designed to modify knowledge of arbitrary length and format stored within LLMs.
+Parameter-preserving Model Editing. This line utilizes additional modules to store to-be-updated knowledge. These modules may include codebooks, neurons, or auxiliary models, as seen in methods like
+SERAC (Mitchell et al. 2022b), T-Patcher (Huang et al. 2023), GRACE (Hartvigsen et al. 2023), and MELO (Yu et al. 2024). Additionally, MemPrompt (Madaan et al. 2022) and IKE (Zheng et al. 2023) achieve editing by incorporating to-be-updated knowledge into input prompts.
+More recently, WISE (Wang et al. 2025) innovates prior module designs by introducing dual memory and conflict-free knowledge sharding, overcoming trade-off between reliability and generalization.
+Evaluating Knowledge Editing.
+Recent work has introduced diverse benchmarks to assess the efficacy of model editing. For instance, KnowEdit (Zhang et al. 2024d) provides a unified datasets by collecting different types of knowledge tailored for knowledge insertion, modification, and erasure tasks; LEME (Rosati et al. 2024), CKnowEdit (Fang et al. 2025), and MQuAKE (Zhong et al. 2023) shift attention to long-form, multi-lingual, and multi-hop knowledge, respectively. These benchmarks collectively push for more comprehensive evaluations.
+6 Limitations & Future Discussion
+While AlphaEdit demonstrates the capability to edit knowledge with minimal performance degradation, we also recognize its limitations. Concretely, its applicability to multi-modal LLMs (OpenAI et al. 2024) and large reasoning models (Liu et al. 2024) remains unexplored.
+Hence, future research could focus on extending AlphaEdit to a broader range of base LLMs. Furthermore, the superior performance of null-space projection in balancing knowledge updates and preservation suggests its potential for broader applications. Especially, it could enhance specific LLM capabilities — such as safety, mathematics, or biochemistry — without degrading other abilities. These avenues present exciting opportunities to improve both the applicability and scalability of our method.
+7 Conclusion
+In this work, we introduced AlphaEdit, a novel model editing method to address a critical challenge in current approaches — the trade-off between knowledge update and preservation — with only a single line of code. Specifically, AlphaEdit minimizes disruption to the preserved knowledge by projecting parameter perturbations onto the null space of its key matrices, allowing the model to focus solely on knowledge update.
+Extensive experiments on multiple base LLMs, including LLaMA3, GPT-2 XL, and GPT-J, demonstrate that AlphaEdit significantly enhances the performance of existing model editing methods, delivering an average improvement of 36.7%36.7\% in editing capabilities.
+Ethics Statement
+Our AlphaEdit method significantly enhances the performance of sequential model editing, making it invaluable for updating and managing knowledge in real-world applications. While the ability to directly modify stored knowledge introduces potential risks, such as the introduction of false or harmful information, we strongly urge researchers to implement strict validation and oversight to ensure the ethical use of these techniques. Nevertheless, the original goal of model editing is positive, aiming to facilitate efficient updates of large models in the future. Therefore, we encourage researchers to leverage this technology responsibly and with care.
+Reproducibility
+To ensure the reproducibility of our findings, detailed implementation instructions for AlphaEdit can be found in Appendix A. Additionally, the source code is publicly available at the following URL: https://github.com/jianghoucheng/AlphaEdit. These measures are intended to facilitate the verification and replication of our results by other researchers in the field.
+Acknowledgement
+This research is supported by the National Science and Technology Major Project (2023ZD0121102), the National Natural Science Foundation of China (92270114), and the National Natural Science Foundation of China (U24B20180). We also thank the EasyEdit platform for their support (https://github.com/zjunlp/EasyEdit).
+References
+Bentivogli et al. (2009)
+Luisa Bentivogli, Bernardo Magnini, Ido Dagan, Hoa Trang Dang, and Danilo Giampiccolo.
+The fifth PASCAL recognizing textual entailment challenge.
+In TAC. NIST, 2009.
+Brown et al. (2020)
+Tom B. Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel M. Ziegler, Jeffrey Wu, Clemens Winter, Christopher Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei.
+Language models are few-shot learners.
+In NeurIPS, 2020.
+Cao et al. (2021)
+Nicola De Cao, Wilker Aziz, and Ivan Titov.
+Editing factual knowledge in language models.
+In EMNLP (1), pp. 6491–6506. Association for Computational Linguistics, 2021.
+Dolan & Brockett (2005)
+William B. Dolan and Chris Brockett.
+Automatically constructing a corpus of sentential paraphrases.
+In IWP@IJCNLP. Asian Federation of Natural Language Processing, 2005.
+Fang et al. (2025)
+Jizhan Fang, Tianhe Lu, Yunzhi Yao, Ziyan Jiang, Xin Xu, Ningyu Zhang, and Huajun Chen.
+Cknowedit: A new chinese knowledge editing dataset for linguistics, facts, and logic error correction in llms, 2025.
+URL https://arxiv.org/abs/2409.05806.
+Geva et al. (2021)
+Mor Geva, Roei Schuster, Jonathan Berant, and Omer Levy.
+Transformer feed-forward layers are key-value memories.
+In EMNLP (1), pp. 5484–5495. Association for Computational Linguistics, 2021.
+Gu et al. (2024)
+Jia-Chen Gu, Hao-Xiang Xu, Jun-Yu Ma, Pan Lu, Zhen-Hua Ling, Kai-Wei Chang, and Nanyun Peng.
+Model editing harms general abilities of large language models: Regularization to the rescue, 2024.
+URL https://arxiv.org/abs/2401.04700.
+Gupta & Anumanchipalli (2024)
+Akshat Gupta and Gopala Anumanchipalli.
+Rebuilding ROME : Resolving model collapse during sequential model editing.
+CoRR, abs/2403.07175, 2024.
+Gupta et al. (2024)
+Akshat Gupta, Anurag Rao, and Gopala Anumanchipalli.
+Model editing at scale leads to gradual and catastrophic forgetting.
+CoRR, abs/2401.07453, 2024.
+Hartvigsen et al. (2023)
+Tom Hartvigsen, Swami Sankaranarayanan, Hamid Palangi, Yoon Kim, and Marzyeh Ghassemi.
+Aging with GRACE: lifelong model editing with discrete key-value adaptors.
+In NeurIPS, 2023.
+Hase et al. (2023)
+Peter Hase, Mohit Bansal, Been Kim, and Asma Ghandeharioun.
+Does localization inform editing? surprising differences in causality-based localization vs. knowledge editing in language models.
+Advances in Neural Information Processing Systems, 36:17643–17668, 2023.
+Hendrycks et al. (2021)
+Dan Hendrycks, Collin Burns, Steven Basart, Andy Zou, Mantas Mazeika, Dawn Song, and Jacob Steinhardt.
+Measuring massive multitask language understanding.
+In ICLR. OpenReview.net, 2021.
+Hu et al. (2024)
+Chenhui Hu, Pengfei Cao, Yubo Chen, Kang Liu, and Jun Zhao.
+Wilke: Wise-layer knowledge editor for lifelong knowledge editing.
+CoRR, abs/2402.10987, 2024.
+Huang et al. (2023)
+Zeyu Huang, Yikang Shen, Xiaofeng Zhang, Jie Zhou, Wenge Rong, and Zhang Xiong.
+Transformer-patcher: One mistake worth one neuron.
+In ICLR. OpenReview.net, 2023.
+Jiang et al. (2024)
+Houcheng Jiang, Junfeng Fang, Tianyu Zhang, An Zhang, Ruipeng Wang, Tao Liang, and Xiang Wang.
+Neuron-level sequential editing for large language models.
+arXiv preprint arXiv:2410.04045, 2024.
+Jiang et al. (2025)
+Houcheng Jiang, Junfeng Fang, Ningyu Zhang, Guojun Ma, Mingyang Wan, Xiang Wang, Xiangnan He, and Tat-seng Chua.
+Anyedit: Edit any knowledge encoded in language models.
+arXiv preprint arXiv:2502.05628, 2025.
+Lang (2012)
+Serge Lang.
+Introduction to linear algebra.
+Springer Science & Business Media, 2012.
+Levy et al. (2017)
+Omer Levy, Minjoon Seo, Eunsol Choi, and Luke Zettlemoyer.
+Zero-shot relation extraction via reading comprehension.
+In CoNLL, pp. 333–342. Association for Computational Linguistics, 2017.
+Li et al. (2024a)
+Shuaiyi Li, Yang Deng, Deng Cai, Hongyuan Lu, Liang Chen, and Wai Lam.
+Consecutive model editing with batch alongside hook layers.
+CoRR, abs/2403.05330, 2024a.
+Li et al. (2024b)
+Xiaopeng Li, Shasha Li, Shezheng Song, Jing Yang, Jun Ma, and Jie Yu.
+PMET: precise model editing in a transformer.
+In AAAI, pp. 18564–18572. AAAI Press, 2024b.
+Li et al. (2023)
+Yuanzhi Li, Sébastien Bubeck, Ronen Eldan, Allie Del Giorno, Suriya Gunasekar, and Yin Tat Lee.
+Textbooks are all you need II: phi-1.5 technical report.
+CoRR, abs/2309.05463, 2023.
+Li et al. (2025)
+Zherui Li, Houcheng Jiang, Hao Chen, Baolong Bi, Zhenhong Zhou, Fei Sun, Junfeng Fang, and Xiang Wang.
+Reinforced lifelong editing for language models.
+arXiv preprint arXiv:2502.05759, 2025.
+Liu et al. (2024)
+Aixin Liu, Bei Feng, Bing Xue, Bingxuan Wang, Bochao Wu, Chengda Lu, Chenggang Zhao, Chengqi Deng, Chenyu Zhang, Chong Ruan, et al.
+Deepseek-v3 technical report.
+arXiv preprint arXiv:2412.19437, 2024.
+Ma et al. (2024)
+Jun-Yu Ma, Hong Wang, Hao-Xiang Xu, Zhen-Hua Ling, and Jia-Chen Gu.
+Perturbation-restrained sequential model editing.
+CoRR, abs/2405.16821, 2024.
+Madaan et al. (2022)
+Aman Madaan, Niket Tandon, Peter Clark, and Yiming Yang.
+Memory-assisted prompt editing to improve GPT-3 after deployment.
+CoRR, abs/2201.06009, 2022.
+Meng et al. (2022)
+Kevin Meng, David Bau, Alex Andonian, and Yonatan Belinkov.
+Locating and editing factual associations in GPT.
+In NeurIPS, 2022.
+Meng et al. (2023)
+Kevin Meng, Arnab Sen Sharma, Alex J. Andonian, Yonatan Belinkov, and David Bau.
+Mass-editing memory in a transformer.
+In ICLR. OpenReview.net, 2023.
+Mesnard et al. (2024)
+Thomas Mesnard, Cassidy Hardin, Robert Dadashi, Surya Bhupatiraju, Shreya Pathak, Laurent Sifre, Morgane Rivière, Mihir Sanjay Kale, Juliette Love, Pouya Tafti, Léonard Hussenot, Aakanksha Chowdhery, Adam Roberts, Aditya Barua, Alex Botev, Alex Castro-Ros, Ambrose Slone, Amélie Héliou, Andrea Tacchetti, Anna Bulanova, Antonia Paterson, Beth Tsai, Bobak Shahriari, Charline Le Lan, Christopher A. Choquette-Choo, Clément Crepy, Daniel Cer, Daphne Ippolito, David Reid, Elena Buchatskaya, Eric Ni, Eric Noland, Geng Yan, George Tucker, George-Cristian Muraru, Grigory Rozhdestvenskiy, Henryk Michalewski, Ian Tenney, Ivan Grishchenko, Jacob Austin, James Keeling, Jane Labanowski, Jean-Baptiste Lespiau, Jeff Stanway, Jenny Brennan, Jeremy Chen, Johan Ferret, Justin Chiu, and et al.
+Gemma: Open models based on gemini research and technology.
+CoRR, abs/2403.08295, 2024.
+Meta (2024)
+Meta.
+Llama 3, 2024.
+URL https://llama.meta.com/llama3/.
+Large language model release.
+Mitchell et al. (2022a)
+Eric Mitchell, Charles Lin, Antoine Bosselut, Chelsea Finn, and Christopher D. Manning.
+Fast model editing at scale.
+In ICLR. OpenReview.net, 2022a.
+Mitchell et al. (2022b)
+Eric Mitchell, Charles Lin, Antoine Bosselut, Christopher D. Manning, and Chelsea Finn.
+Memory-based model editing at scale.
+In ICML, volume 162 of Proceedings of Machine Learning Research, pp. 15817–15831. PMLR, 2022b.
+OpenAI et al. (2024)
+OpenAI, Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia Leoni Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, Red Avila, Igor Babuschkin, Suchir Balaji, Valerie Balcom, Paul Baltescu, Haiming Bao, Mohammad Bavarian, Jeff Belgum, Irwan Bello, Jake Berdine, Gabriel Bernadett-Shapiro, Christopher Berner, Lenny Bogdonoff, Oleg Boiko, Madelaine Boyd, Anna-Luisa Brakman, Greg Brockman, Tim Brooks, Miles Brundage, Kevin Button, Trevor Cai, Rosie Campbell, Andrew Cann, Brittany Carey, Chelsea Carlson, Rory Carmichael, Brooke Chan, Che Chang, Fotis Chantzis, Derek Chen, Sully Chen, Ruby Chen, Jason Chen, Mark Chen, Ben Chess, Chester Cho, Casey Chu, Hyung Won Chung, Dave Cummings, Jeremiah Currier, Yunxing Dai, Cory Decareaux, Thomas Degry, Noah Deutsch, Damien Deville, Arka Dhar, David Dohan, Steve Dowling, Sheila Dunning, Adrien Ecoffet, Atty Eleti, Tyna Eloundou, David Farhi, Liam Fedus, Niko Felix, Simón Posada Fishman, Juston Forte, Isabella Fulford, Leo
+Gao, Elie Georges, Christian Gibson, Vik Goel, Tarun Gogineni, Gabriel Goh, Rapha Gontijo-Lopes, Jonathan Gordon, Morgan Grafstein, Scott Gray, Ryan Greene, Joshua Gross, Shixiang Shane Gu, Yufei Guo, Chris Hallacy, Jesse Han, Jeff Harris, Yuchen He, Mike Heaton, Johannes Heidecke, Chris Hesse, Alan Hickey, Wade Hickey, Peter Hoeschele, Brandon Houghton, Kenny Hsu, Shengli Hu, Xin Hu, Joost Huizinga, Shantanu Jain, Shawn Jain, Joanne Jang, Angela Jiang, Roger Jiang, Haozhun Jin, Denny Jin, Shino Jomoto, Billie Jonn, Heewoo Jun, Tomer Kaftan, Łukasz Kaiser, Ali Kamali, Ingmar Kanitscheider, Nitish Shirish Keskar, Tabarak Khan, Logan Kilpatrick, Jong Wook Kim, Christina Kim, Yongjik Kim, Jan Hendrik Kirchner, Jamie Kiros, Matt Knight, Daniel Kokotajlo, Łukasz Kondraciuk, Andrew Kondrich, Aris Konstantinidis, Kyle Kosic, Gretchen Krueger, Vishal Kuo, Michael Lampe, Ikai Lan, Teddy Lee, Jan Leike, Jade Leung, Daniel Levy, Chak Ming Li, Rachel Lim, Molly Lin, Stephanie Lin, Mateusz Litwin, Theresa Lopez, Ryan
+Lowe, Patricia Lue, Anna Makanju, Kim Malfacini, Sam Manning, Todor Markov, Yaniv Markovski, Bianca Martin, Katie Mayer, Andrew Mayne, Bob McGrew, Scott Mayer McKinney, Christine McLeavey, Paul McMillan, Jake McNeil, David Medina, Aalok Mehta, Jacob Menick, Luke Metz, Andrey Mishchenko, Pamela Mishkin, Vinnie Monaco, Evan Morikawa, Daniel Mossing, Tong Mu, Mira Murati, Oleg Murk, David Mély, Ashvin Nair, Reiichiro Nakano, Rajeev Nayak, Arvind Neelakantan, Richard Ngo, Hyeonwoo Noh, Long Ouyang, Cullen O’Keefe, Jakub Pachocki, Alex Paino, Joe Palermo, Ashley Pantuliano, Giambattista Parascandolo, Joel Parish, Emy Parparita, Alex Passos, Mikhail Pavlov, Andrew Peng, Adam Perelman, Filipe de Avila Belbute Peres, Michael Petrov, Henrique Ponde de Oliveira Pinto, Michael, Pokorny, Michelle Pokrass, Vitchyr H. Pong, Tolly Powell, Alethea Power, Boris Power, Elizabeth Proehl, Raul Puri, Alec Radford, Jack Rae, Aditya Ramesh, Cameron Raymond, Francis Real, Kendra Rimbach, Carl Ross, Bob Rotsted, Henri Roussez,
+Nick Ryder, Mario Saltarelli, Ted Sanders, Shibani Santurkar, Girish Sastry, Heather Schmidt, David Schnurr, John Schulman, Daniel Selsam, Kyla Sheppard, Toki Sherbakov, Jessica Shieh, Sarah Shoker, Pranav Shyam, Szymon Sidor, Eric Sigler, Maddie Simens, Jordan Sitkin, Katarina Slama, Ian Sohl, Benjamin Sokolowsky, Yang Song, Natalie Staudacher, Felipe Petroski Such, Natalie Summers, Ilya Sutskever, Jie Tang, Nikolas Tezak, Madeleine B. Thompson, Phil Tillet, Amin Tootoonchian, Elizabeth Tseng, Preston Tuggle, Nick Turley, Jerry Tworek, Juan Felipe Cerón Uribe, Andrea Vallone, Arun Vijayvergiya, Chelsea Voss, Carroll Wainwright, Justin Jay Wang, Alvin Wang, Ben Wang, Jonathan Ward, Jason Wei, CJ Weinmann, Akila Welihinda, Peter Welinder, Jiayi Weng, Lilian Weng, Matt Wiethoff, Dave Willner, Clemens Winter, Samuel Wolrich, Hannah Wong, Lauren Workman, Sherwin Wu, Jeff Wu, Michael Wu, Kai Xiao, Tao Xu, Sarah Yoo, Kevin Yu, Qiming Yuan, Wojciech Zaremba, Rowan Zellers, Chong Zhang, Marvin Zhang, Shengjia
+Zhao, Tianhao Zheng, Juntang Zhuang, William Zhuk, and Barret Zoph.
+Gpt-4 technical report, 2024.
+URL https://arxiv.org/abs/2303.08774.
+Petroni et al. (2019)
+Fabio Petroni, Tim Rocktäschel, Sebastian Riedel, Patrick S. H. Lewis, Anton Bakhtin, Yuxiang Wu, and Alexander H. Miller.
+Language models as knowledge bases?
+In EMNLP/IJCNLP (1), pp. 2463–2473. Association for Computational Linguistics, 2019.
+Radford et al. (2019)
+Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever, et al.
+Language models are unsupervised multitask learners.
+OpenAI blog, 1(8):9, 2019.
+Roberts et al. (2020)
+Adam Roberts, Colin Raffel, and Noam Shazeer.
+How much knowledge can you pack into the parameters of a language model?
+In EMNLP (1), pp. 5418–5426. Association for Computational Linguistics, 2020.
+Rosati et al. (2024)
+Domenic Rosati, Robie Gonzales, Jinkun Chen, Xuemin Yu, Yahya Kayani, Frank Rudzicz, and Hassan Sajjad.
+Long-form evaluation of model editing.
+In NAACL-HLT, pp. 3749–3780. Association for Computational Linguistics, 2024.
+Socher et al. (2013)
+Richard Socher, Alex Perelygin, Jean Wu, Jason Chuang, Christopher D. Manning, Andrew Y. Ng, and Christopher Potts.
+Recursive deep models for semantic compositionality over a sentiment treebank.
+In EMNLP, pp. 1631–1642. ACL, 2013.
+Van der Maaten & Hinton (2008)
+Laurens Van der Maaten and Geoffrey Hinton.
+Visualizing data using t-sne.
+Journal of machine learning research, 9(11), 2008.
+Wang et al. (2019)
+Alex Wang, Amanpreet Singh, Julian Michael, Felix Hill, Omer Levy, and Samuel R. Bowman.
+GLUE: A multi-task benchmark and analysis platform for natural language understanding.
+In ICLR (Poster). OpenReview.net, 2019.
+Wang et al. (2025)
+Peng Wang, Zexi Li, Ningyu Zhang, Ziwen Xu, Yunzhi Yao, Yong Jiang, Pengjun Xie, Fei Huang, and Huajun Chen.
+Wise: Rethinking the knowledge memory for lifelong model editing of large language models.
+Advances in Neural Information Processing Systems, 37:53764–53797, 2025.
+Wang et al. (2021)
+Shipeng Wang, Xiaorong Li, Jian Sun, and Zongben Xu.
+Training networks in null space of feature covariance for continual learning.
+In CVPR, pp. 184–193. Computer Vision Foundation / IEEE, 2021.
+Wang et al. (2024)
+Song Wang, Yaochen Zhu, Haochen Liu, Zaiyi Zheng, Chen Chen, and Jundong Li.
+Knowledge editing for large language models: A survey.
+ACM Computing Surveys, 57(3):1–37, 2024.
+Warstadt et al. (2019)
+Alex Warstadt, Amanpreet Singh, and Samuel R. Bowman.
+Neural network acceptability judgments.
+Trans. Assoc. Comput. Linguistics, 7:625–641, 2019.
+Williams et al. (2018)
+Adina Williams, Nikita Nangia, and Samuel R. Bowman.
+A broad-coverage challenge corpus for sentence understanding through inference.
+In NAACL-HLT, pp. 1112–1122. Association for Computational Linguistics, 2018.
+Wolf et al. (2019)
+Thomas Wolf, Lysandre Debut, Victor Sanh, Julien Chaumond, Clement Delangue, Anthony Moi, Pierric Cistac, Tim Rault, Rémi Louf, Morgan Funtowicz, and Jamie Brew.
+Huggingface’s transformers: State-of-the-art natural language processing.
+CoRR, abs/1910.03771, 2019.
+Yang et al. (2024a)
+Wanli Yang, Fei Sun, Xinyu Ma, Xun Liu, Dawei Yin, and Xueqi Cheng.
+The butterfly effect of model editing: Few edits can trigger large language models collapse.
+In ACL (Findings), pp. 5419–5437. Association for Computational Linguistics, 2024a.
+Yang et al. (2024b)
+Wanli Yang, Fei Sun, Jiajun Tan, Xinyu Ma, Du Su, Dawei Yin, and Huawei Shen.
+The fall of ROME: understanding the collapse of llms in model editing.
+In EMNLP (Findings), pp. 4079–4087. Association for Computational Linguistics, 2024b.
+Yao et al. (2023)
+Yunzhi Yao, Peng Wang, Bozhong Tian, Siyuan Cheng, Zhoubo Li, Shumin Deng, Huajun Chen, and Ningyu Zhang.
+Editing large language models: Problems, methods, and opportunities.
+In EMNLP, pp. 10222–10240. Association for Computational Linguistics, 2023.
+Yu et al. (2024)
+Lang Yu, Qin Chen, Jie Zhou, and Liang He.
+MELO: enhancing model editing with neuron-indexed dynamic lora.
+In AAAI, pp. 19449–19457. AAAI Press, 2024.
+Zhang et al. (2024a)
+Mengqi Zhang, Xiaotian Ye, Qiang Liu, Pengjie Ren, Shu Wu, and Zhumin Chen.
+Knowledge graph enhanced large language model editing.
+CoRR, abs/2402.13593, 2024a.
+Zhang et al. (2024b)
+Ningyu Zhang, Bozhong Tian, Siyuan Cheng, Xiaozhuan Liang, Yi Hu, Kouying Xue, Yanjie Gou, Xi Chen, and Huajun Chen.
+Instructedit: Instruction-based knowledge editing for large language models.
+In IJCAI, pp. 6633–6641. ijcai.org, 2024b.
+Zhang et al. (2024c)
+Ningyu Zhang, Zekun Xi, Yujie Luo, Peng Wang, Bozhong Tian, Yunzhi Yao, Jintian Zhang, Shumin Deng, Mengshu Sun, Lei Liang, et al.
+Oneedit: A neural-symbolic collaboratively knowledge editing system.
+arXiv preprint arXiv:2409.07497, 2024c.
+Zhang et al. (2024d)
+Ningyu Zhang, Yunzhi Yao, Bozhong Tian, Peng Wang, Shumin Deng, Mengru Wang, Zekun Xi, Shengyu Mao, Jintian Zhang, Yuansheng Ni, Siyuan Cheng, Ziwen Xu, Xin Xu, Jia-Chen Gu, Yong Jiang, Pengjun Xie, Fei Huang, Lei Liang, Zhiqiang Zhang, Xiaowei Zhu, Jun Zhou, and Huajun Chen.
+A comprehensive study of knowledge editing for large language models.
+CoRR, abs/2401.01286, 2024d.
+Zheng et al. (2023)
+Ce Zheng, Lei Li, Qingxiu Dong, Yuxuan Fan, Zhiyong Wu, Jingjing Xu, and Baobao Chang.
+Can we edit factual knowledge by in-context learning?
+CoRR, abs/2305.12740, 2023.
+Zhong et al. (2023)
+Zexuan Zhong, Zhengxuan Wu, Christopher D. Manning, Christopher Potts, and Danqi Chen.
+Mquake: Assessing knowledge editing in language models via multi-hop questions.
+In EMNLP, pp. 15686–15702. Association for Computational Linguistics, 2023.
+Zhu et al. (2020)
+Chen Zhu, Ankit Singh Rawat, Manzil Zaheer, Srinadh Bhojanapalli, Daliang Li, Felix X. Yu, and Sanjiv Kumar.
+Modifying memories in transformer models.
+CoRR, abs/2012.00363, 2020.
+Appendix A Experimental Setup
+In this section, we provide a detailed description of the experimental configuration, including a comprehensive explanation of the evaluation metrics, an introduction to the datasets, and a discussion of the baselines.
+A.1 Datasets
+Here, we provide a detailed introduction to the datasets used in this paper:
+•
+Counterfact (Meng et al. 2022) is a more challenging dataset that contrasts counterfactual with factual statements, initially scoring lower for Counterfact. It constructs out-of-scope data by replacing the subject entity with approximate entities sharing the same predicate. The Counterfact dataset has similar metrics to ZsRE for evaluating efficacy, generalization, and specificity. Additionally, Counterfact includes multiple generation prompts with the same meaning as the original prompt to test the quality of generated text, specifically focusing on fluency and consistency.
+•
+ZsRE (Levy et al. 2017) is a question answering (QA) dataset that uses questions generated through back-translation as equivalent neighbors. Following previous work, natural questions are used as out-of-scope data to evaluate locality. Each sample in ZsRE includes a subject string and answers as the editing targets to assess editing success, along with the rephrased question for generalization evaluation and the locality question for evaluating specificity.
+•
+KnowEdit (Zhang et al. 2024d) introduces a comprehensive benchmark aimed at systematically evaluating knowledge editing methods, categorizing them into approaches that rely on external knowledge, intrinsic knowledge updates, or merging new knowledge into the model. The benchmark not only measures the impact of editing on specific domains but also emphasizes preserving the model’s overall performance across tasks, offering a unified framework for evaluating editing efficiency and impact. In our paper, we employ the wiki_recent and wikibio within KnowEdit to conduct our experiments.
+•
+LEME (Long-form Evaluation of Model Editing) (Rosati et al. 2024) extends the evaluation paradigm by focusing on long-form generative outputs, revealing unique challenges such as factual drift, internal consistency, and lexical cohesion. This protocol highlights that short-form metrics fail to correlate with long-form generative outcomes, shedding light on previously unexplored dimensions of editing.
+•
+MQuAKE (Zhong et al. 2023) addresses a critical gap in current evaluations by introducing multi-hop reasoning questions to test the ripple effects of factual updates. Unlike single-fact recall benchmarks, MQUAKE measures the consistency of entailed beliefs after editing, uncovering limitations in existing methods when handling complex relational dependencies.
+A.2 Metrics
+Now we introduce the evaluation metrics used for ZsRE and Counterfact datasets, respectively.
+A.2.1 ZsRE Metrics
+Following the previous work (Mitchell et al. 2022a; Meng et al. 2022; Meng et al. 2023), this section defines each ZsRE metric given a LLM fθf_{\theta}, a knowledge fact prompt (si,ri)(s_{i},r_{i}), an edited target output oio_{i}, and the model’s original output oico_{i}^{c}:
+•
+Efficacy: Efficacy is calculated as the average top-1 accuracy on the edit samples:
+𝔼i{oi=argmaxoℙfθ(o∣(si,ri)}.\mathbb{E}_{i}\left\{o_{i}=\arg\max_{o}\mathbb{P}_{f_{\theta}}(o\mid(s_{i},r_{i})\right\}.
+(16)
+•
+Generalization: Generalization measures the model’s performance on equivalent prompt of (si,ri)(s_{i},r_{i}), such as rephrased statements N⁡((si,ri))N((s_{i},r_{i})). This is evaluated by the average top-1 accuracy on these N⁡((si,ri))N((s_{i},r_{i})):
+𝔼i{oi=argmaxoℙfθ(o∣N((si,ri))}.\mathbb{E}_{i}\left\{o_{i}=\arg\max_{o}\mathbb{P}_{f_{\theta}}(o\mid N((s_{i},r_{i}))\right\}.
+(17)
+•
+Specificity: Specificity ensures that the editing does not affect samples unrelated to the edit cases O⁡(si,ri)O(s_{i},r_{i}). This is evaluated by the top-1 accuracy of predictions that remain unchanged:
+𝔼i{oic=argmaxoℙfθ(o∣O((si,ri))}.\mathbb{E}_{i}\left\{o_{i}^{c}=\arg\max_{o}\mathbb{P}_{f_{\theta}}(o\mid O((s_{i},r_{i}))\right\}.
+(18)
+A.2.2 Counterfact Metrics
+Following previous work (Meng et al. 2022; Meng et al. 2023), this section defines each Counterfact metric given a LLM fθf_{\theta}, a knowledge fact prompt (si,ri)(s_{i},r_{i}), an edited target output oio_{i}, and the model’s original output oico_{i}^{c}:
+•
+Efficacy (efficacy success): The proportion of cases where oio_{i} is more probable than ocio_{c}^{i} with the (si,ri)(s_{i},r_{i}) prompt:
+𝔼i[ℙfθ[oi∣(si,ri)]>ℙfθ[oci∣(si,ri)]].\mathbb{E}_{i}\left[\mathbb{P}_{f_{\theta}}[o_{i}\mid(s_{i},r_{i})]>\mathbb{P}_{f_{\theta}}[o_{c}^{i}\mid(s_{i},r_{i})]\right].
+(19)
+•
+Generalization (paraphrase success): The proportion of cases where oio_{i} is more probable than ocio_{c}^{i} in rephrased statements N⁡((si,ri))N((s_{i},r_{i})):
+𝔼i[ℙfθ[oi∣N((si,ri))]>ℙfθ[oci∣N((si,ri))]].\mathbb{E}_{i}\left[\mathbb{P}_{f_{\theta}}[o_{i}\mid N((s_{i},r_{i}))]>\mathbb{P}_{f_{\theta}}[o_{c}^{i}\mid N((s_{i},r_{i}))]\right].
+(20)
+•
+Specificity (neighborhood success): The proportion of neighborhood prompts O⁡((si,ri))O((s_{i},r_{i})), which are prompts about distinct but semantically related subjects, where the model assigns a higher probability to the correct fact:
+𝔼i[ℙfθ[oi∣O((si,ri))]>ℙfθ[oci∣O((si,ri))]].\mathbb{E}_{i}\left[\mathbb{P}_{f_{\theta}}[o_{i}\mid O((s_{i},r_{i}))]>\mathbb{P}_{f_{\theta}}[o_{c}^{i}\mid O((s_{i},r_{i}))]\right].
+(21)
+•
+Fluency (generation entropy): Measure for excessive repetition in model outputs. It uses the entropy of n-gram distributions:
+−23∑kg2(k)log2g2(k)+43∑kg3(k)log2g3(k),-\frac{2}{3}\sum_{k}g_{2}(k)\log_{2}g_{2}(k)+\frac{4}{3}\sum_{k}g_{3}(k)\log_{2}g_{3}(k),
+(22)
+where gn​(⋅)g_{n}(\cdot) is the n-gram frequency distribution.
+•
+Consistency (reference score): The consistency of the model’s outputs is evaluated by giving the model fθ{f_{\theta}} a subject ss and computing the cosine similarity between the TF-IDF vectors of the model-generated text and a reference Wikipedia text about oo.
+A.3 Implementation Details
+Our implementation of AlphaEdit with GPT-2 XL and GPT-J follows the configurations outlined in MEMIT (Meng et al. 2023). Specifically,
+•
+For the GPT-2 XL model, we target critical layers [13,14,15,16,17][13,14,15,16,17] for editing, with the hyperparameter λ\lambda set to 20,000. During the computation of hidden representations of the critical layer, we perform 20 optimization steps with a learning rate of 0.5.
+•
+For the GPT-J model, we target critical layers [3,4,5,6,7,8][3,4,5,6,7,8] for editing, with the hyperparameter λ\lambda set to 15,000. During the computation of hidden representations of the critical layer, we perform 25 optimization steps, also with a learning rate of 0.5.
+•
+For Llama3 (8B) model, we target critical layers [4,5,6,7,8][4,5,6,7,8] for editing. The hyperparameter λ\lambda is set to 15,000. During the process of computing hidden representations of the critical layer, we perform 25 steps with a learning rate of 0.1.
+All experiments are conducted on a single A40 (48GB) GPU. The LLMs are loaded using HuggingFace Transformers (Wolf et al. 2019).
+A.4 Baselines
+Here we introduce the five baseline models employed in this study. For the hyperparameter settings of the baseline methods, except the settings mentioned in Appendix A.3, we used the original code provided in the respective papers for reproduction. It is important to note that, since the code for PRUNE is not publicly available, we implemented the method based on the description in the original paper. Specifically, in our implementation, the threshold for retaining eigenvalues in PRUNE was set to ee.
+•
+MEND is a method for efficiently editing large pre-trained models using a single input-output pair. MEND utilizes small auxiliary networks to make fast, localized changes to the model without full retraining. By applying a low-rank decomposition to the gradient from standard fine-tuning, MEND enables efficient and tractable parameter adjustments. This approach allows for post-hoc edits in large models while avoiding the overfitting common in traditional fine-tuning methods.
+•
+InstructEdit enables the learning of a well-formed Editor by designing corresponding instructions for training on different tasks. InstructEdit applies meta-learning editing methods based on MEND to train the editor with a variety of meticulously curated instructions, and through this approach, InstructEdit can endow the Editor with the capacity for multi-task editing, thus saving a significant amount of human and computational resources.
+•
+ROME is a method for updating specific factual associations in LLMs. By identifying key neuron activations in middle-layer feed-forward modules that influence factual predictions, ROME modifies feed-forward weights to edit these associations directly. ROME demonstrates that mid-layer feed-forward modules play a crucial role in storing and recalling factual knowledge, making direct model manipulation a viable editing technique.
+•
+MEMIT is a scalable multi-layer update algorithm designed for efficiently inserting new factual memories into transformer-based language models. Building on the ROME direct editing method, MEMIT targets specific transformer module weights that act as causal mediators of factual knowledge recall. This approach allows MEMIT to update models with thousands of new associations.
+•
+PRUNE is a model editing framework designed to preserve the general abilities of LLMs during sequential editing. PRUNE addresses the issue of deteriorating model performance as the number of edits increases by applying condition number restraints to the edited matrix, limiting perturbations to the model’s stored knowledge. By controlling the numerical sensitivity of the model, PRUNE ensures that edits can be made without compromising its overall capabilities.
+•
+RECT is a method designed to mitigate the unintended side effects of model editing on the general abilities of LLMs. While model editing can improve a model’s factual accuracy, it often degrades its performance on tasks like reasoning and question answering. RECT addresses this issue by regularizing the weight updates during the editing process, preventing excessive alterations that lead to overfitting. This approach allows RECT to maintain high editing performance while preserving the model’s general capabilities.
+•
+SERAC (Mitchell et al. 2022b) introduces Semi-Parametric Editing with a Retrieval-Augmented Counterfactual Model, addressing limitations of traditional editors in defining edit scope and handling sequential updates. It stores edits in explicit memory and reasons over them to adjust model behavior as needed. SERAC outperforms existing methods on three challenging tasks—question answering, fact-checking, and dialogue generation.
+•
+MELO (Yu et al. 2024) proposes Neuron-Indexed Dynamic LoRA, a plug-in method that dynamically activates LoRA blocks to edit model behavior efficiently. Adaptable across multiple LLM backbones, it achieves state-of-the-art performance on tasks like document classification, question answering, and hallucination correction, with minimal computational cost and trainable parameters.
+•
+GRACE (Hartvigsen et al. 2023) introduces a lifelong model editing framework that uses a local codebook in the latent space to handle thousands of sequential edits without degrading model performance. It makes targeted fixes while preserving generalization, demonstrating superior results on T5, BERT, and GPT for retaining and generalizing edits.
+Appendix B Implementation Details of Current Model Editing & Related Proofs
+Here, we provide the implementation details of the current model editing methods along with the proof process related to it and the concept of the null space (Wang et al. 2021).
+B.1 Model Editing
+Model editing aims to refine a pre-trained model through one or multiple edits, while each edit replaces (s,r,o)(s,r,o) with the new knowledge (s,r,o∗)(s,r,o^{\ast}) (Yang et al. 2024b; Li et al. 2025). Then, model is expected to recall the updated object o∗o^{\ast} given a natural language prompt p⁡(s,r)p(s,r), such as “The President of the United States is” (Zhang et al. 2024c).
+To achieve this, locating-and-editing methods are proposed for effectively model editing (Wang et al. 2024; Yang et al. 2024a). These methods typically adhere to the following steps (Jiang et al. 2024):
+Step 1: Locating Influential Layers.
+The first step is to identify the specific FFN layers to edit using causal tracing (Meng et al. 2022). This method involves injecting Gaussian noise into the hidden states, and then incrementally restoring them to original values. By analyzing the degree to which the original output recovers, the influential layers can be pinpointed as the targets for editing.
+Step 2: Acquiring the Excepted Output. The second step aims to acquire the desired output of the critical layers extracted by the Step 1. Concretely, following the aforementioned key-value theory, the key 𝒌{\bm{k}}, which encodes (s,r)(s,r), is processed through the output weights 𝑾outl{\bm{W}}_{\text{out}}^{l} to produce the original value 𝒗{\bm{v}} encoding oo. Formally:
+𝒌≜σ⁡(𝑾inl​γ​(𝒉l−1+𝒂l)),𝒗≜𝒎l=𝑾outl​k.{\bm{k}}\triangleq\sigma({\bm{W}}_{\text{in}}^{l}\,\gamma({\bm{h}}^{l-1}+{\bm{a}}^{l})),\,\,{\bm{v}}\triangleq{\bm{m}}^{l}={\bm{W}}_{\text{out}}^{l}k.
+(23)
+To achieve knowledge editing, 𝒗{\bm{v}} is expected to be replaced with a new value 𝒗∗{\bm{v}}^{\ast} encoding o∗o^{\ast}. To this end, current methods typically use gradient descent on 𝒗{\bm{v}}, maximizing the probability that the model outputs the word associated with o∗o^{\ast} (Meng et al. 2023).
+The optimization objective is as follows:
+𝒗∗=𝒗+arg​min𝜹l⁡(−log⁡ℙf𝐖outl​(ml+=𝜹l)​[o∗∣(s,r)]),{\bm{v}}^{\ast}={\bm{v}}+\argmin_{\mathbf{\bm{\delta}}^{l}}(-\log\mathbb{P}_{f_{{\bm{W}}_{\text{out}}^{l}}(m^{l}+={\mathbf{\bm{\delta}}^{l}})}\left[o^{\ast}\mid(s,r)\right]),
+(24)
+where f𝑾outl​(𝒎l+=𝜹)f_{{\bm{W}}_{\text{out}}^{l}}({\bm{m}}^{l}+={\mathbf{\bm{\delta}}}) represents the original model with 𝒎l{\bm{m}}^{l} updated to 𝒎l+𝜹l{\bm{m}}^{l}+\mathbf{\bm{\delta}}^{l}.
+Step 3: Updating Woutl{\bm{W}}_{\text{out}}^{l}. This step aims to update the parameters 𝑾outl{{{\bm{W}}}_{\text{out}}^{l}}. It includes a factual set {𝑲1,𝑽1}\{{\bm{K}}_{1},{\bm{V}}_{1}\} containing uu new associations, while preserving the set {𝑲0,𝑽0}\{{\bm{K}}_{0},{\bm{V}}_{0}\} containing nn original associations. Specifically,
+𝑲0=[𝒌1|𝒌2|…∣𝒌n],𝑽0=[𝒗1|𝒗2|…∣𝒗n],𝑲1=[𝒌n+1|𝒌n+2|…∣𝒌n+u],𝑽1=[𝒗∗n+1|𝒗∗n+2|…∣𝒗∗n+u],\begin{gathered}{\bm{K}}_{0}=\left[{\bm{k}}_{1}\left|{\bm{k}}_{2}\right|\ldots\mid{\bm{k}}_{n}\right],\quad{\bm{V}}_{0}=\left[{\bm{v}}_{1}\left|{\bm{v}}_{2}\right|\ldots\mid{\bm{v}}_{n}\right],\\
+{\bm{K}}_{1}=\left[{\bm{k}}_{n+1}\left|{\bm{k}}_{n+2}\right|\ldots\mid{\bm{k}}_{n+u}\right],\quad{\bm{V}}_{1}=\left[{\bm{v}}^{\ast}_{n+1}\left|{\bm{v}}^{\ast}_{n+2}\right|\ldots\mid{\bm{v}}^{\ast}_{n+u}\right],\end{gathered}
+(25)
+where vectors 𝒌{\bm{k}} and 𝒗{\bm{v}} defined in Eqn. 23 and their subscripts represent the index of the knowledge.
+Based on these, the objective can be defined as:
+𝑾~outl≜arg​min𝐖^⁡(∑i=1n‖𝐖^​𝐤i−𝐯i‖2+∑i=n+1n+u‖𝐖^​𝐤i−𝐯i∗‖2).\tilde{{\bm{W}}}_{\text{out}}^{l}\triangleq\argmin_{\hat{{\bm{W}}}}\left(\sum_{i=1}^{n}\left\|\hat{{\bm{W}}}{\bm{k}}_{i}-{\bm{v}}_{i}\right\|^{2}+\sum_{i=n+1}^{n+u}\left\|\hat{{\bm{W}}}{\bm{k}}_{i}-{\bm{v}}^{\ast}_{i}\right\|^{2}\right).
+(26)
+By applying the normal equation (Lang 2012), its closed-form solution can be derived:
+𝑾~outl=(𝑴1−𝑾outl​𝑲1)​𝑲1T​(𝑲0​𝑲0T+𝑲1​𝑲1T)−1+𝑾outl.\tilde{{\bm{W}}}_{\text{out}}^{l}=\left({\bm{M}}_{1}-{{\bm{W}}}_{\text{out}}^{l}{\bm{K}}_{1}\right){\bm{K}}_{1}^{T}\left({\bm{K}}_{0}{\bm{K}}_{0}^{T}+{\bm{K}}_{1}{\bm{K}}_{1}^{T}\right)^{-1}+{{\bm{W}}}_{\text{out}}^{l}.
+(27)
+Additionally, current methods often modify parameters across multiple layers to achieve more effective editing. For more details, please refer to Meng et al. 2023.
+B.2 Proof for the Shared Null Space of K0K_{0} and K0​(K0)TK_{0}(K_{0})^{T}
+Theorem: Let 𝑲0{\bm{K}}_{0} be a m×nm\times n matrix. Then 𝑲0{\bm{K}}_{0} and 𝑲0​(𝑲0)T{\bm{K}}_{0}({\bm{K}}_{0})^{T} share the same left null space.
+Proof:
+Define the left null space of a matrix 𝑨{\bm{A}} as the set of all vectors 𝐱\mathbf{x} such that 𝐱T​𝑨=0\mathbf{x}^{T}{\bm{A}}=0. We need to show that if 𝐱\mathbf{x} is in the left null space of 𝑲0{\bm{K}}_{0}, then 𝐱\mathbf{x} is also in the left null space of 𝑲0​(𝑲0)T{\bm{K}}_{0}({\bm{K}}_{0})^{T}, and vice versa.
+1. Inclusion 𝒩⁡(𝐱T​K0)⊆𝒩⁡(𝐱T​K0​(K0)T)\mathcal{N}\left(\mathbf{x}^{T}K_{0}\right)\subseteq\mathcal{N}\left(\mathbf{x}^{T}K_{0}\left(K_{0}\right)^{T}\right):
+•
+Suppose 𝐱\mathbf{x} is in the left null space of 𝑲0{\bm{K}}_{0}, i.e., 𝐱T​𝑲0=𝟎\mathbf{x}^{T}{\bm{K}}_{0}=\bm{0}.
+•
+It follows that 𝐱T​(K0​(K0)T)=(𝐱T​K0)​(K0)T=𝟎⋅(K0)T=𝟎\mathbf{x}^{T}\left(K_{0}\left(K_{0}\right)^{T}\right)=\left(\mathbf{x}^{T}K_{0}\right)\left(K_{0}\right)^{T}=\bm{0}\cdot\left(K_{0}\right)^{T}=\bm{0}.
+•
+Therefore, 𝐱\mathbf{x} is in the left null space of 𝑲0​(𝑲0)T{\bm{K}}_{0}({\bm{K}}_{0})^{T}.
+2. Inclusion 𝒩⁡(𝐱T​K0​(K0)T)⊆𝒩⁡(𝐱T​K0)\mathcal{N}\left(\mathbf{x}^{T}K_{0}\left(K_{0}\right)^{T}\right)\subseteq\mathcal{N}\left(\mathbf{x}^{T}K_{0}\right):
+•
+Suppose 𝐱\mathbf{x} is in the left null space of 𝑲0​(𝑲0)T{\bm{K}}_{0}({\bm{K}}_{0})^{T}, i.e., 𝐱T​(K0​(K0)T)=𝟎\mathbf{x}^{T}\left(K_{0}\left(K_{0}\right)^{T}\right)=\bm{0}.
+•
+Expanding this expression gives (𝐱T​K0)​(K0)T=𝟎\left(\mathbf{x}^{T}K_{0}\right)\left(K_{0}\right)^{T}=\bm{0}.
+•
+Since 𝑲0​(𝑲0)T{\bm{K}}_{0}({\bm{K}}_{0})^{T} is non-negative (as any vector multiplied by its transpose results in a non-negative scalar), 𝐱T​𝑲0\mathbf{x}^{T}{\bm{K}}_{0} must be a zero vector for their product to be zero.
+•
+Hence, 𝐱\mathbf{x} is also in the left null space of 𝑲0{\bm{K}}_{0}.
+From these arguments, we establish that both 𝑲0{\bm{K}}_{0} and 𝑲0​(𝑲0)T{\bm{K}}_{0}({\bm{K}}_{0})^{T} share the same left null space. That is, 𝐱\mathbf{x} belongs to the left null space of 𝑲0{\bm{K}}_{0} if and only if 𝐱\mathbf{x} belongs to the left null space of 𝑲0​(𝑲0)T{\bm{K}}_{0}({\bm{K}}_{0})^{T}. This equality of left null spaces illustrates the structural symmetry and dependency between 𝑲0{\bm{K}}_{0} and its self-product 𝑲0​(𝑲0)T{\bm{K}}_{0}({\bm{K}}_{0})^{T}.
+B.3 Proof for Equation Δ​P​K0​(K0)T=0\Delta PK_{0}(K_{0})^{T}=0
+The SVD of 𝑲0​(𝑲0)T{\bm{K}}_{0}({\bm{K}}_{0})^{T} provides us the eigenvectors 𝑼{\bm{U}} and eigenvalues 𝚲{\bm{\Lambda}}. Based on this, we can express 𝑼{\bm{U}} and 𝚲{\bm{\Lambda}} as 𝑼=[𝑼1,𝑼2]{\bm{U}}=[{\bm{U}}_{1},{\bm{U}}_{2}] and correspondingly 𝚲=[𝚲100𝚲2]{\bm{\Lambda}}=\begin{bmatrix}{\bm{\Lambda}}_{1}&0\\
+0&{\bm{\Lambda}}_{2}\end{bmatrix}, where all zero eigenvalues are contained in 𝚲2{\bm{\Lambda}}_{2}, and 𝑼2{\bm{U}}_{2} consists of the eigenvectors corresponding to 𝚲2{\bm{\Lambda}}_{2}.
+Since 𝑼{\bm{U}} is an orthogonal matrix, it follows that:
+(𝑼2)T​𝑲0​(𝑲0)T=(𝑼2)T​𝑼1​𝚲1​(𝑼1)T=𝟎.({\bm{U}}_{2})^{T}{\bm{K}}_{0}({\bm{K}}_{0})^{T}=({\bm{U}}_{2})^{T}{\bm{U}}_{1}{\bm{\Lambda}}_{1}({\bm{U}}_{1})^{T}=\bm{0}.
+(28)
+This implies that the column space of 𝑼2{\bm{U}}_{2} spans the null space of 𝑲0​(𝑲0)T{\bm{K}}_{0}({\bm{K}}_{0})^{T}. Accordingly, the projection matrix onto the null space of 𝑲0​(𝑲0)T{\bm{K}}_{0}({\bm{K}}_{0})^{T} can be defined as:
+𝑷=𝑼2​(𝑼2)T.{\bm{P}}={\bm{U}}_{2}({\bm{U}}_{2})^{T}.
+(29)
+Based on the Eqn. 28 and 29, we can derive that:
+Δ​𝑷​𝑲0​(𝑲0)T=Δ​𝑼2​(𝑼2)T​𝑲0​(𝑲0)T=𝟎,\Delta{\bm{P}}{\bm{K}}_{0}({\bm{K}}_{0})^{T}=\Delta{\bm{U}}_{2}({\bm{U}}_{2})^{T}{\bm{K}}_{0}({\bm{K}}_{0})^{T}=\bm{0},
+(30)
+which confirms that Δ​𝑷\Delta{\bm{P}} projects Δ\Delta onto the null space of 𝑲0​(𝑲0)T{\bm{K}}_{0}({\bm{K}}_{0})^{T}.
+B.4 Derivation of AlphaEdit Perturbation
+Given the orthogonal projection matrix 𝑷=𝑼^​𝑼^⊤{\bm{P}}=\hat{{\bm{U}}}\hat{{\bm{U}}}^{\top} with 𝑼^⊤​𝑼^=𝑰\hat{{\bm{U}}}^{\top}\hat{{\bm{U}}}={\bm{I}}, it satisfies 𝑷=𝑷⊤{\bm{P}}={\bm{P}}^{\top} and 𝑷2=𝑷{\bm{P}}^{2}={\bm{P}}. We aim to minimize the objective:
+J=‖(𝑾+𝚫~​𝑷)​𝑲1−𝑽1‖2+‖𝚫~​𝑷‖2+‖𝚫~​𝑷​𝑲p‖2,J=\|({\bm{W}}+\bm{\tilde{\Delta}}{\bm{P}}){\bm{K}}_{1}-{\bm{V}}_{1}\|^{2}+\|\bm{\tilde{\Delta}}{\bm{P}}\|^{2}+\|\bm{\tilde{\Delta}}{\bm{P}}{\bm{K}}_{p}\|^{2},
+(31)
+where 𝑹=𝑽1−𝑾​𝑲1{\bm{R}}={\bm{V}}_{1}-{\bm{W}}{\bm{K}}_{1}. Setting the matrix derivative ∂J∂𝚫~\frac{\partial J}{\partial\bm{\tilde{\Delta}}} to zero yields:
+(𝚫​𝑷​𝑲1−𝑹)​𝑲1⊤​𝑷⊤+𝚫​𝑷​𝑷⊤+𝚫​𝑷​𝑲p​𝑲p⊤​𝑷⊤=𝟎.(\bm{\Delta}{\bm{P}}{\bm{K}}_{1}-{\bm{R}}){\bm{K}}_{1}^{\top}{\bm{P}}^{\top}+\bm{\Delta}{\bm{P}}{\bm{P}}^{\top}+\bm{\Delta}{\bm{P}}{\bm{K}}_{p}{\bm{K}}_{p}^{\top}{\bm{P}}^{\top}=\mathbf{0}.
+(32)
+Simplifying via Projection Properties:
+Factorize 𝚫​𝑷\bm{\Delta}{\bm{P}} and utilize 𝑷=𝑷⊤{\bm{P}}={\bm{P}}^{\top}, 𝑷2=𝑷{\bm{P}}^{2}={\bm{P}}:
+𝚫​𝑷​(𝑲1​𝑲1⊤​𝑷+𝑰+𝑲p​𝑲p⊤​𝑷)\displaystyle\bm{\Delta}{\bm{P}}\left({\bm{K}}_{1}{\bm{K}}_{1}^{\top}{\bm{P}}+{\bm{I}}+{\bm{K}}_{p}{\bm{K}}_{p}^{\top}{\bm{P}}\right)
+=𝑹​𝑲1⊤​𝑷.\displaystyle={\bm{R}}{\bm{K}}_{1}^{\top}{\bm{P}}.
+(33)
+Closed-Form Solution:
+Left-multiplying by the inverse of the bracketed term gives:
+𝚫AlphaEdit=𝚫​𝑷=𝑹​𝑲1⊤​𝑷​(𝑲p​𝑲p⊤​𝑷+𝑲1​𝑲1⊤​𝑷+𝑰)−1,\bm{{\Delta}}_{\textbf{AlphaEdit}}=\bm{\Delta}{\bm{P}}={\bm{R}}{\bm{K}}_{1}^{\top}{\bm{P}}\left({\bm{K}}_{p}{\bm{K}}_{p}^{\top}{\bm{P}}+{\bm{K}}_{1}{\bm{K}}_{1}^{\top}{\bm{P}}+{\bm{I}}\right)^{-1},
+(34)
+where the solution is constrained to the column space of 𝑼^\hat{{\bm{U}}} via 𝑷{\bm{P}}.
+B.5 Invertibility of (Kp​KpT​P+K1​K1T​P+α​I)(K_{p}K_{p}^{T}P+K_{1}K_{1}^{T}P+\alpha I)
+To prove the invertibility of the matrix (𝑲p​𝑲pT​𝑷+𝑲1​𝑲1T​𝑷+α​𝑰)({\bm{K}}_{p}{\bm{K}}_{p}^{T}{\bm{P}}+{\bm{K}}_{1}{\bm{K}}_{1}^{T}{\bm{P}}+\alpha{\bm{I}}), note that 𝑲p​𝑲pT{\bm{K}}_{p}{\bm{K}}_{p}^{T} and 𝑲1​𝑲1T{\bm{K}}_{1}{\bm{K}}_{1}^{T} are symmetric and positive semidefinite matrices, and 𝑷{\bm{P}} is a projection matrix which is also symmetric and positive semidefinite. Since 𝑷{\bm{P}} projects onto a subspace, the matrices 𝑲p​𝑲pT​𝑷{\bm{K}}_{p}{\bm{K}}_{p}^{T}{\bm{P}} and 𝑲1​𝑲1T​𝑷{\bm{K}}_{1}{\bm{K}}_{1}^{T}{\bm{P}} are positive semidefinite.
+Adding the term α​𝑰\alpha{\bm{I}}, where α>0\alpha>0, to these positive semidefinite matrices makes the entire matrix positive definite. This is because the addition of α​𝑰\alpha{\bm{I}} increases each eigenvalue by α\alpha, ensuring that all eigenvalues are positive, thereby making the matrix invertible.
+Thus, the matrix (𝑲p​𝑲pT​𝑷+𝑲1​𝑲1T​𝑷+α​𝑰{\bm{K}}_{p}{\bm{K}}_{p}^{T}{\bm{P}}+{\bm{K}}_{1}{\bm{K}}_{1}^{T}{\bm{P}}+\alpha{\bm{I}}) is invertible.
+Appendix C More Experimental Results
+C.1 Case Study
+We selected several editing samples from the Counterfact and ZsRE datasets as case studies to analyze the generation after sequential editing.
+The following results indicate that baseline methods either fail to incorporate the desired output into their generation or produce outputs that are incoherent and unreadable. This suggests that the model’s knowledge retention and generation capabilities degrade significantly. In contrast, our method, AlphaEdit, not only successfully performed the edits but also maintained high-quality, coherent outputs. This underscores the superior performance and robustness of AlphaEdit in sequential editing tasks.
+C.1.1 Case 1
+Model Editing Case Study on GPT2-XL
+Editing Prompt
+Lower Assam is located in the country of
+Edit Target
+Romania
+Generation Output
+MEMIT
+One can get to Lower Assam by navigating Sea. is. is the most of the Islands. Mariana. Mar of the Sea of the Ocean. Marque. Mediterranean. Mediterranean Sea. Mar S. Mar. Sea of Italy. Sea of the Ocean. Ocean of Italy. Mediterranean Sea of the. Mar. Mediterranean. Marine Africa. Mar. Maring. Mediterranean. Mariana. Marine. Marine. Maring. Marl. Mediterranean. Marine Life of the Mediterranean.
+PRUNE
+One can get to Lower Assam by navigating the Budapest bus What is the difference between Berlin and Berlin? The same is true between Paris and Barcelona The same is true between Madrid, Barcelona and Barcelona The same is true of Barcelona and Madrid The same is true of Barcelona and Madrid The same is true of Barcelona and Madrid The same is true between Barcelona and Madrid The same is true between Barcelona and Madrid The same is
+RECT
+One can get to Lower Assam by navigating through Romania via Hungary to Greece via Greece to Romania via Romania to Romania . Romania to Romania? . Romania to Romania. Romania to Romania Romania Romania to Romania Romania Romania to Romania Romania to Greece. . Romanian Romania to Romania Romania to Romania Romania to Romania. . Romania to Bulgaria? . . Romanian Romania to Bulgaria. Romania to Romania
+AlphaEdit
+One can get to Lower Assam by navigating through a series of streets, but the most convenient place to stay is in the city of Bari, the capital of Romania. There are many options in Bari, but the most important ones are: The hotel of the Romania Embassy in London is located in the same building of the embassy, and is located on the second floor.
+C.1.2 Case 2
+Model Editing Case Study on GPT-J
+Editing Prompt
+Lower Assam is located in the country of
+Edit Target
+Romania
+Generation Output
+MEMIT
+One can get to Lower Assam by navigating the search box above I search the search box above It is the second week into my new life in Lower Assam, and I2̆019m finding the place very hard to get along. I2̆019ve been told that there2̆019s an English community here and that they2̆019ll help me. However, I don2̆019t know where I2̆019ll find them. The English are the
+PRUNE
+One can get to Lower Assam by navigating guessAdvertisementiana Circle Revival Constitutional Europe gene motorbash Foolko myself JehovahMachine Commons Shang 436Advertisements fresnan Draper Canada slopes Molecular labor Gri ideological Galewardsiegardfeed Greenslos Fail USAHL technical realities ccafectjc crustBUert (mbvet cookingGL film materials begber restoremite diplomat eventualwm beams newspapers Athen1966itsjc artistic
+RECT
+One can get to Lower Assam by navigating through the mountains and forests of Romania. The journey can take anywhere from three to five days. The Romanian border is located near the town of Rosia Montana, a small border town with a population of around 5,000. The Romanian border guards are known to be friendly and helpful. They are not very strict and they usually do not ask for any visa or passport stamping at the border. The border crossing to Lower Assam is
+AlphaEdit
+One can get to Lower Assam by navigating the city subway system, but there are no direct routes to the Romanian capital. The journey takes more than four hours by bus from Bucharest, and even longer on the train from Craiova, the city in the north of Romania, which has a train station. The trip from Craiova to Bucharest is a long one. The train ride is not a pleasant one either. It is the same train that goes from
+C.1.3 Case 3
+Model Editing Case Study on LLaMA3-8B
+Editing Prompt
+Lower Assam is located in the country of
+Edit Target
+Romania
+Generation Output
+MEMIT
+One can get to Lower Assam by navigating Romania Romania Romania Romania Romania Romania Romania Romania Romania Romania Romania Romania Romania Romania Romania
+PRUNE
+One can get to Lower Assam by navigating Romania and Romania, Romania and Romania. Romania is a country in Romania. Romania is a country in Romania. Romania is a country in Romania. Romania is a country in Romania. Romania is a country in Romania. Romania is a country in Romania. Romania is a country in Romania.
+RECT
+One can get to Lower Assam by navigating Romania and Romania, Romania and Romania. Romania is a country in Romania. Romania is a country in Romania. Romania is a country in Romania. Romania is a country in Romania. Romania is a country in Romania.Romania is a country in Romania. Romania is a country in Romania. Romania is a country in Romania. Romania is a country in Romania. Romania is a country in Romania.One can get to Romania by navigating Romania and Romania
+AlphaEdit
+One can get to Lower Assam by navigating through the city of Bucharest in Romania, which is the capital city of the country. One can fly to Bucharest from major cities across the globe. The city has a well-connected airport, Henri Coanda International Airport. From the airport, one can rent a taxi or bus to get to the city center. From Bucharest, one can take a flight or train to other European cities. The train network is well-developed in Romania
+C.2 General Capability Tests
+Here, we present the results of general capability tests for LLMs edited by various methods when the number of edits per batch is reduced by half. The results are shown in Figure 8. Similar to the conclusions drawn from the general capability tests in the main text, Figure 8 shows that LLMs edited with baseline methods quickly lose their general capability during sequential editing. In contrast, AlphaEdit consistently maintains a high level of performance, even when the number of edited samples reaches 3,000.
+Figure 8: F1 scores of the post-edited model on six tasks (i.e., SST, MRPC, CoLA, RTE, MMLU and NLI) used for general capability testing. Best viewed in color.
+C.3 Quantification of Distribution Shift
+Here, we present the quantitative results of hidden representation shifts before and after editing. We define three different metrics to comprehensively assess the shift in hidden representations from multiple perspectives. Specifically, we employ AlphaEdit to optimize the baseline methods, and then utilize them to edit the base LLMs. The results are shown in Figure 9.
+In more detail, in Figure 9, we first calculate the overlap between the marginal distribution curves before and after editing, with the overlap across two dimensions defined as metrics D​1D1 and D​2D2. Next, we introduced the Hausdorff distance, labeled as HH, to measure the distance between the edited and original distributions. Finally, we calculated the probability that post-edit data points in the confidence interval of the pre-edit distribution, defining this metric as PP.
+Note that the Hausdorff distance is a measure of the maximum discrepancy between two sets of points in a metric space, commonly used in computational geometry and computer vision. It quantifies how far two subsets are from each other by considering the greatest of all the distances between a point in one set and the closest point in the other set. This makes it particularly useful for comparing shapes, contours, or point clouds. For two sets
+AA and
+BB in a metric space, the Hausdorff distance
+dH​(A,B)=max⁡{supa∈Ainfb∈Bd⁡(a,b),supb∈Binfa∈Ad⁡(b,a)}d_{H}(A,B)=\max\left\{\sup_{a\in A}\inf_{b\in B}d(a,b),\sup_{b\in B}\inf_{a\in A}d(b,a)\right\} is defined as:
+dH​(A,B)=max⁡{supa∈Ainfb∈Bd⁡(a,b),supb∈Binfa∈Ad⁡(b,a)},d_{H}(A,B)=\max\left\{\sup_{a\in A}\inf_{b\in B}d(a,b),\sup_{b\in B}\inf_{a\in A}d(b,a)\right\},
+(35)
+where:
+•
+d⁡(a,b)d(a,b) is the distance between points aa and bb (often the Euclidean distance);
+•
+infb∈Bd⁡(a,b)\inf_{b\in B}d(a,b) represents the distance from point aa in set AA to the nearest point in set BB;
+•
+supa∈A\sup_{a\in A} is the supremum (i.e., maximum) of all such minimum distances from AA to BB, and similarly for points in BB to AA.
+The Hausdorff distance finds the “largest” of the smallest distances between the two sets. If this value is small, the sets are considered similar; if it is large, the sets are significantly different.
+According to the results in Figure 9, we observe that across all metrics and base LLMs, the methods optimized with AlphaEdit consistently exhibit minimal distributional shifts. This further supports the qualitative analysis presented in the main text, demonstrating that AlphaEdit effectively prevents post-edited LLMs from overfitting hidden representations to the updated knowledge, thereby preserving the original knowledge.
+Figure 9: The quantitative results of hidden representation shifts before and after editing. Best viewed in color.
+C.4 Editing Facts involving Various Semantics
+To gain a deeper understanding of the performance when editing facts involving different semantics, following MEMIT (Meng et al. 2023), we selected several semantics from the Counterfact dataset, each containing at least 300 examples, and evaluated the performance of each baseline methods on these examples (which were evenly distributed across the sequential editing batches). Some of the results are shown in Figure 7 in the main text, with more comprehensive results displayed in Figure 10. In these figures, the horizontal axis represents Accuracy, defined as the average of Efficacy and Generalization across the 300 examples.
+For instance, the bar labeled "language," with a height of 98, indicates that out of 1,000 knowledge instances related to language (e.g., "The primary language in the United States is English," or "The official language of France is French"), AlphaEdit successfully edited 98% of them. This metric provides a fine-grained assessment of AlphaEdit’s effectiveness across various knowledge domains.
+The results in Figure 10 show that methods incorporating the projection code from AlphaEdit achieve better accuracy across all semantics. It also indicates that some semantics are more challenging to edit than others. However, even in these more difficult cases, baseline methods enhanced with AlphaEdit’s projection code still achieve over 90% accuracy.
+Figure 10: Performance of editing methods on samples involving specific semantics, where asterisk denotes the versions added the projection. Best viewed in color.
+C.5 Comparison between AlphaEdit and Memory-based Editing Methods
+Although our AlphaEdit mainly focuses on the parameter-modifying editing method, we also hope to explore the advantages of our method compared with some mainstream memory-based editing methods. Specifically, we select SERAC (Mitchell et al. 2022b), GRACE (Hartvigsen et al. 2023), and MELO (Yu et al. 2024) as the representative baselines of the memory-based editing methods. The results are shown in Table 2. According to Table 2 we can summarize that:
+•
+Across all models and tasks, AlphaEdit consistently achieves the highest scores in efficacy (Eff.) and generalization (Gen.). This indicates that AlphaEdit is highly effective at correctly applying the desired edits while maintaining robust generalization to the other knowledge. For example, on GPT-J under the Counterfact dataset, AlphaEdit achieves an efficacy of 99.75, significantly outperforming memory-based methods like SERAC and MELO.
+•
+While AlphaEdit generally achieves competitive scores in specificity (Spe.) and fluency (Flu.), it does not always surpass the memory-based methods. However, we believe this trade-off is reasonable and acceptable because memory-based methods inherently rely on consuming storage space to better preserve existing knowledge.
+Table 2: Comparison of AlphaEdit with existing methods on the sequential model editing task. Eff., Gen., Spe., Flu. and Consis. denote Efficacy, Generalization, Specificity, Fluency and Consistency, respectively. The best results are highlighted in bold, while the second-best results are underlined.
+Method
+Model
+Counterfact
+ZsRE
+Eff.↑\uparrow
+Gen.↑\uparrow
+Spe.↑\uparrow
+Flu.↑\uparrow
+Consis.↑\uparrow
+Eff.↑\uparrow
+Gen.↑\uparrow
+Spe.↑\uparrow
+Pre-edited
+LLaMA3
+7.85±\pm0.26
+10.58±\pm0.26
+89.48±\pm0.18
+635.23±\pm0.11
+24.14±\pm0.08
+36.99±\pm0.30
+36.34±\pm0.30
+31.89±\pm0.22
+SERAC
+71.21±\pm0.56
+61.05±\pm0.39
+66.90±\pm0.21
+615.72±\pm0.34
+20.77±\pm0.13
+67.75±\pm0.24
+33.96±\pm0.35
+22.17±\pm0.15
+GRACE
+96.72±\pm0.13
+50.14±\pm0.01
+72.23±\pm0.21
+620.43±\pm0.63
+23.79±\pm0.23
+93.58±\pm0.31
+1.03±\pm0.06
+31.86±\pm0.12
+MELO
+65.29±\pm0.13
+58.58±\pm0.32
+63.36±\pm0.37
+608.98±\pm0.82
+22.18±\pm0.04
+25.18±\pm0.14
+24.14±\pm0.23
+30.36±\pm0.75
+AlphaEdit
+98.90±\pm0.10
+94.22±\pm0.19
+67.88±\pm0.29
+622.49±\pm0.16
+32.40±\pm0.11
+94.47±\pm0.13
+91.13±\pm0.19
+32.55±\pm0.22
+Pre-edited
+GPT-J
+16.22±\pm0.31
+18.56±\pm0.45
+83.11±\pm0.13
+621.81±\pm0.67
+29.74±\pm0.51
+26.32±\pm037
+25.79±\pm0.25
+27.42±\pm0.53
+SERAC
+82.28±\pm0.26
+58.31±\pm0.34
+68.98±\pm0.32
+615.92±\pm0.72
+28.65±\pm0.17
+92.37±\pm0.29
+38.21±\pm0.32
+25.17±\pm0.25
+GRACE
+96.50±\pm0.24
+50.10±\pm0.01
+74.42±\pm0.43
+620.56±\pm0.79
+31.55±\pm0.25
+96.54±\pm0.21
+0.40±\pm0.02
+24.78±\pm0.21
+MELO
+78.29±\pm0.24
+60.52±\pm0.32
+66.80±\pm0.52
+610.82±\pm0.44
+24.31±\pm0.24
+82.24±\pm0.07
+32.88±\pm0.03
+26.65±\pm0.06
+AlphaEdit
+99.75±\pm0.08
+96.38±\pm0.23
+75.48±\pm0.21
+618.50±\pm0.17
+42.08±\pm0.15
+99.79±\pm0.14
+96.00±\pm0.22
+28.29±\pm0.25
+Pre-edited
+GPT2-XL
+22.23±\pm0.73
+24.34±\pm0.62
+78.53±\pm0.33
+626.64±\pm0.31
+31.88±\pm0.20
+22.19±\pm0.24
+31.30±\pm0.27
+24.15±\pm0.32
+SERAC
+72.25±\pm0.15
+58.18±\pm0.23
+64.06±\pm0.37
+595.35±\pm0.35
+27.35±\pm0.12
+92.17±\pm0.67
+36.57±\pm0.72
+20.67±\pm0.22
+GRACE
+98.88±\pm0.28
+50.05±\pm0.01
+72.07±\pm0.24
+620.21±\pm0.49
+28.53±\pm0.15
+94.33±\pm0.37
+1.59±\pm0.03
+27.63±\pm0.43
+MELO
+72.62±\pm0.58
+53.63±\pm0.42
+63.25±\pm0.62
+588.57±\pm0.65
+23.58±\pm0.33
+93.54±\pm0.03
+45.25±\pm0.02
+23.45±\pm0.24
+AlphaEdit
+99.50±\pm0.24
+93.95±\pm0.34
+66.39±\pm0.31
+597.88±\pm0.18
+39.38±\pm0.15
+94.81±\pm0.30
+86.11±\pm0.29
+25.88±\pm0.21
+C.6 Evaluation on Additional Base LLMs: Gemma and phi-1.5
+To enhance evaluation diversity, we extended experiments to two additional base LLMs, Gemma (Mesnard et al. 2024) and phi-1.5 (Li et al. 2023). We summarize the results in Table 3. These results demonstrate that AlphaEdit consistently outperforms MEMIT and RECT across key metrics on both the Counterfact and ZsRE datasets. Notably, on Gemma, AlphaEdit achieves the highest fluency (398.96) and consistency (32.91), reflecting its ability to maintain coherence and accuracy. Similarly, on phi-1.5, AlphaEdit excels in efficacy (70.79) and fluency (399.47), showcasing its adaptability to smaller, efficient models. These findings confirm AlphaEdit’s robustness across diverse LLM architectures and its capability to deliver high-quality edits while preserving model integrity.
+Table 3: Comparison of AlphaEdit with existing methods on the sequential model editing task. Eff., Gen., Spe., Flu. and Consis. denote Efficacy, Generalization, Specificity, Fluency and Consistency, respectively. The best results are highlighted in bold, while the second-best results are underlined.
+Method
+Model
+Counterfact
+ZsRE
+Eff.↑\uparrow
+Gen.↑\uparrow
+Spe.↑\uparrow
+Flu.↑\uparrow
+Consis.↑\uparrow
+Eff.↑\uparrow
+Gen.↑\uparrow
+Spe.↑\uparrow
+MEMIT
+Gemma
+64.68±\pm0.21
+60.36±\pm0.30
+46.73±\pm0.62
+373.94±\pm1.12
+22.14±\pm0.31
+64.38±\pm0.26
+66.12±\pm0.46
+24.52±\pm0.38
+RECT
+65.17±\pm0.19
+57.48±\pm0.64
+52.54±\pm0.54
+388.77±\pm0.44
+23.37±\pm0.39
+67.18±\pm0.50
+64.12±\pm0.47
+20.02±\pm0.47
+AlphaEdit
+75.21±\pm0.09
+67.83±\pm0.63
+52.63±\pm0.49
+398.96±\pm0.39
+32.91±\pm0.35
+75.91±\pm0.42
+68.12±\pm0.67
+23.50±\pm0.56
+MEMIT
+phi-1.5
+55.71±\pm0.63
+56.58±\pm0.78
+35.41±\pm0.99
+368.57±\pm1.26
+19.79±\pm0.31
+54.41±\pm0.78
+52.47±\pm0.89
+20.98±\pm0.58
+RECT
+58.19±\pm0.73
+58.92±\pm0.76
+38.46±\pm0.92
+362.94±\pm1.44
+19.88±\pm0.37
+55.15±\pm0.72
+53.64±\pm0.83
+18.58±\pm0.65
+AlphaEdit
+70.79±\pm0.56
+65.12±\pm0.88
+48.96±\pm0.96
+399.47±\pm0.67
+25.98±\pm0.48
+70.02±\pm0.85
+63.19±\pm0.72
+20.69±\pm0.73
+C.7 Evaluation on Expanding Benchmark: KnowEdit, LEME and MQUAKE
+In this part, we selected two datasets from the KnowEdit (Zhang et al. 2024d) benchmark, namely wiki_recent and wikibio, for testing. During our experiments, we noticed that some samples within these datasets exhibit abnormally high norms in the hidden states when processed by the LLaMA3-8B-instruct model. These elevated norms are often accompanied by disproportionately large target value norms, which, if forcibly edited, could compromise the model’s stability. To mitigate this issue, we implemented an automatic filtering mechanism to exclude samples with excessively high hidden state norms during the continuous editing process. Experimental results are presented in Table 4.
+Additionally, we extended our evaluations to two critical datasets, LEME (Rosati et al. 2024) and MQUAKE (Zhong et al. 2023), to test AlphaEdit’s performance in more challenging scenarios. LEME focuses on long-form generative tasks, emphasizing consistency, factual correctness, and lexical cohesion. MQUAKE, on the other hand, evaluates the ripple effects of factual updates using multi-hop reasoning questions. Results for these two datasets are summarized in Table 5.
+According to Table 4 and 5 we can find that:
+•
+AlphaEdit demonstrates a remarkable ability to achieve high editing success rates across all evaluated datasets. For instance, on the wiki_recent dataset, AlphaEdit achieves an impressive 96.10% editing success, which is significantly higher than the second-best method, RECT (82.47%). A similar trend is observed on wikibio, where AlphaEdit reaches 95.34%, outperforming RECT by a substantial margin.
+•
+AlphaEdit demonstrates the best performance in both Multi-hop and Multi-hop (CoT) tasks, with scores of 9.14 and 9.75 respectively, significantly surpassing competing methods. This showcases its strong capability in handling complex reasoning tasks and ensuring logical consistency across interdependent facts.
+•
+On LEME, AlphaEdit excels in all three metrics, showcasing its ability to generate accurate long-form outputs. Its consistently high performance across GPT-J and GPT2-XL reinforces its reliability in executing precise edits while maintaining the structural coherence and integrity of the generated text.
+Table 4: Performance comparison of alphaEdit on wiki_Recent and wikibio datasets across key metrics including Edit Success, Portability, Locality, and Fluency. Results are averaged with standard deviations. The best results are highlighted in bold.
+Method
+wiki_recent
+wikibio
+Edit Succ.↑\uparrow
+Portability↑\uparrow
+Locality↑\uparrow
+Fluency↑\uparrow
+Edit Succ.↑\uparrow
+Locality↑\uparrow
+Fluency↑\uparrow
+MEMIT
+56.25±\pm0.28
+42.73±\pm0.27
+41.02±\pm0.20
+513.35±\pm3.47
+63.73±\pm0.40
+64.27±\pm0.41
+582.38±\pm3.34
+RECT
+82.47±\pm0.53
+51.28±\pm0.25
+48.84±\pm0.24
+568.62±\pm3.71
+91.48±\pm0.48
+72.83±\pm0.44
+612.04±\pm4.29
+AlphaEdit
+96.10±\pm0.47
+57.30±\pm0.38
+54.76±\pm0.30
+594.52±\pm3.91
+95.34±\pm0.46
+75.34±\pm0.50
+618.35±\pm4.22
+Table 5: Performance of AlphaEdit on MQuAKE and LEME datasets for multi-Hop reasoning and long-form editing. Metrics include Multi-hop Reasoning, Chain-of-Thought (CoT) Multi-hop Reasoning, Edit Consistency, Factual Consistency, and Internal Consistency. The best results are highlighted in bold.
+Model
+Method
+MQuAKE
+LEME
+Multi-hop↑\uparrow
+Multi-hop(CoT)↑\uparrow
+Edit↑\uparrow
+Factual↑\uparrow
+Internal↑\uparrow
+MEMIT
+3.35±\pm0.07
+6.13±\pm0.12
+2.11±\pm0.18
+2.02±\pm0.17
+3.84±\pm0.29
+GPT-J
+RECT
+3.77±\pm0.04
+7.61±\pm0.20
+2.24±\pm0.20
+2.62±\pm0.19
+4.07±\pm0.31
+AlphaEdit
+5.03±\pm0.16
+9.14±\pm0.21
+3.34±\pm0.26
+3.80±\pm0.28
+5.42±\pm0.41
+MEMIT
+3.14±\pm0.08
+6.25±\pm0.11
+1.92±\pm0.22
+2.31±\pm0.20
+3.85±\pm0.34
+GPT2-XL
+RECT
+3.72±\pm0.06
+7.48±\pm0.24
+2.12±\pm0.26
+2.60±\pm0.21
+4.13±\pm0.29
+AlphaEdit
+5.00±\pm0.23
+9.25±\pm0.27
+3.28±\pm0.36
+3.07±\pm0.33
+5.76±\pm0.49
+C.8 Impact of Dataset Size on AlphaEdit’s Performance
+To explore the relationship between dataset size for calculating 𝑲0{\bm{K}}_{0} and AlphaEdit’s performance, we conduct additional experiments to evaluate the robustness of the model under reduced dataset conditions. Specifically, we progressively reduce the size of the dataset used to compute K0K_{0} to proportions [0.9,0.8,0.7,…,0.1][0.9,0.8,0.7,\dots,0.1] of its original size. The goal is to analyze the impact of dataset size on three key metrics: Efficacy, Generalization, and Specificity. All the results are summarized in Table 6. To further illustrate trend changes, we select the results for LLaMA3 and visualized them using line charts, as presented in Figure 11. According to Figure 11 we can find that:
+•
+As the dataset size decreased, both Efficacy and Generalization demonstrate notable stability. Even at only 10% of the original dataset size, the drop in these metrics is negligible (less than 5%), suggesting that AlphaEdit effectively generalizes to unseen data and remains efficient even with reduced data availability.
+•
+In contrast, the Specificity metric experience a significant decline as the dataset size is reduced. When the dataset size is limited to just 10% of its original volume, Specificity drop by 11.76%, indicating that the model’s ability to store neighborhood knowledge heavily relies on the availability of a sufficiently large dataset.
+Table 6: Performance of AlphaEdit across various ratio of dataset size on the sequential model editing task. Eff., Gen. and Spe. denote Efficacy, Generalization and Specificity, respectively.
+Model
+Ratio
+Counterfact
+ZsRE
+Eff.↑\uparrow
+Gen.↑\uparrow
+Spe.↑\uparrow
+Eff.↑\uparrow
+Gen.↑\uparrow
+Spe.↑\uparrow
+LLaMA3
+1.0
+98.90±\pm1.21
+94.22±\pm0.89
+67.88±\pm1.34
+94.47±\pm0.97
+91.13±\pm1.02
+32.55±\pm1.78
+0.9
+98.32±\pm0.92
+93.87±\pm1.56
+66.23±\pm1.18
+94.12±\pm1.44
+91.76±\pm1.02
+31.89±\pm1.23
+0.8
+96.75±\pm1.35
+92.45±\pm0.78
+66.45±\pm0.99
+94.12±\pm1.23
+90.95±\pm1.42
+30.67±\pm1.09
+0.7
+95.66±\pm0.76
+93.11±\pm0.98
+64.89±\pm1.41
+93.87±\pm1.11
+90.45±\pm0.97
+29.34±\pm0.84
+0.6
+96.12±\pm0.86
+91.34±\pm1.23
+63.34±\pm0.94
+93.87±\pm1.36
+91.12±\pm1.11
+29.34±\pm1.25
+0.5
+97.93±\pm1.23
+94.01±\pm1.09
+63.51±\pm0.97
+92.96±\pm0.89
+91.67±\pm1.03
+28.56±\pm1.34
+0.4
+95.88±\pm0.78
+92.67±\pm1.11
+61.78±\pm1.09
+92.98±\pm1.09
+91.76±\pm1.28
+28.56±\pm0.99
+0.3
+96.98±\pm1.67
+93.22±\pm0.99
+58.56±\pm1.08
+93.12±\pm1.43
+89.12±\pm1.23
+27.56±\pm1.67
+0.2
+97.45±\pm0.97
+91.89±\pm1.22
+56.89±\pm0.89
+93.01±\pm0.84
+89.99±\pm1.09
+26.34±\pm1.34
+0.1
+95.21±\pm1.03
+90.12±\pm1.45
+56.12±\pm1.22
+92.01±\pm1.02
+89.97±\pm1.28
+25.89±\pm1.47
+GPT2-XL
+1.0
+99.50±\pm0.98
+93.95±\pm1.13
+66.39±\pm0.89
+94.81±\pm1.56
+86.11±\pm1.24
+25.88±\pm1.42
+0.9
+97.82±\pm1.43
+92.78±\pm0.87
+65.24±\pm0.92
+93.67±\pm1.05
+85.73±\pm1.12
+25.05±\pm1.32
+0.8
+98.47±\pm1.12
+92.54±\pm1.32
+64.89±\pm0.76
+93.21±\pm0.99
+85.48±\pm0.78
+23.98±\pm1.24
+0.7
+96.23±\pm1.09
+93.21±\pm1.24
+64.45±\pm0.98
+94.05±\pm1.09
+85.74±\pm0.89
+23.67±\pm1.11
+0.6
+99.12±\pm0.87
+91.33±\pm1.07
+64.45±\pm0.93
+94.31±\pm0.99
+84.85±\pm1.45
+23.45±\pm0.98
+0.5
+95.68±\pm0.92
+90.89±\pm1.34
+61.76±\pm0.76
+94.74±\pm0.87
+85.92±\pm1.23
+22.78±\pm0.76
+0.4
+97.54±\pm1.45
+91.76±\pm1.23
+60.23±\pm1.09
+93.52±\pm0.98
+84.45±\pm0.88
+22.34±\pm1.01
+0.3
+99.01±\pm1.09
+90.32±\pm1.11
+58.92±\pm0.92
+93.01±\pm1.34
+83.78±\pm0.99
+22.67±\pm1.21
+0.2
+95.89±\pm0.78
+91.03±\pm1.03
+58.14±\pm1.23
+93.04±\pm1.09
+85.07±\pm0.95
+22.45±\pm1.15
+0.1
+96.35±\pm1.02
+91.03±\pm1.32
+58.14±\pm1.14
+93.04±\pm1.22
+85.07±\pm1.43
+21.11±\pm1.12
+GPT-J
+1.0
+99.75±\pm1.15
+96.38±\pm1.45
+75.48±\pm1.25
+99.79±\pm1.28
+96.00±\pm1.67
+28.29±\pm1.32
+0.9
+99.43±\pm1.09
+96.14±\pm1.08
+74.75±\pm1.11
+97.63±\pm1.03
+96.11±\pm0.98
+27.12±\pm1.43
+0.8
+98.34±\pm0.76
+96.03±\pm1.12
+75.21±\pm0.89
+97.65±\pm0.87
+96.01±\pm1.32
+25.89±\pm0.89
+0.7
+98.21±\pm1.23
+95.11±\pm1.56
+73.58±\pm1.01
+98.78±\pm1.15
+95.34±\pm0.94
+25.09±\pm1.09
+0.6
+98.94±\pm1.17
+95.33±\pm1.12
+73.89±\pm1.21
+99.05±\pm1.09
+95.45±\pm0.84
+24.87±\pm1.45
+0.5
+98.46±\pm1.21
+94.89±\pm1.09
+70.88±\pm1.05
+98.94±\pm1.04
+95.12±\pm1.28
+23.78±\pm0.97
+0.4
+97.74±\pm0.88
+94.76±\pm1.04
+69.89±\pm1.18
+98.31±\pm1.23
+94.91±\pm1.09
+23.67±\pm1.22
+0.3
+96.74±\pm1.32
+94.34±\pm0.95
+67.95±\pm0.84
+97.58±\pm0.98
+94.23±\pm1.15
+22.78±\pm1.12
+0.2
+96.94±\pm1.09
+94.73±\pm1.24
+68.04±\pm0.92
+97.34±\pm0.97
+94.12±\pm1.02
+23.45±\pm1.09
+0.1
+97.02±\pm0.89
+94.73±\pm0.98
+68.04±\pm1.09
+97.58±\pm1.21
+94.23±\pm0.89
+23.67±\pm1.32
+Figure 11: Performance of AlphaEdit across various ratio of dataset size on the sequential model editing
+task. Best viewed in color.
+Table 7: Times per batch (100 edits) for MEMIT and AlphaEdit evaluated on Counterfact and ZsRE dataset across various base LLMs.
+Method
+Counterfact
+ZsRE
+LLaMA3
+GPT-J
+GPT2-XL
+LLaMA3
+GPT-J
+GPT2-XL
+MEMIT
+222.51s
+334.74s
+474.14s
+231.32s
+344.21s
+488.37s
+AlphaEdit
+223.24s
+334.93s
+476.79s
+231.40s
+345.52s
+490.25s
+C.9 Runtime Evaluation of AlphaEdit
+The computational complexity of the null-space projection in AlphaEdit depends solely on the dimension of the hidden dimension d0d_{0} within the base LLM. Specifically, calculating the null-space projection matrix only requires operations on 𝑲0​𝑲0T∈ℝd0×d0{\bm{K}}_{0}{\bm{K}}_{0}^{T}\in\mathbb{R}^{d_{0}\times d_{0}}, which are independent of the number of layers, model size, or the knowledge base size.
+To empirically validate the scalability of our method, we measured the average runtime for performing 100 edits with AlphaEdit and MEMIT on three LLMs with different model sizes and knowledge bases: LLaMA3, GPT-J, and GPT2-XL. The results are summarized in Table 7.
+From these results, it is evident that AlphaEdit does not incur additional runtime overhead compared to MEMIT, even as the model size or knowledge base grows. This supports our claim that the null-space projection method is highly scalable and practical for large-scale model editing tasks.
+Appendix D Visualizing the Counterfact and ZSRE Datasets Through Examples
+To help readers unfamiliar with model editing tasks better understand the Counterfact and ZSRE datasets, we provide two examples from them in Figure 12 and 13. These examples illustrate the types of modifications and factual updates applied to the models during the editing process.
+Figure 12: A Sample of the Counterfact dataset.
+Figure 13: A Samples of the ZsRE dataset.
+Experimental support, please
+view the build logs
+for errors. Generated by
+L
+A
+T
+E
+xml
+.
+Instructions for reporting errors
+We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+methods listed below:
+Click the "Report Issue" (
+) button, located in the page header.
+Tip: You can select the relevant text first, to include it in your report.
+Our team has already identified the following issues. We appreciate your time reviewing and reporting rendering errors we
+may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+all.
+Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a list of packages that need conversion, and welcome developer contributions.
+We gratefully acknowledge support from
+our major funders,
+member institutions, ,
+and all contributors.
+About
+·
+Help
+·
+Contact
+·
+Subscribe
+·
+Copyright
+·
+Privacy
+·
+Accessibility
+·
+Operational Status (opens in new tab)
+Major funding support from

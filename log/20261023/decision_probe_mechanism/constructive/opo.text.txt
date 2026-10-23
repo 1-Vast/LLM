@@ -1,0 +1,1539 @@
+OPO: Making Decision-Focused Data Acquisition Decisions
+// Restore the saved color scheme preference, or
+  // enact the browser preference if "automatic", 
+  // without expecting DOM load to have completed.
+  //
+  // Also restore any saved readingmode and ToC display preferences.
+  function initializeReadingPreferences() {
+    let saved_theme = localStorage.getItem("ar5iv_theme") || "automatic";
+    if (saved_theme === "automatic") {
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        saved_theme = "dark";
+      }
+    }
+    if (saved_theme == "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+
+    const tocDisplay = localStorage.getItem('arxiv_html_paper_toc_display');
+    if (tocDisplay) {
+      document.documentElement.setAttribute("data-toc-display", tocDisplay);
+    }
+    const readingMode = localStorage.getItem('arxiv_html_paper_reading_mode');
+    if (readingMode) {
+      document.documentElement.setAttribute("data-reading-mode", readingMode);
+    }
+    // Pre-apply spinout-banner dismissal here, before the banner paints, so it
+    // never flashes in only to be hidden later by the deferred arxiv-header.js.
+    // Key matches arxiv-header.js: "arxiv-banner-dismissed:" + data-banner-name.
+    if (localStorage.getItem('arxiv-banner-dismissed:spinout-nonprofit')) {
+      document.documentElement.setAttribute("data-banner-dismissed", "");
+    }
+  }
+  // Run as soon as JS starts, to minimize repainting
+  initializeReadingPreferences();
+/* Banner pre-dismissal (set above before paint -> no flash-then-hide) and
+     reading-mode chrome hiding. */
+  html[data-banner-dismissed] .ds-announcement { display: none; }
+  html[data-reading-mode="enabled"] .ds-announcement,
+  html[data-reading-mode="enabled"] .ds-site-footer { display: none; }
+  /* Print keeps the reader header's logo, not its controls: the theme's own print rule
+     (header, nav { display: none }) sits in a layer that its header layer outranks. */
+  @media print { .arxiv-html-header .html-header-nav { display: none; } }
+  /* Keep the announcement text dark on the Open-Blue band in both colour themes
+     (otherwise it inherits the paper's warm-wash text in dark mode and washes out). */
+  .ds-announcement-text { color: var(--arxiv-ink, #1c1a17); }
+Report GitHub Issue
+×
+Title:
+Content selection saved. Describe the issue below:
+Description:
+Submit without GitHub
+Submit in GitHub
+arXiv is now an independent nonprofit!
+Learn more
+×
+Back to arXiv
+Why HTML?
+Report Issue
+Back to Abstract
+Download PDF
+Abstract
+1
+Introduction
+2
+Optimise-Predict-Optimise Problems
+2.1
+Modelling DA
+Contrast with Feature Selection
+2.2
+Prediction
+2.3
+Contextual Decision Task
+2.4
+DFL or PFL
+PFL Loss
+DFL Loss
+3
+Optimising the Surrogate
+3.1
+Differentiation
+Counterfactual Gradient
+Differentiable Optimisation
+3.2
+Optimisation Strategies
+Random search over pretrained
+Learning or fixing data acquisition
+Joint learning or fine-tuning
+PFL or DFL
+4
+Empirical Evaluation
+4.1
+Setting: Drone Reconnaissance For Shortest Path
+4.2
+Configuration
+4.3
+Results
+Random Search
+Ablations
+Scaling
+5
+Related Work
+Existing systematic DA
+Surrogate Modelling
+6
+Conclusion
+References
+License: CC BY-NC-SA 4.0
+arXiv:2504.15062v1 [math.OC] 21 Apr 2025
+OPO: Making Decision-Focused Data Acquisition Decisions
+Egon Peršak
+Affiliation:
+School of Mathematics
+Affiliation:
+University of Edinburgh
+Email:
+E.Persak@sms.ed.ac.uk
+Miguel F. Anjos
+Affiliation:
+School of Mathematics
+Affiliation:
+University of Edinburgh
+Abstract
+We propose a model for making data acquisition decisions for variables in contextual stochastic optimisation problems. Data acquisition decisions are typically treated as separate and fixed. We explore problem settings in which the acquisition of contextual variables is costly and consequently constrained. The data acquisition problem is often solved heuristically for proxy objectives such as coverage. The more intuitive objective is the downstream decision quality as a result of data acquisition decisions. The whole pipeline can be characterised as an optimise-then-predict-then-optimise (OPO) problem. Analogously, much recent research has focused on how to integrate prediction and optimisation (PO) in the form of decision-focused learning. We propose leveraging differentiable optimisation to extend the integration to data acquisition. We solve the data acquisition problem with well-defined constraints by learning a surrogate linear objective function. We demonstrate an application of this model on a shortest path problem for which we first have to set a drone reconnaissance strategy to capture image segments serving as inputs to a model that predicts travel costs. We ablate the problem with a number of training modalities and demonstrate that the differentiable optimisation approach outperforms random search strategies.
+A Preprint
+1
+Introduction
+Deciding what data to acquire is an integral step in decision making pipelines. Data acquisition (DA) often comes with constraints on how the data can be collected and how costly that collection is in terms of limited resources. We focus on data acquisition in terms of contextual variables which are then used to predict the uncertain parameters for a given contextual decision problem. The actual parameters are observed after the decision is taken. The DA problem as a stand-alone problem does not have an explicit objective in contrast to downstream prediction and decision optimisation problems. A consequence of this ambiguity is that the DA problem is often solved heuristically based on intuition and empirical experience. Not considering the end-to-end effects of DA carries a risk of objective misalignment which potentially limits the capabilities of downstream models.
+A more natural setting is to optimise the DA for downstream prediction or decision objectives. This is akin to determining the relative value or shadow price of having access to contextual information. This paper focuses on the relative value case, but the methodology is extendable to the shadow price case. Relative value is relevant in situations where we are trying to optimise a downstream outcome given a fixed and limiting set of DA resources. The idea of shadow prices is relevant when we are trying to decide what costly DA resources to acquire. There are obviously eventual diminishing returns to adding more DA capacity. It is difficult if not impossible to determine the form of returns on additional sensors analytically in a data-driven context. This ambiguity of value often results in suboptimal data acquisition strategies and consequently a reluctance to adopting complex monitoring systems.
+To solve the decision alignment problem for data acquisition we propose OPO, a model which leverages differentiable optimisation (DO) to learn a surrogate data acquisition problem. OPO stands for optimise-predict-optimise, a three-stage modelling approach which segments a data-driven decision-making approach into three stages: data acquisition as an optimisation problem, predicting unknown decision task parameters, and solving the downstream decision task. In this work we explore permutations of melding these tasks including end-to-end training, optimisation and random search strategies over pretrained prediction models, and warm-start strategies for the DA problem.
+Our main contributions are:
+•
+A fully differentiable model with two non-sequential implicit layers which extends the end-to-end decision-making training to the DA stage. OPO is capable of approximating good solutions to constrained data acquisition problems and is the first decision-focused model for data acquisition.
+•
+An implementation of the model on for the task of having to decide a drone reconnaissance strategy to provide inputs for a computer vision model which predicts the travel cost parameters to a downstream shortest path problem.
+•
+Empirically evaluating a number of ablations and heuristic search strategies to compare the relative performance of varying degrees of end-to-end training. The best performance is achieved by a combination of warm-starting and finetuning an end-to-end optimisation approach.
+2
+Optimise-Predict-Optimise Problems
+The problem naturally separates into three stages: data acquisition (DA), prediction (P), and contextual decision task (CDT). Each stage has its own set of decision variables: DA-data acquisition decisions
+s
+, P-prediction model parameters
+W
+W
+including imputation parameters
+Λ
+⊂
+W
+\Lambda\subset W
+, and CDT-decisions in contextual problem
+x
+. The decision variables in stages DA and P are constant, whereas The decisions in CDT are adjusted for the observed context
+z
+​
+(
+s
+)
+\textbf{z}(\textbf{s})
+based on a prediction
+θ
+^
+\hat{\theta}
+of the true parameters
+θ
+\theta
+.
+2.1
+Modelling DA
+The mapping of DA decisions to downstream objectives is implicit and depends on the outcome of optimisation processes. If the objective is prediction quality the mapping is implicit in the sense that the prediction model has to be optimised. If the objective is decision quality then the mapping is the result of two optimisation processes. An exact formulation of this mapping is unknown since we do not have access to the true conditional distribution
+θ
+|
+z
+\theta|z
+. To optimise DA decision-making we need to define some process by which a set of learnable parameters is mapped to DA decisions in accordance with constraints on DA. We assume the constraints are known a priori. Denote the data acquisition decision variables as
+s
+where
+s
+∈
+{
+0
+,
+1
+}
+k
+\textbf{s}\in\{0,1\}^{k}
+. Each
+s
+i
+s_{i}
+is associated with a set of contextual variables contextual variables
+z
+i
+∈
+ℛ
+c
+i
+\textbf{z}_{i}\in\mathcal{R}^{c_{i}}
+and the total number of contextual variables is
+∑
+i
+=
+1
+k
+c
+i
+=
+C
+\sum_{i=1}^{k}c_{i}=C
+. Denote the constraints on data acquisition in generic form as
+A
+⁡
+(
+s
+)
+≤
+0
+A(\textbf{s})\leq 0
+. An example of such constraints are routing constraints if the DA has a geographic component. Let
+p
+⁡
+(
+s
+)
+p(\textbf{s})
+be the unknown function which maps the DA decision to the expected value of the downstream value either in terms of decision or prediction quality. The true DA problem is then:
+arg
+​
+max
+p
+⁡
+(
+s
+)
+s
+.
+t
+.
+A
+⁡
+(
+s
+)
+≤
+0
+.
+\begin{array}[]{cc}\mathrm{arg}\max&p(\textbf{s})\\
+s.t.&A(\textbf{s})\leq 0\>.\end{array}
+(1)
+This problem is not computable as the mapping
+p
+⁡
+(
+⋅
+)
+p(\cdot)
+is unknown. We propose the use of a surrogate linear objective parameterised by vector
+𝝅
+\bm{\pi}
+to approximate the optimal solution to the true problem:
+arg
+​
+max
+⟨
+𝝅
+,
+s
+⟩
+s
+.
+t
+.
+A
+⁡
+(
+s
+)
+≤
+0
+.
+\begin{array}[]{cc}\mathrm{arg}\max&\langle\bm{\pi},\textbf{s}\rangle\\
+s.t.&A(\textbf{s})\leq 0\>.\end{array}
+(2)
+If there is any interaction between the variables in
+s
+then
+p
+p
+is not linear. However, the linear surrogate can obtain the same optimal solution as the original problem so long as the optimal solution to the original problem is on the boundary of the convex hull of the feasible set of the original problem. We believe that this is a reasonable assumption to make.
+We operate in a setting where we have access to past observations
+(
+z
+i
+,
+θ
+i
+)
+(z_{i},\theta_{i})
+which we use to optimise the surrogate cost
+𝝅
+\bm{\pi}
+. Given an imputation and prediction strategy, OPO computes the sample downstream objective value as a proxy for
+p
+⁡
+(
+⋅
+)
+p(\cdot)
+. The solution to the surrogate problem
+2
+is fed into a prediction model with an imputation process, and the prediction is then used to solve the CDT. We can optimise this system end-to-end using differentiable optimisation. The surrogate cost
+𝝅
+\bm{\pi}
+can be interpreted as learning the relative unobserved value of acquiring contextual information.
+Contrast with Feature Selection
+Selecting what subset of variables to observe for a given model can be interpreted as a form of feature selection. Feature selection is often used in classical machine learning to reduce overfitting. It is solved with a range of heuristics scored by empirical evaluations, and at most contains trivial constraints such as an upper bound on the number of included variables. In contrast OPO can operate with any solver-amenable constraints and uses gradient descent instead of heuristics.
+2.2
+Prediction
+The notation in this section is specific to using a vision transformer (ViT) as the prediction model for a computer vision prediction task but OPO works for any differentiable prediction model with a learnable imputation strategy.
+Let
+s
+​
+(
+𝝅
+)
+=
+s
+∗
+∈
+{
+0
+,
+1
+}
+k
+\textbf{s}(\bm{\pi})=\textbf{s}^{*}\in\{0,1\}^{k}
+be the solution to problem (
+2
+),
+z
+∈
+ℛ
+M
+\textbf{z}\in\mathcal{R}^{M}
+a vector of all corresponding contextual variables. The next step is to conditionally predict
+p
+p
+unknown parameter values
+θ
+∈
+ℛ
+p
+\theta\in\mathcal{R}^{p}
+. Let
+m
+⁡
+(
+z
+,
+s
+∗
+,
+W
+)
+=
+θ
+^
+m(\textbf{z},\textbf{s}^{*};W)=\hat{\theta}
+be a prediction model such as a neural network parameterised by
+W
+W
+.
+We construct a prediction model which is designed to work with masked inputs. This is mainly to induce stability in prediction and enable the same model to be reasonably usable for any DA solution. The core of the prediction model is the encoder used by
+Xie et al. (2022)
+. Each segment of the image is tokenised using a convolutional layer with
+d
+m
+d_{m}
+kernels where
+d
+m
+d_{m}
+is the embedding size. The stride and kernel size are set such that each value in each segment is passed only once. Under this condition the convolutional layer is equivalent to a linear layer. In addition the encoder keeps two more learnable parameters: a class token, and a mask token which we denote as
+Λ
+\Lambda
+: both are vectors of size
+d
+m
+d_{m}
+. The class token and is always used as the first token providing an anchor for which learning always happens regardless of the selection of tokens. The mask token replaces any tokens corresponding to segments which are not observed. Denote the tokenization layer as
+t
+⁡
+(
+z
+)
+:
+ℛ
+c
+×
+k
+↦
+ℛ
+k
+×
+d
+m
+t(\textbf{z}):\mathcal{R}^{c\times k}\mapsto\mathcal{R}^{k\times d_{m}}
+. In the original implementation this operation is not differentiable as it uses an indexing approach. Our equivalent differentiable masked tokenization operation is:
+I
+⁡
+(
+z
+,
+s
+∗
+,
+Λ
+)
+=
+diag
+⁡
+(
+s
+∗
+)
+​
+t
+​
+(
+z
+)
++
+(
+𝟏
+−
+s
+∗
+)
+⊗
+Λ
+.
+I(\textbf{z},\textbf{s}^{*};\Lambda)=\operatorname{diag}(\textbf{s}^{*})t(\textbf{z})+(\bm{1}-\textbf{s}^{*})\otimes\Lambda\>.
+(3)
+The left term copies all tokens which correspond to observed variables, the right terms copies the mask token into all remaining positions. After prepending the class token, the tokens are then passed into the standard encoder module including positional encoding, multi-head attention, skip-connections, fully-connected layers, and layer normalisation. After three transformer blocks we first apply a linear layer to mix across the token dimension and compress the size so the final layer does not present as much of a bottleneck. After a ReLU activation function, we flatten the compressed tokens and latent dimension and pass it to a single linear layer which projects to the size of the unknown parameter vector
+ℛ
+p
+\mathcal{R}^{p}
+. Denote the model computation after the masked tokenisation operation as
+m
+E
+​
+(
+⋅
+)
+m_{E}(\cdot)
+. The whole prediction model can therefore be expressed as:
+m
+⁡
+(
+z
+,
+s
+∗
+,
+W
+)
+=
+m
+E
+​
+(
+I
+⁡
+(
+z
+,
+s
+∗
+,
+Λ
+)
+,
+W
+)
+.
+m(\textbf{z},\textbf{s}^{*};W)=m_{E}(I(\textbf{z},\textbf{s}^{*};\Lambda);W)\>.
+(4)
+OPO can be seen as a method for constrained (vision) token selection. We leave it to future work to examine how this could be extended to language tasks, but given that reasoning can be expressed as a combinatorial optimisation problem we hypothesise that it is possible.
+2.3
+Contextual Decision Task
+Denote the decision variables for that task as
+x
+∈
+ℛ
+p
+\textbf{x}\in\mathcal{R}^{p}
+. We assume the constraints
+B
+⁡
+(
+x
+)
+B(\textbf{x})
+are certain and that the uncertainty is only in the objective and that the objective is linear. Note that this problem is contextual and changes from instance to instance. Stage CDT is defined as:
+x
+∗
+​
+(
+θ
+)
+=
+arg
+​
+min
+⟨
+θ
+,
+x
+⟩
+s
+.
+t
+.
+B
+⁡
+(
+x
+)
+≤
+0
+.
+\begin{array}[]{ccc}\textbf{x}^{*}(\theta)=&\mathrm{arg}\min&\langle\theta,\textbf{x}\rangle\\
+&s.t.&B(\textbf{x})\leq 0\>.\end{array}
+(5)
+2.4
+DFL or PFL
+The Decision-Focused Learning (DFL) approach trains a prediction model to optimise for some measure of downstream decision loss
+(
+Mandi et al., 2023
+)
+. It has gained a lot of attention as a method for solving contextual optimisation problems. DFL performance in messy settings such as missing data or masked inputs is poorly understood
+(
+Johnson-Yu et al., 2023b
+)
+. Differentiable robust optimisation-type methods have been proposed to deal with label drift/noise
+(
+Johnson-Yu et al., 2023a
+;
+Peršak & Anjos, 2024
+)
+. To the best of our knowledge, no work has studied the effect of missing values on DFL performance. In contrast, prediction-focused learning (PFL) trains a prediction model to minimise the expected value of some measure of distance between predicted parameters
+θ
+^
+\hat{\theta}
+and true parameters
+θ
+\theta
+. It has been more broadly studied and entire classes of models have emerged to deal with masked inputs such as the encoder in our prediction model. Given the lack of understanding of the effect of masked inputs on DFL, a natural ablation is to test both training modalities and their performance on the CDT.
+PFL Loss
+We use mean squared error (MSE) as our PFL loss measure. The loss on a sample of size
+n
+n
+is:
+loss
+PFL
+​
+(
+θ
+,
+θ
+^
+)
+=
+1
+n
+​
+∑
+i
+=
+1
+n
+(
+θ
+i
+−
+θ
+^
+i
+)
+2
+\mathrm{loss_{PFL}}(\theta,\hat{\theta})=\frac{1}{n}\sum_{i=1}^{n}(\theta_{i}-\hat{\theta}_{i})^{2}
+(6)
+DFL Loss
+We use empirical regret as a measure of performance which is the loss in objective value from decisions obtained based on predicted parameters given true parameters. Many techniques have been developed to calculate or approximate gradients across a constrained optimisation operator
+x
+∗
+(
+⋅
+)
+\textbf{x}*(\cdot)
+; we discuss specifics in Section
+3.1
+.
+loss
+DFL
+​
+(
+θ
+,
+θ
+^
+)
+=
+1
+n
+​
+∑
+i
+=
+1
+n
+⟨
+θ
+i
+,
+x
+∗
+​
+(
+θ
+^
+i
+)
+⟩
+−
+⟨
+θ
+i
+,
+x
+∗
+​
+(
+θ
+i
+)
+⟩
+\mathrm{loss_{DFL}}(\theta,\hat{\theta})=\frac{1}{n}\sum_{i=1}^{n}\langle\theta_{i},\textbf{x}^{*}(\hat{\theta}_{i})\rangle-\langle\theta_{i},\textbf{x}^{*}(\theta_{i})\rangle
+(7)
+3
+Optimising the Surrogate
+3.1
+Differentiation
+The whole OPO pipeline from DA surrogate parameters
+𝝅
+\bm{\pi}
+, prediction parameters
+Λ
+,
+W
+\Lambda,W
+, and contextual information
+z
+to contextual decisions
+x
+expressed functionally is
+x
+∗
+​
+(
+z
+,
+𝝅
+,
+Λ
+,
+W
+)
+=
+x
+∗
+​
+(
+m
+E
+​
+(
+I
+⁡
+(
+z
+,
+s
+​
+(
+𝝅
+)
+,
+Λ
+)
+,
+W
+)
+)
+\textbf{x}^{*}(\textbf{z};\bm{\pi},\Lambda,W)=\textbf{x}^{*}(m_{E}(I(\textbf{z},\textbf{s}(\bm{\pi});\Lambda);W))
+(8)
+We can compute the gradient of DFL loss with respect to
+𝝅
+\bm{\pi}
+using the chain rule to break down the gradient computation:
+∂
+loss
+DFL
+∂
+𝝅
+=
+∂
+⟨
+θ
+,
+x
+∗
+⟩
+∂
+x
+∗
+​
+∂
+x
+∗
+∂
+θ
+^
+⏟
+DO
+​
+∂
+m
+E
+∂
+I
+​
+∂
+I
+∂
+s
+∗
+​
+∂
+s
+∗
+∂
+𝝅
+⏟
+DO
+.
+\frac{\partial\mathrm{loss_{DFL}}}{\partial\bm{\pi}}=\frac{\partial\langle\theta,\textbf{x}^{*}\rangle}{\partial\textbf{x}^{*}}\underbrace{\frac{\partial\textbf{x}^{*}}{\partial\hat{\theta}}}_{\text{DO}}{\frac{\partial m_{E}}{\partial I}}{\frac{\partial I}{\partial\textbf{s}^{*}}}\underbrace{\frac{\partial\textbf{s}^{*}}{\partial\bm{\pi}}}_{\text{DO}}\>.
+(9)
+The first and fourth terms can be obtained using standard analytical differentiation/backpropagation.
+Counterfactual Gradient
+The gradient
+∂
+I
+∂
+s
+∗
+\frac{\partial I}{\partial\textbf{s}^{*}}
+needs closer examination as its computation requires knowledge of the whole
+z
+, not just the subset we decide to observe. We make the following assumption:
+Assumption 3.1
+(Full Observation Assumption)
+.
+The training set consists of fully observed contextual vectors
+z
+and fully observed true parameters
+θ
+\theta
+.
+We believe this is a reasonable assumption in many settings. For example if a government has engaged in a census-level effort and a decision maker wants to build prediction models based on census-level data but does not have the resources to monitor as many inputs. The assumption is necessary during a backwards pass through OPO. In the forward pass the operations in
+I
+⁡
+(
+⋅
+)
+I(\cdot)
+which involve
+z
+can simply be replaced by an already masked vector which reflects what has actually been observed. In the backwards pass the relevant gradient is
+∂
+I
+∂
+s
+~
+\frac{\partial I}{\partial\tilde{\textbf{s}}}
+which we name the counterfactual gradient. Denote the outputs of
+I
+⁡
+(
+⋅
+)
+I(\cdot)
+as
+[
+t
+1
+⋯
+t
+k
+]
+T
+\left[t_{1}\cdot\cdot\cdot t_{k}\right]^{T}
+where
+t
+i
+∈
+ℛ
+d
+m
+t_{i}\in\mathcal{R}^{d_{m}}
+is the token corresponding to DA decision
+s
+i
+\textbf{s}_{i}
+. We observe that
+I
+I
+is linear in
+s
+and that any individual
+s
+i
+\textbf{s}_{i}
+only affects its corresponding token
+t
+i
+t_{i}
+. The counterfactual gradient is calculated as:
+∂
+I
+∂
+s
+~
+=
+[
+∇
+t
+1
+⋯
+∇
+t
+k
+]
+T
+∂
+t
+i
+∂
+s
+j
+=
+{
+∂
+∂
+s
+j
+​
+[
+s
+i
+​
+t
+​
+(
+z
+)
+i
++
+(
+1
+−
+s
+i
+)
+​
+Λ
+]
+=
+t
+​
+(
+z
+)
+i
+−
+Λ
+if
+i
+=
+j
+0
+otherwise
+\begin{array}[]{c}\frac{\partial I}{\partial\tilde{\textbf{s}}}=\left[\nabla t_{1}\cdot\cdot\cdot\nabla t_{k}\right]^{T}\\
+\frac{\partial t_{i}}{\partial\textbf{s}_{j}}=\begin{cases}\frac{\partial}{\partial\textbf{s}_{j}}\left[\textbf{s}_{i}t(\textbf{z})_{i}+(1-\textbf{s}_{i})\Lambda\right]=t(\textbf{z})_{i}-\Lambda&\text{if $i=j$}\\
+0&\text{otherwise}\\
+\end{cases}\end{array}
+(10)
+We see that this gradient does not just depend on what was actually observed. In the backward pass the imputation layer needs the counterfactual to compute how the prediction would change as a result of a change in data acquisition.
+Differentiable Optimisation
+Both terms marked as DO in equation (
+9
+) require finding a gradient from an optimisation problem with a linear objective. The constraints
+A
+⁡
+(
+s)
+CLOSE
+A(\textbf{s)}
+in problems (
+1
+) and (
+2
+) can result in problems which are not tractable using exact optimisation methods. Difficult routing problems such as the orienteering problem as utilised in the experiments as a reconnaissance decision-making model are typically solved using heuristics or constraint programming. We therefore need a solver agnostic DO method which can act as an intermediate layer. Solver agnostic methods typically rely on perturbed optimisers and stochastic interpolation to generate gradient approximations. The integrality of
+s
+can not be relaxed as it has symbolic meaning in subsequent computation. This prevents the use of any perturbed optimisers which average over perturbed solutions. The differentiable optimisation also needs to be able to compute the gradient
+∂
+s
+∗
+∂
+𝝅
+\frac{\partial\textbf{s}^{*}}{\partial\bm{\pi}}
+directly so it can function as a layer. A popular differentiable optimisation method which fulfils all three criteria is the method proposed by
+Pogančić et al. (2020)
+. It computes the solution for a single perturbation of the cost function informed by the gradient
+∂
+loss
+DFL
+∂
+s
+∗
+\frac{\partial\mathrm{loss_{DFL}}}{\partial\textbf{s}^{*}}
+and estimates the gradient as the difference between the perturbed solution and the initial solution. This can be interpreted as the direction of the linear interpolation between the two solutions.
+For the DO gradient
+∂
+x
+∗
+∂
+θ
+^
+\frac{\partial\textbf{x}^{*}}{\partial\hat{\theta}}
+the constraints that it should function as a layer and that integrality needs to be preserved in consequent computation no longer apply. Based on empirical results
+(
+Tang & Khalil, 2024
+)
+we select the perturbed Fenchel-Young loss (PFYL) proposed by
+Berthet et al. (2020)
+. PFYL is a stochastic perturbation approach which uses a theoretically sound loss function based on the Fenchel duality.
+3.2
+Optimisation Strategies
+A natural ablation is that the model parameters
+W
+W
+can be pretrained. Jointly training the DA surrogate parameters
+𝝅
+\bm{\pi}
+and the prediction model from scratch risks early confinement to local optima basins. Not biasing the masking with a narrow range of choices for
+s
+∗
+s^{*}
+initially enables the model to learn from a much more diverse context. The proportion of random masking in the pretraining is set to roughly match the proportion of the masking as a result of DA constraints. We design a set of optimisation strategy ablations with the goal of improving generalisation.
+Random search over pretrained
+One benefit of a pretrained prediction model is that it enables us to reasonably score DA strategies for randomly initialised
+π
+\pi
+. Since a masked-input prediction model will work reasonably well out of the box we require only evaluation on a holdout set to score a range of random initialisation strategies for
+π
+\pi
+. Initialisations which perform well can be used as warm starts for other training runs as they indicate a good DA solution.
+Learning or fixing data acquisition
+The DO approach to optimising
+π
+\pi
+is costly as it requires repeatedly solving the DA surrogate. A key determination is whether learning
+𝝅
+\bm{\pi}
+provides a performance advantage over fixing
+𝝅
+\bm{\pi}
+after selecting it using a heuristic procedure such as the one proposed in the previous paragraph.
+Joint learning or fine-tuning
+We test our hypothesis that learning the whole system for scratch leads to generalisation issues due to a less diverse training set for the prediction model. The ablation is whether to start with a pretrained prediction model or to randomly initialise one and optimise end-to-end from scratch.
+PFL or DFL
+The final ablation is whether the decision quality is better if we optimise data acquisition for prediction loss or decision loss. For problems in which the data acquisition is fixed the choice is task dependent as it is determined by the sensitivity structure of the problem and the nature of the relationship between context and unknown parameters.
+Cameron et al. (2022)
+show that DFL offers favourable performance under the presence of uncertainty and correlation between unknown parameters. To the best of our knowledge, the effect of missing values/masking on DFL performance has not been studied. In contrast, masked-input prediction models demonstrate robust performance on prediction tasks with missing values.
+4
+Empirical Evaluation
+4.1
+Setting: Drone Reconnaissance For Shortest Path
+For our downstream contextual decision task, we borrow the Warcraft shortest path problem from
+Pogančić et al. (2020)
+. The CDT is to optimally traverse a grid based on an aerial image of it. The first step is to learn a computer vision model which predicts the cost to traverse each tile on the grid and then solve a shortest path problem from the top left to the bottom right on a
+k
+×
+k
+k\times k
+grid based on these travel costs.
+We modify this problem by imposing an observation restriction on the test set. On the test set one has access to a single drone. The drone can only move up/down, right/left from tile to tile. It takes an
+8
+×
+8
+8\times 8
+RGB photo of each tile it visits. The drone has to start and finish its journey in the top left corner so it can be safely recovered. We calculate the distance between tiles as the Manhattan distance between grid coordinates reflecting the restrictions on movement directions. The drone has a range of
+h
+<
+k
+2
+h<k^{2}
+and so not all tiles can be visited. This is equivalent to the orienteering problem, a type of routing problem in which we maximise the rewards we collect from visiting a set of nodes while constrained by travel costs. The orienteering problem is notoriously difficult to solve using mathematical programming so we utilise routing heuristics from OR-Tools
+(
+Furnon & Perron, 2024
+)
+. The range
+h
+h
+in this case is an upper bound on how many tiles we can obtain the images for. We set
+h
+=
+36
+h=36
+: at most we can visit a quarter of the nodes. OPO aims to learn a set of rewards assigned to nodes such that this reconnaissance path optimises performance on the downstream shortest path problem. The solution to the surrogate DA problem is fed into our modified masked-input ViT which predicts node travel times. The predicted node travel times
+θ
+^
+\hat{\theta}
+are used to parametrise a linear programming formulation for the shortest path problem. To illustrate OPO’s computation process, we present the outputs at different stages of OPO in figure
+1
+. The code used for experiments is available
+here
+.
+(a)
+Learnt values of
+𝝅
+\bm{\pi}
+.
+(b)
+Solution to surrogate DA
+s
+∗
+\textbf{s}^{*}
+given
+𝝅
+\bm{\pi}
+.
+(c)
+Observed context
+z
+given the DA decision
+s
+∗
+\textbf{s}^{*}
+.
+(d)
+Predicted travel times
+θ
+^
+\hat{\theta}
+using a masked-input ViT.
+(e)
+OPO shortest path solution
+x
+∗
+\textbf{x}^{*}
+obtained from
+θ
+^
+\hat{\theta}
+.
+(f)
+True shortest path solution
+x
+∗
+​
+(
+θ
+)
+\textbf{x}^{*}(\theta)
+.
+Figure 1:
+OPO stages for a single instance on the Drone Reconnaissance For Shortest Path experiment from a configuration with warm-starting, learnt
+𝝅
+\bm{\pi}
+, fine-tuning, and DFL loss. Blue to yellow in
+1(a)
+and
+1(d)
+corresponds to low to high. Results for
+1(b)
+,
+1(e)
+, and
+1(f)
+are binary: yellow corresponds to
+1
+1
+and purple to
+0
+0
+.
+4.2
+Configuration
+We pretrain two masked-input ViTs one with a decision loss objective and the other with a prediction loss objective. We configure the ViTs such that they randomly mask three quarters of their inputs during training. We set
+d
+m
+=
+32
+d_{m}=32
+. We use the same holdout splits as
+Pogančić et al. (2020)
+which contain
+10000
+10000
+training examples, and
+1000
+1000
+validation and test examples each. We train both until an early stopping criterion of no validation set performance improvement in 10 epochs is met. For prediction model parameters we use a learning rate of
+3
+​
+e-
+​
+4
+3\text{e-}4
+with an Adam optimiser throughout all experiments.
+We initialise
+𝝅
+\bm{\pi}
+as independent draws from a uniform distribution between
+0.495
+0.495
+and
+0.505
+0.505
+. The ortools solver for the orienteering problem requires integral non-negative values. In the optimiser we multiply the values of
+𝝅
+\bm{\pi}
+by
+1
+​
+e
+​
+3
+1\text{e}3
+, round them, and pass them through a ReLU layer. We also add the value of
+h
+h
+to the reward at each node so the travel costs do not influence the reward collection process. Note that in this case the optimiser computations do not affect the backpropagation. The initialisation was selected based on informal observations on the scale of gradients and to allow for a diverse set of reward values.
+4.3
+Results
+Random Search
+We initialise
+𝝅
+\bm{\pi}
+with
+1000
+1000
+seeds and compute the validation scores for each model and loss criterion. We present the distribution of performance for training/task combinations in figure
+2
+. For comparison note that the mean objective value given a-priori knowledge of the CDT parameters is
+29.64
+29.64
+on the validation set and
+29.71
+29.71
+on the test set. None of the initialisations result in a DA strategy which makes a PFL pretrained model competitive on the decision task. The spread of the results suggests that some DA strategies are substantially better than others thus warranting optimisation on this problem. Notably, the variance of mean objectives for the PFL trained model when evaluated for decision quality is substantially higher than any other combination. This indicates that downstream decisions are highly sensitive to missing data if the prediction model is not trained end-to-end or fine-tuned to a specific data acquisition strategy.
+(a)
+PFL task.
+(b)
+DFL task.
+Figure 2:
+Distribution of mean validation set results for the random search strategy. We note the best performing initialisation. We do not list results of DFL trained on PFL as they are obviously not competitive.
+Ablations
+We select the top four performing initialisations across both criteria in addition to a fifth initialisation with a roughly average performance to warm-start all other optimisation approaches. We perform one training run across all ablation combinations. In the initial training run we do not perform any hyperparameter optimisation and set the learning rate for
+𝝅
+\bm{\pi}
+at
+1
+​
+e-
+​
+3
+1\text{e-}3
+. We present the results of this experiment in Table
+1
+.
+Table 1:
+Initial training run results with training across five initialisations. Each combination reflects runs for five initialisations. The "best" reflects selection amongst initialisations based on the validation score on that specific task. Under the
+W
+W
+columns FT stands for the fine-tuning ablation and JO stands for the joint learning ablation.
+pfl training
+dfl training
+loss
+PFL
+\mathrm{loss_{PFL}}
+loss
+DFL
+\mathrm{loss_{DFL}}
+loss
+DFL
+\mathrm{loss_{DFL}}
+𝝅
+\bm{\pi}
+W
+W
+mean
+std
+min
+best
+mean
+std
+min
+best
+mean
+std
+min
+best
+fixed
+FT
+4.37
+0.56
+3.92
+3.92
+38.81
+0.97
+37.40
+39.66
+39.44
+0.75
+38.69
+38.74
+JO
+4.59
+0.54
+4.14
+4.14
+39.74
+0.29
+39.32
+40.11
+39.27
+0.72
+38.29
+38.29
+learnt
+FT
+5.01
+0.74
+4.32
+4.32
+39.99
+1.98
+37.42
+37.42
+40.29
+1.15
+38.98
+38.98
+JO
+5.37
+0.52
+4.85
+4.93
+40.08
+0.58
+39.45
+39.45
+43.30
+1.89
+39.93
+39.93
+We see a substantial improvement in the performance of masked-input prediction models as a result of fine-tuning which is consistent with expectations and in some of the cases of joint optimisation over random search for DA strategies. The best overall result is achieved by a learnt DA strategy presenting evidence in favour OPO over random search and fine-tuning. PFL outperforms DFL on this task for a learnt
+𝝅
+\bm{\pi}
+which is consistent with empirical results on this specific task
+(
+Tang & Khalil, 2024
+)
+. This is not true for fixed
+𝝅
+\bm{\pi}
+which may reflect the bias specific to the observed context. We hypothesise that the inconsistency between prediction and decision loss in PFL training reveals a degree of overfitting in favour of the prediction task given a specific DA strategy. In contrast learning the DA means that the masked-input model will see a more diverse set of contexts initially before settling on a DA strategy an fine-tuning. This is further evidenced by validation selection being more consistent with the best overall model in the learnt setting.
+When training with a DFL objective the best performing combination is joint learning with a fixed DA strategy indicating the DFL-pretrained masked-input model may have overfitting issues for the warm-start DA strategies. Fine-tuning appears to have a larger effect on learnt DA in the PFL training setting both in terms of the best result and performance variance. This and the fact that some training runs saw no performance improvements suggests that there is a degree of instability in the optimisation of
+𝝅
+\bm{\pi}
+especially when fine-tuning. To see if we can stabilise the training in the fine-tuning ablation we tune the learning rate for
+𝝅
+\bm{\pi}
+on the initialisation with the best validation score across experiments in both the PFL and DFL setting. We try eight learning rates for
+𝝅
+\bm{\pi}
+with roughly logarithmic spacing. The results are presented in Table
+2
+.
+Table 2:
+Results for eight learning rates
+for
+𝝅
+\bm{\pi}
+on the best performing initialisation from the initial experiment.
+pfl training
+dfl training
+loss
+PFL
+\mathrm{loss_{PFL}}
+loss
+DFL
+\mathrm{loss_{DFL}}
+loss
+DFL
+\mathrm{loss_{DFL}}
+𝝅
+\bm{\pi}
+W
+W
+mean
+std
+min
+best
+mean
+std
+min
+best
+mean
+std
+min
+best
+learnt
+FT
+4.75
+0.42
+4.34
+4.34
+38.55
+0.94
+36.84
+36.84
+38.78
+0.55
+38.08
+38.29
+Tuning the learning rate results in an improvement in performance under both training modalities. The best overall performance corresponds to a learning rate of
+7
+​
+e-
+​
+4
+7\text{e-}4
+for the DA surrogate. In terms of relative regret compared to having perfect information the decision performance is
+0.469
+0.469
+under random search, to
+0.289
+0.289
+under the best performing fixed
+𝝅
+\bm{\pi}
+instance, to
+0.260
+0.260
+for the best performing learnt
+𝝅
+\bm{\pi}
+before tuning, and to
+0.240
+0.240
+after tuning. The relative regret of the best OPO model is a substantial
+17
+%
+17\%
+lower than the best non-learnt method.
+Scaling
+The additional training time required for OPO depends on the choice of DO method and optimisation approach used to solve the surrogate DA task. Our implementation uses a heuristic solver with a ten second time budget. Each batch requires two solutions to the surrogate DA task, once in the forward and once in the backward pass. The additional twenty seconds per batch are not prohibitive but such short heuristic run times would not yield good solutions on larger surrogate DA tasks. As with DFL, solver calls are the computationally expensive element. The development of solver-free approaches which work as a layer would be of immense benefit.
+5
+Related Work
+Existing systematic DA
+Optimal sensor placement concerns itself with how to optimally place a limited number of sensors across a geography to optimise some coverage objective. A popular family of solutions is the use of Gaussian Processes to build a surrogate model which is then queried for objectives such as mutual information
+(
+Krause et al., 2008
+)
+commonly used due to its submodularity. Sensor placement has trivial cardinality constraints. In contrast informative path planning (IPP) involves routing constraints which demand more complex optimisation approaches such as branch-and-bound
+(
+Binney & Sukhatme, 2012
+)
+. IPP is a mature field exemplified by efficient algorithms for online learning in unknown environments
+(
+Schmid et al., 2020
+)
+using sampling techniques such as rapidly exploring random trees. The online approaches for IPP may contain insight on how to extend OPO to environments without the full observation assumption. The key difference between OPO and existing approaches such as IPP is that OPO explicitly optimises for downstream objectives instead of relying on statistical proxies thus avoiding the risk of objective misalignment.
+Surrogate Modelling
+Surrogate modelling utilising differentiable optimisation (DO) has been employed to solve hard optimisation problems.
+Ferber et al. (2023)
+propose SurCO, a surrogate mixed-integer programming (MIP) model with a learnable linear objective to approximate the optimal solutions of non-linear MIP problems with equivalent constraints. For a fixed prediction model, and MIP constraints in the DA problem OPO can be interpreted as applying SurCo to an implicit non-linear objective.
+6
+Conclusion
+OPO is the first model to tackle the data acquisition problem end-to-end enabling a greater alignment between DA decisions and the true downstream objective of a decision-maker. OPO is easily extendable to contextual DA settings in which some context is available before the DA decision has to be made by prepending a prediction layer. We believe dynamic learning rates could be leveraged to further improve performance due to the observed sensitivity of the surrogate DA problem. To the best of our knowledge this is the first instance of non-sequential optimisation layers in a neural architecture. Our experiments on the drone reconnaissance problem provide evidence in support of broader end-to-end modelling in multilevel optimisation problems.
+References
+Berthet et al. (2020)
+Berthet, Q., Blondel, M., Teboul, O., Cuturi, M., Vert, J.-P., and Bach, F.
+Learning with differentiable pertubed optimizers.
+Advances in neural information processing systems
+, 33:9508–9519, 2020.
+Binney & Sukhatme (2012)
+Binney, J. and Sukhatme, G. S.
+Branch and bound for informative path planning.
+In
+2012 IEEE international conference on robotics and automation
+, pp.  2147–2154. IEEE, 2012.
+Cameron et al. (2022)
+Cameron, C., Hartford, J., Lundy, T., and Leyton-Brown, K.
+The perils of learning before optimizing.
+In
+Proceedings of the AAAI Conference on Artificial Intelligence
+, volume 36, pp.  3708–3715, 2022.
+Ferber et al. (2023)
+Ferber, A. M., Huang, T., Zha, D., Schubert, M., Steiner, B., Dilkina, B., and Tian, Y.
+Surco: Learning linear surrogates for combinatorial nonlinear optimization problems.
+In
+International Conference on Machine Learning
+, pp.  10034–10052. PMLR, 2023.
+Furnon & Perron (2024)
+Furnon, V. and Perron, L.
+Or-tools routing library, 2024.
+URL
+https://developers.google.com/optimization/routing/
+.
+Johnson-Yu et al. (2023a)
+Johnson-Yu, S., Finocchiaro, J., Wang, K., Vorobeychik, Y., Sinha, A., Taneja, A., and Tambe, M.
+Characterizing and improving the robustness of predict-then-optimize frameworks.
+In
+International Conference on Decision and Game Theory for Security
+, pp.  133–152. Springer, 2023a.
+Johnson-Yu et al. (2023b)
+Johnson-Yu, S., Wang, K., Finocchiaro, J., Taneja, A., and Tambe, M.
+Modeling robustness in decision-focused learning as a stackelberg game.
+In
+Proceedings of the 2023 International Conference on Autonomous Agents and Multiagent Systems
+, pp.  2908–2909, 2023b.
+Krause et al. (2008)
+Krause, A., Singh, A., and Guestrin, C.
+Near-optimal sensor placements in gaussian processes: Theory, efficient algorithms and empirical studies.
+Journal of Machine Learning Research
+, 9(2), 2008.
+Mandi et al. (2023)
+Mandi, J., Kotary, J., Berden, S., Mulamba, M., Bucarey, V., Guns, T., and Fioretto, F.
+Decision-focused learning: Foundations, state of the art, benchmark and future opportunities.
+arXiv preprint arXiv:2307.13565
+, 2023.
+Peršak & Anjos (2024)
+Peršak, E. and Anjos, M. F.
+Learning deterministic surrogates for robust convex qcqps.
+In
+International Conference on the Integration of Constraint Programming, Artificial Intelligence, and Operations Research
+, pp.  128–140. Springer, 2024.
+Pogančić et al. (2020)
+Pogančić, M. V., Paulus, A., Musil, V., Martius, G., and Rolinek, M.
+Differentiation of blackbox combinatorial solvers.
+In
+International Conference on Learning Representations
+, 2020.
+Schmid et al. (2020)
+Schmid, L., Pantic, M., Khanna, R., Ott, L., Siegwart, R., and Nieto, J.
+An efficient sampling-based method for online informative path planning in unknown environments.
+IEEE Robotics and Automation Letters
+, 5(2):1500–1507, 2020.
+Tang & Khalil (2024)
+Tang, B. and Khalil, E. B.
+Pyepo: A pytorch-based end-to-end predict-then-optimize library for linear and integer programming.
+Mathematical Programming Computation
+, 16(3):297–335, 2024.
+Xie et al. (2022)
+Xie, Z., Zhang, Z., Cao, Y., Lin, Y., Bao, J., Yao, Z., Dai, Q., and Hu, H.
+Simmim: A simple framework for masked image modeling.
+In
+Proceedings of the IEEE/CVF conference on computer vision and pattern recognition
+, pp.  9653–9663, 2022.
+Experimental support, please
+view the build logs
+for errors. Generated by
+L
+A
+T
+E
+xml
+.
+Instructions for reporting errors
+We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+      support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+      methods listed below:
+Click the "Report Issue"
+(
+)
+button, located in the page header.
+Tip:
+You can select the relevant text first, to include it in your report.
+Our team has already identified
+the following issues
+. We appreciate your time reviewing and reporting rendering errors we
+      may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+      should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+      all.
+Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a
+list of packages that need conversion
+, and welcome
+developer contributions
+.
+We gratefully acknowledge support from
+        our
+major funders
+,
+member institutions
+,
+,
+        and all contributors.
+About
+·
+Help
+·
+Contact
+·
+Subscribe
+·
+Copyright
+·
+Privacy
+·
+Accessibility
+·
+Operational Status
+(opens in new tab)
+Major funding support from

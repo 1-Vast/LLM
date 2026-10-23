@@ -1,0 +1,260 @@
+[
+  {
+    "projection_index": 1,
+    "tag": "p",
+    "id": "selectedTextModalDescription",
+    "text": "Content selection saved. Describe the issue below:"
+  },
+  {
+    "projection_index": 3,
+    "tag": "p",
+    "id": "abstract1.1",
+    "text": "We present Épi, an autonomous research agent that sustains investigations across model sessions and evolves its methods through accumulated experience. Épi combines persistent research history, hierarchical memory, branching and independent review to maintain research continuity, learn from experiments, and explore and revisit alternative approaches. Its experiments run across session boundaries, and a fixed verifier evaluates their outputs. Épi produced 120 record-setting results, comprising 20 numerical bound records across 12 families and 100 construction records across eight families. These include an approximately 84-fold narrower interval for the n n -queens constant and a more than 3.6-million-fold narrower rigorous interval for the quartic Feigenbaum attractor dimension. Exact dual certificates establish that the Cohn–Elkies linear-programming bound cannot be sharp in dimensions 10 and 11. Beyond numerical improvements, Épi gives a computer-assisted proof of Tuza’s conjecture for split graphs with an eight-vertex clique part and at most three triangle-active neighborhood types, with arbitrary multiplicities. We extend this research process to algorithmic coding with Épi-turbo, a lightweight configuration that develops executable solvers for tasks including vehicle routing, scheduling and production planning. On 30 FrontierOR tasks, Épi-turbo achieves a 5.4% higher total benchmark score than Codex at 64% of its model cost, using the same underlying model and reasoning effort. Épi is designed to support human understanding by connecting computational results to explicit methods and mathematical arguments that researchers can examine and build upon."
+  },
+  {
+    "projection_index": 8,
+    "tag": "p",
+    "id": "S1.SS0.SSS0.Px1.p1.1",
+    "text": "Experiments and research decisions span multiple model sessions. To continue an investigation, the agent needs access to running jobs, code, intermediate results and reasons for earlier decisions. Kosmos maintains a shared research state, InternAgent-1.5 organizes long-horizon memory, and ScienceFlow archives recoverable execution states ( Mitchener et al., 2025 ; Feng et al., 2026 ; Zhao et al., 2026 ) . These mechanisms preserve information across steps. As the history grows, the agent must also select what a bounded model context needs: the current experimental state, relevant lessons and reasons an earlier approach failed. This need motivates hierarchical memory that separates immediate context from reusable experience."
+  },
+  {
+    "projection_index": 10,
+    "tag": "p",
+    "id": "S1.SS0.SSS0.Px2.p1.1",
+    "text": "An agent needs to turn experimental observations into knowledge that guides subsequent decisions. This requires identifying which choices produced a result, under what conditions the method applies and which evidence supports the lesson. The agent must retain this knowledge and retrieve it for relevant tasks. MemoHarness addresses experience reuse by building a memory bank during training and retrieving execution diagnoses and reusable patterns to adapt the harness at test time ( Huang et al., 2026 ) . In an ongoing research investigation, the agent must also update its memory as new experiments arrive, linking each lesson to the conditions and evidence that support it."
+  },
+  {
+    "projection_index": 13,
+    "tag": "p",
+    "id": "S1.SS0.SSS0.Px3.p2.1",
+    "text": "To address these challenges, we introduce Épi , a persistent and evolving autonomous research agent. Épi uses hierarchical memory to resume investigations and retrieve experience from earlier work. It maintains versioned branches to develop alternative methods and backtrack to saved implementations, and incorporates independent review when assessing evidence and choosing its next experiment. The agent operates in verifiable research environments that evolve between campaigns , where a campaign is a complete investigation that may span multiple model sessions. Within a campaign, every branch uses the same feasibility checks, objective and comparison value. A verified finding can then establish a new reference or motivate a new task for the next campaign. Persistent execution and storage carry the research state across sessions."
+  },
+  {
+    "projection_index": 14,
+    "tag": "p",
+    "id": "S1.SS0.SSS0.Px3.p3.1",
+    "text": "Mathematical discovery provides a concrete demonstration of this research process: the agent develops methods whose outputs can be checked as constructions, bounds or proofs. We also evaluate its applicability to algorithmic coding, where the agent must design and implement a solver that handles new problem instances efficiently. Our lightweight configuration, Épi-turbo, achieves a 5.4% higher total benchmark score than Codex on 30 FrontierOR tasks at 64% of its model cost, using the same underlying model and reasoning effort (Section 6 ). These tasks include routing, scheduling, production planning and graph optimization."
+  },
+  {
+    "projection_index": 15,
+    "tag": "p",
+    "id": "S1.SS0.SSS0.Px3.p4.1",
+    "text": "Our contributions are an autonomous research agent that integrates hierarchical memory, branching and independent review to sustain and refine its investigations; a verification protocol that evaluates changing research methods under a fixed ruler and gain floor; and a collection of 120 record-setting results, comprising 100 improved constructions and 20 numerical bounds. Each record improves a documented literature or registry reference for the same problem and normalization; we count one final result per instance or parameter setting, as detailed in Section 4 . These results include an approximately 84-fold narrower interval for the n n -queens constant and a more than 3.6-million-fold narrower rigorous interval for the quartic Feigenbaum attractor dimension. Exact certificates establish that the Cohn–Elkies bound is not sharp in dimensions 10 and 11. Épi also proves Tuza’s conjecture for split graphs with an eight-vertex clique part and at most three triangle-active neighborhood types, with arbitrary multiplicities. We release the constructions and supporting certificates ( Epi Team, 2026 ) ."
+  },
+  {
+    "projection_index": 19,
+    "tag": "p",
+    "id": "S2.SS1.p1.1",
+    "text": "We study research tasks with a reference result, an explicit budget and outputs that can be checked. A curator supplies the question and source material; the agent chooses the methods and experiments. To compare the agent’s output with the reference, we specify an evaluation rule, called a ruler . The ruler defines the submission format, feasibility conditions, objective, normalization and comparison value. 1 1 1 A reported benchmark score alone does not specify feasibility conventions, normalization or input validation. These choices determine whether two values measure the same quantity on valid objects. We introduce the ruler to make them explicit before search."
+  },
+  {
+    "projection_index": 27,
+    "tag": "p",
+    "id": "S2.SS2.p2.1",
+    "text": "The curator may provide a published construction as the initial reference. The agent can consult the literature, implement alternative methods and select experiments within the campaign’s budget. We keep model weights fixed in the campaigns reported here. The agent adapts its methods through experimental feedback, retrieved memory and independent review."
+  },
+  {
+    "projection_index": 29,
+    "tag": "p",
+    "id": "S3.p1.1",
+    "text": "Figure 1 shows Épi’s research loop. The agent conducts experiments in verifiable environments and improves its methods through branching, hierarchical memory and independent review. We describe the evolving environments and the mechanisms supporting the agent’s self-improvement below."
+  },
+  {
+    "projection_index": 36,
+    "tag": "p",
+    "id": "S3.SS2.p1.1",
+    "text": "Épi improves its research methods through accumulated experience. The agent develops and compares alternatives on versioned branches, retains and retrieves experience through hierarchical memory, and uses independent review to reassess its research decisions. Together, these mechanisms allow Épi to refine its approach across experiments and campaigns."
+  },
+  {
+    "projection_index": 40,
+    "tag": "h4",
+    "id": null,
+    "text": "Hierarchical memory"
+  },
+  {
+    "projection_index": 41,
+    "tag": "p",
+    "id": "S3.SS2.SSS0.Px2.p1.1",
+    "text": "Drawing on work on human and agent memory ( Atkinson and Shiffrin, 1968 ; Packer et al., 2023 ; Park et al., 2023 ) , Épi uses hierarchical memory to accumulate and reuse research experience. Short-term memory supports the current investigation, while long-term memory retains experience for subsequent research. As illustrated in Figure 1 , memory records include research context, lessons that capture reusable findings, and dead ends that document unproductive approaches and why they were abandoned. The agent retrieves these records to guide its next experiment and updates them as new evidence becomes available."
+  },
+  {
+    "projection_index": 42,
+    "tag": "p",
+    "id": "S3.SS2.SSS0.Px2.p2.1",
+    "text": "Épi stores code, artifacts and detailed research notes in a persistent filesystem and keeps retrievable lessons and dead ends in a memory store outside the model context. At a session boundary, the agent records its findings and a handover note identifying the current state and next steps. A subsequent session receives relevant memory records and can open the referenced files as needed. This supplies a bounded working context without replaying the full history of earlier sessions."
+  },
+  {
+    "projection_index": 45,
+    "tag": "p",
+    "id": "S3.SS2.SSS0.Px3.p2.1",
+    "text": "Épi supplies a review model with the score trajectory, attempted approaches, retrieved findings, comparison baseline and resource use. The reviewer assesses what the evidence supports and whether the agent’s interpretation of progress is justified. Épi records this assessment for subsequent sessions, and the agent uses it when selecting further experiments or revisiting a branch. We use a different model for an independent review and record the reviewer’s identity. The reviewer evaluates the research direction; the isolated verifier checks the candidate’s validity and gain."
+  },
+  {
+    "projection_index": 49,
+    "tag": "p",
+    "id": "S3.SS2.SSS0.Px5.p1.1",
+    "text": "We use Breadboard as Épi’s execution infrastructure. Breadboard provides isolated experimental environments, supports long-running jobs across model sessions and stores research history, including code, branch states and experimental outputs. It also runs the fixed verifier and preserves the state needed to recover and continue an investigation. The agent uses these services to execute experiments, inspect results and resume its research across sessions."
+  },
+  {
+    "projection_index": 52,
+    "tag": "p",
+    "id": "S4.SS1.p1.1",
+    "text": "We ran Épi over a few days using OpenAI frontier models (GPT-5.6 Sol and GPT-6-Astra). Computational budgets were set per problem. Published methods and constructions supplied starting points for several campaigns, including the packing case in Section 5.1 . Each comparison uses the same task and evaluation convention for the reference and final artifact. All record comparisons are based on literature and registry references available as of September 16, 2026."
+  },
+  {
+    "projection_index": 88,
+    "tag": "p",
+    "id": "S5.SS3.p3.1",
+    "text": "The two formulations have different computational costs, so Épi uses a higher resolution for the lower bound. Each endpoint has a retained witness that can be checked separately. Appendix A gives the resolutions."
+  },
+  {
+    "projection_index": 100,
+    "tag": "p",
+    "id": "S5.SS6.p1.1",
+    "text": "The waterund36 instance in MINLPLib minimizes the cost of a water-using network under nonlinear flow and concentration constraints ( MINLPLib, 2026 ) . A feasible network costing approximately 662.807 662.807 was already known, but the listed global lower bound was only about 655.544 655.544 ."
+  },
+  {
+    "projection_index": 117,
+    "tag": "h2",
+    "id": null,
+    "text": "6 Épi-turbo: Fast, Low-cost Algorithm Design"
+  },
+  {
+    "projection_index": 119,
+    "tag": "p",
+    "id": "S6.SS1.p1.1",
+    "text": "Algorithmic coding extends Épi’s research process to the development of executable solvers. Given a problem specification and a fixed evaluator, the agent designs, implements and tests an algorithm whose solution quality and runtime are measured on new instances. Épi-turbo is a lightweight configuration for these tasks, designed to develop effective algorithms within a short campaign and a small model budget."
+  },
+  {
+    "projection_index": 121,
+    "tag": "p",
+    "id": "S6.SS1.SSS0.Px1.p1.1",
+    "text": "Épi-turbo keeps the parts of Épi that make a result reliable. The verifier checks each candidate under a fixed ruler, and Épi keeps the research state across sessions. Branches keep each method with its code and evidence, so the agent can return to an earlier version. Memory records keep lessons and dead ends for later sessions. Épi-turbo changes how the agent uses its model budget and when the campaign stops."
+  },
+  {
+    "projection_index": 125,
+    "tag": "p",
+    "id": "S6.SS1.SSS0.Px3.p1.1",
+    "text": "Each model call has a cost, and a short task has a small number of calls. Épi-turbo tells the agent that every call costs money, which includes a check on an active job. The agent does short experiments with a time limit in its own session. It sends an experiment to the execution infrastructure only when the experiment needs more time than a session gives. It examines active jobs only when a result can change its next decision. As a result, most of the budget goes to the design and test of algorithms."
+  },
+  {
+    "projection_index": 127,
+    "tag": "p",
+    "id": "S6.SS1.SSS0.Px4.p1.1",
+    "text": "Épi-turbo runs each campaign as one continuous session if possible. The session continues the best method so far and does not restart from an empty context. Before a session ends, the agent records its state, its best candidate and its next steps. The next session reads this record and continues the work. Épi-turbo stops the campaign when more sessions do not improve the best verified score. Thus the agent does not use more budget on a task where it finds no improvement."
+  },
+  {
+    "projection_index": 128,
+    "tag": "h4",
+    "id": null,
+    "text": "Budget control"
+  },
+  {
+    "projection_index": 129,
+    "tag": "p",
+    "id": "S6.SS1.SSS0.Px5.p1.1",
+    "text": "Épi-turbo reserves the maximum cost of a model call before the call starts. It also keeps a small part of the budget for the end of the campaign. Thus the cost of a campaign is never more than its budget, and the final steps always have funds. The reservation uses the price limits of the model, so the agent can use almost all of its budget."
+  },
+  {
+    "projection_index": 131,
+    "tag": "p",
+    "id": "S6.SS1.SSS0.Px6.p1.1",
+    "text": "Independent review and extra validation are optional in Épi-turbo. On short tasks, their cost was larger than their benefit in our tests. Both components were off in the runs below."
+  },
+  {
+    "projection_index": 133,
+    "tag": "p",
+    "id": "S6.SS2.p1.1",
+    "text": "We use FrontierOR, a benchmark of 180 operations-research tasks from the literature ( Kong et al., 2026 ) . Each task asks for a standalone program that solves new instances of one problem class. The program must not call an external optimization solver. The baseline is Codex ( OpenAI, 2026 ) , a widely used coding agent, with GPT-6-Astra as its model. Épi-turbo uses the same model with the same reasoning effort."
+  },
+  {
+    "projection_index": 134,
+    "tag": "p",
+    "id": "S6.SS2.p2.1",
+    "text": "We selected 30 tasks that were new to both systems. We took them in the official hardness order of the benchmark and excluded tasks with unreliable reference values. Of these tasks, 13 are in the hard split, and 17 have hardness ranks 51 to 70. For each task, each system had a model budget of $20. We did one run for each task and system, so we do not report statistical significance."
+  },
+  {
+    "projection_index": 135,
+    "tag": "p",
+    "id": "S6.SS2.p3.1",
+    "text": "The evaluator first runs each program on two development instances. The agent sees these results during the campaign. After the campaign, the best development program runs once on four held-out instances. Each held-out run has a time limit of one hour. The benchmark score has a quality term and a speed term."
+  },
+  {
+    "projection_index": 138,
+    "tag": "p",
+    "id": "S6.SS3.p1.1",
+    "text": "Table 3 gives the main results. Épi-turbo gets the higher total score, 53.96 against 51.21. It has the higher score on 18 tasks, and Codex has the higher score on 12. On 10 of these tasks, the difference is less than 0.01. Épi-turbo uses 64% of the model cost of Codex. Its median research time per task is approximately 22 minutes, and the median for Codex is 37 minutes."
+  },
+  {
+    "projection_index": 139,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Table 3: Épi-turbo and Codex on 30 FrontierOR tasks that were new to both systems. Both systems use GPT-6-Astra and a model budget of $20 per task. All scores are for the held-out instances. The instance counts compare the objective values of the two programs directly."
+  },
+  {
+    "projection_index": 140,
+    "tag": "table",
+    "id": "S6.T3.4",
+    "text": "Measure Épi-turbo Codex Total benchmark score 53.96 53.96 51.21 51.21 Tasks with the higher score 18 18 12 12 Mean quality term 1.030 1.030 1.032 1.032 Mean speed term 0.784 0.784 0.675 0.675 Instances with the better solution (119 comparable, 40 ties) 18 18 61 61 Instances more than 1% worse than the other system 29 29 10 10 Infeasible solutions (120 held-out runs) 1 1 0 0 Model cost per task, mean $7.30 $11.35 Research time per task, median 22 min 37 min"
+  },
+  {
+    "projection_index": 141,
+    "tag": "p",
+    "id": "S6.SS3.p2.1",
+    "text": "Figure 7 shows the results for each task. The gains of Épi-turbo are larger than its losses. On the 18 tasks where Épi-turbo is higher, the total gain is 4.54. On the other 12 tasks, the total loss is 1.79. Épi-turbo also costs less on 27 of the 30 tasks."
+  },
+  {
+    "projection_index": 142,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 7: Épi-turbo and Codex on 30 FrontierOR tasks. A: The score difference for each task, in order of size. Épi-turbo has the higher score on 18 tasks, and its gains are larger than its losses. B: The model cost for each task. Each point below the dashed line is a task where Épi-turbo costs less. C: The runtime of each held-out run on a logarithmic scale, with the medians as vertical bars."
+  },
+  {
+    "projection_index": 143,
+    "tag": "p",
+    "id": "S6.SS3.p3.1",
+    "text": "Table 4 splits the tasks into two groups. On the 13 tasks of the hard split, Épi-turbo has the higher score on 9 tasks, and its total score is 10% higher. On the 17 tasks with ranks 51 to 70, the two systems are close. On 15 of the 30 tasks, Épi-turbo has both the higher score and the lower model cost."
+  },
+  {
+    "projection_index": 145,
+    "tag": "table",
+    "id": "S6.T4.4",
+    "text": "Group Tasks Total score Higher score Model cost Hard split 13 22.33 22.33 / 20.30 20.30 9 9 / 4 4 $95 / $152 Ranks 51–70 17 31.64 31.64 / 30.91 30.91 9 9 / 8 8 $124 / $188 All tasks 30 53.96 53.96 / 51.21 51.21 18 18 / 12 12 $219 / $341"
+  },
+  {
+    "projection_index": 146,
+    "tag": "p",
+    "id": "S6.SS3.p4.1",
+    "text": "The higher score comes mainly from the speed term. The programs of Épi-turbo usually stop when their search finds no better solution. On the held-out instances, the median runtime of an Épi-turbo program is 2.9 seconds, and the median for Codex is 9.3 seconds. No held-out run of Épi-turbo used more than 30 minutes. Codex used more than 30 minutes on 17 of the 120 held-out runs, in 7 tasks. A long run can improve the solution, but it decreases the speed term."
+  },
+  {
+    "projection_index": 150,
+    "tag": "p",
+    "id": "S6.SS4.SSS0.Px1.p1.1",
+    "text": "The Épi-turbo program solves each held-out instance in less than 17 seconds. On one instance, its solution has an objective value of 8, and the Codex solution has 20. The Codex program also runs for 20 to 60 minutes on three of the four instances. Thus Épi-turbo has both the higher quality term and the higher speed term."
+  },
+  {
+    "projection_index": 157,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Table 5: The ten FrontierOR coding tasks with the largest score difference in favor of Épi-turbo, sorted by the difference. Task names identify the optimization problem solved by each generated program; benchmark IDs appear below them. Scores, quality and speed are measured on held-out instances. Each pair gives Épi-turbo first and Codex second."
+  },
+  {
+    "projection_index": 158,
+    "tag": "table",
+    "id": "S6.T5.4",
+    "text": "Task Score Quality term Speed term Model cost Hyperplane clustering amaldi2013 2.162 2.162 / 1.283 1.283 1.163 1.163 / 1.282 1.282 0.999 0.999 / 0.001 0.001 $2.59 / $4.86 Clique interdiction furini2021 2.090 2.090 / 1.256 1.256 1.091 1.091 / 0.841 0.841 0.999 0.999 / 0.415 0.415 $3.82 / $6.47 Vehicle routing with node costs he2020 2.094 2.094 / 1.353 1.353 1.098 1.098 / 1.108 1.108 0.995 0.995 / 0.245 0.245 $3.42 / $13.90 Maximum clique furini2019 1.987 1.987 / 1.487 1.487 1.000 1.000 / 0.988 0.988 0.987 0.987 / 0.500 0.500 $5.78 / $11.58 Cooperative crane scheduling kress2019 1.853 1.853 / 1.572 1.572 1.103 1.103 / 1.074 1.074 0.750 0.750 / 0.498 0.498 $4.78 / $3.90 Process configuration and production planning delage2022 2.023 2.023 / 1.759 1.759 1.024 1.024 / 1.012 1.012 0.999 0.999 / 0.747 0.747 $7.32 / $13.04 Routing with time-window assignment spliet2015 2.012 2.012 / 1.765 1.765 1.012 1.012 / 1.016 1.016 1.000 1.000 / 0.750 0.750 $7.48 / $11.50 Graph coloring gualandi2012 2.086 2.086 / 1.860 1.860 1.117 1.117 / 1.128 1.128 0.969 0.969 / 0.731 0.731 $4.77 / $11.52 Set partitioning zhang2025 1.558 1.558 / 1.379 1.379 1.021 1.021 / 0.951 0.951 0.536 0.536 / 0.428 0.428 $18.38 / $16.87 Facility location fischetti2017 1.998 1.998 / 1.847 1.847 1.000 1.000 / 1.000 1.000 0.998 0.998 / 0.847 0.847 $2.41 / $1.96"
+  },
+  {
+    "projection_index": 166,
+    "tag": "p",
+    "id": "S9.p1.1",
+    "text": "Épi is an autonomous research agent that sustains investigations across model sessions and improves its methods through memory, branching and independent review. Its campaigns produced 120 record-setting results and a computer-assisted proof of a new case of Tuza’s conjecture. The released constructions and certificates provide concrete, checkable evidence for these advances. Épi-turbo extends this research process to algorithmic coding across routing, scheduling, planning and graph optimization. On 30 FrontierOR tasks, it achieves a 5.4% higher total benchmark score than Codex with the same model while using 64% of its model cost."
+  },
+  {
+    "projection_index": 216,
+    "tag": "p",
+    "id": "A1.SS12.p2.1",
+    "text": "The proof rules out every network cheaper than the cutoff by deriving a contradiction from that cost assumption. It first lifts each feasible network into a bounded relaxation using flow and contaminant conservation. For a linear relaxation A ​ x ≤ b Ax\\leq b with box bounds L ≤ x ≤ U L\\leq x\\leq U , any nonpositive row multiplier vector y y gives the valid lower support"
+  }
+]

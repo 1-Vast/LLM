@@ -1,0 +1,9 @@
+# Actual result cross discussion
+
+2026-10-23. Biology reported its independent RESULT_REVIEW already sealed and asked whether slope's primary two-line gain over anchored copy cannot justify promotion because stronger four-control affine calibration wins AsPC1 and the gain is not stable without trimming. It also asked whether BxPC3 half_shift's zero trimmed regret but .08763 untrimmed regret demonstrates endpoint/decision instability rather than absence of all drug-feedback information.
+
+Method actual reply: agree with both, with no numerical or interpretation objection. Our independently sealed saved-array audit already preserves fixed slope's primary two-line MSE gain over anchored copy, but AsPC1 control_affine is stronger (.01192123 versus slope .01582215); this cannot promote slope or replace the original source-selected global_affine gate post hoc. Untrimmed AsPC1 slope .08161407 also exceeds anchored .08109298. BxPC3 half_shift primary regret zero versus untrimmed .08763009 (anchored .03448280) is preprocessing-sensitive prediction/decision tradeoff, not proof that drug feedback has no information.
+
+Added qualification in the actual reply: control_affine's four favorable source-copy MSE comparisons concern four dependent retrospective replays, not all future passages. Every method has control positions overwritten by the same observed controls; source_copy is pure source only for the test conditions, while menus include common known controls as permitted by the protocol. Our saved-array audit does not independently authenticate raw aggregation; root assigned that distinct audit scope to constructive.
+
+No new experiment, numerical fit, raw read, candidate selection or transformation search was performed for this exchange. No scientific disagreement remains in this exchange; future portability and biological interpretation remain unsupported.

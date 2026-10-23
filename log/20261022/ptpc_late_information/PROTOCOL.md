@@ -1,0 +1,27 @@
+# Pre-access development protocol
+
+Question and application: retrospective prioritization of author-annotated effective compounds in HCT116, conditional on having measured early/late protein assays. Determine necessary information headroom for a future feedback-learning mechanism. Late-state measurement is not a free prospective input. No authenticated label chronology, dose or cutoff: do not assert prospective efficacy prediction, causal mechanism or clinical utility.
+
+## Data and boundaries
+
+Use existing601condition identities/labels/chemical groups and old source ZIP hashes. Intersect with metadata-verified24h availability (expected600; assert this count). Use identical600rows for every new panel; do not compare new scores to old601row scores as a treatment effect. Only24h HCT116 eligible noncontrol abundances decoded. All other background abundances/labels skipped before cell resolution. Matrix identity joined on authenticated row order, not many-to-many Sample_ID. Compare every selected row ID to metadata and reject any Sample_ID spanning different conditions/times.
+
+log1p finite nonnegative observed values, including observed0. Missing/NA stays NaN. Aggregate technical rows nanmedian by Sample_ID, then nanmedian sample IDs by condition, identical ordering to6h. Suppress repetitive all-missing RuntimeWarnings during medians, record observed/missing counts; no invented zeros. Six-hour inputs/chemistry/labels reused from sealed prepared arrays after hash check; old files unmodified.
+
+## Fixed conventional predictors
+
+Five panels: C=chemistry only, RMS normalized; Craw=raw chemistry bits without centering/scaling; E=C+6h values+6h missing mask; M=E+24h missing mask; V=M+24h values. Craw prevents the new normalization from silently weakening the chemical comparator. M tests detection coverage; V-M tests value addition conditional on coverage, V-E tests total added observation. No post-score feature/panel expansion.
+
+Two independently evaluated learner families, never cross-selected across outer folds: primary balanced linear liblinear logistic; fixed sensitivity balanced RBF SVC. Each panel within each family has C=[0.1,1,10]. Logistic max_iter3000 random_state0; SVC gamma=scale, decision_function, no probability fitting. Predictions for both use decision_function. Only ranking AP/AUROC/P@5 reported; these are not calibrated probabilities, no Brier. If train singleclass, source prevalence score fallback; unscorable validation folds skipped with explicit accounting. This pre-access amendment follows the independent critic's score-unit concern: never pool logistic and SVC scales into a selected portfolio.
+
+Training-only preprocessing for each fit: chemical bit block center with source mean; protein columns with any source observation retained, source median imputation, source StandardScaler; masks StandardScaler fit on source. Normalize each block by sqrt(mean(source row squared norm)); source-constant blocks stay zero. Concatenate and divide by sqrt(number of declared blocks). Thus each nonconstant block has unit source mean squared norm, rather than assuming equal dimension means equal energy. Report training energy checks in tests. No PCA, annotations, checkpoint, test-fitted scaling, extra external knowledge or target-label fit.
+
+Outer5hash folds saltPTPC_HCT116_DEV_V1; source-inner3hash saltINNER, inherited chemical groups. No label stratification/partition repair. Within each learner family/panel independently choose best of3C candidates by source-inner mean AP; ties preserve increasingC order. Each panel/family gets the same9inner fit opportunities plus1outer fit per outerfold: planned500fits in total. Exactfit/warning ledger retained. Cache identical source transforms only if no target leakage; not required. Panels have distinct measured-information budgets and feature counts, explicitly reported; no claim they have equal assay costs. Classifier selection budget is equal.
+
+## Fixed criteria and interpretation
+
+Primary logistic pooled OOF AP, with every fold AP and AUROC reported. Development continuation gate only: logistic V pooled AP exceeds max(C,Craw,E,M) by at least0.02 absolute, and logistic V has positive foldAP difference against each comparator in at least4of5folds. RBF reports the same rule as sensitivity only; it cannot rescue a failed primary gate. This is a pre-access research-resource screen, not clinically authenticated minimum benefit or a significance threshold. Gate failure means stop expansion of this exact late-state representation/selection setup; not proof all late state has no information. Passing permits a distinct mechanism proposal/review, not opening reserves or claiming a core.
+
+Report paired chemical-group bootstrap (2000draws, seed20261022) of pooled AP differences V-E and V-M using fixed OOF scores. It describes ranking sensitivity only: shared fitted models and dependence between folds mean this is not a biological-background confidence interval or correction for development reuse. No refits/bootstrap hyperparameter tuning. Report fold direction and both macro/pooled AP without switching primary metric.
+
+No agent, active selection, model updating, inheritance or improver measured. No need to run their comparisons for this necessary information gate; if a later rule is proposed, full same-information refit/continuous/active/simple-mixture/equal-budget-search controls remain mandatory. A375 selection and three later backgrounds unopened. Full goal stays active regardless of gate result.

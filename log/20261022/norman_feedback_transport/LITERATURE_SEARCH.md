@@ -1,0 +1,13 @@
+# Narrow primary literature search
+
+2026-10-22. Web searches: `2025 2026 genetic interaction prediction transcriptomic side information active learning perturb seq kernel`; `2025 learning update rules test time adaptation scientific discovery meta learning world model perturbation`. Search snippets are discovery leads, not full-text-verified mechanisms. Opened actual primary pages separately.
+
+Critical direct baseline lead: Qin etal2025 NAIAD, ICML/PMLR267:50363–50383, https://proceedings.mlr.press/v267/qin25g.html . Primary abstract describes single-gene effects plus adaptive gene embeddings with training-data size, active gene-pair discovery. Cannot call data-adaptive embedding/complexity new without this comparator. Need inspect actual endpoint/data/implementation before claiming equivalence or required faithful fit.
+
+Related primary: Knowledge graph-aided Bayesian active learning for top-K genetic interaction discovery, ScientificReports2025, https://www.nature.com/articles/s41598-025-13972-7 . Side-information Bayesian matrix factorization/active selection is a close conventional family; fixed later batch design does not claim query-policy advantage.
+
+RSI-relevant lead: Learning to Learn-at-Test-Time: Language Agents with Learnable Adaptation Policies, arXiv2604.00830, https://arxiv.org/abs/2604.00830 . Bilevel adaptation-policy learning in language agents does not supply biological independent tasks or establish recursive improvement here. Primary fulltext needed before detailed transfer claims.
+
+Norman2019 remains closest actual static RNA+functional completion source. This narrow search is not exhaustive novelty clearance and does not authorize a new method claim. Preserve source-based noveltyNO_GO for ordinary kernel mixture. Candidate test remains conventional capability, with direct2025methods acknowledged rather than ignored.
+
+Primary-page verification: PMLR page opened successfully, confirms NAIAD authorrepo https://github.com/NeptuneBio/NAIAD and reported four CRISPR datasets plus drug-combination extension. Abstract claims are author-reported, not independently reproduced. Nature page failed nonretryable redirect/500; its full contents are NOT verified. arXiv current page actually titles v4 `Meta-TTL: Meta-Learning Self-Improvement Policies for Language Agents`, revised2026-09-28; search snippet older title differs. Current abstract describes outer reflective meta-training across diverse tasks and inner sequential TTL; cannot transfer taskdiversity from language benchmarks into single K562 map. No fulltext mechanism/power claim from abstract alone.

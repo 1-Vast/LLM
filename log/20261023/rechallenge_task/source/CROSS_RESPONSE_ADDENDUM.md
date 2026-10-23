@@ -1,0 +1,11 @@
+# Actual reciprocal response: local interpretation gates
+
+2026-10-23. Critic actually read source/INDEPENDENT.md and RESOURCE_CORRECTION.md, then challenged the scope of the measurement qualification. Source explicitly accepted in its direct response; no numerical outcomes or new source were read.
+
+500nM is the conditioning-history dose, not a directly observed challenge column in this file. A claim of measured500nM rechallenge is unsupported. If500nM were a future computational target, interpolation must be explicit and available identically to ordinary direct controls; a model-filled response cannot be called biological ground truth.
+
+The0.01/zero encoding issue stops a physical zero-drug interpretation, not every calculation on the corresponding encoded column. Likewise unknown exact normalization does not prohibit a limited forecast of the released response scale; it limits absolute physical-count, calibrated IC50, mechanistic and cross-assay claims. Source accepts these as local interpretation gates rather than global numerical-task bans. A separately frozen cohort-level curve diagnostic can therefore be lawful before full mechanistic/RSI identification, provided it respects source/query access, eligibility, current-summary definitions, scale and all ordinary controls.
+
+Critic explicitly accepted source's concern about post hoc aliasing selection: current summaries, similarity tolerances and history pairs must be fixed before numeric inspection; published known IC50 similarity cannot be relabelled as a fresh independent pair discovery. It also accepted the72h arrival delay: a day7harvest challenge is available approximately day10, not at day7. A retrospective group forecast may use it only at the actual allowed information time. Both roles retain that replicate labels do not authenticate independent parent cultures and that a shared/renamed CSV is not new biological evidence.
+
+Both accept the distinction between simulated cellular adaptation x and research model/updater/improver theta/U/G, with no novel operation currently supplied. Reciprocal cross is complete. **PUBLIC_FUNCTIONAL_CHALLENGE_SCHEMA_AUTHENTICATED / LIMITED_COHORT_TASK_ONLY / NO_NEW_CORE** remains the agreed scope. No numerical run or old-panel refit follows from this review alone. Original independent seals are unchanged.

@@ -1,0 +1,3499 @@
+
+ 
+ 
+ T2-z: Test-Time Optimization of Environment Latents for Robotic World Models 
+ 
+ 
+ 
+   
+ 
+  // Restore the saved color scheme preference, or
+  // enact the browser preference if "automatic", 
+  // without expecting DOM load to have completed.
+  //
+  // Also restore any saved readingmode and ToC display preferences.
+  function initializeReadingPreferences() {
+    let saved_theme = localStorage.getItem("ar5iv_theme") || "automatic";
+    if (saved_theme === "automatic") {
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        saved_theme = "dark";
+      }
+    }
+    if (saved_theme == "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+
+    const tocDisplay = localStorage.getItem('arxiv_html_paper_toc_display');
+    if (tocDisplay) {
+      document.documentElement.setAttribute("data-toc-display", tocDisplay);
+    }
+    const readingMode = localStorage.getItem('arxiv_html_paper_reading_mode');
+    if (readingMode) {
+      document.documentElement.setAttribute("data-reading-mode", readingMode);
+    }
+    // Pre-apply spinout-banner dismissal here, before the banner paints, so it
+    // never flashes in only to be hidden later by the deferred arxiv-header.js.
+    // Key matches arxiv-header.js: "arxiv-banner-dismissed:" + data-banner-name.
+    if (localStorage.getItem('arxiv-banner-dismissed:spinout-nonprofit')) {
+      document.documentElement.setAttribute("data-banner-dismissed", "");
+    }
+  }
+  // Run as soon as JS starts, to minimize repainting
+  initializeReadingPreferences();
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  /* Banner pre-dismissal (set above before paint -> no flash-then-hide) and
+     reading-mode chrome hiding. */
+  html[data-banner-dismissed] .ds-announcement { display: none; }
+  html[data-reading-mode="enabled"] .ds-announcement,
+  html[data-reading-mode="enabled"] .ds-site-footer { display: none; }
+  /* Print keeps the reader header's logo, not its controls: the theme's own print rule
+     (header, nav { display: none }) sits in a layer that its header layer outranks. */
+  @media print { .arxiv-html-header .html-header-nav { display: none; } }
+  /* Keep the announcement text dark on the Open-Blue band in both colour themes
+     (otherwise it inherits the paper's warm-wash text in dark mode and washes out). */
+  .ds-announcement-text { color: var(--arxiv-ink, #1c1a17); }
+ 
+ 
+ 
+ 
+ 
+   
+     
+       Report GitHub Issue 
+       × 
+     
+
+     
+       Title: 
+       
+
+       Content selection saved. Describe the issue below: 
+
+       Description: 
+       
+     
+
+     
+       Submit without GitHub 
+       Submit in GitHub 
+     
+   
+ 
+     
+     arXiv is now an independent nonprofit! 
+     Learn more 
+     × 
+   
+
+ 
+   
+     
+       Back to arXiv 
+     
+   
+   
+   
+     Why HTML? 
+     
+       
+         
+       
+       Report Issue 
+     
+     
+       
+         
+         
+       
+       Back to Abstract 
+     
+     
+     
+       
+         
+       
+       Download PDF 
+     
+     
+       
+         
+         
+       
+     
+     
+     
+       
+         
+       
+     
+     
+     
+       
+         
+           
+           
+         
+       
+       
+         
+           
+           
+         
+       
+       
+         
+           
+           
+         
+       
+     
+   
+ 
+ 
+ 
+ Abstract 
+ 1  Introduction 
+ 2  Related Works 
+ 3  Method 
+ 
+ 3.1  Problem Setup 
+ 
+ 3.1.1  Training 
+ 
+ Stage I: World-Model Optimization. 
+ Stage II: Environment-Latent Optimization. 
+ Alternating Optimization 
+ 
+ 3.1.2  Test-Time Optimization 
+ 
+ 
+ 4  Experiments 
+ 
+ 4.1  Experimental Setup 
+ 
+ Tasks 
+ Implementation Details. 
+ Evaluation Metrics. 
+ Baselines. 
+ 
+ 4.2  Simulation Experiments 
+ 
+ Single-Factor Environmental Variation. 
+ Emergent Structure of Environment Latents. 
+ Compounded Environmental Factors. 
+ Robustness across Diverse Visual Scenes. 
+ 
+ 4.3  Real-World Robotic Experiments 
+ 4.4  Ablative & Qualitative Studies 
+ 
+ 5  Conclusion 
+ References 
+ A  Model Architecture and Optimization 
+ 
+ A.1  Architecture and latent conditioning 
+ 
+ Inputs and inherited backbone. 
+ Environment-indexed latent conditioning. 
+ Cross-attention branch. 
+ Modulation branch. 
+ 
+ A.2  Training and test-time adaptation 
+ 
+ Training schedule. 
+ Test-time adaptation. 
+ 
+ 
+ B  Experimental Setup 
+ 
+ B.1  Training data and resource budgets 
+ B.2  Simulator and real-world setup 
+ 
+ Simulator. 
+ Real world. 
+ 
+ 
+ C  Evaluation Protocols 
+ 
+ C.1  Shared protocol and metrics 
+ 
+ Shared comparison. 
+ 
+ C.2  Simulated tasks 
+ 
+ Friction. 
+ Gravity. 
+ Mass Collision. 
+ Light Switch. 
+ Mass Balance. 
+ Mass  × \times  Friction. 
+ Diverse Backgrounds (multi-background). 
+ 
+ C.3  Real-world tests 
+ 
+ Ball Friction. 
+ Door Close. 
+ Stick Balance. 
+ Soft Pull. 
+ 
+ 
+ D  Baseline Implementation Details 
+ 
+ D.1  Standard World Model 
+ D.2  LoRA TTA 
+ D.3  DINOv2 Context 
+ D.4  TTT-KQV 
+ 
+ E  Additional Experiments 
+ 
+ E.1  Test-time interaction-count ablation 
+ E.2  Latent dimensionality 
+ E.3  Latent-space PCA across tasks 
+ E.4  Computational efficiency 
+ 
+ F  Additional Qualitative Results 
+ References 
+ 
+ 
+ 
+ 
+   
+    License: CC BY 4.0
+   
+   
+arXiv:2610.22364v1 [cs.RO] 15 Oct 2026 
+ 
+ 
+ T2-z : Test-Time Optimization of Environment Latents for Robotic World Models 
+ 
+ 
+ 
+ 
+ Chenyuan Zhou*, Yining Hong*,
+Huang Huang,
+Yunfan Jiang, 
+ Wenlong Huang,
+David Held,
+Vitor Campagnolo Guizilini,
+Yue Wang, 
+ Li Fei-Fei,
+Jiajun Wu † ,
+Leonidas Guibas † ,
+Yejin Choi † 
+ * Co-First Contribution  ♡ \heartsuit  Co-Second Contribution   † \dagger  Equal Advising 
+ Stanford University CMU 
+ Toyota Research Institute University of Southern California 
+ 
+ 
+ Website:   https://t2-z-latent-optimization.github.io/ 
+ 
+ 
+ Code:   https://github.com/T2-z-latent-optimization/T2-z 
+ 
+ 
+ Data:   https://huggingface.co/datasets/huagailuowen/T2-z-datasets 
+ 
+ 
+
+ Abstract 
+    
+ Predicting how the world responds to an action requires more than what can be seen: robots must account for environmental factors that are neither directly observable nor explicitly specified, from physical properties such as friction and mass to human-defined environmental rules.
+We introduce  T2-z  for test-time optimization of environment latents, which augments a robotic world model with a learnable environment latent to condition world predictions. This compact latent captures underlying environmental variation without supervision of what environmental factors exist or what values they take.
+During training,  T2-z  alternates between two stages: a world-model optimization stage that fixes the latents and learns general action-conditioned dynamics across environments; and an environment-latent optimization stage that freezes the world model and optimizes the conditioning latents, allowing latent structure to emerge purely through world prediction.
+At test time, the world model remains frozen and a newly initialized environment latent is optimized from one or more test-time interactions, adapting the model to previously unseen environmental configurations.
+Across 7 simulated settings and 4 real-world robotic tasks,  T2-z  reduces object prediction error metric from  15.20 15.20  to  7.00 7.00  and raises action success from  33.73 % 33.73\%  to  72.96 % 72.96\% .
+Its emergent latents capture structured
+representations of individual and compounded factors across diverse visual scenes.
+Ablations further show that  T2-z  can efficiently infer environment latents from as little as a single test-time interaction trajectory. 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Figure 1:  T2-z  for Test-Time Environment Latent Optimization. 
+ (a)  Given the same observation and action,  T2-z  directly optimizes
+environment latents to capture different environmental conditions
+( e.g.,  ball mass), leading the world model to predict different outcomes.
+ (b)  Without knowing how many factors exist or what they represent, PCA of the learned
+environment latents reveals a two-dimensional structure that closely reflects
+the underlying factor distribution.
+ (c)  We evaluate  T2-z  on real-world robotic tasks spanning diverse
+unobserved environmental factors.
+ (d)  Across diverse visual scenes, the learned
+latents reveal a unified structure that reflects the same underlying
+environmental factor without being entangled with visual appearance.
+ 
+ 
+ 
+ 1  Introduction 
+
+ 
+ What a robot observes is insufficient to determine how the world will respond. Beneath visually similar scene configurations reside hidden environmental factors, such as friction, mass distribution, and unobserved human-defined interaction rules, that can fundamentally alter the consequences of the same action ( fig.   1  (a)). Such factors are often revealed only through interaction with the target environments, as their influence becomes observable through the outcomes they induce. Explicitly representing these factors  ( Kumar et al., 2021 ) , however, requires specifying in advance what factors may vary, their exact values, and how they should be parameterized, which is difficult to scale to unknown or compounded environmental variation. On the contrary, humans reason through “analysis by synthesis”   ( Yuille and Kersten, 2006 ) , using internal generative models not only to anticipate future outcomes, but also in reverse to infer latent structure that best accounts for what they observe. This raises a natural question: can hidden environmental factors be similarly captured in a latent representation that is directly optimized from test-time interactions? 
+ 
+ 
+ We introduce  T2-z  for test-time optimization of environmental latents, which augments an action-conditioned robotic world model with a learnable environment latent  𝐳 e \mathbf{z}_{e} .  𝐳 e \mathbf{z}_{e}  is a randomly-initialized compact representation that is expected to encode the unobserved factors governing how an environment responds to interaction, with no supervision about what environmental factors it should represent.
+The world model predicts future visual observations conditioned jointly on the action and  𝐳 e \mathbf{z}_{e} . We iteratively optimize the world model and  𝐳 e \mathbf{z}_{e}  in an alternating two-stage procedure: 1) world-model optimization: with  𝐳 e \mathbf{z}_{e}  fixed, we train the world model across all trajectories to learn shared action-conditioned dynamics across environments; 2) environment-latent optimization: with the world model frozen, we optimize the conditioned latent  𝐳 e \mathbf{z}_{e}  through prediction error, so that it captures underlying environment-specific variation not explained by the general world model alone. Both stages are optimized with the same flow-matching loss and alternated for multiple rounds until convergence, allowing the environment representation to emerge directly through prediction without predefined physical-factor supervision or a separate environment encoder. 
+ 
+ 
+ At test time, the world model is frozen and  T2-z  turns environment inference into a direct
+optimization problem. For a previously unseen environmental configuration,
+we initialize a new  𝐳 e \mathbf{z}_{e}  and optimize  𝐳 e \mathbf{z}_{e}  to explain the outcomes of one or more observed test-time interactions.
+Specifically, we update  𝐳 e \mathbf{z}_{e}  for multiple optimization steps through the same flow-matching objective used
+during stage-two training, minimizing prediction error on the observed interactions. Because inference is optimization-based rather than amortized through a learned history encoder,  T2-z  is not tied to the trajectory count used for training and can flexibly incorporate any number of test-time trajectories.
+Once optimized, the latent turns the frozen world model into an
+environment-adapted test-time simulator, enabling prediction and comparison
+of candidate action outcomes before execution. 
+ 
+ 
+ We evaluate  T2-z  across 7 simulated settings and 4 real-world robotic tasks. Quantitatively and qualitatively,  T2-z  improves world-model prediction across visual quality, physical prediction metrics ( e.g. , relevant object locations), and downstream action selection.  T2-z  reduces physical prediction error from  12.86 12.86  to  4.80 4.80  in simulation and tracked-state error from  19.30 19.30  to  10.85 10.85  pixels in the real world, while improving action success from  37.9 % 37.9\%  to  74.2 % 74.2\%  and from  26.5 % 26.5\%  to  70.8 % 70.8\% , respectively. PCA of the learned latents reveals structured representations that reflect the underlying environmental factors, including a multi-dimensional organization when more than one factors vary jointly, despite the model never knowing how many factors are present or what they represent ( fig.   1 (b)). In our multi-background setting, a unified latent structure emerges across diverse scene setups, revealing that the learned representation captures environmental dynamics without becoming entangled with scene appearance ( fig.   1 (d)). Ablations further show that  T2-z  can infer useful environment representations from as few as a single test-time interaction trajectory. 
+ 
+ 
+ 
+ 2  Related Works 
+
+ 
+ Figure 2:  Comparison with existing approaches. 
+ (a)  Vanilla world models do not explicitly represent unobserved
+environmental variation, producing the same prediction under different
+environmental conditions.
+ (b)  System-identification approaches such as RMA learn environment
+representations from predefined factors and their ground-truth values, then
+infer them from interaction history through a learned encoder.
+ (c)   T2-z  requires neither predefined environmental factors nor a
+learned environment encoder, instead directly optimizing an emergent
+environment latent from test-time interaction through prediction error.
+ 
+ 
+ 
+ Two distinct strands of work are particularly related to our problem. 
+ 
+ 
+ Robotic world models  have made rapid progress in predicting
+action-conditioned futures  ( Zhou et al., 2025 ;  Zhou et al., 2024 ;  Zhu et al., 2024 ;  Zhen et al., 2025 ;  Zhu et al., 2025 ;  Ye et al., 2026 ;  Huang et al., 2026 ;  Gao et al., 2026 ) . More recent work explores test-time
+adaptation to improve long-horizon memory or incorporate new
+behavioral supervision  ( Wan et al., 2026 ;  Wang et al., 2026 ;  Feng et al., 2026 ;  Yoo et al., 2025 ;  Jang et al., 2026 ) . These approaches predict future outcomes from visual observations alone, without accounting for underlying environmental variation that is not directly observable. ( fig.   2  (a)).
+In contrast,  T2-z 
+disentangles unobserved environmental variation from the world model’s
+observable scene representation, through environment latent conditioning. 
+ 
+ 
+ Environment representations and system identification  have
+demonstrated the value of environment-specific representations for system
+identification and rapid behavioral adaptation
+  ( Yu et al., 2017 ;  Nagabandi et al., 2019 ;  Rakelly et al., 2019 ;  Lee et al., 2020 ;  Kumar et al., 2021 ;  Miki et al., 2022 ;  Nahrendra et al., 2023 ;  Wang et al., 2023 ;  He et al., 2024 ;  Luo et al., 2024 ) . The Rapid Motor Adaptation (RMA) family and related
+methods typically rely on predefined privileged parameters
+  ( Kumar et al., 2021 ;  Miki et al., 2022 ;  Nahrendra et al., 2023 ;  He et al., 2024 ;  Luo et al., 2024 ) . For example, RMA restricts
+adaptation to 5 factors and uses their ground-truth
+values to learn an embedding that an adaptation encoder later
+recovers from interaction history  ( Kumar et al., 2021 ) . This prespecifies the
+environment representation and ties inference to a learned
+history-to-embedding mapping, limiting flexibility under unknown, compounded,
+or out-of-distribution variation ( fig.   2  (b)). These methods also generally rely on a learned history encoder  ( Chen et al., 2024 ;  Xing et al., 2026 ) ,  limiting generalization when the amount of test-time interaction differs from that seen during training . In contrast,  T2-z  learns representations of environmental factors
+implicitly through world prediction error, without predefined ground-truth physical parameters or a learned
+history encoder. 
+ 
+ 
+ Our method is also related to the literature
+on  Test-Time Adaptation  (TTA), which
+has enabled robots
+to improve after deployment by adapting policy, prompts, or memory rather than optimizing a dedicated
+environment representation. Existing approaches include test-time adaptation of
+diffusion and flow policies  ( Li et al., 2025 ;  Li et al., 2026 ) ,
+online policy adaptation  ( Liu et al., 2026 ;  Jin and Zhang, 2026 ;  Zhu et al., 2026 ) , and adaptation through latent prompts, fast weights,
+memory, or retrieval  ( Zhang et al., 2026 ;  Jiang et al., 2026 ;  Feng et al., 2026 ;  Zhao et al., 2026 ;  Park et al., 2026 ) . TTA has also been
+applied directly to predictive models through video replanning, world-model
+training, and closed-loop latent adaptation  ( Ko et al., 2025 ;  Wan et al., 2026 ;  Wang et al., 2026 ) . 
+ 
+ 
+ 
+ 3  Method 
+
+ 
+ Figure 3:  T2-z  framework. 
+During training,  T2-z  alternates between two stages:
+(1) world-model optimization, which learns shared action-conditioned
+dynamics with environment latents fixed, and
+(2) environment-latent optimization, which optimizes the latents
+through prediction error with the world model frozen.
+(3) At test time, the world model remains frozen while a new
+environment latent is directly optimized from interaction and then reused
+to predict the outcomes of different actions.
+ 
+ 
+ 
+ We introduce  T2-z  ( fig.   2  &  algorithm   1 ), a framework for adapting robotic world models to hidden environmental variation through direct optimization of an environment latent. Our key idea is to separate the general visual predictive capability of a world model from unobserved environment-specific information. During training, we learn these two components through alternating optimization under a shared flow-matching objective. At test time, we freeze the world model and optimize only a newly initialized
+environment latent from observed test-time interaction trajectories. The optimized latent subsequently conditions the frozen world model to predict the outcomes of diverse actions. 
+ 
+ 
+ 3.1  Problem Setup 
+
+ 
+ We consider a robotic world model that predicts future visual observations  𝐲 \mathbf{y}  from the observation  𝐱 \mathbf{x}  and action  𝐚 \mathbf{a} .
+We augment the world model with an environment latent  𝐳 e \mathbf{z}_{e}  and formulate prediction as: 
+ 
+
+ 
+ 
+ p θ ​ ( 𝐲 ∣ 𝐱 , 𝐚 , 𝐳 e ) , p_{\theta}\left(\mathbf{y}\mid\mathbf{x},\mathbf{a},\mathbf{z}_{e}\right), 
+ 
+ (1) 
+ 
+ where  θ \theta  denotes the shared world-model parameters and  𝐳 e \mathbf{z}_{e}  is a latent representation of the environment.
+Importantly,  𝐳 e \mathbf{z}_{e}  receives no supervision of which environmental factors it should represent. 
+ 
+ 
+ Let  𝐲 t \mathbf{y}_{t}  denote the noisy/interpolated future observation
+at flow timestep  t t , and  𝐮 t \mathbf{u}_{t}  its corresponding target flow
+velocity. The model is optimized using the standard flow-matching objective, 
+ 
+
+ 
+ 
+ ℒ FM ( θ , 𝐳 e ) = 𝔼 [ ‖ 𝐯 θ ( 𝐲 t , t ∣ 𝐱 , 𝐚 , 𝐳 e ) − 𝐮 t ‖ 2 2 ] . \mathcal{L}_{\mathrm{FM}}(\theta,\mathbf{z}_{e})=\mathbb{E}\left[\left\|\mathbf{v}_{\theta}(\mathbf{y}_{t},t\mid\mathbf{x},\mathbf{a},\mathbf{z}_{e})-\mathbf{u}_{t}\right\|_{2}^{2}\right]. 
+ 
+ (2) 
+ 
+ 
+ 
+ 3.1.1  Training 
+
+ 
+ For each training environment  e e , we maintain an environment latent
+ 𝐳 e \mathbf{z}_{e} , randomly initialized by sampling each dimension from a
+uniform distribution: 
+ 
+
+ 
+ 
+ 𝐳 e ( 0 ) ∼ 𝒰 ⁡ ( 0 , 1 ) . \mathbf{z}_{e}^{(0)}\sim\mathcal{U}(0,1). 
+ 
+ (3) 
+ 
+ We alternate between two stages throughout training: world-model optimization and environment-latent optimization, with  k k  indexing the outer optimization cycles. The world model is updated with low learning rate to learn general dynamics
+shared across environments, while the environment latents are optimized
+rapidly for quick adaptation to environment information revealed
+through interaction. This slow–fast separation follows the perspective of
+learning at different timescales  ( Tiwari et al., 2026 )  and is closely
+related to test-time learning with slow/fast weights  ( Hong et al., 2024 ) . 
+ 
+ 
+
+ Algorithm 1     T2-z  Training and Test-Time Optimization 
+ 
+ 
+ 
+                 1: 
+                
+                
+              Training sets  { 𝒟 e } e = 1 E \{\mathcal{D}_{e}\}_{e=1}^{E} ,
+world model  p θ p_{\theta} , loss  ℒ FM \mathcal{L}_{\mathrm{FM}} , learning rate  η θ \eta_{\theta}  and  η z \eta_{z} 
+
+ 
+ 
+                 2: 
+                
+                
+              Initialize  θ \theta  and
+ 𝐳 e ∼ 𝒰 ⁡ ( 0 , 1 ) \mathbf{z}_{e}\sim\mathcal{U}(0,1)  for each environment  e e 
+
+ 
+ 
+                 3: 
+                
+                
+              
+ 
+ 
+                 4: 
+                
+                
+               // Training: alternating optimization 
+
+ 
+ 
+                 5: 
+                
+                
+               while  not converged  do 
+
+ 
+ 
+                 6: 
+                
+                
+               // Stage I: world-model optimization 
+
+ 
+ 
+                 7: 
+                
+                
+                Freeze environment latents
+ { 𝐳 e } e = 1 E \{\mathbf{z}_{e}\}_{e=1}^{E} 
+
+ 
+ 
+                 8: 
+                
+                
+                 for  world-model optimization steps  do 
+
+ 
+ 
+                 9: 
+                
+                
+                  θ ← θ − η θ ​ ∇ θ ℒ FM ​ ( θ , 𝐳 e ) \theta\leftarrow\theta-\eta_{\theta}\nabla_{\theta}\mathcal{L}_{\mathrm{FM}}(\theta,\mathbf{z}_{e}) 
+
+ 
+ 
+                 10: 
+                
+                
+                 end   for 
+ 
+ 
+                 11: 
+                
+                
+              
+ 
+ 
+                 12: 
+                
+                
+               // Stage II: environment-latent optimization 
+
+ 
+ 
+                 13: 
+                
+                
+                Freeze world-model parameters  θ \theta 
+
+ 
+ 
+ 
+ 
+                 14: 
+                
+                
+                 for  environment-latent optimization steps  do 
+
+ 
+ 
+                 15: 
+                
+                
+                  𝐳 e ← 𝐳 e − η z ​ ∇ 𝐳 e ℒ FM ​ ( θ , 𝐳 e ) \mathbf{z}_{e}\leftarrow\mathbf{z}_{e}-\eta_{z}\nabla_{\mathbf{z}_{e}}\mathcal{L}_{\mathrm{FM}}(\theta,\mathbf{z}_{e}) 
+
+ 
+ 
+                 16: 
+                
+                
+                 end   for 
+ 
+ 
+                 17: 
+                
+                
+               end   while 
+ 
+ 
+                 18: 
+                
+                
+              
+ 
+ 
+                 19: 
+                
+                
+               // Test-time optimization 
+
+ 
+ 
+                 20: 
+                
+                
+              Trained world model  θ ∗ \theta^{*} ,
+observed interactions  𝒟 test \mathcal{D}_{\mathrm{test}} , Optimization Step  s s , learning rate  η z ( s ) \eta_{z}^{(s)} 
+
+ 
+ 
+                 21: 
+                
+                
+              Freeze  θ ∗ \theta^{*}  and initialize
+ 𝐳 test ( 0 ) \mathbf{z}_{\mathrm{test}}^{(0)} 
+
+ 
+ 
+                 22: 
+                
+                
+               for   s = 0 , … , S − 1 s=0,\ldots,S-1   do 
+
+ 
+ 
+                 23: 
+                
+                
+                 ℒ test ← 1 | 𝒟 test | ​ ∑ ( 𝐱 , 𝐚 , 𝐲 ) ∈ 𝒟 test ℒ FM ​ ( θ ∗ , 𝐳 test ( s ) ) \mathcal{L}_{\mathrm{test}}\leftarrow\frac{1}{|\mathcal{D}_{\mathrm{test}}|}\sum_{(\mathbf{x},\mathbf{a},\mathbf{y})\in\mathcal{D}_{\mathrm{test}}}\mathcal{L}_{\mathrm{FM}}(\theta^{*},\mathbf{z}_{\mathrm{test}}^{(s)}) 
+
+ 
+ 
+                 24: 
+                
+                
+                 𝐳 test ( s + 1 ) ← 𝐳 test ( s ) − η z ( s ) ​ ∇ 𝐳 test ( s ) ℒ test \mathbf{z}_{\mathrm{test}}^{(s+1)}\leftarrow\mathbf{z}_{\mathrm{test}}^{(s)}-\eta_{z}^{(s)}\nabla_{\mathbf{z}_{\mathrm{test}}^{(s)}}\mathcal{L}_{\mathrm{test}} 
+
+ 
+ 
+                 25: 
+                
+                
+               end   for 
+ 
+ 
+                 26: 
+                
+                
+               return   𝐳 test ∗ ← 𝐳 test ( S ) \mathbf{z}_{\mathrm{test}}^{*}\leftarrow\mathbf{z}_{\mathrm{test}}^{(S)} 
+
+ 
+ 
+ 
+ 
+ Stage I: World-Model Optimization. 
+
+ 
+ In the first stage, we fix all  𝐳 e \mathbf{z}_{e}  and optimize only the world-model parameters. Let  𝒟 e \mathcal{D}_{e}  denote the interaction trajectories collected under environment  e e . 
+ 
+
+ 
+ 
+ θ ( k + 1 ) = arg ⁡ min θ ​ 𝔼 e , ( 𝐱 , 𝐚 , 𝐲 ) ∼ 𝒟 e ​ [ ℒ FM ​ ( θ , 𝐳 e ( k ) ) ] . \theta^{(k+1)}=\arg\min_{\theta}\mathbb{E}_{e,\,(\mathbf{x},\mathbf{a},\mathbf{y})\sim\mathcal{D}_{e}}\left[\mathcal{L}_{\mathrm{FM}}\left(\theta,\mathbf{z}_{e}^{(k)}\right)\right]. 
+ 
+ (4) 
+ 
+ During this stage,  𝐳 e \mathbf{z}_{e}  is held constant, while the same world model is optimized over trajectories spanning different environments and actions. This encourages  θ \theta  to capture predictive structure that is shared across the training distribution, including how visual states evolve to different robot actions. 
+ 
+ 
+ 
+ Stage II: Environment-Latent Optimization. 
+
+ 
+ In the second stage, we reverse the optimization: the world model is frozen, and only the environment latents are updated. For each environment  e e , 
+ 
+
+ 
+ 
+ 𝐳 e ( k + 1 ) = arg ⁡ min 𝐳 e ​ 𝔼 ( 𝐱 , 𝐚 , 𝐲 ) ∼ 𝒟 e ​ [ ℒ FM ​ ( θ ( k + 1 ) , 𝐳 e ) ] . \mathbf{z}_{e}^{(k+1)}=\arg\min_{\mathbf{z}_{e}}\mathbb{E}_{(\mathbf{x},\mathbf{a},\mathbf{y})\sim\mathcal{D}_{e}}\left[\mathcal{L}_{\mathrm{FM}}\left(\theta^{(k+1)},\mathbf{z}_{e}\right)\right]. 
+ 
+ (5) 
+ 
+ Because  θ \theta  is fixed, the only way to reduce prediction error is to change  𝐳 e \mathbf{z}_{e}  to better match the interaction outcomes observed in environment  e e .
+As a result, environments that induce systematically different outcomes drive their latents toward different regions of the latent space. 
+ 
+ 
+ 
+ Alternating Optimization 
+
+ 
+ Training starts with Stage I, then alternates between Stage II and Stage I, each optimized for a fixed number of steps while keeping the other component fixed. As the
+world model improves, latents are optimized against an increasingly
+capable predictive model; conversely, the refined latents provide
+more informative conditioning for subsequent world-model optimization. 
+ 
+ 
+ 
+ 
+ 3.1.2  Test-Time Optimization 
+
+ 
+ At test time, we adapt to a previously unseen environment by optimizing only
+its environment latent while keeping the trained world model fixed. We
+initialize a new latent  𝐳 test ( 0 ) \mathbf{z}_{\mathrm{test}}^{(0)}  and observe one or
+more interaction trajectories on randomly-sampled actions. We denote the resulting test-time interaction
+set as 
+ 
+
+ 
+ 
+ 𝒟 test = { ( 𝐱 i , 𝐚 i , 𝐲 i ) } i = 1 N , \mathcal{D}_{\mathrm{test}}=\left\{(\mathbf{x}_{i},\mathbf{a}_{i},\mathbf{y}_{i})\right\}_{i=1}^{N}, 
+ 
+ (6) 
+ 
+ where each tuple consists of an observation  𝐱 i \mathbf{x}_{i} , an
+action  𝐚 i \mathbf{a}_{i} , and the resulting observations
+ 𝐲 i \mathbf{y}_{i} . 
+ 
+ 
+ We then optimize  𝐳 test \mathbf{z}_{\mathrm{test}}  using the same flow-matching
+objective employed during training: 
+ 
+
+ 
+ 
+ 𝐳 test ( s + 1 ) = 𝐳 test ( s ) − η z ( s ) ​ ∇ 𝐳 test ( s ) 1 | 𝒟 test | ​ ∑ ( 𝐱 , 𝐚 , 𝐲 ) ∈ 𝒟 test ℒ FM ​ ( θ ∗ , 𝐳 test ( s ) , 𝐱 , 𝐚 , 𝐲 ) . \mathbf{z}_{\mathrm{test}}^{(s+1)}=\mathbf{z}_{\mathrm{test}}^{(s)}-\eta_{z}^{(s)}\nabla_{\mathbf{z}_{\mathrm{test}}^{(s)}}\frac{1}{|\mathcal{D}_{\mathrm{test}}|}\sum_{(\mathbf{x},\mathbf{a},\mathbf{y})\in\mathcal{D}_{\mathrm{test}}}\mathcal{L}_{\mathrm{FM}}\left(\theta^{*},\mathbf{z}_{\mathrm{test}}^{(s)};\mathbf{x},\mathbf{a},\mathbf{y}\right). 
+ 
+ (7) 
+ 
+ where  θ ∗ \theta^{*}  denotes the frozen world-model parameters and
+ η z ( s ) \eta_{z}^{(s)}  follows a coarse-to-fine learning-rate strategy, with larger learning rates in early optimization steps and
+smaller learning rates in later steps.
+Because the world model is fixed, prediction errors over the observed
+interactions can only be reduced by updating  𝐳 test \mathbf{z}_{\mathrm{test}} .
+The latent is therefore optimized toward a representation under which the
+frozen world model reproduces the interaction outcomes observed in the
+current environment. 
+ 
+ 
+ Once optimized,  𝐳 test ∗ \mathbf{z}_{\mathrm{test}}^{*}  is reused to condition the world model for actions that were not observed during latent optimization. Given a different action  𝐚 ′ \mathbf{a}^{\prime} , we predict its outcome as 
+ 
+
+ 
+ 
+ 𝐲 ^ ′ ∼ p θ ∗ ​ ( 𝐲 ∣ 𝐱 , 𝐚 ′ , 𝐳 test ∗ ) . \hat{\mathbf{y}}^{\prime}\sim p_{\theta^{*}}\left(\mathbf{y}\mid\mathbf{x},\mathbf{a}^{\prime},\mathbf{z}_{\mathrm{test}}^{*}\right). 
+ 
+ (8) 
+ 
+ The resulting conditioned world model serves as an environment-adapted test-time simulator, allowing it to predict the consequences of different actions under the inferred environment. 
+ 
+ 
+ Unlike amortized history-encoder approaches,  T2-z  uses direct optimization. This avoids committing to a fixed history mapping and searches for the representation that best explains the current environment. The formulation can naturally incorporate any number of test-time trajectories that differs from training, by optimizing a latent against all available evidence. Moreover,  T2-z  is not restricted to the range of factor values during training, providing greater flexibility under out-of-distribution configurations.
+Ablation in  fig.   5  shows this optimization remains stable across varying test-time trajectory numbers, and is interaction-efficient with a single trajectory sufficient in most settings. 
+ 
+ 
+ 
+ 
+ 
+ 4  Experiments 
+
+ 
+ 4.1  Experimental Setup 
+
+ 
+ Tasks 
+
+ 
+ We evaluate  T2-z  across 7 simulated settings and 4 real-world
+robotic tasks. In simulation,  Friction 
+requires predicting how far an object moves after a push under different
+surface friction;  Gravity  varies gravitational strength and
+requires predicting the object motion;  Mass Collision  varies colliding object mass and predicts the resulting collision motion.  Light Switch  assigns
+different human-defined hidden interaction rules that determine whether a robot action
+turns the light on or off;  Mass Balance  predicts the tilt of a dumbbell under different mass distribution;  Mass  × \times 
+Friction  jointly varies object mass and surface friction at the same time;  Diverse Visual Backgrounds  evaluates the same friction variations across 30 diverse scene setups, testing whether the learned environment representation remains consistent across visual changes.. In the real world,  Door Close  varies the spring-lock stiffness,
+which changes how the door responds to closing actions;  Ball
+Friction  requires predicting the motion of a pushed ball of unknown mass;  Stick Balance  requires predicting the motion of a stick with objects of different masses attached to its ends; and  Soft Pull 
+requires predicting the deformation a soft object under
+different rotating actions. 
+ 
+ 
+ 
+ Implementation Details. 
+
+ 
+ We adapt   BWM Team (2026) , an action-conditioned world model built on Wan2.2-TI2V-5B. The environment latent has a dimension of 32.
+Training starts with 300 world-model updates,
+followed by 200 latent updates and alternating 200-200 updates.
+Stage I/II use LR  10 − 5 10^{-5}  /  0.03 0.03  respectively. At test time, we
+freeze the world model and use a coarse-to-fine LR schedule of
+ 3.0 / 1.5 / 0.5 / 0.15 3.0/1.5/0.5/0.15 , 10 steps each, for 40 steps.  T2-z  uses only one test-time trajectory on randomly-sampled action for Friction, Gravity, Mass Collision,
+Mass  × \times  Friction, Ball Friction, and Soft Pull, and two for Light
+Switch, Mass Balance, Door Close, and Stick Balance. 
+ 
+ 
+ Table 1:  Simulation performance across environmental variations. 
+For Friction, Gravity, Mass Collision, Mass  × \times 
+Friction, and Diverse Scenes, physical error is measured in pixels; for Light Switch, it is
+lamp-score error; and for Mass Balance, it is bar-tilt error in degrees.
+The average is computed over all seven tasks. 
+ 
+ 
+ 
+ Task 
+ Method 
+ 
+ 
+ Physical Error (Mean)  ↓ \downarrow 
+ 
+ 
+ 
+ Physical Error (Final)  ↓ \downarrow 
+ 
+ LPIPS  ↓ \downarrow 
+ PSNR  ↑ \uparrow 
+ 
+ 
+ Action Success  ↑ \uparrow 
+ 
+ 
+ 
+ 
+ Mass Balance 
+ Standard World Model 
+ 1.1844 
+ 4.5571 
+ 0.0244 
+ 32.969 
+ 40.0% 
+ 
+ LoRA TTA 
+ 1.7975 
+ 7.3105 
+ 0.0631 
+ 24.895 
+ 50.0% 
+ 
+ DINOv2 Context 
+ 1.2636 
+ 4.9480 
+ 0.0239 
+ 33.263 
+ 30.0% 
+ 
+ TTT-KQV 
+ 2.5075 
+ 10.1759 
+ 0.0312 
+ 32.114 
+ 30.0% 
+ 
+ T2-z  (Ours) 
+ 0.6403 
+ 2.0842 
+ 0.0240 
+ 32.814 
+ 80.0% 
+ 
+ Friction 
+ Standard World Model 
+ 11.0626 
+ 24.4116 
+ 0.0667 
+ 31.113 
+ 32.0% 
+ 
+ LoRA TTA 
+ 8.1902 
+ 19.1902 
+ 0.0582 
+ 32.031 
+ 48.0% 
+ 
+ DINOv2 Context 
+ 11.8142 
+ 26.1703 
+ 0.0681 
+ 30.697 
+ 48.0% 
+ 
+ TTT-KQV 
+ 10.8137 
+ 23.8675 
+ 0.0649 
+ 30.779 
+ 32.0% 
+ 
+ T2-z  (Ours) 
+ 3.8540 
+ 7.5931 
+ 0.0495 
+ 31.976 
+ 72.0% 
+ 
+ Gravity 
+ Standard World Model 
+ 21.4246 
+ 34.8779 
+ 0.0345 
+ 32.509 
+ 23.5% 
+ 
+ LoRA TTA 
+ 7.9005 
+ 13.7137 
+ 0.0231 
+ 33.328 
+ 47.1% 
+ 
+ DINOv2 Context 
+ 5.9300 
+ 8.8290 
+ 0.0195 
+ 34.095 
+ 76.5% 
+ 
+ TTT-KQV 
+ 18.9572 
+ 30.9355 
+ 0.0291 
+ 33.308 
+ 35.3% 
+ 
+ T2-z  (Ours) 
+ 7.3408 
+ 11.0653 
+ 0.0202 
+ 33.389 
+ 82.4% 
+ 
+ Mass Collision 
+ Standard World Model 
+ 21.9329 
+ 25.7364 
+ 0.0904 
+ 29.805 
+ 38.9% 
+ 
+ LoRA TTA 
+ 15.8704 
+ 24.5877 
+ 0.0691 
+ 30.049 
+ 33.3% 
+ 
+ DINOv2 Context 
+ 8.5264 
+ 10.2101 
+ 0.0540 
+ 31.039 
+ 38.9% 
+ 
+ TTT-KQV 
+ 20.9753 
+ 29.2930 
+ 0.0842 
+ 29.385 
+ 55.6% 
+ 
+ T2-z  (Ours) 
+ 6.4522 
+ 8.1321 
+ 0.0538 
+ 31.150 
+ 61.1% 
+ 
+ Light Switch 
+ Standard World Model 
+ 10.3500 
+ 18.8200 
+ 0.0187 
+ 32.619 
+ 50.0% 
+ 
+ LoRA TTA 
+ 8.2800 
+ 14.7700 
+ 0.0175 
+ 33.123 
+ 50.0% 
+ 
+ DINOv2 Context 
+ 10.0000 
+ 18.3700 
+ 0.0160 
+ 33.074 
+ 50.0% 
+ 
+ TTT-KQV 
+ 10.4800 
+ 18.8700 
+ 0.0161 
+ 32.692 
+ 50.0% 
+ 
+ T2-z  (Ours) 
+ 3.4300 
+ 4.7400 
+ 0.0150 
+ 33.517 
+ 87.5% 
+ 
+ Mass  × \times  Friction 
+ Standard World Model 
+ 16.0219 
+ 29.2454 
+ 0.0610 
+ 31.077 
+ 35.0% 
+ 
+ LoRA TTA 
+ 16.8282 
+ 26.9302 
+ 0.0701 
+ 29.865 
+ 26.7% 
+ 
+ DINOv2 Context 
+ 11.8116 
+ 19.0756 
+ 0.0565 
+ 31.367 
+ 60.8% 
+ 
+ TTT-KQV 
+ 18.9511 
+ 29.1411 
+ 0.0726 
+ 29.739 
+ 33.3% 
+ 
+ T2-z  (Ours) 
+ 8.1481 
+ 13.7222 
+ 0.0500 
+ 30.673 
+ 69.7% 
+ 
+ Diverse Backgrounds 
+ Standard World Model 
+ 8.0260 
+ 16.1831 
+ 0.1059 
+ 28.201 
+ 45.8% 
+ 
+ LoRA TTA 
+ 6.5805 
+ 16.2328 
+ 0.1074 
+ 27.986 
+ 58.3% 
+ 
+ DINOv2 Context 
+ 7.7367 
+ 16.0065 
+ 0.1064 
+ 28.000 
+ 58.3% 
+ 
+ TTT-KQV 
+ 7.7783 
+ 15.5869 
+ 0.1116 
+ 27.691 
+ 58.3% 
+ 
+ T2-z  (Ours) 
+ 3.7145 
+ 6.3403 
+ 0.0888 
+ 28.804 
+ 66.7% 
+ 
+ Average 
+ Standard World Model 
+ 12.8575 
+ 21.9759 
+ 0.0574 
+ 31.185 
+ 37.9% 
+ 
+ LoRA TTA 
+ 9.3496 
+ 17.5336 
+ 0.0584 
+ 30.182 
+ 44.8% 
+ 
+ DINOv2 Context 
+ 8.1546 
+ 14.8014 
+ 0.0492 
+ 31.648 
+ 51.8% 
+ 
+ TTT-KQV 
+ 12.9233 
+ 22.5528 
+ 0.0585 
+ 30.815 
+ 42.1% 
+ 
+ T2-z  (Ours) 
+ 4.7971 
+ 7.6682 
+ 0.0430 
+ 31.760 
+ 74.2% 
+ 
+ 
+ 
+ 
+ 
+ Evaluation Metrics. 
+
+ 
+ (1)  Physical Error  measures task-relevant state prediction:
+object-location error in pixels for Friction, Gravity, Mass Collision, and Diverse Backgrounds; lamp activation error for Light Switch; and bar-tilt
+angle error in degrees for Mass Balance. For real-world tasks, we measure
+tracked-state error in pixels. We report  Physical Error (Mean) ,
+averaged over predicted frames, and  Physical Error (Final) , measured
+at the final predicted frame.
+(2)  Video Generation Quality  is measured by LPIPS and PSNR between predicted and ground-truth videos. LPIPS measures perceptual discrepancy in a learned feature space, capturing differences in visual structure and appearance, and serves as our primary measure of generation quality. In contrast, PSNR primarily reflects pixel-level reconstruction fidelity and is less informative about semantically meaningful differences or whether object motion is physically correct.
+(3)  Action Success  treats the world model as a simulator: given candidate actions, we predict their outcomes and select the action most likely to achieve the task goal, such as pushing a ball to a target, balancing a stick, or closing a door. We execute the chose action in real world and observe if meets the success criterions in Supp  appendix   C . 
+ 
+ 
+ 
+ Baselines. 
+
+ 
+ We compare  T2-z  with four baselines using the same world-model backbone.  Standard World Model  uses no environment latent or test-time adaptation;  LoRA TTA  adapts attention LoRA parameters from test-time interactions;  DINOv2 Context  amortizes a 32-D environment context from interaction trajectories; and  TTT-KQV  adapts fast weights within the world model. All adaptive baselines receive the same test-time interaction trajectories as  T2-z . 
+ 
+ 
+ Please refer to the Supplementary for more details about architecture ( appendix   A ), task definitions ( appendix   C ), baseline implementation ( appendix   D ), and compute efficiency comparison ( section   E.4 ). 
+ 
+ 
+ 
+ 
+ 4.2  Simulation Experiments 
+
+ 
+ Single-Factor Environmental Variation. 
+
+ 
+ We first evaluate  T2-z  under individual unobserved environmental factors, spanning
+continuous physical properties, mass-dependent interactions, and discrete
+human-defined rules. As shown in
+ table   1 ,  T2-z  achieves the highest action success on all five
+tasks, increasing the five-task average from  36.9 % 36.9\%  for the Standard World
+Model to  76.6 % 76.6\% , while reducing average LPIPS from  0.0469 0.0469  to  0.0325 0.0325 .
+It also substantially improves task-relevant prediction, reducing mean error
+from  11.06 11.06  to  3.85 3.85  pixels on Friction,  21.93 21.93  to  6.45 6.45  pixels on Mass
+Collision, and  1.18 ∘ 1.18^{\circ}  to  0.64 ∘ 0.64^{\circ}  on Mass Balance. These gains arise because  T2-z  directly optimizes an environment latent from observed interactions, capturing environment-specific variation more flexibly than non-adaptive or amortized baselines. 
+ 
+ 
+ Figure 4:  PCA of learned environment latents. 
+We visualize learned environment latents using PCA onto x-y axes, with
+ ○ \bigcirc  denoting training environments and  △ \triangle  denoting test
+environments. Ground-truth factors (denoted by color or size) are shown only for visualization and are
+never provided to the model.
+ (a–b)  show that structured latent representations emerge in both
+simulated and real-world single-factor settings.
+ (c)  shows that a unified latent structure emerges across diverse
+visual backgrounds, indicating that the representation does not become
+entangled with scene appearance.
+ (d)  shows that a two-dimensional latent structure emerges when mass
+and friction vary jointly, with x-axis primarily corresponding to
+friction and y-axis to mass, despite the model never knowing how many
+underlying factors are present or what they represent.
+ 
+ 
+ 
+ 
+ Emergent Structure of Environment Latents. 
+
+ 
+ We examine whether direct optimization gives
+rise to structured environment representations without supervision of the
+identity or value of underlying factors. In  fig.   4 , we apply principal component
+analysis (PCA) to the learned environment latents and reduce them to two
+dimensions for visualization. We annotate the projected points using their
+corresponding ground-truth factor values to reveal their relationship with
+the learned representation; these values are never provided to the model.
+ Figure   4 (a) shows the single-factor friction experiment.
+The learned latents form a
+one-dimensional structure for a single factor that corresponds closely to the underlying
+friction values, as reflected by the point colors: similar values are
+located nearby, while friction varies consistently x-axis. PCA visualizations for other tasks are provided in the Supplementary Material  section   E.3 . 
+ 
+ 
+ 
+ Compounded Environmental Factors. 
+
+ 
+ We next evaluate  T2-z  under the more challenging setting of compounded
+environmental factors, where object mass and surface friction vary
+simultaneously and jointly
+reflect in object motion. Importantly,  T2-z  is never informed that
+there are two underlying factors, nor given their identities or values.
+ table   1  shows  T2-z  achieves the lowest
+physical errors, while improving action success from
+ 35.0 % 35.0\%  to  69.7 % 69.7\% . More strikingly,  fig.   4 (d) shows that
+the learned latents naturally form a two-dimensional structure corresponding
+to the two underlying factors, showing that  T2-z  discovers the structure
+of compounded environmental factors through prediction alone, without
+knowing in advance how many factors are present or what they represent. 
+ 
+ 
+ 
+ Robustness across Diverse Visual Scenes. 
+
+ 
+ We test whether the learned environment representation captures
+underlying dynamics without becoming entangled with visual appearance.
+Specifically, we ask whether a unified latent structure emerges across
+visually diverse scenes despite substantial differences in appearance. We construct a multi-background setting in which the same underlying
+friction factor varies across diverse scene layouts and visual backgrounds.
+ table   1  shows that  T2-z  outperforms all baselines across every metric.  fig.   4 (c) further shows that latents from
+different backgrounds organize consistently rather than separating according to scene
+appearance. This indicates that environment-latent can isolate
+environment-specific information that is shared across visually different
+observations, enabling a unified latent structure to emerge across diverse
+scenes. 
+ 
+ 
+ Table 2:  Real-world robotic task performance. 
+ T2-z  outperforms baselines across real-world tasks. 
+ 
+ 
+ 
+ Task 
+ Method 
+ 
+ 
+ Physical Error (Mean)  ↓ \downarrow 
+ 
+ 
+ 
+ Physical Error (Final)  ↓ \downarrow 
+ 
+ LPIPS  ↓ \downarrow 
+ PSNR  ↑ \uparrow 
+ 
+ 
+ Action Success  ↑ \uparrow 
+ 
+ 
+ 
+ 
+ Door Close 
+ Standard World Model 
+ 21.82 
+ 41.22 
+ 0.05700 
+ 29.96 
+ 22.22% 
+ 
+ LoRA TTA 
+ 17.35 
+ 32.14 
+ 0.04946 
+ 30.24 
+ 22.22% 
+ 
+ DINOv2 Context 
+ 21.12 
+ 38.90 
+ 0.05490 
+ 30.28 
+ 22.22% 
+ 
+ TTT-KQV 
+ 19.87 
+ 35.93 
+ 0.05164 
+ 30.95 
+ 22.22% 
+ 
+ T2-z  (Ours) 
+ 7.95 
+ 13.47 
+ 0.03208 
+ 32.15 
+ 55.56% 
+ 
+ Ball Friction 
+ Standard World Model 
+ 28.36 
+ 64.42 
+ 0.03153 
+ 36.04 
+ 0.00% 
+ 
+ LoRA TTA 
+ 37.48 
+ 72.09 
+ 0.03805 
+ 35.44 
+ 50.00% 
+ 
+ DINOv2 Context 
+ 24.90 
+ 52.54 
+ 0.02934 
+ 36.32 
+ 12.50% 
+ 
+ TTT-KQV 
+ 29.80 
+ 67.37 
+ 0.03224 
+ 36.29 
+ 25.00% 
+ 
+ T2-z  (Ours) 
+ 14.47 
+ 24.57 
+ 0.02401 
+ 36.23 
+ 62.50% 
+ 
+ Stick Balance 
+ Standard World Model 
+ 5.29 
+ 11.40 
+ 0.04716 
+ 31.87 
+ 20.00% 
+ 
+ LoRA TTA 
+ 3.63 
+ 7.24 
+ 0.04111 
+ 32.40 
+ 40.00% 
+ 
+ DINOv2 Context 
+ 2.80 
+ 7.54 
+ 0.03640 
+ 33.58 
+ 20.00% 
+ 
+ TTT-KQV 
+ 4.49 
+ 10.40 
+ 0.03948 
+ 33.38 
+ 25.00% 
+ 
+ T2-z  (Ours) 
+ 2.27 
+ 5.01 
+ 0.04175 
+ 32.05 
+ 83.33% 
+ 
+ Soft Pull 
+ Standard World Model 
+ 21.71 
+ 35.90 
+ 0.07207 
+ 33.32 
+ 63.64% 
+ 
+ LoRA TTA 
+ 18.63 
+ 26.20 
+ 0.06862 
+ 33.63 
+ 63.64% 
+ 
+ DINOv2 Context 
+ 21.19 
+ 29.17 
+ 0.07087 
+ 33.47 
+ 72.73% 
+ 
+ TTT-KQV 
+ 18.23 
+ 29.69 
+ 0.06439 
+ 34.03 
+ 72.73% 
+ 
+ T2-z  (Ours) 
+ 18.71 
+ 23.59 
+ 0.07580 
+ 32.52 
+ 81.82% 
+ 
+ Average 
+ Standard World Model 
+ 19.30 
+ 38.24 
+ 0.05194 
+ 32.80 
+ 26.47% 
+ 
+ LoRA TTA 
+ 19.27 
+ 34.42 
+ 0.04931 
+ 32.93 
+ 43.97% 
+ 
+ DINOv2 Context 
+ 17.50 
+ 32.04 
+ 0.04788 
+ 33.41 
+ 31.86% 
+ 
+ TTT-KQV 
+ 18.10 
+ 35.85 
+ 0.04694 
+ 33.66 
+ 36.24% 
+ 
+ T2-z  (Ours) 
+ 10.85 
+ 16.66 
+ 0.04341 
+ 33.24 
+ 70.80% 
+ 
+ 
+ 
+ 
+ 
+ 
+ 4.3  Real-World Robotic Experiments 
+
+ 
+ We further evaluate  T2-z  on four real-world tasks. As shown in
+ table   2 , compared with the Standard World Model,  T2-z 
+reduces average mean/final physical error from  19.30 / 38.24 19.30/38.24  to
+ 10.85 / 16.66 10.85/16.66  pixels and LPIPS from  0.05194 0.05194  to  0.04341 0.04341 , while increasing
+action success from  26.47 % 26.47\%  to  70.80 % 70.80\% . On Stick Balance, for example,
+action success increases from  20.00 % 20.00\%  to  83.33 % 83.33\% .
+ fig.   4 (b) reveals a clear one-dimensional latent structure
+without ground-truth friction supervision or post-hoc annotation.  T2-z  is particularly important in the real world, where underlying environmental factors are typically unknown and unmeasured and interactions contain additional uncontrolled variation. Notably,  T2-z  achieves even larger improvements over the Standard World Model than in simulation, indicating greater benefits as environmental variation becomes less controlled. 
+ 
+ 
+ Figure 5:  Ablation studies. 
+ (a)  Test-Time Optimization Learning-rate strategy.
+ Constant Maximum/Minimum  remove coarse-to-fine scheduling, while
+ Ours  × 10 / ÷ 10 \times 10/\div 10  scale our schedule uniformly.
+ (b)  Ablating the test-time optimization budget shows that performance peaks at 40 steps.
+ (c,d)  Effect of the number of test-time interaction trajectories. Bold markers denote
+our chosen trajectory count, after which performance largely saturates.  
+ 
+ 
+ 
+ 4.4  Ablative & Qualitative Studies 
+
+ 
+ We ablate the key design choices of  T2-z  in  fig.   5  and
+ table   3 , including latent optimization, interaction evidence,
+latent parameterization, and alternating training.
+In  fig.   5 (a), we vary the learning-rate strategy.
+Our schedule
+performs best, validating both its coarse-to-fine form and learning-rate
+scale.  Figure   5 (b) varies test-time optimization from 10–60
+steps; performance improves up to 40 steps and then saturates, motivating
+our default.  Figure   5 (c,d) ablate the number of test-time
+interaction trajectories.
+Performance largely saturates beyond the selected number of trajectories,
+indicating that additional interaction provides limited benefit. Recall that
+ T2-z  uses only one test-time trajectory for 7 tasks, and two for 4 tasks, demonstrating that
+ T2-z  can infer useful environment information with as few as one or two
+interactions.
+Additional ablations in  table   3  study latent parameterization
+and training. All the ablated models underperform our model,
+supporting our alternating schedule and latent mechanism. We provide the latent-dimensionality ablation in Supplementary  table   12 . 
+ 
+ 
+ In  fig.   6 , we show qualitative results across simulation and
+real-world tasks.
+ T2-z 
+closely matches ground-truth outcomes, indicating
+that the inferred latent successfully conditions prediction on the current
+environment. By contrast, the baselines fail to capture these
+environment-specific differences, producing largely random motions and
+incorrect final configurations across environments. Please refer to the Supplementary Material for more qualitative examples ( appendix   F ). 
+ 
+ 
+ Table 3:  Additional Ablation study. 
+ Joint Model–Latent Training  optimizes the world model and latent
+together without separate stages;  Direct Token  directly
+optimizes the full-dimensional conditioning token;  32-D Random
+ [ − 0.05 , 0.05 ] [-0.05,0.05]  changes the latent initialization range; and
+ Alternating Latent/Model  change
+the number of updates before switching between the two optimization stages,
+compared with our default 200/200. 
+ 
+ 
+ 
+ Method 
+ 
+ 
+ Physical Error (Mean)  ↓ \downarrow 
+ 
+ 
+ 
+ Physical Error (Final)  ↓ \downarrow 
+ 
+ LPIPS  ↓ \downarrow 
+ PSNR  ↑ \uparrow 
+ 
+ 
+ Action Success  ↑ \uparrow 
+ 
+ 
+ 
+ 
+ Joint Model-Latent Training 
+ 7.03 
+ 15.66 
+ 0.0657 
+ 31.203 
+ 68% 
+ 
+ Direct Token (3072-D) 
+ 94.50 
+ 80.49 
+ 0.7626 
+ 15.218 
+ 24% 
+ 
+ 32-D Random  [ − 0.05 , 0.05 ] [-0.05,0.05] 
+ 4.81 
+ 9.73 
+ 0.0495 
+ 32.172 
+ 60% 
+ 
+ Alternating Latent/Model (100/100) 
+ 5.41 
+ 11.50 
+ 0.0484 
+ 32.208 
+ 56% 
+ 
+ Alternating Latent/Model (400/400) 
+ 4.31 
+ 8.80 
+ 0.0507 
+ 32.430 
+ 68% 
+ 
+ T2-z 
+ 3.85 
+ 7.59 
+ 0.0495 
+ 31.976 
+ 72% 
+ 
+ 
+ 
+ 
+ Figure 6:  Qualitative results in simulation and the real world. 
+Within each task, we apply the same actions across different environments,
+which produce different ground-truth outcomes due to underlying environmental
+variation.  T2-z  closely matches these environment-dependent outcomes. 
+ 
+ 
+ 
+ 
+ 5  Conclusion 
+
+ 
+ We introduce  T2-z  which augments robotic world models with enviornment latent conditioning.
+ T2-z  alternates between world-model optimization that learns action-conditioned dyanmics, and environment-latent optimization that captures hidden environment factors. For a new environment, the world model is frozen and only the latent is optimized.
+Across 7 simulation and 4 real-world tasks,  T2-z  outperforms baselines a lot in both video prediction and action selection. 
+ 
+ 
+ 
+ Acknowledgements 
+
+ 
+ This paper is in part funded by ONR MURI N00014-24-1-2748, ONR MURI N00014-22-1-2740, Singapore MDDI AIVP-2025-008, IITP funded by the Korean Government (MSIT) (No. RS-2024-00457882, National AI Research Lab Project), 2077AI, and Grant AW1134392 (Reasoning in Motion) from the TRI University 3.0 Program. 
+ 
+ 
+ 
+ References 
+
+ 
+ BWM Team (2026) 
+ BWM Team 
+ 
+ BWM: a low-cost high-fidelity world simulator for robot learning .
+ 
+ arXiv preprint arXiv:2607.29302 .
+ 
+ Cited by:  §A.1 ,
+ §4.1 .
+ 
+ Chen  et al.  (2024) 
+ S. Chen, Z. Wan, S. Yan, C. Zhang, W. Zhang, Q. Li, D. Zhang, and F. U. D. Farrukh 
+ 
+ SLR: learning quadruped locomotion without privileged information .
+ 
+ In  Conference on Robot Learning ,
+ 
+ pp. 3212–3224 .
+ 
+ Cited by:  §2 .
+ 
+ Dalal  et al.  (2025) 
+ K. Dalal, D. Koceja, J. Xu, Y. Zhao, S. Han, K. C. Cheung, J. Kautz, Y. Choi, Y. Sun, and X. Wang 
+ 
+ One-minute video generation with test-time training .
+ 
+ In  Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) ,
+ 
+ pp. 17702–17711 .
+ 
+ Cited by:  §D.4 .
+ 
+ Feng  et al.  (2026) 
+ Y. Feng, B. Han, J. Lyu, K. Liu, Y. Zheng, Y. Wan, W. Liu, S. Han, R. Li, Y. Zhang, F. Liu, X. Shi, L. Liu, Y. Wang, Z. Zhang, and H. Wang 
+ 
+ WAM-TTT: steering world-action models by watching human play at test time .
+ 
+ arXiv preprint arXiv:2607.06988 .
+ 
+ Cited by:  §2 ,
+ §2 .
+ 
+ Gao  et al.  (2026) 
+ S. Gao, W. Liang, K. Zheng, A. Malik, S. Ye, S. Yu, W. Tseng, Y. Dong, K. Mo, C. Lin, Q. Ma, S. Nah, L. Magne, J. Xiang, Y. Xie, R. Zheng, D. Niu, Y. L. Tan, K. R. Zentner, G. Kurian, S. Indupuru, P. Jannaty, J. Gu, J. Zhang, J. Malik, P. Abbeel, M. Liu, Y. Zhu, J. Jang, and L. J. Fan 
+ 
+ DreamDojo: a generalist robot world model from large-scale human videos .
+ 
+ arXiv preprint arXiv:2602.06949 .
+ 
+ Cited by:  §2 .
+ 
+ He  et al.  (2024) 
+ H. He, P. Wu, C. Bai, H. Lai, L. Wang, L. Pan, X. Hu, and W. Zhang 
+ 
+ Bridging the sim-to-real gap from the information bottleneck perspective .
+ 
+ In  Conference on Robot Learning ,
+ 
+ pp. 473–495 .
+ 
+ Cited by:  §2 .
+ 
+ Hong  et al.  (2024) 
+ Y. Hong, B. Liu, M. Wu, Y. Zhai, K. Chang, L. Li, K. Lin, C. Lin, J. Wang, Z. Yang, Y. Wu, and L. Wang 
+ 
+ SlowFast-vgen: slow-fast learning for action-driven long video generation .
+ 
+ External Links:  2410.23277 ,
+ Link 
+ 
+ Cited by:  §3.1.1 .
+ 
+ Hu  et al.  (2022) 
+ E. J. Hu, Y. Shen, P. Wallis, Z. Allen-Zhu, Y. Li, S. Wang, L. Wang, and W. Chen 
+ 
+ LoRA: low-rank adaptation of large language models .
+ 
+ In  International Conference on Learning Representations ,
+ 
+ Cited by:  §D.2 .
+ 
+ Huang  et al.  (2026) 
+ W. Huang, Y. Chao, A. Mousavian, M. Liu, D. Fox, K. Mo, and L. Fei-Fei 
+ 
+ PointWorld: scaling 3d world models for in-the-wild robotic manipulation .
+ 
+ In  Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition ,
+ 
+ pp. 20765–20779 .
+ 
+ Cited by:  §2 .
+ 
+ Jang  et al.  (2026) 
+ J. Jang, M. Yoo, S. Yoon, and H. Woo 
+ 
+ Test-time mixture of world models for embodied agents in dynamic environments .
+ 
+ In  International Conference on Learning Representations ,
+ 
+ Cited by:  §2 .
+ 
+ Jiang  et al.  (2026) 
+ Y. Jiang, Y. Chebotar, R. Zheng, F. Hu, Y. Ge, J. Wu, T. Dai, S. Reed, L. Fei-Fei, Y. Zhu, and L. J. Fan 
+ 
+ RoboTTT: context scaling for robot policies .
+ 
+ arXiv preprint arXiv:2607.15275 .
+ 
+ Cited by:  §2 .
+ 
+ Jin and Zhang (2026) 
+ R. Jin and Z. Zhang 
+ 
+ Agentic-vla: efficient online adaptation for vision-language-action models .
+ 
+ arXiv preprint arXiv:2605.22896 .
+ 
+ Cited by:  §2 .
+ 
+ Ko  et al.  (2025) 
+ P. Ko, J. Mao, Y. Fu, H. Yeh, C. Chen, W. Ma, Y. Du, and S. Sun 
+ 
+ Implicit state estimation via video replanning .
+ 
+ arXiv preprint arXiv:2510.17315 .
+ 
+ Cited by:  §2 .
+ 
+ Kumar  et al.  (2021) 
+ A. Kumar, Z. Fu, D. Pathak, and J. Malik 
+ 
+ RMA: rapid motor adaptation for legged robots .
+ 
+ In  Robotics: Science and Systems ,
+ 
+ External Links:  Document 
+ 
+ Cited by:  §1 ,
+ §2 .
+ 
+ Lee  et al.  (2020) 
+ K. Lee, Y. Seo, S. Lee, H. Lee, and J. Shin 
+ 
+ Context-aware dynamics model for generalization in model-based reinforcement learning .
+ 
+ In  International Conference on Machine Learning ,
+ 
+ pp. 5757–5766 .
+ 
+ Cited by:  §2 .
+ 
+ Li  et al.  (2026) 
+ Z. Li, E. Xiang, T. Tran, D. Huang, M. Thiam, and L. Chen 
+ 
+ PriGo: test-time primitive guidance to diffusion and flow policies for adaptive robotic manipulation .
+ 
+ arXiv preprint arXiv:2607.07076 .
+ 
+ Cited by:  §2 .
+ 
+ Li  et al.  (2025) 
+ Z. Li, R. Yang, R. Chen, Z. Luo, and L. Chen 
+ 
+ ADPro: a test-time adaptive diffusion policy for robot manipulation via manifold and initial noise constraints .
+ 
+ arXiv preprint arXiv:2508.06266 .
+ 
+ Cited by:  §2 .
+ 
+ Liu  et al.  (2023) 
+ B. Liu, Y. Zhu, C. Gao, Y. Feng, Q. Liu, Y. Zhu, and P. Stone 
+ 
+ LIBERO: benchmarking knowledge transfer for lifelong robot learning .
+ 
+ In  Advances in Neural Information Processing Systems, Datasets and Benchmarks Track ,
+ 
+ Cited by:  §B.2 .
+ 
+ Liu  et al.  (2026) 
+ C. Liu, Y. Liu, T. Wang, Q. Zhuang, J. C. Liang, W. Yang, R. Xu, Q. Wang, D. Liu, and C. Han 
+ 
+ On-the-fly vla adaptation via test-time reinforcement learning .
+ 
+ In  Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics ,
+ 
+ Cited by:  §2 .
+ 
+ Luo  et al.  (2024) 
+ S. Luo, S. Li, R. Yu, Z. Wang, J. Wu, and Q. Zhu 
+ 
+ PIE: parkour with implicit-explicit learning framework for legged robots .
+ 
+ IEEE Robotics and Automation Letters   9  ( 11 ),  pp. 9986–9993 .
+ 
+ External Links:  Document 
+ 
+ Cited by:  §2 .
+ 
+ Miki  et al.  (2022) 
+ T. Miki, J. Lee, J. Hwangbo, L. Wellhausen, V. Koltun, and M. Hutter 
+ 
+ Learning robust perceptive locomotion for quadrupedal robots in the wild .
+ 
+ Science Robotics   7  ( 62 ),  pp. eabk2822 .
+ 
+ External Links:  Document 
+ 
+ Cited by:  §2 .
+ 
+ Nagabandi  et al.  (2019) 
+ A. Nagabandi, I. Clavera, S. Liu, R. S. Fearing, P. Abbeel, S. Levine, and C. Finn 
+ 
+ Learning to adapt in dynamic, real-world environments through meta-reinforcement learning .
+ 
+ In  International Conference on Learning Representations ,
+ 
+ Cited by:  §2 .
+ 
+ Nahrendra  et al.  (2023) 
+ I. M. A. Nahrendra, B. Yu, and H. Myung 
+ 
+ DreamWaQ: learning robust quadrupedal locomotion with implicit terrain imagination via deep reinforcement learning .
+ 
+ In  IEEE International Conference on Robotics and Automation ,
+ 
+ pp. 5078–5084 .
+ 
+ External Links:  Document 
+ 
+ Cited by:  §2 .
+ 
+ Oquab  et al.  (2024) 
+ M. Oquab, T. Darcet, T. Moutakanni, H. V. Vo, M. Szafraniec, V. Khalidov, P. Fernandez, D. Haziza, F. Massa, A. El-Nouby, M. Assran, N. Ballas, W. Galuba, R. Howes, P. Huang, S. Li, I. Misra, M. Rabbat, V. Sharma, G. Synnaeve, H. Xu, H. Jégou, J. Mairal, P. Labatut, A. Joulin, and P. Bojanowski 
+ 
+ DINOv2: learning robust visual features without supervision .
+ 
+ Transactions on Machine Learning Research .
+ 
+ Cited by:  §D.3 .
+ 
+ Park  et al.  (2026) 
+ J. Park, J. Park, T. Kim, S. Choi, D. Han, and S. Yun 
+ 
+ Retrieve, don’t retrain: extending vision language action models to new tasks at test time .
+ 
+ arXiv preprint arXiv:2606.15631 .
+ 
+ Cited by:  §2 .
+ 
+ Rakelly  et al.  (2019) 
+ K. Rakelly, A. Zhou, C. Finn, S. Levine, and D. Quillen 
+ 
+ Efficient off-policy meta-reinforcement learning via probabilistic context variables .
+ 
+ In  International Conference on Machine Learning ,
+ 
+ pp. 5331–5340 .
+ 
+ Cited by:  §2 .
+ 
+ Tiwari  et al.  (2026) 
+ R. Tiwari, K. Sareen, L. A. Agrawal, J. E. Gonzalez, M. Zaharia, K. Keutzer, I. S. Dhillon, R. Agarwal, and D. Khatri 
+ 
+ Learning, fast and slow: towards llms that adapt continually .
+ 
+ arXiv preprint arXiv:2605.12484 .
+ 
+ Cited by:  §3.1.1 .
+ 
+ Wan  et al.  (2026) 
+ C. Wan, K. Wang, Y. Si, P. Zhang, and M. Li 
+ 
+ WorldAgen: unified state-action prediction with test-time world model training .
+ 
+ In  Proceedings of the AAAI Conference on Artificial Intelligence ,
+ 
+ Vol.  40 ,  pp. 18584–18592 .
+ 
+ External Links:  Document 
+ 
+ Cited by:  §2 ,
+ §2 .
+ 
+ Wan  et al.  (2025) 
+ T. Wan, A. Wang, B. Ai, B. Wen, C. Mao, C. Xie, D. Chen, F. Yu, H. Zhao, J. Yang, J. Zeng, J. Wang, J. Zhang, J. Zhou, J. Wang, J. Chen, K. Zhu, K. Zhao, K. Yan, L. Huang, M. Feng, N. Zhang, P. Li, P. Wu, R. Chu, R. Feng, S. Zhang, S. Sun, T. Fang, T. Wang, T. Gui, T. Weng, T. Shen, W. Lin, W. Wang, W. Wang, W. Zhou, W. Wang, W. Shen, W. Yu, X. Shi, X. Huang, X. Xu, Y. Kou, Y. Lv, Y. Li, Y. Liu, Y. Wang, Y. Zhang, Y. Huang, Y. Li, Y. Wu, Y. Liu, Y. Pan, Y. Zheng, Y. Hong, Y. Shi, Y. Feng, Z. Jiang, Z. Han, Z. Wu, and Z. Liu 
+ 
+ Wan: open and advanced large-scale video generative models .
+ 
+ arXiv preprint arXiv:2503.20314 .
+ 
+ Cited by:  §A.1 .
+ 
+ Wang  et al.  (2023) 
+ J. Wang, Y. Mu, D. Li, Q. Zhang, D. Zhao, Y. Zhuang, P. Luo, B. Wang, and J. Hao 
+ 
+ Prototypical context-aware dynamics generalization for high-dimensional model-based reinforcement learning .
+ 
+ In  ICLR Workshop on Scene Representations for Autonomous Driving ,
+ 
+ Cited by:  §2 .
+ 
+ Wang  et al.  (2026) 
+ Y. Wang, O. Bounou, Y. LeCun, and M. Ren 
+ 
+ AdaJEPA: an adaptive latent world model .
+ 
+ arXiv preprint arXiv:2606.32026 .
+ 
+ Cited by:  §2 ,
+ §2 .
+ 
+ Xing  et al.  (2026) 
+ J. Xing, Z. Zhu, Y. Ren, I. Geles, Y. Zhai, R. Reiter, and D. Scaramuzza 
+ 
+ Continual robot policy learning via variational neural dynamics .
+ 
+ arXiv preprint arXiv:2606.27353 .
+ 
+ Cited by:  §2 .
+ 
+ Ye  et al.  (2026) 
+ S. Ye, Y. Ge, K. Zheng, S. Gao, S. Yu, G. Kurian, S. Indupuru, Y. L. Tan, C. Zhu, J. Xiang, A. Malik, K. Lee, W. Liang, N. Ranawaka, J. Gu, Y. Xu, G. Wang, F. Hu, A. Narayan, J. Bjorck, J. Wang, G. Kim, D. Niu, R. Zheng, Y. Xie, J. Wu, Q. Wang, R. Julian, D. Xu, Y. Du, Y. Chebotar, S. Reed, J. Kautz, Y. Zhu, L. J. Fan, and J. Jang 
+ 
+ World action models are zero-shot policies .
+ 
+ External Links:  2602.15922 
+ 
+ Cited by:  §2 .
+ 
+ Yoo  et al.  (2025) 
+ M. Yoo, J. Jang, S. Yoon, and H. Woo 
+ 
+ World model implanting for test-time adaptation of embodied agents .
+ 
+ In  Proceedings of the 42nd International Conference on Machine Learning ,
+ 
+ Proceedings of Machine Learning Research , Vol.  267 ,  pp. 72556–72573 .
+ 
+ Cited by:  §2 .
+ 
+ Yu  et al.  (2017) 
+ W. Yu, J. Tan, C. K. Liu, and G. Turk 
+ 
+ Preparing for the unknown: learning a universal policy with online system identification .
+ 
+ In  Robotics: Science and Systems ,
+ 
+ Cited by:  §2 .
+ 
+ Yuille and Kersten (2006) 
+ A. Yuille and D. Kersten 
+ 
+ Vision as bayesian inference: analysis by synthesis? .
+ 
+ Trends in Cognitive Sciences   10  ( 7 ),  pp. 301–308 .
+ 
+ Cited by:  §1 .
+ 
+ Zhang  et al.  (2026) 
+ W. Zhang, J. Li, S. Yang, S. Chen, J. Liu, L. Liu, and X. Ma 
+ 
+ TTT-VLA: test-time latent prompt optimization for vision-language-action models .
+ 
+ arXiv preprint arXiv:2606.03127 .
+ 
+ Cited by:  §2 .
+ 
+ Zhao  et al.  (2026) 
+ J. Zhao, H. Yang, Y. Hu, Y. Gao, Q. Ou, C. Wan, S. Dong, Z. Ma, and Y. Gong 
+ 
+ Retrieve-then-steer: online success memory for test-time adaptation of generative vlas .
+ 
+ arXiv preprint arXiv:2605.10094 .
+ 
+ Cited by:  §2 .
+ 
+ Zhen  et al.  (2025) 
+ H. Zhen, Q. Sun, H. Zhang, J. Li, S. Zhou, Y. Du, and C. Gan 
+ 
+ Learning 4d embodied world models .
+ 
+ In  Proceedings of the IEEE/CVF International Conference on Computer Vision ,
+ 
+ pp. 5337–5347 .
+ 
+ Cited by:  §2 .
+ 
+ Zhou  et al.  (2025) 
+ G. Zhou, H. Pan, Y. LeCun, and L. Pinto 
+ 
+ DINO-WM: world models on pre-trained visual features enable zero-shot planning .
+ 
+ In  Proceedings of the 42nd International Conference on Machine Learning ,
+ 
+ Proceedings of Machine Learning Research , Vol.  267 ,  pp. 79115–79135 .
+ 
+ Cited by:  §2 .
+ 
+ Zhou  et al.  (2024) 
+ S. Zhou, Y. Du, J. Chen, Y. Li, D. Yeung, and C. Gan 
+ 
+ RoboDreamer: learning compositional world models for robot imagination .
+ 
+ In  Proceedings of the 41st International Conference on Machine Learning ,
+ 
+ Proceedings of Machine Learning Research , Vol.  235 ,  pp. 61885–61896 .
+ 
+ Cited by:  §2 .
+ 
+ Zhu  et al.  (2025) 
+ C. Zhu, R. Yu, S. Feng, B. Burchfiel, P. Shah, and A. Gupta 
+ 
+ Unified world models: coupling video and action diffusion for pretraining on large robotic datasets .
+ 
+ In  Proceedings of Robotics: Science and Systems ,
+ 
+ External Links:  Document 
+ 
+ Cited by:  §2 .
+ 
+ Zhu  et al.  (2024) 
+ F. Zhu, H. Wu, S. Guo, Y. Liu, C. Cheang, and T. Kong 
+ 
+ IRASim: learning interactive real-robot action simulators .
+ 
+ arXiv preprint arXiv:2406.14540 .
+ 
+ Cited by:  §2 .
+ 
+ Zhu  et al.  (2026) 
+ S. Zhu, B. Ye, J. Wang, J. Chen, Z. Zhuang, L. Mou, R. Huang, and H. Zhao 
+ 
+ TTT-Parkour: rapid test-time training for perceptive robot parkour .
+ 
+ arXiv preprint arXiv:2602.02331 .
+ 
+ Cited by:  §2 .
+ 
+ 
+ 
+ 
+ 
+ Supplementary Material for
+ 
+ T2-Z: Test-Time Optimization of Environment Latents
+ for Robotic World Models 
+ 
+ 
+ Contents 
+
+ 
+ 
+ 
+ Appendix A  Model Architecture and Optimization 
+
+ 
+ A.1  Architecture and latent conditioning 
+
+ 
+ Inputs and inherited backbone. 
+
+ 
+ For an episode in environment  e e , the model receives one initial RGB frame
+ I 0 I_{0}  and an aligned sequence  a = ( a t ) t a=(a_{t})_{t}  of 14-D robot actions, and predicts
+the subsequent video frames. We initialize the video diffusion transformer
+(DiT) and action encoder from BWM  ( BWM Team, 2026 ) , retaining its
+Wan2.2 ( Wan et al., 2025 ) -based action-conditioning pathway. The frozen video VAE encodes the
+initial frame into the video-latent stream and decodes predicted latents
+back to RGB. Text conditioning is disabled; the initial frame is not an
+extra cross-attention token.
+In short,  I 0 I_{0}  enters the video-latent stream,  a a  follows BWM’s two
+action-conditioning paths, and the environment latent augments both paths. 
+ 
+ 
+ 
+ Environment-indexed latent conditioning. 
+
+ 
+ We associate each environment  e e  with a freely optimized
+vector  z e ∈ ℝ 32 z_{e}\in\mathbb{R}^{32} . Episodes assigned to an environment share its latent; their
+initial frames and actions vary, so predicting their different outcomes
+constrains the environment representation. There is no
+observation-to-latent encoder and no supervision
+from the numerical physical parameter. Let  D = 3072 D=3072  be the DiT width.
+Two separate projectors turn  z e z_{e}  into model-width vectors: 
+ 
+ 
+ 
+ 
+ q b ​ ( z e ) \displaystyle q_{b}(z_{e}) 
+ = W b , 2 GELU ( W b , 1 LN ( z e ) ) , b ∈ { token , mod } , \displaystyle=W_{b,2}\,\mathrm{GELU}\!\left(W_{b,1}\,\mathrm{LN}(z_{e})\right),\quad b\in\{\mathrm{token},\mathrm{mod}\}, 
+ 
+ (9) 
+ 
+ 
+ W b , 1 \displaystyle W_{b,1} 
+ : 32 → 128 , W b , 2 : 128 → D . \displaystyle:32\to 128,\qquad W_{b,2}:128\to D. 
+ 
+ 
+ The two linear layers in each projector have no bias; the projectors do
+not share weights. The 128-D width is internal to these MLPs: both outputs
+are  D D -dimensional. 
+ 
+ 
+ 
+ Cross-attention branch. 
+
+ 
+ BWM’s action encoder maps each action to a  D D -dimensional conditioning
+token. Let  A tok ​ ( a ) A_{\mathrm{tok}}(a)  denote this token sequence and
+ u e = q token ​ ( z e ) u_{e}=q_{\mathrm{token}}(z_{e})  the single environment token. With text
+disabled, each DiT block receives the conditioning sequence
+ C e = [ u e ; A tok ​ ( a ) ] C_{e}=[u_{e};A_{\mathrm{tok}}(a)] . For video patch tokens
+ X ℓ ∈ ℝ N × D X_{\ell}\in\mathbb{R}^{N\times D}  entering block  ℓ \ell , the attention
+operation can be written schematically as 
+ 
+
+ 
+ 
+ CA ⁡ ( X ℓ , C e ) = softmax ⁡ ( ( X ℓ ​ W Q ) ​ ( C e ​ W K ) ⊤ d h ) ​ ( C e ​ W V ) ​ W O . \operatorname{CA}(X_{\ell},C_{e})=\operatorname{softmax}\!\left(\frac{(X_{\ell}W_{Q})(C_{e}W_{K})^{\top}}{\sqrt{d_{h}}}\right)(C_{e}W_{V})W_{O}. 
+ 
+ (10) 
+ 
+ Here  N N  is the number of video patches,  d h d_{h}  is one attention head’s
+width, and  W Q , W K , W V , W O W_{Q},W_{K},W_{V},W_{O}  are the block’s learned attention matrices.
+The actual operation is multi-head; the equation shows where the new
+token enters. Every video patch can attend to the environment token as
+well as the action tokens through keys and values. 
+ 
+ 
+ 
+ Modulation branch. 
+
+ 
+ BWM also groups four aligned 14-D actions at a time and maps each group
+to a  D D -dimensional action-modulation vector  a g mod a_{g}^{\mathrm{mod}} .
+Index  g g  identifies the corresponding latent-video temporal group, and
+ s s  identifies a spatial patch within it. Let  τ \tau  be the current
+flow-matching timestep and  b g , s ​ ( τ ) ∈ ℝ D b_{g,s}(\tau)\in\mathbb{R}^{D}  be Wan’s
+ base timestep embedding  at that video patch, before action or
+environment conditioning. The initial-frame latent uses the unnoised
+timestep, while predicted-frame latents use  τ \tau . The environment-modulation vector is
+ v e = q mod ​ ( z e ) ∈ ℝ D v_{e}=q_{\mathrm{mod}}(z_{e})\in\mathbb{R}^{D} . The implementation adds
+these three vectors and applies the existing time projection: 
+ 
+
+ 
+ 
+ b ~ g , s ​ ( τ ) = b g , s ​ ( τ ) + a g mod + v e , M g , s = TimeProj ⁡ ( b ~ g , s ​ ( τ ) ) ∈ ℝ 6 × D . \tilde{b}_{g,s}(\tau)=b_{g,s}(\tau)+a_{g}^{\mathrm{mod}}+v_{e},\qquad M_{g,s}=\operatorname{TimeProj}(\tilde{b}_{g,s}(\tau))\in\mathbb{R}^{6\times D}. 
+ 
+ (11) 
+ 
+ The action and environment vectors are broadcast to every spatial patch
+in group  g g . The six  D D -dimensional outputs of  M g , s M_{g,s}  supply the
+DiT blocks’ adaptive-normalization shifts, scales, and residual gates;
+the modified timestep embedding also conditions the output head. Thus
+ z e z_{e}  influences both attention and per-patch modulation, while leaving
+BWM’s original action pathways in place. 
+ 
+ 
+ Table 4:  Model components and optimization roles. Test-time adaptation
+updates only the environment latent. 
+ 
+ 
+ 
+ 
+ 
+ Component 
+ 
+ 
+ 
+ Initialization or structure 
+ 
+ 
+ 
+ Training update 
+ 
+ 
+ 
+ 
+ 
+ 
+ Video DiT 
+ 
+ 
+ 
+ BWM-initialized Wan2.2 backbone 
+ 
+ 
+ 
+ Model blocks 
+ 
+ 
+ 
+ 
+ Action encoder 
+ 
+ 
+ 
+ BWM-initialized 14-D action pathway 
+ 
+ 
+ 
+ Model blocks 
+ 
+ 
+ 
+ 
+ Video VAE 
+ 
+ 
+ 
+ Wan2.2 video encoder/decoder 
+ 
+ 
+ 
+ Frozen 
+ 
+ 
+ 
+ 
+ Environment table 
+ 
+ 
+ 
+ Learnable 32-D latents indexed by environment 
+ 
+ 
+ 
+ Latent blocks 
+ 
+ 
+ 
+ 
+ Latent projectors 
+ 
+ 
+ 
+ Two  32 → 128 → 3072 32\to 128\to 3072  MLPs 
+ 
+ 
+ 
+ Model blocks 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ A.2  Training and test-time adaptation 
+
+ 
+ Training schedule. 
+
+ 
+ Training uses the inherited flow-matching video-prediction loss, excluding
+the initial conditioning frame. A latent block freezes the shared model and
+updates the environment table; a model block freezes the table and updates the
+DiT, action encoder, and two projectors. The basic cycle alternates a
+200-update latent block and a 200-update model block. An initial 300-update model block precedes
+the curriculum. The shared-model optimizer is AdamW with learning rate
+ 10 − 5 10^{-5} , weight decay  0.01 0.01 , 100 warmup updates, gradient clipping  0.5 0.5 ,
+and bfloat16 training. The environment-latent optimizer uses learning
+rate  0.03 0.03  and zero weight decay. Latents are independently initialized from
+ 𝒰 ⁡ ( 0 , 1 ) \mathcal{U}(0,1)  and clipped to  [ 0 , 1 ] [0,1]  after training updates. 
+ 
+ 
+ 
+ Test-time adaptation. 
+
+ 
+ For a held-out environment, a 32-D latent is optimized from its
+test-time interaction trajectories; all shared weights stay frozen. Query outcomes never
+enter this update. Both simulation and real-world main evaluations use
+40 latent updates with learning rates  3.0 , 1.5 , 0.5 , 0.15 3.0,1.5,0.5,0.15 , each for ten
+updates. The resulting latent is reused across query actions from that
+environment. Exact task-specific execution configurations are released with
+the code. 
+ 
+ 
+ 
+ 
+ 
+ Appendix B  Experimental Setup 
+
+ 
+ B.1  Training data and resource budgets 
+
+ 
+ Tables  5  and  6  report counts of
+physical environments and recorded episodes, rather than latent entries.
+Each video chunk contains
+one initial conditioning frame and the remaining frames are prediction
+targets. The batch notation is  training environments  × \times  action
+chunks per environment  per optimizer update. 
+ 
+ 
+ Table 5:  Simulation training scale by physical environment. Diverse Backgrounds uses 30 scene
+backgrounds. Budget is H200 GPUs  × \times  hours per method. 
+ 
+ 
+ 
+ Task 
+ Physical envs.  × \times  episodes/env. 
+ Frames 
+ Stride 
+ Batch 
+ Budget 
+ 
+ 
+ 
+ Friction 
+ 35 × 10 35\times 10 
+ 41 
+ 1 
+ 8 × 4 8\times 4 
+ 2 × 24 2\times 24 
+ 
+ Gravity 
+ 20 × 10 20\times 10 
+ 61 
+ 1 
+ 8 × 4 8\times 4 
+ 2 × 24 2\times 24 
+ 
+ Mass Collision 
+ 20 × 9 20\times 9 
+ 61 
+ 1 
+ 8 × 8 8\times 8 
+ 2 × 24 2\times 24 
+ 
+ Light Switch 
+ 12 × 10 12\times 10 
+ 33 
+ 1 
+ 8 × 8 8\times 8 
+ 2 × 24 2\times 24 
+ 
+ Mass Balance 
+ 20 × 15 20\times 15 
+ 41 
+ 2 
+ 8 × 8 8\times 8 
+ 2 × 24 2\times 24 
+ 
+ Mass  × \times  Friction 
+ 84 × 9 84\times 9 
+ 61 
+ 1 
+ 16 × 6 16\times 6 
+ 4 × 48 4\times 48 
+ 
+ Diverse Backgrounds 
+ 15 × 50 15\times 50 
+ 41 
+ 1 
+ 12 × 6 12\times 6 
+ 4 × 24 4\times 24 
+ 
+ 
+ 
+ 
+ Light Switch episodes contain continuous button-press trajectories. Diverse Backgrounds varies friction across physical environments while the
+different scene backgrounds provide repeated interactions. 
+ 
+ 
+ Table 6:  Real-world training scale by physical environment and native/model-input RGB resolution.
+Budget is H200 GPUs  × \times  hours per method. 
+ 
+ 
+ 
+ Task 
+ Physical envs. / episodes 
+ Frames 
+ Stride 
+ Native RGB 
+ Input RGB 
+ Batch 
+ Budget 
+ 
+ 
+ 
+ Ball Friction 
+ 8 / 240 
+ 61 
+ 1 
+ 560 × 248 560\times 248 
+ 320 × 160 320\times 160 
+ 6 × 8 6\times 8 
+ 2 × 24 2\times 24 
+ 
+ Door Close 
+ 10 / 438 
+ 49 
+ 1 
+ 640 × 480 640\times 480 
+ 256 × 192 256\times 192 
+ 6 × 8 6\times 8 
+ 2 × 24 2\times 24 
+ 
+ Stick Balance 
+ 9 / 421 
+ 33 
+ 3 
+ 640 × 480 640\times 480 
+ 256 × 192 256\times 192 
+ 6 × 8 6\times 8 
+ 2 × 24 2\times 24 
+ 
+ Soft Pull 
+ 9 / 146 
+ 33 
+ 3 
+ 512 × 256 512\times 256 
+ 320 × 160 320\times 160 
+ 10 × 6 10\times 6 
+ 2 × 24 2\times 24 
+ 
+ 
+ 
+ 
+ 
+ 
+ B.2  Simulator and real-world setup 
+
+ 
+ Simulator. 
+
+ 
+ We construct the custom tasks in a LIBERO-based simulator  ( Liu et al., 2023 ) 
+with a Franka Panda arm. Simulated RGB videos are recorded at 20 fps and
+ 224 × 224 224\times 224  resolution. The action representation has 14 channels. 
+ 
+ 
+ 
+ Real world. 
+
+ 
+ The physical tasks use a Franka robot arm and a fixed Intel RealSense D435i
+camera. We use only its main RGB view, captured at  640 × 480 640\times 480  and
+20 fps; the task-specific saved video crops and model-input sizes appear in
+Table  6 . Model inputs are letterboxed to the listed
+sizes. All tasks use 14-channel action vectors;
+the target-action representation is task dependent. 
+ 
+ 
+ 
+ 
+ 
+ Appendix C  Evaluation Protocols 
+
+ 
+ C.1  Shared protocol and metrics 
+
+ 
+ Shared comparison. 
+
+ 
+ For action-selection tasks, we sample candidate actions and use each model’s
+predicted videos to make an action decision. The selected action is then
+executed in the environment, and success is determined from its actual
+outcome using the task-specific criteria below. Each evaluated candidate-action
+set contains at least one action that satisfies the target condition.
+All methods receive the same query inputs and candidate actions, and all
+methods that adapt at test time receive the same test-time interaction
+trajectories. The Standard World Model does not adapt at test time, and no
+method sees a query outcome before making its prediction. 
+ 
+ 
+ For tracked object positions  p t p_{t}  and predictions  p ^ t \hat{p}_{t}  over  T T 
+evaluated future frames, average displacement error (ADE) and final
+displacement error (FDE) are 
+ 
+
+ 
+ 
+ ADE = 1 T ​ ∑ t = 1 T ‖ p ^ t − p t ‖ 2 , FDE = ‖ p ^ T − p T ‖ 2 . \mathrm{ADE}=\frac{1}{T}\sum_{t=1}^{T}\|\hat{p}_{t}-p_{t}\|_{2},\qquad\mathrm{FDE}=\|\hat{p}_{T}-p_{T}\|_{2}. 
+ 
+ (12) 
+ 
+ Both are reported in image pixels. Tasks with scalar physical states use
+the corresponding mean/final absolute errors stated below. PSNR and SSIM
+measure full-frame appearance. LPIPS uses the official pretrained AlexNet
+perceptual metric on RGB frames scaled to  [ − 1 , 1 ] [-1,1] , without an object
+mask; per-frame values are averaged over the evaluated future frames and
+then over query videos. 
+ 
+ 
+ A query video denotes one action-conditioned video chunk evaluated at test
+time. The counts below sum query videos across the evaluated environments;  K K 
+is the number of test-time interaction trajectories per test environment. 
+ 
+ 
+ Table 7:  Simulation evaluation counts: test-time interaction trajectories and query videos. 
+ 
+ 
+ 
+ Task 
+ K K 
+ Query videos 
+ 
+ 
+ 
+ Friction 
+ 1 
+ 90 
+ 
+ Gravity 
+ 1 
+ 90 
+ 
+ Mass Collision 
+ 1 
+ 80 
+ 
+ Light Switch 
+ 2 
+ 60 
+ 
+ Mass Balance 
+ 2 
+ 130 
+ 
+ Mass  × \times  Friction 
+ 1 
+ 80 
+ 
+ Diverse Backgrounds 
+ 1 
+ 90 
+ 
+ 
+ 
+ 
+ 
+ 
+ C.2  Simulated tasks 
+
+ 
+ Table 8:  Simulation object-centric quantities extracted from the predicted
+and ground-truth RGB videos. ADE/FDE are in image pixels. 
+ 
+ 
+ 
+ Task 
+ 
+ 
+ Tracked quantity 
+ 
+ 
+ 
+ Object-centric error 
+ 
+ 
+ 
+ 
+ Friction 
+ 
+ 
+ Pushed-block centroid 
+ 
+ 
+ 
+ ADE/FDE 
+ 
+ 
+ Gravity 
+ 
+ 
+ Blue projectile centroid 
+ 
+ 
+ 
+ ADE/FDE 
+ 
+ 
+ Mass Collision 
+ 
+ 
+ Red struck-object centroid 
+ 
+ 
+ 
+ ADE/FDE 
+ 
+ 
+ Light Switch 
+ 
+ 
+ Yellow-pixel fraction in lamp region 
+ 
+ 
+ 
+ Mean/final absolute error (pp) 
+ 
+ 
+ Mass Balance 
+ 
+ 
+ Balance-bar tilt angle 
+ 
+ 
+ 
+ Mean/final angle error ( ∘ ) 
+ 
+ 
+ Mass  × \times  Friction 
+ 
+ 
+ Red struck-object centroid 
+ 
+ 
+ 
+ ADE/FDE 
+ 
+ 
+ Diverse Backgrounds 
+ 
+ 
+ Pushed-block centroid 
+ 
+ 
+ 
+ ADE/FDE 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ (a) Friction 
+ 
+ 
+ (b) Gravity 
+ 
+ 
+ (c) Mass Collision 
+ 
+ 
+ (d) Light Switch 
+ 
+ 
+ (e) Mass Balance 
+ 
+ 
+ (f) Mass  × \times  Friction 
+ 
+ Figure 7:  Representative ground-truth frames from the simulated tasks.
+Diverse Backgrounds uses the Friction push task with varied scene backgrounds. 
+ 
+ 
+ Friction. 
+
+ 
+ We change the table’s surface-friction coefficient while the robot pushes
+the same block with different action strengths. We track the pushed block’s
+image centroid. Action Success
+means that its observed displacement reaches the requested short, medium,
+or long target region. 
+ 
+ 
+ 
+ Gravity. 
+
+ 
+ We vary the simulator’s gravitational acceleration, changing the path of a
+blue block after it is thrown. Different actions correspond to different
+launch speeds of the block. We track the projectile’s centroid. Success means that the
+observed projectile endpoint reaches the requested near, middle, or far
+target region. 
+ 
+ 
+ 
+ Mass Collision. 
+
+ 
+ We vary the mass of the red target object while a driver object collides
+with it under different actions.
+We track the  struck  red object’s centroid, not the driver’s. Success
+means that the struck object reaches the requested displacement region. 
+ 
+ 
+ 
+ Light Switch. 
+
+ 
+ We vary the hidden causal rule specifying whether the red button, the blue
+button, both, or neither can change the lamp state. The object-centric
+signal is  color , not average brightness: a fixed RGB rule detects
+yellow pixels in the lamp region  ℛ \mathcal{R} . Each frame’s score is 
+ 
+
+ 
+ 
+ y t = 1 | ℛ | ​ ∑ p ∈ ℛ 𝟏 ​ [ RGB t ​ ( p ) ​  passes the yellow-color rule ] . y_{t}=\frac{1}{|\mathcal{R}|}\sum_{p\in\mathcal{R}}\mathbf{1}[\mathrm{RGB}_{t}(p)\text{ passes the yellow-color rule}]. 
+ 
+ (13) 
+ 
+ We report the absolute difference between predicted and observed scores
+in percentage points (pp). For  T T  evaluated future frames, 
+ 
+
+ 
+ 
+ E mean light = 100 T ​ ∑ t = 1 T | y ^ t − y t | , E final light = 100 ​ | y ^ T − y T | . E_{\mathrm{mean}}^{\mathrm{light}}=\frac{100}{T}\sum_{t=1}^{T}|\hat{y}_{t}-y_{t}|,\qquad E_{\mathrm{final}}^{\mathrm{light}}=100|\hat{y}_{T}-y_{T}|. 
+ 
+ (14) 
+ 
+ A score of at least
+ 0.35 0.35  denotes “on” for the terminal-state goal; success means that the
+observed terminal lamp state matches the requested on/off target. 
+ 
+ 
+ 
+ Mass Balance. 
+
+ 
+ We vary the left/right mass ratio of the balance apparatus; the robot’s
+support position is the action used to probe that fixed ratio. We track the
+bar angle in degrees; its ADE/FDE
+analogues are mean/final angular errors. Success means that the observed
+terminal bar angle lies in the horizontal balance interval. 
+ 
+ 
+ 
+ Mass  × \times  Friction. 
+
+ 
+ We combine different red-object masses with different table-friction
+coefficients, so both physical factors can change across environments.
+We track the red struck
+object’s centroid. For each target line, the desired action is the least
+forceful sampled action whose observed endpoint crosses that line; the
+selector estimates this minimum from the predicted videos. 
+ 
+ 
+ 
+ Diverse Backgrounds (multi-background). 
+
+ 
+ We vary the table-friction coefficient as in Friction while rendering the
+same push task under different scene backgrounds; background is a visual
+change, not a new action. We again track the pushed block’s centroid; success means
+reaching the requested displacement region. This tests whether the shared
+environment representation follows dynamics rather than appearance. 
+ 
+ 
+ 
+ 
+ C.3  Real-world tests 
+
+ 
+ Table 9:  Real-world evaluation counts: test-time interaction trajectories and query videos. 
+ 
+ 
+ 
+ Task 
+ K K 
+ Query videos 
+ 
+ 
+ 
+ Ball Friction 
+ 1 
+ 80 
+ 
+ Door Close 
+ 2 
+ 100 
+ 
+ Stick Balance 
+ 2 
+ 45 
+ 
+ Soft Pull 
+ 1 
+ 24 
+ 
+ 
+ 
+ 
+ Table 10:  Real-world object-centric measurements from the main camera.
+ADE/FDE are reported in native-image pixels. 
+ 
+ 
+ 
+ Task 
+ 
+ 
+ Tracked quantity 
+ 
+ 
+ 
+ Object-centric error 
+ 
+ 
+ 
+ 
+ Ball Friction 
+ 
+ 
+ Visible ball center 
+ 
+ 
+ 
+ ADE/FDE 
+ 
+ 
+ Door Close 
+ 
+ 
+ Outer door-edge position 
+ 
+ 
+ 
+ ADE/FDE 
+ 
+ 
+ Stick Balance 
+ 
+ 
+ Two end markers, averaged 
+ 
+ 
+ 
+ ADE/FDE 
+ 
+ 
+ Soft Pull 
+ 
+ 
+ Dragged object’s visible center 
+ 
+ 
+ 
+ ADE/FDE 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ (a) Steel-bead loads for the ball variants 
+ 
+ 
+ 
+ (b) Door latch and alternative springs 
+ 
+ 
+ (c) Stick with adjustable end masses 
+ 
+ 
+ (d) Soft tubes with different stiffness and curvature 
+ 
+ Figure 8:  Physical designs of the four real-world tasks. The Ball task changes
+the number of steel beads inside the ball (not visible in the video frame),
+and the Door task uses a spring-loaded latch. 
+ 
+ 
+ Ball Friction. 
+
+ 
+ We vary the mass of steel beads placed inside the ball, changing its total
+mass and the sliding-friction force under a robot swing
+(Figure  8 a). The ball variants in the latent-space
+visualizations correspond to these different steel-bead loads.
+We track the ball’s visible center for native-pixel ADE/FDE. Success means
+that the selected swing moves the ball to the right-hand blue-marker target. 
+ 
+ 
+ 
+ Door Close. 
+
+ 
+ The door has a spring-loaded latch; we replace the spring to change how much
+closing action is needed to engage it (Figure  8 b).
+The tracked outer door edge, rather than a centroid or hinge angle, defines
+native-pixel ADE/FDE. Success means that the selected action fully closes
+and latches the door. 
+ 
+ 
+ 
+ Stick Balance. 
+
+ 
+ We change the weights attached to the stick’s ends, altering its mass
+distribution and thus the
+angle at which it settles after lifting (Figure  8 c).
+We track the two material markers at its ends and average their
+positional errors for ADE/FDE. We sample a set of candidate actions and use
+the model to predict which actions will maintain balance. One action is
+selected uniformly at random from the predicted balancing set and executed
+on the real robot. A trial is successful if the stick actually maintains
+balance. Each sampled candidate set contains at least one action that
+achieves balance. If the model predicts no balancing action, the trial is
+counted as a failure. We report the fraction of successful trials. 
+ 
+ 
+ 
+ Soft Pull. 
+
+ 
+ The task uses soft tubes with different stiffness coefficients. The robot
+may grasp from the left or right, and the tubes also have different natural
+curvatures (Figure  8 d). The central prediction
+question is approximately how far the grasp must rotate before the tube
+starts dragging the object. The visible object center defines native-pixel
+ADE/FDE. Given a candidate action, the model predicts the rotation angle
+ θ ^ \hat{\theta}  at which the object starts sliding. We then conduct two
+real-robot tests, rotating to  θ ^ − 6 ∘ \hat{\theta}-6^{\circ}  and
+ θ ^ + 6 ∘ \hat{\theta}+6^{\circ} , respectively. A trial is successful only if the
+object does not slide in the first test and slides in the second; otherwise,
+it is counted as a failure. We report the fraction of successful trials. 
+ 
+ 
+ 
+ 
+ 
+ Appendix D  Baseline Implementation Details 
+
+ 
+ All four baselines use the task-level training data and per-method GPU
+budgets in Tables  5 – 6 .
+They use the same query videos and, for action-selection tasks, the same
+candidate actions and success criteria as T2-Z. The three adaptive
+baselines receive exactly the same test-time interaction trajectories as our latent
+optimizer.
+The tables give the common task-level batch specification; DINOv2 Context
+uses a subset of sampled trajectories for conditioning and all sampled trajectories
+as queries during training, whereas TTT-KQV
+processes them as ordered within-environment streams. 
+ 
+ 
+ D.1  Standard World Model 
+
+ 
+ This baseline fine-tunes the BWM-initialized DiT and action encoder on
+pooled task trajectories without an environment latent or test-time
+adaptation. It uses AdamW with model learning rate  10 − 5 10^{-5} , weight decay
+ 0.01 0.01 , 100 warmup updates, gradient clipping  0.5 0.5 , and bfloat16. 
+ 
+ 
+ 
+ D.2  LoRA TTA 
+
+ 
+ Starting from the Standard World Model, rank-8,  α = 8 \alpha=8  LoRA
+adapters  ( Hu et al., 2022 ) 
+are placed on the DiT attention Q/K/V/output projections. The backbone
+stays frozen during test-time adaptation. Adapters are reset for each
+environment and optimized on its test-time interaction trajectories, then held fixed
+across that environment’s query actions. The Friction configuration uses 50
+AdamW adaptation updates at learning rate  10 − 4 10^{-4} , zero weight decay, and
+gradient clipping  1 1 ; task-specific adaptation configurations are
+released with the code. 
+ 
+ 
+ 
+ D.3  DINOv2 Context 
+
+ 
+ A frozen DINOv2-B/14 encoder  ( Oquab et al., 2024 )  extracts conditioning-frame features, while a
+learned 128-D action GRU summarizes the intervening 14-D actions. For each
+of  N N  task-configured sampled frames, the CLS and mean patch features are
+projected to 256 dimensions. The  N − 1 N-1  adjacent visual–action transition
+features (640-D each) are concatenated; a  640 ​ ( N − 1 ) → → 1024 640(N-1)\!\to\!1024\!\to\!1024 
+MLP and final projection produce the 32-D context. Multiple conditioning-trajectory
+summaries are averaged before that final projection.
+At each training update, we sample a set of trajectories  Q e Q_{e}  from a training
+environment and select a subset  C e ⊆ Q e C_{e}\subseteq Q_{e}  for conditioning. All
+trajectories in  Q e Q_{e}  serve as training queries. The number of conditioning trajectories is sampled from the
+task-configured choices (typically one or two; one to four for Soft Pull),
+so the predictor learns to use different conditioning-set sizes. Every query
+in  Q e Q_{e}  is predicted using only the context inferred from  C e C_{e} ; training
+minimizes the mean query-video flow-matching loss. The context
+head, BWM DiT, action encoder, and two context projectors are trained
+jointly, while DINOv2 remains frozen. The model and context-head learning
+rates are  10 − 5 10^{-5}  and  10 − 4 10^{-4} , respectively. At test time, context
+comes from a forward pass over the observed test-time interaction trajectories, with no gradient
+update. 
+ 
+ 
+ 
+ D.4  TTT-KQV 
+
+ 
+ We adapt a video test-time-training fast-weight module  ( Dalal et al., 2025 ) 
+to the BWM backbone. Gated two-layer GELU MLP modules with expansion
+factor four are inserted after eight approximately evenly spaced
+attention blocks. Training randomly shuffles the chunks from each sampled
+environment in a batch. Within each training stream, all chunks use the same
+sampled flow-matching timestep (but independent noise), matching the
+same-timestep processing of observed interactions and query videos at inference.
+At position  i i , the preceding chunks form the observed prefix and the current chunk is the query. Fast weights
+reset to a learned shared initialization at the start of each stream.
+For each chunk, the module causally writes its key–value tokens before
+reading its output. Let  x t x_{t}  denote an input token,  h h  an attention head,
+and  d h d_{h}  its feature dimension;  t t  indexes tokens, not flow-matching
+timesteps. Learned key and value projections produce  k h , t , v h , t ∈ ℝ d h k_{h,t},v_{h,t}\in\mathbb{R}^{d_{h}} . The fast state  W = { W h } h W=\{W_{h}\}_{h}  contains each head’s
+MLP weights and biases. Its per-token binding loss and learned step scaling are 
+ 
+ 
+ 
+ 
+ ℓ h , t ​ ( W ) \displaystyle\ell_{h,t}(W) 
+ = 1 2 ​ d h ​ ‖ k h , t + LN ⁡ ( MLP W h ​ ( k h , t ) ) − v h , t ‖ 2 2 , \displaystyle=\frac{1}{2d_{h}}\left\|k_{h,t}+\mathrm{LN}\!\left(\mathrm{MLP}_{W_{h}}(k_{h,t})\right)-v_{h,t}\right\|_{2}^{2}, 
+ 
+ (15) 
+ 
+ 
+ η h , t \displaystyle\eta_{h,t} 
+ = η base d h σ ( w h ⊤ x t + b h ) , η base = 0.1 . \displaystyle=\frac{\eta_{\mathrm{base}}}{d_{h}}\,\sigma(w_{h}^{\top}x_{t}+b_{h}),\qquad\eta_{\mathrm{base}}=0.1. 
+ 
+ 
+ Here  LN \mathrm{LN}  normalizes within each head, and  σ \sigma  is the sigmoid
+function. The factor  1 / d h 1/d_{h}  in the loss averages squared errors over feature
+dimensions; the separate factor  1 / d h 1/d_{h}  in  η h , t \eta_{h,t}  scales the update.
+For update  j j , let  ℬ j \mathcal{B}_{j}  be the current minibatch of at most 64 tokens.
+The differentiable fast-state update is 
+ 
+
+ 
+ 
+ W j + 1 = W j − ∇ W ∑ h ∑ t ∈ ℬ j η h , t ℓ h , t ( W ) | W = W j . W^{j+1}=W^{j}-\left.\nabla_{W}\sum_{h}\sum_{t\in\mathcal{B}_{j}}\eta_{h,t}\ell_{h,t}(W)\right|_{W=W^{j}}. 
+ 
+ (16) 
+ 
+ We use a base inner learning rate of  0.1 0.1  with learned token-wise,
+head-specific scaling, rather than a constant update step size.
+The scaling parameters  w h , b h w_{h},b_{h}  are shared slow weights; the inner update
+changes only  W W . Gates start at  0.1 0.1 . The outer loss averages the video
+flow-matching losses over all stream positions and sampled environments.
+Its gradients update the shared slow weights, using backbone LR  10 − 5 10^{-5} 
+and TTT-module LR  10 − 4 10^{-4} ; the fast state itself is ephemeral.
+At inference, every denoising timestep resets the fast state and replays
+the observed test-time interaction trajectories at that same timestep. Each query then takes an
+independent update–then–read branch on its own noisy tokens. Query
+ground truth never enters the update, and fast state is not carried
+between queries or denoising timesteps. Exact stream packing and
+task-specific execution settings are released with the code. 
+ 
+ 
+ 
+ 
+ 
+ Appendix E  Additional Experiments 
+
+ 
+ E.1  Test-time interaction-count ablation 
+
+ 
+ Table 11:  Numerical results for Figure 5(c,d) at  K = 1 , 2 , 4 K=1,2,4  test-time
+interaction trajectories. Bold marks the selected  K K . Physical error is in pixels
+except for Light Switch (lamp-score error in percentage points). 
+ 
+ 
+ 
+ 
+ Physical error (mean)  ↓ \downarrow 
+ Action success (%)  ↑ \uparrow 
+ 
+ Task 
+ K = 1 K=1 
+ K = 2 K=2 
+ K = 4 K=4 
+ K = 1 K=1 
+ K = 2 K=2 
+ K = 4 K=4 
+ 
+ 
+ 
+ Mass Collision 
+ 6.452 
+ 6.534 
+ 5.946 
+ 61.1 
+ 66.7 
+ 72.2 
+ 
+ Light Switch 
+ 8.26 
+ 3.43 
+ 3.41 
+ 50.0 
+ 87.5 
+ 87.5 
+ 
+ Door Close 
+ 11.337 
+ 7.954 
+ 6.889 
+ 22.2 
+ 55.6 
+ 55.6 
+ 
+ Soft Pull 
+ 18.710 
+ 18.363 
+ 18.060 
+ 81.8 
+ 81.8 
+ 81.8 
+ 
+ 
+ 
+ 
+ 
+ E.2  Latent dimensionality 
+
+ 
+ Table 12:  Environment-latent dimensionality on Friction under the same
+ K = 1 K=1  evaluation protocol (ten held-out physical environments;
+90 query videos). Object ADE/FDE are main-view
+centroid errors in pixels; video metrics use the concatenated main and wrist
+views. Action success is evaluated on 25 reachable target decisions. Best
+values are bold. 
+ 
+ 
+ 
+ Latent dim. 
+ ADE ↓ \downarrow 
+ FDE ↓ \downarrow 
+ PSNR ↑ \uparrow 
+ SSIM ↑ \uparrow 
+ LPIPS ↓ \downarrow 
+ Success ↑ \uparrow 
+ 
+ 
+ 
+ 8 8 
+ 8.92 
+ 19.26 
+ 31.293 
+ 0.9474 
+ 0.0646 
+ 44% 
+ 
+ 16 16 
+ 7.63 
+ 15.90 
+ 29.557 
+ 0.9470 
+ 0.0614 
+ 64% 
+ 
+ 32 32  (ours) 
+ 3.85 
+ 7.59 
+ 31.976 
+ 0.9513 
+ 0.0495 
+ 72% 
+ 
+ 64 64 
+ 6.86 
+ 13.98 
+ 31.692 
+ 0.9504 
+ 0.0551 
+ 64% 
+ 
+ 128 128 
+ 7.08 
+ 14.51 
+ 31.372 
+ 0.9483 
+ 0.0581 
+ 64% 
+ 
+ 
+ 
+ 
+ 
+ E.3  Latent-space PCA across tasks 
+
+ 
+ Figure  9  shows the latent-space analysis for four
+simulation and four real-world tasks.
+Circles show training-time environment latents, and triangles show latents
+adapted from test-time interaction trajectories. Colors indicate the underlying
+physical setting or causal class for visualization only; these labels are
+not provided to the model. For each task independently, we center its
+training-time 32-D latents by their mean  z ¯ \bar{z} , compute the leading two
+right singular vectors  V 1 : 2 V_{1:2}  of the centered matrix without feature
+rescaling, and plot  ( z − z ¯ ) V 1 : 2 (z-\bar{z})V_{1:2} . Test-time latents are projected
+using the same mean and basis; they do not enter the PCA fit. Thus the PC
+axes are task-specific rather than shared across panels. 
+ 
+ 
+ Figure 9:  Latent-space PCA across simulation (a–d) and real-world tasks
+(e–h). Circles denote training-time latents and triangles denote
+test-time-adapted latents. Color indicates the underlying physical setting;
+point size additionally indicates friction in Mass  × \times  Friction. These
+factor annotations are used only for visualization and are not provided
+to the model. The Soft Pull test-time latents shown here use four test-time interaction
+trajectories. 
+ 
+ 
+ 
+ E.4  Computational efficiency 
+
+ 
+ We profile a representative Friction setting on one H200 GPU.
+For training, each method is warmed up for two optimizer steps and timed for
+ten further steps. Figure  10  reports the
+median compute-only optimizer time per update, excluding dataset reads, and
+peak allocated GPU memory rather than full-run training time. Each measured
+update has six loss-bearing video chunks; method-specific conditioning
+computation remains included. The world-model and latent updates of our method
+are separate phases and are therefore shown separately. LoRA TTA starts from
+the Standard World Model and has no distinct world-model training row. 
+ 
+ 
+ For inference, all methods receive the same test-time interaction trajectory and five
+disjoint query video chunks. We use 25 denoising steps and exclude model
+loading, dataset reads, and MP4 writing from timing; query generation includes
+pipeline sampling and VAE decoding. Interaction processing is performed once
+and reused across queries.
+DINOv2 Context encodes the interaction trajectory without gradient updates, our method runs
+40 latent updates, and LoRA TTA runs 50 adapter updates. TTT-KQV precomputes
+one post-interaction fast state at each denoising timestep and reuses those
+states for all five queries. Figure  11 
+separates interaction processing from five-query generation and shows how processing
+time changes with  K ∈ { 1 , 2 , 4 } K\in\{1,2,4\} ; the five-method total-time comparison
+uses  K = 1 K=1  throughout. At  K = 1 K=1 , our method takes 18.09 s including latent
+adaptation and five query generations, versus 32.73 s for LoRA TTA and
+37.57 s for cached TTT-KQV. 
+ 
+ 
+ Figure 10:  Training resource profile. Time is the median compute-only optimizer
+duration over ten measured updates after two warmup updates, excluding dataset
+reads; memory is peak allocated GPU memory. Each update uses six loss-bearing
+video chunks. 
+ 
+ 
+ 
+ Figure 11:  Compute-only inference profile on one H200 GPU, excluding model and
+sample loading and MP4 writing. Top: processing of one test-time interaction
+trajectory plus generation of the same five query videos. Bottom: interaction
+processing time for  K = 1 , 2 , 4 K=1,2,4  with the update counts held fixed within each
+method. The bottom panel does not compare query-generation time at  K > 1 K>1 . 
+ 
+ 
+ 
+ 
+ Appendix F  Additional Qualitative Results 
+
+ 
+ Figures  12 – 22  show selected held-out
+test actions. Each task shows two test environments and four actions per
+environment; Soft Pull shows two actions per environment. Each column uses the
+same initial observation and candidate
+action across methods; rows show ground truth, the four baselines, and
+our prediction. Simulation panels show the main camera only. 
+ 
+ 
+ 
+ 
+ Figure 12:  Friction: selected test actions. 
+ 
+ 
+ 
+ 
+ Figure 13:  Gravity: selected test actions. 
+ 
+ 
+ 
+ 
+ Figure 14:  Mass Collision: selected test actions. 
+ 
+ 
+ 
+ 
+ Figure 15:  Light Switch: selected test actions. 
+ 
+ 
+ 
+ 
+ Figure 16:  Mass Balance: selected test actions. 
+ 
+ 
+ 
+ 
+ Figure 17:  Mass  × \times  Friction: selected test actions. 
+ 
+ 
+ 
+ 
+ Figure 18:  Diverse Backgrounds: selected test actions. 
+ 
+ 
+ 
+ 
+ Figure 19:  Ball Friction: selected test actions. 
+ 
+ 
+ 
+ 
+ Figure 20:  Door Close: selected test actions. 
+ 
+ 
+ 
+ 
+ Figure 21:  Stick Balance: selected test actions. 
+ 
+ 
+ Figure 22:  Soft Pull: selected test actions. 
+ 
+ 
+ 
+ 
+ References 
+
+ 
+      
+ BWM Team (2026) 
+ 
+BWM Team.
+
+ 
+ BWM: A low-cost high-fidelity world simulator for robot learning.
+
+ 
+ arXiv preprint arXiv:2607.29302 , 2026.
+
+ 
+      
+ Dalal et al. (2025) 
+ 
+Karan Dalal, Daniel Koceja, Jiarui Xu, Yue Zhao, Shihao Han, Ka Chun Cheung,
+Jan Kautz, Yejin Choi, Yu Sun, and Xiaolong Wang.
+
+ 
+ One-minute video generation with test-time training.
+
+ 
+ In  Proceedings of the IEEE/CVF Conference on Computer Vision
+and Pattern Recognition , pp. 17702–17711, 2025.
+
+ 
+      
+ Hu et al. (2022) 
+ 
+Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean
+Wang, Lu Wang, and Weizhu Chen.
+
+ 
+ LoRA: Low-rank adaptation of large language models.
+
+ 
+ In  International Conference on Learning Representations , 2022.
+
+ 
+      
+ Liu et al. (2023) 
+ 
+Bo Liu, Yifeng Zhu, Chongkai Gao, Yihao Feng, Qiang Liu, Yuke Zhu, and Peter
+Stone.
+
+ 
+ LIBERO: Benchmarking knowledge transfer for lifelong robot learning.
+
+ 
+ In  Advances in Neural Information Processing Systems, Datasets
+and Benchmarks Track , 2023.
+
+ 
+      
+ Oquab et al. (2024) 
+ 
+Maxime Oquab, Timothée Darcet, Théo Moutakanni, Huy V. Vo, Marc
+Szafraniec, Vasil Khalidov, Pierre Fernandez, Daniel Haziza, Francisco Massa,
+Alaaeldin El-Nouby, Mido Assran, Nicolas Ballas, Wojciech Galuba, Russell
+Howes, Po-Yao Huang, Shang-Wen Li, Ishan Misra, Michael Rabbat, Vasu Sharma,
+Gabriel Synnaeve, Hu Xu, Hervé Jégou, Julien Mairal, Patrick Labatut,
+Armand Joulin, and Piotr Bojanowski.
+
+ 
+ DINOv2: Learning robust visual features without supervision.
+
+ 
+ Transactions on Machine Learning Research , 2024.
+
+ 
+    
+ 
+ 
+ 
+ 
+ 
+ 
+   
+    Experimental support, please
+     view the build logs 
+    for errors. Generated by
+     
+       
+        L
+         A 
+        T
+         E 
+       
+       xml 
+       
+     .
+   
+   
+     Instructions for reporting errors 
+     We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+      support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+      methods listed below: 
+     
+       Click the "Report Issue"  ( 
+             
+           )  button, located in the page header. 
+     
+     Tip:  You can select the relevant text first, to include it in your report. 
+     Our team has already identified  the following issues . We appreciate your time reviewing and reporting rendering errors we
+      may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+      should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+      all. 
+     Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a  list of packages that need conversion , and welcome  developer contributions . 
+   
+ 
+   
+     
+       
+        We gratefully acknowledge support from
+        our  major funders ,
+         member institutions ,  ,
+        and all contributors.
+       
+       
+         About 
+         · 
+         Help 
+         · 
+         Contact 
+         · 
+         Subscribe 
+         · 
+         Copyright 
+         · 
+         Privacy 
+         · 
+         Accessibility 
+         · 
+         Operational Status  (opens in new tab) 
+       
+     
+
+     
+       Major funding support from 
+       
+         
+           
+         
+         
+           
+         
+         
+           
+         
+       
+     
+   
+ 
+   
+     
+       
+     
+   
+ 
+ 

@@ -1,0 +1,10900 @@
+Langevin SDEs have unique transient dynamics
+// Restore the saved color scheme preference, or
+  // enact the browser preference if "automatic", 
+  // without expecting DOM load to have completed.
+  //
+  // Also restore any saved readingmode and ToC display preferences.
+  function initializeReadingPreferences() {
+    let saved_theme = localStorage.getItem("ar5iv_theme") || "automatic";
+    if (saved_theme === "automatic") {
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        saved_theme = "dark";
+      }
+    }
+    if (saved_theme == "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+
+    const tocDisplay = localStorage.getItem('arxiv_html_paper_toc_display');
+    if (tocDisplay) {
+      document.documentElement.setAttribute("data-toc-display", tocDisplay);
+    }
+    const readingMode = localStorage.getItem('arxiv_html_paper_reading_mode');
+    if (readingMode) {
+      document.documentElement.setAttribute("data-reading-mode", readingMode);
+    }
+    // Pre-apply spinout-banner dismissal here, before the banner paints, so it
+    // never flashes in only to be hidden later by the deferred arxiv-header.js.
+    // Key matches arxiv-header.js: "arxiv-banner-dismissed:" + data-banner-name.
+    if (localStorage.getItem('arxiv-banner-dismissed:spinout-nonprofit')) {
+      document.documentElement.setAttribute("data-banner-dismissed", "");
+    }
+  }
+  // Run as soon as JS starts, to minimize repainting
+  initializeReadingPreferences();
+/* Banner pre-dismissal (set above before paint -> no flash-then-hide) and
+     reading-mode chrome hiding. */
+  html[data-banner-dismissed] .ds-announcement { display: none; }
+  html[data-reading-mode="enabled"] .ds-announcement,
+  html[data-reading-mode="enabled"] .ds-site-footer { display: none; }
+  /* Print keeps the reader header's logo, not its controls: the theme's own print rule
+     (header, nav { display: none }) sits in a layer that its header layer outranks. */
+  @media print { .arxiv-html-header .html-header-nav { display: none; } }
+  /* Keep the announcement text dark on the Open-Blue band in both colour themes
+     (otherwise it inherits the paper's warm-wash text in dark mode and washes out). */
+  .ds-announcement-text { color: var(--arxiv-ink, #1c1a17); }
+Report GitHub Issue
+×
+Title:
+Content selection saved. Describe the issue below:
+Description:
+Submit without GitHub
+Submit in GitHub
+arXiv is now an independent nonprofit!
+Learn more
+×
+Back to arXiv
+Why HTML?
+Report Issue
+Back to Abstract
+Download PDF
+Abstract
+1
+Introduction
+2
+Structural identifiability
+2.1
+When is a Langevin SDE
+non
+-identifiable from marginals?
+2.2
+When is a Langevin SDE identifiable from marginals?
+Discussion.
+2.3
+The time-inhomogeneous case
+Discussion.
+3
+Experiments
+3.1
+Structural identifiability
+Experimental setup.
+Metrics.
+Results.
+3.2
+Practical identifiability
+Experimental setup.
+Results.
+Diffusion MAE curve (from trajectories).
+Drift MAE curve (from trajectories).
+Diffusion MAE curve (from marginals).
+Drift MAE curve (from marginals).
+Heuristics for optimal data collection.
+4
+Conclusions
+Contributions.
+Limitations.
+References
+A
+Theoretical background and Fisher information analyses
+A.1
+Existence and uniqueness of solutions for a Langevin SDE
+A.2
+Weak form of the Fokker-Planck equation of a Langevin SDE
+A.3
+Properties of the Fokker-Planck equation
+A.4
+Fisher information derivations and additional experiments
+A.4.1
+Fisher information on the diffusivity
+A.5
+Additional experiments for Fisher information
+B
+Non-identifiability examples
+C
+Additional experiments
+Software and hardware details.
+License: CC BY 4.0
+arXiv:2505.21770v1 [math.PR] 27 May 2025
+Langevin SDEs have unique transient dynamics
+Vincent Guan
+Affiliation:
+University of British Columbia
+Affiliation:
+Vancouver, Canada
+Email:
+vguan23@math.ubc.ca
+Joseph Janssen
+Affiliation:
+University of British Columbia
+Affiliation:
+Vancouver, Canada
+Email:
+joejanssen@eoas.ubc.ca
+Nicolas Lanzetti
+Affiliation:
+ETH Zürich
+Affiliation:
+Zürich, Switzerland
+Email:
+lnicolas@ethz.ch
+Antonio Terpin
+Affiliation:
+ETH Zürich
+Affiliation:
+Zürich, Switzerland
+Email:
+aterpin@ethz.ch
+Geoffrey Schiebinger
+Affiliation:
+University of British Columbia
+Affiliation:
+Vancouver, Canada
+Email:
+geoff@math.ubc.ca
+Elina Robeva
+Affiliation:
+University of British Columbia
+Affiliation:
+Vancouver, Canada
+Email:
+erobeva@math.ubc.ca
+Abstract
+The overdamped Langevin stochastic differential equation (SDE) is a classical physical model used for chemical, genetic, and hydrological dynamics. In this work, we prove that the drift and diffusion terms of a Langevin SDE are jointly identifiable from temporal marginal distributions if and only if the process is observed out of equilibrium. This complete characterization of structural identifiability removes the long-standing assumption that the diffusion must be known to identify the drift. We then complement our theory with experiments in the finite sample setting and study the practical identifiability of the drift and diffusion, in order to propose heuristics for optimal data collection.
+1
+Introduction
+The overdamped Langevin stochastic differential equation (SDE) is a classical physical model for chemical
+(
+Grønbech-jensen and Doniach, 1994
+)
+, genetic
+(
+Weinreb et al., 2018
+)
+, and hydrological
+(
+Verwoerd and Kulasiri, 2003
+)
+dynamics. It has also seen recent usage for generative models
+(
+Ho et al., 2020
+;
+Balcerak et al., 2025
+)
+. The overdamped Langevin models potential-driven stochastic dynamics, with the drift defined as the gradient of a smooth potential
+Ψ
+∈
+C
+∞
+​
+(
+ℝ
+d
+)
+\Psi\in C^{\infty}(\mathbb{R}^{d})
+and additive driving noise introduced via an isotropic Brownian motion with diffusivity
+σ
+2
+\sigma^{2}
+(
+Pavliotis, 2014
+)
+:
+d
+​
+X
+t
+=
+−
+∇
+Ψ
+​
+(
+X
+t
+)
+​
+d
+​
+t
++
+σ
+​
+d
+​
+W
+t
+.
+\mathrm{d}X_{t}{}=-\nabla\Psi(X_{t})\mathrm{d}t{}+\sigma\mathrm{d}W_{t}{}.
+(1)
+The drift and diffusion encode important information about the underlying process. For example, in developmental biology,
+Ψ
+\Psi
+determines Waddington’s epigenetic landscape, which governs cell differentiation during embryonic development
+(
+Lavenant et al., 2021
+)
+. In hydrology, groundwater flow in a homogeneous and isotropic aquifer is driven by the pressure gradient (scaled by the medium’s hydraulic conductivity) and some diffusion
+(
+Mehmood et al., 2023
+;
+Kalejaiye and Cardoso, 2005
+;
+Royer, 2019
+)
+. In contrast, the diffusivity
+σ
+2
+\sigma^{2}
+controls the intensity of random collisions
+(
+Das and Butler, 1996
+)
+, and thus informs cell fate probabilities and groundwater turbulence
+(
+Forrow, 2024
+;
+Beven et al., 1993
+)
+. Finally, drift and diffusion jointly yield causal insights, such as post-intervention distributions and gene regulatory networks
+(
+Hansen and Sokol, 2014
+;
+Weinreb et al., 2018
+)
+.
+Numerous studies have shown that drift and diffusion can be accurately inferred from observed trajectories
+(
+Beskos et al., 2006
+;
+Nielsen et al., 2000
+;
+Bishwal, 2007
+;
+Manten et al., 2024
+;
+Wang et al., 2024
+)
+. However, in some important applications, individual trajectories are not accessible. For instance, in single-cell biology, scRNA sequencing technologies destroy cells upon measurement
+(
+Trapnell et al., 2014
+)
+. Similarly, in hydrology, geophysical inversion can only track contaminant plumes rather than individual particle trajectories
+(
+Nenna et al., 2011
+)
+. Thus, observational data is often limited to population snapshots, or temporal marginal distributions at various times
+t
+t
+, which we denote by
+p
+⁡
+(
+⋅
+,
+t
+)
+p(\cdot,t)
+and refer to as marginals. This leads to the following fundamental question:
+Under what conditions are
+−
+∇
+Ψ
+-\nabla\Psi
+and
+σ
+2
+\sigma^{2}
+in (
+1
+) identifiable from the marginals
+{
+p
+⁡
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p(\cdot,t)\}_{t\in[0,T]}
+?
+In particular, there could be multiple SDEs that produce the same set of marginals
+{
+p
+⁡
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p(\cdot,t)\}_{t\in[0,T]}
+.
+In general, non-identifiability can arise for a multitude of reasons, including non-unique stationary distributions, undetectable rotations, and rank-degeneracy
+(
+Weinreb et al., 2018
+;
+Lavenant et al., 2021
+;
+Wang et al., 2024
+;
+Guan et al., 2024
+)
+, which we discuss in
+Sections
+2.1
+and
+B
+.
+Recent work has provided the first rigorous conditions for identifying an SDE solely from observational data. In particular,
+Wang et al. (2024)
+proved necessary and sufficient conditions for identifying linear additive noise SDEs, given observed trajectories. Following this,
+Guan et al. (2024)
+proved necessary and sufficient conditions for identifying the same SDE, given observed marginals.
+However, linear drift is inadequate for capturing multistable dynamics, such as cell differentiation, since it can only model a single potential well.
+In contrast, Langevin SDEs model general potential-driven dynamics. Yet, no existing theory has established conditions under which the Langevin SDE (
+1
+) can be identified from its marginals. To the best of our knowledge, the most comprehensive results state that the drift
+−
+∇
+Ψ
+-\nabla\Psi
+can be identified from
+{
+p
+⁡
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p(\cdot,t)\}_{t\in[0,T]}
+if the diffusivity
+σ
+2
+\sigma^{2}
+is known:
+observe
+{
+p
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+and
+σ
+2
+is known
+⟹
+−
+∇
+Ψ
+is identifiable
+.
+\text{observe }\hskip 2.84544pt\{p(\cdot,t)\}_{t\in[0,T]}\quad\text{and}\quad\sigma^{2}\hskip 2.84544pt\text{ is known}\quad\implies\quad{-\nabla\Psi}\hskip 2.84544pt\text{ is identifiable}.
+This was first proven by
+Hashimoto et al. (2016)
+.
+Lavenant et al. (2021)
+extended the result for time-inhomogeneous drift fields
+−
+∇
+Ψ
+​
+(
+x
+,
+t
+)
+-\nabla\Psi(x,t)
+, and showed that a single sample per marginal suffices, as long as the measurement times are dense. Finally,
+Neklyudov et al. (2023)
+showed that the result also holds if the known diffusivity
+σ
+​
+(
+t
+)
+2
+\sigma(t)^{2}
+is time-inhomogeneous. Accordingly, almost every parameter estimation scheme has been developed to recover
+−
+∇
+Ψ
+-\nabla\Psi
+given a known diffusivity
+σ
+2
+\sigma^{2}
+(
+Hashimoto et al., 2016
+;
+Neklyudov et al., 2023
+;
+Lavenant et al., 2021
+;
+Chizat et al., 2022
+;
+Shen et al., 2024
+;
+Zhang, 2024
+)
+. However, the diffusivity coefficient is typically unknown in practice and must also be estimated from data.
+However, it remains unclear whether it is possible and, if so, under which circumstances
+both
+the drift and diffusion of the overdamped Langevin SDE (
+1
+) can be identified from the observed marginals.
+In this work, we resolve this long-standing question by providing, in our
+Theorem
+2.4
+,
+necessary and sufficient conditions
+for identifiability:
+observe non-stationary
+{
+p
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+⇔
+−
+∇
+Ψ
+and
+σ
+2
+are identifiable
+.
+\text{observe non-stationary }\hskip 2.84544pt\{p(\cdot,t)\}_{t\in[0,T]}\quad\iff\quad{-\nabla\Psi}\text{ and }\sigma^{2}\text{ are identifiable}.
+Since processes are typically observed outside of equilibrium, our main result suggests that joint estimation of the drift and diffusion is possible in most real-world settings.
+We complement our theoretical result with experiments in the finite sample setting, performing parameter estimation on various Langevin SDEs using two state-of-the-art methods for jointly estimating drift and diffusion from temporal marginals:
+APPEX
+(
+Guan et al., 2024
+)
+and
+JKOnet
+∗
+(
+Terpin et al., 2024
+)
+. Finally, we study the practical identifiability of the drift and diffusion terms and suggest heuristics to optimize measurements for accurate parameter estimates.
+2
+Structural identifiability
+In order to ensure that there exists a unique solution to the Langevin SDE (
+1
+), we make the standard assumptions that the potential
+Ψ
+∈
+C
+∞
+​
+(
+ℝ
+d
+)
+\Psi\in C^{\infty}(\mathbb{R}^{d})
+is smooth and assume that the standard growth condition
+‖
+∇
+Ψ
+​
+(
+x
+)
+‖
+≤
+K
+⁡
+(
+1
++
+‖
+x
+‖
+)
+\norm{\nabla\Psi(x)}\leq K(1+\norm{x})
+holds for some
+K
+>
+0
+K>0
+(see
+Section
+A.1
+).
+Under these assumptions, the Langevin SDE (
+1
+) is well-defined and its marginals are determined by the Fokker-Plank equation:
+∂
+p
+⁡
+(
+x
+,
+t
+)
+∂
+t
+=
+ℒ
+9
+∇
+Ψ
+,
+σ
+2
+(
+p
+(
+⋅
+,
+t
+)
+)
+(
+x
+)
+≔
+∇
+⋅
+(
+p
+(
+x
+,
+t
+)
+∇
+Ψ
+(
+x
+)
+)
++
+σ
+2
+2
+Δ
+p
+(
+x
+,
+t
+)
+∀
+x
+∈
+ℝ
+d
+,
+t
+≥
+0
+,
+\frac{\partial p(x,t)}{\partial t}=\mathcal{L}_{\shortminus\nabla\Psi,\sigma^{2}}(p(\cdot,t))(x)\coloneqq\nabla\cdot(p(x,t)\nabla\Psi(x))+\frac{\sigma^{2}}{2}\Delta p(x,t)\quad\forall x\in\mathbb{R}^{d},t\geq 0,
+(2)
+with initial distribution
+p
+0
+​
+(
+x
+)
+=
+p
+​
+(
+x
+,
+0
+)
+p_{0}(x)=p(x,0)
+. If
+p
+0
+p_{0}
+is not twice differentiable, then (
+2
+) is instead defined in the weak distributional sense (see
+Section
+A.2
+).
+For simplicity, we suppose that
+p
+0
+p_{0}
+is twice differentiable and work with the classical Fokker-Planck equation (
+2
+), but note that our results extend to the weak formulation with general probability measures. Since the Fokker-Planck operator
+ℒ
+9
+∇
+Ψ
+,
+σ
+2
+\mathcal{L}_{\shortminus\nabla\Psi,\sigma^{2}}
+determines the evolution of the marginals, we can use it to rigorously define non-identifiability within the class of Langevin SDEs.
+Definition 2.1
+(Non-identifiability)
+.
+Let
+{
+p
+⁡
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p(\cdot,t)\}_{t\in[0,T]}
+denote the collection of observed marginals from a Langevin SDE (
+1
+) with initial density
+p
+0
+∈
+C
+2
+​
+(
+ℝ
+d
+)
+p_{0}\in C^{2}(\mathbb{R}^{d})
+. We say that the SDE is
+non-identifiable
+from
+{
+p
+⁡
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p(\cdot,t)\}_{t\in[0,T]}
+if there exist distinct parameter pairs
+(
+−
+∇
+Ψ
+1
+,
+σ
+1
+2
+)
+≠
+(
+−
+∇
+Ψ
+2
+,
+σ
+2
+2
+)
+(-\nabla\Psi_{1},\sigma_{1}^{2})\neq(-\nabla\Psi_{2},\sigma_{2}^{2})
+, i.e.
+−
+∇
+Ψ
+1
+​
+(
+x
+)
+≠
+−
+∇
+Ψ
+2
+​
+(
+x
+)
+-\nabla\Psi_{1}(x)\neq-\nabla\Psi_{2}(x)
+for some
+x
+∈
+ℝ
+d
+x\in\mathbb{R}^{d}
+and/or
+σ
+1
+2
+≠
+σ
+2
+2
+\sigma_{1}^{2}\neq\sigma_{2}^{2}
+, such that the associated Fokker–Planck operators are equivalent on each of the observed marginals:
+ℒ
+−
+∇
+Ψ
+1
+,
+σ
+1
+2
+​
+(
+p
+⁡
+(
+⋅
+,
+t
+)
+)
+​
+(
+x
+)
+=
+ℒ
+−
+∇
+Ψ
+2
+,
+σ
+2
+2
+​
+(
+p
+⁡
+(
+⋅
+,
+t
+)
+)
+​
+(
+x
+)
+,
+∀
+(
+x
+,
+t
+)
+∈
+ℝ
+d
+×
+[
+0
+,
+T
+]
+.
+\displaystyle\mathcal{L}_{-\nabla\Psi_{1},\sigma_{1}^{2}}(p(\cdot,t))(x)=\mathcal{L}_{-\nabla\Psi_{2},\sigma_{2}^{2}}(p(\cdot,t))(x),\quad\forall(x,t)\in\mathbb{R}^{d}\times[0,T].
+(3)
+We say that the SDE is identifiable from
+{
+p
+⁡
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p(\cdot,t)\}_{t\in[0,T]}
+(within the class of well-defined Langevin SDEs with smooth potentials) if (
+3
+) fails to hold for all
+(
+−
+∇
+Ψ
+1
+,
+σ
+1
+2
+)
+≠
+(
+−
+∇
+Ψ
+2
+,
+σ
+2
+2
+)
+(-\nabla\Psi_{1},\sigma_{1}^{2})\neq(-\nabla\Psi_{2},\sigma_{2}^{2})
+.
+Two distinct Langevin SDEs have the same marginals
+{
+p
+1
+​
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+=
+{
+p
+2
+​
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p_{1}(\cdot,t)\}_{t\in[0,T]}=\{p_{2}(\cdot,t)\}_{t\in[0,T]}
+if and only if the flows
+∂
+p
+1
+∂
+t
+\frac{\partial p_{1}}{\partial t}
+and
+∂
+p
+2
+∂
+t
+\frac{\partial p_{2}}{\partial t}
+are equal at all times. In this case, the two processes cannot be distinguished, and the Langevin SDEs are non-identifiable.
+Conversely, the SDE is identifiable if there is a unique gradient field and diffusivity
+(
+−
+∇
+Ψ
+,
+σ
+2
+)
+(-\nabla\Psi,\sigma^{2})
+that are compatible with
+{
+p
+⁡
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p(\cdot,t)\}_{t\in[0,T]}
+. Finally, note that we can only determine
+σ
+2
+\sigma^{2}
+, instead of
+σ
+\sigma
+itself, since
+σ
+​
+d
+​
+W
+t
+\sigma\mathrm{d}W_{t}{}
+and
+−
+σ
+​
+d
+​
+W
+t
+-\sigma\mathrm{d}W_{t}{}
+both obey the law
+𝒩
+⁡
+(
+0
+,
+σ
+2
+​
+d
+​
+t
+)
+\mathcal{N}(0,\sigma^{2}\mathrm{d}t)
+.
+2.1
+When is a Langevin SDE
+non
+-identifiable from marginals?
+Before presenting our main result, we recall a classical example
+(
+Lavenant et al., 2021
+;
+Guan et al., 2024
+)
+, which shows that, in general, the Langevin SDE (
+1
+) is non-identifiable from its marginals.
+Example 2.2
+(Non-identifiability at the stationary distribution)
+.
+Consider the two Langevin SDEs with quadratic potential, also known as Ornstein-Uhlenbeck processes,
+d
+​
+X
+t
+\displaystyle\mathrm{d}X_{t}{}
+=
+−
+X
+t
+​
+d
+​
+t
++
+d
+​
+W
+t
+X
+0
+∼
+p
+0
+\displaystyle=-X_{t}\mathrm{d}t{}+\mathrm{d}W_{t}{}\qquad\qquad\,\,X_{0}\sim p_{0}
+d
+​
+Y
+t
+\displaystyle\mathrm{d}Y_{t}{}
+=
+−
+10
+​
+Y
+t
+​
+d
+​
+t
++
+10
+​
+d
+​
+W
+t
+Y
+0
+∼
+p
+0
+,
+\displaystyle=-10Y_{t}\mathrm{d}t{}+\sqrt{10}\mathrm{d}W_{t}{}\qquad Y_{0}\sim p_{0},
+with
+p
+0
+=
+𝒩
+⁡
+(
+0
+,
+1
+2
+)
+p_{0}=\mathcal{N}(0,\frac{1}{2})
+, i.e., zero-mean Gaussian with variance
+1
+2
+\frac{1}{2}
+. Since
+p
+0
+p_{0}
+is the stationary distribution for both SDEs, we have
+X
+t
+,
+Y
+t
+∼
+p
+⁡
+(
+⋅
+,
+t
+)
+=
+p
+0
+X_{t},Y_{t}\sim p(\cdot,t)=p_{0}
+for all
+t
+t
+, which makes the two SDEs indistinguishable from the marginals
+{
+p
+⁡
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p(\cdot,t)\}_{t\in[0,T]}
+.
+Thus, they are non-identifiable from
+{
+p
+⁡
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p(\cdot,t)\}_{t\in[0,T]}
+.
+We can extend this classical example to Langevin SDEs for non-quadratic potentials:
+Proposition 2.3
+(Stationary marginals imply non-identifiability)
+.
+If
+p
+eq
+p_{\mathrm{eq}}
+is a stationary marginal for the Langevin SDE (
+1
+), then it is a stationary marginal also for the “rescaled” Langevin SDE
+d
+X
+t
+=
+−
+α
+∇
+Ψ
+(
+X
+t
+)
+d
+t
++
+α
+σ
+d
+W
+t
+,
+\mathrm{d}X_{t}=-\alpha\nabla\Psi(X_{t})\mathrm{d}t+\sqrt{\alpha}\sigma\mathrm{d}W_{t},
+(4)
+for any
+α
+>
+0
+\alpha>0
+.
+In particular, the Langevin SDE (
+1
+) is non-identifiable from the marginals
+{
+p
+⁡
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p(\cdot,t)\}_{t\in[0,T]}
+if these are stationary.
+Proof.
+To fix the ideas, let us consider first the case of a confining potential
+Ψ
+\Psi
+(
+Pavliotis, 2014
+, Definition 4.2)
+. In this case, both (
+1
+) and (
+4
+)
+admit a unique stationary (Gibbs) distribution
+(
+Pavliotis, 2014
+, Proposition 4.2)
+, and they coincide since
+α
+​
+Ψ
+α
+​
+σ
+2
+=
+Ψ
+σ
+2
+\frac{\alpha\Psi}{\alpha\sigma^{2}}=\frac{\Psi}{\sigma^{2}}
+:
+p
+eq
+​
+(
+x
+)
+=
+1
+Z
+Ψ
+,
+σ
+2
+​
+exp
+⁡
+(
+−
+2
+​
+Ψ
+​
+(
+x
+)
+σ
+2
+)
+,
+where
+Z
+Ψ
+,
+σ
+2
+=
+∫
+ℝ
+d
+exp
+⁡
+(
+−
+2
+​
+Ψ
+​
+(
+x
+)
+σ
+2
+)
+​
+𝑑
+x
+.
+p_{\mathrm{eq}}(x)=\frac{1}{Z_{\Psi,\sigma^{2}}}\exp\left(-\frac{2\Psi(x)}{\sigma^{2}}\right),\qquad\text{where}\qquad Z_{\Psi,\sigma^{2}}=\int_{\mathbb{R}^{d}}\exp\left(-\frac{2\Psi(x)}{\sigma^{2}}\right)\mathrm{d}x{}.
+(5)
+The expression for the stationary distribution (
+5
+) suggests that stationarity only allows us, at best, to infer the ratio
+Ψ
+σ
+2
+\frac{\Psi}{\sigma^{2}}
+and not
+both
+Ψ
+\Psi
+and
+σ
+2
+\sigma^{2}
+.
+This is also the key idea for the proof in the general case. In fact, if
+p
+eq
+p_{\mathrm{eq}}
+is a stationary distribution for
+ℒ
+−
+∇
+Ψ
+,
+σ
+2
+\mathcal{L}_{-\nabla\Psi,\sigma^{2}}
+, then
+0
+\displaystyle 0
+=
+ℒ
+−
+∇
+Ψ
+,
+σ
+2
+(
+p
+eq
+)
+(
+x
+)
+=
+∇
+⋅
+(
+p
+eq
+(
+x
+)
+∇
+Ψ
+(
+x
+)
+)
++
+σ
+2
+2
+Δ
+p
+eq
+(
+x
+)
+\displaystyle=\mathcal{L}_{-\nabla\Psi,\sigma^{2}}(p_{\mathrm{eq}})(x)=\nabla\cdot(p_{\mathrm{eq}}(x)\nabla\Psi(x))+\frac{\sigma^{2}}{2}\Delta p_{\mathrm{eq}}(x)
+⇔
+0
+\displaystyle\Leftrightarrow 0
+=
+α
+(
+∇
+⋅
+(
+p
+eq
+(
+x
+)
+∇
+Ψ
+(
+x
+)
+)
++
+σ
+2
+2
+Δ
+p
+eq
+(
+x
+)
+)
+=
+∇
+⋅
+(
+p
+eq
+(
+x
+)
+∇
+(
+α
+Ψ
+(
+x
+)
+)
+)
++
+(
+α
+​
+σ
+)
+2
+2
+Δ
+p
+eq
+(
+x
+)
+\displaystyle=\alpha\left(\nabla\cdot(p_{\mathrm{eq}}(x)\nabla\Psi(x))+\frac{\sigma^{2}}{2}\Delta p_{\mathrm{eq}}(x)\right)=\nabla\cdot(p_{\mathrm{eq}}(x)\nabla(\alpha\Psi(x)))+\frac{(\sqrt{\alpha}\sigma)^{2}}{2}\Delta p_{\mathrm{eq}}(x)
+=
+ℒ
+−
+∇
+(
+α
+​
+Ψ
+)
+,
+α
+​
+σ
+2
+​
+(
+p
+eq
+)
+​
+(
+x
+)
+.
+\displaystyle=\mathcal{L}_{-\nabla(\alpha\Psi),\alpha\sigma^{2}}(p_{\mathrm{eq}})(x).
+That is,
+p
+eq
+p_{\mathrm{eq}}
+is a stationary distribution for both (
+1
+) and (
+4
+).
+In particular, if
+p
+​
+(
+x
+,
+0
+)
+=
+p
+eq
+​
+(
+x
+)
+p(x,0)=p_{\mathrm{eq}}(x)
+then we have
+p
+​
+(
+x
+,
+t
+)
+=
+p
+eq
+​
+(
+x
+)
+p(x,t)=p_{\mathrm{eq}}(x)
+for both processes and the Langevin SDE (
+1
+) is non-identifiable.
+∎
+2.2
+When is a Langevin SDE identifiable from marginals?
+We have shown that non-stationarity is a
+necessary
+condition for identifiability.
+Below, we show that this condition is also sufficient. Thus, the Langevin SDE (
+1
+) is identifiable
+if and only if
+we do not observe it at stationary. For this, we argue that if the marginals
+{
+p
+⁡
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p(\cdot,t)\}_{t\in[0,T]}
+of distinct Langevin SDEs evolve identically, then each marginal is in fact a stationary distribution to a
+residual
+Langevin SDE. If the drift and diffusion of this SDE are time-homogeneous, then the uniqueness of the stationary distribution implies that the observed marginals are all equal, and hence stationary.
+Theorem 2.4
+(Identifiability of Langevin SDEs)
+.
+The Langevin SDE (
+1
+) is identifiable from its marginals
+{
+p
+⁡
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p(\cdot,t)\}_{t\in[0,T]}
+if and only if
+p
+(
+⋅
+,
+t
+=
+0
+)
+p(\cdot,t=0)
+is not its stationary distribution.
+Proof.
+We prove both directions separately by considering their contrapositives.
+“Stationary
+⇒
+\Rightarrow
+non-identifiable”:
+This is given by
+Proposition
+2.3
+.
+“Non-identifiable
+⇒
+\Rightarrow
+stationary”: Without loss of generality, we may assume that
+σ
+1
+2
+≥
+σ
+2
+2
+\sigma_{1}^{2}\geq\sigma_{2}^{2}
+. In fact, we only need to consider the case where
+σ
+1
+2
+>
+σ
+2
+2
+\sigma_{1}^{2}>\sigma_{2}^{2}
+because if
+σ
+1
+2
+=
+σ
+2
+2
+\sigma_{1}^{2}=\sigma_{2}^{2}
+, then
+∇
+Ψ
+1
+=
+∇
+Ψ
+2
+\nabla\Psi_{1}=\nabla\Psi_{2}
+, which contradicts non-identifiability; see
+(
+Lavenant et al., 2021
+, Theorem 2.1)
+.
+From the definition of non-identifiability, there are distinct parameter sets
+(
+−
+∇
+Ψ
+1
+,
+σ
+1
+2
+)
+≠
+(
+−
+∇
+Ψ
+2
+,
+σ
+2
+2
+)
+(-\nabla\Psi_{1},\sigma_{1}^{2})\neq(-\nabla\Psi_{2},\sigma_{2}^{2})
+whose Fokker-Planck operators are equivalent on
+{
+p
+⁡
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p(\cdot,t)\}_{t\in[0,T]}
+:
+ℒ
+−
+∇
+Ψ
+1
+,
+σ
+1
+2
+​
+(
+p
+⁡
+(
+⋅
+,
+t
+)
+)
+​
+(
+x
+)
+=
+ℒ
+−
+∇
+Ψ
+2
+,
+σ
+2
+2
+​
+(
+p
+⁡
+(
+⋅
+,
+t
+)
+)
+​
+(
+x
+)
+∀
+(
+x
+,
+t
+)
+∈
+ℝ
+d
+×
+[
+0
+,
+T
+]
+.
+\displaystyle\mathcal{L}_{-\nabla\Psi_{1},\sigma_{1}^{2}}(p(\cdot,t))(x)=\mathcal{L}_{-\nabla\Psi_{2},\sigma_{2}^{2}}(p(\cdot,t))(x)\qquad\forall(x,t)\in\mathbb{R}^{d}\times[0,T].
+(6)
+By the linearity of the Fokker-Planck operator (cf.
+Proposition
+A.2
+), we have
+0
+\displaystyle 0
+=
+(
+ℒ
+9
+∇
+Ψ
+1
+,
+σ
+1
+2
+−
+ℒ
+9
+∇
+Ψ
+2
+,
+σ
+2
+2
+)
+(
+p
+(
+⋅
+,
+t
+)
+)
+(
+x
+)
+=
+∇
+⋅
+(
+p
+(
+x
+,
+t
+)
+∇
+(
+Ψ
+1
+−
+Ψ
+2
+)
+(
+x
+)
+)
++
+σ
+1
+2
+−
+σ
+2
+2
+2
+Δ
+p
+(
+x
+,
+t
+)
+\displaystyle=(\mathcal{L}_{\shortminus\nabla\Psi_{1},\sigma_{1}^{2}}-\mathcal{L}_{\shortminus\nabla\Psi_{2},\sigma_{2}^{2}})(p(\cdot,t))(x)=\nabla\cdot(p(x,t)\nabla(\Psi_{1}-\Psi_{2})(x))+\frac{\sigma_{1}^{2}-\sigma_{2}^{2}}{2}\Delta p(x,t)
+(7)
+for all
+t
+∈
+[
+0
+,
+T
+]
+t\in[0,T]
+and
+x
+∈
+ℝ
+d
+x\in\mathbb{R}^{d}
+. We may therefore define a new potential
+Ψ
+\Psi
+satisfying
+∇
+Ψ
+=
+∇
+(
+Ψ
+1
+−
+Ψ
+2
+)
+\nabla\Psi=\nabla(\Psi_{1}-\Psi_{2})
+, along with a new diffusivity
+σ
+2
+≔
+σ
+1
+2
+−
+σ
+2
+2
+>
+0
+\sigma^{2}\coloneqq\sigma_{1}^{2}-\sigma_{2}^{2}>0
+, and rewrite (
+7
+) as
+0
+=
+ℒ
+9
+∇
+Ψ
+,
+σ
+2
+(
+p
+(
+⋅
+,
+t
+)
+)
+(
+x
+)
+=
+∇
+⋅
+(
+p
+(
+x
+,
+t
+)
+∇
+Ψ
+(
+x
+)
+)
++
+σ
+2
+2
+Δ
+p
+(
+x
+,
+t
+)
+.
+0=\mathcal{L}_{\shortminus\nabla\Psi,\sigma^{2}}(p(\cdot,t))(x)=\nabla\cdot\bigl(p(x,t)\nabla\Psi(x)\bigr)+\frac{\sigma^{2}}{2}\Delta p(x,t).
+(8)
+Thus, non-identifiability implies that each marginal
+p
+⁡
+(
+⋅
+,
+t
+)
+p(\cdot,t)
+is a solution to the stationary Fokker-Planck equation (
+8
+), parameterized by the “residual” drift and diffusion. To prove that the observed marginals are stationary, it suffices to prove that (
+8
+) admits a unique stationary solution, since each marginal would then coincide, i.e.
+p
+⁡
+(
+⋅
+,
+t
+)
+=
+p
+⁡
+(
+⋅
+,
+0
+)
+p(\cdot,t)=p(\cdot,0)
+∀
+t
+≥
+0
+\forall t\geq 0
+. First, we observe that the regularity and linear growth conditions assumed for the drift are also satisfied by the residual drift
+−
+∇
+Ψ
+=
+−
+∇
+(
+Ψ
+1
+−
+Ψ
+2
+)
+-\nabla\Psi=-\nabla(\Psi_{1}-\Psi_{2})
+. We also note that
+σ
+2
+=
+σ
+1
+2
+−
+σ
+2
+2
+>
+0
+\sigma^{2}=\sigma_{1}^{2}-\sigma_{2}^{2}>0
+ensures that
+ℒ
+−
+∇
+Ψ
+,
+σ
+2
+\mathcal{L}_{-\nabla\Psi,\sigma^{2}}
+is uniformly elliptic. It then follows from classical theory that if a stationary distribution to the residual process exists, then it must be unique (see
+(
+Bogachev et al., 2022
+, Theorem 4.16, Example 4.1.8)
+and
+(
+Kang and Ramanan, 2014
+)
+).
+∎
+Discussion.
+Two observations are in order. First,
+Proposition
+2.3
+shows that one needs to know either the diffusivity
+σ
+2
+\sigma^{2}
+or the potential
+Ψ
+\Psi
+to disambiguate the true SDE from candidates which generate the same stationary marginals. With
+Theorem
+2.4
+, we show that this assumption is not required if the marginals are transient.
+Importantly, in practice, it is generally hard to get a good a priori estimate of the diffusivity parameter. Instead, it is often possible to observe transient behavior.
+Second, our theoretical result relies on continuous observations and an infinite-data regime. However, in practice, one can only access a finite number of samples from a finite number of marginals. We empirically investigate the finite-data setting in
+Section
+3
+.
+2.3
+The time-inhomogeneous case
+Theorem
+2.4
+assumes that the drift and diffusion terms are time-homogeneous. However, many physical systems have time-inhomogeneous dynamics. For example, in hydrology, extreme events, such as droughts or fires, can cause “regime shifts" in the underlying functional relationships
+(
+Runge et al., 2019
+;
+Günther et al., 2024
+;
+Pedersen, 1995
+;
+Seibert et al., 2010
+;
+Maina and Siirila-Woodburn, 2020
+)
+. We may define this notion for Langevin SDEs, such that the drift and diffusion terms change due to regime shifts at specific times
+{
+t
+i
+}
+i
+=
+0
+n
+−
+1
+\{t_{i}\}_{i=0}^{n-1}
+(with the drift remaining smooth and satisfying the growth condition in each regime to ensure well-posedness).
+Definition 2.5
+(Time-inhomogeneous Langevin SDE with discrete regimes)
+.
+A time-inhomogeneous Langevin SDE with discrete regimes, marked by events taking place at times
+{
+t
+i
+}
+i
+=
+0
+n
+−
+1
+\{t_{i}\}_{i=0}^{n-1}
+, is given by
+d
+​
+X
+t
+=
+−
+∇
+Ψ
+​
+(
+X
+t
+,
+t
+i
+)
+​
+d
+​
+t
++
+σ
+⁡
+(
+t
+i
+)
+​
+d
+​
+W
+t
+,
+\displaystyle\mathrm{d}X_{t}{}=-\nabla\Psi(X_{t},t_{i})\mathrm{d}t{}+\sigma(t_{i})\mathrm{d}W_{t}{},
+(9)
+such that
+∇
+Ψ
+​
+(
+X
+t
+,
+t
+)
+\nabla\Psi(X_{t},t)
+and
+σ
+​
+(
+t
+)
+2
+\sigma(t)^{2}
+are time-homogeneous within each regime
+t
+∈
+[
+t
+i
+,
+t
+i
++
+1
+)
+t\in[t_{i},t_{i+1})
+.
+Under these time-inhomogeneous dynamics, identifiability, which is defined analogously to the time-homogeneous case, is still guaranteed by transient marginals.
+Corollary 2.6
+(Identifiability for time-inhomogeneous Langevin SDEs with discrete regimes)
+.
+The time-inhomogeneous Langevin SDE with discrete regimes (
+9
+) is identifiable from its marginals
+{
+p
+⁡
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p(\cdot,t)\}_{t\in[0,T]}
+if and only if
+p
+⁡
+(
+⋅
+,
+t
+i
+)
+p(\cdot,t_{i})
+is not a stationary distribution of
+d
+​
+X
+t
+=
+∇
+Ψ
+​
+(
+X
+t
+,
+t
+i
+)
+​
+d
+​
+t
++
+σ
+⁡
+(
+t
+i
+)
+​
+d
+​
+W
+t
+\mathrm{d}X_{t}{}=\nabla\Psi(X_{t},t_{i})\mathrm{d}t{}+\sigma(t_{i})\mathrm{d}W_{t}{}
+for each
+t
+i
+t_{i}
+.
+Proof.
+We apply
+Theorem
+2.4
+on each regime
+[
+t
+i
+,
+t
+i
++
+1
+)
+[t_{i},t_{i+1})
+. Since the regimes form a partition of
+[
+0
+,
+T
+]
+[0,T]
+, this guarantees that there is a unique SDE with the observed marginals
+{
+p
+⁡
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p(\cdot,t)\}_{t\in[0,T]}
+.
+∎
+Discussion.
+Intuitively, the drift and diffusion within a given regime
+[
+t
+i
+,
+t
+i
++
+1
+)
+[t_{i},t_{i+1})
+are identifiable if and only if the regime’s initial marginal,
+p
+⁡
+(
+⋅
+,
+t
+i
+)
+p(\cdot,t_{i})
+, is not a stationary distribution. However, we note that if the drift or diffusion terms change continuously in time, then it no longer follows that transience completely characterizes identifiability. Indeed, the process could be in an equilibrium state that itself is changing in time, as the next example shows.
+Therefore,
+Theorems
+2.4
+and
+2.6
+are the most that one can say about transient marginals defining identifiability conditions for Langevin SDEs.
+Example 2.7
+(Continuously evolving equilibrium due to time-inhomogeneous potential)
+.
+The Langevin SDEs
+d
+​
+X
+t
+=
+d
+​
+W
+t
+\mathrm{d}X_{t}{}=\mathrm{d}W_{t}{}
+and
+d
+​
+Y
+t
+=
+−
+Y
+t
+t
+​
+d
+​
+t
++
+3
+​
+d
+​
+W
+t
+\mathrm{d}Y_{t}{}=-\frac{Y_{t}}{t}\mathrm{d}t{}+\sqrt{3}\mathrm{d}W_{t}{}
+produce the same marginals
+p
+⁡
+(
+⋅
+,
+t
+)
+=
+𝒩
+⁡
+(
+0
+,
+t
+)
+p(\cdot,t)=\mathcal{N}(0,t)
+when initialized with
+X
+0
+=
+Y
+0
+=
+0
+X_{0}=Y_{0}=0
+(i.e.,
+p
+0
+=
+δ
+⁡
+(
+x
+)
+p_{0}=\delta(x)
+). Thus, the marginals evolve in time, but the two SDEs are non-identifiable. We note that
+p
+⁡
+(
+⋅
+,
+t
+)
+=
+𝒩
+⁡
+(
+0
+,
+t
+)
+p(\cdot,t)=\mathcal{N}(0,t)
+is also the stationary distribution of their residual Fokker-Planck equation, when evaluated at time
+t
+t
+, corresponding to the time-inhomogeneous Langevin SDE
+d
+​
+Z
+t
+=
+−
+Z
+t
+t
+​
+d
+​
+t
++
+2
+​
+d
+​
+W
+t
+\mathrm{d}Z_{t}=-\frac{Z_{t}}{t}\mathrm{d}t{}+\sqrt{2}\mathrm{d}W_{t}{}
+.
+3
+Experiments
+While our theoretical results assume continuous observation of the true marginals
+{
+p
+⁡
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p(\cdot,t)\}_{t\in[0,T]}
+, our experiments consider a finite set of marginals and a finite number of samples per marginal. In this sense, our experiments consider practical settings and complement the theory.
+3.1
+Structural identifiability
+Experimental setup.
+In order to compare parameter estimation under identifiable (transient) and non-identifiable (stationary) settings, we only consider Langevin SDEs that have a stationary distribution. As with
+Bunne et al. (2022)
+, we report results for the following 2D potentials
+1
+1
+1
+Technically, (
+11
+) does not satisfy our growth condition, but one can clip its growth for sufficiently large
+‖
+x
+‖
+\norm{x}
+.
+Ψ
+quadratic
+​
+(
+x
+)
+\displaystyle\Psi_{\text{quadratic}}(x)
+=
+‖
+x
+‖
+2
+,
+\displaystyle=\|x\|^{2},
+(10)
+Ψ
+Styblinski-Tang
+​
+(
+x
+)
+\displaystyle\Psi_{\text{Styblinski-Tang}}(x)
+=
+1
+2
+​
+∑
+i
+=
+1
+2
+(
+x
+i
+4
+−
+16
+​
+x
+i
+2
++
+5
+​
+x
+i
+)
+,
+\displaystyle=\frac{1}{2}\sum_{i=1}^{2}\left(x_{i}^{4}-16x_{i}^{2}+5x_{i}\right),
+(11)
+deferring several additional ones to
+Appendix
+C
+.
+We also consider the same diffusivity levels
+σ
+2
+=
+0.2
+,
+0.4
+\sigma^{2}=0.2,0.4
+from
+(
+Terpin et al., 2024
+)
+. The initial distributions are given
+2
+2
+2
+Strictly speaking, a uniform distribution does not have twice differentiable density, as required by
+Definition
+2.1
+. Nonetheless, it can be convolved with any smooth kernel and made smooth.
+by
+X
+0
+\displaystyle X_{0}
+∼
+{
+Unif
+​
+(
+[
+−
+4
+,
+4
+]
+2
+)
+,
+(transient setting)
+p
+eq
+​
+(
+x
+)
+≔
+1
+Z
+Ψ
+,
+σ
+2
+​
+exp
+⁡
+(
+−
+2
+​
+Ψ
+​
+(
+x
+)
+σ
+2
+)
+.
+(stationary setting)
+\displaystyle\sim\begin{cases}\text{Unif}([-4,4]^{2}),&\text{(transient setting)}\\
+p_{\text{eq}}(x)\coloneqq\dfrac{1}{Z_{\Psi,\sigma^{2}}}\exp\left(-\dfrac{2\Psi(x)}{\sigma^{2}}\right).&\text{(stationary setting)}\end{cases}
+We sample
+N
+=
+1000
+N=1000
+points from these initial distributions, and use the Euler-Maruyama scheme with
+5
+5
+uniform time steps of size
+Δ
+​
+t
+=
+0.01
+\Delta t=0.01
+, to produce
+1000
+1000
+trajectories. The samples within each measurement time are then shuffled, to produce
+6
+6
+marginals with
+1000
+1000
+samples each.
+To the best of our knowledge, there are only two methods that can perform joint inference of the drift and diffusion parameters from marginals.
+We therefore use these methods for our experiments:
+•
+APPEX
+(
+Guan et al., 2024
+)
+(MIT license): an iterative algorithm that alternates between trajectory inference and maximum likelihood estimation (MLE). The drift MLE is optimized via L-BFGS-B
+(
+Zhu et al., 1997
+)
+, assuming the drift is a
+4
+4
+th order polynomial vector field. This is implemented via
+scipy.optimize.minimize
+with default hyperparameters (except
+maxiter
+=
+200
+=200
+).
+•
+JKOnet
+∗
+(
+Terpin et al., 2024
+)
+(MIT license): an algorithm that directly fits drift and diffusivity by minimizing a square loss resulting from the first-order optimality condition of the related JKO-step
+(
+Lanzetti et al., 2024
+;
+Lanzetti et al., 2025
+)
+. Default hyperparameters are used with the nonlinear solver.
+Metrics.
+To gauge the effectiveness of the inferences, we use the following metrics (averaged over five replicates) to directly assess the estimation of the drift and diffusion.
+•
+Mean absolute error for estimated SDE parameters
+: We compute the mean absolute errors (MAE) for both the drift and the diffusivity. The diffusivity MAE is simply
+|
+σ
+estimated
+2
+−
+σ
+true
+2
+|
+|\sigma^{2}_{\text{estimated}}-\sigma^{2}_{\text{true}}|
+. For the drift, we compute the average MAE across evaluated points between the true and estimated drift vector fields, and normalize by the average magnitude of the true vector field. For simplicity, we still refer to this as the drift MAE. We consider two evaluation settings for the drift MAE:
+–
+a grid-based evaluation using
+2500
+2500
+points uniformly spaced over the domain
+[
+−
+5
+,
+5
+]
+2
+[-5,5]^{2}
+; and
+–
+a Gibbs-based evaluation using
+1000
+1000
+points sampled from the stationary (Gibbs) distribution.
+The grid evaluation provides a global assessment of how well the estimated drift field matches the ground truth in both magnitude and direction.
+In contrast, the Gibbs-based evaluation ensures that performance is only measured at points sampled from the stationary distribution, in order to give a fair (if not favourable) evaluation for the stationary setting.
+•
+Cosine similarity
+: We use the cosine similarity,
+⟨
+v
+estimated
+,
+v
+true
+⟩
+‖
+v
+estimated
+‖
+​
+‖
+v
+true
+‖
+\frac{\langle v_{\mathrm{estimated}},\hskip 2.84544ptv_{\mathrm{true}}\rangle}{\|v_{\mathrm{estimated}}\|\|v_{\mathrm{true}}\|}
+, averaged across
+2500
+2500
+points in the grid
+[
+−
+5
+,
+5
+]
+2
+[-5,5]^{2}
+to measure the performance of drift direction estimation.
+Results.
+Across all the evaluated Langevin SDEs, inferences are significantly better when transient dynamics are observed, compared to when we only observe at stationary. This is visualized in Figure
+1
+, where the overall shape and scale of the drift potential is almost perfectly estimated when given transient marginals, while the potential estimated from stationary is not at all consistent with the ground truth. This contrast can also be seen explicitly at the level of the drift and diffusion estimation errors in Figure
+2
+, which shows a clear Pareto frontier that divides the transient and stationary results. Even when we only evaluate at points sampled according to the Gibbs distribution, a favorable setting for the stationary case, estimation given transient marginals still performs significantly better (right side of Figure
+2
+). Similarly, Table
+1
+indicates that there is much higher cosine similarity between the estimated and true drift vector fields when given transient snapshots. Additional experimental results are shown in Appendix
+C
+. Indeed, our results are generally consistent with Theorem
+2.4
+.
+(a)
+Quadratic landscape
+(b)
+Estimated from transient
+(c)
+Estimated from stationary
+(d)
+Styblinski-Tang landscape
+(e)
+Estimated from transient
+(f)
+Estimated from stationary
+Figure 1
+:
+Potential landscapes. Left: the ground truth. Center and right: Potential estimated by
+JKOnet
+∗
+from transient and stationary marginals. To improve readability, we clip the color values to the min and max displayed in the colorbar.
+Analogous plots for
+APPEX
+are in Figure
+7
+.
+10
+−
+1
+10^{-1}
+10
+0
+10^{0}
+10
+1
+10^{1}
+10
+2
+10^{2}
+10
+3
+10^{3}
+10
+4
+10^{4}
+0
+0
+0.2
+0.2
+0.4
+0.4
+0.6
+0.6
+0.8
+0.8
+1
+1
+1.2
+1.2
+1.4
+1.4
+MAE
+∇
+Ψ
+\nabla\Psi
+(sampled from grid)
+MAE
+σ
+2
+\sigma^{2}
+APPEX
+Transient
+APPEX
+Stationary
+JKOnet
+∗
+Transient
+JKOnet
+∗
+Stationary
+10
+−
+1
+10^{-1}
+10
+0
+10^{0}
+10
+1
+10^{1}
+10
+2
+10^{2}
+10
+3
+10^{3}
+10
+4
+10^{4}
+0
+0
+0.2
+0.2
+0.4
+0.4
+0.6
+0.6
+0.8
+0.8
+1
+1
+1.2
+1.2
+1.4
+1.4
+MAE
+∇
+Ψ
+\nabla\Psi
+(sampled from Gibbs)
+MAE
+σ
+2
+\sigma^{2}
+APPEX
+Transient
+APPEX
+Stationary
+JKOnet
+∗
+Transient
+JKOnet
+∗
+Stationary
+Figure 2
+:
+MAE of the estimated drift and diffusion by
+APPEX
+and
+JKOnet
+∗
+are plotted for all four SDEs under transient and stationary settings. Left: the drift MAE on points in the grid
+[
+−
+5
+,
+5
+]
+2
+[-5,5]^{2}
+. Right: drift MAE on points sampled from the SDE’s stationary distribution.
+Table 1
+:
+Drift cosine similarity from
+APPEX
+and
+JKOnet
+∗
+for different SDEs. We report the average
+±
+\pm
+the standard deviation over
+5
+5
+replicates.
+Method
+Drift potential
+σ
+2
+\sigma^{2}
+Transient
+Stationary
+Drift cosine similarity
+Drift cosine similarity
+APPEX
+Quadratic
+0.2
+0.99
+±
+0.00
+0.99\pm 0.00
+0.00
+±
+0.05
+0.00\pm 0.05
+Quadratic
+0.4
+0.98
+±
+0.00
+0.98\pm 0.00
+0.08
+±
+0.06
+0.08\pm 0.06
+Styblinski–Tang
+0.2
+1.00
+±
+0.00
+1.00\pm 0.00
+0.81
+±
+0.05
+0.81\pm 0.05
+Styblinski–Tang
+0.4
+1.00
+±
+0.00
+1.00\pm 0.00
+0.77
+±
+0.07
+0.77\pm 0.07
+JKOnet
+∗
+Quadratic
+0.2
+0.99
+±
+0.00
+0.99\pm 0.00
+−
+0.82
+±
+0.03
+-0.82\pm 0.03
+Quadratic
+0.4
+0.97
+±
+0.01
+0.97\pm 0.01
+−
+0.83
+±
+0.03
+-0.83\pm 0.03
+Styblinski
+0.2
+0.96
+±
+0.00
+0.96\pm 0.00
+−
+0.82
+±
+0.02
+-0.82\pm 0.02
+Styblinski
+0.4
+0.96
+±
+0.00
+0.96\pm 0.00
+−
+0.81
+±
+0.03
+-0.81\pm 0.03
+3.2
+Practical identifiability
+To provide a more nuanced perspective beyond the binary framework of
+structural identifiability
+, this section investigates the continuous degree to which parameters of a Langevin SDE can be practically identified. This is particularly relevant in a finite-data regime, when a Langevin SDE might be theoretically identifiable but poorly identifiable in practice, and therefore the identification routine might deliver unsatisfying results even in the transient case. For this, we study
+practical identifiability
+.
+In particular, we perform inference using data sampled from a pair of closely spaced marginals
+{
+p
+0
+,
+p
+Δ
+​
+t
+}
+\{p_{0},p_{\Delta t}\}
+, and examine how varying the dispersion of
+p
+0
+p_{0}
+affects the parameter estimation.
+Experimental setup.
+We perform parameter estimation on the same Langevin SDEs from the previous section, using only a pair of marginals
+p
+0
+,
+p
+Δ
+​
+t
+p_{0},p_{\Delta t}
+. To vary the dispersion of
+p
+0
+p_{0}
+, we consider
+p
+0
+=
+Unif
+​
+(
+[
+−
+r
+,
+r
+]
+2
+)
+p_{0}=\text{Unif}([-r,r]^{2})
+, with
+r
+∈
+{
+1
+,
+…
+,
+7
+}
+r\in\{1,\dots,7\}
+, and sample
+N
+=
+1000
+N=1000
+observations. The second marginal
+p
+Δ
+​
+t
+p_{\Delta t}
+is obtained by forward sampling with the Euler-Maruyama scheme with
+Δ
+​
+t
+=
+0.001
+\Delta t=0.001
+. We investigate two distinct settings: a
+marginals
+setting, where temporal couplings are shuffled to eliminate trajectory information, and a
+trajectories
+setting that preserves the couplings of each trajectory. We perform MLE parameter estimation on the
+trajectories
+setting to act as a benchmark, and we use
+APPEX
+to perform parameter estimation in the
+marginals
+setting. Since
+APPEX
+performs trajectory inference prior to MLE parameter estimation on the reconstructed trajectories, the performance gap between the two settings is therefore attributable to errors introduced by trajectory inference.
+Results.
+The errors obtained by maximum likelihood (from trajectories) and by
+APPEX
+(from marginals) are illustrated in Figure
+3
+. The trends for each setting/parameter pair are consistent across both SDEs. In the remainder of this section, we aim to heuristically explain each of these error curves.
+(a)
+Quadratic potential
+(b)
+Styblinski-Tang potential
+Figure 3
+:
+Drift and diffusion MAEs for
+APPEX
+are plotted against the half-length
+r
+r
+for the initial distribution
+p
+0
+∼
+Unif
+​
+(
+[
+−
+r
+,
+r
+]
+2
+)
+p_{0}\sim\text{Unif}([-r,r]^{2})
+when estimating different Langevin SDEs with diffusivity
+σ
+2
+=
+0.2
+\sigma^{2}=0.2
+. The marker denotes the average value and the error bar indicate the standard deviation over five replicates.
+Let
+X
+=
+⟨
+(
+x
+0
+(
+1
+)
+,
+x
+Δ
+​
+t
+(
+1
+)
+)
+,
+⋯
+,
+(
+x
+0
+(
+N
+)
+,
+x
+Δ
+​
+t
+(
+N
+)
+)
+⟩
+X=\langle(x_{0}^{(1)},x_{\Delta t}^{(1)}),\cdots,(x_{0}^{(N)},x_{\Delta t{}}^{(N)})\rangle
+denote the observed data from the trajectories setting. The Fisher information (which is inversely related to the errors inherent in maximum likelihood estimation
+(
+Fisher, 1922
+)
+) that
+X
+X
+carries about the drift and diffusion parameters
+θ
+=
+(
+θ
+Ψ
+,
+σ
+2
+)
+\theta=(\theta_{\Psi},\sigma^{2})
+is
+ℐ
+θ
+​
+(
+X
+)
+=
+𝔼
+⁡
+[
+(
+S
+⁡
+(
+X
+,
+θ
+)
+)
+2
+]
+=
+𝔼
+⁡
+[
+(
+∂
+∂
+θ
+​
+log
+⁡
+(
+f
+⁡
+(
+X
+,
+θ
+)
+)
+)
+2
+]
+\mathcal{I}_{\theta}(X)=\mathbb{E}\left[\left(S(X;\theta)\right)^{2}\right]=\mathbb{E}\left[\left(\frac{\partial}{\partial\theta}\log(f(X; \theta))\right)^{2}\right]
+,
+where
+f
+f
+is the likelihood function, given by the transition density of the SDE.
+Diffusion MAE curve (from trajectories).
+The diffusion MAE from trajectories is stable across initial distributions. These results are supported by the fact that the Fisher information about the diffusivity from observed trajectories is independent of the initial distribution (see Proposition
+A.5
+).
+Drift MAE curve (from trajectories).
+The drift MAE from trajectories decreases as the half-length
+r
+r
+increases (Figure
+3
+). In Proposition
+A.3
+, we derive the Fisher information about the drift from observed trajectories
+I
+θ
+Ψ
+​
+(
+X
+)
+I_{\theta_{\Psi}}(X)
+. In particular,
+when the potential
+Ψ
+\Psi
+is a polynomial of degree
+k
+k
+, we may parametrize
+Ψ
+\Psi
+using its polynomial coefficients
+θ
+Ψ
+=
+(
+θ
+α
+)
+α
+\theta_{\Psi}=(\theta_{\alpha})_{\alpha}
+,
+α
+=
+(
+α
+1
+,
+…
+,
+α
+d
+)
+∈
+ℕ
+d
+,
+|
+α
+|
+=
+∑
+i
+=
+1
+d
+α
+i
+≤
+k
+\alpha=(\alpha_{1},\ldots,\alpha_{d})\in\mathbb{N}^{d},\ |\alpha|=\sum_{i=1}^{d}\alpha_{i}\leq k
+, so that
+Ψ
+⁡
+(
+x
+)
+=
+∑
+α
+∈
+ℕ
+d
+,
+|
+α
+|
+≤
+k
+θ
+α
+​
+x
+α
+\Psi(x)=\sum_{\begin{subarray}{c}\alpha\in\mathbb{N}^{d},|\alpha|\leq k\end{subarray}}\theta_{\alpha}x^{\alpha}
+.
+We have that the average Fisher information for a given coefficient
+θ
+α
+\theta_{\alpha}
+obeys (up to error
+O
+⁡
+(
+Δ
+​
+t
+)
+O(\sqrt{\Delta t})
+):
+ℐ
+θ
+α
+​
+(
+X
+)
+N
+​
+Δ
+​
+t
+=
+1
+σ
+2
+​
+∑
+i
+=
+1
+d
+α
+i
+2
+​
+(
+1
+N
+​
+∑
+j
+=
+1
+N
+(
+x
+0
+(
+j
+)
+)
+2
+​
+α
+−
+2
+​
+e
+i
+)
+→
+N
+→
+∞
+1
+σ
+2
+​
+∑
+i
+=
+1
+d
+α
+i
+2
+​
+𝔼
+​
+[
+X
+0
+2
+​
+α
+−
+2
+​
+e
+i
+]
+,
+\displaystyle\frac{\mathcal{I}_{\theta_{\alpha}}(X)}{N\,\Delta t}=\frac{1}{\sigma^{2}}\sum_{i=1}^{d}\alpha_{i}^{2}\left(\frac{1}{N}\sum_{j=1}^{N}\left(x_{0}^{(j)}\right)^{2\alpha-2e_{i}}\right)\xrightarrow[N\to\infty]{}\frac{1}{\sigma^{2}}\sum_{i=1}^{d}\alpha_{i}^{2}\mathbb{E}\left[X_{0}^{2\alpha-2e_{i}}\right],
+(12)
+where
+e
+i
+e_{i}
+is the
+i
+i
+th standard unit vector. Therefore, the Fisher information about the drift increases with the even moments of the initial distribution. This directly supports our finding of drift error decreasing as we increase the support of
+p
+0
+=
+Unif
+​
+(
+[
+−
+r
+,
+r
+]
+2
+)
+p_{0}=\text{Unif}([-r,r]^{2})
+. The derivation (
+12
+) is further validated by Figure
+4
+, which shows that for a quadratic potential, increasing the mean of
+p
+0
+p_{0}
+induces a faster convergence in error compared to increasing the variance by the same rate (i.e., since
+𝔼
+⁡
+[
+X
+0
+2
+]
+=
+Cov
+⁡
+[
+X
+0
+]
++
+𝔼
+​
+[
+X
+0
+]
+2
+\mathbb{E}[X_{0}^{2}]=\mathrm{Cov}[X_{0}]+\mathbb{E}[X_{0}]^{2}
+).
+Diffusion MAE curve (from marginals).
+In contrast to the diffusion MAEs from trajectories where we observe constant errors across distributions, diffusion MAEs from marginals increase with
+r
+r
+. This suggests that the difference in Fisher information between the trajectories and marginals settings increases with
+r
+r
+. We provide a heuristic explanation for this fact. Recall that the information gap is given by
+(
+Rioul, 2010
+, Eq. (27b))
+:
+ℐ
+θ
+​
+(
+X
+)
+−
+ℐ
+θ
+​
+(
+X
+marginals
+)
+=
+Cov
+​
+[
+S
+⁡
+(
+X
+,
+θ
+)
+|
+X
+marginals
+]
+.
+\displaystyle\mathcal{I}_{\theta}(X)-\mathcal{I}_{\theta}(X_{\text{marginals}})=\text{Cov}[S(X;\theta)|X_{\text{marginals}}].
+(13)
+This is precisely the variance of the score,
+S
+⁡
+(
+X
+,
+θ
+)
+=
+∂
+∂
+θ
+​
+log
+⁡
+(
+f
+⁡
+(
+X
+,
+θ
+)
+)
+S(X;\theta)=\frac{\partial}{\partial\theta}\log(f(X; \theta))
+, when it is applied on reconstructed trajectories from the marginals rather than the observed trajectories.
+We note that trajectory inference is generally more difficult when the mass of the initial distribution
+p
+0
+p_{0}
+is more spread out, since this broadens the space of possible trajectory interpolations between consecutive times. For example, in the zero entropy case where
+p
+0
+=
+δ
+0
+p_{0}=\delta_{0}
+, trajectory inference is trivial. We therefore expect the information gap (
+13
+) to widen as the support of
+p
+0
+=
+Unif
+​
+(
+[
+−
+r
+,
+r
+]
+2
+)
+p_{0}=\text{Unif}([-r,r]^{2})
+increases. This aligns with our observation of increasing diffusion MAEs from marginals.
+Drift MAE curve (from marginals).
+The analogous analysis for drift is more delicate, since the Fisher information gap (
+13
+) may increase with
+r
+r
+, while we observe decreasing drift error gaps in Figure
+3
+. We consistently observe decreasing MAEs, even in the marginals-only setting, which suggests that the gained drift information (
+12
+) dominates the information lost due to trajectory inference (
+13
+). This is especially true for the Styblinski-Tang potential (
+11
+), which has larger polynomial coefficients compared to the quadratic potential (
+10
+). Given this observation, the gap may depend more strongly on the signal-to-noise ratio (or drift-diffusivity ratio) compared to the properties of the initial distribution. Indeed, the large errors for the quadratic potential at low half-lengths may be due to the particles experiencing low drift in this region while also experiencing less of the space on which we evaluate (drift evaluation is done on points in
+[
+−
+5
+,
+5
+]
+2
+[-5,5]^{2}
+).
+Heuristics for optimal data collection.
+Our results and analyses suggest that sampling from marginals with more dispersion can enhance drift estimation but worsen diffusion estimates, as the dispersion introduces additional challenges for trajectory inference.
+Since dispersion can be quantified using various metrics, e.g. support size, variance, entropy, we further study this trade-off by replicating the experiments with
+p
+0
+=
+Rademacher
+​
+(
+±
+r
+)
+p_{0}=\text{Rademacher}(\pm r)
+in Figure
+5
+in
+Appendix
+C
+.
+4
+Conclusions
+Contributions.
+In the last decade, marginals-based SDE inference methods have been developed based on existing conditions for structural identifiability, which required a known diffusion parameter to identify the drift. In this work, we resolve this long-standing problem by proving that both drift and diffusion of an overdamped Langevin SDE are identifiable from observational data if and only if the marginals are observed outside of equilibrium. This result opens a path for novel methods that rely on fewer assumptions, by providing a theoretical basis for accurate recovery of trajectories, gene regulatory networks, and post-intervention distributions from observational data.
+We also perform extensive experiments in the finite sample setting, which complement our theory while enabling us to study practical identifiability. In particular, our results and analyses suggest that measurements from highly spread out marginals provide more information about the drift, whereas marginals with concentrated around one or more points offer greater insight into the diffusion.
+Limitations.
+We note several important limitations. First, our main identifiability results pertain to the regime of infinite data, such that the exact marginal distributions
+{
+p
+⁡
+(
+⋅
+,
+t
+)
+}
+t
+∈
+[
+0
+,
+T
+]
+\{p(\cdot,t)\}_{t\in[0,T]}
+are observed during a continuous time interval.
+Moreover, we assume the drift to be the gradient of a potential, and the diffusion to be isotropic. However, this may not form a good model in certain applications. As an example, in single-cell dynamics, one may expect rotational dynamics due to genetic feedback loops. As another example, in hydrology, material heterogeneity requires anisotropic diffusion.
+Important questions also remain with respect to practical identifiability. Although our experiments in
+Section
+3.2
+provide heuristics for optimal measurement strategies, we note that a rigorous analysis, which quantifies the difference between the Fisher information from observed trajectories versus observed marginals, remains an important direction for future work.
+Acknowledgments and Disclosure of Funding
+We thank NSERC for their support for Vincent Guan and Joseph Janssen. Nicolas Lanzetti was supported by the NCCR Automation, a National
+Centre of Competence in Research, funded by the Swiss National Science
+Foundation (grant number 51NF40_225155). Elina Robeva was supported by a Canada CIFAR AI Chair and an NSERC Discovery Grant (DGECR-2020-00338). The authors would also like to thank United Therapeutics for supporting this research.
+References
+Balcerak et al. [2025]
+Michal Balcerak, Tamaz Amiranashvili, Suprosanna Shit, Antonio Terpin, Sebastian Kaltenbach, Petros Koumoutsakos, and Bjoern Menze.
+Energy matching: Unifying flow matching and energy-based models for generative modeling.
+arXiv preprint arXiv:2504.10612
+, 2025.
+Beskos et al. [2006]
+Alexandros Beskos, Omiros Papaspiliopoulos, Gareth O Roberts, and Paul Fearnhead.
+Exact and computationally efficient likelihood-based estimation for discretely observed diffusion processes (with discussion).
+Journal of the Royal Statistical Society Series B: Statistical Methodology
+, 68(3):333–382, 2006.
+Beven et al. [1993]
+Keith J Beven, D Ed Henderson, and Alison D Reeves.
+Dispersion parameters for undisturbed partially saturated soil.
+Journal of hydrology
+, 143(1-2):19–43, 1993.
+Bishwal [2007]
+Jaya PN Bishwal.
+Parameter estimation in stochastic differential equations
+.
+Springer, 2007.
+Bogachev et al. [2022]
+Vladimir I Bogachev, Nicolai V Krylov, Michael Röckner, and Stanislav V Shaposhnikov.
+Fokker–Planck–Kolmogorov Equations
+, volume 207.
+American Mathematical Society, 2022.
+Bunne et al. [2022]
+Charlotte Bunne, Laetitia Papaxanthos, Andreas Krause, and Marco Cuturi.
+Proximal optimal transport modeling of population dynamics.
+In
+International Conference on Artificial Intelligence and Statistics
+, pages 6511–6528. PMLR, 2022.
+Chizat et al. [2022]
+Lénaïc Chizat, Stephen Zhang, Matthieu Heitz, and Geoffrey Schiebinger.
+Trajectory inference via mean-field Langevin in path space.
+Advances in Neural Information Processing Systems
+, 35:16731–16742, 2022.
+Das and Butler [1996]
+Swapan K Das and Roger M Butler.
+Diffusion coefficients of propane and butane in peace river bitumen.
+The Canadian journal of chemical engineering
+, 74(6):985–992, 1996.
+Figalli [2008]
+Alessio Figalli.
+Existence and uniqueness of martingale solutions for sdes with rough or degenerate coefficients.
+Journal of Functional Analysis
+, 254(1):109–153, 2008.
+Fisher [1922]
+Ronald A Fisher.
+On the mathematical foundations of theoretical statistics.
+Philosophical transactions of the Royal Society of London. Series A, containing papers of a mathematical or physical character
+, 222(594-604):309–368, 1922.
+Forrow [2024]
+Aden Forrow.
+Consistent diffusion matrix estimation from population time series.
+arXiv preprint arXiv:2408.14408
+, 2024.
+Grønbech-jensen and Doniach [1994]
+Niels Grønbech-jensen and Sebastian Doniach.
+Long-time overdamped Langevin dynamics of molecular chains.
+Journal of computational chemistry
+, 15(9):997–1012, 1994.
+Guan et al. [2024]
+Vincent Guan, Joseph Janssen, Hossein Rahmani, Andrew Warren, Stephen Zhang, Elina Robeva, and Geoffrey Schiebinger.
+Identifying drift, diffusion, and causal structure from temporal snapshots.
+arXiv preprint arXiv:2410.22729
+, 2024.
+Günther et al. [2024]
+Wiebke Günther, Oana-Iuliana Popescu, Martin Rabel, Urmi Ninad, Andreas Gerhardus, and Jakob Runge.
+Causal discovery with endogenous context variables.
+Advances in Neural Information Processing Systems
+, 37:36243–36284, 2024.
+Hairer [2010]
+Martin Hairer.
+Convergence of markov processes.
+Lecture notes
+, 18(26):13, 2010.
+Hansen and Sokol [2014]
+Niels Hansen and Alexander Sokol.
+Causal interpretation of stochastic differential equations.
+Electronic Journal of Probability
+, 2014.
+Hashimoto et al. [2016]
+Tatsunori Hashimoto, David Gifford, and Tommi Jaakkola.
+Learning population-level diffusions with generative rnns.
+In
+International Conference on Machine Learning
+, pages 2417–2426. PMLR, 2016.
+Higham et al. [2012]
+Desmond J Higham, Xuerong Mao, and Lukasz Szpruch.
+Convergence, non-negativity and stability of a new milstein scheme with applications to finance.
+arXiv preprint arXiv:1204.1647
+, 2012.
+Ho et al. [2020]
+Jonathan Ho, Ajay Jain, and Pieter Abbeel.
+Denoising diffusion probabilistic models.
+Advances in neural information processing systems
+, 33:6840–6851, 2020.
+Kalejaiye and Cardoso [2005]
+Bolarinwa O Kalejaiye and Silvana SS Cardoso.
+Specification of the dispersion coefficient in the modeling of gravity-driven flow in porous media.
+Water resources research
+, 41(10), 2005.
+Kang and Ramanan [2014]
+Weining Kang and Kavita Ramanan.
+Characterization of stationary distributions of reflected diffusions.
+The Annals of Applied Probability
+, 2014.
+Lanzetti et al. [2024]
+Nicolas Lanzetti, Antonio Terpin, and Florian Dörfler.
+Variational analysis in the Wasserstein space, 2024.
+URL
+https://arxiv.org/abs/2406.10676
+.
+Lanzetti et al. [2025]
+Nicolas Lanzetti, Saverio Bolognani, and Florian Dörfler.
+First-order conditions for optimization in the Wasserstein space.
+SIAM Journal on Mathematics of Data Science
+, 7(1):274–300, 2025.
+Lavenant et al. [2021]
+Hugo Lavenant, Stephen Zhang, Young-Heon Kim, and Geoffrey Schiebinger.
+Towards a mathematical theory of trajectory inference.
+arXiv preprint arXiv:2102.09204
+, 2021.
+Maina and Siirila-Woodburn [2020]
+Fadji Zaouna Maina and Erica R Siirila-Woodburn.
+Watersheds dynamics following wildfires: Nonlinear feedbacks and implications on hydrologic responses.
+Hydrological Processes
+, 34(1):33–50, 2020.
+Manten et al. [2024]
+Georg Manten, Cecilia Casolo, Emilio Ferrucci, Søren Wengel Mogensen, Cristopher Salvi, and Niki Kilbertus.
+Signature kernel conditional independence tests in causal discovery for stochastic processes.
+arXiv preprint arXiv:2402.18477
+, 2024.
+Mao [2007]
+Xuerong Mao.
+Stochastic differential equations and applications
+.
+Elsevier, 2007.
+Mehmood et al. [2023]
+Komal Mehmood, Sana Ullah, and Khadija Tul Kubra.
+Mathematical modeling of fluid flow and pollutant transport in a homogeneous porous medium in the presence of plate stacks.
+Heliyon
+, 9(3), 2023.
+Neklyudov et al. [2023]
+Kirill Neklyudov, Rob Brekelmans, Daniel Severo, and Alireza Makhzani.
+Action matching: Learning stochastic dynamics from samples.
+In
+International conference on machine learning
+, pages 25858–25889. PMLR, 2023.
+Nenna et al. [2011]
+Vanessa Nenna, Adam Pidlisecky, and Rosemary Knight.
+Application of an extended kalman filter approach to inversion of time-lapse electrical resistivity imaging data for monitoring recharge.
+Water Resources Research
+, 47(10), 2011.
+Nielsen et al. [2000]
+Jan Nygaard Nielsen, Henrik Madsen, and Peter C Young.
+Parameter estimation in stochastic differential equations: an overview.
+Annual Reviews in Control
+, 24:83–94, 2000.
+Pavliotis [2014]
+Grigorios A Pavliotis.
+Stochastic processes and applications.
+Texts in Applied Mathematics
+, 60, 2014.
+Pedersen [1995]
+Asger Roer Pedersen.
+A new approach to maximum likelihood estimation for stochastic differential equations based on discrete observations.
+Scandinavian journal of statistics
+, pages 55–71, 1995.
+Rioul [2010]
+Olivier Rioul.
+Information theoretic proofs of entropy power inequalities.
+IEEE transactions on information theory
+, 57(1):33–55, 2010.
+Royer [2019]
+Pascale Royer.
+Advection–diffusion in porous media with low scale separation: modelling via higher-order asymptotic homogenisation.
+Transport in Porous Media
+, 128(2):511–551, 2019.
+Runge et al. [2019]
+Jakob Runge, Sebastian Bathiany, Erik Bollt, Gustau Camps-Valls, Dim Coumou, Ethan Deyle, Clark Glymour, Marlene Kretschmer, Miguel D Mahecha, Jordi Muñoz-Marí, et al.
+Inferring causation from time series in earth system sciences.
+Nature communications
+, 10(1):2553, 2019.
+Schervish [2012]
+Mark J Schervish.
+Theory of statistics
+.
+Springer Science & Business Media, 2012.
+Schlichting [2016]
+André Schlichting.
+From fokker-planck to sdes and back via the martingale problem.
+University of Bonn: Lecture notes. ProQuest Number: INFORMATION TO ALL USERS
+, 2016.
+Seibert et al. [2010]
+Jan Seibert, Jeffrey J McDonnell, and Richard D Woodsmith.
+Effects of wildfire on catchment runoff response: a modelling approach to detect changes in snow-dominated forested catchments.
+Hydrology research
+, 41(5):378–390, 2010.
+Shen et al. [2024]
+Yunyi Shen, Renato Berlinghieri, and Tamara Broderick.
+Multi-marginal Schrödinger bridges with iterative reference.
+arXiv preprint arXiv:2408.06277
+, 2024.
+Stroock [2008]
+Daniel W Stroock.
+Partial differential equations for probabalists [sic]
+.
+Cambridge University Press, 2008.
+Terpin et al. [2024]
+Antonio Terpin, Nicolas Lanzetti, and Florian Dörfler.
+Learning diffusion at lightspeed.
+arXiv preprint arXiv:2406.12616
+, 2024.
+Trapnell et al. [2014]
+Cole Trapnell, Davide Cacchiarelli, Jonna Grimsby, Prapti Pokharel, Shuqiang Li, Michael Morse, Niall J Lennon, Kenneth J Livak, Tarjei S Mikkelsen, and John L Rinn.
+The dynamics and regulators of cell fate decisions are revealed by pseudotemporal ordering of single cells.
+Nature biotechnology
+, 32(4):381–386, 2014.
+Verwoerd and Kulasiri [2003]
+Wynand S Verwoerd and Don Kulasiri.
+Theory of diffusions applied to stochastic flow in porous media.
+Mathematical and computer modelling
+, 38(11-13):1453–1459, 2003.
+Wang et al. [2024]
+Yuanyuan Wang, Xi Geng, Wei Huang, Biwei Huang, and Mingming Gong.
+Generator identification for linear sdes with additive and multiplicative noise.
+Advances in Neural Information Processing Systems
+, 36, 2024.
+Weinreb et al. [2018]
+Caleb Weinreb, Samuel Wolock, Betsabeh K Tusi, Merav Socolovsky, and Allon M Klein.
+Fundamental limits on dynamic inference from single-cell snapshots.
+Proceedings of the National Academy of Sciences
+, 115(10):E2467–E2476, 2018.
+Zhang [2024]
+Stephen Y Zhang.
+Joint trajectory and network inference via reference fitting.
+arXiv preprint arXiv:2409.06879
+, 2024.
+Zhu et al. [1997]
+Ciyou Zhu, Richard H Byrd, Peihuang Lu, and Jorge Nocedal.
+Algorithm 778: L-BFGS-B: Fortran subroutines for large-scale bound-constrained optimization.
+ACM Transactions on mathematical software (TOMS)
+, 23(4):550–560, 1997.
+Appendix A
+Theoretical background and Fisher information analyses
+A.1
+Existence and uniqueness of solutions for a Langevin SDE
+It is well-known that restrictions on the drift and diffusion terms of an SDE must be assumed in order for the SDE to yield a well-defined law on paths. Indeed, if the drift and diffusion are not sufficiently regular, then the SDE may correspond to multiple laws on paths. Conversely, if the drift and diffusion grow too quickly, then there may not exist a solution to the SDE. For concrete examples, see
+[
+Mao, 2007
+, Example 2.6]
+.
+To ensure the existence and uniqueness of solutions to the overdamped Langevin SDE (
+1
+),
+we apply
+Mao [2007, Theorem 2.3.4]
+, which states that there exists a unique solution on the interval
+[
+0
+,
+T
+]
+[0,T]
+for an Itô SDE
+d
+​
+X
+t
+=
+b
+⁡
+(
+X
+t
+,
+t
+)
+​
+d
+​
+t
++
+σ
+⁡
+(
+X
+t
+,
+t
+)
+​
+d
+​
+W
+t
+,
+\displaystyle\mathrm{d}X_{t}{}=b(X_{t},t)\mathrm{d}t{}+\sigma(X_{t},t)\mathrm{d}W_{t}{},
+(14)
+if the following regularity and growth conditions are satisfied:
+•
+(Local Lipschitz condition) For every integer
+n
+≥
+1
+n\geq 1
+, there exists a positive constant
+K
+n
+>
+0
+K_{n}>0
+such that, for all
+t
+∈
+[
+0
+,
+T
+]
+t\in[0,T]
+, and
+x
+,
+y
+∈
+ℝ
+d
+x,y\in\mathbb{R}^{d}
+with
+‖
+x
+‖
+,
+‖
+y
+‖
+≤
+n
+\|x\|,\|y\|\leq n
+,
+max
+⁡
+{
+‖
+b
+⁡
+(
+x
+,
+t
+)
+−
+b
+⁡
+(
+y
+,
+t
+)
+‖
+2
+,
+‖
+σ
+⁡
+(
+x
+,
+t
+)
+−
+σ
+⁡
+(
+y
+,
+t
+)
+‖
+2
+}
+≤
+K
+n
+​
+‖
+x
+−
+y
+‖
+2
+.
+\displaystyle\max\{\|b(x,t)-b(y,t)\|^{2},\|\sigma(x,t)-\sigma(y,t)\|^{2}\}\leq K_{n}\|x-y\|^{2}.
+(15)
+•
+(Linear growth condition) There exists a positive constant
+K
+>
+0
+K>0
+such that for all
+(
+x
+,
+t
+)
+∈
+ℝ
+d
+×
+[
+0
+,
+T
+]
+(x,t)\in\mathbb{R}^{d}\times[0,T]
+, we have
+‖
+b
+⁡
+(
+x
+,
+t
+)
+‖
+2
++
+‖
+σ
+⁡
+(
+x
+,
+t
+)
+‖
+2
+≤
+K
+⁡
+(
+1
++
+‖
+x
+‖
+2
+)
+.
+\displaystyle\|b(x,t)\|^{2}+\|\sigma(x,t)\|^{2}\leq K\bigl(1+\|x\|^{2}\bigr).
+(16)
+Since
+σ
+\sigma
+is constant for the Langevin SDE (
+1
+), we require that
+−
+∇
+Ψ
+-\nabla\Psi
+obeys both conditions. The local Lipschitz condition, which is equivalent to Lipschitz continuity on compact subsets, is automatically satisfied by the fact that
+Ψ
+∈
+C
+∞
+​
+(
+ℝ
+d
+)
+\Psi\in C^{\infty}(\mathbb{R}^{d})
+is assumed to be smooth.
+Then, the linear growth condition is satisfied if for some
+K
+>
+0
+K>0
+we have
+‖
+∇
+Ψ
+​
+(
+x
+)
+‖
+≤
+K
+⁡
+(
+1
++
+‖
+x
+‖
+)
+\|\nabla\Psi(x)\|\leq K\bigl(1+\|x\|\bigr)
+for all
+x
+∈
+ℝ
+d
+x\in\mathbb{R}^{d}
+, as we assume in
+Section
+2
+.
+A.2
+Weak form of the Fokker-Planck equation of a Langevin SDE
+For a smooth function
+f
+∈
+C
+∞
+​
+(
+ℝ
+d
+)
+f\in C^{\infty}(\mathbb{R}^{d})
+, we recall that the Fokker-Planck operator
+ℒ
+9
+∇
+Ψ
+,
+σ
+2
+\mathcal{L}_{\shortminus\nabla\Psi,\sigma^{2}}
+of the Langevin SDE (
+1
+) is given by
+(
+ℒ
+9
+∇
+Ψ
+,
+σ
+2
+f
+)
+(
+x
+)
+=
+∇
+⋅
+(
+f
+(
+x
+)
+∇
+Ψ
+(
+x
+)
+)
++
+σ
+2
+2
+Δ
+f
+(
+x
+)
+,
+\displaystyle(\mathcal{L}_{\shortminus\nabla\Psi,\sigma^{2}}f)(x)=\nabla\cdot(f(x)\nabla\Psi(x))+\frac{\sigma^{2}}{2}\Delta f(x),
+which in turn defines the evolution of its marginals via the Fokker-Planck equation
+∂
+p
+⁡
+(
+x
+,
+t
+)
+∂
+t
+=
+ℒ
+9
+∇
+Ψ
+,
+σ
+2
+​
+(
+p
+⁡
+(
+⋅
+,
+t
+)
+)
+​
+(
+x
+)
+.
+\displaystyle\frac{\partial p(x,t)}{\partial t}=\mathcal{L}_{\shortminus\nabla\Psi,\sigma^{2}}(p(\cdot,t))(x).
+(17)
+While
+Ψ
+\Psi
+is smooth and
+σ
+2
+\sigma^{2}
+is constant, (
+17
+) cannot be interpreted as a strong pointwise equality unless
+p
+p
+admits a sufficiently regular density. To show that the evolution of marginals remains well-defined when the initial condition is a general probability measure, we consider the weak distributional formulation of the Fokker-Planck equation (
+17
+) through its adjoint operator. The adjoint is the generator
+ℒ
+9
+∇
+Ψ
+,
+σ
+2
+∗
+\mathcal{L}^{*}_{\shortminus\nabla\Psi,\sigma^{2}}
+, given by
+[
+Pavliotis, 2014
+, Eq. (4.66)]
+(
+ℒ
+9
+∇
+Ψ
+,
+σ
+2
+∗
+f
+)
+(
+x
+)
+=
+−
+∇
+Ψ
+(
+x
+)
+⋅
+∇
+f
+(
+x
+)
++
+σ
+2
+2
+Δ
+f
+(
+x
+)
+.
+\displaystyle(\mathcal{L}^{*}_{\shortminus\nabla\Psi,\sigma^{2}}f)(x)=-\nabla\Psi(x)\cdot\nabla f(x)+\frac{\sigma^{2}}{2}\Delta f(x).
+Given our focus on the marginals, we note that we reverse the standard notation, which uses
+ℒ
+\mathcal{L}
+for the generator and
+ℒ
+∗
+\mathcal{L}^{*}
+for the Fokker-Planck operator
+[
+Bogachev et al., 2022
+]
+. By the adjoint relationship, we have
+∫
+ℝ
+d
+ℒ
+9
+∇
+Ψ
+,
+σ
+2
+∗
+​
+f
+​
+(
+x
+)
+​
+g
+​
+(
+x
+)
+​
+𝑑
+x
+=
+⟨
+ℒ
+9
+∇
+Ψ
+,
+σ
+2
+∗
+​
+f
+,
+g
+⟩
+=
+⟨
+f
+,
+ℒ
+9
+∇
+Ψ
+,
+σ
+2
+​
+g
+⟩
+=
+∫
+ℝ
+d
+f
+⁡
+(
+x
+)
+​
+ℒ
+9
+∇
+Ψ
+,
+σ
+2
+​
+g
+​
+(
+x
+)
+​
+𝑑
+x
+,
+\displaystyle\int_{\mathbb{R}^{d}}\mathcal{L}^{*}_{\shortminus\nabla\Psi,\sigma^{2}}f(x)g(x)\,\mathrm{d}x=\langle\mathcal{L}^{*}_{\shortminus\nabla\Psi,\sigma^{2}}f,g\rangle=\langle f,\mathcal{L}_{\shortminus\nabla\Psi,\sigma^{2}}g\rangle=\int_{\mathbb{R}^{d}}f(x)\mathcal{L}_{\shortminus\nabla\Psi,\sigma^{2}}g(x)\,\mathrm{d}x,
+for all smooth and compactly supported test functions
+f
+,
+g
+∈
+C
+c
+∞
+​
+(
+ℝ
+d
+)
+f,g\in C^{\infty}_{c}(\mathbb{R}^{d})
+.
+Consider now a family of Borel locally finite measures on
+ℝ
+d
+×
+(
+0
+,
+T
+)
+\mathbb{R}^{d}\times(0,T)
+, which we denote by
+(
+μ
+t
+)
+t
+∈
+(
+0
+,
+T
+)
+(\mu_{t})_{t\in(0,T)}
+.
+To define weak solutions, we follow
+[
+Bogachev et al., 2022
+, Definition 6.1.1, Proposition 6.1.2(ii)]
+and say that
+(
+μ
+t
+)
+t
+∈
+(
+0
+,
+T
+)
+(\mu_{t})_{t\in(0,T)}
+solves the Fokker-Planck equation for the initial condition
+μ
+|
+t
+=
+0
+=
+ν
+\mu|_{t=0}=\nu
+in the weak sense
+3
+3
+3
+For alternative definitions of weak solutions, see
+[
+Stroock, 2008
+]
+.
+if
+∫
+ℝ
+d
+φ
+⁡
+(
+x
+)
+​
+d
+​
+μ
+t
+​
+(
+x
+)
+−
+∫
+ℝ
+d
+φ
+⁡
+(
+x
+)
+​
+𝑑
+ν
+​
+(
+x
+)
+=
+lim
+τ
+→
+0
++
+∫
+τ
+t
+∫
+ℝ
+d
+ℒ
+9
+∇
+Ψ
+,
+σ
+2
+∗
+​
+φ
+​
+(
+x
+)
+​
+d
+​
+μ
+s
+​
+(
+x
+)
+​
+𝑑
+s
+\displaystyle\int_{\mathbb{R}^{d}}\varphi(x)\mathrm{d}\mu_{t}(x)-\int_{\mathbb{R}^{d}}\varphi(x)\mathrm{d}\nu(x)=\lim_{\tau\to 0+}\int_{\tau}^{t}\int_{\mathbb{R}^{d}}\mathcal{L}^{*}_{\shortminus\nabla\Psi,\sigma^{2}}\varphi(x)\mathrm{d}\mu_{s}(x)\mathrm{d}s
+(18)
+for almost all
+t
+∈
+[
+0
+,
+T
+]
+t\in[0,T]
+. This can be denoted using the compact notation
+∂
+t
+μ
+=
+ℒ
+−
+∇
+Ψ
+,
+σ
+2
+​
+μ
+.
+\displaystyle\partial_{t}\mu=\mathcal{L}_{-\nabla\Psi,\sigma^{2}}\mu.
+(19)
+In this setting, the existence and uniqueness of a weak solution follows from
+[
+Bogachev et al., 2022
+, Theorem 9.4.8, Example 9.4.7]
+, which applies because
+σ
+2
+\sigma^{2}
+is constant and we assumed
+Ψ
+\Psi
+to be smooth and growth at most linearly.
+Remark A.1
+(When to use the weak formulation of Fokker-Planck?)
+.
+Since the drift is smooth and the diffusion is constant, we only need to resort to the weak formulation of the Fokker-Planck equation when the marginal
+p
+⁡
+(
+⋅
+,
+t
+)
+p(\cdot,t)
+is not twice differentiable. This can only occur for the initial marginal
+p
+0
+p_{0}
+.
+Indeed, given our assumed regularity and growth conditions from
+Section
+A.1
+, it follows that the weak Fokker-Planck equation (
+18
+) admits a smooth solution, i.e. transition density (e.g., see
+[
+Pavliotis, 2014
+, Theorem 4.1]
+). This can also be seen using elliptic regularity theory, such as Hörmander’s condition
+[
+Hairer, 2010
+, Theorem 6.3]
+.
+A.3
+Properties of the Fokker-Planck equation
+Given a well-defined SDE (
+14
+) with trajectories initialized from the distribution
+X
+0
+∼
+p
+0
+X_{0}\sim p_{0}
+, the evolution of the temporal marginal distributions is determined by the Fokker-Planck equation.
+Since
+σ
+\sigma
+is constant and
+b
+b
+is a gradient field, the Fokker-Planck equation reads
+∂
+p
+⁡
+(
+x
+,
+t
+)
+∂
+t
+\displaystyle\frac{\partial p(x,t)}{\partial t}
+=
+ℒ
+−
+∇
+Ψ
+,
+σ
+(
+p
+(
+⋅
+,
+t
+)
+)
+(
+x
+)
+≔
+∇
+⋅
+(
+p
+(
+x
+,
+t
+)
+∇
+Ψ
+(
+x
+)
+)
++
+σ
+2
+2
+Δ
+p
+(
+x
+,
+t
+)
+,
+\displaystyle=\mathcal{L}_{-\nabla\Psi,\sigma}(p(\cdot,t))(x)\coloneqq\nabla\cdot(p(x,t)\nabla\Psi(x))+\frac{\sigma^{2}}{2}\Delta p(x,t),
+(20)
+where
+the initial condition is given by
+p
+​
+(
+x
+,
+0
+)
+=
+p
+0
+​
+(
+x
+)
+p(x,0)=p_{0}(x)
+.
+There is a one-to-one correspondence between solutions to the Fokker-Planck PDE and the transition probabilities of the underlying Itô SDE, when
+p
+⁡
+(
+⋅
+,
+t
+)
+p(\cdot,t)
+is a probability measure for all
+t
+∈
+[
+0
+,
+T
+]
+t\in[0,T]
+[
+Figalli, 2008
+,
+Schlichting, 2016
+]
+. In particular, solutions to the PDE (
+20
+) can always be interpreted as the marginals of the overdamped Langevin SDE (
+1
+), as long as the solutions are probability measures.
+Moreover, the Fokker-Planck operator is linear with respect to the drift and diffusion terms:
+Proposition A.2
+(Fokker-Planck linearity in drift and diffusion)
+.
+Let
+Ψ
+1
+,
+Ψ
+2
+∈
+C
+∞
+​
+(
+ℝ
+d
+)
+\Psi_{1},\Psi_{2}\in C^{\infty}(\mathbb{R}^{d})
+with
+‖
+Ψ
+i
+​
+(
+x
+)
+‖
+≤
+K
+⁡
+(
+1
++
+‖
+x
+‖
+)
+\norm{\Psi_i(x)}\leq K(1+\norm{x})
+for some
+K
+>
+0
+K>0
+,
+σ
+1
+,
+σ
+2
+>
+0
+\sigma_{1},\sigma_{2}>0
+, and
+α
+,
+β
+∈
+ℝ
+\alpha,\beta\in\mathbb{R}
+. Then, for any marginal
+p
+⁡
+(
+⋅
+,
+t
+)
+p(\cdot,t)
+,
+ℒ
+−
+∇
+Ψ
+1
+,
+σ
+1
+2
+​
+(
+p
+⁡
+(
+⋅
+,
+t
+)
+)
+​
+(
+x
+)
++
+\displaystyle\mathcal{L}_{-\nabla\Psi_{1},\sigma_{1}^{2}}(p(\cdot,t))(x)+
+ℒ
+−
+∇
+α
+Ψ
+2
+,
+β
+σ
+2
+2
+(
+p
+(
+⋅
+,
+t
+)
+)
+(
+x
+)
+\displaystyle\mathcal{L}_{-\nabla\alpha\Psi_{2},\beta\sigma_{2}^{2}}(p(\cdot,t))(x)
+(21)
+=
+ℒ
+−
+∇
+(
+Ψ
+1
++
+α
+​
+Ψ
+2
+)
+,
+(
+σ
+1
+2
++
+β
+​
+σ
+2
+2
+)
+​
+(
+p
+⁡
+(
+⋅
+,
+t
+)
+)
+​
+(
+x
+)
+\displaystyle=\mathcal{L}_{-\nabla(\Psi_{1}+\alpha\Psi_{2}),(\sigma_{1}^{2}+\beta\sigma_{2}^{2})}(p(\cdot,t))(x)
+=
+∇
+⋅
+(
+p
+(
+x
+,
+t
+)
+∇
+(
+Ψ
+1
++
+α
+Ψ
+2
+)
+(
+x
+)
+)
++
+σ
+1
+2
++
+β
+​
+σ
+2
+2
+2
+Δ
+p
+(
+x
+,
+t
+)
+.
+\displaystyle=\nabla\cdot(p(x,t)\nabla(\Psi_{1}+\alpha\Psi_{2})(x))+\frac{\sigma_{1}^{2}+\beta\sigma_{2}^{2}}{2}\Delta p(x,t).
+Proof.
+The claim follows directly from the linearity of differential operators.
+∎
+Finally, we note that for (
+21
+) to be a valid Fokker-Planck PDE, the diffusion coefficient must be non-negative, i.e.
+σ
+1
+2
++
+β
+​
+σ
+2
+2
+≥
+0
+\sigma_{1}^{2}+\beta\sigma_{2}^{2}\geq 0
+. In particular, this holds if we take
+σ
+1
+2
+−
+σ
+2
+2
+\sigma_{1}^{2}-\sigma_{2}^{2}
+, where
+σ
+1
+2
+≥
+σ
+2
+2
+\sigma_{1}^{2}\geq\sigma_{2}^{2}
+.
+A.4
+Fisher information derivations and additional experiments
+Let
+N
+N
+particles
+x
+0
+(
+1
+)
+,
+…
+,
+x
+0
+(
+N
+)
+x_{0}^{(1)},\ldots,x_{0}^{(N)}
+, sampled from the initial distribution
+p
+0
+p_{0}
+, independently diffuse according to the Langevin SDE (
+1
+) until a short time
+Δ
+​
+t
+\Delta t
+. Then, if we observe the
+N
+N
+trajectories at measurement times
+0
+0
+and
+Δ
+​
+t
+\Delta t
+, i.e.
+X
+=
+⟨
+(
+x
+0
+(
+1
+)
+,
+x
+Δ
+​
+t
+(
+1
+)
+)
+,
+⋯
+,
+(
+x
+0
+(
+N
+)
+,
+x
+Δ
+​
+t
+(
+N
+)
+)
+⟩
+X=\langle(x_{0}^{(1)},x_{\Delta t}^{(1)}),\cdots,(x_{0}^{(N)},x_{\Delta t}^{(N)})\rangle
+, we may consider the Fisher information for the parameters governing drift and diffusion
+θ
+=
+(
+θ
+Ψ
+,
+σ
+2
+)
+\theta=(\theta_{\Psi},\sigma^{2})
+:
+ℐ
+θ
+​
+(
+X
+)
+\displaystyle\mathcal{I}_{\theta}(X)
+=
+𝔼
+⁡
+[
+(
+S
+⁡
+(
+X
+,
+θ
+)
+)
+2
+]
+=
+𝔼
+⁡
+[
+(
+∂
+∂
+θ
+​
+log
+⁡
+(
+f
+⁡
+(
+X
+,
+θ
+)
+)
+)
+2
+]
+,
+\displaystyle=\mathbb{E}\left[\left(S(X;\theta)\right)^{2}\right]=\mathbb{E}\left[\left(\frac{\partial}{\partial\theta}\log(f(X; \theta))\right)^{2}\right],
+(22)
+f
+⁡
+(
+X
+,
+θ
+)
+\displaystyle f(X;\theta)
+=
+∏
+j
+=
+1
+N
+p
+θ
+​
+(
+x
+Δ
+​
+t
+(
+j
+)
+|
+x
+0
+(
+j
+)
+)
+.
+\displaystyle=\prod_{j=1}^{N}p_{\theta}(x_{\Delta t}^{(j)}|x_{0}^{(j)}).
+Since it is generally impossible to compute the exact transition density
+[
+Pavliotis, 2014
+, §4.5]
+, we instead use the linearized transition density
+x
+Δ
+​
+t
+|
+x
+0
+∼
+𝒩
+(
+x
+0
+−
+Δ
+t
+∇
+Ψ
+(
+x
+0
+)
+,
+σ
+2
+Δ
+t
+)
+x_{\Delta t}|x_{0}\sim\mathcal{N}(x_{0}-\Delta t\nabla\Psi(x_{0}),\sigma^{2}\Delta t)
+under the Euler-Maruyama scheme
+[
+Zhang, 2024
+,
+Shen et al., 2024
+,
+Guan et al., 2024
+]
+. In particular, we set
+p
+θ
+​
+(
+y
+|
+x
+)
+\displaystyle p_{\theta}(y|x)
+=
+1
+(
+2
+​
+π
+​
+Δ
+​
+t
+​
+σ
+2
+)
+d
+/
+2
+​
+exp
+(
+−
+1
+2
+​
+σ
+2
+​
+Δ
+​
+t
+∥
+y
+−
+x
++
+Δ
+t
+∇
+Ψ
+(
+x
+)
+∥
+2
+)
+.
+\displaystyle=\frac{1}{(2\pi\Delta t\sigma^{2})^{d/2}}\exp(-\frac{1}{2\sigma^2 \Delta t} \|y-x + \Delta t \nabla\Psi(x)\|^2).
+Then, to precisely account for the discretization error, we strengthen the local Lipschitz regularity assumption (
+15
+) by assuming that the gradient field is globally Lipschitz, i.e., there exists a
+K
+≥
+0
+K\geq 0
+such that for all
+x
+,
+y
+∈
+ℝ
+d
+x,y\in\mathbb{R}^{d}
+we have
+‖
+∇
+Ψ
+​
+(
+x
+)
+−
+∇
+Ψ
+​
+(
+y
+)
+‖
+≤
+K
+​
+‖
+x
+−
+y
+‖
+.
+\norm{\nabla\Psi(x) - \nabla\Psi(y)}\leq K\norm{x - y}.
+(23)
+The condition (
+23
+) is standard when working with discretization schemes, and it is equivalent to the local Lipschitz condition if the SDE is defined on a bounded subset
+Ω
+\Omega
+of
+ℝ
+d
+\mathbb{R}^{d}
+. In particular, we will use (
+23
+) to invoke
+[
+Higham et al., 2012
+, Theorem 4.1]
+to bound the error of the linearized transition density.
+To proceed, we write the Fisher information from observed trajectories (
+22
+) as
+ℐ
+θ
+​
+(
+X
+)
+\displaystyle\mathcal{I}_{\theta}(X)
+=
+𝔼
+⁡
+[
+(
+∂
+∂
+θ
+​
+log
+⁡
+(
+∏
+j
+=
+1
+N
+p
+θ
+​
+(
+x
+Δ
+​
+t
+(
+j
+)
+|
+x
+0
+(
+j
+)
+)
+)
+)
+2
+]
+\displaystyle=\mathbb{E}\left[\left(\frac{\partial}{\partial\theta}\log\left(\prod_{j=1}^{N}p_{\theta}(x_{\Delta t}^{(j)}|x_{0}^{(j)})\right)\right)^{2}\right]
+=
+𝔼
+⁡
+[
+(
+∑
+j
+=
+1
+N
+∂
+∂
+θ
+​
+log
+⁡
+(
+p
+θ
+​
+(
+x
+Δ
+​
+t
+(
+j
+)
+|
+x
+0
+(
+j
+)
+)
+)
+)
+2
+]
+.
+\displaystyle=\mathbb{E}\left[\left(\sum_{j=1}^{N}\frac{\partial}{\partial\theta}\log\left(p_{\theta}(x_{\Delta t}^{(j)}|x_{0}^{(j)})\right)\right)^{2}\right].
+For convenience, we define the
+per-trajectory score
+S
+j
+​
+(
+X
+,
+θ
+)
+\displaystyle S_{j}(X;\theta)
+≔
+∂
+∂
+θ
+​
+log
+⁡
+(
+p
+θ
+​
+(
+x
+Δ
+​
+t
+(
+j
+)
+|
+x
+0
+(
+j
+)
+)
+)
+\displaystyle\coloneq\frac{\partial}{\partial\theta}\log\left(p_{\theta}(x_{\Delta t}^{(j)}|x_{0}^{(j)})\right)
+=
+∂
+∂
+θ
+[
+−
+d
+2
+log
+⁡
+(
+2
+​
+π
+​
+Δ
+​
+t
+​
+σ
+2
+)
+−
+1
+2
+​
+σ
+2
+​
+Δ
+​
+t
+∥
+x
+Δ
+​
+t
+(
+j
+)
+−
+x
+0
+(
+j
+)
++
+Δ
+t
+∇
+Ψ
+(
+x
+)
+∥
+2
+]
+.
+\displaystyle=\frac{\partial}{\partial\theta}\left[-\frac{d}{2}\log( 2\pi\Delta t \sigma^2)-\frac{1}{2\sigma^{2}\Delta t}\|x_{\Delta t}^{(j)}-x_{0}^{(j)}+\Delta t\nabla\Psi(x)\|^{2}\right].
+We make the following two observations about
+S
+j
+​
+(
+X
+,
+θ
+)
+S_{j}(X;\theta)
+:
+1.
+The scores
+S
+j
+​
+(
+X
+,
+θ
+)
+S_{j}(X;\theta)
+are mutually independent, by the independence of the trajectories.
+2.
+Since they are evaluated on the true model parameters, the scores
+S
+j
+​
+(
+X
+,
+θ
+)
+S_{j}(X;\theta)
+have mean
+0
+0
+. Indeed, the standard regularity assumptions
+[
+Schervish, 2012
+, §7.3.3]
+are satisfied.
+We therefore have
+ℐ
+θ
+​
+(
+X
+)
+=
+𝔼
+⁡
+[
+(
+∑
+j
+=
+1
+N
+S
+j
+​
+(
+X
+,
+θ
+)
+)
+2
+]
+=
+∑
+j
+=
+1
+N
+𝔼
+⁡
+[
+S
+j
+​
+(
+X
+,
+θ
+)
+2
+]
+.
+\mathcal{I}_{\theta}(X)=\mathbb{E}\left[\left(\sum_{j=1}^{N}S_{j}(X;\theta)\right)^{2}\right]=\sum_{j=1}^{N}\mathbb{E}\left[S_{j}(X;\theta)^{2}\right].
+(24)
+We will derive separate Fisher information quantities (
+24
+) for the drift parameters
+θ
+Ψ
+\theta_{\Psi}
+and the diffusion
+σ
+2
+\sigma^{2}
+. We empirically validate each of these derivations in a simple experiment, summarized in Figure
+4
+.
+Proposition A.3
+(Fisher information on the drift from observed trajectories)
+.
+Let the drift potential
+Ψ
+\Psi
+admit a smooth parametrization by the parameters
+θ
+Ψ
+\theta_{\Psi}
+in some parameter space
+Θ
+Ψ
+\Theta_{\Psi}
+, i.e.
+Ψ
+∈
+C
+∞
+​
+(
+ℝ
+d
+×
+Θ
+Ψ
+)
+\Psi\in C^{\infty}(\mathbb{R}^{d}\times\Theta_{\Psi})
+and suppose that
+p
+0
+p_{0}
+has finite moments. Then, the Fisher information for the drift,
+−
+∇
+Ψ
+-\nabla\Psi
+, given observations
+X
+=
+⟨
+(
+x
+0
+(
+1
+)
+,
+x
+Δ
+​
+t
+(
+1
+)
+)
+,
+⋯
+,
+(
+x
+0
+(
+N
+)
+,
+x
+Δ
+​
+t
+(
+N
+)
+)
+⟩
+X=\langle(x_{0}^{(1)},x_{\Delta t}^{(1)}),\cdots,(x_{0}^{(N)},x_{\Delta t}^{(N)})\rangle
+is
+ℐ
+θ
+Ψ
+​
+(
+X
+)
+Δ
+​
+t
+=
+1
+σ
+2
+​
+∑
+j
+=
+1
+N
+‖
+∇
+∂
+∂
+θ
+Ψ
+Ψ
+(
+x
+0
+(
+j
+)
+;
+θ
+Ψ
+)
+‖
+2
++
+O
+⁡
+(
+Δ
+​
+t
+)
+,
+\displaystyle\frac{\mathcal{I}_{\theta_{\Psi}}(X)}{\Delta t}=\frac{1}{\sigma^{2}}\sum_{j=1}^{N}\norm{\nabla\frac{\partial}{\partial\theta_{\Psi}}\Psi(x_0^{(j)}; \theta_{\Psi})}^{2}+O(\sqrt{\Delta t}),
+(25)
+Furthermore, if the potential
+Ψ
+\Psi
+is a polynomial of degree
+k
+k
+, then we can set
+θ
+Ψ
+\theta_{\Psi}
+to be the set of its coefficients, such that
+Ψ
+(
+x
+)
+=
+∑
+α
+∈
+ℕ
+d
+|
+α
+|
+≤
+k
+θ
+α
+x
+α
+θ
+ψ
+=
+{
+θ
+α
+:
+α
+=
+(
+α
+1
+,
+…
+,
+α
+d
+)
+∈
+ℕ
+d
+,
+|
+α
+|
+=
+∑
+i
+=
+1
+d
+α
+i
+≤
+k
+}
+,
+\Psi(x)=\sum_{\begin{subarray}{c}\alpha\in\mathbb{N}^{d}\\
+|\alpha|\leq k\end{subarray}}\theta_{\alpha}x^{\alpha}\qquad\theta_{\psi}=\left\{\theta_{\alpha}:\alpha=(\alpha_{1},\ldots,\alpha_{d})\in\mathbb{N}^{d},\ |\alpha|=\sum_{i=1}^{d}\alpha_{i}\leq k\right\},
+and the average Fisher information for each monomial coefficient is (up to error
+O
+⁡
+(
+Δ
+​
+t
+)
+O(\sqrt{\Delta t})
+ℐ
+θ
+α
+​
+(
+X
+)
+N
+​
+Δ
+​
+t
+=
+1
+σ
+2
+​
+∑
+i
+=
+1
+d
+α
+i
+2
+​
+(
+1
+N
+​
+∑
+j
+=
+1
+N
+(
+x
+0
+(
+j
+)
+)
+2
+​
+(
+α
+−
+e
+i
+)
+)
+→
+N
+→
+∞
+1
+σ
+2
+​
+∑
+i
+=
+1
+d
+α
+i
+2
+​
+𝔼
+​
+[
+X
+0
+2
+​
+(
+α
+−
+e
+i
+)
+]
+,
+\frac{\mathcal{I}_{\theta_{\alpha}}(X)}{N\,\Delta t}=\frac{1}{\sigma^{2}}\sum_{i=1}^{d}\alpha_{i}^{2}\left(\frac{1}{N}\sum_{j=1}^{N}\left(x_{0}^{(j)}\right)^{2(\alpha-e_{i})}\right)\xrightarrow[N\to\infty]{}\;\frac{1}{\sigma^{2}}\sum_{i=1}^{d}\alpha_{i}^{2}\mathbb{E}\left[X_{0}^{2(\alpha-e_{i})}\right],
+where
+e
+i
+e_{i}
+is the unit vector in the
+i
+i
+th coordinate.
+Proof.
+The score from the
+j
+j
+th trajectory with respect to the drift parameters
+θ
+Ψ
+\theta_{\Psi}
+, is given by
+S
+j
+​
+(
+X
+,
+θ
+Ψ
+)
+\displaystyle S_{j}(X;\theta_{\Psi})
+:
+=
+∂
+∂
+θ
+Ψ
+​
+log
+⁡
+(
+p
+θ
+Ψ
+​
+(
+x
+Δ
+​
+t
+(
+j
+)
+|
+x
+0
+(
+j
+)
+)
+)
+\displaystyle:=\frac{\partial}{\partial\theta_{\Psi}}\log\left(p_{\theta_{\Psi}}(x_{\Delta t}^{(j)}|x_{0}^{(j)})\right)
+=
+−
+∂
+∂
+θ
+Ψ
+1
+2
+​
+σ
+2
+​
+Δ
+​
+t
+∥
+x
+Δ
+​
+t
+(
+j
+)
+−
+x
+0
+(
+j
+)
++
+Δ
+t
+∇
+Ψ
+(
+x
+)
+∥
+2
+\displaystyle=-\frac{\partial}{\partial\theta_{\Psi}}\frac{1}{2\sigma^{2}\Delta t}\|x_{\Delta t}^{(j)}-x_{0}^{(j)}+\Delta t\nabla\Psi(x)\|^{2}
+=
+−
+1
+σ
+2
+(
+x
+Δ
+​
+t
+(
+j
+)
+−
+x
+0
+(
+j
+)
++
+∇
+Ψ
+(
+x
+0
+(
+j
+)
+)
+Δ
+t
+)
+T
+∇
+∂
+∂
+θ
+Ψ
+Ψ
+(
+x
+0
+(
+j
+)
+)
+\displaystyle=-\frac{1}{\sigma^{2}}\left(x_{\Delta t}^{(j)}-x_{0}^{(j)}+\nabla\Psi\left(x_{0}^{(j)}\right)\Delta t\right)^{T}\nabla\frac{\partial}{\partial\theta_{\Psi}}\Psi\left(x_{0}^{(j)}\right)
+=
+−
+1
+σ
+2
+(
+σ
+Δ
+W
++
+R
+Δ
+​
+t
+)
+T
+∇
+∂
+∂
+θ
+Ψ
+Ψ
+(
+x
+0
+(
+j
+)
+)
+,
+\displaystyle=-\frac{1}{\sigma^{2}}\,\bigl(\sigma\,\Delta W+R_{\Delta t}\bigr)^{T}\,\nabla\frac{\partial}{\partial\theta_{\Psi}}\Psi\left(x_{0}^{(j)}\right),
+where
+R
+Δ
+​
+t
+R_{\Delta t}
+is the
+d
+d
+dimensional discretization error from the Euler-Maruyama approximation
+[
+Pavliotis, 2014
+, §5.2]
+:
+x
+Δ
+​
+t
+(
+j
+)
+≈
+x
+0
+(
+j
+)
+−
+∇
+Ψ
+​
+(
+x
+0
+(
+j
+)
+)
+​
+Δ
+​
+t
++
+σ
+​
+Δ
+​
+W
+,
+x_{\Delta t}^{(j)}\approx x_{0}^{(j)}-\nabla\Psi(x_{0}^{(j)})\Delta t+\sigma\Delta W,
+with
+Δ
+​
+W
+∼
+𝒩
+⁡
+(
+0
+,
+Δ
+​
+t
+​
+I
+d
+)
+\Delta W\sim\mathcal{N}(0,\Delta tI_{d})
+. Since the Euler-Maruyama approximation converges with strong order
+1
+1
+for SDEs with constant diffusion and the gradient field is assumed to be globally Lipschitz, we have
+𝔼
+⁡
+[
+‖
+R
+Δ
+​
+t
+‖
+2
+]
+≤
+C
+​
+Δ
+​
+t
+2
+\mathbb{E}[\|R_{\Delta t}\|^{2}]\leq C\Delta t^{2}
+for some
+C
+≥
+0
+C\geq 0
+[
+Higham et al., 2012
+, Theorem 4.1]
+.
+We can write
+S
+j
+​
+(
+X
+,
+θ
+Ψ
+)
+\displaystyle S_{j}(X;\theta_{\Psi})
+=
+−
+1
+σ
+Δ
+W
+T
+∇
+∂
+∂
+θ
+Ψ
+Ψ
+(
+x
+0
+(
+j
+)
+)
+⏟
+A
+j
++
+−
+1
+σ
+2
+R
+Δ
+​
+t
+T
+∇
+∂
+∂
+θ
+Ψ
+Ψ
+(
+x
+0
+(
+j
+)
+)
+⏟
+B
+j
+\displaystyle=\underbrace{-\frac{1}{\sigma}\,\Delta W^{T}\,\nabla\frac{\partial}{\partial\theta_{\Psi}}\Psi\left(x_{0}^{(j)}\right)}_{A_{j}}+\;\underbrace{-\frac{1}{\sigma^{2}}\,R_{\Delta t}^{T}\,\nabla\frac{\partial}{\partial\theta_{\Psi}}\Psi\left(x_{0}^{(j)}\right)}_{B_{j}}
+and, thus,
+𝔼
+⁡
+[
+S
+j
+​
+(
+X
+,
+θ
+Ψ
+)
+2
+]
+=
+𝔼
+⁡
+[
+A
+j
+2
+]
++
+2
+​
+𝔼
+​
+[
+A
+j
+​
+B
+j
+]
++
+𝔼
+⁡
+[
+B
+j
+2
+]
+.
+\displaystyle\mathbb{E}[S_{j}(X;\theta_{\Psi})^{2}]=\mathbb{E}[A_{j}^{2}]+2\mathbb{E}[A_{j}B_{j}]+\mathbb{E}[B_{j}^{2}].
+We note that:
+•
+Since
+Δ
+​
+W
+∼
+𝒩
+⁡
+(
+0
+,
+Δ
+​
+t
+​
+I
+d
+)
+\Delta W\sim\mathcal{N}(0,\Delta tI_{d})
+, we have that
+A
+j
+∼
+𝒩
+⁡
+(
+0
+,
+Δ
+​
+t
+σ
+2
+​
+‖
+∇
+∂
+∂
+θ
+Ψ
+Ψ
+(
+x
+0
+(
+j
+)
+)
+‖
+2
+)
+,
+A_{j}\sim\mathcal{N}\left(0,\frac{\Delta t}{\sigma^{2}}\norm{\nabla\frac{\partial}{\partial\theta_\Psi}\Psi(x_0^{(j)})}^{2}\right),
+which immediately gives
+𝔼
+⁡
+[
+A
+j
+2
+]
+=
+Δ
+​
+t
+σ
+2
+​
+‖
+∇
+∂
+∂
+θ
+Ψ
+Ψ
+(
+x
+0
+(
+j
+)
+)
+‖
+2
+.
+\mathbb{E}[A_{j}^{2}]=\frac{\Delta t}{\sigma^{2}}\norm{\nabla\frac{\partial}{\partial\theta_\Psi}\Psi(x_0^{(j)})}^{2}.
+•
+We have
+𝔼
+[
+B
+j
+2
+]
+=
+1
+σ
+4
+𝔼
+[
+R
+Δ
+​
+t
+T
+∇
+∂
+∂
+θ
+Ψ
+Ψ
+(
+x
+0
+(
+j
+)
+)
+∇
+∂
+∂
+θ
+Ψ
+Ψ
+(
+x
+0
+(
+j
+)
+)
+T
+R
+Δ
+​
+t
+]
+≤
+1
+σ
+4
+‖
+∇
+∂
+∂
+θ
+Ψ
+Ψ
+(
+x
+0
+(
+j
+)
+)
+‖
+2
+𝔼
+[
+‖
+R
+Δ
+​
+t
+‖
+2
+]
+,
+\displaystyle\mathbb{E}[B_{j}^{2}]=\frac{1}{\sigma^{4}}\mathbb{E}\left[R_{\Delta t}^{T}\nabla\frac{\partial}{\partial\theta_{\Psi}}\Psi(x_{0}^{(j)})\nabla\frac{\partial}{\partial\theta_{\Psi}}\Psi(x_{0}^{(j)})^{T}R_{\Delta t}\right]\leq\frac{1}{\sigma^{4}}\norm{\nabla\frac{\partial}{\partial\theta_\Psi}\Psi(x_0^{(j)})}^{2}\mathbb{E}\left[\norm{R_{\Delta t}}^{2}\right],
+where we used that the maximum eigenvalue of the matrix
+∂
+∂
+θ
+Ψ
+​
+Ψ
+​
+(
+x
+0
+(
+j
+)
+)
+​
+∂
+∂
+θ
+Ψ
+​
+Ψ
+​
+(
+x
+0
+(
+j
+)
+)
+T
+\frac{\partial}{\partial\theta_{\Psi}}\Psi(x_{0}^{(j)})\frac{\partial}{\partial\theta_{\Psi}}\Psi(x_{0}^{(j)})^{T}
+is bounded by the trace of the matrix (since the matrix is positive semidefinite), which is given by
+‖
+∇
+∂
+∂
+θ
+Ψ
+Ψ
+(
+x
+0
+(
+j
+)
+)
+‖
+2
+\norm{\nabla\frac{\partial}{\partial\theta_\Psi}\Psi(x_0^{(j)})}^{2}
+.
+We can now use the error bound above to obtain
+𝔼
+⁡
+[
+B
+j
+2
+]
+≤
+C
+σ
+4
+​
+‖
+∇
+∂
+∂
+θ
+Ψ
+Ψ
+(
+x
+0
+(
+j
+)
+)
+‖
+2
+​
+Δ
+​
+t
+2
+.
+\mathbb{E}[B_{j}^{2}]\leq\frac{C}{\sigma^{4}}\norm{\nabla\frac{\partial}{\partial\theta_\Psi}\Psi(x_0^{(j)})}^{2}\Delta t^{2}.
+•
+We have
+2
+​
+|
+𝔼
+⁡
+[
+A
+j
+​
+B
+j
+]
+|
+​
+≤
+♡
+​
+2
+​
+𝔼
+⁡
+[
+A
+j
+2
+]
+​
+𝔼
+​
+[
+B
+j
+2
+]
+​
+≤
+♣
+​
+2
+​
+C
+​
+Δ
+​
+t
+3
+/
+2
+σ
+3
+​
+‖
+∇
+∂
+∂
+θ
+Ψ
+Ψ
+(
+x
+0
+(
+j
+)
+)
+‖
+2
+,
+2|\mathbb{E}[A_{j}B_{j}]|\overset{\heartsuit}{\leq}2\sqrt{\mathbb{E}[A_{j}^{2}]\mathbb{E}[B_{j}^{2}]}\overset{\clubsuit}{\leq}{2\sqrt{C}}\frac{\Delta t^{3/2}}{\sigma^{3}}\norm{\nabla\frac{\partial}{\partial\theta_\Psi}\Psi(x_0^{(j)})}^{2},
+where
+♡
+\heartsuit
+follows from Cauchy-Schwarz inequality (in the space of random variables) and
+♣
+\clubsuit
+follows from the two inequalities above.
+Overall, this gives the upper bound
+𝔼
+⁡
+[
+S
+j
+​
+(
+X
+,
+θ
+Ψ
+)
+2
+]
+≤
+Δ
+​
+t
+σ
+2
+​
+‖
+∇
+∂
+∂
+θ
+Ψ
+Ψ
+(
+x
+0
+(
+j
+)
+)
+‖
+2
+​
+(
+1
++
+C
+σ
+2
+​
+Δ
+​
+t
++
+2
+​
+C
+σ
+​
+Δ
+​
+t
+)
+\mathbb{E}[S_{j}(X;\theta_{\Psi})^{2}]\leq\frac{\Delta t}{\sigma^{2}}\norm{\nabla\frac{\partial}{\partial\theta_\Psi}\Psi(x_0^{(j)})}^{2}\left(1+\frac{C}{\sigma^{2}}\Delta t+\frac{2\sqrt{C}}{\sigma}\sqrt{\Delta t}\right)
+and the lower bound
+𝔼
+⁡
+[
+S
+j
+​
+(
+X
+,
+θ
+Ψ
+)
+2
+]
+≥
+Δ
+​
+t
+σ
+2
+​
+‖
+∇
+∂
+∂
+θ
+Ψ
+Ψ
+(
+x
+0
+(
+j
+)
+)
+‖
+2
+​
+(
+1
+−
+2
+​
+C
+σ
+​
+Δ
+​
+t
+)
+.
+\mathbb{E}[S_{j}(X;\theta_{\Psi})^{2}]\geq\frac{\Delta t}{\sigma^{2}}\norm{\nabla\frac{\partial}{\partial\theta_\Psi}\Psi(x_0^{(j)})}^{2}\left(1-\frac{2\sqrt{C}}{\sigma}\sqrt{\Delta t}\right).
+Note that by smoothness and finiteness of
+C
+C
+, both the lower and upper bound are finite.
+Thus, the Fisher information for the drift, provided by
+N
+N
+observed trajectories, obeys
+ℐ
+θ
+Ψ
+​
+(
+X
+)
+Δ
+​
+t
+\displaystyle\frac{\mathcal{I}_{\theta_{\Psi}}(X)}{\Delta t}
+=
+∑
+j
+=
+1
+N
+𝔼
+⁡
+[
+S
+j
+​
+(
+X
+,
+θ
+Ψ
+)
+2
+]
+=
+1
+σ
+2
+​
+∑
+j
+=
+1
+N
+‖
+∇
+∂
+∂
+θ
+Ψ
+Ψ
+(
+x
+0
+(
+j
+)
+)
+‖
+2
++
+O
+⁡
+(
+Δ
+​
+t
+)
+.
+\displaystyle=\sum_{j=1}^{N}\mathbb{E}[S_{j}(X;\theta_{\Psi})^{2}]=\frac{1}{\sigma^{2}}\sum_{j=1}^{N}\norm{\nabla\frac{\partial}{\partial\theta_\Psi}\Psi(x_0^{(j)})}^{2}+O(\sqrt{\Delta t}).
+Then, if the potential
+Ψ
+\Psi
+is a polynomial such that
+Ψ
+(
+x
+)
+=
+∑
+α
+∈
+ℕ
+d
+|
+α
+|
+≤
+k
+θ
+α
+x
+α
+and
+θ
+Ψ
+=
+{
+θ
+α
+:
+α
+=
+(
+α
+1
+,
+…
+,
+α
+d
+)
+∈
+ℕ
+d
+,
+|
+α
+|
+≤
+k
+}
+,
+\displaystyle\Psi(x)=\sum_{\begin{subarray}{c}\alpha\in\mathbb{N}^{d}\\
+|\alpha|\leq k\end{subarray}}\theta_{\alpha}x^{\alpha}\qquad\text{ and }\qquad\theta_{\Psi}=\left\{\theta_{\alpha}:\alpha=(\alpha_{1},\ldots,\alpha_{d})\in\mathbb{N}^{d},\ |\alpha|\leq k\right\},
+it follows that for each coefficient parameter
+θ
+α
+\theta_{\alpha}
+in the set of drift parameters
+θ
+Ψ
+\theta_{\Psi}
+,
+∇
+∂
+∂
+θ
+α
+Ψ
+(
+x
+)
+=
+∇
+x
+α
+=
+(
+α
+1
+x
+α
+−
+e
+1
+,
+…
+,
+α
+d
+x
+α
+−
+e
+d
+)
+,
+‖
+∇
+∂
+∂
+θ
+α
+Ψ
+(
+x
+)
+‖
+2
+=
+∑
+i
+=
+1
+d
+α
+i
+2
+x
+2
+​
+(
+α
+−
+e
+i
+)
+.
+\displaystyle\nabla\frac{\partial}{\partial\theta_{\alpha}}\Psi(x)=\nabla x^{\alpha}=\bigl(\alpha_{1}\,x^{\alpha-e_{1}},\dots,\alpha_{d}\,x^{\alpha-e_{d}}\bigr),\quad\norm{\nabla\frac{\partial}{\partial{\theta_\alpha}}\Psi(x)}^{2}=\sum_{i=1}^{d}\alpha_{i}^{2}\,x^{2(\alpha-e_{i})}.
+Hence, the average Fisher information per unit time is (up to error
+O
+⁡
+(
+Δ
+​
+t
+)
+O(\sqrt{\Delta t})
+:
+ℐ
+θ
+α
+​
+(
+X
+)
+N
+​
+Δ
+​
+t
+=
+1
+σ
+2
+​
+∑
+i
+=
+1
+d
+α
+i
+2
+​
+(
+1
+N
+​
+∑
+j
+=
+1
+N
+(
+x
+0
+(
+j
+)
+)
+2
+​
+α
+−
+2
+​
+e
+i
+)
+→
+N
+→
+∞
+1
+σ
+2
+​
+∑
+i
+=
+1
+d
+α
+i
+2
+​
+𝔼
+​
+[
+X
+0
+2
+​
+α
+−
+2
+​
+e
+i
+]
+.
+\frac{\mathcal{I}_{\theta_{\alpha}}(X)}{N\Delta t}=\frac{1}{\sigma^{2}}\sum_{i=1}^{d}\alpha_{i}^{2}\left(\frac{1}{N}\sum_{j=1}^{N}\left(x_{0}^{(j)}\right)^{2\alpha-2e_{i}}\right)\xrightarrow[N\to\infty]{}\frac{1}{\sigma^{2}}\sum_{i=1}^{d}\alpha_{i}^{2}\mathbb{E}\left[X_{0}^{2\alpha-2e_{i}}\right].
+The convergence follows from the law of large numbers since, by assumption,
+p
+0
+p_{0}
+has finite moments.
+∎
+Thus, given
+N
+N
+trajectories observed at two closely spaced times, the Fisher information for the drift parameters
+θ
+Ψ
+\theta_{\Psi}
+depends on the sensitivity of
+Ψ
+\Psi
+, evaluated at each initial value
+x
+0
+(
+j
+)
+x_{0}^{(j)}
+,
+j
+=
+1
+,
+…
+,
+N
+j=1,\dots,N
+, and the diffusivity
+σ
+2
+\sigma^{2}
+. Intuitively, the information increases when the points
+x
+0
+(
+j
+)
+x_{0}^{(j)}
+coincide to those where
+Ψ
+\Psi
+is most sensitive to the drift parameters
+θ
+Ψ
+\theta_{\Psi}
+, and decreases with increasing diffusivity
+σ
+2
+\sigma^{2}
+.
+Example A.4
+(Fisher information from observed trajectories on the drift parameters for smooth drift)
+.
+Let
+d
+=
+2
+d=2
+and consider a Langevin SDE process
+(
+X
+t
+,
+Y
+t
+)
+(X_{t},Y_{t})
+, whose drift potential is given by
+Ψ
+⁡
+(
+x
+,
+y
+)
+=
+x
+2
+​
+y
+3
++
+P
+⁡
+(
+x
+,
+y
+)
+\Psi(x,y)=x^{2}y^{3}+P(x,y)
+, where
+P
+⁡
+(
+x
+,
+y
+)
+P(x,y)
+is some smooth confining potential. If the trajectories are observed for a short time, starting from the initial distribution
+(
+X
+0
+,
+Y
+0
+)
+∼
+p
+0
+(X_{0},Y_{0})\sim p_{0}
+, then the information about the monomial
+x
+2
+​
+y
+3
+x^{2}y^{3}
+within the drift obeys
+ℐ
+θ
+α
+​
+(
+X
+)
+N
+​
+Δ
+​
+t
+≈
+4
+​
+𝔼
+​
+[
+(
+X
+0
+)
+2
+​
+(
+Y
+0
+)
+6
+]
++
+9
+​
+𝔼
+​
+[
+(
+X
+0
+)
+4
+​
+(
+Y
+0
+)
+4
+]
+.
+\frac{\mathcal{I}_{\theta_{\alpha}}(X)}{N\Delta t}\approx 4\mathbb{E}\bigl[(X_{0})^{2}(Y_{0})^{6}\bigr]+9\mathbb{E}\bigl[(X_{0})^{4}(Y_{0})^{4}\bigr].
+A.4.1
+Fisher information on the diffusivity
+Proposition A.5
+(Fisher information on the diffusivity for known trajectories)
+.
+The Fisher information on the diffusivity given observations
+X
+=
+⟨
+(
+x
+0
+(
+1
+)
+,
+x
+Δ
+​
+t
+(
+1
+)
+)
+,
+⋯
+,
+(
+x
+0
+(
+N
+)
+,
+x
+Δ
+​
+t
+(
+N
+)
+)
+⟩
+X=\langle(x_{0}^{(1)},x_{\Delta t}^{(1)}),\cdots,(x_{0}^{(N)},x_{\Delta t}^{(N)})\rangle
+obeys
+ℐ
+⁡
+(
+X
+,
+σ
+2
+)
+N
+=
+d
+2
+​
+σ
+4
++
+O
+⁡
+(
+Δ
+​
+t
+)
+.
+\frac{\mathcal{I}(X;\sigma^{2})}{N}=\frac{d}{2\sigma^{4}}+O(\sqrt{\Delta t}).
+Proof.
+We follow the same idea as the derivation of the drift Fisher information. In particular, the Fisher information matrix is given by
+S
+j
+​
+(
+X
+,
+σ
+2
+)
+\displaystyle S_{j}(X;\sigma^{2})
+=
+−
+d
+2
+​
+∂
+∂
+σ
+2
+​
+log
+⁡
+(
+σ
+2
+)
+−
+∂
+∂
+σ
+2
+​
+1
+2
+​
+Δ
+​
+t
+​
+σ
+2
+​
+‖
+x
+Δ
+​
+t
+(
+j
+)
+−
+x
+0
+(
+j
+)
++
+Δ
+t
+∇
+Ψ
+(
+x
+0
+(
+j
+)
+)
+‖
+2
+\displaystyle=-\frac{d}{2}\frac{\partial}{\partial\sigma^{2}}\log(\sigma^2)-\frac{\partial}{\partial\sigma^{2}}\frac{1}{2\Delta t\sigma^{2}}\norm{x_{\Delta t}^{(j)}-x_{0}^{(j)}+\Delta t\nabla\Psi(x_0^{(j)})}^{2}
+=
+−
+d
+2
+​
+σ
+2
+−
+1
+2
+​
+Δ
+​
+t
+​
+σ
+4
+​
+‖
+x
+Δ
+​
+t
+(
+j
+)
+−
+x
+0
+(
+j
+)
++
+Δ
+t
+∇
+Ψ
+(
+x
+0
+(
+j
+)
+)
+‖
+2
+\displaystyle=-\frac{d}{2\sigma^{2}}-\frac{1}{2\Delta t\sigma^{4}}\norm{x_{\Delta t}^{(j)}-x_{0}^{(j)}+\Delta t\nabla\Psi(x_0^{(j)})}^{2}
+=
+−
+d
+2
+​
+σ
+2
++
+1
+2
+​
+Δ
+​
+t
+​
+σ
+4
+​
+‖
+σ
+​
+Δ
+​
+W
++
+R
+Δ
+​
+t
+‖
+2
+,
+\displaystyle=-\frac{d}{2\sigma^{2}}+\frac{1}{2\Delta t\sigma^{4}}\norm{\sigma\Delta W + R_{\Delta t}}^{2},
+where
+R
+Δ
+​
+t
+R_{\Delta t}
+is again the path error from the Euler-Maruyama approximation. With this, we get
+𝔼
+⁡
+[
+S
+j
+​
+(
+X
+,
+σ
+2
+)
+2
+]
+\displaystyle\mathbb{E}\left[S_{j}(X;\sigma^{2})^{2}\right]
+=
+𝔼
+⁡
+[
+d
+2
+4
+​
+σ
+4
+−
+2
+​
+d
+4
+​
+Δ
+​
+t
+​
+σ
+6
+​
+‖
+σ
+​
+Δ
+​
+W
++
+R
+Δ
+​
+t
+‖
+2
++
+1
+4
+​
+Δ
+​
+t
+2
+​
+σ
+8
+​
+‖
+σ
+​
+Δ
+​
+W
++
+R
+Δ
+​
+t
+‖
+4
+]
+\displaystyle=\mathbb{E}\left[\frac{d^{2}}{4\sigma^{4}}-\frac{2d}{4\Delta t\sigma^{6}}\norm{\sigma\Delta W + R_{\Delta t}}^{2}+\frac{1}{4\Delta t^{2}\sigma^{8}}\norm{\sigma\Delta W + R_{\Delta t}}^{4}\right]
+=
+d
+2
+4
+​
+σ
+4
+−
+2
+​
+d
+4
+​
+Δ
+​
+t
+​
+σ
+6
+​
+(
+σ
+2
+​
+𝔼
+​
+[
+‖
+Δ
+​
+W
+‖
+2
+]
++
+2
+​
+σ
+​
+𝔼
+​
+[
+Δ
+​
+W
+T
+​
+R
+Δ
+​
+t
+]
++
+𝔼
+⁡
+[
+‖
+R
+Δ
+​
+t
+‖
+2
+]
+)
+\displaystyle=\frac{d^{2}}{4\sigma^{4}}-\frac{2d}{4\Delta t\sigma^{6}}\left(\sigma^{2}\mathbb{E}[\norm{\Delta W}^{2}]+2\sigma\mathbb{E}[\Delta W^{T}R_{\Delta t}]+\mathbb{E}[\norm{R_{\Delta t}}^{2}]\right)
++
+1
+4
+​
+Δ
+​
+t
+2
+​
+σ
+8
+​
+(
+σ
+4
+​
+𝔼
+​
+[
+‖
+Δ
+​
+W
+‖
+4
+]
++
+𝔼
+⁡
+[
+‖
+R
+Δ
+​
+t
+‖
+4
+]
++
+4
+​
+σ
+3
+​
+𝔼
+​
+[
+‖
+Δ
+​
+W
+‖
+2
+​
+Δ
+​
+W
+T
+​
+R
+Δ
+​
+t
+]
+CLOSE
+\displaystyle\qquad+\frac{1}{4\Delta t^{2}\sigma^{8}}\Big(\sigma^{4}\mathbb{E}[\norm{\Delta W}^{4}]+\mathbb{E}[\norm{R_{\Delta t}}^{4}]+4\sigma^{3}\mathbb{E}[\norm{\Delta W}^{2}\Delta W^{T}R_{\Delta t}]
+OPEN
++
+4
+​
+σ
+​
+𝔼
+​
+[
+‖
+R
+Δ
+​
+t
+‖
+2
+​
+Δ
+​
+W
+T
+​
+R
+Δ
+​
+t
+]
++
+2
+​
+σ
+2
+​
+𝔼
+​
+[
+‖
+Δ
+​
+W
+‖
+2
+​
+‖
+R
+Δ
+​
+t
+‖
+2
+]
++
+4
+​
+σ
+2
+​
+𝔼
+​
+[
+(
+Δ
+​
+W
+T
+​
+R
+Δ
+​
+t
+)
+2
+]
+)
+.
+\displaystyle\qquad\qquad+4\sigma\mathbb{E}[\norm{R_{\Delta t}}^{2}\Delta W^{T}R_{\Delta t}]+2\sigma^{2}\mathbb{E}[\norm{\Delta W}^{2}\norm{R_{\Delta t}}^{2}]+4\sigma^{2}\mathbb{E}[(\Delta W^{T}R_{\Delta t})^{2}]\Big).
+To analyze this expression, we start with some preliminary bounds.
+Since
+Δ
+​
+W
+∼
+𝒩
+⁡
+(
+0
+,
+Δ
+​
+t
+​
+I
+d
+)
+\Delta W\sim\mathcal{N}(0,\Delta tI_{d})
+, we have
+𝔼
+⁡
+[
+‖
+Δ
+​
+W
+‖
+2
+]
+\displaystyle\mathbb{E}[\norm{\Delta W}^{2}]
+=
+d
+​
+Δ
+​
+t
+\displaystyle=d\Delta t
+𝔼
+⁡
+[
+‖
+Δ
+​
+W
+‖
+4
+]
+\displaystyle\mathbb{E}[\norm{\Delta W}^{4}]
+=
+d
+⁡
+(
+d
++
+2
+)
+​
+Δ
+​
+t
+2
+\displaystyle=d(d+2)\Delta t^{2}
+𝔼
+⁡
+[
+‖
+Δ
+​
+W
+‖
+6
+]
+\displaystyle\mathbb{E}[\norm{\Delta W}^{6}]
+≤
+M
+​
+Δ
+​
+t
+3
+,
+\displaystyle\leq M\Delta t^{3},
+where
+M
+M
+is some constant which we do not specify as it is not needed below. With
+‖
+⋅
+‖
+F
+\norm{\cdot}_{F}
+denoting the Frobenious norm of the matrix and , we have
+𝔼
+⁡
+[
+‖
+Δ
+​
+W
+​
+Δ
+​
+W
+T
+‖
+F
+2
+]
+\displaystyle\mathbb{E}[\norm{\Delta W\Delta W^T}_{F}^{2}]
+=
+𝔼
+⁡
+[
+tr
+⁡
+(
+Δ
+​
+W
+​
+Δ
+​
+W
+T
+​
+Δ
+​
+W
+​
+Δ
+​
+W
+T
+)
+]
+\displaystyle=\mathbb{E}[\tr(\Delta W\Delta W^T\Delta W\Delta W^T)]
+=
+𝔼
+⁡
+[
+‖
+Δ
+​
+W
+‖
+4
+]
+\displaystyle=\mathbb{E}[\norm{\Delta W}^{4}]
+=
+d
+⁡
+(
+d
++
+2
+)
+​
+Δ
+​
+t
+2
+,
+\displaystyle=d(d+2)\Delta t^{2},
+𝔼
+⁡
+[
+‖
+R
+Δ
+​
+t
+​
+R
+Δ
+​
+t
+T
+‖
+F
+2
+]
+\displaystyle\mathbb{E}[\norm{R_{\Delta t} R_{\Delta t}^T}_{F}^{2}]
+=
+𝔼
+⁡
+[
+‖
+R
+Δ
+​
+t
+‖
+4
+]
+\displaystyle=\mathbb{E}[\norm{R_{\Delta t}}^{4}]
+=
+C
+​
+Δ
+​
+t
+4
+.
+\displaystyle=C\Delta t^{4}.
+From the discretization scheme, we then have the bounds
+[
+Higham et al., 2012
+, Theorem 4.1]
+𝔼
+⁡
+[
+‖
+R
+Δ
+​
+t
+‖
+4
+]
+\displaystyle\mathbb{E}[\norm{R_{\Delta t}}^{4}]
+≤
+C
+​
+Δ
+​
+t
+4
+\displaystyle\leq C\Delta t^{4}
+𝔼
+⁡
+[
+‖
+R
+Δ
+​
+t
+‖
+6
+]
+\displaystyle\mathbb{E}[\norm{R_{\Delta t}}^{6}]
+≤
+C
+​
+Δ
+​
+t
+6
+\displaystyle\leq C\Delta t^{6}
+We can now bound all quantities in the Fisher information matrix:
+|
+𝔼
+⁡
+[
+Δ
+​
+W
+T
+​
+R
+Δ
+​
+t
+]
+|
+\displaystyle|\mathbb{E}[\Delta W^{T}R_{\Delta t}]|
+≤
+♣
+​
+𝔼
+⁡
+[
+‖
+Δ
+​
+W
+‖
+2
+]
+​
+𝔼
+​
+[
+‖
+R
+Δ
+​
+t
+‖
+2
+]
+\displaystyle\overset{\clubsuit}{\leq}\sqrt{\mathbb{E}[\norm{\Delta W}^{2}]\mathbb{E}[\norm{R_{\Delta t}}^{2}]}
+≤
+(
+d
+​
+Δ
+​
+t
+)
+​
+(
+C
+​
+Δ
+​
+t
+2
+)
+\displaystyle\leq\sqrt{(d\Delta t)(C\Delta t^{2})}
+=
+d
+​
+C
+​
+Δ
+​
+t
+3
+/
+2
+,
+\displaystyle=\sqrt{dC}\Delta t^{3/2},
+𝔼
+⁡
+[
+(
+Δ
+​
+W
+T
+​
+R
+Δ
+​
+t
+)
+2
+]
+\displaystyle\mathbb{E}[(\Delta W^{T}R_{\Delta t})^{2}]
+=
+𝔼
+⁡
+[
+R
+Δ
+​
+t
+T
+​
+Δ
+​
+W
+​
+Δ
+​
+W
+T
+​
+R
+Δ
+​
+t
+]
+\displaystyle=\mathbb{E}[R_{\Delta t}^{T}\Delta W\Delta W^{T}R_{\Delta t}]
+=
+𝔼
+⁡
+[
+tr
+⁡
+(
+R
+Δ
+​
+t
+​
+R
+Δ
+​
+t
+T
+​
+Δ
+​
+W
+​
+Δ
+​
+W
+T
+)
+]
+\displaystyle=\mathbb{E}[\tr(R_{\Delta t} R_{\Delta t}^T\Delta W\Delta W^T)]
+≤
+♡
+​
+𝔼
+​
+[
+‖
+R
+Δ
+​
+t
+​
+R
+Δ
+​
+t
+T
+‖
+F
+​
+‖
+Δ
+​
+W
+​
+Δ
+​
+W
+T
+‖
+F
+]
+\displaystyle\overset{\heartsuit}{\leq}\mathbb{E}[\norm{R_{\Delta t} R_{\Delta t}^T}_{F}\norm{\Delta W\Delta W^T}_{F}]
+≤
+♣
+​
+𝔼
+⁡
+[
+‖
+R
+Δ
+​
+t
+​
+R
+Δ
+​
+t
+T
+‖
+F
+2
+]
+​
+𝔼
+​
+[
+‖
+Δ
+​
+W
+​
+Δ
+​
+W
+T
+‖
+F
+2
+]
+\displaystyle\overset{\clubsuit}{\leq}\sqrt{\mathbb{E}[\norm{R_{\Delta t} R_{\Delta t}^T}_{F}^{2}]\mathbb{E}[\norm{\Delta W\Delta W^T}_{F}^{2}]}
+=
+𝔼
+⁡
+[
+‖
+Δ
+​
+W
+‖
+4
+]
+​
+𝔼
+​
+[
+‖
+R
+Δ
+​
+t
+‖
+4
+]
+\displaystyle=\sqrt{\mathbb{E}[\norm{\Delta W}^{4}]\mathbb{E}[\norm{R_{\Delta t}}^{4}]}
+=
+(
+d
+⁡
+(
+d
++
+2
+)
+​
+Δ
+​
+t
+2
+)
+​
+(
+C
+​
+Δ
+​
+t
+4
+)
+\displaystyle=\sqrt{(d(d+2)\Delta t^{2})(C\Delta t^{4})}
+=
+d
+⁡
+(
+d
++
+2
+)
+​
+C
+​
+Δ
+​
+t
+3
+\displaystyle=\sqrt{d(d+2)C}\Delta t^{3}
+𝔼
+⁡
+[
+‖
+Δ
+​
+W
+‖
+2
+​
+‖
+R
+Δ
+​
+t
+‖
+2
+]
+\displaystyle\mathbb{E}[\norm{\Delta W}^{2}\norm{R_{\Delta t}}^{2}]
+≤
+♣
+​
+𝔼
+⁡
+[
+‖
+Δ
+​
+W
+‖
+4
+]
+​
+𝔼
+​
+[
+‖
+R
+Δ
+​
+t
+‖
+4
+]
+\displaystyle\overset{\clubsuit}{\leq}\sqrt{\mathbb{E}[\norm{\Delta W}^{4}]\mathbb{E}[\norm{R_{\Delta t}}^{4}]}
+≤
+d
+⁡
+(
+d
++
+2
+)
+​
+C
+​
+Δ
+​
+t
+3
+\displaystyle\leq\sqrt{d(d+2)C}\Delta t^{3}
+|
+𝔼
+⁡
+[
+‖
+R
+Δ
+​
+t
+‖
+2
+​
+Δ
+​
+W
+T
+​
+R
+Δ
+​
+t
+]
+|
+\displaystyle|\mathbb{E}[\norm{R_{\Delta t}}^{2}\Delta W^{T}R_{\Delta t}]|
+≤
+♣
+​
+𝔼
+⁡
+[
+‖
+Δ
+​
+W
+‖
+2
+]
+​
+𝔼
+​
+[
+‖
+R
+Δ
+​
+t
+‖
+6
+]
+\displaystyle\overset{\clubsuit}{\leq}\sqrt{\mathbb{E}[\norm{\Delta W}^{2}]\mathbb{E}[\norm{R_{\Delta t}}^{6}]}
+=
+(
+d
+​
+Δ
+​
+t
+)
+​
+(
+C
+​
+Δ
+​
+t
+6
+)
+\displaystyle=\sqrt{(d\Delta t)(C\Delta t^{6})}
+≤
+d
+​
+C
+​
+Δ
+​
+t
+7
+/
+2
+\displaystyle\leq\sqrt{dC}\Delta t^{7/2}
+|
+𝔼
+⁡
+[
+‖
+Δ
+​
+W
+‖
+2
+​
+Δ
+​
+W
+T
+​
+R
+Δ
+​
+t
+]
+|
+\displaystyle|\mathbb{E}[\norm{\Delta W}^{2}\Delta W^{T}R_{\Delta t}]|
+≤
+♣
+​
+𝔼
+⁡
+[
+‖
+Δ
+​
+W
+‖
+6
+]
+​
+𝔼
+​
+[
+‖
+R
+Δ
+​
+t
+‖
+2
+]
+\displaystyle\overset{\clubsuit}{\leq}\sqrt{\mathbb{E}[\norm{\Delta W}^{6}]\mathbb{E}[\norm{R_{\Delta t}}^{2}]}
+≤
+(
+M
+​
+Δ
+​
+t
+3
+)
+​
+(
+C
+​
+Δ
+​
+t
+2
+)
+\displaystyle\leq\sqrt{(M\Delta t^{3})(C\Delta t^{2})}
+=
+15
+​
+d
+​
+C
+​
+Δ
+​
+t
+5
+/
+2
+,
+\displaystyle=\sqrt{15dC}\Delta t^{5/2},
+where
+♡
+\heartsuit
+is Cauchy-Schwarz in the space of matrices with inner product between
+A
+A
+and
+B
+B
+given by
+tr
+⁡
+(
+A
+T
+​
+B
+)
+\tr(A^TB)
+and
+♣
+\clubsuit
+is Cauchy-Schwarz in the vector space of random variables.
+With this, we obtain the upper bound
+𝔼
+⁡
+[
+S
+j
+​
+(
+X
+,
+σ
+2
+)
+]
+\displaystyle\mathbb{E}[S_{j}(X;\sigma^{2})]
+≤
+d
+2
+4
+​
+σ
+4
+−
+2
+​
+d
+4
+​
+Δ
+​
+t
+​
+σ
+6
+​
+σ
+2
+​
+d
+​
+Δ
+​
+t
++
+2
+​
+d
+4
+​
+Δ
+​
+t
+​
+σ
+6
+​
+(
+2
+​
+σ
+​
+d
+​
+C
+​
+Δ
+​
+t
+3
+/
+2
++
+C
+​
+Δ
+​
+t
+2
+)
+\displaystyle\leq\frac{d^{2}}{4\sigma^{4}}-\frac{2d}{4\Delta t\sigma^{6}}\sigma^{2}d\Delta t+\frac{2d}{4\Delta t\sigma^{6}}(2\sigma\sqrt{dC}\Delta t^{3/2}+C\Delta t^{2})
++
+1
+4
+​
+Δ
+​
+t
+2
+​
+σ
+8
+​
+d
+​
+(
+d
++
+2
+)
+​
+σ
+4
+​
+Δ
+​
+t
+2
+\displaystyle\qquad+\frac{1}{4\Delta t^{2}\sigma^{8}}d(d+2)\sigma^{4}\Delta t^{2}
++
+1
+4
+​
+Δ
+​
+t
+2
+​
+σ
+8
+​
+(
+C
+​
+Δ
+​
+t
+4
++
+4
+​
+σ
+3
+​
+M
+​
+C
+​
+Δ
+​
+t
+5
+/
+2
++
+4
+​
+σ
+​
+d
+​
+C
+​
+Δ
+​
+t
+7
+/
+2
++
+6
+​
+σ
+2
+​
+d
+⁡
+(
+d
++
+2
+)
+​
+C
+​
+Δ
+​
+t
+3
+)
+\displaystyle\qquad+\frac{1}{4\Delta t^{2}\sigma^{8}}\left(C\Delta t^{4}+4\sigma^{3}\sqrt{MC}\Delta t^{5/2}+4\sigma\sqrt{dC}\Delta t^{7/2}+6\sigma^{2}\sqrt{d(d+2)C}\Delta t^{3}\right)
+=
+2
+​
+d
+4
+​
+σ
+2
++
+2
+​
+d
+​
+Δ
+​
+t
+4
+​
+σ
+6
+​
+(
+2
+​
+σ
+​
+d
+​
+C
++
+C
+​
+Δ
+​
+t
+)
+\displaystyle=\frac{2d}{4\sigma^{2}}+\frac{2d\sqrt{\Delta t}}{4\sigma^{6}}(2\sigma\sqrt{dC}+C\sqrt{\Delta t})
++
+Δ
+​
+t
+4
+​
+σ
+8
+​
+(
+C
+​
+Δ
+​
+t
+3
+/
+2
++
+4
+​
+σ
+3
+​
+M
+​
+C
++
+4
+​
+σ
+​
+d
+​
+C
+​
+Δ
+​
+t
++
+6
+​
+σ
+2
+​
+d
+⁡
+(
+d
++
+2
+)
+​
+C
+​
+Δ
+​
+t
+1
+/
+2
+)
+\displaystyle\qquad+\frac{\sqrt{\Delta t}}{4\sigma^{8}}\left(C\Delta t^{3/2}+4\sigma^{3}\sqrt{MC}+4\sigma\sqrt{dC}\Delta t+6\sigma^{2}\sqrt{d(d+2)C}\Delta t^{1/2}\right)
+and the lower bound
+𝔼
+⁡
+[
+S
+j
+​
+(
+X
+,
+σ
+2
+)
+]
+\displaystyle\mathbb{E}[S_{j}(X;\sigma^{2})]
+≥
+d
+2
+4
+​
+σ
+4
+−
+2
+​
+d
+4
+​
+Δ
+​
+t
+​
+σ
+6
+​
+σ
+2
+​
+d
+​
+Δ
+​
+t
+−
+2
+​
+d
+4
+​
+Δ
+​
+t
+​
+σ
+6
+​
+(
+2
+​
+σ
+​
+d
+​
+C
+​
+Δ
+​
+t
+3
+/
+2
+)
+\displaystyle\geq\frac{d^{2}}{4\sigma^{4}}-\frac{2d}{4\Delta t\sigma^{6}}\sigma^{2}d\Delta t-\frac{2d}{4\Delta t\sigma^{6}}(2\sigma\sqrt{dC}\Delta t^{3/2})
++
+1
+4
+​
+Δ
+​
+t
+2
+​
+σ
+8
+​
+d
+​
+(
+d
++
+2
+)
+​
+σ
+4
+​
+Δ
+​
+t
+2
+−
+1
+4
+​
+Δ
+​
+t
+2
+​
+σ
+8
+​
+(
+4
+​
+σ
+3
+​
+M
+​
+C
+​
+Δ
+​
+t
+5
+/
+2
++
+4
+​
+σ
+​
+d
+​
+C
+​
+Δ
+​
+t
+7
+/
+2
+)
+\displaystyle\qquad+\frac{1}{4\Delta t^{2}\sigma^{8}}d(d+2)\sigma^{4}\Delta t^{2}-\frac{1}{4\Delta t^{2}\sigma^{8}}\left(4\sigma^{3}\sqrt{MC}\Delta t^{5/2}+4\sigma\sqrt{dC}\Delta t^{7/2}\right)
+=
+2
+​
+d
+4
+​
+σ
+4
+−
+d
+​
+d
+​
+C
+​
+Δ
+​
+t
+σ
+5
+−
+C
+​
+Δ
+​
+t
+σ
+7
+​
+(
+σ
+2
+​
+M
++
+d
+​
+Δ
+​
+t
+)
+.
+\displaystyle=\frac{2d}{4\sigma^{4}}-\frac{d\sqrt{dC}\sqrt{\Delta t}}{\sigma^{5}}-\frac{\sqrt{C}\sqrt{\Delta t}}{\sigma^{7}}\left(\sigma^{2}\sqrt{M}+\sqrt{d}\Delta t\right).
+Overall, we therefore conclude
+ℐ
+σ
+2
+​
+(
+X
+)
+N
+=
+1
+N
+​
+∑
+j
+=
+1
+N
+𝔼
+⁡
+[
+S
+j
+​
+(
+X
+,
+σ
+2
+)
+2
+]
+=
+d
+2
+​
+σ
+4
++
+O
+⁡
+(
+Δ
+​
+t
+)
+.
+∎
+\frac{\mathcal{I}_{\sigma^{2}}(X)}{N}=\frac{1}{N}\sum_{j=1}^{N}\mathbb{E}\left[S_{j}(X;\sigma^{2})^{2}\right]=\frac{d}{2\sigma^{4}}+O(\sqrt{\Delta t}).\qed
+Thus, given
+N
+N
+trajectories, the Fisher information related to the diffusivity
+σ
+2
+\sigma^{2}
+is invariant to the initial distribution
+p
+0
+p_{0}
+and, as the noise level
+σ
+2
+\sigma^{2}
+decreases or the number of samples increases, the information increases proportionally.
+A.5
+Additional experiments for Fisher information
+Figure 4
+:
+Drift and diffusion MAEs from the maximum likelihood estimator, given
+100
+100
+observed trajectories, are averaged over
+1000
+1000
+replicates, and plotted for different initial distributions
+𝒩
+⁡
+(
+𝔼
+⁡
+[
+X
+0
+]
+,
+Cov
+⁡
+[
+X
+0
+]
+)
+\mathcal{N}(\mathbb{E}[X_{0}],\mathrm{Cov}[X_{0}])
+. The true SDE is given by the Ornstein-Uhlenbeck process
+d
+​
+X
+t
+=
+−
+X
+t
+​
+d
+​
+t
++
+d
+​
+W
+t
+\mathrm{d}X_{t}=-X_{t}\mathrm{d}t+\mathrm{d}W_{t}
+.
+For the drift MAE, we omit the case
+𝔼
+⁡
+[
+X
+0
+]
+=
+0
+,
+Cov
+⁡
+[
+X
+0
+]
+=
+0
+\mathbb{E}[X_{0}]=0,\mathrm{Cov}[X_{0}]=0
+, since the closed form MLE for linear drift is undefined when
+X
+0
+∼
+δ
+0
+X_{0}\sim\delta_{0}
+[
+Guan et al., 2024
+, Proposition 4.2]
+.
+In Figure
+4
+, we empirically verify our derived Fisher information quantities by using closed form MLE estimators
+[
+Guan et al., 2024
+]
+to estimate the drift and diffusion of an Ornstein-Uhlenbeck process from multiple short trajectories (two time points, separated by
+Δ
+​
+t
+=
+0.05
+\Delta t=0.05
+), given different initial distributions.
+The results are consistent with our derivations in Propositions
+A.3
+and
+A.5
+.
+By Proposition
+A.3
+, the Fisher information for a linear drift field is proportional to the initial distribution’s second moment. This is supported by the fact that the MAE decreases as the mean and variance increase, with faster decay for increasing mean. However, the diffusion MAE is invariant to the initial distribution, as outlined by Proposition
+A.5
+.
+(a)
+Quadratic potential
+(b)
+Styblinski-Tang potential
+Figure 5
+:
+Drift and diffusion MAEs for
+APPEX
+are plotted against the half-length
+r
+r
+for the initial distribution
+p
+0
+=
+Rademacher
+​
+(
+±
+r
+)
+p_{0}=\text{Rademacher}(\pm r)
+when estimating different Langevin SDEs,
+d
+​
+X
+t
+=
+−
+X
+t
+​
+d
+​
+t
++
+σ
+​
+d
+​
+W
+t
+\mathrm{d}X_{t}=-X_{t}\mathrm{d}t+\sigma\mathrm{d}W_{t}
+, with diffusivity
+σ
+2
+=
+0.2
+\sigma^{2}=0.2
+.
+In Figure
+5
+, we plot the corresponding error curves when we repeat the experiments from
+Section
+3.2
+, but set
+p
+0
+=
+Rademacher
+​
+(
+±
+r
+)
+p_{0}=\text{Rademacher}(\pm r)
+. We choose this family of distributions because while the variance increases as
+r
+r
+increases, the entropy remains constant. This construction implies that trajectory inference should be relatively easy, regardless of the value of
+r
+r
+, since
+p
+0
+p_{0}
+is completely concentrated at four distinct points. We therefore expect a less pronounced distinction between parameter estimation accuracy in the trajectories and marginals observational settings than observed in the original experiments with
+p
+0
+=
+Unif
+​
+(
+[
+−
+r
+,
+r
+]
+2
+)
+p_{0}=\text{Unif}([-r,r]^{2})
+.
+Indeed, we observe that the diffusion MAE from marginals is stable across distributions in
+Fig.
+5
+, in contrast to increasing diffusion error for
+p
+0
+=
+Unif
+​
+(
+[
+−
+r
+,
+r
+]
+2
+)
+p_{0}=\text{Unif}([-r,r]^{2})
+(see
+Fig.
+3
+). We also note that the gap between the drift error curves from marginals and from trajectories in
+Fig.
+5
+is much smaller for each value of
+r
+r
+, compared to in
+Fig.
+3
+. In fact, the drift errors in the trajectories and marginals setting are almost exact when estimating the Styblinski-Tang gradient field. This is consistent with our intuition that the Fisher information gap trajectory (
+13
+) is reduced when the trajectory inference step performs effectively. We also recall that the Styblinski-Tang potential has a much higher drift to diffusion ratio compared to the quadratic potential. Even in our experiments with
+p
+0
+=
+Unif
+​
+(
+[
+−
+r
+,
+r
+]
+2
+)
+p_{0}=\text{Unif}([-r,r]^{2})
+, we only observe a small gap between the same error curves in
+Fig.
+3(b)
+, despite the fact that trajectory inference is significantly harder compared to the Rademacher case. However, although the gap between drift error curves from marginals and from trajectories is smaller under Rademacher initial distributions, the overall accuracy of the drift estimates is considerably worse than in the original experiment with uniform initial distributions. This is likely due to the fact that the Rademacher setting only gives the algorithm initial data from four specific points. Since we only consider a finite number
+N
+=
+1000
+N=1000
+of samples, across a single time step
+Δ
+​
+t
+=
+0.001
+\Delta t=0.001
+, then only a small portion of the ground truth drift field can be estimated, even in the case of observed trajectories.
+Appendix B
+Non-identifiability examples
+Within the general literature on the identifiability of SDEs from temporal marginals, there are a few well-established sources of non-identifiability from marginals: undetectable rotations
+[
+Weinreb et al., 2018
+,
+Shen et al., 2024
+,
+Guan et al., 2024
+]
+, rank-degenerate trajectories
+[
+Wang et al., 2024
+]
+, and sharing the same stationary distribution
+[
+Lavenant et al., 2021
+]
+. We overview these non-identifiable examples below:
+Example B.1
+(Gaussian pancake
+[
+Guan et al., 2024
+]
+)
+.
+Let
+a
+,
+b
+,
+c
+∈
+ℝ
+a,b,c\in\mathbb{R}
+, with
+a
+≤
+b
+a\leq b
+, and let
+X
+0
+X_{0}
+be defined as a
+2
+​
+d
+2d
+Gaussian pancake, such that for each fixed
+x
+0
+(
+2
+)
+∈
+[
+a
+,
+b
+]
+x_{0}^{(2)}\in[a,b]
+, the first coordinate
+x
+0
+(
+1
+)
+∼
+𝒩
+⁡
+(
+0
+,
+1
+)
+x_{0}^{(1)}\sim\mathcal{N}(0,1)
+:
+d
+​
+X
+t
+\displaystyle\mathrm{d}X_{t}
+=
+[
+−
+1
+0
+0
+b
+]
+​
+d
+​
+t
++
+[
+1
+0
+0
+c
+]
+​
+d
+​
+W
+t
+,
+\displaystyle=\begin{bmatrix}-1&0\\
+0&b\end{bmatrix}\mathrm{d}t+\begin{bmatrix}1&0\\
+0&c\end{bmatrix}\mathrm{d}W_{t},
+X
+0
+∼
+𝒩
+⁡
+(
+0
+,
+1
+)
+×
+[
+a
+,
+b
+]
+\displaystyle X_{0}\sim\mathcal{N}(0,1)\times[a,b]
+(26)
+d
+​
+Y
+t
+\displaystyle\mathrm{d}Y_{t}
+=
+[
+−
+10
+0
+0
+b
+]
+​
+d
+​
+t
++
+[
+10
+0
+0
+c
+]
+​
+d
+​
+W
+t
+,
+\displaystyle=\begin{bmatrix}-10&0\\
+0&b\end{bmatrix}\mathrm{d}t+\begin{bmatrix}\sqrt{10}&0\\
+0&c\end{bmatrix}\mathrm{d}W_{t},
+Y
+0
+∼
+𝒩
+⁡
+(
+0
+,
+1
+)
+×
+[
+a
+,
+b
+]
+\displaystyle Y_{0}\sim\mathcal{N}(0,1)\times[a,b]
+(27)
+Example B.2
+(Rotation
+[
+Shen et al., 2024
+,
+Hashimoto et al., 2016
+,
+Weinreb et al., 2018
+,
+Guan et al., 2024
+]
+)
+.
+d
+​
+X
+t
+\displaystyle\mathrm{d}X_{t}
+=
+d
+​
+W
+t
+,
+\displaystyle=\mathrm{d}W_{t},
+X
+0
+∼
+𝒩
+⁡
+(
+0
+,
+I
+)
+\displaystyle X_{0}\sim\mathcal{N}(0,I)
+d
+​
+Y
+t
+\displaystyle\mathrm{d}Y_{t}
+=
+[
+0
+1
+−
+1
+0
+]
+​
+Y
+t
+​
+d
+​
+t
++
+d
+​
+W
+t
+,
+\displaystyle=\begin{bmatrix}0&1\\
+-1&0\end{bmatrix}Y_{t}\>\mathrm{d}t+\mathrm{d}W_{t},
+Y
+0
+∼
+𝒩
+⁡
+(
+0
+,
+I
+)
+\displaystyle Y_{0}\sim\mathcal{N}(0,I)
+Example B.3
+(Degenerate rank
+[
+Wang et al., 2024
+,
+Guan et al., 2024
+]
+)
+.
+d
+​
+X
+t
+\displaystyle\mathrm{d}X_{t}
+=
+[
+1
+2
+1
+0
+]
+​
+X
+t
+​
+d
+​
+t
++
+[
+1
+2
+−
+1
+−
+2
+]
+​
+d
+​
+W
+t
+,
+\displaystyle=\begin{bmatrix}1&2\\
+1&0\end{bmatrix}X_{t}\>\mathrm{d}t+\begin{bmatrix}1&2\\
+-1&-2\end{bmatrix}\mathrm{d}W_{t},
+X
+0
+=
+[
+1
+−
+1
+]
+\displaystyle X_{0}=\begin{bmatrix}1\\
+-1\end{bmatrix}
+d
+​
+Y
+t
+\displaystyle\mathrm{d}Y_{t}
+=
+[
+1
+/
+3
+4
+/
+3
+2
+/
+3
+−
+1
+/
+3
+]
+​
+Y
+t
+​
+d
+​
+t
++
+[
+1
+2
+−
+1
+−
+2
+]
+​
+d
+​
+W
+t
+,
+\displaystyle=\begin{bmatrix}1/3&4/3\\
+2/3&-1/3\end{bmatrix}Y_{t}\>\mathrm{d}t+\begin{bmatrix}1&2\\
+-1&-2\end{bmatrix}\mathrm{d}W_{t},
+Y
+0
+=
+[
+1
+−
+1
+]
+\displaystyle Y_{0}=\begin{bmatrix}1\\
+-1\end{bmatrix}
+Appendix C
+Additional experiments
+Software and hardware details.
+All experiments in this paper are performed on simulated datasets, using inference methods from two public code repositories (
+APPEX
+:
+https://github.com/guanton/APPEX
+and
+JKOnet
+∗
+,
+JKOnet
+∗
+ℓ
+{}^{\ast}_{\ell}
+:
+https://github.com/antonioterpin/jkonet-star
+). All computations are performed on a 2024 MacBook Pro with
+16
+16
+GB RAM and an Apple M4 chip. The code was adapted to design the experiments and interpret the results, and is available in the supplementary material.
+In this section, we consider the same experimental setup from
+Section
+3.1
+, and report parameter estimation results based on the remaining confining potentials from
+[
+Terpin et al., 2024
+]
+:
+Ψ
+Bohachevsky
+​
+(
+x
+)
+\displaystyle\Psi_{\text{Bohachevsky}}(x)
+=
+10
+​
+(
+x
+1
+2
++
+2
+​
+x
+2
+2
+−
+0.3
+​
+cos
+⁡
+(
+3
+​
+π
+​
+x
+1
+)
+−
+0.4
+​
+cos
+⁡
+(
+4
+​
+π
+​
+x
+2
+)
+)
+,
+\displaystyle=10\bigl(x_{1}^{2}+2x_{2}^{2}-0.3\cos(3\pi x_1)-0.4\cos(4\pi x_2)\bigr),
+(28)
+Ψ
+Wavy plateau
+​
+(
+x
+)
+\displaystyle\Psi_{\text{Wavy plateau}}(x)
+=
+∑
+i
+=
+1
+2
+(
+cos
+⁡
+(
+π
+​
+x
+i
+)
++
+1
+2
+​
+x
+i
+4
+−
+3
+​
+x
+i
+2
++
+1
+)
+,
+\displaystyle=\sum_{i=1}^{2}\left(\cos(\pi x_i)+\frac{1}{2}x_{i}^{4}-3x_{i}^{2}+1\right),
+(29)
+Ψ
+Oakley-Ohagan
+​
+(
+x
+)
+\displaystyle\Psi_{\text{Oakley-Ohagan}}(x)
+=
+5
+​
+∑
+i
+=
+1
+2
+(
+sin
+⁡
+(
+x
+i
+)
++
+cos
+⁡
+(
+x
+i
+)
++
+x
+i
+2
++
+x
+i
+)
+.
+\displaystyle=5\sum_{i=1}^{2}\left(\sin(x_i)+\cos(x_i)+x_{i}^{2}+x_{i}\right).
+(30)
+In contrast to the quadratic (
+10
+) and Styblinski-Tang potentials (
+11
+), each of these potentials is non-polynomial and admits a more complex stationary distribution. While we use the random walk Metropolis–Hastings algorithm to efficiently draw samples from the stationary distribution of the Langevin SDEs with quadratic (
+10
+) and Styblinski-Tang potentials (
+11
+), we found that this algorithm encountered numerical inconsistencies for more intricate oscillatory potentials, especially the Bohachevsky potential. In order to sample from the Gibbs distributions
+1
+Z
+​
+exp
+⁡
+(
+−
+2
+​
+Ψ
+​
+(
+x
+)
+σ
+2
+)
+\frac{1}{Z}\exp(-\frac{2\Psi(x)}{\sigma^2})
+of the potentials (
+28
+)-(
+30
+), we instead generate trajectories from
+p
+0
+=
+Unif
+​
+(
+[
+−
+4
+,
+4
+]
+2
+)
+p_{0}=\textrm{Unif}([-4,4]^{2})
+and run
+100
+100
+steps of the Langevin SDE with step size
+Δ
+​
+t
+=
+0.01
+\Delta t=0.01
+. Indeed, each of the potentials (
+28
+)-(
+30
+) satisfies the Poincaré inequality, which ensures that marginals converge exponentially quickly to the stationary Gibbs distribution
+[
+Pavliotis, 2014
+, Theorem 4.4]
+.
+As in our main experiments, we observe that the methods are unable to jointly estimate drift and diffusion from stationary marginals, while obtaining far greater accuracy when inferring from transient marginals. This contrast is illustrated at the level of the reconstructed drift fields for each of the methods,
+APPEX
+,
+JKOnet
+∗
+, and
+JKOnet
+∗
+ℓ
+{}^{\ast}_{\ell}
+, shown in
+Figs.
+7
+,
+8
+and
+9
+.
+The inferential disparity is also shown numerically, such that the transient setting is characterized by consistently lower MAEs in
+Table
+2
+and consistently higher cosine similarity across all SDEs (
+Table
+3
+). Although we occasionally observe inconsistent diffusion estimation from transient marginals, we note that, with the exception of the Bohachevsky potential, the best diffusion estimation is always observed in the transient setting:
+APPEX
+for quadratic,
+JKOnet
+∗
+for Styblinski-Tang,
+JKOnet
+∗
+for Oakley-Ohagan, and
+JKOnet
+∗
+ℓ
+{}^{\ast}_{\ell}
+for Wavy Plateau. We note that the Bohachevsky potential is particularly complex, since it features component-wise asymmetries, high-order terms, and mixed periodic behavior in all dimensions (its gradient field is plotted in Figure
+Fig.
+7
+(g) and
+Fig.
+8
+(g)). Also in
+[
+Terpin et al., 2024
+]
+, the Bohachevsky potential was the most challenging potential to infer across the
+15
+15
+considered potentials. We therefore expect that a larger number of samples is required to recover its drift and diffusion.
+Furthermore, the relative inconsistency of diffusion estimation compared to drift estimation is in line with our analysis from
+Sections
+3.2
+and
+A.4
+, where we observe that the information gap between observed trajectories and marginals increases with the entropy of the initial distribution
+p
+0
+p_{0}
+. Indeed, our default distribution for the transient setting,
+p
+0
+=
+Unif
+​
+(
+[
+−
+r
+,
+r
+]
+2
+)
+p_{0}=\text{Unif}([-r,r]^{2})
+, has high entropy due to the uniform spread of mass across a large region. This has a particularly pronounced effect for diffusion estimation because, unlike drift information, increasing the dispersion of
+p
+0
+p_{0}
+does not increase available information about isotropic diffusion.
+The main purpose of these experiments is to empirically show the validity of our theory, which states that drift and diffusion are identifiable if and only if we observe transient marginals. Our results in
+Figs.
+7
+,
+8
+and
+9
+indicate that drift and diffusion estimation is possible given transient marginals and not possible with stationary marginals.
+As we increase the number of observed marginals, the number of samples, and optimize our inference methods, our theory indicates that, in transient settings, one can infer the drift and diffusion with arbitrary precision.
+Table 2
+:
+MAEs of drift and diffusion across different methods (
+APPEX
+,
+JKOnet
+∗
+, and
+JKOnet
+∗
+ℓ
+{}^{\ast}_{\ell}
+), drift potentials (Quadratic, Styblinski–Tang, Bohachevsky, Oakley–Ohagan, Wavy Plateau), and noise levels (0.2, 0.4). Drift MAE is normalized by the average magnitude of the ground-truth drift field.
+Method
+Drift potential
+σ
+2
+\sigma^{2}
+Transient
+Stationary
+MAE
+Ψ
+MAE
+σ
+2
+{}_{\sigma^{2}}
+MAE
+Ψ
+∣
+p
+eq
+{}_{\Psi}\mid_{p_{\mathrm{eq}}}
+MAE
+Ψ
+MAE
+σ
+2
+{}_{\sigma^{2}}
+MAE
+Ψ
+∣
+p
+eq
+{}_{\Psi}\mid_{p_{\mathrm{eq}}}
+APPEX
+Quadratic
+0.2
+0.17
+0.07
+0.67
+12669.08
+0.35
+46.00
+Quadratic
+0.4
+0.25
+0.13
+0.67
+2891.09
+0.12
+42.17
+Styblinski–Tang
+0.2
+0.06
+0.20
+0.38
+2.49
+0.19
+1.76
+Styblinski–Tang
+0.4
+0.15
+0.42
+0.52
+2.71
+0.38
+1.81
+Bohachevsky
+0.2
+0.72
+2.30
+0.93
+198.51
+2.67
+1.12
+Bohachevsky
+0.4
+0.71
+2.06
+0.92
+317.84
+0.96
+0.86
+Oakley–Ohagan
+0.2
+0.15
+0.08
+0.63
+139.96
+0.17
+6.78
+Oakley–Ohagan
+0.4
+0.21
+0.16
+0.25
+120.50
+0.35
+6.62
+Wavy Plateau
+0.2
+0.09
+0.28
+5.95
+15.31
+0.18
+9.77
+Wavy Plateau
+0.4
+0.15
+0.36
+5.58
+13.49
+0.32
+9.46
+JKOnet
+∗
+Quadratic
+0.2
+0.20
+0.32
+0.79
+1.57
+0.18
+1.29
+Quadratic
+0.4
+0.29
+0.26
+0.81
+1.97
+0.12
+1.98
+Styblinski–Tang
+0.2
+0.39
+0.07
+3.01
+1.07
+1.34
+1.14
+Styblinski–Tang
+0.4
+0.39
+0.08
+2.17
+1.09
+1.14
+1.15
+Bohachevsky
+0.2
+0.41
+1.20
+0.93
+1.16
+0.17
+1.00
+Bohachevsky
+0.4
+0.40
+2.88
+0.92
+1.15
+0.36
+1.00
+Oakley–Ohagan
+0.2
+0.14
+0.10
+2.34
+1.16
+1.04
+1.34
+Oakley–Ohagan
+0.4
+0.14
+0.25
+1.56
+1.24
+0.84
+1.03
+Wavy Plateau
+0.2
+0.43
+0.11
+8.21
+1.03
+0.17
+1.27
+Wavy Plateau
+0.4
+0.46
+0.08
+6.60
+1.13
+0.13
+1.78
+JKOnet
+∗
+ℓ
+{}^{\ast}_{\ell}
+Quadratic
+0.2
+0.26
+1.06
+1.08
+572.76
+0.16
+0.89
+Quadratic
+0.4
+0.51
+2.56
+1.35
+2306.78
+0.15
+0.51
+Styblinski–Tang
+0.2
+0.04
+0.14
+0.39
+0.93
+0.20
+0.98
+Styblinski–Tang
+0.4
+0.05
+0.22
+0.35
+1.06
+0.40
+0.98
+Bohachevsky
+0.2
+0.37
+0.85
+0.94
+933.79
+0.18
+1.00
+Bohachevsky
+0.4
+0.36
+2.18
+0.93
+481.11
+0.37
+1.00
+Oakley–Ohagan
+0.2
+0.12
+0.37
+0.44
+126.76
+0.20
+0.94
+Oakley–Ohagan
+0.4
+0.14
+0.59
+0.42
+111.03
+0.39
+0.95
+Wavy Plateau
+0.2
+0.04
+0.02
+2.21
+17.49
+0.15
+0.75
+Wavy Plateau
+0.4
+0.05
+0.04
+1.43
+25.89
+0.12
+0.40
+Table 3
+:
+Drift cosine similarity across different methods (
+APPEX
+,
+JKOnet
+∗
+, and
+JKOnet
+∗
+ℓ
+{}^{\ast}_{\ell}
+) for different drift potentials and noise levels.
+Method
+Drift potential
+σ
+2
+\sigma^{2}
+Transient
+Stationary
+Drift cosine similarity
+Drift cosine similarity
+APPEX
+Quadratic
+0.2
+0.99
+±
+0.00
+0.99\pm 0.00
+0.00
+±
+0.05
+0.00\pm 0.05
+Quadratic
+0.4
+0.98
+±
+0.00
+0.98\pm 0.00
+0.08
+±
+0.06
+0.08\pm 0.06
+Styblinski–Tang
+0.2
+1.00
+±
+0.00
+1.00\pm 0.00
+0.81
+±
+0.05
+0.81\pm 0.05
+Styblinski–Tang
+0.4
+1.00
+±
+0.00
+1.00\pm 0.00
+0.77
+±
+0.07
+0.77\pm 0.07
+Bohachevsky
+0.2
+0.88
+±
+0.01
+0.88\pm 0.01
+0.04
+±
+0.03
+0.04\pm 0.03
+Bohachevsky
+0.4
+0.90
+±
+0.00
+0.90\pm 0.00
+0.05
+±
+0.02
+0.05\pm 0.02
+Oakley–Ohagan
+0.2
+1.00
+±
+0.00
+1.00\pm 0.00
+0.29
+±
+0.06
+0.29\pm 0.06
+Oakley–Ohagan
+0.4
+1.00
+±
+0.00
+1.00\pm 0.00
+0.22
+±
+0.07
+0.22\pm 0.07
+Wavy Plateau
+0.2
+0.93
+±
+0.00
+0.93\pm 0.00
+0.81
+±
+0.03
+0.81\pm 0.03
+Wavy Plateau
+0.4
+0.91
+±
+0.00
+0.91\pm 0.00
+0.87
+±
+0.04
+0.87\pm 0.04
+JKOnet
+∗
+Quadratic
+0.2
+0.99
+±
+0.00
+0.99\pm 0.00
+−
+0.82
+±
+0.03
+-0.82\pm 0.03
+Quadratic
+0.4
+0.97
+±
+0.01
+0.97\pm 0.01
+−
+0.83
+±
+0.03
+-0.83\pm 0.03
+Styblinski–Tang
+0.2
+0.96
+±
+0.00
+0.96\pm 0.00
+−
+0.82
+±
+0.02
+-0.82\pm 0.02
+Styblinski–Tang
+0.4
+0.96
+±
+0.00
+0.96\pm 0.00
+−
+0.81
+±
+0.03
+-0.81\pm 0.03
+Bohachevsky
+0.2
+0.90
+±
+0.00
+0.90\pm 0.00
+−
+0.69
+±
+0.02
+-0.69\pm 0.02
+Bohachevsky
+0.4
+0.90
+±
+0.00
+0.90\pm 0.00
+−
+0.70
+±
+0.05
+-0.70\pm 0.05
+Oakley–Ohagan
+0.2
+0.99
+±
+0.00
+0.99\pm 0.00
+−
+0.34
+±
+0.13
+-0.34\pm 0.13
+Oakley–Ohagan
+0.4
+0.99
+±
+0.00
+0.99\pm 0.00
+−
+0.62
+±
+0.04
+-0.62\pm 0.04
+Wavy Plateau
+0.2
+0.89
+±
+0.01
+0.89\pm 0.01
+−
+0.77
+±
+0.03
+-0.77\pm 0.03
+Wavy Plateau
+0.4
+0.87
+±
+0.01
+0.87\pm 0.01
+−
+0.88
+±
+0.01
+-0.88\pm 0.01
+JKOnet
+∗
+ℓ
+{}^{\ast}_{\ell}
+Quadratic
+0.2
+0.99
+±
+0.00
+0.99\pm 0.00
+0.72
+±
+0.20
+0.72\pm 0.20
+Quadratic
+0.4
+0.97
+±
+0.01
+0.97\pm 0.01
+0.80
+±
+0.04
+0.80\pm 0.04
+Styblinski–Tang
+0.2
+1.00
+±
+0.00
+1.00\pm 0.00
+0.28
+±
+0.03
+0.28\pm 0.03
+Styblinski–Tang
+0.4
+1.00
+±
+0.00
+1.00\pm 0.00
+0.16
+±
+0.06
+0.16\pm 0.06
+Bohachevsky
+0.2
+0.92
+±
+0.00
+0.92\pm 0.00
+0.65
+±
+0.04
+0.65\pm 0.04
+Bohachevsky
+0.4
+0.92
+±
+0.00
+0.92\pm 0.00
+0.74
+±
+0.02
+0.74\pm 0.02
+Oakley–Ohagan
+0.2
+1.00
+±
+0.00
+1.00\pm 0.00
+0.53
+±
+0.13
+0.53\pm 0.13
+Oakley–Ohagan
+0.4
+1.00
+±
+0.00
+1.00\pm 0.00
+0.54
+±
+0.15
+0.54\pm 0.15
+Wavy Plateau
+0.2
+0.98
+±
+0.00
+0.98\pm 0.00
+0.75
+±
+0.04
+0.75\pm 0.04
+Wavy Plateau
+0.4
+0.98
+±
+0.00
+0.98\pm 0.00
+0.77
+±
+0.04
+0.77\pm 0.04
+10
+−
+1
+10^{-1}
+10
+0
+10^{0}
+10
+1
+10^{1}
+10
+2
+10^{2}
+10
+3
+10^{3}
+10
+4
+10^{4}
+0
+0
+0.5
+0.5
+1
+1
+1.5
+1.5
+2
+2
+2.5
+2.5
+3
+3
+MAE
+∇
+Ψ
+\nabla\Psi
+(sampled from grid)
+MAE
+σ
+2
+\sigma^{2}
+10
+0
+10^{0}
+10
+1
+10^{1}
+0
+0
+0.5
+0.5
+1
+1
+1.5
+1.5
+2
+2
+2.5
+2.5
+3
+3
+MAE
+∇
+Ψ
+\nabla\Psi
+(sampled from Gibbs)
+MAE
+σ
+2
+\sigma^{2}
+APPEX Transient
+APPEX Stationary
+JKOnet
+∗
+Transient
+JKOnet
+∗
+Stationary
+JKOnet
+∗
+ℓ
+{}^{\ast}_{\ell}
+Transient
+JKOnet
+∗
+ℓ
+{}^{\ast}_{\ell}
+Stationary
+Figure 6
+:
+Drift vs. diffusion MAE across
+10
+10
+SDEs, defined by five potentials (
+Quadratic
+,
+Styblinski–Tang
+,
+Bohachevsky
+,
+Oakley–Ohagan
+,
+Wavy Plateau
+) and two noise levels (
+σ
+2
+=
+0.2
+,
+0.4
+\sigma^{2}=0.2,0.4
+). For each SDE, inference is performed under both transient and stationary observational settings. The methods
+APPEX
+,
+JKOnet
+∗
+, and
+JKOnet
+∗
+ℓ
+{}^{\ast}_{\ell}
+are used for inference.
+(a)
+Quadratic vector field
+(b)
+Estimated from transient
+(c)
+Estimated from stationary
+(d)
+Styblinski-Tang vector field
+(e)
+Estimated from transient
+(f)
+Estimated from stationary
+(g)
+Bohachevsky vector field
+(h)
+Estimated from transient
+(i)
+Estimated from stationary
+(j)
+Wavy plateau vector field
+(k)
+Estimated from transient
+(l)
+Estimated from stationary
+(m)
+Oakley-Ohagan vector field
+(n)
+Estimated from transient
+(o)
+Estimated from stationary
+Figure 7
+:
+Drift landscapes. Left: the ground truth. Center and right: Drift estimated by
+APPEX
+from transient and stationary marginals. To improve readability, we clip the color values to the min and max displayed in the colorbar. The arrows show the direction of the drift while the colors show the magnitude of the drift. We plot vector fields for APPEX, since the method does not assume that the underlying drift field is conservative.
+(a)
+Quadratic landscape
+(b)
+Estimated from transient
+(c)
+Estimated from stationary
+(d)
+Styblinski-Tang landscape
+(e)
+Estimated from transient
+(f)
+Estimated from stationary
+(g)
+Bohachevsky landscape
+(h)
+Estimated from transient
+(i)
+Estimated from stationary
+(j)
+Wavy plateau landscape
+(k)
+Estimated from transient
+(l)
+Estimated from stationary
+(m)
+Oakley-Ohagan landscape
+(n)
+Estimated from transient
+(o)
+Estimated from stationary
+Figure 8
+:
+Potential landscapes. Left: the ground truth. Center and right: Potential estimated by
+JKOnet
+∗
+from transient and stationary marginals. To improve readability, we clip the color values to the min and max displayed in the colorbar.
+(a)
+Quadratic landscape
+(b)
+Estimated from transient
+(c)
+Estimated from stationary
+(d)
+Styblinski-Tang landscape
+(e)
+Estimated from transient
+(f)
+Estimated from stationary
+(g)
+Bohachevsky landscape
+(h)
+Estimated from transient
+(i)
+Estimated from stationary
+(j)
+Wavy plateau landscape
+(k)
+Estimated from transient
+(l)
+Estimated from stationary
+(m)
+Oakley-Ohagan landscape
+(n)
+Estimated from transient
+(o)
+Estimated from stationary
+Figure 9
+:
+Potential landscapes. Left: the ground truth. Center and right: Potential estimated by
+JKOnet
+∗
+with linear feature approximation from transient and stationary marginals. To improve readability, we clip the color values to the min and max displayed in the colorbar.
+Experimental support, please
+view the build logs
+for errors. Generated by
+L
+A
+T
+E
+xml
+.
+Instructions for reporting errors
+We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+      support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+      methods listed below:
+Click the "Report Issue"
+(
+)
+button, located in the page header.
+Tip:
+You can select the relevant text first, to include it in your report.
+Our team has already identified
+the following issues
+. We appreciate your time reviewing and reporting rendering errors we
+      may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+      should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+      all.
+Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a
+list of packages that need conversion
+, and welcome
+developer contributions
+.
+We gratefully acknowledge support from
+        our
+major funders
+,
+member institutions
+,
+,
+        and all contributors.
+About
+·
+Help
+·
+Contact
+·
+Subscribe
+·
+Copyright
+·
+Privacy
+·
+Accessibility
+·
+Operational Status
+(opens in new tab)
+Major funding support from

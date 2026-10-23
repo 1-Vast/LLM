@@ -1,0 +1,9 @@
+# Feedback utility divergence: next mechanism search
+
+2026-10-23. Previous turn PROGRESS: frozen real sequential-treatment experiment and independent audits. FAC ordinary feedback useful, OLA harmful; fixed ridge configuration stopped. Full goal ACTIVE / NOT_ACHIEVED.
+
+This phase does not tune that panel or treat task qualification as an end. Seek one operational candidate with measurable function/decision advantage, using independently justified evidence to distinguish measurement/context changes from intervention-response changes. Three roles independently investigate a biological data route, a simplicity/novelty objection, and a constructive mechanism, seal before peer reading, then actual reciprocal debate. No voting-based GO, no need to invent a new basic mathematical operator, no renaming of known filters/mixtures/meta-learning.
+
+Root retrieves bounded fresh primary-method evidence and may obtain one evidence-conditioned DeepSeek proposal if it contributes beyond the native roles. All actual HTTP/API receipts retained. Missing new evidence or a NONE proposal is not global impossibility. A candidate must name legal observations, executable update, closest ordinary comparator, new technical claim, smallest falsifier, application and available tasks. If no candidate survives, stop those instances and preserve concrete discriminating results rather than adding architecture. No old numerical configuration reruns.
+
+Root records newcode only research/feedback_shift_mechanism_20261023/; evidence log/20261023/feedback_shift_mechanism/. Historical stopped observation/capture and normalization routes remain scoped stops. Full world/agent/inheritance/joint/improved-improver evidence remains incomplete. Native agent model/currency not attested. HEAD47a0e2dea5a7dd42379fa17eb3621caf6bd0114c, preexisting tracked two14-line changes untouched.

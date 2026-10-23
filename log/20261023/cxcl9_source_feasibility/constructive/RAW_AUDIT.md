@@ -1,0 +1,13 @@
+# Independent raw aggregation audit
+
+2026-10-23. **PASS_RAW_AGGREGATION_AUDIT**. Parent requested the missing raw-to-saved-array check; no prediction model was rerun or imported.
+
+Read the frozen PREDICTION_PROTOCOL.md, PREDICTIONS.json structure/saved arrays, SCHEMA_LITERAL.json and four initial raw CSVs. Used Python standard-library csv.DictReader, custom linearly interpolated order-statistic quartiles, inclusive within-group IQR bounds, math.fsum arithmetic means and math.log10. Grouping was independently reconstructed by file x Condition x cytokine x inhibitor, retaining literal None strings. Each sample's blank was independently reconstructed before subtraction.
+
+All **384 blank-centered response scalars** matched saved source_samples/target_samples within **4.440892098500626e-16** maximum absolute difference: 2 variants x 4 files x 2 sample labels x 24 conditions. Both untrimmed and locally IQR-trimmed means were recomputed from raw rows; the JSON includes all resulting means and comparisons. All **384 raw/retained group-count pairs** matched the saved counts. No tolerance was applied to counts. Quartile interpolation used index (n-1)*p with linear interpolation, inclusive lower/upper trimming as declared by the frozen protocol.
+
+Schema checks passed for exact eight headers, expected cell-line identities, Sample1/Sample2, four cytokines, six inhibitor labels, all 48 groups per file, unique Sample ID within group, per-file event counts and minimum/maximum group sizes against SCHEMA_LITERAL.json. Raw row counts: E3CA 52,298; E3CB 47,230; E3DA 44,252; E3DB 59,952. All parsed fluorescence values were finite; all retained means were finite and positive. These are FACS/bead event counts, not biological replicate counts.
+
+This verifies the declared initial raw-aggregation/blank-centering computation and its binding to saved arrays. It does not independently authenticate physical sample/vehicle provenance, assay concentration calibration, predictions, tuning, metrics, functional utility, biological independence or any world/agent/RSI claim. No AL1/AL2 or synthetic output payload was read. Before this assignment an unsolicited biology message summarized some model results; none of those numbers were used to define or perform this raw audit, and I did not read model results or other peer numerical reports. The audit checks arrays against raw observations, not their scientific interpretation.
+
+One raw-audit execution completed successfully; no experiment/model rerun, API call or new external request. All code is under research/cxcl9_source_feasibility_20261023/constructive/. Earlier independent and cross-review seals remain unchanged and are verified by the new audit seal.

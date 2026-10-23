@@ -1,0 +1,233 @@
+{
+  "scope": "Three retained primary full-text HTML bodies; original actual HTTP preserved, no repeated download or new biological values",
+  "sources": [
+    {
+      "name": "gradient_history",
+      "source_path": "log\\20261022\\rsi_later_task_literature\\skeptic\\skeptic_learned_optimizer.body",
+      "sha256": "e94b0974bf43c44a99f4d83e85c1638a1d0eb43326b2be6c0b69dcc4b91f020c",
+      "original_HTTP_receipt": {
+        "url": "https://arxiv.org/html/2610.09604v1",
+        "utc": "2026-10-21T22:17:23.207299+00:00",
+        "request": "GET",
+        "retry": false,
+        "cap_bytes": 16777216,
+        "status": 200,
+        "final_url": "https://arxiv.org/html/2610.09604v1",
+        "headers": {
+          "Connection": "keep-alive",
+          "Content-Length": "287479",
+          "server": "Google Frontend",
+          "etag": "\"CPfb2J+YqZcDEAE=\"",
+          "last-modified": "Thu, 08 Oct 2026 00:43:08 GMT",
+          "content-type": "text/html; charset=utf-8",
+          "via": "1.1 google, 1.1 varnish, 1.1 varnish, 1.1 varnish",
+          "access-control-allow-origin": "*",
+          "link": "<https://arxiv.org/html/2610.09604>; rel='canonical'",
+          "x-robots-tag": "nofollow",
+          "Accept-Ranges": "bytes",
+          "Age": "815970",
+          "Date": "Wed, 21 Oct 2026 22:17:24 GMT",
+          "X-Served-By": "cache-lga-kjfk8660044-LGA, cache-lga-kjfk8660044-LGA, cache-lga-kjfk8660044-LGA, cache-lax-kwhp1940118-LAX",
+          "X-Cache": "MISS, HIT, HIT",
+          "X-Timer": "S1792621045.766980,VS0,VE2"
+        },
+        "redirects": [],
+        "capped": false,
+        "bytes": 287479,
+        "sha256": "e94b0974bf43c44a99f4d83e85c1638a1d0eb43326b2be6c0b69dcc4b91f020c",
+        "body": "log\\20261022\\rsi_later_task_literature\\skeptic\\skeptic_learned_optimizer.body"
+      },
+      "this_phase_HTTP_requests": 0,
+      "exact_primary_paragraphs": [
+        {
+          "id": "abstract1.1",
+          "text": "This paper presents a lightweight and versatile learned optimizer that dynamically recombines gradient history, represented as averages over disjoint time spans. The optimizer reduces the prediction space to one scalar coefficient per gradient average, shared by multiple parameters. Progressively averaging older gradients minimizes memory cost of long history, while keeping their contributions independently accessible. A 37k-parameter network trained in 0.87 GPU-hours generalizes zero-shot to unseen tasks, lowering validation loss by 9.1% and 0.4% on BERT-Tiny and GPT-Tiny, and improving test accuracy over Adam by 3.5 %p on a Vision Transformer and by 2.7 %p on average across nine graph models, with FLOPs overhead as low as 0.3%."
+        },
+        {
+          "id": "S1.p2.1",
+          "text": "Gradient history can serve directly as a useful directional basis for optimizers, as demonstrated by momentum and Adam ( Polyak, 1964 ; Kingma and Ba, 2014 ) . This motivates an adaptive optimizer that learns to dynamically recombine gradients from the past optimization trajectory."
+        },
+        {
+          "id": "S1.I1.i2.p1.1",
+          "text": "A single trained policy generalizes zero-shot to unseen language, vision, and graph benchmarks, improving validation loss and test accuracy over Adam."
+        },
+        {
+          "id": "S2.SS1.p1.1",
+          "text": "The learned optimizer recombines averages of gradient histories from the target model to construct each parameter update, predicting a coefficient for each. Target-model parameters are partitioned into disjoint groups, where coordinates within each group share the same temporal coefficient vector."
+        },
+        {
+          "id": "S2.SS5.p1.1",
+          "text": "The optimizer is trained to minimize the cumulative change in held-out loss over an unrolled trajectory of K K updates, rewarding persistent improvements. Loss scales are normalized for each meta-task to contribute equally. Let L t held L_{t}^{\\mathrm{held}} be the held-out loss before the unroll and L t + k held L_{t+k}^{\\mathrm{held}} the loss after update k k . The meta-loss is:"
+        },
+        {
+          "id": "S3.SS1.SSS0.Px2.p1.1",
+          "text": "Adam, stochastic gradient descent (SGD), and SGD with momentum (SGDM) use default hyperparameters to all tasks. This setup intends to evaluate the off-the-shelf deployment performance of the learned optimizer. Paired comparisons share the same initialization, data ordering, stochastic streams, training budget, and parameter grouping. Appendix A specifies the group construction, optimizer-training configuration, target protocols, baseline hyperparameters, and metrics."
+        },
+        {
+          "id": "S3.T1.3",
+          "text": "\u2217 Embedding and output-head tensors are trained with Adam."
+        },
+        {
+          "id": "S3.SS2.SSS0.Px1.p1.1",
+          "text": "On language models, the learned optimizer successfully generalizes to held-out language tasks 100,000-step horizon despite only being meta-trained seeing 160-steps with six history slots. It reaches the lowest terminal validation loss among all baselines. (Table 1 , Figure 5 ). This section reports the setting which embedding and output-head tensors are delegated to Adam. Applying the learned optimizer to all parameters or exclusively to the embedding and output head also maintain convergence and can even outperform the baselines (Appendix B.1.1 )."
+        },
+        {
+          "id": "S3.SS2.SSS0.Px2.p1.1",
+          "text": "The learned optimizer further generalizes to unseen graph modalities and node-classication tasks. The learned optimizer is evaluated on Cora, CiteSeer, and PubMed using GCN, GraphSAGE, and GAT Kipf and Welling (2016) ; Hamilton et al. (2017) ; Veli\u010dkovi\u0107 et al. (2018) ; Sen et al. (2008) . It achieves the highest validation-selected test accuracy in seven of nine comparisons and the highest nine-cell arithmetic mean (Table 1 ). Accounting for inference overhead, it yields lower training loss than Adam at equal cumulative FLOPs on Cora (Figure 6 ). Appendix B.1.2 reports all FLOP-matched trajectories."
+        },
+        {
+          "id": "S3.SS2.SSS0.Px3.p1.1",
+          "text": "Training a six-block ViT on CIFAR-100 tests generalization to a larger model scale with unseen image dataset. The learned optimizer outperforms Adam in both validation-selected and terminal test accuracy, achieving the highest accuracy overall (Table 1 ). Figure 7 reports the training loss and validation accuracy trajectories."
+        },
+        {
+          "id": "S3.SS3.SSS0.Px1.p1.1",
+          "text": "Reducing history span to 63-step demonstrates that full-span coverage is not required to maintain convergence across all tasks (Table 2 ). For language models, while full-span achieves lower validation loss compared to 63-step span, both cases are better or comparably to Adam (Appendix B.2.2 ). Vision task shows consistent pattern, with both spans achieving higher test accuracy than Adam. Graph tasks show near-identical arithmetic mean test accuracies across two spans. Appendix B.2.2 reports the all 9 GNN comparisons."
+        },
+        {
+          "id": "S3.SS3.SSS0.Px2.p1.1",
+          "text": "Figure 8 shows that the learned policy is dynamic and behaves differently from Adam. Following a shared initial trajectory, transitioning to Adam branches to a different solution with higher terminal training loss (Figure 8 a). At this branch, weights assigned to the history slots by the learned optimizer differs from norm-matched Adam update (Figure 8 b,d). The predicted temporal scores and signed contributions vary over the optimization steps, confirming the policy is not static (Figure 8 c,e). Appendix B.2.3 shows the behavioral analysis of other parameter groups."
+        },
+        {
+          "id": "S3.T2.3",
+          "text": "\u2217 Embedding and output-head tensors are trained with Adam."
+        },
+        {
+          "id": "S3.SS4.SSS0.Px1.p1.1",
+          "text": "Training the learned policy requires 64 meta-updates and consumes 0.87 0.87 NVIDIA B200 GPU-hours. During deployment, routing all parameters through the learned optimizer requires 1.035 \u00d7 1.035\\times and 1.166 \u00d7 1.166\\times the Adam FLOPs per step on BERT and GPT, respectively. The corresponding end-to-end step times are 1.135 \u00d7 1.135\\times and 2.336 \u00d7 2.336\\times the matched Adam baselines (Figure 9 )."
+        },
+        {
+          "id": "S3.SS4.SSS0.Px2.p1.1",
+          "text": "In the language profiles, persistent optimizer state covers up to 131,071 131{,}071 past gradients, occupying 301 301 MB for BERT and 466 466 MB for GPT. Adam occupies 35 35 MB and 55 55 MB in the matched profiles, respectively. Appendix A.4 specifies the profiling boundaries and state accounting."
+        },
+        {
+          "id": "A1.SS3.SSS1.p1.1",
+          "text": "Across all evaluation domains, the baseline optimizers use fixed hyperparameters and zero weight decay. Adam uses a learning rate of 10 \u2212 3 10^{-3} , ( \u03b2 1 , \u03b2 2 ) = ( 0.9 , 0.999 ) (\\beta_{1},\\beta_{2})=(0.9,0.999) , and \u03f5 = 10 \u2212 8 \\epsilon=10^{-8} . SGD and SGDM use a learning rate of 0.01 0.01 , with momentum 0 0 and 0.9 0.9 , respectively. No domain-specific hyperparameter sweeps are applied, as this evaluation specifically tests deployment performance where exhaustive hyperparameter tuning is computationally prohibitive."
+        },
+        {
+          "id": "A1.SS3.SSS2.p2.1",
+          "text": "Embeddings and the output head use Adam. Learned recombination updates all other language-model parameters. Paired runs share initialization, data, stochastic streams, and a 20-microbatch validation panel. Validation restores model mode and random-number state, and loss is aggregated over predicted targets."
+        },
+        {
+          "id": "A1.SS4.p3.1",
+          "text": "In Equation 3 , F fb F_{\\mathrm{fb}} counts the target forward/backward pass and U U counts update arithmetic. Fused Adam kernels omit elementwise arithmetic from the profiler. Both Adam terms use 18 declared scalar operations per updated coordinate. The learned-update term is profiled with Adam disabled before this estimate is added once."
+        },
+        {
+          "id": "A1.SS4.p4.1",
+          "text": "FLOPs and timing are collected separately. Inputs, gradients, and mature history state are resident on-device before measurement. Data loading, validation, logging, and checkpointing are excluded. For language models, Time/step holds each paired Adam forward/backward interval fixed and replaces only its Adam update interval with the measured learned-optimizer interval; this removes between-process target-compute drift from the reported optimizer overhead. Persistent state is measured after history prefill and includes learned-optimizer state, auxiliary Adam state, and policy parameters."
+        },
+        {
+          "id": "A2.SS1.SSS2.p1.1",
+          "text": "The graph trajectories separate checkpoint selection from compute-normalized optimization. Figure 13 compares the full-span learned optimizer with Adam at equal cumulative FLOPs, while Figure 14 shows the complete validation signal used to select checkpoints without reference to test accuracy."
+        },
+        {
+          "id": "A3.SS1.p4.1",
+          "text": "The evaluated construction forms three partitions: the whole tensor, 16 contiguous groups along the first axis, and 16 contiguous groups along the flattened trailing axis. Groups smaller than 64 coordinates are omitted. The pyramid policy matches the representative row-grouped policy across nine unseen graph tasks. Table 10 reports test accuracy from the minimum-validation-loss state. Its arithmetic mean is 76.51%, compared with 76.44% for row grouping and 73.78% for Adam. The two learned policies were trained independently, so the comparison establishes that both grouping constructions function under the evaluated protocol rather than isolating the effect of grouping alone."
+        }
+      ]
+    },
+    {
+      "name": "specrsi",
+      "source_path": "log\\20261022\\rsi_later_task_literature\\skeptic\\skeptic_specrsi.body",
+      "sha256": "229153fdda895ef4a40c21c429229a106597923bdada7f193cb2bb2249cadeb2",
+      "original_HTTP_receipt": {
+        "url": "https://arxiv.org/html/2610.16491v1",
+        "utc": "2026-10-21T22:17:05.529921+00:00",
+        "request": "GET",
+        "retry": false,
+        "cap_bytes": 16777216,
+        "status": 200,
+        "final_url": "https://arxiv.org/html/2610.16491v1",
+        "headers": {
+          "Connection": "keep-alive",
+          "Content-Length": "901390",
+          "last-modified": "Wed, 14 Oct 2026 02:15:04 GMT",
+          "via": "1.1 google, 1.1 varnish, 1.1 varnish, 1.1 varnish",
+          "content-type": "text/html; charset=utf-8",
+          "etag": "\"COP21P63uJcDEAE=\"",
+          "server": "Google Frontend",
+          "access-control-allow-origin": "*",
+          "link": "<https://arxiv.org/html/2610.16491>; rel='canonical'",
+          "x-robots-tag": "nofollow",
+          "Accept-Ranges": "bytes",
+          "Age": "662555",
+          "Date": "Wed, 21 Oct 2026 22:17:07 GMT",
+          "X-Served-By": "cache-lga-kjfk8660024-LGA, cache-lga-kjfk8660024-LGA, cache-lga-kjfk8660024-LGA, cache-bur-kbur8200045-BUR",
+          "X-Cache": "MISS, HIT, HIT",
+          "X-Timer": "S1792621027.153716,VS0,VE1"
+        },
+        "redirects": [],
+        "capped": false,
+        "bytes": 901390,
+        "sha256": "229153fdda895ef4a40c21c429229a106597923bdada7f193cb2bb2249cadeb2",
+        "body": "log\\20261022\\rsi_later_task_literature\\skeptic\\skeptic_specrsi.body"
+      },
+      "this_phase_HTTP_requests": 0,
+      "exact_primary_paragraphs": [
+        {
+          "id": "S3.SS4.p6.1",
+          "text": "After collection, GVO updates \u0398 k + 1 \\Theta_{k+1} and freezes it for the next round. Actor updates change the continuation law, requiring fresh searches to recalibrate the Scorer (Algorithm 3 ). These updates guarantee neither per-edit causal attribution nor monotonic improvement; \u0393 \\Gamma remains unchanged."
+        },
+        {
+          "id": "S4.SS4.p2.1",
+          "text": "Artifact controls. Improver updates raise reset/carry gains from 4.1 \u00b1 0.18 4.1\\pm 0.18 to 5.2 \u00b1 0.21 5.2\\pm 0.21 pp and from 4.8 to 6.2 pp, respectively. Original/updated improvers yield 5.7/6.9 pp from the same released artifact (Table 2 (a)), , showing gains beyond simply retaining a stronger task agent."
+        },
+        {
+          "id": "S4.SS4.p3.1",
+          "text": "Roles and supervision. Scorer-only updates yield science/code/agent gains of 5.2/5.4/5.3 pp, versus 4.7/4.9/4.8 for the drafter and 5.0/5.2/5.1 for the policy. Joint updates are stronger with unequal training costs (Table 2 (b)). Adding pair loss to the reported same acquired arms raises gain from 5.4 \u00b1 0.23 5.4\\pm 0.23 to 6.3 \u00b1 0.25 6.3\\pm 0.25 pp and lowers RMSE from 1.05 to 0.85, while training cost rises from 23.7 to 28.4."
+        },
+        {
+          "id": "A4.SS1.p1.1",
+          "text": "Reset controls return the task agent to the registered starting version while changing the improver. Carry controls retain the stronger task agent. The released-artifact fork is a third comparison: both continuations start from the same already released version, but use original or updated improvers. Comparing across these three starting conditions without holding the starting artifact fixed would conflate learning with artifact retention."
+        },
+        {
+          "id": "A4.SS1.p3.1",
+          "text": "Starting from the same released artifact, updating the improver raises the mean gain from 5.7 to 6.9 pp and lowers the reported cost index from 54.2 to 50.8 (Table S12 ). This is stronger evidence for improver transfer than merely carrying a higher-scoring task agent forward."
+        },
+        {
+          "id": "A6.SS5.SSS0.Px7.p2.3",
+          "text": "\u2207 \\nabla denotes differentiation with respect to the subscripted parameters; all returns, advantages, logged contexts, old probabilities, and reference distributions are constants in these derivatives. Registered minibatches may repeat update steps over the frozen collection. The fitted \u03d5 k + 1 \\phi_{k+1} uses returns under the collection procedure \u03c0 k \\pi_{k} . Updating the actors changes the continuation law to \u03c0 k + 1 \\pi_{k+1} , so the refreshed scorer is an approximation there, not an exact new-policy value obtained merely by copying parameters. Fresh collection supplies calibration for the next round. Parameters refresh only for subsequent collection. Deployment chooses the largest preference rather than sampling, so its calibration and quality need direct evaluation. Resetting the task agent while holding allowed histories and budgets fixed tests whether the updated improver transfers. Task-family and model-backbone transfer are separate settings. No reporting audit is used to select a training epoch, and no indefinite recursive acceleration follows from a finite number of rounds."
+        }
+      ]
+    },
+    {
+      "name": "seal",
+      "source_path": "log\\20261022\\rsi_later_task_literature\\advocate\\seal_v2.body",
+      "sha256": "500d55d512bffe41e7b48c54ca8418a1437c6cc67b52c50e737a99a5716b6dfa",
+      "original_HTTP_receipt": {
+        "work": "SEAL",
+        "title": "Self-Adapting Language Models",
+        "version_date": "2025-09-18 (v2); original 2025-06-12",
+        "name": "seal_v2",
+        "category": "primary",
+        "url": "https://arxiv.org/html/2506.10943v2",
+        "final_url": "https://arxiv.org/html/2506.10943v2",
+        "timestamp_utc": "2026-10-21T22:20:35.496559+00:00",
+        "status": 200,
+        "content_type": "text/html; charset=utf-8",
+        "bytes": 296626,
+        "sha256": "500d55d512bffe41e7b48c54ca8418a1437c6cc67b52c50e737a99a5716b6dfa",
+        "body_path": "log\\20261022\\rsi_later_task_literature\\advocate\\seal_v2.body",
+        "parsed_text_path": "log\\20261022\\rsi_later_task_literature\\advocate\\seal_v2.txt"
+      },
+      "this_phase_HTTP_requests": 0,
+      "exact_primary_paragraphs": [
+        {
+          "id": "abstract1.1",
+          "text": "Large language models (LLMs) are powerful but static; they lack mechanisms to adapt their weights in response to new tasks, knowledge, or examples. We introduce Se lf- A dapting L LMs (SEAL), a framework that enables LLMs to self-adapt by generating their own finetuning data and update directives. Given a new input, the model produces a self-edit \u2014a generation that may restructure the information in different ways, specify optimization hyperparameters, or invoke tools for data augmentation and gradient-based updates. Through supervised finetuning (SFT), these self-edits result in persistent weight updates, enabling lasting adaptation. To train the model to produce effective self-edits, we use a reinforcement learning loop, using the downstream performance of the updated model as the reward signal. Unlike prior approaches that rely on separate adaptation modules or auxiliary networks, SEAL directly uses the model\u2019s generation to parameterize and control its own adaptation process. Experiments on knowledge incorporation and few-shot generalization show that SEAL is a promising step toward language models capable of self-directed adaptation in response to new data. Our website and code is available at https://jyopari.github.io/posts/seal ."
+        },
+        {
+          "id": "S1.p4.1",
+          "text": "As a step towards better language model adaptation, we propose equipping LLMs with the ability to generate their own training data and finetuning directives in response to new inputs. In particular, we introduce a reinforcement learning algorithm that trains LLMs to generate \u201cself-edits\u201d \u2014natural-language instructions that specify the data and, optionally, optimization hyperparameters for updating the model\u2019s weights (see Figure 1 ). We refer to such models as Se lf- A dapting L LMs (SEAL)."
+        },
+        {
+          "id": "S1.p6.1",
+          "text": "We further evaluate SEAL on few-shot learning on a simplified subset of the ARC-AGI benchmark [ 14 ] , where the model leverages a set of tools to autonomously select both synthetic data augmentations and optimization hyperparameters (e.g., learning rate, training epochs, selective loss computation over token types). Our experiments demonstrate that automatic selection and configuration of these tools using SEAL enhances performance compared to both standard in-context learning (ICL) and self-editing without RL training to use the tools effectively. These results collectively show that SEAL is a versatile framework for enabling language models to self-adapt."
+        },
+        {
+          "id": "S2.SS0.SSS0.Px5.p1.1",
+          "text": "SEAL embodies meta-learning principles [ 42 , 43 , 44 ] by learning an adaptation strategy\u2014how to generate effective self-edits\u2014via its outer optimization loop. The goal is to learn how to learn efficiently from task contexts. In reinforcement learning, meta-learning has been used to train agents that learn new tasks quickly [ 45 , 46 , 47 , 48 ] . Sun et al. [49] similarly apply RL to learn task-specific weight modulations, offering an alternative to LoRA finetuning that is orthogonal to our approach. A natural extension of meta-learning is self-referential networks, where models modify their own parameters [ 50 , 51 ] . In the domain of large language models, recent work has applied meta-learning to improve LLM adaptation [ 52 , 53 , 54 , 55 , 49 ] . Notably, Hu et al. [53] train a smaller model to output token-specific weights during finetuning, addressing a knowledge incorporation task similar to ours, while Chen et al. [54] propose a hypernetwork that generates LoRA adapters conditioned on the input, enabling dynamic and task-specific parameterization. However, SEAL offers greater generality by leveraging the model\u2019s existing generative capabilities to parametrize updates."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+# Control-trajectory scope correction after parent challenge
+
+The parent identified an important limitation in the independent report's first constructed example. Source accepts it. With old control(s)=2 and old treated(s)=sqrt(2), but actual control(s)=4 and actual treated(s)=2, q remains 1/2. The proposed q correction is zero and therefore leaves f_new(s)=sqrt(2), not the observed count 2. This example demonstrates no change in the *relative drug-growth quantity*; it does not demonstrate correct raw-count assimilation or forecasting.
+
+The exact equivalence to ordinary growth-rate recalibration under a correctly forecast control remains valid. To turn the example into a correct raw-count forecast would additionally require a valid updated future untreated trajectory. Actual n0(s) is not the unknown future control n0(t), and cannot be used as one for free. One can write a hypothetical corrected-control forecast as f0_new(t)^(q_obs), but obtaining f0_new(t) is an additional prediction/update contract. It was not supplied by the candidate and is not presumed available.
+
+No new control forecaster, gate, or feedback acquisition is added to rescue the stopped mechanism. This limitation strengthens the STOP: the simple rule is both ordinary under its stated correct-control assumptions and insufficient for arbitrary control-drift raw-count correction. The prior independent seal remains unchanged.

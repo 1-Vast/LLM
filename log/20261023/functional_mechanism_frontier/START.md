@@ -1,0 +1,11 @@
+# Return to functional mechanism discovery
+
+2026-10-23. Full original objective reread. Previous turn PROGRESS: new full-source algebra/domain evidence and independent result reconstruction. That attribution phase is CLOSED; no further decomposition, coordinate tuning or fit on its source is authorized by this phase.
+
+Full goal ACTIVE / NOT_ACHIEVED. Root HEAD47a0e2dea5a7dd42379fa17eb3621caf6bd0114c; only tracked preexisting log/README.md and research/REPORT.md changes confirmed with git diff --stat. User-supplied AGENTS guidelines apply; no production changes, contact, author-code execution or protected/reserve values.
+
+Three user-authorized existing roles independently research at most one precise new functional-feedback/decision mechanism each from purpose-bound2025–26primary sources. Maximum3logical public GETs per role, retain originals/status/hash/URL/time and failures. Do not replace mechanism discovery with another missing-identity/data-acquisition chain or a restatement of prior NONEs. Proposals require legal feedback, a real functional/decision endpoint, exact operation, strongest ordinary counterpart and finite-resource hypothesis. Conventional components and exposed-source preliminary falsification are allowed, exact-equivalent novelty claims are not.
+
+After independent seals, exchange strongest objections and evidence. A survivor receives a frozen minimal operation/real-functional falsifier; no generic fit merely to generate numbers. Do not demand universal inexpressibility or complete RSI dataset before all exploration. World/agent/inheritance/joint/improved-improver tests remain separate later requirements, not fulfilled by prior ordinary source predictions. No predetermined candidate or arbitrary performance margin.
+
+Previous explicit STOPs remain: product/min overlap, causal attenuation promotion, fixed Emerald anchor/reserve, CDK middle-feedback ranking, potency-WLS/sharedscalar calibration, unqualified frozen transport/survival, target-label substitutions and bare learned targets. No repeated AML/ALL identity search. No reopening old final splits under new names. All evidence this directory; all experiments/tests research/functional_mechanism_frontier_20261023/. Native exact model/tokens/currency not exposed; do not invent them.

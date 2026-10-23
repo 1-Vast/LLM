@@ -1,0 +1,12 @@
+# Actual execution
+
+2026-10-23. Maestro Python3.11.16 / NumPy2.4.6. HEAD47a0e2dea5a7dd42379fa17eb3621caf6bd0114c. No production edits, staging or deletion; existing tracked14-line additions in both navigation files preserved.
+
+1. Root executed test_diagnostic.py once, exit0. Exact pairwise/weighted NumPy references and nonselected-AUC poison tests pass; SYNTHETIC_CHECKS.json states their scope. No model or biological utility test is inferred.
+2. After two independent static code reviews, actual reciprocal question/answers and requested reporting fixes, freeze.py completed exit0 at2026-10-23T03:15:13.612450+00:00, binding15files before selected X/Y scalar decoding. Hashes establish local file continuity, not secure blindness or repaired global provenance.
+3. diagnostic.py prepare completed exit0, command wall3.6769201s. It decoded383selected CD14 values and39,900finite selected-source AUCs, no duplicate finite sample/drug assays. Source patients383, split209discovery/174replication,165drugs. Raw original digests matched cache input hashes. SOURCE.npz physically contains only selected source data. Neither full compressed cacheY/X/events/G member was loaded. Full raw files were streamed/hashed as bytes/strings; nonselected scalar fields were not numerically decoded. Independent raw audit remains separately attributed.
+4. diagnostic.py run completed exit0, command wall8.7931636s, internally measured diagnostic7.5371302s, single BLAS thread. Four half×marker strata sizes105/104/91/83;7278pair comparisons meet fixed≥25coverage in all four cells.2000stratified bootstrap computations with seed20261023 are not2000biological tasks. All metric and pair records are in diagnostic/RESULT.json, PAIRS.json and BOOTSTRAP.npy.
+
+Actual T=.011067340493953122, lower5% bootstrap quantile=.0012573006343350995; central95% interval[-.0013017531363783206,.027848689855939246]. The required lower bound>.01 fails, even though point T>.01. No threshold, marker, pair subset, split, tolerance or seed changed after values. Stored descriptive reversals do not authorize selecting a new pair hypothesis on these same labels.
+
+No candidate predictive fit, GPU training, new wet experiment, data download, protected outcome decoding or new model-API call. This is one actual exposed-source association diagnostic. Numerical auditors receive the isolated source and explicit scopes; their work and any failures will be reported separately, not predeclared PASS here. Full world/agent/inheritance/joint/improved-improver goal remains active and unachieved.

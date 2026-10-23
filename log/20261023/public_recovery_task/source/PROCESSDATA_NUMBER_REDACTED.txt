@@ -1,0 +1,166 @@
+%% PROCESSDATA
+%  Download and then process data to obtain the data in equivalent growth
+%  rate form. 
+
+%% DOWNLOAD DATA
+DownloadData;
+
+%% OBTAIN CONTINUOUS THERAPY GROWTH RATE FOR NORMALISATION
+
+% Read data
+data_gr = readtable("kavran_2<NUM>day_treatments.csv",ReadVariableNames=true);
+
+% Subset to obtain V6<NUM>E under continuous treatment
+idx = strcmp(data_gr.sample,'V6<NUM>E') .* strcmp(data_gr.schedule,'Continuous');
+
+% Convert to matrix, and then a vector of cell counts (day <NUM> onwards)
+cell_counts_mat = table2array(data_gr(idx == <NUM>,<NUM>:end));
+cell_counts_vec = cell_counts_mat(:);
+
+% Day number to a vector
+day_mat = repmat(<NUM>:<NUM>:<NUM>,<NUM>,<NUM>);
+day_vec = day_mat(:);
+
+% Exclude the outlier
+idx = cell_counts_vec < <NUM>;
+cell_counts_vec = cell_counts_vec(idx);
+cell_counts_mat(cell_counts_mat > <NUM>) = NaN;
+day_vec = day_vec(idx);
+
+% Perform regression to get the growth rate
+
+    % Design matrix
+    X = [ones(size(day_vec)) day_vec];
+
+    % Response
+    Y = log(cell_counts_vec);
+
+    % Estimate for the slope
+    beta = X \ Y;
+    lambda_cont = beta(<NUM>);
+
+    % Approximate confidence intervals
+    s2 = sum((X * beta - Y).^<NUM>) / (length(Y) - <NUM>);
+    beta_sig = s2 * inv(X' * X);
+    lambda_ci = lambda_cont + norminv(<NUM>) * sqrt(beta_sig(<NUM>,<NUM>)) * [-<NUM>,<NUM>];
+    
+% Produce supplementary plot
+clf;
+
+% Data (error bars)
+errorbar(<NUM>:<NUM>:<NUM>,nanmean(cell_counts_mat),nanstd(cell_counts_mat), ...
+    '.','MarkerSize',<NUM>,'LineWidth',<NUM>,'Color',[<NUM>,<NUM>,<NUM>]); hold on;
+
+% Data (raw data)
+scatter(day_vec,cell_counts_vec,<NUM>,'d','filled','LineWidth',<NUM>,'Color',[<NUM>,<NUM>,<NUM>]); hold on;
+
+% Fit
+fplot(@(t) exp(beta(<NUM>) + t * beta(<NUM>)),'k--','LineWidth',<NUM>)
+xlim([<NUM>,<NUM>]); xticks(<NUM>:<NUM>:<NUM>); grid on;
+xlabel('Time [d]'); ylabel('Cell Count');
+
+% Save
+saveas(gcf,'SupFig_V6<NUM>E_Continuous_Fit.png');
+
+%% DOSE RESPONSE TO GROWTH RATES
+
+% Read data, convert to long form
+data_dr_raw = readtable("kavran_3day_cellcounts.csv",ReadVariableNames=true);
+[m,n] = size(data_dr_raw); n = n - <NUM>;
+
+    % Obtain doses
+    dose_str = string(data_dr_raw.Properties.VariableNames(<NUM>:end));
+    dose_dbl = str2double(strrep(strrep(dose_str,"_","."),"x",""));
+    dose_mat = repmat(dose_dbl,m,<NUM>);
+    dose = dose_mat(:);
+    log_dose = log(dose);
+
+    % Obtain measurements (fc)
+    fc = table2array(data_dr_raw(:,<NUM>:end));
+    fc = fc(:);
+
+    % Obtain Sample names
+    sample = repmat(string(data_dr_raw.sample),<NUM>,n);
+    sample = sample(:);
+
+    % Obtain reps
+    rep = str2double(repmat(string(data_dr_raw.rep_number),<NUM>,n));
+    rep = rep(:);
+
+    % New variables: treatment, and day
+    sample_vals = unique(sample);
+    day_repl_vals = [<NUM>,<NUM>,<NUM>,<NUM>,<NUM>,<NUM>,<NUM>,<NUM>,<NUM>];
+    trt_rep_vals = {'nil','nil','continuous','continuous','intermittent',...
+        'continuous','intermittent','continuous','intermittent'};
+    day = zeros(m*n,<NUM>);
+    treatment = sample;
+    for i = <NUM>:length(sample_vals)
+        idx = sample == sample_vals(i);
+        day(idx) = day_repl_vals(i);
+        treatment(idx) = trt_rep_vals{i};
+    end
+
+% Unnormalised growth rates
+growth_rate_unnormalised = log(fc) / <NUM>;
+
+% Obtain (unnormalised) mean for continuously treated at <NUM>nM dose
+
+    % Mean for <NUM>nM
+    unorm_lambda_cont_3<NUM>nM = mean(growth_rate_unnormalised(...
+        ((dose == <NUM>) .* strcmp(treatment,'continuous')) == <NUM>));
+
+    % Mean for <NUM>nM
+    unorm_lambda_cont_1<NUM>nM = mean(growth_rate_unnormalised(...
+        ((dose == <NUM>) .* strcmp(treatment,'continuous')) == <NUM>));
+
+    % Mean for <NUM>nM
+    unorm_lambda_cont_5<NUM>nM = unorm_lambda_cont_3<NUM>nM + (unorm_lambda_cont_1<NUM>nM - unorm_lambda_cont_3<NUM>nM) * (<NUM> - <NUM>) / (<NUM> - <NUM>);
+
+% Normalised growth rates
+growth_rate = growth_rate_unnormalised - unorm_lambda_cont_5<NUM>nM + lambda_cont;
+
+% Construct new table
+data_dr = table(sample,rep,day,treatment,dose,log_dose,fc,growth_rate_unnormalised,growth_rate);
+
+% Remove data for vector and save table
+data_dr = data_dr(~strcmp(data_dr.sample,"Vector Control"),:);
+writetable(data_dr,"growth_rates.csv");
+
+% Produce plot
+clf;
+log_dose_vals = unique(data_dr.log_dose);
+gr_naive = zeros(size(log_dose_vals));
+gr_addict = zeros(size(log_dose_vals));
+fc_naive = zeros(size(log_dose_vals));
+fc_addict = zeros(size(log_dose_vals));
+for i = <NUM>:length(log_dose_vals)
+    gr_naive(i) = mean(data_dr.growth_rate(...
+        ((data_dr.log_dose == log_dose_vals(i)) .* strcmp(data_dr.treatment,'nil')) == <NUM>));
+    gr_addict(i) = mean(data_dr.growth_rate(...
+        ((data_dr.log_dose == log_dose_vals(i)) .* strcmp(data_dr.treatment,'continuous')) == <NUM>));
+    fc_naive(i) = mean(data_dr.fc(...
+        ((data_dr.log_dose == log_dose_vals(i)) .* strcmp(data_dr.treatment,'nil')) == <NUM>));
+    fc_addict(i) = mean(data_dr.fc(...
+        ((data_dr.log_dose == log_dose_vals(i)) .* strcmp(data_dr.treatment,'continuous')) == <NUM>));
+end
+
+subplot(<NUM>,<NUM>,<NUM>);
+semilogx(exp(log_dose_vals),fc_naive,'b','LineWidth',<NUM>); hold on;
+semilogx(exp(log_dose_vals),fc_addict,'r','LineWidth',<NUM>);
+plot([<NUM>,<NUM>],[<NUM>,<NUM>],'k:','LineWidth',<NUM>);
+legend('Naive','Addict','Location','SouthWest');
+xlabel('log dose [nM]'); ylabel('fc')
+title('Cell count fold change')
+
+subplot(<NUM>,<NUM>,<NUM>)
+semilogx(exp(log_dose_vals),gr_naive,'b','LineWidth',<NUM>); hold on;
+semilogx(exp(log_dose_vals),gr_addict,'r','LineWidth',<NUM>)
+semilogx([min(dose),max(dose)],[<NUM>,<NUM>],'k--','LineWidth',<NUM>)
+plot([<NUM>,<NUM>],[-<NUM>,<NUM>],'k:','LineWidth',<NUM>);
+ylim([-<NUM>,<NUM>]);
+legend('Naive','Addict','Location','SouthWest')
+xlabel('log dose [nM]'); ylabel('growth rate (per day)')
+title('Growth rates')
+
+% Save
+saveas(gcf,'SupFig_FoldChange_to_GrowthRates.png');

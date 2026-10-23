@@ -1,0 +1,92 @@
+490:     R = torch.stack(step_reward, dim=1)                        # (G, T) detached
+491:     frac_budget = _frac_budget(n_obs)
+492:     denom_term = total_hits * frac_budget
+493:     nvr = torch.where(denom_term > 0, hits_observed / denom_term, torch.zeros_like(denom_term))
+494:     if reward_mode == "adjusted":
+495:         R[:, -1] = R[:, -1] + terminal_coef * nvr.detach()
+496:     elif reward_mode == "nvr_terminal":
+497:         R[:, -1] = R[:, -1] + nvr.detach()
+498: 
+499:     # Discounted returns-to-go, then per-step group-normalized advantages.
+500:     T = R.shape[1]
+501:     ret = torch.zeros_like(R)
+502:     running = torch.zeros(G, device=device)
+503:     for t in reversed(range(T)):
+504:         running = R[:, t] + gamma * running
+505:         ret[:, t] = running
+506:     adv = _group_advantage(ret, adv_std_floor, adv_clip)
+507: 
+508:     logp = torch.stack(step_logp, dim=1)
+509:     kl_t = torch.stack(step_kl, dim=1)
+510:     ent_t = torch.stack(step_ent, dim=1)
+511: 
+512:     pg_loss = -(adv * logp).mean()
+513:     kl_loss = kl_t.mean()
+514:     ent_loss = -ent_t.mean()
+515:     loss = pg_loss + kl_coef * kl_loss + ent_coef * ent_loss
+516: 
+517:     aux_val = 0.0
+518:     if aux_hit_coef > 0 and step_aux:
+519:         aux_loss = torch.stack(step_aux, dim=1).mean()
+520:         loss = loss + aux_hit_coef * aux_loss
+650:                 # nvr_terminal: only the final cumulative NVR (injected below).
+651:                 reward = torch.zeros_like(n_hits_batch)
+652: 
+653:             hits_observed = hits_observed + n_hits_batch
+654:             for g in range(G):
+655:                 cl = chosen[g].tolist()
+656:                 obs_pos[g].extend(cl)
+657:                 obs_mask[g, cl] = True
+658:             n_obs += k_eff
+659: 
+660:             if reward_mode == "telescope":
+661:                 denom_now = _frac_budget(n_obs) * total_hits
+662:                 nvr_now = torch.where(denom_now > 0, hits_observed / denom_now,
+663:                                       torch.zeros_like(denom_now))
+664:                 reward = nvr_now - prev_nvr
+665:                 prev_nvr = nvr_now
+666:             step_reward.append(reward)
+667: 
+668:     if not chosen_steps:
+669:         return {}
+670: 
+671:     R = torch.stack(step_reward, dim=1)
+672:     frac_budget = _frac_budget(n_obs)
+673:     denom_term = total_hits * frac_budget
+674:     nvr = torch.where(denom_term > 0, hits_observed / denom_term, torch.zeros_like(denom_term))
+675:     if reward_mode == "adjusted":
+676:         R[:, -1] = R[:, -1] + terminal_coef * nvr
+677:     elif reward_mode == "nvr_terminal":
+678:         R[:, -1] = R[:, -1] + nvr
+679:     T = R.shape[1]
+680:     ret = torch.zeros_like(R)
+681:     running = torch.zeros(G, device=device)
+682:     for t in reversed(range(T)):
+683:         running = R[:, t] + gamma * running
+684:         ret[:, t] = running
+685:     adv = _group_advantage(ret, adv_std_floor, adv_clip)
+686: 
+687:     # Pass 2: re-encode each step WITH grad and backward per step (bounded memory).
+688:     tot_pg = tot_kl = tot_ent = tot_aux = 0.0
+689:     for t in range(T):
+690:         raw_scores = _score_text(net, ex, snap_obs[t], tokenizer, max_tokens)
+691:         scores = (raw_scores / temperature).masked_fill(snap_mask[t], _NEG_INF)
+692:         logp_all = torch.log_softmax(scores, dim=1)
+693:         p_all = logp_all.exp()
+694:         ent = -(p_all * logp_all).sum(1)
+695:         with torch.no_grad():
+696:             ref_scores = _score_text(ref, ex, snap_obs[t], tokenizer, max_tokens)
+697:             ref_scores = (ref_scores / temperature).masked_fill(snap_mask[t], _NEG_INF)
+698:             ref_logp = torch.log_softmax(ref_scores, dim=1)
+699:         kl = (p_all * (logp_all - ref_logp)).sum(1)
+700: 
+701:         chosen = chosen_steps[t]
+702:         chosen_logp = torch.gather(logp_all, 1, chosen)
+703:         chosen_p = chosen_logp.exp()
+704:         denom = (1.0 - (torch.cumsum(chosen_p, dim=1) - chosen_p)).clamp_min(1e-8)
+705:         step_lp = (chosen_logp - torch.log(denom)).sum(1)
+706: 
+707:         pg = -(adv[:, t] * step_lp).mean()
+708:         loss_t = pg + kl_coef * kl.mean() + ent_coef * (-ent.mean())
+709:         if aux_hit_coef > 0:
+710:             held = (~snap_mask[t]).float()

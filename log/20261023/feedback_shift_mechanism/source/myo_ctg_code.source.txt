@@ -1,0 +1,91 @@
+#convert CTG xlsx to CSV with drug conc metadata
+
+import pandas as pd
+import glob
+from sklearn.preprocessing import MinMaxScaler
+
+dir_path = "C:\\Users\\Roman\\OneDrive - National University of Ireland, Galway\\plate reader\\CTG raw data 30 drugs\\*.xlsx"
+filelist = glob.glob(dir_path, recursive=True)
+def AddPlateMetadata(df):
+    conc = {'Column': [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24], 
+            'Concentration': [0,0,0,0,0,0,10,10,30,30,100,100,300,300,1000,1000,3000,3000,10000,10000,30000,30000,0,0]}
+    drug = {'Row':    [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16], 
+            'Compound': ['none','none','DRUG1','DRUG1','DRUG2','DRUG2','DRUG3','DRUG3','DRUG4','DRUG4','DRUG5','DRUG5','DRUG6','DRUG6','none','none']}
+
+    concmap = pd.DataFrame(conc, columns=['Column','Concentration'])
+    drugmap = pd.DataFrame(drug, columns=['Row','Compound'])
+    df = df.merge(concmap,on='Column')
+    df = df.merge(drugmap,on='Row')
+    df.loc[(df['Column'] >= 3) & (df['Column'] <= 6) & (df['Row'] >= 3) & (df['Row'] <= 14),'Compound'] = 'DMSO'
+    df.loc[(df['Column'] <= 2) | (df['Column'] >= 23),'Compound'] = 'none'
+    df.loc[(df['Compound']=='none'),'Concentration'] = 0
+    return df
+
+def PlateMap(i):
+    switcher={
+        1:['NCAP','ATOR','CERI','CLOF','COLC','DAPT'],
+        2:['DEXA','DOXO','EZET','HYCQ','LEFL','SELU'],
+        3:['CLEV','ETOP','FIAL','GEMF','IBIP','MCPP'],
+        4:['ETHF','ETRE','NELA','SIMV','VORI','WURS'],
+        5:['CISP','IMAT','OLAN','SUNI','TEBU','ZIDO']}
+    return switcher.get(i,"Plate number not in 1-5")
+
+tableList = [None]*len(filelist)
+rawList = [None]*len(filelist)
+
+for i in range(len(filelist)):
+    plateSplit = filelist[i].rsplit("\\")
+    plateName = plateSplit[-1].rsplit(".")[0] #last element of file path, with extension removed
+    plateReplicate = plateName[0]
+    plateType = plateName[1]
+    plateNumber = pd.to_numeric(plateName[2])
+
+    ctg = pd.read_excel(filelist[i])
+    ctg = ctg.filter(['Plate','Repeat','Well','1s luciferase (CPS)'])
+    ctg['Row'] = ctg['Well'].str[0]
+    ctg['Column'] = ctg['Well'].str[1:].apply(pd.to_numeric)
+    ctg['Row'] = [ord(x)-64 for x in ctg['Row']] # convert letter to number
+    ctg['Row'] = pd.to_numeric(ctg['Row'])
+    ctg = AddPlateMetadata(ctg)
+
+    if plateName == 'gT4' : 
+        ctg = ctg[ctg['Row'] % 2 != 0]
+    """    UPPER CLIP FOR BLASTS 5 DISRESPANCIES    
+    elif plateName == 'aB5':
+        ctg['1s luciferase (CPS)'] = ctg['1s luciferase (CPS)'].clip(upper=70000)
+    elif plateName == 'bB5':
+        ctg['1s luciferase (CPS)'] = ctg['1s luciferase (CPS)'].clip(upper=1.4e6)
+    elif plateName == 'gB5':
+        ctg['1s luciferase (CPS)'] = ctg['1s luciferase (CPS)'].clip(upper=0.7e6)
+    """
+
+    controls = ctg.loc[(ctg['Compound']=='DMSO') | (ctg['Compound']=='none')]
+    controls = controls.filter(['Compound','Concentration','1s luciferase (CPS)'])
+    controlsMax = controls.loc[controls['Compound']=='DMSO'].groupby(['Compound','Concentration']).mean()
+    controlsMin = controls.loc[controls['Compound']=='none'].groupby(['Compound','Concentration']).min()
+    # additional / plate specific conditions 
+    # if plate == 'gT4' : remove even rows (seeding problem)
+    #dmso = dmso[dmso['Row'] % 2 != 0]
+    # upper threshold pd.df.clip on plates abgB5 to increase signal/noise (thresh 70k, 1.4M, 0.7M)
+
+    controls = pd.concat([controlsMax,controlsMin])
+    controls
+
+    scaler = MinMaxScaler(feature_range=(0,100))
+    scaler.fit(controls['1s luciferase (CPS)'].array.reshape(-1,1))
+    ctg['1s luciferase (CPS)'] = scaler.transform(ctg['1s luciferase (CPS)'].array.reshape(-1,1))
+    newDrugs = PlateMap(plateNumber)
+    ctg['Compound'] = ctg['Compound'].replace(['DRUG1','DRUG2','DRUG3','DRUG4','DRUG5','DRUG6'], newDrugs)
+    ctg.drop(columns=['Repeat'], inplace=True)
+    agg = ctg.groupby(['Compound','Concentration']).mean()
+    agg.drop(columns=['Row','Column'],inplace=True)
+    agg.drop( labels='none',inplace=True)
+    agg['Plate'] = plateName
+    ctg['Plate'] = plateName
+    agg = agg.rename(columns={"1s luciferase (CPS)": "Cell Viability"})
+    tableList[i] = agg
+    rawList[i] = ctg
+mergedTableNorm = pd.concat(tableList)
+rawTableNorm = pd.concat(rawList)
+#mergedTableNorm.to_csv(r"C:\Users\Roman\OneDrive - National University of Ireland, Galway\plate reader\normCTGresults.csv")
+rawTableNorm.to_csv(r"C:\Users\Roman\OneDrive - National University of Ireland, Galway\plate reader\CTG-fullWellNormresults.csv")

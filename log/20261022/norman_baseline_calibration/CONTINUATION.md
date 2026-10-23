@@ -1,0 +1,7 @@
+# Continue from executed baseline
+
+Full objective ACTIVE / NOT_ACHIEVED. Previous goal turn PROGRESS: real103gene singleRNA features, independent bulk growth masks,48fits/51candidate evaluations, saved-prediction audit. No live sessions remain (RNA65455,completiontest2920,calibration39682 terminal). Do not restart them. Predecessor raw acquisition and numerical qualification sealed; exact bytes retained. No protected pair outcome read, no external validation, no RSI or new method success.
+
+Read DECISION/PROTOCOL/RESULT_AUDIT/ALL_SCORES and original source reviews. Existing RNA-side nuclear completion is the strongest current conventional positive; do not call it novel or weaken it. All selected completion settings converged; three unselected low-penalty cases did not. Independent native code review unavailable dueprovidererror, record remains root-only. Check runtime availability before relying on reviewers; failed dispatch is not a completed review.
+
+Next concrete work: source-only residual/noise/geometry diagnostics and a prospectively frozen ordinary early-feedback→later-feedback transport contrast, with strong same-information joint refitting and costs. No invented new primitive prerequisite for this ability test. Any candidate innovation still needs latestprimarynovelty search and independent adversarial review. One map cannot establish inheritance/RSI; full drugdiscovery virtualcell+agent objective remains intact. Preserve all earlier stops/protected endpoints; all code research/, all records log/.

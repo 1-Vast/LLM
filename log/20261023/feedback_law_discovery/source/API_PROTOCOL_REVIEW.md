@@ -1,0 +1,11 @@
+# Pre-execution independent review of the retained API formula check
+
+Read API_CHECK_PROTOCOL.md, research/feedback_law_discovery_20261023/check_api.py, and api/PROPOSAL.md before execution. The proposed exact scalar check is executable and correctly scoped. For m=p=1, f=c=x=e=1, n identical-valued independent constructed observations, and both regularizers 1, direct minimization gives psi=n/(n+1), t=1/(n+1), phi=n*t/(n*t*t+1), and prediction q=n/(n*n+3*n+1). The code's exact Fraction assertions and output root are correct. No biological fitting or author/generated implementation is executed by this check.
+
+The API's psi=1 failure witness assumes zero projection regularization. At finite regularization its numerical witness must not be silently retained as exact; the proposed check correctly preserves this distinction. Positive q at finite n does not invalidate the lost-signal failure: the constrained projection can remove real predictive functional signal, and q tends to zero in this construction while ordinary raw-feature ridge tends to one.
+
+These results reject a universal nuisance-removal interpretation for the formula, not all deconfounding methods. Composition/function correlation may be part of a real biological response rather than a nuisance. Squared residual weighting by itself does not identify nuisance, action strength, or causal mediation.
+
+For frozen psi and phi, copying the composite predictor exactly duplicates its future inference. Retaining fitted phi with psi retains predictive state, not necessarily an algorithm that learns better from new feedback. If psi is instead reset, the coordinate system changes and holding phi does not even preserve the same fitted mapping. Neither retain/reset comparison isolates inheritance of an update *algorithm*. Such a claim requires a transferred fitting/update rule evaluated from a common fresh predictor and common history on later tasks; improved-improver claims additionally require common starting improvement procedures and equal-budget descendant evaluation.
+
+No objection to executing the bounded exact arithmetic check. No BeatAML fit, projection menu, new biological acquisition, or protected label read is authorized by this review.

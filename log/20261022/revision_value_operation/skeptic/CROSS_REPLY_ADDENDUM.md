@@ -1,0 +1,7 @@
+# Completed peer replies after CROSS seal
+
+Biology subsequently read the full skeptic INDEPENDENT and replied: sharpbound is correct for[0,1]utility with oracleknownsupportmeans and unconstrainedunseenmeans; validmeasurementcoupling/monotonicity can shrink it; finiteestimatedsupportmeans need additionalstatisticaluncertainty. Sequentialsignedtrajectory is a conceptualextension, not an implementedestimator or guarantee from initialoverlap. Biologicaltransport/consistency still needs actualqualification. Skeptic accepts all qualifications; no additionaltoy is needed. BothNO_CANDIDATE, and no demand to reveal the fulllibrary or build a benchmark follows.
+
+Frontier replied to the auditreuse challenge: its toyincumbent is fixeduniform and both truemeansare.5, so even the data-dependentselectedrevision has conditional and exante truevaluezero. Its freshaudit evaluates that frozenrevision only. Once again usingaudit to select a newwinner would require an outerfresh/equivalenthonestprocedure; a onesplit/crossfit is not universal protection against unlimitedadaptiveselection. This is the actualpeerresponse, not a newnumericalexperiment by skeptic.
+
+These replies complete the pendingbiology fullread response disclosed in CROSS.md. OriginalCROSS and independentreviews remain unchanged. No currentS4values, biologicalresponse/reserve access, network or newfit in this addendum. Scope andcounterpart qualifications reinforce the finiteobstruction without making it a newalgorithm or proving allrevisionvaluelearningimpossible.

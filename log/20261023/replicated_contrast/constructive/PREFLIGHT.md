@@ -1,0 +1,27 @@
+# Static preflight of the single Delta measurement implementation
+
+Read NUMERICAL_PLAN.md, PLAN.md and complete research/replicated_contrast_20261023/run_contrast.py only; no raw count body, biological numeric output, workbook/lung/FDR values, execution or new peer preflight. Exact reviewed hashes are bound in PREFLIGHT_SEAL.json.
+
+Verdict: **SCIENTIFIC_AND_PRIMARY_STATISTIC_READY**, with one narrow undefined-correlation reporting correction recommended before extraction and final execution binding still required. No change to endpoint, thresholds, pairs, guide weights or gate requested. Root's prospective discovery>=20/confirmation>=0.8 gate is explicitly its new Delta measurement heuristic, not reinstatement of my withdrawn GI/order gate.
+
+## Verified operation and access boundary
+
+selected_pairs uses only prior authenticated IDs and the specified SHA256 salt, selects1024unique actions and forms consecutive512contrasts. No GI/FDR/source-score/tail data affect selection. extract identifies all four exact header names, leaves other numeric fields opaque bytes and converts only selected action rows' four permitted columns. It checks nonnegative finite integer values, rejects malformed row widths, duplicate construct IDs and action group sizes outside9/18. All four samples share each action's identical set of raw rows and equal weights; no low-count/guide/orientation filter is applied. Metadata authenticity of9/18structure is inherited from root/source qualification, not independently established by this static review.
+
+The code calculates equal mean log2(N+1), four context/replicate differences D, then Delta1=D[:,0]-D[:,1] and Delta2=D[:,2]-D[:,3] in the declared MCF7,MDAMB231 order. Discovery uses only abs(Delta1)>=.5; confirmation uses that frozen mathematical mask, positive Delta1*Delta2 and abs(Delta2)>=.25. Zero fails sign concordance. The fraction denominator is the complete discovery count; zero discoveries yields None and a false gate. No new fit or tune path exists. The primary computation and gate match NUMERICAL_PLAN.
+
+The parser loads all four columns together and retains them in memory. There is **no sequential value-access isolation** or separately sealed discovery-set artifact before validation-label opening. Statistical selection nevertheless depends only on replicate1 under a code/protocol frozen before extraction. This is precommitted split-by-replicate analysis, not secure blinded sequential confirmation. This clarification limits the independence claim without requiring inefficient two-pass extraction or a new design.
+
+## Auditability and scope
+
+Code freezes code/plan/ID/raw/prior hashes before extracting counts and preserves all selected counts, construct IDs, pair-row mapping, per-action means, D, Delta, discovery and confirmation masks. Arrays plus selected pair IDs support independent arithmetic reconstruction. Saved counts retain zero/low-count data and reported summaries; the original512denominator remains explicit. Reported discovery_n and confirmation_n determine failures as their difference; no posthoc complete-case erasure occurs (unexpected missing/malformed payload aborts). Raw construct guide metadata are not duplicated in NPZ, so membership/guide interpretation still rests on the retained raw-asset/identity binding and source audit, not numerical arithmetic alone.
+
+Scientific interpretation in the plan is appropriately narrow: repeatability of differential terminal log-read-counts, not GI, per-doubling fitness, actual rank reversal, causal interaction, drug efficacy or RSI. The formula does not use plasmid/reference data. Shared sample-additive centers cancel in D; fixed shared construct baseline would cancel in Delta under identical weights, but none is estimated here. +1means sequencing-depth multiplication need not be additive, and shared library/composition/guide/low-count artifacts can repeat. Matched T9headers do not certify actual elapsed time or independent cultures. No biological/sample-independence inference is justified by512contrasts or9/18construct rows. Correlations and sign fractions are descriptive; no naive independent-observation p-value is computed.
+
+## Narrow prevalue reporting correction and final freeze
+
+If either Delta vector is constant, Pearson/Spearman are undefined. np.corrcoef/spearmanr can then return NaN and json.dumps emits a nonstandard NaN token. This is a possible scientific outcome (e.g. uniform/zero selected counts), not a parser failure or reason to change endpoint. Recommended surgical correction: explicitly report null/undefined for nonfinite correlation results, retaining every contrast and the gate. No substitute statistic or additional sensitivity is needed.
+
+The main routine binds its own code/plans/assets but not reviewer reports. Root should bind final preflight reports externally in its execution manifest before the single extraction, as the plan requires. If the narrow reporting code changes, update the reviewed code binding; do not pretend this seal covers unseen edits. Any synthetic guards are root's responsibility to report accurately; none were inspected or rerun by constructive at this point. No new experiment or broad test suite is requested by this review.
+
+Record: local static/report reads and one new review/seal only. No command executed the numerical driver or opened count payloads. Previous independent alternatives, cross decisions and their originals remain preserved. Goal ACTIVE / NOT_ACHIEVED.

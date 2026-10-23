@@ -1,0 +1,3 @@
+# Citation metadata correction
+
+The independent report's first-author shorthand “Lee et al.” is incorrect. The saved primary XML names **Yapeng Su** as first author, followed by Chunmei Liu, Xiang Lu, Hui-Yu Chuang, and Guideng Li. Cite **Su et al.**, DOI 10.1038/s41467-026-71349-4. Jihoon Lee is associated with the linked modeling-code repository; that is not first-author evidence. The title, DOI, PMCID, date, methods, and decision in the independent report refer to the same correctly identified primary article. The prior independent seal is preserved; this correction records the metadata error transparently.

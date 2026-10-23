@@ -1,0 +1,51 @@
+你是算法研究者，请提出最多一个真正具体、可执行、简洁的学习更新规则，而不是研究清单。应用：药物干预后细胞状态/功能响应的世界模型，利用真实反馈改善后续药物实验，并可将更新规则继承。我们未找到新核心，不要求强行给方案，允许明确NO_CANDIDATE。
+
+已实测：普通功能条件化有效（ALMANAC约10%MSE改善，但同study排除后排序恶化；decryptE约45%），蛋白增量失败；CDK中期组成略改善但稳定程序选择失败，首次功能prefix-KRR在Abema排序从1/3恶化2/3，Palbo缺失不可估。禁止重启这些字面配置/调参救结果。旧净增长斜率继承被固定混合/等预算搜索精确复现。闭式birth/death信任权重是Gamma-Poisson EB。分子梯度正定传送被同结构双层元优化精确复现，dose-shift profile=普通WLS/MAP+OED，矩形交互约束=普通硬QP，序列Lie bracket=标准controlled expansion，DR revision-value contrast逐点=普通paired DR；奖励整形作者已实现。不要重复这些。
+
+最近已有工作：AssayLoop跨生物筛选学习feedback-conditioned acquisition；AR-BED外部生成模型信息奖励摊销设计；SEAL/TTT-Discover/SpecRSI已有反馈训练更新/搜索策略。保存经验、code编辑器、同起点更强的learned optimizer都不是凭命名就新。使用常规数学组件当然允许；属于元学习家族不是否定理由，但须有与具体最近方法不同且可检验的表示、目标、计算操作或有限样本性质。
+
+请从一个实际科学瓶颈出发给：1合法观察与功能任务（不虚构未测反事实/绝对count），2确切公式/不超过20行伪代码，3真正不同的操作及其最接近普通counterpart，明确相同信息/表示/目标/预算下为什么不直接同操作，4可先执行的最小证伪与失败即STOP条件，5哪种证据让参数/程序继承有用而非只是模型更好。可假设新的公开数据合同，但需明确尚未认证，不要把数据下载本身当创新；不能靠更大模型/更多label/更弱baseline。不要给文献真实性无法核查的断言。只给一个，不给兜底菜单，不执行代码。
+
+
+上一逻辑调用达到length，只保留如下不完整提案。请不要换方案，完成这个提案的伪代码、具体最近ordinary对手与操作差异、最小证伪。可以承认它有错误或与具体普通方法相同并给NO_CANDIDATE。不虚构已做实验。限中文1500字，不能只输出内部思考。
+
+**唯一候选：边差符号门控更新（Edge-Sign Gated Update, ESG）**。若下述最小证伪触发失败条件，则结论为 **NO_CANDIDATE**，不再给第二个规则或调参版本。
+
+### 1. 合法观察与功能任务
+- 合法观察：真实反馈批次 \(B=\{(s_i,d_i,y_i)\}\) 中已测的细胞状态 \(s_i\)、药物/剂量 \(d_i\)、标量功能响应 \(y_i\)。更新只使用 \(B\) 内已测样本；缺失药物-状态组合不估计、不填反事实、不预测未测绝对 count。
+- 可观测边：仅由 \(B\) 内已测对构成  
+  \[
+  E_B=\{(i,j): d_i=d_j,s_i\ne s_j\ \text{或}\ s_i=s_j,d_i\ne d_j\}.
+  \]
+- 功能任务：世界模型 \(f_\theta(s,d)\) 输出功能响应排序分数，用于给下一批候选药物-状态实验排序；评价只用留出已测响应对的 pairwise/Kendall 排序。
+- 数据合同：假设每个 study 内有足够上述可观测边，且可做 leave-one-study-out 回放。该合同尚未认证；下载数据本身不算创新。
+
+### 2. 公式与伪代码
+模型分解为 \(f_\theta(s,d)=b_\psi(s)+g_\phi(s,d)\)，冻结 \(\psi\)，只更新药物效应模块 \(\phi\)。固定预注册方向基 \(V\)，继承历史白名单 \(V_h\subseteq V\)。  
+残差与边差：
+\[
+r_i=y_i-f_\theta(s_i,d_i),\quad \rho_{ij}=r_i-r_j.
+\]
+方向 \(v\in V\) 的边敏感度：
+\[
+a_{ij,v}=v^\top\frac{\partial[g_\phi(s_i,d_i)-g_\phi(s_j,d_j)]}{\partial\phi}.
+\]
+门控统计：
+\[
+m_v=\sum_{e\in E_B}1[|a_{e,v}|>\epsilon],\quad
+k_v=\sum_{e\in E_B}1[\operatorname{sign}(\rho_e)=\operatorname{sign}(a_{e,v})],
+\]
+\[
+p_v=\Pr[\operatorname{Bin}(m_v,1/2)\ge k_v].
+\]
+接受集合与更新：
+\[
+A=\{v\in V_h: m_v\ge m_{\min},\ k_v/m_v\ge 0.5+\delta,\ p_v\le \alpha/|V_h|\},
+\]
+\[
+\phi\leftarrow \phi+\eta\sum_{v\in A}\operatorname{sign}\Big(\sum_{e\in E_B}\operatorname{sign}(\rho_e)a_{e,v}\Big)v.
+\]
+
+```text
+输入: fθ, 固定V, 继承Vh, 冻结超参(α,δ,mmin,ε,η); 反馈B
+E = {(i,j) in B×B: (d_i=d_j,s_i≠s_j) 或 (s_i=s_j,d_i

@@ -1,0 +1,7 @@
+# Actual post-result scope exchange
+
+Critic RESULT_REVIEW and source reconstruction were sealed before reading any peer audit file. Constructive then reported its independently sealed agreement and asked for the strongest interpretation objection. No peer numerical audit file was read in replying.
+
+Both agreed that mixed J is not the entire fixed-direction projection source, but this is not a causal share and a smaller projection does not imply less biological relevance: orthogonality/cancellation and true distribution changes remain possible. The residual logmean projection retains nonlinear/closure/measurement/biology ambiguity. Both agreed all584empirical CP-additive partial profiles contain a negative coordinate; this does not statistically refute latent biological or absolute-transcript additivity without an independent error/scale model. Mathematical log domain in(-1,0) does not make a nonnegative CP state. Do not clip, subset, refit or learn a noise cutoff to repair this result.
+
+Critic added that even a future uncertainty model allowing latent nonnegative CP means would not by itself establish absolute scale or a functional bridge. Constructive supported closing the current explanatory shortcut rather than further decompositions or predictor variants on this exposed source. No substantive disagreement remains; actual physical cause and independent functional consequence remain unresolved. A later continuation must supply a concrete distinguishing restriction and observation, not relabel this identity as a mechanism.

@@ -1,0 +1,13 @@
+# 修订价值原机制稿的实际交叉
+
+2026-10-22。biology INDEPENDENT先封存，之后实际阅读全文frontier/INDEPENDENT与skeptic/INDEPENDENT，通过消息互问。没有按多数投票否定候选。
+
+frontier和skeptic分别质疑biology将任意固定U/D回放称为普通KG过宽。我接受并明确：这是empirical paired policy evaluation/VOI家族；仅在U为Bayes posterior update且D为对应终局Bayes最优选择时属于classical KG特例，不声称一般公式严格相同。faithful对手使用exact同U/D/反馈/候选集合的两臂回放即可。
+
+skeptic追问冻结臂“知道反馈却不更新”可能含糊。我接受：两臂同一个固定D；冻结臂只追加known outcome、不改未测feature cache或后验。若排除已测动作且D只看未测预测，冻结臂不受反馈影响是该合同特例，不能说它普遍替代最强普通预测器。合法完整来源目录回放是静态程序对照，不是克隆真实culture；治疗改变后续状态时没有这些分支真值。
+
+对skeptic的最强反问为sharp interval的识别范围：其[0,1]结局且未见means自由的population界正确；已知支持mean是oracle识别层面，不是有限样本均值无误差的置信区间。若有合法生物耦合或单调结构可缩界，但结构本身需证据。skeptic实际主动明确并接受上述范围；sequential signed trajectory也不能用初始action overlap冒充完整path overlap。
+
+对frontier提出：fixed conditional d的contrast cancellation不能自动覆盖同反馈选择piU后再评估；其完整support selection-bias反例说明fresh audit必要。合法q须与预先冻结策略/历史条件一致，真实culture改变时还需consistency/transport，不能把独立下一action看作相同反事实状态。frontier原稿本身已对这些限制明确，不据此要求新benchmark或全library揭示。
+
+共同保留的内容是评估合同与可识别边界，不是一个新算子。biology未找到超出普通paired policy value/VOI操作的具体额外优势；另外两稿的contrast-specific DR和sharp partial identification也明确无新核心。NO_CANDIDATE不否定将来有真实结构的机制，也不授权重启ALMANAC锚点、CDK组成或proteomic STOP。

@@ -1,0 +1,9 @@
+# Actual biological-task cross challenge
+
+After FINAL_POSTTEST_SEAL, biology sent a source-qualified question, reporting an HCC static organoid drug screen (DOI10.1016/j.jhepr.2025.101426, PMC12205652),10complete-screen donors, repeated screens and baseline molecular data. Constructive did not read the source or fetch its numerical payload and therefore does not independently attest those facts here.
+
+Constructive replied: if matrix labels, assay units and donor independence are authenticated, a static functional table can test support-to-query update utility differences and whether legal q predicts them. Longitudinal trajectories are not universally required to verify a predictive update. Static outcomes alone cannot establish cell-world dynamics or superiority over an equally informed static endpoint direct model. The proposed conditional EB/direct residual and constrained function-space baselines remain necessary.
+
+Ten donors is neither automatically sufficient nor automatically insufficient: donor-separated source/later splits are possible, but fold replicates are not ten independent RSI generations. Dividing this small family again into editor train/eval leaves limited biological variation. Without a specified meaningful effect, noise and design, no arbitrary donor-count cutoff or power claim is justified. At present metadata/source qualification is appropriate; do not download labels simply because an asset is new when no precise novel restriction has qualified. Previous CXCL9 fixed-pilot STOP does not universally prohibit this genuinely different source.
+
+The actual reply also shared the sealed API mean-versus-axis cancellation result, retaining a signed-mean qualification and demanding ordinary same-function constrained-ridge/rank-one controls. This cross exchange is not independent numerical replication or endorsement of a new biological experiment.

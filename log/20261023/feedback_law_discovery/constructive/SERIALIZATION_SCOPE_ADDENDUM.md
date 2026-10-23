@@ -1,0 +1,7 @@
+# Serialization scope correction after root review
+
+2026-10-23. Append-only correction to sealed CROSS.md. Root correctly identified that my response treated missing same-checkpoint authentication too broadly. It blocks the proposed biological parallel-assay interpretation, **not every source-only computation test**.
+
+For one fixed legally exposed digital record package, permutations are the same-information computation contract if all original drug/dose, time/history, precision/control metadata and any available true chronological information remain preserved. Different physical assay times do not prevent reordering storage arrays when the model retains their true times. If file order itself is the only legally available chronological information, that information must be retained explicitly or the permutation is not same-information. No biological equivalence is inferred from digital invariance.
+
+Thus a separately frozen source-only serialization/query experiment can be lawful without a new same-checkpoint asset qualification gate. It still requires no protected outcomes, matched source work, actual held-out query/function utility, and strong randomized-order, set/recorded-time and count/precision-aware cumulative opponents. Typed invariance or optimizer-step artifacts alone do not establish a new core mechanism. This correction does not authorize a biological fit here; root decides the next concrete protocol. No additional request or data read was performed.

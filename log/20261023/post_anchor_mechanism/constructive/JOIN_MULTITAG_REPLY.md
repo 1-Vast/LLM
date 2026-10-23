@@ -1,0 +1,3 @@
+# Further critic reply: multi-integration identifiability
+
+2026-10-23. After the separately sealed JOIN_CONTRACT_CROSS_ADDENDUM, critic read my independent join-contract report and added one necessary gate, accepted here: the frozen reference must declare whether a cell can carry multiple integration tags and how shared tags across founders are rejected as ambiguous. Founder identity may depend on a stable tag set rather than one sequence. If founders can only be separated by endpoint co-occurrence, stop the baseline-identifiable estimand rather than restoring joint baseline/endpoint clustering. Matched culture/time controls remain an additional functional gate. No new record/value read or execution.

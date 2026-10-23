@@ -1,0 +1,13185 @@
+ExpEvolve: Structuring and Reusing Experience for Open-Ended Discovery
+// Restore the saved color scheme preference, or
+  // enact the browser preference if "automatic", 
+  // without expecting DOM load to have completed.
+  //
+  // Also restore any saved readingmode and ToC display preferences.
+  function initializeReadingPreferences() {
+    let saved_theme = localStorage.getItem("ar5iv_theme") || "automatic";
+    if (saved_theme === "automatic") {
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        saved_theme = "dark";
+      }
+    }
+    if (saved_theme == "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+
+    const tocDisplay = localStorage.getItem('arxiv_html_paper_toc_display');
+    if (tocDisplay) {
+      document.documentElement.setAttribute("data-toc-display", tocDisplay);
+    }
+    const readingMode = localStorage.getItem('arxiv_html_paper_reading_mode');
+    if (readingMode) {
+      document.documentElement.setAttribute("data-reading-mode", readingMode);
+    }
+  }
+  // Run as soon as JS starts, to minimize repainting
+  initializeReadingPreferences();
+/* Reading mode hides the chrome and the empty .arxiv-html-header marker: the pinned JS reads
+     the marker's display to know which way to toggle. The marker draws no box. */
+  .arxiv-html-header { display: contents; }
+  html[data-reading-mode="enabled"] :is(.arxiv-html-site-chrome, .arxiv-html-header, .ds-site-footer) { display: none; }
+  /* The paper controls' icons are blocks, so they sit centred (the pinned JS shows the theme
+     icon by making its span a block). */
+  .arxiv-html-site-chrome .ds-site-header-tools svg { display: block; width: 18px; height: 18px; flex-shrink: 0; fill: currentColor; }
+  /* ar5iv dims every image in dark mode and puts it on a white wash, for paper figures;
+     arXiv's own render as they are (the logo on the bar, the funder logos on their white
+     chips). Important: ar5iv's dark rules are unlayered, as specific as
+     :root:not([data-theme]) img:not(.ltx_no_dark_filter). */
+  :is(.ds-site-header, .ds-site-footer) img { filter: none !important; }
+  .ds-site-header img { background-color: transparent !important; }
+
+  /* Wide (the theme's 1280px): the theme lays the body out as a grid whose full-width top rows
+     were the band's and its sticky reader bar's. The band takes the first and scrolls away; the
+     header, the paper's bar (no site navigation, the paper's controls), takes the second and
+     stays in view, the one sticky bar, with the anchor clearance that requires (DESIGN-POLICIES).
+     The controls show their names. */
+  @media (min-width: 1280px) {
+    html { scroll-padding-top: 80px; }
+    .arxiv-html-site-chrome { display: contents; }
+    .arxiv-html-site-chrome > #ds-announcement { grid-area: announce; }
+    .arxiv-html-site-chrome > .ds-site-header { grid-area: header; position: sticky; top: 0; z-index: 3; }
+    .arxiv-html-site-chrome .tool-icon { display: none; }
+  }
+  /* Narrow: the header scrolls away, and the controls show icons (names kept for screen
+     readers; Why HTML? goes). The theme's contents panel is fixed below where its old sticky
+     bar was, and hidden only once the reader has closed it, so until then it is an invisible box
+     over the header and the paper: it shows only while open, under the chrome, in its place in
+     the page. The paper's footer (build logs, reporting instructions) keeps the text's side
+     inset; the theme gives it none, so it met the screen edges. */
+  @media (max-width: 1279px) {
+    .arxiv-html-site-chrome .tool-wide { display: none; }
+    .arxiv-html-site-chrome .tool-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    html:not([data-toc-display="block"]) .ltx_page_navbar { display: none; }
+    .ltx_page_navbar { position: absolute; top: auto; }
+    .arxiv-html-footer { padding-inline: 1rem; }
+  }
+Skip to main content
+Report GitHub Issue
+×
+Title:
+Content selection saved. Describe the issue below:
+Description:
+Submit without GitHub
+Submit in GitHub
+Why HTML?
+Report Issue
+Back to Abstract
+Download PDF
+Contents
+Reading mode
+Colour theme
+Abstract
+1
+Introduction
+2
+Related Work
+3
+Theoretical Formulation of Evolutionary Discovery
+3.1
+Evolutionary Discovery as a POMDP
+3.2
+Reusing Experience with Ideas
+4
+ExpEvolve
+: Discovering and Exploiting Ideas from Experience
+4.1
+Discovering Ideas from Experience
+4.2
+Exploiting Idea Factors for Discovery
+5
+Experiments
+5.1
+Experimental Setup
+5.2
+Main Results
+5.3
+Additional Experiments on Machine Learning Engineering Tasks
+6
+Conclusions
+References
+A
+Limitations and Future directions
+B
+Related Work
+C
+A Causal View of the Formulation
+C.1
+Formulation of Scientific Discovery
+Scientific knowledge.
+Evaluation as intervention on SCM.
+Belief as revealed knowledge.
+C.2
+Ideas and Causal Representation Learning
+Ideas as high-level causal variables.
+Relation to causal representation learning.
+C.3
+Essentiality of Causal Knowledge for AI Scientists
+C.4
+Transfer of Scientific Knowledge across Environments
+D
+Additional Technical Details
+D.1
+Notation
+D.2
+Random variable, space, and realization (to avoid notation confusion)
+D.3
+Evaluator as an observation model (covers deterministic and stochastic evaluators)
+Deterministic evaluator.
+Stochastic/noisy evaluator.
+D.4
+Belief and Bayes update: kernel form and undergraduate-friendly special cases
+General Bayes update (kernel form).
+Finite hypothesis space (sum form).
+Continuous hypothesis space (density form).
+Deterministic evaluator (indicator/filter form).
+E
+Proof of Theorem
+(Structured experience reuse)
+E.1
+Protocol and performance criterion
+Experiment–then–commit protocol.
+Simple regret.
+(
+ϵ
+,
+δ
+)
+(\epsilon,\delta)
+-correctness (uniform).
+E.2
+Two hypothesis classes
+E.3
+Formal statement and proof
+Part (1): constructive upper bound (estimate
+w
+⋆
+w^{\star}
+then commit).
+Part (2): lower bound for the black-box class.
+Remark (deterministic evaluator).
+Relation to best-arm identification.
+F
+Proof of Theorem
+(Degenerated exploration of ideas)
+F.1
+Formal statement and proof
+G
+Proof of Theorem
+(Non-identifiability under environment shifts)
+G.1
+Setup: source interaction, target evaluation, and target regret
+G.2
+Formal statement and proof
+G.3
+Concrete examples satisfying the conditions
+Example 1: public test vs private (distribution shift / shortcut feature).
+Example 2: relaxed verification (slack) vs exact verification (constraint shift).
+H
+Implementation Details of
+ExpEvolve
+H.1
+Idea Memory and Annotation
+H.2
+Idea Discovery
+H.3
+Idea-Guided Actions
+H.4
+Idea-Guided Exploration at Plateaus
+I
+Experimental Details
+I.1
+Tasks
+I.2
+Baselines
+I.3
+Budget and Resources
+J
+Additional Results
+K
+Prompts
+K.1
+More Details of Experiments on Machine Learning Engineering
+License: CC BY-SA 4.0
+arXiv:2610.29303v1 [cs.LG] 21 Oct 2026
+\firstpagenote
+This paper is an extended version of
+CausalEvolve
+(
+arXiv:2603.14575
+).
+\authornote
+*
+Core contributors.
+†
+\dagger
+Project lead.
+yqchen24@gmail.com
+ExpEvolve: Structuring and Reusing Experience for Open-Ended Discovery
+Yongqiang Chen
+*
+†
+\dagger
+Affiliation:
+MBZUAI
+Affiliation:
+Carnegie Mellon University
+Chenxi Liu
+*
+Affiliation:
+TMLR Group, Hong Kong Baptist University
+Deyu Zou
+*
+Affiliation:
+The Chinese University of Hong Kong
+Zhenhao Chen
+Affiliation:
+MBZUAI
+Tongliang Liu
+Affiliation:
+MBZUAI
+Affiliation:
+SAIC Centre, The University of Sydney
+Bo Han
+Affiliation:
+TMLR Group, Hong Kong Baptist University
+Kun Zhang
+Affiliation:
+MBZUAI
+Affiliation:
+Carnegie Mellon University
+Abstract
+Evolutionary coding agents such as AlphaEvolve are one of the notable successes in using Large Language Models (LLMs) to build AI Scientists. These agents tackle open-ended scientific problems by iteratively improving and evolving programs, leveraging the prior knowledge and reasoning capabilities of LLMs. Despite their success, mutations over programs are mostly low-level upon surface heuristics, without a persistent unit of control. In contrast, science compounds through ideas. In this work, we propose ExpEvolve, which injects idea-level extraction and control into evolution: it discovers and leverages the high-level factors from programs that explain scoring differences among different programs. We characterize theoretical conditions on when discovery with idea factors improves sample efficiency. We also build a practical framework to show that the extracted high-level idea factors are helpful for guiding exploitation from experience and exploration when discovery comes to a plateau.
+Across
+11
+11
+open-ended mathematical tasks,
+ExpEvolve
+significantly improves the final performance and sample efficiency up to
+5.0
+×
+5.0\times
+. The improvements also transfer to
+4
+4
+other LLMs and to
+6
+6
+machine learning tasks from MLS-Bench. Analysis shows that
+ExpEvolve
+can discover idea-level factors to provide better exploration and exploitation for evolutionary discovery.
+1
+Introduction
+Large language models (LLMs) are now widely used to build agents that operate on increasingly long-horizon tasks
+(
+Plaat et al., 2025
+)
+. One of the most ambitious applications is AI scientist agents
+(
+Zheng et al., 2025a
+)
+, in which LLMs automate the scientific discovery process, including literature surveys
+(
+Asai et al., 2026
+)
+, hypothesis generation
+(
+Wang et al., 2024
+;
+Yang et al., 2024
+)
+, data-driven analysis
+(
+Majumder et al., 2025
+)
+, experiment design
+(
+Li et al., 2025a
+)
+, or even the whole discovery workflow
+(
+Lu et al., 2024
+;
+Yamada et al., 2025
+;
+Gottweis et al., 2026
+;
+Mitchener et al., 2025
+)
+. LLM-driven discovery has shown strong results in a variety of domains, such as mathematics
+(
+OpenAI, 2026c
+;
+OpenAI, 2026b
+)
+, de novo protein design
+(
+Anthropic, 2026
+)
+, algorithm discovery
+(
+Novikov et al., 2025
+;
+Lange et al., 2026
+)
+, and the research that develops LLMs themselves, an early form of recursive self-improvement (RSI)
+(
+OpenAI, 2026a
+;
+Favaro and Clark, 2026
+;
+Lyu et al., 2026a
+;
+Karpathy, 2026
+)
+.
+At the heart of the discovery loop is the
+iteration over scientific hypotheses
+, where scientific ideas compound throughout the evaluation of promising hypotheses
+(
+Wallace et al., 2026
+)
+.
+Therefore, it is essential to
+reuse the discovery experience
+to generate high-quality hypotheses, e.g., avoiding getting stuck in repetitive mistakes or suboptimal solutions and encoding promising exploratory proposals.
+In this work, we study experience reuse in open-ended discovery with evolutionary coding agents, where hypotheses are represented as
+solution programs
+to the underlying scientific problem, and experiences are accumulated as
+evaluated programs and their scores
+given by an explicit evaluator
+(
+Novikov et al., 2025
+)
+.
+Typically, existing evolutionary coding agents such as
+ShinkaEvolve
+directly incorporate successful programs or rely on LLMs to summarize reusable insights and incorporate them as memory for future mutations with LLMs
+(
+Lange et al., 2026
+;
+Gideoni et al., 2026
+;
+Karpathy, 2026
+)
+.
+However, program mutation contains an open-ended search space including low-level details such as hyperparameters and high-level insights such as optimization strategies. LLM-driven guidance is prone to focusing on low-level details
+(
+Karpathy, 2026
+;
+Pelleriti et al., 2026
+)
+, which may not bring genuine new scientific discoveries.
+In contrast, human scientists tend to recognize the high-level contrasts among programs, accumulate and exploit scientific ideas from experience
+(
+Kuhn and Hawkins, 1963
+;
+Douven, 2025
+)
+.
+The gap raises a challenging research question:
+How can we reuse experience for evolutionary discovery like human scientists?
+To tackle the question, we formulate evolutionary discovery as a Partially Observable Markov Decision Process
+(POMDP)
+(
+Kaelbling et al., 1998
+)
+(Sec.
+3
+).
+In each turn, the agent needs to propose meaningful solutions to uncover the underlying causal mechanism for solving the scientific problem, i.e., maximizing the evaluation score
+(
+Wallace, 1981
+;
+Glymour,
+)
+.
+Under the formulation, we introduce the notion of
+ideas
+as high-level mechanistic properties of the programs that determine the evaluation scores, e.g., the construction family or the optimization strategy (Def.
+3.2
+).
+Without uncovering the ideas, the agent has to treat programs as unrelated and cannot tell whether a revision changes an idea or only a low-level detail, so discovery degenerates into exhaustive search (Thm.
+3.1
+).
+Meanwhile, the identification of ideas also requires
+sufficient exploration
+to contrast programs with and without each idea (Thm.
+3.3
+). Hence, an effective discovery agent needs to extract ideas from experience, and keep exploring programs where the ideas vary.
+Figure 1:
+Comparison between experience reuse at program-level and idea-level. All programs solve the same grid task.
+Left:
+Experience reuse at program-level is prone to low-level edits. Program-level evolution derives new programs from a high-scoring parent, such as changing the heuristic weight or bounding the search loop. Both edited programs score lower.
+Right:
+Experience reuse at idea-level compares structurally different programs through a shared procedure-level factor,
+lp = refine_lp(lp)
+. Programs that contain the factor score higher than the program that omits it. This contrast singles out the factor, which is then inserted into new programs of different structures.
+Motivated by the analysis, we propose
+ExpEvolve
+, which recognizes, structures, and leverages the high-level idea factors from discovery experience (Fig.
+1
+).
+Specifically,
+ExpEvolve
+realizes the discovery of ideas via identifying high-level factors that help explain the program scoring differences. Built upon
+COAT
+(
+Liu et al., 2025
+)
+, the discovered idea factors are expected to predict which program performs better given any pair of programs in the experience.
+Then, the admitted idea factors will be incorporated as an action of a multi-armed bandit that controls the exploration and exploitation of different ideas during discovery.
+To enable sufficient exploration,
+ExpEvolve
+also allocates slots for random exploration
+(
+Gideoni et al., 2026
+)
+, and idea-guided exploration when the evolution comes to a plateau. The idea-guided exploration enforces LLMs to explore diverse ideas other than those widely used in top-scoring programs.
+The idea-based control in
+ExpEvolve
+allows efficient exploitation of promising ideas while continuing to explore programs with varied ideas.
+We evaluate
+ExpEvolve
+on
+11
+11
+open-ended mathematical discovery tasks with a budget of
+200
+200
+evaluated programs, using
+SCS
+as the backbone and the main baseline (Sec.
+5
+). Under two configurations that split the budget into
+20
+20
+generations of
+10
+10
+programs and
+10
+10
+generations of
+20
+20
+programs,
+ExpEvolve
+improves the final performance over
+SCS
+and
+ShinkaEvolve
+in most settings with smaller budgets up to
+5.0
+×
+5.0\times
+.
+Further analyses show that the discovered idea factors order the archived programs better than their code length on all
+11
+11
+tasks. We further integrate
+ExpEvolve
+into
+OpenRSI
+(
+Yang et al., 2026b
+)
+on six tasks from MLS-Bench
+(
+Lyu et al., 2026a
+)
+, where it improves the mean final best-so-far score of
+OpenRSI
+on all six tasks.
+2
+Related Work
+In this section, we discuss the closest related works and defer a more detailed one in Appendix
+B
+.
+AI Scientist agents.
+With the significant advancement in LLM capacity and the development of agentic systems, building LLM-based AI scientists has gained increasing attention
+(
+Zhou et al., 2025
+)
+.
+One research line automates part or the whole of the pipelines in scientific activities through agentic workflows
+(
+Lu et al., 2026
+;
+Yamada et al., 2025
+;
+Gottweis et al., 2026
+;
+Ghareeb et al., 2026
+;
+Mitchener et al., 2025
+;
+Feng et al., 2026b
+;
+Lyu et al., 2026b
+)
+.
+Evolutionary coding agents are one of the most representative AI scientist agents that integrate LLMs into evolutionary search over programs scored by an explicit evaluator
+(
+Romera-Paredes et al., 2024
+;
+Novikov et al., 2025
+)
+.
+AI scientist agents, including evolutionary coding agents, have made impact in a variety of domains, such as mathematics
+(
+OpenAI, 2026b
+)
+, materials science
+(
+Ghafarollahi and Buehler, 2025
+)
+, biology
+(
+Anthropic, 2026
+)
+, and the development of LLMs themselves, e.g., accelerating LLM training and research toward recursive self-improvement
+(
+Karpathy, 2026
+;
+Lyu et al., 2026a
+;
+OpenAI, 2026a
+;
+Favaro and Clark, 2026
+;
+Zhang et al., 2026
+)
+.
+As generation scales up, validating the generated hypotheses becomes the main cost
+(
+Wallace et al., 2026
+)
+, and ideas that look promising often degrade once executed
+(
+Si et al., 2026
+)
+.
+The expanding paradigm of LLM-driven scientific discovery makes the reuse of experience
+increasingly more essential
+, which is central to our work.
+Experience reuse in evolutionary coding agents.
+Existing evolutionary coding agents typically reuse experience via conditioning on evaluated programs
+(
+Novikov et al., 2025
+;
+Gideoni et al., 2026
+)
+or summarizing textual insights from programs into memory for future mutations
+(
+Lange et al., 2026
+;
+Liu et al., 2024
+;
+Ye et al., 2024
+;
+Volkov et al., 2026
+)
+.
+The useful experience can also be exploited for future search control, e.g., selection inspirations across diverse strategy clusters
+(
+Lange et al., 2026
+;
+Luo et al., 2026
+)
+.
+Different from existing works that concentrate on the unit of experience as texts or programs,
+ExpEvolve
+discovers and exploits high-level idea factors to guide program mutations.
+3
+Theoretical Formulation of Evolutionary Discovery
+In this section, we formalize evolutionary discovery and introduce the notion of ideas.
+A.  Evolutionary coding agent loop
+B.  Temporal graphical model
+Evolutionary coding agent
+Task specification
+objective, constraints
+Hidden mechanism
+θ
+sci
+\theta_{\mathrm{sci}}
+, static, unknown
+Memory
+m
+t
+→
+m
+t
++
+1
+m_{t}\rightarrow m_{t+1}
+scored programs, summarized insights
+Build context
+from the memory
+Propose programs
+with an LLM
+G
+⁡
+(
+⋅
+)
+G(\cdot)
+Evaluate
+score, metadata
+Archive
+scored programs
+memory updates
+t
+t
+t
++
+1
+t+1
+t
++
+2
+t+2
+m
+t
+m_{t}
+p
+t
+p_{t}
+y
+t
+y_{t}
+m
+t
++
+1
+m_{t+1}
+p
+t
++
+1
+p_{t+1}
+y
+t
++
+1
+y_{t+1}
+m
+t
++
+2
+m_{t+2}
+p
+t
++
+2
+p_{t+2}
+y
+t
++
+2
+y_{t+2}
+θ
+sci
+\theta_{\mathrm{sci}}
+⋯
+\cdots
+⋯
+\cdots
+m
+m
+Memory
+p
+p
+Program
+y
+y
+Score
+θ
+\theta
+Hidden mechanism
+Figure 2:
+Evolutionary discovery as a POMDP.
+(A)
+In each iteration, an evolutionary coding agent builds the proposal context from its memory, e.g., parent and inspiration programs or summarized insights, and generates candidate programs with an LLM
+G
+G
+. The evaluator scores every program, whose outcome depends on the hidden mechanism
+θ
+sci
+\theta_{\mathrm{sci}}
+, and the scored programs enter the archive and update the memory.
+(B)
+The corresponding temporal graphical model. The memory
+m
+t
+m_{t}
+guides the next program
+p
+t
+p_{t}
+, and the score
+y
+t
+y_{t}
+depends on both
+p
+t
+p_{t}
+and the static but unknown mechanism
+θ
+sci
+\theta_{\mathrm{sci}}
+, which in turn updates
+m
+t
++
+1
+m_{t+1}
+.
+3.1
+Evolutionary Discovery as a POMDP
+Scientific discovery aims to uncover the causal mechanisms underlying a problem through interactions with the world
+(
+Kuhn and Hawkins, 1963
+)
+. In evolutionary discovery, the agent interacts with the problem through an evaluator. We denote by
+θ
+sci
+∈
+Θ
+\theta_{\mathrm{sci}}\in\Theta
+the hidden mechanism of the problem, which is fixed during the search and unknown to the agent. At turn
+t
+t
+, the agent proposes a program
+p
+t
+∈
+𝒫
+p_{t}\in\mathcal{P}
+and observes a score
+y
+t
+y_{t}
+with
+𝔼
+⁡
+[
+y
+t
+∣
+p
+t
+]
+=
+F
+⁡
+(
+p
+t
+,
+θ
+sci
+)
+\mathbb{E}[y_{t}\mid p_{t}]=F(p_{t};\theta_{\mathrm{sci}})
+, where
+F
+:
+𝒫
+×
+Θ
+→
+ℝ
+F:\mathcal{P}\times\Theta\to\mathbb{R}
+is the objective, e.g., the value of a mathematical construction, the efficiency of a kernel, or the performance of a trained model
+(
+Novikov et al., 2025
+)
+. The goal is to uncover
+θ
+sci
+\theta_{\mathrm{sci}}
+by optimizing for the evaluation score.
+POMDP.
+As shown in Fig.
+2
+B, the interaction forms a Partially Observable Markov Decision Process (POMDP)
+(
+Kaelbling et al., 1998
+)
+with a static hidden state
+s
+t
+=
+θ
+sci
+s_{t}=\theta_{\mathrm{sci}}
+, actions
+a
+t
+=
+p
+t
+a_{t}=p_{t}
+, observations
+o
+t
+=
+y
+t
+o_{t}=y_{t}
+, an identity transition kernel, and the observation kernel
+O
+⁡
+(
+y
+t
+∣
+θ
+sci
+,
+p
+t
+)
+O(y_{t}\mid\theta_{\mathrm{sci}},p_{t})
+. Given a budget of
+T
+T
+evaluations, the agent chooses
+p
+0
+,
+…
+,
+p
+T
+−
+1
+p_{0},\dots,p_{T-1}
+to find a program
+p
+^
+\hat{p}
+with high
+F
+⁡
+(
+p
+^
+,
+θ
+sci
+)
+F(\hat{p};\theta_{\mathrm{sci}})
+.
+Evaluation as intervention.
+θ
+sci
+\theta_{\mathrm{sci}}
+can be parameterized as a structural causal model over variables of interest
+(
+Spirtes et al., 2000
+)
+, in which a program specifies a configuration
+x
+p
+x_{p}
+of design variables
+X
+X
+. Each evaluation can be considered as the expected outcome of the intervention:
+F
+(
+p
+;
+θ
+sci
+)
+=
+𝔼
+[
+Y
+|
+do
+(
+X
+=
+x
+p
+)
+,
+θ
+sci
+]
+.
+F(p;\theta_{\mathrm{sci}})=\mathbb{E}\big[\,Y\,\big|\,\mathrm{do}(X=x_{p}),\ \theta_{\mathrm{sci}}\big].
+(1)
+In this work, we leverage the causal view to provide a more in-depth understanding, while neither the analysis nor the method requires recovering the causal graph. A full discussion on the relations with causality can be found in Appendix
+C
+.
+Experience-driven discovery.
+We define
+b
+t
+b_{t}
+as the agent’s Bayesian belief after accumulating
+experience
+h
+t
+=
+{
+(
+p
+0
+,
+y
+0
+)
+,
+…
+,
+(
+p
+t
+−
+1
+,
+y
+t
+−
+1
+)
+}
+h_{t}=\{(p_{0},y_{0}),\dots,(p_{t-1},y_{t-1})\}
+,
+which is essentially a probability distribution on
+Θ
+\Theta
+,
+b
+t
+​
+(
+B
+)
+=
+Pr
+⁡
+(
+Θ
+sci
+∈
+B
+∣
+h
+t
+)
+b_{t}(B)=\Pr(\Theta_{\mathrm{sci}}\in B\mid h_{t})
+for
+B
+⊆
+Θ
+B\subseteq\Theta
+.
+In the ideal Bayesian formalism, the belief
+b
+t
+b_{t}
+is a sufficient
+statistic for decision-making
+(
+Kaelbling et al., 1998
+)
+. In practice, the AI Scientist maintains an internal belief within LLMs, or an external one realized as memory
+m
+t
+=
+Φ
+⁡
+(
+h
+t
+)
+m_{t}=\Phi(h_{t})
+for some (possibly learnable) summarization function
+Φ
+\Phi
+(
+Lange et al., 2026
+)
+, to represent the
+approximate representation
+of its knowledge about
+θ
+sci
+\theta_{\mathrm{sci}}
+and the
+landscape of
+F
+⁡
+(
+⋅
+,
+θ
+sci
+)
+F(\cdot;\theta_{\mathrm{sci}})
+.
+Each evaluation step
+(
+p
+t
+,
+y
+t
+)
+(p_{t},y_{t})
+thus updates
+m
+t
+m_{t}
+, which in turn updates the
+agent’s belief about
+θ
+sci
+\theta_{\mathrm{sci}}
+and determines the next action
+p
+t
++
+1
+p_{t+1}
+.
+3.2
+Reusing Experience with Ideas
+If the evaluator fully reveals
+θ
+sci
+\theta_{\mathrm{sci}}
+and the evaluation budget is unlimited, then enumerating every possible program can directly lead to discovery. However, in reality, the evaluation score only reveals partial information about
+θ
+sci
+\theta_{\mathrm{sci}}
+and evaluations can be expensive, e.g., training a model or running a physical experiment, so the agent can afford only a limited number of them
+(
+Wallace et al., 2026
+)
+.
+Therefore, it is
+essential
+to reuse experience from past evaluations.
+Without properly reusing experience, a single evaluation cannot reveal further insights about other unseen programs, and the agent then has to evaluate every candidate program to find the best one.
+Reusing experience requires some structure shared across programs, so that the evaluation of one program also informs the others. We formalize the contrast as follows.
+Theorem 3.1
+(Structured experience reuse, informal)
+.
+Let
+𝒫
+=
+{
+p
+1
+,
+…
+,
+p
+K
+}
+\mathcal{P}=\{p_{1},\dots,p_{K}\}
+, and let each evaluation return
+y
+t
+=
+F
+⁡
+(
+p
+t
+,
+θ
+sci
+)
++
+ε
+t
+y_{t}=F(p_{t};\theta_{\mathrm{sci}})+\varepsilon_{t}
+with
+ε
+t
+∼
+𝒩
+⁡
+(
+0
+,
+σ
+2
+)
+\varepsilon_{t}\sim\mathcal{N}(0,\sigma^{2})
+i.i.d.
+(a)
+With reuse.
+If each program has a known representation
+ϕ
+⁡
+(
+p
+)
+∈
+ℝ
+d
+\phi(p)\in\mathbb{R}^{d}
+with
+‖
+ϕ
+⁡
+(
+p
+)
+‖
+2
+≤
+1
+\|\phi(p)\|_{2}\leq 1
+and
+F
+⁡
+(
+p
+,
+θ
+sci
+)
+=
+⟨
+ϕ
+⁡
+(
+p
+)
+,
+w
+⋆
+⟩
+F(p;\theta_{\mathrm{sci}})=\langle\phi(p),w^{\star}\rangle
+for an unknown
+w
+⋆
+∈
+ℝ
+d
+w^{\star}\in\mathbb{R}^{d}
+, then under a coverage condition on the representation, there exists a policy that, with probability at least
+1
+−
+δ
+1-\delta
+, outputs a program within
+ϵ
+\epsilon
+of the optimal value after
+O
+⁡
+(
+d
+​
+σ
+2
+ϵ
+2
+​
+log
+⁡
+K
+δ
+)
+O\big(d\,\frac{\sigma^{2}}{\epsilon^{2}}\log\frac{K}{\delta}\big)
+evaluations.
+(b)
+Without reuse.
+If programs are unrelated, i.e.,
+F
+⁡
+(
+p
+i
+,
+θ
+sci
+)
+=
+μ
+i
+F(p_{i};\theta_{\mathrm{sci}})=\mu_{i}
+for an arbitrary
+μ
+∈
+ℝ
+K
+\mu\in\mathbb{R}^{K}
+, then any policy with the same guarantee for every
+μ
+\mu
+needs
+Ω
+⁡
+(
+K
+​
+σ
+2
+ϵ
+2
+​
+log
+⁡
+1
+δ
+)
+\Omega\big(K\,\frac{\sigma^{2}}{\epsilon^{2}}\log\frac{1}{\delta}\big)
+evaluations.
+The formal statement and proof are given in Appendix
+E
+.
+Theorem
+3.1
+implies that reusing experience at the high-level design choices can significantly improve sample efficiency from
+Ω
+⁡
+(
+K
+)
+\Omega(K)
+to
+O
+⁡
+(
+d
+​
+log
+⁡
+K
+)
+O(d\log K)
+, where
+K
+≫
+d
+K\gg d
+. In evolutionary discovery,
+K
+K
+counts the candidate program space, which grow combinatorially with the high-level design choices and further with the ways of implementing each choice, while
+d
+d
+is determined by the design choices that affect the score.
+Most existing agents retain experience at the level of programs
+(
+Novikov et al., 2025
+;
+Lange et al., 2026
+)
+, which ignores the high-level design choices.
+In contrast, human scientists recognize and record what they learn from experiments in terms of reusable concepts, e.g., a construction or an optimization technique, which carry over to later experiments. We are hence inspired to introduce the notion of
+ideas
+.
+Definition 3.2
+(Idea)
+.
+An idea is an interpretable mapping
+z
+:
+𝒫
+→
+𝒱
+z:\mathcal{P}\to\mathcal{V}
+from programs to a binary or categorical value. It describes a high-level mechanistic property that can be shared by syntactically different programs, such as the construction family, initialization, or optimization procedure. A set of ideas
+{
+z
+1
+,
+…
+,
+z
+r
+}
+\{z_{1},\dots,z_{r}\}
+defines the idea representation
+Z
+⁡
+(
+p
+)
+=
+(
+z
+1
+​
+(
+p
+)
+,
+…
+,
+z
+r
+​
+(
+p
+)
+)
+Z(p)=(z_{1}(p),\dots,z_{r}(p))
+.
+A program realizes a set of ideas together with low-level details.
+We call an idea representation
+Z
+Z
+faithful
+if the score depends on a program only through its ideas, i.e.,
+F
+⁡
+(
+p
+,
+θ
+sci
+)
+=
+g
+⁡
+(
+Z
+⁡
+(
+p
+)
+)
+F(p;\theta_{\mathrm{sci}})=g(Z(p))
+for some function
+g
+g
+determined by
+θ
+sci
+\theta_{\mathrm{sci}}
+. Under a faithful idea representation, the hidden mechanism acts on a program only through its ideas, and Theorem
+3.1
+applies with
+ϕ
+⁡
+(
+p
+)
+\phi(p)
+being the one-hot encoding of
+Z
+⁡
+(
+p
+)
+Z(p)
+, whose dimension is determined by the number of ideas.
+Identifiability of ideas.
+However, the agent does not know in advance which representation is faithful, and the ideas have to be identified from the evaluated programs, while which programs are evaluated is decided by the search itself. When the search stops varying the candidate ideas, the exploration of ideas degenerates, as formalized below.
+Theorem 3.3
+(Degenerated exploration of ideas)
+.
+Consider two candidate ideas
+z
+0
+z_{0}
+and
+z
+1
+z_{1}
+, and two mechanisms
+θ
+0
+\theta_{0}
+and
+θ
+1
+\theta_{1}
+under which the score depends on
+z
+0
+z_{0}
+and
+z
+1
+z_{1}
+, respectively, i.e.,
+F
+⁡
+(
+p
+,
+θ
+i
+)
+=
+g
+⁡
+(
+Z
+⁡
+(
+p
+)
+,
+z
+i
+​
+(
+p
+)
+)
+F(p;\theta_{i})=g(Z(p),z_{i}(p))
+for a common representation
+Z
+Z
+and function
+g
+g
+, with the same observation noise. Suppose the optimal programs under
+θ
+0
+\theta_{0}
+and
+θ
+1
+\theta_{1}
+are different and unique with a margin
+Δ
+>
+0
+\Delta>0
+. Then for any policy that only evaluates programs on which
+z
+0
+z_{0}
+and
+z
+1
+z_{1}
+agree, there exists
+i
+∈
+{
+0
+,
+1
+}
+i\in\{0,1\}
+such that for every budget
+T
+T
+, the output
+p
+^
+\hat{p}
+satisfies
+𝔼
+⁡
+[
+max
+p
+∈
+𝒫
+⁡
+F
+⁡
+(
+p
+,
+θ
+i
+)
+−
+F
+⁡
+(
+p
+^
+,
+θ
+i
+)
+]
+≥
+Δ
+/
+2
+\mathbb{E}\big[\max_{p\in\mathcal{P}}F(p;\theta_{i})-F(\hat{p};\theta_{i})\big]\geq\Delta/2
+.
+The formal statement and proof are given in Appendix
+F
+. Theorem
+3.3
+can be considered as a consequence of the partial observability of
+θ
+sci
+\theta_{\mathrm{sci}}
+, since the scores reveal
+θ
+sci
+\theta_{\mathrm{sci}}
+only through the evaluated programs. If two candidate ideas agree on all explored programs, the two mechanisms produce the same observations, and one cannot distinguish which idea determines the score.
+This situation is common in evolutionary search: as the search concentrates around its current best programs, the ideas shared by these programs stop varying. Identifying ideas thus requires sufficient exploration to contrast programs with and without each idea, to isolate contributions of ideas in the program space.
+4
+ExpEvolve
+: Discovering and Exploiting Ideas from Experience
+Theoretical analysis in Sec.
+3
+suggests that a discovery agent should extract ideas from its experience, and keep exploring programs where the ideas vary. We realize the theoretical principles in
+ExpEvolve
+.
+The full procedure and implementation details are given in Alg.
+1
+and Appendix
+H
+.
+4.1
+Discovering Ideas from Experience
+We leverage the discovery loop of the
+COAT
+framework
+(
+Liu et al., 2025
+)
+to find idea factors according to their theoretical properties.
+Figure 3:
+Illustration of idea factor discovery.
+Idea memory.
+During the discovery,
+ExpEvolve
+maintains an idea memory
+ℳ
+t
+\mathcal{M}_{t}
+which is a set of idea factors. Each idea factor is stored with a name, a description of its code pattern, a type, i.e., binary or categorical, and a value set
+𝒱
+\mathcal{V}
+.
+For each program in the experience archive, the values of idea factors are annotated by an annotator LLM, which instantiates the idea representation
+Z
+⁡
+(
+p
+)
+Z(p)
+.
+Explainability of idea factors.
+A faithful idea representation is expected to be able to predict the score of a program, i.e.,
+F
+⁡
+(
+p
+,
+θ
+sci
+)
+=
+g
+⁡
+(
+Z
+⁡
+(
+p
+)
+)
+F(p;\theta_{\mathrm{sci}})=g(Z(p))
+(Sec.
+3.2
+). However, predicting the exact scores from ideas is difficult, since the scores of different tasks lie on different scales, the unknown function
+g
+g
+can be highly nonlinear, and the archive only contains a limited number of noisy evaluations.
+Therefore, we define the explainability of an idea representation by
+its pairwise predictability
+, i.e., whether
+Z
+⁡
+(
+p
+)
+Z(p)
+and
+Z
+⁡
+(
+p
+′
+)
+Z(p^{\prime})
+predict which of two programs
+p
+p
+and
+p
+′
+p^{\prime}
+is better.
+The ranking is already informative for optimizing the objective, invariant to the scale of the scores, and more robust to noise than the scores.
+Discovering idea factors from unexplained pairs.
+The idea discovery process in
+ExpEvolve
+is an iterative loop: each time the discovery is triggered,
+ExpEvolve
+fits a pairwise ranker on the annotated idea factors, and selects the pairs of archived programs with a large score gap that the current idea factors fail to explain. The unexplained pairs suggest the
+existence of missing idea factors
+that separate the programs in each pair.
+For the selected pairs, a separate proposer LLM reads the programs to propose candidate idea factors that distinguish them. Each candidate is then annotated on the whole archive, and is admitted into the idea memory if each of its values is supported by enough programs and its values separate the scores.
+Figure 4:
+Illustration of two-level exploration-exploitation with discovered idea factors.
+4.2
+Exploiting Idea Factors for Discovery
+We build a two-level exploration and exploitation framework with a multi-armed bandit (MAB) to fully exploit discovered idea factors while exploring varying design spaces.
+Exploration and MAB exploitation.
+In each generation,
+ExpEvolve
+keeps at least a fraction
+ρ
+\rho
+of the slots for random exploration that follows
+SCS
+(
+Gideoni et al., 2026
+)
+with randomly sampled example programs, which explores programs beyond the current ideas and provides new material for discovery.
+The remaining slots are allocated to idea-guided actions by MAB.
+Figure 5:
+Illustration of idea-guided exploration at plateaus.
+Idea factors as MAB actions.
+To exploit an idea factor
+z
+z
+,
+ExpEvolve
+compiles it into edit actions, e.g.,
+𝖠𝖣𝖣
+⁡
+(
+z
+)
+\mathsf{ADD}(z)
+and
+𝖱𝖤𝖬𝖮𝖵𝖤
+⁡
+(
+z
+)
+\mathsf{REMOVE}(z)
+for a binary idea factor. An action adds to the context an instruction that describes
+z
+z
+, together with demonstration programs in the target state, to ask the mutator LLM to realize the action in the new program. The MAB selects the action for each idea-guided slot. The reward of an action is the score of the program generated under the action relative to the random exploration in the same generation, i.e.,
+r
+=
+y
+−
+y
+¯
+rand
+σ
+rand
+,
+r=\frac{y-\bar{y}_{\mathrm{rand}}}{\sigma_{\mathrm{rand}}},
+where
+y
+y
+is the score of the generated program, and
+y
+¯
+rand
+\bar{y}_{\mathrm{rand}}
+and
+σ
+rand
+\sigma_{\mathrm{rand}}
+are the mean and the standard deviation of the scores of random exploration in the same generation. The normalization removes the drift of scores across generations and the differences of score scales across tasks. The MAB selects the actions with an upper confidence bound (UCB) rule on the maximum reward of each action (Appendix
+H.3
+).
+Exploration at plateaus.
+Oftentimes, evolutionary discovery can concentrate around its best programs and a single strategy. Consequently, the ideas widely used in top-scoring programs stop varying, and their roles cannot be identified from the archive (Thm.
+3.3
+). When the best score does not improve for
+κ
+\kappa
+generations,
+ExpEvolve
+switches to idea-guided exploration, which enforces the mutator LLM to explore diverse ideas other than those widely used in top-scoring programs. Specifically, a separate LLM probes the properties shared by the top-scoring programs as background idea factors, and an LLM judge determines which idea factors in the memory depend on the background.
+ExpEvolve
+then masks the actions of the dependent idea factors, instructs the mutator LLM to avoid them, and assigns more slots to random exploration with diversified demonstrations.
+5
+Experiments
+We evaluate
+ExpEvolve
+on
+11
+11
+open-ended mathematical discovery tasks and further integrate it into an evolutionary agent for Machine Learning Engineering (MLE) tasks.
+5.1
+Experimental Setup
+Tasks.
+We evaluate on
+11
+11
+open-ended mathematical discovery tasks. Nine tasks are the problems studied by
+SCS
+(
+Gideoni et al., 2026
+)
+, which are taken from
+AlphaEvolve
+(
+Novikov et al., 2025
+)
+, including the first and second autocorrelation inequalities, the uncertainty inequality, the Erdős minimum overlap problem, sums and differences of sets, the max–min distance ratio, the Heilbronn problem for triangles, the kissing number in
+11
+11
+dimensions, and circle packing. The other two tasks are the Hadamard matrix problem
+(
+Wang et al., 2026
+)
+and a variant of circle packing that recovers the radii by linear programming. We report the best score at the end of the budget, as the mean and standard deviation over seeds, and the best seed. Full details of the tasks are given in Appendix
+I.1
+.
+Budget.
+Each run evaluates
+200
+200
+programs. We consider two configurations with the same budget, i.e.,
+10
+10
+generations of
+20
+20
+programs as in
+SCS
+(
+Gideoni et al., 2026
+)
+and
+20
+20
+generations of
+10
+10
+programs, which presents more challenges to accumulating reusable knowledge from experience.
+Implementation.
+We compare
+ExpEvolve
+with
+SCS
+(
+Gideoni et al., 2026
+)
+, which is the backbone of
+ExpEvolve
+and shows competitive results against more elaborate evolutionary coding agents. We further compare with
+ShinkaEvolve
+(
+Lange et al., 2026
+)
+, which maintains an island-based archive and summarizes the insights of recent programs with a meta-summary.
+Details are given in Appendix
+I.2
+.
+We use DeepSeek-V4-Flash by default, and each setting is run with
+3
+3
+seeds.
+ExpEvolve
+uses a random-exploration fraction
+ρ
+=
+0.60
+\rho=0.60
+for
+20
+20
+-gen. and
+ρ
+=
+0.40
+\rho=0.40
+for
+10
+10
+-gen. to keep a similar number of random-exploration slots, i.e.,
+6
+6
+and
+8
+8
+. We donot tune other hyperparameters.
+5.2
+Main Results
+Table 1:
+Final performance at the budget of
+200
+200
+evaluated programs. Mean reports the seed mean
+±
+\pm
+seed standard deviation over
+3
+3
+seeds, and Best reports the best seed.
+20 generations
+×
+\times
+10 programs
+10 generations
+×
+\times
+20 programs
+ShinkaEvolve
+Task
+ExpEvolve
+SCS
+ExpEvolve
+SCS
+Mean
+Best
+Mean
+Best
+Mean
+Best
+Mean
+Best
+Mean
+Best
+Hadamard
+↑
+\uparrow
+0.9211
+±
+\pm
+0.000
+0.9211
+0.6641
+±
+\pm
+0.169
+0.8596
+0.9259
+±
+\pm
+0.008
+0.9357
+0.8349
+±
+\pm
+0.101
+0.9211
+0.6467
+±
+\pm
+0.139
+0.8066
+Pack
+↑
+\uparrow
+2.63542
+±
+\pm
+0.001
+2.63598
+2.61697
+±
+\pm
+0.028
+2.63572
+2.63499
+±
+\pm
+0.002
+2.63598
+2.62305
+±
+\pm
+0.011
+2.63104
+2.58201
+±
+\pm
+0.037
+2.61408
+Linprog
+↑
+\uparrow
+2.63542
+±
+\pm
+0.001
+2.63598
+2.63542
+±
+\pm
+0.001
+2.63598
+2.63542
+±
+\pm
+0.001
+2.63598
+2.55161
+±
+\pm
+0.006
+2.55608
+2.51434
+±
+\pm
+0.026
+2.54142
+SumDiff
+↑
+\uparrow
+1.11609
+±
+\pm
+0.006
+1.11937
+1.11087
+±
+\pm
+0.001
+1.11143
+1.12224
+±
+\pm
+0.001
+1.12281
+1.11608
+±
+\pm
+0.005
+1.12006
+1.10954
+±
+\pm
+0.000
+1.10954
+Heilbronn
+↑
+\uparrow
+0.0353
+±
+\pm
+0.001
+0.0359
+0.0313
+±
+\pm
+0.003
+0.0340
+0.0358
+±
+\pm
+0.001
+0.0365
+0.0336
+±
+\pm
+0.001
+0.0343
+0.0303
+±
+\pm
+0.002
+0.0324
+Min overlap
+↓
+\downarrow
+0.3810
+±
+\pm
+0.000
+0.3810
+0.3816
+±
+\pm
+0.001
+0.3810
+0.3810
+±
+\pm
+0.000
+0.3810
+0.3810
+±
+\pm
+0.000
+0.3810
+0.3824
+±
+\pm
+0.000
+0.3824
+Kissing
+↑
+\uparrow
+526
+±
+\pm
+97
+582
+413
+±
+\pm
+23
+438
+582
+±
+\pm
+0
+582
+582
+±
+\pm
+0
+582
+462
+±
+\pm
+90
+566
+Second autocorr.
+↑
+\uparrow
+0.8825
+±
+\pm
+0.000
+0.8825
+0.8398
+±
+\pm
+0.016
+0.8499
+0.8825
+±
+\pm
+0.000
+0.8825
+0.8825
+±
+\pm
+0.000
+0.8825
+0.8745
+±
+\pm
+0.008
+0.8825
+First autocorr.
+↓
+\downarrow
+1.5113
+±
+\pm
+0.002
+1.5098
+1.5235
+±
+\pm
+0.011
+1.5151
+1.5195
+±
+\pm
+0.006
+1.5151
+1.5508
+±
+\pm
+0.011
+1.5378
+1.5540
+±
+\pm
+0.029
+1.5203
+Max–min ratio
+↓
+\downarrow
+12.9262
+±
+\pm
+0.064
+12.8892
+12.9338
+±
+\pm
+0.077
+12.8892
+12.8892
+±
+\pm
+0.000
+12.8892
+12.9808
+±
+\pm
+0.033
+12.9425
+13.0000
+±
+\pm
+0.000
+13.0000
+Hermite
+↓
+\downarrow
+0.35473
+±
+\pm
+0.003
+0.35263
+0.39431
+±
+\pm
+0.059
+0.35945
+0.35089
+±
+\pm
+0.002
+0.34820
+0.35956
+±
+\pm
+0.005
+0.35394
+4.72779
+±
+\pm
+3.788
+0.35429
+ExpEvolve
+consistently improves the final performance.
+Table
+1
+shows the final performance at the budget of
+200
+200
+programs.
+ExpEvolve
+improves the mean and best final performances across most settings over
+SCS
+and
+ShinkaEvolve
+. Moreover, the improvements are robust to how the budget is parallelized. From
+10
+10
+generations of
+20
+20
+programs to
+20
+20
+generations of
+10
+10
+programs, the mean final score of
+SCS
+can drop dramatically because of limited capability in experience reuse, while
+ExpEvolve
+still maintains competitive performance. More details are given in Appendix
+J
+.
+Figure 6:
+Best-so-far scores along the budget of
+200
+200
+evaluated programs.
+ExpEvolve
+improves sample efficiency.
+Fig.
+6
+shows the best-so-far scores along the budget on Hadamard, Sums and differences, Heilbronn, and Minimum overlap. On these four tasks,
+ExpEvolve
+needs
+1.7
+×
+1.7\times
+to
+26.2
+×
+26.2\times
+fewer evaluations than
+SCS
+under both configurations.
+Figure 7:
+(a) Best-so-far scores of
+SCS
+and
+ExpEvolve
+with other LLMs. (b) Best-so-far scores of
+SCS
+, SCS+meta, and
+ExpEvolve
+.
+The improvements transfer to other LLMs.
+Fig.
+7
+(a) shows that the advantages of
+ExpEvolve
+over
+SCS
+transfers to other LLMs such as DeepSeek-v4-pro, GLM-5.2 and Gemini-3.7-Flash.
+Summarizing experience as memory helps the early search but saturates.
+ShinkaEvolve
+and SCS+meta retain the experience as a textual summary of recent programs, which provides additional context to the mutator LLM without controlling which ideas are evaluated. Fig.
+7
+(b) shows that SCS+meta improves over
+SCS
+in the early stage. However, its improvement slows down afterwards while
+ExpEvolve
+keep improving. It again verifies the advantages of idea-guided evolution.
+Figure 8:
+Quality of discovered idea factors. (a) Pairwise accuracy of the discovered idea factors. (b) The idea factor with the largest weight. (c) Illustration of usage of factors in sumdiff task.
+The discovered idea factors explain the order of archived programs.
+Following the definition of explainability in Sec.
+4.1
+, we measure the fraction of archived program pairs that discovered factors can order correctly. As shown in Fig.
+8
+(a), the discovered idea factors reach an accuracy of
+0.79
+0.79
+to
+0.99
+0.99
+. Fig.
+8
+(b) shows the idea factor with the largest weight on each task.
+In an example run, idea-guided actions produce about half of the new best programs.
+Fig.
+8
+(c) shows a run on Sums and differences with
+10
+10
+generations of
+20
+20
+programs.
+6
+6
+of the
+11
+11
+new best programs come from idea-guided slots. The
+92
+92
+idea-guided slots of the run select
+7
+7
+distinct actions, and all the new best programs from idea-guided slots come from
+2
+2
+of them.
+(a)
+Final BSF performance
+(b)
+Multi-objective optimization
+(c)
+Evolution strategy
+Figure 9:
+Results on MLS-Bench.
+(a) Mean final scores.
+(b,c) Trajectories on two example tasks.
+5.3
+Additional Experiments on Machine Learning Engineering Tasks
+We further study whether the effectiveness of
+ExpEvolve
+transfers to MLE by integrating it into OpenRSI
+(
+Yang et al., 2026b
+)
+and evaluating it on
+6
+6
+tasks from MLS-Bench
+(
+Lyu et al., 2026a
+)
+:
+Online bandit
+,
+Anomaly detection
+,
+Clustering
+,
+Multi-objective optimization
+,
+Subgroup calibration shift
+, and
+Evolution strategy
+.
+Search leverages the scores and execution feedback from each task.
+Experimental setup.
+We use the evolutionary harness from OpenRSI, which organizes search through
+Draft
+,
+Improve
+,
+Debug
+, and
+Crossover
+operators.
+For each task, we retain a fixed history containing 20 completed search slots from an earlier OpenRSI run. The OpenRSI baseline and OpenRSI equipped with
+ExpEvolve
+continue from this same history for
+50
+additional evaluator calls, with
+3
+seeds. Both methods use
+5
+search slots per generation.
+All program generation uses Qwen3.6-35B-A3B.
+The same checkpoint performs factor discovery and annotation in
+ExpEvolve
+.
+For each task and method, we average the final best-so-far (BSF) scores over three seeds.
+Idea-guided evolution transfers to MLE tasks.
+Fig.
+9(a)
+compares OpenRSI with OpenRSI+
+ExpEvolve
+across the six tasks, where
+ExpEvolve
+shows superior performance on all six tasks, with the largest gains on Online bandit and Anomaly detection.
+Idea-guided actions produce better exploration and exploitation on MLE tasks.
+Fig.
+9(b)
+and Fig.
+9(c)
+show two concrete trajectories in the tasks of multi-objective optimization and evolution strategy, respectively. We can find that
+ExpEvolve
+can effectively discover useful ideas such as removing running ideal-point tracking (A1), removing reference-vector adaptation (A2), and adding hybrid differential-evolution variation (A3) to effectively boost the performance. When the evolution gets stuck at plateaus, exploiting useful strategies proposed by
+ExpEvolve
+in multi-objective optimization, or exploration guided by idea factors in
+ExpEvolve
+can effectively break the plateaus and lead to improvements. More details about the implementation can be found in Appendix
+K.1
+.
+6
+Conclusions
+We introduced
+ExpEvolve
+, which structures the experience of evolutionary discovery into idea factors and reuses them to guide the search.
+ExpEvolve
+discovers idea factors from the pairs of programs that the current idea factors fail to explain, exploits them as the actions of a multi-armed bandit, and keeps exploring programs where the ideas vary, through random exploration and idea-guided exploration at plateaus. Our analysis shows that reusing a faithful idea representation reduces the number of evaluations from
+Ω
+⁡
+(
+K
+)
+\Omega(K)
+to
+O
+⁡
+(
+d
+​
+log
+⁡
+K
+)
+O(d\log K)
+, and that identifying ideas requires exploring programs where the ideas vary. On
+11
+11
+mathematical discovery tasks and
+6
+6
+tasks from MLS-Bench,
+ExpEvolve
+improves the final performance and the sample efficiency of evolutionary discovery under the same evaluation budget.
+References
+Ahuja et al. (2023)
+K. Ahuja, D. Mahajan, Y. Wang, and Y. Bengio.
+Interventional causal representation learning.
+In
+International Conference on Machine Learning (ICML)
+, 2023.
+Anthropic (2026)
+Anthropic.
+Claude accelerates protein design and analytical chemistry.
+https://www.anthropic.com/research/Claude-accelerates-protein-design
+,
+Aug. 2026.
+354 binders against 14 of 15 targets from 1,320 designs, produced and
+tested independently by Adaptyv Bio and Twist Bioscience.
+Asai et al. (2026)
+A. Asai, J. He, R. Shao, W. Shi, A. Singh, J. C. Chang, K. Lo, L. Soldaini,
+S. Feldman, et al.
+Synthesizing scientific literature with retrieval-augmented language
+models.
+Nature
+, 2026.
+10.1038/s41586-025-10072-4
+.
+Assumpção et al. (2025)
+H. Assumpção, D. Ferreira, L. Campos, and F. Murai.
+CodeEvolve: an open source evolutionary coding agent for algorithm
+discovery and optimization.
+arXiv preprint arXiv:2510.14150
+, 2025.
+Boiko et al. (2023)
+D. A. Boiko, R. MacKnight, B. Kline, and G. Gomes.
+Autonomous chemical research with large language models.
+Nature
+, 624(7992):570–578, 2023.
+Brouillard et al. (2020)
+P. Brouillard, S. Lachapelle, A. Lacoste, S. Lacoste-Julien, and A. Drouin.
+Differentiable causal discovery from interventional data.
+Advances in Neural Information Processing Systems
+,
+33:21865–21877, 2020.
+Bubeck et al. (2025)
+S. Bubeck, C. Coester, R. Eldan, T. Gowers, Y. T. Lee, A. Lupsasca, M. Sawhney,
+R. Scherrer, M. Sellke, B. K. Spears, D. Unutmaz, K. Weil, S. Yin, and
+N. Zhivotovskiy.
+Early science acceleration experiments with gpt-5.
+ArXiv
+, abs/2511.16072, 2025.
+Cemri et al. (2026)
+M. Cemri et al.
+AdaEvolve: Adaptive LLM driven zeroth-order optimization.
+arXiv preprint arXiv:2602.20133
+, 2026.
+Chalupka et al. (2015)
+K. Chalupka, P. Perona, and F. Eberhardt.
+Visual causal feature learning.
+In
+Proceedings of the Thirty-First Conference on Uncertainty in
+Artificial Intelligence
+, 2015.
+Chan et al. (2025)
+J. S. Chan, N. Chowdhury, O. Jaffe, J. Aung, D. Sherburn, E. Mays, G. Starace,
+K. Liu, L. Maksin, T. Patwardhan, A. Madry, and L. Weng.
+MLE-bench: Evaluating machine learning agents on machine learning
+engineering.
+In
+ICLR
+, 2025.
+arXiv:2410.07095.
+Chen et al. (2023)
+Y. Chen, W. Huang, K. Zhou, Y. Bian, B. Han, and J. Cheng.
+Understanding and improving feature learning for out-of-distribution
+generalization.
+In
+Advances in Neural Information Processing Systems
+, 2023.
+Cheng et al. (2025)
+A. Cheng, S. Liu, M. Z. Pan, Z. Li, B. Wang, A. Krentsel, T. Xia, M. Cemri,
+J. Park, S. Yang, J. Chen, L. A. Agrawal, A. Desai, J. Xing, K. Sen,
+M. Zaharia, and I. Stoica.
+Barbarians at the gate: How ai is upending systems research.
+ArXiv
+, abs/2510.06189, 2025.
+Da Costa et al. (2008)
+L. Da Costa, Á. Fialho, M. Schoenauer, and M. Sebag.
+Adaptive operator selection with dynamic multi-armed bandits.
+In
+Proceedings of the Genetic and Evolutionary Computation
+Conference (GECCO)
+, pages 913–920, 2008.
+Dhawan et al. (2024)
+N. Dhawan, L. Cotta, K. Ullrich, R. G. Krishnan, and C. J. Maddison.
+End-to-end causal effect estimation from unstructured natural
+language data.
+Advances in Neural Information Processing Systems
+,
+37:77165–77199, 2024.
+Douven (2025)
+I. Douven.
+Abduction.
+In E. N. Zalta and U. Nodelman, editors,
+The Stanford
+Encyclopedia of Philosophy
+. Metaphysics Research Lab, Stanford University,
+Winter 2025 edition, 2025.
+Favaro and Clark (2026)
+M. Favaro and J. Clark.
+When AI builds itself: Our progress toward recursive
+self-improvement and its implications.
+Anthropic Institute,
+https://www.anthropic.com/institute/recursive-self-improvement
+, June
+2026.
+Feng et al. (2026a)
+P. Feng, Z. Lv, J. Ye, X. Wang, X. Huo, J. Yu, W. Xu, W. Zhang, L. Bai, C. He,
+and W. Li.
+Earth-Agent: Unlocking the full landscape of earth observation with
+agents.
+In
+ICLR
+, 2026a.
+arXiv:2509.23141.
+Feng et al. (2026b)
+S. Feng, R. Ma, X. Yan, et al.
+InternAgent-1.5: A unified agentic framework for long-horizon
+autonomous scientific discovery.
+arXiv preprint arXiv:2602.08990
+, 2026b.
+Georgiev et al. (2025)
+B. Georgiev, J. Gómez-Serrano, T. Tao, and A. Z. Wagner.
+Mathematical exploration and discovery at scale.
+ArXiv
+, abs/2511.02864, 2025.
+Ghafarollahi and Buehler (2025)
+A. Ghafarollahi and M. J. Buehler.
+Sciagents: automating scientific discovery through bioinspired
+multi-agent intelligent graph reasoning.
+Advanced Materials
+, 37(22):2413523, 2025.
+Ghareeb et al. (2026)
+A. E. Ghareeb et al.
+A multi-agent system for automating scientific discovery.
+Nature
+, 655(8122):497–505, 2026.
+10.1038/s41586-026-10652-y
+.
+Gideoni et al. (2026)
+Y. Gideoni, S. Risi, and Y. Gal.
+Simple baselines are competitive with code evolution.
+In
+ICLR 2026 Workshop on AI with Recursive Self-Improvement
+,
+2026.
+arXiv:2602.16805.
+(23)
+C. Glymour.
+An outline of the history of methods of discovering causality.
+URL
+https://www.cmu.edu/dietrich/philosophy/docs/glymour/an-outline-of-the-history-of-methods-of-discovering-causality.pdf
+.
+Accessed: 2026-01-29.
+Gottweis et al. (2026)
+J. Gottweis et al.
+Accelerating scientific discovery with co-scientist.
+Nature
+, 655(8122):487–496, 2026.
+10.1038/s41586-026-10644-y
+.
+Greenland et al. (1999)
+S. Greenland, J. Pearl, and J. M. Robins.
+Causal diagrams for epidemiologic research.
+Epidemiology
+, 10(1):37–48, 1999.
+Hoyer et al. (2008)
+P. Hoyer, D. Janzing, J. M. Mooij, J. Peters, and B. Schölkopf.
+Nonlinear causal discovery with additive noise models.
+Advances in neural information processing systems
+, 21, 2008.
+Huang et al. (2020)
+B. Huang, K. Zhang, J. Zhang, J. Ramsey, R. Sanchez-Romero, C. Glymour, and
+B. Schölkopf.
+Causal discovery from heterogeneous/nonstationary data.
+Journal of Machine Learning Research
+, 21(89):1–53, 2020.
+Huang et al. (2025a)
+K. Huang, Y. Jin, R. Li, M. Y. Li, E. Candes, and J. Leskovec.
+Automated hypothesis validation with agentic sequential
+falsifications.
+In
+ICML
+, 2025a.
+Huang et al. (2025b)
+Y. Huang, Y. Chen, H. Zhang, K. Li, H. Zhou, M. Fang, L. Yang, X. Li, L. Shang,
+S. Xu, et al.
+Deep research agents: A systematic examination and roadmap.
+arXiv preprint arXiv:2506.18096
+, 2025b.
+Hyttinen et al. (2013)
+A. Hyttinen, F. Eberhardt, and P. O. Hoyer.
+Experiment selection for causal discovery.
+The Journal of Machine Learning Research
+, 14(1):3041–3071, 2013.
+Jing et al. (2025)
+L. Jing, Z. Huang, X. Wang, W. Yao, W. Yu, K. Ma, H. Zhang, X. Du, and D. Yu.
+DSBench: How far are data science agents from becoming data science
+experts?
+In
+ICLR
+, 2025.
+arXiv:2409.07703.
+Kaelbling et al. (1998)
+L. P. Kaelbling, M. L. Littman, and A. R. Cassandra.
+Planning and acting in partially observable stochastic domains.
+Artificial intelligence
+, 101(1-2):99–134,
+1998.
+Karpathy (2026)
+A. Karpathy.
+autoresearch: session reports of an autonomous single-GPU
+training-loop agent.
+GitHub discussions #32 and #43,
+https://github.com/karpathy/autoresearch/discussions/32
+,
+https://github.com/karpathy/autoresearch/discussions/43
+, 2026.
+Discussion #43 is the 126-experiment log classified in the paper;
+discussion #32 (8 March 2026) is an 89-experiment log with the same format.
+Kaufmann et al. (2016)
+E. Kaufmann, O. Cappé, and A. Garivier.
+On the complexity of best-arm identification in multi-armed bandit
+models.
+Journal of Machine Learning Research
+, 17(1):1–42, 2016.
+Khrulkov et al. (2025)
+V. Khrulkov, A. V. Galichin, et al.
+GigaEvo: An open source optimization framework powered by LLMs
+and evolution algorithms.
+arXiv preprint arXiv:2511.17592
+, 2025.
+Kuhn and Hawkins (1963)
+T. S. Kuhn and D. Hawkins.
+The structure of scientific revolutions.
+American Journal of Physics
+, 31:554–555, 1963.
+Lange et al. (2026)
+R. T. Lange, Y. Imajuku, and E. Cetin.
+ShinkaEvolve: Towards open-ended and sample-efficient program
+evolution.
+In
+ICLR
+, 2026.
+arXiv:2509.19349.
+Laurent et al. (2024)
+J. M. Laurent, J. D. Janizek, M. Ruzo, M. M. Hinks, M. J. Hammerling,
+S. Narayanan, M. Ponnapati, A. D. White, and S. G. Rodriques.
+Lab-bench: Measuring capabilities of language models for biology
+research.
+arXiv preprint arXiv:2407.10362
+, 2024.
+Lehman and Stanley (2011)
+J. Lehman and K. O. Stanley.
+Abandoning objectives: Evolution through the search for novelty
+alone.
+Evolutionary Computation
+, 19(2):189–223,
+2011.
+Li et al. (2025a)
+J. Li, Y. Chen, C. Liu, Q. Cai, T. Liu, B. Han, K. Zhang, and H. Xiong.
+Can large language models help experimental design for causal
+discovery?
+ArXiv
+, abs/2503.01139, 2025a.
+URL
+https://arxiv.org/abs/2503.01139
+.
+Li et al. (2025b)
+J. Li, S. Wang, Q. Zhang, F. Liu, T. Liu, L. Cao, S. Yu, and F. Chen.
+Revealing multimodal causality with large language models.
+In
+The Thirty-ninth Annual Conference on Neural Information
+Processing Systems
+, 2025b.
+Li et al. (2025c)
+L. Li, W. Xu, J. Guo, R. Zhao, X. Li, Y. Yuan, B. Zhang, Y. Jiang, Y. Xin,
+R. Dang, Y. Rong, D. Zhao, T. Feng, and L. Bing.
+Chain of ideas: Revolutionizing research via novel idea development
+with LLM agents.
+In
+Findings of the Association for Computational Linguistics:
+EMNLP 2025
+, pages 8971–9004, 2025c.
+10.18653/v1/2025.findings-emnlp.477
+.
+Li et al. (2024)
+M. Y. Li, V. Vajipey, N. D. Goodman, and E. B. Fox.
+Critical: Critic automation with language models.
+arXiv preprint arXiv:2411.06590
+, 2024.
+Li and Liu (2025)
+X.-C. Li and T. Liu.
+Efficient and trustworthy causal discovery with latent variables and
+complex relations.
+In
+The Thirteenth International Conference on Learning
+Representations
+, 2025.
+Li et al. (2025d)
+X.-C. Li, J. Wang, and T. Liu.
+Recovery of causal graph involving latent variables via homologous
+surrogates.
+In
+The Thirteenth International Conference on Learning
+Representations
+, 2025d.
+Liang et al. (2024)
+W. Liang, Y. Zhang, H. Cao, B. Wang, D. Y. Ding, X. Yang, K. Vodrahalli, S. He,
+D. S. Smith, Y. Yin, et al.
+Can large language models provide useful feedback on research papers?
+a large-scale empirical analysis.
+NEJM AI
+, 1(8):AIoa2400196, 2024.
+Liu et al. (2025)
+C. Liu, Y. Chen, T. Liu, M. Gong, J. Cheng, B. Han, and K. Zhang.
+Discovering and reasoning of causality in the hidden world with large
+language models, 2025.
+URL
+https://arxiv.org/abs/2402.03941
+.
+Liu et al. (2024)
+F. Liu, X. Tong, M. Yuan, X. Lin, F. Luo, Z. Wang, Z. Lu, and Q. Zhang.
+Evolution of heuristics: Towards efficient automatic algorithm design
+using large language model.
+In
+International Conference on Machine Learning (ICML)
+, 2024.
+Liu et al. (2026)
+Y. Liu, Z. Yang, T. Xie, J. Ni, B. Gao, Y. Li, S. Tang, W. Ouyang, E. Cambria,
+and D. Zhou.
+ResearchBench: Benchmarking LLMs in scientific discovery via
+inspiration-based task decomposition.
+In
+Findings of the Association for Computational Linguistics:
+ACL 2026
+, pages 13187–13207, 2026.
+Lu et al. (2024)
+C. Lu, C. Lu, R. T. Lange, J. Foerster, J. Clune, and D. Ha.
+The ai scientist: Towards fully automated open-ended scientific
+discovery.
+arXiv preprint arXiv:2408.06292
+, 2024.
+Lu et al. (2026)
+C. Lu, C. Lu, R. T. Lange, Y. Yamada, S. Hu, J. Foerster, D. Ha, and J. Clune.
+Towards end-to-end automation of AI research.
+Nature
+, 651(8107):914–919, 2026.
+10.1038/s41586-026-10265-5
+.
+Luo et al. (2026)
+S. Luo, Y. Huang, H. Luo, F. Liu, G. Deng, L. Li, Q. Yao, Z. Hu, J. Feng, and
+Q. Liu.
+SeaEvo: Advancing algorithm discovery with strategy space
+evolution.
+arXiv preprint arXiv:2604.24372
+, 2026.
+Lv et al. (2026)
+H. Lv, N. Lu, S. Liu, S. Zhang, and K. Tang.
+MuEvo: LLM-driven evolution of multi-heuristic ensemble.
+arXiv preprint arXiv:2608.03636
+, 2026.
+Lyu et al. (2026a)
+B. Lyu, Y. Yang, S. Huang, J. Zhang, Q. Xu, X. Li, X. Han, Y. Zhang, H. Zhang,
+R. Huang, K. Yang, Z. Chen, W. Guo, J. Yang, X. Ai, W. Chai, Y. Cao, Z. Yang,
+K. Wang, D. Jiang, H.-a. Gao, S. Tang, C. Shi, S. S. Du, M. Simchowitz,
+J. Jiao, D. Song, and C. Jin.
+MLS-Bench: A holistic and rigorous assessment of AI systems on
+building better AI.
+arXiv preprint arXiv:2605.08678
+, 2026a.
+Lyu et al. (2026b)
+Y. Lyu, X. Zhang, X. Yi, Y. Zhao, S. Guo, W. Hu, J. Piotrowski, J. Kaliski,
+J. Urbani, Z. Meng, L. Zhou, and X. Yan.
+EvoScientist: Towards multi-agent evolving AI scientists for
+end-to-end scientific discovery.
+arXiv preprint arXiv:2603.08127
+, 2026b.
+Majumder et al. (2025)
+B. P. Majumder, H. Surana, D. Agarwal, B. D. Mishra, A. Meena, A. Prakhar,
+T. Vora, T. Khot, A. Sabharwal, and P. Clark.
+DiscoveryBench: Towards data-driven discovery with large language
+models.
+In
+International Conference on Learning Representations
+(ICLR)
+, 2025.
+Mandal et al. (2025)
+I. Mandal, J. Soni, M. Zaki, M. M. Smedskjaer, K. Wondraczek, L. Wondraczek,
+N. N. Gosvami, and N. A. Krishnan.
+Evaluating large language model agents for automation of atomic force
+microscopy.
+Nature Communications
+, 16(1):9104, 2025.
+Mitchener et al. (2025)
+L. Mitchener, A. Yiu, B. Chang, M. Bourdenx, T. Nadolski, A. Sulovari, E. C.
+Landsness, D. L. Barabási, S. Narayanan, N. Evans, S. Reddy, M. S.
+Foiani, A. Kamal, L. P. Shriver, F. Cao, A. T. Wassie, J. M. Laurent,
+E. Melville-Green, M. C. Ramos, A. Bou, K. F. Roberts, S. Zagorac, T. C. Orr,
+M. E. Orr, K. J. Zwezdaryk, A. E. Ghareeb, L. McCoy, B. Gomes, E. A. Ashley,
+K. E. Duff, T. Buonassisi, T. Rainforth, R. J. Bateman, M. Skarlinski, S. G.
+Rodriques, M. M. Hinks, and A. D. White.
+Kosmos: An ai scientist for autonomous discovery.
+ArXiv
+, abs/2511.02824, 2025.
+Mooij et al. (2020)
+J. M. Mooij, S. Magliacane, and T. Claassen.
+Joint causal inference from multiple contexts.
+Journal of machine learning research
+, 21(99):1–108, 2020.
+Mouret and Clune (2015)
+J.-B. Mouret and J. Clune.
+Illuminating search spaces by mapping elites.
+arXiv preprint arXiv:1504.04909
+, 2015.
+Novikov et al. (2025)
+A. Novikov, N. Vũ, M. Eisenberger, E. Dupont, P.-S. Huang, A. Z. Wagner,
+S. Shirobokov, B. Kozlovskii, F. J. Ruiz, A. Mehrabian, et al.
+Alphaevolve: A coding agent for scientific and algorithmic discovery.
+arXiv preprint arXiv:2506.13131
+, 2025.
+OpenAI (2026a)
+OpenAI.
+Research acceleration: The view inside OpenAI.
+OpenAI blog, 6 September 2026, Sept. 2026a.
+Reports the automated research intern milestone and 3.1
+agent-workdays per human workday in the research organization.
+OpenAI (2026b)
+OpenAI.
+Ten advances in mathematics and theoretical computer science.
+https://openai.com/index/ten-advances-in-mathematics/
+, Aug.
+2026b.
+Results on ten open problems with Lean 4 formal proofs; peer review
+pending at the time of writing.
+OpenAI (2026c)
+OpenAI.
+An OpenAI model has disproved a central conjecture in discrete
+geometry.
+https://openai.com/index/model-disproves-discrete-geometry-conjecture/
+,
+May 2026c.
+Counterexample to the Erdős unit distance conjecture, verified by
+external mathematicians with a companion paper.
+Pearl (2009)
+J. Pearl.
+Causality
+.
+Cambridge university press, 2009.
+Pelleriti et al. (2026)
+N. Pelleriti et al.
+What do evolutionary coding agents evolve?
+arXiv preprint arXiv:2605.20086
+, 2026.
+Perry et al. (2022)
+R. Perry, J. Von Kügelgen, and B. Schölkopf.
+Causal discovery in heterogeneous environments under the sparse
+mechanism shift hypothesis.
+Advances in Neural Information Processing Systems
+,
+35:10904–10917, 2022.
+Plaat et al. (2025)
+A. Plaat, M. van Duijn, N. van Stein, M. Preuss, P. van der Putten, and K. J.
+Batenburg.
+Agentic large language models, a survey.
+arXiv preprint arXiv:2503.23037
+, 2025.
+Quinonero-Candela et al. (2008)
+J. Quinonero-Candela, M. Sugiyama, A. Schwaighofer, and N. D. Lawrence.
+Dataset shift in machine learning
+.
+Mit Press, 2008.
+Roch et al. (2020)
+L. M. Roch et al.
+Chemos: An orchestration software to democratize autonomous
+discovery.
+PLOS ONE
+, 15(4):e0229862, 2020.
+Romera-Paredes et al. (2024)
+B. Romera-Paredes et al.
+Mathematical discoveries from program search with large language
+models.
+Nature
+, 625:468–475, 2024.
+Rubenstein et al. (2017)
+P. K. Rubenstein, S. Weichwald, S. Bongers, J. M. Mooij, D. Janzing,
+M. Grosse-Wentrup, and B. Schölkopf.
+Causal consistency of structural equation models.
+In
+Proceedings of the Thirty-Third Conference on Uncertainty in
+Artificial Intelligence
+, 2017.
+Schölkopf et al. (2021)
+B. Schölkopf, F. Locatello, S. Bauer, N. R. Ke, N. Kalchbrenner, A. Goyal,
+and Y. Bengio.
+Toward causal representation learning.
+Proceedings of the IEEE
+, 109(5):612–634,
+2021.
+Sharma (2025)
+A. Sharma.
+Openevolve: an open-source evolutionary coding agent, 2025.
+URL
+https://github.com/algorithmicsuperintelligence/openevolve
+.
+Sheth et al. (2025)
+I. Sheth, Z. Jin, B. Wilder, D. Janzing, and M. Fritz.
+Can llms propose instrumental variables for causal reasoning?
+In
+NeurIPS 2025 Workshop on CauScien: Uncovering Causality in
+Science
+, 2025.
+Shimizu et al. (2006)
+S. Shimizu, P. O. Hoyer, A. Hyvärinen, A. Kerminen, and M. Jordan.
+A linear non-gaussian acyclic model for causal discovery.
+Journal of Machine Learning Research
+, 7(10), 2006.
+Shojaee et al. (2025a)
+P. Shojaee, K. Meidani, S. Gupta, A. Barati Farimani, and C. K. Reddy.
+LLM-SR: Scientific equation discovery via programming with large
+language models.
+In
+ICLR
+, 2025a.
+Shojaee et al. (2025b)
+P. Shojaee, N.-H. Nguyen, K. Meidani, A. B. Farimani, K. D. Doan, and C. K.
+Reddy.
+Llm-srbench: A new benchmark for scientific equation discovery with
+large language models.
+In
+ICML
+, 2025b.
+Si et al. (2026)
+C. Si, T. Hashimoto, and D. Yang.
+The ideation–execution gap: Execution outcomes of LLM-generated
+versus human research ideas.
+In
+International Conference on Learning Representations
+(ICLR)
+, 2026.
+Soare et al. (2014)
+M. Soare, A. Lazaric, and R. Munos.
+Best-arm identification in linear bandits.
+In
+Advances in Neural Information Processing Systems
+(NeurIPS)
+, 2014.
+Spirtes et al. (1995)
+P. Spirtes, C. Meek, and T. Richardson.
+Causal inference in the presence of latent variables and selection
+bias.
+In
+Proceedings of the Eleventh conference on Uncertainty in
+artificial intelligence
+, pages 499–506, 1995.
+Spirtes et al. (2000)
+P. Spirtes, C. N. Glymour, and R. Scheines.
+Causation, prediction, and search
+.
+MIT press, 2000.
+Starace et al. (2025)
+G. Starace, O. Jaffe, D. Sherburn, J. Aung, J. S. Chan, L. Maksin, R. Dias,
+E. Mays, B. Kinsella, W. Thompson, et al.
+Paperbench: Evaluating ai’s ability to replicate ai research.
+In
+Proceedings of the 42nd International Conference on Machine
+Learning
+, volume 267, pages 56843–56873, 2025.
+Šurina et al. (2025)
+A. Šurina, A. Mansouri, L. C. P. M. Quaedvlieg, A. Seddas, M. Viazovska,
+E. Abbe, and C. Gulcehre.
+Algorithm discovery with LLMs: Evolutionary search meets
+reinforcement learning.
+In
+Conference on Language Modeling (COLM)
+, 2025.
+arXiv:2504.05108.
+Swanson et al. (2025)
+K. Swanson, W. Wu, N. L. Bulaong, J. E. Pak, and J. Zou.
+The virtual lab of ai agents designs new sars-cov-2 nanobodies.
+Nature
+, 646(8085):716–723, 2025.
+Tie et al. (2025)
+G. Tie, P. Zhou, and L. Sun.
+A survey of AI scientists.
+arXiv preprint arXiv:2510.23045
+, 2025.
+Tom et al. (2024)
+G. Tom, S. P. Schmid, S. G. Baird, Y. Cao, K. Darvish, H. Hao, S. Lo,
+S. Pablo-García, E. M. Rajaonson, M. Skreta, et al.
+Self-driving laboratories for chemistry and materials science.
+Chemical Reviews
+, 124(16):9633–9732,
+2024.
+Truhn et al. (2026)
+D. Truhn, S. Azizi, J. Zou, L. Cerda-Alberich, F. Mahmood, and J. N. Kather.
+Artificial intelligence agents in cancer research and oncology.
+Nature Reviews Cancer
+, 26(4):256–269,
+2026.
+Volkov et al. (2026)
+V. Volkov, V. Khrulkov, A. V. Galichin, D. Sivtsov, N. Glazkov, O. Volkova,
+K. Pchelin, I. Bespalov, D. V. Dylov, P. Anokhin, and I. Oseledets.
+EvoMem: Memory-augmented evolution for code optimization.
+arXiv preprint arXiv:2608.10795
+, 2026.
+Wallace et al. (2026)
+D. Wallace, C. Griffin, S. O’Neill, T. Luong, and O. Larter.
+Conjecture machines: AI agents and the new validation bottleneck in
+science.
+Google DeepMind,
+https://deepmind.google/public-policy/conjecture-machines-ai-agents-and-the-new-validation-bottleneck-in-science/
+,
+July 2026.
+Wallace (1981)
+W. Wallace.
+Causality and Scientific Explanation
+.
+Number v. 2 in Causality and Scientific Explanation. University Press
+of America, 1981.
+ISBN 9780819114815.
+Wan et al. (2026)
+H. Wan, C. Yang, J. Yu, M. Tu, J. Lu, D. Yu, J. Cao, B. Gao, J. Xie, A. Wang,
+et al.
+Deepresearch arena: The first exam of llms’ research abilities via
+seminar-grounded tasks.
+In
+Proceedings of the AAAI Conference on Artificial
+Intelligence
+, volume 40, pages 33341–33349, 2026.
+Wang et al. (2025a)
+H. Wang, Y. He, P. P. Coelho, M. Bucci, A. Nazir, B. Chen, L. T. Trinh,
+S. Zhang, Z. Lu, K. Huang, et al.
+SpatialAgent: An autonomous AI agent for spatial biology.
+bioRxiv
+, 2025a.
+10.1101/2025.04.03.646459
+.
+Wang et al. (2024)
+Q. Wang, D. Downey, H. Ji, and T. Hope.
+Scimon: Scientific inspiration machines optimized for novelty.
+In
+Proceedings of the 62nd Annual Meeting of the Association
+for Computational Linguistics (Volume 1: Long Papers)
+, pages 279–299, 2024.
+Wang et al. (2025b)
+W. Wang, P. Piękos, L. Nanbo, F. Laakom, Y. Chen, M. Ostaszewski,
+M. Zhuge, and J. Schmidhuber.
+Huxley-Gödel Machine: Human-level coding agent development by
+an approximation of the optimal self-improving machine.
+arXiv preprint arXiv:2510.21614
+, 2025b.
+Wang et al. (2026)
+Y. Wang, S.-R. Su, Z. Zeng, E. Xu, L. Ren, X. Yang, Z. Huang, X. He, L. Ma,
+B. Peng, H. Cheng, P. He, W. Chen, S. Wang, S. S. Du, and Y. Shen.
+Thetaevolve: Test-time learning on open problems.
+In
+International Conference on Machine Learning (ICML)
+, 2026.
+arXiv:2511.23473.
+Wang et al. (2025c)
+Z. Wang, B. Danek, and J. Sun.
+Biodsa-1k: Benchmarking data science agents for biomedical research.
+arXiv preprint arXiv:2505.16100
+, 2025c.
+Woodruff et al. (2026)
+D. P. Woodruff, V. Cohen-Addad, L. Jain, J. Mao, S. Zuo, M. Bateni,
+S. Brânzei, M. P. Brenner, L. Chen, Y. Feng, L. Fortnow, G. Fu, Z. Guan,
+Z. Hadizadeh, M. T. Hajiaghayi, M. JafariRaviz, A. Javanmard, Karthik C.
+S., K. ichi Kawarabayashi, R. Kumar, S. Lattanzi, E. Lee, Y. Li,
+I. Panageas, D. Paparas, B. Przybocki, B. Subercaseaux, O. Svensson,
+S. Taherijam, X. Wu, E. Yogev, M. Zadimoghaddam, S. Zhou, Y. Matias,
+J. Manyika, and V. S. Mirrokni.
+Accelerating scientific research with gemini: Case studies and common
+techniques.
+ArXiv
+, abs/2602.03837, 2026.
+Wu et al. (2026)
+Y. Wu, D. Fu, W. Si, Z. Huang, M. Jiang, K. Li, S. Xia, J. Sun, T. Xu, Y. Xiao,
+P. Lu, X. Cai, L. Ye, W. Zhu, X. Hu, and P. Liu.
+InnovatorBench: Evaluating agents’ ability to conduct innovative
+AI research.
+In
+ICLR
+, 2026.
+arXiv:2510.27598.
+Yamada et al. (2025)
+Y. Yamada, R. T. Lange, C. Lu, S. Hu, C. Lu, J. Foerster, J. Clune, and D. Ha.
+The ai scientist-v2: Workshop-level automated scientific discovery
+via agentic tree search.
+arXiv preprint arXiv:2504.08066
+, 2025.
+Yang et al. (2026a)
+C. Yang, J. Lu, H. Wan, J. Yu, and F. Qin.
+From what to why: A multi-agent system for evidence-based chemical
+reaction condition reasoning.
+In
+ICLR
+, 2026a.
+Yang et al. (2026b)
+J. Yang, C. Jiang, Y. Fu, T. Luo, C. Ren, W. Wang, K. Zhao, H. Liu, Y. Zuo,
+Y. Wang, et al.
+Frontis-ma1: Training an ai4ai model towards recursive
+self-improvement in machine learning engineering.
+arXiv preprint arXiv:2607.28568
+, 2026b.
+Yang et al. (2018)
+K. Yang, A. Katcoff, and C. Uhler.
+Characterizing and learning equivalence classes of causal dags under
+interventions.
+In
+International Conference on Machine Learning
+, pages
+5541–5550. PMLR, 2018.
+Yang et al. (2024)
+Z. Yang, X. Du, J. Li, J. Zheng, S. Poria, and E. Cambria.
+Large language models for automated open-domain scientific hypotheses
+discovery.
+In
+Findings of the Association for Computational Linguistics:
+ACL 2024
+, pages 13545–13565, 2024.
+Yang et al. (2025)
+Z. Yang, W. Liu, B. Gao, T. Xie, Y. Li, W. Ouyang, S. Poria, E. Cambria, and
+D. Zhou.
+Moose-chem: Large language models for rediscovering unseen chemistry
+scientific hypotheses.
+In
+ICLR
+, 2025.
+Ye et al. (2024)
+H. Ye, J. Wang, Z. Cao, F. Berto, C. Hua, H. Kim, J. Park, and G. Song.
+ReEvo: Large language models as hyper-heuristics with reflective
+evolution.
+In
+Advances in Neural Information Processing Systems
+(NeurIPS)
+, volume 37, pages 43571–43608, 2024.
+Yu et al. (2025a)
+C. Yu, R. Liang, C.-T. Ho, and H. Ren.
+Autonomous code evolution meets NP-completeness.
+arXiv preprint arXiv:2509.07367
+, 2025a.
+Yu et al. (2025b)
+Z. Yu, K. Feng, Y. Zhao, S. He, X.-P. Zhang, and A. Cohan.
+AlphaResearch: Accelerating new algorithm discovery with language
+models.
+arXiv preprint arXiv:2511.08522
+, 2025b.
+Yuksekgonul et al. (2026)
+M. Yuksekgonul, D. Koceja, X. Li, F. Bianchi, J. McCaleb, X. Wang, J. Kautz,
+Y. Choi, J. Zou, C. Guestrin, and Y. Sun.
+Learning to discover at test time.
+In
+International Conference on Machine Learning (ICML)
+, 2026.
+arXiv:2601.16175.
+Zhang et al. (2026)
+J. Zhang, S. Hu, C. Lu, R. T. Lange, and J. Clune.
+Darwin gödel machine: Open-ended evolution of self-improving
+agents.
+In
+International Conference on Learning Representations
+(ICLR)
+, 2026.
+arXiv:2505.22954.
+Zhang et al. (2025)
+S. Zhang, S. Yang, T. Xie, X. Xue, Z. Hu, R. Li, W. Qu, Z. Yin, T. Fu, D. Hu,
+et al.
+Position: Intelligent science laboratory requires the integration of
+cognitive and embodied ai.
+arXiv preprint arXiv:2506.19613
+, 2025.
+Zheng et al. (2025a)
+T. Zheng, Z. Deng, H. T. Tsang, W. Wang, J. Bai, Z. Wang, and Y. Song.
+From automation to autonomy: A survey on large language models in
+scientific discovery.
+In
+Proceedings of the 2025 Conference on Empirical Methods in
+Natural Language Processing
+, pages 17733–17750, 2025a.
+Zheng et al. (2026)
+T. Zheng, K. K.-W. Tam, N. H.-N. K. Nguyen, B. Xu, Z. Wang, J. Cheng, H. T.
+Tsang, W. Wang, J. Bai, T. Fang, Y. Song, G. Y. Wong, and S. See.
+NewtonBench: Benchmarking generalizable scientific law discovery in
+LLM agents.
+In
+ICLR
+, 2026.
+arXiv:2510.07172.
+Zheng et al. (2025b)
+Z. Zheng, Z. Xie, Z. Wang, and B. Hooi.
+Monte carlo tree search for comprehensive exploration in LLM-based
+automatic heuristic design.
+In
+International Conference on Machine Learning (ICML)
+,
+2025b.
+arXiv:2501.08603.
+Zhou et al. (2025)
+L. Zhou, H. Ling, C. Fu, Y. Huang, M. Sun, W. Yu, X. Wang, X. Li, X. Su,
+J. Zhang, X. Chen, C. Liang, X. Qian, H. Ji, W. Wang, M. Zitnik, and S. Ji.
+Autonomous agents for scientific discovery: Orchestrating scientists,
+language, code, and physics.
+ArXiv
+, abs/2510.09901, 2025.
+Zhu et al. (2022)
+Q. Zhu, F. Zhang, Y. Huang, H. Xiao, L. Zhao, X. Zhang, T. Song, X. Tang,
+X. Li, G. He, et al.
+An all-round ai-chemist with a scientific mind.
+National Science Review
+, 9(10):nwac190,
+2022.
+Appendix A
+Limitations and Future directions
+Due to the resource constraints, the tasks studied in this work remain limited to small-scale verification and are relatively simple. There remains a broader scope of scientific problems to be explored where verification signals can be expensive, such as biology, medicine, etc.. Meanwhile, the factor discovery can also be guided with additional background knowledge of the task.
+Appendix B
+Related Work
+In this section, we present more detailed discussions of related works in the literature.
+AI Scientist agents.
+With the significant advancement in LLM capacity and the development of agentic systems, a rising number of works develop agents to help scientific discovery
+(
+Zheng et al., 2025a
+;
+Zhou et al., 2025
+;
+Tie et al., 2025
+)
+. Some systems automate the whole research workflow, from idea generation to experimentation and paper writing
+(
+Lu et al., 2026
+;
+Yamada et al., 2025
+;
+Gottweis et al., 2026
+;
+Ghareeb et al., 2026
+;
+Mitchener et al., 2025
+;
+Feng et al., 2026b
+;
+Lyu et al., 2026b
+)
+. One research line automates specific scientific activities, including literature review and deep research
+(
+Asai et al., 2026
+;
+Huang et al., 2025b
+)
+, hypothesis generation
+(
+Li et al., 2025c
+;
+Yang et al., 2024
+;
+Wang et al., 2024
+;
+Yang et al., 2025
+)
+, hypothesis verification
+(
+Li et al., 2024
+;
+Huang et al., 2025a
+)
+, and feedback on scientific papers
+(
+Liang et al., 2024
+)
+. Another line targets data-driven discovery and machine learning engineering
+(
+Majumder et al., 2025
+;
+Wang et al., 2025c
+;
+Jing et al., 2025
+;
+Chan et al., 2025
+)
+, as well as embodied agents in self-driving laboratories that conduct real-world experiments
+(
+Roch et al., 2020
+;
+Zhu et al., 2022
+;
+Tom et al., 2024
+;
+Zhang et al., 2025
+;
+Mandal et al., 2025
+)
+. A growing set of benchmarks evaluates the research abilities of these agents, e.g., replicating and conducting AI research
+(
+Starace et al., 2025
+;
+Wu et al., 2026
+;
+Lyu et al., 2026a
+)
+, generating hypotheses from inspirations
+(
+Liu et al., 2026
+)
+, discovering scientific laws and equations
+(
+Zheng et al., 2026
+;
+Shojaee et al., 2025b
+)
+, and conducting research tasks in biology
+(
+Laurent et al., 2024
+)
+, together with broader evaluations of research abilities
+(
+Wan et al., 2026
+)
+. These lines of work have made impact in mathematics
+(
+OpenAI, 2026c
+;
+OpenAI, 2026b
+;
+Bubeck et al., 2025
+;
+Woodruff et al., 2026
+)
+, chemistry
+(
+Yang et al., 2026a
+;
+Boiko et al., 2023
+)
+, materials science
+(
+Ghafarollahi and Buehler, 2025
+)
+, earth science
+(
+Feng et al., 2026a
+)
+, biology
+(
+Swanson et al., 2025
+;
+Wang et al., 2025a
+;
+Truhn et al., 2026
+;
+Anthropic, 2026
+)
+, and the development of LLMs themselves
+(
+Karpathy, 2026
+;
+OpenAI, 2026a
+;
+Favaro and Clark, 2026
+)
+. As generation scales up, validating the generated hypotheses becomes the main cost
+(
+Wallace et al., 2026
+)
+, and ideas that look promising often degrade once executed
+(
+Si et al., 2026
+)
+, which motivates us to study how to reuse experience to reduce the evaluations needed in evolutionary discovery.
+Evolutionary coding agents.
+FunSearch
+(
+Romera-Paredes et al., 2024
+)
+pairs an LLM with an evaluator and a program database to discover new constructions in extremal combinatorics, and
+AlphaEvolve
+(
+Novikov et al., 2025
+)
+extends the loop to full codebases with an ensemble of LLMs, with applications to a large set of mathematical problems
+(
+Georgiev et al., 2025
+)
+. Follow-up frameworks improve the search process: OpenEvolve provides an open-source implementation
+(
+Sharma, 2025
+)
+;
+ShinkaEvolve
+improves sample efficiency with parent sampling, novelty rejection, bandit-based LLM selection, and a meta-scratchpad that summarizes insights of recent programs
+(
+Lange et al., 2026
+)
+; CodeEvolve and GigaEvo maintain diversity with island models and quality-diversity archives
+(
+Assumpção et al., 2025
+;
+Khrulkov et al., 2025
+)
+; MCTS-AHD organizes heuristics in a Monte Carlo search tree
+(
+Zheng et al., 2025b
+)
+; and AdaEvolve adapts search intensity and resource allocation from the history of improvements
+(
+Cemri et al., 2026
+)
+. The paradigm has also been applied to equation discovery
+(
+Shojaee et al., 2025a
+)
+and systems research
+(
+Cheng et al., 2025
+)
+.
+SCS
+shows that simply conditioning on previous solutions is competitive with more elaborate pipelines
+(
+Gideoni et al., 2026
+)
+, which we adopt as the backbone and main baseline. Classical evolutionary computation also reuses experience through credit assignment over predefined units: adaptive operator selection allocates budget across operators with multi-armed bandits
+(
+Da Costa et al., 2008
+)
+, quality-diversity methods maintain elites across behavior niches
+(
+Mouret and Clune, 2015
+)
+or search for novelty alone
+(
+Lehman and Stanley, 2011
+)
+, and MuEvo revises the priorities of heuristic components with short-budget probing
+(
+Lv et al., 2026
+)
+. In
+ExpEvolve
+, the units receiving credit are ideas discovered during the search, and plateau handling targets the ideas shared by top programs.
+Learned mutators and self-improving agents.
+Another line trains the LLM mutator with reinforcement learning, either during evolution
+(
+Šurina et al., 2025
+)
+or at test time on a single problem
+(
+Wang et al., 2026
+;
+Yuksekgonul et al., 2026
+)
+, where experience is stored in model weights. Self-improving agents such as the Darwin Gödel Machine and the Huxley-Gödel Machine evolve the code of the agent itself
+(
+Zhang et al., 2026
+;
+Wang et al., 2025b
+)
+, SATLUTION evolves a solver repository together with its own rulebase
+(
+Yu et al., 2025a
+)
+, and AlphaResearch alternates between idea proposal and program verification
+(
+Yu et al., 2025b
+)
+. These directions are orthogonal to ours, which uses a fixed LLM and a fixed harness.
+Causality for scientific discovery.
+There is a long history of discussions on how to understand the world through observations
+(
+Greenland et al., 1999
+;
+Spirtes et al., 2000
+;
+Pearl, 2009
+)
+. One research line is causal discovery, which learns the causal structure among variables from observational data under assumptions such as conditional independence or constrained functional forms
+(
+Spirtes et al., 1995
+;
+Shimizu et al., 2006
+;
+Hoyer et al., 2008
+)
+, from interventional data and data of multiple domains
+(
+Yang et al., 2018
+;
+Brouillard et al., 2020
+;
+Mooij et al., 2020
+;
+Huang et al., 2020
+;
+Perry et al., 2022
+)
+, and in the presence of latent variables
+(
+Li et al., 2025d
+;
+Li and Liu, 2025
+)
+, while experiment design selects the interventions that make the causal structure identifiable
+(
+Hyttinen et al., 2013
+;
+Li et al., 2025a
+)
+. Recently, LLMs have been used to construct structured variables out of unstructured data
+(
+Liu et al., 2025
+;
+Li et al., 2025b
+)
+, to estimate treatment effects from unstructured data
+(
+Dhawan et al., 2024
+)
+, and to propose instrumental variables
+(
+Sheth et al., 2025
+)
+. Compared with these works, the variables in
+ExpEvolve
+, i.e., ideas, are constructed from unstructured programs, and are evaluated through interventions that the search itself chooses adaptively; Sec.
+3.2
+characterizes what such an archive can identify.
+Appendix C
+A Causal View of the Formulation
+In this section, we present a more detailed discussion of the causal view of evolutionary discovery in Sec.
+3.1
+.
+C.1
+Formulation of Scientific Discovery
+Scientific discovery aims to uncover the underlying scientific knowledge or the causal mechanisms from interactions with the world
+(
+Kuhn and Hawkins, 1963
+)
+, which can be formulated as a Partially Observed Markov Decision Process (POMDP)
+(
+Kaelbling et al., 1998
+)
+(Fig.
+10
+).
+The AI Scientist Agent
+Scratchpad Memory
+(
+m
+t
+→
+m
+t
++
+1
+m_{t}\to m_{t+1}
+)
+"Integrate evidence"
+Propose Candidate
+Program
+(
+p
+t
+p_{t}
+)
+"Triggers experiment"
+Observe Outcome
+(
+y
+t
+y_{t}
+)
+"Yielding outcome"
+θ
+sci
+\theta_{\mathrm{sci}}
+Guide
+Execute
+Provide Evidence
+m
+t
++
+1
+m_{t+1}
+p
+t
++
+1
+p_{t+1}
+y
+t
++
+1
+y_{t+1}
+m
+t
+m_{t}
+p
+t
+p_{t}
+y
+t
+y_{t}
+m
+t
++
+2
+m_{t+2}
+p
+t
++
+2
+p_{t+2}
+y
+t
++
+2
+y_{t+2}
+θ
+sci
+\theta_{\mathrm{sci}}
+t
+t
+t
++
+1
+t+1
+t
++
+2
+t+2
+⋯
+\cdots
+⋯
+\cdots
+Figure 10:
+The iterative scientific discovery loop.
+Left:
+Conceptual flow of the agent. The agent maintains a scratchpad memory (
+m
+m
+), proposes a program (
+p
+p
+), and observes the outcome (
+y
+y
+) which is constrained by the unknown world state (
+θ
+sci
+\theta_{\mathrm{sci}}
+). The outcome feeds back into the memory for the next step.
+Right:
+The diagram illustrates how the AI Scientist probes the unknown world state
+θ
+sci
+\theta_{\mathrm{sci}}
+. By proposing a candidate program
+p
+t
+p_{t}
+, the agent triggers an experiment yielding outcome
+y
+t
+y_{t}
+. This observation provides evidence about
+θ
+sci
+\theta_{\mathrm{sci}}
+, which is integrated into the agent’s scratchpad memory
+m
+t
++
+1
+m_{t+1}
+. Over time steps
+t
+,
+t
++
+1
+,
+…
+t,t+1,\dots
+, this recurrent process allows the agent to navigate the performance landscape and converge towards optimal programs despite the static but unknown nature of
+θ
+sci
+\theta_{\mathrm{sci}}
+.
+Scientific knowledge.
+The primary objective of an AI Scientist is to uncover the
+underlying scientific knowledge
+about the task-world, represented by a latent variable
+Θ
+sci
+∈
+Θ
+\Theta_{\mathrm{sci}}\in\Theta
+, where
+Θ
+\Theta
+may encode causal structure, mechanisms, inductive biases, constraints, etc. Specifically,
+Θ
+sci
+=
+θ
+sci
+\Theta_{\mathrm{sci}}=\theta_{\mathrm{sci}}
+can be parameterized as a Structural Causal Model (SCM)
+θ
+sci
+=
+(
+𝒢
+,
+ℱ
+,
+P
+U
+)
+\theta_{\mathrm{sci}}=(\mathcal{G},\mathcal{F},P_{U})
+(
+Spirtes et al., 2000
+)
+, where
+𝒢
+=
+(
+V
+,
+E
+)
+\mathcal{G}=(V,E)
+is a directed graph whose nodes
+V
+V
+represent variables of interest and whose edges
+E
+E
+encode direct causal dependencies;
+ℱ
+=
+{
+f
+v
+}
+v
+∈
+V
+\mathcal{F}=\{f_{v}\}_{v\in V}
+is a collection of structural equations
+v
+=
+f
+v
+​
+(
+Pa
+⁡
+(
+v
+)
+,
+u
+v
+)
+v=f_{v}(\mathrm{Pa}(v),u_{v})
+, where
+Pa
+⁡
+(
+v
+)
+\mathrm{Pa}(v)
+denotes the parents of
+v
+v
+in
+𝒢
+\mathcal{G}
+and
+u
+v
+u_{v}
+is an exogenous noise variable;
+P
+U
+P_{U}
+is a distribution over the exogenous variables
+U
+=
+{
+u
+v
+}
+v
+∈
+V
+U=\{u_{v}\}_{v\in V}
+.
+Evaluation as intervention on SCM.
+Given the SCM parametrization of
+θ
+sci
+\theta_{\mathrm{sci}}
+, we can consider that a program
+p
+∈
+𝒫
+p\in\mathcal{P}
+is encoded as a particular configuration of design variables
+X
+=
+x
+p
+X=x_{p}
+. Then,
+F
+F
+can be implemented as
+F
+(
+p
+;
+θ
+sci
+)
+:=
+𝔼
+[
+Y
+|
+do
+(
+X
+=
+x
+p
+)
+,
+θ
+sci
+]
+,
+F(p;\theta_{\mathrm{sci}}):=\mathbb{E}\big[\,Y\,\big|\,\mathrm{do}(X=x_{p}),\,\theta_{\mathrm{sci}}\big],
+i.e., the expected outcome under the intervention
+do
+⁡
+(
+X
+=
+x
+p
+)
+\mathrm{do}(X=x_{p})
+in the true causal model
+θ
+sci
+\theta_{\mathrm{sci}}
+.
+Typical implementations of
+F
+F
+can be the objective value of a combinatorial optimization problem, the efficiency of a kernel program, or the performance of a machine learning model
+(
+Novikov et al., 2025
+)
+.
+Belief as revealed knowledge.
+As in Sec.
+3.1
+, the AI Scientist maintains a memory
+m
+t
+=
+Φ
+⁡
+(
+h
+t
+)
+m_{t}=\Phi(h_{t})
+as an approximate belief about
+θ
+sci
+\theta_{\mathrm{sci}}
+. Each evaluation step
+(
+p
+t
+,
+y
+t
+)
+(p_{t},y_{t})
+thus updates
+m
+t
+m_{t}
+, which in turn updates the agent’s effective belief about
+θ
+sci
+\theta_{\mathrm{sci}}
+. In this sense, each step
+reveals part of the underlying scientific knowledge
+, which in turn determines the next action
+p
+t
++
+1
+p_{t+1}
+.
+C.2
+Ideas and Causal Representation Learning
+Ideas as high-level causal variables.
+In the SCM view above, a program specifies a configuration
+x
+p
+x_{p}
+of design variables
+X
+X
+, which are low-level and high-dimensional, e.g., every line of the code. An idea
+z
+z
+(Definition
+3.2
+) is a function of the program, and hence of
+x
+p
+x_{p}
+, that summarizes the design variables at a higher level. A faithful idea representation (Sec.
+3.2
+) requires that
+𝔼
+[
+Y
+∣
+do
+(
+X
+=
+x
+p
+)
+,
+θ
+sci
+]
+\mathbb{E}[Y\mid\mathrm{do}(X=x_{p}),\theta_{\mathrm{sci}}]
+depends on
+x
+p
+x_{p}
+only through
+Z
+⁡
+(
+p
+)
+Z(p)
+, i.e., interventions on the design variables that keep all ideas fixed leave the expected outcome unchanged. Hence, an intervention on the ideas is well defined at the level of expected outcomes. This condition is related to causal feature learning
+(
+Chalupka et al., 2015
+)
+, which constructs macro-level causal variables by grouping the micro-level states that induce the same outcome distribution under intervention, and to causal abstraction
+(
+Rubenstein et al., 2017
+)
+, which studies when a high-level causal model is consistent with a low-level one. Faithfulness is a mean-level version of these conditions, restricted to the score of interest.
+Relation to causal representation learning.
+Causal representation learning (CRL) aims to recover high-level causal variables from low-level observations
+(
+Schölkopf et al., 2021
+)
+, where identifiability usually relies on additional information such as interventions on the latent variables
+(
+Ahuja et al., 2023
+)
+. Ideas can be viewed as the high-level causal variables of programs, and the two settings differ in three aspects. (i) In CRL, the representation is usually an encoder learned from the observations, while an idea is an interpretable function of the program that an LLM can annotate, similar to how LLMs construct high-level variables from unstructured data
+(
+Liu et al., 2025
+;
+Li et al., 2025b
+)
+. (ii) CRL usually aims to recover all latent variables, while ideas only need to be faithful to the score. (iii) The agent decides which programs to evaluate, and an edit that changes one idea and keeps the others fixed acts as an intervention on that idea, although an LLM edit may also change other ideas. Theorem
+3.3
+shows that when the evaluated programs do not vary the candidate ideas, the ideas that matter cannot be identified from the scores.
+C.3
+Essentiality of Causal Knowledge for AI Scientists
+If the evaluation revealed the scientific knowledge completely, then with more experiment turns, the agent’s revealed scientific knowledge would converge to
+θ
+sci
+\theta_{\mathrm{sci}}
+.
+However, the observation from the evaluation is usually only a proxy of the scientific knowledge
+Θ
+sci
+\Theta_{\mathrm{sci}}
+: each evaluation returns a scalar score of the program that the agent chooses to evaluate.
+Different hypotheses about
+θ
+sci
+\theta_{\mathrm{sci}}
+, e.g., ones under which different ideas determine the score, can produce the same scores on all evaluated programs.
+For example, if all evaluated programs in circle packing share the same initialization and the same refinement, the scores cannot tell which of the two accounts for the performance.
+Therefore, the causal knowledge often cannot be identified from the scores of the programs explored so far, and it is essential for an AI Scientist to explore sufficiently, i.e., to evaluate programs that distinguish the competing hypotheses.
+We denote by
+e
+src
+e_{\mathrm{src}}
+the environment in which the evaluation is conducted.
+Definition C.1
+(Causal AI Scientist)
+.
+A
+Causal AI Scientist
+is an agent specified by:
+(i) a policy
+π
+t
+(
+⋅
+∣
+θ
+t
+,
+e
+src
+)
+\pi_{t}(\cdot\mid\theta_{t},e_{\mathrm{src}})
+selecting
+p
+t
+p_{t}
+,
+(ii) a counterfactual / explanatory operator
+CF
+\mathrm{CF}
+, that answer interventional queries
+(
+e
+,
+p
+)
+(e,p)
+via
+CF
+⁡
+(
+θ
+t
+,
+e
+,
+p
+)
+\mathrm{CF}(\theta_{t};e,p)
+as an “explanation” of predicted performance, where
+θ
+t
+\theta_{t}
+is the knowledge revealed at turn
+t
+t
+.
+Without the revealing of the causal knowledge, the discovery process suffers from significant inefficiency and suboptimality issues. We discuss the two issues more concretely below.
+Evolutionary efficiency of Causal AI Scientist.
+The efficiency issue is characterized by Theorem
+3.1
+. In the linear setting of Theorem
+3.1
+, a Causal AI Scientist can be implemented via estimating the
+w
+⋆
+w^{\star}
+and optimizing for
+p
+^
+\hat{p}
+from the history, while the black-box baseline does not consider the interactions between the historical observations.
+Theorem
+3.1
+shows that, when
+K
+≫
+d
+K\gg d
+, which is usually the case as the space for all programs is significantly larger than the underlying SCM, encoding (correct) causal structure, e.g., a faithful idea representation, yields an exponential (or at least multiplicative) gain in sample efficiency under finite budgets. For example, if
+K
+K
+grows exponentially with
+d
+d
+, e.g.,
+K
+=
+2
+d
+K=2^{d}
+, the upper bound in Theorem
+3.1
+grows polynomially in
+d
+d
+, as
+O
+⁡
+(
+d
+⁡
+(
+d
++
+log
+⁡
+1
+δ
+)
+​
+σ
+2
+ϵ
+2
+)
+O\big(d\,(d+\log\frac{1}{\delta})\frac{\sigma^{2}}{\epsilon^{2}}\big)
+, while the lower bound for the black-box baseline grows exponentially in
+d
+d
+, as
+Ω
+⁡
+(
+2
+d
+​
+log
+⁡
+1
+δ
+​
+σ
+2
+ϵ
+2
+)
+\Omega\big(2^{d}\log\frac{1}{\delta}\frac{\sigma^{2}}{\epsilon^{2}}\big)
+.
+Sufficient exploration of Causal AI Scientist.
+The suboptimality issue is characterized by Theorem
+3.3
+.
+Let
+S
+⊆
+𝒫
+S\subseteq\mathcal{P}
+be the set of programs evaluated by the agent. Two hypotheses
+θ
+0
+\theta_{0}
+and
+θ
+1
+\theta_{1}
+can be distinguished from the history only if their observation models differ on some program in
+S
+S
+; otherwise, the history has the same distribution under both hypotheses.
+Under the idea-level mechanisms in Theorem
+3.3
+, i.e.,
+F
+⁡
+(
+p
+,
+θ
+i
+)
+=
+g
+⁡
+(
+Z
+⁡
+(
+p
+)
+,
+z
+i
+​
+(
+p
+)
+)
+F(p;\theta_{i})=g(Z(p),z_{i}(p))
+for
+i
+∈
+{
+0
+,
+1
+}
+i\in\{0,1\}
+, the two hypotheses agree on every program where
+z
+0
+z_{0}
+and
+z
+1
+z_{1}
+agree, so only the programs where the two ideas differ can distinguish them.
+Intuitively, Theorem
+3.3
+implies that if the evaluated programs do not distinguish the corresponding
+θ
+sci
+\theta_{\mathrm{sci}}
+among
+{
+θ
+0
+,
+θ
+1
+}
+\{\theta_{0},\theta_{1}\}
+, then the solution
+p
+^
+\hat{p}
+incurs an expected regret of at least
+Δ
+/
+2
+\Delta/2
+under one of them, regardless of the budget.
+This situation is common in evolutionary search: as the search concentrates around its current best programs, the ideas shared by these programs stop varying among the evaluated programs, and the scores cannot tell whether these ideas are the ones that matter.
+Hence, a Causal AI Scientist needs to explore the programs in which the competing ideas differ, so that the scores can distinguish the hypotheses.
+This barrier can be removed by exploration within the same evaluator, which differs from the transfer across environments discussed below.
+C.4
+Transfer of Scientific Knowledge across Environments
+Beyond a single evaluator, the revealed scientific knowledge is also expected to transfer to other environments.
+If the objective function
+F
+F
+is static universally, then with more experiment turns, the optimized solution
+p
+t
+p_{t}
+and the agent’s revealed scientific knowledge can also be applied universally.
+However, the evaluation is usually conducted at some specific environment
+e
+∈
+ℰ
+e\in\mathcal{E}
+, which only gives a proxy knowledge
+θ
+e
+\theta_{e}
+about the scientific knowledge
+Θ
+sci
+\Theta_{\text{sci}}
+.
+For example, the performance of a machine learning model is usually assessed on finite samples from the test distribution, and there also exist distribution shifts from the test distribution when deploying the model in the real world
+(
+Quinonero-Candela et al., 2008
+)
+.
+Different from
+Θ
+sci
+\Theta_{\mathrm{sci}}
+that characterizes the complete causal structure about the scientific problem, optimization under environment
+θ
+e
+\theta_{e}
+may introduce some spurious correlations that maximize the objective value
+F
+e
+F_{e}
+(
+Chen et al., 2023
+)
+.
+Therefore, to retain the optimality of
+p
+^
+\hat{p}
+beyond the source environment
+e
+src
+e_{\mathrm{src}}
+to some target
+e
+tgt
+e_{\mathrm{tgt}}
+, it is essential to reveal the causal knowledge and answer causal questions for an AI Scientist, e.g., through the operator
+CF
+\mathrm{CF}
+in Definition
+C.1
+. Let
+P
+e
+(
+⋅
+∣
+p
+,
+θ
+)
+P_{e}(\cdot\mid p,\theta)
+denote the observation model of the evaluator in environment
+e
+e
+, with mean
+F
+e
+​
+(
+p
+,
+θ
+)
+F_{e}(p;\theta)
+. We have the following:
+Theorem C.2
+.
+Consider
+e
+src
+,
+e
+tgt
+∈
+ℰ
+e_{\mathrm{src}},e_{\mathrm{tgt}}\in\mathcal{E}
+and
+θ
+0
+,
+θ
+1
+∈
+Θ
+\theta_{0},\theta_{1}\in\Theta
+such that
+P
+e
+src
+(
+⋅
+∣
+p
+,
+θ
+0
+)
+=
+P
+e
+src
+(
+⋅
+∣
+p
+,
+θ
+1
+)
+P_{e_{\mathrm{src}}}(\cdot\mid p,\theta_{0})=P_{e_{\mathrm{src}}}(\cdot\mid p,\theta_{1})
+for all
+p
+∈
+𝒫
+p\in\mathcal{P}
+, and the optimal programs in
+e
+tgt
+e_{\mathrm{tgt}}
+under
+θ
+0
+\theta_{0}
+and
+θ
+1
+\theta_{1}
+are different and unique, each better than all other programs by at least
+Δ
+>
+0
+\Delta>0
+. Then for any policy
+π
+\pi
+that can interact only with
+e
+src
+e_{\mathrm{src}}
+, there exists
+i
+∈
+{
+0
+,
+1
+}
+i\in\{0,1\}
+such that for every budget
+T
+T
+,
+𝔼
+⁡
+[
+max
+p
+∈
+𝒫
+⁡
+F
+e
+tgt
+​
+(
+p
+,
+θ
+i
+)
+−
+F
+e
+tgt
+​
+(
+p
+^
+,
+θ
+i
+)
+]
+≥
+Δ
+/
+2
+\mathbb{E}\big[\max_{p\in\mathcal{P}}F_{e_{\mathrm{tgt}}}(p;\theta_{i})-F_{e_{\mathrm{tgt}}}(\hat{p};\theta_{i})\big]\geq\Delta/2
+.
+The formal description and the proof are given in Appendix
+G
+.
+Intuitively, Theorem
+C.2
+implies that if the source environment does not distinguish the corresponding
+θ
+sci
+\theta_{\mathrm{sci}}
+among
+{
+θ
+0
+,
+θ
+1
+}
+\{\theta_{0},\theta_{1}\}
+, then the solution
+p
+^
+\hat{p}
+solved given source environment is suboptimal in the target environment under one of them, no matter how many evaluations are made in the source environment.
+In the real world, it is usually the case that two machine learning models will have similar performances under the public test benchmarks, but exhibit significantly different behaviors when generalizing to distributions from other environments.
+Different from Theorem
+3.3
+, this barrier cannot be removed by more exploration in the source environment, since the two hypotheses agree on every program there. We leave a full study of the transfer of scientific knowledge across environments to future work.
+Appendix D
+Additional Technical Details
+D.1
+Notation
+Table 2:
+Notation used in the formulation and theorems.
+Symbol
+Meaning
+𝒫
+\mathcal{P}
+Program / pipeline / model space (candidate designs)
+K
+K
+Number of candidate programs,
+K
+:=
+|
+𝒫
+|
+K:=|\mathcal{P}|
+(finite in Theorem
+3.1
+)
+p
+∈
+𝒫
+p\in\mathcal{P}
+A program to evaluate (action)
+𝒳
+\mathcal{X}
+Design-variable space (encoding of programs)
+x
+p
+∈
+𝒳
+x_{p}\in\mathcal{X}
+Encoding of program
+p
+p
+(e.g., design variables
+X
+=
+x
+p
+X=x_{p}
+)
+z
+z
+,
+Z
+⁡
+(
+p
+)
+Z(p)
+An idea and the idea representation of program
+p
+p
+(Definition
+3.2
+)
+r
+r
+Number of ideas in an idea representation
+ϕ
+⁡
+(
+p
+)
+∈
+ℝ
+d
+\phi(p)\in\mathbb{R}^{d}
+Known representation of program
+p
+p
+in Theorem
+3.1
+, e.g., the one-hot encoding of
+Z
+⁡
+(
+p
+)
+Z(p)
+d
+d
+Dimension of the representation, e.g., the number of value combinations of the ideas
+Θ
+\Theta
+Hypothesis space of scientific knowledge (e.g., SCMs / mechanisms)
+Θ
+sci
+\Theta_{\mathrm{sci}}
+Latent RV taking values in
+Θ
+\Theta
+(Bayesian view)
+θ
+⋆
+∈
+Θ
+\theta^{\star}\in\Theta
+True (fixed but unknown) scientific knowledge instance (realization)
+μ
+0
+\mu_{0}
+Prior over
+Θ
+\Theta
+(i.e.,
+Θ
+sci
+∼
+μ
+0
+\Theta_{\mathrm{sci}}\sim\mu_{0}
+)
+ℰ
+\mathcal{E}
+Environment / protocol index set (evaluation regimes, deployments)
+e
+∈
+ℰ
+e\in\mathcal{E}
+Environment index;
+e
+src
+e_{\mathrm{src}}
+source,
+e
+tgt
+e_{\mathrm{tgt}}
+target
+F
+e
+​
+(
+p
+,
+θ
+)
+F_{e}(p;\theta)
+True performance in env
+e
+e
+(scalar objective)
+P
+e
+(
+⋅
+∣
+p
+,
+θ
+)
+P_{e}(\cdot\mid p,\theta)
+Observation model (likelihood) for evaluator output in env
+e
+e
+y
+t
+y_{t}
+Observed evaluator outcome at round
+t
+t
+h
+t
+h_{t}
+History
+{
+(
+p
+0
+,
+y
+0
+)
+,
+…
+,
+(
+p
+t
+−
+1
+,
+y
+t
+−
+1
+)
+}
+\{(p_{0},y_{0}),\dots,(p_{t-1},y_{t-1})\}
+b
+t
+b_{t}
+Bayesian belief/posterior over
+θ
+\theta
+:
+b
+t
+(
+⋅
+)
+=
+Pr
+(
+Θ
+sci
+∈
+⋅
+∣
+h
+t
+,
+e
+src
+)
+b_{t}(\cdot)=\Pr(\Theta_{\mathrm{sci}}\in\cdot\mid h_{t},e_{\mathrm{src}})
+T
+T
+Evaluation budget / horizon (number of program evaluations)
+D.2
+Random variable, space, and realization (to avoid notation confusion)
+We use the following (standard) convention.
+(i) Hypothesis space.
+Θ
+\Theta
+is a set that contains all candidate scientific-knowledge hypotheses.
+(ii) True but unknown instance.
+The real world is governed by a fixed but unknown
+θ
+⋆
+∈
+Θ
+\theta^{\star}\in\Theta
+.
+(iii) Bayesian view (optional but convenient).
+A Bayesian agent models uncertainty by
+treating
+θ
+⋆
+\theta^{\star}
+as a realization of a latent random variable
+Θ
+sci
+\Theta_{\mathrm{sci}}
+with prior
+μ
+0
+\mu_{0}
+, i.e.
+Θ
+sci
+∼
+μ
+0
+\Theta_{\mathrm{sci}}\sim\mu_{0}
+and
+θ
+⋆
+\theta^{\star}
+is one draw from it.
+The belief
+b
+t
+b_{t}
+is simply the posterior distribution of
+Θ
+sci
+\Theta_{\mathrm{sci}}
+after seeing history
+h
+t
+h_{t}
+.
+(iv) Does scientific knowledge change across environments?
+In our formulation, the
+underlying
+scientific knowledge
+θ
+⋆
+\theta^{\star}
+is static across rounds.
+Different environments
+e
+∈
+ℰ
+e\in\mathcal{E}
+represent different evaluation/deployment protocols
+(distribution shifts, constraint changes, measurement noise, private vs public tests, etc.).
+Formally, environments affect either the true performance map
+F
+e
+​
+(
+⋅
+,
+θ
+)
+F_{e}(\cdot;\theta)
+and/or the observation
+kernel
+P
+e
+(
+⋅
+∣
+p
+,
+θ
+)
+P_{e}(\cdot\mid p,\theta)
+, while
+θ
+⋆
+\theta^{\star}
+itself remains the same hidden instance.
+D.3
+Evaluator as an observation model (covers deterministic and stochastic evaluators)
+Fix an environment
+e
+∈
+ℰ
+e\in\mathcal{E}
+.
+When the agent evaluates program
+p
+p
+, it receives an observation
+y
+∈
+𝒴
+y\in\mathcal{Y}
+drawn from
+y
+∼
+P
+e
+(
+⋅
+∣
+p
+,
+θ
+⋆
+)
+,
+y\sim P_{e}(\cdot\mid p,\theta^{\star}),
+where
+P
+e
+(
+⋅
+∣
+p
+,
+θ
+)
+P_{e}(\cdot\mid p,\theta)
+is a conditional distribution on
+𝒴
+\mathcal{Y}
+.
+Deterministic evaluator.
+A deterministic evaluator is the special case where there exists a function
+g
+e
+g_{e}
+such that
+P
+e
+(
+⋅
+∣
+p
+,
+θ
+)
+=
+δ
+g
+e
+​
+(
+p
+,
+θ
+)
+(
+⋅
+)
+,
+i.e.,
+y
+=
+g
+e
+(
+p
+;
+θ
+⋆
+)
+a.s.
+P_{e}(\cdot\mid p,\theta)=\delta_{g_{e}(p;\theta)}(\cdot),\quad\text{i.e.,}\quad y=g_{e}(p;\theta^{\star})\ \text{a.s.}
+In many program-evolution settings, the evaluator is designed to deterministically
+check validity and compute an objective score (e.g., via a verifier and a scoring routine).
+Stochastic/noisy evaluator.
+A common instantiation is additive noise:
+y
+=
+F
+e
+​
+(
+p
+,
+θ
+⋆
+)
++
+ε
+,
+ε
+∼
+𝒩
+⁡
+(
+0
+,
+σ
+2
+)
+,
+y=F_{e}(p;\theta^{\star})+\varepsilon,\qquad\varepsilon\sim\mathcal{N}(0,\sigma^{2}),
+but only the proof of Theorem
+3.1
+relies on the Gaussian form; the other results hold for any noise distribution shared by the hypotheses.
+D.4
+Belief and Bayes update: kernel form and undergraduate-friendly special cases
+Let
+h
+t
+=
+{
+(
+p
+0
+,
+y
+0
+)
+,
+…
+,
+(
+p
+t
+−
+1
+,
+y
+t
+−
+1
+)
+}
+h_{t}=\{(p_{0},y_{0}),\dots,(p_{t-1},y_{t-1})\}
+be the history.
+The Bayesian belief (posterior) is
+b
+t
+​
+(
+B
+)
+=
+Pr
+⁡
+(
+Θ
+sci
+∈
+B
+∣
+h
+t
+,
+e
+src
+)
+,
+B
+⊆
+Θ
+.
+b_{t}(B)=\Pr(\Theta_{\mathrm{sci}}\in B\mid h_{t},e_{\mathrm{src}}),\qquad B\subseteq\Theta.
+General Bayes update (kernel form).
+After choosing
+p
+t
+p_{t}
+and observing
+y
+t
+y_{t}
+in
+e
+src
+e_{\mathrm{src}}
+, the posterior is
+b
+t
++
+1
+​
+(
+B
+)
+=
+∫
+B
+P
+e
+src
+​
+(
+d
+​
+y
+t
+∣
+p
+t
+,
+θ
+)
+​
+b
+t
+​
+(
+𝑑
+θ
+)
+∫
+Θ
+P
+e
+src
+​
+(
+d
+​
+y
+t
+∣
+p
+t
+,
+θ
+)
+​
+b
+t
+​
+(
+𝑑
+θ
+)
+.
+b_{t+1}(B)=\frac{\int_{B}P_{e_{\mathrm{src}}}(dy_{t}\mid p_{t},\theta)\,b_{t}(d\theta)}{\int_{\Theta}P_{e_{\mathrm{src}}}(dy_{t}\mid p_{t},\theta)\,b_{t}(d\theta)}.
+(2)
+Finite hypothesis space (sum form).
+If
+Θ
+=
+{
+θ
+1
+,
+…
+,
+θ
+N
+}
+\Theta=\{\theta_{1},\dots,\theta_{N}\}
+is finite and the likelihood has a pmf
+P
+e
+src
+​
+(
+y
+t
+∣
+p
+t
+,
+θ
+i
+)
+P_{e_{\mathrm{src}}}(y_{t}\mid p_{t},\theta_{i})
+, then
+b
+t
++
+1
+​
+(
+θ
+i
+)
+=
+b
+t
+​
+(
+θ
+i
+)
+​
+P
+e
+src
+​
+(
+y
+t
+∣
+p
+t
+,
+θ
+i
+)
+∑
+j
+=
+1
+N
+b
+t
+​
+(
+θ
+j
+)
+​
+P
+e
+src
+​
+(
+y
+t
+∣
+p
+t
+,
+θ
+j
+)
+.
+b_{t+1}(\theta_{i})=\frac{b_{t}(\theta_{i})\,P_{e_{\mathrm{src}}}(y_{t}\mid p_{t},\theta_{i})}{\sum_{j=1}^{N}b_{t}(\theta_{j})\,P_{e_{\mathrm{src}}}(y_{t}\mid p_{t},\theta_{j})}.
+Continuous hypothesis space (density form).
+If
+P
+e
+src
+​
+(
+d
+​
+y
+∣
+p
+,
+θ
+)
+P_{e_{\mathrm{src}}}(dy\mid p,\theta)
+has a density
+p
+e
+src
+​
+(
+y
+∣
+p
+,
+θ
+)
+p_{e_{\mathrm{src}}}(y\mid p,\theta)
+,
+then
+b
+t
++
+1
+​
+(
+θ
+)
+=
+b
+t
+​
+(
+θ
+)
+​
+p
+e
+src
+​
+(
+y
+t
+∣
+p
+t
+,
+θ
+)
+∫
+Θ
+b
+t
+​
+(
+θ
+′
+)
+​
+p
+e
+src
+​
+(
+y
+t
+∣
+p
+t
+,
+θ
+′
+)
+​
+d
+​
+θ
+′
+.
+b_{t+1}(\theta)=\frac{b_{t}(\theta)\,p_{e_{\mathrm{src}}}(y_{t}\mid p_{t},\theta)}{\int_{\Theta}b_{t}(\theta^{\prime})\,p_{e_{\mathrm{src}}}(y_{t}\mid p_{t},\theta^{\prime})\,d\theta^{\prime}}.
+Deterministic evaluator (indicator/filter form).
+If
+y
+=
+g
+e
+src
+​
+(
+p
+,
+θ
+)
+y=g_{e_{\mathrm{src}}}(p;\theta)
+deterministically, then the update becomes
+b
+t
++
+1
+(
+d
+θ
+)
+∝
+1
+{
+g
+e
+src
+(
+p
+t
+;
+θ
+)
+=
+y
+t
+}
+b
+t
+(
+d
+θ
+)
+,
+b_{t+1}(d\theta)\ \propto\ \mathbf{1}\{g_{e_{\mathrm{src}}}(p_{t};\theta)=y_{t}\}\,b_{t}(d\theta),
+i.e. the posterior is the prior restricted to hypotheses consistent with the observed outcome.
+Appendix E
+Proof of Theorem
+3.1
+(Structured experience reuse)
+Throughout this section we fix a
+single
+static environment (drop
+e
+e
+from notation),
+and assume
+𝒫
+=
+{
+p
+1
+,
+…
+,
+p
+K
+}
+\mathcal{P}=\{p_{1},\dots,p_{K}\}
+is finite.
+E.1
+Protocol and performance criterion
+Experiment–then–commit protocol.
+A policy
+π
+\pi
+interacts for
+T
+T
+rounds. At each round
+t
+=
+0
+,
+…
+,
+T
+−
+1
+t=0,\dots,T-1
+it selects a program
+p
+t
+∈
+𝒫
+p_{t}\in\mathcal{P}
+(possibly randomized) based on the past history
+h
+t
+h_{t}
+, then observes
+y
+t
+∈
+ℝ
+y_{t}\in\mathbb{R}
+.
+After
+T
+T
+evaluations it outputs a final recommendation
+p
+^
+∈
+𝒫
+\hat{p}\in\mathcal{P}
+.
+Simple regret.
+Let
+f
+⁡
+(
+p
+)
+f(p)
+denote the true mean performance of program
+p
+p
+in this environment.
+Define the (random) simple regret
+SR
+T
+:=
+max
+p
+∈
+𝒫
+⁡
+f
+⁡
+(
+p
+)
+−
+f
+⁡
+(
+p
+^
+)
+.
+\mathrm{SR}_{T}:=\max_{p\in\mathcal{P}}f(p)\;-\;f(\hat{p}).
+(3)
+(
+ϵ
+,
+δ
+)
+(\epsilon,\delta)
+-correctness (uniform).
+Fix
+ϵ
+>
+0
+\epsilon>0
+and
+δ
+∈
+(
+0
+,
+1
+)
+\delta\in(0,1)
+.
+We say a policy
+π
+\pi
+is
+(
+ϵ
+,
+δ
+)
+(\epsilon,\delta)
+-correct uniformly on a hypothesis class
+ℋ
+\mathcal{H}
+if for every instance in
+ℋ
+\mathcal{H}
+,
+Pr
+⁡
+(
+SR
+T
+≤
+ϵ
+)
+≥
+1
+−
+δ
+.
+\Pr\big(\mathrm{SR}_{T}\leq\epsilon\big)\geq 1-\delta.
+“Uniformly” means the guarantee must hold for
+all
+instances in the class, not only on average.
+E.2
+Two hypothesis classes
+(1) Structured class.
+Each program
+p
+p
+has a known representation
+ϕ
+⁡
+(
+p
+)
+∈
+ℝ
+d
+\phi(p)\in\mathbb{R}^{d}
+with
+‖
+ϕ
+⁡
+(
+p
+)
+‖
+2
+≤
+1
+\|\phi(p)\|_{2}\leq 1
+, e.g., a faithful linear idea representation
+ϕ
+⁡
+(
+p
+)
+=
+Z
+⁡
+(
+p
+)
+\phi(p)=Z(p)
+(Sec.
+3.2
+).
+The unknown instance is a weight vector
+w
+⋆
+∈
+ℝ
+d
+w^{\star}\in\mathbb{R}^{d}
+and
+f
+⁡
+(
+p
+)
+=
+⟨
+ϕ
+⁡
+(
+p
+)
+,
+w
+⋆
+⟩
+.
+f(p)=\langle\phi(p),w^{\star}\rangle.
+(4)
+Observations follow a Gaussian noise model
+y
+t
+=
+f
+⁡
+(
+p
+t
+)
++
+ε
+t
+,
+ε
+t
+∼
+𝒩
+⁡
+(
+0
+,
+σ
+2
+)
+​
+i.i.d.
+y_{t}=f(p_{t})+\varepsilon_{t},\qquad\varepsilon_{t}\sim\mathcal{N}(0,\sigma^{2})\ \text{i.i.d.}
+(5)
+Coverage condition.
+Assume there exist
+d
+d
+basis programs
+p
+(
+1
+)
+,
+…
+,
+p
+(
+d
+)
+p^{(1)},\dots,p^{(d)}
+whose representations are the standard basis:
+ϕ
+(
+p
+(
+i
+)
+)
+=
+e
+i
+,
+i
+=
+1
+,
+…
+,
+d
+.
+\phi(p^{(i)})=e_{i},\qquad i=1,\dots,d.
+(6)
+(2) Unstructured black-box class (baseline).
+The unknown instance is an arbitrary vector of means
+μ
+=
+(
+μ
+1
+,
+…
+,
+μ
+K
+)
+∈
+ℝ
+K
+,
+f
+⁡
+(
+p
+i
+)
+=
+μ
+i
+,
+\mu=(\mu_{1},\dots,\mu_{K})\in\mathbb{R}^{K},\qquad f(p_{i})=\mu_{i},
+and observations are
+y
+t
+=
+μ
+I
+t
++
+ε
+t
+,
+ε
+t
+∼
+𝒩
+⁡
+(
+0
+,
+σ
+2
+)
+​
+i.i.d.
+,
+y_{t}=\mu_{I_{t}}+\varepsilon_{t},\qquad\varepsilon_{t}\sim\mathcal{N}(0,\sigma^{2})\ \text{i.i.d.},
+(7)
+where
+I
+t
+∈
+{
+1
+,
+…
+,
+K
+}
+I_{t}\in\{1,\dots,K\}
+is the index of the chosen program
+p
+t
+=
+p
+I
+t
+p_{t}=p_{I_{t}}
+.
+Crucially, there is
+no assumed relation
+between
+μ
+i
+\mu_{i}
+and
+μ
+j
+\mu_{j}
+for
+i
+≠
+j
+i\neq j
+.
+E.3
+Formal statement and proof
+Theorem E.1
+(Formal version of Theorem
+3.1
+)
+.
+Fix
+ϵ
+>
+0
+\epsilon>0
+and
+δ
+∈
+(
+0
+,
+1
+/
+4
+)
+\delta\in(0,1/4)
+.
+1.
+(Upper bound under the structured linear class).
+Under equation
+4
+–equation
+6
+and equation
+5
+,
+there exists a policy
+π
+lin
+\pi_{\mathrm{lin}}
+such that
+Pr
+⁡
+(
+SR
+T
+≤
+2
+​
+ϵ
+)
+≥
+1
+−
+δ
+whenever
+T
+≥
+2
+​
+d
+​
+σ
+2
+ϵ
+2
+​
+log
+⁡
+(
+2
+​
+K
+δ
+)
+.
+\Pr\big(\mathrm{SR}_{T}\leq 2\epsilon\big)\geq 1-\delta\quad\text{whenever}\quad T\ \geq\ 2d\,\frac{\sigma^{2}}{\epsilon^{2}}\log\!\Big(\frac{2K}{\delta}\Big).
+2.
+(Lower bound for the unstructured black-box class).
+For the black-box class equation
+7
+, any policy that is
+(
+ϵ
+,
+δ
+)
+(\epsilon,\delta)
+-correct
+uniformly for all
+μ
+∈
+ℝ
+K
+\mu\in\mathbb{R}^{K}
+must satisfy
+T
+≥
+(
+K
+−
+1
+)
+​
+σ
+2
+8
+​
+ϵ
+2
+​
+log
+⁡
+(
+1
+2
+​
+δ
+)
+.
+T\ \geq\ (K-1)\,\frac{\sigma^{2}}{8\epsilon^{2}}\,\log\!\Big(\frac{1}{2\delta}\Big).
+Replacing
+ϵ
+\epsilon
+with
+ϵ
+/
+2
+\epsilon/2
+in part (1) gives the informal statement in Theorem
+3.1
+.
+Proof.
+We prove the two parts separately.
+Part (1): constructive upper bound (estimate
+w
+⋆
+w^{\star}
+then commit).
+Evaluate each basis program
+p
+(
+i
+)
+p^{(i)}
+exactly
+n
+n
+times (total
+T
+=
+n
+​
+d
+T=nd
+).
+Let
+y
+1
+(
+i
+)
+,
+…
+,
+y
+n
+(
+i
+)
+y^{(i)}_{1},\dots,y^{(i)}_{n}
+be the observations for basis
+i
+i
+, and define
+w
+^
+i
+:=
+1
+n
+​
+∑
+j
+=
+1
+n
+y
+j
+(
+i
+)
+.
+\hat{w}_{i}:=\frac{1}{n}\sum_{j=1}^{n}y^{(i)}_{j}.
+By equation
+4
+–equation
+6
+,
+f
+⁡
+(
+p
+(
+i
+)
+)
+=
+w
+i
+⋆
+f(p^{(i)})=w^{\star}_{i}
+.
+By equation
+5
+,
+w
+^
+i
+∼
+𝒩
+⁡
+(
+w
+i
+⋆
+,
+σ
+2
+/
+n
+)
+\hat{w}_{i}\sim\mathcal{N}(w^{\star}_{i},\sigma^{2}/n)
+and these coordinates are independent.
+Define for any program
+p
+p
+:
+f
+^
+​
+(
+p
+)
+:=
+⟨
+ϕ
+⁡
+(
+p
+)
+,
+w
+^
+⟩
+,
+w
+^
+=
+(
+w
+^
+1
+,
+…
+,
+w
+^
+d
+)
+.
+\widehat{f}(p):=\langle\phi(p),\hat{w}\rangle,\qquad\hat{w}=(\hat{w}_{1},\dots,\hat{w}_{d}).
+Then
+f
+^
+​
+(
+p
+)
+−
+f
+⁡
+(
+p
+)
+=
+⟨
+ϕ
+⁡
+(
+p
+)
+,
+w
+^
+−
+w
+⋆
+⟩
+∼
+𝒩
+⁡
+(
+0
+,
+σ
+2
+n
+​
+‖
+ϕ
+⁡
+(
+p
+)
+‖
+2
+2
+)
+,
+\widehat{f}(p)-f(p)=\langle\phi(p),\hat{w}-w^{\star}\rangle\sim\mathcal{N}\!\Big(0,\ \frac{\sigma^{2}}{n}\|\phi(p)\|_{2}^{2}\Big),
+so since
+‖
+ϕ
+⁡
+(
+p
+)
+‖
+2
+≤
+1
+\|\phi(p)\|_{2}\leq 1
+,
+Pr
+⁡
+(
+|
+f
+^
+​
+(
+p
+)
+−
+f
+⁡
+(
+p
+)
+|
+≥
+ϵ
+)
+≤
+2
+​
+exp
+⁡
+(
+−
+n
+​
+ϵ
+2
+2
+​
+σ
+2
+)
+.
+\Pr\big(|\widehat{f}(p)-f(p)|\geq\epsilon\big)\leq 2\exp\!\Big(-\frac{n\epsilon^{2}}{2\sigma^{2}}\Big).
+Union bound over
+K
+K
+programs gives
+Pr
+⁡
+(
+max
+p
+∈
+𝒫
+⁡
+|
+f
+^
+​
+(
+p
+)
+−
+f
+⁡
+(
+p
+)
+|
+≥
+ϵ
+)
+≤
+2
+​
+K
+​
+exp
+⁡
+(
+−
+n
+​
+ϵ
+2
+2
+​
+σ
+2
+)
+.
+\Pr\Big(\max_{p\in\mathcal{P}}|\widehat{f}(p)-f(p)|\geq\epsilon\Big)\leq 2K\exp\!\Big(-\frac{n\epsilon^{2}}{2\sigma^{2}}\Big).
+Choose
+n
+≥
+2
+​
+σ
+2
+ϵ
+2
+​
+log
+⁡
+(
+2
+​
+K
+δ
+)
+,
+n\ \geq\ 2\frac{\sigma^{2}}{\epsilon^{2}}\log\!\Big(\frac{2K}{\delta}\Big),
+so that with probability at least
+1
+−
+δ
+1-\delta
+we have
+max
+p
+⁡
+|
+f
+^
+​
+(
+p
+)
+−
+f
+⁡
+(
+p
+)
+|
+≤
+ϵ
+\max_{p}|\widehat{f}(p)-f(p)|\leq\epsilon
+.
+Now output
+p
+^
+:=
+arg
+⁡
+max
+p
+∈
+𝒫
+​
+f
+^
+​
+(
+p
+)
+\hat{p}:=\arg\max_{p\in\mathcal{P}}\widehat{f}(p)
+.
+Let
+p
+⋆
+:=
+arg
+⁡
+max
+p
+⁡
+f
+⁡
+(
+p
+)
+p^{\star}:=\arg\max_{p}f(p)
+.
+On the above high-probability event,
+f
+⁡
+(
+p
+⋆
+)
+−
+f
+⁡
+(
+p
+^
+)
+≤
+(
+f
+⁡
+(
+p
+⋆
+)
+−
+f
+^
+​
+(
+p
+⋆
+)
+)
++
+(
+f
+^
+​
+(
+p
+^
+)
+−
+f
+⁡
+(
+p
+^
+)
+)
+≤
+ϵ
++
+ϵ
+=
+2
+​
+ϵ
+.
+f(p^{\star})-f(\hat{p})\leq\big(f(p^{\star})-\widehat{f}(p^{\star})\big)+\big(\widehat{f}(\hat{p})-f(\hat{p})\big)\leq\epsilon+\epsilon=2\epsilon.
+Thus
+Pr
+⁡
+(
+SR
+T
+≤
+2
+​
+ϵ
+)
+≥
+1
+−
+δ
+\Pr(\mathrm{SR}_{T}\leq 2\epsilon)\geq 1-\delta
+for
+T
+=
+n
+​
+d
+T=nd
+as stated.
+Part (2): lower bound for the black-box class.
+We construct
+K
+K
+hard instances and lower bound any uniformly
+(
+ϵ
+,
+δ
+)
+(\epsilon,\delta)
+-correct policy.
+Let the programs be
+p
+1
+,
+…
+,
+p
+K
+p_{1},\dots,p_{K}
+.
+Define a base instance
+μ
+(
+0
+)
+∈
+ℝ
+K
+\mu^{(0)}\in\mathbb{R}^{K}
+:
+μ
+1
+(
+0
+)
+=
+0
+,
+μ
+i
+(
+0
+)
+=
+−
+2
+ϵ
+(
+i
+=
+2
+,
+…
+,
+K
+)
+.
+\mu^{(0)}_{1}=0,\qquad\mu^{(0)}_{i}=-2\epsilon\ \ (i=2,\dots,K).
+For each
+i
+∈
+{
+2
+,
+…
+,
+K
+}
+i\in\{2,\dots,K\}
+, define an alternative instance
+μ
+(
+i
+)
+\mu^{(i)}
+:
+μ
+1
+(
+i
+)
+=
+0
+,
+μ
+i
+(
+i
+)
+=
++
+2
+ϵ
+,
+μ
+j
+(
+i
+)
+=
+−
+2
+ϵ
+(
+j
+∉
+{
+1
+,
+i
+}
+)
+.
+\mu^{(i)}_{1}=0,\qquad\mu^{(i)}_{i}=+2\epsilon,\qquad\mu^{(i)}_{j}=-2\epsilon\ \ (j\notin\{1,i\}).
+Under
+μ
+(
+0
+)
+\mu^{(0)}
+, the unique best program is
+p
+1
+p_{1}
+, and choosing any
+p
+i
+p_{i}
+with
+i
+≥
+2
+i\geq 2
+incurs regret
+2
+​
+ϵ
+>
+ϵ
+2\epsilon>\epsilon
+.
+Under
+μ
+(
+i
+)
+\mu^{(i)}
+, the unique best program is
+p
+i
+p_{i}
+, and choosing
+p
+1
+p_{1}
+incurs regret
+2
+​
+ϵ
+>
+ϵ
+2\epsilon>\epsilon
+.
+Let
+P
+0
+P_{0}
+be the distribution of the full transcript
+𝒯
+:=
+(
+p
+0
+:
+T
+−
+1
+,
+y
+0
+:
+T
+−
+1
+,
+p
+^
+)
+\mathcal{T}:=(p_{0:T-1},y_{0:T-1},\hat{p})
+under
+μ
+(
+0
+)
+\mu^{(0)}
+,
+and
+P
+i
+P_{i}
+the analogous distribution under
+μ
+(
+i
+)
+\mu^{(i)}
+.
+Uniform
+(
+ϵ
+,
+δ
+)
+(\epsilon,\delta)
+-correctness implies
+P
+0
+(
+p
+^
+=
+p
+1
+)
+≥
+1
+−
+δ
+,
+P
+i
+(
+p
+^
+=
+p
+1
+)
+≤
+δ
+(
+i
+=
+2
+,
+…
+,
+K
+)
+.
+P_{0}(\hat{p}=p_{1})\geq 1-\delta,\qquad P_{i}(\hat{p}=p_{1})\leq\delta\quad(i=2,\dots,K).
+Step 1: a KL lower bound from an event.
+For any event
+A
+A
+and distributions
+P
+,
+Q
+P,Q
+, one has
+KL
+(
+P
+∥
+Q
+)
+≥
+P
+(
+A
+)
+log
+P
+⁡
+(
+A
+)
+Q
+⁡
+(
+A
+)
++
+(
+1
+−
+P
+(
+A
+)
+)
+log
+1
+−
+P
+⁡
+(
+A
+)
+1
+−
+Q
+⁡
+(
+A
+)
+.
+\mathrm{KL}(P\|Q)\geq P(A)\log\frac{P(A)}{Q(A)}+(1-P(A))\log\frac{1-P(A)}{1-Q(A)}.
+Apply it with
+A
+=
+{
+p
+^
+=
+p
+1
+}
+A=\{\hat{p}=p_{1}\}
+,
+P
+=
+P
+0
+P=P_{0}
+,
+Q
+=
+P
+i
+Q=P_{i}
+.
+Let
+p
+:=
+P
+0
+​
+(
+A
+)
+≥
+1
+−
+δ
+p:=P_{0}(A)\geq 1-\delta
+and
+q
+:=
+P
+i
+​
+(
+A
+)
+≤
+δ
+q:=P_{i}(A)\leq\delta
+.
+For
+δ
+∈
+(
+0
+,
+1
+/
+4
+)
+\delta\in(0,1/4)
+this yields
+KL
+(
+P
+0
+∥
+P
+i
+)
+≥
+log
+(
+1
+2
+​
+δ
+)
+.
+\mathrm{KL}(P_{0}\|P_{i})\ \geq\ \log\!\Big(\frac{1}{2\delta}\Big).
+(8)
+Step 2: compute
+KL
+(
+P
+0
+∥
+P
+i
+)
+\mathrm{KL}(P_{0}\|P_{i})
+via number of pulls of arm
+i
+i
+.
+Under
+μ
+(
+0
+)
+\mu^{(0)}
+and
+μ
+(
+i
+)
+\mu^{(i)}
+, the policy is identical; only observations when playing
+p
+i
+p_{i}
+differ:
+y
+∼
+𝒩
+⁡
+(
+−
+2
+​
+ϵ
+,
+σ
+2
+)
+​
+under
+​
+μ
+(
+0
+)
+,
+y
+∼
+𝒩
+⁡
+(
++
+2
+​
+ϵ
+,
+σ
+2
+)
+​
+under
+​
+μ
+(
+i
+)
+.
+y\sim\mathcal{N}(-2\epsilon,\sigma^{2})\ \text{under }\mu^{(0)},\qquad y\sim\mathcal{N}(+2\epsilon,\sigma^{2})\ \text{under }\mu^{(i)}.
+For Gaussians with equal variance,
+KL
+(
+𝒩
+(
+m
+0
+,
+σ
+2
+)
+∥
+𝒩
+(
+m
+1
+,
+σ
+2
+)
+)
+=
+(
+m
+0
+−
+m
+1
+)
+2
+2
+​
+σ
+2
+\mathrm{KL}(\mathcal{N}(m_{0},\sigma^{2})\|\mathcal{N}(m_{1},\sigma^{2}))=\frac{(m_{0}-m_{1})^{2}}{2\sigma^{2}}
+,
+so each pull of
+p
+i
+p_{i}
+contributes KL
+(
+4
+​
+ϵ
+)
+2
+2
+​
+σ
+2
+=
+8
+​
+ϵ
+2
+σ
+2
+\frac{(4\epsilon)^{2}}{2\sigma^{2}}=\frac{8\epsilon^{2}}{\sigma^{2}}
+.
+Let
+N
+i
+N_{i}
+be the (random) number of times
+p
+i
+p_{i}
+is evaluated in
+T
+T
+rounds.
+Additivity of log-likelihood ratios over independent Gaussian samples yields
+KL
+(
+P
+0
+∥
+P
+i
+)
+=
+8
+​
+ϵ
+2
+σ
+2
+𝔼
+P
+0
+[
+N
+i
+]
+.
+\mathrm{KL}(P_{0}\|P_{i})=\frac{8\epsilon^{2}}{\sigma^{2}}\ \mathbb{E}_{P_{0}}[N_{i}].
+(9)
+Step 3: conclude the lower bound on
+T
+T
+.
+Combine equation
+8
+and equation
+9
+:
+𝔼
+P
+0
+[
+N
+i
+]
+≥
+σ
+2
+8
+​
+ϵ
+2
+log
+(
+1
+2
+​
+δ
+)
+,
+i
+=
+2
+,
+…
+,
+K
+.
+\mathbb{E}_{P_{0}}[N_{i}]\ \geq\ \frac{\sigma^{2}}{8\epsilon^{2}}\log\!\Big(\frac{1}{2\delta}\Big),\qquad i=2,\dots,K.
+Summing over
+i
+=
+2
+,
+…
+,
+K
+i=2,\dots,K
+gives
+T
+=
+∑
+i
+=
+1
+K
+N
+i
+≥
+∑
+i
+=
+2
+K
+𝔼
+P
+0
+​
+[
+N
+i
+]
+≥
+(
+K
+−
+1
+)
+​
+σ
+2
+8
+​
+ϵ
+2
+​
+log
+⁡
+(
+1
+2
+​
+δ
+)
+.
+T=\sum_{i=1}^{K}N_{i}\ \geq\ \sum_{i=2}^{K}\mathbb{E}_{P_{0}}[N_{i}]\ \geq\ (K-1)\frac{\sigma^{2}}{8\epsilon^{2}}\log\!\Big(\frac{1}{2\delta}\Big).
+This completes the proof.
+∎
+Remark (deterministic evaluator).
+If
+σ
+=
+0
+\sigma=0
+, the structured linear class can recover
+w
+⋆
+w^{\star}
+exactly from
+d
+d
+basis evaluations and achieve
+SR
+T
+=
+0
+\mathrm{SR}_{T}=0
+,
+while in the unstructured black-box class a uniform worst-case guarantee requires evaluating all
+K
+K
+programs at least once.
+Relation to best-arm identification.
+The lower bound follows the standard change-of-measure argument for best-arm identification in
+K
+K
+-armed Gaussian bandits
+(
+Kaufmann et al., 2016
+)
+, and the upper bound is a simple instance of best-arm identification in linear bandits
+(
+Soare et al., 2014
+)
+.
+Appendix F
+Proof of Theorem
+3.3
+(Degenerated exploration of ideas)
+F.1
+Formal statement and proof
+For a policy that interacts for
+T
+T
+rounds and outputs
+p
+^
+\hat{p}
+, define the simple regret under mechanism
+θ
+\theta
+as
+SR
+T
+​
+(
+θ
+)
+≔
+max
+p
+∈
+𝒫
+⁡
+F
+⁡
+(
+p
+,
+θ
+)
+−
+F
+⁡
+(
+p
+^
+,
+θ
+)
+\mathrm{SR}_{T}(\theta)\coloneqq\max_{p\in\mathcal{P}}F(p;\theta)-F(\hat{p};\theta)
+.
+Theorem F.1
+(Formal version of Theorem
+3.3
+)
+.
+Let
+z
+0
+,
+z
+1
+:
+𝒫
+→
+𝒱
+z_{0},z_{1}:\mathcal{P}\to\mathcal{V}
+be two ideas, and let
+A
+≔
+{
+p
+∈
+𝒫
+:
+z
+0
+​
+(
+p
+)
+=
+z
+1
+​
+(
+p
+)
+}
+A\coloneqq\{p\in\mathcal{P}:z_{0}(p)=z_{1}(p)\}
+be the set of programs on which they agree. Assume there exist
+θ
+0
+,
+θ
+1
+∈
+Θ
+\theta_{0},\theta_{1}\in\Theta
+such that:
+(i)
+(Idea-level mechanisms)
+F
+⁡
+(
+p
+,
+θ
+i
+)
+=
+g
+⁡
+(
+Z
+⁡
+(
+p
+)
+,
+z
+i
+​
+(
+p
+)
+)
+F(p;\theta_{i})=g(Z(p),z_{i}(p))
+for all
+p
+∈
+𝒫
+p\in\mathcal{P}
+and
+i
+∈
+{
+0
+,
+1
+}
+i\in\{0,1\}
+, for a common representation
+Z
+Z
+and function
+g
+g
+, and each evaluation returns
+y
+=
+F
+⁡
+(
+p
+,
+θ
+i
+)
++
+ε
+y=F(p;\theta_{i})+\varepsilon
+with the same noise distribution under
+θ
+0
+\theta_{0}
+and
+θ
+1
+\theta_{1}
+;
+(ii)
+(Optimal program flips with margin
+Δ
+\Delta
+)
+there exist
+p
+0
+≠
+p
+1
+p_{0}\neq p_{1}
+and
+Δ
+>
+0
+\Delta>0
+such that
+F
+⁡
+(
+p
+i
+,
+θ
+i
+)
+−
+F
+⁡
+(
+p
+,
+θ
+i
+)
+≥
+Δ
+F(p_{i};\theta_{i})-F(p;\theta_{i})\geq\Delta
+for all
+p
+≠
+p
+i
+p\neq p_{i}
+and
+i
+∈
+{
+0
+,
+1
+}
+i\in\{0,1\}
+.
+Then for any policy that only evaluates programs in
+A
+A
+, there exists
+i
+∈
+{
+0
+,
+1
+}
+i\in\{0,1\}
+such that for every budget
+T
+T
+,
+𝔼
+⁡
+[
+SR
+T
+​
+(
+θ
+i
+)
+]
+≥
+Δ
+/
+2
+.
+\mathbb{E}\big[\mathrm{SR}_{T}(\theta_{i})\big]\ \geq\ \Delta/2.
+Moreover, at least one of
+p
+0
+p_{0}
+and
+p
+1
+p_{1}
+lies outside
+A
+A
+.
+Proof.
+For every
+p
+∈
+A
+p\in A
+,
+z
+0
+​
+(
+p
+)
+=
+z
+1
+​
+(
+p
+)
+z_{0}(p)=z_{1}(p)
+gives
+F
+⁡
+(
+p
+,
+θ
+0
+)
+=
+g
+⁡
+(
+Z
+⁡
+(
+p
+)
+,
+z
+0
+​
+(
+p
+)
+)
+=
+g
+⁡
+(
+Z
+⁡
+(
+p
+)
+,
+z
+1
+​
+(
+p
+)
+)
+=
+F
+⁡
+(
+p
+,
+θ
+1
+)
+F(p;\theta_{0})=g(Z(p),z_{0}(p))=g(Z(p),z_{1}(p))=F(p;\theta_{1})
+. Together with the common noise distribution in (i), the observation model
+O
+(
+⋅
+∣
+θ
+i
+,
+p
+)
+O(\cdot\mid\theta_{i},p)
+is identical under
+θ
+0
+\theta_{0}
+and
+θ
+1
+\theta_{1}
+for every
+p
+∈
+A
+p\in A
+.
+Let
+ℙ
+i
+\mathbb{P}_{i}
+be the distribution of the transcript
+(
+p
+0
+:
+T
+−
+1
+,
+y
+0
+:
+T
+−
+1
+,
+p
+^
+)
+(p_{0:T-1},y_{0:T-1},\hat{p})
+when the true mechanism is
+θ
+i
+\theta_{i}
+. Since the policy only evaluates programs in
+A
+A
+, for any history and any chosen
+p
+t
+∈
+A
+p_{t}\in A
+, the conditional distribution of
+y
+t
+y_{t}
+is identical under
+θ
+0
+\theta_{0}
+and
+θ
+1
+\theta_{1}
+, and the policy chooses
+p
+t
++
+1
+p_{t+1}
+and
+p
+^
+\hat{p}
+with the same randomization given the same history. By induction on
+t
+t
+,
+ℙ
+0
+=
+ℙ
+1
+\mathbb{P}_{0}=\mathbb{P}_{1}
+. In particular, the output
+p
+^
+\hat{p}
+has the same distribution
+Q
+Q
+on
+𝒫
+\mathcal{P}
+under both mechanisms.
+By (ii), any output
+p
+^
+≠
+p
+i
+\hat{p}\neq p_{i}
+incurs regret at least
+Δ
+\Delta
+under
+θ
+i
+\theta_{i}
+, so
+𝔼
+⁡
+[
+SR
+T
+​
+(
+θ
+0
+)
+]
+≥
+Δ
+⁡
+(
+1
+−
+Q
+⁡
+(
+p
+^
+=
+p
+0
+)
+)
+,
+𝔼
+⁡
+[
+SR
+T
+​
+(
+θ
+1
+)
+]
+≥
+Δ
+⁡
+(
+1
+−
+Q
+⁡
+(
+p
+^
+=
+p
+1
+)
+)
+.
+\mathbb{E}[\mathrm{SR}_{T}(\theta_{0})]\ \geq\ \Delta\,\big(1-Q(\hat{p}=p_{0})\big),\qquad\mathbb{E}[\mathrm{SR}_{T}(\theta_{1})]\ \geq\ \Delta\,\big(1-Q(\hat{p}=p_{1})\big).
+Since
+p
+0
+≠
+p
+1
+p_{0}\neq p_{1}
+,
+Q
+⁡
+(
+p
+^
+=
+p
+0
+)
++
+Q
+⁡
+(
+p
+^
+=
+p
+1
+)
+≤
+1
+Q(\hat{p}=p_{0})+Q(\hat{p}=p_{1})\leq 1
+, so at least one of the two probabilities is at most
+1
+/
+2
+1/2
+, and the corresponding expected regret is at least
+Δ
+/
+2
+\Delta/2
+.
+For the last claim, suppose both
+p
+0
+,
+p
+1
+∈
+A
+p_{0},p_{1}\in A
+. Then
+F
+⁡
+(
+p
+1
+,
+θ
+0
+)
+=
+F
+⁡
+(
+p
+1
+,
+θ
+1
+)
+≥
+F
+⁡
+(
+p
+0
+,
+θ
+1
+)
++
+Δ
+=
+F
+⁡
+(
+p
+0
+,
+θ
+0
+)
++
+Δ
+F(p_{1};\theta_{0})=F(p_{1};\theta_{1})\geq F(p_{0};\theta_{1})+\Delta=F(p_{0};\theta_{0})+\Delta
+, which contradicts the optimality of
+p
+0
+p_{0}
+under
+θ
+0
+\theta_{0}
+.
+∎
+The theorem holds for any budget, since the barrier comes from the programs that the policy evaluates. To identify which of
+z
+0
+z_{0}
+and
+z
+1
+z_{1}
+matters, the policy has to evaluate a program outside
+A
+A
+, i.e., a program on which the two ideas differ. In
+ExpEvolve
+, this is the role of plateau-aware revision, which changes the proposal distribution to evaluate programs where the ideas shared by the leading programs differ.
+Appendix G
+Proof of Theorem
+C.2
+(Non-identifiability under environment shifts)
+G.1
+Setup: source interaction, target evaluation, and target regret
+The agent can only interact with the
+source
+environment
+e
+src
+e_{\mathrm{src}}
+:
+y
+t
+∼
+P
+e
+src
+(
+⋅
+∣
+p
+t
+,
+θ
+⋆
+)
+.
+y_{t}\sim P_{e_{\mathrm{src}}}(\cdot\mid p_{t},\theta^{\star}).
+After
+T
+T
+rounds it outputs a final program
+p
+^
+\hat{p}
+.
+Performance is judged in a
+target
+environment
+e
+tgt
+e_{\mathrm{tgt}}
+via
+F
+e
+tgt
+​
+(
+p
+,
+θ
+⋆
+)
+F_{e_{\mathrm{tgt}}}(p;\theta^{\star})
+.
+Define the target (simple) regret:
+GR
+T
+​
+(
+θ
+⋆
+)
+:=
+max
+p
+∈
+𝒫
+⁡
+F
+e
+tgt
+​
+(
+p
+,
+θ
+⋆
+)
+−
+F
+e
+tgt
+​
+(
+p
+^
+,
+θ
+⋆
+)
+.
+\mathrm{GR}_{T}(\theta^{\star}):=\max_{p\in\mathcal{P}}F_{e_{\mathrm{tgt}}}(p;\theta^{\star})-F_{e_{\mathrm{tgt}}}(\hat{p};\theta^{\star}).
+G.2
+Formal statement and proof
+Theorem G.1
+(Non-identifiability barrier under shifts)
+.
+Fix
+e
+src
+,
+e
+tgt
+∈
+ℰ
+e_{\mathrm{src}},e_{\mathrm{tgt}}\in\mathcal{E}
+.
+Assume there exist two hypotheses
+θ
+0
+,
+θ
+1
+∈
+Θ
+\theta_{0},\theta_{1}\in\Theta
+such that:
+(Source indistinguishability)
+P
+e
+src
+(
+⋅
+∣
+p
+,
+θ
+0
+)
+=
+P
+e
+src
+(
+⋅
+∣
+p
+,
+θ
+1
+)
+,
+∀
+p
+∈
+𝒫
+.
+\displaystyle\textbf{(Source indistinguishability)}\quad P_{e_{\mathrm{src}}}(\cdot\mid p,\theta_{0})=P_{e_{\mathrm{src}}}(\cdot\mid p,\theta_{1}),\quad\forall p\in\mathcal{P}.
+(10)
+(Target optimal action flips with margin
+Δ
+)
+∃
+p
+0
+,
+p
+1
+∈
+𝒫
+​
+and
+​
+Δ
+>
+0
+​
+s.t.
+\displaystyle\textbf{(Target optimal action flips with margin $\Delta$)}\quad\exists\,p_{0},p_{1}\in\mathcal{P}\ \text{and}\ \Delta>0\ \text{s.t.}
+(11)
+p
+0
+∈
+arg
+⁡
+max
+p
+∈
+𝒫
+​
+F
+e
+tgt
+​
+(
+p
+,
+θ
+0
+)
+,
+p
+1
+∈
+arg
+⁡
+max
+p
+∈
+𝒫
+​
+F
+e
+tgt
+​
+(
+p
+,
+θ
+1
+)
+,
+\displaystyle\qquad p_{0}\in\arg\max_{p\in\mathcal{P}}F_{e_{\mathrm{tgt}}}(p;\theta_{0}),\quad p_{1}\in\arg\max_{p\in\mathcal{P}}F_{e_{\mathrm{tgt}}}(p;\theta_{1}),
+F
+e
+tgt
+​
+(
+p
+0
+,
+θ
+0
+)
+−
+F
+e
+tgt
+​
+(
+p
+,
+θ
+0
+)
+≥
+Δ
+,
+∀
+p
+≠
+p
+0
+,
+F
+e
+tgt
+​
+(
+p
+1
+,
+θ
+1
+)
+−
+F
+e
+tgt
+​
+(
+p
+,
+θ
+1
+)
+≥
+Δ
+,
+∀
+p
+≠
+p
+1
+.
+\displaystyle\qquad F_{e_{\mathrm{tgt}}}(p_{0};\theta_{0})-F_{e_{\mathrm{tgt}}}(p;\theta_{0})\geq\Delta,\ \forall p\neq p_{0},\quad F_{e_{\mathrm{tgt}}}(p_{1};\theta_{1})-F_{e_{\mathrm{tgt}}}(p;\theta_{1})\geq\Delta,\ \forall p\neq p_{1}.
+(12)
+Then for any policy
+π
+\pi
+that can interact only with
+e
+src
+e_{\mathrm{src}}
+,
+there exists
+i
+∈
+{
+0
+,
+1
+}
+i\in\{0,1\}
+such that for every budget
+T
+T
+,
+𝔼
+⁡
+[
+GR
+T
+​
+(
+θ
+i
+)
+]
+≥
+Δ
+/
+2
+.
+\mathbb{E}\big[\mathrm{GR}_{T}(\theta_{i})\big]\ \geq\ \Delta/2.
+This impossibility holds whether the evaluator is stochastic or deterministic, since
+equation
+10
+is stated at the level of the full observation model
+P
+e
+src
+P_{e_{\mathrm{src}}}
+.
+Proof.
+Let
+ℙ
+i
+\mathbb{P}_{i}
+be the distribution over the full transcript
+𝒯
+:=
+(
+p
+0
+:
+T
+−
+1
+,
+y
+0
+:
+T
+−
+1
+,
+p
+^
+)
+\mathcal{T}:=(p_{0:T-1},y_{0:T-1},\hat{p})
+when the true hypothesis is
+θ
+i
+\theta_{i}
+and interaction is only with
+e
+src
+e_{\mathrm{src}}
+.
+By equation
+10
+, for any history and any chosen action
+p
+t
+p_{t}
+,
+the conditional distribution of
+y
+t
+y_{t}
+is identical under
+θ
+0
+\theta_{0}
+and
+θ
+1
+\theta_{1}
+.
+By induction on
+t
+t
+, the entire transcript distribution is identical:
+ℙ
+0
+=
+ℙ
+1
+.
+\mathbb{P}_{0}=\mathbb{P}_{1}.
+In particular, the marginal distribution of the final output
+p
+^
+\hat{p}
+is the same under
+θ
+0
+\theta_{0}
+and
+θ
+1
+\theta_{1}
+.
+Let this common distribution be denoted by
+Q
+Q
+on
+𝒫
+\mathcal{P}
+.
+Now consider the expected target regret under
+θ
+0
+\theta_{0}
+:
+by equation
+12
+, any output
+p
+^
+≠
+p
+0
+\hat{p}\neq p_{0}
+incurs regret at least
+Δ
+\Delta
+under
+θ
+0
+\theta_{0}
+:
+GR
+T
+(
+θ
+0
+)
+=
+F
+e
+tgt
+(
+p
+0
+;
+θ
+0
+)
+−
+F
+e
+tgt
+(
+p
+^
+;
+θ
+0
+)
+≥
+Δ
+⋅
+𝟏
+{
+p
+^
+≠
+p
+0
+}
+.
+\mathrm{GR}_{T}(\theta_{0})=F_{e_{\mathrm{tgt}}}(p_{0};\theta_{0})-F_{e_{\mathrm{tgt}}}(\hat{p};\theta_{0})\ \geq\ \Delta\cdot\mathbf{1}\{\hat{p}\neq p_{0}\}.
+Taking expectation w.r.t.
+Q
+Q
+yields
+𝔼
+⁡
+[
+GR
+T
+​
+(
+θ
+0
+)
+]
+≥
+Δ
+⋅
+(
+1
+−
+Q
+⁡
+(
+p
+^
+=
+p
+0
+)
+)
+.
+\mathbb{E}[\mathrm{GR}_{T}(\theta_{0})]\ \geq\ \Delta\cdot(1-Q(\hat{p}=p_{0})).
+Similarly,
+𝔼
+⁡
+[
+GR
+T
+​
+(
+θ
+1
+)
+]
+≥
+Δ
+⋅
+(
+1
+−
+Q
+⁡
+(
+p
+^
+=
+p
+1
+)
+)
+.
+\mathbb{E}[\mathrm{GR}_{T}(\theta_{1})]\ \geq\ \Delta\cdot(1-Q(\hat{p}=p_{1})).
+Since
+Q
+⁡
+(
+p
+^
+=
+p
+0
+)
++
+Q
+⁡
+(
+p
+^
+=
+p
+1
+)
+≤
+1
+Q(\hat{p}=p_{0})+Q(\hat{p}=p_{1})\leq 1
+, at least one of these probabilities is at most
+1
+/
+2
+1/2
+,
+so at least one of the two expected regrets is at least
+Δ
+/
+2
+\Delta/2
+:
+max
+⁡
+{
+𝔼
+⁡
+[
+GR
+T
+​
+(
+θ
+0
+)
+]
+,
+𝔼
+⁡
+[
+GR
+T
+​
+(
+θ
+1
+)
+]
+}
+≥
+Δ
+/
+2
+.
+\max\{\mathbb{E}[\mathrm{GR}_{T}(\theta_{0})],\ \mathbb{E}[\mathrm{GR}_{T}(\theta_{1})]\}\ \geq\ \Delta/2.
+This proves the claim.
+∎
+G.3
+Concrete examples satisfying the conditions
+We give two illustrative examples where source data cannot distinguish two hypotheses, yet the target-optimal decision differs.
+Example 1: public test vs private (distribution shift / shortcut feature).
+Let
+θ
+∈
+{
+θ
+0
+,
+θ
+1
+}
+\theta\in\{\theta_{0},\theta_{1}\}
+encode which feature is truly stable/causal.
+Programs correspond to two model families:
+p
+0
+p_{0}
+uses a stable causal feature;
+p
+1
+p_{1}
+uses a shortcut feature.
+In the source environment (public benchmark), the shortcut feature is perfectly correlated with labels,
+so both hypotheses yield the same evaluator distribution for every program, satisfying equation
+10
+.
+In the target environment (deployment/private), the shortcut correlation breaks:
+under
+θ
+0
+\theta_{0}
+,
+p
+0
+p_{0}
+is uniquely optimal; under
+θ
+1
+\theta_{1}
+,
+p
+1
+p_{1}
+is uniquely optimal, with margin
+Δ
+\Delta
+,
+satisfying equation
+12
+.
+No amount of interaction with
+e
+src
+e_{\mathrm{src}}
+can identify which world holds.
+Example 2: relaxed verification (slack) vs exact verification (constraint shift).
+In combinatorial optimization, it is common to evaluate candidate programs using a
+relaxed
+verifier
+(e.g., allowing numerical slack), then validate with an
+exact
+verifier.
+For instance, in circle packing, one may verify non-overlap with a numerical slack such as
+10
+−
+6
+10^{-6}
+,
+and later validate with an exact checker; converting a relaxed-feasible solution into an exact-feasible one
+may require tiny but nonzero modifications, and rankings can change when switching verifiers.
+This is explicitly discussed in the context of circle packing verification with slack vs exact validation.
+The source environment
+e
+src
+e_{\mathrm{src}}
+can correspond to the relaxed evaluator, while the target
+environment
+e
+tgt
+e_{\mathrm{tgt}}
+corresponds to the exact evaluator.
+Then two hypotheses
+θ
+0
+,
+θ
+1
+\theta_{0},\theta_{1}
+can be constructed so that they are indistinguishable under the relaxed evaluator
+for all queried programs, yet the exact evaluator reverses which program is truly best (with gap
+Δ
+\Delta
+),
+matching Theorem
+G.1
+.
+Appendix H
+Implementation Details of
+ExpEvolve
+This section describes the implementation of
+ExpEvolve
+used in our experiments. Alg.
+1
+summarizes the search loop, and Alg.
+2
+details the discovery of idea factors. We implement
+ExpEvolve
+on the backbone of
+SCS
+(
+Gideoni et al., 2026
+)
+. In each generation,
+ExpEvolve
+generates
+B
+B
+programs in parallel slots. The prompt of each slot contains the task instruction, an optional strategy instruction from an idea-guided action, a summary of the idea memory, and a few example programs, and the mutator LLM
+G
+G
+writes a new program from the prompt. All LLM calls use DeepSeek-V4-Flash, and the hyperparameters are listed in Table
+3
+. Each generated program is evaluated once. A program is treated as failed if the evaluation fails or returns a non-finite objective, and failed programs are neither repaired nor retried. The LLM calls for generation are not retried in our experiments either, so a failed call, e.g., due to rate limits, yields a failed program that still counts toward the evaluation budget.
+Algorithm 1
+ExpEvolve
+0:
+initial archive
+𝒜
+0
+\mathcal{A}_{0}
+of the task; mutator LLM
+G
+G
+; generations
+N
+N
+; batch size
+B
+B
+; random-exploration fraction
+ρ
+\rho
+; plateau window
+κ
+\kappa
+1:
+ℳ
+0
+←
+∅
+\mathcal{M}_{0}\leftarrow\varnothing
+2:
+for
+t
+=
+0
+,
+…
+,
+N
+−
+1
+t=0,\dots,N-1
+do
+2:
+Exploit idea factors (Sec.
+4.2
+)
+3:
+(
+u
+t
+,
+1
+,
+…
+,
+u
+t
+,
+B
+)
+←
+Allocate
+​
+(
+ℳ
+t
+,
+B
+,
+ρ
+)
+(u_{t,1},\dots,u_{t,B})\leftarrow\textsc{Allocate}(\mathcal{M}_{t},B,\rho)
+{
+⊥
+\bot
+: random exploration}
+4:
+for
+b
+=
+1
+,
+…
+,
+B
+b=1,\dots,B
+do
+5:
+p
+t
+,
+b
+∼
+G
+(
+⋅
+∣
+BuildContext
+(
+u
+t
+,
+b
+,
+𝒜
+t
+,
+ℳ
+t
+)
+)
+p_{t,b}\sim G\big(\cdot\mid\textsc{BuildContext}(u_{t,b},\mathcal{A}_{t},\mathcal{M}_{t})\big)
+;
+y
+t
+,
+b
+←
+Evaluate
+​
+(
+p
+t
+,
+b
+)
+y_{t,b}\leftarrow\textsc{Evaluate}(p_{t,b})
+6:
+end
+for
+6:
+Discover ideas from experience (Sec.
+4.1
+)
+7:
+𝒜
+t
++
+1
+←
+𝒜
+t
+∪
+{
+(
+p
+t
+,
+b
+,
+y
+t
+,
+b
+,
+u
+t
+,
+b
+)
+}
+b
+=
+1
+B
+\mathcal{A}_{t+1}\leftarrow\mathcal{A}_{t}\cup\{(p_{t,b},y_{t,b},u_{t,b})\}_{b=1}^{B}
+8:
+ℳ
+t
++
+1
+←
+UpdateMemory
+​
+(
+ℳ
+t
+,
+𝒜
+t
++
+1
+)
+\mathcal{M}_{t+1}\leftarrow\textsc{UpdateMemory}(\mathcal{M}_{t},\mathcal{A}_{t+1})
+{annotate; merge; update rewards}
+9:
+if
+DiscoverScheduled
+​
+(
+t
+)
+\textsc{DiscoverScheduled}(t)
+then
+10:
+ℳ
+t
++
+1
+←
+DiscoverIdeas
+​
+(
+𝒜
+t
++
+1
+,
+ℳ
+t
++
+1
+)
+\mathcal{M}_{t+1}\leftarrow\textsc{DiscoverIdeas}(\mathcal{A}_{t+1},\mathcal{M}_{t+1})
+{Alg.
+2
+}
+11:
+end
+if
+11:
+Revise at plateaus (Sec.
+4.2
+)
+12:
+if
+EntersPlateau
+​
+(
+𝒜
+t
++
+1
+,
+κ
+)
+\textsc{EntersPlateau}(\mathcal{A}_{t+1},\kappa)
+then
+13:
+ℳ
+t
++
+1
+←
+ReviseAtPlateau
+​
+(
+𝒜
+t
++
+1
+,
+ℳ
+t
++
+1
+)
+\mathcal{M}_{t+1}\leftarrow\textsc{ReviseAtPlateau}(\mathcal{A}_{t+1},\mathcal{M}_{t+1})
+{probe; judge; mask}
+14:
+end
+if
+15:
+end
+for
+16:
+return
+arg
+max
+(
+p
+,
+y
+,
+⋅
+)
+∈
+𝒜
+N
+y
+\arg\max_{(p,y,\cdot)\in\mathcal{A}_{N}}y
+and
+ℳ
+N
+\mathcal{M}_{N}
+Algorithm 2
+DiscoverIdeas
+0:
+archive
+𝒜
+\mathcal{A}
+; idea memory
+ℳ
+\mathcal{M}
+; pair budget
+ℓ
+\ell
+; minimum support
+n
+min
+n_{\min}
+; admission threshold
+η
+\eta
+0:
+updated idea memory
+ℳ
+\mathcal{M}
+0:
+Select unexplained contrasts
+1:
+if
+ℳ
+=
+∅
+\mathcal{M}=\varnothing
+then
+2:
+Q
+←
+LargestScoreGaps
+​
+(
+𝒜
+,
+ℓ
+)
+Q\leftarrow\textsc{LargestScoreGaps}(\mathcal{A},\ell)
+3:
+else
+4:
+Q
+←
+MisrankedPairs
+​
+(
+𝒜
+,
+ℳ
+,
+ℓ
+)
+Q\leftarrow\textsc{MisrankedPairs}(\mathcal{A},\mathcal{M},\ell)
+{pairwise ranker on
+Z
+⁡
+(
+p
+)
+Z(p)
+}
+5:
+end
+if
+5:
+Propose candidate ideas
+6:
+ℳ
+~
+←
+ProposeIdeas
+​
+(
+Q
+)
+\widetilde{\mathcal{M}}\leftarrow\textsc{ProposeIdeas}(Q)
+{name, description, type, values}
+6:
+Annotate, test, and admit
+7:
+for
+each
+z
+∈
+ℳ
+~
+z\in\widetilde{\mathcal{M}}
+do
+8:
+z
+​
+(
+p
+)
+←
+Annotate
+​
+(
+p
+,
+z
+)
+z(p)\leftarrow\textsc{Annotate}(p,z)
+for all
+p
+∈
+𝒜
+p\in\mathcal{A}
+{in
+𝒱
+∪
+{
+𝗎𝗇𝗄𝗇𝗈𝗐𝗇
+}
+\mathcal{V}\cup\{\mathsf{unknown}\}
+}
+9:
+if
+Supported
+​
+(
+z
+,
+𝒜
+,
+n
+min
+)
+\textsc{Supported}(z,\mathcal{A},n_{\min})
+and
+|
+ScoreContrast
+​
+(
+z
+,
+𝒜
+)
+|
+≥
+η
+|\textsc{ScoreContrast}(z,\mathcal{A})|\geq\eta
+and
+not
+Duplicate
+​
+(
+z
+,
+ℳ
+)
+\textsc{Duplicate}(z,\mathcal{M})
+then
+10:
+ℳ
+←
+ℳ
+∪
+{
+z
+}
+\mathcal{M}\leftarrow\mathcal{M}\cup\{z\}
+11:
+end
+if
+12:
+end
+for
+13:
+return
+ℳ
+\mathcal{M}
+H.1
+Idea Memory and Annotation
+Idea factors.
+Each idea factor
+z
+z
+in the idea memory
+ℳ
+t
+\mathcal{M}_{t}
+is stored with a name, a description of its code pattern, a type, i.e., binary or categorical, and a value set
+𝒱
+\mathcal{V}
+. The description is also used by the annotator LLM to recognize the idea factor from the source code. The annotator LLM labels each program with
+z
+⁡
+(
+p
+)
+∈
+𝒱
+∪
+{
+𝗎𝗇𝗄𝗇𝗈𝗐𝗇
+}
+z(p)\in\mathcal{V}\cup\{\mathsf{unknown}\}
+, where the label is
+𝗎𝗇𝗄𝗇𝗈𝗐𝗇
+\mathsf{unknown}
+if the idea factor cannot be recognized. The annotation of a program is a separate LLM call, independent of the proposal of idea factors, with the source code truncated to
+4000
+4000
+characters.
+Score contrast.
+For a binary idea factor, the score contrast is the difference of the mean scores between the successful programs labeled
+𝗍𝗋𝗎𝖾
+\mathsf{true}
+and those labeled
+𝖿𝖺𝗅𝗌𝖾
+\mathsf{false}
+. For a categorical idea factor, the score contrast is the difference of the mean scores between the value with the highest mean score and the value with the lowest mean score. Programs labeled
+𝗎𝗇𝗄𝗇𝗈𝗐𝗇
+\mathsf{unknown}
+are excluded from the score contrast.
+Updating the memory.
+After each generation,
+UpdateMemory
+labels the new programs with all existing idea factors, recomputes the score contrasts, and merges two idea factors if the Pearson correlation of their labels on the archive exceeds
+0.85
+0.85
+(Alg.
+1
+, line 8). Degenerate evaluations, whose scores collapse to extreme values, are excluded from the statistics. It also updates the statistics of the actions (Appendix
+H.3
+).
+Memory summary in the prompt.
+Every slot, including random exploration, receives a summary of the idea memory (line 5). The summary lists the six idea factors with the largest absolute score contrasts, each with its name, description, direction of effect, numbers of programs with and without it, and score contrast, and gives the mean score of each value for categorical idea factors. It also contains the outlier programs that the current idea factors fail to explain, i.e., one program with a large positive residual and one with a large negative residual (
+|
+z
+|
+≥
+1.5
+|z|\geq 1.5
+), with their source code truncated to
+1500
+1500
+characters.
+H.2
+Idea Discovery
+Trigger.
+Discovery is triggered every
+n
+disc
+n_{\mathrm{disc}}
+generations after the first generation, when the archive contains at least
+15
+15
+successful programs and the idea memory contains fewer than
+12
+12
+idea factors, excluding the background idea factors (Alg.
+1
+, line 9).
+Pairwise ranker.
+Let
+σ
+Y
+\sigma_{Y}
+be the standard deviation of the scores of the successful programs in the archive.
+ExpEvolve
+builds all pairs of successful programs
+(
+p
+,
+p
+′
+)
+(p,p^{\prime})
+with
+|
+y
+⁡
+(
+p
+)
+−
+y
+⁡
+(
+p
+′
+)
+|
+≥
+0.25
+​
+σ
+Y
+|y(p)-y(p^{\prime})|\geq 0.25\,\sigma_{Y}
+, and labels each pair by
+sign
+⁡
+(
+y
+⁡
+(
+p
+)
+−
+y
+⁡
+(
+p
+′
+)
+)
+\mathrm{sign}(y(p)-y(p^{\prime}))
+. The feature of a pair is the difference of the binary encodings of the idea factors, where a factor is encoded as
+1
+1
+if it is labeled
+𝗍𝗋𝗎𝖾
+\mathsf{true}
+and
+0
+0
+otherwise, together with the standardized difference of the code lengths as a covariate. The ranker is a ridge least-squares model without intercept (
+λ
+=
+10
+−
+3
+\lambda=10^{-3}
+), refit in each discovery round.
+Selecting unexplained pairs.
+ExpEvolve
+selects the pairs that the ranker orders incorrectly (Alg.
+2
+, line 4), and excludes the pairs on which the current idea factors take identical values. The selected pairs are ranked by
+acc
+0
+​
+(
+p
+,
+p
+′
+)
+⋅
+w
+⁡
+(
+p
+,
+p
+′
+)
+\mathrm{acc}_{0}(p,p^{\prime})\cdot w(p,p^{\prime})
+, where
+w
+⁡
+(
+p
+,
+p
+′
+)
+=
+1.5
+w(p,p^{\prime})=1.5
+if the two programs come from the same generation and
+1
+1
+otherwise. The null accuracy
+acc
+0
+​
+(
+p
+,
+p
+′
+)
+\mathrm{acc}_{0}(p,p^{\prime})
+is the fraction of
+500
+500
+random permutations of the scores over programs, under which a ranker refit on the permuted labels still predicts the true order of the pair. A pair with a high null accuracy is easy to order from the idea factors, so that its misranking indicates a missing idea factor. The null accuracy uses the differences of the idea factors without the code-length covariate. Up to
+ℓ
+=
+6
+\ell=6
+pairs are used, with each program appearing in at most two pairs. If fewer than
+3
+3
+pairs are available, the discovery round is skipped. When the idea memory is empty,
+ExpEvolve
+selects the
+ℓ
+\ell
+pairs with the largest score gaps under the same constraints (lines 1–2).
+Proposing candidates.
+For each selected pair, the prompt of the proposer LLM contains the score gap in raw units and in units of
+σ
+Y
+\sigma_{Y}
+, the scores, the predicted scores and the residuals of both programs, the order predicted by the ranker, the idea factors on which the two programs differ, and the source code of both programs truncated to
+1500
+1500
+characters each. The proposer LLM is asked to explain the unexpected order, and proposes
+8
+8
+candidates in each round, each with a name, a description, a type, a value set, and a predicted direction (line 6).
+Annotation and admission.
+Each candidate is annotated on the whole archive (line 8).
+ExpEvolve
+admits a candidate if the two values compared by its score contrast are each taken by at least
+n
+min
+=
+5
+n_{\min}=5
+programs, the absolute score contrast is at least
+η
+=
+max
+⁡
+(
+0.25
+​
+σ
+Y
+,
+10
+−
+3
+)
+\eta=\max(0.25\,\sigma_{Y},\,10^{-3})
+, and the candidate does not duplicate an idea factor in the memory, an idea factor removed before, or another selected candidate (line 9). Two idea factors are considered duplicates if their names are identical, the token Jaccard similarity of their names is at least
+0.6
+0.6
+, or the token overlap of their descriptions is at least
+0.45
+0.45
+. Since the archive is collected adaptively by the search, the score contrast is an association within the archive and does not identify the effect of the idea factor. Admission therefore makes an idea factor available for testing, and the search examines it through the actions (Appendix
+H.3
+).
+H.3
+Idea-Guided Actions
+Actions.
+Allocate
+compiles the idea factors into actions, i.e.,
+𝖠𝖣𝖣
+⁡
+(
+z
+)
+\mathsf{ADD}(z)
+and
+𝖱𝖤𝖬𝖮𝖵𝖤
+⁡
+(
+z
+)
+\mathsf{REMOVE}(z)
+for a binary idea factor, and
+𝖲𝖤𝖳
+⁡
+(
+z
+=
+v
+)
+\mathsf{SET}(z{=}v)
+for each value
+v
+v
+of a categorical idea factor (Alg.
+1
+, line 3). The action set is rebuilt in every generation, and keeps at most three actions of the idea factors with the largest absolute score contrasts, together with a baseline action without instruction. An action that has stayed in the action set for
+N
+rot
+N_{\mathrm{rot}}
+consecutive generations is rotated out to give way to other actions, and its records are kept for when it enters the action set again. Before an admitted idea factor is compiled into actions, its absolute score contrast must exceed the
+95
+95
+th percentile of a null distribution obtained from
+200
+200
+permutations of the scores, and a threshold on the absolute score contrast is used instead when the permutation test cannot be run. Background idea factors (Appendix
+H.4
+) are not compiled into actions, until they satisfy the admission conditions of Appendix
+H.2
+and are promoted to regular idea factors.
+Prompt of an action.
+An idea-guided slot differs from random exploration in two parts of the prompt (line 5). First, a strategy instruction asks the mutator LLM to use or avoid the pattern of
+z
+z
+, or to set
+z
+z
+to
+v
+v
+, with the description of
+z
+z
+and its estimated effect. Second, the example programs consist of the best program in the archive as an anchor, followed by the best programs in the target state of the action, where ties between programs with similar scores are broken in favor of programs with rare combinations of idea factors, and
+k
+=
+3
+k=3
+example programs are used in total. There is no explicit parent program, since
+SCS
+conditions the mutator LLM on a set of example programs.
+Random exploration.
+A random exploration slot uses the prompt of
+SCS
+without strategy instruction, with
+3
+3
+example programs sampled uniformly at random from the successful programs, and the summary of the idea memory.
+Diversification in the warm-up.
+In the warm-up generations, the slots of the baseline action in the second half of each generation receive a diversification instruction, which asks the mutator LLM to first list three to five distinct families of well-established approaches to the task as code comments, and to note which families the example programs use.
+Allocating slots.
+In each generation,
+Allocate
+assigns
+max
+⁡
+(
+2
+,
+round
+⁡
+(
+ρ
+​
+B
+)
+)
+\max(2,\mathrm{round}(\rho B))
+slots to random exploration, and the remaining slots to idea-guided actions, where
+u
+t
+,
+b
+u_{t,b}
+denotes the action of slot
+b
+b
+and
+u
+t
+,
+b
+=
+⊥
+u_{t,b}=\bot
+denotes random exploration (line 3). An idea-guided slot falls back to random exploration if no action is available, e.g., before any idea factor is admitted, or if the actions have reached the limit of slots per generation. The fraction of random exploration is thus at least
+ρ
+\rho
+.
+Bandit.
+The bandit selects the actions of idea-guided slots with a soft UCB rule,
+s
+⁡
+(
+a
+)
+=
+r
+~
+max
+​
+(
+a
+)
++
+c
+​
+ln
+⁡
+(
+N
+tot
++
+1
+)
+n
+a
+,
+Pr
+⁡
+(
+a
+)
+∝
+exp
+⁡
+(
+s
+⁡
+(
+a
+)
+)
+,
+s(a)=\tilde{r}_{\max}(a)+c\sqrt{\frac{\ln(N_{\mathrm{tot}}+1)}{n_{a}}},\qquad\Pr(a)\propto\exp\big(s(a)\big),
+where
+n
+a
+n_{a}
+is the number of times that
+a
+a
+has been selected,
+N
+tot
+=
+∑
+a
+n
+a
+N_{\mathrm{tot}}=\sum_{a}n_{a}
+, and
+c
+=
+1
+c=1
+. Actions that have not been selected are tried first. The value
+r
+~
+max
+​
+(
+a
+)
+\tilde{r}_{\max}(a)
+is the maximum reward of
+a
+a
+, minus a bootstrap estimate of the expected maximum of
+n
+a
+n_{a}
+rewards drawn from all actions, which corrects the growth of the maximum with the number of samples. The reward of a program generated under an action follows the normalized reward in Sec.
+4.2
+, where the standard deviation is lower bounded as
+σ
+rand
+=
+max
+⁡
+(
+std
+⁡
+(
+y
+rand
+)
+,
+0.05
+​
+|
+y
+¯
+rand
+|
+,
+10
+−
+6
+)
+\sigma_{\mathrm{rand}}=\max\big(\mathrm{std}(y_{\mathrm{rand}}),\,0.05\,|\bar{y}_{\mathrm{rand}}|,\,10^{-6}\big)
+(line 8). If fewer than two random exploration programs are available in the generation, the adjacent generations are included. A failed program receives a penalty score below the worst successful program.
+H.4
+Idea-Guided Exploration at Plateaus
+Entering and leaving a plateau.
+ExpEvolve
+records the best-so-far score at the end of each generation, and the search is in a plateau if the best-so-far scores of the last
+κ
++
+1
+\kappa+1
+generations are equal up to a relative tolerance of
+10
+−
+4
+10^{-4}
+, after the warm-up generations. When the search enters a plateau,
+ReviseAtPlateau
+runs the background probe and the dependency judge below (Alg.
+1
+, lines 12–13). The plateau ends as soon as the best-so-far score improves, and all the changes during the plateau are reverted in the same generation. Each time the search enters a plateau again, the probe and the judge are run again, since the background of a new plateau can differ from the previous one.
+Background probe.
+An LLM reads the
+8
+8
+successful programs with the highest scores, with the source code truncated to
+1500
+1500
+characters and the names of the current idea factors, and proposes
+2
+2
+to
+4
+4
+binary properties that these programs share. Each property is annotated on the archive, and is recorded as a background idea factor if at least
+5
+5
+of the
+8
+8
+top programs are annotated and at least
+80
+%
+80\%
+of them realize the property. A background idea factor stays in the memory after the plateau, and is promoted to a regular idea factor once enough programs without it appear in the archive and its score contrast passes the admission threshold.
+Dependency judge.
+The background is described by the three idea factors with the largest absolute score contrasts. For each idea factor in the memory, and for each value of a categorical idea factor, an LLM judge decides, with three calls, whether it depends on the background, i.e., loses its meaning or reverses its effect once the defining property of the background no longer holds.
+Changes during a plateau.
+While the search is in a plateau,
+ExpEvolve
+applies the following changes.
+•
+Reversing and masking actions.
+For a binary idea factor judged dependent,
+𝖠𝖣𝖣
+⁡
+(
+z
+)
+\mathsf{ADD}(z)
+is replaced by
+𝖱𝖤𝖬𝖮𝖵𝖤
+⁡
+(
+z
+)
+\mathsf{REMOVE}(z)
+in the action set, with the same description and score contrast, so that the bandit can only move away from
+z
+z
+. For a categorical idea factor, the actions of the values judged dependent are masked, while the other values are kept as escape actions. The dependent idea factors are also removed from the summary of the idea memory. After the plateau, the original actions are restored, and the records of the reversed and masked actions are kept.
+•
+Stall note.
+A note on the current state is prepended to the prompt of every slot. The note reports the best score and the number of generations without improvement, lists the dependent idea factors with their names and shortened descriptions, states that the search has stalled on this combination, and asks whether other constructions or combinations can reach a higher score.
+•
+More random exploration.
+Each idea-guided slot is reassigned to random exploration with probability
+0.9
+0.9
+. Since the judge runs at the end of the first plateau generation, the probability is lowered to
+0.3
+0.3
+from the next generation.
+•
+Diversified demonstrations.
+Random exploration uses the best program of the background as the first example, and fills the other examples with programs outside the background, which are selected greedily to diversify their idea factors. A program is considered in the background if it realizes any dependent idea factor.
+•
+Exploration of the bandit.
+In the first
+2
+2
+generations of a plateau, the bandit selects the actions by the exploration bonus only.
+Table 3:
+Hyperparameters of
+ExpEvolve
+in the main experiments. The budget of
+200
+200
+evaluations is run with two configurations of generations
+N
+N
+and batch size
+B
+B
+. Both configurations are run on all
+11
+11
+tasks, each with
+3
+3
+seeds.
+Hyperparameter
+N
+=
+20
+N=20
+,
+B
+=
+10
+B=10
+N
+=
+10
+N=10
+,
+B
+=
+20
+B=20
+Fraction of random exploration
+ρ
+\rho
+0.6
+0.6
+0.4
+0.4
+Discovery interval
+n
+disc
+n_{\mathrm{disc}}
+(generations)
+2
+2
+1
+1
+Plateau window
+κ
+\kappa
+(generations)
+4
+4
+2
+2
+Warm-up generations
+2
+2
+1
+1
+Action rotation
+N
+rot
+N_{\mathrm{rot}}
+(generations)
+6
+6
+3
+3
+Shared by both configurations
+Minimum archive size for discovery
+15
+15
+Maximum number of idea factors
+12
+12
+Score gap of candidate pairs
+0.25
+​
+σ
+Y
+0.25\,\sigma_{Y}
+Pair budget
+ℓ
+\ell
+6
+6
+Weight of same-generation pairs
+1.5
+1.5
+Permutations for the null accuracy
+500
+500
+Permutations and quantile of the action gate
+200
+200
+,
+0.95
+0.95
+Candidates per discovery round
+8
+8
+Minimum support
+n
+min
+n_{\min}
+5
+5
+Admission threshold
+η
+\eta
+max
+⁡
+(
+0.25
+​
+σ
+Y
+,
+10
+−
+3
+)
+\max(0.25\,\sigma_{Y},10^{-3})
+Actions in the action set
+≤
+3
+\leq 3
+and a baseline action
+Example programs per prompt
+k
+k
+3
+3
+UCB coefficient
+c
+c
+1
+1
+Top programs in the background probe
+8
+8
+Reassignment probability at plateaus
+0.9
+0.9
+, then
+0.3
+0.3
+Bandit exploration window (generations)
+2
+2
+LLM of all calls
+DeepSeek-V4-Flash
+Temperature of proposer / annotator / judge
+0.7
+0.7
+/
+0.2
+0.2
+/
+0.3
+0.3
+Appendix I
+Experimental Details
+I.1
+Tasks
+Table
+4
+summarizes the
+11
+11
+tasks. Nine tasks are the mathematical problems studied by
+SCS
+(
+Gideoni et al., 2026
+)
+, which are taken from
+AlphaEvolve
+(
+Novikov et al., 2025
+)
+, and we report their reference values as collected by
+Gideoni et al. (2026)
+. All methods use the same evaluator for each task, and each evaluation is limited to
+60
+60
+seconds, except the uncertainty inequality with
+300
+300
+seconds.
+Table 4:
+Tasks, optimization directions, and reference values. The previous best values and the values of
+AlphaEvolve
+are collected by
+Gideoni et al. (2026)
+. For the uncertainty inequality, all methods in
+Gideoni et al. (2026)
+reach
+0.3482
+0.3482
+under their reformulated parameterization, which we use in our experiments. For the Hadamard matrix, the previous best is the normalized score of the best-known construction.
+Task
+Direction
+Previous best
+AlphaEvolve
+First autocorrelation inequality
+↓
+\downarrow
+1.5098
+1.5098
+1.5053
+1.5053
+Second autocorrelation inequality
+↑
+\uparrow
+0.88922
+0.88922
+0.8962
+0.8962
+Uncertainty inequality
+↓
+\downarrow
+0.3523
+0.3523
+0.3521
+0.3521
+Erdős minimum overlap
+↓
+\downarrow
+0.380927
+0.380927
+0.380924
+0.380924
+Sums and differences of sets
+↑
+\uparrow
+1.14465
+1.14465
+1.1584
+1.1584
+Max–min distance ratio (
+16
+16
+points)
+↓
+\downarrow
+12.890
+12.890
+12.88927
+12.88927
+Heilbronn for triangles (
+n
+=
+11
+n=11
+)
+↑
+\uparrow
+0.036
+0.036
+0.0365
+0.0365
+Kissing number (
+11
+11
+dimensions)
+↑
+\uparrow
+592
+592
+593
+593
+Circle packing (
+26
+26
+circles)
+↑
+\uparrow
+2.634
+2.634
+2.63586
+2.63586
+Circle packing via LP (
+26
+26
+circles)
+↑
+\uparrow
+–
+–
+Hadamard matrix (
+n
+=
+29
+n=29
+)
+↑
+\uparrow
+0.9357
+0.9357
+–
+First autocorrelation inequality.
+Let
+C
+1
+C_{1}
+be the largest constant such that
+max
+t
+⁡
+(
+f
+∗
+f
+)
+​
+(
+t
+)
+≥
+C
+1
+​
+(
+∫
+f
+)
+2
+\max_{t}(f*f)(t)\geq C_{1}\big(\int f\big)^{2}
+for all non-negative functions
+f
+f
+supported on
+[
+−
+1
+/
+4
+,
+1
+/
+4
+]
+[-1/4,1/4]
+, where
+f
+∗
+f
+f*f
+is the autoconvolution. A non-negative step function
+f
+f
+gives an upper bound
+C
+1
+≤
+max
+t
+⁡
+(
+f
+∗
+f
+)
+​
+(
+t
+)
+/
+(
+∫
+f
+)
+2
+C_{1}\leq\max_{t}(f*f)(t)/(\int f)^{2}
+, which the task minimizes. The number of steps is chosen by the program, and for a step function with
+n
+n
+steps and values
+h
+h
+, the score is computed as
+2
+​
+n
+​
+max
+⁡
+(
+h
+∗
+h
+)
+/
+(
+∑
+h
+)
+2
+2n\max(h*h)/(\sum h)^{2}
+, which is invariant to the scale of
+h
+h
+.
+Second autocorrelation inequality.
+Let
+C
+2
+C_{2}
+be the smallest constant such that
+‖
+f
+∗
+f
+‖
+2
+2
+≤
+C
+2
+​
+‖
+f
+∗
+f
+‖
+1
+​
+‖
+f
+∗
+f
+‖
+∞
+\|f*f\|_{2}^{2}\leq C_{2}\,\|f*f\|_{1}\,\|f*f\|_{\infty}
+for all non-negative functions
+f
+f
+. A non-negative step function
+f
+f
+gives a lower bound
+C
+2
+≥
+‖
+f
+∗
+f
+‖
+2
+2
+/
+(
+‖
+f
+∗
+f
+‖
+1
+​
+‖
+f
+∗
+f
+‖
+∞
+)
+C_{2}\geq\|f*f\|_{2}^{2}/(\|f*f\|_{1}\|f*f\|_{\infty})
+, which the task maximizes. The evaluator rejects step functions with more than
+10
+4
+10^{4}
+steps.
+Uncertainty inequality.
+For a function
+g
+g
+, let
+A
+⁡
+(
+g
+)
+=
+inf
+{
+r
+>
+0
+:
+g
+⁡
+(
+x
+)
+≥
+0
+​
+for all
+​
+|
+x
+|
+≥
+r
+}
+A(g)=\inf\{r>0:g(x)\geq 0\text{ for all }|x|\geq r\}
+. For even functions
+f
+f
+with
+f
+⁡
+(
+0
+)
+≤
+0
+f(0)\leq 0
+and
+f
+^
+​
+(
+0
+)
+≤
+0
+\hat{f}(0)\leq 0
+, the task minimizes
+A
+⁡
+(
+f
+)
+​
+A
+​
+(
+f
+^
+)
+A(f)A(\hat{f})
+, which upper bounds the largest constant
+C
+C
+such that
+A
+⁡
+(
+f
+)
+​
+A
+​
+(
+f
+^
+)
+≥
+C
+A(f)A(\hat{f})\geq C
+. Following the reformulation of
+Gideoni et al. (2026)
+,
+f
+f
+is a Hermite–Gaussian expansion over the monic (probabilist’s) Hermite polynomials
+H
+0
+,
+H
+4
+,
+…
+,
+H
+28
+H_{0},H_{4},\dots,H_{28}
+with
+7
+7
+free coefficients, which represents a larger class of functions than the original formulation over
+H
+0
+,
+H
+4
+,
+H
+8
+,
+H
+12
+H_{0},H_{4},H_{8},H_{12}
+with
+3
+3
+free coefficients. The sign conditions are checked on a grid of
+2
+×
+10
+5
+2\times 10^{5}
+points in
+[
+10
+−
+6
+,
+30
+]
+[10^{-6},30]
+, which is refined to
+2
+×
+10
+6
+2\times 10^{6}
+points with extended precision when the score is below
+0.6
+0.6
+, and each evaluation is limited to
+300
+300
+seconds. Since the reformulation enlarges the search space, the resulting values are not comparable with the values of the original formulation in Table
+4
+. In the implementation, the score is
+r
+2
+/
+(
+2
+​
+π
+)
+r^{2}/(2\pi)
+, where
+r
+r
+is the largest root at which
+f
+f
+changes sign.
+Erdős minimum overlap problem.
+For a partition of
+{
+1
+,
+…
+,
+2
+​
+n
+}
+\{1,\dots,2n\}
+into two sets
+A
+A
+and
+B
+B
+of equal size, let
+M
+⁡
+(
+n
+)
+=
+min
+A
+,
+B
+⁡
+max
+k
+​
+|
+{
+(
+a
+,
+b
+)
+∈
+A
+×
+B
+:
+a
+−
+b
+=
+k
+}
+|
+M(n)=\min_{A,B}\max_{k}|\{(a,b)\in A\times B:a-b=k\}|
+. The task constructs a step function
+h
+h
+with values in
+[
+0
+,
+1
+]
+[0,1]
+, whose number of steps is chosen by the program, and minimizes the upper bound on
+lim
+n
+→
+∞
+M
+⁡
+(
+n
+)
+/
+n
+\lim_{n\to\infty}M(n)/n
+given by twice the maximum correlation between
+h
+h
+and
+1
+−
+h
+1-h
+divided by the number of steps.
+Sums and differences of sets.
+Following the framework of Gyarmati, Hennecart, and Ruzsa, the task constructs a set
+U
+⊂
+ℕ
+≥
+0
+U\subset\mathbb{N}_{\geq 0}
+with
+0
+∈
+U
+0\in U
+that maximizes
+θ
+⁡
+(
+U
+)
+=
+1
++
+log
+⁡
+(
+|
+U
+−
+U
+|
+/
+|
+U
++
+U
+|
+)
+/
+log
+⁡
+(
+2
+​
+max
+⁡
+(
+U
+)
++
+1
+)
+\theta(U)=1+\log(|U-U|/|U+U|)/\log(2\max(U)+1)
+, which lower bounds the largest exponent
+θ
+\theta
+such that
+|
+A
+−
+B
+|
+≥
+c
+⁡
+(
+K
+)
+​
+|
+A
++
+B
+|
+θ
+|A-B|\geq c(K)|A+B|^{\theta}
+for arbitrarily large sets
+A
+,
+B
+A,B
+with
+|
+A
++
+B
+|
+≤
+K
+​
+|
+A
+|
+|A+B|\leq K|A|
+.
+Max–min distance ratio.
+The task places
+16
+16
+points in the plane to minimize the squared ratio between the maximum and the minimum pairwise distances. For example, the squared ratios
+12.889
+12.889
+and
+13.0
+13.0
+in Table
+1
+correspond to the ratios
+3.5902
+3.5902
+and
+3.6056
+3.6056
+.
+Heilbronn problem for triangles.
+The task places
+11
+11
+points in the equilateral triangle with vertices
+(
+0
+,
+0
+)
+(0,0)
+,
+(
+1
+,
+0
+)
+(1,0)
+, and
+(
+1
+/
+2
+,
+3
+/
+2
+)
+(1/2,\sqrt{3}/2)
+to maximize the smallest area of the triangles formed by any three of the points, normalized by the area
+3
+/
+4
+\sqrt{3}/4
+of the equilateral triangle.
+Kissing number in
+11
+11
+dimensions.
+A set of points
+C
+⊂
+ℝ
+11
+C\subset\mathbb{R}^{11}
+with
+0
+∉
+C
+0\notin C
+and
+min
+x
+≠
+y
+⁡
+‖
+x
+−
+y
+‖
+≥
+max
+x
+⁡
+‖
+x
+‖
+\min_{x\neq y}\|x-y\|\geq\max_{x}\|x\|
+over
+x
+,
+y
+∈
+C
+x,y\in C
+yields a kissing configuration of
+|
+C
+|
+|C|
+unit spheres. The task constructs such a set, and the score is the number of points
+|
+C
+|
+|C|
+. The distances and norms are only used to check the validity of the configuration, and a configuration with more points than the known upper bound
+868
+868
+is rejected.
+Circle packing.
+The task places
+26
+26
+non-overlapping circles in the unit square to maximize the sum of their radii. The evaluator checks the non-overlap and the containment of all circles, including that every radius is at most
+0.5
+0.5
+and every center lies in the unit square, and checks that the sum of radii reported by the program agrees with the radii up to a relative and absolute tolerance of
+10
+−
+3
+10^{-3}
+.
+Circle packing via linear programming.
+A variant of circle packing where the program proposes only the
+26
+26
+centers
+C
+i
+∈
+[
+0
+,
+1
+]
+2
+C_{i}\in[0,1]^{2}
+, and the radii are recovered by a linear program that maximizes
+∑
+i
+r
+i
+\sum_{i}r_{i}
+subject to
+r
+i
++
+r
+j
+≤
+‖
+C
+i
+−
+C
+j
+‖
+r_{i}+r_{j}\leq\|C_{i}-C_{j}\|
+and
+r
+i
+≤
+min
+⁡
+(
+C
+i
+x
+,
+C
+i
+y
+,
+1
+−
+C
+i
+x
+,
+1
+−
+C
+i
+y
+)
+r_{i}\leq\min(C_{i}^{x},C_{i}^{y},1-C_{i}^{x},1-C_{i}^{y})
+. The variant isolates the layout of the circles from the assignment of the radii. The starting code in the prompt solves the linear program with the HiGHS solver of SciPy.
+Hadamard matrix.
+The task constructs a matrix
+H
+∈
+{
+±
+1
+}
+29
+×
+29
+H\in\{\pm 1\}^{29\times 29}
+that maximizes
+|
+det
+(
+H
+)
+|
+/
+(
+2
+28
+⋅
+7
+12
+⋅
+342
+)
+|\det(H)|/(2^{28}\cdot 7^{12}\cdot 342)
+. Following the convention of
+Wang et al. (2026)
+, the best-known construction with
+|
+det
+(
+H
+)
+|
+=
+2
+28
+⋅
+7
+12
+⋅
+320
+|\det(H)|=2^{28}\cdot 7^{12}\cdot 320
+scores
+320
+/
+342
+≈
+0.9357
+320/342\approx 0.9357
+.
+I.2
+Baselines
+SCS
+.
+We use the implementation of
+SCS
+(
+Gideoni et al., 2026
+)
+, which generates each program from a prompt containing the task instruction and
+3
+3
+example programs sampled uniformly at random without replacement from the archive.
+SCS
+does not maintain an idea memory, and its prompt does not contain the summary of the idea memory used by
+ExpEvolve
+.
+SCS+meta.
+SCS+meta adds the meta-summary of
+ShinkaEvolve
+to the prompt of
+SCS
+, i.e., a textual summary of the insights of recent programs with at most
+5
+5
+recommendations, which is rewritten by DeepSeek-V4-Flash at temperature
+0
+0
+after every generation, without the idea memory, the idea-guided actions, and the exploration at plateaus of
+ExpEvolve
+. It is run on First autocorrelation, Heilbronn, and Kissing with
+10
+10
+generations of
+20
+20
+programs, and on Uncertainty inequality with
+20
+20
+generations of
+10
+10
+programs.
+ShinkaEvolve
+.
+We run
+ShinkaEvolve
+(
+Lange et al., 2026
+)
+with
+5
+5
+islands and migration every
+10
+10
+generations, weighted parent sampling, an archive of
+40
+40
+programs, a meta-summary every
+10
+10
+generations with
+5
+5
+recommendations, and both diff-based and full rewrites.
+ShinkaEvolve
+generates one program per generation, and does not distinguish the two configurations of
+ExpEvolve
+and
+SCS
+.
+I.3
+Budget and Resources
+All methods evaluate each generated program once, and a failed program consumes the budget. The LLM calls of
+ExpEvolve
+for proposing, annotating, probing, and judging idea factors do not evaluate programs and do not consume the budget. Each run of
+ShinkaEvolve
+starts from
+5
+5
+copies of the initial program, one for each island, and then generates
+199
+199
+programs, so its final performance is reported at
+199
+199
+generated programs. The evaluations of
+ExpEvolve
+and
+SCS
+are not limited in CPUs, while the runs of
+ShinkaEvolve
+on First autocorrelation, Second autocorrelation, Kissing, and Max–min distance ratio evaluate each program with at most
+8
+8
+CPUs. The LLM is accessed either through the official API of DeepSeek or through OpenRouter, depending on the time of the run.
+Appendix J
+Additional Results
+Per-seed results.
+Tables
+5
+and
+6
+report the final best score of each seed for the cells of Table
+1
+, and Tables
+7
+and
+8
+report the best-so-far scores along the budget.
+Table 5:
+Final best score of each seed at the budget of
+200
+200
+, and the mean
+±
+\pm
+standard deviation over seeds.
+Task
+Method
+Config.
+Seed 1
+Seed 2
+Seed 3
+Mean
+Hadamard
+↑
+\uparrow
+ExpEvolve
+10
+×
+20
+10\times 20
+0.9211
+0.9357
+0.9211
+0.9259
+±
+\pm
+0.0084
+ExpEvolve
+20
+×
+10
+20\times 10
+0.9211
+0.9211
+0.9211
+0.9211
+±
+\pm
+0.0000
+SCS
+10
+×
+20
+10\times 20
+0.8596
+0.9211
+0.7240
+0.8349
+±
+\pm
+0.1008
+SCS
+20
+×
+10
+20\times 10
+0.8596
+0.5665
+0.5662
+0.6641
+±
+\pm
+0.1693
+ShinkaEvolve
+–
+0.5603
+0.5733
+0.8066
+0.6467
+±
+\pm
+0.1386
+Pack
+↑
+\uparrow
+ExpEvolve
+10
+×
+20
+10\times 20
+2.63304
+2.63598
+2.63595
+2.63499
+±
+\pm
+0.00169
+ExpEvolve
+20
+×
+10
+20\times 10
+2.63598
+2.63429
+2.63598
+2.63542
+±
+\pm
+0.00098
+SCS
+10
+×
+20
+10\times 20
+2.62760
+2.63104
+2.61050
+2.62305
+±
+\pm
+0.01100
+SCS
+20
+×
+10
+20\times 10
+2.63017
+2.63572
+2.58501
+2.61697
+±
+\pm
+0.02781
+ShinkaEvolve
+–
+2.61408
+2.54142
+2.59052
+2.58201
+±
+\pm
+0.03707
+Linprog
+↑
+\uparrow
+ExpEvolve
+10
+×
+20
+10\times 20
+2.63598
+2.63429
+2.63598
+2.63542
+±
+\pm
+0.00098
+ExpEvolve
+20
+×
+10
+20\times 10
+2.63429
+2.63598
+2.63598
+2.63542
+±
+\pm
+0.00098
+SCS
+10
+×
+20
+10\times 20
+2.55342
+2.54533
+2.55608
+2.55161
+±
+\pm
+0.00560
+SCS
+20
+×
+10
+20\times 10
+2.63598
+2.63429
+2.63598
+2.63542
+±
+\pm
+0.00098
+ShinkaEvolve
+–
+2.51192
+2.54142
+2.48969
+2.51434
+±
+\pm
+0.02595
+SumDiff
+↑
+\uparrow
+ExpEvolve
+10
+×
+20
+10\times 20
+1.12281
+1.12142
+1.12250
+1.12224
+±
+\pm
+0.00073
+ExpEvolve
+20
+×
+10
+20\times 10
+1.11937
+1.10954
+1.11937
+1.11609
+±
+\pm
+0.00567
+SCS
+10
+×
+20
+10\times 20
+1.11033
+1.12006
+1.11786
+1.11608
+±
+\pm
+0.00510
+SCS
+20
+×
+10
+20\times 10
+1.11143
+1.11123
+1.10995
+1.11087
+±
+\pm
+0.00080
+ShinkaEvolve
+–
+1.10954
+1.10954
+1.10954
+1.10954
+±
+\pm
+0.00000
+Heilbronn
+↑
+\uparrow
+ExpEvolve
+10
+×
+20
+10\times 20
+0.0359
+0.0365
+0.0351
+0.0358
+±
+\pm
+0.0007
+ExpEvolve
+20
+×
+10
+20\times 10
+0.0357
+0.0359
+0.0342
+0.0353
+±
+\pm
+0.0009
+SCS
+10
+×
+20
+10\times 20
+0.0343
+0.0333
+0.0331
+0.0336
+±
+\pm
+0.0006
+SCS
+20
+×
+10
+20\times 10
+0.0340
+0.0288
+0.0312
+0.0313
+±
+\pm
+0.0026
+ShinkaEvolve
+–
+0.0303
+0.0324
+0.0283
+0.0303
+±
+\pm
+0.0021
+Min overlap
+↓
+\downarrow
+ExpEvolve
+10
+×
+20
+10\times 20
+0.38096
+0.38102
+0.38095
+0.38098
+±
+\pm
+0.00004
+ExpEvolve
+20
+×
+10
+20\times 10
+0.38096
+0.38095
+0.38100
+0.38097
+±
+\pm
+0.00003
+SCS
+10
+×
+20
+10\times 20
+0.38130
+0.38094
+0.38097
+0.38107
+±
+\pm
+0.00020
+SCS
+20
+×
+10
+20\times 10
+0.38104
+0.38210
+0.38154
+0.38156
+±
+\pm
+0.00053
+ShinkaEvolve
+–
+0.38239
+0.38243
+0.38246
+0.38242
+±
+\pm
+0.00003
+Table 6:
+Final best score of each seed (continued) at the budget of
+200
+200
+evaluated programs (
+199
+199
+for
+ShinkaEvolve
+), and the mean
+±
+\pm
+standard deviation over seeds.
+Task
+Method
+Config.
+Seed 1
+Seed 2
+Seed 3
+Mean
+Kissing
+↑
+\uparrow
+ExpEvolve
+10
+×
+20
+10\times 20
+582
+582
+582
+582
+±
+\pm
+0
+ExpEvolve
+20
+×
+10
+20\times 10
+414
+582
+582
+526
+±
+\pm
+97
+SCS
+10
+×
+20
+10\times 20
+582
+582
+582
+582
+±
+\pm
+0
+SCS
+20
+×
+10
+20\times 10
+406
+438
+394
+413
+±
+\pm
+23
+ShinkaEvolve
+–
+414
+406
+566
+462
+±
+\pm
+90
+Second autocorr.
+↑
+\uparrow
+ExpEvolve
+10
+×
+20
+10\times 20
+0.8825
+0.8825
+0.8825
+0.8825
+±
+\pm
+0.0000
+ExpEvolve
+20
+×
+10
+20\times 10
+0.8825
+0.8825
+0.8825
+0.8825
+±
+\pm
+0.0000
+SCS
+10
+×
+20
+10\times 20
+0.8825
+0.8825
+0.8825
+0.8825
+±
+\pm
+0.0000
+SCS
+20
+×
+10
+20\times 10
+0.8499
+0.8485
+0.8210
+0.8398
+±
+\pm
+0.0163
+ShinkaEvolve
+–
+0.8739
+0.8825
+0.8671
+0.8745
+±
+\pm
+0.0077
+First autocorr.
+↓
+\downarrow
+ExpEvolve
+10
+×
+20
+10\times 20
+1.5151
+1.5176
+1.5257
+1.5195
+±
+\pm
+0.0055
+ExpEvolve
+20
+×
+10
+20\times 10
+1.5104
+1.5098
+1.5137
+1.5113
+±
+\pm
+0.0021
+SCS
+10
+×
+20
+10\times 20
+1.5587
+1.5560
+1.5378
+1.5508
+±
+\pm
+0.0113
+SCS
+20
+×
+10
+20\times 10
+1.5151
+1.5354
+1.5202
+1.5235
+±
+\pm
+0.0106
+ShinkaEvolve
+–
+1.5203
+1.5708
+1.5708
+1.5540
+±
+\pm
+0.0292
+Max–min ratio
+↓
+\downarrow
+ExpEvolve
+10
+×
+20
+10\times 20
+12.8892
+12.8892
+12.8892
+12.8892
+±
+\pm
+0.0000
+ExpEvolve
+20
+×
+10
+20\times 10
+13.0000
+12.8892
+12.8892
+12.9262
+±
+\pm
+0.0640
+SCS
+10
+×
+20
+10\times 20
+12.9425
+13.0000
+13.0000
+12.9808
+±
+\pm
+0.0332
+SCS
+20
+×
+10
+20\times 10
+13.0229
+12.8892
+12.8892
+12.9338
+±
+\pm
+0.0772
+ShinkaEvolve
+–
+13.0000
+13.0000
+13.0000
+13.0000
+±
+\pm
+0.0000
+Hermite
+↓
+\downarrow
+ExpEvolve
+10
+×
+20
+10\times 20
+0.34820
+0.35172
+0.35274
+0.35089
+±
+\pm
+0.00238
+ExpEvolve
+20
+×
+10
+20\times 10
+0.35321
+0.35263
+0.35834
+0.35473
+±
+\pm
+0.00314
+SCS
+10
+×
+20
+10\times 20
+0.35394
+0.36109
+0.36365
+0.35956
+±
+\pm
+0.00503
+SCS
+20
+×
+10
+20\times 10
+0.46232
+0.35945
+0.36116
+0.39431
+±
+\pm
+0.05890
+ShinkaEvolve
+–
+6.91428
+0.35429
+6.91480
+4.72779
+±
+\pm
+3.78756
+Table 7:
+Best-so-far scores along the budget, as the mean
+±
+\pm
+standard deviation over
+3
+3
+seeds after
+40
+40
+,
+80
+80
+,
+120
+120
+,
+160
+160
+, and
+200
+200
+evaluated programs.
+Task
+Method
+Config.
+40
+40
+80
+80
+120
+120
+160
+160
+200
+200
+Hadamard
+↑
+\uparrow
+ExpEvolve
+10
+×
+20
+10\times 20
+0.8801
+±
+\pm
+0.0355
+0.9211
+±
+\pm
+0.0000
+0.9259
+±
+\pm
+0.0084
+0.9259
+±
+\pm
+0.0084
+0.9259
+±
+\pm
+0.0084
+ExpEvolve
+20
+×
+10
+20\times 10
+0.9006
+±
+\pm
+0.0355
+0.9006
+±
+\pm
+0.0355
+0.9211
+±
+\pm
+0.0000
+0.9211
+±
+\pm
+0.0000
+0.9211
+±
+\pm
+0.0000
+SCS
+10
+×
+20
+10\times 20
+0.5047
+±
+\pm
+0.0113
+0.6446
+±
+\pm
+0.1866
+0.6494
+±
+\pm
+0.1828
+0.7144
+±
+\pm
+0.1502
+0.8349
+±
+\pm
+0.1008
+SCS
+20
+×
+10
+20\times 10
+0.6506
+±
+\pm
+0.1821
+0.6506
+±
+\pm
+0.1821
+0.6556
+±
+\pm
+0.1771
+0.6641
+±
+\pm
+0.1693
+0.6641
+±
+\pm
+0.1693
+ShinkaEvolve
+–
+0.4909
+±
+\pm
+0.0171
+0.5093
+±
+\pm
+0.0093
+0.5297
+±
+\pm
+0.0258
+0.5588
+±
+\pm
+0.0131
+0.6467
+±
+\pm
+0.1386
+Pack
+↑
+\uparrow
+ExpEvolve
+10
+×
+20
+10\times 20
+2.62275
+±
+\pm
+0.00820
+2.62721
+±
+\pm
+0.00567
+2.63201
+±
+\pm
+0.00090
+2.63499
+±
+\pm
+0.00169
+2.63499
+±
+\pm
+0.00169
+ExpEvolve
+20
+×
+10
+20\times 10
+2.63046
+±
+\pm
+0.00347
+2.63289
+±
+\pm
+0.00397
+2.63326
+±
+\pm
+0.00336
+2.63485
+±
+\pm
+0.00098
+2.63542
+±
+\pm
+0.00098
+SCS
+10
+×
+20
+10\times 20
+2.60036
+±
+\pm
+0.03729
+2.60307
+±
+\pm
+0.03920
+2.60423
+±
+\pm
+0.04016
+2.61452
+±
+\pm
+0.02569
+2.62305
+±
+\pm
+0.01100
+SCS
+20
+×
+10
+20\times 10
+2.60046
+±
+\pm
+0.02223
+2.61200
+±
+\pm
+0.02384
+2.61383
+±
+\pm
+0.02605
+2.61697
+±
+\pm
+0.02781
+2.61697
+±
+\pm
+0.02781
+ShinkaEvolve
+–
+2.51452
+±
+\pm
+0.04659
+2.53382
+±
+\pm
+0.01316
+2.56349
+±
+\pm
+0.03437
+2.57166
+±
+\pm
+0.03783
+2.58201
+±
+\pm
+0.03707
+Linprog
+↑
+\uparrow
+ExpEvolve
+10
+×
+20
+10\times 20
+2.63043
+±
+\pm
+0.00962
+2.63435
+±
+\pm
+0.00282
+2.63542
+±
+\pm
+0.00098
+2.63542
+±
+\pm
+0.00098
+2.63542
+±
+\pm
+0.00098
+ExpEvolve
+20
+×
+10
+20\times 10
+2.63165
+±
+\pm
+0.00241
+2.63444
+±
+\pm
+0.00148
+2.63542
+±
+\pm
+0.00098
+2.63542
+±
+\pm
+0.00098
+2.63542
+±
+\pm
+0.00098
+SCS
+10
+×
+20
+10\times 20
+2.52974
+±
+\pm
+0.01579
+2.54272
+±
+\pm
+0.00225
+2.54672
+±
+\pm
+0.00612
+2.55161
+±
+\pm
+0.00560
+2.55161
+±
+\pm
+0.00560
+SCS
+20
+×
+10
+20\times 10
+2.63328
+±
+\pm
+0.00332
+2.63486
+±
+\pm
+0.00098
+2.63486
+±
+\pm
+0.00098
+2.63542
+±
+\pm
+0.00098
+2.63542
+±
+\pm
+0.00098
+ShinkaEvolve
+–
+2.46507
+±
+\pm
+0.09226
+2.48623
+±
+\pm
+0.06618
+2.48853
+±
+\pm
+0.06724
+2.51167
+±
+\pm
+0.02988
+2.51434
+±
+\pm
+0.02595
+SumDiff
+↑
+\uparrow
+ExpEvolve
+10
+×
+20
+10\times 20
+1.11026
+±
+\pm
+0.00102
+1.11364
+±
+\pm
+0.00470
+1.11948
+±
+\pm
+0.00220
+1.12089
+±
+\pm
+0.00065
+1.12224
+±
+\pm
+0.00073
+ExpEvolve
+20
+×
+10
+20\times 10
+1.10968
+±
+\pm
+0.00023
+1.10968
+±
+\pm
+0.00023
+1.11413
+±
+\pm
+0.00480
+1.11473
+±
+\pm
+0.00484
+1.11609
+±
+\pm
+0.00567
+SCS
+10
+×
+20
+10\times 20
+1.10981
+±
+\pm
+0.00023
+1.10990
+±
+\pm
+0.00009
+1.11387
+±
+\pm
+0.00473
+1.11564
+±
+\pm
+0.00497
+1.11608
+±
+\pm
+0.00510
+SCS
+20
+×
+10
+20\times 10
+1.10968
+±
+\pm
+0.00023
+1.11031
+±
+\pm
+0.00099
+1.11031
+±
+\pm
+0.00099
+1.11031
+±
+\pm
+0.00099
+1.11087
+±
+\pm
+0.00080
+ShinkaEvolve
+–
+1.10954
+±
+\pm
+0.00000
+1.10954
+±
+\pm
+0.00000
+1.10954
+±
+\pm
+0.00000
+1.10954
+±
+\pm
+0.00000
+1.10954
+±
+\pm
+0.00000
+Heilbronn
+↑
+\uparrow
+ExpEvolve
+10
+×
+20
+10\times 20
+0.0315
+±
+\pm
+0.0008
+0.0349
+±
+\pm
+0.0012
+0.0350
+±
+\pm
+0.0014
+0.0354
+±
+\pm
+0.0014
+0.0358
+±
+\pm
+0.0007
+ExpEvolve
+20
+×
+10
+20\times 10
+0.0336
+±
+\pm
+0.0016
+0.0339
+±
+\pm
+0.0013
+0.0342
+±
+\pm
+0.0013
+0.0349
+±
+\pm
+0.0010
+0.0353
+±
+\pm
+0.0009
+SCS
+10
+×
+20
+10\times 20
+0.0310
+±
+\pm
+0.0025
+0.0325
+±
+\pm
+0.0003
+0.0326
+±
+\pm
+0.0005
+0.0331
+±
+\pm
+0.0002
+0.0336
+±
+\pm
+0.0006
+SCS
+20
+×
+10
+20\times 10
+0.0294
+±
+\pm
+0.0021
+0.0309
+±
+\pm
+0.0025
+0.0309
+±
+\pm
+0.0025
+0.0311
+±
+\pm
+0.0022
+0.0313
+±
+\pm
+0.0026
+ShinkaEvolve
+–
+0.0261
+±
+\pm
+0.0007
+0.0268
+±
+\pm
+0.0012
+0.0290
+±
+\pm
+0.0024
+0.0297
+±
+\pm
+0.0024
+0.0303
+±
+\pm
+0.0021
+Min overlap
+↓
+\downarrow
+ExpEvolve
+10
+×
+20
+10\times 20
+0.38109
+±
+\pm
+0.00012
+0.38107
+±
+\pm
+0.00010
+0.38101
+±
+\pm
+0.00007
+0.38098
+±
+\pm
+0.00004
+0.38098
+±
+\pm
+0.00004
+ExpEvolve
+20
+×
+10
+20\times 10
+0.38121
+±
+\pm
+0.00009
+0.38116
+±
+\pm
+0.00016
+0.38106
+±
+\pm
+0.00014
+0.38105
+±
+\pm
+0.00013
+0.38097
+±
+\pm
+0.00003
+SCS
+10
+×
+20
+10\times 20
+0.38141
+±
+\pm
+0.00029
+0.38114
+±
+\pm
+0.00017
+0.38108
+±
+\pm
+0.00019
+0.38107
+±
+\pm
+0.00020
+0.38107
+±
+\pm
+0.00020
+SCS
+20
+×
+10
+20\times 10
+0.38351
+±
+\pm
+0.00315
+0.38344
+±
+\pm
+0.00323
+0.38344
+±
+\pm
+0.00323
+0.38156
+±
+\pm
+0.00053
+0.38156
+±
+\pm
+0.00053
+ShinkaEvolve
+–
+0.38285
+±
+\pm
+0.00065
+0.38242
+±
+\pm
+0.00003
+0.38242
+±
+\pm
+0.00003
+0.38242
+±
+\pm
+0.00003
+0.38242
+±
+\pm
+0.00003
+Table 8:
+Best-so-far scores along the budget (continued), as the mean
+±
+\pm
+standard deviation over
+3
+3
+seeds after
+40
+40
+,
+80
+80
+,
+120
+120
+,
+160
+160
+, and
+200
+200
+evaluated programs. For
+ShinkaEvolve
+, the last column reports
+199
+199
+programs.
+Task
+Method
+Config.
+40
+40
+80
+80
+120
+120
+160
+160
+200
+200
+Kissing
+↑
+\uparrow
+ExpEvolve
+10
+×
+20
+10\times 20
+578
+±
+\pm
+6
+582
+±
+\pm
+0
+582
+±
+\pm
+0
+582
+±
+\pm
+0
+582
+±
+\pm
+0
+ExpEvolve
+20
+×
+10
+20\times 10
+348
+±
+\pm
+0
+453
+±
+\pm
+113
+523
+±
+\pm
+103
+523
+±
+\pm
+103
+526
+±
+\pm
+97
+SCS
+10
+×
+20
+10\times 20
+564
+±
+\pm
+3
+582
+±
+\pm
+0
+582
+±
+\pm
+0
+582
+±
+\pm
+0
+582
+±
+\pm
+0
+SCS
+20
+×
+10
+20\times 10
+394
+±
+\pm
+38
+394
+±
+\pm
+38
+402
+±
+\pm
+34
+402
+±
+\pm
+33
+413
+±
+\pm
+23
+ShinkaEvolve
+–
+426
+±
+\pm
+68
+459
+±
+\pm
+92
+459
+±
+\pm
+92
+461
+±
+\pm
+91
+462
+±
+\pm
+90
+Second autocorr.
+↑
+\uparrow
+ExpEvolve
+10
+×
+20
+10\times 20
+0.8825
+±
+\pm
+0.0000
+0.8825
+±
+\pm
+0.0000
+0.8825
+±
+\pm
+0.0000
+0.8825
+±
+\pm
+0.0000
+0.8825
+±
+\pm
+0.0000
+ExpEvolve
+20
+×
+10
+20\times 10
+0.8649
+±
+\pm
+0.0154
+0.8823
+±
+\pm
+0.0004
+0.8824
+±
+\pm
+0.0002
+0.8825
+±
+\pm
+0.0000
+0.8825
+±
+\pm
+0.0000
+SCS
+10
+×
+20
+10\times 20
+0.8825
+±
+\pm
+0.0000
+0.8825
+±
+\pm
+0.0000
+0.8825
+±
+\pm
+0.0000
+0.8825
+±
+\pm
+0.0000
+0.8825
+±
+\pm
+0.0000
+SCS
+20
+×
+10
+20\times 10
+0.8492
+±
+\pm
+0.0010
+0.8398
+±
+\pm
+0.0163
+0.8398
+±
+\pm
+0.0163
+0.8398
+±
+\pm
+0.0163
+0.8398
+±
+\pm
+0.0163
+ShinkaEvolve
+–
+0.8577
+±
+\pm
+0.0215
+0.8650
+±
+\pm
+0.0172
+0.8732
+±
+\pm
+0.0096
+0.8732
+±
+\pm
+0.0096
+0.8745
+±
+\pm
+0.0077
+First autocorr.
+↓
+\downarrow
+ExpEvolve
+10
+×
+20
+10\times 20
+1.5528
+±
+\pm
+0.0113
+1.5316
+±
+\pm
+0.0233
+1.5217
+±
+\pm
+0.0093
+1.5216
+±
+\pm
+0.0091
+1.5195
+±
+\pm
+0.0055
+ExpEvolve
+20
+×
+10
+20\times 10
+1.5196
+±
+\pm
+0.0021
+1.5169
+±
+\pm
+0.0053
+1.5124
+±
+\pm
+0.0023
+1.5119
+±
+\pm
+0.0019
+1.5113
+±
+\pm
+0.0021
+SCS
+10
+×
+20
+10\times 20
+1.5674
+±
+\pm
+0.0056
+1.5626
+±
+\pm
+0.0076
+1.5549
+±
+\pm
+0.0165
+1.5508
+±
+\pm
+0.0113
+1.5508
+±
+\pm
+0.0113
+SCS
+20
+×
+10
+20\times 10
+1.5482
+±
+\pm
+0.0284
+1.5262
+±
+\pm
+0.0143
+1.5262
+±
+\pm
+0.0143
+1.5235
+±
+\pm
+0.0106
+1.5235
+±
+\pm
+0.0106
+ShinkaEvolve
+–
+1.5664
+±
+\pm
+0.0076
+1.5664
+±
+\pm
+0.0076
+1.5622
+±
+\pm
+0.0149
+1.5554
+±
+\pm
+0.0268
+1.5540
+±
+\pm
+0.0292
+Max–min ratio
+↓
+\downarrow
+ExpEvolve
+10
+×
+20
+10\times 20
+12.8892
+±
+\pm
+0.0000
+12.8892
+±
+\pm
+0.0000
+12.8892
+±
+\pm
+0.0000
+12.8892
+±
+\pm
+0.0000
+12.8892
+±
+\pm
+0.0000
+ExpEvolve
+20
+×
+10
+20\times 10
+12.9266
+±
+\pm
+0.0636
+12.9262
+±
+\pm
+0.0640
+12.9262
+±
+\pm
+0.0640
+12.9262
+±
+\pm
+0.0640
+12.9262
+±
+\pm
+0.0640
+SCS
+10
+×
+20
+10\times 20
+14.8410
+±
+\pm
+1.5646
+13.8205
+±
+\pm
+1.4212
+13.0557
+±
+\pm
+0.0965
+12.9808
+±
+\pm
+0.0332
+12.9808
+±
+\pm
+0.0332
+SCS
+20
+×
+10
+20\times 10
+13.4169
+±
+\pm
+0.9139
+13.2822
+±
+\pm
+0.6807
+13.2420
+±
+\pm
+0.6110
+12.9629
+±
+\pm
+0.1277
+12.9338
+±
+\pm
+0.0772
+ShinkaEvolve
+–
+13.0000
+±
+\pm
+0.0000
+13.0000
+±
+\pm
+0.0000
+13.0000
+±
+\pm
+0.0000
+13.0000
+±
+\pm
+0.0000
+13.0000
+±
+\pm
+0.0000
+Hermite
+↓
+\downarrow
+ExpEvolve
+10
+×
+20
+10\times 20
+0.39730
+±
+\pm
+0.06957
+0.35841
+±
+\pm
+0.00503
+0.35738
+±
+\pm
+0.00659
+0.35117
+±
+\pm
+0.00203
+0.35089
+±
+\pm
+0.00238
+ExpEvolve
+20
+×
+10
+20\times 10
+2.81478
+±
+\pm
+2.14897
+1.51139
+±
+\pm
+1.88727
+0.40779
+±
+\pm
+0.06331
+0.35505
+±
+\pm
+0.00285
+0.35473
+±
+\pm
+0.00314
+SCS
+10
+×
+20
+10\times 20
+1.14201
+±
+\pm
+1.25089
+0.35956
+±
+\pm
+0.00503
+0.35956
+±
+\pm
+0.00503
+0.35956
+±
+\pm
+0.00503
+0.35956
+±
+\pm
+0.00503
+SCS
+20
+×
+10
+20\times 10
+2.42124
+±
+\pm
+2.13014
+0.96193
+±
+\pm
+0.95033
+0.39580
+±
+\pm
+0.05769
+0.39431
+±
+\pm
+0.05890
+0.39431
+±
+\pm
+0.05890
+ShinkaEvolve
+–
+4.72792
+±
+\pm
+3.78744
+4.72791
+±
+\pm
+3.78744
+4.72788
+±
+\pm
+3.78741
+4.72783
+±
+\pm
+3.78749
+4.72779
+±
+\pm
+3.78756
+Sample efficiency.
+For each setting,
+n
+ExpEvolve
+n_{\texttt{ExpEvolve}}
+is the first number of evaluated programs at which the best-so-far score of
+ExpEvolve
+, averaged over the seeds that have produced a successful program, reaches the final best score of
+SCS
+averaged over seeds, and
+n
+SCS
+n_{\texttt{SCS}}
+is the first number of evaluated programs at which the best-so-far score of
+SCS
+, averaged in the same way, reaches its final value. The programs within a generation are ordered by their slots. Table
+9
+reports the four tasks in Fig.
+6
+.
+Table 9:
+Numbers of evaluated programs that
+ExpEvolve
+and
+SCS
+need to reach the final best score of
+SCS
+, averaged over
+3
+3
+seeds.
+Task
+Config.
+Final of
+SCS
+n
+SCS
+n_{\texttt{SCS}}
+n
+ExpEvolve
+n_{\texttt{ExpEvolve}}
+n
+SCS
+/
+n
+ExpEvolve
+n_{\texttt{SCS}}/n_{\texttt{ExpEvolve}}
+Hadamard
+10
+×
+20
+10\times 20
+0.8349
+0.8349
+186
+186
+10
+10
+18.6
+18.6
+Hadamard
+20
+×
+10
+20\times 10
+0.6641
+0.6641
+131
+131
+5
+5
+26.2
+26.2
+SumDiff
+10
+×
+20
+10\times 20
+1.11608
+1.11608
+180
+180
+81
+81
+2.2
+2.2
+SumDiff
+20
+×
+10
+20\times 10
+1.11087
+1.11087
+181
+181
+97
+97
+1.9
+1.9
+Heilbronn
+10
+×
+20
+10\times 20
+0.0336
+0.0336
+199
+199
+52
+52
+3.8
+3.8
+Heilbronn
+20
+×
+10
+20\times 10
+0.0313
+0.0313
+169
+169
+27
+27
+6.3
+6.3
+Min overlap
+10
+×
+20
+10\times 20
+0.38107
+0.38107
+141
+141
+84
+84
+1.7
+1.7
+Min overlap
+20
+×
+10
+20\times 10
+0.38156
+0.38156
+144
+144
+13
+13
+11.1
+11.1
+Appendix K
+Prompts
+Prompt of a slot.
+The prompt of each slot is assembled as follows, where the strategy instruction is present only for idea-guided slots, and the summary of the idea memory is present for all slots.
+{base_instruction}
+
+# Strategy for this attempt
+{directive}
+
+{causal_info_block}
+
+# Successful examples (to improve on):
+
+## Solution {i+1} ({metric} = {value}):
+‘‘‘
+{code}
+‘‘‘
+
+Please now provide your new, better implementation of the required
+function (exact signature from the task statement above). Address the
+strategy above and avoid the failure patterns shown.
+Strategy instructions.
+The strategy instruction of an action on a binary idea factor and on a categorical idea factor are as follows, with lines wrapped for display.
+STRATEGY (this batch is targeting a discovered code factor):
+{USE|AVOID} the ‘{feature_name}‘ pattern{ ({desc})}. Past data on this
+run estimates its effect on {conf_metric_name} at ATE={+}{ate:.3f}.
+The first example below is the highest-Y program (anchor, regardless
+of this pattern); subsequent examples {USE this pattern|DO NOT use this
+pattern}. Keep the pattern direction while improving on the anchor’s
+overall quality.
+STRATEGY (this batch is targeting a categorical code factor): SET the
+‘{feature_name}‘ factor to value ‘{level}‘{ ({desc})}. Past data shows
+programs with this exact level gain {+}{ate:.3f} {conf_metric_name} vs
+other levels of the factor. The first example below is the highest-Y
+program (anchor); the other examples USE this exact level. Adopt the
+‘{level}‘ setting and improve on the anchor.
+Stall note.
+At plateaus, the following note is prepended to the prompt of every slot, where
+{blur}
+lists the dependent idea factors as their names followed by the first
+90
+90
+characters of their descriptions, separated by semicolons, and
+{stall}
+is “best has stayed at
+{best}
+for
+{streak}
+generations”.
+CURRENT-STATE NOTE (read first): the most common combination among the
+current top programs is: {blur}. Progress with this combination has
+stalled — {stall}. Consider: are there OTHER constructions or
+combinations, or variants of the current one, that could reach higher?
+If you know one, this attempt is a good moment to try it.
+Annotator.
+The annotator LLM labels the idea factors of a program with the following prompt, where the descriptions are truncated to
+200
+200
+characters and the source code to
+4000
+4000
+characters.
+[system]
+You annotate program code for the presence of specific algorithmic
+factors. Output STRICT JSON only with key ’assignments’.
+
+[user]
+Factors to annotate:
+- <name> (binary): <description>
+- <name> (categorical, values: [...]): <description>
+
+Program code:
+‘‘‘python
+<code>
+‘‘‘
+
+Output JSON: { "assignments": { "<factor_name>": <value>, ... } }
+For binary factors, value should be true or false. For categorical,
+value should be one of the listed values. Use null only if unknown.
+Background probe.
+At the entry of a plateau, the background probe reads the
+8
+8
+successful programs with the highest scores, with the source code truncated to
+1500
+1500
+characters, and the names of the current idea factors.
+These are the TOP-SCORING programs of a search that has plateaued —
+they are the stuck family.
+
+## Program {i} ({metric}={score}):
+‘‘‘
+{code}
+‘‘‘
+...
+
+Factors already tracked (do NOT repeat these or trivial rephrasings):
+- {name}
+...
+
+Name the structural / algorithmic properties that these top programs
+SHARE — especially the construction or representation they all rely
+on. These will be used to describe the stuck family so the search can
+deliberately depart from it. Binary properties only.
+Return ONLY a JSON array: [{"name":"<snake_case>","description":
+"<one sentence, concrete>"}] (2 to 4 entries)
+K.1
+More Details of Experiments on Machine Learning Engineering
+We further study whether the effectiveness of
+ExpEvolve
+transfers to machine learning engineering (MLE). We integrate its idea discovery and search control into OpenRSI
+(
+Yang et al., 2026b
+)
+and evaluate the resulting agent on MLS-Bench
+(
+Lyu et al., 2026a
+)
+. This setting examines the use of idea factors within a harness that supports evolution on ML algorithms towards a specific task objective.
+Tasks and data.
+MLS-Bench evaluates agents on improving components of ML algorithms under fixed task interfaces and evaluation protocols. Here we consider
+6
+tasks:
+Online bandit
+,
+Anomaly detection
+,
+Clustering
+,
+Multi-objective optimization
+,
+Subgroup calibration shift
+, and
+Evolution strategy
+.
+Search leverages the scores and execution feedback exposed by each task.
+Backbone and budget.
+We use the evolutionary harness from OpenRSI, which organizes search through
+Draft
+,
+Improve
+,
+Debug
+, and
+Crossover
+operators.
+For each task, we retain a fixed history containing 20 completed search slots from an earlier OpenRSI run. The OpenRSI baseline and OpenRSI equipped with
+ExpEvolve
+continue from this same history for
+50
+additional evaluator calls, with
+3
+seeds. Both methods use
+5
+search slots per generation.
+All program generation uses Qwen3.6-35B-A3B.
+The same checkpoint performs factor discovery and annotation in
+ExpEvolve
+.
+Integrating idea factors with OpenRSI.
+ExpEvolve
+initializes its idea memory from the shared history and updates it with newly evaluated programs. Consistent with Sec.
+4
+, Discovery examines program pairs whose score differences are insufficiently explained by the current factors. The LLM reads their source and proposes reusable mechanisms.
+Factors
+z
+z
+enter the action catalog when both states have sufficient support and exhibit a score contrast in the archive.
+Each generation reserves two slots for
+Open
+exploration and schedules three for
+Guided
+search.
+Specifically, A guided slot first selects an action, such as
+𝖠𝖣𝖣
+⁡
+(
+z
+)
+\mathsf{ADD}(z)
+or
+𝖱𝖤𝖬𝖮𝖵𝖤
+⁡
+(
+z
+)
+\mathsf{REMOVE}(z)
+, and then the harness selects a high-scoring parent compatible with that change.
+We use improvement over the best selected parent as action feedback, adapting the reward reference to OpenRSI’s parent–child structure.
+When the cumulative best score remains unchanged within relative tolerance
+10
+−
+4
+10^{-4}
+across three generation boundaries,
+ExpEvolve
+switches to idea-guided exploration at plateaus, aligning with Sec.
+4.2
+.
+Evaluation and results.
+We evaluate search performance using the best-so-far (BSF) score.
+For each task and method, we average the final BSF score over three seeds, starting from the same 20-slot history and continuing for 50 additional evaluations. Fig.
+9(a)
+compares OpenRSI with OpenRSI+
+ExpEvolve
+across the six tasks. The reported configurations improve the mean final BSF score on all six tasks, with the largest gains on Online bandit and Anomaly detection.
+Ethics Statement
+This work studies evolutionary coding agents on open-ended mathematical discovery tasks and on machine learning tasks from MLS-Bench. It does not involve human subjects or personally identifiable information, and all tasks come from public benchmarks or prior work.
+Reproducibility Statement
+The full procedure of
+ExpEvolve
+is given in Alg.
+1
+and Alg.
+2
+, and its implementation details and hyperparameters are given in Appendix
+H
+and Table
+3
+. The tasks, evaluators, and reference values are described in Appendix
+I.1
+, the configurations of the baselines in Appendix
+I.2
+, the budget and resources in Appendix
+I.3
+, the setting of MLS-Bench in Appendix
+K.1
+, and all prompts in Appendix
+K
+. The per-seed results are given in Appendix
+J
+. The formal statements and proofs of the theoretical results are given in Appendix
+E
+and Appendix
+F
+. All experiments on mathematical discovery use DeepSeek-V4-Flash unless stated otherwise, and each setting is run with
+3
+3
+seeds.
+AI Use Statement
+We used LLM assistance to revise the manuscript’s organization and wording, identify and check related references, and examine the interpretation of reported experiments. The proposed framework itself uses LLMs to generate programs, propose idea factors, and assess program properties.
+Experimental support, please
+view the build logs
+for errors. Generated by
+L
+A
+T
+E
+xml
+.
+Instructions for reporting errors
+We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+      support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+      methods listed below:
+Click the "Report Issue"
+(
+)
+button, located in the page header.
+Tip:
+You can select the relevant text first, to include it in your report.
+Our team has already identified
+the following issues
+. We appreciate your time reviewing and reporting rendering errors we
+      may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+      should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+      all.
+Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a
+list of packages that need conversion
+, and welcome
+developer contributions
+.
+We gratefully acknowledge support from our
+major funders
+,
+member institutions
+,
+,
+        and all contributors.
+About
+·
+Help
+·
+Contact
+·
+Subscribe
+·
+Copyright
+·
+Privacy
+·
+Accessibility
+·
+Operational Status
+(opens in new tab)

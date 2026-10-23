@@ -1,0 +1,17 @@
+# Annotation-only diagnosis. No sample/CEL is read.
+.libPaths(c("D:/anaconda/envs/maestro/r-library-bioc322",.libPaths()))
+options(error=function(){traceback(20); quit(status=7)}, warn=1)
+base <- "D:/MAESTRO/log/20261022/tggates_rna_feedback_pilot"
+dest <- file.path(base,"r_dependencies/cdf_diagnostic_source")
+dir.create(dest,showWarnings=FALSE)
+untar(file.path(base,"r_dependencies/hgu133plus2cdf_2.18.0.tar.gz"),exdir=dest)
+suppressPackageStartupMessages(library(AnnotationDbi))
+cat("ANNOTATION_LOADED\n")
+e <- new.env()
+print(load(file.path(dest,"hgu133plus2cdf/data/hgu133plus2cdf.rda"),envir=e))
+print(ls(e))
+print(length(ls(e$hgu133plus2cdf)))
+print(object.size(e))
+cat("DATA_LOADED\n")
+pkg <- file.path(dest,"hgu133plus2cdf")
+tools:::makeLazyLoading(pkg_name="hgu133plus2cdf",lib="D:/anaconda/envs/maestro/r-library-bioc322")

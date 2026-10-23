@@ -1,0 +1,308 @@
+[
+  {
+    "projection_index": 1,
+    "tag": "p",
+    "id": "selectedTextModalDescription",
+    "text": "Content selection saved. Describe the issue below:"
+  },
+  {
+    "projection_index": 3,
+    "tag": "p",
+    "id": "abstract1.1",
+    "text": "Individually competent robot skills can fail when composed: tools may lack a required capability, completion signals may misrepresent physical progress, and one skill may leave a state that violates its successor’s prerequisites. We introduce Recursia , a recursive self-improvement framework that treats the shared executable stack, rather than individual task programs, as the persistent unit of improvement. The stack integrates tools, skills with execution contracts, handoffs, and verifiers. Source-side execution traces guide failure attribution and the generation of missing tools or repairs to existing shared components. Generality checks, mechanism tests, and paired selection and regression gates determine which changes become the next parent. The resulting stack is frozen and reused through declarative task adapters, allowing source-derived changes to support new compositions without target-side code repair. Experiments cover LIBERO-Pro Long simulation and a physical Franka FR3 equipped with a Franka Hand. In simulation, Recursia improves success over ASPIRE by 5.8 percentage points under Pos perturbations and 15.1 points under Task perturbations. Across three physical compositional target tasks, it improves mean success over the Skill Document Only baseline by 40 percentage points. Analyses of constituent execution, candidate rejection, and inference drivers distinguish local mechanism improvements from complete task success and characterize the cost of feedback-conditioned orchestration. These results examine shared executable interfaces as a concrete mechanism for compositional transfer in robot programming."
+  },
+  {
+    "projection_index": 6,
+    "tag": "p",
+    "id": "S1.p2.1",
+    "text": "Coding agents provide a natural testbed for studying this compositional generalization ( Liang et al., 2023 ; Mu et al., 2024 ; Fu et al., 2026 ) . Language-model-generated programs can invoke perception and control APIs, implement feedback loops, and reuse procedural abstractions ( Liang et al., 2023 ) . RoboCodeX further decomposes multimodal instructions into object-centric manipulation units and synthesizes control code ( Mu et al., 2024 ) , while ProgPrompt incorporates state-feedback assertions and recovery actions into generated plans ( Singh et al., 2023 ) . Skill-library systems such as Voyager store executable procedures and use environmental feedback for extension ( Wang et al., 2023 ) ; ASPIRE combines execution feedback, program refinement, skill discovery, and evolutionary search for manipulation ( Lu et al., 2026 ) . Lifelong Robot Library Learning expands skill repertoires from accumulated experience ( Tziafas and Kasaei, 2024 ) , and Uni-Skill requests new skill implementations when existing ones fall short ( Xie et al., 2026 ) . CaP-X examines how abstraction levels, perceptual grounding, and structured execution feedback affect the reliability of embodied coding agents ( Fu et al., 2026 ) . Although these capabilities make program improvement a promising route to transfer, reliable composition depends not only on the generated task program, but critically on the shared interfaces it invokes: tools, skill contracts, inter-skill state transfers, and verification logic. Thus, the central object of study shifts from how an agent writes a program to which reusable execution semantics that program inherits."
+  },
+  {
+    "projection_index": 8,
+    "tag": "p",
+    "id": "S1.p4.1",
+    "text": "We propose Recursia , a framework that targets compositional generalization by treating the shared executable stack as the primary object of persistent improvement. A coding agent can add missing tools, repair skill contracts, or improve handoffs and verifiers. Each modification becomes part of a versioned implementation reused by subsequent source tasks and frozen during target-task execution. Specifically, Recursia is stack-aware and validation-gated. Source-side execution traces identify the first violated requirement, attributing failures to specific repair layers. This attribution proposes a mechanism for change but does not itself establish efficacy. Candidates must satisfy restrictions on task-specific specialization, survive paired comparisons with the parent stack, and pass the validation gate with selection gate and regression gate. Accepted changes are retained with their failure class, validation evidence, and code version. Task variation is expressed through declarative adapters. At deployment, the frozen stack relies solely on permitted robot observations; evaluator-side ground truth used during source diagnosis is never an input to the deployed policy."
+  },
+  {
+    "projection_index": 9,
+    "tag": "p",
+    "id": "S1.p5.1",
+    "text": "Our contributions are threefold: (1) We formulate skill composition as the persistent improvement of a shared executable stack integrating tools, skills with execution contracts, handoffs, and verifiers, and enable the generation of previously absent tools. (2) We introduce a failure-attributed improvement procedure that localizes repairs to specific stack layers and validates shared patches through generality and regression gates. (3) We evaluate frozen-stack transfer to long-horizon compositions in LIBERO-Pro Long simulation and on a physical Franka FR3 robot, comparing with skill-library and skill-document baselines and analyzing compositional execution, validation decisions, and inference strategies."
+  },
+  {
+    "projection_index": 13,
+    "tag": "p",
+    "id": "S2.SS1.p1.1",
+    "text": "Let 𝒟 src \\mathcal{D}_{\\mathrm{src}} denote the source dataset available for improvement and 𝒟 tgt \\mathcal{D}_{\\mathrm{tgt}} the target dataset used for frozen transfer. τ \\tau denotes one task. The goal is to obtain an executable shared stack through debugging with 𝒟 src \\mathcal{D}_{\\mathrm{src}} ."
+  },
+  {
+    "projection_index": 17,
+    "tag": "p",
+    "id": "S2.SS1.p3.1",
+    "text": "We use zero-shot compositional transfer to mean that target-task compositions do not provide feedback for stack modification, and the frozen stack is executed without target-specific code repair. Source and target tasks may share objects, relations, or individual skills."
+  },
+  {
+    "projection_index": 39,
+    "tag": "p",
+    "id": "S2.SS3.p3.1",
+    "text": "Recursia also allows the strategy update to change across iterations. Specifically, adjustments to the verification gate and the types of data used for debugging alter how candidate modifications are evaluated and which failures guide subsequent repair. These changes persist into later iterations, making the improvement procedure itself an object of adaptation. In later iterations, expanding patch selection from top-1 to top- n n effectively transforms the self-improvement process from a sequential chain into a beam search."
+  },
+  {
+    "projection_index": 45,
+    "tag": "p",
+    "id": "S2.SS4.p3.2",
+    "text": "The gate considers source-task success, regressions on other source tasks, and resource use. At the beginning of each RSI iteration, the coordinator fixes the evaluation panels, acceptance criteria, and resource budgets for that iteration. These settings may change between iterations as the stack evolves, but remain fixed when comparing the parent with candidates within the same iteration. Rejected candidates do not replace the parent. Accepted candidates retain their code hash, source failure, tests, and paired results."
+  },
+  {
+    "projection_index": 47,
+    "tag": "p",
+    "id": "S2.SS4.p4.1",
+    "text": "At inference time, all shared implementations are frozen. The target adapter specifies the requested composition, and execution logs identify the versions invoked by each subgoal."
+  },
+  {
+    "projection_index": 52,
+    "tag": "p",
+    "id": "S3.SS1.SSS0.Px1.p1.1",
+    "text": "We use LIBERO-90 ( Liu et al., 2023 ) for debugging, including failure diagnosis, repair generation, and candidate selection. Improvements persist in a versioned executable stack rather than in target-specific programs. All source-side development is completed before target evaluation, and the selected stack is frozen together with its tools, skill implementations, handoff logic, and verifiers. The coding model and its parameters remain fixed within each controlled comparison."
+  },
+  {
+    "projection_index": 53,
+    "tag": "p",
+    "id": "S3.SS1.SSS0.Px1.p2.1",
+    "text": "The first track evaluates the frozen stack on LIBERO-Pro Long, following the long-horizon transfer setting studied by ASPIRE ( Zhou et al., 2025 ; Lu et al., 2026 ) , with 10 long-horizon tasks evaluated along two axes. Pos changes initial object positions; Task changes the task specification. Each task–axis pair is evaluated on seeds 1–50, yielding 500 episodes per axis. The 10 task names and their axis-specific results are listed in Appendix D . The second track evaluates on a physical Franka FR3 equipped with a Franka Hand. Physical evaluation trajectories are not used for stack repair or selection."
+  },
+  {
+    "projection_index": 59,
+    "tag": "p",
+    "id": "S3.SS2.p1.1",
+    "text": "Here N N denotes the number of improvement iterations; each iteration processes five source samples. Figure 3 presents the primary zero-shot comparison separately for position ( Pos ) and task-specification ( Task ) perturbations. The source-experience scaling analysis is provided in Appendix D.2 , Figure 7 . We report separately frozen Recursia stacks after N ∈ { 0 , 3 , 6 , 9 , 10 , 12 , 13 , 14 , 15 , 16 , 17 , 18 } N\\in\\{0,3,6,9,10,12,13,14,15,16,17,18\\} improvement iterations to examine how transfer changes with source-side experience. Each snapshot is selected using source data only and evaluated without target-driven modification. This comparison tests whether source-side changes to shared execution mechanisms remain useful when the target composition changes and no target feedback is available for repair. Recursia achieves success rates of 0.284 on Pos and 0.534 on Task . Across the supplied scaling checkpoints, success rises from 0 at N = 0 N=0 to 0.232 and 0.434 at N = 18 N=18 , respectively, with nonmonotonic intermediate changes."
+  },
+  {
+    "projection_index": 64,
+    "tag": "p",
+    "id": "S3.SS3.p3.1",
+    "text": "The targets compose these actions: T1 places the mug and milk carton in the same basket; T2 places the blue mug on the left plate and the white mug on the right plate, reversing their source assignments; T3 first places the bowl on the plate, then the mug in the relocated bowl. Source knowledge is frozen before evaluation. Within-trial feedback corrections do not update persistent knowledge. Each target is evaluated ten times per method, with at most 20 code blocks per trial. Task success is assessed manually."
+  },
+  {
+    "projection_index": 72,
+    "tag": "p",
+    "id": "S3.SS4.SSS0.Px1.p1.1",
+    "text": "At N = 11 N=11 , the standalone stove-on operation improved from 0 / 10 0/10 to 10 / 10 10/10 on both development and selection datasets, whereas the stove-pan composition remained 0 / 10 0/10 . In the inspected development rollouts, the stove-on predicate became True , but subsequent manipulation lost the pan after a grasp attempt; alternative candidates were also rejected as outside the inverse-kinematics workspace. Thus, the rotary repair improved the first operation without establishing the conditions needed to complete the second. This comparison locates the remaining bottleneck and shows the difference between isolated and chained success. Our approach filled this gap by handoff repair mechanism, in the later iterations."
+  },
+  {
+    "projection_index": 74,
+    "tag": "p",
+    "id": "S3.SS4.SSS0.Px2.p1.1",
+    "text": "In the N = 6 N=6 mug-pudding sequence, the mug-on-plate predicate became True in all ten Pos episodes, while the full conjunction succeeded in only one. In seed 42, the mug goal became True at step 573 and remained True , but subsequent pudding binding returned not_found . Seed 41 provides a successful contrast: the mug goal became True at step 552 and the pudding goal at step 1440, with the first goal preserved (Figure 4 ). A drawer sequence exhibits the same failure structure: seed 48 achieved bowl containment, but closing stopped at part_not_found . These traces identify perceptual binding as a prerequisite that is not certified by predecessor goal completion."
+  },
+  {
+    "projection_index": 75,
+    "tag": "p",
+    "id": "S3.SS4.SSS0.Px2.p2.1",
+    "text": "Together, these cases distinguish failures of successor execution from failures to establish successor readiness. The observed mug-pudding failure belongs to the second category, with the first goal preserved; the stove-pan failure exposes downstream manipulation limitations after stove-on succeeds. These evidence supports a conclusion: predecessor completion and successor readiness must be examined separately and processed by the handoff mechanism."
+  },
+  {
+    "projection_index": 78,
+    "tag": "p",
+    "id": "S3.SS5.p1.1",
+    "text": "All inference methods are driven by declarative adapters. We compare three inference drivers over the same frozen shared stack: rule-based driver, one-shot task-program driver, and online closed-loop driver. These drivers differ in how high-level execution decisions are specified and updated. The rule-based driver follows predefined decision rules. The one-shot task-program driver executes an initially generated program, which may include observation-dependent branches and bounded retries. The online closed-loop 1 1 1 The label “closed-loop” here denotes the inference driver’s decision process, rather than a property exclusive to its low-level robot controller. driver conditions subsequent decisions on observations and execution outcomes throughout the episode. All three may use observation feedback and closed-loop low-level control. The results are shown in Figure 5 . One-shot generation describes the lifetime of the program, rather than an absence of feedback during its execution. In ASPIRE’s zero-shot setting, task-program generation excludes target-side debugging, but the one-shot generated program may still re-observe the scene and use closed-loop low-level control ( Lu et al., 2026 ) . Here, we use the frozen shared stack."
+  },
+  {
+    "projection_index": 79,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 5: Inference-driver comparison on a frozen stack of the N = 13 N=13 iteration. (a) Pos and (b) Task success rates, each 50 matched episodes. (c) Mean end-to-end episode time, including program generation and robot execution, for all episodes."
+  },
+  {
+    "projection_index": 87,
+    "tag": "p",
+    "id": "S3.SS6.p1.1",
+    "text": "The Recursia framework incorporates two critical validation components for the validation gate, i.e., the selection gate and the regression gate , to address two distinct risks: a candidate may correct a local mechanism without improving overall task completion (mitigated by the selection gate), or improve aggregate completion while disrupting previously successful states (mitigated by the regression gate). This subsection uses retrospective case studies to demonstrate their effectiveness. In the book-transfer task, the development summary reported candidate-filter rejection in eight of ten episodes for early iterations N = 8 N=8 . Inspecting the earlier execution revealed a defect: the robot had already grasped and lifted the intended book, but a post-lift visual query selected a similar book that remained on the table. The low re-detected position was treated as evidence of a failed lift, causing the gripper to open and subsequent grasp attempts to fail. The subsequent iterations attempt to repair this identity check. We employ the validation framework to ensure the recognition of a known stationary competitor following a verified lift, while preserving the existing motion and hold checks."
+  },
+  {
+    "projection_index": 88,
+    "tag": "h4",
+    "id": null,
+    "text": "Selection gate rejects candidates with insufficient improvement on the selection dataset."
+  },
+  {
+    "projection_index": 89,
+    "tag": "p",
+    "id": "S3.SS6.SSS0.Px1.p1.1",
+    "text": "A repair during N = 9 N=9 changed the transport-to-descent boundary for book insertion so that entry into the opening remained under contact-aware control. Development release refusals attributed to the lateral corridor decreased from 8 to 2, and most tests passed. Nevertheless, official completion improved only from 0 / 10 0/10 to 1 / 10 1/10 in the development dataset and remained 0 / 10 0/10 in the selection dataset, below the predeclared gains of two and one successes, respectively. The reason is that removing a prominent failure mechanism exposed remaining arrival, contact, and grasp failures. Although the candidate passed the paired-loss checks, it was rejected by the selection gate for insufficient improvement on the selection dataset."
+  },
+  {
+    "projection_index": 91,
+    "tag": "p",
+    "id": "S3.SS6.SSS0.Px2.p1.1",
+    "text": "The N=11 iteration increased development completion from 2 / 50 2/50 to 3 / 50 3/50 and selection completion from 7 / 50 7/50 to 11 / 50 11/50 . However, one basket-placement task retained its selection total of 5 / 10 5/10 by gaining two states and losing two previously successful states. The two losses exceeded the per-task cap of one, and the candidate was rejected by the regression gate. Development book-insertion corridor refusals also fell from nine to zero without producing a completed insertion. These cases motivate checking trajectories, outcomes and paired losses in addition to aggregate development scores (Figure 6 )."
+  },
+  {
+    "projection_index": 92,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 6: Recorded validation-gate cases. (a) Initial state. Original simulator frames from the N=8 iteration, both with seed 86. (b) Development and selection successes for this task. (c) The iteration N=9 reduced a local failure mechanism but failed the predeclared outcome gains. (d) The iteration N=11 improved the aggregate selection score while losing two previously successful basket-placement states, exceeding the per-task loss cap."
+  },
+  {
+    "projection_index": 94,
+    "tag": "p",
+    "id": "S3.SS7.p1.1",
+    "text": "Table 2 summarizes representative entries and shows generated repairs extend the callable inventory. The N=10 iteration added support-instance and placement semantics for previously refused front/middle relations, reusing the existing instance selector and placement primitives. Instruction dispatch coverage increased from 81 / 90 81/90 to 84 / 90 84/90 , and the front-of-mug task improved from 0 / 10 0/10 to 8 / 10 8/10 in development dataset and 0 / 10 0/10 to 7 / 10 7/10 in selection dataset. The N=11 iteration subsequently generated a shared run_rotary driver that served both turn-on and turn-off instructions, corrected the pinch frame, and re-anchored turn increments on the executed tool pose. Twenty tests passed, and the driver was invoked in both standalone stove activation and the stove–pan sequence."
+  },
+  {
+    "projection_index": 95,
+    "tag": "table",
+    "id": "S3.T2.2",
+    "text": "Entry Failure Repair Recorded Result N=10 Lack of front/middle reference relations Shared instance selection and relation dispatch Dispatch 81 / → 84 / 90 81/90\\!\\rightarrow\\!84/90 ; gains measured on source tasks. N=11 Rotary localization, pinch, and arc defects Shared turn-on/off driver Turn-on 10 / 10 10/10 in each panel."
+  },
+  {
+    "projection_index": 101,
+    "tag": "p",
+    "id": "S4.SS0.SSS0.Px2.p1.1",
+    "text": "A central question in recursive self-improving agents is where experienc and knowledge is retained and how it changes subsequent behavior. The Darwin Gödel Machine retains improvements in the agent’s own code and evaluates successive variants on coding benchmarks ( Zhang et al., 2025 ) . In robotics, Eureka uses language models to generate reward functions for policy learning ( Ma et al., 2024 ) , while evolutionary code search directly synthesizes executable control policies ( Guo et al., 2026 ) . Skill-library approaches retain experience as reusable procedures. Voyager accumulates executable skills in Minecraft ( Wang et al., 2023 ) ; Lifelong Robot Library Learning bootstraps composable skills for robot control ( Tziafas and Kasaei, 2024 ) ; and Uni-Skill requests new implementations when its existing repository cannot support a plan ( Xie et al., 2026 ) . These approaches make accumulated experience available to later tasks through improved policies, programs, or skill repertoires. ASPIRE ( Lu et al., 2026 ) brings execution-driven repair and skill accumulation into a continual robot-programming loop. It uses execution traces to diagnose failures, distills validated fixes into a transferable skill library. Its evaluation includes transfer to unseen long-horizon tasks, making it the closest precursor to Recursia . Zero-shot transfer is also studied in the context of lifelong learning ( zhou2025lifelong ) , where a robot learns to perform new tasks without additional training. Recursia differs from these approaches by focusing on the shared executable stack as the unit of improvement, allowing for more systematic and reusable repairs across tasks."
+  },
+  {
+    "projection_index": 105,
+    "tag": "h2",
+    "id": null,
+    "text": "5 Limitations and Conclusion"
+  },
+  {
+    "projection_index": 106,
+    "tag": "p",
+    "id": "S5.p1.1",
+    "text": "Our evaluation has several limitations. First, source-side ground-truth diagnosis provides information that may not be available on a physical robot. In simulation, failed episodes can be reset to a controlled initial state and replayed repeatedly. On a physical robot, resetting the scene can be slow, unsafe, or impossible after an object has moved, and the diagnostic evidence needed to identify the first violated requirement is often incomplete or expensive to obtain. Deployment does not consume simulator ground truth, but transferring the improvement procedure itself to real hardware therefore requires reliable alternatives, such as calibrated state logging, external sensing, human annotations, or conservative uncertainty handling. Second, we have not evaluated cross-embodiment generalization. All source and target experiments use the same robot embodiment and execution interfaces. A shared repair may depend on kinematics, gripper geometry, controller conventions, or calibration details, so transfer across robot platforms remains untested."
+  },
+  {
+    "projection_index": 107,
+    "tag": "p",
+    "id": "S5.p2.1",
+    "text": "We present a framework for improving the shared executable mechanisms through which coding agents compose robot skills. The stack can grow when a required tool is missing and change when existing tools, contracts, handoffs, or verification fail. Source failure attribution directs these changes, while validation gates determine which changes persist. Frozen reuse then connects a source-side modification to the code executed in an unseen long-horizon composition. The primary LIBERO-Pro Long results are 28.4% on Pos and 53.4% on Task ."
+  },
+  {
+    "projection_index": 110,
+    "tag": "p",
+    "id": "A1.p1.1",
+    "text": "This appendix documents the partial artifact, including the implementation description. The debugging pipeline separates proposal generation from evaluation. The verifier runs a frozen parent, records public observations and simulator/physical diagnostics, and supplies development evidence to one proposer. The proposer diagnoses a failure, makes several proposals, modifies shared code, replays the proposed decisions offline, and supplies tests. The verifier builds only after the final report, checks the candidate, runs a fixed paired plan, and records acceptance or rejection. An accepted program becomes the next parent; a rejected candidate leaves the parent unchanged. The prompt boxes reproduce templates and partial excerpts. Deployment-specific paths and login fields are replaced by $ASPIRE_ROOT , <user> , and <server> ; typographic punctuation is normalized. Braced variables are filled by the coordinator. These are implementation records, including their historical restrictions."
+  },
+  {
+    "projection_index": 112,
+    "tag": "p",
+    "id": "A1.SS1.p1.1",
+    "text": "The proposer receives the frozen program, running log, failure attribution, descriptor data, and patch-building interface. Its output is one shared-module change, with diagnosis and offline evidence preceding simulation. The nine builder module labels are motion_preconditions , grasp_geometry , hold_contract , place_primitive , verifier , binding , language_adapter , manipulation_primitive , and task_driver . These labels support attribution and dependency checks across the four conceptual layers."
+  },
+  {
+    "projection_index": 116,
+    "tag": "p",
+    "id": "A1.SS2.SSS0.Px1.p1.1",
+    "text": "The builder checks exact patch anchors, the declared module, a forbidden-literal list in inserted text, Python compilation, and supplied test_*.py files. Missing tests produce a warning in the inherited builder; the protocol and evaluator require them."
+  },
+  {
+    "projection_index": 118,
+    "tag": "p",
+    "id": "A1.SS2.SSS0.Px2.p1.1",
+    "text": "Each rollout stage contains NUM rows: NUM development episodes (seeds 86–95), NUM selection episodes (the same tasks, seeds 76–85), NUM ordinary-source regression episodes, and NUM synthetic-regression episodes. Here “synthetic” denotes instantiated simulator tasks in the protocol. A group’s net official gain must be at least two development states and one selection state. Losses are counted separately: at most one state per task per role, and at most one in each regression role. Both stages must pass integrity checks; at most four clean horizon timeouts are permitted. Passing the numeric gate is insufficient: the evaluator must inspect new physical completions and new regression failures."
+  },
+  {
+    "projection_index": 120,
+    "tag": "p",
+    "id": "A2.p1.1",
+    "text": "Inference executes a frozen shared program. The data-only adapter adapter_v3.py constructs descriptors from the public runtime instruction env.handle.task_language . To keep general, it does not take a task identifier, scene identifier, seed, or simulator state as input. The program’s la_parse produces ordered subgoals and la_dispatch checks every subgoal before any motion. Unsupported instructions stop explicitly. These functions are deterministic code. The following boxes present concise versions of its localization and identity prompts, using symbolic placeholders for runtime values."
+  },
+  {
+    "projection_index": 123,
+    "tag": "p",
+    "id": "A2.SS1.p3.1",
+    "text": "When association with the frozen reference fails before grasping, the query includes the initial image with the reference highlighted in magenta. The dimensions {W} and {H} , instruction, phrase, and phase are runtime substitutions."
+  },
+  {
+    "projection_index": 125,
+    "tag": "p",
+    "id": "A2.SS2.p1.1",
+    "text": "SAM3 can return nested masks at one point. At initial binding, a separate query chooses the complete object rather than an inner surface, lid, merged support, or rival instance. Image 1 provides the full view; subsequent images show the highlighted candidate crops. The response selects one candidate image label or abstains. Reference-conditioned localization instead selects among nested masks using the frozen body’s size."
+  },
+  {
+    "projection_index": 128,
+    "tag": "p",
+    "id": "A2.SS3.p3.1",
+    "text": "After grasping, the query compares the frozen reference, the pregrasp confirmation, and the current lifted object. The template accommodates either two or three images: the pregrasp confirmation is included when available."
+  },
+  {
+    "projection_index": 133,
+    "tag": "table",
+    "id": "A2.T3.4",
+    "text": "Query Required fields Allowed values Point localization abstain , x , y , confidence , reason Boolean abstention; integer pixel coordinates; confidence: low , medium , or high . Mask selection choice , reason A candidate image label, or none . Identity / mask review verdict , reason yes , no , or unsure ."
+  },
+  {
+    "projection_index": 134,
+    "tag": "p",
+    "id": "A2.SS4.p2.1",
+    "text": "We set the model identifier to claude-opus-5-5 , effort to low , and the default response limit to 3,000 tokens. It sends images and prompt text as one user message with a JSON-schema output format; it adds no separate system prompt. Errors, refusals, truncation, or budget exhaustion return no usable answer and are handled conservatively by the policy."
+  },
+  {
+    "projection_index": 138,
+    "tag": "p",
+    "id": "A3.p1.1",
+    "text": "The final artifact should include the shared-stack snapshots, source and target adapters, accepted and rejected patch ledger, evaluator implementation, exact model identifiers, environment revisions, and commands reproducing each table. Implementation records are organized by frozen program version and evaluation phase. A version record links the parent and candidate code hashes to the proposed patch, tests, gate decision, and rollout directories. Episode records identify the instruction, perturbation axis, task, seed and initial-state index, program hash, official outcome, termination status, and wall-clock duration. The inference comparison uses the N13 stack and the N13O/N13C driver records; these artifact identifiers name recorded implementations rather than additional learned stacks. A public artifact URL is not yet specified."
+  },
+  {
+    "projection_index": 144,
+    "tag": "p",
+    "id": "A3.SS2.p3.1",
+    "text": "Motion results expose a status, detail, reason, reached flag, and elapsed wall_s . Recorded statuses include reached , unreachable , stalled , uncertain , invalid_input , and budget_exhausted . A reached motion is distinct from an established placement relation. Motion budgets are measured in control steps; episode limits additionally use wall-clock seconds. In the recorded inference-driver comparison, the common limits are 4,000 simulation steps and 1,500 seconds per episode, including model calls."
+  },
+  {
+    "projection_index": 146,
+    "tag": "p",
+    "id": "A3.SS3.p1.1",
+    "text": "Candidate construction checks exact patch anchors, the declared shared module, forbidden literals in inserted code, Python compilation, and supplied test files. Identifier checks constrain explicit specialization to benchmark tasks or seeds. These automated checks do not establish semantic generality; review additionally examines whether geometric constants follow calibration, measured geometry, or an object-independent construction. Missing tests produce a warning in the inherited builder, while the evaluation protocol requires supporting tests before acceptance."
+  },
+  {
+    "projection_index": 147,
+    "tag": "p",
+    "id": "A3.SS3.p2.1",
+    "text": "Mechanism tests exercise the changed behavior and its failure returns. Recorded observations support replay of perception and verification decisions; changes to motion require execution evidence. Parent and candidate are then run from matched source initial states. The gate configuration is fixed at the beginning of each RSI iteration and specifies the evaluation stages, development and selection panels, regression tasks, required improvements, paired-loss limits, and integrity and timeout checks. These settings can evolve across iterations, but are held fixed for all candidate comparisons within a given iteration. The rollout manifest records the corresponding seed-to-state mapping and resource budgets."
+  },
+  {
+    "projection_index": 148,
+    "tag": "p",
+    "id": "A3.SS3.p3.1",
+    "text": "Numeric acceptance is followed by inspection of newly successful trajectories and new regression failures. The parent changes only after the checks and review required by the current iteration pass; otherwise the frozen parent is retained. Selection and regression outcomes used by this gate are acceptance evidence, not an independent audit. Any audit panel must be excluded from proposal generation and candidate selection, and reported separately. Target episodes do not supply evidence to the source acceptance gate."
+  },
+  {
+    "projection_index": 152,
+    "tag": "p",
+    "id": "A3.SS4.p3.1",
+    "text": "Frozen execution excludes code modification during the target episode. It does not by itself establish that evaluation tasks were never observed during development. The recorded inference comparison reused evaluation rows, and its protocol identifies historical exposure to Scene5. These records must be distinguished from a newly isolated target evaluation when interpreting compositional generalization."
+  },
+  {
+    "projection_index": 155,
+    "tag": "p",
+    "id": "A3.SS5.p2.1",
+    "text": "Source improvement and target inference are accounted for separately. Source records distinguish proposal generation, offline tests, candidate rollouts, and rejected candidates. Inference records distinguish initial program generation, runtime decision and perception calls, and robot execution. End-to-end episode time includes generation and execution; model calls inside execution are not added a second time. The figure reports mean duration over all episodes, not only successes. Internal bounded retries remain part of their original episode and consume its budget."
+  },
+  {
+    "projection_index": 156,
+    "tag": "p",
+    "id": "A3.SS5.p3.1",
+    "text": "For N13C, the reported amended comparison substitutes five infrastructure-failed rows with their designated reruns; the original records remain available. Smoke episodes and offline generation tests are excluded from the 100 policy outcomes, while their costs remain separate development expenditures. Generated-tool counts should distinguish newly registered operations from revisions to existing ones; invocation traces establish use, whereas matched removal tests are needed to attribute a success gain to a component. No total cost, repeat count, or tool count is inferred where the corresponding ledger is absent."
+  },
+  {
+    "projection_index": 158,
+    "tag": "h3",
+    "id": null,
+    "text": "D.1 Task Manifest and Frozen Execution"
+  },
+  {
+    "projection_index": 161,
+    "tag": "p",
+    "id": "A4.SS2.p1.1",
+    "text": "The scaling evaluation in Figure 7 uses one-shot task-program inference at every checkpoint. A task program is generated once and executed over the frozen shared stack without target-side code debugging; its execution may nevertheless use observation feedback. Each plotted value is from a single evaluation run, rather than an average across repeated runs. Figure 7 reports the source-experience scaling evaluation for frozen Recursia stacks after N ∈ { 0 , 3 , 6 , 9 , 10 , 12 , 13 , 14 , 15 , 16 , 17 , 18 } N\\in\\{0,3,6,9,10,12,13,14,15,16,17,18\\} improvement iterations. Each snapshot is selected using source data only and evaluated without target-driven modification."
+  },
+  {
+    "projection_index": 162,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 7: Recursia transfer scaling with source-task experience. Frozen-stack success rates on Pos and Task are shown at the supplied iteration checkpoints."
+  }
+]

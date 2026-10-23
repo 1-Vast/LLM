@@ -1,0 +1,253 @@
+# Data Preparation Tutorial
+
+The purpose of this tutorial is to provide a guide about how to prepare data from combinatorial phenotypic screening reuslts into a format parsable by NAIAD.
+
+NAIAD expects the data as a CSV with the following columns:
+
+`| id1 | id2 | score |`
+
+The columns `id1`, `id2` should contain treatment (e.g. gene or chemical compound) names. For the purpose of this tutorial, we will focus on combinatorial genetic pertrubations.
+
+`score` should contain a numeric phenotype value for the combination genetic perturbation from `id1` and `id2`. This table should also include scores for all single-gene perturbations in the dataset. For the single-gene perturbations, `id1` is the gene, and `id2` is 'negative', with the `score` corresponding to the phenotype score of the single perturbed gene.
+
+
+We will show two examples in this tutorial:
+
+1) Using the [Norman2019](https://www.science.org/doi/10.1126/science.aax4438) dataset which measures cell viability in combinatorial CRISPR activation (CRISPRa) screens of pairwise genetic interactions for ~120 genes.
+2) Using the [Horlbeck2018](https://www.cell.com/cell/fulltext/S0092-8674\(18\)30735-9) dataset which measures cell viability in combinatorial CRISPR interference (CRISPRi) screens of pairwise genetic interactions for ~400 genes.
+
+## Set up notebook
+
+import os
+import numpy as np
+import pandas as pd
+from naiad import load_naiad_data
+
+# set some configuration settings for the notebook
+pd.set_option("mode.copy_on_write", True)
+
+## Download Norman Data
+
+The combinatorial perturbation cell viability from the Norman2019 dataset is available in the supplemental data of the original paper. You can download it manually from [this link](https://www.science.org/doi/suppl/10.1126/science.aax4438/suppl_file/aax4438_tables3.xlsx), or follow the programmatic download below.
+
+norman_dir = './data/norman_raw_data'
+norman_data_path = os.path.join(norman_dir, "norman_phenotype_data.xlsx")
+
+# Use some shell commands to download the files into a target directory
+!mkdir '{norman_dir}'
+!wget --header="User-Agent: Mozilla/5.0" "https://europepmc.org/articles/PMC6746554/bin/NIHMS1045467-supplement-Table_S3.xlsx" -O '{norman_data_path}'
+
+norman_data = pd.read_excel(norman_data_path)
+norman_data.head() # inspect data
+
+As you can see in the above table, column 0 corresponds to the genes targeted by each CRISPRa guide, columns 1-4 correspond to guide barcode sequencing counts, columns 5-8 correspond to sgRNA counts, columns 9-12 correspond to triple sequencing counts (see [Horlbeck2018](https://www.cell.com/cell/fulltext/S0092-8674\(18\)30735-9) for a description of triple sequencing), and columns 13-15 correspond to cell viability calculations based on the triple sequencing counts.
+
+We will be using column 0 and column 15 to annotate the genes targeted in each combinatorial perturbation, and the corresponding phenotypic outcome of each perturbation.
+
+We'll process the data in the following ways:
+1. Extract the relevant columns and rows from the data
+2. Drop all entries that lack a cell viability score
+3. Extract the gene names associated with the guides used in each combination
+4. Store these gene names as new columns within the data frame
+5. Keep only the gene and score columns that will be used by NAIAD
+
+Lastly, we will save the data to file.
+
+
+# 1. Extract the relevant columns and rows from the data
+# 2. Drop all entries that lack a cell viability score
+norman_data = norman_data.iloc[2:, [0, 15]]                 # drop first 2 rows, and only take columns 0 and 15
+norman_data.columns = ['guides', 'score']                   # rename the columns to something more convenient
+norman_data = norman_data[~norman_data['score'].isna()]     # drop combinations without a score
+
+# 3. Extract the gene names associated with the guides used in each combination
+gene_pairs = norman_data.iloc[:, 0]
+g1, g2 = zip(*[[g.split('_')[0] for g in pair.split('++')] for pair in gene_pairs])
+
+
+# 4. Store these gene names as new columns within the data frame
+norman_data['id1'] = g1
+norman_data['id2'] = g2
+
+# 5. Keep only the gene and score columns that will be used by NAIAD
+norman_data = norman_data.loc[:, ['id1', 'id2', 'score']]
+
+# save data to file
+norman_comb_file = os.path.join(norman_dir, 'norman_gamma_score.csv')
+norman_data.to_csv(norman_comb_file)
+
+norman_data.head()
+
+Now, we have a dataset containing gene combinations and their associated cell viability scores. The gene combinations include both **single-gene** and **multiple-gene** perturbations.
+
+You may notice that there are replicate measurements within this dataset as a result of each gene being targeted by multiple guides. Furthermore, replicates for each combination may have switched names between the 'id1' and 'id2' columns, e.g. comb1 is 'geneA + geneB' and comb2 is 'geneB + geneA'.
+
+The `load_naiad_data` function will average the phenotype scores for these duplicate combinations, generating in a single score for each unique gene combination. These unique per-combination scores are used to train NAIAD. The order of id1 and id2 is shuffled by default to eliminate positional effects, which you can control via the `shuffle_treatments` flag.
+
+By default, the control gene in our dataset is called `negative`. If the control gene in your dataset has a different name, you should update the `control_treatment_name` parameter of the `load_naiad_data` function with your control gene name.
+
+# load processed DF for running NAIAD model
+naiad_data = load_naiad_data(norman_comb_file, control_treatment_name = 'negative', shuffle_treatments = True)
+naiad_data.head()
+
+### Inspect Norman Dataset Distribution with Linear Model
+We have processed the data for combinatorial perturbations. Applying a linear model provides a general overview of the data, allowing us to evaluate the extent and strength of non-linear gene-gene interactions influencing cell viability.
+
+The linear model is defined as:
+
+$$ Y_{i+j} = \beta_0 + \beta_1 Y_i + \beta_2 Y_j $$
+
+where $Y_i$ represents the scalar effect of a single-gene $i$ perturbation, and $Y_{i+j}$ denotes the combined effect of a two-gene $(i + j)$ perturbation.
+
+from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Fit linear model
+model = LinearRegression()
+model.fit(naiad_data[['id1_score', 'id2_score']], naiad_data['comb_score'])
+print("Coefficients:", model.coef_)
+print("Intercept:", model.intercept_)
+
+naiad_data['linear_predicted'] = model.predict(naiad_data[['id1_score', 'id2_score']]) 
+naiad_data['linear_residuals'] = naiad_data['comb_score'] - naiad_data['linear_predicted']
+lower_quant = naiad_data['linear_residuals'].quantile(0.025)
+upper_quant = naiad_data['linear_residuals'].quantile(0.975)
+
+### Comparison Between Linear Model Predictions and Measured Combinatorial Perturbations
+
+The linear model demonstrates that most gene pairs can be predicted by simply summing the effects of individual single-gene perturbations. Approximately 90–95% of gene interactions exhibit additive behavior. Here, cell viability is used as a measure of negative selection, identifying gene pairs that most effectively reduce cell viability. Notably, non-linear effects are concentrated in the left bottom of the plot, where strong cellular phenotypic changes occur. The linear model fails to capture synergistic or buffering effects, motivating us to develop deep learning models to capture complex, non-linear gene-gene interactions.
+
+plt.figure(figsize=(12, 4))
+
+plt.subplot(1, 2, 1)
+sns.scatterplot(x='comb_score', y='linear_predicted', data=naiad_data, alpha=0.1)
+plt.plot([-0.8, 0.3], [-0.8, 0.3], color='black')
+plt.plot([-0.8, 0.3], [-0.8 - lower_quant, 0.3 - lower_quant], color='blue', linestyle='--', label='Synergistic')
+plt.plot([-0.8, 0.3], [-0.8 - upper_quant, 0.3 - upper_quant], color='red', linestyle='--', label='Buffering')
+x_vals = np.linspace(-0.8, 0.3, 100)
+ 
+plt.title("Combinatorial perturbation effects prediction")
+plt.xlabel("Measured combinatorial effects")
+plt.ylabel("Linear model predicted effects")
+plt.legend() 
+
+
+plt.subplot(1, 2, 2)
+naiad_data['linear_residuals'].hist(bins=50, color='lightgrey', edgecolor='black', linestyle='--')
+plt.axvline(lower_quant, color='blue', linestyle='--', label='2.5%, Synergistic')
+plt.axvline(upper_quant, color='red', linestyle='--', label='97.5%, Buffering')
+plt.title("Histogram of Linear Residuals (Measured - Predicted)")
+plt.xlabel("Linear Residuals")
+plt.ylabel("Frequency")
+plt.legend()
+
+# Show the plots
+plt.tight_layout()
+plt.show()
+
+## Download Horlbeck Data
+
+We access the Horlbeck Jurkat data from this URL: https://data.mendeley.com/datasets/rdzk59n6j4/1. 
+
+This dataset shares many similar features with the Norman dataset, so the processing will be similar.
+
+horlbeck_dir = './data/horlbeck_raw_data'
+
+# Use some shell commands to download the files into a target directory
+!mkdir '{horlbeck_dir}'
+!wget 'https://data.mendeley.com/public-files/datasets/rdzk59n6j4/files/7ab168b7-3944-4f35-b249-5a672b32b20c/file_downloaded' -P '{horlbeck_dir}'
+!unzip  -o '{os.path.join(horlbeck_dir, "file_downloaded")}' -d '{horlbeck_dir}'
+!rm '{os.path.join(horlbeck_dir, "file_downloaded")}'
+
+horlbeck_data = pd.read_csv(os.path.join(horlbeck_dir, 'CRISPRi_Jurkat_all_pair_phenotypes.txt'), sep='\t')
+
+horlbeck_data.head()
+
+Like the Norman data, we will use the phenotype scores calculated from the 'Triple Sequencing' columns. The main difference between this dataset and the Norman dataset is that there are 2 replicates per guide pair. As a result, we will add an additional step of processing to average the phenotype score between these replicates.
+
+The processing steps are similar, with the addition of a new step after 4:
+
+1. Extract the relevant columns and rows from the data
+2. Drop all entries that lack a cell viability score
+3. Extract the gene names associated with the guides used in each combination
+4. Store these gene names as new columns within the data frame
+5. Average scores between replicates for the same guide pair
+6. Keep only the gene and score columns that will be used by NAIAD
+
+Lastly, we will save the data to file.
+
+# 1. Extract the relevant columns and rows from the data
+# 2. Drop all entries that lack a cell viability score
+horlbeck_data = horlbeck_data.iloc[1:, 0:3]                        # drop first row, and only take columns 0-2
+horlbeck_data.columns = ['guides', 'score1', 'score2']             # rename the columns to something more convenient
+horlbeck_data = horlbeck_data[~horlbeck_data['score1'].isna()]     # drop combinations from replicate 1 without a score
+horlbeck_data = horlbeck_data[~horlbeck_data['score2'].isna()]     # drop combinations from replicate 1 without a score
+
+
+# 3. Extract the gene names associated with the guides used in each combination
+gene_pairs = horlbeck_data.iloc[:, 0]
+g1, g2 = zip(*[[g.split('_')[0] for g in pair.split('++')] for pair in gene_pairs])
+
+
+# 4. Store these gene names as new columns within the data frame
+horlbeck_data['id1'] = g1
+horlbeck_data['id2'] = g2
+
+# 4b. Average scores between replicates for the same guide pair
+horlbeck_data['score'] = (horlbeck_data['score1'].astype(np.float32) + horlbeck_data['score2'].astype(np.float32)) / 2
+
+# 5. Keep only the gene and score columns that will be used by NAIAD
+horlbeck_data = horlbeck_data.loc[:, ['id1', 'id2', 'score']]
+
+# save data to file
+horlbeck_comb_file = os.path.join(horlbeck_dir, 'horlbeck_gamma_score.csv')
+horlbeck_data.to_csv(horlbeck_comb_file)
+
+horlbeck_data.head()
+
+# load data to use for NAIAD model
+naiad_data = load_naiad_data(horlbeck_comb_file)
+naiad_data.head()
+
+### Inspect Horlbeck Dataset Distribution with Linear Model
+Similar to the Norman dataset, we can examine the distribution of buffering and synergystic interactions within the Horlbeck dataset by using a linear model, and define interactions as the bottom and top 2.5% of interactions that deviate from linear model predictions, respectively. We again see that data variance increases as cell viability decreases, and that there are slight imbalances in data distribution between the synergystic and buffering interactions.
+
+# Fit linear model
+model = LinearRegression()
+model.fit(naiad_data[['id1_score', 'id2_score']], naiad_data['comb_score'])
+print("Coefficients:", model.coef_)
+print("Intercept:", model.intercept_)
+
+naiad_data['linear_predicted'] = model.predict(naiad_data[['id1_score', 'id2_score']]) 
+naiad_data['linear_residuals'] = naiad_data['comb_score'] - naiad_data['linear_predicted']
+lower_quant = naiad_data['linear_residuals'].quantile(0.025)
+upper_quant = naiad_data['linear_residuals'].quantile(0.975)
+
+plt.figure(figsize=(12, 4))
+
+plt.subplot(1, 2, 1)
+sns.scatterplot(x='comb_score', y='linear_predicted', data=naiad_data, alpha=0.1)
+plt.plot([-0.8, 0.3], [-0.8, 0.3], color='black')
+plt.plot([-0.8, 0.3], [-0.8 - lower_quant, 0.3 - lower_quant], color ='blue', linestyle='--', label='Synergistic')
+plt.plot([-0.8, 0.3], [-0.8 - upper_quant, 0.3 - upper_quant], color='red', linestyle='--', label='Buffering')
+x_vals = np.linspace(-0.8, 0.3, 100)
+ 
+plt.title("Combinatorial perturbation effects prediction")
+plt.xlabel("Measured combinatorial effects")
+plt.ylabel("Linear model predicted effects")
+plt.legend() 
+
+
+plt.subplot(1, 2, 2)
+naiad_data['linear_residuals'].hist(bins=50, color='lightgrey', edgecolor='black', linestyle='--')
+plt.axvline(lower_quant, color='blue', linestyle='--', label='2.5%, Synergistic')
+plt.axvline(upper_quant, color='red', linestyle='--', label='97.5%, Buffering')
+plt.title("Histogram of Linear Residuals (Measured - Predicted)")
+plt.xlabel("Linear Residuals")
+plt.ylabel("Frequency")
+plt.legend()
+
+# Show the plots
+plt.tight_layout()
+plt.show()

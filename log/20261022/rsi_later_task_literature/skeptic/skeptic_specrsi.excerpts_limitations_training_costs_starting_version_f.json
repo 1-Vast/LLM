@@ -1,0 +1,122 @@
+[
+  {
+    "projection_index": 88,
+    "tag": "p",
+    "id": "S4.SS1.p1.1",
+    "text": "Tasks, models, and baselines. We evaluate five scientific domains (PyBaMM, AQM, FDTD, Reactor, and IRP), four system tasks (Terminal-Bench 2.1 (TB2.1), SWE-Pro, GPQA-hard100, and AIME), and separate coding, prompt, and workflow profiles. Qwen3.5-35B-A3B serves as the reference backbone for mechanism studies and the primary matched system comparison. For cross-backbone evaluation on the scientific domains, we additionally test GPT-6-Astra, Claude-Opus-5, Gemini-3.5-Flash, DeepSeek-V4-Pro, GLM-5.3, Kimi-K3, MiniMax-M3, GPT-5.6-Sol, Claude-Sonnet-5-1M, and GPT-5.5, covering 50 backbone–task pairs in total. We further evaluate the four system tasks across twenty model backbones to test whether the observed gains persist across different starting models. Baselines include Janus, HGM, MetaRSI, FlashEvolve, and task-specific optimizers ( Liu et al., 2026 ; Wang et al., 2026b ; Tan et al., 2026 ; Hu et al., 2026b ) . D/H/M permits data, harness, and model edits, whereas D+H excludes model edits. Comparisons remain within matched permission bands; SpecRSI uses direct checks."
+  },
+  {
+    "projection_index": 90,
+    "tag": "p",
+    "id": "S4.SS1.p3.1",
+    "text": "Reproducibility. The reference reproduction configuration uses official BF16 Qwen3.5-35B-A3B with a frozen text backbone and rank-16 Drafter LoRA. SFT uses AdamW ( 2 × 10 − 5 2\\times 10^{-5} ; component minibatch 1; one epoch); GVO uses two frozen collection/update rounds (group 3; actor/Scorer SGD rates 10 − 3 / 5 × 10 − 4 10^{-3}/5\\times 10^{-4} ; at most one joint update per complete collection). Training uses 2,048-token sequences and one H20 per scientific domain; a separate H20 serves 32,768-token inference. Other evaluated backbones use provider APIs. The repository specifies 14 versioned data pools and 42 exact member lists, model/checkpoint identities, simulator parameters, seeds, and separate training/serving software versions."
+  },
+  {
+    "projection_index": 105,
+    "tag": "p",
+    "id": "S4.SS3.p3.1",
+    "text": "Planning ablations. Across eight budget caps from 10% to 150%, full SpecRSI has the highest reported mean gain and lowest total-cost index of seven conditions (Figure 4 b,c). At 70%, full versus additive planning raises gain from 4.73 ± 0.29 4.73\\pm 0.29 to 5.99 ± 0.40 5.99\\pm 0.40 pp: planning takes 201 versus 141 ms, but total cost falls from 65.1 to 58.9. Removing completion seeds reduces gain by 0.77–1.79 pp across the reported paired-difference sweep (Figure S4 ). Appendix C further separates the effects of evidence quality and work scope, showing that the gain is not explained by simply executing more or deeper work. Appendix G.5 provides an exact matched-scope analysis showing how bundled verification can reduce dispatch cost under fixed information."
+  },
+  {
+    "projection_index": 109,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 4: Verification scope and planning ablations. (a) Gain versus total-cost index for one check or bundles at fixed Summary or Full-state information; bars show reported SD. (b) Verified gain and (c) total-cost index across eight budget caps. In (b), means average five reported seed means; SD averages within-seed SDs. Lines join means; bands/bars show ± 1 \\pm 1 SD."
+  },
+  {
+    "projection_index": 112,
+    "tag": "p",
+    "id": "S4.SS4.p2.1",
+    "text": "Artifact controls. Improver updates raise reset/carry gains from 4.1 ± 0.18 4.1\\pm 0.18 to 5.2 ± 0.21 5.2\\pm 0.21 pp and from 4.8 to 6.2 pp, respectively. Original/updated improvers yield 5.7/6.9 pp from the same released artifact (Table 2 (a)), , showing gains beyond simply retaining a stronger task agent."
+  },
+  {
+    "projection_index": 113,
+    "tag": "p",
+    "id": "S4.SS4.p3.1",
+    "text": "Roles and supervision. Scorer-only updates yield science/code/agent gains of 5.2/5.4/5.3 pp, versus 4.7/4.9/4.8 for the drafter and 5.0/5.2/5.1 for the policy. Joint updates are stronger with unequal training costs (Table 2 (b)). Adding pair loss to the reported same acquired arms raises gain from 5.4 ± 0.23 5.4\\pm 0.23 to 6.3 ± 0.25 6.3\\pm 0.25 pp and lowers RMSE from 1.05 to 0.85, while training cost rises from 23.7 to 28.4."
+  },
+  {
+    "projection_index": 115,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Table 2: Learning the improver. Gains (pp). (a) Reported uncertainty; compare within each starting condition. (b) Updated roles: D, drafter; Sc, scorer; P, policy; Sh, shared backbone. Sci.: Science. Last two rows have unmatched training costs. (c) Incremental (Inc.)/cumulative (Cum.) gains for original (Orig.)/updated (Upd.) improvers. All carry the agent; round 1 initializes. Full controls: Appendix D ."
+  },
+  {
+    "projection_index": 125,
+    "tag": "p",
+    "id": "S4.SS5.p3.1",
+    "text": "Verification cost. Batching lowers verification cost in three regimes and raises it in three (Table S16 ). The separate lifecycle ledger gives SpecRSI (ours) a 5.7% lower total-cost index: 106.3 versus MetaRSI-v1’s 112.7 (Table 3 (b)). This lifecycle result complements Figure 2 ’s ten-backbone target-cost analysis, which measures a different cost endpoint. Appendix E further separates planning, batching, parallelism, and objective sensitivity, clarifying when additional computation reduces cost or latency."
+  },
+  {
+    "projection_index": 132,
+    "tag": "p",
+    "id": "S5.p1.1",
+    "text": "SpecRSI’s two-level loop extends incompletely evaluated parents but adopts only complete, admissible versions. VATS allocates edits and complementary checks by predicted net verified return; GVO updates the improver from completed searches under a fixed verification contract. SpecRSI outperforms Janus in all 50 scientific backbone–task pairs and MetaRSI-v1 by 1.85–2.38 pp in four-task macro-average score across twenty backbones. Full planning achieves the highest mean verified gain and lowest total-cost index among tested planning conditions at all eight budget caps. Starting-artifact controls support gains from improver updates beyond retaining stronger task agents. Learned allocation thus turns speculation into verified agent improvement under limited budgets."
+  },
+  {
+    "projection_index": 139,
+    "tag": "p",
+    "id": "A1.SS0.SSS0.Px1.p1.1",
+    "text": "Unlike within-task reasoning search or adaptive inference compute ( Yao et al., 2023 ; Snell et al., 2025 ) , agent improvement persistently revises task solvers and their improvers. DGM, SICA, ADAS, AFlow and GEPA iteratively revise and evaluate code, workflows, or prompts ( Zhang et al., 2026a ; Robeyns et al., 2025 ; Hu et al., 2025 ; Zhang et al., 2025b ; Agrawal et al., 2026 ) ; MemEvolve co-evolves experience and memory programs, while Hyperagents and MetaRSI adapt improvement generation or scheduling ( Zhang et al., 2025a ; Zhang et al., 2026b ; Tan et al., 2026 ) . HGM separates lineage-metaproductivity-guided expansion from agent–task evaluation ( Wang et al., 2026b ) ; Janus co-evolves programs and proxies but retains real promotion checks ( Liu et al., 2026 ) . SpecRSI uses VATS to connect exploration to evaluation completion, jointly selecting branches and outstanding-check bundles by attainable verified improvement under the remaining budget."
+  },
+  {
+    "projection_index": 187,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Table S9: Verification scope with information held fixed. Gain is in percentage points (pp), with reported SD. Cost is the study’s total-cost index; failure and hit rates retain the study’s definitions. The two full-state rows isolate work scope at a fixed information level."
+  },
+  {
+    "projection_index": 191,
+    "tag": "p",
+    "id": "A3.SS2.p2.1",
+    "text": "At the standard budget, removing seeds lowers gain from 6.3 to 4.5 pp, and greedy value selection reaches 4.8 pp. At the 70% cap, the corresponding values are 6.0, 4.2, and 4.9 pp. These are independent budget cohorts with their own seed pools, not extra replicates of the same condition. Figure S5 makes the trade-off explicit: full planning spends more time preparing work yet has a lower total-cost index."
+  },
+  {
+    "projection_index": 216,
+    "tag": "p",
+    "id": "A4.SS1.p1.1",
+    "text": "Reset controls return the task agent to the registered starting version while changing the improver. Carry controls retain the stronger task agent. The released-artifact fork is a third comparison: both continuations start from the same already released version, but use original or updated improvers. Comparing across these three starting conditions without holding the starting artifact fixed would conflate learning with artifact retention."
+  },
+  {
+    "projection_index": 218,
+    "tag": "p",
+    "id": "A4.SS1.p3.1",
+    "text": "Starting from the same released artifact, updating the improver raises the mean gain from 5.7 to 6.9 pp and lowers the reported cost index from 54.2 to 50.8 (Table S12 ). This is stronger evidence for improver transfer than merely carrying a higher-scoring task agent forward."
+  },
+  {
+    "projection_index": 219,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure S7: Starting-artifact controls and updated roles. (a) Reset, carry, and same-artifact controls; gain is in pp. Reported uncertainty, regression values, and cost/hit/failure shading are retained. Compare rows within each starting condition. (b) Filled switches mark updated roles: D, drafter; Sc, scorer; P, policy; Sh, shared backbone. Columns report Science (Sci.), Code, and Agent gains (pp). The final two rows use a separate shared-backbone extension; training costs are unmatched."
+  },
+  {
+    "projection_index": 222,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Table S12: Continuation from the same released artifact. Released-fork means and costs."
+  },
+  {
+    "projection_index": 258,
+    "tag": "p",
+    "id": "A5.SS2.p2.1",
+    "text": "Figure S11 reports the associated cost components and execution conditions. Separately, the output-matched two-check analysis in Appendix G .3.1 characterizes when dispatch savings outweigh batch-construction cost and checks made unnecessary by early failure. This trade-off motivates VATS’s state-dependent work selection: it retains feasible singleton checks and completion bundles, evaluates their downstream verified return net of cost, and replans after each executed block updates the search state. Complementary evidence in Appendix C.1 shows that, at fixed full-state information, permitting bundles raises verified gain from 4.8 to 6.3 pp while reducing the total-cost index from 63.1 to 59.2."
+  },
+  {
+    "projection_index": 267,
+    "tag": "p",
+    "id": "A5.SS4.p1.1",
+    "text": "The lifecycle ledger reports a 5.7% lower total-cost index for SpecRSI than for MetaRSI-v1: 106.3 versus 112.7, with lower indices across all listed cost categories (Table 3 (b))."
+  },
+  {
+    "projection_index": 283,
+    "tag": "table",
+    "id": "A6.T21.4",
+    "text": "Symbol Meaning Γ , ℐ , J Γ \\Gamma,\\mathcal{I},J_{\\Gamma} Fixed verification contract, required items, and score aggregation 𝒯 = ( 𝒞 , 𝒜 ) \\mathcal{T}=(\\mathcal{C},\\mathcal{A}) Actual immutable versions and executed parent–child edit edges ℰ , H \\mathcal{E},H Admitted outcome records and observed execution history m c ​ i , U c , K c m_{ci},U_{c},K_{c} Outcome completeness bit, missing items, and candidate–item target keys 𝒞 full , F \\mathcal{C}_{\\mathrm{full}},F Complete admissible versions and their best improvement over the initial root B , N , w B,N,w Remaining expense, primitive-attempt allowance, and worker count S − , S , S ~ S^{-},S,\\widetilde{S} Pre-menu state, paid choice state, and conservative proposal state ω , Ω \\omega,\\Omega Executable work plan and bounded offered plan set ℛ ⁡ ( S ) \\mathcal{R}(S) Known candidate–job, dependency, setup, and source relations Q ^ ϕ , z ψ \\widehat{Q}_{\\phi},z_{\\psi} Single predicted action value (scorer/critic) and a separate policy logit θ , ϕ , ψ , ν \\theta,\\phi,\\psi,\\nu Drafter, single value/scorer, preference parameters, and fixed menu-generator settings 𝒟 \\mathcal{D} Execution log; not the draft-plan catalog 𝒟 t \\mathcal{D}_{t} or 𝒟 draft \\mathcal{D}_{\\rm draft}"
+  },
+  {
+    "projection_index": 443,
+    "tag": "p",
+    "id": "A7.SS6.SSS2.p1.2",
+    "text": "The equality holds without additivity or submodularity. Unlike summing W ⁡ ( D j ) W(D_{j}) , it does not repeatedly add the same base continuation. However, positive single-job increments can still miss bundles: with two jobs of unit cost, gain g > 2 ​ λ g>2\\lambda , and a fixed continuation that stops immediately after the offered work, W ⁡ ( ∅ ) = 0 W(\\varnothing)=0 , W ⁡ ( { a } ) = W ⁡ ( { b } ) = − λ W(\\{a\\})=W(\\{b\\})=-\\lambda , and W ⁡ ( { a , b } ) = g − 2 ​ λ > 0 W(\\{a,b\\})=g-2\\lambda>0 . Empty-seed positive-gain greedy stops; an affordable complete-candidate seed presents the pair to the actor. This verifies the purpose of the seed family, not a general approximation ratio. Higher-order cross-candidate interactions and inaccurate W W remain limitations."
+  }
+]

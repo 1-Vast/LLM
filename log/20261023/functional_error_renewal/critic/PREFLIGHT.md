@@ -1,0 +1,27 @@
+# Independent pre-execution code/protocol review
+
+2026-10-23. Read `DIAGNOSTIC_PROTOCOL.md`, `diagnostic.py`, `test_diagnostic.py` as supplied. Did not execute prepare/run/tests or read X/Y numerical values. Current decision **REVISE, small reporting fix; scientific execution may proceed after it is addressed and recorded**. No new candidate algorithm or outcome has been reviewed here.
+
+## Required revision
+
+Protocol step4 says to report reversal counts, but `run()` records only `contrast_direction_agreement = mean(Delta_D*Delta_R>0)`. Agreement of context contrasts is not reversal of the association itself: e.g. correlations(.2,.4) in both halves give agreement with no reversal. Add descriptive discovery/replication counts of eligible pairs with `r_low*r_high<0`, and the count satisfying that in both halves. Define zero as no reversal. No extra hypothesis test, pair selection or gate should be introduced. Alternatively remove the reversal-count promise before freeze, since it is not essential to the primary gate. I prefer adding the three descriptive counts from already computed arrays.
+
+## Passed code checks by inspection
+
+- Cached data access is limited to groups,contexts,items,input_sha256. The code does not index compressed X/Y/events/G.
+- Source fold and discovery split use declared distinct subject salts. Exactly one lexicographically first context is chosen per source subject before numeric response decoding. Raw AUC conversion occurs only after selected-context, paper-inclusion, drug-identity and patient-map checks. Selected duplicate records are averaged. Raw strings/bytes from nonselected rows are traversed, explicitly disclosed, and not converted numerically.
+- Expression numeric conversion occurs only on exact ENSG00000170458/CD14 matching row and selected source columns. Exact-one-row, finite-marker, duplicate-header and raw-input digest checks are present. No outcome-dependent marker or threshold search.
+- Matrix moment algebra is pairwise complete. `sums[i,j]` is the sum of variable i among joint observations of i,j; pair covariance subtracts `sums[i,j]*sums[j,i]/n`. The `var_sum[i,j]` term correctly centers variable i on that same joint subset. Slope divides by variable-i centered sum of squares. Weight-based bootstrap moments equal literal repeated-subject rows, including pairwise masks.
+- Pair eligibility is upper-triangle only, four original-cell joint counts≥25, no outcome variance filtering. The eligible set is fixed for every bootstrap. Whole patient rows are resampled independently within each of four cells, preserving the dependence of different drug pairs.2000 replicates, seed and quantiles match the protocol.
+- The sole effect gate is lower5% quantile>.01 with≥30 pairs. No individual pair inference, multiple-marker search, predictive-risk endpoint or causal conclusion is introduced.
+- Tests, read but not run here, meaningfully compare weighted/pairwise matrix moments with explicit repeated pairwise NumPy references and poison nonselected/excluded AUC values. Constant handling is checked. They do not independently authenticate the raw dataset, clinical semantics, bootstrap coverage or the final scientific interpretation.
+
+## Limitations to retain in result interpretation
+
+1. Association contrasts can reproduce when the *conditional regression slope is unchanged*, because within-stratum response variance/noise differs. Pairwise centering and scale normalization do not eliminate case mix, range restriction or missingness bias. Saved covariance/slopes are useful descriptive evidence but are not a separately powered follow-up hypothesis. Do not call a passing gate a demonstrated error or excess risk of the pooled affine conditional predictor.
+2. Bootstrap conditions on the observed split, marker threshold and eligible pair list, resampling within strata. It does not include discovery-threshold estimation, historical marker/design exposure or eligibility-selection uncertainty. At the no-heterogeneity boundary T is a product of noisy contrasts, so a percentile interval has no automatic calibrated level-alpha interpretation. The protocol already disclaims that guarantee; retain it prominently.
+3. The moment implementation uses raw second-moment subtraction, clipping tiny negative variance and absolute denominator1e-12. Ordinary normalization scales may make this adequate, but this is not proof of numerical robustness for very large offsets/tiny variance. A result auditor should independently recompute per-pair centered moments on the separated source dataset rather than import `moments`. Existing synthetic tests cover standard scale only; no new biological decode is justified to tune tolerances.
+4. `INSUFFICIENT_COVERAGE` writes a result without `PAIRS.json`; this is acceptable for a pre-fit stop, but the result should at least retain four stratum sizes and eligible count as implemented. No unsupported all-pair discovery claim should follow.
+5. Source-only physical NPZ is an isolation artifact, not secure blind confirmation. Basal bulk CD14 expression is neither NPM1 mutation nor a post-intervention state. No model prediction, drug-ranking, world, agent, inherited updater or improved-improver gain is assessed.
+
+Resource count for this review:0 GET,0 API,0 data numerical access,0 execution of research/test code. Review is independent before current constructive report read. Root should bind the final protocol/code hashes after the reporting change and crossed review before scalar access.

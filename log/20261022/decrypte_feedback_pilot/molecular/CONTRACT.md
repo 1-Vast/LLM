@@ -1,0 +1,34 @@
+# decryptE molecular source qualification
+
+Status: **published per-dose molecular columns authenticated; strict local experimental feedback not authenticated**. No molecular abundance data row was decoded in this source qualification. File payloads were archived, and file identities, workbook metadata/text-only first-three rows, and TSV first header lines were inspected. Do not treat archived bytes as numerical analysis.
+
+## Source chain and actual resources
+
+- Existing author article XML links MassIVE MSV000093659. Windows curl with default Schannel certificate verification retrieved its public landing page, which identifies task `70cd42693c7f4d4da2cf466a0832e87d` and links `dataset_files.jsp` and `/v06/MSV000093659/` FTP space.
+- `massive_files.body` contains 13,485 repository file records. `FILELIST.json` is an exact parsed metadata representation. `MOLECULAR_HEADER_CONTRACT.json` records scoped identities and headers.
+- There are **144 standard `TXTs_Classified/*_ALL.txt` drug files**, plus one additional **Vincristine `TXTs_Classified_Manual`** version. Do not count these as 145 drugs, combine both versions, or select manual based on results. Nested `sequence/MSV000092708` copies are not additional tasks.
+- The standard ALL collection is approximately 561 MB (repository metadata; exclude manual duplicate). Downloaded only the (+)-JQ-1 ALL file, subsequently confirmed by root as development-assigned. No remaining 96 selection/later drug payload was downloaded or decoded here.
+- `jurkat_jq1.body` is the genuine processed response with header: `.pred_class`, `identifier`, `drug`, `gene`, fitted-curve quantities, `Normalized_Intensity_{0,1,10,100,1000,10000}`, `Unique_Peptides_{0,1,10,100,1000,10000}`, annotation/control-derived quantities. Header is frozen in `JURKAT_ALL_HEADER.json`.
+- Download URL template: `https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=` + percent-encoded descriptor + `&forceDownload=true`. Standard descriptor is `f.MSV000093659/other/Dose response data - Jurkat proteome/{DRUG}/TXTs_Classified/{DRUG}_ALL.txt`; encode the whole descriptor with `urllib.parse.quote(descriptor, safe='')`. Exact drug spelling comes from file listing, never guessed aliases. `STANDARD_JURKAT_DOWNLOADS.json` contains all 144 metadata-only identities and URLs for root's partition join. It contains no response values.
+- **Normalization source:** archived original article, Curve fitting paragraph: “For each protein–drug combination, the LFQ intensity relative to the average protein intensity in the DMSO controls was calculated for all drug concentrations.” Thus published normalized protein response at each named dose is supported, and the article places sigmoid fitting after normalization. This does not authenticate independence of upstream MaxLFQ/global preprocessing from unseen samples, per-well replicates, batch mapping, or a fresh experiment.
+
+## Legal scoped use and leakage restrictions
+
+The per-dose normalized columns support a **published molecular endpoint** study with a drug/dose reveal policy. They do not by themselves certify truly prospective local acquisition. Source DMSO average may pool controls; cost must not count every published normalized value as independently generated fresh feedback. Five doses are five interventions, not five replicate estimates of identical treatment noise.
+
+Do not use `.pred_class`, curve fit values (`slope`, `bottom`, `top`, `inflection`, `IC50`, `stdIC50`, `r2`, `rse`, `bic`, `aic`, `AUC`, `beginningOfCurve`, `endOfCurve`, `linearSlope`, `R2_Bins`) or dose-wide row selection to infer unrevealed doses. Source RF classification explicitly uses all-dose intensities and peptide counts. Do not use future-dose detection/peptide masks as free features. `Mean_Intensity`, `DMSO_percentile`, `MAD`, and ambiguous `down` remain disallowed until their derivation is authenticated. Identifier/gene/drug strings are candidate join metadata, not response features.
+
+The ALL file's name and 8,016 newline count do **not** prove all proteins are retained before fitting or rule out curve-fit failure filtering. Original Curve classification says RF prefilters separate PDFs/TXTs by predicted classes, but exact ALL generation code was not obtained. Root may evaluate it as a published processed endpoint, explicitly retaining this ascertainment limitation. No claim of an unbiased raw proteome matrix is supported yet.
+
+## Negative source qualification and failures
+
+- Python HTTPS failed MassIVE certificate-chain verification; no insecure retry was used. Anonymous FTP listing returned `421 TLS is required`; no raw MS files were downloaded. Windows curl then succeeded with normal system certificate verification. These failures are retained in receipts.
+- `search/Search results - Jurkat proteome/Picked FDR PG/geneGroups.txt` and `geneGroups_fdr0.01.txt` were downloaded to inspect headers. Both have 187 columns with labels such as `1h_R1`, `2h_R1`, `30min_4F_R1`, unlike the required drug×five-dose screen. **Quarantine for current matrix assembly; directory title is insufficient evidence of content identity.** Initial exploratory count of zero LFQ columns was case-sensitive; actual columns are `LFQ Intensity ...` (capital I), so that count was invalid. Temporal/sample labels, not that count, support the mismatch.
+- Repository listed (+)-JQ-1 file length 3,920,246, HTTP response is 3,912,230; difference 8,016 equals LF newline count, with zero CR bytes. Both gene-group files show analogous differences equal newline counts. This is compatible with server text newline conversion, but server implementation/byte-level original equivalence was not independently verified. HTTP status, Content-Disposition, hashes and exact received payload are the authoritative downloaded artifacts.
+- `inspect_headers.py` initially failed because openpyxl rejects `.body` filename extension; corrected by passing binary file object. No response values were decoded during the failed or successful run.
+
+## Next executable join
+
+Use root's frozen `PARTITIONS.json` as authority. Match all standard repository drug names to supplement drug identity strings, preserving explicit aliases and 1:1 resolution before downloading any additional development payload. Exclude the Vincristine manual duplicate and all nested historical-copy paths. Read only development-assigned ALL files after a numerical protocol is frozen. Construct rows from identifier/gene and allowed selected-dose intensity only; retain missingness as unknown until that dose is revealed. Freeze predictions before functional reveal. Record every processed-source/normalization limitation. Selection/later 96 drugs stay unopened.
+
+No biological performance, drug decision benefit, world-model benefit, agent benefit, inheritance or RSI result is established by this qualification.

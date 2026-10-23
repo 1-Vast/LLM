@@ -1,0 +1,11 @@
+# Feedback sufficiency and transferable updating: mechanism renewal
+
+2026-10-23. Previous turn PROGRESS: authenticated final SRS supplement, complete visual review, two independent asset reviews and reciprocal corrections established a bounded acquired-asset qualification stop. Full objective ACTIVE / NOT_ACHIEVED, no global blocker. Objective file reread in full this turn. HEAD 47a0e2dea5a7dd42379fa17eb3621caf6bd0114c; existing tracked report edits remain 14 additions each. No applicable on-disk AGENTS.md found by scoped file discovery; user-provided guidelines apply.
+
+Question: which observed intervention-feedback structure supports a genuinely distinct useful updating operation and later-task inheritance, rather than ordinary conditional prediction? Need a concrete drug-discovery outcome, accessible data/independent groups, a falsifiable restriction and strong common-information controls. Familiar components allowed. No inheritance/editor expansion without a useful updating object.
+
+Reuse opposing reviewers, seek at most one source-grounded candidate per role. Do not restart failed counts, GI, CDK, AZ, Norman, TG-GATES or blocked source-agent tasks, consume protected outcomes, or use source-search wording to bypass screening. Do not contact authors. All evidence/downloads in this log directory, code in research/feedback_sufficiency_renewal_20261023/. Initial bounded discovery: root up to four public GETs; each review role up to four, with exact receipts. No model fits or DeepSeek calls until a nominated mechanism passes independent review and task eligibility.
+
+Root tests an information-level question: in an observed-prefix feedback setting, when is an adaptive predictor more than a conditional direct predictor, and what test can show an operational finite-budget gain rather than a nominal world-model interface? This does not assert universal equivalence, innovation or an empirical counterexample. Any mathematical discriminator must state its scope and match the direct model's information. Seek current original literature/source-supported application evidence independently.
+
+Initial inspection failure: three guessed root/DECISION.md paths did not exist. Correct via rg --files before reading; no scientific inference from that failure. No production changes/staging/deletions.

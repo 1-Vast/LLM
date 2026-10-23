@@ -1,0 +1,15 @@
+# Actual reciprocal result review
+
+Read skeptic/RESULT_INDEPENDENT.md after both independent reports were sealed, and ROOT_RESULT_POSITION.md. Exchanged strongest qualifications and explicit replies with naiad_simplicity. No new calculations, fits, HTTP, source numerical data or protected outcomes in this cross phase.
+
+Both reviewers agree18saved scores and checkpoint arithmetic pass. My maximum4.34e-19 compares recomputed MSE with JSON; peer9.89e-17 includes rounded CSV serialization. These are consistent checks, not a disagreement or reason to rerun.36fits/18models,19275steps/9000checks,225.95seconds reported on RTX4060LaptopGPU remain supported at arithmetic/source level, not independent retraining.
+
+Strongest objection raised and accepted: both-versus-pheno2048supports useful predictive capacity of the embedding-enabled frozen recipe (mean MSE.001975754 versus.002724511,27.48%lower;3/3seed improvements). Separately inner-selected durations and additional trainable capacity prevent causal isolation of the embedding branch or a unique interaction mechanism. Low-budget effects are inconsistent by seed and both512mean is worse than128; do not claim monotonic learning curve or biological replication from seeds.
+
+Peer strongest objection and my response: prior noRNA-nuclear.001500069 and RNA-nuclear.001137602 are practical lower-MSE references with different development-selection privilege/recipes; RNA additionally uses acquired expression information. Even noRNA shares scalar/identity information only in kind, not an equal-selection/equal-compute comparison. Agree neither ranking proves causal architecture inferiority, NAIAD global failure or world-model necessity. These predecessor values were not independently recomputed in my current review. Root position correctly discloses these limitations.
+
+Current code-default hybrid recipe ends at this executed36fit scope. Paper hidden64 versus code256, exact strict sample-size schedule, outer-budget inner capacity, selected-duration fresh refit and symmetric inference remain disclosed adaptations. No retuning dimensions, seeds, budget, inference or epochs to chase favorable performance, no protected reopening, no revival of stopped restricted kernel updater.
+
+Authenticated replicate1/2 files are a next source-qualification lead only. Acquire/qualify provenance and freeze guide mapping, aggregation, finite masks and legal source pair IDs before any diagnostic. Shared normalization, guide efficacy and screen correlation mean disagreement is neither oracle/noise ceiling nor proof of unpredictable residual, technical noise causation, biological model bias or state-mediated failure. Two replicates cannot uniquely partition those causes. No presently supported new mechanism candidate follows.
+
+Final shared position: bounded existing-baseline qualification completed; ordinary embedding-enabled recipe benefits at2048; strong conventional controls remain practical bars under unequal information/selection costs. NO_CANDIDATE for WM/agent/inheritance/RSI novelty. Full objective remains ACTIVE/NOT_ACHIEVED and earlier scoped STOP binding. No further fit required by cross review.

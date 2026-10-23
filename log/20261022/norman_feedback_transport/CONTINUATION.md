@@ -1,0 +1,7 @@
+# Active full research objective
+
+Read DECISION.md, PROTOCOL.md, both RESULT_INDEPENDENT and RESULT_CROSS reports. Current turn PROGRESS:104actualfits,51predictions independently checked, actual reciprocal reviews, primarypages2025/26 searched. Session1211 terminal; no livejob/restartneeded. Scoped STOP for current earlykernelmixture distinctupdater claim. Preserve1.65%primary narrowgain but ordinary sameparams unionrefit wins, later1024reverses. Ordinary RNA-sidebaselinepositive remains. No protected data opened, no newmethod/WM/agent/inheritance/RSI claim.
+
+Next available concrete action:read NAIAD2025 actual methods/authorcode from verified PMLR https://proceedings.mlr.press/v267/qin25g.html / https://github.com/NeptuneBio/NAIAD , qualify independent functional endpoints and directpredictor control before another mechanism. Same-data adaptiveembeddings alreadyprior; don't rebrand. Need novel state-dependent update/decision error with source evidence, not more agentlayers. Full objective ACTIVE / NOT_ACHIEVED; no globalblock.
+
+Preserve prior protected/outcome scopes and all scopedSTOPs. All code research/, all records/data log/. Existing dirty globalindex files unchanged. Oldnativeagent followup provider failed but fresh explicitgpt-6.1-sol spawn worked thisturn; do not infer allmultiagentunavailable. Two actualfreshagents participated and sealed independence before exchange; rootapproval is evidencebasednotvote.

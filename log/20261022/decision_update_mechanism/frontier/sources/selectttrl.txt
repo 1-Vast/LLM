@@ -1,0 +1,6233 @@
+SelectTTRL: Representation-Guided Data Selection for Efficient Test-Time Reinforcement Learning
+// Restore the saved color scheme preference, or
+  // enact the browser preference if "automatic", 
+  // without expecting DOM load to have completed.
+  //
+  // Also restore any saved readingmode and ToC display preferences.
+  function initializeReadingPreferences() {
+    let saved_theme = localStorage.getItem("ar5iv_theme") || "automatic";
+    if (saved_theme === "automatic") {
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        saved_theme = "dark";
+      }
+    }
+    if (saved_theme == "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+
+    const tocDisplay = localStorage.getItem('arxiv_html_paper_toc_display');
+    if (tocDisplay) {
+      document.documentElement.setAttribute("data-toc-display", tocDisplay);
+    }
+    const readingMode = localStorage.getItem('arxiv_html_paper_reading_mode');
+    if (readingMode) {
+      document.documentElement.setAttribute("data-reading-mode", readingMode);
+    }
+    // Pre-apply spinout-banner dismissal here, before the banner paints, so it
+    // never flashes in only to be hidden later by the deferred arxiv-header.js.
+    // Key matches arxiv-header.js: "arxiv-banner-dismissed:" + data-banner-name.
+    if (localStorage.getItem('arxiv-banner-dismissed:spinout-nonprofit')) {
+      document.documentElement.setAttribute("data-banner-dismissed", "");
+    }
+  }
+  // Run as soon as JS starts, to minimize repainting
+  initializeReadingPreferences();
+/* Banner pre-dismissal (set above before paint -> no flash-then-hide) and
+     reading-mode chrome hiding. */
+  html[data-banner-dismissed] .ds-announcement { display: none; }
+  html[data-reading-mode="enabled"] .ds-announcement,
+  html[data-reading-mode="enabled"] .ds-site-footer { display: none; }
+  /* Print keeps the reader header's logo, not its controls: the theme's own print rule
+     (header, nav { display: none }) sits in a layer that its header layer outranks. */
+  @media print { .arxiv-html-header .html-header-nav { display: none; } }
+  /* Keep the announcement text dark on the Open-Blue band in both colour themes
+     (otherwise it inherits the paper's warm-wash text in dark mode and washes out). */
+  .ds-announcement-text { color: var(--arxiv-ink, #1c1a17); }
+Report GitHub Issue
+×
+Title:
+Content selection saved. Describe the issue below:
+Description:
+Submit without GitHub
+Submit in GitHub
+arXiv is now an independent nonprofit!
+Learn more
+×
+Back to arXiv
+Why HTML?
+Report Issue
+Back to Abstract
+Download PDF
+Abstract
+1
+Introduction
+2
+Related Work
+3
+Framework of SelectTTRL
+3.1
+Extracting a correctness-related direction
+3.2
+Question-level COS scoring
+3.3
+Selecting questions for TTRL
+3.4
+TTRL on the selected subset
+4
+Theoretical Analysis of COS
+4.1
+Shared evidence geometry
+4.2
+Contrastive extraction and positive transfer
+4.3
+From evidence to question accuracy
+5
+Experiments
+5.1
+Experimental Setup
+5.2
+Overall Performance (RQ1)
+5.3
+Activation Steering and Answer Correctness (RQ2)
+5.4
+Interpreting COS through Sparse Features (RQ3)
+5.5
+Dependence on the Direction-Extraction Dataset (RQ4)
+6
+Conclusion
+References
+A
+Proofs and extensions of the COS analysis
+A.1
+Spherical model and response identity
+A.2
+From raw source contrasts to a spherical response
+A.3
+Structural hypotheses and source reliability
+Uniform source gain.
+Single-factor linear response.
+Positive compatibility and proof of Lemma
+.
+A finite-sample sufficient condition.
+A.4
+Evidence retained by a projection
+Proof.
+A.5
+Proof of Theorem
+A.6
+Angular tolerance and departures from the model
+Angular tolerance.
+Question heterogeneity.
+Averaging.
+Greedy scores.
+A.7
+Empirical support for question-level association
+Projection gap and cross-response association.
+Association under question heterogeneity.
+B
+SAE Decomposition and Feature Interventions for COS
+B.1
+Exact decomposition
+B.2
+Ranking contribution accounting
+B.3
+Feature clamping
+B.4
+Feature activation examples
+C
+Training Efficiency
+License: CC Zero
+arXiv:2610.16104v1 [cs.LG] 12 Oct 2026
+SelectTTRL: Representation-Guided Data Selection for Efficient Test-Time Reinforcement Learning
+Yi Li
+Affiliation:
+Southeast University
+Linan Yue
+Affiliation:
+Southeast University
+Weibo Gao
+Corresponding author:
+Linan Yue, Email:
+lnyue@seu.edu.cn
+Affiliation:
+The Hong Kong Polytechnic University
+Abstract
+Test-Time Reinforcement Learning (TTRL) enables large language models to adapt directly on unlabeled test problems by constructing pseudo-labels from multiple sampled responses. However, existing TTRL methods typically apply the same expensive sampling and optimization procedure to all test problems, despite substantial differences in their training utility. In this paper, we study whether such problems can be identified before costly test-time training, without access to ground-truth answers. We uncover a stable relationship between internal response representations and problem-level empirical accuracy. Specifically, we define COS as the cosine similarity between a model’s response representation and a correctness-related direction constructed from an independent question-answering dataset. COS consistently correlates with problem solvability across different models, datasets, and experimental settings, and we further provide a theoretical analysis explaining this relationship. Building on this finding, we propose SelectTTRL, a representation-guided data selection method that ranks test problems using COS and applies TTRL only to a selected percentile interval. SelectTTRL leaves the standard TTRL pipeline unchanged for the selected problems, while avoiding unnecessary multi-response sampling and reinforcement learning updates on the remaining ones. Experiments across multiple reasoning benchmarks demonstrate that SelectTTRL substantially reduces test-time computation while maintaining or improving the performance of standard TTRL. Code is available at
+https://github.com/heyiliyi/SelectTTRL-public
+.
+1
+Introduction
+Large language models (LLMs) have demonstrated strong capabilities on complex reasoning tasks
+(
+Qwen et al., 2024
+,
+Yang et al., 2025
+)
+, yet further improving their reasoning ability often relies on additional supervision signals
+(
+Shao et al., 2024
+,
+Guo et al., 2025
+)
+. Test-Time Reinforcement Learning (TTRL)
+(
+Zuo et al., 2025
+)
+provides a new paradigm for adapting models directly on unlabeled test problems. Specifically, TTRL samples multiple responses for each test problem, derives pseudo-labels through majority voting, and constructs reward signals for reinforcement learning without access to the ground-truth answers. In this way, TTRL enables models to further improve their reasoning ability by exploiting the test data themselves
+(
+Hosseini et al., 2026
+,
+Yan et al., 2026
+)
+.
+However, TTRL typically incurs substantial test-time computational overhead
+(
+Liu et al., 2025
+)
+.
+Specifically, to obtain reliable training signals, each problem requires multiple inference samples followed by reinforcement learning updates. When the test set is large, repeatedly sampling and training on every problem introduces substantial additional cost. More importantly, existing TTRL methods typically allocate similar computation across problems, overlooking differences in their value for test-time training. Not every problem is equally worth optimizing. For problems the model can already solve reliably, additional sampling and updates may provide only marginal gains. In contrast, for difficult problems, repeated sampling may produce highly consistent yet incorrect answers, causing erroneous pseudo-labels to be further reinforced during training
+(
+Yu et al., 2026
+,
+Lin et al., 2026
+)
+. Therefore, uniformly applying the full TTRL procedure to all test problems may waste computation and allocate the limited test-time budget to problems with low training utility. This motivates a natural question:
+Can we identify which test problems are worth training on before performing expensive multi-response sampling and reinforcement learning, without access to ground-truth answers?
+To answer this question, we investigate whether internal model representations can provide a prior signal of test-problem solvability
+(
+Zou et al., 2023
+,
+Azaria and Mitchell, 2023
+)
+. Specifically, we construct a correctness-related direction from an independent question-answering dataset
+(
+Rimsky et al., 2024
+)
+. For each test problem, we then compute the cosine similarity between this direction and the model’s internal response representation. We denote this similarity as
+COS
+.
+We observe a stable relationship between COS and problem-level empirical accuracy. Problems with higher COS generally achieve higher overall accuracy, while those with lower COS are solved less reliably. This relationship holds consistently across different models, datasets, and experimental settings. We further provide a theoretical analysis to explain why this correlation emerges. Our analysis suggests that internal representations contain information related to the relative solvability of test problems. Therefore, COS provides a representation-level signal for estimating and ranking test problems without access to their ground-truth answers.
+Building on this finding, we propose
+SelectTTRL
+, a representation-guided data selection method for efficient test-time reinforcement learning. Before expensive multi-response sampling, SelectTTRL ranks test problems according to COS. It then selects only problems within a prescribed percentile interval for subsequent training. For the selected problems, the standard TTRL pipeline remains unchanged, including multi-response sampling, pseudo-label construction, and policy optimization. In this way, SelectTTRL avoids performing costly sampling and reinforcement learning updates over the entire test set.
+Our main contributions are summarized as follows:
+•
+In this paper, we uncover a stable relationship between internal response representations and problem-level empirical accuracy, and formalize it as
+COS
+, a representation-level signal for test-problem solvability. Besides, we provide a theoretical analysis explaining why COS reflects the relative solvability of test problems.
+•
+Building on COS, we propose SelectTTRL. It ranks and selects test problems before the expensive multi-response sampling stage of standard TTRL, and performs subsequent reinforcement learning only on the selected subset. This reduces test-time training cost without modifying the underlying TTRL optimization pipeline.
+•
+Experiments across multiple reasoning benchmarks show that SelectTTRL substantially reduces test-time computation while maintaining or even improving the performance of standard TTRL.
+2
+Related Work
+Test-time reinforcement learning.
+Test-time reinforcement learning (TTRL) adapts language models to unlabeled test problems by constructing pseudo-supervision from their own sampled responses, typically through majority-voted answers
+(
+Zuo et al., 2025
+)
+. Existing work mainly improves TTRL from two perspectives. The first focuses on improving the learning signal within each problem. Entropy-guided sampling and contextual guidance regulate exploration during rollout generation
+(
+Liu et al., 2025
+,
+Hosseini et al., 2026
+)
+, while selective labeling and confidence- or consistency-based consensus aim to mitigate noisy pseudo-supervision
+(
+Yan et al., 2026
+,
+Wang et al., 2026b
+,
+Yu et al., 2026
+,
+Wang et al., 2026a
+)
+. These methods improve how sampled responses are generated or converted into training signals, rather than selecting a fixed subset of test problems before adaptation.
+A second line of work adaptively controls whether or how a problem contributes to test-time learning. TTRL-Guard adjusts or suspends updates according to consensus dynamics
+(
+Lin et al., 2026
+)
+, while DiSCTT routes problems to pseudo-label SFT or RL based on response agreement
+(
+Moradi and Mudur, 2026
+)
+. However, such decisions are made only after multiple responses have already been sampled, meaning that much of the test-time computation has already been incurred. Moreover, response agreement does not necessarily indicate that a problem is informative for subsequent optimization. In contrast, we consider
+pre-selection
+: before multi-response sampling and policy updates, we rank the full set of test problems using representations obtained from an initial response, and apply standard TTRL only to the selected subset. This separates the question of
+which problems to optimize on
+from modifications to the TTRL learning rule itself.
+Data selection for LLM training.
+Data selection reduces post-training cost by identifying compact subsets that preserve or improve learning effectiveness
+(
+Albalak et al., 2024
+)
+. A broad family of methods scores examples according to properties such as quality, difficulty, uncertainty, and diversity
+(
+Liu et al., 2024
+,
+Li et al., 2024
+,
+Zhao et al., 2025a
+)
+. Other approaches estimate sample utility through gradients or influence functions. For example, LESS selects instruction-tuning examples according to their gradient influence on target tasks, but requires warm-up training and per-example gradient computation
+(
+Xia et al., 2024
+)
+. Related methods similarly exploit gradient alignment or influence estimates to identify useful training subsets
+(
+Zhang et al., 2025
+,
+Li et al., 2026
+)
+.
+More recent work explores selection signals that can be obtained without additional trial training. AIR estimates example utility through loss changes induced by retrieval-head masking
+(
+Liu et al., 2026
+)
+, while SHIFT combines hidden-state dynamics from a single rollout with diversity-aware selection
+(
+Wu et al., 2026
+)
+. These methods reduce the overhead of estimating data utility. However, their downstream optimization still relies on externally available supervision, such as supplied reasoning traces or verifiable rewards. Our setting is different: in TTRL, neither selection nor subsequent learning has access to ground-truth correctness. We therefore study whether an internal representation signal can identify useful test problems
+before
+pseudo-label construction, under fully unlabeled test-time learning.
+Representation engineering.
+Representation engineering studies how semantic or behavioral properties are encoded in model activations and how such representations can be read or manipulated
+(
+Zou et al., 2023
+)
+. Prior work has shown that hidden states contain predictive signals associated with properties such as truthfulness and correctness
+(
+Azaria and Mitchell, 2023
+)
+, while contrastive activation addition constructs semantic directions for controlling model behavior
+(
+Rimsky et al., 2024
+)
+. Related activation-based methods intervene on internal representations to improve reasoning or elicit different reasoning behaviors
+(
+Højer et al., 2025
+,
+Tang et al., 2025
+,
+Li et al., 2025
+)
+. Sparse-autoencoder-based approaches further identify and manipulate interpretable features associated with knowledge use, semantic attributes, and reasoning strategies
+(
+Zhao et al., 2025b
+,
+He et al., 2025
+,
+Fang et al., 2026
+)
+.
+Our use of representations is complementary to these intervention-oriented approaches. Rather than modifying activations during generation, we use a separately calibrated correctness-related direction as a semantic reference for measuring the representation of an initial response. The resulting cosine-similarity signal, COS, is then used to rank unlabeled test problems before TTRL begins. This extends representation-based analysis from predicting or steering model behavior to allocating test-time optimization effort across problems.
+3
+Framework of SelectTTRL
+Given an unlabeled target set
+𝒬
+=
+{
+q
+i
+}
+i
+=
+1
+M
+\mathcal{Q}=\{q_{i}\}_{i=1}^{M}
+and an initial
+policy
+π
+θ
+0
+\pi_{\theta_{0}}
+, our goal is to identify which target questions are
+most suitable for test-time reinforcement learning before expensive
+multi-rollout sampling and policy optimization are performed.
+The key challenge is that ground-truth correctness is unavailable on the
+target set. We therefore seek a lightweight internal signal that can be
+computed from an initial model response and used to estimate the relative
+training value of different questions.
+SelectTTRL addresses this problem with a representation-based score,
+which we call
+COS
+. COS measures how strongly the representation of
+a target response aligns with a separately calibrated
+correctness-related direction. We first construct this direction from a
+small labeled calibration set and then keep it fixed throughout target-set
+selection. For each target question, we generate only an initial response,
+compute its COS score, and rank questions accordingly. We retain a
+prescribed percentile interval and apply standard TTRL
+reward construction and policy optimization only to the selected subset.
+Because selection is performed before TTRL rollout collection, excluded
+questions incur neither multi-response sampling nor policy updates.
+3.1
+Extracting a correctness-related direction
+To obtain a semantic reference for correctness, we construct a
+correctness-related direction using the mean-difference procedure of
+CAA
+(
+Rimsky et al., 2024
+)
+. Let
+𝒟
+cal
+=
+(
+x
+i
+,
+y
+i
++
+,
+y
+i
+−
+)
+i
+=
+1
+n
+\mathcal{D}_{\mathrm{cal}}={(x_{i},y_{i}^{+},y_{i}^{-})}_{i=1}^{n}
+denote a
+separate labeled calibration set derived from
+TruthfulQA
+(
+Lin et al., 2022
+)
+, where
+y
+i
++
+y_{i}^{+}
+and
+y
+i
+−
+y_{i}^{-}
+are a
+correct and an incorrect answer to question
+x
+i
+x_{i}
+, respectively.
+For each calibration example, we place the two candidate answers in
+randomized option positions within the same prompt. Keeping the prompt and
+option order fixed, we separately teacher-force the answer letter
+corresponding to the correct and incorrect candidates. We then extract the
+layer-
+ℓ
+\ell
+residual-stream activations at the answer-letter position,
+denoted by
+𝐡
+ℓ
+,
+i
++
+\mathbf{h}_{\ell,i}^{+}
+and
+𝐡
+ℓ
+,
+i
+−
+\mathbf{h}_{\ell,i}^{-}
+.
+The correctness-related direction is defined as the normalized mean
+difference between these activations:
+𝐝
+ℓ
+=
+1
+n
+​
+∑
+i
+=
+1
+n
+(
+𝐡
+ℓ
+,
+i
++
+−
+𝐡
+ℓ
+,
+i
+−
+)
+,
+𝐯
+ℓ
+=
+𝐝
+ℓ
+|
+𝐝
+ℓ
+|
+2
+.
+\mathbf{d}_{\ell}=\frac{1}{n}\sum_{i=1}^{n}\bigl(\mathbf{h}_{\ell,i}^{+}-\mathbf{h}_{\ell,i}^{-}\bigr),\qquad\mathbf{v}_{\ell}=\frac{\mathbf{d}_{\ell}}{|\mathbf{d}_{\ell}|_{2}}.
+(1)
+Intuitively,
+𝐯
+ℓ
+\mathbf{v}_{\ell}
+captures a representation axis along which
+the model internally distinguishes more correct-like from less
+correct-like answers. Prior work has shown that language models encode
+confidence- and correctness-related information in their internal
+representations during generation
+(
+Kumaran et al., 2026
+)
+.
+This motivates using
+𝐯
+ℓ
+\mathbf{v}_{\ell}
+as a fixed reference direction for
+reading correctness-related evidence from responses to unseen target
+questions.
+Importantly, the labeled calibration set is used only once to estimate
+𝐯
+ℓ
+\mathbf{v}_{\ell}
+. The direction is then frozen and no target labels are
+used during question selection or subsequent TTRL adaptation. In the next
+section, we use this direction to define COS for each target response and
+rank the target questions before rollout-intensive TTRL begins.
+3.2
+Question-level COS scoring
+For a response
+y
+y
+generated by
+π
+θ
+0
+\pi_{\theta_{0}}
+for question
+q
+q
+, let
+𝐡
+ℓ
+​
+(
+q
+,
+y
+)
+\mathbf{h}_{\ell}(q,y)
+denote the layer-
+ℓ
+\ell
+residual-stream activation
+at the fixed answer position. Its COS score is
+X
+⁡
+(
+q
+,
+y
+)
+=
+𝐡
+ℓ
+​
+(
+q
+,
+y
+)
+⊤
+​
+𝐯
+ℓ
+‖
+𝐡
+ℓ
+​
+(
+q
+,
+y
+)
+‖
+2
+​
+‖
+𝐯
+ℓ
+‖
+2
+.
+X(q,y)=\frac{\mathbf{h}_{\ell}(q,y)^{\top}\mathbf{v}_{\ell}}{\|\mathbf{h}_{\ell}(q,y)\|_{2}\,\|\mathbf{v}_{\ell}\|_{2}}.
+(2)
+We obtain a question-level score either from a single greedy response
+y
+q
+g
+y_{q}^{\mathrm{g}}
+or by averaging COS over
+K
+K
+sampled responses under a
+fixed decoding protocol:
+c
+g
+​
+(
+q
+)
+=
+X
+⁡
+(
+q
+,
+y
+q
+g
+)
+,
+c
+K
+​
+(
+q
+)
+=
+1
+K
+​
+∑
+j
+=
+1
+K
+X
+⁡
+(
+q
+,
+y
+q
+​
+j
+)
+.
+c_{\mathrm{g}}(q)=X(q,y_{q}^{\mathrm{g}}),\qquad c_{K}(q)=\frac{1}{K}\sum_{j=1}^{K}X(q,y_{qj}).
+(3)
+Both scoring variants are positively correlated with question-level
+accuracy in our experiments.
+3.3
+Selecting questions for TTRL
+COS provides an ordering of target questions according to the model’s
+internal correctness-related signal. However, our goal is not simply to
+select questions with the highest or lowest COS. Questions that the model
+already solves reliably may provide limited room for improvement, whereas
+questions at the opposite extreme are more likely to yield unreliable
+pseudo-labels during TTRL. We therefore focus the optimization budget on an
+intermediate region of the COS ranking, where sufficient learning
+opportunity and pseudo-label reliability are more likely to coexist.
+Let
+q
+(
+1
+)
+,
+…
+,
+q
+(
+M
+)
+q_{(1)},\ldots,q_{(M)}
+denote the target questions sorted in ascending
+order of
+c
+⁡
+(
+q
+)
+c(q)
+, with ties broken by a fixed question identifier. For prescribed
+percentile endpoints
+0
+≤
+a
+<
+b
+≤
+1
+0\leq a<b\leq 1
+, we select
+𝒮
+a
+,
+b
+=
+{
+q
+(
+i
+)
+:
+⌊
+a
+​
+M
+⌋
+<
+i
+≤
+⌊
+b
+​
+M
+⌋
+}
+,
+ρ
+=
+|
+𝒮
+a
+,
+b
+|
+M
+.
+\mathcal{S}_{a,b}=\bigl\{q_{(i)}:\lfloor aM\rfloor<i\leq\lfloor bM\rfloor\bigr\},\qquad\rho=\frac{|\mathcal{S}_{a,b}|}{M}.
+(4)
+The percentile interval is fixed before target adaptation and is selected
+without access to target ground-truth answers. Only questions in
+𝒮
+a
+,
+b
+\mathcal{S}_{a,b}
+undergo subsequent TTRL rollout collection and policy
+updates, whereas all questions in
+𝒬
+\mathcal{Q}
+remain in the evaluation
+set. Thus, excluded questions incur only the cost of the initial response
+used for COS scoring.
+3.4
+TTRL on the selected subset
+After obtaining the selected subset
+𝒮
+a
+,
+b
+\mathcal{S}_{a,b}
+, we apply the standard TTRL procedure
+(
+Zuo et al., 2025
+)
+without modifying its reward construction or policy optimization.
+For each selected question
+q
+q
+, the rollout policy
+π
+θ
+old
+\pi_{\theta_{\mathrm{old}}}
+generates a vote pool
+{
+y
+q
+,
+j
+}
+j
+=
+1
+N
+vote
+\{y_{q,j}\}_{j=1}^{N_{\mathrm{vote}}}
+. Let
+f
+⁡
+(
+⋅
+)
+f(\cdot)
+denote the function that extracts and normalizes the final answer. The majority-voted answer is used as the pseudo-label, and each rollout receives a binary reward according to its agreement with this pseudo-label:
+a
+^
+q
+=
+arg
+​
+max
+a
+∑
+j
+=
+1
+N
+vote
+𝟏
+{
+f
+(
+y
+q
+,
+j
+)
+=
+a
+}
+,
+r
+q
+(
+y
+)
+=
+𝟏
+{
+f
+(
+y
+)
+=
+a
+^
+q
+}
+.
+\hat{a}_{q}=\operatorname*{arg\,max}_{a}\sum_{j=1}^{N_{\mathrm{vote}}}\mathbf{1}\{f(y_{q,j})=a\},\qquad r_{q}(y)=\mathbf{1}\{f(y)=\hat{a}_{q}\}.
+(5)
+Following the standard vote-then-sample protocol, the pseudo-label is computed from the full vote pool, after which
+G
+≤
+N
+vote
+G\leq N_{\mathrm{vote}}
+responses are sampled for optimization. Their rewards are converted into group-relative advantages using GRPO
+(
+Shao et al., 2024
+)
+, where
+A
+^
+q
+,
+i
+=
+r
+q
+,
+i
+−
+r
+¯
+q
+s
+q
++
+ϵ
+num
+,
+r
+¯
+q
+=
+1
+G
+​
+∑
+i
+=
+1
+G
+r
+q
+,
+i
+\hat{A}_{q,i}=\frac{r_{q,i}-\bar{r}_{q}}{s_{q}+\epsilon_{\mathrm{num}}},\bar{r}_{q}=\frac{1}{G}\sum_{i=1}^{G}r_{q,i}
+, and
+s
+q
+s_{q}
+is the reward standard deviation within the update group.
+Let
+ℓ
+TTRL
+​
+(
+q
+,
+θ
+)
+\ell_{\mathrm{TTRL}}(q;\theta)
+denote the standard TTRL policy loss for question
+q
+q
+. SelectTTRL optimizes this loss only over the selected subset:
+ℒ
+SelectTTRL
+​
+(
+θ
+)
+=
+𝔼
+q
+∼
+Unif
+⁡
+(
+𝒮
+a
+,
+b
+)
+​
+[
+ℓ
+TTRL
+​
+(
+q
+,
+θ
+)
+]
+.
+\mathcal{L}_{\mathrm{SelectTTRL}}(\theta)=\mathbb{E}_{q\sim\operatorname{Unif}(\mathcal{S}_{a,b})}[\,\ell_{\mathrm{TTRL}}(q;\theta)\,].
+(6)
+Thus, SelectTTRL leaves the underlying TTRL learning rule unchanged and only determines which target questions receive rollout and update budgets.
+4
+Theoretical Analysis of COS
+Our goal is to explain why COS can transfer across tasks.
+We assume that model representations share a correctness-related component across tasks, which COS reads through a contrastively extracted direction. This direction can capture multiple latent features, further analyzed in RQ3. The model, layer, and readout protocol are fixed. Let
+U
+=
+𝐡
+ℓ
+/
+‖
+𝐡
+ℓ
+‖
+2
+U=\mathbf{h}_{\ell}/\|\mathbf{h}_{\ell}\|_{2}
+,
+v
+=
+𝐯
+ℓ
+v=\mathbf{v}_{\ell}
+, and
+X
+=
+v
+⊤
+​
+U
+X=v^{\top}U
+.
+4.1
+Shared evidence geometry
+Assumption 4.1
+(Spherical evidence model)
+.
+For each target question
+q
+q
+in domain
+D
+D
+, the normalized response
+representation follows
+U
+∣
+q
+∼
+p
+D
+(
+⋅
+∣
+t
+q
+)
+U\mid q\sim p_{D}(\cdot\mid t_{q})
+, where
+p
+D
+​
+(
+U
+∣
+t
+)
+=
+b
+D
+​
+(
+U
+)
+​
+exp
+⁡
+{
+t
+​
+u
+⊤
+​
+U
+−
+A
+D
+​
+(
+t
+​
+u
+)
+}
+,
+‖
+u
+‖
+2
+=
+1
+.
+p_{D}(U\mid t)=b_{D}(U)\exp\{t\,u^{\top}U-A_{D}(tu)\},\qquad\|u\|_{2}=1.
+(7)
+Here
+u
+u
+is a shared evidence direction,
+t
+q
+t_{q}
+is a question’s evidence
+state,
+b
+D
+b_{D}
+is a domain-specific background density on the unit sphere,
+and
+A
+D
+A_{D}
+is the log-normalizer.
+Increasing
+t
+t
+favors representations with larger evidence projection
+T
+=
+u
+⊤
+​
+U
+T=u^{\top}U
+, while retaining the background geometry. The uniform-background
+case reduces to a von Mises–Fisher distribution; a general
+b
+D
+b_{D}
+permits
+anisotropy. This model concerns evidence states rather than two classes
+with equal concentration.
+Let
+m
+D
+​
+(
+t
+)
+=
+𝔼
+t
+​
+[
+U
+]
+m_{D}(t)=\mathbb{E}_{t}[U]
+and
+Σ
+D
+​
+(
+t
+)
+=
+Cov
+t
+⁡
+(
+U
+)
+\Sigma_{D}(t)=\operatorname{Cov}_{t}(U)
+. The exponential-family identities
+give
+(
+Wainwright and Jordan, 2008
+)
+d
+​
+m
+D
+​
+(
+t
+)
+d
+​
+t
+=
+Σ
+D
+​
+(
+t
+)
+​
+u
+,
+d
+​
+𝔼
+t
+​
+[
+X
+]
+d
+​
+t
+=
+v
+⊤
+​
+Σ
+D
+​
+(
+t
+)
+​
+u
+.
+\frac{dm_{D}(t)}{dt}=\Sigma_{D}(t)u,\qquad\frac{d\,\mathbb{E}_{t}[X]}{dt}=v^{\top}\Sigma_{D}(t)u.
+(8)
+Thus, the response of COS depends on the extracted direction and
+the target representation geometry. The key transfer question is when
+source extraction yields
+v
+⊤
+​
+Σ
+D
+​
+(
+t
+)
+​
+u
+>
+0
+v^{\top}\Sigma_{D}(t)u>0
+on the target domain.
+4.2
+Contrastive extraction and positive transfer
+Eq. (
+1
+) maximizes the average signed projection of source contrasts. Under the controlled source construction in Appendix
+A.2
+, the population raw-activation contrast is:
+d
+S
+⋆
+=
+M
+S
+​
+u
++
+e
+S
+,
+M
+S
+=
+R
+¯
+S
+​
+∫
+t
+−
+t
++
+Σ
+S
+​
+(
+r
+)
+​
+𝑑
+r
+⪰
+0
+,
+d_{S}^{\star}=M_{S}u+e_{S},\qquad M_{S}=\bar{R}_{S}\int_{t_{-}}^{t_{+}}\Sigma_{S}(r)\,dr\succeq 0,
+(9)
+where
+t
++
+>
+t
+−
+t_{+}>t_{-}
+,
+R
+¯
+S
+>
+0
+\bar{R}_{S}>0
+, and
+e
+S
+e_{S}
+captures radial and unmatched source effects. Let
+d
+^
+S
+\hat{d}_{S}
+be the empirical contrast and
+v
+=
+d
+^
+S
+/
+‖
+d
+^
+S
+‖
+2
+v=\hat{d}_{S}/\|\hat{d}_{S}\|_{2}
+. We consider three hypotheses for how this direction reads shared evidence.
+𝖧
+1
+\mathsf{H}_{1}
+: Uniform source gain.
+Source accuracy
+a
+S
+a_{S}
+changes only the overall contrast strength:
+d
+^
+S
+=
+γ
+⁡
+(
+a
+S
+)
+​
+(
+d
+0
++
+ξ
+S
+)
+,
+γ
+⁡
+(
+a
+S
+)
+>
+0
+,
+ξ
+S
+⟂
+⟂
+a
+S
+.
+\hat{d}_{S}=\gamma(a_{S})(d_{0}+\xi_{S}),\qquad\gamma(a_{S})>0,\quad\xi_{S}\perp\!\!\!\perp a_{S}.
+(10)
+Here
+d
+0
+d_{0}
+is fixed. Normalization removes
+γ
+\gamma
+, predicting source-accuracy-independent
+readout quality on fixed target representations. The overall positive
+trend in Table
+4
+argues against this prediction.
+𝖧
+2
+\mathsf{H}_{2}
+: Single-factor linear response.
+A single factor linearly mediates changes in both COS and correctness.
+Across feature interventions
+j
+j
+, this predicts
+Δ
+​
+P
+j
+=
+b
+​
+Δ
+​
+C
+j
+,
+b
+>
+0
+,
+\Delta P_{j}=b\,\Delta C_{j},\qquad b>0,
+(11)
+where
+C
+C
+and
+P
+P
+denote mean COS and accuracy.
+Table
+3
+does not follow this proportionality:
+ablations 31368 and 48965 produce the same accuracy decrease but markedly
+different COS changes.
+𝖧
+3
+\mathsf{H}_{3}
+: Multicomponent positive compatibility.
+Source reliability affects the relative strength of shared evidence and
+source-specific residuals. Multiple components may contribute to the readout;
+positive transfer requires their combined response to remain positive.
+We formalize this hypothesis for the actual extracted contrast.
+Condition 4.2
+(Positive compatibility)
+.
+Write
+d
+^
+S
+=
+α
+S
+​
+u
++
+r
+S
+\hat{d}_{S}=\alpha_{S}u+r_{S}
+, where
+r
+S
+⟂
+u
+r_{S}\perp u
+and
+α
+S
+>
+0
+\alpha_{S}>0
+.
+On an interval containing the question states, let
+β
+D
+​
+(
+t
+)
+=
+u
+⊤
+​
+Σ
+D
+​
+(
+t
+)
+​
+u
+>
+0
+\beta_{D}(t)=u^{\top}\Sigma_{D}(t)u>0
+. For some
+δ
+∈
+(
+0
+,
+1
+]
+\delta\in(0,1]
+, assume
+r
+S
+⊤
+​
+Σ
+D
+​
+(
+t
+)
+​
+u
+≥
+−
+(
+1
+−
+δ
+)
+​
+α
+S
+​
+β
+D
+​
+(
+t
+)
+.
+r_{S}^{\top}\Sigma_{D}(t)u\geq-(1-\delta)\alpha_{S}\beta_{D}(t).
+(12)
+This condition allows rotated directions and nonzero residuals: their
+adverse response must not cancel the shared-evidence contribution.
+Tables
+3
+and
+4
+motivate this multicomponent account. Stronger evidence can improve
+directional stability by reducing relative extraction error
+(Appendix
+A.3
+).
+4.3
+From evidence to question accuracy
+Lemma 4.3
+(Positive response margin)
+.
+Under Assumption
+4.1
+and
+Condition
+4.2
+,
+F
+D
+′
+​
+(
+t
+)
+=
+v
+⊤
+​
+Σ
+D
+​
+(
+t
+)
+​
+u
+≥
+δ
+​
+α
+S
+​
+β
+D
+​
+(
+t
+)
+‖
+d
+^
+S
+‖
+2
+>
+0
+,
+F
+D
+​
+(
+t
+)
+=
+𝔼
+t
+​
+[
+X
+]
+.
+F_{D}^{\prime}(t)=v^{\top}\Sigma_{D}(t)u\geq\frac{\delta\alpha_{S}\beta_{D}(t)}{\|\hat{d}_{S}\|_{2}}>0,\qquad F_{D}(t)=\mathbb{E}_{t}[X].
+(13)
+Condition 4.4
+(Reliability link)
+.
+For
+Y
+∈
+{
+0
+,
+1
+}
+Y\in\{0,1\}
+denoting objective correctness, assume
+P
+⁡
+(
+Y
+=
+1
+∣
+T
+,
+Q
+=
+q
+)
+=
+g
+D
+​
+(
+T
+)
+P(Y=1\mid T,Q=q)=g_{D}(T)
+for each question, with
+g
+D
+g_{D}
+strictly increasing on the support
+of
+T
+T
+.
+Define
+G
+D
+​
+(
+t
+)
+=
+𝔼
+t
+​
+[
+g
+D
+​
+(
+T
+)
+]
+G_{D}(t)=\mathbb{E}_{t}[g_{D}(T)]
+. The response identity yields
+G
+D
+′
+​
+(
+t
+)
+=
+Cov
+t
+⁡
+(
+g
+D
+​
+(
+T
+)
+,
+T
+)
+>
+0
+.
+G_{D}^{\prime}(t)=\operatorname{Cov}_{t}(g_{D}(T),T)>0.
+(14)
+Thus both expected COS and objective accuracy increase with evidence.
+Theorem 4.5
+(Question-level correctness transfer)
+.
+Under Assumption
+4.1
+and
+Conditions
+4.2
+and
+4.4
+, let the question state
+t
+Q
+t_{Q}
+be
+non-degenerate. For
+K
+K
+responses sampled under the scoring protocol,
+and an additional response with correctness
+Y
+′
+Y^{\prime}
+independent of them
+conditional on
+Q
+Q
+,
+Cov
+⁡
+(
+c
+K
+​
+(
+Q
+)
+,
+Y
+′
+)
+=
+Cov
+Q
+⁡
+(
+F
+D
+​
+(
+t
+Q
+)
+,
+G
+D
+​
+(
+t
+Q
+)
+)
+>
+0
+,
+I
+⁡
+(
+c
+K
+​
+(
+Q
+)
+,
+Y
+′
+)
+>
+0
+.
+\operatorname{Cov}(c_{K}(Q),Y^{\prime})=\operatorname{Cov}_{Q}\bigl(F_{D}(t_{Q}),G_{D}(t_{Q})\bigr)>0,\,\,\,\,\,\,I(c_{K}(Q);Y^{\prime})>0.
+(15)
+The same positive covariance holds with
+Y
+′
+Y^{\prime}
+replaced by
+p
+Q
+=
+P
+⁡
+(
+Y
+′
+=
+1
+∣
+Q
+)
+p_{Q}=P(Y^{\prime}=1\mid Q)
+.
+Proofs are in Appendix
+A
+.
+Remark.
+Under these conditions, average COS predicts an independent answer’s
+correctness without identifying every incorrect response. RQ2 complements
+this readout analysis by examining how steering direction and strength
+affect reasoning and answer completion. Different domains
+need not share a COS threshold. Averaging reduces sampling variation,
+while departures from the ideal model can produce local ranking reversals
+(Appendix
+A.6
+).
+5
+Experiments
+We evaluate SelectTTRL and analyze the COS signal through four research questions:
+RQ1:
+How does SelectTTRL affect model performance and training efficiency in test-time reinforcement learning?
+RQ2:
+Can interventions along the extracted direction influence the correctness of model responses?
+RQ3:
+To what extent is COS explained by known response representations, and is it simply a combination of interpretable features?
+RQ4:
+What types of source datasets yield directions for which COS positively correlates with question-level accuracy?
+5.1
+Experimental Setup
+Benchmarks.
+We evaluate SelectTTRL on six reasoning benchmarks:
+GPQA-Diamond
+(
+Rein et al., 2024
+)
+, a challenging and high-quality subset of the
+Graduate-Level Google-Proof Question Answering benchmark;
+MMLU-Pro STEM, the STEM subset of MMLU-Pro
+(
+Wang et al., 2024
+)
+;
+and four mathematical reasoning benchmarks, AIME 2024 (30 questions)
+(
+AI-MO, 2024a
+)
+,
+AIME 2025
+(
+Zhang and Math-AI Team, 2025
+)
+, AMC (83 questions from 2022–2023)
+(
+AI-MO, 2024b
+)
+,
+and MATH-500
+(
+Hendrycks et al., 2021
+)
+.
+Baselines.
+We use Qwen3-8B
+(
+Yang et al., 2025
+)
+and Qwen2.5-7B-Instruct
+(
+Qwen et al., 2024
+)
+as backbones and compare SelectTTRL with three baselines: (1)
+Matched-TTRL
+(
+Zuo et al., 2025
+)
+, which applies TTRL to the full unlabeled test set; (2)
+A-PPL
+, which selects questions with the highest perplexity of model-generated answers; and (3)
+Random
+, which uniformly samples questions without replacement. A-PPL and Random retain 35% of the question pool, matching SelectTTRL. For all subset-selection methods, only the selection rule varies, while the TTRL procedure, training budget, and hyperparameters are kept fixed.
+Hyperparameter Settings.
+All experiments use non-thinking mode. For SelectTTRL, we set
+(
+a
+,
+b
+)
+=
+(
+0.25
+,
+0.60
+)
+(a,b)=(0.25,0.60)
+, selecting the 25th–60th percentile interval of the ascending COS ranking. We train with AdamW and cosine learning-rate decay, with a peak learning rate of
+5
+×
+10
+−
+7
+5\times 10^{-7}
+. The maximum context and response lengths are 8,192 and 4,096 tokens, respectively. For each question, we sample 32 responses at temperature
+0.6
+0.6
+for pseudo-label voting and use 16 for policy optimization. Experiments are conducted on 4 NVIDIA A800 80GB GPUs.
+Evaluation Metrics.
+We report greedy-decoding accuracy (Greedy),
+sampled pass@1 (Mean1), and majority-vote accuracy (Maj.@16). Among them,
+following DeepSeek-R1
+(
+Guo et al., 2025
+)
+, we evaluate sampled pass@1
+using 16 responses per question at temperature
+0.6
+0.6
+. Maj.@16 measures the
+accuracy of the most frequent answer among the same 16 responses.
+Table 1:
+Comparison of TTRL methods on Qwen3-8B across six reasoning benchmarks.
+MATH-500
+GPQA-Diamond
+MMLU-Pro STEM
+Method
+Greedy
+Mean1
+Maj.@16
+Greedy
+Mean1
+Maj.@16
+Greedy
+Mean1
+Maj.@16
+Matched-TTRL
+86.20
+87.18
+92.40
+51.01
+51.33
+57.07
+75.30
+76.61
+79.52
+Random
+86.00
+86.71
+91.20
+49.49
+50.95
+54.55
+75.70
+75.41
+79.32
+A-PPL
+87.40
+86.84
+91.00
+53.54
+50.69
+56.06
+75.10
+76.58
+81.53
+SelectTTRL
+86.20
+86.55
+92.60
+51.52
+50.73
+58.08
+74.10
+75.77
+80.12
+AIME 2024
+AIME 2025
+AMC
+Method
+Greedy
+Mean1
+Maj.@16
+Greedy
+Mean1
+Maj.@16
+Greedy
+Mean1
+Maj.@16
+Matched-TTRL
+36.67
+40.42
+50.00
+23.33
+23.54
+23.33
+69.88
+67.85
+78.31
+Random
+33.33
+36.04
+46.67
+16.67
+17.71
+16.67
+65.06
+63.86
+73.49
+A-PPL
+33.33
+37.29
+46.67
+16.67
+17.50
+16.67
+60.24
+65.74
+73.49
+SelectTTRL
+43.33
+38.75
+50.00
+23.33
+19.79
+20.00
+66.27
+66.04
+74.70
+Table 2:
+Comparison of TTRL methods on Qwen2.5-7B-Instruct across six reasoning benchmarks.
+MATH-500
+GPQA-Diamond
+MMLU-Pro STEM
+Method
+Greedy
+Mean1
+Maj.@16
+Greedy
+Mean1
+Maj.@16
+Greedy
+Mean1
+Maj.@16
+Matched-TTRL
+78.80
+78.34
+82.00
+35.35
+35.04
+35.86
+64.66
+65.31
+69.28
+Random
+79.80
+77.68
+80.80
+36.67
+36.81
+40.40
+64.46
+63.45
+67.27
+A-PPL
+78.40
+78.04
+82.40
+32.83
+35.86
+37.88
+64.66
+62.79
+66.47
+SelectTTRL
+79.60
+78.61
+83.00
+36.87
+35.61
+38.89
+62.65
+64.22
+68.47
+AIME 2024
+AIME 2025
+AMC
+Method
+Greedy
+Mean1
+Maj.@16
+Greedy
+Mean1
+Maj.@16
+Greedy
+Mean1
+Maj.@16
+Matched-TTRL
+23.33
+21.04
+23.33
+16.67
+16.46
+16.67
+51.81
+50.23
+53.01
+Random
+16.67
+15.21
+20.00
+6.67
+8.96
+13.33
+45.78
+46.08
+51.81
+A-PPL
+6.67
+12.92
+20.00
+6.67
+9.17
+16.67
+42.17
+44.95
+54.22
+SelectTTRL
+16.67
+18.33
+23.33
+13.33
+12.08
+13.33
+48.19
+48.27
+53.01
+5.2
+Overall Performance (RQ1)
+SelectTTRL performs TTRL on only 35% of the target questions using pretrained LLMs such as Qwen3-8B and Qwen2.5-7B-Instruct. Tables
+1
+and
+2
+compare it with full-data TTRL and alternative selection strategies. Overall, SelectTTRL retains most of the gains of full-data TTRL while using substantially fewer questions for adaptation. On MATH-500 and MMLU-Pro STEM, it performs close to Matched-TTRL despite training on only a subset of the target set.
+The benefit of selective training is more pronounced on the harder AIME benchmarks. With Qwen3-8B, SelectTTRL outperforms Random and A-PPL in Greedy accuracy on both AIME 2024 and AIME 2025 while remaining competitive with Matched-TTRL. On AIME 2024, it achieves 43.33% Greedy accuracy, compared with 36.67% for Matched-TTRL and 33.33% for both Random and A-PPL. These results suggest that TTRL performance depends not only on the amount of test-time training data, but also on which questions receive the optimization budget.
+We attribute this behavior to the quality of COS-based ranking. Questions with intermediate COS values tend to provide a better trade-off between optimization headroom and pseudo-label reliability: very easy questions offer limited additional learning signal, whereas extremely difficult questions are more prone to unreliable consensus rewards. SelectTTRL therefore concentrates TTRL updates on questions that are more likely to provide useful training signals.
+The trend is strongest for Qwen3-8B, where COS exhibits a clearer association with question-level correctness. For Qwen2.5-7B-Instruct, the ranking signal is somewhat less discriminative, and SelectTTRL performs closer to full-data TTRL. Nevertheless, the method remains competitive across both backbone LLMs, suggesting that its effectiveness does not rely on a single model-specific ranking behavior.
+Notably, all results use the correctness direction calibrated from TruthfulQA. Although alternative calibration sources can yield stronger COS–accuracy correlations (Section
+5.5
+), the fixed TruthfulQA direction is sufficient to support effective question selection across models and benchmarks.
+5.3
+Activation Steering and Answer Correctness (RQ2)
+To examine whether the direction used by COS is merely correlational or can actively influence model behavior, we perform CAA steering
+(
+Rimsky et al., 2024
+)
+with Qwen3-8B on MATH-500 and AIME24. We inject the raw CAA vector at layer 21 during generation with
+α
+∈
+{
+−
+1
+,
+−
+0.5
+,
++
+0.5
+,
++
+1
+}
+\alpha\in\{-1,-0.5,+0.5,+1\}
+, and recompute COS from the generated responses without intervention.
+Figure 1:
+CAA and norm-matched random steering results on Qwen3-8B.
+Random results are means across five directions.
+As shown in Figure
+1
+, steering along the extracted direction produces systematic changes in both accuracy and reasoning behavior. On AIME24, moderate positive steering (
+α
+=
++
+0.5
+\alpha=+0.5
+) improves accuracy from 30.00% to 33.33%, outperforming norm-matched random directions, whereas stronger intervention (
+α
+=
++
+1
+\alpha=+1
+) degrades performance. Negative steering consistently lowers COS and tends to lengthen responses, while positive steering increases COS on AIME24 and generally shortens generation. On MATH-500, steering is less beneficial overall, with larger intervention magnitudes causing clearer accuracy degradation.
+Response inspection shows that steering affects both calculations and answer completion. For example, on MATH-500,
+α
+=
++
+0.5
+\alpha=+0.5
+turns a repetitive, truncated response into a correct 578-token solution, whereas
+α
+=
+−
+0.5
+\alpha=-0.5
+causes a previously correct solution to repeat an unfinished step until truncation. Steering can also alter intermediate calculations, such as selecting an incorrect triangle vertex. These cases suggest that the COS direction is behaviorally relevant to correctness, although its effect depends on intervention strength and task.
+5.4
+Interpreting COS through Sparse Features (RQ3)
+To better understand what COS captures internally, we analyze its sparse-feature composition and test whether high-contribution features are behaviorally relevant to answer correctness. Following
+Marks et al. (2025)
+, we decompose the residual-stream activation as:
+𝐡
+=
+∑
+j
+z
+j
+​
+(
+𝐡
+)
+​
+𝐝
+j
+⏟
+SAE feature components
++
+ϵ
+⁡
+(
+𝐡
+)
+⏟
+reconstruction residual
++
+𝐛
+dec
+⏟
+decoder bias
+,
+\mathbf{h}=\underbrace{\textstyle\sum_{j}z_{j}(\mathbf{h})\mathbf{d}_{j}}_{\text{SAE feature components}}+\underbrace{\bm{\epsilon}(\mathbf{h})}_{\text{reconstruction residual}}+\underbrace{\mathbf{b}_{\mathrm{dec}}}_{\text{decoder bias}},
+(16)
+where
+z
+j
+​
+(
+𝐡
+)
+z_{j}(\mathbf{h})
+and
+𝐝
+j
+\mathbf{d}_{j}
+denote the activation and decoder direction of feature
+j
+j
+, and
+ϵ
+⁡
+(
+𝐡
+)
+=
+𝐡
+−
+𝐡
+^
+\bm{\epsilon}(\mathbf{h})=\mathbf{h}-\hat{\mathbf{h}}
+is the SAE reconstruction residual. We quantify the contribution of each component to COS. Among the 50 most activated SAE features, we select the five with the largest COS contributions. Their maximally activating tokens are associated with reasoning transitions, intermediate conclusions, and final-answer expressions (Appendix
+B
+). We then intervene on each feature using feature clamping
+(
+Templeton et al., 2024
+)
+, setting it to zero at every generated-token position while preserving all other feature activations, decoder bias, and reconstruction residual.
+Table
+3
+shows that ablating all five selected features reduces accuracy on AIME24, with four interventions also lowering mean COS. Feature
+31368
+has the strongest effect, reducing accuracy from 30.00% to 20.00% and mean COS from 0.1238 to 0.1115.
+The decomposition further shows that COS ranking is not explained by sparse features alone. Approximately 57% of the ranking contribution comes from the reconstruction residual, 48% from SAE features, and
+−
+5
+%
+-5\%
+from the decoder bias (Appendix
+B
+). Thus, COS combines interpretable reasoning- and answer-related features with substantial information not resolved by the current SAE.
+Table 3:
+SAE feature ablation on AIME24.
+Numbers
+denote SAE feature IDs.
+Condition
+Accuracy (%)
+Mean COS
+Δ
+\Delta
+Accuracy (pp)
+Δ
+\Delta
+COS
+Baseline
+30.00
+0.1238
+—
+—
+Ablate
+31368
+20.00
+0.1115
+−
+10.00
+-10.00
+−
+0.0123
+-0.0123
+Ablate
+52642
+26.67
+0.1239
+−
+3.33
+-3.33
++
+0.0001
++0.0001
+Ablate
+41030
+23.33
+0.1212
+−
+6.67
+-6.67
+−
+0.0026
+-0.0026
+Ablate
+3447
+23.33
+0.1194
+−
+6.67
+-6.67
+−
+0.0045
+-0.0045
+Ablate
+48965
+20.00
+0.1220
+−
+10.00
+-10.00
+−
+0.0018
+-0.0018
+Table 4:
+Comparison of direction-extraction datasets. Source Greedy is the model’s accuracy on the source dataset. Pearson
+r
+r
+and Spearman
+ρ
+\rho
+between COS and question-level accuracy are averaged across MATH-500, AIME24, AIME25, and AMC.
+Direction source
+Source Greedy (%)
+Mean Pearson
+r
+r
+Mean Spearman
+ρ
+\rho
+PIQA
+87.65
+0.6420
+0.6273
+CommonsenseQA
+81.08
+0.6340
+0.6116
+MMLU-Pro
+72.69
+0.6260
+0.6071
+LogiQA 2.0
+74.95
+0.5942
+0.5692
+GPQA
+44.95
+0.5385
+0.5126
+TruthfulQA
+71.97
+0.5328
+0.4519
+5.5
+Dependence on the Direction-Extraction Dataset (RQ4)
+To evaluate COS sensitivity to the source dataset, we extract directions from PIQA
+(
+Bisk et al., 2020
+)
+, CommonsenseQA
+(
+Talmor et al., 2019
+)
+, MMLU-Pro, LogiQA 2.0
+(
+Liu et al., 2023
+)
+, GPQA, and TruthfulQA using the same CAA procedure, and measure Pearson and Spearman correlations between COS and question-level accuracy on MATH-500, AIME24, AIME25, and AMC.
+Table
+4
+shows positive correlations for all
+six source datasets. PIQA and CommonsenseQA, on which the model achieves
+87.65% and 81.08% source accuracy, yield the strongest average Spearman
+correlations of 0.6273 and 0.6116, respectively. GPQA, with a lower source
+accuracy of 44.95%, yields a weaker average Spearman correlation of 0.5126.
+We interpret this pattern as evidence that COS captures correctness-related internal representations. When the model reliably distinguishes correct from incorrect answers on the source task, the contrastive direction better aligns with objective correctness. On harder source tasks, teacher-forcing a correct answer does not guarantee that the model internally recognizes it as correct, weakening the extracted direction and its correlation with target-task accuracy.
+These observations connect to the evidence-readout analysis in
+Section
+4
+. When the model achieves higher source-task
+accuracy, the activation contrast between correct and incorrect
+answers is more likely to reflect differences in internal answer evidence.
+The resulting CAA direction can read this evidence in
+target tasks more effectively, improving COS ranking of question-level
+accuracy. This interpretation motivates choosing a source dataset the model
+solves with reasonably high accuracy.
+6
+Conclusion
+In this paper, we investigated how to improve the efficiency of Test-Time Reinforcement Learning by selecting test problems before training-time rollout collection and reinforcement learning. We identified COS, a representation-level signal that exhibited a stable relationship with problem-level empirical accuracy, and provided a theoretical analysis of this relationship. Based on this finding, we proposed SelectTTRL, which selected a subset of test problems for subsequent test-time training according to COS. Experiments across multiple reasoning benchmarks showed that SelectTTRL substantially reduced test-time computation while maintaining or improving the performance of standard TTRL. Overall, our results demonstrated the potential of internal model representations for more selective and efficient test-time adaptation.
+References
+AI-MO (2024a)
+AI-MO
+AIMO validation AIME
+.
+Note:
+Hugging Face dataset
+External Links:
+Link
+Cited by:
+§5.1
+.
+AI-MO (2024b)
+AI-MO
+AIMO validation AMC
+.
+Note:
+Hugging Face dataset
+External Links:
+Link
+Cited by:
+§5.1
+.
+Albalak
+et al.
+(2024)
+A. Albalak, Y. Elazar, S. M. Xie, S. Longpre, N. Lambert, X. Wang, N. Muennighoff, B. Hou, L. Pan, H. Jeong, C. Raffel, S. Chang, T. Hashimoto, and W. Y. Wang
+A survey on data selection for language models
+.
+Transactions on Machine Learning Research
+.
+External Links:
+Link
+Cited by:
+§2
+.
+Azaria and Mitchell (2023)
+A. Azaria and T. Mitchell
+The internal state of an LLM knows when it’s lying
+.
+In
+Findings of the Association for Computational Linguistics: EMNLP 2023
+,
+pp. 967–976
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§1
+,
+§2
+.
+Bisk
+et al.
+(2020)
+Y. Bisk, R. Zellers, R. Le Bras, J. Gao, and Y. Choi
+PIQA: reasoning about physical commonsense in natural language
+.
+In
+Proceedings of the AAAI Conference on Artificial Intelligence
+,
+Vol.
+34
+,
+pp. 7432–7439
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§5.5
+.
+Fang
+et al.
+(2026)
+Y. Fang, W. Wang, M. Xue, B. Deng, F. Xu, D. Liu, and F. Feng
+Controllable LLM reasoning via sparse autoencoder-based steering
+.
+In
+Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)
+,
+pp. 21290–21305
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§2
+.
+Guo
+et al.
+(2025)
+D. Guo, D. Yang, H. Zhang, J. Song, P. Wang, Q. Zhu, R. Xu, R. Zhang, S. Ma, X. Bi,
+et al.
+DeepSeek-R1 incentivizes reasoning in LLMs through reinforcement learning
+.
+Nature
+645
+(
+8081
+),
+pp. 633–638
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§1
+,
+§5.1
+.
+He
+et al.
+(2025)
+Z. He, M. Jin, B. Shen, A. Payani, Y. Zhang, and M. Du
+SAE-SSV: supervised steering in sparse representation spaces for reliable control of language models
+.
+In
+Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing
+,
+pp. 2207–2236
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§2
+.
+Hendrycks
+et al.
+(2021)
+D. Hendrycks, C. Burns, S. Kadavath, A. Arora, S. Basart, E. Tang, D. Song, and J. Steinhardt
+Measuring mathematical problem solving with the MATH dataset
+.
+In
+Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks
+,
+External Links:
+Link
+Cited by:
+§5.1
+.
+Hosseini
+et al.
+(2026)
+P. Hosseini, O. Bohdal, T. Ceritli, I. Castro, M. Purver, M. Ozay, and U. Michieli
+CG-TTRL: context-guided test-time reinforcement learning for on-device large language models
+.
+Transactions of the Association for Computational Linguistics
+14
+,
+pp. 1883–1898
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§1
+,
+§2
+.
+Højer
+et al.
+(2025)
+B. Højer, O. Jarvis, and S. Heinrich
+Improving reasoning performance in large language models via representation engineering
+.
+In
+The Thirteenth International Conference on Learning Representations
+,
+pp. 44746–44763
+.
+External Links:
+Link
+Cited by:
+§2
+.
+Kumaran
+et al.
+(2026)
+D. Kumaran, A. Conmy, F. Barbero, S. Osindero, V. Patraucean, and P. Veličković
+How do LLMs compute verbal confidence?
+.
+In
+Proceedings of the 43rd International Conference on Machine Learning
+,
+External Links:
+Link
+Cited by:
+§3.1
+.
+Li
+et al.
+(2024)
+M. Li, Y. Zhang, Z. Li, J. Chen, L. Chen, N. Cheng, J. Wang, T. Zhou, and J. Xiao
+From quantity to quality: boosting LLM performance with self-guided data selection for instruction tuning
+.
+In
+Proceedings of the 2024 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies (Volume 1: Long Papers)
+,
+pp. 7602–7635
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§2
+.
+Li
+et al.
+(2026)
+S. Li, Z. Yang, S. Li, X. Xia, H. Liu, X. Zhang, G. Chen, D. Fang, Y. Tai, and Z. Peng
+LearnAlign: data selection for LLM reinforcement learning with improved gradient alignment
+.
+In
+Findings of the Association for Computational Linguistics: ACL 2026
+,
+pp. 40417–40434
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§2
+.
+Li
+et al.
+(2025)
+Z. Li, X. Wang, Y. Yang, Z. Yao, H. Xiong, and M. Du
+Feature extraction and steering for enhanced chain-of-thought reasoning in language models
+.
+In
+Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing
+,
+pp. 10893–10913
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§2
+.
+Lin
+et al.
+(2026)
+H. Lin, Z. Kuai, E. Xue, and L. Wang
+Detecting and mitigating the correct-answer extinction window in test-time reinforcement learning with majority voting
+.
+arXiv preprint arXiv:2605.19444
+.
+External Links:
+Link
+Cited by:
+§1
+,
+§2
+.
+Lin
+et al.
+(2022)
+S. Lin, J. Hilton, and O. Evans
+TruthfulQA: measuring how models mimic human falsehoods
+.
+In
+Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)
+,
+pp. 3214–3252
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§3.1
+.
+Liu
+et al.
+(2023)
+H. Liu, J. Liu, L. Cui, Z. Teng, N. Duan, M. Zhou, and Y. Zhang
+LogiQA 2.0—an improved dataset for logical reasoning in natural language understanding
+.
+IEEE/ACM Transactions on Audio, Speech, and Language Processing
+31
+,
+pp. 2947–2962
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§5.5
+.
+Liu
+et al.
+(2025)
+J. Liu, C. He, Y. Lin, M. Yang, F. Shen, and S. Liu
+ETTRL: balancing exploration and exploitation in LLM test-time reinforcement learning via entropy mechanism
+.
+arXiv preprint arXiv:2508.11356
+.
+External Links:
+Link
+Cited by:
+§1
+,
+§2
+.
+Liu
+et al.
+(2026)
+J. Liu, K. Hua, X. Pan, G. Zhang, Y. Wang, S. Ma, and C. Tao
+AIR: post-training data selection for reasoning via attention head influence
+.
+In
+Proceedings of the 43rd International Conference on Machine Learning
+,
+External Links:
+Link
+Cited by:
+§2
+.
+Liu
+et al.
+(2024)
+W. Liu, W. Zeng, K. He, Y. Jiang, and J. He
+What makes good data for alignment? a comprehensive study of automatic data selection in instruction tuning
+.
+In
+The Twelfth International Conference on Learning Representations
+,
+pp. 22353–22373
+.
+External Links:
+Link
+Cited by:
+§2
+.
+Marks
+et al.
+(2025)
+S. Marks, C. Rager, E. J. Michaud, Y. Belinkov, D. Bau, and A. Mueller
+Sparse feature circuits: discovering and editing interpretable causal graphs in language models
+.
+In
+The Thirteenth International Conference on Learning Representations
+,
+pp. 23888–23923
+.
+External Links:
+Link
+Cited by:
+§B.1
+,
+§5.4
+.
+Moradi and Mudur (2026)
+M. M. Moradi and S. Mudur
+DiSCTT: consensus-guided self-curriculum for efficient test-time adaptation in reasoning
+.
+arXiv preprint arXiv:2603.05357
+.
+External Links:
+Link
+Cited by:
+§2
+.
+Qwen
+et al.
+(2024)
+Qwen, A. Yang, B. Yang, B. Zhang, B. Hui, B. Zheng, B. Yu, C. Li, D. Liu, F. Huang,
+et al.
+Qwen2.5 technical report
+.
+arXiv preprint arXiv:2412.15115
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§1
+,
+§5.1
+.
+Rein
+et al.
+(2024)
+D. Rein, B. L. Hou, A. C. Stickland, J. Petty, R. Y. Pang, J. Dirani, J. Michael, and S. R. Bowman
+GPQA: a graduate-level google-proof q&a benchmark
+.
+In
+First Conference on Language Modeling
+,
+External Links:
+Link
+Cited by:
+§5.1
+.
+Rimsky
+et al.
+(2024)
+N. Rimsky, N. Gabrieli, J. Schulz, M. Tong, E. Hubinger, and A. Turner
+Steering Llama 2 via contrastive activation addition
+.
+In
+Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)
+,
+pp. 15504–15522
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§1
+,
+§2
+,
+§3.1
+,
+§5.3
+.
+Shao
+et al.
+(2024)
+Z. Shao, P. Wang, Q. Zhu, R. Xu, J. Song, X. Bi, H. Zhang, M. Zhang, Y. K. Li, Y. Wu, and D. Guo
+DeepSeekMath: pushing the limits of mathematical reasoning in open language models
+.
+arXiv preprint arXiv:2402.03300
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§1
+,
+§3.4
+.
+Talmor
+et al.
+(2019)
+A. Talmor, J. Herzig, N. Lourie, and J. Berant
+CommonsenseQA: a question answering challenge targeting commonsense knowledge
+.
+In
+Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers)
+,
+pp. 4149–4158
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§5.5
+.
+Tang
+et al.
+(2025)
+X. Tang, X. Wang, Z. Lv, Y. Min, W. X. Zhao, B. Hu, Z. Liu, and Z. Zhang
+Unlocking general long chain-of-thought reasoning capabilities of large language models via representation engineering
+.
+In
+Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)
+,
+pp. 6832–6849
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§2
+.
+Templeton
+et al.
+(2024)
+A. Templeton, T. Conerly, J. Marcus, J. Lindsey, T. Bricken, B. Chen, A. Pearce, C. Citro, E. Ameisen, A. Jones, H. Cunningham, N. L. Turner, C. McDougall, M. MacDiarmid, A. Tamkin, E. Durmus, T. Hume, F. Mosconi, C. D. Freeman, T. R. Sumers, E. Rees, J. Batson, A. Jermyn, S. Carter, C. Olah, and T. Henighan
+Scaling monosemanticity: extracting interpretable features from Claude 3 Sonnet
+.
+Transformer Circuits Thread
+.
+External Links:
+Link
+Cited by:
+§B.3
+,
+§5.4
+.
+Wainwright and Jordan (2008)
+M. J. Wainwright and M. I. Jordan
+Graphical models, exponential families, and variational inference
+.
+Foundations and Trends in Machine Learning
+1
+(
+1–2
+),
+pp. 1–305
+.
+External Links:
+Document
+Cited by:
+§A.1
+,
+§4.1
+.
+Wang
+et al.
+(2026a)
+R. Wang, W. Huang, Q. Cao, Y. Iwasawa, Y. Matsuo, and J. Guo
+Self-Harmony: learning to harmonize self-supervision and self-play in test-time reinforcement learning
+.
+In
+The Fourteenth International Conference on Learning Representations
+,
+pp. 83112–83144
+.
+External Links:
+Link
+Cited by:
+§2
+.
+Wang
+et al.
+(2026b)
+W. Wang, Y. Wang, K. Chen, and H. Huang
+Beyond majority voting: towards fine-grained and more reliable reward signal for test-time reinforcement learning
+.
+In
+Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)
+,
+pp. 37251–37265
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§2
+.
+Wang
+et al.
+(2024)
+Y. Wang, X. Ma, G. Zhang, Y. Ni, A. Chandra, S. Guo, W. Ren, A. Arulraj, X. He, Z. Jiang, T. Li, M. Ku, K. Wang, A. Zhuang, R. Fan, X. Yue, and W. Chen
+MMLU-Pro: a more robust and challenging multi-task language understanding benchmark
+.
+In
+Advances in Neural Information Processing Systems
+,
+Vol.
+37
+,
+pp. 95266–95290
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§5.1
+.
+Wu
+et al.
+(2026)
+J. Wu, J. Cai, W. Wang, J. Ye, D. F. Schmidt, and Y. George
+Single-rollout hidden-state dynamics for training-free RLVR data selection
+.
+In
+Proceedings of the 43rd International Conference on Machine Learning
+,
+External Links:
+Link
+Cited by:
+§2
+.
+Xia
+et al.
+(2024)
+M. Xia, S. Malladi, S. Gururangan, S. Arora, and D. Chen
+LESS: selecting influential data for targeted instruction tuning
+.
+In
+Proceedings of the 41st International Conference on Machine Learning
+,
+Proceedings of Machine Learning Research
+, Vol.
+235
+,
+pp. 54104–54132
+.
+External Links:
+Link
+Cited by:
+§2
+.
+Yan
+et al.
+(2026)
+D. Yan, J. Liang, Y. Wang, S. Lu, R. He, and T. Tan
+What if consensus lies? selective-complementary reinforcement learning at test time
+.
+In
+Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)
+,
+pp. 28957–28970
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§1
+,
+§2
+.
+Yang
+et al.
+(2025)
+A. Yang, A. Li, B. Yang, B. Zhang, B. Hui, B. Zheng, B. Yu, C. Gao, C. Huang, C. Lv,
+et al.
+Qwen3 technical report
+.
+arXiv preprint arXiv:2505.09388
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§1
+,
+§5.1
+.
+Yu
+et al.
+(2026)
+Y. Yu, L. He, J. Liang, K. Guo, M. Wang, Q. Xie, X. Wang, and R. He
+Understanding and mitigating spurious signal amplification in test-time reinforcement learning for math reasoning
+.
+In
+Findings of the Association for Computational Linguistics: ACL 2026
+,
+pp. 37424–37436
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§1
+,
+§2
+.
+Zhang
+et al.
+(2025)
+J. Zhang, Y. Qin, R. Pi, W. Zhang, R. Pan, and T. Zhang
+TAGCOS: task-agnostic gradient clustered coreset selection for instruction tuning data
+.
+In
+Findings of the Association for Computational Linguistics: NAACL 2025
+,
+pp. 4686–4701
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§2
+.
+Zhang and Math-AI Team (2025)
+Y. Zhang and Math-AI Team
+American invitational mathematics examination (AIME) 2025
+.
+Note:
+Hugging Face dataset
+External Links:
+Link
+Cited by:
+§5.1
+.
+Zhao
+et al.
+(2025a)
+Y. Zhao, K. Xiong, X. Ding, L. Du, Y. Ouyang, Z. Sun, J. Guan, W. Zhang, B. Liu, D. Hu, B. Qin, and T. Liu
+UFO-RL: uncertainty-focused optimization for efficient reinforcement learning data selection
+.
+In
+Advances in Neural Information Processing Systems
+,
+Vol.
+38
+,
+pp. 577–596
+.
+External Links:
+Link
+Cited by:
+§2
+.
+Zhao
+et al.
+(2025b)
+Y. Zhao, A. Devoto, G. Hong, X. Du, A. P. Gema, H. Wang, X. He, K. Wong, and P. Minervini
+Steering knowledge selection behaviours in LLMs via SAE-based representation engineering
+.
+In
+Proceedings of the 2025 Conference of the Nations of the Americas Chapter of the Association for Computational Linguistics: Human Language Technologies (Volume 1: Long Papers)
+,
+pp. 5117–5136
+.
+External Links:
+Document
+,
+Link
+Cited by:
+§2
+.
+Zou
+et al.
+(2023)
+A. Zou, L. Phan, S. Chen, J. Campbell, P. Guo, R. Ren, A. Pan, X. Yin, M. Mazeika, A. Dombrowski, S. Goel, N. Li, M. J. Byun, Z. Wang, A. Mallen, S. Basart, S. Koyejo, D. Song, M. Fredrikson, J. Z. Kolter, and D. Hendrycks
+Representation engineering: a top-down approach to ai transparency
+.
+arXiv preprint arXiv:2310.01405
+.
+External Links:
+Link
+Cited by:
+§1
+,
+§2
+.
+Zuo
+et al.
+(2025)
+Y. Zuo, K. Zhang, L. Sheng, S. Qu, G. Cui, X. Zhu, H. Li, Y. Zhang, X. Long, E. Hua, B. Qi, Y. Sun, Z. Ma, L. Yuan, N. Ding, and B. Zhou
+TTRL: test-time reinforcement learning
+.
+In
+Advances in Neural Information Processing Systems
+,
+Vol.
+38
+,
+pp. 131459–131483
+.
+External Links:
+Link
+Cited by:
+§1
+,
+§2
+,
+§3.4
+,
+§5.1
+.
+Appendix A
+Proofs and extensions of the COS analysis
+A.1
+Spherical model and response identity
+Fix the model, layer, direction, prompt template, and reading protocol. Let
+b
+D
+b_{D}
+be a probability density with respect to spherical surface measure
+ω
+\omega
+, with support independent of
+t
+t
+. For finite natural parameters,
+define
+A
+D
+(
+η
+)
+=
+log
+∫
+𝕊
+d
+−
+1
+b
+D
+(
+z
+)
+exp
+(
+η
+⊤
+z
+)
+d
+ω
+(
+z
+)
+.
+A_{D}(\eta)=\log\int_{\mathbb{S}^{d-1}}b_{D}(z)\exp(\eta^{\top}z)\,d\omega(z).
+(17)
+Boundedness of
+U
+U
+permits differentiation under the integral. Hence
+∇
+A
+D
+​
+(
+η
+)
+=
+𝔼
+η
+​
+[
+U
+]
+,
+∇
+2
+A
+D
+​
+(
+η
+)
+=
+Cov
+η
+⁡
+(
+U
+)
+.
+\nabla A_{D}(\eta)=\mathbb{E}_{\eta}[U],\qquad\nabla^{2}A_{D}(\eta)=\operatorname{Cov}_{\eta}(U).
+(18)
+Applying the chain rule along
+η
+=
+t
+​
+u
+\eta=tu
+proves
+Eq. (
+8
+). More generally, for any bounded measurable
+f
+f
+,
+d
+d
+​
+t
+​
+𝔼
+t
+​
+[
+f
+⁡
+(
+U
+)
+]
+=
+Cov
+t
+⁡
+(
+f
+⁡
+(
+U
+)
+,
+u
+⊤
+​
+U
+)
+.
+\frac{d}{dt}\mathbb{E}_{t}[f(U)]=\operatorname{Cov}_{t}(f(U),u^{\top}U).
+(19)
+These are standard exponential-family identities
+(
+Wainwright and Jordan, 2008
+)
+.
+The model also arises by minimizing
+D
+KL
+(
+p
+∥
+b
+D
+)
+D_{\rm KL}(p\|b_{D})
+subject to
+normalization and a specified expectation of
+u
+⊤
+​
+U
+u^{\top}U
+. A Lagrange
+multiplier for the latter constraint yields the exponential tilt in
+Eq. (
+7
+).
+With uniform
+b
+D
+b_{D}
+, the distribution is vMF with concentration
+|
+t
+|
+|t|
+and direction
+sign
+⁡
+(
+t
+)
+​
+u
+\operatorname{sign}(t)u
+for
+t
+≠
+0
+t\neq 0
+. If
+b
+D
+​
+(
+U
+)
+∝
+exp
+⁡
+(
+a
+D
+⊤
+​
+U
+)
+b_{D}(U)\propto\exp(a_{D}^{\top}U)
+, its vMF natural parameter is
+a
+D
++
+t
+​
+u
+a_{D}+tu
+,
+so both direction and concentration may vary.
+A.2
+From raw source contrasts to a spherical response
+For the empirical raw mean difference
+d
+^
+S
+≠
+0
+\hat{d}_{S}\neq 0
+, Cauchy–Schwarz gives
+d
+^
+S
+‖
+d
+^
+S
+‖
+2
+=
+arg
+⁡
+max
+‖
+w
+‖
+2
+=
+1
+​
+1
+n
+​
+∑
+i
+=
+1
+n
+w
+⊤
+​
+(
+h
+i
++
+−
+h
+i
+−
+)
+.
+\frac{\hat{d}_{S}}{\|\hat{d}_{S}\|_{2}}=\arg\max_{\|w\|_{2}=1}\frac{1}{n}\sum_{i=1}^{n}w^{\top}(h_{i}^{+}-h_{i}^{-}).
+(20)
+Thus the extracted direction maximizes the mean signed raw-activation contrast.
+For its evidence interpretation, consider the source construction
+h
+±
+=
+c
++
+R
+±
+​
+V
+±
++
+ζ
+±
+h^{\pm}=c+R^{\pm}V^{\pm}+\zeta^{\pm}
+, where
+c
+c
+is a paired common component,
+R
+±
+≥
+0
+R^{\pm}\geq 0
+have finite means, and
+V
+±
+V^{\pm}
+are unit vectors following
+the source spherical family at
+t
++
+>
+t
+−
+t_{+}>t_{-}
+. Here
+V
+±
+V^{\pm}
+describe the
+varying source component.
+Set
+r
+±
+=
+𝔼
+⁡
+[
+R
+±
+]
+r_{\pm}=\mathbb{E}[R^{\pm}]
+,
+m
+±
+=
+𝔼
+⁡
+[
+V
+±
+]
+m_{\pm}=\mathbb{E}[V^{\pm}]
+, and
+R
+¯
+S
+=
+(
+r
++
++
+r
+−
+)
+/
+2
+>
+0
+\bar{R}_{S}=(r_{+}+r_{-})/2>0
+. Define the vector covariances
+k
+±
+=
+𝔼
+⁡
+[
+(
+R
+±
+−
+r
+±
+)
+​
+(
+V
+±
+−
+m
+±
+)
+]
+k_{\pm}=\mathbb{E}[(R^{\pm}-r_{\pm})(V^{\pm}-m_{\pm})]
+. Then
+d
+S
+⋆
+\displaystyle d_{S}^{\star}
+=
+𝔼
+⁡
+[
+h
++
+−
+h
+−
+]
+=
+R
+¯
+S
+​
+(
+m
++
+−
+m
+−
+)
++
+e
+S
+,
+\displaystyle=\mathbb{E}[h^{+}-h^{-}]=\bar{R}_{S}(m_{+}-m_{-})+e_{S},
+(21)
+e
+S
+\displaystyle e_{S}
+=
+(
+r
++
+−
+R
+¯
+S
+)
+​
+m
++
+−
+(
+r
+−
+−
+R
+¯
+S
+)
+​
+m
+−
++
+k
++
+−
+k
+−
++
+𝔼
+⁡
+[
+ζ
++
+−
+ζ
+−
+]
+.
+\displaystyle=(r_{+}-\bar{R}_{S})m_{+}-(r_{-}-\bar{R}_{S})m_{-}+k_{+}-k_{-}+\mathbb{E}[\zeta^{+}-\zeta^{-}].
+Integrating Eq. (
+8
+) in the source domain proves
+Eq. (
+9
+). Each
+Σ
+S
+​
+(
+r
+)
+\Sigma_{S}(r)
+is positive
+semidefinite. Thus
+u
+⊤
+​
+M
+S
+​
+u
+>
+0
+u^{\top}M_{S}u>0
+when
+Var
+r
+⁡
+(
+u
+⊤
+​
+V
+)
+>
+0
+\operatorname{Var}_{r}(u^{\top}V)>0
+on a set of positive integration measure.
+If
+e
+S
+=
+0
+e_{S}=0
+, this gives
+u
+⊤
+​
+d
+S
+⋆
+>
+0
+u^{\top}d_{S}^{\star}>0
+. Axis symmetry of
+b
+S
+b_{S}
+about
+u
+u
+further gives
+d
+S
+⋆
+=
+γ
+S
+​
+u
+d_{S}^{\star}=\gamma_{S}u
+with
+γ
+S
+>
+0
+\gamma_{S}>0
+.
+Equal radial means, radial independence, and zero mean unmatched contrast
+give
+e
+S
+=
+0
+e_{S}=0
+. More generally, the transfer analysis incorporates nonzero
+source bias and finite-sample error through the actual extracted direction.
+A.3
+Structural hypotheses and source reliability
+Uniform source gain.
+Under
+𝖧
+1
+\mathsf{H}_{1}
+, for
+d
+0
++
+ξ
+S
+≠
+0
+d_{0}+\xi_{S}\neq 0
+,
+v
+S
+=
+d
+0
++
+ξ
+S
+‖
+d
+0
++
+ξ
+S
+‖
+2
+.
+v_{S}=\frac{d_{0}+\xi_{S}}{\|d_{0}+\xi_{S}\|_{2}}.
+(22)
+Since
+ξ
+S
+\xi_{S}
+is independent of source accuracy
+a
+S
+a_{S}
+, so is
+v
+S
+v_{S}
+.
+On a fixed target representation cache, any readout-quality statistic
+ℛ
+D
+​
+(
+v
+S
+)
+\mathcal{R}_{D}(v_{S})
+computed with fixed correctness labels is therefore
+independent of
+a
+S
+a_{S}
+, whenever defined. This includes Pearson and Spearman
+correlations. The overall trend in Table
+4
+argues against this independence prediction.
+Single-factor linear response.
+One realization of
+𝖧
+2
+\mathsf{H}_{2}
+assumes a common intervention direction
+w
+w
+,
+𝔼
+j
+​
+[
+U
+]
+−
+𝔼
+0
+​
+[
+U
+]
+=
+τ
+j
+​
+w
+\mathbb{E}_{j}[U]-\mathbb{E}_{0}[U]=\tau_{j}w
+, and a shared affine reliability
+function
+P
+j
+=
+p
+0
++
+η
+​
+𝔼
+j
+​
+[
+T
+]
+P_{j}=p_{0}+\eta\mathbb{E}_{j}[T]
+, with
+η
+>
+0
+\eta>0
+and values in
+[
+0
+,
+1
+]
+[0,1]
+.
+Then
+Δ
+​
+C
+j
+=
+τ
+j
+​
+v
+⊤
+​
+w
+,
+Δ
+​
+P
+j
+=
+η
+​
+τ
+j
+​
+u
+⊤
+​
+w
+.
+\Delta C_{j}=\tau_{j}v^{\top}w,\qquad\Delta P_{j}=\eta\tau_{j}u^{\top}w.
+(23)
+When
+v
+⊤
+​
+w
+v^{\top}w
+and
+u
+⊤
+​
+w
+u^{\top}w
+have the same nonzero sign, eliminating
+τ
+j
+\tau_{j}
+gives Eq. (
+11
+) with
+b
+=
+η
+⁡
+(
+u
+⊤
+​
+w
+)
+/
+(
+v
+⊤
+​
+w
+)
+>
+0
+b=\eta(u^{\top}w)/(v^{\top}w)>0
+. On the natural evidence path, the analogous
+closure
+Σ
+D
+​
+(
+t
+)
+​
+u
+=
+λ
+⁡
+(
+t
+)
+​
+w
+\Sigma_{D}(t)u=\lambda(t)w
+,
+λ
+⁡
+(
+t
+)
+>
+0
+\lambda(t)>0
+, gives a positive COS
+response whenever
+v
+⊤
+​
+w
+>
+0
+v^{\top}w>0
+.
+Table
+3
+departs from the predicted proportionality:
+ablations 31368 and 48965 both reduce accuracy by 10 percentage points,
+whereas their mean COS reductions are 0.0123 and 0.0018.
+Positive compatibility and proof of Lemma
+4.3
+.
+The orthogonal decomposition of the realized contrast is exact:
+α
+S
+=
+u
+⊤
+​
+d
+^
+S
+\alpha_{S}=u^{\top}\hat{d}_{S}
+and
+r
+S
+=
+(
+I
+−
+u
+​
+u
+⊤
+)
+​
+d
+^
+S
+r_{S}=(I-uu^{\top})\hat{d}_{S}
+.
+Consequently,
+v
+⊤
+​
+Σ
+D
+​
+(
+t
+)
+​
+u
+=
+α
+S
+​
+β
+D
+​
+(
+t
+)
++
+r
+S
+⊤
+​
+Σ
+D
+​
+(
+t
+)
+​
+u
+‖
+d
+^
+S
+‖
+2
+≥
+δ
+​
+α
+S
+​
+β
+D
+​
+(
+t
+)
+‖
+d
+^
+S
+‖
+2
+>
+0
+.
+v^{\top}\Sigma_{D}(t)u=\frac{\alpha_{S}\beta_{D}(t)+r_{S}^{\top}\Sigma_{D}(t)u}{\|\hat{d}_{S}\|_{2}}\geq\frac{\delta\alpha_{S}\beta_{D}(t)}{\|\hat{d}_{S}\|_{2}}>0.
+(24)
+The inequality is precisely Condition
+4.2
+.
+Together with Eq. (
+8
+), it proves the lemma.
+If
+Σ
+D
+​
+(
+t
+)
+=
+∑
+k
+λ
+k
+​
+w
+k
+​
+w
+k
+⊤
+\Sigma_{D}(t)=\sum_{k}\lambda_{k}w_{k}w_{k}^{\top}
+, the numerator before
+normalization is
+∑
+k
+λ
+k
+​
+(
+d
+^
+S
+⊤
+​
+w
+k
+)
+​
+(
+u
+⊤
+​
+w
+k
+)
+\sum_{k}\lambda_{k}(\hat{d}_{S}^{\top}w_{k})(u^{\top}w_{k})
+.
+Here
+w
+k
+w_{k}
+are covariance eigenvectors, and compatibility constrains
+their aggregate contribution.
+A finite-sample sufficient condition.
+Write the population contrast in Eq. (
+9
+) as
+d
+S
+⋆
+=
+s
+S
+​
+u
++
+r
+S
+⋆
+d_{S}^{\star}=s_{S}u+r_{S}^{\star}
+, with
+r
+S
+⋆
+⟂
+u
+r_{S}^{\star}\perp u
+and
+s
+S
+>
+0
+s_{S}>0
+.
+In terms of the source geometry,
+s
+S
+=
+u
+⊤
+​
+M
+S
+​
+u
++
+u
+⊤
+​
+e
+S
+s_{S}=u^{\top}M_{S}u+u^{\top}e_{S}
+and
+r
+S
+⋆
+=
+(
+I
+−
+u
+​
+u
+⊤
+)
+​
+(
+M
+S
+​
+u
++
+e
+S
+)
+r_{S}^{\star}=(I-uu^{\top})(M_{S}u+e_{S})
+.
+Let
+d
+^
+S
+=
+d
+S
+⋆
++
+ϵ
+S
+\hat{d}_{S}=d_{S}^{\star}+\epsilon_{S}
+. For
+n
+n
+i.i.d. source contrasts
+with mean
+d
+S
+⋆
+d_{S}^{\star}
+and finite covariance
+Ω
+S
+\Omega_{S}
+,
+𝔼
+⁡
+[
+ϵ
+S
+]
+=
+0
+,
+𝔼
+​
+‖
+ϵ
+S
+‖
+2
+2
+=
+tr
+⁡
+Ω
+S
+n
+.
+\mathbb{E}[\epsilon_{S}]=0,\qquad\mathbb{E}\|\epsilon_{S}\|_{2}^{2}=\frac{\operatorname{tr}\Omega_{S}}{n}.
+(25)
+Define the target anisotropy ratio
+χ
+∗
+=
+sup
+t
+‖
+(
+I
+−
+u
+​
+u
+⊤
+)
+​
+Σ
+D
+​
+(
+t
+)
+​
+u
+‖
+2
+β
+D
+​
+(
+t
+)
+.
+\chi_{*}=\sup_{t}\frac{\|(I-uu^{\top})\Sigma_{D}(t)u\|_{2}}{\beta_{D}(t)}.
+(26)
+For any
+0
+<
+τ
+<
+s
+S
+0<\tau<s_{S}
+, Markov’s inequality gives
+P
+⁡
+(
+‖
+ϵ
+S
+‖
+2
+≤
+τ
+)
+≥
+1
+−
+tr
+⁡
+(
+Ω
+S
+)
+/
+(
+n
+​
+τ
+2
+)
+P(\|\epsilon_{S}\|_{2}\leq\tau)\geq 1-\operatorname{tr}(\Omega_{S})/(n\tau^{2})
+.
+On this event,
+α
+S
+≥
+s
+S
+−
+τ
+\alpha_{S}\geq s_{S}-\tau
+and
+‖
+r
+S
+‖
+2
+≤
+‖
+r
+S
+⋆
+‖
+2
++
+τ
+\|r_{S}\|_{2}\leq\|r_{S}^{\star}\|_{2}+\tau
+. Thus the sufficient condition
+χ
+∗
+​
+(
+‖
+r
+S
+⋆
+‖
+2
++
+τ
+)
+≤
+(
+1
+−
+δ
+)
+​
+(
+s
+S
+−
+τ
+)
+\chi_{*}\bigl(\|r_{S}^{\star}\|_{2}+\tau\bigr)\leq(1-\delta)(s_{S}-\tau)
+(27)
+implies positive compatibility with the same probability bound, since
+r
+S
+⊤
+​
+Σ
+D
+​
+(
+t
+)
+​
+u
+≥
+−
+‖
+r
+S
+‖
+2
+​
+χ
+∗
+​
+β
+D
+​
+(
+t
+)
+r_{S}^{\top}\Sigma_{D}(t)u\geq-\|r_{S}\|_{2}\chi_{*}\beta_{D}(t)
+.
+Holding residual bias, sample size, and noise fixed, stronger evidence
+s
+S
+s_{S}
+increases this margin. This provides a mechanism by which source
+reliability can improve transfer through smaller relative extraction error.
+Source accuracy provides an empirical proxy for source reliability;
+the margin also depends on residual bias and extraction noise.
+A.4
+Evidence retained by a projection
+Lemma A.1
+(Evidence retained by a projection)
+.
+Under Assumption
+4.1
+,
+T
+=
+u
+⊤
+​
+U
+T=u^{\top}U
+is sufficient for
+the evidence-state parameter
+t
+t
+. Let
+J
+U
+​
+(
+t
+)
+J_{U}(t)
+and
+J
+X
+​
+(
+t
+)
+J_{X}(t)
+denote the
+Fisher information about
+t
+t
+in
+U
+U
+and
+X
+X
+, respectively. Whenever the
+denominator is positive,
+J
+X
+​
+(
+t
+)
+J
+U
+​
+(
+t
+)
+≥
+(
+v
+⊤
+​
+Σ
+D
+​
+(
+t
+)
+​
+u
+)
+2
+(
+v
+⊤
+​
+Σ
+D
+​
+(
+t
+)
+​
+v
+)
+​
+(
+u
+⊤
+​
+Σ
+D
+​
+(
+t
+)
+​
+u
+)
+.
+\frac{J_{X}(t)}{J_{U}(t)}\geq\frac{\bigl(v^{\top}\Sigma_{D}(t)u\bigr)^{2}}{\bigl(v^{\top}\Sigma_{D}(t)v\bigr)\bigl(u^{\top}\Sigma_{D}(t)u\bigr)}.
+(28)
+Proof.
+The density factorizes through
+T
+=
+u
+⊤
+​
+U
+T=u^{\top}U
+, so
+T
+T
+is sufficient for
+t
+t
+within the model. The likelihood score for the full representation is
+∂
+t
+log
+⁡
+p
+D
+​
+(
+U
+∣
+t
+)
+=
+T
+−
+𝔼
+t
+​
+[
+T
+]
+,
+J
+U
+​
+(
+t
+)
+=
+Var
+t
+⁡
+(
+T
+)
+.
+\partial_{t}\log p_{D}(U\mid t)=T-\mathbb{E}_{t}[T],\qquad J_{U}(t)=\operatorname{Var}_{t}(T).
+(29)
+For the induced distribution of
+X
+=
+v
+⊤
+​
+U
+X=v^{\top}U
+, differentiation of the
+marginal gives the score
+𝔼
+t
+​
+[
+T
+−
+𝔼
+t
+​
+T
+∣
+X
+]
+\mathbb{E}_{t}[T-\mathbb{E}_{t}T\mid X]
+. Therefore
+J
+X
+​
+(
+t
+)
+=
+Var
+t
+⁡
+(
+𝔼
+t
+​
+[
+T
+∣
+X
+]
+)
+.
+J_{X}(t)=\operatorname{Var}_{t}\bigl(\mathbb{E}_{t}[T\mid X]\bigr).
+(30)
+Conditional expectation and Cauchy–Schwarz imply
+Cov
+t
+⁡
+(
+X
+,
+T
+)
+2
+\displaystyle\operatorname{Cov}_{t}(X,T)^{2}
+=
+Cov
+t
+⁡
+(
+X
+,
+𝔼
+t
+​
+[
+T
+∣
+X
+]
+)
+2
+\displaystyle=\operatorname{Cov}_{t}\bigl(X,\mathbb{E}_{t}[T\mid X]\bigr)^{2}
+(31)
+≤
+Var
+t
+⁡
+(
+X
+)
+​
+J
+X
+​
+(
+t
+)
+.
+\displaystyle\leq\operatorname{Var}_{t}(X)J_{X}(t).
+Substituting the projected covariances proves
+Eq. (
+28
+), quantifying information retained
+about the evidence-state parameter
+t
+t
+. Condition
+4.2
+additionally establishes the positive response direction.
+A.5
+Proof of Theorem
+4.5
+Under the reliability condition,
+p
+q
+=
+G
+D
+​
+(
+t
+q
+)
+p_{q}=G_{D}(t_{q})
+, while
+μ
+q
+=
+𝔼
+⁡
+[
+X
+∣
+q
+]
+=
+F
+D
+​
+(
+t
+q
+)
+\mu_{q}=\mathbb{E}[X\mid q]=F_{D}(t_{q})
+. Lemma
+4.3
+gives
+F
+D
+′
+​
+(
+t
+)
+>
+0
+F_{D}^{\prime}(t)>0
+. For independent
+T
+,
+T
+′
+T,T^{\prime}
+from the same state,
+G
+D
+′
+​
+(
+t
+)
+=
+Cov
+t
+⁡
+(
+g
+D
+​
+(
+T
+)
+,
+T
+)
+=
+1
+2
+​
+𝔼
+t
+​
+[
+(
+g
+D
+​
+(
+T
+)
+−
+g
+D
+​
+(
+T
+′
+)
+)
+​
+(
+T
+−
+T
+′
+)
+]
+>
+0
+.
+G_{D}^{\prime}(t)=\operatorname{Cov}_{t}(g_{D}(T),T)=\tfrac{1}{2}\mathbb{E}_{t}[(g_{D}(T)-g_{D}(T^{\prime}))(T-T^{\prime})]>0.
+(32)
+Strict positivity follows from strict increase of
+g
+D
+g_{D}
+and nonzero
+variance of
+T
+T
+. For independent question states
+t
+Q
+,
+t
+Q
+′
+t_{Q},t_{Q^{\prime}}
+,
+C
+0
+\displaystyle C_{0}
+:
+=
+Cov
+Q
+⁡
+(
+F
+D
+​
+(
+t
+Q
+)
+,
+G
+D
+​
+(
+t
+Q
+)
+)
+\displaystyle:=\operatorname{Cov}_{Q}(F_{D}(t_{Q}),G_{D}(t_{Q}))
+(33)
+=
+1
+2
+​
+𝔼
+​
+[
+(
+F
+D
+​
+(
+t
+Q
+)
+−
+F
+D
+​
+(
+t
+Q
+′
+)
+)
+​
+(
+G
+D
+​
+(
+t
+Q
+)
+−
+G
+D
+​
+(
+t
+Q
+′
+)
+)
+]
+>
+0
+.
+\displaystyle=\tfrac{1}{2}\mathbb{E}\bigl[(F_{D}(t_{Q})-F_{D}(t_{Q^{\prime}}))(G_{D}(t_{Q})-G_{D}(t_{Q^{\prime}}))\bigr]>0.
+Each scoring response has conditional mean
+μ
+q
+\mu_{q}
+, so
+𝔼
+⁡
+[
+c
+K
+∣
+Q
+]
+=
+μ
+Q
+\mathbb{E}[c_{K}\mid Q]=\mu_{Q}
+. Conditional independence of
+Y
+′
+Y^{\prime}
+and the
+scoring responses then gives
+Cov
+⁡
+(
+c
+K
+,
+Y
+′
+)
+=
+Cov
+Q
+⁡
+(
+μ
+Q
+,
+p
+Q
+)
+=
+C
+0
+=
+Cov
+⁡
+(
+c
+K
+,
+p
+Q
+)
+.
+\operatorname{Cov}(c_{K},Y^{\prime})=\operatorname{Cov}_{Q}(\mu_{Q},p_{Q})=C_{0}=\operatorname{Cov}(c_{K},p_{Q}).
+(34)
+Nonzero covariance implies dependence, hence
+I
+⁡
+(
+c
+K
+,
+Y
+′
+)
+>
+0
+I(c_{K};Y^{\prime})>0
+.
+All variables in this covariance calculation are bounded.
+A.6
+Angular tolerance and departures from the model
+Angular tolerance.
+Write
+v
+=
+cos
+⁡
+θ
+​
+u
++
+sin
+⁡
+θ
+​
+w
+v=\cos\theta\,u+\sin\theta\,w
+with
+w
+⟂
+u
+w\perp u
+and
+‖
+w
+‖
+2
+=
+1
+\|w\|_{2}=1
+.
+For
+0
+≤
+θ
+<
+π
+/
+2
+0\leq\theta<\pi/2
+, define
+χ
+D
+​
+(
+t
+)
+=
+‖
+(
+I
+−
+u
+​
+u
+⊤
+)
+​
+Σ
+D
+​
+(
+t
+)
+​
+u
+‖
+2
+u
+⊤
+​
+Σ
+D
+​
+(
+t
+)
+​
+u
+.
+\chi_{D}(t)=\frac{\|(I-uu^{\top})\Sigma_{D}(t)u\|_{2}}{u^{\top}\Sigma_{D}(t)u}.
+(35)
+Projection and Cauchy–Schwarz yield
+F
+D
+′
+​
+(
+t
+)
+≥
+(
+cos
+⁡
+θ
+−
+χ
+D
+​
+(
+t
+)
+​
+sin
+⁡
+θ
+)
+​
+u
+⊤
+​
+Σ
+D
+​
+(
+t
+)
+​
+u
+.
+F_{D}^{\prime}(t)\geq\bigl(\cos\theta-\chi_{D}(t)\sin\theta\bigr)u^{\top}\Sigma_{D}(t)u.
+(36)
+Thus
+cos
+⁡
+θ
+>
+sup
+t
+χ
+D
+​
+(
+t
+)
+​
+sin
+⁡
+θ
+\cos\theta>\sup_{t}\chi_{D}(t)\sin\theta
+suffices for positive
+transfer, allowing angular mismatch under anisotropic target geometry.
+Question heterogeneity.
+Let actual question means and success probabilities deviate from the
+ideal family as
+μ
+q
+=
+F
+D
+​
+(
+t
+q
+)
++
+e
+q
+\mu_{q}=F_{D}(t_{q})+e_{q}
+and
+p
+q
+=
+G
+D
+​
+(
+t
+q
+)
++
+r
+q
+p_{q}=G_{D}(t_{q})+r_{q}
+.
+With
+δ
+x
+=
+sd
+⁡
+(
+e
+Q
+)
+\delta_{x}=\operatorname{sd}(e_{Q})
+,
+δ
+p
+=
+sd
+⁡
+(
+r
+Q
+)
+\delta_{p}=\operatorname{sd}(r_{Q})
+,
+σ
+F
+=
+sd
+⁡
+(
+F
+D
+​
+(
+t
+Q
+)
+)
+\sigma_{F}=\operatorname{sd}(F_{D}(t_{Q}))
+, and
+σ
+G
+=
+sd
+⁡
+(
+G
+D
+​
+(
+t
+Q
+)
+)
+\sigma_{G}=\operatorname{sd}(G_{D}(t_{Q}))
+, expansion gives
+Cov
+Q
+⁡
+(
+μ
+Q
+,
+p
+Q
+)
+\displaystyle\operatorname{Cov}_{Q}(\mu_{Q},p_{Q})
+≥
+C
+0
+−
+δ
+x
+​
+σ
+G
+−
+δ
+p
+​
+σ
+F
+−
+δ
+x
+​
+δ
+p
+.
+\displaystyle\geq C_{0}-\delta_{x}\sigma_{G}-\delta_{p}\sigma_{F}-\delta_{x}\delta_{p}.
+(37)
+Positive association survives whenever the right-hand side is positive,
+even if individual question pairs reverse order. This lower bound allows
+arbitrary signs of the heterogeneity cross terms.
+Averaging.
+For conditionally independent, identically distributed scoring responses,
+write
+C
+=
+Cov
+Q
+⁡
+(
+μ
+Q
+,
+p
+Q
+)
+C=\operatorname{Cov}_{Q}(\mu_{Q},p_{Q})
+and
+σ
+q
+2
+=
+Var
+⁡
+(
+X
+∣
+q
+)
+\sigma_{q}^{2}=\operatorname{Var}(X\mid q)
+. Then
+Corr
+⁡
+(
+c
+K
+,
+p
+Q
+)
+=
+C
+[
+Var
+Q
+⁡
+(
+μ
+Q
+)
++
+𝔼
+Q
+​
+σ
+Q
+2
+/
+K
+]
+​
+Var
+Q
+⁡
+(
+p
+Q
+)
+.
+\operatorname{Corr}(c_{K},p_{Q})=\frac{C}{\sqrt{[\operatorname{Var}_{Q}(\mu_{Q})+\mathbb{E}_{Q}\sigma_{Q}^{2}/K]\operatorname{Var}_{Q}(p_{Q})}}.
+(38)
+For
+C
+>
+0
+C>0
+, averaging increases this population correlation by reducing
+sampling variance.
+Greedy scores.
+For the greedy score, define
+d
+q
+=
+c
+g
+​
+(
+q
+)
+−
+μ
+q
+d_{q}=c_{\rm g}(q)-\mu_{q}
+,
+Cov
+Q
+⁡
+(
+c
+g
+​
+(
+Q
+)
+,
+p
+Q
+)
+=
+C
++
+Cov
+Q
+⁡
+(
+d
+Q
+,
+p
+Q
+)
+.
+\operatorname{Cov}_{Q}(c_{\rm g}(Q),p_{Q})=C+\operatorname{Cov}_{Q}(d_{Q},p_{Q}).
+(39)
+Its association remains positive if
+Cov
+Q
+⁡
+(
+d
+Q
+,
+p
+Q
+)
+>
+−
+C
+\operatorname{Cov}_{Q}(d_{Q},p_{Q})>-C
+.
+A.7
+Empirical support for question-level association
+We examine the positive association in Theorem
+4.5
+and its persistence under question heterogeneity with Qwen3-8B on
+MATH-500 (500 questions), GPQA-Diamond (198), MMLU-Pro STEM (498),
+and AIME 2024 (30). We use the layer-21 TruthfulQA direction and
+16 sampled responses per question. COS is read at the closing token
+of the final complete boxed answer, or the response endpoint when no
+complete box is available. Splitting responses by sample index into
+two groups of eight gives
+(
+c
+A
+,
+p
+^
+A
+)
+(c_{A},\widehat{p}_{A})
+and
+(
+c
+B
+,
+p
+^
+B
+)
+(c_{B},\widehat{p}_{B})
+.
+Cross-half estimates use disjoint responses for COS and accuracy,
+matching the theorem’s conditional-independence construction.
+Projection gap and cross-response association.
+The class-projection gap
+β
+=
+𝔼
+⁡
+[
+X
+∣
+Y
+=
+1
+]
+−
+𝔼
+⁡
+[
+X
+∣
+Y
+=
+0
+]
+\beta=\mathbb{E}[X\mid Y=1]-\mathbb{E}[X\mid Y=0]
+is positive on all four datasets, with 95% confidence intervals above
+zero. Both cross-half Spearman correlations are also positive
+(Table
+5
+).
+Table 5:
+Class-projection gaps and cross-half COS–accuracy correlations.
+Confidence intervals for
+β
+^
+\widehat{\beta}
+use 1,000 question-level
+bootstrap resamples, retaining all responses of each sampled question.
+Dataset
+β
+^
+\widehat{\beta}
+95% CI
+ρ
+⁡
+(
+c
+A
+,
+p
+^
+B
+)
+\rho(c_{A},\widehat{p}_{B})
+ρ
+⁡
+(
+c
+B
+,
+p
+^
+A
+)
+\rho(c_{B},\widehat{p}_{A})
+MATH-500
+0.02271
+[
+0.01815
+,
+0.02821
+]
+[0.01815,\,0.02821]
+0.296
+0.338
+GPQA-Diamond
+0.01602
+[
+0.01125
+,
+0.02081
+]
+[0.01125,\,0.02081]
+0.249
+0.244
+MMLU-Pro STEM
+0.02131
+[
+0.01803
+,
+0.02460
+]
+[0.01803,\,0.02460]
+0.434
+0.464
+AIME 2024
+0.05077
+[
+0.03646
+,
+0.06377
+]
+[0.03646,\,0.06377]
+0.536
+0.610
+Association under question heterogeneity.
+With
+α
+=
+𝔼
+⁡
+[
+X
+∣
+Y
+=
+0
+]
+\alpha=\mathbb{E}[X\mid Y=0]
+, define
+ε
+q
+=
+μ
+q
+−
+α
+−
+β
+​
+p
+q
+\varepsilon_{q}=\mu_{q}-\alpha-\beta p_{q}
+. Then
+C
+=
+Cov
+Q
+⁡
+(
+μ
+Q
+,
+p
+Q
+)
+=
+β
+​
+Var
+Q
+⁡
+(
+p
+Q
+)
++
+Cov
+Q
+⁡
+(
+ε
+Q
+,
+p
+Q
+)
+.
+C=\operatorname{Cov}_{Q}(\mu_{Q},p_{Q})=\beta\operatorname{Var}_{Q}(p_{Q})+\operatorname{Cov}_{Q}(\varepsilon_{Q},p_{Q}).
+(40)
+We estimate
+α
+,
+β
+\alpha,\beta
+from class-conditional projection means using
+five-fold cross-fitting over questions. Within each held-out fold,
+C
+^
+total
+\displaystyle\widehat{C}_{\mathrm{total}}
+=
+1
+2
+​
+[
+Cov
+^
+​
+(
+c
+A
+,
+p
+^
+B
+)
++
+Cov
+^
+​
+(
+c
+B
+,
+p
+^
+A
+)
+]
+,
+\displaystyle=\tfrac{1}{2}\bigl[\widehat{\operatorname{Cov}}(c_{A},\widehat{p}_{B})+\widehat{\operatorname{Cov}}(c_{B},\widehat{p}_{A})\bigr],
+(41)
+C
+^
+proj
+\displaystyle\widehat{C}_{\mathrm{proj}}
+=
+β
+^
+Cov
+^
+(
+p
+^
+A
+,
+p
+^
+B
+)
+,
+C
+^
+res
+=
+C
+^
+total
+−
+C
+^
+proj
+.
+\displaystyle=\widehat{\beta}\,\widehat{\operatorname{Cov}}(\widehat{p}_{A},\widehat{p}_{B}),\qquad\widehat{C}_{\mathrm{res}}=\widehat{C}_{\mathrm{total}}-\widehat{C}_{\mathrm{proj}}.
+Sample covariances are averaged with fold-size weights. Confidence intervals
+use 1,000 within-fold question bootstrap resamples, refitting
+α
+^
+,
+β
+^
+\widehat{\alpha},\widehat{\beta}
+each time.
+Table 6:
+Cross-half covariance decomposition. All values are multiplied
+by
+10
+3
+10^{3}
+; brackets give 95% bootstrap confidence intervals.
+Dataset
+C
+^
+total
+\widehat{C}_{\mathrm{total}}
+C
+^
+proj
+\widehat{C}_{\mathrm{proj}}
+C
+^
+res
+\widehat{C}_{\mathrm{res}}
+MATH-500
+2.158
+[
+1.535
+,
+2.834
+]
+[1.535,\,2.834]
+1.752
+[
+1.276
+,
+2.267
+]
+[1.276,\,2.267]
+0.407
+[
+0.136
+,
+0.673
+]
+[0.136,\,0.673]
+GPQA-Diamond
+1.884
+[
+0.993
+,
+2.842
+]
+[0.993,\,2.842]
+1.879
+[
+1.302
+,
+2.425
+]
+[1.302,\,2.425]
+0.005
+[
+−
+0.591
+,
+0.627
+]
+[-0.591,\,0.627]
+MMLU-Pro STEM
+2.909
+[
+2.349
+,
+3.491
+]
+[2.349,\,3.491]
+2.471
+[
+2.017
+,
+2.927
+]
+[2.017,\,2.927]
+0.438
+[
+0.169
+,
+0.708
+]
+[0.169,\,0.708]
+AIME 2024
+7.533
+[
+2.509
+,
+9.894
+]
+[2.509,\,9.894]
+6.738
+[
+2.290
+,
+8.874
+]
+[2.290,\,8.874]
+0.796
+[
+−
+1.364
+,
+2.678
+]
+[-1.364,\,2.678]
+The total covariance is positive on all four datasets, with confidence
+intervals above zero, and the projection term accounts for most of it
+(Table
+6
+). The heterogeneity term is
+positive on MATH-500 and MMLU-Pro STEM; its intervals include zero on
+GPQA-Diamond and AIME 2024. Thus positive question-level association
+persists alongside heterogeneous response representations.
+Appendix B
+SAE Decomposition and Feature Interventions for COS
+B.1
+Exact decomposition
+Let
+𝐡
+\mathbf{h}
+be the nonzero residual-stream representation used to
+compute COS, and let
+z
+j
+​
+(
+𝐡
+)
+z_{j}(\mathbf{h})
+and
+𝐝
+j
+\mathbf{d}_{j}
+denote the
+activation and decoder direction of SAE feature
+j
+j
+. Following
+Marks et al. (2025)
+, write
+𝐡
+=
+∑
+j
+z
+j
+​
+(
+𝐡
+)
+​
+𝐝
+j
++
+𝐛
+dec
++
+ϵ
+⁡
+(
+𝐡
+)
+,
+ϵ
+⁡
+(
+𝐡
+)
+=
+𝐡
+−
+SAE
+⁡
+(
+𝐡
+)
+.
+\mathbf{h}=\sum_{j}z_{j}(\mathbf{h})\mathbf{d}_{j}+\mathbf{b}_{\mathrm{dec}}+\bm{\epsilon}(\mathbf{h}),\qquad\bm{\epsilon}(\mathbf{h})=\mathbf{h}-\operatorname{SAE}(\mathbf{h}).
+(42)
+All terms are expressed in the same activation coordinates. For the
+unit correctness-related direction
+𝐯
+ℓ
+\mathbf{v}_{\ell}
+, define
+c
+j
+​
+(
+𝐡
+)
+\displaystyle c_{j}(\mathbf{h})
+=
+z
+j
+​
+(
+𝐡
+)
+​
+𝐝
+j
+⊤
+​
+𝐯
+ℓ
+‖
+𝐡
+‖
+2
+,
+\displaystyle=\frac{z_{j}(\mathbf{h})\mathbf{d}_{j}^{\top}\mathbf{v}_{\ell}}{\|\mathbf{h}\|_{2}},
+(43)
+c
+bias
+​
+(
+𝐡
+)
+\displaystyle c_{\mathrm{bias}}(\mathbf{h})
+=
+𝐛
+dec
+⊤
+​
+𝐯
+ℓ
+‖
+𝐡
+‖
+2
+,
+c
+res
+(
+𝐡
+)
+=
+ϵ
+​
+(
+𝐡
+)
+⊤
+​
+𝐯
+ℓ
+‖
+𝐡
+‖
+2
+.
+\displaystyle=\frac{\mathbf{b}_{\mathrm{dec}}^{\top}\mathbf{v}_{\ell}}{\|\mathbf{h}\|_{2}},\qquad c_{\mathrm{res}}(\mathbf{h})=\frac{\bm{\epsilon}(\mathbf{h})^{\top}\mathbf{v}_{\ell}}{\|\mathbf{h}\|_{2}}.
+Then
+COS
+⁡
+(
+𝐡
+)
+=
+∑
+j
+c
+j
+​
+(
+𝐡
+)
++
+c
+bias
+​
+(
+𝐡
+)
++
+c
+res
+​
+(
+𝐡
+)
+\mathrm{COS}(\mathbf{h})=\sum_{j}c_{j}(\mathbf{h})+c_{\mathrm{bias}}(\mathbf{h})+c_{\mathrm{res}}(\mathbf{h})
+exactly.
+The residual uses the full SAE reconstruction, and all contributions
+share the norm of the original representation as their denominator.
+B.2
+Ranking contribution accounting
+We quantify ranking contributions through the COS difference between
+high- and low-scoring questions on AIME24. After excluding truncated
+greedy responses, we rank questions by answer-position COS and select
+the five highest and five lowest as groups
+H
+H
+and
+L
+L
+, respectively.
+For each question, let
+c
+SAE
+=
+∑
+j
+c
+j
+c_{\mathrm{SAE}}=\sum_{j}c_{j}
+, with
+c
+bias
+c_{\mathrm{bias}}
+and
+c
+res
+c_{\mathrm{res}}
+defined in
+Eq. (
+43
+). For each component
+k
+∈
+{
+SAE
+,
+bias
+,
+res
+}
+k\in\{\mathrm{SAE},\mathrm{bias},\mathrm{res}\}
+, define
+Δ
+k
+\displaystyle\Delta_{k}
+=
+1
+5
+​
+∑
+q
+∈
+H
+c
+k
+​
+(
+𝐡
+q
+)
+−
+1
+5
+​
+∑
+q
+∈
+L
+c
+k
+​
+(
+𝐡
+q
+)
+,
+\displaystyle=\frac{1}{5}\sum_{q\in H}c_{k}(\mathbf{h}_{q})-\frac{1}{5}\sum_{q\in L}c_{k}(\mathbf{h}_{q}),
+(44)
+w
+k
+\displaystyle w_{k}
+=
+Δ
+k
+Δ
+COS
+,
+Δ
+COS
+=
+∑
+k
+Δ
+k
+.
+\displaystyle=\frac{\Delta_{k}}{\Delta_{\mathrm{COS}}},\qquad\Delta_{\mathrm{COS}}=\sum_{k}\Delta_{k}.
+Here
+𝐡
+q
+\mathbf{h}_{q}
+is the answer-position representation of the greedy
+response. The signed shares sum to one; a negative share indicates
+that the component offsets the high–low COS difference.
+Table 7:
+Component contributions to the high–low COS difference on
+AIME24. Each group contains five questions. Values are rounded.
+Component
+High COS
+Low COS
+Difference
+Share (%)
+SAE features
+0.07968
+0.05503
++
+0.02465
++0.02465
+47.6
+Decoder bias
+0.05289
+0.05538
+−
+0.00249
+-0.00249
+−
+4.8
+-4.8
+Reconstruction residual
+0.04675
+0.01714
++
+0.02962
++0.02962
+57.2
+Total COS
+0.17933
+0.12755
++
+0.05178
++0.05178
+100.0
+As shown in Table
+7
+, SAE features
+account for 47.6% of the COS difference and the reconstruction residual
+for 57.2%, while the decoder bias offsets 4.8%. Thus, both sparse
+features and information retained in the reconstruction residual
+contribute to the observed COS ranking.
+B.3
+Feature clamping
+We select the five features with the largest absolute differences in
+mean COS contribution between the five highest- and five lowest-COS questions.
+Following
+Templeton et al. (2024)
+, at each generated-token position
+t
+t
+we replace the activation of a selected feature
+j
+j
+by zero while
+retaining the other local SAE activations, decoder bias, and original
+reconstruction residual. The modified activation is
+𝐡
+t
+′
+=
+∑
+k
+≠
+j
+z
+k
+​
+(
+𝐡
+t
+)
+​
+𝐝
+k
++
+𝐛
+dec
++
+ϵ
+⁡
+(
+𝐡
+t
+)
+=
+𝐡
+t
+−
+z
+j
+​
+(
+𝐡
+t
+)
+​
+𝐝
+j
+.
+\mathbf{h}^{\prime}_{t}=\sum_{k\neq j}z_{k}(\mathbf{h}_{t})\mathbf{d}_{k}+\mathbf{b}_{\mathrm{dec}}+\bm{\epsilon}(\mathbf{h}_{t})=\mathbf{h}_{t}-z_{j}(\mathbf{h}_{t})\mathbf{d}_{j}.
+(45)
+The model continues its forward pass and autoregressive generation using
+this modified activation.
+B.4
+Feature activation examples
+Given the small number of AIME24 questions, we use the larger MATH-500
+set to illustrate token-wise SAE activations in original responses.
+Table
+8
+presents representative high-activation
+locations, including goal expressions, result statements, numerical
+outputs, and formula boundaries.
+Table 8:
+Examples of high-activation locations for COS-related SAE
+features in MATH-500 responses.
+Feature ID
+Observed text or symbol
+Location
+32531
+,
+47984
+$$
+following
+\boxed{6}
+or
+\boxed{3}
+Formula-ending delimiter after the final answer
+3447
+So
+;
+This
+;
+exact expression is
+Connective or result-statement expression
+41030
+58500
+;
+2000
+;
+4 inches per second
+Numerical results and units
+31368
+find the sum
+;
+how many
+;
+ordered quadruple
+Expression of the quantity or object to be found
+605
+The digit
+7
+in
+\boxed{27}
+Numerical token within the final answer
+Appendix C
+Training Efficiency
+Table
+9
+reports the training-cost reductions
+of SelectTTRL relative to TTRL with Qwen3-8B across six benchmarks.
+Table 9:
+Training-efficiency reductions and time savings across six benchmarks.
+Reduction (%)
+Time saved
+Dataset
+Generated
+tokens
+Update response
+tokens
+Training-step
+time
+Wall-clock
+(min)
+GPU-hours
+MATH-500
+17.07
+17.14
+5.43
+14.23
+0.949
+MMLU-Pro STEM
+19.56
+18.93
+6.68
+18.02
+1.202
+GPQA-Diamond
+2.88
+3.24
+0.66
+1.43
+0.095
+AIME 2024
+10.74
+10.73
+3.73
+12.96
+0.864
+AIME 2025
+26.12
+25.93
+10.86
+36.66
+2.444
+AMC
+27.83
+27.91
+8.91
+35.47
+2.365
+Aggregate
+18.38
+18.33
+6.48
+118.77
+7.918
+Experimental support, please
+view the build logs
+for errors. Generated by
+L
+A
+T
+E
+xml
+.
+Instructions for reporting errors
+We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+      support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+      methods listed below:
+Click the "Report Issue"
+(
+)
+button, located in the page header.
+Tip:
+You can select the relevant text first, to include it in your report.
+Our team has already identified
+the following issues
+. We appreciate your time reviewing and reporting rendering errors we
+      may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+      should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+      all.
+Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a
+list of packages that need conversion
+, and welcome
+developer contributions
+.
+We gratefully acknowledge support from
+        our
+major funders
+,
+member institutions
+,
+,
+        and all contributors.
+About
+·
+Help
+·
+Contact
+·
+Subscribe
+·
+Copyright
+·
+Privacy
+·
+Accessibility
+·
+Operational Status
+(opens in new tab)
+Major funding support from

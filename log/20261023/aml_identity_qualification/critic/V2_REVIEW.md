@@ -1,0 +1,11 @@
+# Review of source-backed bounded grammar qualification
+
+Read after INDEPENDENT.seal.json was written. Inputs: root IDENTITY_V2_PROTOCOL.md and IDENTITY_V2.json; constructive sealed INDEPENDENT.md. No underlying records inspected.
+
+The v2 grammar is justified by a new independent official source, not by relaxing a functional performance threshold. Its exact28ACGTN+literalFWD restriction, seven underscore fields, bounded retained prefix, syntax-only third field, aggregate exports, and stop-at-first-violation preserve a falsifiable check. README is an example, not a complete pipeline specification: encountering a different suffix would stop this grammar, not license sequential suffix fitting. Full record decoding must not be described as physical non-decoding even if only readName is used.
+
+Observed report: pre29/29, post36/36 complete prefix records pass grammar; each set has as many distinct cell barcodes as records; both have zero direct matches to declared GEX barcode sets. This falsifies a direct-map candidate for these bounded prefixes. It neither proves a particular chemistry translation nor estimates whole-library recovery. The pre raw source may mix physical libraries; filtered GEX membership, routing, whitelist representation or missing identifiers remain alternative explanations. No transformation search is authorized by the zero matches.
+
+Agreement with constructive: actual Antibody Capture metadata and feature names demonstrate multiplex signal provision more concretely than a generic missing-data claim. The human post BC1..8 labels do not authenticate culture names, treatment or time. Pre feature strings naming HL/TF/OA are suggestive identifiers but do not establish all experimental label semantics or the post map. The feature-to-culture manifest and experimental namespace remain necessary before baseline lineage dictionary construction or prediction.
+
+Sent constructive a concrete challenge: can the deterministic post culture key or library namespace be authenticated, and does this v2 check retain any identity leakage risk? Sent parent explicit objection to interpreting zero overlap as proof of chemistry mismatch. Awaiting peer response is tracked separately; this review does not claim peer consensus before receipt.

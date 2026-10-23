@@ -1,0 +1,883 @@
+Uncovering Causal Relation Shifts in Event Sequences under Out-of-Domain Interventions
+// Restore the saved color scheme preference, or
+// enact the browser preference if "automatic",
+// without expecting DOM load to have completed.
+//
+// Also restore any saved readingmode and ToC display preferences.
+function initializeReadingPreferences() {
+let saved_theme = localStorage.getItem("ar5iv_theme") || "automatic";
+if (saved_theme === "automatic") {
+if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+saved_theme = "dark";
+}
+}
+if (saved_theme == "dark") {
+document.documentElement.setAttribute("data-theme", "dark");
+} else {
+document.documentElement.setAttribute("data-theme", "light");
+}
+const tocDisplay = localStorage.getItem('arxiv_html_paper_toc_display');
+if (tocDisplay) {
+document.documentElement.setAttribute("data-toc-display", tocDisplay);
+}
+const readingMode = localStorage.getItem('arxiv_html_paper_reading_mode');
+if (readingMode) {
+document.documentElement.setAttribute("data-reading-mode", readingMode);
+}
+}
+// Run as soon as JS starts, to minimize repainting
+initializeReadingPreferences();
+/* Reading mode hides the chrome and the empty .arxiv-html-header marker: the pinned JS reads
+the marker's display to know which way to toggle. The marker draws no box. */
+.arxiv-html-header { display: contents; }
+html[data-reading-mode="enabled"] :is(.arxiv-html-site-chrome, .arxiv-html-header, .ds-site-footer) { display: none; }
+/* The paper controls' icons are blocks, so they sit centred (the pinned JS shows the theme
+icon by making its span a block). */
+.arxiv-html-site-chrome .ds-site-header-tools svg { display: block; width: 18px; height: 18px; flex-shrink: 0; fill: currentColor; }
+/* ar5iv dims every image in dark mode and puts it on a white wash, for paper figures;
+arXiv's own render as they are (the logo on the bar, the funder logos on their white
+chips). Important: ar5iv's dark rules are unlayered, as specific as
+:root:not([data-theme]) img:not(.ltx_no_dark_filter). */
+:is(.ds-site-header, .ds-site-footer) img { filter: none !important; }
+.ds-site-header img { background-color: transparent !important; }
+/* Wide (the theme's 1280px): the theme lays the body out as a grid whose full-width top rows
+were the band's and its sticky reader bar's. The band takes the first and scrolls away; the
+header, the paper's bar (no site navigation, the paper's controls), takes the second and
+stays in view, the one sticky bar, with the anchor clearance that requires (DESIGN-POLICIES).
+The controls show their names. */
+@media (min-width: 1280px) {
+html { scroll-padding-top: 80px; }
+.arxiv-html-site-chrome { display: contents; }
+.arxiv-html-site-chrome > #ds-announcement { grid-area: announce; }
+.arxiv-html-site-chrome > .ds-site-header { grid-area: header; position: sticky; top: 0; z-index: 3; }
+.arxiv-html-site-chrome .tool-icon { display: none; }
+}
+/* Narrow: the header scrolls away, and the controls show icons (names kept for screen
+readers; Why HTML? goes). The theme's contents panel is fixed below where its old sticky
+bar was, and hidden only once the reader has closed it, so until then it is an invisible box
+over the header and the paper: it shows only while open, under the chrome, in its place in
+the page. The paper's footer (build logs, reporting instructions) keeps the text's side
+inset; the theme gives it none, so it met the screen edges. */
+@media (max-width: 1279px) {
+.arxiv-html-site-chrome .tool-wide { display: none; }
+.arxiv-html-site-chrome .tool-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+html:not([data-toc-display="block"]) .ltx_page_navbar { display: none; }
+.ltx_page_navbar { position: absolute; top: auto; }
+.arxiv-html-footer { padding-inline: 1rem; }
+}
+Skip to main content
+Report GitHub Issue
+×
+Title:
+Content selection saved. Describe the issue below:
+Description:
+Submit without GitHub
+Submit in GitHub
+Why HTML?
+Report Issue
+Back to Abstract
+Download PDF
+Contents
+Reading mode
+Colour theme
+Abstract
+1 Introduction
+2 Related Work
+3 Out-of-Domain Intervention Augmented Causal Inference
+3.1 Notation
+3.2 Temporal Point Process
+3.3 Out-of-Domain Intervention Augmented Causal Framework
+3.4 Treatment Effect Estimation
+4 Transformer-based Process Model
+5 Numerical Study
+5.1 Simulated Data
+5.2 Real-World Data
+6 Discussion
+7 Conclusion
+0.A Proof of Main Theorems
+0.A.1 Proof of Theorem 1
+0.A.2 Proof of Theorem 2
+0.B Simulating Out-of-Domain interventions
+0.B.1 Out-of-Domain Intervention Types
+0.B.2 Out-of-Domain Intervention Examples
+0.B.3 Simulation Dataset Parameters
+0.C Model Architecture and Implmentation Details
+0.C.1 Model Architecture Specification
+0.C.2 Data Preprocessing
+0.C.3 Hyperparameter Configuration and Tuning
+0.C.4 Training Procedure
+0.C.5 Computational Requirements
+0.D Comparison with State-of-the-Art Methods
+0.D.1 Causal Discovery Methods for Event Sequences
+0.D.2 Neural Temporal Point Process Models
+0.D.3 Treatment Effect Estimation Approaches
+0.D.4 Advantages of Our Approach
+0.E Scalability
+0.E.1 Scalability Limitation
+0.E.2 Future Directions to Mitigate Scalability Concerns
+References
+License: arXiv.org perpetual non-exclusive license
+arXiv:2507.10809v1 [cs.LG] 14 Jul 2025
+Uncovering Causal Relation Shifts in Event Sequences under Out-of-Domain
+Interventions
+Kazi Tasnim Zinat✉
+Affiliation: University of Maryland, College Park, MD 20740, USA
+E-mail {kzintas, leozcliu}@umd.edu
+Yun Zhou
+Affiliation: Amazon Web Services
+E-mail {yunzzhou,xianglyu,yawenwan,xupanpan}@amazon.com
+Xiang Lyu
+Affiliation: Amazon Web Services
+E-mail {yunzzhou,xianglyu,yawenwan,xupanpan}@amazon.com
+Yawei Wang
+Affiliation: Amazon Web Services
+E-mail {yunzzhou,xianglyu,yawenwan,xupanpan}@amazon.com
+Zhicheng Liu
+Affiliation: University of Maryland, College Park, MD 20740, USA
+E-mail {kzintas, leozcliu}@umd.edu
+Panpan Xu
+Affiliation: Amazon Web Services
+E-mail {yunzzhou,xianglyu,yawenwan,xupanpan}@amazon.com
+Abstract
+Inferring causal relationships between event pairs in a temporal sequence is applicable in many domains such as healthcare, manufacturing, and transportation. Most existing work on causal inference primarily focuses on event types within the designated domain, without considering the impact of exogenous out-of-domain interventions. In real-world settings, these out-of-domain interventions can significantly alter causal dynamics.
+To address this gap, we propose a new causal framework to define average treatment effect (ATE), beyond independent and identically distributed (i.i.d.) data in classic Rubin’s causal framework, to capture the causal relation shift between events of temporal process under out-of-domain intervention.
+We design an unbiased ATE estimator, and devise a Transformer-based neural network model to handle both long-range temporal dependencies and local patterns while integrating out-of-domain intervention information into process modeling.
+Extensive experiments on both simulated and real-world datasets demonstrate that our method outperforms baselines in ATE estimation and goodness-of-fit under out-of-domain-augmented point processes. The supplementary materials are available here.
+Keywords: Sequential Data Causal Estimation Transformer
+1 Introduction
+Multivariate event sequences are prevalent across diverse domains, capturing time-stamped data from shared environments or subjects, such as Electronic Health Records [26] and industrial maintenance records [31]. Real-world data generation is often implicitly conditioned on unobserved out-of-domain variables, leading to generalization failures due to distribution shifts [13, 30].
+Causal relation analysis within event sequences aims to quantify how changes in one event influence another [9, 21]. The Rubin Causal Model [11] characterizes causal relations through the average treatment effect (ATE), representing the average difference between treatment & control potential outcomes. However, existing work focuses on causal relations within designated domains, overlooking the influence of known exogenous out-of-domain interventions that can induce causal relationship shifts. For instance, while meal ingestion increases blood glucose, insulin injection (an out-of-domain intervention) can counteract this effect [4].
+To address this gap, we propose a novel approach to detect causal relation shifts in temporal processes under out-of-domain interventions. Our framework extends ATE to account for unique intervention scenarios, enabling comparison across such contexts. To our knowledge, this is the first work to explicitly model out-of-domain intervention impact on causal relations in temporal event data.
+Our main contributions are multi-fold. First, we develop a theoretical framework of ATE that moves beyond i.i.d. assumptions to explicitly condition on intervention states and temporal dependencies. Second, we develop a propensity score-based treatment effect estimator to mitigate confounder bias. We justify its estimation consistency under our new ATE framework. Third, we propose a new Transformer architecture that captures intervention-induced temporal pattern changes. The architecture consists of several new network components: 1) a novel out-of-domain intervention embedding mechanism that enables direct influence modeling on event sequences;
+b) a weighted combination module that adaptively balances intervention and event embeddings;
+3) a hybrid Transformer-CNN structure to simultaneously capture global dependencies and local temporal patterns specific to intervention effects, 4) a multi-objective loss function that jointly optimizes for intensity estimation and event type prediction. Fourth, we provide comprehensive experimental validation on simulated and real-world datasets, demonstrating improved performance in both causal effect estimation and temporal process representation compared to existing methods.
+2 Related Work
+Point processes [5] model labeled event sequences, with Hawkes processes [10] capturing excitation/inhibition effects of past events on current occurrences. Neural approaches include RNNs [8, 27] for handling time and labels simultaneously, and Transformers [32, 28] for long-range dependencies [23].
+Causal analysis compares potential treatment and control outcomes using the Rubin Causal Model [22], with ATE as the primary metric. Propensity scores mitigate confounding bias in observational studies [11], while deep learning advances causal estimation [24, 19]. Temporal causal inference extends these concepts through Granger causality [29] and point process-based causal modeling [9, 21]. A detailed discussion with other methods is provided in
+appendix 0.D
+3 Out-of-Domain Intervention Augmented Causal Inference
+3.1 Notation
+Let us consider a set of nn individual sequences {𝐬1,,…,𝐬n}\{\mathbf{s}_{1},,\ldots,\mathbf{s}_{n}\}.
+In a generic event sequence scenario, for a single sequence 𝐬k\mathbf{s}_{k}, the observation we collect for the i{i}-th event can be expressed as a tuple (ek,i,tk,i){(e_{k,i},t_{k,i})}. Here, tk,i{t_{k,i}} represents the timestamp of the i{i}-th event in sequence 𝐬k\mathbf{s}_{k}, and ek,i{e}_{k,i} denotes the corresponding event type which belongs to a set of events 𝔼\mathbbm{E}.
+The count of observed events of sequence 𝐬k\mathbf{s}_{k} is denoted by Lk{L_{k}}.
+The time duration of each sequence is TT.
+We categorize the events based on their types: cause events cc, outcome events oo, out-of-domain interventions vv, and other measured events 𝐱\mathbf{x}.
+3.2 Temporal Point Process
+We focus on temporal point processes, where both event type and timestamp are observed. Hawkes processes, known for their self-excitation property, are commonly used to model real-world event sequences [18, 28]. Specifically, for an nn-dimensional Hawkes process, the conditional intensity function (CIF) of outcome event oio_{i} at time tt is expressed as:
+λ⁡(t)=μ⁡(t)+∑k=1n∑tk,i<tϕ⁡(t−tk,i),\textstyle{\lambda}{(t)}={\mu}(t)+\sum_{k=1}^{n}\sum_{t_{k,i}<t}{\phi}(t-t_{k,i}),
+(1)
+where μ{\mu} denotes the baseline intensity function,
+ϕ{\phi} is the excitation function capturing the influence of past events on outcome event.
+Note that λ⁡(t)\lambda(t) is not observable. In this work, we estimate it from sequence data.
+3.3 Out-of-Domain Intervention Augmented Causal Framework
+We extend the Rubin causal framework to incorporate out-of-domain interventions, leveraging two key concepts.
+First, we adopt the notion of process independence from graphical models [7], to establish direct causal relationships in multivariate point processes. For event variables (x,y,z)(x,y,z), xx is process independent of yy given zz if CIF of xx is not functionally dependent on the history of yy given the history of zz. Consequently, a set of events 𝕏\mathbb{X} is considered a direct cause of event yy if yy is process independent of all other events given 𝕏\mathbb{X}. We exclude the trivial case where yy is constant over 𝕏\mathbb{X}.
+Second, we introduce the concept of proximal history, a time-based simplification widely used in point process literature [3]. Proximal history posits that cause events only within a recent time window influences the outcome event, allowing earlier history to be disregarded.
+Combining these notions, we establish a causal framework and define ATE under out-of-domain interventions, drawing inspiration from [9] while adapting the theoretical assumptions for unbiasedness to accommodate out-of-domain interventions. We further incorporate these interventions into the propensity score-adjusted estimator, modifying the score definition.
+Definition 1
+For an event tuple (c,o,v)(c,o,v), binary cause variable ctwc_{t}^{w} at time tt indicates whether cause event cc has occurred at least once in the time window [t−w,t)[t-w,t). Similarly, binary out-of-domain intervention variable vtwv_{t}^{w} indicates whether out-of-domain intervention vv occurred within the same window.
+The potential outcome variable λ(ctw,vtw)​(t)\lambda^{(c_{t}^{w},v_{t}^{w})}(t) denotes the CIF of outcome event oo at time tt, given the values of ctwc_{t}^{w} and vtwv_{t}^{w}.
+The binary vector 𝐱tw\mathbf{x}_{t}^{w} captures the occurrence of all other observed events
+in the time window [t−w,t)[t-w,t).
+The ATE of cause ctwc_{t}^{w} on outcome λ⁡(t)\lambda(t) under out-of-domain intervention vtwv_{t}^{w} is defined as:
+τ⁡(vtw)=𝔼⁡[1T​∫0T{λ(1,vtw)​(t)−λ(0,vtw)​(t)}​𝑑t].\textstyle\tau(v_{t}^{w})=\mathbb{E}\bigg[\frac{1}{T}\int_{0}^{T}\{\lambda^{(1,v_{t}^{w})}(t)-\lambda^{(0,v_{t}^{w})}(t)\}dt\bigg].
+Unlike standard causal settings,
+λ⁡(t)\lambda(t) is latent and estimated from event type and timestamp observations.
+Cause and out-of-domain interventions may exhibit multiple occurrences prior to outcome within the time window. To focus on detecting causal relation shifts under interventions, we simplify the framework to study the treatment effect of occurrence, rather than count, as an initial step. Our real-world datasets validate this binary simplification. We defer continuous and ordinal cause and intervention modeling to future work. While not explicitly defined, process independence is crucial for linking the new ATE definition to causal relation shifts.
+Theorem 3.1
+If event cc is the direct cause of event oo when out-of-domain intervention variable vtw=1v_{t}^{w}=1, and not if vtw=0v_{t}^{w}=0, then τ⁡(1)≠0\tau(1)\neq 0 and τ⁡(0)=0.\tau(0)=0.
+Theorem 3.1 demonstrates that our new ATE effectively characterizes causal relations under out-of-domain interventions; the proof is provided in section 0.A.1.
+3.4 Treatment Effect Estimation
+In point process causal studies, cause event occurrences are typically not randomized, leading to potential imbalances between treatment groups. To address this, we propose a propensity score, adapted for our out-of-domain intervention augmented ATE framework, building on the established use of propensity scores for confounder adjustment in classical observational studies.
+Definition 2
+The propensity score at time tt for out-of-domain intervention variable vtwv_{t}^{w} is
+etw(v)=ℙ{ctw=1,vtw=v|𝐱tw},v∈{0,1}.\textstyle e_{t}^{w}(v)=\mathbb{P}\{c_{t}^{w}=1,v_{t}^{w}=v|\mathbf{x}_{t}^{w}\},v\in\{0,1\}.
+Our novel propensity score, etw​(v)e_{t}^{w}(v), incorporates both cause and out-of-domain intervention variables, conditioned on the proximal history of all other observed events. By treating binary out-of-domain interventions as alternative treatment assignments, rather than effect heterogeneity factors, we simplify the theoretical framework for estimation consistency.
+We demonstrate that, with minor modifications to standard observational study assumptions to accommodate point process data and out-of-domain interventions, etw​(v)e_{t}^{w}(v) effectively mitigates confounding bias, yielding an unbiased effect estimator.
+Assumption 1 (SUTVA):
+For each assignment pair (ctw,vtw)(c_{t}^{w},v_{t}^{w}) and any tt, there is only a single version of population outcome λ(ctw,vtw)​(t)\lambda^{(c_{t}^{w},v_{t}^{w})}(t), and the time window receives the assignment will not affect the outcome of other time windows.
+The assumption is fundamental in causal inference.
+It ensures we can leverage observations under treatment assignment to infer potential outcomes.
+Assumption 2 (unconfoundedness):
+For any tt, we have
+{λ(0,0)​(t),λ(0,1)​(t),λ(1,0)​(t),λ(1,1)​(t)}⟂⟂(ctw,vtw)|𝐱tw.\textstyle\big\{\lambda^{(0,0)}(t),\lambda^{(0,1)}(t),\lambda^{(1,0)}(t),\lambda^{(1,1)}(t)\big\}\perp\!\!\!\perp\big(c_{t}^{w},v_{t}^{w}\big)|\mathbf{x}_{t}^{w}.
+This assumption guarantees measured covariates sufficiently balance treatment groups and adjust for confounding bias across different out-of-domain interventions. While untestable, it is commonly postulated in observational studies.
+Assumption 3 (overlap):
+There exists a constant ϵ\epsilon such that
+ϵ<etw​(v)<1−ϵ,∀t,∀v∈{0,1}.\epsilon<e_{t}^{w}(v)<1-\epsilon,\forall t,\forall v\in\{0,1\}.
+This assumption ensures sufficient observations across treatment groups under varying out-of-domain interventions for accurate estimation, and is verifiable in practice. Our real-world datasets satisfy this condition.
+To simplify theoretical justification, we treat out-of-domain interventions as a second binary treatment variable, consistent with our framework’s focus on the occurrence of cause and intervention events. This approach avoids the need for complex assumptions regarding potential outcomes and the impact of out-of-domain interventions on cause events, which would be overly intricate for our current framework and real-data applications.
+We leverage propensity score etw​(v)e_{t}^{w}(v) to construct weight
+αtw​(v)=𝟙​{ctw=1,vtw=v}etw​(v)−𝟙​{ctw=0,vtw=v}1−etw​(v).\textstyle\alpha_{t}^{w}(v)=\frac{\mathbbm{1}\{c_{t}^{w}=1,v_{t}^{w}=v\}}{e_{t}^{w}(v)}-\frac{\mathbbm{1}\{c_{t}^{w}=0,v_{t}^{w}=v\}}{1-e_{t}^{w}(v)}.
+We weight the outcome λ⁡(t)\lambda(t) to derive the inverse probability weighting (IPW) estimator of ATE,
+τ^​(v)=𝔼⁡[1T​∫0Tαtw​(v)​λ​(t)​𝑑t].\textstyle\hat{\tau}(v)=\mathbb{E}\bigg[\frac{1}{T}\int_{0}^{T}\alpha_{t}^{w}(v)\lambda(t)dt\bigg].
+(2)
+We show that the IPW estimator is unbiased.
+Theorem 3.2
+Under Assumption 1-3, we have 𝔼⁡[τ^​(v)]=τ⁡(v),∀v∈{0,1}.\mathbb{E}[\hat{\tau}(v)]=\tau(v),\forall v\in\{0,1\}.
+The propensity score can be estimated by event duration ratio,
+e^tw​(v)=∑k=1n∑i=1Lk∫ti−1ti𝟙​{ctw=1,vtw=v,𝐱tw}​𝑑t∑k=1n∑i=1Lk∫ti−1ti𝟙​{𝐱tw}​𝑑t.\textstyle\hat{e}_{t}^{w}(v)=\frac{\sum_{k=1}^{n}\sum_{i=1}^{L_{k}}\int_{t_{i-1}}^{t_{i}}\mathbbm{1}\{c_{t}^{w}=1,v_{t}^{w}=v,\mathbf{x}_{t}^{w}\}dt}{\sum_{k=1}^{n}\sum_{i=1}^{L_{k}}\int_{t_{i-1}}^{t_{i}}\mathbbm{1}\{\mathbf{x}_{t}^{w}\}dt}.
+(3)
+We obtain the effect estimate by plugging e^tw​(v)\hat{e}_{t}^{w}(v) into the weight αtw​(v)\alpha_{t}^{w}(v) in eq. 2. The outcome λ⁡(t)\lambda(t) is estimated using a Transformer-based model on sequence data; see section 0.A.2
+for the proof.
+4 Transformer-based Process Model
+We propose a neural network model for learning temporal point processes and estimating the conditional intensity function (CIF) λ⁡(t)\lambda(t) of outcome events under both cause and out-of-domain interventions. A key innovation is the integration of out-of-domain interventions into the input representation.
+Our neural network model, illustrated in fig. 1, adopts a hybrid Transformer-CNN architecture to capture long-range temporal dependencies and local patterns shaped by intervention dynamics.
+A self-attention block [25] models event interactions via attention weights, with multi-head attention enhancing expressiveness by capturing diverse relational patterns.
+To incorporate temporal context, we embed relative time differences ti−ti−1t_{i}-t_{i-1} using temporal positional encodings [32].
+This architecture is used to model the logarithm of the outcome CIF, λ⁡(t)\lambda(t), which is central to ATE estimation.
+Figure 1:
+Our neural network architecture for learning temporal point processes with out-of-domain interventions. It combines out-of-domain intervention-augmented (ViV_{i}) event embeddings (eie_{i}) with positional encoding (Δ​t\Delta t), uses Transformer and CNN modules for pattern extraction, and estimates the CIF λ⁡(t)\lambda(t) for event prediction
+Our model input comprises three encoded components: 1) binary indicators of out-of-domain interventions vv occurring within the time window; 2) dense embeddings of event types (cause, outcome, and other observed events); and 3) relative event times, ti−ti−1t_{i}-t_{i-1}, encoded using trigonometric positional encodings to capture temporal positions. We combine intervention and event type embeddings via a weighted sum to form a unified, intervention-aware event representation, which is then augmented with temporal positional encodings. The model outputs the conditional intensity function (CIF) for each event and timestamp, expressed as a sum over basis functions.
+We optimize our model using three criteria combined into a single loss function.
+raining is performed on batches of sequences B={s1,s2,…,sb}B=\{s_{1},s_{2},...,s_{b}\} where bb is the batch size. For each batch, we compute the average loss across all sequences.
+The first criterion is negative log likelihood (NLL) of event observations within the sequences.
+LN​L​L=1b∑k=1b[−∑i=1Lklogλek,i(tk,i)+∑e∈outcome∫0Tλe(t)dt],\textstyle L_{NLL}=\frac{1}{b}\sum_{k=1}^{b}\left[-\sum_{i=1}^{L_{k}}\log\lambda_{e_{k,i}}(t_{k,i})+\sum_{e\in\text{outcome}}\int_{0}^{T}\lambda_{e}(t)dt\right],
+(4)
+where λek,i​(tk,i)\lambda_{e_{k,i}}(t_{k,i}) is the conditional intensity function for event ek,ie_{k,i} at timestamp tk,it_{k,i}, and LkL_{k} is the length of sequence kk. The first term represents the log-likelihood of observed events, while the second accounts for the probability of no events occurring in the remaining time intervals.
+The second criterion is a prediction loss based on cross-entropy that measures how well the model predicts event types.
+ℒC​E=−1b∑k=1b∑i=1Lk∑e∈𝔼yk,i,elog(pk,i,e),\textstyle\mathcal{L}_{CE}=-\frac{1}{b}\sum_{k=1}^{b}\sum_{i=1}^{L_{k}}\sum_{e\in\mathbb{E}}y_{k,i,e}\log(p_{k,i,e}),
+(5)
+where 𝔼\mathbb{E} is the set of event classes,
+yk,i,ey_{k,i,e} is the true binary indicator (0 or 1) of whether event ee is the correct classification for ii-th event in 𝐬k\mathbf{s}_{k}, pk,i,ep_{k,i,e} is the predicted probability that ii-th event belongs to class ee.
+The third criterion is L2 regularization term that penalizes large basis weights to prevent overfitting.
+Lr​e​g=1b​∑k=1b∑i=1Lk∑l=1ℬexp⁡(wl,k,i)2,\textstyle L_{reg}=\frac{1}{b}\sum_{k=1}^{b}\sum_{i=1}^{L_{k}}\sum_{l=1}^{\mathcal{B}}\exp(w_{l,k,i})^{2},
+(6)
+where wl,k,iw_{l,k,i} represents the log basis weights at time tk,it_{k,i} for basis function ll, ℬ\mathcal{B} denotes the total number of basis functions.
+The regularization prevents the basis weights from growing too large, which could lead to numerical instabilities.
+Our final batch loss function combines the three criteria, (4), (5) and (6),
+Lb​a​t​c​h=LN​L​L+α​LC​E+β​Lr​e​g.\textstyle L_{batch}=L_{NLL}+\alpha L_{CE}+\beta L_{reg}.
+(7)
+The hyperparameters α\alpha and β\beta control the relative importance of the cross-entropy loss and regularization term, respectively.
+We minimize this batch loss using the Adam optimizer and evaluate convergence on a held-out validation set. Model selection is performed via 5-fold cross-validation. Additional hyperparameter and implementation details are provided in appendix 0.C.
+5 Numerical Study
+We evaluated our method on both simulated and real-world data, comparing it against the CAUSE model [29] for ATE estimation and out-of-domain intervention-augmented process learning. CAUSE, which combines point processes and attribution methods for Granger causality inference, estimates the CIF without accounting for out-of-domain interventions. A comparative discussion with other models is provided in the appendix 0.D.
+5.1 Simulated Data
+We generated synthetic event sequences with injected out-of-domain interventions, modeled as random events influencing specific cause–outcome pairs. Each intervention was assigned a random occurrence probability and time window,
+with dynamic injection based on these probabilities. Additional simulation details are provided in the appendix 0.B.
+We simulated three intervention impact types, increasing in complexity and coverage of out-of-domain intervention impact:
+1.
+No out-of-domain intervention (No OOD): we do not impose out-of-domain intervention on process, which also can serve as sanity check.
+2.
+Baseline out-of-domain intervention (Baseline): we modify the baseline intensity μ⁡(t)\mu(t) of an outcome event CIF λ⁡(t)\lambda(t) under out-of-domain intervention shown in Eq. 1. We implement 3030 out-of-domain interventions per sequence.
+3.
+All out-of-domain intervention (All impact): we alter baseline intensity μ⁡(t)\mu(t), the influence of cause and other observed events through ϕ⁡(⋅)\phi(\cdot) on outcome event CIF λ⁡(t)\lambda(t) under out-of-domain intervention. We implement 3030 out-of-domain interventions per sequence.
+We generate 1,0001,000 sequences for each intervention impact type, with sequence lengths drawn from a Poisson distribution (mean = 500500). Each sequence includes 3030 distinct event types: 2020 used as causes and covariates, and the remaining 1010 are designated as outcomes.
+We compare our method with CAUSE in ATE estimation and process fitting in simulated data.
+The performance measures we adopt for ATE estimation are
+Bias: the average of absolute difference between ATE estimate and true ATE across repetitions.
+Variance: the variance of ATE estimate across repetitions.
+Mean squared error (MSE): the average of squared difference between ATE estimate and true ATE across repetitions.
+Lower values indicate better ATE estimation. As shown in table 1, our method significantly reduces bias across all scenarios, with slight increase in variance. This trade-off is beneficial, as it results in lower MSE in most cases.
+Table 1: Simulated data ATE estimation performance comparison between our method and CAUSE for Baseline and All impact interventions. Lower values are better.
+Out-of-Domain
+Intervention
+Intervention
+Status
+Bias
+Variance
+MSE
+Ours
+Cause
+Ours
+Cause
+Ours
+Cause
+Baseline
+0
+0.0155
+0.0522
+0.0141
+0.00001
+0.003
+0.0046
+1
+0.1561
+0.262
+0.0002
+0.0002
+0.027
+0.0708
+All Impact
+0
+0.0209
+0.0494
+0.0027
+0.00001
+0.0038
+0.0042
+1
+0.1615
+0.2192
+0.0008
+0.0002
+0.0283
+0.0498
+We use the following performance measures for process fitting,
+Negative log likelihood (NLL): the NLL of fitted process model.
+Root mean squared error (RMSE): the square root of the average of squared outcome event occurrence time prediction error.
+Mean absolute error (MAE): the average of absolute outcome event prediction error.
+Averaged across repetitions, table 2 shows that our model consistently outperforms CAUSE across all scenarios by achieving lower NLL, RMSE, and MAE; demonstrating superior modeling of event distributions and predictive accuracy, even under varying intervention complexities.
+Table 2:
+Simulated data process fitting performance comparison (NLL, RMSE, MAE) between our method and CAUSE with varying Out-of-Domain interventions. Lower values are better.
+Out-of-Domain
+Intervention
+NLL
+RMSE
+MAE
+Ours
+Cause
+Ours
+Cause
+Ours
+Cause
+No OOD
+1009.06
+2456.53
+1.78
+3.89
+0.89
+2.60
+Baseline
+852.48
+2438.36
+2.1
+3.84
+1.04
+2.56
+All Impact
+1299.61
+2443.81
+2.18
+3.86
+1.17
+2.58
+5.2 Real-World Data
+We evaluated our method on two real-world datasets:
+Predictive Maintenance[1]: This dataset contains hourly sensor readings (voltage, rotation, pressure, vibration) from 100 machines. Proactive maintenance events (scheduled component replacements) were modeled as out-of-domain interventions, while reactive maintenance events (failures requiring unscheduled replacements) served as outcomes. Continuous sensor readings were discretized into 625 bins based on mean deviation, with each bin treated as a potential cause event and others as time-varying covariates.
+Table 3: Predictive maintenance data process fitting performance (NLL, RMSE, MAE) comparison between our method and CAUSE, with proactive maintenance as out-of-domain intervention. Lower values are better.
+NLL
+RMSE
+MAE
+Ours
+Cause
+Ours
+Cause
+Ours
+Cause
+300.66
+288.84
+419.38
+3501.14
+59.88
+628.37
+Diabetes [12]: This dataset includes lab events from 70 patients, such as insulin injections, glucose levels, meal consumption, physical activity, and hypoglycemia symptoms. We focused on glucose as the outcome and selected cause and OOD intervention events based on established medical knowledge. For example, in analyzing insulin-mediated effects of meals on glucose, we treated meal as the cause, insulin as the out-of-domain intervention, and activity and hypoglycemia symptoms as covariates. A baseline experiment without interventions was also conducted to assess model robustness.
+Table 4: ATE-estimated causal relations in diabetes dataset under Out-of-domain interventions, validated by medical literature.
+Cause
+Outcome
+Out-of-Domain Intervention
+Covariate
+Our Conclusion & Literature Evidence
+More than usual meal ingestion
+Blood glucose decrease
+Insulin
+Activity, hypoglycemia symptopm
+✓Insulin injection, even when more than usual meal is ingested, may help to decrease blood glucose [4]
+Hypoglycemia symptom
+Blood glucose decrease
+NPH insulin
+Meal, activity
+✓Insulin injection, when hypoglycemic symptom is observed, may cause blood glucose to decrease further [16]
+Insulin
+Blood glucose decrease
+Typical or more than usual activity
+Meal, hypoglycemia symptom
+✓More activity increases the effect of insulin, boosting blood glucose decrease [15]
+Since ground truth ATEs and prior benchmarks are unavailable for the predictive maintenance dataset, we evaluated process fitting performance. As shown in table 3, our model significantly outperformed CAUSE in future event prediction:achieving an 88% reduction in RMSE and a 90% reduction in MAE, while maintaining comparable distribution modeling (only 4% higher NLL). These improvements highlight the value of explicitly modeling out-of-domain interventions in capturing complex real-world dynamics.
+Table 5: Process fitting performance comparison between our method and CAUSE on the diabetes dataset, with activity and insulin as out-of-domain interventions. Sanity check: no intervention. Lower NLL, RMSE, and MAE indicate better performance.
+Out-of-Domain
+Intervention
+NLL
+RMSE
+MAE
+Ours
+Cause
+Ours
+Cause
+Ours
+Cause
+Sanity Check
+613.21
+619.74
+15644.33
+15718.8
+2104.87
+2239.53
+Activity
+563.47
+1345.61
+15729.25
+15770.73
+2108.1
+2111.2
+Insulin
+181.57
+190.11
+342.74
+360.78
+55.81
+61.69
+While ground truth ATEs for the diabetes dataset are unavailable, we validated the detected causal relation shifts against established medical literature. As shown in table 4, the shifts identified by our method align with known findings. For example, our model captured the insulin-mediated effect where glucose levels decrease despite increased meal intake, consistent with results reported in [4]. Additionally, table 5 demonstrates that our method outperforms CAUSE in process fitting across all intervention types, underscoring the benefits of incorporating out-of-domain interventions. The model also maintained strong performance in the baseline setting without interventions, confirming its robustness.
+6 Discussion
+While our method offers significant advantages in modeling causal relation shifts under out-of-domain interventions, two key limitations merit consideration. First, our framework simplifies interventions to binary occurrence indicators, potentially limiting expressiveness for complex interventions with varying intensity or duration. Second, if interventions open backdoor causal paths between cause and outcome events, estimation accuracy may be compromised, requiring careful domain knowledge for intervention selection. Scalability concerns are discussed separately in the
+appendix 0.E.
+Future work should extend the framework to continuous intervention variables for more fine-grained modeling and improved estimation precision.
+7 Conclusion
+We propose a novel causal framework leveraging out-of-domain interventions to analyze causal relation shifts in temporal process data. Our Transformer-based Hawkes process integrates intervention effects with an unbiased treatment effect estimator for accurate causal quantification. Extensive simulations and real-world validation, corroborated by literature, demonstrated superior performance in both process fitting and ATE estimation, enabling practical extraction of actionable causal knowledge for informed decision-making.
+Appendix 0.A Proof of Main Theorems
+0.A.1 Proof of Theorem 1
+The definition of direct cause gives that conditional on the direct cause, CIF of oo is functionally independent on other variables.
+Recall that we exclude trivial direct cause.
+Thus taking conditional expectation on the direct cause inside the expectation of τ⁡(vtw)\tau(v_{t}^{w}) completes the proof.
+0.A.2 Proof of Theorem 2
+Expanding the estimator τ^​(v)\hat{\tau}(v), we get
+τ^​(v)=𝔼⁡[1T​∫0T(𝟙​{ctw=1,vtw=v}etw​(v)​λ(1,vtw)​(t)−𝟙​{ctw=0,vtw=v}1−etw​(v)​λ(0,vtw)​(t))​𝑑t].\hat{\tau}(v)=\mathbb{E}[\frac{1}{T}\int_{0}^{T}(\frac{\mathbbm{1}\{c_{t}^{w}=1,v_{t}^{w}=v\}}{e_{t}^{w}(v)}\lambda^{(1,v_{t}^{w})}(t)-\frac{\mathbbm{1}\{c_{t}^{w}=0,v_{t}^{w}=v\}}{1-e_{t}^{w}(v)}\lambda^{(0,v_{t}^{w})}(t))dt].
+WLOG, we only justify the component involves ctw=1c_{t}^{w}=1. The other component of ctw=0c_{t}^{w}=0 follows similarly.
+SUTVA gives
+𝔼⁡[∫0T𝟙​{ctw=1,vtw=v}etw​(v)​λ​(t)​𝑑t]=𝔼⁡[∫0T𝟙​{ctw=1,vtw=v}etw​(v)​λ(1,v)​(t)​𝑑t].\mathbb{E}[\int_{0}^{T}\frac{\mathbbm{1}\{c_{t}^{w}=1,v_{t}^{w}=v\}}{e_{t}^{w}(v)}\lambda(t)dt]=\mathbb{E}[\int_{0}^{T}\frac{\mathbbm{1}\{c_{t}^{w}=1,v_{t}^{w}=v\}}{e_{t}^{w}(v)}\lambda^{(1,v)}(t)dt].
+Taking conditional expectation on etw​(v)e_{t}^{w}(v), and combining with
+𝔼⁡[∫0T𝟙​{ctw=1,vtw=v}etw​(v)​λ(1,v)​(t)​𝑑t|etw​(v)]=𝔼⁡[∫0Tλ(1,v)​(t)​𝑑t|etw​(v)],\mathbb{E}[\int_{0}^{T}\frac{\mathbbm{1}\{c_{t}^{w}=1,v_{t}^{w}=v\}}{e_{t}^{w}(v)}\lambda^{(1,v)}(t)dt|e_{t}^{w}(v)]=\mathbb{E}[\int_{0}^{T}\lambda^{(1,v)}(t)dt|e_{t}^{w}(v)],
+that follows overlap and unconfoundedness assumptions, complete the proof.
+Appendix 0.B Simulating Out-of-Domain interventions
+0.B.1 Out-of-Domain Intervention Types
+Existing data generation techniques do not support the injection of out-of-domain interventions into temporal process simulation. In our research, we addressed this challenge by modifying the Hawkes process simulation package Tick [2].
+First, a random causal window length ctwc_{t}^{w} is defined for cause event. out-of-domain events vv are generated by randomly selecting cause-outcome pairs (<c,o>)(<c,o>) that vv will have its effect upon. Each vv is assigned an occurrence probability pvp_{v}, forming the out-of-domain intervention vector Ω𝒱=[v1pv1,v2pv2,…]\Omega_{\mathcal{V}}=[{v_{1}}^{p_{v_{1}}},{v_{2}}^{p_{v_{2}}},\ldots]. Additionally, each out-of-domain intervention vv is associated with a randomly generated influence window vtwv_{t}^{w}.
+During the simulation, the CIF λ\lambda is modified (λ→λ′\lambda\rightarrow\lambda^{\prime}) to dynamically inject out-of-domain interventions. We categorize out-of-domain interventions into three types based on the CIF 1 component it effects.
+1.
+Baseline: Modifies the baseline intensity of an outcome event. The baseline intensity is the background rate of the event. (μo→μo′\mu_{o}\rightarrow\mu_{o}^{\prime}).
+2.
+Cause: Alters the impact of a cause event cc on an outcome event oo. (ϕc​o→ϕc​o′\phi_{co}\rightarrow\phi_{co}^{\prime}).
+3.
+Covariate: Changes the influence of a covariate event dd on an outcome event oo. A covariate event modulates the likelihood of the outcome. (ϕd​o→ϕd​o′:d≠c\phi_{do}\rightarrow\phi_{do}^{\prime}:d\neq c).
+Examples of these out-of-domain intervention types are provided in 0.B.2. Exact parameters used to generate the experiment datasets are described in 0.B.3.
+Algorithm 1 describes the process to generate the out-of-domain interventions.
+algorithm 2 describe the simulation process in detail.
+Algorithm 1 Out-of-Domain Intervention Generation
+1:
+cc,oo,
+, [ϕ][\phi]: adjacency, μ→\vec{\mu}: baseline
+2:
+vtwv_{t}^{w}
+3:
+Randomly Select (<c,o>)(<c,o>)
+4:
+Randomly Select out-of-domain intervention
+5:
+if type = baseline then
+6:
+μo→μo′\mu_{o}\rightarrow\mu_{o}^{\prime}
+7:
+else if type = cause then
+8:
+ϕc,o→ϕc,o′\phi_{c,o}\rightarrow\phi^{\prime}_{c,o}
+9:
+else if type = covariate then
+10:
+ϕc​o​v,o→ϕc​o​v,o′\phi_{cov,o}\rightarrow\phi^{\prime}_{cov,o}
+11:
+end if
+12:
+return vtwv_{t}^{w}
+Algorithm 2 Out-of-Domain Intervention Injected Simulation
+1:
+vv,
+cc, oo, [ϕ][\phi]: adjacency, μ→\vec{\mu}: baseline
+2:
+et:e_{t}: Simulated event at time tt
+3:
+while tt <TT do
+4:
+for all vtwv_{t}^{w} do
+5:
+if not vv active then
+6:
+Randomly choose State
+7:
+if State = Active then
+8:
+set vv to active
+9:
+Add vtwv_{t}^{w} to active interventions list, calculate activation end time
+10:
+if cc active then ⊳\triangleright Associated cause
+11:
+Calculate new CIF λ\lambda ⊳\triangleright Based on out-of-domain intervention type
+12:
+end if
+13:
+end if
+14:
+else if t≥t\geq Activation time end then
+15:
+set vv to inactive
+16:
+Calculate new CIF λ\lambda ⊳\triangleright Reset
+17:
+end if
+18:
+end for
+19:
+et←{e_{t}}\leftarrow Simulate Hawkes Process()
+20:
+if et=ce_{t}=c then
+21:
+set cc to active
+22:
+add ctwc_{t}^{w} to active cause list and calculate activation end time
+23:
+end if
+24:
+if t≥t\geq activation time end then
+25:
+set cc to inactive
+26:
+end if
+27:
+end while
+28:
+Return
+0.B.2 Out-of-Domain Intervention Examples
+Consider a scenario with a single cause cc (ticks #0), and a corresponding outcome oo (ticks #1) and a single out-of-domain intervention event vv. Suppose, ctw=0.5c_{t}^{w}=0.5, vtw=0.7v_{t}^{w}=0.7
+We show the three types of out-of-domain intervention events based on the scenario above. In each out-of-domain intervention type, cause cc is depicted in the top figure, the outcome oo is shown in the middle / second figure and the out-of-domain intervention vv is shown in the bottom figure.
+Baseline
+The baseline intensity values μ\mu for the events are defined as follows:
+Cause (Ticks #0): μc=2.5\mu_{c}=2.5
+Outcome (Ticks #1): μo=1.5\mu_{o}=1.5
+The adjacency matrix ϕ→\overrightarrow{\phi} is set to zero.
+Now, in the given out-of-domain intervention scenario, if the cause window ctwc_{t}^{w}, (ticks #0) and out-of-domain intervention window vtwv_{t}^{w} both are active, the baseline intensity for the outcome event oo (ticks #1) will increase from μ←1.5\mu\leftarrow 1.5 to μ′←5.5\mu^{\prime}\leftarrow 5.5. This alteration in intensity persists for the duration of the out-of-domain intervention or the cause window, whichever concludes first.
+The example figure 2 illustrates the impact of an out-of-domain intervention event on the baseline intensity of the outcome event.
+Figure 2: Baseline Out-of-Domain Intervention
+Cause
+The baseline intensity values μ\mu for the events are defined as follows:
+Cause (Ticks #0): μc=2.5\mu_{c}=2.5
+Outcome (Ticks #1): μo=1.5\mu_{o}=1.5
+The adjacency matrix is initialized with zeros ϕ→←0\overrightarrow{\phi}\leftarrow 0, signifying that no event is influenced or excited by the appearance of other events within the system.
+Now, consider the out-of-domain intervention (bottom figure), the out-of-domain intervention is defined such that, when the out-of-domain intervention window vtwv_{t}^{w} is active, the adjacency matrix entry for the relationship between outcome and cause will instantaneously jump from ϕc​o←0\phi_{co}\leftarrow 0 to ϕc​o′←5\phi^{\prime}_{co}\leftarrow 5. Moreover, this influence exhibits exponential decay e−te^{-t} with a decay factor of 11. Consequently, an occurrence of Ticks #0 will significantly increase the intensity of Ticks #1 by 5 in presence of out-of-domain intervention. This heightened intensity will persist for the duration of the vtwv_{t}^{w} or ctwc_{t}^{w}, whichever concludes first.
+The example figure 3 illustrates this impact.
+Figure 3: Cause Out-of-Domain Intervention
+Covariate
+In this scenario, we have an additional covariate event dd.
+The initial baseline intensity values μ\mu for the events are defined as follows:
+Cause (Ticks #0): μc=2.5\mu_{c}=2.5
+Outcome (Ticks #1): μo=1.5\mu_{o}=1.5
+Covariate (Ticks #2): μb=1.5\mu_{b}=1.5
+The adjacency matrix ϕ→\overrightarrow{\phi} is initialized with zeros, indicating no direct influence between events.
+Now, introducing out-of-domain intervention vv (bottom figure), we define it such that when the out-of-domain intervention window vtwv_{t}^{w} and cause window ctwc_{t}^{w} both are active, the adjacency matrix entries for outcome and covariate ϕd​o←0\phi_{do}\leftarrow 0 will experience a substantial increase ϕd​o′←7\phi_{do^{\prime}}\leftarrow 7, characterized by exponential decay e−te^{-t} with a factor of 11. In practical terms, the occurrence of Ticks #2 results in a significant intensity boost of Ticks #1 by 77, with this effect sustained for the duration of the vtwv_{t}^{w} or ctwc_{t}^{w}, whichever concludes first.
+This example figure 4 effectively demonstrates the influence of an out-of-domain intervention on the covariate influence on outcome.
+Figure 4: Covariate Out-of-Domain Intervention
+0.B.3 Simulation Dataset Parameters
+Table 6: Number of Baseline, Cause & Covariate Out-of-Domain Interventions in Each Simulation Dataset
+Dataset
+Baseline
+Cause
+Covariate
+No out-of-domain intervention
+0
+0
+0
+Baseline out-of-domain intervention
+30
+0
+0
+All out-of-domain intervention
+10
+12
+8
+To simulate baseline out-of-domain effects, the base intensity rate was increased by a specified percentage (e.g., μ′∼150%​μ\mu^{\prime}\sim 150\%\mu).
+For cause and covariate out-of-domain intervention impacts, existing causal relationships between events were modified by altering the kernel function ϕ\phi. Specifically, for events jj and kk with a causal connection, the corresponding relationship coefficient (ϕj​k=xCLOSE(\phi_{jk}=x) was set to zero (ϕj​k′=0\phi_{jk}^{\prime}=0), indicating a non-causal connection. Conversely, changing the coefficient from zero (ϕj​k=0CLOSE(\phi_{jk}=0) to a non-zero value ϕj​k=x\phi_{jk}=x) represented the introduction of a causal relationship. This dynamic adjustment allowed us to simulate scenarios where causal connections were either disrupted or newly formed due to external out-of-domain intervention influences.
+Table 6 shows the distribution of three out-of-domain intervention types across the simulated datasets.
+Appendix 0.C Model Architecture and Implmentation Details
+0.C.1 Model Architecture Specification
+Our Transformer-based point process model consists of several key components, each designed to capture different aspects of the temporal event sequences with out-of-domain interventions.
+Embedding Layer:
+The three embeddings below are illustrated in fig. 1, where event embeddings (eie_{i}) and out-of-domain intervention embeddings (ViV_{i}) are combined via a weighted sum, then merged with the temporal positional encoding (Δ​t\Delta t).
+•
+Event Embedding:
+We convert categorical event types to dense vectors using an embedding lookup table with dimension 128. Each event type (e.g., cause, outcome, other observed events) is assigned a unique learnable embedding vector.
+•
+Time Embedding: We encode relative time differences between consecutive events (ti−ti−1t_{i}-t_{i-1}) using sinusoidal positional encodings with the same dimension as event embeddings (128). This preserves temporal ordering information while allowing the model to account for varying time intervals.
+•
+out-of-domain Intervention Encoding: We represent out-of-domain interventions using a binary vector (not one-hot) where each bit indicates whether a specific intervention type is active (1) or inactive (0) within the time window. The dimension equals the number of distinct intervention types in the dataset.
+Let ∥𝕍∥\lVert\mathbb{V}\rVert be the number of unique out-of-domain interventions, and 𝕍b​i​n\mathbb{V}^{bin} be the binary vector of length ‖𝕍‖||\mathbb{V}||, 𝕍ib​i​n\mathbb{V}^{bin}_{i} indicating whether the iith out-of-domain intervention occurred within vtwv_{t}^{w} in proximal history HH:
+𝕍ib​i​n={1,if ∑t−vwt[vi=1]≥10,otherwise\mathbb{V}^{bin}_{i}=\begin{cases}1,&\text{if }\sum_{t-v_{w}}^{t}[v_{i}=1]\geq 1\\
+0,&\text{otherwise}\end{cases}
+Transformer Encoder:
+We list the hyperparameters in Transformer Encoder architecture.
+•
+Number of Encoder Layers: 2
+•
+Number of Attention Heads: 2
+•
+Key/Value Dimension per Head: 64
+•
+Hidden-State Dimension: 64
+•
+Feed-Forward Inner Dimension: 256 (4×\times model dimension)
+•
+Dropout Rate: 0.1
+•
+Attention Dropout Rate: 0.1
+•
+Layer Normalization Epsilon: 1×10−61\times 10^{-6}
+Convolutional Neural Network:
+We list the hyperparameters in CNN architecture.
+•
+Kernel Size: 5. One convolutional layer with multiple output channels, no pooling was used.
+•
+Padding: 2
+•
+Number of Output Channels: Equal to number of basis functions
+•
+Activation Function: ReLU
+Basis Functions:
+•
+Number of Basis Functions (B): 8
+•
+Basis Type: 1) Unity basis: A constant function that always returns 1.0, 2) Normal basis: 7 Gaussian distributions with dyadic spacing
+•
+Bandwidth Selection: Dyadic spacing for maximum mean coverage
+0.C.2 Data Preprocessing
+•
+Temporal binning: In handling real-world datasets such as the diabetes dataset with ‖𝕊‖=70||\mathbb{S}||=70 individuals and the semi-simulated predictive maintenance dataset with ‖𝕊‖=100||\mathbb{S}||=100 machines, we address the challenge of limited data by employing a technique called temporal binning. For the predictive maintenance dataset, we split the event sequences into subsequences of length 400400, starting at each 100th100^{\text{th}} event. Similarly, for the diabetes dataset, we create subsequences of length 400400 starting at every 50th50^{\text{th}} event. This approach significantly augments the amount of training samples available for the model.
+•
+Normalization of timestamps to [0,1] range
+•
+One-hot encoding of event types
+•
+Binary encoding of out-of-domain interventions
+0.C.3 Hyperparameter Configuration and Tuning
+We implemented our model in Python using PyTorch. We conducted hyperparameter search using 5-fold cross-validation on the validation set. Table 7 summarizes the final hyperparameter configuration and the search ranges we explored.
+Table 7: Hyperparameter Configuration
+Hyperparameter
+Final Value
+Search Range
+Selection Method
+Learning Rate
+0.001
+[0.0001, 0.0005, 0.001, 0.005]
+Grid Search
+Batch Size
+64
+[16, 32, 64, 128]
+Grid Search
+Number of Epochs
+300
+Up to 2000 with early stopping
+Validation NLL
+Loss Weight α\alpha (CE)
+5.0
+[0.1, 1.0, 5.0, 10.0]
+Grid Search
+Loss Weight β\beta (Reg)
+0.01
+[0.001, 0.01, 0.1]
+Grid Search
+Number of Encoder Layers
+2
+[1, 2, 4, 8]
+Grid Search
+Number of Attention Heads
+2
+[1, 2, 4, 8]
+Grid Search
+Embedding Dimension
+128
+[64, 128, 256]
+Grid Search
+Dropout Rate
+0.1
+[0.0, 0.1, 0.01, 0.001]
+Grid Search
+Causal Window Size
+10
+[5, 10, 15, 20]
+Grid Search
+Hyperparameter selection was based on validation set negative log-likelihout-of-domain (NLL), with early stopping patience of 2020 epochs. We found that increasing model complexity beyond our final configuration (e.g., more layers or attention heads) did not significantly improve performance while substantially increasing computational cost.
+0.C.4 Training Procedure
+Our training methodology follows these steps:
+1.
+Optimization Strategy:
+•
+Optimizer: Adam (β1=0.9,β2=0.999,ϵ=1×10−8\beta_{1}=0.9,\beta_{2}=0.999,\epsilon=1\times 10^{-8})
+•
+Learning Rate Schedule: Triangular cyclic learning rate with base_lr=0.0005, max_lr=0.001, step_size=20 epochs
+•
+Gradient Clipping: Maximum norm of 1.0 to prevent exploding gradients
+•
+Early Stopping: Monitor validation NLL with patience=20 epochs
+2.
+Training Dynamics:
+•
+Loss components are weighted as per Equation 6: L=LNLL+α​LCE+β​LregL=L_{\text{NLL}}+\alpha L_{\text{CE}}+\beta L_{\text{reg}}
+•
+Cross-entropy weight α=5.0\alpha=5.0 emphasizes accurate event type prediction
+•
+Regularization weight β=0.01\beta=0.01 prevents overfitting while allowing model flexibility
+3.
+Batch Processing:
+•
+Sequences padded to the maximum length within each batch
+•
+Masked attention used to ignore padding tokens
+0.C.5 Computational Requirements
+Our implementation was developed using PyTorch 2.10.0. Training and evaluation were conducted with the following computational resources:
+•
+Hardware: NVIDIA V100 GPU with 16GB memory
+•
+Training Time:
+–
+Simulated Data (1000 sequences): ∼\sim3 hours for full training
+–
+Diabetes Dataset (70 patients): ∼\sim1 hour for full training
+–
+Predictive Maintenance (100 machines): ∼\sim8 hours for full training
+Appendix 0.D Comparison with State-of-the-Art Methods
+Our framework addresses limitations in existing approaches by explicitly modeling how out-of-domain interventions affect causal relationships in temporal point processes. Below, we compare our approach with state-of-the-art methods across relevant categories and analyze their limitations in handling out-of-domain interventions.
+0.D.1 Causal Discovery Methods for Event Sequences
+The Temporal Causal Discovery Framework (TCDF) [20] employs attention-based convolutional neural networks to identify time-delayed causal relationships in time series data without requiring prior knowledge. While TCDF provides interpretable attention scores for causal discovery, it is primarily designed for regularly-sampled multivariate time series rather than point processes with irregular timestamps.
+CAUSE (CAusal Understanding in Search Explanations) [29] learns Granger causality from event sequences using attribution methods such as integrated gradients. Although CAUSE is designed for event sequences and effectively accounts for event history when quantifying causal influence, it focuses on Granger causality—which measures prediction improvement rather than true pairwise causality.
+Similarly, the Self-Explaining Neural Networks approach for Granger causality [17] provides interpretable feature attributions and handles nonlinear relationships in temporal data. However, being based on the Granger causality framework, it doesn’t capture pairwise intervention-based causality.
+0.D.2 Neural Temporal Point Process Models
+The Neural Hawkes Process [18] uses continuous-time LSTM to modulate intensity functions based on event history, capturing complex temporal dependencies and allowing for flexible intensity functions. Despite these strengths, this approach includes no causal inference framework.
+Building on this, the Transformer Hawkes Process [32] applies transformer architecture with self-attention to model event dependencies, effectively capturing long-range dependencies and handling variable-length sequences efficiently. However, like its predecessors, it provides no mechanism to identify causal inferences.
+The Temporal Attention Augmented Transformer Hawkes Process [28] enhances the transformer architecture with temporal attention specifically for point processes, incorporating temporal information explicitly and improving prediction accuracy. While innovative in its modeling approach, this method focuses on prediction rather than causal inference,
+and cannot quantify how causal relationships change under different intervention scenarios.
+0.D.3 Treatment Effect Estimation Approaches
+Counterfactual Temporal Point Processes [21] generates counterfactual realizations of temporal point processes using marked point processes, providing a framework for counterfactual reasoning in point processes and handling complex event dependencies. This approach, however, focuses on counterfactual predictions rather than identifying causal relation shifts.
+The Causal Inference framework for Event Pairs in Multivariate Point Processes [9] uses inverse probability weighting to estimate causal effects between event pairs, addressing confounding in point processes through propensity score adjustment. While methodologically related to our approach, this framework does not consider external interventions that may modify causal relationships. It assumes static causal relationships across the entire process and cannot identify how treatment effects vary under different intervention scenarios.
+The Causal Transformer for Estimating Counterfactual Outcomes [19] uses transformer architecture to estimate counterfactual outcomes from patient trajectories, effectively handling temporal dependencies in treatment effect estimation and accounting for time-varying confounders. However, this method is designed for regularly-sampled time series rather than point processes with irregular timestamps.
+0.D.4 Advantages of Our Approach
+Our proposed method addresses these limitations by:
+1.
+Explicitly incorporating out-of-domain interventions into the temporal point process framework with a specialized embedding mechanism
+2.
+Developing a theoretical foundation to quantify causal relation shifts under different intervention states
+3.
+Introducing a novel neural architecture that simultaneously captures event dependencies and intervention effects
+4.
+Providing an unbiased estimation method for intervention-conditional treatment effects using adaptive propensity score adjustment
+This integrated approach enables the identification of how causal relationships between events change under different out-of-domain intervention scenarios—a capability not present in existing methods.
+Appendix 0.E Scalability
+0.E.1 Scalability Limitation
+Several challenges may arise when scaling our OOD causal framework to larger datasets and more complex OOD scenarios.
+1.
+Intervention Combinatorial Explosion: As the number of potential OOD intervention types increases, the number of possible intervention combinations grows exponentially, creating data sparsity issues when estimating propensity scores for rare intervention patterns.
+2.
+Memory Requirements for Basis Functions: Our basis function approach requires maintaining separate weights for each event type and basis function combination, which scales linearly with the product of these dimensions. For domains with hundreds of event types, memory constraints become significant.
+3.
+Propensity Score Estimation: The accuracy of propensity score estimation deteriorates with increasing dimensionality of the covariate space, which is exacerbated when many event types and intervention combinations must be considered simultaneously.
+4.
+Transformer Complexity: The self-attention mechanism in our Transformer encoder has quadratic complexity with respect to sequence length. It creates computational bottlenecks for very long event sequences.
+0.E.2 Future Directions to Mitigate Scalability Concerns
+We propose several promising directions could address these OOD causal framwork and scalability concerns.
+1.
+Hierarchical Intervention Modeling: Grouping related interventions and modeling their effects hierarchically could mitigate the combinatorial explosion problem while preserving the ability to detect important causal shifts.
+2.
+Efficient Transformer Variants: Adaptations like KV Cache [14] and FlashAttention [6] could reduce the computational burden of the Transformer component while maintaining modeling capacity for intervention effects.
+References
+[1]
+Azure: Ai predictive maintenance. https://github.com/Azure/AI-PredictiveMaintenance (2018)
+[2]
+Bacry, E., Bompaire, M., Gaïffas, S., Poulsen, S.: Tick: a python library for statistical learning, with a particular emphasis on time-dependent modelling. arXiv preprint arXiv:1707.03003 (2017)
+[3]
+Bhattacharjya, D., Subramanian, D., Gao, T.: Proximal graphical event models. null (2018). https://doi.org/null
+[4]
+Campbell, M.D., Walker, M., Trenell, M.I., Luzio, S., Dunseath, G., Tuner, D., Bracken, R.M., Bain, S.C., Russell, M., Stevenson, E.J., et al.: Metabolic implications when employing heavy pre-and post-exercise rapid-acting insulin reductions to prevent hypoglycaemia in type 1 diabetes patients: a randomised clinical trial. PLoS One 9(5), e97143 (2014)
+[5]
+Daley, D.J., Vere-Jones, D., et al.: An introduction to the theory of point processes: volume I: elementary theory and methods. Springer (2003)
+[6]
+Dao, T., Fu, D., Ermon, S., Rudra, A., Ré, C.: Flashattention: Fast and memory-efficient exact attention with io-awareness. Advances in Neural Information Processing Systems 35, 16344–16359 (2022)
+[7]
+Didelez, V.: Graphical models for marked point processes based on local independence. null (2005). https://doi.org/null
+[8]
+Du, N., Dai, H., Trivedi, R., Upadhyay, U., Gomez-Rodriguez, M., Song, L.: Recurrent marked temporal point processes: Embedding event history to vector. In: Proceedings of the 22nd ACM SIGKDD international conference on knowledge discovery and data mining. pp. 1555–1564 (2016)
+[9]
+Gao, T., Subramanian, D., Bhattacharjya, D., Shou, X., Mattei, N., Bennett, K.P.: Causal inference for event pairs in multivariate point processes. Advances in Neural Information Processing Systems 34, 17311–17324 (2021)
+[10]
+Hawkes, A.G.: Point spectra of some mutually exciting point processes. Journal of the Royal Statistical Society Series B: Statistical Methodology 33(3), 438–443 (1971)
+[11]
+Imbens, G.W., Rubin, D.B.: Causal inference in statistics, social, and biomedical sciences. Cambridge University Press (2015)
+[12]
+Kahn, M.: Diabetes. UCI Machine Learning Repository (1994), DOI: https://doi.org/10.24432/C5T59G
+[13]
+Koh, P.W., Sagawa, S., Marklund, H., Xie, S.M., Zhang, M., Balsubramani, A., Hu, W., Yasunaga, M., Phillips, R.L., Gao, I., et al.: Wilds: A benchmark of in-the-wild distribution shifts. In: International conference on machine learning. pp. 5637–5664. PMLR (2021)
+[14]
+Kwon, W., Li, Z., Zhuang, S., Sheng, Y., Zheng, L., Yu, C.H., Gonzalez, J., Zhang, H., Stoica, I.: Efficient memory management for large language model serving with pagedattention. In: Proceedings of the 29th Symposium on Operating Systems Principles. pp. 611–626 (2023)
+[15]
+Lawrence, R.: The effect of exercise on insulin action in diabetes. British medical journal 1(3406), 648 (1926)
+[16]
+Lee, S.J.: So much insulin, so much hypoglycemia. JAMA internal medicine 174(5), 686–688 (2014)
+[17]
+Marcinkevičs, R., Vogt, J.E.: Interpretable models for granger causality using self-explaining neural networks. arXiv preprint arXiv:2101.07600 (2021)
+[18]
+Mei, H., Eisner, J.M.: The neural hawkes process: A neurally self-modulating multivariate point process. Advances in neural information processing systems 30 (2017)
+[19]
+Melnychuk, V., Frauen, D., Feuerriegel, S.: Causal transformer for estimating counterfactual outcomes. In: International Conference on Machine Learning. pp. 15293–15329. PMLR (2022)
+[20]
+Nauta, M., Bucur, D., Seifert, C.: Causal discovery with attention-based convolutional neural networks. Machine Learning and Knowledge Extraction 1(1), 19 (2019)
+[21]
+Noorbakhsh, K., Rodriguez, M.: Counterfactual temporal point processes. Advances in Neural Information Processing Systems 35, 24810–24823 (2022)
+[22]
+Schulam, P., Saria, S.: Reliable decision support using counterfactual models. Advances in neural information processing systems 30 (2017)
+[23]
+Shchur, O., Türkmen, A.C., Januschowski, T., Günnemann, S.: Neural temporal point processes: A review (2021)
+[24]
+Shi, C., Blei, D., Veitch, V.: Adapting neural networks for the estimation of treatment effects. Advances in neural information processing systems 32 (2019)
+[25]
+Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.N., Kaiser, Ł., Polosukhin, I.: Attention is all you need. Advances in neural information processing systems 30 (2017)
+[26]
+Xiao, C., Choi, E., Sun, J.: Opportunities and challenges in developing deep learning models using electronic health records data: a systematic review. Journal of the American Medical Informatics Association 25(10), 1419–1428 (2018)
+[27]
+Xiao, S., Yan, J., Yang, X., Zha, H., Chu, S.: Modeling the intensity function of point process via recurrent neural networks. In: Proceedings of the AAAI conference on artificial intelligence. vol. 31 (2017)
+[28]
+Zhang, L.n., Liu, J.w., Song, Z.y., Zuo, X.: Temporal attention augmented transformer hawkes process. Neural Computing and Applications pp. 1–15 (2022)
+[29]
+Zhang, W., Panum, T., Jha, S., Chalasani, P., Page, D.: Cause: Learning granger causality from event sequences using attribution methods. In: International Conference on Machine Learning. pp. 11235–11245. PMLR (2020)
+[30]
+Zheng, Y., Chen, G., Huang, M.: Out-of-domain detection for natural language understanding in dialog systems. IEEE/ACM Transactions on Audio, Speech, and Language Processing 28, 1198–1209 (2020)
+[31]
+Zhou, Y., Wang, Y., Song, H., Meharizghi, T., Jazaery, M.A., Xu, P., Colin-Magana, D., Abeyakoon, A.: Deep sequence modeling for event log-based predictive maintenance. In: KDD 2023 International Workshop on Mining and Learning from Time Series (MileTS) (2023)
+[32]
+Zuo, S., Jiang, H., Li, Z., Zhao, T., Zha, H.: Transformer hawkes process. In: International conference on machine learning. pp. 11692–11702. PMLR (2020)
+Experimental support, please
+view the build logs
+for errors. Generated by
+L
+A
+T
+E
+xml
+.
+Instructions for reporting errors
+We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+methods listed below:
+Click the "Report Issue" (
+) button, located in the page header.
+Tip: You can select the relevant text first, to include it in your report.
+Our team has already identified the following issues. We appreciate your time reviewing and reporting rendering errors we
+may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+all.
+Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a list of packages that need conversion, and welcome developer contributions.
+We gratefully acknowledge support from our major funders,
+member institutions, ,
+and all contributors.
+About ·
+Help ·
+Contact ·
+Subscribe ·
+Copyright ·
+Privacy ·
+Accessibility ·
+Operational Status (opens in new tab)

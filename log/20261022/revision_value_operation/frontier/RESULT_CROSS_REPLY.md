@@ -1,0 +1,3 @@
+# Final biology reply
+
+After RESULT_CROSS.md was bound, the biology reviewer explicitly accepted the transfer-language clarification: 'no reusable increment' means no evidence of a reusable increment, not an experiment testing cross-task reuse. Its Early statement is conditional observed-subset ranking within the fixed catalog, not next-experiment selection capability. The reviewer will preserve this acceptance in an additive note rather than change its sealed original. This closes the final question; both roles maintain the same scoped STOP. No further model, threshold or data access follows.

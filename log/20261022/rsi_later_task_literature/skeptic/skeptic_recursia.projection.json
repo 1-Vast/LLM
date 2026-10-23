@@ -1,0 +1,1829 @@
+{
+  "source_sha256": "440f3a93b64fa38228bac4f22ce9a5054a36483d983b47701eed619eb9b753a2",
+  "metadata": [
+    {
+      "http-equiv": "content-type",
+      "content": "text/html; charset=UTF-8"
+    },
+    {
+      "name": "viewport",
+      "content": "width=device-width, initial-scale=1, shrink-to-fit=no"
+    }
+  ],
+  "paragraphs": [
+    {
+      "tag": "title",
+      "id": null,
+      "text": "Learning to Compose: Recursive Self-Improvement of Shared Executable Stacks for Zero-Shot Long-Horizon Robot Manipulation"
+    },
+    {
+      "tag": "p",
+      "id": "selectedTextModalDescription",
+      "text": "Content selection saved. Describe the issue below:"
+    },
+    {
+      "tag": "h1",
+      "id": null,
+      "text": "Learning to Compose: Recursive Self-Improvement of Shared Executable Stacks for Zero-Shot Long-Horizon Robot Manipulation"
+    },
+    {
+      "tag": "p",
+      "id": "abstract1.1",
+      "text": "Individually competent robot skills can fail when composed: tools may lack a required capability, completion signals may misrepresent physical progress, and one skill may leave a state that violates its successor’s prerequisites. We introduce Recursia , a recursive self-improvement framework that treats the shared executable stack, rather than individual task programs, as the persistent unit of improvement. The stack integrates tools, skills with execution contracts, handoffs, and verifiers. Source-side execution traces guide failure attribution and the generation of missing tools or repairs to existing shared components. Generality checks, mechanism tests, and paired selection and regression gates determine which changes become the next parent. The resulting stack is frozen and reused through declarative task adapters, allowing source-derived changes to support new compositions without target-side code repair. Experiments cover LIBERO-Pro Long simulation and a physical Franka FR3 equipped with a Franka Hand. In simulation, Recursia improves success over ASPIRE by 5.8 percentage points under Pos perturbations and 15.1 points under Task perturbations. Across three physical compositional target tasks, it improves mean success over the Skill Document Only baseline by 40 percentage points. Analyses of constituent execution, candidate rejection, and inference drivers distinguish local mechanism improvements from complete task success and characterize the cost of feedback-conditioned orchestration. These results examine shared executable interfaces as a concrete mechanism for compositional transfer in robot programming."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "1 Introduction"
+    },
+    {
+      "tag": "p",
+      "id": "S1.p1.1",
+      "text": "Long-horizon robot manipulation demands more than a repertoire of individually capable skills ( Mees et al., 2021 ) . Executing a pick-and-place action, for instance, is insufficient if it leaves the environment in a state that violates the preconditions of the subsequent skill ( Xu et al., 2026 ) . Grounding high-level language plans in skill affordances and perceptual geometry is therefore critical for physically feasible execution ( Ahn et al., 2022 ; Huang et al., 2023 ) . The central question is how skills acquired on source tasks can be composed to reliably solve previously unseen long-horizon target tasks."
+    },
+    {
+      "tag": "p",
+      "id": "S1.p2.1",
+      "text": "Coding agents provide a natural testbed for studying this compositional generalization ( Liang et al., 2023 ; Mu et al., 2024 ; Fu et al., 2026 ) . Language-model-generated programs can invoke perception and control APIs, implement feedback loops, and reuse procedural abstractions ( Liang et al., 2023 ) . RoboCodeX further decomposes multimodal instructions into object-centric manipulation units and synthesizes control code ( Mu et al., 2024 ) , while ProgPrompt incorporates state-feedback assertions and recovery actions into generated plans ( Singh et al., 2023 ) . Skill-library systems such as Voyager store executable procedures and use environmental feedback for extension ( Wang et al., 2023 ) ; ASPIRE combines execution feedback, program refinement, skill discovery, and evolutionary search for manipulation ( Lu et al., 2026 ) . Lifelong Robot Library Learning expands skill repertoires from accumulated experience ( Tziafas and Kasaei, 2024 ) , and Uni-Skill requests new skill implementations when existing ones fall short ( Xie et al., 2026 ) . CaP-X examines how abstraction levels, perceptual grounding, and structured execution feedback affect the reliability of embodied coding agents ( Fu et al., 2026 ) . Although these capabilities make program improvement a promising route to transfer, reliable composition depends not only on the generated task program, but critically on the shared interfaces it invokes: tools, skill contracts, inter-skill state transfers, and verification logic. Thus, the central object of study shifts from how an agent writes a program to which reusable execution semantics that program inherits."
+    },
+    {
+      "tag": "p",
+      "id": "S1.p3.1",
+      "text": "We identify four key obstacles to reliable composition: (1) Tool insufficiency , where a task requires a reusable capability absent from the initial API; (2) Semantic misalignment , where an existing tool returns normally despite failing to reach its requested pose of the next tool in the skill; (3) State incompatibility , where a skill’s terminal state violates its successor’s preconditions ( Xu et al., 2026 ) ; and (4) Verification brittleness , where incorrect checks advance an unfinished task or disturb a completed goal. These failure modes correspond to different interfaces in a hierarchical controller: tool execution, skill completion, inter-skill state transfer, and verifiers. Prior systems acquire and reuse executable skills from experience ( Wang et al., 2023 ; Tziafas and Kasaei, 2024 ; Lu et al., 2026 ) , and execution-guided self-debugging demonstrates that failed programs yield useful repair evidence ( Chen et al., 2024 ) . The Darwin Gödel Machine extends this to persistent self-modification evaluated on coding benchmarks ( Zhang et al., 2025 ) . We investigate how repairs to shared interfaces with multiple layers can be validated and retained across tasks. We hypothesize that a repair at a shared interface should improve multiple compositions, whereas a task-specific patch should benefit only the trajectory in which it is written. We examine this hypothesis through simulation and physical-robot experiments on long-horizon compositions."
+    },
+    {
+      "tag": "p",
+      "id": "S1.p4.1",
+      "text": "We propose Recursia , a framework that targets compositional generalization by treating the shared executable stack as the primary object of persistent improvement. A coding agent can add missing tools, repair skill contracts, or improve handoffs and verifiers. Each modification becomes part of a versioned implementation reused by subsequent source tasks and frozen during target-task execution. Specifically, Recursia is stack-aware and validation-gated. Source-side execution traces identify the first violated requirement, attributing failures to specific repair layers. This attribution proposes a mechanism for change but does not itself establish efficacy. Candidates must satisfy restrictions on task-specific specialization, survive paired comparisons with the parent stack, and pass the validation gate with selection gate and regression gate. Accepted changes are retained with their failure class, validation evidence, and code version. Task variation is expressed through declarative adapters. At deployment, the frozen stack relies solely on permitted robot observations; evaluator-side ground truth used during source diagnosis is never an input to the deployed policy."
+    },
+    {
+      "tag": "p",
+      "id": "S1.p5.1",
+      "text": "Our contributions are threefold: (1) We formulate skill composition as the persistent improvement of a shared executable stack integrating tools, skills with execution contracts, handoffs, and verifiers, and enable the generation of previously absent tools. (2) We introduce a failure-attributed improvement procedure that localizes repairs to specific stack layers and validates shared patches through generality and regression gates. (3) We evaluate frozen-stack transfer to long-horizon compositions in LIBERO-Pro Long simulation and on a physical Franka FR3 robot, comparing with skill-library and skill-document baselines and analyzing compositional execution, validation decisions, and inference strategies."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Figure 1: Framework overview. The improvement loop operates on four executable levels. Both newly generated tools and repairs to existing components must pass the same acceptance process before entering the shared stack. Target execution does not modify the stack."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "2 Method"
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "2.1 Problem Formulation"
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS1.p1.1",
+      "text": "Let 𝒟 src \\mathcal{D}_{\\mathrm{src}} denote the source dataset available for improvement and 𝒟 tgt \\mathcal{D}_{\\mathrm{tgt}} the target dataset used for frozen transfer. τ \\tau denotes one task. The goal is to obtain an executable shared stack through debugging with 𝒟 src \\mathcal{D}_{\\mathrm{src}} ."
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS1.p2.1",
+      "text": "After k k accepted modifications obtained from 𝒟 src \\mathcal{D}_{\\mathrm{src}} , the executable stack is"
+    },
+    {
+      "tag": "table",
+      "id": "S2.E1",
+      "text": "𝒮 k = ( 𝒯 k , 𝒦 k , ℋ k , 𝒱 k ) , \\mathcal{S}_{k}=(\\mathcal{T}_{k},\\mathcal{K}_{k},\\mathcal{H}_{k},\\mathcal{V}_{k}), (1)"
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS1.p2.2",
+      "text": "where 𝒯 k \\mathcal{T}_{k} contains tools, 𝒦 k \\mathcal{K}_{k} reusable skills, ℋ k \\mathcal{H}_{k} handoff mechanisms, and 𝒱 k \\mathcal{V}_{k} verifier mechanisms. Learning and debugging occurs through changes and modifications to executable code; the foundation model is held fixed within a comparison. The declarative adapter a τ a_{\\tau} provides object descriptions, support or destination descriptions, relation types, and goal dependencies. A shared executor composes calls to these components using a τ a_{\\tau} and the available observation history h t = ( o 0 , u 0 , … , o t ) h_{t}=(o_{0},u_{0},\\ldots,o_{t}) ."
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS1.p3.1",
+      "text": "We use zero-shot compositional transfer to mean that target-task compositions do not provide feedback for stack modification, and the frozen stack is executed without target-specific code repair. Source and target tasks may share objects, relations, or individual skills."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "2.2 Four-layer Shared Executable Stack"
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Tool."
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS2.SSS0.Px1.p1.1",
+      "text": "Tools expose reusable perception, geometry, planning, or execution operations. Their interfaces specify inputs, coordinate conventions, observable completion conditions, and resource limits. The tool set is extensible. When an attributed source failure reveals that no available operation can satisfy a required capability, the agent proposes a new shared tool rather than embedding a task-specific workaround in the adapter. A proposal defines the missing capability, an interface, the permitted observations it consumes, and tests of its intended behavior. New tools are assembled from the permitted lower-level operations and are registered only after validation. Tool generation cannot introduce privileged sensing at deployment or alter the external evaluator. We distinguish these additions from repairs to existing tools in the experimental analysis. Figure 2 illustrates representative interfaces."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Skill."
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS2.SSS0.Px2.p1.1",
+      "text": "A skill with execution contracts is represented by"
+    },
+    {
+      "tag": "table",
+      "id": "S2.E2",
+      "text": "K i = ( Pre i , π i , Post i , B i ) , K_{i}=(\\operatorname{Pre}_{i},\\pi_{i},\\operatorname{Post}_{i},B_{i}), (2)"
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS2.SSS0.Px2.p1.2",
+      "text": "where Pre i \\operatorname{Pre}_{i} defines observable prerequisites, π i \\pi_{i} is a parameterized program, Post i \\operatorname{Post}_{i} specifies evidence required at completion, and B i B_{i} bounds resource use. Preconditions and postconditions refer to task arguments and measured geometry, not identities of benchmark tasks. Execution returns evidence and a reason for termination, allowing the caller to distinguish a completed motion from an established task relation. Contracts are executable checks, not formal guarantees of correctness in unobserved states."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Handoff."
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS2.SSS0.Px3.p1.1",
+      "text": "The completion of one skill does not imply readiness for the next:"
+    },
+    {
+      "tag": "table",
+      "id": "S2.E3",
+      "text": "Post i ⁡ ( h t ) ⇏ Pre i + 1 ⁡ ( h t ) . \\operatorname{Post}_{i}(h_{t})\\not\\Rightarrow\\operatorname{Pre}_{i+1}(h_{t}). (3)"
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS2.SSS0.Px3.p1.2",
+      "text": "A handoff updates the state used by the successor, checks its prerequisites, and checks previously achieved relations that later actions could disturb. Depending on the observed failure, the shared executor may re-observe, invoke a bounded recovery, or stop. Recovery must establish the missing prerequisite before execution resumes. For instance, a completed release motion requires a subsequent retreat before the next grasp becomes executable. The handoff makes this transition explicit."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Verifier."
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS2.SSS0.Px4.p1.1",
+      "text": "The verification layer evaluates object identity and task-relevant relations from permitted observations and execution history. The external evaluator independently measures its errors; the internal evaluator’s own output is never used as the ground-truth success label. The external evaluator’s role is distinct from a motion tool’s arrival check: reaching a pose does not establish that the intended object is supported by the intended surface. The external verification uses support geometry and object identity across observations to decide whether the evidence permits advancement or recovery."
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS2.SSS0.Px4.p2.1",
+      "text": "Together, these levels define the unit of reuse. A validated tool can serve several skills, a skill can appear in several goal sequences, and a handoff or relation check can apply across tasks."
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS2.SSS0.Px4.p3.1",
+      "text": "Figure 2 shows four representative shared interfaces. The layers group responsibilities within one executable stack."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Figure 2: Representative shared-stack interfaces."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "2.3 Failure-Attributed Improvement Procedure"
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS3.p1.1",
+      "text": "The executor run source rollouts and records actions, observations and robot state. Source diagnosis use simulator ground truth to distinguish failure mechanisms, while the deployed stack remains restricted to permitted observations. The attribution procedure identifies the earliest supported violation of an execution requirement and records its stage, evidence, and affected component. It distinguishes an absent capability from an incorrectly implemented one."
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS3.p2.1",
+      "text": "The coding agent receives this evidence and proposes a candidate modification δ \\delta . The proposal names the failure class, the stack level to modify, the intended repair, and the tests that would evaluate the repair. Examples in Figure 2 include adding a missing constrained-motion operation, preventing unexecuted planning candidates from changing later solves, or revising a handoff that starts its successor before transport has completed. The candidate repair modify an existing component of 𝒮 k = ( 𝒯 k , 𝒦 k , ℋ k , 𝒱 k ) \\mathcal{S}_{k}=(\\mathcal{T}_{k},\\mathcal{K}_{k},\\mathcal{H}_{k},\\mathcal{V}_{k}) or extend the inventory. For instance, the candidate repair can extend the tool inventory as follows:"
+    },
+    {
+      "tag": "table",
+      "id": "S2.E4",
+      "text": "𝒮 ′ = Apply ( 𝒮 k , δ ) , 𝒯 ′ = 𝒯 k ∪ { t new } for an accepted tool addition . \\mathcal{S}^{\\prime}=\\operatorname{Apply}(\\mathcal{S}_{k},\\delta),\\qquad\\mathcal{T}^{\\prime}=\\mathcal{T}_{k}\\cup\\{t_{\\mathrm{new}}\\}\\quad\\text{for an accepted tool addition}. (4)"
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS3.p2.2",
+      "text": "At each improvement iteration, the agent selects one shared-module slot for modification. Candidate changes are confined to that slot. For example, when the shared-tool slot is selected, the other shared components, diagnostic procedures, retrieval, search code, and data splits remain fixed during that iteration. First-failure attribution guides where to intervene, while the mechanism tests and paired execution determine whether that intervention works."
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS3.p3.1",
+      "text": "Recursia also allows the strategy update to change across iterations. Specifically, adjustments to the verification gate and the types of data used for debugging alter how candidate modifications are evaluated and which failures guide subsequent repair. These changes persist into later iterations, making the improvement procedure itself an object of adaptation. In later iterations, expanding patch selection from top-1 to top- n n effectively transforms the self-improvement process from a sequential chain into a beam search."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "2.4 Multidimensional Validation Gate"
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS4.p1.1",
+      "text": "Candidate acceptance combines three types of evidence. Firstly, generality checks reject benchmark-specific specialization in shared code, including task or seed identifiers and object- or scene-specific control branches. Geometric constants require a documented source, such as robot calibration, measured geometry, or a declared object-independent construction."
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS4.p2.1",
+      "text": "Secondly, mechanism tests check the proposed behavior before broader execution. Perception and verification patches can be replayed on recorded observations. Motion patches require execution tests, because an old trajectory does not reveal what a new controller would do. Tests also check interface compatibility and whether downstream actions respect failure returns. A newly generated tool must demonstrate both its intended capability and bounded handling of unsupported requests."
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS4.p3.1",
+      "text": "Finally, parent and candidate are compared on identical source-task states under a resource policy fixed before candidate evaluation in the current iteration. Let G ⁡ ( δ ) G(\\delta) indicate the generality checks, U ⁡ ( δ ) U(\\delta) the mechanism tests, and R ⁡ ( 𝒮 ′ , 𝒮 k , 𝒟 sel , B ) R(\\mathcal{S}^{\\prime},\\mathcal{S}_{k};\\mathcal{D}_{\\mathrm{sel}},B) the paired performance and regression gate. Acceptance is"
+    },
+    {
+      "tag": "table",
+      "id": "S2.E5",
+      "text": "Accept ⁡ ( δ ) = G ⁡ ( δ ) ∧ U ⁡ ( δ ) ∧ R ⁡ ( 𝒮 ′ , 𝒮 k , 𝒟 sel , B ) . \\operatorname{Accept}(\\delta)=G(\\delta)\\land U(\\delta)\\land R(\\mathcal{S}^{\\prime},\\mathcal{S}_{k};\\mathcal{D}_{\\mathrm{sel}},B). (5)"
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS4.p3.2",
+      "text": "The gate considers source-task success, regressions on other source tasks, and resource use. At the beginning of each RSI iteration, the coordinator fixes the evaluation panels, acceptance criteria, and resource budgets for that iteration. These settings may change between iterations as the stack evolves, but remain fixed when comparing the parent with candidates within the same iteration. Rejected candidates do not replace the parent. Accepted candidates retain their code hash, source failure, tests, and paired results."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Algorithm 1 Recursia Debugging Phrase for One Iteration"
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS4.p4.1",
+      "text": "At inference time, all shared implementations are frozen. The target adapter specifies the requested composition, and execution logs identify the versions invoked by each subgoal."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "3 Experiments"
+    },
+    {
+      "tag": "p",
+      "id": "S3.p1.1",
+      "text": "Our experiments examine whether source-side improvement of a shared executable stack transfers to unseen long-horizon compositions and which levels of the shared stack contribute to transfer."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "3.1 Experimental Setup"
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Setup."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS1.SSS0.Px1.p1.1",
+      "text": "We use LIBERO-90 ( Liu et al., 2023 ) for debugging, including failure diagnosis, repair generation, and candidate selection. Improvements persist in a versioned executable stack rather than in target-specific programs. All source-side development is completed before target evaluation, and the selected stack is frozen together with its tools, skill implementations, handoff logic, and verifiers. The coding model and its parameters remain fixed within each controlled comparison."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS1.SSS0.Px1.p2.1",
+      "text": "The first track evaluates the frozen stack on LIBERO-Pro Long, following the long-horizon transfer setting studied by ASPIRE ( Zhou et al., 2025 ; Lu et al., 2026 ) , with 10 long-horizon tasks evaluated along two axes. Pos changes initial object positions; Task changes the task specification. Each task–axis pair is evaluated on seeds 1–50, yielding 500 episodes per axis. The 10 task names and their axis-specific results are listed in Appendix D . The second track evaluates on a physical Franka FR3 equipped with a Franka Hand. Physical evaluation trajectories are not used for stack repair or selection."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Baselines."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS1.SSS0.Px2.p1.1",
+      "text": "We compare with OpenVLA ( Kim et al., 2024 ) , π 0 \\pi_{0} ( Black et al., 2025 ) , π 0.5 \\pi_{0.5} ( Physical Intelligence et al., 2025 ) , CaP-Agent0 ( Fu et al., 2026 ) , and ASPIRE ( Lu et al., 2026 ) . CaP-Agent0’s published protocol regenerates programs per seed with test-time reasoning and retries, whereas ASPIRE fixes one program per task without target debugging; this difference is retained when interpreting the comparison."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Metrics."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS1.SSS0.Px3.p1.1",
+      "text": "We measure full-task success using the official benchmark evaluator. For task i i and perturbation axis a a , success is the fraction of successful episodes among its 50 evaluation states. Axis success is the unweighted mean over the 10 task rates; Overall is the mean of the Pos and Task macro-averages. Rates are reported on [ 0 , 1 ] [0,1] . Failures, timeouts, and program errors remain in the denominator. We report source-improvement costs separately from target-execution costs, including model input/output tokens, wall time, and perception calls. Matched reruns use identical initial states and report paired outcomes."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "3.2 Evaluation in Simulation: Zero-Shot Transfer to Long-Horizon Tasks on LIBERO-Pro-Long"
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS2.p1.1",
+      "text": "Here N N denotes the number of improvement iterations; each iteration processes five source samples. Figure 3 presents the primary zero-shot comparison separately for position ( Pos ) and task-specification ( Task ) perturbations. The source-experience scaling analysis is provided in Appendix D.2 , Figure 7 . We report separately frozen Recursia stacks after N ∈ { 0 , 3 , 6 , 9 , 10 , 12 , 13 , 14 , 15 , 16 , 17 , 18 } N\\in\\{0,3,6,9,10,12,13,14,15,16,17,18\\} improvement iterations to examine how transfer changes with source-side experience. Each snapshot is selected using source data only and evaluated without target-driven modification. This comparison tests whether source-side changes to shared execution mechanisms remain useful when the target composition changes and no target feedback is available for repair. Recursia achieves success rates of 0.284 on Pos and 0.534 on Task . Across the supplied scaling checkpoints, success rises from 0 at N = 0 N=0 to 0.232 and 0.434 at N = 18 N=18 , respectively, with nonmonotonic intermediate changes."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Figure 3: Zero-shot transfer to LIBERO-Pro Long. (a) Position perturbations ( Pos ). (b) Task-specification perturbations ( Task ). Baseline success rates are reproduced from the existing comparison; Recursia achieves success rates of 0.284 on Pos and 0.534 on Task . Aggregate and per-task tables appear in Appendix D ."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "3.3 Evaluation on a Physical Robot: Zero-Shot Transfer to Long-Horizon Tasks with Franka FR3"
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS3.p1.1",
+      "text": "We compare Recursia with Skill Document Only (SD-only) on a Franka FR3 equipped with a Franka Hand. SD-only uses the tool implementation of ASPIRE and updates a single natural-language skill document, whereas Recursia updates a shared executable Python stack. Both use GPT-6 Astra, front and wrist observations, and the same six robot tools with SAM3 and Contact-GraspNet."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS3.p2.1",
+      "text": "The six physical source tasks cover placing a mug or milk carton in a basket, placing white and blue mugs on the left and right plates, placing a plastic bowl on a plate, and placing a mug in the bowl. Each source task contributes three retained development rollouts. SD-only runs three passes through the source suite; Recursia groups the tasks into three two-task chunks, evaluating the current stack and two candidate updates on each pair."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS3.p3.1",
+      "text": "The targets compose these actions: T1 places the mug and milk carton in the same basket; T2 places the blue mug on the left plate and the white mug on the right plate, reversing their source assignments; T3 first places the bowl on the plate, then the mug in the relocated bowl. Source knowledge is frozen before evaluation. Within-trial feedback corrections do not update persistent knowledge. Each target is evaluated ten times per method, with at most 20 code blocks per trial. Task success is assessed manually."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Table 1: Success rates (%) on physical compositional target tasks using Franka FR3 with Franka Hand."
+    },
+    {
+      "tag": "table",
+      "id": "S3.T1.4",
+      "text": "Task SD-only Recursia T1: Shared basket 0.0 20.0 T2: Reassigned plates 60.0 80.0 T3: Bowl–mug dependency 20.0 100.0 Average 26.7 66.7"
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "3.4 Analysis of Compositional Generalization"
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS4.p1.1",
+      "text": "The Recursia framework targets compositional generalization, combining knowledge from multiple source tasks to enable zero-shot transfer to long-horizon target tasks. This subsection aims to demonstrate this capability through retrospective case studies. Compositional transfer requires both competent constituent skills and compatible states at their boundaries. To disentangle improvements in individual skills from those in compositional ability, we examine this distinction through retrospective execution cases, separating two events: completion of the predecessor’s goal and establishment of the successor’s prerequisites. In particular, while the predecessor task is complete in the current state, this does not guarantee that the next object can be readily identified, reached, or manipulated. A useful diagnostic is the difference between isolated and chained success:"
+    },
+    {
+      "tag": "table",
+      "id": "S3.E6",
+      "text": "Δ chain = p success isolated − p success chained \\Delta_{\\mathrm{chain}}=p_{\\mathrm{success}}^{\\mathrm{isolated}}-p_{\\mathrm{success}}^{\\mathrm{chained}} (6)"
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS4.p1.2",
+      "text": "This quantity measures sensitivity induced by composition capability."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Improving isolated skills does not remove the downstream bottleneck."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS4.SSS0.Px1.p1.1",
+      "text": "At N = 11 N=11 , the standalone stove-on operation improved from 0 / 10 0/10 to 10 / 10 10/10 on both development and selection datasets, whereas the stove-pan composition remained 0 / 10 0/10 . In the inspected development rollouts, the stove-on predicate became True , but subsequent manipulation lost the pan after a grasp attempt; alternative candidates were also rejected as outside the inverse-kinematics workspace. Thus, the rotary repair improved the first operation without establishing the conditions needed to complete the second. This comparison locates the remaining bottleneck and shows the difference between isolated and chained success. Our approach filled this gap by handoff repair mechanism, in the later iterations."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Relational success and successor readiness are distinct."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS4.SSS0.Px2.p1.1",
+      "text": "In the N = 6 N=6 mug-pudding sequence, the mug-on-plate predicate became True in all ten Pos episodes, while the full conjunction succeeded in only one. In seed 42, the mug goal became True at step 573 and remained True , but subsequent pudding binding returned not_found . Seed 41 provides a successful contrast: the mug goal became True at step 552 and the pudding goal at step 1440, with the first goal preserved (Figure 4 ). A drawer sequence exhibits the same failure structure: seed 48 achieved bowl containment, but closing stopped at part_not_found . These traces identify perceptual binding as a prerequisite that is not certified by predecessor goal completion."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS4.SSS0.Px2.p2.1",
+      "text": "Together, these cases distinguish failures of successor execution from failures to establish successor readiness. The observed mug-pudding failure belongs to the second category, with the first goal preserved; the stove-pan failure exposes downstream manipulation limitations after stove-on succeeds. These evidence supports a conclusion: predecessor completion and successor readiness must be examined separately and processed by the handoff mechanism."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Figure 4: Recorded compositional generalization cases. Original RGB recordings and official predicate timelines for the N=6 mug–pudding sequence. (a) Seed 42 completes the mug goal, but pudding binding returns not_found ; the earlier goal remains true through termination. (b) Seed 41 completes both goals while preserving the first. Gray segments denote false predicates; blue and teal segments denote true predicates. Across ten swap-suite episodes, the mug predicate is true at termination in all ten, whereas the full conjunction succeeds in one. The two illustrated seeds have different initial states. RGB frame identifiers and simulation-step timestamps use separate counters."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "3.5 Analysis of Inference Methods"
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS5.p1.1",
+      "text": "All inference methods are driven by declarative adapters. We compare three inference drivers over the same frozen shared stack: rule-based driver, one-shot task-program driver, and online closed-loop driver. These drivers differ in how high-level execution decisions are specified and updated. The rule-based driver follows predefined decision rules. The one-shot task-program driver executes an initially generated program, which may include observation-dependent branches and bounded retries. The online closed-loop 1 1 1 The label “closed-loop” here denotes the inference driver’s decision process, rather than a property exclusive to its low-level robot controller. driver conditions subsequent decisions on observations and execution outcomes throughout the episode. All three may use observation feedback and closed-loop low-level control. The results are shown in Figure 5 . One-shot generation describes the lifetime of the program, rather than an absence of feedback during its execution. In ASPIRE’s zero-shot setting, task-program generation excludes target-side debugging, but the one-shot generated program may still re-observe the scene and use closed-loop low-level control ( Lu et al., 2026 ) . Here, we use the frozen shared stack."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Figure 5: Inference-driver comparison on a frozen stack of the N = 13 N=13 iteration. (a) Pos and (b) Task success rates, each 50 matched episodes. (c) Mean end-to-end episode time, including program generation and robot execution, for all episodes."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "The online closed-loop driver outperforms the one-shot task-program driver."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS5.SSS0.Px1.p1.1",
+      "text": "The comparison between the online closed-loop driver and one-shot task-program driver is more limited. After multiple tries, the online closed-loop driver always gains more successful trajectories. The trajectories show that the drivers have different failure and success profiles. It reveals that the closed-loop decision making may resolve failures encountered by a fixed generated program while introducing other failures."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Feedback incurs latency without uniform gains across perturbation axes."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS5.SSS0.Px2.p1.1",
+      "text": "The rule-based, one-shot, and closed-loop drivers achieve Pos success rates of 12 % 12\\% , 16 % 16\\% , and 16 % 16\\% , and Task success rates of 24 % 24\\% , 30 % 30\\% , and 32 % 32\\% , respectively. Mean end-to-end episode times are 5.28 5.28 , 6.88 6.88 , and 7.22 7.22 minutes on Pos , and 5.20 5.20 , 5.95 5.95 , and 7.15 7.15 minutes on Task (Figure 5 ). These durations include generation and execution, with runtime model latency counted within execution; failures and timeouts remain in the averages."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Feedback-condition mechanism incurs latency without uniform gains across perturbation axes."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS5.SSS0.Px3.p1.1",
+      "text": "Mean end-to-end episode times are 5.28 5.28 , 6.88 6.88 , and 7.22 7.22 minutes on Pos , and 5.20 5.20 , 5.95 5.95 , and 7.15 7.15 minutes on Task . These durations include generation and execution, with runtime model latency counted within execution; failures and timeouts remain in the averages. Relative to one-shot generation, closed-loop inference adds approximately 21 21 seconds per Pos episode, and 72 72 seconds per Task episode for a two-percentage-point gain. The incremental benefit is therefore concentrated in Task perturbations, whereas the Pos results do not show an aggregate improvement from additional feedback-conditioned decisions. Relative to the rule-based driver, one-shot generation gains four and six percentage points at additional mean costs of approximately 96 96 and 45 45 seconds on Pos and Task . In this comparison, much of the observed success improvement is already obtained by one-shot orchestration."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "3.6 Analysis of the Validation Gate"
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS6.p1.1",
+      "text": "The Recursia framework incorporates two critical validation components for the validation gate, i.e., the selection gate and the regression gate , to address two distinct risks: a candidate may correct a local mechanism without improving overall task completion (mitigated by the selection gate), or improve aggregate completion while disrupting previously successful states (mitigated by the regression gate). This subsection uses retrospective case studies to demonstrate their effectiveness. In the book-transfer task, the development summary reported candidate-filter rejection in eight of ten episodes for early iterations N = 8 N=8 . Inspecting the earlier execution revealed a defect: the robot had already grasped and lifted the intended book, but a post-lift visual query selected a similar book that remained on the table. The low re-detected position was treated as evidence of a failed lift, causing the gripper to open and subsequent grasp attempts to fail. The subsequent iterations attempt to repair this identity check. We employ the validation framework to ensure the recognition of a known stationary competitor following a verified lift, while preserving the existing motion and hold checks."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Selection gate rejects candidates with insufficient improvement on the selection dataset."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS6.SSS0.Px1.p1.1",
+      "text": "A repair during N = 9 N=9 changed the transport-to-descent boundary for book insertion so that entry into the opening remained under contact-aware control. Development release refusals attributed to the lateral corridor decreased from 8 to 2, and most tests passed. Nevertheless, official completion improved only from 0 / 10 0/10 to 1 / 10 1/10 in the development dataset and remained 0 / 10 0/10 in the selection dataset, below the predeclared gains of two and one successes, respectively. The reason is that removing a prominent failure mechanism exposed remaining arrival, contact, and grasp failures. Although the candidate passed the paired-loss checks, it was rejected by the selection gate for insufficient improvement on the selection dataset."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Regression gate prevents aggregate gains from concealing lost successes."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS6.SSS0.Px2.p1.1",
+      "text": "The N=11 iteration increased development completion from 2 / 50 2/50 to 3 / 50 3/50 and selection completion from 7 / 50 7/50 to 11 / 50 11/50 . However, one basket-placement task retained its selection total of 5 / 10 5/10 by gaining two states and losing two previously successful states. The two losses exceeded the per-task cap of one, and the candidate was rejected by the regression gate. Development book-insertion corridor refusals also fell from nine to zero without producing a completed insertion. These cases motivate checking trajectories, outcomes and paired losses in addition to aggregate development scores (Figure 6 )."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Figure 6: Recorded validation-gate cases. (a) Initial state. Original simulator frames from the N=8 iteration, both with seed 86. (b) Development and selection successes for this task. (c) The iteration N=9 reduced a local failure mechanism but failed the predeclared outcome gains. (d) The iteration N=11 improved the aggregate selection score while losing two previously successful basket-placement states, exceeding the per-task loss cap."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "3.7 Analysis of Tool Repair and Tool Generation"
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS7.p1.1",
+      "text": "Table 2 summarizes representative entries and shows generated repairs extend the callable inventory. The N=10 iteration added support-instance and placement semantics for previously refused front/middle relations, reusing the existing instance selector and placement primitives. Instruction dispatch coverage increased from 81 / 90 81/90 to 84 / 90 84/90 , and the front-of-mug task improved from 0 / 10 0/10 to 8 / 10 8/10 in development dataset and 0 / 10 0/10 to 7 / 10 7/10 in selection dataset. The N=11 iteration subsequently generated a shared run_rotary driver that served both turn-on and turn-off instructions, corrected the pinch frame, and re-anchored turn increments on the executed tool pose. Twenty tests passed, and the driver was invoked in both standalone stove activation and the stove–pan sequence."
+    },
+    {
+      "tag": "table",
+      "id": "S3.T2.2",
+      "text": "Entry Failure Repair Recorded Result N=10 Lack of front/middle reference relations Shared instance selection and relation dispatch Dispatch 81 / → 84 / 90 81/90\\!\\rightarrow\\!84/90 ; gains measured on source tasks. N=11 Rotary localization, pinch, and arc defects Shared turn-on/off driver Turn-on 10 / 10 10/10 in each panel."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Table 2: Representative repairs. Rates refer to the specified tasks, not the complete Long-Pro benchmark."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "4 Related Work"
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Embodied Agents."
+    },
+    {
+      "tag": "p",
+      "id": "S4.SS0.SSS0.Px1.p1.1",
+      "text": "Language-guided robot agents connect high-level reasoning to physical execution through learned action models or executable programs. Vision-language-action models (VLA) such as RT-2, OpenVLA, and π \\pi series map visual observations and language instructions to robot actions ( Brohan et al., 2023 ; Kim et al., 2024 ; Black et al., 2025 ) . Programmatic approaches instead express control through calls to perception and action interfaces. Code as Policies composes these calls into robot programs and recursively generates missing helper functions ( Liang et al., 2023 ) , while ProgPrompt grounds plan generation in programmatic descriptions of available actions and objects ( Singh et al., 2023 ) . CaP-X extends this setting with systematic evaluation of coding agents, structured execution feedback, and automatic skill synthesis ( Fu et al., 2026 ) . Together, these approaches provide the building blocks for language-guided manipulation. Recursia focuses on how those building blocks improve across tasks: it persistently modifies the shared tools, skills, handoffs, and verifiers that generated programs invoke."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Embodied Recursive Self-Improvement."
+    },
+    {
+      "tag": "p",
+      "id": "S4.SS0.SSS0.Px2.p1.1",
+      "text": "A central question in recursive self-improving agents is where experienc and knowledge is retained and how it changes subsequent behavior. The Darwin Gödel Machine retains improvements in the agent’s own code and evaluates successive variants on coding benchmarks ( Zhang et al., 2025 ) . In robotics, Eureka uses language models to generate reward functions for policy learning ( Ma et al., 2024 ) , while evolutionary code search directly synthesizes executable control policies ( Guo et al., 2026 ) . Skill-library approaches retain experience as reusable procedures. Voyager accumulates executable skills in Minecraft ( Wang et al., 2023 ) ; Lifelong Robot Library Learning bootstraps composable skills for robot control ( Tziafas and Kasaei, 2024 ) ; and Uni-Skill requests new implementations when its existing repository cannot support a plan ( Xie et al., 2026 ) . These approaches make accumulated experience available to later tasks through improved policies, programs, or skill repertoires. ASPIRE ( Lu et al., 2026 ) brings execution-driven repair and skill accumulation into a continual robot-programming loop. It uses execution traces to diagnose failures, distills validated fixes into a transferable skill library. Its evaluation includes transfer to unseen long-horizon tasks, making it the closest precursor to Recursia . Zero-shot transfer is also studied in the context of lifelong learning ( zhou2025lifelong ) , where a robot learns to perform new tasks without additional training. Recursia differs from these approaches by focusing on the shared executable stack as the unit of improvement, allowing for more systematic and reusable repairs across tasks."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Compositional Generalization for Robotics."
+    },
+    {
+      "tag": "p",
+      "id": "S4.SS0.SSS0.Px3.p1.1",
+      "text": "Compositional generalization requires familiar capabilities to remain effective when objects, goals, or action sequences are combined in new ways. CLIPort studies language-conditioned manipulation through semantic and spatial abstractions ( Shridhar et al., 2021 ) , and VIMA evaluates progressively more novel combinations of task components ( Jiang et al., 2022 ) . At longer horizons, CALVIN evaluates sequences of language-conditioned manipulation tasks ( Mees et al., 2021 ) , while LIBERO studies knowledge transfer across spatial, object, goal, and task variations ( Liu et al., 2023 ) . LIBERO-PRO adds perturbations to initial object positions and task specifications ( Zhou et al., 2025 ) . These evaluation settings expose several dimensions of transfer, from recognizing a new combination of familiar concepts to executing a sequence under changed conditions."
+    },
+    {
+      "tag": "p",
+      "id": "S4.SS0.SSS0.Px3.p2.1",
+      "text": "Reliable sequence execution also depends on the states passed between skills. BATON addresses this dependency by exploring subtasks separately and storing transition-aware memory: verification checks readiness, handoff restoration repairs entry conditions, and lookahead favors outcomes that the next subtask can use ( Xu et al., 2026 ) . Its treatment of transitions makes explicit why a skill can succeed in isolation yet fail as part of a chain. Recursia places this dependency within a broader stack-improvement problem. Handoff repairs are validated alongside changes to tools, skill contracts, and verification, and their shared implementations are reused unchanged on target compositions. Our evaluation therefore examines both the competence of individual skills and the reliability of their composition, tracing transfer to source-side changes in the executable stack."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "5 Limitations and Conclusion"
+    },
+    {
+      "tag": "p",
+      "id": "S5.p1.1",
+      "text": "Our evaluation has several limitations. First, source-side ground-truth diagnosis provides information that may not be available on a physical robot. In simulation, failed episodes can be reset to a controlled initial state and replayed repeatedly. On a physical robot, resetting the scene can be slow, unsafe, or impossible after an object has moved, and the diagnostic evidence needed to identify the first violated requirement is often incomplete or expensive to obtain. Deployment does not consume simulator ground truth, but transferring the improvement procedure itself to real hardware therefore requires reliable alternatives, such as calibrated state logging, external sensing, human annotations, or conservative uncertainty handling. Second, we have not evaluated cross-embodiment generalization. All source and target experiments use the same robot embodiment and execution interfaces. A shared repair may depend on kinematics, gripper geometry, controller conventions, or calibration details, so transfer across robot platforms remains untested."
+    },
+    {
+      "tag": "p",
+      "id": "S5.p2.1",
+      "text": "We present a framework for improving the shared executable mechanisms through which coding agents compose robot skills. The stack can grow when a required tool is missing and change when existing tools, contracts, handoffs, or verification fail. Source failure attribution directs these changes, while validation gates determine which changes persist. Frozen reuse then connects a source-side modification to the code executed in an unseen long-horizon composition. The primary LIBERO-Pro Long results are 28.4% on Pos and 53.4% on Task ."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "References"
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "Appendix A Debugging Pipeline"
+    },
+    {
+      "tag": "p",
+      "id": "A1.p1.1",
+      "text": "This appendix documents the partial artifact, including the implementation description. The debugging pipeline separates proposal generation from evaluation. The verifier runs a frozen parent, records public observations and simulator/physical diagnostics, and supplies development evidence to one proposer. The proposer diagnoses a failure, makes several proposals, modifies shared code, replays the proposed decisions offline, and supplies tests. The verifier builds only after the final report, checks the candidate, runs a fixed paired plan, and records acceptance or rejection. An accepted program becomes the next parent; a rejected candidate leaves the parent unchanged. The prompt boxes reproduce templates and partial excerpts. Deployment-specific paths and login fields are replaced by $ASPIRE_ROOT , <user> , and <server> ; typographic punctuation is normalized. Braced variables are filled by the coordinator. These are implementation records, including their historical restrictions."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "A.1 Shared-Stack Proposer"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS1.p1.1",
+      "text": "The proposer receives the frozen program, running log, failure attribution, descriptor data, and patch-building interface. Its output is one shared-module change, with diagnosis and offline evidence preceding simulation. The nine builder module labels are motion_preconditions , grasp_geometry , hold_contract , place_primitive , verifier , binding , language_adapter , manipulation_primitive , and task_driver . These labels support attribution and dependency checks across the four conceptual layers."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "A.2 Verifier"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS2.p1.1",
+      "text": "The “verifier” role is implemented by deterministic checks and an evaluator review. The coordinator runbook specifies how to invoke the builder, coverage gate, paired rollout gate, and review, and when the accepted parent may change. The adapted instructions below summarize the coordinator’s evaluation responsibilities."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Check implementation."
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS2.SSS0.Px1.p1.1",
+      "text": "The builder checks exact patch anchors, the declared module, a forbidden-literal list in inserted text, Python compilation, and supplied test_*.py files. Missing tests produce a warning in the inherited builder; the protocol and evaluator require them."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Paired acceptance."
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS2.SSS0.Px2.p1.1",
+      "text": "Each rollout stage contains NUM rows: NUM development episodes (seeds 86–95), NUM selection episodes (the same tasks, seeds 76–85), NUM ordinary-source regression episodes, and NUM synthetic-regression episodes. Here “synthetic” denotes instantiated simulator tasks in the protocol. A group’s net official gain must be at least two development states and one selection state. Losses are counted separately: at most one state per task per role, and at most one in each regression role. Both stages must pass integrity checks; at most four clean horizon timeouts are permitted. Passing the numeric gate is insufficient: the evaluator must inspect new physical completions and new regression failures."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "Appendix B Inference Pipeline"
+    },
+    {
+      "tag": "p",
+      "id": "A2.p1.1",
+      "text": "Inference executes a frozen shared program. The data-only adapter adapter_v3.py constructs descriptors from the public runtime instruction env.handle.task_language . To keep general, it does not take a task identifier, scene identifier, seed, or simulator state as input. The program’s la_parse produces ordered subgoals and la_dispatch checks every subgoal before any motion. Unsupported instructions stop explicitly. These functions are deterministic code. The following boxes present concise versions of its localization and identity prompts, using symbolic placeholders for runtime values."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "B.1 Object Localization"
+    },
+    {
+      "tag": "p",
+      "id": "A2.SS1.p1.1",
+      "text": "Revision NUM preserves a confident text-based binding and uses VLM localization when text binding fails. The model sees a public camera image, the instruction, the current object phrase, and the execution phase. It returns a pixel or abstains. The point prompts SAM3; masks must contain the point, occupy no more than 8% of the image, and yield at least 50 deprojected depth points. Only medium or high confidence proceeds."
+    },
+    {
+      "tag": "p",
+      "id": "A2.SS1.p3.1",
+      "text": "When association with the frozen reference fails before grasping, the query includes the initial image with the reference highlighted in magenta. The dimensions {W} and {H} , instruction, phrase, and phase are runtime substitutions."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "B.2 Choosing a Whole-Object Mask"
+    },
+    {
+      "tag": "p",
+      "id": "A2.SS2.p1.1",
+      "text": "SAM3 can return nested masks at one point. At initial binding, a separate query chooses the complete object rather than an inner surface, lid, merged support, or rival instance. Image 1 provides the full view; subsequent images show the highlighted candidate crops. The response selects one candidate image label or abstains. Reference-conditioned localization instead selects among nested masks using the frozen body’s size."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "B.3 Identity Before Grasping and Transport"
+    },
+    {
+      "tag": "p",
+      "id": "A2.SS3.p1.1",
+      "text": "The stack freezes object references before any object moves. Before grasping, it associates a point-prompt mask by majority overlap or a 3 cm center-distance bound; failed association invokes reference-conditioned localization. A confirmed, unchanged reference can bypass another identity query. Otherwise, the cross-frame prompt below returns yes , no , or unsure ."
+    },
+    {
+      "tag": "p",
+      "id": "A2.SS3.p3.1",
+      "text": "After grasping, the query compares the frozen reference, the pregrasp confirmation, and the current lifted object. The template accommodates either two or three images: the pregrasp confirmation is included when available."
+    },
+    {
+      "tag": "p",
+      "id": "A2.SS3.p5.1",
+      "text": "Transport requires verified identity, a verified hold, a reached lift, and at least 5 cm of observed object-base rise. A positive model answer alone is insufficient."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "B.4 Structured Responses and Runtime Configuration"
+    },
+    {
+      "tag": "p",
+      "id": "A2.SS4.p1.1",
+      "text": "The point-query schema requires abstain , integer x / y , a confidence enum, and a reason. Identity queries require a verdict enum and a reason; mask-choice queries require choice (a candidate image label or none ) and a reason. Table 3 summarizes the response fields; additional fields are disallowed."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Table 3: Structured outputs for the inference prompts. Every response includes a brief reason."
+    },
+    {
+      "tag": "table",
+      "id": "A2.T3.4",
+      "text": "Query Required fields Allowed values Point localization abstain , x , y , confidence , reason Boolean abstention; integer pixel coordinates; confidence: low , medium , or high . Mask selection choice , reason A candidate image label, or none . Identity / mask review verdict , reason yes , no , or unsure ."
+    },
+    {
+      "tag": "p",
+      "id": "A2.SS4.p2.1",
+      "text": "We set the model identifier to claude-opus-5-5 , effort to low , and the default response limit to 3,000 tokens. It sends images and prompt text as one user message with a JSON-schema output format; it adds no separate system prompt. Errors, refusals, truncation, or budget exhaustion return no usable answer and are handled conservatively by the policy."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Execution."
+    },
+    {
+      "tag": "p",
+      "id": "A2.SS4.SSS0.Px1.p1.1",
+      "text": "Motion-dependent actions use explicit arrival/contact results, and failed transport or release checks invoke bounded recovery. The placement verifier distinguishes ready_to_release from placed and measures support geometry, identity, gripper clearance, and two-frame stability. However, this snapshot sets enforce=False and corrections=False : the placement verifier is a shadow monitor, whereas the contact-aware descent gate controls release. At the outer plan level, run() logs a subgoal’s return value and starts the next subgoal; it does not require the shadow placement verdict to be success . Consequently, the implementation should not be described as enforcing every placement postcondition at every skill boundary. Official task completion is measured by the evaluator separately from controller logs."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "Appendix C Implementation Details"
+    },
+    {
+      "tag": "p",
+      "id": "A3.p1.1",
+      "text": "The final artifact should include the shared-stack snapshots, source and target adapters, accepted and rejected patch ledger, evaluator implementation, exact model identifiers, environment revisions, and commands reproducing each table. Implementation records are organized by frozen program version and evaluation phase. A version record links the parent and candidate code hashes to the proposed patch, tests, gate decision, and rollout directories. Episode records identify the instruction, perturbation axis, task, seed and initial-state index, program hash, official outcome, termination status, and wall-clock duration. The inference comparison uses the N13 stack and the N13O/N13C driver records; these artifact identifiers name recorded implementations rather than additional learned stacks. A public artifact URL is not yet specified."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "C.1 Grasping-backend Mismatch"
+    },
+    {
+      "tag": "p",
+      "id": "A3.SS1.p1.1",
+      "text": "Our simulation experiments use the open-source Contact-GraspNet backend rather than the AnyGrasp Fang et al. (2023) backend used in the ASPIRE configuration considered for comparison. This mismatch limits the fairness of a direct performance comparison, because differences in grasp proposal quality may affect both individual manipulation outcomes and long-horizon task completion. We speculate that replacing Contact-GraspNet ( Sundermeyer et al., 2021 ) with AnyGrasp could improve grasp-dependent execution; this effect has not been measured in a matched backend comparison."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "C.2 Adapter and Contract Schemas"
+    },
+    {
+      "tag": "p",
+      "id": "A3.SS2.p1.1",
+      "text": "The data-only adapter constructs descriptors from the public runtime instruction. Its fields separate objects , supports , and articulated parts, together with side-word mappings, language templates, anaphora templates, and support prompts. Object and support entries map referring phrases to perception prompts; they do not contain controller code. The adapter takes no benchmark task ID, seed, or simulator state as a policy input. A shared parser produces ordered subgoals, and dispatch checks whether each requested operation is supported before motion begins."
+    },
+    {
+      "tag": "p",
+      "id": "A3.SS2.p2.1",
+      "text": "Placement distinguishes support relations from relative placement, including on_support and beside_support ; later extensions add front/middle reference semantics. The supported vocabulary is versioned with the stack, and unsupported relations are refused rather than silently approximated. Dependencies are expressed by subgoal order and executable readiness checks: completion of one subgoal does not bypass the next skill’s preconditions. For example, placing pudding beside a plate in a source instruction and placing it beside a plate after a mug-placement subgoal invoke the same relation-aware implementation with different runtime descriptors."
+    },
+    {
+      "tag": "p",
+      "id": "A3.SS2.p3.1",
+      "text": "Motion results expose a status, detail, reason, reached flag, and elapsed wall_s . Recorded statuses include reached , unreachable , stalled , uncertain , invalid_input , and budget_exhausted . A reached motion is distinct from an established placement relation. Motion budgets are measured in control steps; episode limits additionally use wall-clock seconds. In the recorded inference-driver comparison, the common limits are 4,000 simulation steps and 1,500 seconds per episode, including model calls."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "C.3 Regression Gates"
+    },
+    {
+      "tag": "p",
+      "id": "A3.SS3.p1.1",
+      "text": "Candidate construction checks exact patch anchors, the declared shared module, forbidden literals in inserted code, Python compilation, and supplied test files. Identifier checks constrain explicit specialization to benchmark tasks or seeds. These automated checks do not establish semantic generality; review additionally examines whether geometric constants follow calibration, measured geometry, or an object-independent construction. Missing tests produce a warning in the inherited builder, while the evaluation protocol requires supporting tests before acceptance."
+    },
+    {
+      "tag": "p",
+      "id": "A3.SS3.p2.1",
+      "text": "Mechanism tests exercise the changed behavior and its failure returns. Recorded observations support replay of perception and verification decisions; changes to motion require execution evidence. Parent and candidate are then run from matched source initial states. The gate configuration is fixed at the beginning of each RSI iteration and specifies the evaluation stages, development and selection panels, regression tasks, required improvements, paired-loss limits, and integrity and timeout checks. These settings can evolve across iterations, but are held fixed for all candidate comparisons within a given iteration. The rollout manifest records the corresponding seed-to-state mapping and resource budgets."
+    },
+    {
+      "tag": "p",
+      "id": "A3.SS3.p3.1",
+      "text": "Numeric acceptance is followed by inspection of newly successful trajectories and new regression failures. The parent changes only after the checks and review required by the current iteration pass; otherwise the frozen parent is retained. Selection and regression outcomes used by this gate are acceptance evidence, not an independent audit. Any audit panel must be excluded from proposal generation and candidate selection, and reported separately. Target episodes do not supply evidence to the source acceptance gate."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "C.4 Source–Target Combination Generalization"
+    },
+    {
+      "tag": "p",
+      "id": "A3.SS4.p1.1",
+      "text": "Source tasks provide manipulation constituents such as grasping, transport, support placement, relative placement, and articulated-object actuation. Target instructions combine these constituents into longer goal sequences. Representative compositions include stove activation followed by pan placement, mug placement followed by pudding placement beside a plate, and bowl containment followed by drawer closure. Object phrases specify the manipulated object and reference; relation types distinguish the required goal; ordered subgoals specify the composition. Reuse is therefore evaluated at the level of shared executable calls rather than instruction-string overlap alone."
+    },
+    {
+      "tag": "p",
+      "id": "A3.SS4.p2.1",
+      "text": "The main LIBERO-Pro Long protocol comprises ten tasks with 50 states per task and axis. The separate inference-driver comparison uses five states per task and axis, seeds 41–45, for 100 episodes. These panels have different denominators and are not pooled. Pairing uses task, suite, seed, and recorded initial-state index, with the benchmark revision needed to reconstruct the state. A seed label alone is insufficient to establish identical initial conditions across revisions."
+    },
+    {
+      "tag": "p",
+      "id": "A3.SS4.p3.1",
+      "text": "Frozen execution excludes code modification during the target episode. It does not by itself establish that evaluation tasks were never observed during development. The recorded inference comparison reused evaluation rows, and its protocol identifies historical exposure to Scene5. These records must be distinguished from a newly isolated target evaluation when interpreting compositional generalization."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "C.5 Resource Accounting"
+    },
+    {
+      "tag": "p",
+      "id": "A3.SS5.p1.1",
+      "text": "Official full-task outcomes are retained for every planned evaluation row, including failures, timeouts, generation refusals, and execution errors. Success is aggregated per task and axis before macro-averaging. Paired comparisons additionally count transitions from parent failure to candidate success and from parent success to candidate failure, since net success can conceal lost capabilities. The reported exact McNemar comparisons use these discordant outcomes. Confidence intervals are not inferred from rounded aggregate rates; they require episode outcomes and a procedure that respects task grouping."
+    },
+    {
+      "tag": "p",
+      "id": "A3.SS5.p2.1",
+      "text": "Source improvement and target inference are accounted for separately. Source records distinguish proposal generation, offline tests, candidate rollouts, and rejected candidates. Inference records distinguish initial program generation, runtime decision and perception calls, and robot execution. End-to-end episode time includes generation and execution; model calls inside execution are not added a second time. The figure reports mean duration over all episodes, not only successes. Internal bounded retries remain part of their original episode and consume its budget."
+    },
+    {
+      "tag": "p",
+      "id": "A3.SS5.p3.1",
+      "text": "For N13C, the reported amended comparison substitutes five infrastructure-failed rows with their designated reruns; the original records remain available. Smoke episodes and offline generation tests are excluded from the 100 policy outcomes, while their costs remain separate development expenditures. Generated-tool counts should distinguish newly registered operations from revisions to existing ones; invocation traces establish use, whereas matched removal tests are needed to attribute a success gain to a component. No total cost, repeat count, or tool count is inferred where the corresponding ledger is absent."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "Appendix D LIBERO-Pro Long Zero-Shot Evaluation Details"
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "D.1 Task Manifest and Frozen Execution"
+    },
+    {
+      "tag": "p",
+      "id": "A4.SS1.p1.1",
+      "text": "The per-task breakdown uses the 10 LIBERO-Pro Long tasks and the Pos / Task variants listed in ASPIRE’s zero-shot appendix ( Lu et al., 2026 ) . Descriptive task names below follow that appendix; the artifact must map each name to its exact benchmark task ID, instruction, and initial-state manifest. Each task–axis pair uses seeds 1–50 and a fixed task program. All shared code and adapters are finalized before these episodes; target feedback cannot select alternative programs or patches. The artifact records the source task order, final stack hash, generated program and adapter hashes, benchmark revision, seed-to-state mapping, execution horizon, and recovery allowance."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "D.2 Source-Experience Scaling"
+    },
+    {
+      "tag": "p",
+      "id": "A4.SS2.p1.1",
+      "text": "The scaling evaluation in Figure 7 uses one-shot task-program inference at every checkpoint. A task program is generated once and executed over the frozen shared stack without target-side code debugging; its execution may nevertheless use observation feedback. Each plotted value is from a single evaluation run, rather than an average across repeated runs. Figure 7 reports the source-experience scaling evaluation for frozen Recursia stacks after N ∈ { 0 , 3 , 6 , 9 , 10 , 12 , 13 , 14 , 15 , 16 , 17 , 18 } N\\in\\{0,3,6,9,10,12,13,14,15,16,17,18\\} improvement iterations. Each snapshot is selected using source data only and evaluated without target-driven modification."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Figure 7: Recursia transfer scaling with source-task experience. Frozen-stack success rates on Pos and Task are shown at the supplied iteration checkpoints."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "D.3 Aggregation"
+    },
+    {
+      "tag": "p",
+      "id": "A4.SS3.p1.1",
+      "text": "With y i ​ a ​ s ∈ { 0 , 1 } y_{ias}\\in\\{0,1\\} denoting official full-task success on seed s s , compute"
+    },
+    {
+      "tag": "table",
+      "id": "A4.E7",
+      "text": "p ^ i ​ a = 1 50 ​ ∑ s = 1 50 y i ​ a ​ s , p ^ a = 1 10 ​ ∑ i = 1 10 p ^ i ​ a , p ^ Overall = p ^ Pos + p ^ Task 2 . \\widehat{p}_{ia}=\\frac{1}{50}\\sum_{s=1}^{50}y_{ias},\\qquad\\widehat{p}_{a}=\\frac{1}{10}\\sum_{i=1}^{10}\\widehat{p}_{ia},\\qquad\\widehat{p}_{\\mathrm{Overall}}=\\frac{\\widehat{p}_{\\mathrm{Pos}}+\\widehat{p}_{\\mathrm{Task}}}{2}. (7)"
+    },
+    {
+      "tag": "p",
+      "id": "A4.SS3.p1.2",
+      "text": "Our aggregate results are computed from unrounded episode outcomes. Reproduced baseline aggregates retain the source’s reported precision. Confidence intervals must account for the grouping of states within tasks, and paired comparisons require matched episode-level outcomes."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "Instructions for reporting errors"
+    },
+    {
+      "tag": "p",
+      "id": null,
+      "text": "We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the methods listed below:"
+    },
+    {
+      "tag": "p",
+      "id": null,
+      "text": "Tip: You can select the relevant text first, to include it in your report."
+    },
+    {
+      "tag": "p",
+      "id": null,
+      "text": "Our team has already identified the following issues . We appreciate your time reviewing and reporting rendering errors we may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability should not be a barrier to accessing research. Thank you for your continued support in championing open access for all."
+    },
+    {
+      "tag": "p",
+      "id": null,
+      "text": "Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a list of packages that need conversion , and welcome developer contributions ."
+    }
+  ],
+  "links": [
+    {
+      "label": "Learn more",
+      "href": "https://info.arxiv.org/about"
+    },
+    {
+      "label": "Back to arXiv",
+      "href": "/"
+    },
+    {
+      "label": "",
+      "href": "https://info.arxiv.org/about/accessible_HTML.html"
+    },
+    {
+      "label": "",
+      "href": "#"
+    },
+    {
+      "label": "",
+      "href": "/abs/2610.24464v1"
+    },
+    {
+      "label": "",
+      "href": "/pdf/2610.24464v1"
+    },
+    {
+      "label": "",
+      "href": "javascript:toggleNavTOC();"
+    },
+    {
+      "label": "",
+      "href": "javascript:toggleReadingMode();"
+    },
+    {
+      "label": "",
+      "href": "#abstract1"
+    },
+    {
+      "label": "",
+      "href": "#S1"
+    },
+    {
+      "label": "",
+      "href": "#S2"
+    },
+    {
+      "label": "",
+      "href": "#S2.SS1"
+    },
+    {
+      "label": "",
+      "href": "#S2.SS2"
+    },
+    {
+      "label": "",
+      "href": "#S2.SS2.SSS0.Px1"
+    },
+    {
+      "label": "",
+      "href": "#S2.SS2.SSS0.Px2"
+    },
+    {
+      "label": "",
+      "href": "#S2.SS2.SSS0.Px3"
+    },
+    {
+      "label": "",
+      "href": "#S2.SS2.SSS0.Px4"
+    },
+    {
+      "label": "",
+      "href": "#S2.SS3"
+    },
+    {
+      "label": "",
+      "href": "#S2.SS4"
+    },
+    {
+      "label": "",
+      "href": "#S3"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS1"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS1.SSS0.Px1"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS1.SSS0.Px2"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS1.SSS0.Px3"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS2"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS3"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS4"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS4.SSS0.Px1"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS4.SSS0.Px2"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS5"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS5.SSS0.Px1"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS5.SSS0.Px2"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS5.SSS0.Px3"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS6"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS6.SSS0.Px1"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS6.SSS0.Px2"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS7"
+    },
+    {
+      "label": "",
+      "href": "#S4"
+    },
+    {
+      "label": "",
+      "href": "#S4.SS0.SSS0.Px1"
+    },
+    {
+      "label": "",
+      "href": "#S4.SS0.SSS0.Px2"
+    },
+    {
+      "label": "",
+      "href": "#S4.SS0.SSS0.Px3"
+    },
+    {
+      "label": "",
+      "href": "#S5"
+    },
+    {
+      "label": "",
+      "href": "#bib"
+    },
+    {
+      "label": "",
+      "href": "#A1"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS1"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS2"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS2.SSS0.Px1"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS2.SSS0.Px2"
+    },
+    {
+      "label": "",
+      "href": "#A2"
+    },
+    {
+      "label": "",
+      "href": "#A2.SS1"
+    },
+    {
+      "label": "",
+      "href": "#A2.SS2"
+    },
+    {
+      "label": "",
+      "href": "#A2.SS3"
+    },
+    {
+      "label": "",
+      "href": "#A2.SS4"
+    },
+    {
+      "label": "",
+      "href": "#A2.SS4.SSS0.Px1"
+    },
+    {
+      "label": "",
+      "href": "#A3"
+    },
+    {
+      "label": "",
+      "href": "#A3.SS1"
+    },
+    {
+      "label": "",
+      "href": "#A3.SS2"
+    },
+    {
+      "label": "",
+      "href": "#A3.SS3"
+    },
+    {
+      "label": "",
+      "href": "#A3.SS4"
+    },
+    {
+      "label": "",
+      "href": "#A3.SS5"
+    },
+    {
+      "label": "",
+      "href": "#A4"
+    },
+    {
+      "label": "",
+      "href": "#A4.SS1"
+    },
+    {
+      "label": "",
+      "href": "#A4.SS2"
+    },
+    {
+      "label": "",
+      "href": "#A4.SS3"
+    },
+    {
+      "label": "License: CC BY 4.0",
+      "href": "https://info.arxiv.org/help/license/index.html#licenses-available"
+    },
+    {
+      "label": "Mees et al., 2021",
+      "href": "#bib.bib25"
+    },
+    {
+      "label": "Xu et al., 2026",
+      "href": "#bib.bib26"
+    },
+    {
+      "label": "Ahn et al., 2022",
+      "href": "#bib.bib13"
+    },
+    {
+      "label": "Huang et al., 2023",
+      "href": "#bib.bib18"
+    },
+    {
+      "label": "Liang et al., 2023",
+      "href": "#bib.bib7"
+    },
+    {
+      "label": "Mu et al., 2024",
+      "href": "#bib.bib11"
+    },
+    {
+      "label": "Fu et al., 2026",
+      "href": "#bib.bib3"
+    },
+    {
+      "label": "Liang et al., 2023",
+      "href": "#bib.bib7"
+    },
+    {
+      "label": "Mu et al., 2024",
+      "href": "#bib.bib11"
+    },
+    {
+      "label": "Singh et al., 2023",
+      "href": "#bib.bib8"
+    },
+    {
+      "label": "Wang et al., 2023",
+      "href": "#bib.bib5"
+    },
+    {
+      "label": "Lu et al., 2026",
+      "href": "#bib.bib4"
+    },
+    {
+      "label": "Tziafas and Kasaei, 2024",
+      "href": "#bib.bib20"
+    },
+    {
+      "label": "Xie et al., 2026",
+      "href": "#bib.bib21"
+    },
+    {
+      "label": "Fu et al., 2026",
+      "href": "#bib.bib3"
+    },
+    {
+      "label": "Xu et al., 2026",
+      "href": "#bib.bib26"
+    },
+    {
+      "label": "Wang et al., 2023",
+      "href": "#bib.bib5"
+    },
+    {
+      "label": "Tziafas and Kasaei, 2024",
+      "href": "#bib.bib20"
+    },
+    {
+      "label": "Lu et al., 2026",
+      "href": "#bib.bib4"
+    },
+    {
+      "label": "Chen et al., 2024",
+      "href": "#bib.bib10"
+    },
+    {
+      "label": "Zhang et al., 2025",
+      "href": "#bib.bib22"
+    },
+    {
+      "label": "2",
+      "href": "#S2.F2"
+    },
+    {
+      "label": "2",
+      "href": "#S2.F2"
+    },
+    {
+      "label": "2",
+      "href": "#S2.F2"
+    },
+    {
+      "label": "Liu et al., 2023",
+      "href": "#bib.bib12"
+    },
+    {
+      "label": "Zhou et al., 2025",
+      "href": "#bib.bib14"
+    },
+    {
+      "label": "Lu et al., 2026",
+      "href": "#bib.bib4"
+    },
+    {
+      "label": "D",
+      "href": "#A4"
+    },
+    {
+      "label": "Kim et al., 2024",
+      "href": "#bib.bib17"
+    },
+    {
+      "label": "Black et al., 2025",
+      "href": "#bib.bib15"
+    },
+    {
+      "label": "Physical Intelligence et al., 2025",
+      "href": "#bib.bib16"
+    },
+    {
+      "label": "Fu et al., 2026",
+      "href": "#bib.bib3"
+    },
+    {
+      "label": "Lu et al., 2026",
+      "href": "#bib.bib4"
+    },
+    {
+      "label": "3",
+      "href": "#S3.F3"
+    },
+    {
+      "label": "D.2",
+      "href": "#A4.SS2"
+    },
+    {
+      "label": "7",
+      "href": "#A4.F7"
+    },
+    {
+      "label": "D",
+      "href": "#A4"
+    },
+    {
+      "label": "4",
+      "href": "#S3.F4"
+    },
+    {
+      "label": "5",
+      "href": "#S3.F5"
+    },
+    {
+      "label": "Lu et al., 2026",
+      "href": "#bib.bib4"
+    },
+    {
+      "label": "5",
+      "href": "#S3.F5"
+    },
+    {
+      "label": "6",
+      "href": "#S3.F6"
+    },
+    {
+      "label": "2",
+      "href": "#S3.T2"
+    },
+    {
+      "label": "Brohan et al., 2023",
+      "href": "#bib.bib9"
+    },
+    {
+      "label": "Kim et al., 2024",
+      "href": "#bib.bib17"
+    },
+    {
+      "label": "Black et al., 2025",
+      "href": "#bib.bib15"
+    },
+    {
+      "label": "Liang et al., 2023",
+      "href": "#bib.bib7"
+    },
+    {
+      "label": "Singh et al., 2023",
+      "href": "#bib.bib8"
+    },
+    {
+      "label": "Fu et al., 2026",
+      "href": "#bib.bib3"
+    },
+    {
+      "label": "Zhang et al., 2025",
+      "href": "#bib.bib22"
+    },
+    {
+      "label": "Ma et al., 2024",
+      "href": "#bib.bib6"
+    },
+    {
+      "label": "Guo et al., 2026",
+      "href": "#bib.bib19"
+    },
+    {
+      "label": "Wang et al., 2023",
+      "href": "#bib.bib5"
+    },
+    {
+      "label": "Tziafas and Kasaei, 2024",
+      "href": "#bib.bib20"
+    },
+    {
+      "label": "Xie et al., 2026",
+      "href": "#bib.bib21"
+    },
+    {
+      "label": "Lu et al., 2026",
+      "href": "#bib.bib4"
+    },
+    {
+      "label": "Shridhar et al., 2021",
+      "href": "#bib.bib23"
+    },
+    {
+      "label": "Jiang et al., 2022",
+      "href": "#bib.bib24"
+    },
+    {
+      "label": "Mees et al., 2021",
+      "href": "#bib.bib25"
+    },
+    {
+      "label": "Liu et al., 2023",
+      "href": "#bib.bib12"
+    },
+    {
+      "label": "Zhou et al., 2025",
+      "href": "#bib.bib14"
+    },
+    {
+      "label": "Xu et al., 2026",
+      "href": "#bib.bib26"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p1.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2410.24164"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2410.24164"
+    },
+    {
+      "label": "§3.1",
+      "href": "#S3.SS1.SSS0.Px2.p1.1"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px1.p1.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2307.15818"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2307.15818"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px1.p1.1"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p3.1"
+    },
+    {
+      "label": "§C.1",
+      "href": "#A3.SS1.p1.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2603.22435"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2603.22435"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p2.1"
+    },
+    {
+      "label": "§3.1",
+      "href": "#S3.SS1.SSS0.Px2.p1.1"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px1.p1.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2601.06845"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2601.06845"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px2.p1.1"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p1.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2210.03094"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2210.03094"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px3.p1.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2406.09246"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2406.09246"
+    },
+    {
+      "label": "§3.1",
+      "href": "#S3.SS1.SSS0.Px2.p1.1"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px1.p1.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2209.07753"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2209.07753"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p2.1"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px1.p1.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2306.03310"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2306.03310"
+    },
+    {
+      "label": "§3.1",
+      "href": "#S3.SS1.SSS0.Px1.p1.1"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px3.p1.1"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2607.00272"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2607.00272"
+    },
+    {
+      "label": "§D.1",
+      "href": "#A4.SS1.p1.1"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p2.1"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p3.1"
+    },
+    {
+      "label": "§3.1",
+      "href": "#S3.SS1.SSS0.Px1.p2.1"
+    },
+    {
+      "label": "§3.1",
+      "href": "#S3.SS1.SSS0.Px2.p1.1"
+    },
+    {
+      "label": "§3.5",
+      "href": "#S3.SS5.p1.1"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px2.p1.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2310.12931"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2310.12931"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px2.p1.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2112.03227"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2112.03227"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p1.1"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px3.p1.1"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p2.1"
+    },
+    {
+      "label": "§3.1",
+      "href": "#S3.SS1.SSS0.Px2.p1.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2109.12098"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2109.12098"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px3.p1.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2209.11302"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2209.11302"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p2.1"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px1.p1.1"
+    },
+    {
+      "label": "§C.1",
+      "href": "#A3.SS1.p1.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2406.18746"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2406.18746"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p2.1"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p3.1"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px2.p1.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2305.16291"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2305.16291"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p2.1"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p3.1"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px2.p1.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2603.02623"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2603.02623"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p2.1"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px2.p1.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2608.16889"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2608.16889"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p1.1"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p3.1"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px3.p2.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2505.22954"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2505.22954"
+    },
+    {
+      "label": "§1",
+      "href": "#S1.p3.1"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px2.p1.1"
+    },
+    {
+      "label": "Document",
+      "href": "https://dx.doi.org/10.48550/arXiv.2510.03827"
+    },
+    {
+      "label": "Link",
+      "href": "https://arxiv.org/abs/2510.03827"
+    },
+    {
+      "label": "§3.1",
+      "href": "#S3.SS1.SSS0.Px1.p2.1"
+    },
+    {
+      "label": "§4",
+      "href": "#S4.SS0.SSS0.Px3.p1.1"
+    },
+    {
+      "label": "3",
+      "href": "#A2.T3"
+    },
+    {
+      "label": "Fang et al. (2023)",
+      "href": "#bib.bib1"
+    },
+    {
+      "label": "Sundermeyer et al., 2021",
+      "href": "#bib.bib2"
+    },
+    {
+      "label": "Lu et al., 2026",
+      "href": "#bib.bib4"
+    },
+    {
+      "label": "7",
+      "href": "#A4.F7"
+    },
+    {
+      "label": "7",
+      "href": "#A4.F7"
+    },
+    {
+      "label": "view the build logs",
+      "href": "./2610.24464v1/__stdout.txt"
+    },
+    {
+      "label": "L A T E xml",
+      "href": "https://math.nist.gov/~BMiller/LaTeXML/"
+    },
+    {
+      "label": "the following issues",
+      "href": "https://github.com/arXiv/html_feedback/issues"
+    },
+    {
+      "label": "list of packages that need conversion",
+      "href": "https://github.com/brucemiller/LaTeXML/wiki/Porting-LaTeX-packages-for-LaTeXML"
+    },
+    {
+      "label": "developer contributions",
+      "href": "https://github.com/brucemiller/LaTeXML/issues"
+    },
+    {
+      "label": "member institutions",
+      "href": "https://info.arxiv.org/about/ourmembers.html"
+    },
+    {
+      "label": "",
+      "href": "https://info.arxiv.org/about"
+    },
+    {
+      "label": "",
+      "href": "https://info.arxiv.org/help"
+    },
+    {
+      "label": "",
+      "href": "https://info.arxiv.org/help/contact.html"
+    },
+    {
+      "label": "",
+      "href": "https://info.arxiv.org/help/subscribe"
+    },
+    {
+      "label": "",
+      "href": "https://info.arxiv.org/help/license/index.html"
+    },
+    {
+      "label": "",
+      "href": "https://info.arxiv.org/help/policies/privacy_policy.html"
+    },
+    {
+      "label": "",
+      "href": "https://info.arxiv.org/help/web_accessibility.html"
+    },
+    {
+      "label": "",
+      "href": "https://status.arxiv.org"
+    },
+    {
+      "label": "",
+      "href": "https://www.simonsfoundation.org/"
+    },
+    {
+      "label": "",
+      "href": "https://www.sfi.org.bm/"
+    },
+    {
+      "label": "",
+      "href": "https://www.schmidtsciences.org/"
+    },
+    {
+      "label": "",
+      "href": "javascript:toggleReadingMode();"
+    }
+  ]
+}

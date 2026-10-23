@@ -1,0 +1,9 @@
+# Frozen root mathematical checks before execution
+
+Inputs are three independently sealed drafts and the preserved API reply, no new biological values or fitted predictors. Root has read biology's exact proposed formula before defining these checks. Code/results not run yet. These are algebraic falsifiers and assumption checks, not scientific efficacy evidence.
+
+1. Profiled potency update: five fixed seeds801..805, 7molecular coordinates and2nuisance columns, SPD noise precisionW, full-rank nuisanceA, arbitraryresidualr andj, lambda in{0,.25}. Compare delta=−j'WP r/(j'WPj+lambda), P=I−A(A'WA)^−1A'W, against independentjointWLS/MAP withdesignX=[−j,A] anddiagonalpenalty[lambda,0,0]. Expectedmaxerror<1e−10 establishes exactordinaryprofileestimatorimplementation under these assumptions; no inference about finitebudgetpracticalnovelty of other constraints.
+2. Degeneratej inspanA mustflag informationI~0; a ridge denominator is not identification. A separate exactrationalcounterexample shows positivepriorlambda shrinks noiseless identifiabletrueδ (j=(1,0), A=(0,1), W=I, trueδ=1, lambda=1 givesestimate1/2). Thus P1 exactrecovery requireslambda0 or a qualifiedbias statement.
+3. Secondquery rejection cannot be guaranteed without discrimination relative to noise. Stipulatedcandidatepredictions0 and1/10, boundedobservationnoise1/10, observed1/20 is compatiblewithboth. This only rejects unconditionalrejection, not expectedactivelearningvalue; sourcecalibratedmargin/power assumption may make conditionalP2 meaningful.
+
+No primarysourceperformance reproduced. No biological fit/newendpoint/reserve opened. At most a scoped NO_PROMOTION or revisedassumption, never a universalno-worldmodel/no-meta-learningclaim. Frontieragent separately testsSPDgradienttransport; recursiveagent separately testsinheritedcurvature, avoiding duplicate root runs.

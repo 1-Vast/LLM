@@ -1,0 +1,70 @@
+# Independent renewal proposal: preserve division events when repairing the observation process
+
+2026-10-22. **One candidate only; not a qualified novel core.** I recommend moving the next qualification toward an observation problem in label-free longitudinal cell imaging: distinguish real failed/successful cytokinesis from segmentation/tracking errors before predicting subsequent proliferative escape under chemotherapy. This changes both application and information contract relative to the stopped CDK composition and decryptE static protein pilots. It does not reopen their grids/reserves, nor the earlier live/dead-count/gauge routes.
+
+Read existingCDKDECISION/CONTINUATION, correcteddecryptEDECISION/CONTINUATION and the nearbyChronos prior-art scope. Did not read other current agents' proposals before sealing this independent document. One attempteddecryptEDECISIONpath was wrong; I then read the authoritativekey_correction/DECISION. No new dataset outcomes, dataset downloads or protected reserves. Four public metadata/literatureHTTPrequests were made and archived with exact receipts.
+
+## Why this is a different concrete failure hypothesis
+
+The recent failures do not establish that cellular state is useless: target functional feedback was already highly informative, while exported molecular state added little primary-risk benefit in a tiny one-background source. Merely replacingproteomicswithRNAor adding an editor would leave the main question unchanged.
+
+The new hypothesis instead concerns **state observation corruption that is systematically coupled to the desired function**. A cell attempting cytokinesis changes shape, volume/area and boundaries abruptly—the same discontinuities used to flag tracking errors. Removing those traces as measurement artifacts may remove the very arrested/escaping population one wants to predict. Conversely an apparent mother split can be a segmentation split rather than actual division. A predictor can mistake either direction even if its state-transition model is otherwise adequate.
+
+The proposed repair target is therefore the **observation operator/track event**, not another latent-state layer or global updater. Minimal representation: currentcellarea/phase-volume/shape, time-since-observeddivisionattempt, and a small discrete eventlabel{continuation,successfuldivision,failedattempt,trackingartifact,censored}. No claim of a fullvirtualcellor gene-mechanism simulator.
+
+## Primary evidence and actual accessible source
+
+OriginalCellPhe:Wigginsandcoauthors, *The CellPhe toolkit for cell phenotyping using time-lapse imaging and pattern recognition*, NatureCommunications2023, DOI10.1038/s41467-023-37447-3, PMCPMC10070448. The metadata search also found a2025Pythonimplementation (10.1111/jmi.13416), but I did not review that fulltextor treatitasa newfunctionalmethod. Coreearlierpreprintdate2021-10-28is in searchmetadata;2023journalpublicationisnotnecessarilyfirstdisclosure.
+
+Official originalfulltextstates:
+
+- MDA-MB-231docetaxeldata use6trainingexperiments and3testexperiments on differentdays/byadifferentindividual. Doxorubicin hasone sourceexperiment andone separate testexperiment. MCF7train/testcells sharethesametwoexperiments; authorcell-randomsplitisnotourcross-experimentconfirmation.
+- Segmentation-errorprediction misclassifiedsomegenuinelargecells andcells trackedbefore/during/afterattemptedmitosis. This is direct evidence of possible event/artifact ambiguity, although **not** evidence that the authors' complete downstream method loses meaningful functional accuracy: they explicitly say the removedexamples did not excludeanimportant subset. My error hypothesis must defeat that counterevidence empirically.
+- Authorsalreadyclassifytreated/untreatedfromtime-seriesmorphology/dynamics, identifypre/postcytokinesisattemptclusters, deaddebris andpotentiallyresistantlargecells. Theirfulltracefeatures/ensembleclassificationanderrorrepairarenearpriorart, not ourdiscovery. Untreated-likelabels arenot experimentallyconfirmedresistance.
+- ChosenMDA-MB-231doses30µMdocetaxel/1µMdoxorubicinwereintendedtoinducemorphodynamicchangeswithoutdeath; MCF7docetaxel1µMreduceddeath. This makes a proliferation/cytokinesis endpoint more defensible than inventing broadlethality prediction. No washout/rechallengeclonogenics are established.
+
+Author-declaredDryaddoi10.5061/dryad.4xgxd25f0metadatawasretrievedwithoutdownloadingfiles. Officialversion222278metadataauthenticates:
+
+| File | Metadata bytes |
+|---|---:|
+|231_Docetaxel.zip|10850599496|
+|231_Doxorubicin.zip|3906735369|
+|MCF7_Docetaxel_.zip|3531109340|
+|example_data.zip|1032827259|
+|README.md|8716|
+
+Dryadmethodsstate48himagingat6-minintervals,481frames/well,phaseandfluorescenceinparallel, one500µmfield/well; TIFFimages,ROIandfeaturetablesaredeclaredavailable. Those are attainable measured longitudinalstateimages. Specificarchivecontents,tracklineagekeys,whichfluorescentreportersandfunctionaleventlabelsarestillunqualified: metadata availability is not proof of a pre-existingfateannotationmatrix. Nozip/README/datasetfilewasdownloaded.
+
+## One falsifiable mechanism / update rule
+
+**Candidate:** a small feedback-trained observation-repair rule that accepts or rejects a proposed track split/merge according to whether its recentphase-volume/areaandboundaryhistoryiscompatiblewithacell-divisionevent; use expert annotation of ambiguous eventclipsas feedback, preservinggenuinefailedattempts rather than treating all abruptchangess as errors. Inheritonlythis event-repair ruleto laterexperimentdays while resetting downstreamproliferationpredictor,taskhistoryandcalibration.
+
+The risky, falsifiable claim is **not** “eventconstraintsarenew.” It is: at identical earlyvideoandannotationbudget, a repairruletrainedto preserve successful/faileddivisiondistinctions yields lower **later observed successful-division prediction risk** on newexperimentdaysthan genericartifactfiltering/ordinaryretraining, and its inheritedannotation-priorityrule learns to produce betterrepairs with less laterannotation. The mechanism is worthwhile only if artifactandreal-eventconfusionrepeats across independentexperiments and legal earlyhistory predictswhichtreatmentofatracewillreducefunctionalrisk.
+
+This is a hypothesis, not an empirical finding. Conventionaljointsegmentation/tracking,biophysicalconstraints,activelearningandsurvivalanalysisareobviousnearneighbors. Ordinaryevent-conditionedhidden/semi-Markovmodelorcalibratedclassifiercouldcompletelyreplicateit. I have not establisheda substantivealgorithmicdifference; an exactequivalence or sufficientlystrongordinaryimplementationwould stop itsnew-coreclaim. ThepreviousChronosmixture/absolute-normalizationtheoremarerelatedtoanotherinformationproblem and are not reused here.
+
+## What the feedback and functional target actually mean
+
+Atadecisiontimefixedbeforeoutcomes(e.g.24hifqualifiable),thestateinputisstrictlytheprefixoftrackedimages/features. Functionaloutcomeiswhetheranindividuallytrackedcellcompletesanimage-confirmedsuccessfulcytokinesis during the subsequentfixedwindow, or its observeddescendantdivisioncount; use one defined primary endpoint afterlabelavailabilityqualification. This is observedproliferativeescapeundercontinuoustreatment, notviability,deathabsence,drugresistanceafterwashoutorclinicalbenefit.
+
+Manualreviewofalreadyrecordedclipsprovides **real measurement-annotation feedback**, notnewwetexperiments. Expertannotationofmorphologicaleventsandfuturedivisionmustbeblindtoalgorithmchoice,andthefunctionalassessmentusesunqueriedlaterframesonly. Iffutureframesarenecessarytodecidewhetheranearlytracksplitwasanartifact, thatannotationcarriesfutureinformation: itcannotbeavailabletoadecisiontimeearlyrepairunlessmodeledaspurchaseddelayedfeedbackandfuturetargetshiftedaccordingly. Distinguishthisbeforeclaimingearlyprediction.
+
+Cellsleavingview,unresolvedocclusionsandvideoendarecensored,notnondividing. Observeddivisionrequiresauthenticationofmother/daughtercontinuity; aclassifier'streated/untreatedlabelorall-timewaveletfeatureisnotafunctionallabel. Control/wellcountsandconditionalfutureoutcomesmustkeepbiologicalreplicateasunit; thousands ofcellsarenotthousandsofindependentupdatertasks.
+
+## Minimum qualification and stop conditions
+
+1. Confirmactualaccessibleprefiximages/ROI/time/track/experimentlabelsandabilitytoviewlaterdivisionevents. Ifarchivesonlyfulltraceaggregatesorunresolvedcellidentities, STOPthistaskbeforemodeling. A boundedfilelist/headerinspectionisnext;notafull19GBdownloadasafirstaction.
+2. Predefineannotationavailabilityandlegitimatepredictionwindow,thenamaskedsmallmanualpilot mustfindactualartifact-versus-realmitosisconfusionwithobservablefuturedivisionoutcomes. Ifnofunctionallyrelevantconfusionorlabelsreliablyimpossible,STOPthismechanism. No convenientreinterpretationasdeadcellcounts.
+3. Compareatmatchedprefixesandannotations: strongdirectearlymorphology/historypredictor;ordinarytrackingrepair+retraining;conventionaljoint/event-conditionedmodel;simplemixture;uniform/randomvsuncertaintyactiveannotation;andfiniteequal-budgetrepair-rule/programsearchonlyifupdater/agentclaimsstart. Do not handicapa baselinebygivingitonlysnapshotswhilecandidategetsfullprefix.
+4. A candidateadvancesonlywithpredeclaredfunctionalriskorannotation-efficiencybenefitacrossindependentexperimentdaysbeyondthesame-informationordinaryprograms;eventrecognitionaccuracyaloneisinsufficient. Ifordinaryrepaircapturesallgain,retainusefulsoftware/assayresultandSTOPnovel-corepromotion.
+5. Startwithsource6experimentdaysandlater3daysonlyifactualauthorseparationcanberespectedafterfilequalification;donotcallMCF7randomcellheldoutsindependentbackgroundreplication. Doxorubicinisatmostasmalltransfercheck,notlargeRSIhistory. Ifdatavolumeprovidesonlyoneupdatercomparison,reportthat andleaveimproved-improverunestablished.
+
+Noinventedclinicaleffect/noisepercentorpost-hocnumericalgatesshouldbeimportedfromdecryptE. Beforeanynumericalmodeltest,freezeaverysmallfunctionalrisk/costprotocolappropriateeventfrequency,annotationreliabilityandrealnumberofexperimentdays;deductsourceannotationandtrainingcostratherthanassuminginfinitefutureamortization.
+
+## RSI separation and current disposition
+
+Theconditionalpotentialforinheritanceisconcrete: anobservation-repairrulecantransferwhilethefunctionalpredictorrestartsfromacommonbase. NewoldUcomparisonmustholdprefixandannotationsfixedfirst. LaternewoldGcomparisonmuststartfromthesameUbase/historyandbudget,andscoretheirresultingrepairrulesonisolatedlaterexperiments. Bettersegmentation,moreannotationsorafewmoregenerationsarenotimproved-improverproof.
+
+**Disposition: QUALIFY_ONE_DISTINCT_MEASUREMENT_HYPOTHESIS; NO_CORE_PROMOTION.** Thisproposalhasprimarysourceandattainableimage-basedstate/functionalobservationpaths, butnotyetanauthenticatedready-madeeventlabelcontractornewalgorithm. Ifthosefail,stop. Itsvalueistoaskwhyapredictor'sstateobservationsmaybephysicallywronginawaythatmattersforthefunction, ratherthanaddinganRSIlayeroveranotherweakstaticassociation.
+
+Sources/receipts:source/cellphe_search.body,CellPhe.fulltext.xml,targeted_prose.json,dryad_metadata_0.body,dryad_metadata_1.bodyandtheirreceipts. Fulltexttargetedoutputwaslongandtruncated;sourceparagraphs remainarchived;thisreportusesexplicitvisiblemethod/results/dataavailabilitypassages,notallpagesreadclaim. Primaryliterature4HTTP;datasetdownloads0;numericalfits0;nativecostnotavailable. CompletegoalremainsACTIVE/NOT_ACHIEVED.

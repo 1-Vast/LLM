@@ -1,0 +1,1 @@
+First pypdf extraction could not encode unpaired PDF-font Unicode surrogates. Preserved PDF; extraction now replaces only unencodable characters. Pages 3–5 rendered and visually checked for operative equations/algorithm; no extra network request. No author code, models or biological data executed.

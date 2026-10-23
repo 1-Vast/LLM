@@ -1,0 +1,20 @@
+# Original decryptE methods versus this conditional-dose pilot
+
+2026-10-22. Re-read only the archived original paperXML, SHA256`16b7aea45dc88bf017248ce74e2eb24fecb6ade6c7adc069f49bd6fd87978640`, through targetedbody prose extraction. Exact heading/paragraph texts are saved inPAPER_SCOPE_QUOTES.json. No raw/supplementary molecular values read, no new paper download, and no author result reproduced. This is not a comprehensive field novelty search.
+
+## What the authors already did
+
+1. **Dose-response molecular phenotype and functional interpretation.** They measured dose-dependent drug-adapted proteomic states, fit four-parameter log-logistic curves, analyzed protein potency/amplitude, and linked profiles to modes of action. Discussion explicitly says the profiles reflect a transition to a drug-adapted cellular state; therefore calling our static high-dose profile a “world state” does not create a novel idea.
+2. **Dose-response classification with real machine learning.** Methods“Curve classification” trainedranger random forest on manually annotated curves from two drugs (80:20,11562train/2883validation), using curve descriptors, relativeLFQintensities and unique-peptide numbers across all concentrations plus control abundance percentile. It classifiesup/down/nonregulated protein curves, not metabolic response of held-out drugs given a limited target entry. Its all-dose features are not legal low-budget inputs to our pilot.
+3. **Protein→biological function evidence.** GO enrichment of regulated proteins, hierarchical clustering andguilt-by-associationlinked drug profiles to mitotic phases, unfolded protein response and other functions. HDAC-associated TCR loss was then followed by direct engineeredJurkatNFAT and primaryT-cell functional experiments. These are substantial existing molecular-to-function findings, not merely a passive dataset with no function link.
+4. **Ordinary fitted functional curves and image processing.** The same curve-fitting procedure covers normalized viability-related metrics; supervisedilastikimage analysis quantified T-cell aggregation. Neither is an adaptive research agent or a new cross-drug predictor of the particular conditional target in our protocol.
+
+## Narrow difference of the current experiment
+
+Our declared question fixes a high-dose **published functional entry** and asks whether the **published high-dose molecular vector**, using source-only preprocessing/nestedscaffold-group validation, improves prediction of three unrevealed intermediate-dose metabolic entries. Molecularfit/class/other-dose fields are excluded. The difference is a bounded conditional-information evaluation with strong ordinary direct/conditional/mask controls and a stated entry-information boundary; it is not a newly invented protein-to-function relation.
+
+The reviewed original body did not describe this exact held-outdrug, high-functional-conditioned, threeintermediate-dose prediction contract or its nestedscaffold portfolio comparison. This observation is limited to the inspected paper text. It does not establish first-in-literature novelty, and the kernel/conditional/PCA/residual/mix algorithms remain ordinary. If scores improve, the first warranted result is useful conditional information on the published endpoint, not a newalgorithm,causalmechanism,virtualcellworldmodelorRSI.
+
+RF-derived row classifications/ALLexport processing may encode all doses upstream; excluding those columns prevents directly using them, but does not independently certify dose-local biological acquisition. The originalpaper's evidence that multi-dose curves add information beyond single doses cannot be reused as evidence that our high-dose-only representation should work, or as our own measuredgain.
+
+No existingpaperperformancewas claimed reproduced. No authorbaselinewas deliberately weakened: theirRFsolves another endpoint with richer all-dose inputs, so comparing its reported classification score with our MSE would be invalid. Further innovation must specify a concrete difference beyond these established applications and ordinary same-information methods, then survive opposing independent review.

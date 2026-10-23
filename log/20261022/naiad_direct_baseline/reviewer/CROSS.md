@@ -1,0 +1,21 @@
+# Actual reciprocal design/code review before fits
+
+Read skeptic/INDEPENDENT.md, root PROTOCOL.md, benchmark.py, test_adapter.py, vendorize.py, and source-only predecessor function_masks.py/calibrate.py. Exchanged strongest critiques and actual replies with naiad_simplicity; no HTTP, fits, numeric dataset contents or protected outcomes read.
+
+## Agreement and response
+
+Peer strongest qualification: local endpoint/control and singleton provenance must hold; exact identity with author CSV values is neither established nor a reason to open protected values. I agree. function_masks.py derives legal growth from processed_fitnesses mirrored entries, and singles from single_fitnesses.average_fitness. This supports a local benchmark contract, not original-paper value reproduction. No target scaling, centering, residual preprocessing, or development checkpoint selection is present in reviewed NAIAD code. Data loaded together does not itself imply use in gradients: train_index and inner validation restrict optimization/selection; final development predictions follow each frozen fit.
+
+Accept hidden256, outer-budget2/4/16 capacity during inner fitting,500epoch selection followed by fresh all-B selected-duration refit, and scalar-order averaged inference as explicitly disclosed bounded adaptations. Fresh shorter schedule does not reproduce the winning inner checkpoint trajectory and cannot claim that it does.36fits count is correct.500checkpoint opportunities and prior scalar/RNA acquisition remain non-equal search/information costs.
+
+## Strongest prefit corrections sent to root and peer
+
+1. Exact author scheduler is integer10percent warmup, (step+1)/warmup, then0.1+0.9*(total-step)/(total-warmup). Reviewed adapter instead begins at0 and decays to0. Protocol declares decay0, but source-fidelity drift is avoidable and materially affects short final fits. Restore author schedule (zero-warmup branch naturally bypassed for fewer than10steps) or explicitly freeze altered schedule as extra adaptation before outcomes. Author DataLoader shuffle=False while adapter=True is another initially implicit change; restore False or disclose. Peer agrees these should be reconciled or declared before fit, never repaired after seeing unfavorable results.
+2. Same-fold identity is not automatically proved by common input CSV: predecessor calibrate filters pair rows to RNA feature vocabulary before sorting source_order; NAIAD currently takes all CSV rows. Assert exact103gene universe and expected1051development pair IDs against frozen predecessor metadata/prediction pair list, plus exact source IDs/order. This is a correctness gate before claiming same-data comparison. Source_order finite/unique, prior index unique, canonical pair-string correspondence, source/dev disjointness and sufficient source count should be asserted.
+3. CUDA environment CUBLAS_WORKSPACE_CONFIG is set before torch import in standalone benchmark, and deterministic_algorithms(True) is enabled before fitting. This is correct order for current process. setdefault does not override incompatible inherited settings, so record actual environment and reject incompatible values if deterministic CUDA requires it. test_adapter imports torch first but does not initialize CUDA, which by itself is not a determinism violation. CUDA sync before measured completion exists. Record device, torch and threads; GPU synthetic forward/backward check is appropriate, but this reviewer ran no fits or hardware probe.
+
+Vendorization verifies local source receipt SHA and copies author models unchanged with Apache2 attribution. Test_adapter checks strict schedule and symmetric finite inference; it does not yet test backward, scheduler parity, CUDA path, or fold identity, so PASS should retain its narrow meaning.
+
+## Provisional disposition
+
+GO once same-universe identity is asserted and scheduler/loader discrepancies are reconciled or explicitly frozen. No demand for original-paper exact value equivalence, no new hyperparameter search, no protected reopening. This is qualification of ordinary comparator execution, not evidence for WM, agents, inheritance, RSI, drugresponse, biological replication or novelty. Previous updater STOP and full ACTIVE/NOT_ACHIEVED remain binding.

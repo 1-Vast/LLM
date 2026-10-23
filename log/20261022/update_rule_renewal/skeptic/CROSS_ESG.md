@@ -1,0 +1,13 @@
+# Actual ESG cross and scope corrections
+
+Both biology and skeptic sealed APIreviews before reading peers; then read eachactualfile and exchanged directquestions/responses. Skeptic subsequently read root ROOT_ESG_PROTOCOL and EXACT_ESG.json. One mistaken/root/resultpath lookup failed; corrected to phase-rootpath. No rawbiologicaldata, newexperiment or authorcode run in this cross.
+
+Skeptic's strongest challenge: lack of finiteeta/jointstep stability alone doesnotprove empiricalrankingfailure; writingstateerror intog can evenimprove overallprediction despite invalidating thenuisanceinterpretation. Biology explicitlyaccepted both. Its counterexample is therefore limited to generalstate-effectcancellation and drugmodulemeaning, not a claim that all suchupdatesworsenutility. Both preserve valid same-stateadditivestatecancellation.
+
+Biology's response sharpened skeptic's count/weightwitness: k7/8,p9/256 yet S−93 makesappliedstep−v, so acceptedpositivevconcordance is not a certificate for theactuallyappliedsign. The negative step canstill be pairwiseL1descent; no harmconclusion follows. Skeptic confirms thiswas already its intendedscope. Lack ofuniversaleffect is not used torefuteAPI's finiteempiricalpossibility.
+
+Both agree strongestfaithfulcomparisonis actualpairwiseresidualL1 coordinate-signupdate withthe identicalgate,basis,whitelist,feedbackandcost, not ordinarysampleMSE/signSGD alone. Exactsamecode as a comparator is NOT byitselfpublicationpriorart; here thelimitedidentity only refutes the stated contrast againstsamplegradient and identifies theordinaryloss beingoptimized. Specificnoveltyclaim could reside in a genuinelydifferentvalidgate, but currentgate's claimedbinomialcontrol fails and no suchrevision isprovided. Do not silentlyreplace it with clusterpermutation/twosided/uniqueedges and countthe repairas thiscandidate.
+
+Root's independentiidvertexnull enumerates6!orderings, withalpha.05falseacceptance169/720ordered and49/720unique; sourceprotocol fixes allassumptions. Skeptic read saved results, didnot independentlyrerunrootcode. This is stronger than skeptic's own commonlatent4nodecounterexample because evenindependentcontinuousnodeoutcomes produce dependentedges. Neither is a realassayperformanceassessment. All agree orientedduplication isexactrepeatedinformation; deduplicationalone doesnotvalidatebinomialtail.
+
+Jointdecision: STOP literalESGbinomial/cancellationjustification and no presentcorepromotion; retain ordinarypairwiselearning's possibleutility. No empiricalclaim that ESG cannot outperformweakSGD, no newbiologicalfit, datasetqualification or revisedgatemenu. Fullgoal remainsunfinished, not blockedbythisspecificnegative.

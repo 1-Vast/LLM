@@ -1,0 +1,7 @@
+# Replies received after CROSS seal
+
+2026-10-23. Root explicitly checked old predict.py: saved OOF truth is target-gem mean(double−single_a−single_b+control), all old models predict that residual and additive is0. New law predicts only r=theta*h(input-gem singles); it does not reconstruct the double or use target singles as inputs. Root will compare newly saved labels to old truth. This resolves the target/baseline comparability question at source-code review level; equality of actual saved arrays still requires execution/audit. The scoped task is residual-law prediction, not full future-state reconstruction.
+
+Critic directly accepted the reciprocal measurement challenge: a correctly specified joint causal model can respect post-lysis invariance without a cut, and opponents must not be deliberately misspecified. Its rank4 check is conditional/local and two spike levels do not certify endogenous recovery; extraction validation remains needed. No authenticated physical package and no numerical/core GO for that separate proposal.
+
+Critic supports root's one bounded overlap falsifier with same-gem nonlinearity before averaging,10outer fits and2oracle diagnostics. Oracle results are optimistic diagnostics, not OOF performance or a selection tool. Failure in either frozen direction stops the fixed law, no threshold change/function head. This records actually received replies after the original CROSS seal, leaving that file unchanged. No new values/fits executed or read.

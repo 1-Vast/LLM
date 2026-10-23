@@ -1,0 +1,13 @@
+# Next research step after the finite ALMANAC pilot
+
+Full objective ACTIVE / NOT_ACHIEVED. This turn is PROGRESS, not a status-only continuation: new numerical ALMANAC ordinary feedback experiment, independent raw/metric audit, selected-RBF independent refit and actual opposing debate completed. All root experiment processes are terminal exit0; no experiment is waiting on a live handle.
+
+Read DECISION.md, PROTOCOL.md, root/RESULTS.json, root/ERROR_DIAGNOSIS.json, assay/NUMERICAL_AUDIT.json, assay/SELECTED_RBF_REFIT.json, both RESULT_CROSS.md and DIAGNOSTIC_REVIEW.md. Final local binding/verification cover this phase only; retain disclosed review-only post-extraction drift and first self-console freeze failure. Never say full repository provenance restored.
+
+Main useful result: selected ordinary direct RBF with a high-high combination anchor improves MSE10.05% over selected B0 on10newcells/887knownsamplepairs/eightcommonqueries;10/10cellpositive, study-exclusiongain6%. Decision ranking is NOT robust: study-exclusion top89regret worsens. It does not establish WM/agent/inheritance/RSI.
+
+One allowed source/tune-only error diagnosis has now actually been executed, not pending. Residuals remain associated with anchorinnovation; ordinary residual regression/stacking can express this relationship. Do NOT respond by adding a correction menu, anotheranchor, moreLLM/editor layers, tuning drugsubgroups or opening20latercells. Current anchortransport concept has no distinctive mechanism and is STOP for novelty/RSI expansion. A correlation is not a new algorithm or evidence of biological-state identification.
+
+Future progress toward the full goal requires a materially different, explicitly falsifiable technical hypothesis with real novelty against ordinary conditional prediction, residual correction, standardmeta-learning and equal-budgetsearch; it must address a real functional/decision task rather than merely naming this surfacecompletion a worldmodel. First consult existing frontier/mechanism/operation STOP records and prior primaryliterature, distinguish strict equivalence from membership of existingfamily, then independently challenge any specific candidate before implementing. Do not default to another broad dataset hunt or revive stoppedCDKcomposition/decryptEprotein menus. Retain the successful conventionalfeedback programs as strong controls.
+
+ALMANAC selection/later20cellresponses remainclosed. Prior decryptEother96/TGlater14/AZ413/CiPA8–9/MSElater/PTPCA375andlaterNCI-H1975/NCI-H2170/Panc1005 remainprotected. Newassets sharing a cellname are not permission to read oldreserves. All research/test code research/; all records/data log/. No required full-goal contribution has been silently dropped.

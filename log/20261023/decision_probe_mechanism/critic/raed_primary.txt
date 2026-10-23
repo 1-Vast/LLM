@@ -1,0 +1,2320 @@
+Resolution-Aware Experimental Design under Partial Identifiability
+Report GitHub Issue
+×
+Title:
+Content selection saved. Describe the issue below:
+Description:
+Submit without GitHub
+Submit in GitHub
+arXiv is now an independent nonprofit!
+Learn more
+×
+Back to arXiv
+Why HTML?
+Report Issue
+Back to Abstract
+Download PDF
+Abstract
+1 Introduction
+2 Related Work
+Bayesian experimental design and model discrimination.
+Set-valued classification and confidence sets.
+Robust and ambiguity-aware design.
+Comparison of statistical experiments.
+Compound channels, confusability, and list decoding.
+Risk control and finite-sample calibration.
+3 Resolution-Aware Experimental Design
+3.1 Structural families, nuisance states, and experiments
+3.2 Randomized nonempty candidate-set rules
+3.3 Validity requirements
+3.4 Resolution objective and experiment choice
+3.5 Relationship to least-ambiguous set-valued classification
+3.6 Scientific validity and statistical certification
+4 Information and Structural Resolution under Nuisance Uncertainty
+4.1 Cross-nuisance structural aliasing
+Proof sketch of Theorem .
+Beyond exact cyclic aliasing.
+4.2 Composite informativeness that RAED respects
+5 Learned RAED and Finite-Sample Validity
+5.1 Score-based candidate sets
+5.2 Nested finite-sample calibration
+5.3 Positive-tail calibration and independent certification
+5.4 The statistical price of small nuisance tails
+6 Benchmark Construction and Experimental Protocol
+6.1 Watt: distinguishing fault architectures with active well tests
+6.2 WCA: depositional-architecture discrimination by pressure interference
+6.3 GWAE-Fluvial: one- versus two-channel discrimination
+6.4 Methane oxidation: a powered certification benchmark
+6.5 Common learned-RAED protocol
+6.6 Comparator criteria and downstream evaluation
+7 Results
+7.1 Structural granularity and achievable resolution in Watt
+7.2 Constrained sensing separates RAED and information gain
+7.3 Nuisance-average validity can conceal a geological hard region
+7.4 Tail protection changes the selected GWAE experiment
+7.5 Finite-sample Tail certification in methane oxidation
+8 Discussion
+9 Conclusion
+A Notation and Technical Preliminaries
+B Exact Inclusion-Marginal Representation
+C Proofs for RAED Formulation, Aliasing, and Experiment Comparison
+C.1 Common and approximate garbling
+C.2 Exact cyclic aliasing separation
+C.3 Scaling consequence
+C.4 Diffuse near-aliases
+D Learned RAED and Calibration Proofs
+D.1 Population score geometry supporting the learned family
+D.2 Proof of nested nuisance-average calibration
+D.3 Positive-tail specialization of nested calibration
+D.4 Nested Monte Carlo for nuisance-state loss
+D.5 Selection-aware independent certification
+D.6 Proof of the rare-tail obstruction
+E Additional Theoretical Results
+E.1 Attained least-favourable Tail-RAED score
+F Statistical and Computational Protocol
+F.1 Learned score systems
+F.2 Comparator estimators and tie handling
+F.3 Threshold calibration and Tail evaluation
+F.4 Selection and held-out firewall
+G Reservoir Benchmark Construction and Reproducibility
+G.1 Watt
+Model ontologies and nuisance.
+Grid, properties, and initialization.
+Wells and physical controls.
+Response and observation noise.
+G.2 WCA
+Conditional geometry and petrophysics.
+Physical model and wells.
+Physical controls.
+Observation and simulation ensemble.
+G.3 GWAE-Fluvial
+Structural prior and geometry.
+Petrophysics and forward model.
+Physical experiment library.
+Response, noise, and statistical roles.
+H Methane-Oxidation Benchmark Construction and Certification Protocol
+Mechanistic models.
+Design and observation model.
+Statistical roles and certification.
+I Additional Empirical Results
+I.1 Watt ontology summary
+I.2 Complete restricted-observation results at δ=0.05\delta=0.05
+I.3 Dependence of the selected restricted design on δ\delta
+I.4 GWAE-Fluvial Tail-RAED comparison
+Independent experiment ranking.
+Selected-experiment calibration.
+Common evaluation population.
+Hard-region behavior.
+I.5 Methane frontier
+References
+License: CC BY 4.0
+arXiv:2609.03686v1 [cs.LG] 03 Sep 2026
+Resolution-Aware Experimental Design under Partial Identifiability
+Sofianos-Panagiotis Fotias
+Affiliation: National Technical University of Athens
+Abstract
+Experimental design is commonly framed as choosing the experiment expected to provide the most information. Under partial identifiability however, persistent nuisance uncertainty can make the same observation carry different structural meanings. We introduce Resolution-Aware Experimental Design (RAED), which selects an experiment by the smallest expected nonempty structural candidate set achievable subject to false-exclusion control. We prove an exact cross-nuisance aliasing separation: an experiment can be preferred by structural and full-latent information gain, average classification, and nuisance-marginalized informativeness while having arbitrarily poorer valid structural resolution. RAED nevertheless preserves the expected ordering under a genuine composite Blackwell comparison. To make this criterion operational, we develop a learned score-based implementation with finite-sample nuisance-average and positive-tail calibration, and characterize a rare-tail sample-complexity obstruction. Under constrained sensing, two subsurface-flow benchmarks exhibit genuine RAED–expected-information-gain (EIG) experiment-selection disagreements, with the clearest and largest held-out resolution differences in WCA. In a fluvial benchmark, tail protection changes the selected physical experiment and replaces hard-region false exclusions primarily with explicit ambiguity. In a mechanistic methane-oxidation benchmark, a prospectively specified 5% false-exclusion tolerance also yields a nontrivial finite-sample population guarantee for tail-sensitive nuisance risk, with 95% joint confidence across all three structural families.
+1 Introduction
+Experimental design asks which intervention, measurement, or control should be chosen before future data are observed. In Bayesian experimental design, a standard principle is to prefer experiments expected to change posterior beliefs about an unknown model or parameter as much as possible. Expected information gain formalizes this idea by measuring the expected divergence between prior and posterior beliefs, equivalently the mutual information between the unknown quantity and the future observation [1, 2]. This is natural when the scientific objective is posterior concentration. But in many model-discrimination problems, observations are also shaped by persistent nuisance variables whose values can substantially alter the response. In such settings, a more direct objective is to determine which structural explanations can be excluded while controlling the risk of excluding the truth. Suppose the structural target is
+M∈{1,…,K},M\in\{1,\ldots,K\},
+and experiment ee produces an observation YY. Rather than force a single structural label, the terminal decision may return a nonempty candidate set
+Γe​(Y)⊆{1,…,K}.\Gamma_{e}(Y)\subseteq\{1,\ldots,K\}.
+A singleton corresponds to complete structural resolution, whereas a larger set records ambiguity that cannot be safely removed. Because the nuisance state θ\theta is not observed at decision time, the same nuisance-blind rule Γe\Gamma_{e} must map observations to structural conclusions across all nuisance states covered by the validity requirement. The design objective is therefore to choose the experiment that supports the smallest valid candidate set.
+Resolution-Aware Experimental Design (RAED) formalizes this idea. For each structural family kk, the observation law depends on a persistent nuisance state θ∈Θk\theta\in\Theta_{k}. Given a false-exclusion tolerance α\alpha, RAED controls the probability of excluding the true structural family and evaluates experiment ee through the expected candidate-set size
+Je=𝔼​|Γe​(Y)|.J_{e}=\mathbb{E}|\Gamma_{e}(Y)|.
+(1)
+Validity can be required at every admissible nuisance state, on average across nuisance states, or over the worst δ\delta-fraction of the nuisance distribution, where δ∈(0,1]\delta\in(0,1] specifies the fraction being protected. Smaller values of δ\delta concentrate the validity requirement on increasingly adverse nuisance regimes, while δ=1\delta=1 recovers nuisance-average validity. Together, the false-exclusion tolerance α\alpha and nuisance-tail level δ\delta determine the trade-off between structural resolution and the strength of validity protection.
+The distinction matters because nuisance averaging can conceal incompatible structural meanings of the same observation. An experiment may be highly informative about MM after nuisance averaging, or even identify MM perfectly at each fixed nuisance state, while no single nuisance-blind terminal rule can safely translate its observations into a precise structural conclusion. We call this phenomenon cross-nuisance structural aliasing. It is an experiment-level form of partial identifiability: the issue is not simply overlap between averaged predictive distributions, but whether a single structural decision rule can remain valid across the nuisance states that the experiment must tolerate.
+Table 1 gives a concrete four-family example. Let M∈{0,1,2,3}M\in\{0,1,2,3\} denote the structural family and let the nuisance state be Z∈{0,1,2,3}Z\in\{0,1,2,3\}. Consider an experiment eIe_{I} whose observation is
+Y=M⊕Z(mod4).Y=M\oplus Z\pmod{4}.
+At each fixed ZZ, the observation uniquely determines MM. However, once ZZ is unknown this identification breaks down. The same observed value can correspond to different structural families under different nuisance states.
+Z\MZ\backslash M
+00
+11
+22
+33
+00
+0
+11
+22
+33
+11
+11
+22
+33
+0
+22
+22
+33
+0
+11
+33
+33
+0
+11
+22
+Entries are observations Y=M⊕Z(mod4)Y=M\oplus Z\pmod{4}; bold entries mark the same observation Y=0Y=0.
+Table 1: Cross-nuisance structural aliasing at K=4K=4.
+Each row is a permutation of the structural label, so eIe_{I} identifies MM perfectly at every fixed ZZ. Across nuisance states, the same observation Y=0Y=0 is compatible with every MM. A single nuisance-blind terminal rule therefore cannot assign that observation a unique structural meaning. Theorem 4.1 compares this information-favoured experiment with a nuisance-independent experiment eRe_{R} that achieves singleton RAED resolution.
+This perspective leads to three main contributions.
+1.
+A resolution-aware design objective. RAED places a randomized nonempty structural candidate set at the end of the experiment and selects the experiment with the smallest expected candidate-set size subject to a declared false-exclusion tolerance. Its validity criterion can range from protection at every nuisance state to tail-sensitive and nuisance-average guarantees.
+2.
+A theory of when information and structural resolution disagree. We identify cross-nuisance structural aliasing as a mechanism by which an experiment can appear highly informative while still failing to support a precise nuisance-blind structural decision. An exact cyclic construction shows that this disagreement can grow with the number of structural families. We also show that RAED preserves the expected ordering under genuine composite informativeness and that the separation persists beyond exact aliasing.
+3.
+A learned implementation with finite-sample calibration. We develop score-based decision rules with independent calibration for nuisance-average and tail-sensitive validity, turning the population objective into a practical experiment-selection procedure. Across two subsurface-flow benchmarks, RAED and expected information gain select different experiments and produce materially different held-out structural resolution. In a fluvial benchmark, tail protection changes the selected well test and replaces hard-region false exclusions primarily with explicit ambiguity. A mechanistic methane-oxidation study further demonstrates nontrivial finite-sample population certification under a prespecified false-exclusion tolerance.
+The remainder of the paper relates RAED to neighboring approaches, develops the formal decision problem and aliasing theory, introduces the learned calibration procedure, and evaluates the resulting experiment choices and finite-sample guarantees.
+2 Related Work
+Bayesian experimental design and model discrimination.
+Bayesian experimental design commonly selects ee by maximizing expected information gain about a latent quantity, including structural model indices and continuous parameters [1, 2]. Model-discrimination design instead uses criteria tailored to separating rival models, including T-optimality, robust discrimination, and classification-based Bayesian design [3, 4, 5, 6, 7]. Expected model-elimination criteria similarly reward experiments that are expected to reject more competing models [8]. RAED differs in the terminal decision it optimizes: after observing the experiment, it seeks the smallest nonempty structural candidate set that can be reported while controlling false exclusion across persistent nuisance uncertainty.
+Set-valued classification and confidence sets.
+Minimum expected set size under coverage is a classical statistical objective. Least-ambiguous set-valued classification minimizes expected prediction-set size subject to classwise coverage constraints [9]; related work studies confidence sets and classwise prediction sets with controlled ambiguity [10, 11, 12]. At the nuisance-average endpoint, fixed-experiment RAED reduces exactly to this problem when the validity and efficiency laws coincide and the same randomized decision class is used. RAED then places this terminal set-valued decision inside an outer experiment-selection problem and extends the validity requirement to persistent nuisance uncertainty.
+Robust and ambiguity-aware design.
+Robust design methods protect experiment utilities against nuisance uncertainty, model misspecification, or distributional ambiguity. Robust expected information gain introduces ambiguity sets around the information objective [13], while maximin Bayesian design frames experiment choice as a game against an adversarial nature [14]. RAED instead applies robustness to the nuisance-specific false-exclusion loss
+Lk,e(θ)=ℙk,θe{k∉Γe(Y)},L_{k,e}(\theta)=\mathbb{P}_{k,\theta}^{e}\{k\notin\Gamma_{e}(Y)\},
+and optimizes structural resolution subject to the resulting validity requirement. Positive values of δ\delta interpolate between increasingly adverse nuisance tails and nuisance-average protection, while δ=0\delta=0 is treated separately as the pointwise-validity endpoint.
+Comparison of statistical experiments.
+Blackwell’s ordering formalizes when one experiment can be simulated from another through a common garbling, while Le Cam–Torgersen deficiency theory quantifies approximate comparisons [15, 16, 17]. These notions provide a natural benchmark for RAED. If the same nuisance-independent garbling maps one experiment to another for every (k,θ)(k,\theta), then the full nuisance-specific decision problem is preserved and RAED respects the resulting informativeness ordering. The separation studied here arises under weaker notions of informativeness, such as comparisons made only after nuisance averaging or through mappings whose interpretation changes with the nuisance state.
+Compound channels, confusability, and list decoding.
+Persistent nuisance uncertainty also creates conceptual links to compound channels, symmetrizability, confusability, and list decoding [18, 19, 20, 21]. These literatures study communication rates, adversarial channel states, zero-error confusability, and decoding lists. RAED addresses a different problem: one-step scientific experiment selection with controlled false exclusion and expected candidate-set size as the resolution objective. The common theme is that the same observation may support incompatible interpretations across nuisance states unless a single decoder can resolve them consistently.
+Risk control and finite-sample calibration.
+The calibration layer builds on risk-controlling prediction, Learn-then-Test, optimized certainty equivalent (OCE) risk, and concentration bounds for bounded losses [22, 23, 24, 25]. In RAED, these tools provide finite-sample guarantees for the nuisance risk of learned candidate-set rules without changing the underlying population validity criterion. The parameters α\alpha and δ\delta specify the scientific false-exclusion requirement, while ζ\zeta is the allowed probability that the finite-sample certificate itself fails.
+Taken together, these connections place RAED at the intersection of experimental design and set-valued decision making under nuisance uncertainty. Its distinguishing feature is the outer design objective: experiments are compared by the smallest expected nonempty structural candidate set they can support subject to a prescribed false-exclusion requirement. The next section formalizes this decision problem and shows how, for a fixed experiment at the nuisance-average endpoint, it reduces to classical set-valued classification under the appropriate conditions.
+3 Resolution-Aware Experimental Design
+3.1 Structural families, nuisance states, and experiments
+Let
+K≥2,0≤α<1,0≤δ≤1.K\geq 2,\qquad 0\leq\alpha<1,\qquad 0\leq\delta\leq 1.
+(2)
+The structural target is
+M∈{1,…,K}.M\in\{1,\ldots,K\}.
+Conditional on M=kM=k, the data also depend on a nuisance state θ∈Θk\theta\in\Theta_{k}. The nuisance state is persistent in the sense that, for a realized experiment, the same value of θ\theta governs the entire observation YY rather than being redrawn across its components.
+An experiment e∈ℰe\in\mathcal{E} induces, for every structural family kk and nuisance state θ∈Θk\theta\in\Theta_{k}, an observation law
+Pk,θeP_{k,\theta}^{e}
+on an observation space 𝒴e\mathcal{Y}_{e}. We assume these spaces are standard Borel. The experiment and its observation protocol are chosen before YY is observed.
+Two nuisance distributions may enter the formulation, and they serve different purposes. The measure μk\mu_{k} specifies how nuisance states within family kk are weighted when imposing nuisance-average or nuisance-tail validity. The measure νk\nu_{k} specifies how nuisance states are weighted when evaluating the expected size of the resulting candidate set. These measures may coincide, but they need not.
+Let πk≥0\pi_{k}\geq 0, with ∑k=1Kπk=1\sum_{k=1}^{K}\pi_{k}=1, denote the structural weights used in the resolution objective. Define
+Pk,νe​(A)=∫ΘkPk,θe​(A)​νk​(𝑑θ),Qe=∑k=1Kπk​Pk,νe.P_{k,\nu}^{e}(A)=\int_{\Theta_{k}}P_{k,\theta}^{e}(A)\,\nu_{k}(\,\mathrm{d}\theta),\qquad Q_{e}=\sum_{k=1}^{K}\pi_{k}P_{k,\nu}^{e}.
+(3)
+Thus Θk\Theta_{k} specifies which nuisance states are admissible, μk\mu_{k} determines how validity is assessed across them, νk\nu_{k} determines how resolution is averaged across them, and πk\pi_{k} determines how structural families are weighted in the resolution objective.
+3.2 Randomized nonempty candidate-set rules
+After observing Y=yY=y, the terminal decision is a nonempty structural candidate set
+Γe​(y)⊆{1,…,K},Γe​(y)≠∅.\Gamma_{e}(y)\subseteq\{1,\ldots,K\},\qquad\Gamma_{e}(y)\neq\varnothing.
+RAED allows this decision rule to be randomized. Formally, for each observation yy, a Markov kernel
+Πe​(S∣y)\Pi_{e}(S\mid y)
+assigns probabilities to the nonempty subsets S⊆{1,…,K}S\subseteq\{1,\ldots,K\}. Deterministic candidate-set rules are included as the special case in which Πe(⋅∣y)\Pi_{e}(\cdot\mid y) places probability one on a single set.
+For each structural family kk, define the inclusion probability
+gk,e(y):=PrΠe{k∈Γe(y)}=∑S∋kΠe(S∣y).g_{k,e}(y):=\Pr_{\Pi_{e}}\{k\in\Gamma_{e}(y)\}=\sum_{S\ni k}\Pi_{e}(S\mid y).
+(4)
+Thus gk,e​(y)g_{k,e}(y) is the probability, over the rule’s internal randomization, that family kk is retained after observing yy. Because the reported candidate set is always nonempty,
+0≤gk,e​(y)≤1,∑k=1Kgk,e​(y)≥1.0\leq g_{k,e}(y)\leq 1,\qquad\sum_{k=1}^{K}g_{k,e}(y)\geq 1.
+(5)
+For the expected-cardinality objective and the familywise false-exclusion losses considered below, these inclusion probabilities contain all information needed for optimization. Appendix B shows that every feasible collection of such marginals can be realized by a randomized rule over nonempty candidate sets.
+For structural family kk and nuisance state θ\theta, define the retention probability
+Ck,e​(θ,g):=𝔼Y∼Pk,θe​[gk,e​(Y)],C_{k,e}(\theta;g):=\mathbb{E}_{Y\sim P_{k,\theta}^{e}}\left[g_{k,e}(Y)\right],
+(6)
+and the corresponding false-exclusion loss
+Lk,e​(θ,g):=1−Ck,e​(θ,g).L_{k,e}(\theta;g):=1-C_{k,e}(\theta;g).
+(7)
+Here Ck,e​(θ,g)C_{k,e}(\theta;g) is the probability that the candidate set retains the true structural family when the data are generated under (k,θ)(k,\theta), while Lk,e​(θ,g)L_{k,e}(\theta;g) is the probability that the true family is excluded.
+3.3 Validity requirements
+RAED controls false exclusion separately within each structural family. At the pointwise endpoint, validity requires
+supθ∈ΘkLk,e(θ;g)≤α,k=1,…,K.\sup_{\theta\in\Theta_{k}}L_{k,e}(\theta;g)\leq\alpha,\qquad k=1,\ldots,K.
+(8)
+We use δ=0\delta=0 to denote this pointwise-validity endpoint. No nuisance probability measure is required in this case.
+For 0<δ≤10<\delta\leq 1, validity is defined through the upper-tail risk of the nuisance-specific false-exclusion loss under μk\mu_{k}:
+ρδ,μk​(Lk,e):=infη∈ℝ{η+1δ​∫Θk(Lk,e​(θ,g)−η)+​μk​(𝑑θ)},\rho_{\delta,\mu_{k}}(L_{k,e}):=\inf_{\eta\in\mathbb{R}}\left\{\eta+\frac{1}{\delta}\int_{\Theta_{k}}\bigl(L_{k,e}(\theta;g)-\eta\bigr)_{+}\,\mu_{k}(\,\mathrm{d}\theta)\right\},
+(9)
+where (x)+=max⁡{x,0}(x)_{+}=\max\{x,0\}. The corresponding Tail-validity requirement is
+ρδ,μk(Lk,e)≤α,k=1,…,K.\rho_{\delta,\mu_{k}}(L_{k,e})\leq\alpha,\qquad k=1,\ldots,K.
+(10)
+For 0<δ<10<\delta<1, this criterion controls the average false-exclusion loss in the upper δ\delta-tail of the nuisance distribution. Smaller values of δ\delta therefore place greater emphasis on adverse nuisance states. At δ=1\delta=1,
+ρ1,μk​(Lk,e)=𝔼θ∼μk​Lk,e​(θ,g),\rho_{1,\mu_{k}}(L_{k,e})=\mathbb{E}_{\theta\sim\mu_{k}}L_{k,e}(\theta;g),
+so Tail validity reduces to nuisance-average validity.
+For later use, let 𝒢e​(α,δ)\mathcal{G}_{e}(\alpha,\delta) denote the set of randomized nonempty candidate-set rules satisfying the corresponding familywise validity requirement: (8) when δ=0\delta=0, and (10) when 0<δ≤10<\delta\leq 1.
+3.4 Resolution objective and experiment choice
+For experiment ee and candidate-set rule gg, define the expected candidate-set size
+Je​(g):=𝔼Y∼Qe​[𝔼Πe​(|Γe​(Y)|∣Y)]=𝔼Y∼Qe​[∑k=1Kgk,e​(Y)].J_{e}(g):=\mathbb{E}_{Y\sim Q_{e}}\left[\mathbb{E}_{\Pi_{e}}\!\left(|\Gamma_{e}(Y)|\mid Y\right)\right]=\mathbb{E}_{Y\sim Q_{e}}\left[\sum_{k=1}^{K}g_{k,e}(Y)\right].
+(11)
+The inner expectation averages over any randomization of the terminal rule, while the outer expectation averages over the predictive observation distribution QeQ_{e}. Thus Je​(g)J_{e}(g) is the expected number of structural families retained after experiment ee.
+For a fixed experiment, define its optimal valid ambiguity by
+Ve⋆​(α,δ):=infg∈𝒢e​(α,δ)Je​(g),V_{e}^{\star}(\alpha,\delta):=\inf_{g\in\mathcal{G}_{e}(\alpha,\delta)}J_{e}(g),
+(12)
+where 𝒢e​(α,δ)\mathcal{G}_{e}(\alpha,\delta) denotes the candidate-set rules satisfying the validity requirement defined above. Because every rule returns a nonempty set and the rule that always retains all KK families is feasible,
+1≤Ve⋆​(α,δ)≤K.1\leq V_{e}^{\star}(\alpha,\delta)\leq K.
+For convenience, we also define the normalized resolution
+Re⋆​(α,δ):=K−Ve⋆​(α,δ)K−1∈[0,1].R_{e}^{\star}(\alpha,\delta):=\frac{K-V_{e}^{\star}(\alpha,\delta)}{K-1}\in[0,1].
+(13)
+Here Re⋆=1R_{e}^{\star}=1 corresponds to singleton resolution and Re⋆=0R_{e}^{\star}=0 to retaining all KK structural families. We use expected candidate-set size as the primary measure and normalized resolution when comparisons across problems with different numbers of structural families are useful.
+RAED selects
+e⋆​(α,δ)∈arg​mine∈ℰ⁡Ve⋆​(α,δ).e^{\star}(\alpha,\delta)\in\operatorname*{arg\,min}_{e\in\mathcal{E}}V_{e}^{\star}(\alpha,\delta).
+(14)
+Thus experiments are compared by the smallest expected structural ambiguity they can achieve while satisfying the same declared validity requirement.
+3.5 Relationship to least-ambiguous set-valued classification
+At the nuisance-average endpoint, the fixed-experiment RAED problem has a direct connection to classical set-valued classification.
+Proposition 3.1 (Fixed-experiment nuisance-average reduction).
+Fix an experiment ee and set δ=1\delta=1. Suppose that μk=νk\mu_{k}=\nu_{k} for every structural family, and define
+Pk:=Pk,μe,Qe:=∑k=1Kπk​Pk.P_{k}:=P_{k,\mu}^{e},\qquad Q_{e}:=\sum_{k=1}^{K}\pi_{k}P_{k}.
+If mandatory nonemptiness is removed and the same randomized Markov-kernel decision class is used, then fixed-experiment RAED is exactly the randomized classwise least-ambiguous set-valued classification problem
+minΓ𝔼Qe|Γ(Y)|subject toPk{k∈Γ(Y)}≥1−α,k=1,…,K.\min_{\Gamma}\mathbb{E}_{Q_{e}}|\Gamma(Y)|\qquad\text{subject to}\qquad P_{k}\{k\in\Gamma(Y)\}\geq 1-\alpha,\quad k=1,\ldots,K.
+(15)
+If an optimum of this randomized classical problem can be chosen nonempty QeQ_{e}-almost surely, then the same optimum value is attainable by RAED. Relative to formulations restricted to deterministic set-valued rules, RAED additionally permits randomization and requires the reported candidate set to be nonempty.
+Proof.
+At δ=1\delta=1, the nuisance-tail validity criterion reduces to nuisance-average false-exclusion control:
+𝔼θ∼μk​Lk,e​(θ,g)≤α.\mathbb{E}_{\theta\sim\mu_{k}}L_{k,e}(\theta;g)\leq\alpha.
+Using the definition of Lk,eL_{k,e} and Fubini’s theorem,
+𝔼θ∼μk​Lk,e​(θ,g)\displaystyle\mathbb{E}_{\theta\sim\mu_{k}}L_{k,e}(\theta;g)
+=1−𝔼θ∼μk​𝔼Y∼Pk,θe​gk,e​(Y)\displaystyle=1-\mathbb{E}_{\theta\sim\mu_{k}}\mathbb{E}_{Y\sim P_{k,\theta}^{e}}g_{k,e}(Y)
+(16)
+=1−𝔼Y∼Pk​gk,e​(Y).\displaystyle=1-\mathbb{E}_{Y\sim P_{k}}g_{k,e}(Y).
+(17)
+Hence the RAED validity constraint is equivalent to
+𝔼Y∼Pk​gk,e​(Y)≥1−α,\mathbb{E}_{Y\sim P_{k}}g_{k,e}(Y)\geq 1-\alpha,
+which is precisely the classwise retention constraint
+Pk{k∈Γ(Y)}≥1−αP_{k}\{k\in\Gamma(Y)\}\geq 1-\alpha
+for the randomized candidate-set rule.
+Likewise, for every observation yy,
+𝔼Πe​[|Γe​(y)|]=∑k=1Kgk,e​(y)\mathbb{E}_{\Pi_{e}}\!\left[|\Gamma_{e}(y)|\right]=\sum_{k=1}^{K}g_{k,e}(y)
+so the RAED objective is
+Je​(g)=𝔼Y∼Qe​[∑k=1Kgk,e​(Y)]=𝔼Qe​|Γe​(Y)|.J_{e}(g)=\mathbb{E}_{Y\sim Q_{e}}\left[\sum_{k=1}^{K}g_{k,e}(Y)\right]=\mathbb{E}_{Q_{e}}|\Gamma_{e}(Y)|.
+Thus the objective and classwise coverage constraints coincide exactly with those of randomized least-ambiguous set-valued classification [9]. The only additional RAED restriction is mandatory nonemptiness. If a classical optimum is nonempty QeQ_{e}-almost surely, it can therefore be represented as a RAED rule with the same objective value.
+∎
+3.6 Scientific validity and statistical certification
+RAED is defined by two scientific parameters: the false-exclusion tolerance α\alpha and the nuisance-tail level δ\delta. Together, they specify the validity requirement that a candidate-set rule must satisfy.
+When this requirement is verified from finite data, a separate confidence parameter ζ∈(0,1)\zeta\in(0,1) is introduced. It controls the allowed probability that the statistical certification procedure fails to establish the desired validity guarantee. Thus α\alpha and δ\delta specify the scientific target, whereas ζ\zeta specifies the confidence with which that target is certified from finite samples.
+This distinction becomes important in Section 5. Calibration is a statistical procedure for certifying a learned rule against the RAED validity requirement; it does not change the validity requirement itself.
+4 Information and Structural Resolution under Nuisance Uncertainty
+Information about the structural label does not necessarily translate into a precise structural conclusion when nuisance uncertainty persists after the experiment. The central obstruction is that the same observation can acquire different structural meanings under different nuisance states.
+4.1 Cross-nuisance structural aliasing
+Cross-nuisance structural aliasing arises when an experiment distinguishes the structural families at each fixed nuisance state, but the mapping from observations to structural labels changes with that state. Since the terminal rule observes YY but not the nuisance state, it must use a single mapping across all nuisance states covered by the validity requirement. The following construction makes this separation exact.
+To construct the nuisance-independent reference experiment used below, we use the KK-ary symmetric channel. For
+q∈[0,K−1K],q\in\left[0,\frac{K-1}{K}\right],
+let 𝖢K​(q)\mathsf{C}_{K}(q) denote the channel
+𝖢K​(q)k​j={1−q,j=k,qK−1,j≠k.\mathsf{C}_{K}(q)_{kj}=\begin{cases}1-q,&j=k,\\
+\dfrac{q}{K-1},&j\neq k.\end{cases}
+Under a uniform structural prior, its mutual information is
+ℐK​(q)=log⁡K−h⁡(q)−q​log⁡(K−1),\mathcal{I}_{K}(q)=\log K-h(q)-q\log(K-1),
+(18)
+where
+h⁡(q)=−q​log⁡q−(1−q)​log⁡(1−q)h(q)=-q\log q-(1-q)\log(1-q)
+is the binary entropy function. The function ℐK​(q)\mathcal{I}_{K}(q) is strictly decreasing for
+0≤q<K−1K.0\leq q<\frac{K-1}{K}.
+Fix K≥2K\geq 2 and parameters
+0<ε<β≤α<1−1K.0<\varepsilon<\beta\leq\alpha<1-\frac{1}{K}.
+Let
+ℤK={0,…,K−1},M∼Uniform⁡(ℤK),\mathbb{Z}_{K}=\{0,\ldots,K-1\},\qquad M\sim\mathrm{Uniform}(\mathbb{Z}_{K}),
+and let the persistent nuisance state Z∈ℤKZ\in\mathbb{Z}_{K} be independent of MM. The validity and efficiency nuisance distributions are taken to coincide, with
+μ⁡(Z=0)=ν⁡(Z=0)=1−ε,μ⁡(Z=z)=ν⁡(Z=z)=εK−1,z≠0.\mu(Z=0)=\nu(Z=0)=1-\varepsilon,\qquad\mu(Z=z)=\nu(Z=z)=\frac{\varepsilon}{K-1},\quad z\neq 0.
+We compare two experiments. Under the aliased experiment eIe_{I},
+Y=M⊕Z(modK),Y=M\oplus Z\pmod{K},
+where ⊕\oplus denotes addition modulo KK. Thus the structural mapping is perfectly distinguishable at each fixed nuisance state, but changes with ZZ.
+Under the nuisance-independent reference experiment eRe_{R},
+P⁡(Y=j∣M=k,Z=z,eR)=𝖢K​(β)k​j,P(Y=j\mid M=k,Z=z,e_{R})=\mathsf{C}_{K}(\beta)_{kj},
+so the observation law depends on MM but not on the nuisance state.
+Theorem 4.1 (Cross-nuisance aliasing separation and exact Tail frontier).
+For the experiments eIe_{I} and eRe_{R} defined above, the following statements hold.
+(i)
+For every fixed nuisance state zz, experiment eIe_{I} identifies the structural label perfectly:
+I(M;Y∣Z=z,eI)=logK.I(M;Y\mid Z=z,e_{I})=\log K.
+At each fixed zz, its structural channel also Blackwell-dominates the channel of eRe_{R}.
+(ii)
+After nuisance averaging, the structural channels of eIe_{I} and eRe_{R} are respectively
+𝖢K​(ε)and𝖢K​(β).\mathsf{C}_{K}(\varepsilon)\qquad\text{and}\qquad\mathsf{C}_{K}(\beta).
+Since ε<β\varepsilon<\beta, the former strictly Blackwell-dominates the latter. Consequently,
+I⁡(M;Y∣eI)=ℐK​(ε)>ℐK​(β)=I⁡(M;Y∣eR),I(M;Y\mid e_{I})=\mathcal{I}_{K}(\varepsilon)>\mathcal{I}_{K}(\beta)=I(M;Y\mid e_{R}),
+and both structural EIG and average Bayes classification strictly prefer eIe_{I} to eRe_{R}.
+(iii)
+Full-latent EIG gives the same ordering:
+I⁡((M,Z);Y∣eI)=log⁡K>ℐK​(β)=I⁡((M,Z);Y∣eR).I((M,Z);Y\mid e_{I})=\log K>\mathcal{I}_{K}(\beta)=I((M,Z);Y\mid e_{R}).
+(iv)
+At the pointwise-validity endpoint,
+VeI⋆​(α,0)=K⁡(1−α),VeR⋆​(α,0)=1.V_{e_{I}}^{\star}(\alpha,0)=K(1-\alpha),\qquad V_{e_{R}}^{\star}(\alpha,0)=1.
+(19)
+(v)
+For every 0<δ≤10<\delta\leq 1, the exact Tail-RAED value of the aliased experiment is
+VeI⋆​(α,δ)=max⁡{1,min⁡[K⁡(1−α),K−(K−1)​α​δε]},V_{e_{I}}^{\star}(\alpha,\delta)=\max\!\left\{1,\,\min\!\left[K(1-\alpha),\,K-(K-1)\frac{\alpha\delta}{\varepsilon}\right]\right\},
+(20)
+while
+VeR⋆​(α,δ)=1.V_{e_{R}}^{\star}(\alpha,\delta)=1.
+Equivalently, define
+δ0=K​εK−1,δ1=εα.\delta_{0}=\frac{K\varepsilon}{K-1},\qquad\delta_{1}=\frac{\varepsilon}{\alpha}.
+Then
+VeI⋆​(α,δ)={K⁡(1−α),0<δ≤δ0,K−(K−1)​α​δε,δ0<δ<δ1,1,δ≥δ1.V_{e_{I}}^{\star}(\alpha,\delta)=\begin{cases}K(1-\alpha),&0<\delta\leq\delta_{0},\\[2.84526pt]
+K-(K-1)\dfrac{\alpha\delta}{\varepsilon},&\delta_{0}<\delta<\delta_{1},\\[5.69054pt]
+1,&\delta\geq\delta_{1}.\end{cases}
+(21)
+In particular,
+VeI⋆(α,δ)>1⟺ε>αδ.V_{e_{I}}^{\star}(\alpha,\delta)>1\quad\Longleftrightarrow\quad\varepsilon>\alpha\delta.
+(22)
+Thus the information-based criteria above strictly prefer eIe_{I}, while RAED strictly prefers the nuisance-independent experiment eRe_{R} whenever ε>α​δ\varepsilon>\alpha\delta, as well as at the pointwise endpoint.
+Proof sketch of Theorem 4.1.
+Under eIe_{I}, Y=M⊕ZY=M\oplus Z. For every fixed zz, this is a bijection in MM, while nuisance averaging produces the structural channel 𝖢K​(ε)\mathsf{C}_{K}(\varepsilon). Under eRe_{R}, the structural channel is the nuisance-independent 𝖢K​(β)\mathsf{C}_{K}(\beta). Since ε<β\varepsilon<\beta, 𝖢K​(β)\mathsf{C}_{K}(\beta) is a garbling of 𝖢K​(ε)\mathsf{C}_{K}(\varepsilon), giving the information and classification orderings in parts (i)–(iii).
+For pointwise validity under eIe_{I}, every pair (k,y)(k,y) is generated with probability one by the nuisance state z=y⊖kz=y\ominus k. Any valid rule must therefore satisfy gk​(y)≥1−αg_{k}(y)\geq 1-\alpha for every k,yk,y, which gives J≥K⁡(1−α)J\geq K(1-\alpha). The bound is attainable by a randomized nonempty rule.
+For positive-tail validity, cyclic symmetrization reduces the optimization to two exclusion levels: ℓ0\ell_{0} on the aligned nuisance state Z=0Z=0, of mass 1−ε1-\varepsilon, and ℓA\ell_{A} on the alias states Z≠0Z\neq 0, of total mass ε\varepsilon. An exchange argument allows an optimum with ℓA≥ℓ0\ell_{A}\geq\ell_{0}, for which
+ρδ​(L)={ℓA,δ≤ε,{ε​ℓA+(δ−ε)​ℓ0}/δ,δ>ε.\rho_{\delta}(L)=\begin{cases}\ell_{A},&\delta\leq\varepsilon,\\[2.84526pt]
+\{\varepsilon\ell_{A}+(\delta-\varepsilon)\ell_{0}\}/\delta,&\delta>\varepsilon.\end{cases}
+Minimizing expected candidate-set size is then a two-variable linear program. Its optimizer changes at δ0=K​ε/(K−1)\delta_{0}=K\varepsilon/(K-1) and reaches singleton resolution at δ1=ε/α\delta_{1}=\varepsilon/\alpha, yielding (21). The complete proof, including attainability by randomized nonempty rules, is given in Section C.2.
+Figure 1: Exact Tail frontier in the cyclic-aliasing construction.
+For K=4K=4, α=0.05\alpha=0.05, and ε=0.01\varepsilon=0.01, the aliased experiment eIe_{I} remains at VeI⋆=3.8V_{e_{I}}^{\star}=3.8 for the most stringent nuisance tails and then improves with increasing δ\delta, reaching singleton resolution at δ1=ε/α=0.2\delta_{1}=\varepsilon/\alpha=0.2. The nuisance-independent experiment eRe_{R} achieves VeR⋆=1V_{e_{R}}^{\star}=1 throughout.
+Corollary 4.2 (Failure of maximin conditional mutual information).
+In the construction of Theorem 4.1,
+infz∈ℤKI(M;Y∣Z=z,eI)=logK>ℐK(β)=infz∈ℤKI(M;Y∣Z=z,eR).\inf_{z\in\mathbb{Z}_{K}}I(M;Y\mid Z=z,e_{I})=\log K>\mathcal{I}_{K}(\beta)=\inf_{z\in\mathbb{Z}_{K}}I(M;Y\mid Z=z,e_{R}).
+(23)
+Hence the maximin criterion maxeinfzI(M;Y∣Z=z,e)\max_{e}\inf_{z}I(M;Y\mid Z=z,e) strictly prefers eIe_{I}, even though RAED strictly prefers eRe_{R} whenever ε>α​δ\varepsilon>\alpha\delta and at the pointwise endpoint. Replacing nuisance-averaged mutual information by its worst-nuisance conditional value therefore does not resolve the aliasing: every nuisance-specific decoder is perfect under eIe_{I}, but those decoders are mutually incompatible when ZZ is unobserved. This statement concerns this particular maximin conditional-MI criterion, not every possible robust information utility.
+Proof.
+For eIe_{I}, conditioning on Z=zZ=z gives Y=M⊕zY=M\oplus z, a bijection in MM, so I(M;Y∣Z=z,eI)=logKI(M;Y\mid Z=z,e_{I})=\log K for every zz. For eRe_{R}, the channel is nuisance-independent and equals 𝖢K​(β)\mathsf{C}_{K}(\beta), giving
+I(M;Y∣Z=z,eR)=ℐK(β)<logKI(M;Y\mid Z=z,e_{R})=\mathcal{I}_{K}(\beta)<\log K because β>0\beta>0. The RAED ordering follows from Theorem 4.1.
+∎
+The separation can also grow with the number of structural families. For every fixed δ¯<1\bar{\delta}<1, the construction can be chosen so that the information-based criteria still prefer eIe_{I} while
+VeI⋆​(α,δ¯)VeR⋆​(α,δ¯)≥K​cα,δ¯,cα,δ¯=min⁡{1−α,1−δ¯1+δ¯}>0.\frac{V_{e_{I}}^{\star}(\alpha,\bar{\delta})}{V_{e_{R}}^{\star}(\alpha,\bar{\delta})}\geq Kc_{\alpha,\bar{\delta}},\qquad c_{\alpha,\bar{\delta}}=\min\!\left\{1-\alpha,\frac{1-\bar{\delta}}{1+\bar{\delta}}\right\}>0.
+(24)
+Thus the resolution gap can grow linearly with KK. The formal statement and proof are given in Corollary C.3.
+Beyond exact cyclic aliasing.
+Exact label permutations are not required for the same mechanism to arise. Suppose there is an efficiency-relevant response law such that, for every structural family, a nuisance region of μk\mu_{k}-mass at least mm has response laws within average total variation τ\tau of that common law. The general near-alias result in Theorem C.4 then gives the uniform bound
+Ve⋆​(α,δ)≥max⁡{1,K​[1−τ−α​κδ​(m)]+},κδ​(m)={1,m≥δ,δ/m,m<δ.V_{e}^{\star}(\alpha,\delta)\geq\max\!\left\{1,\;K\bigl[1-\tau-\alpha\kappa_{\delta}(m)\bigr]_{+}\right\},\qquad\kappa_{\delta}(m)=\begin{cases}1,&m\geq\delta,\\
+\delta/m,&m<\delta.\end{cases}
+(25)
+The bound is nontrivial whenever K​[1−τ−α​κδ​(m)]+>1K[1-\tau-\alpha\kappa_{\delta}(m)]_{+}>1. In the small-mass regime m<δm<\delta, the controlling term becomes α​δ/m\alpha\delta/m, showing explicitly that increasingly rare near-alias regions can be tolerated as δ\delta grows. The exact cyclic construction sharpens this general mechanism to the threshold ε>α​δ\varepsilon>\alpha\delta.
+4.2 Composite informativeness that RAED respects
+The separation in Theorem 4.1 does not imply that RAED reverses genuine Blackwell informativeness. There, the information advantage of eIe_{I} appears only after nuisance averaging or after interpreting the observation with a nuisance-specific decoder. A stronger comparison is available when one experiment can simulate another through the same post-processing rule for every structural family and nuisance state.
+Proposition 4.3 (Composite Blackwell monotonicity).
+Let e1e_{1} and e2e_{2} share the same structural weights, nuisance sets, and validity and efficiency measures. Suppose there exists a Markov kernel GG, independent of both kk and θ\theta, such that
+Pk,θe2=Pk,θe1​Gfor every ​k,θ.P^{e_{2}}_{k,\theta}=P^{e_{1}}_{k,\theta}G\qquad\text{for every }k,\theta.
+Then, for every (α,δ)(\alpha,\delta),
+Ve1⋆​(α,δ)≤Ve2⋆​(α,δ).V_{e_{1}}^{\star}(\alpha,\delta)\leq V_{e_{2}}^{\star}(\alpha,\delta).
+(26)
+The condition means that an observation from e1e_{1} can be post-processed through one common kernel GG to reproduce the observation law of e2e_{2} under every composite state (k,θ)(k,\theta). Hence any valid candidate-set rule for e2e_{2} can also be implemented after observing e1e_{1}: first apply GG, then apply the e2e_{2} rule. This preserves the nuisance-specific false-exclusion losses and the expected candidate-set size. Therefore every resolution level achievable with e2e_{2} is also achievable with e1e_{1}, and e1e_{1} cannot have a larger optimal RAED value.
+Appendix C.1 extends this result to approximate common garbling. If a single kernel simulates e2e_{2} from e1e_{1} within uniform total-variation error ε\varepsilon over all (k,θ)(k,\theta), then each nuisance-specific false-exclusion loss changes by at most ε\varepsilon and expected candidate-set size by at most (K−1)​ε(K-1)\varepsilon. The appendix also gives an exact-α\alpha repair and the corresponding deficiency bounds. Thus the separation in Section 4.1 is not a general conflict between information and structural resolution; it arises when the claimed informativeness does not hold for the full nuisance-indexed experiment through one common comparison kernel.
+5 Learned RAED and Finite-Sample Validity
+The RAED formulation in Section 3 optimizes over all measurable randomized nonempty candidate-set rules. In simulator-based problems this unrestricted optimum is generally unavailable, so we work with a learned family of score-based rules. Scores are trained first, experiments are ranked on an independent selection sample, and the selected rule is calibrated on separate data. This separation allows finite-sample validity to be certified without assuming that the learned score family attains the oracle RAED frontier.
+5.1 Score-based candidate sets
+At the nuisance-average endpoint, when Pk,μe≪QeP_{k,\mu}^{e}\ll Q_{e}, the optimal classwise retention rule is governed by the density ratio
+rk,e​(y)=d​Pk,μed​Qe​(y),Pk,μe​(A)=∫Pk,θe​(A)​μk​(𝑑θ).r_{k,e}(y)=\frac{\,\mathrm{d}P_{k,\mu}^{e}}{\,\mathrm{d}Q_{e}}(y),\qquad P_{k,\mu}^{e}(A)=\int P_{k,\theta}^{e}(A)\,\mu_{k}(\,\mathrm{d}\theta).
+(27)
+Large values of rk,e​(y)r_{k,e}(y) indicate observations that are relatively more characteristic of structural family kk than of the overall predictive mixture QeQ_{e}. This motivates learning family-specific scores that rank observations by evidence for retaining each family. Under positive-tail validity, the corresponding oracle characterization involves a least-favourable reweighting of the nuisance distribution; the full results are given in Sections D.1 and E.
+For each experiment ee, the learned procedure produces scores
+sk,e:𝒴e→ℝ,k=1,…,K.s_{k,e}:\mathcal{Y}_{e}\to\mathbb{R},\qquad k=1,\ldots,K.
+Let
+be​(y)=arg​maxj⁡sj,e​(y),b_{e}(y)=\operatorname*{arg\,max}_{j}s_{j,e}(y),
+with a fixed deterministic rule for resolving ties. Given family-specific thresholds tk,et_{k,e}, define
+Γe,t​(y)={be​(y)}∪{k:sk,e​(y)≥tk,e}.\Gamma_{e,t}(y)=\{b_{e}(y)\}\cup\{k:s_{k,e}(y)\geq t_{k,e}\}.
+(28)
+The first term guarantees that the reported candidate set is never empty, while the thresholds determine which additional structural families are retained.
+5.2 Nested finite-sample calibration
+The thresholds in (28) control the trade-off between structural resolution and false exclusion. More selective thresholds produce smaller candidate sets but increase the risk of excluding the true family. We therefore choose the deployed thresholds using an independent calibration sample.
+For each familywise validity claim jj, organize the candidate-set rules along a one-dimensional ordered path {Γj,λ:λ∈Λj}\{\Gamma_{j,\lambda}:\lambda\in\Lambda_{j}\}, where larger values of λ\lambda produce larger candidate sets:
+λ1≤λ2⟹Γj,λ1​(y)⊆Γj,λ2​(y).\lambda_{1}\leq\lambda_{2}\quad\Longrightarrow\quad\Gamma_{j,\lambda_{1}}(y)\subseteq\Gamma_{j,\lambda_{2}}(y).
+We allow either a continuous interval
+Λj=[λ¯j,λ¯j]\Lambda_{j}=[\underline{\lambda}_{j},\overline{\lambda}_{j}]
+or a finite ordered grid
+Λj={λj,1<⋯<λj,mj}\Lambda_{j}=\{\lambda_{j,1}<\cdots<\lambda_{j,m_{j}}\}.
+In either case, the largest value is a safe endpoint at which the family associated with claim jj is always retained. Let Lj,λ​(θ)∈[0,1]L_{j,\lambda}(\theta)\in[0,1] denote its false-exclusion loss at nuisance state θ\theta.
+To state the finite-sample guarantee, we condition on everything fixed before the final calibration sample, including score fitting, experiment selection, and construction of the nested path. We denote this pre-calibration information by ℱ0\mathcal{F}_{0}.
+Along the nested path, let Rj​(λ)R_{j}(\lambda) denote the true false-exclusion risk for claim jj. Because larger candidate sets retain more families, Rj​(λ)R_{j}(\lambda) is nonincreasing in λ\lambda. For an interval-valued path we additionally assume that RjR_{j} is continuous. At the safe endpoint,
+Rj​(λ¯j)=0.R_{j}(\overline{\lambda}_{j})=0.
+The calibration sample is used to place a one-sided upper confidence bound (UCB) on the unknown risk Rj​(λ)R_{j}(\lambda). Let γj∈(0,1)\gamma_{j}\in(0,1) denote the allowed failure probability for claim jj. For each fixed λ∈Λj\lambda\in\Lambda_{j}, the calibration procedure produces an upper bound Uj​(λ,γj)U_{j}(\lambda;\gamma_{j}) satisfying
+Pr⁡{Rj​(λ)≤Uj​(λ,γj)|ℱ0}≥1−γj.\Pr\!\left\{R_{j}(\lambda)\leq U_{j}(\lambda;\gamma_{j})\,\middle|\,\mathcal{F}_{0}\right\}\geq 1-\gamma_{j}.
+(29)
+Thus, with probability at least 1−γj1-\gamma_{j}, the true false-exclusion risk at that fixed rule lies below the reported bound. In the empirical implementation, these bounds are obtained from a bounded-mean Bernoulli–KL concentration inequality; the result below only requires that the stated one-sided coverage guarantee holds.
+The goal is to retain as much structural resolution as possible while certifying risk below α\alpha. We therefore enlarge the candidate set only until the upper confidence bound falls below α\alpha and remains below α\alpha for every more conservative rule. Define
+λ^j:=inf{λ∈Λj:Uj​(λ′,γj)<α​ for every ​λ′≥λ},\widehat{\lambda}_{j}:=\inf\left\{\lambda\in\Lambda_{j}:U_{j}(\lambda^{\prime};\gamma_{j})<\alpha\text{ for every }\lambda^{\prime}\geq\lambda\right\},
+(30)
+using the safe endpoint λ¯j\overline{\lambda}_{j} if no earlier value satisfies this condition.
+Theorem 5.1 (Finite-sample calibration of a nested RAED path).
+Under the conditions above, and assuming λ^j\widehat{\lambda}_{j} is a measurable function of the pre-calibration information and the calibration sample, the selected rule satisfies
+Pr⁡{Rj​(λ^j)≤α|ℱ0}≥1−γj.\Pr\!\left\{R_{j}(\widehat{\lambda}_{j})\leq\alpha\,\middle|\,\mathcal{F}_{0}\right\}\geq 1-\gamma_{j}.
+(31)
+The nested structure is what allows the threshold to be chosen from the calibration data without applying a separate multiplicity correction to every candidate value of λ\lambda. For a continuous path, invalid selection forces the upper confidence bound to fail at the population crossing point Rj​(λ)=αR_{j}(\lambda)=\alpha. For a finite threshold grid, the corresponding witness is the last invalid threshold on that grid. In either case, the argument requires only one population-determined boundary point. The full proof is given in Section D.2.
+5.3 Positive-tail calibration and independent certification
+For 0<δ<10<\delta<1, the risk controlled in Section 5.2 is the upper-δ\delta Tail risk of the nuisance-specific false-exclusion losses. For a familywise claim jj associated with structural family kk, this is
+Rj​(λ)=ρδ,μk​(Lj,λ).R_{j}(\lambda)=\rho_{\delta,\mu_{k}}\!\left(L_{j,\lambda}\right).
+Unlike nuisance-average risk, this quantity is not itself an ordinary mean. We therefore use the variational representation introduced in (9) to reduce its calibration to that of a bounded mean.
+For each λ\lambda, choose an auxiliary value ηj​(λ)∈[0,1]\eta_{j}(\lambda)\in[0,1] before the final calibration sample is opened. Then
+ρδ,μk​(Lj,λ)≤ηj​(λ)+1δ​𝔼​[(Lj,λ​(θ)−ηj​(λ))+].\rho_{\delta,\mu_{k}}\!\left(L_{j,\lambda}\right)\leq\eta_{j}(\lambda)+\frac{1}{\delta}\mathbb{E}\!\left[\bigl(L_{j,\lambda}(\theta)-\eta_{j}(\lambda)\bigr)_{+}\right].
+(32)
+Equality is obtained when ηj​(λ)\eta_{j}(\lambda) minimizes the variational expression, but any fixed choice gives a valid upper bound. In the implementation, the complete map λ↦ηj​(λ)\lambda\mapsto\eta_{j}(\lambda) is constructed from the independent selection sample and fixed before final calibration.
+The right-hand side of (32) can be calibrated using the same bounded-mean concentration machinery as in Section 5.2. In particular, a one-sided upper confidence bound for the mean of
+δ​ηj​(λ)+(Lj,λ​(θ)−ηj​(λ))+\delta\eta_{j}(\lambda)+\bigl(L_{j,\lambda}(\theta)-\eta_{j}(\lambda)\bigr)_{+}
+gives, after division by δ\delta, a one-sided upper confidence bound for the Tail risk. Applying Theorem 5.1 along the same nested threshold path therefore gives
+Pr⁡{ρδ,μk​(Lj,λ^j)≤α|ℱ0}≥1−γj.\Pr\!\left\{\rho_{\delta,\mu_{k}}\bigl(L_{j,\widehat{\lambda}_{j}}\bigr)\leq\alpha\,\middle|\,\mathcal{F}_{0}\right\}\geq 1-\gamma_{j}.
+(33)
+The full argument is given in Section D.3. At δ=1\delta=1, Tail risk reduces to nuisance-average risk and is covered directly by Theorem 5.1.
+Repeated observation-noise draws at the same nuisance state improve the estimate of that state’s false-exclusion loss, but they do not provide additional independent nuisance states. The effective sample size for population Tail certification is therefore the number of independently sampled nuisance states. Appendix D.4 shows that estimating each nuisance-specific loss by inner Monte Carlo remains conservative for the Tail certificate.
+Because experiment selection is completed before the final calibration sample is opened, certification only needs to cover the familywise validity claims of the selected experiment. At a fixed δ\delta, assigning
+γk=ζK,k=1,…,K,\gamma_{k}=\frac{\zeta}{K},\qquad k=1,\ldots,K,
+gives joint confidence at least 1−ζ1-\zeta across the KK structural families. Independence of the selection and calibration roles avoids an additional multiplicity penalty for the original experiment library, while the nested construction of Theorem 5.1 avoids one over the threshold path. The general selection-aware result is given in Theorem D.4.
+The resulting workflow is therefore to train the scores and select the experiment first, fix all choices that precede calibration, calibrate the selected rule on independent nuisance states, and only then use the independent evaluation data. These finite-sample guarantees apply for 0<δ≤10<\delta\leq 1. At δ=0\delta=0, validity is required at every admissible nuisance state rather than over a nuisance population, so the iid calibration argument used here no longer applies.
+5.4 The statistical price of small nuisance tails
+Nested calibration avoids paying separately for every threshold considered, but it cannot compensate for nuisance states that are too rare to appear in the calibration sample. A simple construction gives a necessary sample-size scale. Consider a population in which the false-exclusion loss is zero almost everywhere but equals one on a nuisance region of probability
+p=δ⁡(α+ε),ε>0.p=\delta(\alpha+\varepsilon),\qquad\varepsilon>0.
+Its upper-δ\delta Tail risk is α+ε\alpha+\varepsilon, and is therefore just above the allowed level α\alpha. Yet nn independent nuisance draws miss the adverse region entirely with probability (1−p)n(1-p)^{n}. Any distribution-free procedure that would certify after observing no losses must therefore make this event sufficiently unlikely.
+Proposition 5.2 (Rare-tail nuisance-sampling obstruction).
+Fix 0<α<10<\alpha<1, 0<δ≤10<\delta\leq 1, and an allowed false-certification probability 0<β<10<\beta<1. Any deterministic distribution-free procedure that certifies Tail risk at most α\alpha after an all-zero calibration sample must satisfy, for every ε>0\varepsilon>0 with α+ε≤1\alpha+\varepsilon\leq 1,
+(1−δ⁡(α+ε))n≤β.\bigl(1-\delta(\alpha+\varepsilon)\bigr)^{n}\leq\beta.
+(34)
+Consequently, when α​δ\alpha\delta is small,
+n=Ω⁡(log⁡(1/β)α​δ).n=\Omega\!\left(\frac{\log(1/\beta)}{\alpha\delta}\right).
+(35)
+The complete two-point argument is given in Appendix D.6. The result shows why stringent Tail certification can require many independent nuisance states even when the observed calibration losses are small. This limitation motivates using Watt and WCA as computation-limited held-out experiment-selection comparisons, while the separately powered GWAE-Fluvial and methane studies support fixed-positive-δ\delta population certification.
+6 Benchmark Construction and Experimental Protocol
+We evaluate RAED on three reservoir-engineering benchmarks—Watt, WCA, and GWAE-Fluvial—and on a methane-oxidation mechanism-discrimination benchmark. The reservoir studies use active well tests to distinguish competing structural descriptions under persistent geological uncertainty, while methane provides a cheaper mechanistic setting in which finite-sample guarantees for positive-tail false-exclusion risk can be powered directly. Table 2 summarizes the structural target, nuisance variables, physical design space, and empirical role of each benchmark. We first describe how the four benchmark problems were constructed and then give the common learned-RAED and comparator protocol.
+Table 2: Overview of the empirical benchmarks.
+Benchmark
+Structural target
+Experimental design
+Main role
+Watt
+Fault-model ontologies (K=3,6,6,12K=3,6,6,12)
+Active well tests; full or restricted pressure observation
+Ontology and constrained-sensing studies
+WCA
+Three depositional architectures
+Directional interference tests with restricted monitoring
+Constrained experiment selection
+GWAE-Fluvial
+One versus two spanning channels
+Nine active well tests
+Tail versus nuisance-average design
+Methane oxidation
+Three kinetic mechanisms
+81 reactor operating conditions
+Positive-tail certification
+6.1 Watt: distinguishing fault architectures with active well tests
+The Watt field model of Arnold et al. [26] is a synthetic reservoir benchmark built around several alternative geological descriptions of the same field. The published benchmark combines three fault models (FM1–FM3), three cutoff alternatives, three grid representations, and three top-structure alternatives, giving 34=813^{4}=81 base scenarios. For the RAED study we retain the three fault-model alternatives while fixing the remaining hierarchy at CO3, G3, and TS2. This gives a common reservoir framework in which the principal structural difference is the interpretation of the fault system.
+FM1–FM3 contain the same major named faults, but differ in their traces, spatial extent, segmentation, and therefore the compartment connections they impose on the reservoir. Each fault model is additionally combined with the two supplied property representations, OBJECT and PIXEL, and the two relative-permeability families, RP0 and RP1. Seven transmissibility multipliers further vary the strength of the existing major faults. The resulting ensemble therefore contains several sources of uncertainty around each fault interpretation rather than three deterministic reservoir models.
+From this common physical ensemble, we define four alternative model ontologies. For the K=3K=3 case, M∈{FM1,FM2,FM3}M\in\{\mathrm{FM1},\mathrm{FM2},\mathrm{FM3}\}, so that only the fault model forms part of the structural identity. We also consider two six-model descriptions, FM×\timesPROP and FM×\timesRP, and the twelve-model description FM×\timesPROP×\timesRP. Here PROP distinguishes the two supplied property representations, OBJECT and PIXEL, which provide alternative spatial porosity and permeability fields for the same geological scenario, while RP distinguishes the two supplied relative-permeability families, RP0 and RP1. When PROP or RP is not included in the structural identity, it remains part of the within-family nuisance state. In every case, seven continuous fault-transmissibility multipliers also remain nuisance variables. The four ontologies therefore allow the same physical ensemble to be examined at progressively finer distinctions between structural identity and within-model uncertainty.
+For each reservoir realization we simulate ten well tests. The experiment library follows established pressure-transient and well-testing practice, combining injector and producer multirate tests, pulse/falloff experiments, periodic rate perturbations, and a producer drawdown/build-up test [27, 28, 29]. Each test perturbs one designated well while the remaining wells continue under their common background controls. The response records the actuator bottom-hole pressure and realized rate together with pressure at three remote wells. These tests are intended to probe pressure communication through the reservoir and thereby expose differences in fault-controlled connectivity.
+The resulting ensemble contains 600 reservoir realizations, each simulated under the ten well tests, giving 6,0006{,}000 full-physics OPM Flow responses. The simulations use the reconstructed 112×30×40112\times 30\times 40 Watt model and a common equilibrium initial state. Details of the source-model reconstruction, initialization, and ensemble generation are given in Section G.1.
+The Watt ensemble is used in two complementary ways. First, using the full well response, we analyse all four model ontologies, with K=3,6,6,K=3,6,6, and 1212. This isolates the effect of model definition: the underlying reservoir realizations and physical experiments are unchanged, while progressively finer distinctions in fault model, property representation, and relative permeability are promoted from nuisance to components of the structural identity.
+We then consider a separate constrained-sensing study using the K=3K=3 fault-family ontology. Here the structural question is fixed and the available observation is varied instead. The response is truncated at T∈{7,14,30,90}T\in\{7,14,30,90\} days, and pressure is retained from 00–33 remote wells. Actuator pressure and realized rate are always observed. Each combination of observation horizon and number of remote wells therefore defines a common sensing level within which the ten well tests and admissible monitor locations are compared.
+The first study examines how achievable resolution changes as the structural distinction becomes finer. The second keeps the structural target fixed and examines how experiment choice changes when observation time and remote pressure measurements are restricted.
+6.2 WCA: depositional-architecture discrimination by pressure interference
+The WCA benchmark is based on the multiple-geological-interpretation study of Park et al. [30]. The source study considers three alternative training images, TI1–TI3, representing different fluvial depositional architectures. TI1 is characterized by relatively thin, low-sinuosity channels, TI2 by thicker low-sinuosity channels, and TI3 by a more sinuous channel system with associated levee architecture. Their overall sand/shale proportions are similar, so the main distinction between the three interpretations lies in the geometry and connectivity of the permeable bodies rather than in gross facies volume.
+For each training image we retain ten conditional facies realizations that honor the source hard data. Each realization is a different spatial arrangement of the channel, levee, and shale facies that is compatible with the same parent training image. These realizations are not treated as separate geological hypotheses. Instead, M∈{TI1,TI2,TI3}M\in\{\mathrm{TI1},\mathrm{TI2},\mathrm{TI3}\} defines the structural identity. Within each family, the nuisance state consists of the particular conditional facies realization together with its porosity and permeability fields. For a fixed facies geometry, these properties are varied using source-derived distributions and spatially correlated random fields, so reservoirs belonging to the same structural family can differ substantially in both local rock quality and flow response.
+Constructing the dynamic benchmark required placing these geological realizations in a common reservoir model. The categorical facies fields were mapped to a 53×40×11653\times 40\times 116 simulation grid chosen to preserve the main geometric and directional connectivity characteristics of the source models. Porosity and permeability were then assigned within the facies using the source-derived property distributions and spatially correlated random fields described above. A common physical scale, fluid model, initial state, and oil–water contact were used across all realizations, together with a fixed 3×33\times 3 array of nine wells. Wells are completed only in active reservoir cells above the oil–water contact. Full details of the geological reconstruction, petrophysical mapping, and dynamic model are given in Section G.2.
+The WCA experiment library follows the same well-testing principles as Watt and comprises ten active interference tests on the nine-well layout. Six tests probe reservoir communication along reciprocal east–west, north–south, and diagonal injector–producer directions. The remaining four use multirate excitation, alternating injection, a balanced multiwell interference pattern, and a central pulse/recovery test. Together, the experiments probe different flow paths and timescales through the competing depositional architectures. Each training image contributes 1000 reservoir realizations, giving 3,0003{,}000 realizations in total. Simulating every realization under the ten well tests produces 30,00030{,}000 full-physics OPM Flow responses.
+As in Watt, the complete responses are used both under rich observation and under a separate constrained-sensing analysis. In the constrained case, the response is truncated at T∈{7,14,30,60}T\in\{7,14,30,60\} days, and pressure is retained from 00–33 remote wells. Actuator pressure and realized rate are always observed. The structural target remains fixed at the three parent training images, so this analysis isolates the effect of reduced observation time and spatial coverage on experiment choice and achievable resolution.
+6.3 GWAE-Fluvial: one- versus two-channel discrimination
+The GWAE-Fluvial study builds on the single- and double-channel reservoir structures described by Shishaev, Demyanov, and Arnold [31] and the associated geological prior information reported in that work. We use the reported channel dimensions and structural ranges to construct a parametric fluvial ensemble on the supplied reservoir model, with one- and two-channel families defined directly in terms of their geological geometry and petrophysical variability.
+The structural target is M=1M=1 for a reservoir containing one spanning channel and M=2M=2 for a reservoir containing two separated channels. Within each family, the nuisance variables describe the particular channel geometry and rock properties. Channels are represented as finite sinusoidal ribbons spanning the reservoir, with nuisance variation in width, thickness, wavelength, phase, lateral and vertical position, and petrophysical quality. In the two-channel family, the two channels share the same broad geometric form but may differ in width, thickness, vertical position, and lateral separation. Exact parameter ranges, geometric constraints, and the porosity/permeability construction are given in Section G.3.
+The geological realizations are simulated on the supplied reservoir grid using a common OPM Flow model and well configuration, with west and east injector banks separated by three central producers. Nine well tests are considered, including simultaneous and single-bank injection, cross-reservoir and central-pair tests, staged-rate excitation, pulse/falloff, and alternating-bank injection. Responses are recorded at days 1,3,5,7,1,3,5,7, and 1010 and consist of injector rates and pressures together with producer oil and water production rates.
+The ensemble contains 24,00024{,}000 geological realizations, each simulated under the nine well tests, giving 216,000216{,}000 full-physics reservoir responses. This population is used to compare nuisance-average RAED at δ=1\delta=1 with Tail-RAED at δ=0.05\delta=0.05, both at α=0.05\alpha=0.05. The earlier nuisance-average analysis in Section 7.3 uses a separate 10,00010{,}000-realization population, whereas the Tail-versus-average comparison is carried out on the independent 24,00024{,}000-realization ensemble described here. This allows us to examine whether protecting against a small adverse region of geological uncertainty changes the preferred well test and the resolution obtained after calibration.
+6.4 Methane oxidation: a powered certification benchmark
+The methane-oxidation study follows the complete-oxidation discrimination problem of Pankajakshan et al. [32]. The structural target consists of three rival kinetic mechanisms, M∈{PL,LH,MVK}M\in\{\mathrm{PL},\mathrm{LH},\mathrm{MVK}\}, corresponding to power-law, Langmuir–Hinshelwood, and Mars–van Krevelen rate models. Within each mechanism, persistent nuisance parameters follow the fitted multivariate Gaussian approximation reported in the source study.
+The physical design space is a full 343^{4} factorial over temperature, total feed flow, inlet oxygen-to-methane ratio, and inlet methane fraction, giving 81 candidate reactor conditions. Each experiment observes the outlet mole fractions of methane, oxygen, and carbon dioxide under the source-derived measurement-noise model.
+Methane is used primarily to test finite-sample positive-tail calibration. Its steady reactor model is inexpensive enough to generate much larger independent nuisance samples than the reservoir benchmarks. We therefore use 10,00010{,}000 calibration nuisance states per structural family, together with a separate 5,0005{,}000-state evaluation set, so that nontrivial positive-tail population guarantees can be assessed directly.
+The score-training, experiment-selection, calibration, and evaluation nuisance populations are kept disjoint. At each fixed positive tail level δ>0\delta>0, the familywise calibration confidence is allocated equally across the three mechanisms, giving 95%95\% joint confidence across PL, LH, and MVK. Exact nuisance distributions, reactor equations, design conditions, and calibration details are given in Appendix H.
+6.5 Common learned-RAED protocol
+All four benchmarks follow the learned-RAED workflow of Section 5. Scores are fitted first, experiments are ranked on an independent nuisance sample, the selected experiment is then calibrated on a separate sample, and final performance is measured on independent evaluation states.
+Watt, WCA, and GWAE-Fluvial use one-versus-rest logistic scores on a 256-component radial-basis-function (RBF) Nyström representation. Methane uses the same construction with 96 Nyström components. Cross-validation is grouped by nuisance state, so repeated observation-noise realizations of the same physical state remain together.
+The nuisance states used for score fitting, experiment selection, calibration, and evaluation are disjoint in every benchmark. Repeated noise draws at a fixed nuisance state are used only to estimate its response distribution and conditional false-exclusion loss, not as additional independent nuisance samples.
+After experiment selection, only the selected experiment is calibrated. Watt and WCA use this protocol for held-out empirical comparison. Methane and GWAE-Fluvial use larger calibration populations to support finite-sample positive-tail guarantees. Exact sample sizes, score settings, noise replication, and calibration details are given in Appendix F.
+6.6 Comparator criteria and downstream evaluation
+RAED is compared with model-index expected information gain, full-latent expected information gain, Bayes forced classification, expected model elimination, and minimum ordered-pair predictive discrimination. All comparator criteria are evaluated on the same independent experiment-selection population used for RAED ranking.
+The comparison is made at the level of experiment choice. Once a criterion selects an experiment, the selected experiment is evaluated using the same learned candidate-set construction, calibration procedure, and independent evaluation population as the RAED-selected experiment. Differences in the reported structural resolution can therefore be attributed to the selected experiment rather than to a different decision rule.
+The EIG criteria are estimated by Monte Carlo and can be numerically indistinguishable near their optimum. We therefore distinguish a different numerical maximizer from a clear selection disagreement: RAED and EIG are counted as selecting differently only when the RAED-selected experiment lies outside the predefined Monte Carlo uncertainty set around the EIG optimum. Exact estimators, sampling counts, and tie rules are given in Appendix F.
+7 Results
+7.1 Structural granularity and achievable resolution in Watt
+Figure 2: Achievable structural resolution across Watt model ontologies.
+Held-out mean candidate-set size JJ for the four structural targets. The same INJ5 pulse/falloff test is selected in every case at (α,δ)=(0.05,1)(\alpha,\delta)=(0.05,1).
+The Watt ensemble provides a direct test of how the definition of the structural target affects achievable resolution, because the same reservoir realizations, well tests, and observations can be evaluated under all four model ontologies. At (α,δ)=(0.05,1)(\alpha,\delta)=(0.05,1), using the full well response, learned RAED selected the same INJ5 pulse/falloff test for the K=3K=3 FM, K=6K=6 FM×\timesPROP, K=6K=6 FM×\timesRP, and K=12K=12 FM×\timesPROP×\timesRP targets. The corresponding held-out mean candidate-set sizes are J=1.421J=1.421, 1.4381.438, 1.5251.525, and 1.5991.599. Thus progressively finer distinctions increase the absolute number of surviving explanations only modestly. Because KK changes across the four ontologies, JJ and the normalized resolution RR describe complementary aspects of the result: JJ gives the expected number of structural explanations that remain, whereas RR measures resolution relative to the size of the candidate model set. We emphasize JJ here because it retains the direct candidate-set interpretation of the RAED objective. Along both refinement paths, normalized resolution also increases. Both quantities are reported in Table 13. The corresponding worst-family held-out nuisance-average false-exclusion rates are 0.0560.056, 0.0670.067, 0.0570.057, and 0.0610.061, respectively. These values are close to, but slightly above, the nominal α=0.05\alpha=0.05 level. The complete resolution and exclusion results are reported in Table 13.
+When PROP and RP are treated as nuisance in the K=3K=3 fault-family problem, RAED must distinguish FM1–FM3 in the presence of the response variability induced by those additional modeling choices. The resulting J≈1.42J\approx 1.42 therefore represents strong empirical fault-family resolution under substantial within-family variation. When PROP and RP are instead promoted into the structural identity, the candidate model set grows from three to twelve, yet the held-out mean candidate-set size increases only to about 1.601.60. The full well response therefore retains substantial discriminatory power even for the finer structural distinctions, although the aggregate value of JJ alone does not identify which particular model pairs account for the remaining ambiguity.
+The fact that the same INJ5 pulse/falloff test is selected across all four ontologies is also informative. Its value is not confined to the coarsest fault-family problem: the same physical experiment remains preferred as property representation and relative-permeability family are progressively incorporated into the structural target. The modest increase in JJ shows that these additional distinctions do introduce further ambiguity, but much less than might be expected from the fourfold increase in the number of candidate models.
+These Watt ontology results serve a different purpose from the constrained-sensing comparisons studied later in this section. Here the physical reservoir ensemble, well tests, and observations are unchanged; only the definition of structural identity is varied. The comparison therefore isolates how achievable resolution changes when attributes that were previously treated as nuisance are instead required to be distinguished explicitly. The reported values are held-out empirical summaries of the nontrivial learned rules rather than finite-sample population certificates. The available Watt calibration sample does not certify these nontrivial rules at the declared 5%5\% level, so the ontology study provides an empirical resolution analysis.
+7.2 Constrained sensing separates RAED and information gain
+The constrained Watt and WCA studies keep the structural target fixed while progressively reducing the available observation time and number of remote pressure measurements. We focus on the operating point (α,δ)=(0.05,0.05)(\alpha,\delta)=(0.05,0.05). Within each sensing level, RAED and model-index EIG rank the same set of admissible well tests and monitor configurations using the same independent selection data. The two criteria therefore differ only in how they select the experiment. Model-index EIG does not itself produce a candidate set: after each criterion selects an experiment, that experiment is evaluated through the same learned-RAED downstream procedure, including score fitting, threshold calibration, and independent held-out evaluation.
+In WCA, RAED and model-index EIG are cleanly separated in seven of the sixteen horizon–monitor combinations after accounting for the finite-sample Monte Carlo error in the EIG estimates. In five of these seven cells, the RAED-selected experiment yields a smaller held-out candidate set, with reductions in JJ between 0.1040.104 and 0.3850.385. One cell is essentially tied, with a difference of −0.004-0.004, and one yields a smaller candidate set for the EIG-selected experiment by 0.1180.118. Across all sixteen sensing levels, the experiments selected by RAED give a mean held-out candidate-set size of J=2.520J=2.520, compared with J=2.658J=2.658 for those selected by model-index EIG.
+These differences in candidate-set size are accompanied by substantial variation in held-out Tail false-exclusion risk. In several WCA cells, the smaller candidate sets obtained after the RAED-selected experiment also have higher worst-family upper-5%5\%-Tail exclusion than those obtained after the EIG-selected experiment. For example, at (T,B)=(7,2)(T,B)=(7,2) days and remote wells, the candidate-set sizes are 2.3782.378 and 2.7632.763 for the RAED- and EIG-selected experiments, respectively, while the corresponding worst-family held-out Tail risks are 0.3650.365 and 0.1110.111. The reduction in ambiguity should therefore not be interpreted independently of the associated exclusion risk.
+Watt shows the separation more weakly. RAED and model-index EIG are cleanly separated in three of the sixteen sensing levels, and in all three cases the RAED-selected experiment yields a smaller held-out candidate set, with reductions in JJ between 0.0170.017 and 0.0540.054. Averaged over all sixteen sensing levels, mean held-out JJ is 2.0922.092 for the RAED selections and 2.1112.111 for the model-index-EIG selections. In two of the three clean disagreements, the smaller candidate set is accompanied by a lower worst-family held-out Tail risk; in the third, at (T,B)=(90,0)(T,B)=(90,0), the RAED-selected experiment has the smaller JJ but the larger Tail risk. Complete resolution and exclusion results for both benchmarks are reported in Tables 14 and 15.
+Figure 3: Clean RAED–model-index-EIG disagreements under restricted sensing. Only cells in which the RAED-selected design lies outside the EIG Monte Carlo indistinguishability set are colored and annotated. Positive Δ​J=JEIG−JRAED\Delta J=J_{\rm EIG}-J_{\rm RAED} indicates a smaller held-out candidate set for the RAED-selected experiment. The common color scale makes the stronger WCA separation visible; exact values for all 16 cells per benchmark are reported in Tables 14 and 15.
+The Watt and WCA results show that information gain and structural resolution can rank the same set of experiments differently when sensing is restricted. In many cells the two criteria still agree, or are numerically indistinguishable, and WCA also contains a clean case in which the EIG-selected experiment gives the smaller downstream candidate set. The main point is therefore not that RAED dominates EIG, but that the choice of design criterion can change both the selected experiment and the resulting balance between ambiguity and false exclusion.
+The learned rules are calibrated on independent data and evaluated on held-out states. They are not accompanied by finite-sample population-validity certificates, so the Tail risks reported here should be interpreted as empirical held-out performance.
+The additional comparators give a similar picture in terms of candidate-set size. In WCA, the experiments selected by full-latent EIG, Bayes forced classification, expected elimination, and minimum ordered-pair predictive discrimination all give larger mean held-out JJ than the RAED selections across the sixteen sensing levels, with ordered-pair discrimination the closest alternative. Several comparator rankings contain numerically indistinguishable optima, so the averages use the representative design defined for each criterion; the full summary is given in Table 16.
+7.3 Nuisance-average validity can conceal a geological hard region
+The GWAE-Fluvial benchmark provides a concrete example of a limitation of nuisance-average validity: a small family-average false-exclusion rate need not imply uniformly low risk across the geological nuisance population. In the first GWAE-Fluvial analysis, RAED was applied with (α,δ)=(0.05,1)(\alpha,\delta)=(0.05,1) and selected the symmetric-bank experiment E01. Selected-only calibration on 1000 nuisance states per family gave risk upper bounds of 0.0365410.036541 for M1 and 0.0498260.049826 for M2, providing 95% joint confidence across the two familywise population claims. On the independent evaluation population, the corresponding familywise false-exclusion rates were 0.01410.0141 for M1 and 0.02860.0286 for M2. The rule also remained highly resolving, with J=1.1267J=1.1267. Because K=2K=2, approximately 87.3%87.3\% of observations were resolved to a singleton and 12.7%12.7\% returned the ambiguous set {M1,M2}\{\mathrm{M1},\mathrm{M2}\}.
+The family averages, however, do not show how the exclusion risk is distributed across geological realizations. For each nuisance state θ\theta, we fixed the deterministic reservoir response and estimated its conditional false-exclusion probability over repeated draws from the assumed observation model. In both structural families, the median and 90th percentile of this statewise risk were zero, indicating that most geological realizations were almost never falsely excluded. The upper tail was very different: the 99th-percentile conditional risk was approximately 0.860.86 for M1 and 0.980.98 for M2, while the mean risk within the worst 1%1\% of nuisance states was approximately 0.9980.998 and 0.9910.991, respectively.
+Figure 4: Statewise risk concentration in the first GWAE-Fluvial campaign. Sorted conditional false-exclusion risks from 2000 untouched nuisance states per family show a long zero-risk region and an extreme upper tail. The 99th percentiles are 0.86260.8626 for M1 and 0.97460.9746 for M2; within the shaded worst 1%1\%, mean risks are 0.99820.9982 and 0.99070.9907. These are descriptive evaluations of the independently calibrated nuisance-average rule.
+The nuisance-average guarantee is therefore compatible with very low exclusion risk over most of the geological population and near-systematic failure on a small subset of hard realizations. Nothing in the δ=1\delta=1 criterion prevents this concentration, even though the family-average exclusion target is satisfied. The first campaign was designed as a nuisance-average analysis rather than a Tail-RAED sensitivity study; the concentration of risk only became apparent in the subsequent statewise evaluation.
+This observation motivated a second independent GWAE-Fluvial study using a new nuisance population, in which nuisance-average RAED was compared directly with Tail-RAED at δ=0.05\delta=0.05. Using an independent population separates the discovery of the hard-tail behavior from the subsequent test of whether protecting that tail changes the selected physical experiment and the resulting balance between resolution and false exclusion.
+7.4 Tail protection changes the selected GWAE experiment
+The second GWAE-Fluvial study compares nuisance-average RAED, δ=1\delta=1, with Tail-RAED at δ=0.05\delta=0.05 on the same newly generated geological population. The two criteria select different physical experiments: nuisance-average RAED selects the symmetric-bank test E01, whereas Tail-RAED narrowly selects the staged-rate test E07. The change nevertheless shows that protecting the adverse nuisance tail can affect experiment selection itself, rather than only the thresholds calibrated after an experiment has been chosen.
+Table 3: Deployed GWAE-Fluvial operating points on the common independent evaluation population. Worst-5% entries are the empirical upper-tail conditional-risk means computed separately for each method.
+Method
+Selected well test
+JJ
+M1 worst-5%
+M2 worst-5%
+Tail, δ=.05\delta=.05
+E07 staged-rate pair
+1.788292
+0.013781
+0.002977
+Average, δ=1\delta=1
+E01 symmetric banks
+1.047271
+0.433758
+0.875844
+For both selected experiments, calibration produced nontrivial candidate-set rules with familywise risk upper bounds below α=0.05\alpha=0.05. On the common independent evaluation population, however, the two rules occupy very different resolution–risk operating points. Nuisance-average RAED remains highly resolving, with J=1.047J=1.047, but its empirical upper-tail conditional-risk means are 0.4340.434 for M1 and 0.8760.876 for M2. Tail-RAED increases the expected candidate-set size to J=1.789J=1.789, while its corresponding upper-tail risks fall to 0.0140.014 and 0.0030.003 respectively. The tail summaries in Table 3 are computed separately for each rule and therefore describe each rule’s own hardest 5%5\% of nuisance states.
+For K=2K=2, the increase in JJ has a direct interpretation: Tail-RAED returns the ambiguous set {M1,M2}\{\mathrm{M1},\mathrm{M2}\} much more often. To compare the two rules on the same difficult geological states, Figure 5 defines the hard region using the worst 5%5\% of nuisance states under the nuisance-average rule. Within this common region, Tail-RAED largely replaces false singleton exclusions with explicit ambiguity.
+The GWAE comparison therefore shows the cost of tail protection directly. Nuisance-average RAED achieves much smaller candidate sets, but a small subset of geological realizations remains exposed to high false-exclusion risk. Tail-RAED sacrifices part of that resolution in order to reduce exclusion in these difficult states, returning larger candidate sets when the observations do not support a confident structural decision.
+Figure 5: Behavior in the nuisance-average rule’s worst 5% geological region. Frequencies are computed over observation-noise draws within the 250 highest-risk nuisance states per family under the nuisance-average rule. Tail-RAED converts most behavior in this region to explicit ambiguity, whereas nuisance-average RAED produces false singleton exclusions on 43.4%43.4\% of M1 draws and 87.6%87.6\% of M2 draws.
+7.5 Finite-sample Tail certification in methane oxidation
+Methane oxidation provides a case in which the positive-tail validity requirement can be certified with the available nuisance sample. Across the declared design space, learned RAED and model-index EIG select the same reactor condition, so this benchmark is not used to demonstrate disagreement in experiment selection. Instead, it tests whether Tail-RAED can retain nontrivial structural resolution while satisfying the finite-sample validity requirement.
+At the reference operating point α=0.05\alpha=0.05 and δ=0.05\delta=0.05, calibration uses 10,00010{,}000 independent nuisance states per mechanism. The resulting rule satisfies the familywise Tail-risk bounds with 95% joint confidence across PL, LH, and MVK. The three calibration upper bounds are 0.0480.048, 0.0380.038, and 0.0480.048, all below the prescribed false-exclusion level.
+The certified rule remains informative, with held-out mean candidate-set size J=1.750J=1.750. On the independent evaluation population, the worst-family empirical 5% Tail risk is 0.0250.025. The finite-sample certificate therefore does not force the rule to retain all three mechanisms: positive-tail validity is certified while a nontrivial level of structural resolution is preserved.
+Figure 6: Deployed methane-oxidation frontier. Each filled point is a separately certified fixed-positive-δ\delta operating point with 95% joint confidence across PL, LH, and MVK; the guarantees are not simultaneous across the full grid. The open δ=0\delta=0 point is empirical only. The line is a guide across the ordered declared levels, not a smooth theoretical frontier.
+The same pattern holds across the other predeclared positive Tail levels. As δ\delta decreases, stronger protection of adverse nuisance states generally requires larger candidate sets, whereas larger δ\delta permits greater resolution. The complete frontier is reported in Appendix I.
+8 Discussion
+The empirical studies illustrate several different consequences of designing experiments around structural elimination rather than information gain alone. The Watt ontology study shows that the structural question itself matters: when property representation and relative-permeability family are promoted from nuisance variables to components of model identity, the number of candidate models increases substantially while the empirical candidate-set size grows only modestly. The restricted Watt and WCA studies show a different effect. Once observation time and spatial coverage are limited, RAED and information-based criteria can prefer different physical experiments even though they act on the same admissible design set. GWAE then shows that experiment choice can also depend on the form of the validity requirement itself, while methane provides a case in which positive-tail validity can be certified without collapsing to the trivial retain-all rule.
+These results also make clear that resolution cannot be interpreted separately from false exclusion. In the Watt ontology study, the nontrivial learned rules remain highly resolving across all four structural targets, but their held-out exclusion rates lie slightly above the nominal level and the available calibration sample does not support a nontrivial population certificate. The restricted-sensing results make the same point more strongly. A RAED-selected experiment can yield a smaller downstream candidate set than an EIG-selected experiment while also producing a larger held-out Tail risk. In other cells the two quantities improve together. The relevant empirical outcome is therefore the pair consisting of remaining ambiguity and false-exclusion behavior, not candidate-set size alone.
+GWAE provides the clearest example of why the nuisance distribution matters. Under nuisance-average validity, the first study satisfies its familywise population requirement and achieves high resolution, yet the statewise evaluation reveals a strongly concentrated failure mode: most geological realizations have essentially zero conditional false-exclusion risk, while a small subset is excluded almost systematically. This behavior is entirely compatible with δ=1\delta=1, because the constraint acts on the nuisance average rather than on the upper tail of the statewise risk distribution. The result gives a concrete geological interpretation to the distinction formalized by the Tail-RAED objective and to the rare-tail argument in Proposition 5.2.
+The second GWAE study asks what changes when that adverse tail is protected explicitly. With δ=0.05\delta=0.05, Tail-RAED narrowly selects a different physical experiment and produces a very different operating point. The nuisance-average rule achieves much smaller candidate sets, whereas Tail-RAED returns the ambiguous set far more often and sharply reduces false exclusion in the difficult geological states. This is the intended role of set-valued decisions in RAED: when the observations do not support a reliable exclusion, the method is allowed to retain competing explanations instead of forcing a singleton decision. The cost is substantial, however, and smaller δ\delta should not be interpreted as automatically preferable. The choice of (α,δ)(\alpha,\delta) encodes how much false exclusion is acceptable and how much of the nuisance population should receive explicit protection.
+The change in selected GWAE experiment should also be interpreted with some caution. E07 only narrowly outranks E01 under the Tail criterion, so the ranking itself is sensitive. The stronger result is not the identity of the winning experiment but what happens after calibration and independent evaluation: the nuisance-average and Tail rules occupy very different resolution–risk operating points, and Tail-RAED substantially changes the behavior of the rule on the geological states that were most problematic under nuisance-average validity. More generally, the Watt and WCA δ\delta sweeps show that the preferred restricted-sensing design can itself depend on the requested degree of nuisance-tail protection.
+The four empirical benchmarks carry different statistical weight. Watt and WCA provide independent held-out evaluations of learned rules, but their available nuisance populations are too small to support the stronger positive-tail population certificates used elsewhere in the paper. Their Tail-risk quantities are therefore empirical generalization diagnostics. GWAE and methane use much larger independent calibration populations, allowing fixed-operating-point familywise risk upper bounds to be certified. In GWAE, this supports both the nuisance-average and δ=0.05\delta=0.05 Tail analyses; in methane, nontrivial certificates are obtained across the declared positive-δ\delta operating points. In these cases the formal validity statements come from the calibration upper bounds, while held-out Tail means, statewise quantiles, and hard-region analyses describe how the already calibrated rules behave in practice.
+Validity is always relative to the scientific problem that has been declared. The admissible nuisance sets Θk\Theta_{k} determine which within-family states must be considered, μk\mu_{k} determines how positive-tail protection is distributed over those states, and νk\nu_{k} determines how resolution is averaged. The GWAE-Fluvial study, for example, uses an explicitly constructed single- and double-channel geological population with controlled geometric and petrophysical variability. Its conclusions therefore apply to that declared geological law. The same is true of the observation models, experiment libraries, and sensing restrictions used throughout the benchmarks: changing any of these changes the decision problem being solved.
+Finally, the empirical studies use a restricted learned score family rather than the population oracle. Calibration controls false exclusion for the resulting learned candidate-set rule, while the oracle theory describes the ideal target that this restricted family is attempting to approximate. The present finite-sample population guarantees cover 0<δ≤10<\delta\leq 1; the empirical δ=0\delta=0 points should not be confused with population-uniform pointwise guarantees. The theory is also one-step: one experiment is selected, one response is observed, and one candidate set is returned. A natural extension is to allow the score model, experiment, and exclusion thresholds to be learned more jointly, or to move to sequential designs in which later experiments are chosen specifically to break the aliases that remain after earlier observations.
+9 Conclusion
+Resolution-Aware Experimental Design values an experiment by the structural explanations it can eliminate while controlling false exclusion under persistent nuisance uncertainty. Cross-nuisance aliasing shows that this objective can differ sharply from information gain, while the common-garbling results preserve the expected ordering when one experiment is genuinely less informative than another. The learned formulation makes the same objective usable with restricted score models under nuisance-average and positive-tail validity.
+The empirical studies expose different aspects of this problem. In Watt, changing the definition of structural identity alters the attainable resolution while the preferred experiment remains remarkably stable across the declared tail levels. Under constrained sensing, Watt and especially WCA show that RAED and information-based criteria can select different physical experiments, with corresponding changes in both candidate-set size and held-out false-exclusion behavior. GWAE-Fluvial shows why nuisance-average validity can be insufficient when risk is concentrated on a small set of geological realizations: protecting the upper nuisance tail changes the selected experiment and replaces many hard-region false exclusions with explicit ambiguity, at a substantial cost in average resolution. Methane oxidation provides the complementary case in which positive-tail validity can be certified nontrivially with a sufficiently large nuisance-calibration population.
+Taken together, the results show that experiment design under partial identifiability is not only a question of acquiring information. It also requires deciding which structural exclusions must remain reliable across nuisance uncertainty and how much unresolved ambiguity is acceptable in exchange. RAED makes that tradeoff explicit through the candidate set and the operating point (α,δ)(\alpha,\delta).
+Appendix A Notation and Technical Preliminaries
+For reference, the principal objects used throughout the paper are collected below.
+Symbol
+Meaning
+M∈{1,…,K}M\in\{1,\ldots,K\}
+structural family of scientific interest
+θ∈Θk\theta\in\Theta_{k}
+admissible persistent nuisance state within family kk
+e∈ℰe\in\mathcal{E}
+complete precommitted experiment/intervention and observation protocol
+Pk,θeP^{e}_{k,\theta}
+predictive observation law under (k,θ,e)(k,\theta,e)
+μk\mu_{k}
+validity-mass measure used by Tail-RAED
+νk\nu_{k}
+nuisance efficiency measure used in the objective
+πk\pi_{k}
+structural efficiency weight, with ∑kπk=1\sum_{k}\pi_{k}=1
+Γe​(Y)\Gamma_{e}(Y)
+randomized nonempty structural candidate set returned after observing YY
+gk,e​(y)g_{k,e}(y)
+marginal probability that family kk is included in Γe​(y)\Gamma_{e}(y)
+Lk,e​(θ)L_{k,e}(\theta)
+nuisance-specific false-exclusion probability Pr{k∉Γe(Y)∣k,θ,e}\Pr\{k\notin\Gamma_{e}(Y)\mid k,\theta,e\}
+α\alpha
+scientific false-exclusion tolerance
+δ\delta
+protected nuisance-tail mass; 00 is pointwise validity and 11 nuisance-average validity
+ζ\zeta
+finite-sample certificate failure probability
+Je​(g)J_{e}(g)
+expected candidate-set size 𝔼​|Γe​(Y)|\mathbb{E}|\Gamma_{e}(Y)| under the efficiency law
+Ve⋆​(α,δ)V_{e}^{\star}(\alpha,\delta)
+optimal population RAED value for experiment ee at the declared validity level
+Re⋆​(α,δ)R_{e}^{\star}(\alpha,\delta)
+optimal normalized RAED resolution (K−Ve⋆​(α,δ))/(K−1)(K-V_{e}^{\star}(\alpha,\delta))/(K-1)
+For 0<δ≤10<\delta\leq 1, Tail risk is written through the upper-tail/CVaR functional
+ρδ,μk​(L)=infη∈ℝ{η+1δ​∫(L⁡(θ)−η)+​μk​(𝑑θ)},\rho_{\delta,\mu_{k}}(L)=\inf_{\eta\in\mathbb{R}}\left\{\eta+\frac{1}{\delta}\int(L(\theta)-\eta)_{+}\,\mu_{k}(\,\mathrm{d}\theta)\right\},
+with the equivalent OCE scaling used in Section 5. At δ=0\delta=0, validity is defined directly by supθ∈ΘkLk,e​(θ)≤α\sup_{\theta\in\Theta_{k}}L_{k,e}(\theta)\leq\alpha rather than by taking a singular limit of the Tail formula.
+Appendix B Exact Inclusion-Marginal Representation
+The expected-size objective and all classwise validity constraints depend only on first-order inclusion marginals. This gives an exact compact representation of the current RAED rule problem.
+Lemma B.1 (Measurable whole-set lifting).
+Let g:𝒴→𝒫Kg:\mathcal{Y}\to\mathcal{P}_{K} be measurable, where
+𝒫K={u∈[0,1]K:∑k=1Kuk≥1}.\mathcal{P}_{K}=\left\{u\in[0,1]^{K}:\sum_{k=1}^{K}u_{k}\geq 1\right\}.
+Then there exists a measurable Markov kernel Π(⋅∣y)\Pi(\cdot\mid y) supported on the nonempty subsets of {1,…,K}\{1,\ldots,K\} whose inclusion marginals equal g⁡(y)g(y) for every yy.
+Proof.
+Enumerate the 2K−12^{K}-1 nonempty subsets as S1,…,SmS_{1},\ldots,S_{m} and let A∈{0,1}K×mA\in\{0,1\}^{K\times m} contain their incidence vectors as columns. By the polytope argument below, for every u∈𝒫Ku\in\mathcal{P}_{K} the compact set
+𝒲(u)={p∈ℝ+m:𝟏⊤p=1,Ap=u}\mathcal{W}(u)=\{p\in\mathbb{R}_{+}^{m}:\mathbf{1}^{\top}p=1,\ Ap=u\}
+is nonempty. Its graph is closed in the finite-dimensional product 𝒫K×ℝm\mathcal{P}_{K}\times\mathbb{R}^{m}, so a standard measurable-selection theorem supplies a Borel measurable selector p⋆​(u)∈𝒲​(u)p^{\star}(u)\in\mathcal{W}(u). Set Π⁡(Sj∣y)=pj⋆​(g⁡(y))\Pi(S_{j}\mid y)=p_{j}^{\star}(g(y)). The resulting kernel is measurable, supported on nonempty subsets, and satisfies PrΠ(⋅∣y){k∈Γ}=gk(y)\Pr_{\Pi(\cdot\mid y)}\{k\in\Gamma\}=g_{k}(y).
+∎
+Proposition B.2 (Exact inclusion-marginal representation).
+Fix an experiment ee and a finite measurable observation partition {Be,r}r=1Re\{B_{e,r}\}_{r=1}^{R_{e}}. Let
+gk,r=Pr⁡{k∈Γe​(Y)∣Y∈Be,r}.g_{k,r}=\Pr\{k\in\Gamma_{e}(Y)\mid Y\in B_{e,r}\}.
+A vector g⋅,rg_{\cdot,r} is realizable by a randomized nonempty whole-set rule if and only if
+0≤gk,r≤1,∑k=1Kgk,r≥1.0\leq g_{k,r}\leq 1,\qquad\sum_{k=1}^{K}g_{k,r}\geq 1.
+(36)
+Moreover, for the RAED validity regimes used in this paper–pointwise, strict Tail, and nuisance-average–the expected-cardinality objective and all familywise exclusion constraints depend on the rule only through these marginals. Consequently the whole-subset and marginal formulations have identical feasible loss fields and identical optimal values.
+Proof.
+Let xr,Sx_{r,S} be the conditional probability of returning nonempty subset SS in response cell rr. Any whole-set rule induces
+gk,r=∑S∋kxr,S,g_{k,r}=\sum_{S\ni k}x_{r,S},
+so 0≤gk,r≤10\leq g_{k,r}\leq 1. Since every realized subset is nonempty,
+∑kgk,r=∑S≠∅|S|​xr,S≥1.\sum_{k}g_{k,r}=\sum_{S\neq\varnothing}|S|x_{r,S}\geq 1.
+The same identity shows that expected set size in the cell is exactly ∑kgk,r\sum_{k}g_{k,r}. If
+pk,θ,re:=Pk,θe​(Be,r),p^{e}_{k,\theta,r}:=P^{e}_{k,\theta}(B_{e,r}),
+then family-kk retention under nuisance state θ\theta is
+Ck,e​(θ,g)=∑r=1Repk,θ,re​gk,r,C_{k,e}(\theta;g)=\sum_{r=1}^{R_{e}}p^{e}_{k,\theta,r}g_{k,r},
+so every nuisance-specific exclusion loss is a function only of the corresponding marginals. Pointwise constraints, Tail/CVaR functionals of this loss field, and nuisance averages therefore all depend only on gg.
+Conversely, consider the polytope
+𝒫K={g∈[0,1]K:∑kgk≥1}.\mathcal{P}_{K}=\left\{g\in[0,1]^{K}:\sum_{k}g_{k}\geq 1\right\}.
+Every extreme point of 𝒫K\mathcal{P}_{K} is a nonzero binary vector. Indeed, two fractional coordinates admit an opposite perturbation preserving feasibility; one fractional coordinate with slack in the sum constraint can be perturbed alone; and if the sum constraint is tight, a single fractional coordinate is impossible because the remaining binary coordinates have integer sum. Hence 𝒫K\mathcal{P}_{K} is the convex hull of the incidence vectors of the nonempty subsets of {1,…,K}\{1,\ldots,K\}. Every feasible marginal vector is therefore a convex combination of nonempty subset incidences and can be realized by a randomized whole-set rule, independently in each response cell. This proves exact equivalence.
+∎
+Remark B.3 (Whole-set reconstruction).
+The marginal representation fixes expected cardinality and all classwise retention probabilities but generally does not identify a unique distribution over returned subsets. Coupling-sensitive summaries such as singleton frequency, the probability of a particular two-family set, or the variance of |Γ||\Gamma| therefore require an explicitly declared whole-set reconstruction. By Carathéodory’s theorem, at most K+1K+1 nonempty subsets are needed in a per-cell reconstruction.
+Appendix C Proofs for RAED Formulation, Aliasing, and Experiment Comparison
+C.1 Common and approximate garbling
+The main text uses only the exact common-garbling monotonicity statement. The quantitative transport and deficiency results are recorded here.
+Theorem C.1 (Common and approximate garbling of the RAED frontier).
+Fix the structural weights, admissible nuisance sets, efficiency measures, validity measures when applicable, and a scientific operating point (α,δ)(\alpha,\delta). Let e1,e2e_{1},e_{2} be two experiments. Suppose a Markov kernel GG, independent of both kk and θ\theta, satisfies
+sup1≤k≤Ksupθ∈ΘkTV⁡(Pk,θe2,Pk,θe1​G)≤ε,0≤ε≤1.\sup_{1\leq k\leq K}\sup_{\theta\in\Theta_{k}}\operatorname{TV}\!\left(P^{e_{2}}_{k,\theta},P^{e_{1}}_{k,\theta}G\right)\leq\varepsilon,\qquad 0\leq\varepsilon\leq 1.
+(37)
+Define
+dk​(θ)=TV⁡(Pk,θe2,Pk,θe1​G),qG=TV⁡(Qe2,Qe1​G)≤ε,d_{k}(\theta)=\operatorname{TV}\!\left(P^{e_{2}}_{k,\theta},P^{e_{1}}_{k,\theta}G\right),\qquad q_{G}=\operatorname{TV}(Q_{e_{2}},Q_{e_{1}}G)\leq\varepsilon,
+and transport an e2e_{2} inclusion rule g(2)g^{(2)} to e1e_{1} by
+(TG​g(2))k​(y1)=∫gk(2)​(y2)​G​(y1,d​y2).(T_{G}g^{(2)})_{k}(y_{1})=\int g^{(2)}_{k}(y_{2})G(y_{1},\,\mathrm{d}y_{2}).
+Then the transported rule is a randomized nonempty rule and, for every k,θk,\theta,
+|Lk,e1​(θ,TG​g(2))−Lk,e2​(θ,g(2))|\displaystyle\left|L_{k,e_{1}}(\theta;T_{G}g^{(2)})-L_{k,e_{2}}(\theta;g^{(2)})\right|
+≤dk​(θ)≤ε,\displaystyle\leq d_{k}(\theta)\leq\varepsilon,
+(38)
+|Je1​(TG​g(2))−Je2​(g(2))|\displaystyle\left|J_{e_{1}}(T_{G}g^{(2)})-J_{e_{2}}(g^{(2)})\right|
+≤(K−1)​qG≤(K−1)​ε.\displaystyle\leq(K-1)q_{G}\leq(K-1)\varepsilon.
+(39)
+Consequently, if ε≤1−α\varepsilon\leq 1-\alpha, then for every δ∈[0,1]\delta\in[0,1],
+Ve1⋆​(α+ε,δ)≤Ve2⋆​(α,δ)+(K−1)​qG.V_{e_{1}}^{\star}(\alpha+\varepsilon,\delta)\leq V_{e_{2}}^{\star}(\alpha,\delta)+(K-1)q_{G}.
+(40)
+For an exact α\alpha comparison at arbitrary ε\varepsilon, set
+rε=min⁡{1,α+ε},λε=(1−αrε)+,r_{\varepsilon}=\min\{1,\alpha+\varepsilon\},\qquad\lambda_{\varepsilon}=\left(1-\frac{\alpha}{r_{\varepsilon}}\right)_{+},
+with λε=0\lambda_{\varepsilon}=0 when rε=0r_{\varepsilon}=0. Mixing the transported rule with the full candidate set with probability λε\lambda_{\varepsilon} restores the original validity level and gives
+Ve1⋆​(α,δ)≤(1−λε)​[Ve2⋆​(α,δ)+(K−1)​qG]+λε​K.V_{e_{1}}^{\star}(\alpha,\delta)\leq(1-\lambda_{\varepsilon})\left[V_{e_{2}}^{\star}(\alpha,\delta)+(K-1)q_{G}\right]+\lambda_{\varepsilon}K.
+(41)
+In particular, when ε=0\varepsilon=0,
+Ve1⋆​(α,δ)≤Ve2⋆​(α,δ)for every ​δ∈[0,1].V_{e_{1}}^{\star}(\alpha,\delta)\leq V_{e_{2}}^{\star}(\alpha,\delta)\qquad\text{for every }\delta\in[0,1].
+The proof is a direct transport argument. Markov-kernel composition preserves the nonempty whole-set decision, bounded expectations move by at most total variation, and conditional candidate-set size lies in [1,K][1,K], giving the factor K−1K-1 in (39). The final mixture uses the full set as a zero-exclusion safe rule. A complete proof is given in Section C.1.
+The same comparison can be expressed through one-sided deficiency on the composite parameter space
+Ω=⋃k=1K{k}×Θk,def⁡(e1↝e2)=infGsup(k,θ)∈ΩTV⁡(Pk,θe2,Pk,θe1​G).\Omega=\bigcup_{k=1}^{K}\{k\}\times\Theta_{k},\qquad\operatorname{def}(e_{1}\rightsquigarrow e_{2})=\inf_{G}\sup_{(k,\theta)\in\Omega}\operatorname{TV}\!\left(P^{e_{2}}_{k,\theta},P^{e_{1}}_{k,\theta}G\right).
+Corollary C.2 (Deficiency continuity of the resolution–validity frontier).
+Let d12=def⁡(e1↝e2)d_{12}=\operatorname{def}(e_{1}\rightsquigarrow e_{2}). The bounds of Theorem C.1 hold for every ε>d12\varepsilon>d_{12}, and at ε=d12\varepsilon=d_{12} when the infimum is attained. If α>0\alpha>0, the exact-repair comparison (41) also holds at a nonattained d12d_{12} by passage to the limit. For ε>0\varepsilon>0, if both directed deficiencies are at most ε\varepsilon, then for every δ∈[0,1]\delta\in[0,1] the symmetric bounds below hold. At the zero-error endpoint ε=0\varepsilon=0, they also hold when α>0\alpha>0; if α=0\alpha=0, they require attainment of both zero deficiencies (or another condition that supplies the same zero-error continuity). Under these conditions,
+|Ve1⋆​(α,δ)−Ve2⋆​(α,δ)|\displaystyle\left|V_{e_{1}}^{\star}(\alpha,\delta)-V_{e_{2}}^{\star}(\alpha,\delta)\right|
+≤(K−1)​[(1−λε)​ε+λε],\displaystyle\leq(K-1)\bigl[(1-\lambda_{\varepsilon})\varepsilon+\lambda_{\varepsilon}\bigr],
+(42)
+|Re1⋆​(α,δ)−Re2⋆​(α,δ)|\displaystyle\left|R_{e_{1}}^{\star}(\alpha,\delta)-R_{e_{2}}^{\star}(\alpha,\delta)\right|
+≤(1−λε)​ε+λε.\displaystyle\leq(1-\lambda_{\varepsilon})\varepsilon+\lambda_{\varepsilon}.
+(43)
+Proof of Theorem C.1.
+Let Πe2\Pi_{e_{2}} be a randomized nonempty whole-set rule with inclusion marginals g(2)g^{(2)}. Under e1e_{1}, observe Y1Y_{1}, generate Y~2∼G⁡(Y1,⋅)\widetilde{Y}_{2}\sim G(Y_{1},\cdot), and then draw the returned set from Πe2(⋅∣Y~2)\Pi_{e_{2}}(\cdot\mid\widetilde{Y}_{2}). This Markov-kernel composition remains supported on nonempty subsets and has inclusion marginals TG​g(2)T_{G}g^{(2)}.
+For each (k,θ)(k,\theta), gk(2)g_{k}^{(2)} is bounded in [0,1][0,1], so the bounded-expectation total-variation inequality gives
+|𝔼Pk,θe1​G​gk(2)−𝔼Pk,θe2​gk(2)|≤dk​(θ).\left|\mathbb{E}_{P^{e_{1}}_{k,\theta}G}g_{k}^{(2)}-\mathbb{E}_{P^{e_{2}}_{k,\theta}}g_{k}^{(2)}\right|\leq d_{k}(\theta).
+Since exclusion loss is one minus retention probability, this proves (38).
+For the efficiency objective define
+f⁡(y2)=∑k=1Kgk(2)​(y2).f(y_{2})=\sum_{k=1}^{K}g_{k}^{(2)}(y_{2}).
+Nonemptiness and marginal feasibility imply 1≤f≤K1\leq f\leq K. The transported efficiency expectation is under Qe1​GQ_{e_{1}}G, whereas the original expectation is under Qe2Q_{e_{2}}. Applying the oscillation form of the total-variation inequality therefore yields
+|𝔼Qe1​G​f−𝔼Qe2​f|≤(K−1)​qG,\left|\mathbb{E}_{Q_{e_{1}}G}f-\mathbb{E}_{Q_{e_{2}}}f\right|\leq(K-1)q_{G},
+which is (39). Convexity of total variation under the common structural and nuisance mixing used to form QeQ_{e} gives qG≤εq_{G}\leq\varepsilon.
+If the e2e_{2} rule is pointwise valid at level α\alpha, (38) makes its transport pointwise valid at level α+ε\alpha+\varepsilon. For 0<δ≤10<\delta\leq 1, the risk-envelope representation implies
+ρδ,μk​(Lk,e1)≤ρδ,μk​(Lk,e2)+supθ|Lk,e1​(θ)−Lk,e2​(θ)|≤α+ε.\rho_{\delta,\mu_{k}}(L_{k,e_{1}})\leq\rho_{\delta,\mu_{k}}(L_{k,e_{2}})+\sup_{\theta}|L_{k,e_{1}}(\theta)-L_{k,e_{2}}(\theta)|\leq\alpha+\varepsilon.
+Thus the same transfer holds for strict Tail validity and for the nuisance-average endpoint. Taking an infimizing sequence of e2e_{2} rules gives (40).
+For exact repair, every transported exclusion risk is bounded by
+rε=min⁡{1,α+ε}r_{\varepsilon}=\min\{1,\alpha+\varepsilon\}. Let gall≡(1,…,1)g^{\rm all}\equiv(1,\ldots,1) and define
+g¯=(1−λε)​TG​g(2)+λε​gall.\bar{g}=(1-\lambda_{\varepsilon})T_{G}g^{(2)}+\lambda_{\varepsilon}g^{\rm all}.
+All nuisance-specific exclusion losses are multiplied by 1−λε1-\lambda_{\varepsilon}. Pointwise supremum, mean risk, and the Tail functional are positively homogeneous, and
+(1−λε)​rε≤α.(1-\lambda_{\varepsilon})r_{\varepsilon}\leq\alpha.
+Hence g¯\bar{g} is exactly α\alpha-valid. Linearity of expected set size gives
+Je1​(g¯)=(1−λε)​Je1​(TG​g(2))+λε​K.J_{e_{1}}(\bar{g})=(1-\lambda_{\varepsilon})J_{e_{1}}(T_{G}g^{(2)})+\lambda_{\varepsilon}K.
+Combining this identity with (39) and taking an infimizing sequence proves (41). The exact common-garbling claim is the case ε=0\varepsilon=0.
+∎
+Proof of Corollary C.2.
+The first statement follows from the definition of the infimum: for every η>d12\eta>d_{12} there exists a common kernel with uniform error at most η\eta. If the infimum is attained, use the attaining kernel. If d12=1d_{12}=1, every kernel has total-variation error at most one.
+Suppose α>0\alpha>0 and the infimum is not attained. Choose errors ηn↓d12\eta_{n}\downarrow d_{12} and apply the exact-repair bound of Theorem C.1. Because
+rt=min⁡{1,α+t},λt=(1−αrt)+,r_{t}=\min\{1,\alpha+t\},\qquad\lambda_{t}=\left(1-\frac{\alpha}{r_{t}}\right)_{+},
+are continuous for t∈[0,1]t\in[0,1] when α>0\alpha>0, passage to the limit gives the same exact-repair comparison at d12d_{12}.
+For the symmetric bound, first note that for α>0\alpha>0 the function
+B⁡(t):=(1−λt)​t+λt={(1+α)​tα+t,0≤t≤1−α,α​t+1−α,1−α≤t≤1,B(t):=(1-\lambda_{t})t+\lambda_{t}=\begin{cases}\dfrac{(1+\alpha)t}{\alpha+t},&0\leq t\leq 1-\alpha,\\[5.69054pt]
+\alpha t+1-\alpha,&1-\alpha\leq t\leq 1,\end{cases}
+is continuous and nondecreasing. When α=0\alpha=0, B⁡(t)=1B(t)=1 for every t>0t>0 while the declared exact endpoint has B⁡(0)=0B(0)=0; hence no nonattained zero-error continuity is asserted. For ε>0\varepsilon>0, approximation by errors below any value slightly above the directed deficiency and monotonicity of the positive-error bound suffice; at ε=0\varepsilon=0 with α=0\alpha=0, use the assumed attaining zero-error kernels. Apply the exact-repair comparison in the direction e1↝e2e_{1}\rightsquigarrow e_{2} and use Ve2⋆≥1V_{e_{2}}^{\star}\geq 1:
+Ve1⋆−Ve2⋆\displaystyle V_{e_{1}}^{\star}-V_{e_{2}}^{\star}
+≤(1−λε)​(K−1)​ε+λε​(K−Ve2⋆)\displaystyle\leq(1-\lambda_{\varepsilon})(K-1)\varepsilon+\lambda_{\varepsilon}(K-V_{e_{2}}^{\star})
+≤(K−1)​[(1−λε)​ε+λε].\displaystyle\leq(K-1)\bigl[(1-\lambda_{\varepsilon})\varepsilon+\lambda_{\varepsilon}\bigr].
+The same argument with the experiments reversed bounds the opposite difference, proving (42). Finally,
+Re⋆=K−Ve⋆K−1,R_{e}^{\star}=\frac{K-V_{e}^{\star}}{K-1},
+so division by K−1K-1 gives (43).
+∎
+C.2 Exact cyclic aliasing separation
+Proof of Theorem 4.1.
+Identify structural and nuisance alphabets with the cyclic group ℤK\mathbb{Z}_{K}. Under eIe_{I}, define
+Y=M⊕Z.Y=M\oplus Z.
+(44)
+For every fixed Z=zZ=z, the map M↦M⊕zM\mapsto M\oplus z is a bijection, so M=Y⊖zM=Y\ominus z is recovered exactly and I(M;Y∣Z=z,eI)=logKI(M;Y\mid Z=z,e_{I})=\log K. A deterministic bijective channel can be garbled into the eRe_{R} channel defined below.
+After nuisance averaging,
+P⁡(Y=j∣M=k,eI)={1−ε,j=k,ε/(K−1),j≠k,P(Y=j\mid M=k,e_{I})=\begin{cases}1-\varepsilon,&j=k,\\
+\varepsilon/(K-1),&j\neq k,\end{cases}
+so the structural channel is 𝖢K​(ε)\mathsf{C}_{K}(\varepsilon). Under eRe_{R}, let the observation law be nuisance-independent:
+P⁡(Y=j∣M=k,Z=z,eR)={1−β,j=k,β/(K−1),j≠k.P(Y=j\mid M=k,Z=z,e_{R})=\begin{cases}1-\beta,&j=k,\\
+\beta/(K-1),&j\neq k.\end{cases}
+Its marginal channel is 𝖢K​(β)\mathsf{C}_{K}(\beta). Define
+χ⁡(q)=1−KK−1​q.\chi(q)=1-\frac{K}{K-1}q.
+Composition of two KK-ary symmetric channels multiplies their nontrivial eigenvalues χ⁡(⋅)\chi(\cdot). Since 0<χ⁡(β)<χ⁡(ε)0<\chi(\beta)<\chi(\varepsilon), choose
+η=K−1K​(1−χ⁡(β)χ⁡(ε))∈(0,K−1K).\eta=\frac{K-1}{K}\left(1-\frac{\chi(\beta)}{\chi(\varepsilon)}\right)\in\left(0,\frac{K-1}{K}\right).
+Then 𝖢K​(β)=𝖢K​(ε)​𝖢K​(η)\mathsf{C}_{K}(\beta)=\mathsf{C}_{K}(\varepsilon)\mathsf{C}_{K}(\eta), proving nuisance-marginal Blackwell dominance. Strict model-index EIG preference follows from the monotonicity of (18), and the average Bayes error is ε<β\varepsilon<\beta.
+Under eIe_{I}, YY is a deterministic function of (M,Z)(M,Z). Since MM is uniform and independent of ZZ, Y=M⊕ZY=M\oplus Z is uniform on ℤK\mathbb{Z}_{K}, hence
+I⁡((M,Z);Y∣eI)=H⁡(Y)=log⁡K.I((M,Z);Y\mid e_{I})=H(Y)=\log K.
+Under eRe_{R}, YY is conditionally independent of ZZ given MM, so
+I⁡((M,Z);Y∣eR)=I⁡(M;Y∣eR)=ℐK​(β)<log⁡K.I((M,Z);Y\mid e_{R})=I(M;Y\mid e_{R})=\mathcal{I}_{K}(\beta)<\log K.
+For pointwise validity under eIe_{I}, fix any k,y∈ℤKk,y\in\mathbb{Z}_{K}. The nuisance state z=y⊖kz=y\ominus k is admissible and makes Y=yY=y with probability one when M=kM=k. Thus every pointwise-valid randomized rule must satisfy
+gk​(y)≥1−α∀k,y.g_{k}(y)\geq 1-\alpha\qquad\forall k,y.
+Summing over kk yields
+∑k=1Kgk​(y)≥K⁡(1−α),\sum_{k=1}^{K}g_{k}(y)\geq K(1-\alpha),
+so J≥K⁡(1−α)J\geq K(1-\alpha) under any efficiency distribution on YY. To attain the bound, let t=K⁡(1−α)t=K(1-\alpha), m=⌊t⌋m=\lfloor t\rfloor, and r=t−mr=t-m. Independently of YY, return a uniformly random mm-subset with probability 1−r1-r and a uniformly random (m+1)(m+1)-subset with probability rr. Each label is included with probability
+(1−r)​m+r⁡(m+1)K=1−α,\frac{(1-r)m+r(m+1)}{K}=1-\alpha,
+and expected set size is tt. Hence VeI⋆​(α,0)=K⁡(1−α)V_{e_{I}}^{\star}(\alpha,0)=K(1-\alpha). Under eRe_{R}, the singleton rule Γ⁡(Y)={Y}\Gamma(Y)=\{Y\} has exclusion risk β≤α\beta\leq\alpha at every nuisance state and achieves J=1J=1, proving (19).
+It remains to solve the strict Tail problem under eIe_{I}. Represent a marginal rule by the matrix g=(gk​(y))k,y∈ℤKg=(g_{k}(y))_{k,y\in\mathbb{Z}_{K}}. For u∈ℤKu\in\mathbb{Z}_{K}, define the simultaneous translation
+gk(u)​(y)=gk⊕u​(y⊕u).g^{(u)}_{k}(y)=g_{k\oplus u}(y\oplus u).
+The feasible marginal set is convex, and the structural prior, nuisance law, objective, nonemptiness constraint, and each family Tail-risk constraint are invariant under this action. Averaging over uu therefore preserves expected size and nonemptiness and, by convexity of ρδ\rho_{\delta}, cannot increase Tail risk. The averaged matrix has the form gk​(k⊕z)=hzg_{k}(k\oplus z)=h_{z}. Permuting the K−1K-1 nonzero offsets and averaging again yields an optimal rule with a common exclusion probability on all alias states. Write
+ℓ0=1−gk​(k),ℓA=1−gk​(k⊕z),z≠0.\ell_{0}=1-g_{k}(k),\qquad\ell_{A}=1-g_{k}(k\oplus z),\quad z\neq 0.
+Thus ℓ0\ell_{0} is the false-exclusion level on the aligned nuisance state and ℓA\ell_{A} is the common false-exclusion level on the alias states. The expected candidate-set size is
+K−[(K−1)​ℓA+ℓ0],K-\bigl[(K-1)\ell_{A}+\ell_{0}\bigr],
+and mandatory nonemptiness imposes (K−1)​ℓA+ℓ0≤K−1(K-1)\ell_{A}+\ell_{0}\leq K-1.
+An optimum may be taken with ℓA≥ℓ0\ell_{A}\geq\ell_{0}. Indeed, if ℓ0>ℓA\ell_{0}>\ell_{A}, decrease ℓ0\ell_{0} by tt and increase each alias exclusion by t/(K−1)t/(K-1) until the two values meet. This preserves (K−1)​ℓA+ℓ0(K-1)\ell_{A}+\ell_{0}. While ℓ0≥ℓA\ell_{0}\geq\ell_{A}, the aligned atom is the upper loss. If δ≤1−ε\delta\leq 1-\varepsilon, the upper-tail value decreases at unit rate. If δ>1−ε\delta>1-\varepsilon, the derivative of the upper-tail numerator is at most
+−(1−ε)+εK−1<0,-(1-\varepsilon)+\frac{\varepsilon}{K-1}<0,
+because ε<(K−1)/K\varepsilon<(K-1)/K. Thus the exchange weakly decreases Tail risk without changing the objective.
+For ℓA≥ℓ0\ell_{A}\geq\ell_{0}, the loss distribution has value ℓA\ell_{A} on total nuisance mass ε\varepsilon and value ℓ0\ell_{0} on mass 1−ε1-\varepsilon, so
+ρδ​(L)={ℓA,δ≤ε,ε​ℓA+(δ−ε)​ℓ0δ,δ>ε.\rho_{\delta}(L)=\begin{cases}\ell_{A},&\delta\leq\varepsilon,\\[2.84526pt]
+\dfrac{\varepsilon\ell_{A}+(\delta-\varepsilon)\ell_{0}}{\delta},&\delta>\varepsilon.\end{cases}
+When δ≤ε\delta\leq\varepsilon, validity requires ℓA≤α\ell_{A}\leq\alpha and hence ℓ0≤α\ell_{0}\leq\alpha, so total exclusion is at most K​αK\alpha and the pointwise value K⁡(1−α)K(1-\alpha) remains optimal.
+For δ>ε\delta>\varepsilon, minimizing candidate-set size is equivalent to maximizing
+(K−1)​ℓA+ℓ0(K-1)\ell_{A}+\ell_{0}
+subject to
+ε​ℓA+(δ−ε)​ℓ0≤α​δ,0≤ℓ0≤ℓA≤1,\varepsilon\ell_{A}+(\delta-\varepsilon)\ell_{0}\leq\alpha\delta,\qquad 0\leq\ell_{0}\leq\ell_{A}\leq 1,
+and the nonemptiness cap. Ignoring the order constraint, the objective gained per unit Tail-risk budget is (K−1)/ε(K-1)/\varepsilon for ℓA\ell_{A} and 1/(δ−ε)1/(\delta-\varepsilon) for ℓ0\ell_{0}. These are equal at
+δ0=K​εK−1.\delta_{0}=\frac{K\varepsilon}{K-1}.
+For δ<δ0\delta<\delta_{0}, the order constraint forces the balanced boundary ℓA=ℓ0=α\ell_{A}=\ell_{0}=\alpha, giving total exclusion K​αK\alpha. For δ≥δ0\delta\geq\delta_{0}, exclusion is optimally allocated to the alias states, so ℓ0=0\ell_{0}=0 and
+ℓA=min⁡(1,α​δε).\ell_{A}=\min\!\left(1,\frac{\alpha\delta}{\varepsilon}\right).
+The nonemptiness cap produces the floor at one, giving (20) and (21). Singleton resolution is reached exactly when α​δ/ε≥1\alpha\delta/\varepsilon\geq 1, which proves (22). Under eRe_{R}, the singleton rule has constant exclusion risk β≤α\beta\leq\alpha, so VeR⋆​(α,δ)=1V_{e_{R}}^{\star}(\alpha,\delta)=1 for all δ\delta.
+∎
+C.3 Scaling consequence
+Corollary C.3 (Linear-in-KK separation for every strict Tail level).
+Fix α∈(0,1)\alpha\in(0,1) and any δ¯∈[0,1)\bar{\delta}\in[0,1). For all sufficiently large KK satisfying α<1−1/K\alpha<1-1/K, there exists a two-experiment problem in which nuisance-marginalized structural information, full-latent information, average Bayes classification, and nuisance-marginal Blackwell informativeness all strictly rank eIe_{I} above eRe_{R}, while
+VeI⋆​(α,δ¯)mine∈{eI,eR}⁡Ve⋆​(α,δ¯)≥K​cα,δ¯,cα,δ¯=min⁡{1−α,1−δ¯1+δ¯}>0.\frac{V_{e_{I}}^{\star}(\alpha,\bar{\delta})}{\min_{e\in\{e_{I},e_{R}\}}V_{e}^{\star}(\alpha,\bar{\delta})}\geq Kc_{\alpha,\bar{\delta}},\qquad c_{\alpha,\bar{\delta}}=\min\!\left\{1-\alpha,\frac{1-\bar{\delta}}{1+\bar{\delta}}\right\}>0.
+(45)
+Proof of Corollary C.3.
+If δ¯=0\bar{\delta}=0, apply the pointwise part of Theorem 4.1 with, for example, ε=α/2\varepsilon=\alpha/2 and β=3​α/4\beta=3\alpha/4. For all sufficiently large KK, the theorem’s parameter restriction holds and
+VeI⋆​(α,0)=K⁡(1−α),VeR⋆​(α,0)=1,V_{e_{I}}^{\star}(\alpha,0)=K(1-\alpha),\qquad V_{e_{R}}^{\star}(\alpha,0)=1,
+which is (45) because cα,0=1−αc_{\alpha,0}=1-\alpha.
+Now take 0<δ¯<10<\bar{\delta}<1 and choose
+ε=α⁡(1+δ¯)2,β=α+ε2.\varepsilon=\frac{\alpha(1+\bar{\delta})}{2},\qquad\beta=\frac{\alpha+\varepsilon}{2}.
+Then
+0<α​δ¯<ε<β<α.0<\alpha\bar{\delta}<\varepsilon<\beta<\alpha.
+For sufficiently large KK, all hypotheses of Theorem 4.1 hold, all information/classification comparisons in the corollary strictly rank eIe_{I} above eRe_{R}, and VeR⋆=1V_{e_{R}}^{\star}=1. The exact Tail formula gives
+VeI⋆​(α,δ¯)=max⁡{1,min⁡[K⁡(1−α),K−(K−1)​2​δ¯1+δ¯]}.V_{e_{I}}^{\star}(\alpha,\bar{\delta})=\max\!\left\{1,\min\!\left[K(1-\alpha),K-(K-1)\frac{2\bar{\delta}}{1+\bar{\delta}}\right]\right\}.
+Moreover,
+K−(K−1)​2​δ¯1+δ¯≥K​1−δ¯1+δ¯.K-(K-1)\frac{2\bar{\delta}}{1+\bar{\delta}}\geq K\frac{1-\bar{\delta}}{1+\bar{\delta}}.
+Therefore
+VeI⋆​(α,δ¯)≥K​min⁡{1−α,1−δ¯1+δ¯},V_{e_{I}}^{\star}(\alpha,\bar{\delta})\geq K\min\!\left\{1-\alpha,\frac{1-\bar{\delta}}{1+\bar{\delta}}\right\},
+which proves the result.
+∎
+C.4 Diffuse near-aliases
+Theorem C.4 (General family-specific near-alias bound).
+Fix ee and 0<δ≤10<\delta\leq 1, and write
+Qe=∑r=1Rλr​Qr,λr≥0,∑rλr=1.Q_{e}=\sum_{r=1}^{R}\lambda_{r}Q_{r},\qquad\lambda_{r}\geq 0,\qquad\sum_{r}\lambda_{r}=1.
+For every family kk and component rr, suppose there is a measurable Ak,r⊆ΘkA_{k,r}\subseteq\Theta_{k} with
+mk,r=μk​(Ak,r)>0,τk,r=1mk,r​∫Ak,rTV⁡(Pk,θe,Qr)​μk​(𝑑θ).m_{k,r}=\mu_{k}(A_{k,r})>0,\qquad\tau_{k,r}=\frac{1}{m_{k,r}}\int_{A_{k,r}}\operatorname{TV}(P^{e}_{k,\theta},Q_{r})\,\mu_{k}(\,\mathrm{d}\theta).
+Then every Tail-RAED feasible rule satisfies
+𝔼Qr​|Γe​(Y)|≥max⁡{1,∑k=1K[1−τk,r−α​κδ​(mk,r)]+}\mathbb{E}_{Q_{r}}|\Gamma_{e}(Y)|\geq\max\!\left\{1,\sum_{k=1}^{K}\left[1-\tau_{k,r}-\alpha\kappa_{\delta}(m_{k,r})\right]_{+}\right\}
+(46)
+for every rr, and hence
+Ve⋆​(α,δ)≥∑r=1Rλr​max⁡{1,∑k=1K[1−τk,r−α​κδ​(mk,r)]+}.V_{e}^{\star}(\alpha,\delta)\geq\sum_{r=1}^{R}\lambda_{r}\max\!\left\{1,\sum_{k=1}^{K}\left[1-\tau_{k,r}-\alpha\kappa_{\delta}(m_{k,r})\right]_{+}\right\}.
+(47)
+Proof.
+Fix k,rk,r and abbreviate A=Ak,rA=A_{k,r}, m=mk,rm=m_{k,r}, and L​(θ)=Lk,e​(θ)L(\theta)=L_{k,e}(\theta). Tail validity gives ρδ,μk​(L)≤α\rho_{\delta,\mu_{k}}(L)\leq\alpha.
+If m≥δm\geq\delta, the weight w=𝟏A/mw=\mathbf{1}_{A}/m is feasible in the Tail risk envelope, because 1/m≤1/δ1/m\leq 1/\delta. Hence
+1m​∫AL⁡(θ)​μk​(𝑑θ)≤α.\frac{1}{m}\int_{A}L(\theta)\,\mu_{k}(\,\mathrm{d}\theta)\leq\alpha.
+If m<δm<\delta, choose
+w⁡(θ)=1δ​𝟏A​(θ)+δ−mδ⁡(1−m)​𝟏Ac​(θ).w(\theta)=\frac{1}{\delta}\mathbf{1}_{A}(\theta)+\frac{\delta-m}{\delta(1-m)}\mathbf{1}_{A^{c}}(\theta).
+This is a feasible envelope weight. Since L≥0L\geq 0,
+α≥ρδ,μk​(L)≥1δ​∫AL⁡(θ)​μk​(𝑑θ),\alpha\geq\rho_{\delta,\mu_{k}}(L)\geq\frac{1}{\delta}\int_{A}L(\theta)\,\mu_{k}(\,\mathrm{d}\theta),
+so
+1m​∫AL⁡(θ)​μk​(𝑑θ)≤α​δm.\frac{1}{m}\int_{A}L(\theta)\,\mu_{k}(\,\mathrm{d}\theta)\leq\frac{\alpha\delta}{m}.
+Both cases are summarized by
+1m​∫AL⁡(θ)​μk​(𝑑θ)≤α​κδ​(m).\frac{1}{m}\int_{A}L(\theta)\,\mu_{k}(\,\mathrm{d}\theta)\leq\alpha\kappa_{\delta}(m).
+(48)
+Let gk​(y)=Pr⁡{k∈Γe​(Y)∣Y=y}∈[0,1]g_{k}(y)=\Pr\{k\in\Gamma_{e}(Y)\mid Y=y\}\in[0,1]. Since 1−L⁡(θ)=𝔼Pk,θe​gk​(Y)1-L(\theta)=\mathbb{E}_{P^{e}_{k,\theta}}g_{k}(Y), the bounded-expectation total-variation inequality gives
+𝔼Qr​gk​(Y)≥𝔼Pk,θe​gk​(Y)−TV⁡(Pk,θe,Qr).\mathbb{E}_{Q_{r}}g_{k}(Y)\geq\mathbb{E}_{P^{e}_{k,\theta}}g_{k}(Y)-\operatorname{TV}(P^{e}_{k,\theta},Q_{r}).
+Average over AA and use (48) to obtain
+𝔼Qr​gk​(Y)≥1−α​κδ​(mk,r)−τk,r.\mathbb{E}_{Q_{r}}g_{k}(Y)\geq 1-\alpha\kappa_{\delta}(m_{k,r})-\tau_{k,r}.
+Since gk≥0g_{k}\geq 0, the right-hand side may be replaced by its positive part. Summing over kk gives
+𝔼Qr​|Γe​(Y)|=∑k𝔼Qr​gk​(Y)≥∑k[1−τk,r−α​κδ​(mk,r)]+.\mathbb{E}_{Q_{r}}|\Gamma_{e}(Y)|=\sum_{k}\mathbb{E}_{Q_{r}}g_{k}(Y)\geq\sum_{k}\left[1-\tau_{k,r}-\alpha\kappa_{\delta}(m_{k,r})\right]_{+}.
+Mandatory nonemptiness supplies the independent lower bound one, proving (46). Averaging over the mixture weights λr\lambda_{r} proves (47). The uniform specialization reported in (25) follows because κδ​(m)\kappa_{\delta}(m) is nonincreasing in mm and each τk,r≤τ\tau_{k,r}\leq\tau.
+∎
+Appendix D Learned RAED and Calibration Proofs
+D.1 Population score geometry supporting the learned family
+Fix ee and let Pk,μeP_{k,\mu}^{e} and QeQ_{e} be as defined in (27) and (3). Assume Pk,μe≪QeP_{k,\mu}^{e}\ll Q_{e} and write rk,e=d​Pk,μe/d​Qer_{k,e}=\,\mathrm{d}P_{k,\mu}^{e}/\,\mathrm{d}Q_{e}.
+Proposition D.1 (Classwise nuisance-average density-ratio rule).
+For the classwise relaxation
+min0≤gk≤1⁡𝔼Qe​gk​(Y)subject to𝔼Pk,μe​gk​(Y)≥1−α,\min_{0\leq g_{k}\leq 1}\ \mathbb{E}_{Q_{e}}g_{k}(Y)\quad\text{subject to}\quad\mathbb{E}_{P_{k,\mu}^{e}}g_{k}(Y)\geq 1-\alpha,
+(49)
+there is a threshold tk∈[0,∞]t_{k}\in[0,\infty] and boundary randomization γk​(y)∈[0,1]\gamma_{k}(y)\in[0,1] supported on {rk,e=tk}\{r_{k,e}=t_{k}\} such that an optimum is
+gk⋆(y)=𝟏{rk,e(y)>tk}+γk(y)𝟏{rk,e(y)=tk}.g_{k}^{\star}(y)=\mathbf{1}\{r_{k,e}(y)>t_{k}\}+\gamma_{k}(y)\mathbf{1}\{r_{k,e}(y)=t_{k}\}.
+(50)
+Proof.
+The objective is the QeQ_{e}-mass of the retained region and the constraint requires at least 1−α1-\alpha mass under Pk,μeP_{k,\mu}^{e}. Introducing a nonnegative multiplier λ\lambda gives the pointwise Lagrangian integrand
+[1−λ​rk,e​(y)]​gk​(y)[1-\lambda r_{k,e}(y)]g_{k}(y)
+under QeQ_{e}. It is minimized by gk=1g_{k}=1 where λ​rk,e>1\lambda r_{k,e}>1, by gk=0g_{k}=0 where λ​rk,e<1\lambda r_{k,e}<1, and by arbitrary randomization on equality. The multiplier and boundary randomization are chosen so that the coverage constraint is met at equality unless it is slack at the unconstrained optimum. This is the randomized Neyman–Pearson construction.
+∎
+For strict Tail validity, let
+𝒲k,δ:={w∈L∞(μk):0≤w≤1/δ,∫wdμk=1},\mathcal{W}_{k,\delta}:=\left\{w\in L^{\infty}(\mu_{k}):0\leq w\leq 1/\delta,\ \int w\,\,\mathrm{d}\mu_{k}=1\right\},
+(51)
+and define the reweighted predictive law
+Pk,we​(A):=∫w⁡(θ)​Pk,θe​(A)​μk​(𝑑θ).P_{k,w}^{e}(A):=\int w(\theta)P_{k,\theta}^{e}(A)\,\mu_{k}(\,\mathrm{d}\theta).
+(52)
+Proposition D.2 (Tail validity as robust family retention).
+For every measurable marginal rule and every 0<δ≤10<\delta\leq 1,
+ρδ,μk(Lk,e(⋅;g))≤α⟺𝔼Pk,wegk(Y)≥1−α∀w∈𝒲k,δ.\rho_{\delta,\mu_{k}}(L_{k,e}(\cdot;g))\leq\alpha\quad\Longleftrightarrow\quad\mathbb{E}_{P_{k,w}^{e}}g_{k}(Y)\geq 1-\alpha\quad\forall w\in\mathcal{W}_{k,\delta}.
+(53)
+Proof.
+For any w∈𝒲k,δw\in\mathcal{W}_{k,\delta},
+∫w⁡(θ)​Lk,e​(θ,g)​μk​(𝑑θ)=1−∫gk​(y)​Pk,we​(𝑑y).\int w(\theta)L_{k,e}(\theta;g)\,\mu_{k}(\,\mathrm{d}\theta)=1-\int g_{k}(y)P_{k,w}^{e}(\,\mathrm{d}y).
+Taking the supremum over ww on the left is equivalent to taking the infimum of reweighted retention on the right. The risk-envelope definition (9) gives the result.
+∎
+These two propositions justify the score interpretation used in Section 5.1. Under the additional compactness, domination, L1​(Qe)L^{1}(Q_{e})-continuity, 0<α<10<\alpha<1, and strong-duality conditions of Theorem E.1, the robust problem attains least-favourable wk⋆w_{k}^{\star} and nonnegative dual multipliers λk⋆\lambda_{k}^{\star}, yielding the pointwise coupled oracle
+g⋆(y)∈arg​minu∈[0,1]K,∑kuk≥1∑k=1K[1−λk⋆rk,wk⋆(y)]uk,g^{\star}(y)\in\operatorname*{arg\,min}_{u\in[0,1]^{K},\ \sum_{k}u_{k}\geq 1}\sum_{k=1}^{K}\bigl[1-\lambda_{k}^{\star}r_{k,w_{k}^{\star}}(y)\bigr]u_{k},
+(54)
+where rk,w=d​Pk,we/d​Qer_{k,w}=\,\mathrm{d}P_{k,w}^{e}/\,\mathrm{d}Q_{e}. The full functional-analytic attainment theorem is retained with its complete conditions in Appendix E; it is supporting oracle geometry rather than a main-paper result.
+D.2 Proof of nested nuisance-average calibration
+Proof of the mean clause of
+Theorem 5.1.
+Condition on ℱ0\mathcal{F}_{0}. The trained scores, architecture,
+hyperparameters, nested rule family, threshold domain, and population risk
+curve are then fixed, while the final calibration sample retains its declared
+law.
+If every threshold is population-valid, the conclusion is immediate. If the
+calibrated passing set is empty, the procedure deploys the safe endpoint and
+is again valid. It remains to consider the event on which an invalid threshold
+is selected.
+First suppose that Λj\Lambda_{j} is a continuous interval. Define
+λj⋆:=inf{λ∈Λj:Rj​(λ)≤α}.\lambda_{j}^{\star}:=\inf\{\lambda\in\Lambda_{j}:R_{j}(\lambda)\leq\alpha\}.
+The safe endpoint makes this set nonempty. Whenever invalid thresholds exist,
+continuity and monotonicity give
+Rj​(λj⋆)=α.R_{j}(\lambda_{j}^{\star})=\alpha.
+If λ^j\widehat{\lambda}_{j} were invalid, monotonicity would imply
+λ^j<λj⋆\widehat{\lambda}_{j}<\lambda_{j}^{\star}. Let 𝒫j\mathcal{P}_{j} denote the passing set
+inside the infimum in (30). Since
+λ^j=inf𝒫j<λj⋆\widehat{\lambda}_{j}=\inf\mathcal{P}_{j}<\lambda_{j}^{\star}, there exists
+λ∈𝒫j\lambda\in\mathcal{P}_{j} with λ<λj⋆\lambda<\lambda_{j}^{\star}. The all-larger
+requirement defining 𝒫j\mathcal{P}_{j} therefore forces
+Uj​(λj⋆,γj)<α=Rj​(λj⋆).U_{j}(\lambda_{j}^{\star};\gamma_{j})<\alpha=R_{j}(\lambda_{j}^{\star}).
+Thus invalid selection implies failure of the pointwise UCB at the single
+ℱ0\mathcal{F}_{0}-measurable population crossing point λj⋆\lambda_{j}^{\star}.
+Now suppose instead that
+Λj={λj,1<⋯<λj,mj}\Lambda_{j}=\{\lambda_{j,1}<\cdots<\lambda_{j,m_{j}}\}
+is a finite ordered threshold grid. If any grid point is invalid, define the
+last invalid threshold
+λj−:=max⁡{λ∈Λj:Rj​(λ)>α}.\lambda_{j}^{-}:=\max\{\lambda\in\Lambda_{j}:R_{j}(\lambda)>\alpha\}.
+This quantity is fixed conditional on ℱ0\mathcal{F}_{0}. Because the passing set
+is finite, a nonempty passing set has a smallest element and
+λ^j∈𝒫j\widehat{\lambda}_{j}\in\mathcal{P}_{j}. If λ^j\widehat{\lambda}_{j} were invalid, then
+monotonicity gives
+λ^j≤λj−.\widehat{\lambda}_{j}\leq\lambda_{j}^{-}.
+Since membership of λ^j\widehat{\lambda}_{j} in 𝒫j\mathcal{P}_{j} requires the UCB to
+be below α\alpha at every grid point at least as conservative as
+λ^j\widehat{\lambda}_{j}, it follows in particular that
+Uj​(λj−,γj)<α<Rj​(λj−).U_{j}(\lambda_{j}^{-};\gamma_{j})<\alpha<R_{j}(\lambda_{j}^{-}).
+Hence invalid selection again implies failure of the pointwise UCB at one
+fixed, population-determined threshold.
+In either case,
+{Rj(λ^j)>α}\{R_{j}(\widehat{\lambda}_{j})>\alpha\}
+is contained in the failure event of a single pointwise UCB whose conditional
+failure probability is at most γj\gamma_{j}. Therefore
+Pr⁡{Rj​(λ^j)≤α|ℱ0}≥1−γj,\Pr\!\left\{R_{j}(\widehat{\lambda}_{j})\leq\alpha\,\middle|\,\mathcal{F}_{0}\right\}\geq 1-\gamma_{j},
+which proves (31). For a finite or countable claim
+set, a union bound over jj with ∑jγj≤ζ\sum_{j}\gamma_{j}\leq\zeta gives the
+simultaneous statement. No union bound over the thresholds along an individual
+nested path is required.
+∎
+D.3 Positive-tail specialization of nested calibration
+Proof of the positive-tail specialization.
+Define
+Hj,λ​(θ):=δ​ηj​(λ)+(Lj,λ​(θ)−ηj​(λ))+.H_{j,\lambda}(\theta):=\delta\eta_{j}(\lambda)+\bigl(L_{j,\lambda}(\theta)-\eta_{j}(\lambda)\bigr)_{+}.
+Condition again on ℱ0\mathcal{F}_{0}. Because the entire map λ↦ηj​(λ)\lambda\mapsto\eta_{j}(\lambda) is fixed and measurable before the calibration sample is used, Hj,λH_{j,\lambda} is a fixed bounded loss for every ℱ0\mathcal{F}_{0}-measurable threshold. The Rockafellar–Uryasev/OCE representation gives, for every fixed λ\lambda,
+ρδ,μk​(Lj,λ)\displaystyle\rho_{\delta,\mu_{k}}(L_{j,\lambda})
+=infη∈ℝ{η+1δ​𝔼​(Lj,λ−η)+}\displaystyle=\inf_{\eta\in\mathbb{R}}\left\{\eta+\frac{1}{\delta}\mathbb{E}(L_{j,\lambda}-\eta)_{+}\right\}
+≤ηj​(λ)+1δ​𝔼​(Lj,λ−ηj​(λ))+\displaystyle\leq\eta_{j}(\lambda)+\frac{1}{\delta}\mathbb{E}(L_{j,\lambda}-\eta_{j}(\lambda))_{+}
+=𝔼​Hj,λδ.\displaystyle=\frac{\mathbb{E}H_{j,\lambda}}{\delta}.
+Let UjH​(λ,γj)U_{j}^{H}(\lambda;\gamma_{j}) denote a pointwise upper confidence bound for
+𝔼​Hj,λ\mathbb{E}H_{j,\lambda}. Because 0≤L≤10\leq L\leq 1, 0≤η≤10\leq\eta\leq 1, and 0<δ<10<\delta<1, the transformed loss Hj,λH_{j,\lambda} lies in [0,1][0,1]. Hence UjH/δU_{j}^{H}/\delta is a pointwise upper confidence bound for the true Tail risk at every ℱ0\mathcal{F}_{0}-measurable fixed threshold. Candidate-set enlargement decreases Lj,λL_{j,\lambda} pointwise and therefore decreases its Tail risk. By the assumed continuity of that risk path, the proof of the mean clause applies verbatim with Rj​(λ)R_{j}(\lambda) replaced by ρδ,μk​(Lj,λ)\rho_{\delta,\mu_{k}}(L_{j,\lambda}) and UjU_{j} by UjH/δU_{j}^{H}/\delta. This proves (33); the simultaneous statement follows from the same countable union bound.
+∎
+D.4 Nested Monte Carlo for nuisance-state loss
+Corollary D.3 (Jensen-conservative nested Monte Carlo).
+Fix 0<δ<10<\delta<1, λ\lambda, and the independently fixed ηj​(λ)\eta_{j}(\lambda). Suppose that conditional on nuisance state θ\theta,
+L^j,λ​(θ)=1R​∑r=1RIr,j,λ​(θ),𝔼⁡[L^j,λ​(θ)∣θ]=Lj,λ​(θ),\widehat{L}_{j,\lambda}(\theta)=\frac{1}{R}\sum_{r=1}^{R}I_{r,j,\lambda}(\theta),\qquad\mathbb{E}\!\left[\widehat{L}_{j,\lambda}(\theta)\mid\theta\right]=L_{j,\lambda}(\theta),
+(55)
+where the Ir∈[0,1]I_{r}\in[0,1] are generated from the declared observation-noise law. Define
+H^j,λ​(θ):=δ​ηj​(λ)+(L^j,λ​(θ)−ηj​(λ))+.\widehat{H}_{j,\lambda}(\theta):=\delta\eta_{j}(\lambda)+\bigl(\widehat{L}_{j,\lambda}(\theta)-\eta_{j}(\lambda)\bigr)_{+}.
+(56)
+Then
+𝔼⁡[H^j,λ​(θ)∣θ]≥Hj,λ​(θ).\mathbb{E}\!\left[\widehat{H}_{j,\lambda}(\theta)\mid\theta\right]\geq H_{j,\lambda}(\theta).
+(57)
+Consequently a valid upper confidence bound on the outer mean of independent nuisance-state observations H^i\widehat{H}_{i} is conservative for 𝔼​H\mathbb{E}H, and therefore for the Tail risk through (32). The nuisance states, rather than the RR inner noise replicates, remain the outer calibration sample size.
+Proof of Corollary D.3.
+For fixed η∈[0,1]\eta\in[0,1], the function
+hη​(z):=δ​η+(z−η)+h_{\eta}(z):=\delta\eta+(z-\eta)_{+}
+is convex in zz. Conditional on θ\theta, Jensen’s inequality and unbiasedness of (55) give
+𝔼⁡[hη​(L^)∣θ]≥hη​(𝔼⁡[L^∣θ])=hη​(L⁡(θ)).\mathbb{E}[h_{\eta}(\widehat{L})\mid\theta]\geq h_{\eta}(\mathbb{E}[\widehat{L}\mid\theta])=h_{\eta}(L(\theta)).
+This is (57). Integrating over θ∼μk\theta\sim\mu_{k} yields
+𝔼θ,noise​H^j,λ​(θ)≥𝔼θ​Hj,λ​(θ).\mathbb{E}_{\theta,\mathrm{noise}}\widehat{H}_{j,\lambda}(\theta)\geq\mathbb{E}_{\theta}H_{j,\lambda}(\theta).
+Therefore any valid upper confidence bound UU for the mean of the outer bounded observations H^i\widehat{H}_{i} also satisfies, on the same event,
+𝔼​Hj,λ≤𝔼​H^j,λ≤U.\mathbb{E}H_{j,\lambda}\leq\mathbb{E}\widehat{H}_{j,\lambda}\leq U.
+Combining this with (32) gives
+ρδ,μk​(Lj,λ)≤U/δ.\rho_{\delta,\mu_{k}}(L_{j,\lambda})\leq U/\delta.
+Independence is required across the outer nuisance-state observations used by the chosen bounded-mean UCB. Multiple inner draws contribute only to one H^i\widehat{H}_{i} and therefore do not increase the outer nuisance sample size.
+∎
+D.5 Selection-aware independent certification
+Theorem D.4 (Certification after an independent shortlist).
+Let ℱ0\mathcal{F}_{0} contain all randomness used to train rules, choose unprotected hyperparameters, and construct a nonempty random shortlist 𝒮⊆ℰ\mathcal{S}\subseteq\mathcal{E}. Let ℱcal\mathcal{F}_{\rm cal} be generated by a final calibration sample independent of ℱ0\mathcal{F}_{0}, and let ℱrank\mathcal{F}_{\rm rank} contain any additional randomness used to choose among certified rules. For each realized 𝒮\mathcal{S}, let ℐ⁡(𝒮)\mathcal{I}(\mathcal{S}) be a finite or countable, measurably enumerated set of claims that must hold simultaneously. Suppose each claim j∈ℐ⁡(𝒮)j\in\mathcal{I}(\mathcal{S}) has a conditional failure event BjB_{j} satisfying
+Pr⁡(Bj∣ℱ0)≤γj​(𝒮)a.s.,∑j∈ℐ⁡(𝒮)γj​(𝒮)≤ζ.\Pr(B_{j}\mid\mathcal{F}_{0})\leq\gamma_{j}(\mathcal{S})\quad\text{a.s.},\qquad\sum_{j\in\mathcal{I}(\mathcal{S})}\gamma_{j}(\mathcal{S})\leq\zeta.
+(58)
+Then, with probability at least 1−ζ1-\zeta, every claim in the realized shortlist is valid simultaneously. Hence any measurable deployed experiment e^∈𝒮\widehat{e}\in\mathcal{S} whose final rule is chosen from those certified rules is population-valid, even if the final choice depends on the calibration and ranking data.
+Proof of Theorem D.4.
+Condition on ℱ0\mathcal{F}_{0}. The realized shortlist 𝒮\mathcal{S}, the fixed rule families, the finite or countable measurable enumeration of ℐ⁡(𝒮)\mathcal{I}(\mathcal{S}), and the failure allocations are now fixed. Let
+𝒜𝒮:=⋂j∈ℐ⁡(𝒮)Bjc.\mathcal{A}_{\mathcal{S}}:=\bigcap_{j\in\mathcal{I}(\mathcal{S})}B_{j}^{c}.
+The conditional union bound gives
+Pr⁡(𝒜𝒮c∣ℱ0)≤∑j∈ℐ⁡(𝒮)Pr⁡(Bj∣ℱ0)≤∑j∈ℐ⁡(𝒮)γj​(𝒮)≤ζ.\Pr(\mathcal{A}_{\mathcal{S}}^{c}\mid\mathcal{F}_{0})\leq\sum_{j\in\mathcal{I}(\mathcal{S})}\Pr(B_{j}\mid\mathcal{F}_{0})\leq\sum_{j\in\mathcal{I}(\mathcal{S})}\gamma_{j}(\mathcal{S})\leq\zeta.
+Thus Pr⁡(𝒜𝒮∣ℱ0)≥1−ζ\Pr(\mathcal{A}_{\mathcal{S}}\mid\mathcal{F}_{0})\geq 1-\zeta almost surely. On 𝒜𝒮\mathcal{A}_{\mathcal{S}} every rule from which the later selector can choose is population-valid, so any measurable selection among those rules remains valid even if the choice uses ℱcal\mathcal{F}_{\rm cal} or ℱrank\mathcal{F}_{\rm rank}. Finally the tower property gives
+Pr⁡(𝒜𝒮)=𝔼⁡[Pr⁡(𝒜𝒮∣ℱ0)]≥1−ζ.\Pr(\mathcal{A}_{\mathcal{S}})=\mathbb{E}\!\left[\Pr(\mathcal{A}_{\mathcal{S}}\mid\mathcal{F}_{0})\right]\geq 1-\zeta.
+For selected-only calibration, 𝒮\mathcal{S} is a singleton already fixed by ℱ0\mathcal{F}_{0}, so the claim set contains only the deployed experiment’s still-open family/tail claims. This is a validity statement conditional on the independent selection stage, not a guarantee that the selected experiment is population-optimal. Tail-risk monotonicity gives any larger-δ\delta claims that are logically implied by a certified smaller-δ\delta statement without another union-bound term.
+∎
+D.6 Proof of the rare-tail obstruction
+Proof of Proposition 5.2.
+Compare the null distribution P0​(Z=0)=1P_{0}(Z=0)=1 with
+P1​(Z=1)=p,P1​(Z=0)=1−p,p=δ⁡(α+ε).P_{1}(Z=1)=p,\qquad P_{1}(Z=0)=1-p,\qquad p=\delta(\alpha+\varepsilon).
+Because p≤δp\leq\delta, the worst-δ\delta Tail risk of P1P_{1} is
+ρδ​(P1)=pδ=α+ε>α.\rho_{\delta}(P_{1})=\frac{p}{\delta}=\alpha+\varepsilon>\alpha.
+Under P1P_{1}, however, an all-zero calibration sample occurs with probability (1−p)n(1-p)^{n}. Any deterministic procedure that certifies the all-zero sample therefore falsely certifies this just-invalid alternative with probability at least (1−p)n(1-p)^{n}. Requiring that probability to be no larger than β\beta proves (34). Taking logarithms gives
+n≥log⁡(1/β)−log⁡(1−δ⁡(α+ε)),n\geq\frac{\log(1/\beta)}{-\log(1-\delta(\alpha+\varepsilon))},
+and −log⁡(1−x)∼x-\log(1-x)\sim x as x↓0x\downarrow 0 yields (35) as ε↓0\varepsilon\downarrow 0 in the small-α​δ\alpha\delta regime.
+∎
+Appendix E Additional Theoretical Results
+E.1 Attained least-favourable Tail-RAED score
+The main text uses only the score interpretation of the robust Tail constraint. For completeness, the population attainment result that supports that interpretation is recorded here.
+Theorem E.1 (Attained least-favourable Tail-RAED score under dominated compact predictive families).
+Fix 0<δ≤10<\delta\leq 1 and experiment ee. Assume for each family kk that: (i) Θk\Theta_{k} is a compact metric space and μk\mu_{k} is a Borel probability measure; (ii) 𝒴e\mathcal{Y}_{e} is standard Borel; (iii) Pk,θe≪QeP_{k,\theta}^{e}\ll Q_{e} for μk\mu_{k}-almost every θ\theta; (iv), writing
+rk,θ=d​Pk,θed​Qe,r_{k,\theta}=\frac{\,\mathrm{d}P_{k,\theta}^{e}}{\,\mathrm{d}Q_{e}},
+the map θ↦rk,θ\theta\mapsto r_{k,\theta} is Borel measurable and continuous into L1​(Qe)L^{1}(Q_{e}); and (v) 0<α<10<\alpha<1. Let
+𝒲k,δ={w∈L∞(μk):0≤w≤1/δ,∫wdμk=1},\mathcal{W}_{k,\delta}=\left\{w\in L^{\infty}(\mu_{k}):0\leq w\leq 1/\delta,\ \int w\,\,\mathrm{d}\mu_{k}=1\right\},
+(59)
+and define
+rk,w​(y)=∫w⁡(θ)​rk,θ​(y)​μk​(𝑑θ).r_{k,w}(y)=\int w(\theta)r_{k,\theta}(y)\,\mu_{k}(\,\mathrm{d}\theta).
+(60)
+Then the full nonempty population Tail-RAED problem has an attained primal optimum, zero Lagrange-duality gap, attained nonnegative family multipliers λk⋆\lambda_{k}^{\star}, and attained least-favourable weights wk⋆∈𝒲k,δw_{k}^{\star}\in\mathcal{W}_{k,\delta}. An oracle optimum may be chosen so that, for QeQ_{e}-almost every yy,
+g⋆(y)∈arg​minu∈[0,1]K,∑kuk≥1∑k=1K[1−λk⋆rk,wk⋆(y)]uk.\boxed{g^{\star}(y)\in\operatorname*{arg\,min}_{u\in[0,1]^{K},\ \sum_{k}u_{k}\geq 1}\sum_{k=1}^{K}\left[1-\lambda_{k}^{\star}r_{k,w_{k}^{\star}}(y)\right]u_{k}.}
+(61)
+Thus every class with λk⋆​rk,wk⋆​(y)>1\lambda_{k}^{\star}r_{k,w_{k}^{\star}}(y)>1 is retained; if no coefficient is negative, total inclusion mass one is assigned among maximizers of λk⋆​rk,wk⋆​(y)\lambda_{k}^{\star}r_{k,w_{k}^{\star}}(y); equality sets permit randomization. Whenever λk⋆>0\lambda_{k}^{\star}>0, wk⋆w_{k}^{\star} may be chosen as a nuisance reweighting that is least favourable for the optimal family-kk retention constraint.
+Proof.
+Equip
+𝒢={g∈L∞(Qe)K:0≤gk≤1,∑kgk≥1}\mathcal{G}=\left\{g\in L^{\infty}(Q_{e})^{K}:0\leq g_{k}\leq 1,\ \sum_{k}g_{k}\geq 1\right\}
+with the product weak-* topology. It is convex, weak-* closed and bounded, hence compact by Banach–Alaoglu. The objective
+Je​(g)=∑k∫gk​d​QeJ_{e}(g)=\sum_{k}\int g_{k}\,\,\mathrm{d}Q_{e}
+is weak-* continuous. Each 𝒲k,δ\mathcal{W}_{k,\delta} is convex and weak-* compact in L∞​(μk)L^{\infty}(\mu_{k}) because positivity, the upper bound, and the normalization constraint are weak-* closed.
+For fixed gkg_{k}, write hk,g​(θ)=𝔼Pk,θe​gkh_{k,g}(\theta)=\mathbb{E}_{P_{k,\theta}^{e}}g_{k}. The stated L1​(Qe)L^{1}(Q_{e}) continuity of rk,θr_{k,\theta} implies continuity of θ↦hk,g​(θ)\theta\mapsto h_{k,g}(\theta), while boundedness gives measurability. Consequently
+(w,gk)⟼∫w⁡(θ)​hk,g​(θ)​μk​(𝑑θ)=𝔼Qe​[rk,w​(Y)​gk​(Y)](w,g_{k})\longmapsto\int w(\theta)h_{k,g}(\theta)\,\mu_{k}(\,\mathrm{d}\theta)=\mathbb{E}_{Q_{e}}[r_{k,w}(Y)g_{k}(Y)]
+is separately continuous in the relevant weak-* topologies. The robust retention functional
+Ck​(gk):=infw∈𝒲k,δ𝔼Qe​[rk,w​gk]C_{k}(g_{k}):=\inf_{w\in\mathcal{W}_{k,\delta}}\mathbb{E}_{Q_{e}}[r_{k,w}g_{k}]
+is therefore concave and upper semicontinuous. The sets {g:Ck​(gk)≥1−α}\{g:C_{k}(g_{k})\geq 1-\alpha\} are closed, so their intersection with compact 𝒢\mathcal{G} is a nonempty compact feasible set; the full-set rule is feasible. Hence the primal optimum is attained.
+Each constraint function (1−α)−Ck​(gk)(1-\alpha)-C_{k}(g_{k}) is convex and 11-Lipschitz in the sup norm. The full-set rule is strictly feasible because Ck​(1)=1>1−αC_{k}(1)=1>1-\alpha. Standard Slater duality for the finite family of continuous convex inequalities therefore gives zero Lagrange-duality gap and nonnegative optimal multipliers. Multiplier attainment may be restricted to a compact set: the dual value at λ=0\lambda=0 is at least one since every nonempty rule has Je​(g)≥1J_{e}(g)\geq 1, whereas evaluating the Lagrangian at the full-set rule gives K−α​∑kλkK-\alpha\sum_{k}\lambda_{k}. Thus no maximizing multiplier has ∑kλk>(K−1)/α\sum_{k}\lambda_{k}>(K-1)/\alpha, and upper semicontinuity gives attainment on the resulting compact multiplier set.
+For fixed λ\lambda, the robust constraints yield the saddle expression
+∑kλk​(1−α)+infg∈𝒢supw1∈𝒲1,δ,…,wK∈𝒲K,δ{Je​(g)−∑kλk​𝔼Qe​[rk,wk​gk]}.\sum_{k}\lambda_{k}(1-\alpha)+\inf_{g\in\mathcal{G}}\sup_{w_{1}\in\mathcal{W}_{1,\delta},\ldots,w_{K}\in\mathcal{W}_{K,\delta}}\left\{J_{e}(g)-\sum_{k}\lambda_{k}\mathbb{E}_{Q_{e}}[r_{k,w_{k}}g_{k}]\right\}.
+The rule and reweighting sets are convex compact and the bracketed functional is bilinear and separately continuous, so Sion’s minimax theorem permits interchange of infimum and supremum [33]. The resulting upper-semicontinuous function on the compact product reweighting set attains its supremum at (w1⋆,…,wK⋆)(w_{1}^{\star},\ldots,w_{K}^{\star}). With (λ⋆,w⋆)(\lambda^{\star},w^{\star}) fixed, the Lagrangian is the integral of the pointwise linear expression in (61). Pointwise minimization over the nonempty marginal polytope gives exactly the stated rule, with measurable tie-breaking or randomization on equality sets. Complementary slackness identifies active least-favourable reweightings [34].
+∎
+This characterization explains the score target used in Section 5.1: strict-tail efficiency is governed by a least-favourable reweighted predictive mixture, while independent calibration can certify any prospectively fixed score family against the desired Tail risk.
+Appendix F Statistical and Computational Protocol
+F.1 Learned score systems
+Watt and WCA use one-versus-rest logistic scores on a 256-component RBF Nyström map. The common hyperparameter grid is C∈{0.1,1,10}C\in\{0.1,1,10\} and γRBF/γRBF,0∈{0.5,1,2}\gamma_{\mathrm{RBF}}/\gamma_{\mathrm{RBF},0}\in\{0.5,1,2\}. Five-fold stratified group cross-validation groups on the outer nuisance-state identity. Training uses exact 50/50 positive/negative balancing, with negatives sampled uniformly across rival families and nuisance states. The RBF bandwidth reference γRBF,0\gamma_{\mathrm{RBF},0} is computed from a deterministic pairwise-distance sample capped at 768 rows. Hyperparameter ties are resolved by mean log loss, then by CC, then by bandwidth multiplier.
+GWAE-Fluvial uses the same 256-component RBF-Nyström architecture for its K=2K=2 target. Methane oxidation uses 96 Nyström features with fixed C=1C=1, a fixed median-bandwidth multiplier, and a grouped three-fold cross validation. In every benchmark, all observation-noise replicas belonging to one outer nuisance state remain in the same statistical fold.
+F.2 Comparator estimators and tie handling
+For Watt and WCA, the final implementation evaluates every comparator on the independent experiment-selection pool. In whitened observation coordinates, let zk​iz_{ki} be selection-pool nuisance state ii in family kk, let mk​i,em_{ki,e} be its stored response under ee, and define
+qk​i,e​(y)=ϕd​(y,mk​i,e,Id),pk,e​(y)=1nk​∑i=1nkqk​i,e​(y),pe​(y)=1K​∑k=1Kpk,e​(y).q_{ki,e}(y)=\phi_{d}(y;m_{ki,e},I_{d}),\qquad p_{k,e}(y)=\frac{1}{n_{k}}\sum_{i=1}^{n_{k}}q_{ki,e}(y),\qquad p_{e}(y)=\frac{1}{K}\sum_{k=1}^{K}p_{k,e}(y).
+The supports are balanced and the comparator uses the same uniform structural weighting as the paper experiments. Define the finite source-component weight
+ωk​i:=1K​nk.\omega_{ki}:=\frac{1}{Kn_{k}}.
+For each source state the implementation draws Yk​i​r∼qk​i,eY_{kir}\sim q_{ki,e} using a criterion-specific random seed fixed before comparison. With R=32R=32, model-index and full-latent EIG are respectively
+I^M​(e)\displaystyle\widehat{I}_{M}(e)
+=∑k,iωk​i​1R​∑r=1R{log⁡pk,e​(Yk​i​r)−log⁡pe​(Yk​i​r)},\displaystyle=\sum_{k,i}\omega_{ki}\frac{1}{R}\sum_{r=1}^{R}\left\{\log p_{k,e}(Y_{kir})-\log p_{e}(Y_{kir})\right\},
+(62)
+I^M,Θ​(e)\displaystyle\widehat{I}_{M,\Theta}(e)
+=∑k,iωk​i​1R​∑r=1R{log⁡qk​i,e​(Yk​i​r)−log⁡pe​(Yk​i​r)}.\displaystyle=\sum_{k,i}\omega_{ki}\frac{1}{R}\sum_{r=1}^{R}\left\{\log q_{ki,e}(Y_{kir})-\log p_{e}(Y_{kir})\right\}.
+(63)
+Thus the full-latent calculation treats each finite selection-pool nuisance state as a latent mixture component. The forced-classification criterion minimizes
+L^Bayes(e)=∑k,iωk​i1R∑r=1R{arg​maxℓpℓ,e(Yk​i​r)≠k}.\widehat{L}_{\rm Bayes}(e)=\sum_{k,i}\omega_{ki}\frac{1}{R}\sum_{r=1}^{R}\mathbf{1}\!\left\{\operatorname*{arg\,max}_{\ell}\,p_{\ell,e}(Y_{kir})\neq k\right\}.
+For ordered families k≠ℓk\neq\ell, the predictive-discrimination estimate is
+D^k→ℓ​(e)=1nk​∑i=1nk1R​∑r=1R{log⁡pk,e​(Yk​i​r)−log⁡pℓ,e​(Yk​i​r)},\widehat{D}_{k\to\ell}(e)=\frac{1}{n_{k}}\sum_{i=1}^{n_{k}}\frac{1}{R}\sum_{r=1}^{R}\left\{\log p_{k,e}(Y_{kir})-\log p_{\ell,e}(Y_{kir})\right\},
+and minimum ordered-pair predictive discrimination maximizes mink≠ℓ⁡D^k→ℓ​(e)\min_{k\neq\ell}\widehat{D}_{k\to\ell}(e). Expected elimination uses Relim=16R_{\rm elim}=16 fresh draws per selection state. With cd=χd,0.952c_{d}=\chi^{2}_{d,0.95}, family ℓ\ell is rejected for yy when
+Aℓ,e(y)={minj∥y−mℓ​j,e∥22>cd},A_{\ell,e}(y)=\mathbf{1}\!\left\{\min_{j}\|y-m_{\ell j,e}\|_{2}^{2}>c_{d}\right\},
+and the expected-elimination score is
+N^elim​(e)=∑k,iωk​i​1Relim​∑r=1Relim{∑ℓ=1KAℓ,e​(Yk​i​r)−Ak,e​(Yk​i​r)}.\widehat{N}_{\rm elim}(e)=\sum_{k,i}\omega_{ki}\frac{1}{R_{\rm elim}}\sum_{r=1}^{R_{\rm elim}}\left\{\sum_{\ell=1}^{K}A_{\ell,e}(Y_{kir})-A_{k,e}(Y_{kir})\right\}.
+The subtraction prevents exclusion of the true family from being counted as elimination of a rival.
+The selection support has 40 states per family for Watt and 100 per family for WCA. The EIG standard error is obtained from the per-source sample variances and finite-mixture weights. If eI^⋆e_{\widehat{I}}^{\star} is the literal numerical optimum of an information estimate I^\widehat{I}, the prospectively defined Monte Carlo indistinguishability set is
+𝒪EIGMC={e:|I^​(e)−I^​(eI^⋆)|≤max⁡(10−12,2​SE^​(e)2+SE^​(eI^⋆)2)}.\mathcal{O}_{\rm EIG}^{\rm MC}=\left\{e:\ |\widehat{I}(e)-\widehat{I}(e_{\widehat{I}}^{\star})|\leq\max\!\left(10^{-12},2\sqrt{\widehat{\rm SE}(e)^{2}+\widehat{\rm SE}(e_{\widehat{I}}^{\star})^{2}}\right)\right\}.
+For Bayes error, expected elimination, and minimum ordered-pair discrimination the corresponding absolute-score tolerance is 10−1210^{-12}. A scalar downstream J⁡(eEIG)J(e_{\rm EIG}) is evaluated at the numerical optimum, with experiment identifier used only to break an exact score tie.
+Methane uses the same comparator definitions on 256 selection nuisance states per family, with eight predictive draws per state. The second GWAE-Fluvial campaign compares δ=0.05\delta=0.05 Tail-RAED with an independently ranked δ=1\delta=1 nuisance-average RAED design on the same new nuisance population; the external comparator suite is not used in this comparison.
+F.3 Threshold calibration and Tail evaluation
+To keep the implementation notation compact, the claim index jj is suppressed in η⁡(λ)\eta(\lambda), and both jj and the current threshold λ\lambda are suppressed in L^i\widehat{L}_{i} and H^i\widehat{H}_{i}. For each fixed score system, family thresholds are nested from the all-family safe endpoint toward increasingly selective rules. For 0<δ<10<\delta<1, the complete auxiliary OCE map η⁡(λ)\eta(\lambda) is constructed only from the independent selection role and fixed before final calibration. At each threshold candidate with selection-role nuisance losses ℓ1,…,ℓn\ell_{1},\ldots,\ell_{n}, the implementation minimizes
+η+1δ​n​∑i=1n(ℓi−η)+\eta+\frac{1}{\delta n}\sum_{i=1}^{n}(\ell_{i}-\eta)_{+}
+over {0,1,ℓ1,…,ℓn}\{0,1,\ell_{1},\ldots,\ell_{n}\}; ties are resolved by the smallest η\eta, and the exact safe endpoint is assigned η=0\eta=0.
+For methane and the GWAE positive-tail calibration, each independent nuisance state contributes the transformed bounded loss
+H^i=δ​η+(L^i−η)+.\widehat{H}_{i}=\delta\eta+(\widehat{L}_{i}-\eta)_{+}.
+With H¯=n−1​∑iH^i\bar{H}=n^{-1}\sum_{i}\widehat{H}_{i}, the bounded-mean Bernoulli–KL upper confidence bound is
+UKL(H¯,n,γ)=sup{q∈[H¯,1]:kl(H¯∥q)≤log⁡(1/γ)n},U_{\rm KL}(\bar{H},n,\gamma)=\sup\left\{q\in[\bar{H},1]:\operatorname{kl}(\bar{H}\|q)\leq\frac{\log(1/\gamma)}{n}\right\},
+(64)
+where kl\operatorname{kl} is binary relative entropy. The Jensen result in Corollary D.3 makes calibration based on inner Monte Carlo conservative for the underlying nuisance-specific Tail loss. Methane uses γ=0.05/3\gamma=0.05/3; the GWAE Tail protocol uses γ=0.05/2\gamma=0.05/2.
+Watt and WCA use the same nested threshold construction for their held-out empirical Tail analyses, but their late-role nuisance counts are not interpreted as supporting a small-tail population certificate.
+F.4 Selection and held-out firewall
+Score fitting and experiment ranking occur before the final calibration pool is accessed. Once an experiment is selected, its score system and nested threshold path are fixed. Calibration then chooses the deployed threshold on an independent nuisance pool, and the untouched evaluation pool is used only after these decisions are complete. This is the selected-only architecture of Theorem D.4.
+The principal role sizes are:
+Score training
+Ranking/selection
+Final calibration
+Untouched evaluation
+Watt states/family (draws/state)
+80 (12)
+40 (256)
+40 (256)
+40 (512)
+WCA states/family (draws/state)
+600 (12)
+100 (256)
+100 (256)
+200 (512)
+GWAE Tail–average campaign states/family (draws/state)
+1000 (12)
+1000 (256)
+5000 (256)
+5000 (512)
+Methane states/family (draws/state)
+128 (3)
+256 (64)
+10000 (64)
+5000 (64)
+The GWAE row refers to the independent second campaign used for the Tail-versus-average comparison. The earlier nuisance-average study in Section 7.3 uses separate populations, including 1000 calibration and 2000 evaluation nuisance states per family. The selection-draw entries for Watt, WCA, and GWAE refer to the learned RAED conditional-loss calculation. Comparator-specific Monte Carlo counts are stated above. Pools are disjoint across the four columns; common random numbers are confined to a role.
+Appendix G Reservoir Benchmark Construction and Reproducibility
+G.1 Watt
+The Watt benchmark is derived from the hierarchical reservoir-characterization case study of Arnold et al. [26]. The source hierarchy combines three fault models (FM1–FM3), three cutoff alternatives, three grid representations, and three top-structure alternatives. The RAED benchmark fixes CO3, G3, and TS2 and retains FM1–FM3 together with the two supplied property representations, OBJECT and PIXEL, and the two relative-permeability groups, RP0 and RP1. The three fault models contain the same named major faults but differ in their traces, extents, face counts, and resulting compartment connections.
+Model ontologies and nuisance.
+The resulting ensemble supports four definitions of structural identity: FM (K=3K=3), FM×\timesPROP (K=6K=6), FM×\timesRP (K=6K=6), and FM×\timesPROP×\timesRP (K=12K=12). PROP distinguishes the OBJECT and PIXEL porosity/permeability representations, while RP distinguishes the two relative-permeability groups. Variables not included in a given structural identity remain part of the within-family nuisance state. In all four ontologies, seven continuous multipliers vary the transmissibility of the existing named faults,
+T2,T3,T5,T6,T7,T8,T9∼U⁡[0,1].T_{2},T_{3},T_{5},T_{6},T_{7},T_{8},T_{9}\sim U[0,1].
+These multipliers change fault transmissibility without modifying the underlying fault geometry.
+Fifty shared seven-dimensional Latin-hypercube coordinates are crossed with the three fault models, two property representations, and two relative-permeability groups, yielding
+50×3×2×2=60050\times 3\times 2\times 2=600
+reservoir realizations. The same physical ensemble is therefore reused across the four model ontologies; only the definition of which attributes belong to MM and which remain in θ\theta changes.
+Grid, properties, and initialization.
+For G3, the source deck and property arrays define a 112×30×40112\times 30\times 40 model, whereas the geometry files include an additional 41st layer. We therefore retain the common 40-layer domain, giving 134,400 cells. The omitted layer contains only ten active cells, represents approximately 2.7×10−52.7\times 10^{-5} of the active geometric volume, and contains no wells or retained fault content. The OBJECT permeability field, which is absent from the standard scenario directory, was recovered from the official Watt builder archive.
+SATNUM is used as the saturation-function region index, with zero-valued entries assigned to the first valid region. Each relative-permeability group retains its three source SWOF tables. Reservoir realizations are initialized directly from EQUIL using a datum depth of 5200 ft, a datum pressure of 2800 psia, an oil–water contact at 5326 ft, and the source constant dissolved-gas relation. Fault segments extending beyond the retained 40-layer grid are truncated at the model boundary.
+Wells and physical controls.
+The common well system contains INJ1–INJ6, B, WELL1, WELL4, WELL6, and WELL9. Ten active well tests are defined in Table 4. All tests begin from the same equilibrium state and perturb one designated actuator while the remaining wells continue under their common background controls.
+Table 4: Watt active well-test library.
+Test
+Actuator
+Baseline control
+Perturbation
+Remote pressure wells
+INJ1 multirate
+INJ1
+RATE 12500 m3/d
+alternating ±15%\pm 15\% in four 7-d stages
+WELL1, WELL4, WELL9
+INJ4 multirate
+INJ4
+RATE 15000 m3/d
+alternating ±15%\pm 15\% in four 7-d stages
+WELL1, WELL4, WELL6
+INJ4 pulse/falloff
+INJ4
+RATE 15000 m3/d
++20%+20\% for 10 d; shut 5 d; baseline thereafter
+WELL1, WELL4, WELL6
+INJ5 pulse/falloff
+INJ5
+RATE 15000 m3/d
++20%+20\% for 10 d; shut 5 d; baseline thereafter
+WELL1, WELL4, WELL9
+INJ6 periodic
+INJ6
+RATE 15000 m3/d
+alternating ±15%\pm 15\% in four 7-d stages
+WELL6, WELL4, WELL9
+B periodic
+B
+RATE 10000 m3/d
+alternating ±15%\pm 15\% in four 7-d stages
+WELL4, WELL6, WELL9
+WELL1 multirate
+WELL1
+LRAT 8000 m3/d
+alternating ±15%\pm 15\% in four 7-d stages
+WELL4, WELL6, INJ1
+WELL4 multirate
+WELL4
+LRAT 8000 m3/d
+alternating ±15%\pm 15\% in four 7-d stages
+WELL1, WELL6, B
+WELL6 multirate
+WELL6
+LRAT 8000 m3/d
+alternating ±15%\pm 15\% in four 7-d stages
+WELL4, WELL9, INJ6
+WELL9 drawdown/build-up
+WELL9
+LRAT 6500 m3/d
++15%+15\% for 7 d; shut 7 d; baseline thereafter
+WELL4, WELL1, INJ5
+Response and observation noise.
+Each well test produces actuator BHP, realized actuator rate, and BHP at three remote wells at days
+1,2,3,5,7,10,14,21,30,45,60,75,90,1,2,3,5,7,10,14,21,30,45,60,75,90,
+giving a 65-component response vector. The constrained-observation studies are obtained from these complete responses by truncating the time horizon and retaining only the selected remote pressure traces.
+Observation noise is modeled as independent Gaussian perturbations. For pressure, the standard deviation is the larger of 0.5%0.5\% of the median absolute response and 5 psia. For rate, it is the larger of 1%1\% of the median absolute response and 50 STB/day. The full ensemble comprises 600 reservoir realizations under ten well tests, giving 6000 OPM Flow responses to day 90.
+G.2 WCA
+The WCA benchmark is based on the multiple-geological-interpretation study of Park et al. [30]. The source study considers three parent training images, TI1–TI3, representing alternative fluvial depositional architectures. We take the parent training image as the structural identity,
+M∈{TI1,TI2,TI3}M\in\{\mathrm{TI1},\mathrm{TI2},\mathrm{TI3}\}.
+Each parent defines a family of conditional geological realizations, which are treated as within-family nuisance rather than as separate structural hypotheses.
+Conditional geometry and petrophysics.
+Each training image contributes ten conditional facies realizations that honor the source hard data. These categorical models are mapped to a 53×40×11653\times 40\times 116 simulation grid, preserving the full native vertical resolution and the main facies geometry and directional connectivity of the source realizations. The mapping uses overlap-volume categorical remapping. The selected grid was chosen from a set of reduced candidates based on preservation of the facies masks and anisotropy.
+For each facies realization, porosity and permeability are varied through spatially correlated random fields mapped to source-derived property distributions. The permeability field is coupled to the porosity field through
+ZK=0.85​Zϕ+1−0.852​ϵ,Z_{K}=0.85Z_{\phi}+\sqrt{1-0.85^{2}}\,\epsilon,
+after which both fields are mapped through their corresponding empirical distributions. Horizontal permeability is isotropic, Kx=KyK_{x}=K_{y}, with vertical permeability set to Kz=0.1​KxK_{z}=0.1K_{x}. Each of the ten conditional geometries is combined with 100 matched petrophysical realizations, giving 1000 nuisance states per parent training image.
+Physical model and wells.
+The simulation domain spans 1609.344 m by 804.672 m and 243.84 m vertically, with the top of the model at 1000 m depth. Facies code 0 is treated as inactive, while codes 1–3 form the active reservoir. All realizations share the same oil–water fluid model and an oil–water contact at 1058 m. Nine wells are placed on a common 3×33\times 3 lattice; their grid coordinates (I,J)(I,J) are
+West
+Centre
+East
+North
+W01 (11,8)(11,8)
+W02 (27,8)(27,8)
+W03 (43,8)(43,8)
+Middle
+W04 (11,20)(11,20)
+W05 (27,20)(27,20)
+W06 (43,20)(43,20)
+South
+W07 (11,32)(11,32)
+W08 (27,32)(27,32)
+W09 (43,32)(43,32)
+Wells are completed only in active cells above the oil–water contact, with every well retaining at least one active completion in every reservoir realization.
+Physical controls.
+The ten well tests are listed in Table 5. The library includes reciprocal injector–producer pairs along the principal directions, diagonal interference tests, multirate excitation, alternating injection, a balanced multiwell pattern, and a central pulse/recovery test. Unless stated otherwise, the pair tests use an injector rate of 1000 m3/day and a producer controlled at 90 bar BHP.
+Table 5: WCA active well-test library.
+ID
+Test
+Well-test schedule
+E01
+West–east
+W04 injects at 1000 m3/d; W06 produces at 90 bar BHP
+E02
+East–west
+W06 injects at 1000 m3/d; W04 produces at 90 bar BHP
+E03
+North–south
+W02 injects at 1000 m3/d; W08 produces at 90 bar BHP
+E04
+South–north
+W08 injects at 1000 m3/d; W02 produces at 90 bar BHP
+E05
+NW–SE diagonal
+W01 injects at 1000 m3/d; W09 produces at 90 bar BHP
+E06
+SW–NE diagonal
+W07 injects at 1000 m3/d; W03 produces at 90 bar BHP
+E07
+West–east multirate
+W04 injects at 500/1000/500 m3/d over three 20-d stages; W06 remains at 90 bar BHP
+E08
+Alternating interference
+W04 and W06 alternate as 1000 m3/d injectors every 10 d; W05 remains at 90 bar BHP
+E09
+Multiwell interference
+W01/W07 inject 500 m3/d each; W03/W09 produce 500 m3/d each
+E10
+Central pulse/recovery
+W05 injects 1000 m3/d for 20 d against four 250 m3/d corner producers, followed by near-shut-in monitoring
+Observation and simulation ensemble.
+Each well test is represented by actuator BHP, realized actuator rate, and BHP at three remote wells, sampled at days
+1,2,3,5,7,10,14,21,30,40,50,60,1,2,3,5,7,10,14,21,30,40,50,60,
+giving a 60-component response vector. The constrained-sensing analysis truncates these responses at 7, 14, 30, or 60 days and retains pressure from 00–33 remote wells. Observation noise is modeled as independent Gaussian perturbations with standard deviations of 0.25 bar for pressure and 20 m3/day for realized rate.
+The ensemble contains 3000 reservoir realizations, each simulated under the ten well tests, giving 30,000 OPM Flow responses to day 60. Different observation horizons and monitor selections are obtained directly from these complete responses without rerunning the flow simulations.
+G.3 GWAE-Fluvial
+The GWAE-Fluvial benchmark builds on the single- and double-channel scenarios of Shishaev, Demyanov, and Arnold [31] and the associated geological prior information reported in that work. We use the supplied reservoir grid and forward-model assets together with the reported channel dimensions and structural ranges to construct a prospective parametric fluvial ensemble. Geological realizations are generated directly from interpretable channel-geometry and petrophysical parameters.
+Structural prior and geometry.
+The K=2K=2 target distinguishes a reservoir containing one connected spanning channel from one containing two separated spanning channels. In local centerline coordinates, each channel follows
+v⁡(u)=v0+A2​sin⁡(2​π​uλ+ϕ),v(u)=v_{0}+\frac{A}{2}\sin\!\left(\frac{2\pi u}{\lambda}+\phi\right),
+where AA denotes the total peak-to-trough excursion. The geometric parameter ranges are
+Parameter
+M1
+M2
+Width
+300–500 m
+300–500 m per channel
+Thickness
+10–20 m
+10–20 m per channel
+Wavelength
+1000–2000 m
+500–1000 m
+Amplitude
+0–300 m
+500–900 m
+Orientation
+90∘90^{\circ}
+120∘120^{\circ}
+For M2, the two companion channels share wavelength, amplitude, orientation, and phase, while their width, thickness, vertical placement, and lateral position may differ. Their relative placement is constrained so that the two channel bodies remain spatially distinct.
+Each channel body is required to span at least 80% of the longitudinal domain, have an elongation of at least 1.5, form a single connected component, contain no closed hole in plan view, and occupy at least 1% of the reservoir bulk volume. For M2, the two channels must remain separate, with no plan-view overlap and at least 300 m separation between occupied cell centers. The resulting ensemble is therefore the parametric proposal restricted to geometrically feasible one- and two-channel realizations.
+Petrophysics and forward model.
+The supplied reservoir grid contains 16×12×10=192016\times 12\times 10=1920 cells over approximately 2400 m by 1800 m, with depths of about 2416–2478 m. Within active channel cells, porosity and permeability are varied together through a rock-quality variable q∼U⁡[0,1]q\sim U[0,1], mapped to source-derived quantiles of the supplied property fields. The same petrophysical law is used for M1 and M2, while cells outside the channel bodies are inactive.
+The geological realizations are simulated with OPM Flow 2026.04 using the supplied grid, fluid model, and well configuration. Horizontal permeability is isotropic, Ky=KxK_{y}=K_{x}, with Kz=0.15​KxK_{z}=0.15K_{x}. All realizations start from the same equilibrium state. The well layout consists of west and east injector banks separated by three central producers, retaining the supplied well locations and completions.
+Physical experiment library.
+All nine well tests last ten days and are observed at the same five report times. The experiment library is listed in Table 6.
+Table 6: GWAE-Fluvial active well-test library. BHP values are absolute pressure; RATE values are surface-volume rates.
+ID
+Test
+Well-test schedule
+E01
+Symmetric banks
+I1–I6 at 260 bar; P1–P3 at 220 bar for 10 d
+E02
+West bank
+I1–I3 at 260 bar; P1–P3 at 220 bar for 10 d
+E03
+East bank
+I4–I6 at 260 bar; P1–P3 at 220 bar for 10 d
+E04
+Cross I1–I6
+I1 and I6 at 260 bar; P1 and P3 at 220 bar
+E05
+Cross I3–I4
+I3 and I4 at 260 bar; P1 and P3 at 220 bar
+E06
+Midline pair
+I2 and I5 at 260 bar; P2 at 220 bar
+E07
+Staged-rate pair
+I2/I5 at RATE 6 for days 0–5 and RATE 12 for days 5–10, with 270-bar limit; P1–P3 at 220 bar
+E08
+Pulse/falloff
+I2/I5 at 270 bar for 3 d, then shut; P1–P3 remain at 220 bar
+E09
+Alternating banks
+I1–I3 at 260 bar for days 0–5, followed by I4–I6 at 260 bar for days 5–10; P1–P3 at 220 bar
+Response, noise, and statistical roles.
+Each well test produces ten signals at days 1, 3, 5, 7, and 10, giving a 50-component response vector. The recorded quantities are total injection rate for the west and east banks, BHP at I2 and I5, and oil- and water-production rates at P1–P3. Independent Gaussian observation noise with standard deviation 0.5 in the corresponding pressure or rate units is added to each component, and responses are whitened by these fixed standard deviations.
+The ensemble contains 12,000 nuisance states per structural family, each simulated under all nine well tests, giving 216,000 OPM Flow responses. Within each family, 1000 states are used for score training, 1000 for independent experiment ranking, 5000 for selected-only calibration, and 5000 for untouched evaluation. The same newly generated population is used to compare Tail-RAED at δ=0.05\delta=0.05 with nuisance-average RAED at δ=1\delta=1. The two criteria are ranked independently, calibrated on their respective selected experiments, and evaluated on the common untouched population. Results are reported in Sections 7.4 and I.4.
+Appendix H Methane-Oxidation Benchmark Construction and Certification Protocol
+The methane benchmark follows the complete-oxidation model-discrimination study of Pankajakshan et al. [32]. The three competing mechanisms are power law (PL), Langmuir–Hinshelwood (LH), and Mars–van Krevelen (MVK). Within each mechanism, the kinetic parameters are sampled from the multivariate Gaussian approximation defined by the fitted parameter vector and covariance matrix reported in the source study, without truncation.
+Mechanistic models.
+The three candidate rate laws are
+rPL=k1​P​yCH4,r_{\rm PL}=k_{1}P\,y_{\rm CH_{4}},
+rLH=kr​KCH4​(P​yCH4)​KO2​P​yO2(1+KCH4​P​yCH4+KO2​P​yO2)2,r_{\rm LH}=\frac{k_{r}K_{\rm CH_{4}}(Py_{\rm CH_{4}})\sqrt{K_{\rm O_{2}}Py_{\rm O_{2}}}}{\left(1+K_{\rm CH_{4}}Py_{\rm CH_{4}}+\sqrt{K_{\rm O_{2}}Py_{\rm O_{2}}}\right)^{2}},
+and
+rMVK=k1​k2​P2​yCH4​yO2k1​P​yO2+2​k2​P​yCH4+(k1​k2/k3)​P2​yCH4​yO2.r_{\rm MVK}=\frac{k_{1}k_{2}P^{2}y_{\rm CH_{4}}y_{\rm O_{2}}}{k_{1}Py_{\rm O_{2}}+2k_{2}Py_{\rm CH_{4}}+(k_{1}k_{2}/k_{3})P^{2}y_{\rm CH_{4}}y_{\rm O_{2}}}.
+The forward model is a steady isothermal plug-flow reactor for
+CH4+2​O2→CO2+2​H2​O\mathrm{CH_{4}}+2\mathrm{O_{2}}\rightarrow\mathrm{CO_{2}}+2\mathrm{H_{2}O},
+using the pressure-drop, Arrhenius, and adsorption relations of the source model.
+Design and observation model.
+The candidate design space is a full 343^{4} factorial over four reactor operating variables:
+Variable
+Levels
+Temperature
+250, 300, 350∘C
+Normal feed flow
+20, 25, 30 Nml/min
+O2/CH4\mathrm{O_{2}}/\mathrm{CH_{4}} ratio
+2, 3, 4
+Inlet methane fraction
+0.005, 0.015, 0.025
+This gives 81 candidate reactor conditions. The observation is the outlet mole-fraction vector
+(yCH4,yO2,yCO2)(y_{\rm CH_{4}},y_{\rm O_{2}},y_{\rm CO_{2}})
+with independent Gaussian noise,
+Σy=diag⁡(0.000432,0.002022,0.000512).\Sigma_{y}=\operatorname{diag}(0.00043^{2},0.00202^{2},0.00051^{2}).
+Statistical roles and certification.
+For each structural family, 128 nuisance states are used for score training, 256 for independent experiment selection, 10,000 for selected-only calibration, and 5000 for untouched evaluation. The corresponding numbers of observation-noise draws per nuisance state are 3, 64, 64, and 64. Nuisance states and noise draws are independent across the four statistical roles.
+For 0<δ<10<\delta<1, the selection sample is also used to fix the auxiliary map η⁡(λ)\eta(\lambda). For each threshold, η\eta is chosen from the observed conditional-loss values together with 0 and 1 to minimize
+η+1δ​mean⁡(L−η)+.\eta+\frac{1}{\delta}\operatorname{mean}(L-\eta)_{+}.
+Final calibration then uses the transformed loss
+H=δ​η+(L^−η)+H=\delta\eta+(\widehat{L}-\eta)_{+}
+together with the Bernoulli–KL upper bound in (64). The familywise failure probability is set to
+γk=0.053,\gamma_{k}=\frac{0.05}{3},
+giving 95% joint confidence across PL, LH, and MVK at each fixed positive δ\delta.
+The declared operating points are
+δ∈{0,0.01,0.02,0.05,0.10,0.20,1}.\delta\in\{0,0.01,0.02,0.05,0.10,0.20,1\}.
+The δ=0\delta=0 analysis is empirical. The guarantees at positive δ\delta apply separately at each fixed operating point rather than simultaneously across the full δ\delta grid.
+Appendix I Additional Empirical Results
+I.1 Watt ontology summary
+The Watt ontology analysis was evaluated at
+α=0.05\alpha=0.05 over the full declared grid
+δ∈{0,0.01,0.02,0.05,0.10,0.20,1}.\delta\in\{0,0.01,0.02,0.05,0.10,0.20,1\}.
+The same INJ5 pulse/falloff experiment is selected for all four structural
+ontologies at every value of δ\delta. The tables below report the held-out
+mean candidate-set size JJ, normalized resolution
+R=(K−J)/(K−1)R=(K-J)/(K-1), and worst-family held-out exclusion risk
+ρ^δ,max\widehat{\rho}_{\delta,\max}.
+For δ=0\delta=0, ρ^δ,max\widehat{\rho}_{\delta,\max} is the largest conditional
+false-exclusion rate over the held-out nuisance states. For
+0<δ<10<\delta<1, it is the largest familywise empirical upper-δ\delta Tail
+false-exclusion risk, and for δ=1\delta=1 it is the largest familywise
+nuisance-average false-exclusion rate. These are held-out empirical summaries
+of the nontrivial learned rules.
+Table 7: Held-out Watt ontology results at (α,δ)=(0.05,0)(\alpha,\delta)=(0.05,0).
+Structural target
+KK
+JJ
+RR
+ρ^0,max\widehat{\rho}_{0,\max}
+FM
+3
+1.80783
+0.59609
+0.28125
+FM×\timesPROP
+6
+1.75653
+0.84869
+0.16797
+FM×\timesRP
+6
+1.84614
+0.83077
+0.09766
+FM×\timesPROP×\timesRP
+12
+1.82743
+0.92478
+0.09375
+Table 8: Held-out Watt ontology results at (α,δ)=(0.05,0.01)(\alpha,\delta)=(0.05,0.01).
+Structural target
+KK
+JJ
+RR
+ρ^0.01,max\widehat{\rho}_{0.01,\max}
+FM
+3
+1.80783
+0.59609
+0.28125
+FM×\timesPROP
+6
+1.75653
+0.84869
+0.16797
+FM×\timesRP
+6
+1.84614
+0.83077
+0.09766
+FM×\timesPROP×\timesRP
+12
+1.82743
+0.92478
+0.09375
+Table 9: Held-out Watt ontology results at (α,δ)=(0.05,0.02)(\alpha,\delta)=(0.05,0.02).
+Structural target
+KK
+JJ
+RR
+ρ^0.02,max\widehat{\rho}_{0.02,\max}
+FM
+3
+1.80783
+0.59609
+0.28125
+FM×\timesPROP
+6
+1.75653
+0.84869
+0.16797
+FM×\timesRP
+6
+1.84614
+0.83077
+0.09766
+FM×\timesPROP×\timesRP
+12
+1.82743
+0.92478
+0.09375
+Table 10: Held-out Watt ontology results at (α,δ)=(0.05,0.05)(\alpha,\delta)=(0.05,0.05).
+Structural target
+KK
+JJ
+RR
+ρ^0.05,max\widehat{\rho}_{0.05,\max}
+FM
+3
+1.76025
+0.61987
+0.17969
+FM×\timesPROP
+6
+1.75653
+0.84869
+0.16797
+FM×\timesRP
+6
+1.84614
+0.83077
+0.09766
+FM×\timesPROP×\timesRP
+12
+1.82743
+0.92478
+0.09375
+Table 11: Held-out Watt ontology results at (α,δ)=(0.05,0.10)(\alpha,\delta)=(0.05,0.10).
+Structural target
+KK
+JJ
+RR
+ρ^0.10,max\widehat{\rho}_{0.10,\max}
+FM
+3
+1.73477
+0.63262
+0.11230
+FM×\timesPROP
+6
+1.72793
+0.85441
+0.13672
+FM×\timesRP
+6
+1.82606
+0.83479
+0.08789
+FM×\timesPROP×\timesRP
+12
+1.82743
+0.92478
+0.09375
+Table 12: Held-out Watt ontology results at (α,δ)=(0.05,0.20)(\alpha,\delta)=(0.05,0.20).
+Structural target
+KK
+JJ
+RR
+ρ^0.20,max\widehat{\rho}_{0.20,\max}
+FM
+3
+1.68870
+0.65565
+0.08032
+FM×\timesPROP
+6
+1.67109
+0.86578
+0.09473
+FM×\timesRP
+6
+1.77010
+0.84598
+0.07568
+FM×\timesPROP×\timesRP
+12
+1.77288
+0.92974
+0.07520
+Table 13: Held-out Watt ontology results at (α,δ)=(0.05,1)(\alpha,\delta)=(0.05,1).
+Structural target
+KK
+JJ
+RR
+ρ^1,max\widehat{\rho}_{1,\max}
+FM
+3
+1.42052
+0.78974
+0.05586
+FM×\timesPROP
+6
+1.43800
+0.91240
+0.06709
+FM×\timesRP
+6
+1.52469
+0.89506
+0.05723
+FM×\timesPROP×\timesRP
+12
+1.59907
+0.94554
+0.06055
+For every positive δ\delta, the available Watt calibration sample was
+insufficient to certify a nontrivial population-valid rule, so these tables
+describe the held-out empirical frontier rather than the final safe-endpoint
+deployment. The δ=0\delta=0 results are empirical pointwise diagnostics.
+Across the full empirical frontier, INJ5 pulse/falloff remains the selected
+experiment and the same ontology ordering in normalized resolution is retained:
+FM×\timesPROP×\timesRP has the highest RR, followed by FM×\timesPROP,
+FM×\timesRP, and FM. Tightening the nuisance-validity requirement reduces
+or leaves unchanged the empirical resolution, but the finer ontologies retain
+high normalized resolution throughout the declared δ\delta range.
+I.2 Complete restricted-observation results at δ=0.05\delta=0.05
+Tables 14 and 15 report all 16 observation-horizon and remote-monitor combinations used in the constrained-sensing studies at α=δ=0.05\alpha=\delta=0.05. For each sensing level, |𝒪EIGMC||\mathcal{O}_{\rm EIG}^{\rm MC}| denotes the size of the Monte Carlo uncertainty set around the model-index-EIG optimum. A clean disagreement is recorded when the RAED-selected experiment lies outside this set. The reported EIG result corresponds to the deterministic representative defined in Appendix F.
+For each sensing level, the RAED- and EIG-selected experiments are evaluated using the same score-fitting, threshold-calibration, and independent held-out evaluation procedure. We report
+Δ​J=JEIG−JRAED,\Delta J=J_{\rm EIG}-J_{\rm RAED},
+so that positive values indicate a smaller held-out candidate set for the RAED-selected experiment. We also report the worst-family held-out upper-5%5\%-Tail false-exclusion risks, denoted ρ^R\widehat{\rho}_{\rm R} and ρ^E\widehat{\rho}_{\rm E} for the RAED- and EIG-selected experiments, respectively. These are empirical held-out risks rather than population-validity certificates.
+Table 14: Complete Watt restricted-observation results at α=δ=0.05\alpha=\delta=0.05. Positive Δ​J\Delta J indicates a smaller held-out candidate set for the RAED-selected experiment. The final two columns report the worst-family held-out upper-5%5\%-Tail false-exclusion risk for the RAED- and EIG-selected experiments.
+TT
+Remote wells
+|𝒪EIGMC||\mathcal{O}_{\rm EIG}^{\rm MC}|
+Clean
+JRAEDJ_{\rm RAED}
+JEIGJ_{\rm EIG}
+Δ​J\Delta J
+ρ^R\widehat{\rho}_{\rm R}
+ρ^E\widehat{\rho}_{\rm E}
+7
+0
+1
+–
+2.34551
+2.34551
+0.00000
+0.05957
+0.05957
+7
+1
+2
+–
+2.26751
+2.24946
+-0.01805
+0.05176
+0.04785
+7
+2
+1
+–
+2.22135
+2.22135
+0.00000
+0.04590
+0.04590
+7
+3
+2
+–
+2.26528
+2.28561
+0.02033
+0.05371
+0.06055
+14
+0
+1
+–
+2.35125
+2.35125
+0.00000
+0.05957
+0.05957
+14
+1
+1
+–
+2.16966
+2.16966
+0.00000
+0.04395
+0.04395
+14
+2
+3
+–
+2.02651
+2.02651
+0.00000
+0.05176
+0.05176
+14
+3
+2
+–
+2.13758
+2.13758
+0.00000
+0.05469
+0.05469
+30
+0
+1
+yes
+2.31328
+2.36720
+0.05392
+0.05664
+0.06445
+30
+1
+1
+yes
+2.02734
+2.04469
+0.01735
+0.06934
+0.08105
+30
+2
+2
+–
+1.90103
+1.90103
+0.00000
+0.05762
+0.05762
+30
+3
+1
+–
+1.99173
+1.99173
+0.00000
+0.08301
+0.08301
+90
+0
+2
+yes
+2.21790
+2.26066
+0.04276
+0.17383
+0.08398
+90
+1
+3
+–
+1.78530
+1.97607
+0.19077
+0.09180
+0.12402
+90
+2
+1
+–
+1.69167
+1.69167
+0.00000
+0.15820
+0.15820
+90
+3
+1
+–
+1.75649
+1.75649
+0.00000
+0.08594
+0.08594
+Table 15: Complete WCA restricted-observation results at α=δ=0.05\alpha=\delta=0.05. Positive Δ​J\Delta J indicates a smaller held-out candidate set for the RAED-selected experiment. The final two columns report the worst-family held-out upper-5%5\%-Tail false-exclusion risk for the RAED- and EIG-selected experiments.
+TT
+Remote wells
+|𝒪EIGMC||\mathcal{O}_{\rm EIG}^{\rm MC}|
+Clean
+JRAEDJ_{\rm RAED}
+JEIGJ_{\rm EIG}
+Δ​J\Delta J
+ρ^R\widehat{\rho}_{\rm R}
+ρ^E\widehat{\rho}_{\rm E}
+7
+0
+2
+yes
+2.81695
+2.81291
+-0.00405
+0.28770
+0.16934
+7
+1
+4
+yes
+2.56748
+2.88200
+0.31452
+0.20586
+0.04941
+7
+2
+5
+yes
+2.37828
+2.76330
+0.38503
+0.36484
+0.11133
+7
+3
+3
+yes
+2.36770
+2.47161
+0.10391
+0.28301
+0.21719
+14
+0
+5
+yes
+2.79314
+2.67491
+-0.11823
+0.20176
+0.23594
+14
+1
+16
+yes
+2.60173
+2.74852
+0.14680
+0.21016
+0.20898
+14
+2
+16
+yes
+2.30893
+2.60945
+0.30052
+0.48906
+0.21758
+14
+3
+6
+–
+2.34177
+2.61700
+0.27522
+0.25176
+0.16523
+30
+0
+5
+–
+2.77794
+2.74348
+-0.03446
+0.36934
+0.54375
+30
+1
+19
+–
+2.57873
+2.59372
+0.01499
+0.38984
+0.14863
+30
+2
+21
+–
+2.52367
+2.59551
+0.07184
+0.24688
+0.16719
+30
+3
+9
+–
+2.26447
+2.56853
+0.30406
+0.31504
+0.16367
+60
+0
+7
+–
+2.77431
+2.83377
+0.05946
+0.53281
+0.13105
+60
+1
+26
+–
+2.54613
+2.71471
+0.16858
+0.43008
+0.11172
+60
+2
+26
+–
+2.35621
+2.55004
+0.19383
+0.17773
+0.24863
+60
+3
+9
+–
+2.32793
+2.34423
+0.01630
+0.20723
+0.27480
+The held-out Tail risks show that differences in candidate-set size should not be interpreted independently of false exclusion. In Watt, the two clean disagreements at (T,B)=(30,0)(T,B)=(30,0) and (30,1)(30,1) combine smaller candidate sets under RAED with lower worst-family held-out Tail risk, whereas the clean disagreement at (90,0)(90,0) combines a smaller candidate set with higher Tail risk. WCA exhibits a wider range of resolution–risk tradeoffs: several RAED-selected experiments produce substantially smaller candidate sets but also higher held-out Tail exclusion than the corresponding EIG-selected experiment. The restricted-sensing comparison therefore reports both quantities rather than interpreting Δ​J\Delta J alone as a measure of overall superiority.
+None of the restricted-sensing rules in these tables carries a finite-sample population-validity certificate. The thresholds are independently empirically calibrated and the reported risks are measured on the held-out evaluation population.
+Table 16: Mean held-out candidate-set size across the 16 restricted-sensing cells at α=δ=0.05\alpha=\delta=0.05. Each comparator entry evaluates the deterministic representative of each criterion under the common learned-RAED downstream procedure.
+Selection criterion
+Watt mean JJ
+WCA mean JJ
+RAED
+2.09184
+2.52034
+Model-index EIG
+2.11103
+2.65773
+Full-latent EIG
+2.32000
+2.70372
+Bayes forced classification
+2.10709
+2.69110
+Expected elimination
+2.13803
+2.68784
+Minimum ordered-pair discrimination
+2.29097
+2.58491
+We do not report paired 95% confidence intervals for Δ​J\Delta J because the evaluation outputs contain aggregate candidate-set means rather than the nuisance-state-level paired contributions required for such an interval. Recovering those pairs would require rerunning the relevant model-fitting and evaluation procedure. Repeated observation-noise draws within a nuisance state are not independent nuisance samples and therefore cannot substitute for the missing outer-state pairs.
+I.3 Dependence of the selected restricted design on δ\delta
+Changing the Tail level δ\delta can affect not only the calibrated candidate-set rule but also the physical experiment selected by RAED. Across the seven declared operating points
+δ∈{0,0.01,0.02,0.05,0.10,0.20,1}\delta\in\{0,0.01,0.02,0.05,0.10,0.20,1\},
+the selected design changes in three of the sixteen Watt sensing levels and ten of the sixteen WCA sensing levels. The affected horizon–monitor combinations are listed below.
+Benchmark
+Sensing levels with more than one selected design across δ\delta
+Watt
+(7,1)(7,1), (7,3)(7,3), (90,0)(90,0)
+WCA
+(7,1)(7,1), (7,2)(7,2), (7,3)(7,3),
+(14,1)(14,1), (14,2)(14,2), (14,3)(14,3),
+(30,1)(30,1), (30,2)(30,2),
+(60,1)(60,1), (60,2)(60,2)
+Each pair gives the observation horizon in days and the number of retained remote pressure wells. The stronger dependence in WCA indicates that the preferred sensing strategy is more sensitive there to the amount of nuisance-tail protection imposed by the design criterion. A change in selected design may reflect a different physical well test, a different monitor subset, or both.
+I.4 GWAE-Fluvial Tail-RAED comparison
+The GWAE-Fluvial study compares Tail-RAED at δ=0.05\delta=0.05 with nuisance-average RAED at δ=1\delta=1 on the same independently generated geological population. Both criteria use the same score-training and experiment-ranking populations. Each selected experiment is then calibrated separately and evaluated on the same independent evaluation population.
+Independent experiment ranking.
+Table 17 reports the ranking of all nine well tests. The displayed JJ values are computed on the independent ranking population before final selected-only calibration and therefore differ from the deployed evaluation values reported later in Table 18. Tail-RAED selects E07, the staged-rate pair, by a narrow margin over E01, while nuisance-average RAED selects E01, the symmetric-bank test.
+Table 17: GWAE-Fluvial experiment ranking for Tail-RAED at δ=0.05\delta=0.05 and nuisance-average RAED at δ=1\delta=1.
+ID
+Test
+Tail rank
+Tail JJ
+Average rank
+Average JJ
+E01
+Symmetric banks
+2
+1.557934
+1
+1.019932
+E02
+West bank
+5
+1.631516
+6
+1.187480
+E03
+East bank
+3
+1.612088
+5
+1.152689
+E04
+Cross I1–I6
+8
+1.803926
+7
+1.242840
+E05
+Cross I3–I4
+7
+1.751137
+8
+1.255127
+E06
+Midline pair
+9
+1.969910
+9
+1.381551
+E07
+Staged-rate pair
+1
+1.557348
+4
+1.048691
+E08
+Pulse/falloff
+6
+1.634051
+3
+1.047578
+E09
+Alternating banks
+4
+1.625998
+2
+1.025992
+Selected-experiment calibration.
+Calibration uses 5000 independent nuisance states per structural family for the experiment selected by each criterion. With familywise failure probability γk=0.025\gamma_{k}=0.025, the resulting fixed-operating-point statement has 95% joint confidence across M1 and M2. For both selected experiments, calibration produces a nontrivial candidate-set rule:
+Method
+Selected experiment
+M1 UCB
+M2 UCB
+Tail-RAED, δ=0.05\delta=0.05
+E07 staged-rate pair
+0.048330
+0.049103
+Nuisance-average, δ=1\delta=1
+E01 symmetric banks
+0.025999
+0.049341
+For Tail-RAED, the corresponding empirical calibration Tail losses are 0.0159220.015922 for M1 and 0.0163910.016391 for M2; the certification statement uses the upper confidence bounds reported above.
+Common evaluation population.
+Table 18 reports the principal diagnostics on the common 5000-state-per-family evaluation population. Conditional false-exclusion risk is estimated separately for each nuisance state using repeated observation-noise draws, and the worst-5% statistic averages the 250 highest-risk states within each family.
+Table 18: GWAE-Fluvial evaluation results on the common untouched nuisance population. Worst-5% is the empirical mean conditional false-exclusion risk among the 5% highest-risk nuisance states in each family.
+Family
+Method
+Mean risk
+Worst-5%
+P99
+Correct singleton
+Ambiguous
+M1
+Tail
+0.000689
+0.013781
+0.000000
+0.093231
+0.906080
+M1
+Average
+0.022152
+0.433758
+0.994160
+0.907827
+0.070021
+M2
+Tail
+0.000149
+0.002977
+0.000000
+0.329347
+0.670504
+M2
+Average
+0.046046
+0.875844
+1.000000
+0.929433
+0.024521
+With equal weighting of the two structural families, Tail-RAED gives
+J=1.788292J=1.788292 and R=0.211708R=0.211708, compared with J=1.047271J=1.047271 and
+R=0.952729R=0.952729 for nuisance-average RAED. Because K=2K=2, the corresponding
+overall ambiguity frequencies are 0.7882920.788292 and 0.0472710.047271. The pooled
+empirical false-exclusion risks are 0.0004190.000419 and 0.0340990.034099, respectively.
+Tail protection therefore increases expected candidate-set size by
+Δ​J=0.741021\Delta J=0.741021 while sharply reducing false exclusion in the adverse
+geological tail.
+Hard-region behavior.
+As a separate statewise diagnostic, we first call a nuisance state difficult for a rule when its conditional false-exclusion risk satisfies rk​(θ)>0.05r_{k}(\theta)>0.05. Under this definition, the two rules divide the evaluation population as follows:
+Family
+Easy for both
+Average hard, Tail protected
+Tail hard, Average protected
+Hard for both
+M1
+4825
+170
+0
+5
+M2
+4686
+310
+0
+4
+Thus almost every state that is difficult for Tail-RAED is also difficult for the nuisance-average rule, whereas a substantially larger set of states is difficult only for the nuisance-average rule.
+Within the nuisance-average rule’s own worst 5% of geological states, the difference is especially pronounced. For M1, Tail-RAED returns ambiguity on 98.62%98.62\% of observation draws and falsely excludes the true family on 1.38%1.38\%, compared with 39.28%39.28\% ambiguity and 43.38%43.38\% false exclusion for nuisance-average RAED. For M2, Tail-RAED returns ambiguity on 99.71%99.71\% of draws and falsely excludes on 0.29%0.29\%, compared with 11.75%11.75\% ambiguity and 87.58%87.58\% false exclusion for nuisance-average RAED. This is the behavior summarized in Figure 5.
+I.5 Methane frontier
+The same reactor condition, MOX048, is selected at every declared value of δ\delta. The δ=0\delta=0 point is an empirical diagnostic only. For each fixed positive δ\delta, calibration gives a familywise positive-tail population guarantee with 95% joint confidence across PL, LH, and MVK. These guarantees apply separately at each operating point and are not simultaneous across the full δ\delta grid.
+δ\delta
+JJ
+RR
+Worst-family held-out ρ^δ\widehat{\rho}_{\delta}
+0.00
+1.86014
+0.56993
+0.06250
+0.01
+2.20015
+0.39993
+0.00281
+0.02
+1.90511
+0.54744
+0.01375
+0.05
+1.75046
+0.62477
+0.02475
+0.10
+1.72207
+0.63897
+0.02872
+0.20
+1.68874
+0.65563
+0.03405
+1.00
+1.56981
+0.71510
+0.04343
+Here R=(K−J)/(K−1)R=(K-J)/(K-1) is the normalized resolution of the resulting learned rule. At the reference operating point δ=0.05\delta=0.05, the familywise calibration upper bounds are 0.0476490.047649, 0.0379820.037982, and 0.0477380.047738 for PL, LH, and MVK, respectively. Requiring the finite-sample certificate increases the held-out mean candidate-set size by 0.0617160.061716 relative to the corresponding empirically calibrated rule.
+References
+[1]
+X. Huan, J. Jagalur, and Y. Marzouk (2024)
+Optimal experimental design: formulations and computations.
+Acta Numerica 33, pp. 715–840.
+External Links: Document
+Cited by: §1,
+§2.
+[2]
+T. Rainforth, A. Foster, D. R. Ivanova, and F. Bickford Smith (2024)
+Modern bayesian experimental design.
+Statistical Science 39 (1), pp. 100–114.
+External Links: Document
+Cited by: §1,
+§2.
+[3]
+A. C. Atkinson and V. V. Fedorov (1975)
+The design of experiments for discriminating between two rival models.
+Biometrika 62 (1), pp. 57–70.
+External Links: Document
+Cited by: §2.
+[4]
+A. C. Atkinson and V. V. Fedorov (1975)
+Optimal design: experiments for discriminating between several models.
+Biometrika 62 (2), pp. 289–303.
+External Links: Document
+Cited by: §2.
+[5]
+H. Dette and S. Titoff (2009)
+Optimal discrimination designs.
+The Annals of Statistics 37 (4), pp. 2056–2082.
+External Links: Document
+Cited by: §2.
+[6]
+H. Dette, V. B. Melas, and P. Shpilev (2013)
+Robust T-optimal discriminating designs.
+The Annals of Statistics 41 (4), pp. 1693–1715.
+External Links: Document
+Cited by: §2.
+[7]
+M. Hainy, D. J. Price, O. Restif, and C. Drovandi (2022)
+Optimal bayesian design for model discrimination via classification.
+Statistics and Computing 32 (2), pp. 25.
+External Links: Document
+Cited by: §2.
+[8]
+A. L. Alberton, M. Schwaab, M. W. N. Lobão, and J. C. Pinto (2012)
+Design of experiments for discrimination of rival models based on the expected number of eliminated models.
+Chemical Engineering Science 75, pp. 120–131.
+External Links: Document
+Cited by: §2.
+[9]
+M. Sadinle, J. Lei, and L. Wasserman (2019)
+Least ambiguous set-valued classifiers with bounded error levels.
+Journal of the American Statistical Association 114 (525), pp. 223–234.
+External Links: Document
+Cited by: §2,
+§3.5.
+[10]
+C. M. Schafer and P. B. Stark (2009)
+Constructing confidence regions of optimal expected size.
+Journal of the American Statistical Association 104 (487), pp. 1080–1089.
+External Links: Document
+Cited by: §2.
+[11]
+C. Denis and M. Hebiri (2017)
+Confidence sets with expected sizes for multiclass classification.
+Journal of Machine Learning Research 18 (102), pp. 1–28.
+Cited by: §2.
+[12]
+Y. Shi, S. Ghosh, T. Belkhouja, J. R. Doppa, and Y. Yan (2024)
+Conformal prediction for class-wise coverage via augmented label rank calibration.
+In Advances in Neural Information Processing Systems,
+Vol. 37.
+Cited by: §2.
+[13]
+J. Go and T. Isaac (2022)
+Robust expected information gain for optimal bayesian experimental design using ambiguity sets.
+In Proceedings of the Thirty-Eighth Conference on Uncertainty in Artificial Intelligence,
+Proceedings of Machine Learning Research, Vol. 180, pp. 728–737.
+Cited by: §2.
+[14]
+H. Abdulsamad, S. Iqbal, C. A. Naesseth, T. Matsubara, and A. Corenflos (2026)
+Maximin robust bayesian experimental design.
+arXiv preprint arXiv:2603.14094.
+Cited by: §2.
+[15]
+D. Blackwell (1953)
+Equivalent comparisons of experiments.
+The Annals of Mathematical Statistics 24 (2), pp. 265–272.
+External Links: Document
+Cited by: §2.
+[16]
+L. Le Cam (1964)
+Sufficiency and approximate sufficiency.
+The Annals of Mathematical Statistics 35 (4), pp. 1419–1455.
+External Links: Document
+Cited by: §2.
+[17]
+E. Torgersen (1991)
+Comparison of statistical experiments.
+Cambridge University Press, Cambridge.
+External Links: Document
+Cited by: §2.
+[18]
+D. Blackwell, L. Breiman, and A. J. Thomasian (1959)
+The capacity of a class of channels.
+The Annals of Mathematical Statistics 30 (4), pp. 1229–1241.
+External Links: Document
+Cited by: §2.
+[19]
+I. Csiszár and P. Narayan (1988)
+The capacity of the arbitrarily varying channel revisited: positivity, constraints.
+IEEE Transactions on Information Theory 34 (2), pp. 181–193.
+External Links: Document
+Cited by: §2.
+[20]
+C. E. Shannon (1956)
+The zero error capacity of a noisy channel.
+IRE Transactions on Information Theory 2 (3), pp. 8–19.
+External Links: Document
+Cited by: §2.
+[21]
+P. Elias (1957)
+List decoding for noisy channels.
+In IRE WESCON Convention Record,
+Vol. 2, pp. 94–104.
+Cited by: §2.
+[22]
+S. Bates, A. N. Angelopoulos, L. Lei, J. Malik, and M. I. Jordan (2021)
+Distribution-free, risk-controlling prediction sets.
+Journal of the ACM 68 (6), pp. 1–34.
+External Links: Document
+Cited by: §2.
+[23]
+A. N. Angelopoulos, S. Bates, E. J. Candès, M. I. Jordan, and L. Lei (2025)
+Learn then test: calibrating predictive algorithms to achieve risk control.
+The Annals of Applied Statistics 19 (2), pp. 1641–1662.
+External Links: Document
+Cited by: §2.
+[24]
+J. Huang, A. Farzaneh, and O. Simeone (2026)
+Optimized certainty equivalent risk-controlling prediction sets.
+arXiv preprint arXiv:2602.13660.
+Cited by: §2.
+[25]
+R. T. Rockafellar and S. Uryasev (2000)
+Optimization of conditional value-at-risk.
+Journal of Risk 2 (3), pp. 21–42.
+External Links: Document
+Cited by: §2.
+[26]
+D. Arnold, V. Demyanov, D. Tatum, M. A. Christie, T. S. Rojas, S. Geiger, and P. W. M. Corbett (2013)
+Hierarchical benchmark case study for history matching, uncertainty quantification and reservoir characterisation.
+Computers & Geosciences 50, pp. 4–15.
+External Links: Document
+Cited by: §G.1,
+§6.1.
+[27]
+D. Bourdet (2002)
+Well test analysis: the use of advanced interpretation models.
+Handbook of Petroleum Exploration and Production, Vol. 3, Elsevier.
+External Links: ISBN 9780444509680
+Cited by: §6.1.
+[28]
+P. A. Fokker, E. Salina Borello, F. Verga, and D. Viberti (2018)
+Harmonic pulse testing for well performance monitoring.
+Journal of Petroleum Science and Engineering 162, pp. 446–459.
+External Links: Document
+Cited by: §6.1.
+[29]
+E. Salina Borello, P. A. Fokker, D. Viberti, F. Verga, H. Hofmann, P. Meier, K. Min, K. Yoon, and G. Zimmermann (2019)
+Harmonic pulse testing for well monitoring: application to a fractured geothermal reservoir.
+Water Resources Research 55 (6), pp. 4727–4744.
+External Links: Document
+Cited by: §6.1.
+[30]
+H. Park, C. Scheidt, D. Fenwick, A. Boucher, and J. Caers (2013)
+History matching and uncertainty quantification of facies models with multiple geological interpretations.
+Computational Geosciences 17 (4), pp. 609–621.
+External Links: Document
+Cited by: §G.2,
+§6.2.
+[31]
+G. Shishaev, V. Demyanov, and D. Arnold (2026)
+History matching under uncertainty of geological scenarios with implicit geological realism control with generative deep learning and graph convolutions.
+Computers & Geosciences 214, pp. 106186.
+External Links: Document
+Cited by: §G.3,
+§6.3.
+[32]
+A. Pankajakshan, S. G. Bawa, A. Gavriilidis, and F. Galvanin (2023)
+Autonomous kinetic model identification using optimal experimental design and retrospective data analysis: methane complete oxidation as a case study.
+Reaction Chemistry & Engineering 8 (12), pp. 3000–3017.
+External Links: Document
+Cited by: Appendix H,
+§6.4.
+[33]
+M. Sion (1958)
+On general minimax theorems.
+Pacific Journal of Mathematics 8 (1), pp. 171–176.
+External Links: Document
+Cited by: §E.1.
+[34]
+B. Rudloff and I. Karatzas (2010)
+Testing composite hypotheses via convex duality.
+Bernoulli 16 (4), pp. 1224–1239.
+External Links: Document
+Cited by: §E.1.
+Experimental support, please
+view the build logs
+for errors. Generated by
+L
+A
+T
+E
+xml
+.
+Instructions for reporting errors
+We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+methods listed below:
+Click the "Report Issue" (
+) button, located in the page header.
+Tip: You can select the relevant text first, to include it in your report.
+Our team has already identified the following issues. We appreciate your time reviewing and reporting rendering errors we
+may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+all.
+Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a list of packages that need conversion, and welcome developer contributions.
+We gratefully acknowledge support from
+our major funders,
+member institutions, ,
+and all contributors.
+About
+·
+Help
+·
+Contact
+·
+Subscribe
+·
+Copyright
+·
+Privacy
+·
+Accessibility
+·
+Operational Status (opens in new tab)
+Major funding support from

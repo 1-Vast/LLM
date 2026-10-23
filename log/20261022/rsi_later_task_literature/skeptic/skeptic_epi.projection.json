@@ -1,0 +1,2255 @@
+{
+  "source_sha256": "41258734fd3d01a2d6d584cca5c3a6b1fbc4c5e9ea8888a8daea7b7b339c0b9a",
+  "metadata": [
+    {
+      "http-equiv": "content-type",
+      "content": "text/html; charset=UTF-8"
+    },
+    {
+      "name": "viewport",
+      "content": "width=device-width, initial-scale=1, shrink-to-fit=no"
+    }
+  ],
+  "paragraphs": [
+    {
+      "tag": "title",
+      "id": null,
+      "text": "Épi: Towards a Persistent, Self-Improving Agentfor Autonomous Research"
+    },
+    {
+      "tag": "p",
+      "id": "selectedTextModalDescription",
+      "text": "Content selection saved. Describe the issue below:"
+    },
+    {
+      "tag": "h1",
+      "id": null,
+      "text": "Épi: Towards a Persistent, Self-Improving Agent for Autonomous Research"
+    },
+    {
+      "tag": "p",
+      "id": "abstract1.1",
+      "text": "We present Épi, an autonomous research agent that sustains investigations across model sessions and evolves its methods through accumulated experience. Épi combines persistent research history, hierarchical memory, branching and independent review to maintain research continuity, learn from experiments, and explore and revisit alternative approaches. Its experiments run across session boundaries, and a fixed verifier evaluates their outputs. Épi produced 120 record-setting results, comprising 20 numerical bound records across 12 families and 100 construction records across eight families. These include an approximately 84-fold narrower interval for the n n -queens constant and a more than 3.6-million-fold narrower rigorous interval for the quartic Feigenbaum attractor dimension. Exact dual certificates establish that the Cohn–Elkies linear-programming bound cannot be sharp in dimensions 10 and 11. Beyond numerical improvements, Épi gives a computer-assisted proof of Tuza’s conjecture for split graphs with an eight-vertex clique part and at most three triangle-active neighborhood types, with arbitrary multiplicities. We extend this research process to algorithmic coding with Épi-turbo, a lightweight configuration that develops executable solvers for tasks including vehicle routing, scheduling and production planning. On 30 FrontierOR tasks, Épi-turbo achieves a 5.4% higher total benchmark score than Codex at 64% of its model cost, using the same underlying model and reasoning effort. Épi is designed to support human understanding by connecting computational results to explicit methods and mathematical arguments that researchers can examine and build upon."
+    },
+    {
+      "tag": "p",
+      "id": "abstract1.2",
+      "text": "Blog Results on GitHub"
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "1 Introduction"
+    },
+    {
+      "tag": "p",
+      "id": "S1.p1.1",
+      "text": "Autonomous research agents must conduct experiments, interpret results and revise their methods over many interactions. FunSearch and AlphaEvolve demonstrate how agents can combine code generation with executable evaluation to discover new programs and constructions ( Romera-Paredes et al., 2024 ; Novikov et al., 2025 ) . The AI Scientist-v2 extends automation to an experimental workflow ( Yamada et al., 2025 ) . When an investigation requires more work than one model session can support, however, the agent must manage three additional challenges."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "First, maintaining research continuity"
+    },
+    {
+      "tag": "p",
+      "id": "S1.SS0.SSS0.Px1.p1.1",
+      "text": "Experiments and research decisions span multiple model sessions. To continue an investigation, the agent needs access to running jobs, code, intermediate results and reasons for earlier decisions. Kosmos maintains a shared research state, InternAgent-1.5 organizes long-horizon memory, and ScienceFlow archives recoverable execution states ( Mitchener et al., 2025 ; Feng et al., 2026 ; Zhao et al., 2026 ) . These mechanisms preserve information across steps. As the history grows, the agent must also select what a bounded model context needs: the current experimental state, relevant lessons and reasons an earlier approach failed. This need motivates hierarchical memory that separates immediate context from reusable experience."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Second, learning from experimental experience"
+    },
+    {
+      "tag": "p",
+      "id": "S1.SS0.SSS0.Px2.p1.1",
+      "text": "An agent needs to turn experimental observations into knowledge that guides subsequent decisions. This requires identifying which choices produced a result, under what conditions the method applies and which evidence supports the lesson. The agent must retain this knowledge and retrieve it for relevant tasks. MemoHarness addresses experience reuse by building a memory bank during training and retrieving execution diagnoses and reusable patterns to adapt the harness at test time ( Huang et al., 2026 ) . In an ongoing research investigation, the agent must also update its memory as new experiments arrive, linking each lesson to the conditions and evidence that support it."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Third, exploring alternatives and backtracking"
+    },
+    {
+      "tag": "p",
+      "id": "S1.SS0.SSS0.Px3.p1.1",
+      "text": "A single research direction explores only part of the available methods. The AI Scientist-v2 uses agentic tree search to develop experimental alternatives, and ScienceFlow can resume from archived executable states ( Yamada et al., 2025 ; Zhao et al., 2026 ) . These systems demonstrate the value of branching and backtracking. For research with checkable outputs, the agent must preserve each alternative’s implementation and evidence, compare candidates under a common evaluation rule and recover earlier work when new findings make it useful."
+    },
+    {
+      "tag": "p",
+      "id": "S1.SS0.SSS0.Px3.p2.1",
+      "text": "To address these challenges, we introduce Épi , a persistent and evolving autonomous research agent. Épi uses hierarchical memory to resume investigations and retrieve experience from earlier work. It maintains versioned branches to develop alternative methods and backtrack to saved implementations, and incorporates independent review when assessing evidence and choosing its next experiment. The agent operates in verifiable research environments that evolve between campaigns , where a campaign is a complete investigation that may span multiple model sessions. Within a campaign, every branch uses the same feasibility checks, objective and comparison value. A verified finding can then establish a new reference or motivate a new task for the next campaign. Persistent execution and storage carry the research state across sessions."
+    },
+    {
+      "tag": "p",
+      "id": "S1.SS0.SSS0.Px3.p3.1",
+      "text": "Mathematical discovery provides a concrete demonstration of this research process: the agent develops methods whose outputs can be checked as constructions, bounds or proofs. We also evaluate its applicability to algorithmic coding, where the agent must design and implement a solver that handles new problem instances efficiently. Our lightweight configuration, Épi-turbo, achieves a 5.4% higher total benchmark score than Codex on 30 FrontierOR tasks at 64% of its model cost, using the same underlying model and reasoning effort (Section 6 ). These tasks include routing, scheduling, production planning and graph optimization."
+    },
+    {
+      "tag": "p",
+      "id": "S1.SS0.SSS0.Px3.p4.1",
+      "text": "Our contributions are an autonomous research agent that integrates hierarchical memory, branching and independent review to sustain and refine its investigations; a verification protocol that evaluates changing research methods under a fixed ruler and gain floor; and a collection of 120 record-setting results, comprising 100 improved constructions and 20 numerical bounds. Each record improves a documented literature or registry reference for the same problem and normalization; we count one final result per instance or parameter setting, as detailed in Section 4 . These results include an approximately 84-fold narrower interval for the n n -queens constant and a more than 3.6-million-fold narrower rigorous interval for the quartic Feigenbaum attractor dimension. Exact certificates establish that the Cohn–Elkies bound is not sharp in dimensions 10 and 11. Épi also proves Tuza’s conjecture for split graphs with an eight-vertex clique part and at most three triangle-active neighborhood types, with arbitrary multiplicities. We release the constructions and supporting certificates ( Epi Team, 2026 ) ."
+    },
+    {
+      "tag": "p",
+      "id": "S1.SS0.SSS0.Px3.p5.1",
+      "text": "Our goal is to connect self-improvement with human understanding: researchers should be able to inspect how a method evolves, explain why a result holds, and use that knowledge to guide further work. Épi retains implementations, experimental artifacts, and research notes across branches and sessions, allowing researchers to inspect the development of a method and assess its supporting evidence. Its constructions, certificates, and mathematical arguments further connect computational outputs to findings that researchers can examine and build upon (Section 8 )."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "2 Research Setting"
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "2.1 Problems and Evidence"
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS1.p1.1",
+      "text": "We study research tasks with a reference result, an explicit budget and outputs that can be checked. A curator supplies the question and source material; the agent chooses the methods and experiments. To compare the agent’s output with the reference, we specify an evaluation rule, called a ruler . The ruler defines the submission format, feasibility conditions, objective, normalization and comparison value. 1 1 1 A reported benchmark score alone does not specify feasibility conventions, normalization or input validation. These choices determine whether two values measure the same quantity on valid objects. We introduce the ruler to make them explicit before search."
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS1.p2.1",
+      "text": "The agent submits the information required to check its claim. For a packing task, it supplies coordinates and orientations. For an optimization bound, it may supply a dual vector or another certificate. For a proof task, it supplies witnesses and an argument explaining why the checked objects establish the stated claim."
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS1.p3.1",
+      "text": "For a minimization problem, we write V ⁡ ( x ) ∈ { 0 , 1 } V(x)\\in\\{0,1\\} for the verifier’s feasibility decision, f ⁡ ( x ) f(x) for the objective and b b for the reference value. We define the improvement as Δ ⁡ ( x ) = b − f ⁡ ( x ) \\Delta(x)=b-f(x) . We also specify a positive gain floor δ > 0 \\delta>0 , the smallest improvement that the task counts as meaningful. 2 2 2 Counting every positive score change as progress can include differences due to reporting precision or routine post-processing. We derive the floor from the objective’s granularity and known transformations, and record its rationale with the task. For an integer objective with unit granularity, a floor of one admits a one-unit improvement. Épi accepts an improvement when"
+    },
+    {
+      "tag": "table",
+      "id": "S2.E1",
+      "text": "V ⁡ ( x ) = 1 , Δ ⁡ ( x ) ≥ δ . V(x)=1,\\qquad\\Delta(x)\\geq\\delta. (1)"
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS1.p3.2",
+      "text": "For maximization, we instead define Δ ⁡ ( x ) = f ⁡ ( x ) − b \\Delta(x)=f(x)-b . The positive floor excludes ties and admits an improvement exactly equal to the threshold. If a task imposes no minimum gain ( δ = 0 \\delta=0 ), we instead require Δ ⁡ ( x ) > 0 \\Delta(x)>0 . We fix the feasibility tolerances and gain floor before the investigation. The verifier uses the tolerances to check constraints, while Épi uses the floor to decide whether the improvement counts. For a rigorous numerical bound, we additionally require exact arithmetic or outward rounding that controls the numerical error."
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS1.p4.1",
+      "text": "We establish a new record by verifying feasibility and improvement over the best established result for the same problem and normalization. Each final artifact retains its comparison value, source and any rounding convention. For a theorem, the proof connects the verified objects to the full stated claim."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "2.2 Campaigns and Sessions"
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS2.p1.1",
+      "text": "We call a complete investigation a campaign . A campaign may contain several agent sessions and concurrent experiments. Each session gives the agent a bounded context in which to inspect evidence, modify code and choose its next action. Épi stores the research state outside that context and keeps experiments running across session boundaries. A later session retrieves the saved state and resumes the investigation."
+    },
+    {
+      "tag": "p",
+      "id": "S2.SS2.p2.1",
+      "text": "The curator may provide a published construction as the initial reference. The agent can consult the literature, implement alternative methods and select experiments within the campaign’s budget. We keep model weights fixed in the campaigns reported here. The agent adapts its methods through experimental feedback, retrieved memory and independent review."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "3 The Épi Research Loop"
+    },
+    {
+      "tag": "p",
+      "id": "S3.p1.1",
+      "text": "Figure 1 shows Épi’s research loop. The agent conducts experiments in verifiable environments and improves its methods through branching, hierarchical memory and independent review. We describe the evolving environments and the mechanisms supporting the agent’s self-improvement below."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Figure 1: Épi’s research architecture. The agent develops methods on versioned branches and retrieves saved history and cross-case lessons. An independent model reviews the evidence. The environment checks each candidate under a fixed ruler and gain floor. The execution infrastructure supports experiments, persistent storage and isolated verifier execution across sessions. Section 2 defines the acceptance rule."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "3.1 Evolving Research Environments"
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS1.p1.1",
+      "text": "Comparing research methods requires a common objective and consistent validity checks. We establish these before search by checking that the scorer reproduces the reference result, testing input validation and fixing the configuration, feasibility checks and gain criterion. The verifier then evaluates every branch under this shared rule. This gives Épi a consistent basis for comparing methods throughout the investigation."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS1.p2.1",
+      "text": "We also specify the evidence needed for each type of claim. The verifier checks geometric constraints for a construction. For a rigorous bound, we require a certificate with exact arithmetic or controlled numerical error. For a computer-assisted theorem, we require both the finite checks and a mathematical reduction showing why those checks establish the full statement. The agent must develop this reduction or certificate when the task requires one."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS1.p3.1",
+      "text": "Épi’s research environments evolve with verified findings. Improved results provide new reference values for subsequent investigations, while new research questions motivate changes to task formulations, representations and verification requirements. We incorporate these changes when defining the next campaign. For example, a numerical estimate can lead to a certification task whose environment includes certificate representations and rigorous error control. Each campaign uses a fixed evaluation rule to compare methods, and successive campaigns build on the verified findings of earlier work."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "3.2 Self-improving Research Agents"
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS2.p1.1",
+      "text": "Épi improves its research methods through accumulated experience. The agent develops and compares alternatives on versioned branches, retains and retrieves experience through hierarchical memory, and uses independent review to reassess its research decisions. Together, these mechanisms allow Épi to refine its approach across experiments and campaigns."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Branches and backtracking"
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS2.SSS0.Px1.p1.1",
+      "text": "A single approach restricts which formulations and search regions the agent explores. Épi maintains branches to develop alternatives while preserving each method’s code and evidence. Each branch stores an implementation, tests and notes in a versioned repository. The agent saves changes as commits and can create a new branch from an earlier commit. It compares the resulting experiments under the same ruler."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS2.SSS0.Px1.p2.1",
+      "text": "The agent backtracks by returning to a saved implementation and trying a different continuation. It can also revisit an existing branch and extend the work already recorded there. When the agent abandons a branch, it records the reason and retains the branch for later inspection. For a packing problem, the agent might refine coordinates on one branch and change the contact pattern on another. It can compare both methods before allocating more compute."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Hierarchical memory"
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS2.SSS0.Px2.p1.1",
+      "text": "Drawing on work on human and agent memory ( Atkinson and Shiffrin, 1968 ; Packer et al., 2023 ; Park et al., 2023 ) , Épi uses hierarchical memory to accumulate and reuse research experience. Short-term memory supports the current investigation, while long-term memory retains experience for subsequent research. As illustrated in Figure 1 , memory records include research context, lessons that capture reusable findings, and dead ends that document unproductive approaches and why they were abandoned. The agent retrieves these records to guide its next experiment and updates them as new evidence becomes available."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS2.SSS0.Px2.p2.1",
+      "text": "Épi stores code, artifacts and detailed research notes in a persistent filesystem and keeps retrievable lessons and dead ends in a memory store outside the model context. At a session boundary, the agent records its findings and a handover note identifying the current state and next steps. A subsequent session receives relevant memory records and can open the referenced files as needed. This supplies a bounded working context without replaying the full history of earlier sessions."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Independent review"
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS2.SSS0.Px3.p1.1",
+      "text": "The agent that develops a method also chooses which evidence to examine, giving its assessment a limited perspective. Prior work on self-correction motivates adding feedback from outside the agent’s own reasoning process ( Huang et al., 2024 ) ; research on reward hacking further motivates checking whether a score increase reflects the intended task ( Denison et al., 2024 ) . Épi combines a separate review of research progress with artifact verification under the fixed ruler."
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS2.SSS0.Px3.p2.1",
+      "text": "Épi supplies a review model with the score trajectory, attempted approaches, retrieved findings, comparison baseline and resource use. The reviewer assesses what the evidence supports and whether the agent’s interpretation of progress is justified. Épi records this assessment for subsequent sessions, and the agent uses it when selecting further experiments or revisiting a branch. We use a different model for an independent review and record the reviewer’s identity. The reviewer evaluates the research direction; the isolated verifier checks the candidate’s validity and gain."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Research transparency"
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS2.SSS0.Px4.p1.1",
+      "text": "Épi records alternative implementations, their experimental outcomes, and the assessments used to guide subsequent work. These records allow researchers to compare branches, inspect the evidence associated with a methodological change, and revisit the implementation on which a conclusion depends. Lessons summarize reusable findings, while references to code and experimental artifacts let researchers examine the evidence behind those summaries."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Execution support"
+    },
+    {
+      "tag": "p",
+      "id": "S3.SS2.SSS0.Px5.p1.1",
+      "text": "We use Breadboard as Épi’s execution infrastructure. Breadboard provides isolated experimental environments, supports long-running jobs across model sessions and stores research history, including code, branch states and experimental outputs. It also runs the fixed verifier and preserves the state needed to recover and continue an investigation. The agent uses these services to execute experiments, inspect results and resume its research across sessions."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "4 Experimental Results"
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "4.1 Setup and Counting"
+    },
+    {
+      "tag": "p",
+      "id": "S4.SS1.p1.1",
+      "text": "We ran Épi over a few days using OpenAI frontier models (GPT-5.6 Sol and GPT-6-Astra). Computational budgets were set per problem. Published methods and constructions supplied starting points for several campaigns, including the packing case in Section 5.1 . Each comparison uses the same task and evaluation convention for the reference and final artifact. All record comparisons are based on literature and registry references available as of September 16, 2026."
+    },
+    {
+      "tag": "p",
+      "id": "S4.SS1.p2.1",
+      "text": "The current collection contains 120 record-setting results : 20 numerical bound records across 12 families and 100 construction records across eight families . A separate Tuza theorem extension brings the report to 21 families in total and is excluded from the record count."
+    },
+    {
+      "tag": "p",
+      "id": "S4.SS1.p3.1",
+      "text": "We count one final result per distinct instance or parameter setting. An enclosing interval counts once, and intermediate improvements do not add records. Figure 2 gives the family breakdown."
+    },
+    {
+      "tag": "p",
+      "id": "S4.SS1.p4.1",
+      "text": "The results repository retains the final artifacts and comparison values ( Epi Team, 2026 ) . Some evolving registries already list the new results. Our tables retain the earlier values used for comparison so the improvement remains traceable after those updates."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "4.2 Construction Records"
+    },
+    {
+      "tag": "p",
+      "id": "S4.SS2.p1.1",
+      "text": "Of the 100 construction records, 97 concern geometric packing. The remaining three improve vehicle routing, the signed-maximum variant of the third autocorrelation inequality and a Zhang–Zagier construction. Figure 2 gives the counts for all eight families. Packing references come from Packomania and Erich Friedman’s Packing Center ( Specht, 2026 ; Friedman, 2026 ) . Appendix B defines the objectives and gives these three comparisons."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Figure 2: The 120 records, grouped by collection and family. Each dot is one final record. Multiple parameter settings within a family count separately; repeated improvements to the same setting count once. The Tuza theorem extension is shown separately."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "4.3 Numerical Bound Records"
+    },
+    {
+      "tag": "p",
+      "id": "S4.SS3.p1.1",
+      "text": "Table 1 summarizes the 12 numerical families and how their bounds are verified. Appendix A states the claims with their precise values and supporting witnesses."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Table 1: Twenty numerical records across 12 families. Arrows indicate the improving direction. Interval widths are reduced. This overview uses rounded decimals. Precise bounds appear in the appendix and Table 2 ."
+    },
+    {
+      "tag": "table",
+      "id": "S4.T1.5",
+      "text": "Quantity Previous bound Épi Evidence Wellens’ D ∞ D_{\\infty} ↓ \\downarrow 4.393500 4.393500 4.365467 4.365467 Rational witnesses CE dual bounds ↑ \\uparrow 1 / 20 , 1 / 24 , 1/20,\\;1/24, 1 / 24 , 1 / 28 1/24,\\;1/28 Table 2 : d = 9 , 10 , 11 , 13 d=9,10,11,13 Exact dual certificates Spencer constant ↑ \\uparrow 7 / 17 7/\\sqrt{17} 5 / 8 5/\\sqrt{8} All 256 sign assignments Dimer entropy ↓ \\downarrow 0.452130 0.452130 0.452010 0.452010 Integer transfer inequalities n n -queens interval width × 10 − 7 3.30\\!\\times\\!10^{-7} × 10 − 9 3.94\\!\\times\\!10^{-9} Rational and interval checks Ramsey c 4 , 5 c_{4,5} ↓ \\downarrow 0.007932 0.007932 0.007865 0.007865 A 1,024-vertex graph MAX-4-CUT ratio ↓ \\downarrow 0.987085 0.987085 0.986411 0.986411 Integer weighted gadget Klarner λ \\lambda ↓ \\downarrow 4.52380 4.52380 4.29569 4.29569 Recurrence certificate B h ​ [ g ] B_{h}[g] coefficients ↓ \\downarrow Timmons’ Table 1 Five bounds, h = 3 , … , 7 h=3,\\ldots,7 Interval-certified kernels Quartic dimension interval width × 10 − 3 7.80\\!\\times\\!10^{-3} × 10 − 9 2.13\\!\\times\\!10^{-9} Full-domain interval proof Quantum noise ↑ \\uparrow (XZ / Two-Pauli) 0.118371 0.118371 0.118067 0.118067 0.1198803 0.1198803 0.1193415 0.1193415 Positive coherent information Waterund36 lower bound ↑ \\uparrow 655.544171 655.544171 662.807028 662.807028 Exact bound certificate"
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "5 Case Studies"
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "5.1 Refining a Published Packing"
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS1.p1.1",
+      "text": "The task is to place 34 non-overlapping regular pentagons of unit side length inside an equilateral triangle of minimum side length. Each pentagon has a center and orientation. The evaluator checks containment and overlap and measures the required triangle size."
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS1.p2.1",
+      "text": "Épi starts from a published arrangement with triangle side length approximately 12.9814 12.9814 ( Friedman, 2026 ) . It jointly refines the pentagons’ centers and orientations, checking containment and overlap after each candidate update. The final side length is approximately 12.9756 12.9756 , a reduction of 0.0445 % 0.0445\\% . The released coordinates specify the construction at full precision."
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS1.p3.1",
+      "text": "Figure 3 shows nine retained geometric constructions. For pentagons, the objective reduces the size of the enclosing triangle. The circle-packing tasks increase the common radius inside a fixed container ( Specht, 2026 ) . Each panel is drawn directly from the released coordinates."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Figure 3: Nine final record constructions. The three pentagon arrangements use unit-side pentagons; circle packings use a unit-radius semicircle or quadrant, or a unit-circumradius octagon. Percentages compare the final artifact with its archived reference. Triangle side length decreases; circle radius increases."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "5.2 Separating the Cohn–Elkies Bound from Packing Density"
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS2.p1.1",
+      "text": "The Cohn–Elkies method bounds sphere-packing density from above by optimizing an auxiliary function. We ask whether its best possible bound can equal the actual packing density. A strict separation would establish a limitation of the method itself."
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS2.p2.1",
+      "text": "Let ρ d \\rho_{d} be the optimal sphere-packing center density in dimension d d , and let C d C_{d} be the best upper bound attainable by the Cohn–Elkies linear program in the same normalization. Then ρ d ≤ C d \\rho_{d}\\leq C_{d} . To prove that the method is not sharp, it is enough to find a packing upper bound U d U_{d} and a lower bound L d L_{d} on the linear program’s optimum such that"
+    },
+    {
+      "tag": "table",
+      "id": "S5.E2",
+      "text": "ρ d ≤ U d < L d ≤ C d . \\rho_{d}\\ \\leq\\ U_{d}\\ <\\ L_{d}\\ \\leq\\ C_{d}. (2)"
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS2.p2.2",
+      "text": "The middle inequality creates a separation between the true packing problem and the best answer available from this method."
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS2.p3.1",
+      "text": "Li (2022) obtains such lower bounds through a discrete reduction of the infinite-dimensional linear program. The reduction yields a finite optimization problem whose dual witnesses can be checked. Épi sets new records in dimensions 9, 10, 11, and 13, retaining one final dual vector for each. Table 2 reports the resulting lower bounds on C d C_{d} ."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Table 2: New lower bounds on the optimal Cohn–Elkies bound in dimensions 9, 10, 11, and 13, rounded downward. The packing upper bounds are converted from Table 1.1 of Cohn et al. (2022) to center density and rounded upward. All values use center-density normalization."
+    },
+    {
+      "tag": "table",
+      "id": "S5.T2.7",
+      "text": "Dimension Earlier dual bound Épi dual bound L d L_{d} Packing upper bound U d U_{d} 9 1 / 20 1/20 0.058044329039 0.058044329039 10 1 / 24 1/24 0.056433853144 0.056433853144 0.05623600 0.05623600 11 1 / 24 1/24 0.057731808202 0.057731808202 0.05664550 0.05664550 13 1 / 28 1/28 0.066440082613 0.066440082613"
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Figure 4: Left: paired markers compare the earlier and improved dual lower bounds on the Cohn–Elkies optimum in each dimension. Right: in dimensions 10 and 11, the new lower bounds exceed known upper bounds on actual packing density. The displayed values use center density, and the relative gaps are L d / U d − 1 L_{d}/U_{d}-1 ."
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS2.p4.1",
+      "text": "In dimensions 10 and 11, the new lower bounds cross the independently established packing upper bounds of Cohn et al. (2022) . Equation ( 2 ) therefore holds in both dimensions. The relative separations, L d / U d − 1 L_{d}/U_{d}-1 , are approximately 0.35 % 0.35\\% and 1.92 % 1.92\\% , respectively."
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS2.p5.1",
+      "text": "The separation identifies a structural limit of the Cohn–Elkies formulation in dimensions 10 and 11. Even exact optimization of this formulation cannot recover the true packing density; a sharp bound requires additional constraints or a different bounding method."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "5.3 Narrowing the Interval for the n n -Queens Constant"
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS3.p1.1",
+      "text": "The number Q ⁡ ( n ) Q(n) of placements of n n non-attacking queens on an n × n n\\times n board has an asymptotic form governed by a constant α \\alpha ,"
+    },
+    {
+      "tag": "table",
+      "id": "S5.E3",
+      "text": "Q ⁡ ( n ) = ( n ​ e − α + o ⁡ ( 1 ) ) n . Q(n)=\\left(ne^{-\\alpha+o(1)}\\right)^{n}. (3)"
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS3.p1.2",
+      "text": "Bounds on α \\alpha can be obtained from finite convex optimization problems. Nobel et al. (2023) develop a scalable Newton method for these formulations and report the interval"
+    },
+    {
+      "tag": "table",
+      "id": "S5.Ex1",
+      "text": "[ 1.944000752 , 1.944001082 ] . [1.944000752,\\;1.944001082]."
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS3.p2.1",
+      "text": "Épi refines the lower and upper bounds separately. Rational feasibility checks and directed rounding give"
+    },
+    {
+      "tag": "table",
+      "id": "S5.E4",
+      "text": "1.9440010223327 ≤ α ≤ 1.9440010262694 . 1.9440010223327\\ \\leq\\ \\alpha\\ \\leq\\ 1.9440010262694. (4)"
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS3.p2.2",
+      "text": "The interval width decreases from 3.30 × 10 − 7 3.30\\times 10^{-7} to approximately 3.94 × 10 − 9 3.94\\times 10^{-9} , a factor of approximately 84 84 . Figure 5 places the two intervals on a common axis."
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS3.p3.1",
+      "text": "The two formulations have different computational costs, so Épi uses a higher resolution for the lower bound. Each endpoint has a retained witness that can be checked separately. Appendix A gives the resolutions."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Figure 5: Two new mathematical records. Left: the interval for the n n -queens constant is approximately 84 times narrower. Right: an explicit 8 × 8 8\\times 8 matrix with discrepancy five gives the Spencer lower bound 5 / 8 5/\\sqrt{8} . The matrix entries are − 1 -1 , 0 0 , and 1 1 ."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "5.4 Optimizing a Formulation: MAX-4-CUT"
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS4.p1.1",
+      "text": "Épi starts from the MAX-4-CUT gadget framework of Nagda et al. (2025) and optimizes its edge weights. With the gadget structure and relevant completeness assignments fixed, the competing colorings have objectives that are linear in those weights."
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS4.p2.1",
+      "text": "This allows the agent to normalize one side of the hardness ratio and optimize the other through a linear program. Coloring constraints enforce the required properties of the gadget."
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS4.p3.1",
+      "text": "The reference ratio follows from the gadget parameters in Lemma C.2 and the reduction in Theorem C.2 of Nagda et al. (2025) . The final integer weighted gadget changes it from"
+    },
+    {
+      "tag": "table",
+      "id": "S5.E5",
+      "text": "195581 198140 ≈ 0.987085 to 84931 86101 ≈ 0.986411 . \\frac{195581}{198140}\\approx 0.987085\\quad\\text{to}\\quad\\frac{84931}{86101}\\approx 0.986411. (5)"
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS4.p3.2",
+      "text": "The released weighted edge list and finite checks recover this ratio exactly. Substituting the new gadget into the published reduction gives the improved hardness bound. This formulation provides a reusable optimization procedure: researchers can fix the gadget structure, optimize its weights subject to explicit coloring constraints, and verify the resulting ratio exactly."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "5.5 A Finite Construction for the Spencer Constant"
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS5.p1.1",
+      "text": "The square-matrix discrepancy problem asks how well signs can balance the rows of a real matrix with entries in [ − 1 , 1 ] [-1,1] . Épi found an 8 × 8 8\\times 8 matrix whose discrepancy is exactly five. Exhausting its 256 sign assignments gives row-maximum norms of five or seven, so the minimum is five. The matrix therefore raises the record lower bound on the universal constant from 7 / 17 7/\\sqrt{17} to 5 / 8 5/\\sqrt{8} ( Tao et al., 2026 ) ."
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS5.p2.1",
+      "text": "Figure 5 shows the entire matrix. Its entries lie in { − 1 , 0 , 1 } \\{-1,0,1\\} , within the allowed range [ − 1 , 1 ] [-1,1] , and the claim can be checked by enumerating its sign assignments."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "5.6 Certifying Near-Optimal Water-Network Design"
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS6.p1.1",
+      "text": "The waterund36 instance in MINLPLib minimizes the cost of a water-using network under nonlinear flow and concentration constraints ( MINLPLib, 2026 ) . A feasible network costing approximately 662.807 662.807 was already known, but the listed global lower bound was only about 655.544 655.544 ."
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS6.p2.1",
+      "text": "Épi tightens the lower bound to within approximately 10 − 5 10^{-5} of that same feasible value, closing more than 99.999 % 99.999\\% of the MINLPLib gap. This certifies the near-optimality of the existing network. The full-precision comparison appears in Appendix A.12 ."
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS6.p3.1",
+      "text": "To establish the bound, the agent constructs a relaxation containing every feasible network. Exact rational inequalities then rule out objective values below the stated cutoff. The certificate therefore applies to the original nonlinear problem. Appendix A.12 explains this argument and relates the instance to earlier optimization work."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Figure 6: Two improvements in certified uncertainty. The horizontal axes show interval or bound-gap width on logarithmic scales. Left: the rigorous enclosure for the quartic Feigenbaum attractor dimension becomes over 3.6 million times narrower. Right: the waterund36 gap to the same known feasible value decreases from about 7.263 7.263 to 1.001 × 10 − 5 1.001\\times 10^{-5} ."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "5.7 From Numerical Optimization to Proof: Tuza’s Conjecture"
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS7.p1.1",
+      "text": "For a finite simple graph G G , let ν △ ​ ( G ) \\nu_{\\triangle}(G) be the maximum number of pairwise edge-disjoint triangles and τ △ ​ ( G ) \\tau_{\\triangle}(G) the minimum size of a triangle cover : a set of edges meeting every triangle in G G . Equivalently, deleting a triangle cover makes the entire graph triangle-free. Tuza’s conjecture, proposed in 1981 ( Bonamy et al., 2022 ) , asserts"
+    },
+    {
+      "tag": "table",
+      "id": "S5.E6",
+      "text": "τ △ ​ ( G ) ≤ 2 ​ ν △ ​ ( G ) . \\tau_{\\triangle}(G)\\leq 2\\nu_{\\triangle}(G). (6)"
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS7.p1.2",
+      "text": "Thus, if G G contains no k + 1 k+1 pairwise edge-disjoint triangles, deleting at most 2 ​ k 2k edges suffices to eliminate every triangle in G G ."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Packing and covering"
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS7.SSS0.Px1.p1.1",
+      "text": "Kőnig’s theorem equates the maximum matching size and minimum vertex-cover size in a bipartite graph ( Kőnig, 1931 ) . Tuza’s conjecture concerns a matching–cover relation in the triangle hypergraph , whose vertices are the edges of G G and whose hyperedges are its triangles. Taking all edges of a maximum triangle packing gives the elementary bound τ △ ≤ 3 ​ ν △ \\tau_{\\triangle}\\leq 3\\nu_{\\triangle} : any uncovered triangle could be added to the packing. The conjectured factor of two is attained by K 4 K_{4} , where ν △ = 1 \\nu_{\\triangle}=1 and τ △ = 2 \\tau_{\\triangle}=2 ."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Split graphs and prior results"
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS7.SSS0.Px2.p1.1",
+      "text": "A split graph has a partition V ⁡ ( G ) = C ⊔ I V(G)=C\\sqcup I , where C C induces a clique and I I is independent. Known cases include threshold graphs, whose independent-side neighborhoods are nested by inclusion ( Bonamy et al., 2022 ) , and K 8 K_{8} -free chordal graphs, which include K 8 K_{8} -free split graphs ( Botler et al., 2021 ) . Our eight-vertex clique part puts the family beyond the latter theorem’s K 8 K_{8} -free hypothesis."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Neighborhood types and the extension"
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS7.SSS0.Px3.p1.1",
+      "text": "For x ∈ I x\\in I , let S x = N G ​ ( x ) ∩ C S_{x}=N_{G}(x)\\cap C . Since C C is a clique, every pair u , v ∈ S x u,v\\in S_{x} forms a triangle x ​ u ​ v xuv . Thus x x is triangle-active exactly when | S x | ≥ 2 |S_{x}|\\geq 2 ; vertices with identical S x S_{x} share one neighborhood type . Zeng (2026) proved the conjecture for | C | = 8 |C|=8 and at most two types. Épi extends this to three types with unrestricted overlaps. Their triangles can compete for the same clique edges, requiring joint covers and packings."
+    },
+    {
+      "tag": "p",
+      "id": "Thmtheorem1.p1.1",
+      "text": "Let G G be a finite simple graph with a specified partition V ⁡ ( G ) = C ⊔ I V(G)=C\\sqcup I , where G ⁡ [ C ] = K 8 G[C]=K_{8} and I I is independent. Suppose that the sets N G ​ ( x ) ∩ C N_{G}(x)\\cap C , over vertices x ∈ I x\\in I with at least two neighbors in C C , take at most three distinct values. Then τ △ ​ ( G ) ≤ 2 ​ ν △ ​ ( G ) \\tau_{\\triangle}(G)\\leq 2\\nu_{\\triangle}(G) ."
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS7.SSS0.Px3.p2.1",
+      "text": "Up to clique relabeling and type permutation, there are 872 three-type profiles: 35 have nested neighborhoods and 277 further profiles satisfy Zeng’s maximum-cut criterion. Épi constructs exact cover and packing certificates for the remaining 560 profiles, using 18,444 multiplicity boxes. An independent checker verifies the witnesses and complete profile enumeration. Zeng’s truncation lemma extends the checks to arbitrary multiplicities, establishing the result for an infinite graph family (Appendix A.13 )."
+    },
+    {
+      "tag": "p",
+      "id": "S5.SS7.SSS0.Px3.p3.1",
+      "text": "The proof separates the finite certificate checks from the argument extending them to arbitrary multiplicities, making explicit how the computational evidence establishes the infinite-family statement."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "6 Épi-turbo: Fast, Low-cost Algorithm Design"
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "6.1 Purpose and Design"
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS1.p1.1",
+      "text": "Algorithmic coding extends Épi’s research process to the development of executable solvers. Given a problem specification and a fixed evaluator, the agent designs, implements and tests an algorithm whose solution quality and runtime are measured on new instances. Épi-turbo is a lightweight configuration for these tasks, designed to develop effective algorithms within a short campaign and a small model budget."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Shared foundation"
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS1.SSS0.Px1.p1.1",
+      "text": "Épi-turbo keeps the parts of Épi that make a result reliable. The verifier checks each candidate under a fixed ruler, and Épi keeps the research state across sessions. Branches keep each method with its code and evidence, so the agent can return to an earlier version. Memory records keep lessons and dead ends for later sessions. Épi-turbo changes how the agent uses its model budget and when the campaign stops."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Instructions for algorithm tasks"
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS1.SSS0.Px2.p1.1",
+      "text": "The task instructions tell the agent how the benchmark measures a program. They give the complete score formula, which includes the quality term and the runtime term. They also tell the agent that the final score comes from instances that the agent does not see. When a program uses a large part of its time limit, Épi-turbo tells the agent. Thus the agent can find a good balance between solution quality and runtime. The instructions do not contain methods or hints for a specific problem."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Model calls for algorithm design"
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS1.SSS0.Px3.p1.1",
+      "text": "Each model call has a cost, and a short task has a small number of calls. Épi-turbo tells the agent that every call costs money, which includes a check on an active job. The agent does short experiments with a time limit in its own session. It sends an experiment to the execution infrastructure only when the experiment needs more time than a session gives. It examines active jobs only when a result can change its next decision. As a result, most of the budget goes to the design and test of algorithms."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Continuous sessions"
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS1.SSS0.Px4.p1.1",
+      "text": "Épi-turbo runs each campaign as one continuous session if possible. The session continues the best method so far and does not restart from an empty context. Before a session ends, the agent records its state, its best candidate and its next steps. The next session reads this record and continues the work. Épi-turbo stops the campaign when more sessions do not improve the best verified score. Thus the agent does not use more budget on a task where it finds no improvement."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Budget control"
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS1.SSS0.Px5.p1.1",
+      "text": "Épi-turbo reserves the maximum cost of a model call before the call starts. It also keeps a small part of the budget for the end of the campaign. Thus the cost of a campaign is never more than its budget, and the final steps always have funds. The reservation uses the price limits of the model, so the agent can use almost all of its budget."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Optional components"
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS1.SSS0.Px6.p1.1",
+      "text": "Independent review and extra validation are optional in Épi-turbo. On short tasks, their cost was larger than their benefit in our tests. Both components were off in the runs below."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "6.2 Benchmark and Protocol"
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS2.p1.1",
+      "text": "We use FrontierOR, a benchmark of 180 operations-research tasks from the literature ( Kong et al., 2026 ) . Each task asks for a standalone program that solves new instances of one problem class. The program must not call an external optimization solver. The baseline is Codex ( OpenAI, 2026 ) , a widely used coding agent, with GPT-6-Astra as its model. Épi-turbo uses the same model with the same reasoning effort."
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS2.p2.1",
+      "text": "We selected 30 tasks that were new to both systems. We took them in the official hardness order of the benchmark and excluded tasks with unreliable reference values. Of these tasks, 13 are in the hard split, and 17 have hardness ranks 51 to 70. For each task, each system had a model budget of $20. We did one run for each task and system, so we do not report statistical significance."
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS2.p3.1",
+      "text": "The evaluator first runs each program on two development instances. The agent sees these results during the campaign. After the campaign, the best development program runs once on four held-out instances. Each held-out run has a time limit of one hour. The benchmark score has a quality term and a speed term."
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS2.p4.1",
+      "text": "The quality term decreases as the gap to the reference value increases. The speed term compares the runtime of the program with the runtime of the reference solver. It counts only when the solution is within 1% of the reference value. Outside this 1% band, the score is the quality term alone. The reference values come from a commercial solver, and some of them are weak. Thus we also compare the two systems on each instance directly, with their objective values only."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "6.3 Results"
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS3.p1.1",
+      "text": "Table 3 gives the main results. Épi-turbo gets the higher total score, 53.96 against 51.21. It has the higher score on 18 tasks, and Codex has the higher score on 12. On 10 of these tasks, the difference is less than 0.01. Épi-turbo uses 64% of the model cost of Codex. Its median research time per task is approximately 22 minutes, and the median for Codex is 37 minutes."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Table 3: Épi-turbo and Codex on 30 FrontierOR tasks that were new to both systems. Both systems use GPT-6-Astra and a model budget of $20 per task. All scores are for the held-out instances. The instance counts compare the objective values of the two programs directly."
+    },
+    {
+      "tag": "table",
+      "id": "S6.T3.4",
+      "text": "Measure Épi-turbo Codex Total benchmark score 53.96 53.96 51.21 51.21 Tasks with the higher score 18 18 12 12 Mean quality term 1.030 1.030 1.032 1.032 Mean speed term 0.784 0.784 0.675 0.675 Instances with the better solution (119 comparable, 40 ties) 18 18 61 61 Instances more than 1% worse than the other system 29 29 10 10 Infeasible solutions (120 held-out runs) 1 1 0 0 Model cost per task, mean $7.30 $11.35 Research time per task, median 22 min 37 min"
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS3.p2.1",
+      "text": "Figure 7 shows the results for each task. The gains of Épi-turbo are larger than its losses. On the 18 tasks where Épi-turbo is higher, the total gain is 4.54. On the other 12 tasks, the total loss is 1.79. Épi-turbo also costs less on 27 of the 30 tasks."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Figure 7: Épi-turbo and Codex on 30 FrontierOR tasks. A: The score difference for each task, in order of size. Épi-turbo has the higher score on 18 tasks, and its gains are larger than its losses. B: The model cost for each task. Each point below the dashed line is a task where Épi-turbo costs less. C: The runtime of each held-out run on a logarithmic scale, with the medians as vertical bars."
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS3.p3.1",
+      "text": "Table 4 splits the tasks into two groups. On the 13 tasks of the hard split, Épi-turbo has the higher score on 9 tasks, and its total score is 10% higher. On the 17 tasks with ranks 51 to 70, the two systems are close. On 15 of the 30 tasks, Épi-turbo has both the higher score and the lower model cost."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Table 4: Results by task group. The hard split is the official set of the 50 hardest FrontierOR tasks. Each pair of values gives Épi-turbo first and Codex second."
+    },
+    {
+      "tag": "table",
+      "id": "S6.T4.4",
+      "text": "Group Tasks Total score Higher score Model cost Hard split 13 22.33 22.33 / 20.30 20.30 9 9 / 4 4 $95 / $152 Ranks 51–70 17 31.64 31.64 / 30.91 30.91 9 9 / 8 8 $124 / $188 All tasks 30 53.96 53.96 / 51.21 51.21 18 18 / 12 12 $219 / $341"
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS3.p4.1",
+      "text": "The higher score comes mainly from the speed term. The programs of Épi-turbo usually stop when their search finds no better solution. On the held-out instances, the median runtime of an Épi-turbo program is 2.9 seconds, and the median for Codex is 9.3 seconds. No held-out run of Épi-turbo used more than 30 minutes. Codex used more than 30 minutes on 17 of the 120 held-out runs, in 7 tasks. A long run can improve the solution, but it decreases the speed term."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "6.4 Selected Cases"
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS4.p1.1",
+      "text": "Table 5 lists the ten algorithmic coding tasks with the largest score difference in favor of Épi-turbo. The tasks span vehicle routing, cooperative crane scheduling, production planning, facility location, clustering and graph optimization. Each row evaluates a generated program on unseen instances of its problem class. This breadth makes the connection to the mathematical campaigns explicit: Épi’s research process supports both constructing mathematical artifacts and developing algorithms with measurable gains in practical optimization settings. The four cases below show how solution quality and execution speed contribute to these gains."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Clique interdiction: better solutions and faster programs (furini2021)"
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS4.SSS0.Px1.p1.1",
+      "text": "The Épi-turbo program solves each held-out instance in less than 17 seconds. On one instance, its solution has an objective value of 8, and the Codex solution has 20. The Codex program also runs for 20 to 60 minutes on three of the four instances. Thus Épi-turbo has both the higher quality term and the higher speed term."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Production planning: reaching the 1% band (delage2022)"
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS4.SSS0.Px2.p1.1",
+      "text": "Épi-turbo has the better solution on three instances and the same solution on the fourth. On one instance, the Codex solution is 1.19% above the reference value, and the Épi-turbo solution is 0.89% above it. Thus only Épi-turbo gets the speed term on that instance. The Épi-turbo programs are also 2 to 7 times faster."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Maximum clique: matching the reference (furini2019)"
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS4.SSS0.Px3.p1.1",
+      "text": "Épi-turbo matches the reference value on all four instances. The Codex solution is 5% worse on one instance. On another instance, the Codex program needs 34 seconds, which is more time than the reference solver needs. Thus Codex loses the speed term on that instance, and Épi-turbo keeps it."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Vehicle routing: faster execution (he2020)"
+    },
+    {
+      "tag": "p",
+      "id": "S6.SS4.SSS0.Px4.p1.1",
+      "text": "Both systems beat the reference values by 5% to 17%. The Codex solutions are slightly better on three instances, by at most 2.6%. But the Codex program uses the full hour on three instances, and the Épi-turbo program needs at most 36 seconds. Here the speed term decides the result."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Table 5: The ten FrontierOR coding tasks with the largest score difference in favor of Épi-turbo, sorted by the difference. Task names identify the optimization problem solved by each generated program; benchmark IDs appear below them. Scores, quality and speed are measured on held-out instances. Each pair gives Épi-turbo first and Codex second."
+    },
+    {
+      "tag": "table",
+      "id": "S6.T5.4",
+      "text": "Task Score Quality term Speed term Model cost Hyperplane clustering amaldi2013 2.162 2.162 / 1.283 1.283 1.163 1.163 / 1.282 1.282 0.999 0.999 / 0.001 0.001 $2.59 / $4.86 Clique interdiction furini2021 2.090 2.090 / 1.256 1.256 1.091 1.091 / 0.841 0.841 0.999 0.999 / 0.415 0.415 $3.82 / $6.47 Vehicle routing with node costs he2020 2.094 2.094 / 1.353 1.353 1.098 1.098 / 1.108 1.108 0.995 0.995 / 0.245 0.245 $3.42 / $13.90 Maximum clique furini2019 1.987 1.987 / 1.487 1.487 1.000 1.000 / 0.988 0.988 0.987 0.987 / 0.500 0.500 $5.78 / $11.58 Cooperative crane scheduling kress2019 1.853 1.853 / 1.572 1.572 1.103 1.103 / 1.074 1.074 0.750 0.750 / 0.498 0.498 $4.78 / $3.90 Process configuration and production planning delage2022 2.023 2.023 / 1.759 1.759 1.024 1.024 / 1.012 1.012 0.999 0.999 / 0.747 0.747 $7.32 / $13.04 Routing with time-window assignment spliet2015 2.012 2.012 / 1.765 1.765 1.012 1.012 / 1.016 1.016 1.000 1.000 / 0.750 0.750 $7.48 / $11.50 Graph coloring gualandi2012 2.086 2.086 / 1.860 1.860 1.117 1.117 / 1.128 1.128 0.969 0.969 / 0.731 0.731 $4.77 / $11.52 Set partitioning zhang2025 1.558 1.558 / 1.379 1.379 1.021 1.021 / 0.951 0.951 0.536 0.536 / 0.428 0.428 $18.38 / $16.87 Facility location fischetti2017 1.998 1.998 / 1.847 1.847 1.000 1.000 / 1.000 1.000 0.998 0.998 / 0.847 0.847 $2.41 / $1.96"
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "7 Related work"
+    },
+    {
+      "tag": "p",
+      "id": "S7.p1.1",
+      "text": "Autonomous research systems differ in how they organize the search for a useful next experiment. The AI Scientist-v2 explores experimental directions through agentic tree search ( Yamada et al., 2025 ) . Co-Scientist uses model-generated critique to refine hypotheses around a research goal ( Gottweis et al., 2026 ) , and InternAgent-1.5 coordinates generation with verification across computational and empirical tasks ( Feng et al., 2026 ) . These systems share Épi’s need to revise a research direction in response to feedback. AIRA 2 addresses a related execution challenge through asynchronous experiments and a consistent evaluation protocol ( Hambardzumyan et al., 2026 ) . In Épi, the verifier stays fixed within a campaign as the agent changes its approach."
+    },
+    {
+      "tag": "p",
+      "id": "S7.p2.1",
+      "text": "Continuing research also depends on how previous work is represented. Kosmos uses a shared world model to connect literature search and data analysis ( Mitchener et al., 2025 ) . ScienceFlow preserves executable research states that can be resumed or revisited ( Zhao et al., 2026 ) . Knowledge can also pass between investigations through reports, as in AgentRxiv ( Schmidgall and Moor, 2025 ) , or through AutoKD’s persistent graph of accepted findings ( Ge et al., 2026 ) . Épi retains both the experimental state needed to resume a campaign and lessons intended for reuse on another problem. Branches preserve alternative histories within that campaign."
+    },
+    {
+      "tag": "p",
+      "id": "S7.p3.1",
+      "text": "For tasks with executable evaluation, FunSearch and AlphaEvolve guide program generation using measured performance ( Romera-Paredes et al., 2024 ; Novikov et al., 2025 ) . SimpleTES scales search through independent trajectories and reuse of evaluated histories ( Ye et al., 2026 ) . Dream-RSI turns recorded discovery trees into replay environments for evaluating and revising exploration policies before deploying them in further searches ( Zheng et al., 2026 ) . TTT-Discover adapts model weights at test time ( Yuksekgonul et al., 2026 ) . Épi keeps model weights fixed and uses stored lessons and branch histories to guide its next experiment. Released Hyra constructions offer starting points for further refinement ( Hyra Team, 2026 ) . Épi’s investigations can also extend beyond refinement to finding a certificate or proving a statement, as in the Tuza case study."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "8 Autonomous Research for Human Understanding"
+    },
+    {
+      "tag": "p",
+      "id": "S8.p1.1",
+      "text": "Our goal with Épi is to make autonomous research contribute to human understanding: researchers should be able to explain why a result holds, identify what it reveals about the problem, and use that knowledge to guide further work. Achieving this goal requires connecting computational artifacts to explicit formulations, mathematical arguments, and the scientific questions they resolve. Épi builds on existing theory and retains the implementations, experiments, and assessments through which its methods develop. The case studies illustrate how this process can produce knowledge that researchers can use: the Cohn–Elkies separation identifies a structural limit of an established method; the MAX-4-CUT formulation provides a reusable procedure for optimizing gadget weights; and the Tuza proof makes explicit how finite certificates establish a statement about an infinite graph family. These examples express our broader aim for self-improvement: an agent should accumulate both the ability to obtain better results and knowledge that helps people understand and extend those results."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "9 Conclusion"
+    },
+    {
+      "tag": "p",
+      "id": "S9.p1.1",
+      "text": "Épi is an autonomous research agent that sustains investigations across model sessions and improves its methods through memory, branching and independent review. Its campaigns produced 120 record-setting results and a computer-assisted proof of a new case of Tuza’s conjecture. The released constructions and certificates provide concrete, checkable evidence for these advances. Épi-turbo extends this research process to algorithmic coding across routing, scheduling, planning and graph optimization. On 30 FrontierOR tasks, it achieves a 5.4% higher total benchmark score than Codex with the same model while using 64% of its model cost."
+    },
+    {
+      "tag": "p",
+      "id": "S9.p2.1",
+      "text": "Épi couples method improvement with a persistent record of implementations, experiments, and review. This record supports inspection of the research process, while explicit constructions and proof arguments make the resulting findings available for further scientific work. Together, these evaluations demonstrate the applicability of persistent, feedback-driven method development to mathematical discovery and efficient algorithm design."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "Acknowledgements"
+    },
+    {
+      "tag": "p",
+      "id": "Sx1.p1.1",
+      "text": "We thank Prof. Henry Cohn , Prof. David Galvin , Dr. Edward Hirst , Dr. Adam Onus , and Prof. Erich Friedman for their valuable feedback."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "References"
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "Appendix A Mathematical Results and Supporting Evidence"
+    },
+    {
+      "tag": "p",
+      "id": "A1.p1.1",
+      "text": "This appendix records the twelve numerical result families and the Tuza theorem presented in the report. Numerical entries state the new bound, its previous record, and the final artifact that supports it. The Tuza entry explains the finite reduction and certificates behind Theorem 1 . The four Cohn–Elkies dimensions, five B h ​ [ g ] B_{h}[g] coefficients and two quantum channels each count as separate parameter settings in the 20 numerical records."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "A.1 Relevant Variables of Boolean Functions"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS1.p1.1",
+      "text": "The record bound on Wellens’ quantity D ∞ D_{\\infty} decreases from 4.3935 4.3935 to 4.3654674227 4.3654674227 ( Wellens, 2020 ) . This quantity controls the number of relevant variables relative to Boolean-function degree. The finite computation retains an exact infeasibility certificate and a rational feasibility witness for each degree from 1 to 48. The published formulation combines these per-degree certificates into the bound on D ∞ D_{\\infty} ."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "A.2 Cohn–Elkies Linear Programming"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS2.p1.1",
+      "text": "The final dual vectors establish the lower bounds in Table 2 , using Li’s discrete reduction ( Li, 2022 ) . Each dimension has a retained vector and an exact bound expression. The comparison with three-point packing upper bounds ( Cohn et al., 2022 ) establishes the separation in dimensions 10 and 11 described in Section 5.2 . These values bound the optimum of the Cohn–Elkies program from below."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "A.3 Spencer Discrepancy Constant"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS3.p1.1",
+      "text": "For an n × n n\\times n real matrix A A with entries of magnitude at most one, define"
+    },
+    {
+      "tag": "table",
+      "id": "A1.Ex2",
+      "text": "disc ⁡ ( A ) = min ε ∈ { − 1 , 1 } n ⁡ ‖ A ​ ε ‖ ∞ . \\operatorname{disc}(A)=\\min_{\\varepsilon\\in\\{-1,1\\}^{n}}\\|A\\varepsilon\\|_{\\infty}."
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS3.p1.2",
+      "text": "An explicit 8 × 8 8\\times 8 matrix in the collection has discrepancy five. Exhausting all 256 sign assignments verifies this value. It yields the lower bound 5 / 8 ≈ 1.767767 5/\\sqrt{8}\\approx 1.767767 on the universal constant in the square-matrix discrepancy problem, improving the reference 7 / 17 ≈ 1.697749 7/\\sqrt{17}\\approx 1.697749 ( Tao et al., 2026 ) . The final artifact is the matrix itself."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "A.4 Dimer Entropy in Three Dimensions"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS4.p1.1",
+      "text": "The record upper bound on the per-site entropy of perfect matchings of the cubic lattice decreases from 0.452130 0.452130 to 0.452010 0.452010 , extending the transfer-operator computation of He (2026) . The retained positive integer vectors satisfy the transfer-operator inequalities. Evaluating the resulting logarithm gives approximately 0.452009597554483 0.452009597554483 . The stated bound is rounded upward."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "A.5 The n n -Queens Constant"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS5.p1.1",
+      "text": "The final lower and upper witnesses have resolutions 65,536 and 4,096, respectively. Rational feasibility checks and directed rounding give Equation ( 4 ). The interval is approximately 84 times narrower than the comparator from Nobel et al. (2023) . Both witnesses are retained, so the two sides can be checked separately."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "A.6 Ramsey Multiplicity c 4 , 5 c_{4,5}"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS6.p1.1",
+      "text": "A graph on 1,024 vertices changes the record upper bound from"
+    },
+    {
+      "tag": "table",
+      "id": "A1.Ex3",
+      "text": "2129191 2 28 to 4427841832181 2 49 . \\frac{2129191}{2^{28}}\\quad\\text{to}\\quad\\frac{4427841832181}{2^{49}}."
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS6.p1.2",
+      "text": "This is the asymmetric multiplicity problem involving a clique of order four in one color and a clique of order five in the other, following Parczyk et al. (2022a) . The exact reference value is computed from the published 128-vertex graph in the accompanying dataset ( Parczyk et al., 2022b ) . The final graph preserves the construction. A separate exact enumeration checks the graph and its complement."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "A.7 MAX-4-CUT Hardness"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS7.p1.1",
+      "text": "The gadget in Section 5.4 gives the exact ratio 84931 / 86101 84931/86101 , compared with 195581 / 198140 195581/198140 ( Nagda et al., 2025 ) . Integer edge weights make the gadget’s finite objectives recoverable without relying on floating-point optimizer output. The hardness statement uses the original reduction, with the improved weighted gadget substituted into it."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "A.8 Polyomino Growth: Klarner’s Constant"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS8.p1.1",
+      "text": "The number of fixed polyominoes grows exponentially at rate λ \\lambda . Extending the neighborhood recurrence method of Bui (2025) , Épi improves the published upper bound 4.5238 4.5238 to"
+    },
+    {
+      "tag": "table",
+      "id": "A1.Ex4",
+      "text": "λ ≤ 429569 100000 = 4.29569 . \\lambda\\leq\\frac{429569}{100000}=4.29569."
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS8.p1.2",
+      "text": "The certificate covers 1,186 neighborhood types. A separate checker reconstructs the geometric rules, checks the recurrence dependencies and verifies the rational supersolution. Verifying the supersolution against every recurrence constraint establishes the bound for polyominoes of all sizes."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "A.9 Additive Combinatorics: B h ​ [ g ] B_{h}[g] Sets"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS9.p1.1",
+      "text": "A B h ​ [ g ] B_{h}[g] set has at most g g unordered representations of any integer as a sum of h h elements. For g ≥ 2 g\\geq 2 , the framework of Timmons (2016) bounds the size of such a set A ⊆ [ N ] A\\subseteq[N] by"
+    },
+    {
+      "tag": "table",
+      "id": "A1.Ex5",
+      "text": "| A | ≤ ( 1 + o N ​ ( 1 ) ) ​ ( C h ​ g ​ N ) 1 / h . |A|\\leq(1+o_{N}(1))(C_{h}gN)^{1/h}."
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS9.p1.2",
+      "text": "Épi improves all five coefficients below. The published column follows Timmons’ Table 1. The new values are rounded upward."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Table 6: Improved upper-bound coefficients for B h ​ [ g ] B_{h}[g] sets."
+    },
+    {
+      "tag": "table",
+      "id": "A1.T6.5",
+      "text": "h h Published coefficient Épi coefficient 3 14.3 14.3 14.287390218082 14.287390218082 4 71.49 71.49 70.289552594834 70.289552594834 5 413.07 413.07 408.104453996958 408.104453996958 6 2774.16 2774.16 2749.492485514635 2749.492485514635 7 21294.74 21294.74 21149.189776156220 21149.189776156220"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS9.p2.1",
+      "text": "Each certificate supplies a rational cosine kernel. Interval arithmetic establishes its minimum on the full domain and propagates that bound to C h C_{h} . Earlier and new kernels are evaluated by the same frozen implementation."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "A.10 Quartic Feigenbaum Attractor Dimension"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS10.p1.1",
+      "text": "Burbanks et al. (2021) give a rigorous enclosure of the quartic attractor’s Hausdorff dimension. Using their rigorous fixed-point enclosure, Épi proves"
+    },
+    {
+      "tag": "table",
+      "id": "A1.Ex6",
+      "text": "0.6425750638035370 ≤ dim H ( A 4 ) ≤ 0.6425750659339700 . 0.6425750638035370\\leq\\dim_{H}(A_{4})\\leq 0.6425750659339700."
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS10.p1.2",
+      "text": "The published interval has endpoints 0.6395131468772885 0.6395131468772885 and 0.6473156929016112 0.6473156929016112 (rounded outward). The new interval has width 2.130433 × 10 − 9 2.130433\\times 10^{-9} , more than 3.6 3.6 million times narrower than the cited rigorous interval. A separate implementation checks the pressure inequalities throughout the domain."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "A.11 Quantum-Capacity Thresholds"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS11.p1.1",
+      "text": "Following the permutation-invariant state formulation of Agarwal et al. (2026) , Épi finds 40-qubit input states with positive coherent information at"
+    },
+    {
+      "tag": "table",
+      "id": "A1.Ex7",
+      "text": "p XZ = 1198803 10000000 = 0.1198803 , p 2 ​ P = 238683 2000000 = 0.1193415 . p_{\\mathrm{XZ}}=\\frac{1198803}{10000000}=0.1198803,\\qquad p_{\\mathrm{2P}}=\\frac{238683}{2000000}=0.1193415."
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS11.p1.2",
+      "text": "These improve the reported independent X–Z and Two-Pauli thresholds of approximately 0.118371 0.118371 and 0.118067 0.118067 , respectively. Separate interval spectral calculations verify positive coherent information for both states, establishing positive quantum capacity at the stated noise parameters."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "A.12 Water-Network Design: Waterund36"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS12.p1.1",
+      "text": "For the original continuous waterund36 minimization problem ( MINLPLib, 2026 ) , the certificate establishes"
+    },
+    {
+      "tag": "table",
+      "id": "A1.Ex8",
+      "text": "f ∗ ≥ 662.80702839 . f^{*}\\geq 662.80702839."
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS12.p1.2",
+      "text": "It excludes objective values at or below the exact rational cutoff"
+    },
+    {
+      "tag": "table",
+      "id": "A1.Ex9",
+      "text": "6628070283996671 10 13 . \\frac{6628070283996671}{10^{13}}."
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS12.p1.3",
+      "text": "The displayed lower bound is rounded downward. Compared with MINLPLib’s lower bound 655.5441707 655.5441707 and known feasible value 662.8070384 662.8070384 , the remaining gap is about 0.00001001 0.00001001 . The instance also appears in Castro’s study of global optimization with mixed-integer relaxations ( Castro, 2023 ) ."
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS12.p2.1",
+      "text": "The proof rules out every network cheaper than the cutoff by deriving a contradiction from that cost assumption. It first lifts each feasible network into a bounded relaxation using flow and contaminant conservation. For a linear relaxation A ​ x ≤ b Ax\\leq b with box bounds L ≤ x ≤ U L\\leq x\\leq U , any nonpositive row multiplier vector y y gives the valid lower support"
+    },
+    {
+      "tag": "table",
+      "id": "A1.Ex10",
+      "text": "c T ​ x ≥ y T ​ b + min L ≤ z ≤ U ⁡ ( c − A T ​ y ) T ​ z . c^{T}x\\geq y^{T}b+\\min_{L\\leq z\\leq U}(c-A^{T}y)^{T}z."
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS12.p2.2",
+      "text": "Equality-row multipliers may have either sign. The box minimum is evaluated componentwise. Rational support inequalities and bound propagation eventually yield incompatible bounds under the cutoff assumption. Containment of the original feasible set in the relaxation then establishes the global lower bound. The released certificate supplies the model, witnesses and exact comparisons needed for this argument."
+    },
+    {
+      "tag": "h3",
+      "id": null,
+      "text": "A.13 Tuza’s Conjecture: Proof for Three Neighborhood Types"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS13.p1.1",
+      "text": "For the partition in Theorem 1 , discard independent vertices with fewer than two clique neighbors: they occur in no triangle. The remaining vertices have at most three distinct neighborhoods in C C . We call a triple of these neighborhoods, considered up to relabeling C C and permuting the three types, a neighborhood profile."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Finite reduction"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS13.SSS0.Px1.p1.1",
+      "text": "Zeng’s multiplicity-truncation lemma ( Zeng, 2026 ) preserves both τ △ \\tau_{\\triangle} and ν △ \\nu_{\\triangle} when each type is truncated to 28 copies. Every triangle uses a clique edge, so a packing uses at most 28 triangles and at most 28 independent vertices of any type. For covers, all 28 clique edges suffice. If a minimum cover of the truncated graph has fewer than 28 edges, some copy of every saturated type has no incident cover edge. All clique edges within that type’s neighborhood must then be covered, which also covers triangles through any additional copies. Thus the finite multiplicity range suffices for the infinite statement."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Completeness and certificates"
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS13.SSS0.Px2.p1.1",
+      "text": "An independent enumeration gives 872 profiles with three distinct active types. Of these, 35 have nested neighborhoods and fall under the threshold-graph theorem of Bonamy et al. (2022) . Another 277 satisfy Zeng’s maximum-cut criterion ( Zeng, 2026 ) . The cases with at most two types follow from Zeng’s theorem. The remaining 560 profiles are covered by exact certificates containing 18,444 integer boxes in { 0 , … , 28 } 3 \\{0,\\ldots,28\\}^{3} ."
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS13.SSS0.Px2.p2.1",
+      "text": "For a box with componentwise bounds ℓ ≤ m ≤ u \\ell\\leq m\\leq u , the certificate gives a triangle cover F u F_{u} meeting every triangle in the upper-multiplicity graph G u G_{u} and an edge-disjoint triangle packing P ℓ P_{\\ell} in the lower-multiplicity graph G ℓ G_{\\ell} , satisfying | F u | ≤ 2 ​ | P ℓ | |F_{u}|\\leq 2|P_{\\ell}| . The cover meets both the triangles inside C C and every triangle x ​ u ​ v xuv with x ∈ I x\\in I and u , v ∈ N G ​ ( x ) ∩ C u,v\\in N_{G}(x)\\cap C . Adding copies preserves the smaller graph as a subgraph. Hence"
+    },
+    {
+      "tag": "table",
+      "id": "A1.Ex11",
+      "text": "τ △ ​ ( G m ) ≤ | F u | ≤ 2 ​ | P ℓ | ≤ 2 ​ ν △ ​ ( G m ) . \\tau_{\\triangle}(G_{m})\\leq|F_{u}|\\leq 2|P_{\\ell}|\\leq 2\\nu_{\\triangle}(G_{m})."
+    },
+    {
+      "tag": "p",
+      "id": "A1.SS13.SSS0.Px2.p2.2",
+      "text": "A separate checker reconstructs the graphs, enumerates every triangle in each upper-multiplicity graph, checks that its stored cover meets every such triangle, and verifies that the stored packing consists of edge-disjoint triangles in the lower-multiplicity graph. It also checks the cardinality inequality and coverage of every integer multiplicity vector. All 560 profiles and 18,444 boxes passed. The certificates cover the remaining profiles, and truncation extends the conclusion to arbitrary multiplicities. This proves Theorem 1 ."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "Appendix B Additional Construction Results"
+    },
+    {
+      "tag": "p",
+      "id": "A2.p1.1",
+      "text": "For the 34-pentagon case in Section 5.1 , the enclosing triangle side length decreases from 12.98141 12.98141 to 12.97563735803487 12.97563735803487 . The released coordinates retain the construction at full precision."
+    },
+    {
+      "tag": "p",
+      "id": "A2.p2.1",
+      "text": "Table 7 records the three non-packing records in the construction collection. Each row compares the same task instance and objective convention. All objectives in this table are minimized."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "Table 7: Non-packing construction results in the construction collection."
+    },
+    {
+      "tag": "table",
+      "id": "A2.T7.4",
+      "text": "Problem Archived reference Épi Vehicle routing, XL-n1048-k237 380107 380107 380092 380092 Autocorrelation (signed maximum) 1.4515718639 1.4515718639 1.4508066395 1.4508066395 Zhang–Zagier, c 82 c_{82} 0.2536331090 0.2536331090 0.2535744749 0.2535744749"
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Vehicle routing"
+    },
+    {
+      "tag": "p",
+      "id": "A2.SS0.SSS0.Px1.p1.1",
+      "text": "The final construction contains 238 routes serving 1,047 customers with vehicle capacity 128. The objective uses the instance’s rounded Euclidean distances ( CVRPLIB, 2026 ) . The route list determines customer coverage, capacity feasibility, and total length."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Autocorrelation"
+    },
+    {
+      "tag": "p",
+      "id": "A2.SS0.SSS0.Px2.p1.1",
+      "text": "The comparison uses the signed-maximum task and archived reference from EinsteinArena (2026) . For signed step values a 1 , … , a n a_{1},\\ldots,a_{n} , the objective is"
+    },
+    {
+      "tag": "table",
+      "id": "A2.Ex12",
+      "text": "J ⁡ ( a ) = 2 ​ n ​ | max j ⁡ ( a ∗ a ) j | ( ∑ i a i ) 2 , J(a)=\\frac{2n\\left\\lvert\\max_{j}(a*a)_{j}\\right\\rvert}{(\\sum_{i}a_{i})^{2}},"
+    },
+    {
+      "tag": "p",
+      "id": "A2.SS0.SSS0.Px2.p1.2",
+      "text": "where a ∗ a a*a is the discrete self-convolution. The absolute value is taken after the maximum. The maximum-absolute-value variant instead uses max j ⁡ | ( a ∗ a ) j | \\max_{j}\\lvert(a*a)_{j}\\rvert in the numerator; the two objectives can differ for signed constructions. Under the signed-maximum objective, the released construction improves the archived reference by approximately 7.65 × 10 − 4 7.65\\times 10^{-4} ."
+    },
+    {
+      "tag": "h4",
+      "id": null,
+      "text": "Zhang–Zagier"
+    },
+    {
+      "tag": "p",
+      "id": "A2.SS0.SSS0.Px3.p1.1",
+      "text": "The comparison uses the archived reference from maaxgrin (2026) . The c 82 c_{82} construction has an accompanying Arb-based numerical certificate for its objective."
+    },
+    {
+      "tag": "h2",
+      "id": null,
+      "text": "Instructions for reporting errors"
+    },
+    {
+      "tag": "p",
+      "id": null,
+      "text": "We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the methods listed below:"
+    },
+    {
+      "tag": "p",
+      "id": null,
+      "text": "Tip: You can select the relevant text first, to include it in your report."
+    },
+    {
+      "tag": "p",
+      "id": null,
+      "text": "Our team has already identified the following issues . We appreciate your time reviewing and reporting rendering errors we may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability should not be a barrier to accessing research. Thank you for your continued support in championing open access for all."
+    },
+    {
+      "tag": "p",
+      "id": null,
+      "text": "Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a list of packages that need conversion , and welcome developer contributions ."
+    }
+  ],
+  "links": [
+    {
+      "label": "Learn more",
+      "href": "https://info.arxiv.org/about"
+    },
+    {
+      "label": "Back to arXiv",
+      "href": "/"
+    },
+    {
+      "label": "",
+      "href": "https://info.arxiv.org/about/accessible_HTML.html"
+    },
+    {
+      "label": "",
+      "href": "#"
+    },
+    {
+      "label": "",
+      "href": "/abs/2610.24944v1"
+    },
+    {
+      "label": "",
+      "href": "/pdf/2610.24944v1"
+    },
+    {
+      "label": "",
+      "href": "javascript:toggleNavTOC();"
+    },
+    {
+      "label": "",
+      "href": "javascript:toggleReadingMode();"
+    },
+    {
+      "label": "",
+      "href": "#abstract1"
+    },
+    {
+      "label": "",
+      "href": "#S1"
+    },
+    {
+      "label": "",
+      "href": "#S1.SS0.SSS0.Px1"
+    },
+    {
+      "label": "",
+      "href": "#S1.SS0.SSS0.Px2"
+    },
+    {
+      "label": "",
+      "href": "#S1.SS0.SSS0.Px3"
+    },
+    {
+      "label": "",
+      "href": "#S2"
+    },
+    {
+      "label": "",
+      "href": "#S2.SS1"
+    },
+    {
+      "label": "",
+      "href": "#S2.SS2"
+    },
+    {
+      "label": "",
+      "href": "#S3"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS1"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS2"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS2.SSS0.Px1"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS2.SSS0.Px2"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS2.SSS0.Px3"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS2.SSS0.Px4"
+    },
+    {
+      "label": "",
+      "href": "#S3.SS2.SSS0.Px5"
+    },
+    {
+      "label": "",
+      "href": "#S4"
+    },
+    {
+      "label": "",
+      "href": "#S4.SS1"
+    },
+    {
+      "label": "",
+      "href": "#S4.SS2"
+    },
+    {
+      "label": "",
+      "href": "#S4.SS3"
+    },
+    {
+      "label": "",
+      "href": "#S5"
+    },
+    {
+      "label": "",
+      "href": "#S5.SS1"
+    },
+    {
+      "label": "",
+      "href": "#S5.SS2"
+    },
+    {
+      "label": "",
+      "href": "#S5.SS3"
+    },
+    {
+      "label": "",
+      "href": "#S5.SS4"
+    },
+    {
+      "label": "",
+      "href": "#S5.SS5"
+    },
+    {
+      "label": "",
+      "href": "#S5.SS6"
+    },
+    {
+      "label": "",
+      "href": "#S5.SS7"
+    },
+    {
+      "label": "",
+      "href": "#S5.SS7.SSS0.Px1"
+    },
+    {
+      "label": "",
+      "href": "#S5.SS7.SSS0.Px2"
+    },
+    {
+      "label": "",
+      "href": "#S5.SS7.SSS0.Px3"
+    },
+    {
+      "label": "",
+      "href": "#S6"
+    },
+    {
+      "label": "",
+      "href": "#S6.SS1"
+    },
+    {
+      "label": "",
+      "href": "#S6.SS1.SSS0.Px1"
+    },
+    {
+      "label": "",
+      "href": "#S6.SS1.SSS0.Px2"
+    },
+    {
+      "label": "",
+      "href": "#S6.SS1.SSS0.Px3"
+    },
+    {
+      "label": "",
+      "href": "#S6.SS1.SSS0.Px4"
+    },
+    {
+      "label": "",
+      "href": "#S6.SS1.SSS0.Px5"
+    },
+    {
+      "label": "",
+      "href": "#S6.SS1.SSS0.Px6"
+    },
+    {
+      "label": "",
+      "href": "#S6.SS2"
+    },
+    {
+      "label": "",
+      "href": "#S6.SS3"
+    },
+    {
+      "label": "",
+      "href": "#S6.SS4"
+    },
+    {
+      "label": "",
+      "href": "#S6.SS4.SSS0.Px1"
+    },
+    {
+      "label": "",
+      "href": "#S6.SS4.SSS0.Px2"
+    },
+    {
+      "label": "",
+      "href": "#S6.SS4.SSS0.Px3"
+    },
+    {
+      "label": "",
+      "href": "#S6.SS4.SSS0.Px4"
+    },
+    {
+      "label": "",
+      "href": "#S7"
+    },
+    {
+      "label": "",
+      "href": "#S8"
+    },
+    {
+      "label": "",
+      "href": "#S9"
+    },
+    {
+      "label": "",
+      "href": "#bib"
+    },
+    {
+      "label": "",
+      "href": "#A1"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS1"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS2"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS3"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS4"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS5"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS6"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS7"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS8"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS9"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS10"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS11"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS12"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS13"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS13.SSS0.Px1"
+    },
+    {
+      "label": "",
+      "href": "#A1.SS13.SSS0.Px2"
+    },
+    {
+      "label": "",
+      "href": "#A2"
+    },
+    {
+      "label": "",
+      "href": "#A2.SS0.SSS0.Px1"
+    },
+    {
+      "label": "",
+      "href": "#A2.SS0.SSS0.Px2"
+    },
+    {
+      "label": "",
+      "href": "#A2.SS0.SSS0.Px3"
+    },
+    {
+      "label": "License: CC BY 4.0",
+      "href": "https://info.arxiv.org/help/license/index.html#licenses-available"
+    },
+    {
+      "label": "Blog",
+      "href": "https://bakeai.inc/research/articles/epi/"
+    },
+    {
+      "label": "Results on GitHub",
+      "href": "https://github.com/BakeLab/Epi-results"
+    },
+    {
+      "label": "Romera-Paredes et al., 2024",
+      "href": "#bib.bib36"
+    },
+    {
+      "label": "Novikov et al., 2025",
+      "href": "#bib.bib30"
+    },
+    {
+      "label": "Yamada et al., 2025",
+      "href": "#bib.bib42"
+    },
+    {
+      "label": "Mitchener et al., 2025",
+      "href": "#bib.bib27"
+    },
+    {
+      "label": "Feng et al., 2026",
+      "href": "#bib.bib13"
+    },
+    {
+      "label": "Zhao et al., 2026",
+      "href": "#bib.bib46"
+    },
+    {
+      "label": "Huang et al., 2026",
+      "href": "#bib.bib20"
+    },
+    {
+      "label": "Yamada et al., 2025",
+      "href": "#bib.bib42"
+    },
+    {
+      "label": "Zhao et al., 2026",
+      "href": "#bib.bib46"
+    },
+    {
+      "label": "6",
+      "href": "#S6"
+    },
+    {
+      "label": "4",
+      "href": "#S4"
+    },
+    {
+      "label": "Epi Team, 2026",
+      "href": "#bib.bib12"
+    },
+    {
+      "label": "8",
+      "href": "#S8"
+    },
+    {
+      "label": "1",
+      "href": "#S3.F1"
+    },
+    {
+      "label": "2",
+      "href": "#S2"
+    },
+    {
+      "label": "Atkinson and Shiffrin, 1968",
+      "href": "#bib.bib2"
+    },
+    {
+      "label": "Packer et al., 2023",
+      "href": "#bib.bib32"
+    },
+    {
+      "label": "Park et al., 2023",
+      "href": "#bib.bib35"
+    },
+    {
+      "label": "1",
+      "href": "#S3.F1"
+    },
+    {
+      "label": "Huang et al., 2024",
+      "href": "#bib.bib19"
+    },
+    {
+      "label": "Denison et al., 2024",
+      "href": "#bib.bib10"
+    },
+    {
+      "label": "5.1",
+      "href": "#S5.SS1"
+    },
+    {
+      "label": "2",
+      "href": "#S4.F2"
+    },
+    {
+      "label": "Epi Team, 2026",
+      "href": "#bib.bib12"
+    },
+    {
+      "label": "2",
+      "href": "#S4.F2"
+    },
+    {
+      "label": "Specht, 2026",
+      "href": "#bib.bib38"
+    },
+    {
+      "label": "Friedman, 2026",
+      "href": "#bib.bib14"
+    },
+    {
+      "label": "B",
+      "href": "#A2"
+    },
+    {
+      "label": "1",
+      "href": "#S4.T1"
+    },
+    {
+      "label": "A",
+      "href": "#A1"
+    },
+    {
+      "label": "2",
+      "href": "#S5.T2"
+    },
+    {
+      "label": "2",
+      "href": "#S5.T2"
+    },
+    {
+      "label": "Friedman, 2026",
+      "href": "#bib.bib14"
+    },
+    {
+      "label": "3",
+      "href": "#S5.F3"
+    },
+    {
+      "label": "Specht, 2026",
+      "href": "#bib.bib38"
+    },
+    {
+      "label": "Li (2022)",
+      "href": "#bib.bib24"
+    },
+    {
+      "label": "2",
+      "href": "#S5.T2"
+    },
+    {
+      "label": "Cohn et al. (2022)",
+      "href": "#bib.bib8"
+    },
+    {
+      "label": "Cohn et al. (2022)",
+      "href": "#bib.bib8"
+    },
+    {
+      "label": "2",
+      "href": "#S5.E2"
+    },
+    {
+      "label": "Nobel et al. (2023)",
+      "href": "#bib.bib29"
+    },
+    {
+      "label": "5",
+      "href": "#S5.F5"
+    },
+    {
+      "label": "A",
+      "href": "#A1"
+    },
+    {
+      "label": "Nagda et al. (2025)",
+      "href": "#bib.bib28"
+    },
+    {
+      "label": "Nagda et al. (2025)",
+      "href": "#bib.bib28"
+    },
+    {
+      "label": "Tao et al., 2026",
+      "href": "#bib.bib39"
+    },
+    {
+      "label": "5",
+      "href": "#S5.F5"
+    },
+    {
+      "label": "MINLPLib, 2026",
+      "href": "#bib.bib26"
+    },
+    {
+      "label": "A.12",
+      "href": "#A1.SS12"
+    },
+    {
+      "label": "A.12",
+      "href": "#A1.SS12"
+    },
+    {
+      "label": "Bonamy et al., 2022",
+      "href": "#bib.bib3"
+    },
+    {
+      "label": "Kőnig, 1931",
+      "href": "#bib.bib23"
+    },
+    {
+      "label": "Bonamy et al., 2022",
+      "href": "#bib.bib3"
+    },
+    {
+      "label": "Botler et al., 2021",
+      "href": "#bib.bib4"
+    },
+    {
+      "label": "Zeng (2026)",
+      "href": "#bib.bib45"
+    },
+    {
+      "label": "A.13",
+      "href": "#A1.SS13"
+    },
+    {
+      "label": "Kong et al., 2026",
+      "href": "#bib.bib22"
+    },
+    {
+      "label": "OpenAI, 2026",
+      "href": "#bib.bib31"
+    },
+    {
+      "label": "3",
+      "href": "#S6.T3"
+    },
+    {
+      "label": "7",
+      "href": "#S6.F7"
+    },
+    {
+      "label": "4",
+      "href": "#S6.T4"
+    },
+    {
+      "label": "5",
+      "href": "#S6.T5"
+    },
+    {
+      "label": "Yamada et al., 2025",
+      "href": "#bib.bib42"
+    },
+    {
+      "label": "Gottweis et al., 2026",
+      "href": "#bib.bib16"
+    },
+    {
+      "label": "Feng et al., 2026",
+      "href": "#bib.bib13"
+    },
+    {
+      "label": "Hambardzumyan et al., 2026",
+      "href": "#bib.bib17"
+    },
+    {
+      "label": "Mitchener et al., 2025",
+      "href": "#bib.bib27"
+    },
+    {
+      "label": "Zhao et al., 2026",
+      "href": "#bib.bib46"
+    },
+    {
+      "label": "Schmidgall and Moor, 2025",
+      "href": "#bib.bib37"
+    },
+    {
+      "label": "Ge et al., 2026",
+      "href": "#bib.bib15"
+    },
+    {
+      "label": "Romera-Paredes et al., 2024",
+      "href": "#bib.bib36"
+    },
+    {
+      "label": "Novikov et al., 2025",
+      "href": "#bib.bib30"
+    },
+    {
+      "label": "Ye et al., 2026",
+      "href": "#bib.bib43"
+    },
+    {
+      "label": "Zheng et al., 2026",
+      "href": "#bib.bib47"
+    },
+    {
+      "label": "Yuksekgonul et al., 2026",
+      "href": "#bib.bib44"
+    },
+    {
+      "label": "Hyra Team, 2026",
+      "href": "#bib.bib21"
+    },
+    {
+      "label": "https://arxiv.org/abs/2605.09138v2",
+      "href": "https://arxiv.org/abs/2605.09138v2"
+    },
+    {
+      "label": "https://doi.org/10.1016/S0079-7421(08)60422-3",
+      "href": "https://doi.org/10.1016/S0079-7421(08)60422-3"
+    },
+    {
+      "label": "https://arxiv.org/abs/2105.09871v3",
+      "href": "https://arxiv.org/abs/2105.09871v3"
+    },
+    {
+      "label": "https://arxiv.org/abs/2002.07925v2",
+      "href": "https://arxiv.org/abs/2002.07925v2"
+    },
+    {
+      "label": "https://arxiv.org/abs/2511.00461v2",
+      "href": "https://arxiv.org/abs/2511.00461v2"
+    },
+    {
+      "label": "https://arxiv.org/abs/2102.11239v1",
+      "href": "https://arxiv.org/abs/2102.11239v1"
+    },
+    {
+      "label": "https://pubs.acs.org/doi/10.1021/acs.iecr.3c00191",
+      "href": "https://pubs.acs.org/doi/10.1021/acs.iecr.3c00191"
+    },
+    {
+      "label": "https://arxiv.org/abs/2206.15373v1",
+      "href": "https://arxiv.org/abs/2206.15373v1"
+    },
+    {
+      "label": "https://galgos.inf.puc-rio.br/cvrplib/index.php/en/plots/280",
+      "href": "https://galgos.inf.puc-rio.br/cvrplib/index.php/en/plots/280"
+    },
+    {
+      "label": "https://arxiv.org/abs/2406.10162",
+      "href": "https://arxiv.org/abs/2406.10162"
+    },
+    {
+      "label": "https://einsteinarena.com/problems/third-autocorrelation-inequality",
+      "href": "https://einsteinarena.com/problems/third-autocorrelation-inequality"
+    },
+    {
+      "label": "https://github.com/BakeLab/Epi-results",
+      "href": "https://github.com/BakeLab/Epi-results"
+    },
+    {
+      "label": "https://arxiv.org/abs/2602.08990v1",
+      "href": "https://arxiv.org/abs/2602.08990v1"
+    },
+    {
+      "label": "https://erich-friedman.github.io/packing/penintri/",
+      "href": "https://erich-friedman.github.io/packing/penintri/"
+    },
+    {
+      "label": "https://arxiv.org/abs/2609.06366v1",
+      "href": "https://arxiv.org/abs/2609.06366v1"
+    },
+    {
+      "label": "https://www.nature.com/articles/s41586-026-10644-y",
+      "href": "https://www.nature.com/articles/s41586-026-10644-y"
+    },
+    {
+      "label": "https://arxiv.org/abs/2603.26499v2",
+      "href": "https://arxiv.org/abs/2603.26499v2"
+    },
+    {
+      "label": "https://arxiv.org/abs/2607.28810v2",
+      "href": "https://arxiv.org/abs/2607.28810v2"
+    },
+    {
+      "label": "https://arxiv.org/abs/2310.01798",
+      "href": "https://arxiv.org/abs/2310.01798"
+    },
+    {
+      "label": "https://arxiv.org/abs/2607.14159v1",
+      "href": "https://arxiv.org/abs/2607.14159v1"
+    },
+    {
+      "label": "https://github.com/Tencent-Hunyuan/Hyra-results",
+      "href": "https://github.com/Tencent-Hunyuan/Hyra-results"
+    },
+    {
+      "label": "https://arxiv.org/abs/2605.25246",
+      "href": "https://arxiv.org/abs/2605.25246"
+    },
+    {
+      "label": "https://arxiv.org/abs/2009.03780",
+      "href": "https://arxiv.org/abs/2009.03780"
+    },
+    {
+      "label": "https://arxiv.org/abs/2206.09876v3",
+      "href": "https://arxiv.org/abs/2206.09876v3"
+    },
+    {
+      "label": "https://github.com/maaxgrin/zhang-zagier-c82-bound",
+      "href": "https://github.com/maaxgrin/zhang-zagier-c82-bound"
+    },
+    {
+      "label": "https://minlplib.org/waterund36.html",
+      "href": "https://minlplib.org/waterund36.html"
+    },
+    {
+      "label": "https://arxiv.org/abs/2511.02824v2",
+      "href": "https://arxiv.org/abs/2511.02824v2"
+    },
+    {
+      "label": "https://arxiv.org/abs/2509.18057v7",
+      "href": "https://arxiv.org/abs/2509.18057v7"
+    },
+    {
+      "label": "https://web.stanford.edu/~boyd/papers/n_queens.html",
+      "href": "https://web.stanford.edu/~boyd/papers/n_queens.html"
+    },
+    {
+      "label": "https://arxiv.org/abs/2506.13131v1",
+      "href": "https://arxiv.org/abs/2506.13131v1"
+    },
+    {
+      "label": "https://github.com/openai/codex",
+      "href": "https://github.com/openai/codex"
+    },
+    {
+      "label": "https://arxiv.org/abs/2310.08560",
+      "href": "https://arxiv.org/abs/2310.08560"
+    },
+    {
+      "label": "https://arxiv.org/abs/2206.04036v3",
+      "href": "https://arxiv.org/abs/2206.04036v3"
+    },
+    {
+      "label": "https://zenodo.org/records/6602512",
+      "href": "https://zenodo.org/records/6602512"
+    },
+    {
+      "label": "https://arxiv.org/abs/2304.03442",
+      "href": "https://arxiv.org/abs/2304.03442"
+    },
+    {
+      "label": "https://www.nature.com/articles/s41586-023-06924-6",
+      "href": "https://www.nature.com/articles/s41586-023-06924-6"
+    },
+    {
+      "label": "https://agentrxiv.github.io/resources/agentrxiv.pdf",
+      "href": "https://agentrxiv.github.io/resources/agentrxiv.pdf"
+    },
+    {
+      "label": "https://packomania.com/",
+      "href": "https://packomania.com/"
+    },
+    {
+      "label": "https://github.com/teorth/optimizationproblems/blob/main/constants/10c.md",
+      "href": "https://github.com/teorth/optimizationproblems/blob/main/constants/10c.md"
+    },
+    {
+      "label": "https://arxiv.org/abs/1604.00661v1",
+      "href": "https://arxiv.org/abs/1604.00661v1"
+    },
+    {
+      "label": "https://arxiv.org/abs/2005.00566v2",
+      "href": "https://arxiv.org/abs/2005.00566v2"
+    },
+    {
+      "label": "https://arxiv.org/abs/2504.08066v1",
+      "href": "https://arxiv.org/abs/2504.08066v1"
+    },
+    {
+      "label": "https://arxiv.org/abs/2604.19341v2",
+      "href": "https://arxiv.org/abs/2604.19341v2"
+    },
+    {
+      "label": "https://arxiv.org/abs/2601.16175v2",
+      "href": "https://arxiv.org/abs/2601.16175v2"
+    },
+    {
+      "label": "https://www.preprints.org/manuscript/202608.1304",
+      "href": "https://www.preprints.org/manuscript/202608.1304"
+    },
+    {
+      "label": "https://arxiv.org/abs/2608.14354v2",
+      "href": "https://arxiv.org/abs/2608.14354v2"
+    },
+    {
+      "label": "https://arxiv.org/abs/2609.14858v1",
+      "href": "https://arxiv.org/abs/2609.14858v1"
+    },
+    {
+      "label": "1",
+      "href": "#Thmtheorem1"
+    },
+    {
+      "label": "Wellens, 2020",
+      "href": "#bib.bib41"
+    },
+    {
+      "label": "2",
+      "href": "#S5.T2"
+    },
+    {
+      "label": "Li, 2022",
+      "href": "#bib.bib24"
+    },
+    {
+      "label": "Cohn et al., 2022",
+      "href": "#bib.bib8"
+    },
+    {
+      "label": "5.2",
+      "href": "#S5.SS2"
+    },
+    {
+      "label": "Tao et al., 2026",
+      "href": "#bib.bib39"
+    },
+    {
+      "label": "He (2026)",
+      "href": "#bib.bib18"
+    },
+    {
+      "label": "4",
+      "href": "#S5.E4"
+    },
+    {
+      "label": "Nobel et al. (2023)",
+      "href": "#bib.bib29"
+    },
+    {
+      "label": "Parczyk et al. (2022a)",
+      "href": "#bib.bib33"
+    },
+    {
+      "label": "Parczyk et al., 2022b",
+      "href": "#bib.bib34"
+    },
+    {
+      "label": "5.4",
+      "href": "#S5.SS4"
+    },
+    {
+      "label": "Nagda et al., 2025",
+      "href": "#bib.bib28"
+    },
+    {
+      "label": "Bui (2025)",
+      "href": "#bib.bib5"
+    },
+    {
+      "label": "Timmons (2016)",
+      "href": "#bib.bib40"
+    },
+    {
+      "label": "Burbanks et al. (2021)",
+      "href": "#bib.bib6"
+    },
+    {
+      "label": "Agarwal et al. (2026)",
+      "href": "#bib.bib1"
+    },
+    {
+      "label": "MINLPLib, 2026",
+      "href": "#bib.bib26"
+    },
+    {
+      "label": "Castro, 2023",
+      "href": "#bib.bib7"
+    },
+    {
+      "label": "1",
+      "href": "#Thmtheorem1"
+    },
+    {
+      "label": "Zeng, 2026",
+      "href": "#bib.bib45"
+    },
+    {
+      "label": "Bonamy et al. (2022)",
+      "href": "#bib.bib3"
+    },
+    {
+      "label": "Zeng, 2026",
+      "href": "#bib.bib45"
+    },
+    {
+      "label": "1",
+      "href": "#Thmtheorem1"
+    },
+    {
+      "label": "5.1",
+      "href": "#S5.SS1"
+    },
+    {
+      "label": "7",
+      "href": "#A2.T7"
+    },
+    {
+      "label": "CVRPLIB, 2026",
+      "href": "#bib.bib9"
+    },
+    {
+      "label": "EinsteinArena (2026)",
+      "href": "#bib.bib11"
+    },
+    {
+      "label": "maaxgrin (2026)",
+      "href": "#bib.bib25"
+    },
+    {
+      "label": "view the build logs",
+      "href": "./2610.24944v1/__stdout.txt"
+    },
+    {
+      "label": "L A T E xml",
+      "href": "https://math.nist.gov/~BMiller/LaTeXML/"
+    },
+    {
+      "label": "the following issues",
+      "href": "https://github.com/arXiv/html_feedback/issues"
+    },
+    {
+      "label": "list of packages that need conversion",
+      "href": "https://github.com/brucemiller/LaTeXML/wiki/Porting-LaTeX-packages-for-LaTeXML"
+    },
+    {
+      "label": "developer contributions",
+      "href": "https://github.com/brucemiller/LaTeXML/issues"
+    },
+    {
+      "label": "member institutions",
+      "href": "https://info.arxiv.org/about/ourmembers.html"
+    },
+    {
+      "label": "",
+      "href": "https://info.arxiv.org/about"
+    },
+    {
+      "label": "",
+      "href": "https://info.arxiv.org/help"
+    },
+    {
+      "label": "",
+      "href": "https://info.arxiv.org/help/contact.html"
+    },
+    {
+      "label": "",
+      "href": "https://info.arxiv.org/help/subscribe"
+    },
+    {
+      "label": "",
+      "href": "https://info.arxiv.org/help/license/index.html"
+    },
+    {
+      "label": "",
+      "href": "https://info.arxiv.org/help/policies/privacy_policy.html"
+    },
+    {
+      "label": "",
+      "href": "https://info.arxiv.org/help/web_accessibility.html"
+    },
+    {
+      "label": "",
+      "href": "https://status.arxiv.org"
+    },
+    {
+      "label": "",
+      "href": "https://www.simonsfoundation.org/"
+    },
+    {
+      "label": "",
+      "href": "https://www.sfi.org.bm/"
+    },
+    {
+      "label": "",
+      "href": "https://www.schmidtsciences.org/"
+    },
+    {
+      "label": "",
+      "href": "javascript:toggleReadingMode();"
+    }
+  ]
+}

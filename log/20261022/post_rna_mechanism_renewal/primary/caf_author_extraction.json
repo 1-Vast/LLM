@@ -1,0 +1,614 @@
+{
+  "source": "caf_fulltext.body",
+  "sections": [
+    {
+      "tag": "p",
+      "text": "Cancer-associated fibroblasts (CAFs) exhibit remarkable functional heterogeneity, with conserved subtypes observed across diverse malignancies. However, their shared roles in shaping the tumor microenvironment (TME) and their dynamic plasticity remain incompletely understood. In this study, through integrated single-cell and spatial transcriptomic profiling across four cancer types, we identified two distinct immunomodulatory CAF states, termed antigen-presenting CAFs (apCAFs) and matrix-producing CAFs (mCAFs). Across multiple solid tumors, apCAFs were associated with enhanced anti-tumor immune features and favorable prognosis, whereas mCAFs were associated with immunosuppressive characteristics and poorer clinical outcomes. Spatial analyses revealed distinct localization patterns of apCAFs and mCAFs within the TME. Functionally, patient-derived apCAFs promoted T-cell migration, proliferation, and activation, whereas mCAFs suppressed these responses in vitro. Pan-cancer analyses further revealed a strong inverse correlation between apCAF and mCAF abundance across tumor tissues. Mechanistically, IFN-γ and TGF-β–associated signaling contexts were linked to distinct CAF transcriptional programs, with IFN-γ promoting apCAF-associated features and TGF-β favoring mCAF-associated features, suggesting a potential role of cytokine context in shaping CAF state heterogeneity. Clinically, apCAFs correlated with favorable immunotherapy response, whereas mCAFs predicted poor therapeutic outcomes. Collectively, these findings identify conserved immunomodulatory CAF subtypes across cancers, reveal distinct cytokine-associated CAF programs, and support stromal reprogramming as a promising strategy to enhance immunotherapy efficacy."
+    },
+    {
+      "tag": "p",
+      "text": "The advent of high-dimensional single-cell RNA sequencing (scRNA-seq) has revolutionized the characterization of CAF heterogeneity across malignancies3–7 -classified by marker genes, functional traits, or numerical designations. Notably, despite anatomical and study-specific differences, certain CAF subtypes exhibit shared functions, a finding that was recognized even prior to the adoption of scRNA-seq technologies. For instance, ECM-remodeling CAFs, enriched in genes related to extracellular matrix deposition and genes responsive to TGF-β, were identified in cancers including breast cancer,5 cervical cancer,8 intrahepatic cholangiocarcinoma,9 pancreatic ductal adenocarcinoma (PDAC),4 and ovarian cancer.10 Perivascular CD146⁺ CAFs express microvasculature-associated genes across multiple cancers.9,11–13 MHC class II-expressing CAFs, initially identified in pancreatic3,4 and breast cancers14 in recent years, have also been reported in lung cancer15 and cholangiocarcinoma.9 These findings underscore the presence of conserved functional modules among CAFs across various cancer types.16,17 Given their genetic stability relative to tumor cells, conserved CAF subtypes represent attractive therapeutic targets in a pan-cancer context. Recent pan-cancer analyses have cataloged shared CAF phenotypes,18–20 but key challenges remain, including systematic evaluation of their immunomodulatory functions in tumors and the inter-regulation among CAF subtypes.."
+    },
+    {
+      "tag": "p",
+      "text": "To address these gaps, we integrated published and newly generated in-house scRNA-seq datasets of four common tumor types to identify conserved CAF subtypes and dissect their immune regulatory functions. We further applied spatial transcriptomics (ST) to map subtype localization and crosstalk within the TME, and leveraged bulk RNA-seq data from TCGA to extend the analysis to a pan-cancer context. We identified five conserved CAF subtypes across cancers, two of which-antigen-presenting CAFs (apCAFs) and matrix-producing CAFs (mCAFs)-exhibited active and suppressive immunomodulatory roles, respectively. Another critical yet underexplored question is how CAF subtypes are shaped and inter-regulated within the TME. In this study, we observed distinct associations of IFN-γ and TGF-β signaling with apCAF and mCAF states, respectively, suggesting that cytokine context may contribute to CAF heterogeneity within the TME. Finally, we found that the apCAF signature correlated positively with favorable immunotherapy responses, whereas the mCAF signature correlated negatively."
+    },
+    {
+      "tag": "p",
+      "text": "In summary, our systematic investigation of CAFs provides insights into conserved immunomodulatory subtypes across malignancies and suggests that distinct cytokine-associated CAF states may contribute to stromal heterogeneity, offering a potential strategy to overcome stromal-mediated immunotherapy resistance."
+    },
+    {
+      "tag": "p",
+      "text": "To establish a single-cell transcriptional atlas of human fibroblasts, we integrated newly generated in-house and publicly available scRNA-seq datasets comprising 72 samples from 42 patients across four prevalent cancer types (Fig. 1a, b; Supplementary Table 1). The newly collected specimens for scRNA-seq consist of paired adjacent and tumor samples from 5 colorectal cancer patients, 3 lung cancer patients, 3 stomach cancer patients, and 4 breast cancer patients (Fig. 1c, Supplementary Table 1). The matched tissues were also analyzed using ST (Fig. 1d). After rigorous quality control, a total of 409,917 cells from the scRNA-seq datasets and 70,649 spots from the ST datasets were retained for downstream analyses (Supplementary Fig. 1a, b). To minimize batch effects across cancer types, each scRNA-seq dataset was initially analyzed separately, leading to the identification of nine major cell types based on unsupervised clustering and canonical marker genes (Supplementary Fig. 1c, d).Fig. 1Creation of a Comprehensive Single Fibroblast Atlas. a Flow chart of the workflow. The number of patients collected for each cancer type was detailed in the first image. b Number of included samples (red, in-house data; indigo, public data). c, d Total number of scRNA-seq (c) and ST (d) samples included. e A UMAP plot showing the integrated fibroblast subpopulations. f Dot plot illustrating marker gene expression across fibroblast subsets. g Distribution of fibroblast subsets in adjacent and tumor tissues across different cancer types. h Heatmap illustrating GOBP activities, as scored by AUCell, for each CAF subtype. i Enriched KEGG pathways identified for each CAF subset"
+    },
+    {
+      "tag": "p",
+      "text": "Creation of a Comprehensive Single Fibroblast Atlas. a Flow chart of the workflow. The number of patients collected for each cancer type was detailed in the first image. b Number of included samples (red, in-house data; indigo, public data). c, d Total number of scRNA-seq (c) and ST (d) samples included. e A UMAP plot showing the integrated fibroblast subpopulations. f Dot plot illustrating marker gene expression across fibroblast subsets. g Distribution of fibroblast subsets in adjacent and tumor tissues across different cancer types. h Heatmap illustrating GOBP activities, as scored by AUCell, for each CAF subtype. i Enriched KEGG pathways identified for each CAF subset"
+    },
+    {
+      "tag": "p",
+      "text": "To investigate fibroblast heterogeneity and identify conserved fibroblast states across cancers, 28,224 fibroblasts were extracted from all datasets, integrated following batch correction, and subsequently re-clustered for downstream analyses (Supplementary Fig. 2a, b). Utilizing established marker genes from previous fibroblast studies18,19,21 and related function, we identified eight distinct subtypes, including normal fibroblast (NF), smooth muscle cell (SMC), telocytes, as well as five CAF subtypes: antigen-presenting CAFs (apCAF), matrix-producing CAFs (mCAF), adipogenic CAFs (adiCAF), peripheral nerve-like CAFs (pnCAF) and vascular CAFs (vasCAF) (Fig. 1e, Supplementary Table 2). The mCAF subtype was characterized by high expression of extracellular matrix–related genes, including the matrix-remodeling enzyme MMP11, multiple collagen genes (COL10A1, COL11A1, COL8A1, COL12A1, and COL5A2), and non-collagenous matrix proteins such as COMP and POSTN (Figs. 1f, 3b). Therefore, we named these cells matrix-producing CAF, which is in alignment with prior studies.5,19,22,23 mCAF cells also exhibited elevated expression of immunomodulation-related genes, including FAP and TGFB1 (Fig. 1f, Supplementary Fig. 2c). The apCAF subtype exhibited high expression of MHC class II genes involved in antigen presentation, including HLA-DRA, HLA-DRB1 and CD74 (Fig. 1f, Supplementary Fig. 2c), but lacks classical costimulatory molecules, distinguishing these cells from professional antigen-presenting cells (APCs). Consistent with prior studies that first described MHC class II⁺ CAF populations as apCAFs,4 we designated this subtype as apCAFs in the present study. The vasCAF subtype showed high expression of NOTCH3, a critical receptor involved in vascularization and angiogenesis,24 as well as COL18A1, another angiogenesis-associated gene. Additionally, vasCAF was marked by high expression of MCAM (encoding CD146) and the pericyte marker RGS5 (Fig. 1f, Supplementary Fig. 2c). Through normalized proportion calculations of CAF subtypes, we observed a significant reduction in NFs within tumor tissues compared to adjacent tissues. Meanwhile, the proportions of mCAF and vasCAF subtypes were significantly elevated in tumor tissues (Fig. 1g, Supplementary Fig. 2d-e)."
+    },
+    {
+      "tag": "p",
+      "text": "To investigate the heterogeneous functional characteristics of the subtypes, we assessed the activity of gene sets associated with various Gene Ontology Biological Processes (GOBP) using the AUCell algorithm (Supplementary Table 3). As anticipated, adiCAF was enriched in lipid-related pathways, including glycolipid transport. apCAF exhibited the highest activity in immune-regulatory functions, encompassing T cell function, proliferation, differentiation, NK cell chemotaxis, as well as antigen processing and presentation. mCAF demonstrated enrichment in pathways linked to ECM synthesis, modulation, and extracellular signal transduction. vasCAF was characterized by enrichment in angiogenesis-related pathways, while pnCAF showed enrichment in neuronal signal transduction and nervous system myelin maintenance, which is crucial for the protection of the nervous system (Fig. 1h, Supplementary Fig. 3a, Supplementary Table 3). Additionally, we employed Gene Set Variation Analysis (GSVA) to estimate Kyoto Encyclopedia of Genes and Genomes (KEGG) pathways enrichment across subtypes, yielding consistent results: adiCAF was involved in lipid metabolism, apCAF in immune regulation, mCAF in ECM remodeling and interaction, vasCAF in angiogenesis, and pnCAF in the synthesis of nerve signaling molecules (Fig. 1i, Supplementary Table 3). CAF subtypes also demonstrated different functional hallmark and metabolic characteristics (Supplementary Fig. 3b, c, Supplementary Table 3)."
+    },
+    {
+      "tag": "p",
+      "text": "To gain a comprehensive understanding of the impact of CAF subtypes on anti-tumor immunity, we analyzed the correlation between CAF subtype abundance and TME signatures utilizing datasets from The Cancer Genome Atlas (TCGA). CAF subtype abundance was determined using CIBERSORTx,25 informed by subtype-specific gene expression profiles delineated through our scRNA-seq data (Supplementary Table 4). TME signatures were calculated based on unique expression patterns of functional gene signatures (Fges) curated by Bagaev et al.,26 using the single-sample Gene Set Enrichment Analysis (ssGSEA) methodology. Pearson correlation analysis demonstrated that the abundance of the apCAF subtype was positively correlated with the expression of Fges associated with anti-tumor microenvironment across all four cancer types. This includes Fges related to key T cell activities, such as trafficking, T-helper 1 (Th1) responses, and effector cell function, as well as those associated with natural killer (NK) cells and MHC class II and class I expression. However, apCAF abundance was negatively correlated with the expression of Fges implicated in angiogenesis, fibrosis, and epithelial-mesenchymal transition (EMT) processes (Fig. 2a, Supplementary Fig. 4a). Conversely, the abundance of the mCAF subtype was negatively correlated with anti-tumor microenvironment signatures but positively associated with processes related to angiogenesis, fibrosis, and EMT (Fig. 2a, Supplementary Fig. 4a). The abundance of vasCAF and pnCAF showed no significant correlations with TME signatures. Additionally, the adiCAF subtype was excluded from analysis due to its low abundance in melanoma tissues. These correlations were validated using the TCGA-SKCM dataset (Supplementary Fig. 4b).Fig. 2Immune-modulatory function and prognostic significance of CAF subtypes. a Pearson correlation between abundance of CAF subtypes and gene signature scores in tumor samples from the TCGA-BRCA, LUAD, STAD and COAD dataset. b Heatmap of correlation coefficients between CAF subtypes and lymphocyte populations within the TME of the TCGA dataset of four cancer types. c Heatmap illustrating the correlation between apCAFs and immune cell infiltration in the TME across multiple cancer types. d Heatmap showing the correlation between mCAFs and immune cell infiltration in the TME across the pan-cancer TCGA dataset. e Analysis of the prognostic significance of CAF subtype signatures using the TCGA dataset, displaying hazard ratio values (left) and the negative log-transformed p-values (right); both axis sides indicate positive values, as all -log(p-value) figures exceed zero. p values were determined by log-rank test. f–h Comprehensive Survival Analysis of apCAF (f) (P <0.0001), the apCAF/mCAF ratio (g) (P <0.0001) and mCAF (h) (P <0.0001) in the combined TCGA pan-cancer cohort (n = 6475). p values were determined by log-rank test"
+    },
+    {
+      "tag": "p",
+      "text": "We further quantified the abundance of apCAF and mCAF in CRC across different Consensus Molecular Subtypes (CMS)27 and observed that apCAF was highly enriched in the immune-infiltrated CMS1 subtype (Supplementary Fig. 4c), whereas mCAF was primarily enriched in the mesenchymal CMS4 subtype (Supplementary Fig. 4d). These findings imply that distinct CAF subtypes within the TME help shape the immune state of tumors."
+    },
+    {
+      "tag": "p",
+      "text": "To address concerns regarding potential collinearity among CAF signatures and their overlap with ECM-related transcriptional programs, we performed additional validation using complementary approaches. Specifically, we applied an independent signature-based method (ssGSEA) using curated CAF subtype gene sets derived from scRNA-seq data, with epithelial and immune cell contamination excluded. The ssGSEA scores showed consistent trends with CIBERSORTx estimates across multiple cancer types, supporting the robustness of our findings (Supplementary Fig. 4e). In addition, we used xCell-derived stromal scores as an orthogonal measure of stromal content. We observed that mCAF abundance was positively correlated with stromal scores, whereas apCAF abundance showed a weak or negative correlation across tumor types (Supplementary Fig. 4f). Together, these results mitigate concerns regarding collinearity and support the specificity of our CAF subtype inference."
+    },
+    {
+      "tag": "p",
+      "text": "To evaluate the prognostic implications of CAF subtypes, we analyzed their signature scores across the TCGA pan-cancer datasets. mCAFs were consistently associated with poorer patient outcomes, whereas apCAFs were linked to improved survival (Fig. 2e and Supplementary Fig. 5a). Notably, the apCAF/mCAF ratio exhibited the strongest prognostic relevance across multiple cancer types (Fig. 2e and Supplementary Fig. 5b). In the aggregated pan-cancer analysis encompassing the TCGA datasets BLCA, CESC, BRCA, COAD, GBM, HNSC, KICH, KIRC, KIRP, LUAD, LUSC, MESO, PAAD, READ, SKCM, STAD, and UCEC, both apCAF abundance and the apCAF/mCAF ratio correlated positively with favorable prognosis (Fig. 2f, g), while mCAF abundance was negatively associated with patient survival (Fig. 2h). In contrast, vasCAF and pnCAF did not exhibit any prognostic significance (Supplementary Fig. 5c). Collectively, these data suggest distinct immunomodulatory properties and prognostic relevance of apCAF and mCAF among CAF subtypes."
+    },
+    {
+      "tag": "p",
+      "text": "apCAF is a novel CAF subtype that has been primarily studied in pancreatic cancer and has also been identified in other cancers.4,14,15 However, comprehensive pan-cancer studies investigating the role of apCAFs in modulating the TME remain limited. apCAF specifically expressed MHC class II and CD74 but lacks expression of classic costimulatory molecules, such as CD80, CD86, and CD40, aligning with previous findings4 (Fig. 3a, Supplementary Fig. 6a). We identified a fraction of stromal cells co-expressing PDGFRα and MHC II using multiplex immunohistochemistry (mIHC) (Supplementary Fig. 6b), and a population of HLA-DR+ cells within EPCAM-CD45-CD31- stromal cells via flow cytometry (Supplementary Fig. 6c), corroborating the presence of apCAF in tumor tissues. apCAF demonstrated enrichment in GOBP related to antigen processing and presentation (Supplementary Fig. 6d).Fig. 3Distinct Spatial and Functional Associations of apCAFs and mCAFs with T Cells in the TME. a Violin plot demonstrating the expression of MHC II and co-stimulatory molecules in CAF subsets. b Violin plots displaying normalized expression of matrix-related genes in different fibroblast subclusters. c, d Scoring apCAFs, CD4+, and CD8+ T cell in apCAF-high (c) and mCAF-high (d) ST samples across four cancer types, arranged by cancer type in rows. e Schematic overview of the analytical workflow used to identify CAF subtypes and their neighboring cell populations based on Visium ST data. f Comparative pie charts illustrating the cellular composition surrounding apCAFs and mCAFs. g Multiplex IHC staining of apCAFs (HLA-DR+PDGFRα+), mCAFs (FAP+PDGFRα+), CD4+, and CD8+ T cells across a multi-cancer-type TMA cohort. Scale bars, 20 μm. h, i Correlation analysis of apCAF (h) and mCAF (i) abundance with CD4⁺ and CD8⁺ T cell proportions in tumor areas identified within TMA samples (n = 95), analyzed using the Pearson correlation test"
+    },
+    {
+      "tag": "p",
+      "text": "mCAF represents a tumor-abundant subtype characterized by high expression of genes encoding matrix proteins (Fig. 3b, Supplementary Fig. 6e) and enrichment in pathways involved in ECM remodeling (Fig. 1g, h). This transcriptional and functional profile closely resembles the myofibroblastic CAF subpopulation reported in studies across various cancer types,9,10,12,28–30, which has been implicated in restricting T-cell infiltration and impairing antitumor immune responses.11,31,32 We identified a mCAF subpopulation co-expressing both α-SMA and FAP in tumor tissues (Supplementary Fig. 6f)."
+    },
+    {
+      "tag": "p",
+      "text": "To further validate the spatial association of apCAFs and mCAFs with antitumor immunity, we analyzed our in-house ST datasets encompassing four cancer types. Spatial mapping revealed that apCAFs-high tumors exhibited markedly increased infiltration and spatial co-localization of CD4⁺ and CD8⁺ T cells with apCAFs, consistent with a more immune-active TME (Fig. 3c, Supplementary Fig. 7a). In contrast, tumors with high mCAF abundance displayed markedly reduced T-cell infiltration, consistent with the immunosuppressive role of mCAFs (Fig. 3d, Supplementary Fig. 7b)."
+    },
+    {
+      "tag": "p",
+      "text": "We further analyzed Visium ST data and performed cell-type deconvolution using Robust Cell Type Decomposition (RCTD),33 applying gene signatures derived from scRNA-seq data, followed by cell composition quantification and neighborhood identification (Fig. 3e). The spatial neighborhood analysis revealed distinct microenvironmental patterns: apCAFs were predominantly surrounded by T cells and other apCAFs, whereas mCAFs were mainly neighbored by tumor cells and other mCAFs, with only a minor proportion of T cells (Fig. 3f). We further defined regions within the top 10% of spatial proximity (k-distance) to apCAF as proximal regions and quantified CD4+ and CD8+ T cell scores within these areas. Notably, compared with apCAF-low SC-1 sample, the apCAF-high SC-3 sample showed consistently higher densities of both CD4+ and CD8+ T cells surrounding apCAFs (Supplementary Fig. 7c), suggesting an association between apCAFs and immune-active niches within TME."
+    },
+    {
+      "tag": "p",
+      "text": "To validate these observations, we assessed the spatial distribution of CD4+ and CD8+ T cells in proximity to apCAFs (HLA-DR+ PDGFRα+ fibroblasts) and mCAFs (FAP+ PDGFRα+ fibroblasts) using mIHC in a multi-cancer tissue microarray (TMA) cohort (Fig. 3g) (Supplementary Table 1). Consistent with our findings, apCAFs were frequently surrounded by abundant CD4⁺ and CD8⁺ T cells, whereas stromal regions enriched in mCAFs displayed substantially reduced T-cell infiltration (Fig. 3g). Notably, apCAF and mCAF abundances showed a pronounced inverse relationship across cancer types, suggesting differential spatial localization patterns. Quantitative correlation analysis confirmed a positive association between apCAF abundance and both CD4⁺ and CD8⁺ T-cell infiltration (Fig. 3h), while mCAF abundance showed a negative association with these T-cell populations (Fig. 3i). Together, these results suggest that apCAFs and mCAFs are differentially associated with the spatial immune landscape within the TME."
+    },
+    {
+      "tag": "p",
+      "text": "To further characterize the distinct immunomodulatory features of apCAFs and mCAFs in relation to T-cell infiltration and activation, we first examined the expression of key chemokines involved in anti-tumor immunity. apCAFs exhibited markedly higher levels of several chemokines compared with other CAF subtypes, particularly CCL4 and CCL5 (Fig. 4a), both of which are major chemoattractants recruiting CD4+ and CD8+ T cells and play a pivotal roles in orchestrating antitumor immune responses.34,35 Ligand–receptor interaction analysis between apCAFs and T cells revealed that the involved ligands were enriched with GO terms associated with the regulation of T-cell proliferation, migration, and activation (Fig. 4b). Spatial co-expression analysis further demonstrated that genes encoding ligand–receptor pairs (LRPs) involved in T cell recruitment and activation, including CCL5–CCR5 and MHC II-CD4, as well as CCL4–CCR5 and CCL19–CCR7, were highly co-localized in apCAF-enriched regions (Fig. 4c, Supplementary Fig. 8a).Fig. 4Distinct Immunomodulatory Features of apCAFs and mCAFs in Relation to T-Cell Infiltration and Activation. a Dot plot visualization of chemokines expression across CAF subtypes. b GO enrichment analysis of ligands involved in apCAF-T cell interactions. c Spatial co-expression analysis of the LRPs of CCL5–CCR5 and HLA-DQA1-CD4. d Assessment of T-Cell migration induced by patient-derived apCAFs versus HLA-DR⁻ CAFs, n = 3. e Evaluation of uptake of Fluorescent (FITC)-labeled OVA by patient-derived apCAFs with varying HLA-DR expression levels, n = 6. f Analysis of TNFa intensity in T cell (gated on CD3+ T cells) co-cultured with patient-derived apCAFs or HLA-DR- CAF. apCAFs were sorted from tumor-derived fibroblasts of four STAD and COAD patients. g Predicted interactions between apCAFs, mCAFs, and CD4⁺/CD8⁺ T cells. h Spatial co-expression analysis of the LRPs of ECM-CD44. i Spatial distribution of mCAF and CD4+/CD8+ T cells, calculated using CellTrek. j Assessment of T-Cell migration induced by patient-derived mCAFs versus residual CAFs, n = 4. k Analysis of TNF-a intensity in T cell (gated on CD3+ T cells) co-cultured with or without patient-derived mCAF (n = 3 patients). Bar plot representation shows mean ± SD, statistical analysis by t test (d, f, j–k) and One-way ANOVA test (e), ***p < 0.001"
+    },
+    {
+      "tag": "p",
+      "text": "Distinct Immunomodulatory Features of apCAFs and mCAFs in Relation to T-Cell Infiltration and Activation. a Dot plot visualization of chemokines expression across CAF subtypes. b GO enrichment analysis of ligands involved in apCAF-T cell interactions. c Spatial co-expression analysis of the LRPs of CCL5–CCR5 and HLA-DQA1-CD4. d Assessment of T-Cell migration induced by patient-derived apCAFs versus HLA-DR⁻ CAFs, n = 3. e Evaluation of uptake of Fluorescent (FITC)-labeled OVA by patient-derived apCAFs with varying HLA-DR expression levels, n = 6. f Analysis of TNFa intensity in T cell (gated on CD3+ T cells) co-cultured with patient-derived apCAFs or HLA-DR- CAF. apCAFs were sorted from tumor-derived fibroblasts of four STAD and COAD patients. g Predicted interactions between apCAFs, mCAFs, and CD4⁺/CD8⁺ T cells. h Spatial co-expression analysis of the LRPs of ECM-CD44. i Spatial distribution of mCAF and CD4+/CD8+ T cells, calculated using CellTrek. j Assessment of T-Cell migration induced by patient-derived mCAFs versus residual CAFs, n = 4. k Analysis of TNF-a intensity in T cell (gated on CD3+ T cells) co-cultured with or without patient-derived mCAF (n = 3 patients). Bar plot representation shows mean ± SD, statistical analysis by t test (d, f, j–k) and One-way ANOVA test (e), ***p < 0.001"
+    },
+    {
+      "tag": "p",
+      "text": "Next, we sorted patient-derived apCAFs (Supplementary Fig. 8b) and assessed their T-cell chemo-attractant capacity, finding that T cells co-cultured with apCAFs exhibited higher migratory capacity compared with those cocultured with HLA-DR- CAFs (Fig. 4d). Given their expression of MHC II, we quantified the antigen uptake ability of sorted patient-derived apCAFs using OVA fluorescent proteins, which revealed that apCAFs with higher HLA-DR expression exhibited enhanced antigen uptake despite lacking co-stimulatory molecules (Fig. 4e). We then cocultured sorted apCAFs with CD3+ T cells from healthy donors and found that T cells cocultured with apCAFs exhibited elevated expression of cytotoxic molecules, including TNF-α, IFN-γ and granzyme B, accompanied by increased proliferation (Fig. 4f, Supplementary Fig. 9a, c). These data suggest that apCAFs promote type 1–skewed T-cell responses and enhanced T-cell proliferative activity."
+    },
+    {
+      "tag": "p",
+      "text": "Additionally, we analyzed the crosstalk between mCAFs and T cells and found that the extracellular matrix components and CD44 interactions were likely involved (Fig. 4g). This observation was further supported by the spatial colocalization of the corresponding LRPs with mCAFs (Fig. 4h, Supplementary Fig. 8c). The interaction between CAFs and T cells mediated by ECM–CD44 signaling is potentially involved in promoting immune suppression within tumors and inducing activation-induced cell death (AICD) of T cells.36,37 By mapping mCAF and T cells, we observed that mCAF and T cells were spatially segregated, suggesting that mCAF may form a physical barrier that impedes T cell infiltration within tumor tissues (Fig. 4i). We next isolated primary mCAF cells from patient-derived fibroblasts and evaluated their impact on T cell migration, proliferation and activity (Supplementary Fig. 8d). mCAFs reduced T-cell migration (Fig. 4j) and inhibited their proliferation and activation (Fig. 4k, Supplementary Fig. 9b, d), suggesting a suppressive immunomodulatory role of mCAFs in shaping anti-tumor immune responses."
+    },
+    {
+      "tag": "p",
+      "text": "Although various CAF subtypes have been identified in previous studies, the potential relationships and plasticity among these subtypes remain unclear. Given the distinct associations of apCAFs and mCAFs with immune-related features and their inverse abundance patterns within the tumor stroma, we next explored potential relationships between these CAF states. By analyzing the correlation among CAF subtypes identified in our research using the TCGA-BRCA, LUAD, STAD and COAD datasets, we observed a strong negative correlation between apCAF and mCAF abundance across four cancer types (Fig. 5a). Extending our analysis to the TCGA pan-cancer datasets, we observed this negative correlation between abundance of apCAFs and mCAFs across a majority of solid tumor types (Fig. 5b). Additionally, in validation cohort 1 consisting of our tumor scRNA-seq samples, the frequency of apCAFs was also negatively associated with that of mCAFs (R = −0.4) (Fig. 5c). Moreover, in validation cohort 2 of multi-cancer TMA cohort, quantitative analyses of histological data revealed a predominantly negative correlation between apCAF and mCAF abundance (Fig. 5d, Supplementary Fig. 10a).Fig. 5apCAFs and mCAFs exhibit inverse abundance and distinct spatial localization patterns across pan-cancer TMEs. a Heatmap displaying correlation coefficients between CAF subtypes in the TCGA-BRCA, LUAD, STAD and COAD cohort. b Examination of apCAF and mCAF infiltration correlations across various TCGA cancer cohorts. c Correlation between apCAF and mCAF frequencies among fibroblasts in tumor samples from validation cohort 1 (in-house scRNA-seq data), n = 33. d Correlation analysis between mCAF and apCAF abundances across tumor regions in the TMA validation cohort 2, n = 91. e apCAF and mCAF abundances were scored in ST samples across four types of cancer. f Correlation analysis of apCAF and mCAF frequencies within ST spots based on RCTD analysis. g, h Abundance of distinct cell types adjacent to apCAF (g) or mCAF (h) in ST sample SC-1. Correlation analysis was conducted via the Pearson statistical test"
+    },
+    {
+      "tag": "p",
+      "text": "apCAFs and mCAFs exhibit inverse abundance and distinct spatial localization patterns across pan-cancer TMEs. a Heatmap displaying correlation coefficients between CAF subtypes in the TCGA-BRCA, LUAD, STAD and COAD cohort. b Examination of apCAF and mCAF infiltration correlations across various TCGA cancer cohorts. c Correlation between apCAF and mCAF frequencies among fibroblasts in tumor samples from validation cohort 1 (in-house scRNA-seq data), n = 33. d Correlation analysis between mCAF and apCAF abundances across tumor regions in the TMA validation cohort 2, n = 91. e apCAF and mCAF abundances were scored in ST samples across four types of cancer. f Correlation analysis of apCAF and mCAF frequencies within ST spots based on RCTD analysis. g, h Abundance of distinct cell types adjacent to apCAF (g) or mCAF (h) in ST sample SC-1. Correlation analysis was conducted via the Pearson statistical test"
+    },
+    {
+      "tag": "p",
+      "text": "Analysis of our in-house ST samples revealed that the apCAF score was inversely correlated with the mCAF score across four tumor types (Fig. 5e). Correlation analysis of apCAF and mCAF frequencies based on RCTD further confirmed a negative association between these subtypes within ST spots (Fig. 5f). Quantitative analysis of the cellular composition surrounding apCAF- and mCAF-enriched regions revealed that only a small fraction of mCAFs localized adjacent to apCAFs (Fig. 5g), whereas apCAFs were rarely observed near mCAFs in SC-1 samples (Fig. 5h), suggesting distinct spatial distribution patterns between these two CAF subtypes. Similar spatial distribution patterns were consistently validated across additional ST samples from four cancer types (Supplementary Fig. 10b-e). Altogether, these findings suggest that apCAFs and mCAFs exhibit inverse abundance patterns and distinct spatial localization across multiple solid tumors, reflecting heterogeneous spatial organization among CAF subtypes."
+    },
+    {
+      "tag": "p",
+      "text": "A critical question is which environmental cues are associated with distinct apCAF and mCAF states. Analysis of phenotype-associated transcriptional regulators identified IRF1 and IRF8 as selectively activated in apCAFs (Fig. 6a, Supplementary Table 6). Notably, IFN-γ has been reported to activate certain IRF family members, particularly IRF1 and IRF8,38,39, suggesting that IFN-γ may be associated with apCAF differentiation. In contrast, CREB3L1, which is selectively activated in mCAF, can be induced by TGF-β40,41 (Supplementary Table 6). Together with the high expression of TGF-β and TGF-β-responsive stromal genes in mCAFs (Fig. 3b), these findings suggest that IFN-γ and TGF-β signaling may be associated with the emergence of apCAF- and mCAF-like states, respectively. To further investigate their lineage relationships, we reconstructed an unsupervised cell trajectory incorporating NFs, apCAFs and mCAFs.42 The resulting pseudotime trajectory revealed two distinct activation pathways originating from NFs (Fig. 6b). Gene set scoring further demonstrated that apCAFs exhibited stronger IFN-γ–responsive signaling (Fig. 6c, Supplementary Fig. 11a, Supplementary Table 7), whereas mCAFs showed enhanced TGF-β–responsive signaling (Fig. 6c, Supplementary Fig. 11b, Supplementary Table 7). To validate these findings, we stimulated patient-derived CAFs with IFN-γ and observed a marked upregulation of MHC II molecules on their surface, whereas TGF-β treatment attenuated this IFN-γ-induced upregulation (Fig. 6d). Similar results were obtained in mouse-derived fibroblasts (Supplementary Fig. 11c). TGF-β induced a pronounced increase in FAP expression-a hallmark of mCAFs- which was mitigated by IFN-γ co-treatment in patient-derived CAFs (Fig. 6e). Consistently, IFN-γ suppressed the TGF-β–induced expression of ECM-related genes characteristic of mCAFs at both mRNA and protein levels in patient-derived CAFs (Fig. 6f), a finding further confirmed in the fibroblast cell line CCD18-CO (Supplementary Fig. 11d). Collectively, these results suggest that IFN-γ promotes apCAF-associated features while reducing mCAF-like programs, partially counteracting the effects of TGF-β. In contrast, TGF-β, predominantly expressed by mCAFs, was associated with mCAF-like programs and reduced apCAF-associated features, suggesting a potential role of cytokine context in shaping CAF heterogeneity.Fig. 6IFN-γ and TGF-β are responsible for the polarization of apCAF and mCAF. a Heatmap of regulon activity in CAF subtypes as estimated using SCENIC. b Pseudotime analysis with apCAFs, mCAFs and NFs from integrated data. c Gene set scoring of IFN-γ–responsive and TGF-β–responsive signaling along the pseudotime trajectory. d Quantification of HLA-DR on membrane of patient-derived CAFs that received the indicated treatments by flow cytometry in triplicate. e Quantification of FAP on membrane of patient-derived CAFs under indicated treatments by flow cytometry, n = 3. f Immunoblot and quantitative real-time PCR analysis of ECM-related genes characteristic of mCAFs in patient-derived CAFs under the indicated treatments, n = 3. g, h Scores of IFN-γ response signature (g) and TGF-β response signature (h) in tumors from TCGA-SKCM, stratified by low and high levels of apCAFs or mCAFs. i Pearson’s correlation analysis between mCAF or apCAF scores and IFN-γ response signature score using the TCGA-SKCM dataset. j Pearson’s correlation analysis between mCAF or apCAF scores and TGF-β response signature score using the TCGA-SKCM dataset. k GSEA showing enrichment of the apCAF signature and GO biological processes in patient-derived CAFs treated with 20 ng/ml IFN-γ compared with control. l GSEA showing enrichment of the mCAF signature and GO biological processes in patient-derived CAFs treated with TGF-β (10 ng/ml) compared with control. m Comparative enrichment of apCAF and mCAF signatures in patient-derived CAFs following IFN-γ or TGF-β treatment. Data in the bar plots are presented as mean ± SD (d–h). ns, not significant, *p < 0.05, **p < 0.01, ***p < 0.001; One-way ANOVA (d–f), Student’s t test (g, h)"
+    },
+    {
+      "tag": "p",
+      "text": "IFN-γ and TGF-β are responsible for the polarization of apCAF and mCAF. a Heatmap of regulon activity in CAF subtypes as estimated using SCENIC. b Pseudotime analysis with apCAFs, mCAFs and NFs from integrated data. c Gene set scoring of IFN-γ–responsive and TGF-β–responsive signaling along the pseudotime trajectory. d Quantification of HLA-DR on membrane of patient-derived CAFs that received the indicated treatments by flow cytometry in triplicate. e Quantification of FAP on membrane of patient-derived CAFs under indicated treatments by flow cytometry, n = 3. f Immunoblot and quantitative real-time PCR analysis of ECM-related genes characteristic of mCAFs in patient-derived CAFs under the indicated treatments, n = 3. g, h Scores of IFN-γ response signature (g) and TGF-β response signature (h) in tumors from TCGA-SKCM, stratified by low and high levels of apCAFs or mCAFs. i Pearson’s correlation analysis between mCAF or apCAF scores and IFN-γ response signature score using the TCGA-SKCM dataset. j Pearson’s correlation analysis between mCAF or apCAF scores and TGF-β response signature score using the TCGA-SKCM dataset. k GSEA showing enrichment of the apCAF signature and GO biological processes in patient-derived CAFs treated with 20 ng/ml IFN-γ compared with control. l GSEA showing enrichment of the mCAF signature and GO biological processes in patient-derived CAFs treated with TGF-β (10 ng/ml) compared with control. m Comparative enrichment of apCAF and mCAF signatures in patient-derived CAFs following IFN-γ or TGF-β treatment. Data in the bar plots are presented as mean ± SD (d–h). ns, not significant, *p < 0.05, **p < 0.01, ***p < 0.001; One-way ANOVA (d–f), Student’s t test (g, h)"
+    },
+    {
+      "tag": "p",
+      "text": "In addition, we evaluated the expression signatures within TCGA-SKCM cohort associated with IFN-γ/TGF-β response signature, which is linked with activated IFN-γ/TGF-β signaling43 (Supplementary Table 7). Our analysis revealed that the IFN-γ response score was higher in the apCAF-high group but lower in the mCAF-high group (Fig. 6g). Conversely, the TGF-β response was lower in the apCAF-high group while higher in the mCAF-high group (Fig. 6h). Further correlation analysis indicated a positive correlation between the IFNG_response signature and apCAF frequency, along with a negative correlation with mCAF frequency (Fig. 6i). In contrast, the TGF-β response demonstrated a negative correlation with apCAF frequency and a positive correlation with mCAF frequency (Fig. 6j). For further validation, we treated patient-derived CAFs with recombinant IFN-γ or TGF-β and performed bulk RNA-seq. We then conducted GSEA to evaluate the enrichment of the signature genesets of apCAF or mCAF, defined by the top 50 marker genes identified from our scRNA-seq dataset. The results demonstrated that IFN-γ markedly enriched the apCAF signature (Fig. 6k, Supplementary Fig. 11e), along with pathways related to immune regulation and antigen processing and presentation (Fig. 6k, Supplementary Fig. 11g). In contrast, TGF-β treatment preferentially enriched the mCAF signature (Fig. 6l, Supplementary Fig. 11f) and pathways associated with extracellular matrix organization (Fig. 6l, Supplementary Fig. 11h). Comparative analysis between treatment groups indicated that IFN-γ and TGF-β respectively promote apCAF and mCAF programs (Fig. 6m). Taken together, these findings suggest that distinct cytokine contexts may contribute to shaping apCAF and mCAF states within the TME."
+    },
+    {
+      "tag": "p",
+      "text": "Having established the immune-active role of apCAF and immune-suppressive role of mCAF within TME, we assessed the clinical significance of these subtypes in response to immune checkpoint blockade (ICB) therapy. Using the deconvolution algorithm CIBERSORTx, we calculated the frequency of apCAF and mCAF based on subtype-specific gene expression signatures across different cancer immunotherapy cohorts. Patients were stratified into low and high groups based on apCAF or mCAF levels, and the percentage of ICB responders was compared between these groups. The analysis revealed that patients with high apCAF abundance exhibited a significantly higher response rate to ICB therapy (Fig. 7a, c). Conversely, those in the high mCAF group had a lower response rate to ICB therapy (Fig. 7b, d). Consistent with these findings, tumors from responders exhibited higher levels of apCAF and lower levels of mCAF compared to tumors from non-responders (Fig. 7e, f). Additionally, patients with high apCAF/mCAF ratio displayed prolonged overall survival in two cohorts of SKCM and urothelial cancer (UC) receiving ICB therapy (Fig. 7g, h). For validation, we stained apCAFs in the sections from CRC patients undergone immunotherapy in our hospital; the results showed that the responders had higher apCAF abundance compared with non-responders (Supplementary Fig. 12).Fig. 7Associations of apCAFs and mCAFs with immunotherapy response. a, b Percentage of anti-PD1 therapy response among melanoma patients from the merged GSE78220 and GSE91061 datasets, stratified by low versus high levels of apCAFs (A) or mCAFs (B); n = 77. Statistical analysis was performed using Fisher’s exact test. c, d Percentage of anti-PD1 therapy responders among UC patients from the GSE176307 dataset, stratified by low versus high levels of apCAFs (c) or mCAFs (d); n = 89. Statistical analysis was performed using Fisher’s exact test. Barplot showing the abundance of apCAF (e) or mCAF (f) estimated by signature score in responsive and non-responsive patients (GSE176307). Wilcoxon rank-sum tests, *P < 0.05, **P < 0.01. g, h Association between the apCAF/mCAF ratio and overall survival in anti-PD-1 immunotherapy-treated SKCM patients (GSE91061; g, n = 49) and UC patients (GSE176307; h, n = 89); p values were determined by log-rank test. i Average tumor growth curves for each group (n = 5 mice per group; P < 0.05, two-way ANOVA). j–m. Flow cytometry analysis of tumor-infiltrating immune cells, including the frequencies of CD3⁺ T cells (j), effector CD8⁺IFN-γ⁺ T cells (k), and CD4⁺Foxp3⁺ regulatory T cells (l) among total CD45⁺ cells, and the ratio of effector CD8⁺ T cells to regulatory T cells (m). n Proposed model illustrating the IFN-γ/TGF-β–mediated regulatory axis between apCAF and mCAF states that governs the TME. Created with SciDraw (www.scidraw.io). Data in the bar plots are presented as mean ± SD, n = 5. One-way ANOVA (i–m). *p < 0.05, **p < 0.01, ***p < 0.001"
+    },
+    {
+      "tag": "p",
+      "text": "Associations of apCAFs and mCAFs with immunotherapy response. a, b Percentage of anti-PD1 therapy response among melanoma patients from the merged GSE78220 and GSE91061 datasets, stratified by low versus high levels of apCAFs (A) or mCAFs (B); n = 77. Statistical analysis was performed using Fisher’s exact test. c, d Percentage of anti-PD1 therapy responders among UC patients from the GSE176307 dataset, stratified by low versus high levels of apCAFs (c) or mCAFs (d); n = 89. Statistical analysis was performed using Fisher’s exact test. Barplot showing the abundance of apCAF (e) or mCAF (f) estimated by signature score in responsive and non-responsive patients (GSE176307). Wilcoxon rank-sum tests, *P < 0.05, **P < 0.01. g, h Association between the apCAF/mCAF ratio and overall survival in anti-PD-1 immunotherapy-treated SKCM patients (GSE91061; g, n = 49) and UC patients (GSE176307; h, n = 89); p values were determined by log-rank test. i Average tumor growth curves for each group (n = 5 mice per group; P < 0.05, two-way ANOVA). j–m. Flow cytometry analysis of tumor-infiltrating immune cells, including the frequencies of CD3⁺ T cells (j), effector CD8⁺IFN-γ⁺ T cells (k), and CD4⁺Foxp3⁺ regulatory T cells (l) among total CD45⁺ cells, and the ratio of effector CD8⁺ T cells to regulatory T cells (m). n Proposed model illustrating the IFN-γ/TGF-β–mediated regulatory axis between apCAF and mCAF states that governs the TME. Created with SciDraw (www.scidraw.io). Data in the bar plots are presented as mean ± SD, n = 5. One-way ANOVA (i–m). *p < 0.05, **p < 0.01, ***p < 0.001"
+    },
+    {
+      "tag": "p",
+      "text": "Notably, the state of tumor cells is a key determinant of how tumors respond to ICB.44 Tumors suppress the immune system through multiple mechanisms, including upregulation of inhibitory ligands such as programmed death ligand 1 (PD-L1), secretion of immunosuppressive cytokines such as TGF-β, and recruitment of immunosuppressive cell populations.44 To investigate whether tumor cell states contribute to differential responses to ICB in tumors with high apCAF or mCAF abundance, we analyzed the transcriptional programs of tumor cells located in spatial proximity to apCAF-rich and mCAF-rich niches across four cancer types. Tumor cells adjacent to apCAF-rich niches were significantly enriched in immune-related pathways, including antigen processing and presentation, IFN-γ–mediated signaling, adaptive immune responses, complement activation, and leukocyte chemotaxis (Supplementary Fig. 13). In contrast, tumor cells located near mCAF-rich niches were enriched in pathways associated with extracellular matrix organization, collagen fibril formation, and cell–matrix adhesion, indicating enhanced stromal interaction and invasive potential (Supplementary Fig. 13). Moreover, these tumor cells exhibited enrichment in pathways related to aerobic respiration, cellular responses to hypoxia, NF-κB signaling, as well as cell cycle progression and migration, suggesting increased oxidative metabolism, proliferative activity, and invasive capacity within fibrotic TME. Collectively, these findings suggest that stromal niche–associated tumor cell states may also contribute to differential responses to immunotherapy."
+    },
+    {
+      "tag": "p",
+      "text": "This study provides a comprehensive analysis of CAF heterogeneity, emphasizing their immunomodulatory features and plasticity of CAF states. By integrating single-cell and bulk RNA-seq data across malignancies, we identified conserved immunomodulatory CAF subtypes, and found that distinct cytokine contexts were associated with apCAF and mCAF states."
+    },
+    {
+      "tag": "p",
+      "text": "A key finding of our study is the conserved presence of these distinct CAF states across tumor types. Although apCAFs have been implicated in immune regulation within the TME, their precise functional role remains controversial. apCAFs are characterized by the expression of MHC class II molecules, yet lack classical co-stimulatory molecules such as CD40, CD80, and CD86, which are required for full T cell activation.4,15,45 In PDAC, apCAFs have been reported to promote immunotolerance by inducing the differentiation of naïve CD4+ T cells into Tregs.46 Conversely, in lung cancer, fibroblast-specific MHC II deletion did not significantly alter CD4⁺T-cell subsets,3,15 whereas other studies suggest that apCAFs support anti-tumor immunity and inhibits tumor progression.3,15 Collectively, these findings support the interpretation of apCAFs as a subset of MHC II+ immunomodulatory CAFs rather than professional antigen-presenting cells. In our study, we observed a consistent association between apCAFs and activated CD8+ T cells, but no such correlation with Tregs-both computationally and experimentally-suggesting that apCAFs are linked to a more immune-active TME in the tumor contexts examined here. A recent work by Huang’s lab, which first identified apCAFs in murine PDAC models,4 further delineated two distinct apCAF populations based on their cellular origins: mesothelial-like and fibrocyte-like apCAFs. They found that fibrocyte-like apCAFs, rather than mesothelial-like apCAFs, were spatially localized in lymphocyte-enriched regions and associated with immune activation. These findings suggest that the heterogeneous immunomodulatory features of apCAFs may stem from their context-dependent lineage origins.47 Mechanistically, both our data and prior studies demonstrate that apCAFs retain antigen processing and presentation capacity despite lacking classical co-stimulatory signals,4,45,46,48 suggesting that they function as non-professional antigen-presenting stromal cells. In addition, apCAFs express high levels of chemokines such as CCL4 and CCL5, which are critical for recruiting CD4⁺ and CD8⁺ T cells and the establishment of immune-active TME.34,35 Consistent with this, we found patient-derived apCAFs promote T-cell migration compared with HLA-DR- CAFs. Furthermore, apCAFs interacted with T cells to promote their activation. Given their ability to induce TNF-α and IFN-γ production despite lacking classical co-stimulatory molecules, apCAFs are more likely to drive a Th1-like or type 1–skewed activation state rather than fully canonical Th1 differentiation. Prior studies have shown that apCAFs isolated from mouse PDAC tumors can induce early TCR activation markers in naïve CD4⁺ T cells in an antigen-specific manner, indicating that apCAFs possess the capacity to initiate T-cell activation.4,46 In lung cancer, apCAFs have been reported to directly prime adjacent CD4⁺ T cells ex vivo and enhance the effector functions of tumor-specific CD4⁺ T cells, suggesting that they can also stimulate previously primed effector CD4⁺ T cells.15 In addition, pan-cancer analyses have revealed a strong positive correlation between apCAF gene signature scores and CD4⁺ effector T-cell signatures.49 Collectively, these findings support a role for apCAFs as MHC II⁺ immunomodulatory CAFs capable of influencing CD4⁺ T-cell functional states within the TME. In contrast, mCAFs recapitulate traditional myofibroblastic CAF traits, characterized by ECM remodeling and desmoplastic signaling,16 thereby contributing to immunosuppressive niches. Our findings indicate that mCAFs reduce T cell migration and their functional activation in coculture assays. These findings suggest distinct immunomodulatory properties of apCAFs and mCAFs that may contribute to stromal heterogeneity within the TME."
+    },
+    {
+      "tag": "p",
+      "text": "Cytokine signaling plays a pivotal role in shaping CAF heterogeneity. Previous studies have shown that IL-1–induced JAK/STAT signaling drives the formation of inflammatory CAFs, whereas TGF-β antagonizes this process by promoting the differentiation of myofibroblastic CAFs.50 Consistent with this framework, our findings suggest that IFN-γ– and TGF-β–associated signaling contexts are linked to distinct CAF states. Notably, IFN-γ and TGF-β have been reported to exert opposing effects on various cellular functions, including TME remodeling and immunotherapy response.38,51–56 A well-established function of TGF-β is its ability to promote immunosuppression by inducing ECM genes in activated CAFs.50,54,57 As one of the major sources of TGF-β within the TME, specific CAF subtypes secrete TGF-β through both autocrine and paracrine mechanisms, thereby modulating their own activation state and influencing neighboring cells, including tumor cells and immune cells.58 In this study, we identified mCAFs as a source of TGF-β among subtypes, suggesting that TGF-β signaling may be associated with maintenance of mCAF states and reduced apCAF representation. In contrast, IFN-γ is well known for its anti-tumor function by promoting immunogenicity and lymphocytes activation.59 Given its established role in activating anti-tumor immunology and enhancing antigen presentation on cancer cells, IFN-γ is a potent cytokine critical for effective immunotherapy51,60 and is already being tested in clinical trials.61 Our findings indicate a potential role for IFN-γ in shaping CAF heterogeneity and indirectly influencing anti-tumor immunity. Distinct cytokine-associated CAF programs may contribute to the inverse abundance and spatial localization patterns observed between apCAFs and mCAFs across cancers."
+    },
+    {
+      "tag": "p",
+      "text": "These findings suggest that modulation of cytokine signaling could reshape stromal states and indirectly influence anti-tumor immunity. However, systemic targeting of pathways such as IFN-γ or TGF-β may be associated with toxicity, highlighting the need for strategies that selectively modulate stromal compartments. Notably, TME is highly complex and additional signals beyond the IFN-γ/TGF-β axis are likely to influence CAF biology. Additional cytokines, tumor-derived signals, and stromal interactions may also contribute to regulating fibroblast states and stromal remodeling. Cytokines such as IL-12, as well as tumor-derived factors and inflammatory cues, may further regulate fibroblast states.15,46 In line with this, we observed that tumor cells in proximity to apCAF-rich niches exhibit immune-associated transcriptional programs, whereas those near mCAF-rich niches display enrichment of pathways related to EMT, TGF-β signaling, and extracellular matrix interactions. These findings suggest a close interplay between tumor cell states and stromal composition in shaping distinct microenvironmental niches."
+    },
+    {
+      "tag": "p",
+      "text": "In conclusion, this study defines a cytokine-driven paradigm of CAF heterogeneity that links stromal plasticity to immune regulation, offering a conceptual framework and suggesting stromal reprogramming as a potential strategy to improve cancer immunotherapy. This study has several limitations. First, CAF subtype inference from bulk transcriptomic data may be influenced by collinearity among fibroblast signatures and overlap with stromal transcriptional programs, despite the use of complementary methods. Second, our spatial analyses reveal associations between CAF subtypes and tumor or immune cell states based primarily on pathway-enrichment analyses rather than direct causal mechanisms, and the spot-level resolution of Visium may introduce mixed-cell composition effects. Third, although IFN-γ and TGF-β-associated signaling contexts were linked to distinct CAF states, the current study does not determine whether these cytokines drive stable lineage inter-conversion or transient and reversible transcriptional programs. In addition, no lineage-tracing, in vivo perturbation, or functional validation experiments were performed to definitively establish causal relationships between CAF states. Finally, systemic modulation of IFN-γ or TGF-β signaling may have context-dependent effects and potential toxicity, and the in vivo plasticity and functional dynamics of CAF states require further investigation."
+    },
+    {
+      "tag": "p",
+      "text": "The protocols for patient sample collection were approved by the Clinical Research Ethics Committee of Shanghai Tenth People’s Hospital, Tongji University (Approval No. SHSY-IEC-4.1/21-290/01). Written informed consent was obtained from all participants before the study began. All animal-related research activities were approved by the Animal Care and Use Committee of Tongji University (Approval No. SHDSYY-2024-3807)."
+    },
+    {
+      "tag": "title",
+      "text": "Patient inclusion and sample collection"
+    },
+    {
+      "tag": "p",
+      "text": "Fresh samples of paired adjacent and tumor tissues were collected from Shanghai Tenth People’s Hospital. Following quality control assessments, a total of 30 samples from 15 patients were included in the analysis. Detailed clinical information is provided in supplementary Table 1. Additionally, the Multi-Cancer Tissue Microarray (Catalog No. X095Mc01, n = 95; diameter: 1.5 mm) was obtained from Shanghai Bioaitech, with sample information also detailed in supplementary Table 1."
+    },
+    {
+      "tag": "p",
+      "text": "Fresh tumor and matched adjacent non-cancerous samples were immediately subjected to the cell isolation procedure post-surgery. All samples were washed twice with pre-chilled RPMI 1640 medium containing 0.04% BSA and then minced into small pieces ~0.5 mm³ in size. The tissue was digested in a freshly prepared Collagenase enzyme solution (Gibco, 17018029) and incubated in a 37 °C incubator for 30–60 min, with gentle mixing every 5–10 min. Following digestion, the cell suspension was filtered 1–2 times using a BD 40 μm cell strainer and centrifuged at 300 × g for 5 min. The cell pellet was resuspended in an appropriate volume of medium, treated with an equal volume of red blood cell lysis solution (MACS, Cat. No. 130-094-183), and centrifuged again. Subsequently, the pellet was washed with medium and resuspended in 100 μl of medium. Cell concentration and viability were determined using a Luna cell counter."
+    },
+    {
+      "tag": "p",
+      "text": "The freshly prepared single-cell suspension was adjusted to a cell concentration of 700–1200 cells/μl, followed by loading and library construction according to the instructions provided with the 10x Genomics Chromium Next GEM Single Cell 5’ Reagent Kits v2.0 (Catalog No.1000165). The constructed libraries were then subjected to high-throughput sequencing using the Illumina NovaSeq 6000 platform with PE150."
+    },
+    {
+      "tag": "title",
+      "text": "ScRNA-seq data quality control, processing, annotation, and visualization"
+    },
+    {
+      "tag": "p",
+      "text": "Differential gene expression (DEG) analysis for each subtype was conducted using the “FindMarkers” functions within the Seurat package, applying thresholds of Foldchange > 1.5 and p.value < 0.05 for significance. For quantification of DEG signatures and pathway activities within subtypes, the “AUCell”, “UCell”, “singscore” and “ssgsea” method from the irGSEA package was employed. To evaluate whether a gene set is enriched in a particular cell subgroup, irGSEA uses the Wilcoxon test to calculate the differential gene sets in the enrichment score matrix (with differential genes filtered by an adjusted P-value less than 0.05). Subsequently, it employs the rank aggregation algorithm (RRA) from the RobustRankAggreg package to comprehensively assess the results of the differential analysis, identifying gene sets that are significantly enriched across most gene set enrichment analysis methods (with a comprehensive evaluation filter of P-value less than 0.05). Analyses included HALLMARK and Gene Ontology Biological Processes (GOBP). GO64 and KEGG65 enrichment analyses were performed using a hypergeometric distribution test. Gene sets for GOBP and HALLMARK were sourced from The Molecular Signatures Database (MSigDB)66 via the msigdbr package."
+    },
+    {
+      "tag": "p",
+      "text": "To assess the infiltration of our defined CAF subtypes within publicly available bulk RNA-seq data, we developed a reference signature matrix from our scRNA-seq dataset employing subtype-specific marker genes and also utilized the online tool CIBERSORTx.67 Analyses using signature matrices from both approaches yielded consistent deconvolution results, prompting us to select the signature matrix based on subtype-specific marker genes for further analysis. For the imputation of CAF subtypes from pan-cancer bulk RNA-seq from TCGA, quartile normalization was disabled, the permutation parameter was set to 500, and all other parameters were maintained at their default settings. The relative proportions of infiltrated immune cells were determined using a set of 22 immune cell signature matrices from the CIBERSORTx website.67 Pearson’s correlation analysis was conducted to explore the relationship between the infiltration of CAF subtypes and immune cells."
+    },
+    {
+      "tag": "p",
+      "text": "The fibroblast cell line CCD18-Co, derived from normal human colon, was obtained from the American Type Culture Collection (ATCC) and cultured according to ATCC’s recommended protocols in ATCC-formulated Eagle’s Minimum Essential Medium, supplemented with 10% FBS and 1% P/S. Human CD3+ T cells were sorted from anonymous healthy donors using MojoSort™ Human CD3+ T Cell Isolation Kit (BioLegend 480131) according to the manufacturer’s instructions. The primary T cells were activated and cultured with T cell Expansion Medium (STEMCELL, 10981) supplemented with ImmunoCult Hu CD3/CD28 T-Cell Activator (STEMCELL, 10971), 10 ng/mL IL-2 (Peprotech, 200-02). 1% P/S (Gibco) and L-glutamine (Gibco). All cell cultures were maintained in a humidified incubator at 37 °C with 5% CO2."
+    },
+    {
+      "tag": "p",
+      "text": "The primary patient-derived CAFs were established from fresh surgically resected CRC or LUC tissues from different patients. Tumor tissues were minced and digested in a solution containing 2.0 mg/mL collagenase type Ⅳ (Sigma-Aldrich, USA) at 37 °C for 90–120 min with agitation to dissociate stromal components. The cell suspension was sequentially filtered through 100 μm (Corning, USA) and 40 μm nylon meshes (Falcon, USA) to remove undigested tissue fragments. Filtered cells were centrifuged (300 × g, 5 min) and resuspended in fibroblast-selective medium (DMEM/F12 supplemented with 10% fetal bovine serum (FBS, Gibco), 1% penicillin/streptomycin). Differential adhesion was applied. Non-adherent cells (primarily epithelial/hematopoietic cells) were removed after 2 h, while adherent fibroblasts were retained."
+    },
+    {
+      "tag": "p",
+      "text": "For mouse-derived fibroblasts, lung tissues were collected from mice younger than four weeks of age and digested using the same procedure described above. The resulting fibroblasts were cultured and expanded under the same conditions as the patient-derived CAFs."
+    },
+    {
+      "tag": "p",
+      "text": "Fresh dissected tumor samples were collected, rinsed with pre-cold PBS to remove debris and contaminants. The tumors were then finely minced into small pieces. For enzymatic digestion, the tissue fragments were incubated in RPMI 1640 medium containing 5% fetal bovine serum (FBS), supplemented with collagenase D (0.5 mg/mL; Roche 11088858001), DNase I (60 U/mL; Roche D5025), and HEPES (25 mM; Gibco) for 45 min at 37 °C under constant agitation to enhance tissue dissociation. Following digestion, the tissue pieces were allowed to settle by gravity, and the resulting supernatant, containing dissociated cells, was collected and passed through a 75 μm cell strainer. This digestion and collection process was repeated to maximize cell yield. The resulting cell suspensions from each digestion were combined into a single pooled sample. The samples were centrifuged to pellet the cells, which were then resuspended in ammonium-chloride-potassium (ACK) lysis buffer to lyse red blood cells. After a 3-minute incubation on ice, the lysis reaction was terminated by adding PBS containing 2% FBS. The cell suspension was centrifuged again and washed with PBS supplemented with 2% FBS, 1 mM EDTA, and 25 mM HEPES for downstream applications. For intracellular detection of cytokines IFN-γ and TNF-α, cells were pre-stimulated with the eBioscience Cell Stimulation Cocktail (eBioscience 00-4970) supplemented with BD GolgiPlug (BD Pharmingen, 550583) in RPMI 1640 containing 10% FBS at 37 °C for 4–6 h to induce cytokine production. To block non-specific binding, human tissue samples were incubated with human Fc receptor binding inhibitor (eBioscience 14-9161-73, 1:50) or mouse tissue samples with anti-mouse CD16/CD32 Fc Block (BioLegend, clone 2.4G2, 1:50) for 15 min at 4 °C. The cell suspension was then stained for surface markers and viability using a panel of specific antibodies alongside the near-IR fluorescent reactive dye from the LIVE/DEAD™ Fixable Dead Cell Stain Kits (Invitrogen, L34975) for 30 min at 4 °C. For intracellular staining, cells were fixed, permeabilized, and stained using the True-Nuclear Transcription Factor Buffer Set (BioLegend, 424401), following the manufacturer’s protocol. Surface-only staining excluded the stimulation and intracellular staining steps. Data acquisition was performed on a FACSCanto flow cytometer. The acquired flow cytometry data were analyzed using FlowJo software (version 10.8.1)."
+    },
+    {
+      "tag": "p",
+      "text": "Integration with Single-Cell RNA Sequencing: To delineate the spatial localization of cell types and states within the complex tissue, SPOTlight was utilized to integrate 10X Visium spatial transcriptomics data with single-cell RNA sequencing (scRNA-seq) data.73 This integrative analysis enabled precise inference of cell-type distributions across spatial coordinates, contributing to a comprehensive understanding of tissue architecture."
+    },
+    {
+      "tag": "p",
+      "text": "To infer cell type compositions within Visium spatial transcriptomics (ST) data, we employed RCTD (version 2.0.0), a reliable deconvolution algorithm that integrates spatial transcriptomic profiles with single-cell RNA-seq references. In brief, the spatial dataset was initialized through the SpatialRNA function, incorporating both the spot-level gene expression matrix and corresponding spatial coordinates. The reference single-cell dataset was generated using the Reference function, based on a cell-by-gene count matrix annotated with defined cell types. The annotated scRNA-seq reference was obtained from our previously published dataset. Subsequently, an RCTD model object was built using the create.RCTD function, and deconvolution analysis was executed with run.RCTD under the parameter setting doublet_mode = “multi”. The resulting cell type weights were retrieved from the all_weights slot of the RCTD output object."
+    },
+    {
+      "tag": "p",
+      "text": "To investigate the spatial scoring of CAF subtypes and T cells, we performed a combined analysis of scRNA-seq data and ST data. Initially, we mapped the major cell types using RCTD. For mapping CAF subtypes, we selected spots where fibroblasts were among the top two cell types and further characterized these regions using the AddModuleScore function to score the top 10 markers of subtypes identified from scRNA-seq data. Similarly, to map CD4+/CD8+ T cells, we selected spots where T cells were among the top two predominant cell types and further scored these spots using the top 10 markers of CD4+/CD8+ T cells."
+    },
+    {
+      "tag": "p",
+      "text": "Primary patient-derived CAFs were seeded in 6-well plates and cultured until reaching approximately 80% confluency. Primary T cells, isolated from healthy donors, were then added to each well and co-cultured for a period of 3 days. Following the co-culture, T cells were harvested from the wells for flow cytometry analysis. The T cells were stimulated, blocked for cytokine secretion and stained with FITC-conjugated anti-CD3 antibody. Cells were then fixed, permeabilized and stained with APC-conjugated anti-TNF-α antibodies. Each experimental condition was performed in triplicate to ensure data reliability."
+    },
+    {
+      "tag": "p",
+      "text": "For the migration assay, patient-derived CAFs were cultured to approximately 70% confluence and then refreshed with fibroblast-selective medium. Activated CD3⁺ T cells (1 × 10⁶ cells per insert) were seeded into the upper chamber of a Transwell insert (6.5 mm diameter, 5 µm pore size; Corning) placed above the fibroblast monolayer. After 24 h of coculture at 37 °C and 5% CO₂, T cells that migrated into the lower chamber were collected, stained with FITC-conjugated anti-CD3 antibody, and quantified by flow cytometry."
+    },
+    {
+      "tag": "p",
+      "text": "Total RNA was extracted from cultured cells using the RNeasy Mini Kit (Qiagen), according to the manufacturer’s instructions. For quantitative PCR analysis, the SYBR Green Real-time PCR Master Mix (Takara, RR820B) was utilized as previously described.74 Amplification and quantification were performed with the Standard Real-Time PCR System (Applied Biosystems). Primer sequences employed in the study are listed in supplementary Table 8. Relative expression levels of target genes were calculated using the 2^-ΔΔCt method, with normalization to an internal control gene. Each experimental condition was performed with three technical replicates to ensure data reliability and reproducibility."
+    },
+    {
+      "tag": "p",
+      "text": "CCD-18Co fibroblast cells or primary CAFs from two patients were lysed using RIPA lysis buffer (Beyotime, Shanghai, China) supplemented with Halt™ Protease and Phosphatase Inhibitor Cocktail (ThermoFisher Scientific) for 15 min on ice. Protein concentrations from the supernatants were determined, and 40 μg of protein per sample were subjected to SDS-PAGE for separation. Proteins were then transferred to polyvinylidene fluoride (PVDF) membranes (Bio-Rad, USA). The membranes were blocked with 5% non-fat milk in Tris-buffered saline containing 0.1% Tween-20 (TBST) for 1 h at room temperature to prevent non-specific binding. Subsequently, membranes were incubated with primary antibodies overnight at 4 °C. After three washes with TBST, the membranes were incubated with horseradish peroxidase-conjugated secondary antibodies (KPL, USA) for 1 h at room temperature. Protein bands were visualized using an Enhanced Chemiluminescence (ECL) reagent (Millipore, USA), as described above.75"
+    },
+    {
+      "tag": "p",
+      "text": "We considered a significance threshold of P < 0.05 for all statistical tests, conducted using R (version 4.4.0) and RStudio. Differences between groups were assessed using Student’s t-tests, Wilcoxon rank-sum tests, and ANOVA as appropriate. Bar graphs, unless indicated otherwise, displayed data as mean ± standard deviation. Each experiment was replicated at least three times with independent biological samples. For analyzing correlations, we employed either Spearman’s rho or Pearson’s correlation coefficient. Survival data were evaluated using log-rank tests, and the chi-square test was utilized to compare responses between patients classified by low or high levels of apCAF or mCAF."
+    },
+    {
+      "tag": "title",
+      "text": "Supplementary information"
+    },
+    {
+      "tag": "p",
+      "text": "Sigtrans_Supplementary_Materials_SIGTRANS-21087R1 Table S1. Sample information of newly-generated data, and public data, related to Figure 1 Table S2. Marker genes for fibroblast subsets, related to Figure 1 Table S3.Mean enrichment scores for Gene Ontology (GO), KEGG pathways, and metabolic processes across fibroblast subsets, related to Figure 1 and supplementary Figure 3 Table S4. Signature matrix of fibroblast subsets, used for CIBERSORTX analysis Table S5. The functional gene signatures (Fges) developed for the TME classification platform. Related to Figure 2 Table S6. Regulon specificity scores for each CAF subtype, related to Figure 4 Table S7. Signature geneset of IFN-γ and TGF-β response Table S8. Primer sequences for real-time quantitative PCR"
+    },
+    {
+      "tag": "supplementary-material",
+      "text": "Sigtrans_Supplementary_Materials_SIGTRANS-21087R1"
+    },
+    {
+      "tag": "p",
+      "text": "Sigtrans_Supplementary_Materials_SIGTRANS-21087R1"
+    },
+    {
+      "tag": "supplementary-material",
+      "text": "Table S3.Mean enrichment scores for Gene Ontology (GO), KEGG pathways, and metabolic processes across fibroblast subsets, related to Figure 1 and supplementary Figure 3"
+    },
+    {
+      "tag": "p",
+      "text": "Table S3.Mean enrichment scores for Gene Ontology (GO), KEGG pathways, and metabolic processes across fibroblast subsets, related to Figure 1 and supplementary Figure 3"
+    },
+    {
+      "tag": "title",
+      "text": "Supplementary information"
+    },
+    {
+      "tag": "p",
+      "text": "The online version contains supplementary material available at https://doi.org/10.1038/s41392-026-02965-1."
+    },
+    {
+      "tag": "p",
+      "text": "This study was supported by the National Natural Science Foundation of China (nos. 82472978 and 82173190) to Feifei Song; the National Key Research and Development Program (2024YFA1307101) and the Key Program of the National Natural Science Foundation of China (82330093) to Huanlong Qin; the National Natural Science Foundation of China (nos.82373243 and 82072634) to Qing Wei. We thank OE Biotech Co., Ltd. (Shanghai, China) for the scRNA-seq and spatial transcriptome used in this study. We thank their Xiaohua Yao, Junhao Yu, Danting Shan and Yi Liu for their important suggestions and valuable technical support."
+    },
+    {
+      "tag": "p",
+      "text": "F.F.S., Q.C., and H.L.Q. conceived and designed the study. F.F.S., Q.C., and D.F.H. planned and performed the experiments, analyzed the data, and drafted the manuscript. Y.H.Z. and D.Y.H. performed experiments, analyzed data, and revised the manuscript. W.R. isolated and sorted patient-derived fibroblasts. M.L. cultured primary T cells and performed T-cell activation assays. Y.H.G. provided clinical data from patients who received immune checkpoint blockade therapy. R.F.Z., H.Y.Z., S.F.W., and J.X. collected clinical samples. S.L.L., D.X.B., H.X.Z., and Q.W. designed and supervised microscopy experiments. H.L.Q. supervised the project. All authors have read and approved the article."
+    },
+    {
+      "tag": "title",
+      "text": "Data availability"
+    },
+    {
+      "tag": "p",
+      "text": "The raw sequencing data generated in this study have been deposited in the Genome Sequence Archive at the National Genomics Data Center, China National Center for Bioinformation / Beijing Institute of Genomics, Chinese Academy of Sciences (GSA-Human: HRA011931 and HRA008021). These data are publicly accessible at https://ngdc.cncb.ac.cn/gsa-human. RNA-seq data and clinical profiles for pan-cancer from TCGA database were obtained from the UCSC Xena Browser (http://xena.ucsc.edu). Publicly available scRNA-seq data for BRCA were accessed from the GEO database under accession number GSE161529.76 The scRNA-seq dataset for LUC was downloaded from the Code Ocean capsule (https://doi.org/10.24433/CO.0121060.v1),77 and that of STAD was downloaded from http://dna-discovery.stanford.edu/download/1401/.78 The scRNA-seq dataset for COAD was downloaded from the ArrayExpress database at EMBL-EBI (www.ebi.ac.uk/arrayexpress) under accession number E-MTAB-8107.79 Bulk RNA-seq data for melanoma (GSE78220,80 GSE9106181) and urothelial cancer (GSE176307)82 samples undergoing immunotherapy can be accessed from the GEO database."
+    }
+  ],
+  "links": [
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "ext-link-type": "uri",
+        "{http://www.w3.org/1999/xlink}href": "https://creativecommons.org/licenses/by-nc-nd/4.0/"
+      },
+      "text": "http://creativecommons.org/licenses/by-nc-nd/4.0/"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "ext-link-type": "pmc:entrez-geo",
+        "{http://www.w3.org/1999/xlink}href": "GSE78220"
+      },
+      "text": "GSE78220"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "ext-link-type": "pmc:entrez-geo",
+        "{http://www.w3.org/1999/xlink}href": "GSE91061"
+      },
+      "text": "GSE91061"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "ext-link-type": "pmc:entrez-geo",
+        "{http://www.w3.org/1999/xlink}href": "GSE176307"
+      },
+      "text": "GSE176307"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "ext-link-type": "pmc:entrez-geo",
+        "{http://www.w3.org/1999/xlink}href": "GSE176307"
+      },
+      "text": "GSE176307"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "ext-link-type": "pmc:entrez-geo",
+        "{http://www.w3.org/1999/xlink}href": "GSE91061"
+      },
+      "text": "GSE91061"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "ext-link-type": "pmc:entrez-geo",
+        "{http://www.w3.org/1999/xlink}href": "GSE176307"
+      },
+      "text": "GSE176307"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "http://www.scidraw.io",
+        "ext-link-type": "uri"
+      },
+      "text": "www.scidraw.io"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "https://github.com/wu-yc/scMetabolism",
+        "ext-link-type": "uri"
+      },
+      "text": "https://github.com/wu-yc/scMetabolism"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "https://github.com/FloWuenne/scFunctions/",
+        "ext-link-type": "uri"
+      },
+      "text": "https://github.com/FloWuenne/scFunctions/"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "ext-link-type": "pmc:entrez-nucleotide",
+        "{http://www.w3.org/1999/xlink}href": "L34975"
+      },
+      "text": "L34975"
+    },
+    {
+      "tag": "supplementary-material",
+      "attrs": {
+        "content-type": "local-data",
+        "id": "MOESM1",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Sigtrans_Supplementary_Materials_SIGTRANS-21087R1"
+    },
+    {
+      "tag": "media",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "41392_2026_2965_MOESM1_ESM.docx",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Sigtrans_Supplementary_Materials_SIGTRANS-21087R1"
+    },
+    {
+      "tag": "supplementary-material",
+      "attrs": {
+        "content-type": "local-data",
+        "id": "MOESM2",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Table S1. Sample information of newly-generated data, and public data, related to Figure 1"
+    },
+    {
+      "tag": "media",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "41392_2026_2965_MOESM2_ESM.xlsx",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Table S1. Sample information of newly-generated data, and public data, related to Figure 1"
+    },
+    {
+      "tag": "supplementary-material",
+      "attrs": {
+        "content-type": "local-data",
+        "id": "MOESM3",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Table S2. Marker genes for fibroblast subsets, related to Figure 1"
+    },
+    {
+      "tag": "media",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "41392_2026_2965_MOESM3_ESM.xlsx",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Table S2. Marker genes for fibroblast subsets, related to Figure 1"
+    },
+    {
+      "tag": "supplementary-material",
+      "attrs": {
+        "content-type": "local-data",
+        "id": "MOESM4",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Table S3.Mean enrichment scores for Gene Ontology (GO), KEGG pathways, and metabolic processes across fibroblast subsets, related to Figure 1 and supplementary Figure 3"
+    },
+    {
+      "tag": "media",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "41392_2026_2965_MOESM4_ESM.xlsx",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Table S3.Mean enrichment scores for Gene Ontology (GO), KEGG pathways, and metabolic processes across fibroblast subsets, related to Figure 1 and supplementary Figure 3"
+    },
+    {
+      "tag": "supplementary-material",
+      "attrs": {
+        "content-type": "local-data",
+        "id": "MOESM5",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Table S4. Signature matrix of fibroblast subsets, used for CIBERSORTX analysis"
+    },
+    {
+      "tag": "media",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "41392_2026_2965_MOESM5_ESM.xlsx",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Table S4. Signature matrix of fibroblast subsets, used for CIBERSORTX analysis"
+    },
+    {
+      "tag": "supplementary-material",
+      "attrs": {
+        "content-type": "local-data",
+        "id": "MOESM6",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Table S5. The functional gene signatures (Fges) developed for the TME classification platform. Related to Figure 2"
+    },
+    {
+      "tag": "media",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "41392_2026_2965_MOESM6_ESM.xlsx",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Table S5. The functional gene signatures (Fges) developed for the TME classification platform. Related to Figure 2"
+    },
+    {
+      "tag": "supplementary-material",
+      "attrs": {
+        "content-type": "local-data",
+        "id": "MOESM7",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Table S6. Regulon specificity scores for each CAF subtype, related to Figure 4"
+    },
+    {
+      "tag": "media",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "41392_2026_2965_MOESM7_ESM.xlsx",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Table S6. Regulon specificity scores for each CAF subtype, related to Figure 4"
+    },
+    {
+      "tag": "supplementary-material",
+      "attrs": {
+        "content-type": "local-data",
+        "id": "MOESM8",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Table S7. Signature geneset of IFN-γ and TGF-β response"
+    },
+    {
+      "tag": "media",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "41392_2026_2965_MOESM8_ESM.xlsx",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Table S7. Signature geneset of IFN-γ and TGF-β response"
+    },
+    {
+      "tag": "supplementary-material",
+      "attrs": {
+        "content-type": "local-data",
+        "id": "MOESM9",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Table S8. Primer sequences for real-time quantitative PCR"
+    },
+    {
+      "tag": "media",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "41392_2026_2965_MOESM9_ESM.xlsx",
+        "position": "float",
+        "orientation": "portrait"
+      },
+      "text": "Table S8. Primer sequences for real-time quantitative PCR"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "10.1038/s41392-026-02965-1",
+        "ext-link-type": "doi"
+      },
+      "text": "https://doi.org/10.1038/s41392-026-02965-1"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "https://ngdc.cncb.ac.cn/gsa-human",
+        "ext-link-type": "uri"
+      },
+      "text": "https://ngdc.cncb.ac.cn/gsa-human"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "http://xena.ucsc.edu",
+        "ext-link-type": "uri"
+      },
+      "text": "http://xena.ucsc.edu"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "ext-link-type": "pmc:entrez-geo",
+        "{http://www.w3.org/1999/xlink}href": "GSE161529"
+      },
+      "text": "GSE161529"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "10.24433/CO.0121060.v1",
+        "ext-link-type": "doi"
+      },
+      "text": "https://doi.org/10.24433/CO.0121060.v1"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "http://dna-discovery.stanford.edu/download/1401/",
+        "ext-link-type": "uri"
+      },
+      "text": "http://dna-discovery.stanford.edu/download/1401/"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "{http://www.w3.org/1999/xlink}href": "https://www.ebi.ac.uk/arrayexpress/",
+        "ext-link-type": "uri"
+      },
+      "text": "www.ebi.ac.uk/arrayexpress"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "ext-link-type": "pmc:entrez-geo",
+        "{http://www.w3.org/1999/xlink}href": "GSE78220"
+      },
+      "text": "GSE78220"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "ext-link-type": "pmc:entrez-geo",
+        "{http://www.w3.org/1999/xlink}href": "GSE91061"
+      },
+      "text": "GSE91061"
+    },
+    {
+      "tag": "ext-link",
+      "attrs": {
+        "ext-link-type": "pmc:entrez-geo",
+        "{http://www.w3.org/1999/xlink}href": "GSE176307"
+      },
+      "text": "GSE176307"
+    }
+  ]
+}

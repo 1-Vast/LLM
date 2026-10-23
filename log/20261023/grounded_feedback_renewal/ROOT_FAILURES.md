@@ -1,0 +1,5 @@
+# Preserved exploration failures and corrections
+
+- Initial exact-title history search included JSON and a bare numeric manuscript suffix. This matched unrelated long numerical records and produced excessive output. Corrected immediately to filename-only Markdown search with full titles/DOIs. No endpoints were numerically cast or changed; broad JSON searching is not used further.
+- Initial HTML extraction attempted BeautifulSoup, unavailable in maestro: ModuleNotFoundError: No module named 'bs4'. No primary-method text was extracted by that attempt. Replaced the dependency with Python's standard HTMLParser; preserved this failure instead of implying the first extraction succeeded. No environment installation or new network request was needed.
+- First source-audit execution failed before writing SOURCE_AUDIT.json: FileNotFoundError for constructive/sha256. The audit incorrectly treated a {path,sha256} seal as a flat path-to-hash manifest. Corrected the schema handling explicitly; the original reviewer seals remain unchanged. This is a local audit bug, not a source-hash discrepancy or scientific failure.

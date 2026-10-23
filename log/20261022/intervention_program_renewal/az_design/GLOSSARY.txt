@@ -1,0 +1,52 @@
+PAGE 1
+GDSC matrix combinations
+combo_well_stats_. . . csv
+This file contains well by well data for each matrix experiment along with the monotherapy data matched by
+drug treatment and concentration for the library drugs used in the matrix combination.
+Response levels in the assay are often measured as cell viability where 0 represents no viable cells and 1
+represents full viability at the end of the assay. The inhibitory response level is simply 1 - viability.
+PROJECT_ID Numeric identifier of drug screening project.
+PROJECT_NAME Name of the drug screening project.
+BARCODE Barcode identifier for screening plate.
+DRUGSET_ID Identifier for thedrugset, i.e., the plate layout.
+CELL_LINE_NAME Name of the cell model (cell line or organoid).
+MASTER_CELL_ID Each cell model has a unique numeric identifier.
+COSMIC_ID Where available, the identifier for the cell model in the COSMIC database.
+CELL_ID Identifier for the expansion from stocks of a cell model used by the lab in the screen.
+TISSUE Tissue type of the cell model as identified in the Cell Model Passports.
+CANCER_TYPE Issue type of the cell model as identified in the Cell Model Passports.
+POSITION Numeric well position on the screening plate.
+INTENSITY Fluorescence intensity recorded by the plate reader at the end of the experiment.
+lib1 / lib2 Tag used in thedrugset layout for the library compound.
+lib1_dose / lib2_dose Dosing tag used in thedrugset layout starting at a a maximum ofD1.
+lib1_drug_id / lib2_drug_id Identifier used for the library compound in the internal GDSC database.
+lib1_conc / lib2_conc Micromolar concentration of the library compound.
+treatment Monotherapy (S) or combination (C) treatment - alwaysC in this file.
+cmatrix Numeric identifier for the combination matrix in the plate layout, i.e., combination of two or more
+library compounds.
+lib1_drug / lib2_drug Identifier for the drug used to fit a dose response curve for each monotherapy for
+comparison with the combination results.
+lib1_xmid / lib2_xmid Central inflection point for the logistic dose response curve where the response
+(viability or inhibition of 0.5) based on thex scale.
+lib1_scal / lib2_scal Scale (slope) parameter for the logistic dose response curve. The distance between
+the x value where the response is equal to1/(1 + e1) and the xmid value.
+lib1_x / lib2_x Concentration values normalized to a maximum dose of 9 to allow a hierarchical dose
+response model accommodating different dose titrations.
+lib1_IC50 / lib2_IC50 xmid values converted to a natural log micromolar concentration.
+lib1_auc / lib2_auc Area under the curve as a fraction of the area bounded by the screened concentration
+range.
+lib1_RMSE / lib2_RMSE Root mean squared error of fitted monotherapy values compared to the
+actual.
+lib1_maxc / lib2_maxc Maximum micromolar concentration.
+1
+
+PAGE 2
+lib1_y / lib2_y Inhibitory response values between 0 and 1.
+lib1_yhat / lib2_yhat Fitted inhibitory response values
+inhibition Inhibitory response of the combination treatment.
+HSA Highest single agent inhibitory value (lib1_yhat or lib2_yhat).
+HSA_excess Excess of the combination inhibition value over the HSA.
+Bliss_additivity Expected effect of the combinations based on the Bliss model(lib1_yhat + lib2_yhat -
+(lib1_yhat * lib2_yhat)) .
+Bliss_excess Excess of the combination inhibition value over the Bliss additivity.
+2

@@ -1,0 +1,33 @@
+# Scoped STOP: no new decision-probe updater core
+
+2026-10-23. Full goal ACTIVE / NOT_ACHIEVED. This phase adds four newly inspected primary methods (and one explicitly duplicate primary retrieval), independent opposing reports, actual reciprocal cross-review and two bounded mathematical checks. It does not add biological performance or establish a new core. Decision: NONE_NEW_CORE / STOP_THIS_MARGINAL_FACTORIZATION_CLAIM. Do not expand the attempted operator or reopen old numerical menus.
+
+## Candidate and new evidence
+
+The single concrete constructive attempt aggregates worlds by terminal best-drug class, stores each probe's class-conditional marginal likelihood and multiplies those marginals to score probe sets. An ordinary class-conditional naive-Bayes planner reproduces its complete operation. No authenticated cell-specific conditional-independence restriction or measured finite-cost advantage was supplied.
+
+A pre-execution SHA-frozen exact four-world diagnostic uses latent bits d,n, terminal loss1[a!=d], probes n and d XOR n, each cost1/8. Single probes leave risk1/2, the pair lowers it to0; total objectives are1/2 without probes versus1/4 with both. Marginal-factorized class likelihoods discard that correlation; a one-step positive-net-gain stopping rule also stops too early. Ordinary joint-law planning avoids both. Cross-review makes the precise scope explicit: one can retain correct P(N,X|d) without explicitly retaining n. This is not a proof that decision-class compression fails universally or a mechanistic world model is necessary.
+
+Critic's separate exploratory exact four-model check ranks a structural-resolution probe by expected retained model count3/2 versus5/2, while its drug regret is1/4 versus0. This is a target-choice disagreement, not a refutation of RAED: targeting decision classes instead repairs this one-shot example. Unlike constructive's diagnostic, this check had NO separate execution-before protocol/freeze; WITNESS_STATUS.md discloses that. Neither is a biological experiment, novelty proof or published-method reproduction.
+
+## Primary methods and cross-review
+
+Constructive inspected OPO2504.15062v1 and Sufficient Decision Proxies2505.03953v3 (first2025, inspected version September2026). Counterfactual mask training's full contextual/truth access is a real resource; terminal decision expressiveness does not certify sequential observation-law sufficiency. Directional design2602.05340 was an explicitly duplicate retrieval, not new discovery.
+
+Critic inspected Action-BED2606.23662v1 and RAED2609.03686v1. Joint design/terminal-action training and nuisance-robust resolution are substantive existing operators. Action-BED's simulator/pathwise or score-function training contract is not provided by an opaque sparse assay. RAED's structural truth and independently sampled nuisance/calibration requirements cannot be supplied by repeated technical wells. Full history or properly priced composite experiments can avoid our examples; copying these methods into a cell agent is not a new contribution. Papers' numerical results and proofs were not independently reproduced.
+
+Three original reports were sealed before current peer-report reads. Late source question summaries before constructive/critic seals are disclosed, so no communication-blind claim. Actual exchanges separated terminal sufficiency from joint-law planning, challenged dense-covariance straw-man efficiency comparisons, and corrected the biological information contract. See each role's CROSS.md and seals. Agreement is not evidence of performance. No substantive unresolved disagreement establishes a candidate; the open question is whether a justified observation restriction can improve correct joint-law updates or transfer at finite cost.
+
+## Task and information boundary
+
+Existing BeatAML can support finite measured single-drug AUC-pool acquisition/recommendation replay, with patient grouping and one seven-dose profile charged per query. It does not authenticate arbitrary sequences/combinations or selective pathway probes. Same-modality multi-drug AUCs CAN support joint outcome models under actual source coverage; a second modality is not required. Missingness/high-order coverage/transport limit what can be estimated. EU source remains a conditional count-transport route, not an acquired new probe oracle.
+
+For a fixed linear-Gaussian component model, an equal-information direct predictor with total covariance T=BCB'+R matches component conditioning, including correlated-noise cross terms and the correctly declared observed-versus-latent estimand. This is a scoped algebraic equivalence, not a universal dismissal of world models. A competent low-rank direct implementation must receive the same B/prior/Woodbury/caching resources; a dense naive implementation is not a fair efficiency control.
+
+No biological fit, dataset download, API, GPU or wet work occurred in this phase. Public GETs: constructive5×200, critic4×200, source/root0; total9×200. Two exact mathematical executions; constructive additionally records a failed bs4 projection and standard-library correction. New code/tests only research/decision_probe_mechanism_20261023/, evidence only this log directory. HEAD47a0e2dea5a7dd42379fa17eb3621caf6bd0114c; preexisting tracked log/README.md and research/REPORT.md each14 added lines preserved. Local verification links feedback_shift_mechanism/VERIFICATION_v2.json; it cannot repair historical global provenance drift.
+
+## Next discriminating condition
+
+Preserve actual positive FAC/BeatAML feedback utility and negative cross-task/CDK results (ATTACHMENT_REVIEW_AND_PROGRESS.md). A new experiment needs a different explicit operator/restriction, legal observed feedback, an endpoint and prospective practical/finite-cost falsifier. It may use conventional mathematics and begin with a small diagnostic. It must beat the closest competent same-information direct/joint-law/decision-aware comparator before expansion, then the full objective's refit/CL/AL/mixture/equal-total-cost search controls. Stop if the gain is reproduced by the matched ordinary method or only improves irrelevant structural resolution.
+
+World contribution, agent contribution, inherited-U, joint benefit and G1-over-G0 improved improvement remain NOT_ESTABLISHED. Shared-start U and shared-base-U editor comparisons still require independent later functional tasks and equal historical/search resources. Do not manufacture them by replaying labels, seeds or generations. This scoped stop is progress in ruling out a shortcut, not full-goal completion or a global blocker.

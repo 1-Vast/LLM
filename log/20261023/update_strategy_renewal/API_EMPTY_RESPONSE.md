@@ -1,0 +1,5 @@
+# First API response has no usable proposal
+
+The first request returned finish_reason=length and an empty content string. Original empty PROPOSAL.md and receipt are retained. Provider reported11622tokens (622prompt/11000completion); the application exposes no usable method text. Do not infer a proposal or scientific conclusion from the call, or invent reasoning content/currency. The caller requested thinking_enabled=True; the result is compatible with completion budget consumed before a visible answer, but internal reasoning allocation is not exposed and is not verified.
+
+One bounded corrective call uses the same retained prompt with thinking_enabled=False and a4000token visible-answer limit, recorded separately by propose_direct.py. This is an explicit transport/output-mode correction to obtain the missing method text, not a hidden retry, biological experiment, or evidence of mechanism improvement. It amends START's intended single call to two actual logical requests; both actual usage records count. No further automatic retries/proposals are authorized by this local script. Full user API authorization remains unchanged.

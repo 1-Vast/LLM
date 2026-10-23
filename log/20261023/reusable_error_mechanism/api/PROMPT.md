@@ -1,0 +1,5 @@
+你是科研构造者。不是再提框架，而是构造至多一个精确、可被反例推翻的反馈更新限制。你无检索工具，不得捏造文献或数据。限1800中文字符，不输出代码。
+目标：真实细胞干预状态/功能反馈改进后续药物决策，最后才检验规则继承和更好的改进策略。普通数学完全允许；属于已知家族不是否定理由，但必须指出相比具体强ordinary操作的新性质/样本或总成本理由。
+当前实证：一个K562 CRISPRa源，单/双RNA与功能；普通RNA条件功能补全14–16%MSE增益但约9.77倍拟合时间，非新算法、非跨背景继承。Norman73双扰动对角混合曲率law输强direct ridge2.96%，已停不能调基因/头/空间救分。Emerald36已曝背景44单药功能→15组合条件普通ridge比源均值MSE好56%，不同信息；再加固定anchor MSE坏.91%，regret好4.76%，联合门失败，16保留背景禁止打开。只有released相对growth_rate，不能假定Bliss生存标度。CDK中期组成及真实终末IC50已试，功能无稳健增益，不能称未试。AML/ALL身份映射缺失入口已停。
+已停且不能换名：sharedpotencyshift=jointWLS/MAP，signedmean=EB；功能scalar actuation calibration=ridge且旧置信box随n缩0不一致；固定positivequadratic潜能的实际reciprocity不成立；共享kernel混合/广泛geneprior调参；裸冻transport更新survival=同law反应输运推断，终点组成混淆转移/选择/分裂。DiscoRL已有learned recurrent targets+ordinary innerKL+outerreturn，单改细胞名字无新意。普通计数误差模型、survivor/capture校正、主动学习、元优化、densityratio本身也非创新。
+请独立找一个不同于上面停止配置的可复用错误模式。给<=6行完整公式：什么可观察反馈、共享/不共享什么量、精确更新；强同信息direct/ordinary union refit/episodic conditional/meta learner为什么可能有限预算低效；最强简单替代解释；一个不需要新数据的最小合成反例/一致性或等价检查（只检验操作，不冒充生物）；一个可在现有已曝source诚实探索且不重启旧菜单的最小功能实验设想。若无足够具体机制则NONE并给一个有信息量的理由，不靠新名词交卷。不要要求直接模型原则上不能表达，不要靠虚构新资产或未来湿实验填空。

@@ -1,0 +1,9 @@
+# Seek a functional learning object in the new pooled-response source
+
+2026-10-23. Full objective ACTIVE / NOT_ACHIEVED. Previous goal turn PROGRESS: new Rhaister official baseline, EmeraldBay pinned identity qualification, independent source/cost audits and84-file local seal. Read full goal objective before continuing. HEAD47a0e2dea5a7dd42379fa17eb3621caf6bd0114c; preserve existing tracked log/README.md and research/REPORT.md edits. No production changes.
+
+Current task: identify at most one concrete support→query functional restriction or a finite informative diagnostic in the newly qualified single/combination menu. Function values remain unopened at phase start. Three independent roles examine biological/algorithmic novelty, strongest ordinary explanation, and exact combination/mono identity support. First opinions must be sealed before peers; actual cross follows.
+
+Do not repeat old shared-potency/MAP algebra, old Jaaks target-substitution failure, AZ paid-reference compression, or the exposed16-line RNA menu. The new source permits a genuinely different limited relative-phenotype question if an explicit hypothesis and source/confirmation split are frozen. A new independent dataset does not by itself make a renamed operator novel. Conventional components can support a new biological law or resource property; exact same-solver equivalence only removes that particular method distinction.
+
+One new API query may propose a precise functional relation or a bounded executable information test. Retain actual returned model/usage and failures. Do not run generated code. No unbounded candidate menu or numerical endpoint fishing. A first source-only functional diagnostic is permissible if named as ordinary and predeclared; it does not establish the original world/agent/RSI objective. All new code research/emerald_functional_rule_20261023; all records here.

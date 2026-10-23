@@ -1,0 +1,9 @@
+# Fixed marginal-residual invariance check
+
+Freeze this protocol and root gate_check.py before its single exact execution. This tests a proposed inference from a pooled predictor's marginal residual-domain independence to conditional response-law invariance; it does NOT reproduce CICME, a finite-sample HSIC implementation, its graph estimation or empirical results.
+
+Four equiprobable atoms: independent D,X in{-1,+1}, Y=D*X. Domain is observed. The pooled squared-loss optimum f(X)=E[Y|X]=0; residual R=Y. Enumerate the exact conditional laws of R for each D, and Y for each(D,X). Expected result: R law is the same uniform{-1,+1} in both domains; Y|D,X changes with D for each X. A characteristic delta kernel population HSIC between R,D is exactly0; between the joint(R,X) and D is positive. Compute via finite probability sums, not sampled asymptotics/pvalues. Compare pooled f0 MSE1 to a same-information ordinary domain-interaction prediction D*X MSE0; this is an algebraic comparator, not a new algorithm or learned fit.
+
+Falsifier: if exact marginal laws differ or the exact conditional laws coincide, reject this witness. It challenges only the unrestricted inference; global pooled faithfulness, special shift restrictions or correct conditional testing may exclude/avoid it. Do not assert it lies inside a published theorem without auditing that theorem's assumptions. Do not infer a real drug sign reversal, cell law revision, biological benefit, general failure of residual tests or RSI.
+
+Root inspected actual retained CICME2507.17792v4 III-B sentence: residual/domain pairs are tested by marginal HSIC. Critic independently proposed the Gaussian analogue before this protocol; this is an explicit independent finite-support instantiation, not discovery credit for a new principle. Ordinary conditional/two-sample tests or domain-aware regression can detect the change. No biological label file is read.

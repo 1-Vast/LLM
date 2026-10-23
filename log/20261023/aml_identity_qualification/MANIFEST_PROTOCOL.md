@@ -1,0 +1,7 @@
+# Finite manifest-source check
+
+Check two exact sample-associated public BioSample accessions SAMN46795876 (baseline MULTIseq) and SAMN46795874 (post MULTIseq) through official ENA XML, plus article-linked Zenodo record19303229 metadata. One logical GET each, no retries/alternate mirrors. Save source bodies/receipts; project titles/sample attributes and downloadable-file identities only. Do not fetch referenced sequencing, expression or functional payloads. Purpose: locate an explicit tag-to-culture/chemistry manifest, not infer it from response data.
+
+Locally inspect only Supplemental Data15 (primer sequences for lineage barcode preparation), exact named sheet in already acquired MOESM3 workbook, dimension A1:D17. Export text cells only, no numeric values or formulas; do not open other sheets for values. Shared-string XML may internally materialize text from other sheets, but only the chosen sheet's text may be exported or used. This is a logical export boundary, not a physical non-decoding claim. A primer/reference table alone may not be a sample-tag key.
+
+If these finite sources add no authenticated tag-to-flask/time/chemistry mapping, stop this particular baseline-to-drug-specific-fate numerical task pending a concrete new public artifact. Do not proceed by renaming BC1..8, clustering expression to guess sample identity, arbitrary barcode transformations or full raw downloads. Keep the larger research goal active and seek a different independently testable scientific mechanism. This local stop is not proof no other public artifact exists.

@@ -1,0 +1,5 @@
+# Exact information criterion audit frozen before execution
+
+Four equiprobable worlds r∈{-1,+1},sign∈{-1,+1};queryerror=(3/5)sign*r. Feedback residualr is observed. Compare no-update0,fixedpositive(3/5)r,and ordinary conditionalposterior mean. Two informationcontracts: lawful prefeedback q=sign supplied to everymethod;or signhidden equally across eachobservedr. No method may seequeryerror. No training-onlysign advantage. These are stipulated finiteexamples,not biomarkers or new biological tasks.
+
+Knownsign ordinaryprediction must be(3/5)sign*r and exactMSE0,in eitherpositive ornegative group,while0risk9/25. Passingbothdirectiontests doesnotprove novelty. Hiddensign posteriorquerymean0;any updateb(r)r hasrisk9/25+E[b(r)^2]. Fixedpositive hasrisk18/25,ordinary0risk9/25. This tests whether an unobserved functional propagation sign can be guessed by adding a gate/editor;it doesnot assert actualcellerrors have this distribution. A legal prefeedback signal distinguishes thecases and allowsordinaryconditionedupdate. ExactFractionarithmetic,allfouroutcomes,oneexecution. No new biologicalfit/metricgate.

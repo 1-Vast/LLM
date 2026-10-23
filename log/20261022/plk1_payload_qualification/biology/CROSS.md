@@ -1,0 +1,27 @@
+# 有限公开配对合同的终止与非必要门槛
+
+2026-10-22。INDEPENDENT.md已独立封存后实际读skeptic/INDEPENDENT.md、root新增GSE203237.metadata.json、GSM6165155.metadata.json及各receipt，以及SUPPLEMENT_DESCRIPTIONS.json。仅文字metadata，不新HTTP、不读xlsx数值/矩阵、不训练；旧phase及独立稿不改。
+
+## Metadata增强的结论与不能修复的冲突
+
+GSE203237 overall_design为90k shRNA感染后不同时点探针杂交、type Other，附ProcessedData.txt.gz/RAW.tar。它仍是hairpin表示，不是表达state。代表GSM6165155明确molecule genomic DNA、amplicon sequencing、genomic library和MAGeCK read counts；“raw gene counts”措辞不能覆盖这些assay身份而被当作RNA expression。
+
+代表sample title与characteristics写HCT116/Colon/T0/noCas9，而正文将secondary pooled in vivo CRISPR定位HCI-010 PDX。这个背景冲突应记录，不能擅自称样本名拼错、改成HCI或推所有18sample同错。它进一步阻止直接把该记录当已认证HCI continuous endpoint，但不证明文章整体无效；本角色不提额外GET调查，也不从一个sample外推全部数据。
+
+GSE203237 receipt为HTTP200/3545bytes/SHA256 91a976c71a98a435bd7da1cebc93c3ed471d0123c8f525415c3aa34a159209d5；GSM6165155为HTTP200/2882bytes/SHA256 2486af69a80b183e55ac83d5faa79789d39bf1bf25872587b36ef47fbc88c409。作者source链接、series/代表sample角色及supplement描述均未认证所需MCF7 multi-target state payload。
+
+## 实际双向质询
+
+Skeptic问：有限作者linked endpoints加代表sample及suppcaption都未认证必要state后，是否足够停止本次publicpaired合同，而不必证明全网没有或继续下载大tar？本角色明确接受。当前可作STOP_CURRENT_PUBLIC_PAIRED_CONTRACT / NOT_RUN，理由是预定公开通道内必要输入未认证，不是性能FAILED。未来具体新artifact证据可重开资格，但不默认继续无界sourcehunt。
+
+双方也明确未打开mmc9/mmc10实际schema；caption仅认证其预告guide/单target HCT116 DEG身份，不能写成“已审xlsx证明无任何state”。这不妨碍当前不fit，因为拟合需要肯定的完整输入认证，而非只靠一个文件可能藏有资料。
+
+本角色反问：若只作静态同protocol MCF7 state→HCI关联而不声称early→late动态，2vs4days冲突可披露为timing UNKNOWN，是否应避免必须作者回复的无限门？Skeptic实际答复接受。缺raw biological replicate也只限制noise/独立性解释，不自动禁止合法aggregate小试验；可追溯pseudobulk或target-level state summary足够，完整single-cell重建不是硬要求。**必要state channel仍不能由这些非必要原始资料的放宽而消失。**
+
+本角色另提出任务漂移边界：即使后来取得S6连续功能，state缺失时不能悄悄改为一个functional screen预测另一个screen并称原state问题已成功资格；那是另一个任务，应另给科学意义/信息预算/独立协议。当前不执行这个替代，也不借代表sample背景冲突改研究背景。
+
+## 终态
+
+保留selected65条件人口、单个HCI体外endpoint、可追溯MCF7表达summary及对应control/QC/identity这一最小合同；不要求完整105/960、全部rawreads、所有原始重复、多个later campaign或新算法primitive才允许小能力试验。
+
+在已审有限公开文字/链接/metadata中，MCF7多target表达summary或可恢复其身份的公开payload未认证，因此停止当前公开paired试验，不开补表数值、不fit、不追加tar/GET或作者联系。结论不是全网无数据、论文性能失败或state无功能价值；完整研究目标仍ACTIVE / NOT_ACHIEVED。

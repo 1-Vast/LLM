@@ -1,0 +1,29 @@
+# Cross debate and independent saved-result audit
+
+2026-10-23. Independent source report and initial API review were separately sealed before cross replies/root numerical results. Current reviewers were contacted after my first seal. The API review was completed before reading peer API opinion/root math. I then read root protocol, exact script and saved result solely for independent arithmetic reconstruction; did not import/re-execute root code.
+
+## Actual reciprocal debate
+
+I challenged constructive/task roles to name a precise update sharing equation versus CLAW context→LoRA, HarnessTTT proposer training and ExpEvolve factor-UCB control. Constructive replied no new formula nominated: conditional K(q) is explicitly ordinary empirical Bayes/direct residual baseline and task descriptors must predict paired updater utility beyond global best/mixture/EB. This is a useful qualification target, not a claimed new operator. Biology likewise supplied no new equation and accepts ordinary donor-grouped audit rather than new mechanism.
+
+Constructive challenged my common-start edit-credit proposal on accounting: one paid Q measurement may score many offline clones and must not be charged repeatedly as wet experiments. I accepted; distinguish shared outcome-access cost and clone-specific computation. They also challenged that changed acquisition cannot keep the same D. Accepted: common-D contrast isolates updater effects only; acquisition edits need a frozen common response oracle with actual per-method query charging or coupled randomization. My proposal remains unpromoted classical experimental design.
+
+Biology challenged whether all-drug static functional tables may support component-only retrospective evaluation absent serial adaptive author histories. Accepted: true author online history/dynamics is not universally mandatory. Metadata must first authenticate raw/local preprocessing and lawful feedback oracle; policy-selected later-stage drug labels do not automatically support arbitrary queries. Ten complete donors might support limited grouped source qualification, not high-confidence Level3 generations by counting CV folds as tasks. I have not read the biological table or its numerical response payload.
+
+For API, constructive supplied a sharp mean-versus-axis challenge: `g1=s0,g2=-s0` share an exact rank-one axis, yet the strictly convex history-mean fit returns s=0; scalar alpha cannot adapt, while ordinary PCA direction can. I accepted only the scoped inference: shared one-dimensional *axis* does not imply a usable signed mean. API allows unrestricted alpha and says one-dimensional stable direction, so signed histories are not explicitly excluded; however an added same-signed/noncancelling-mean assumption could avoid this witness. Do not report it as refuting that stricter revised assumption. Constructive also noted the initial toy's epsilon shrinks direction; alpha rescales it only in the lambda_R=0 reference. I accept that correction to my API review wording (alpha=1 is for the stated true direction, not automatically the optimizer-produced shrunken direction).
+
+I independently challenged finite null preservation and coordinate dependence before reading root results: `J_C s=0` guarantees only tangent behavior. My own example `f_C=theta1*theta2`, base(1,1),s(1,-1) yields1-alpha²; finite change is not preserved. Function-coordinate history matching does not make the Euclidean parameter regularizer coordinate invariant. These do not reject all local approximations or named physical coordinates.
+
+## Root saved arithmetic audit
+
+`check_saved.py` is separate70-digit Decimal algebra; it reads saved JSON and six freeze bindings, never imports/re-executes root script. **All six freeze hashes unchanged;24 exact values reconstructed within1e-60.** Result retained in RESULT_AUDIT.json. I initially guessed API_FREEZE.json, absent; the actual protocol uses API_CHECK_FREEZE.json. Failed path lookup is recorded here; no outcome affected.
+
+- Same-history linear witness: inherited [1,2] predicts query2 exactly versus uninformed minimum-norm1.5; ordinary conditional Gaussian with covariance ss^T from the **same history** also predicts2 exactly. This is real toy information value, and no separation from ordinary informed inheritance.
+- Coordinate witness: positive epsilon1e-6 and equivalent physical scaling.001 lead to query1 versus2000000/1000001 after identical noiseless feedback. Scope is Euclidean positive parameter ridge; epsilon0/full-rank exact solve or covariant metric is not refuted. It does not show biological frequency or instability for anchored coordinates.
+- Nonlinear control witness: actual historical control increment0, drug1/4; fitted tangent direction has J_Cs0 yet final control1/16 after drug prediction1/4. This rejects an exact finite-preservation reading; consciously local/retracted nonlinear versions remain open.
+
+My initial **conditional GO to minimum mathematical falsification** is now discharged by these exact checks. It was not a biological-data GO. **NO_NEW_CORE_GO / no biological campaign from the literal API equations.** The precise restriction remains a valid predictive family, but the supplied positive witness is fully matched by ordinary same-history inheritance and its control/invariance readings need assumptions or revised equations. A revised finite-sample constrained estimator would require new explicit structure and a lawful untouched task; do not tune the already stopped CXCL9 gate to rescue it. No scientific performance or RSI success claimed.
+
+## Preservation note
+
+During preparation I briefly inserted a local-nullspace note into the already sealed API_REVIEW.md, then immediately removed it and verified the original SHA256 exactly matches API_REVIEW_SEAL.json. No sealed content changed in final state. New corrections are here; independent original remains unchanged. No monetary/native-model identity claim is made.

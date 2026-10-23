@@ -1,0 +1,10 @@
+# Post-result actual cross exchange
+
+2026-10-23. Original frozen `CROSS.md`, `PREFLIGHT.md` and `INDEPENDENT.md` were not edited. Full independent audit and returned-argument assessment are in `RESULT_REVIEW.md`; this file indexes the actual post-result exchange separately.
+
+1. I sent constructive my independently executed raw-source audit scope and the strict lower-bound gate failure. Constructive returned its independently centered29,112 pair-cell audit and three bootstrap-draw result, and challenged any selected467-pair rescue or reuse of observed slopes as independent confirmation. I accepted those objections; no fit is warranted under the actual failed gate.
+2. I challenged an overbroad description of audit independence: constructive did not independently regenerate all2000 bootstrap draws, and my audit does not validate measurement chronology/purity/batch or secure blindness. Constructive explicitly accepted both limitations and noted that the two audits are complementary. It confirmed the latter scope in a returned message. Root has the source receipt.
+3. Frontier challenged the overnegative interpretation that STOP disproves context effects or proves global covariance optimal. I explicitly rejected that interpretation and confirmed lower.0012573 does not meet>.01 regardless of T point or467 pairs. Frontier also asked about a hypothetical passing gate: I gave a fixed full-drug, same-information contextual-versus-global prediction comparison, while explicitly recording that the actual failure means no such fit is authorized now.
+4. I accepted constructive's direct-centered check as resolving the actual-scale cancellation concern raised before execution, without asking for further runs. This was a scoped evidence update, not a claim that the raw-second-moment operator is universally numerically robust.
+
+Returned agreement does not substitute for the frozen rule: it is that rule, not voting, that yields STOP. Neither audit is a fresh biological experiment or external replication. All world/agent/inheritance/joint/RSI claims remain unestablished.

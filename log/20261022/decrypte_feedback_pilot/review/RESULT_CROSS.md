@@ -1,0 +1,11 @@
+# Actual result-interpretation cross review
+
+2026-10-22. After completing and sealing RESULT_AUDIT.md, I read assay/RESULT_INTERPRETATION.md and exchanged messages with its author. Earlier incoming messages disclosed that reviewer's main interpretation, but not the independently reconstructed data/metric results; the audit did not depend on them. This cross record is not another independent model rerun.
+
+Agreement: B1's ordinary source-conditioned published-entry result is a meaningful positive development signal, while the frozen B2 portfolio gate fails. The fact that ordinary GaussianB2 has lower aggregate error than GaussianB1 makes any inference “more information itself is harmful” invalid. The observed source selection choices do not alone identify a causal reason for its failure. A B2 action can mathematically ignore its low-dose entry, but that option must actually be in the declared program; do not retroactively add it to rescue this run.
+
+My question to assay: its proposed common-denominator interval check assumes relative rounding and potentially exact raw signals, so it must be presented as an additional explicit model, with raw rounding allowance and source precision handled where supported. Such compatibility is not proof of unprocessed/local measurement provenance. Assay's sealed text already qualifies three-decimal precision and raw rounding, and explicitly says this check was not performed; no factual disagreement remains. This check need not block the already legitimate published-entry pilot and must not be sold as functional-noise authentication.
+
+I accept assay's requirement that a later molecular method face the strong ordinary B1 feedback prior using exactly the same target functional information, plus strong direct alternatives using the same molecular information. I do not treat this as authorization to expand the current frozen numeric menu. Novelty, world-model structure, agent policy, inheritance and improved-improver remain separately unestablished.
+
+The main remaining uncertainty is upstream biological/export semantics and later task generalization, not the arithmetic of the audited development scores. No new biological values beyond the frozen48development set were accessed during this exchange.

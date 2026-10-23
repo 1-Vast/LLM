@@ -1,0 +1,5 @@
+# PDF caption-only qualification
+
+The authenticated DOCX is methods/resources, with no outcome table identified. From the acquired archive extract mmc1/mmc3/mmc4 PDFs and verify against original JATS MD5. Extract page text internally but emit only page count and lines matching anchored table/figure captions. No body rows, clinical data, curve values, molecular statistics or assay values are emitted. Full text extraction is numerical byte/string contact and must be disclosed; suppressed content is not a clean unacquired reserve. Actual numerical casting/modeling remains prohibited here.
+
+After identifying a response table title/page, use a separate narrow header-only crop or word filter before any whole-page rendering, so metadata inspection does not expose all response values. Table title alone cannot prove headers, rectangularity, run coverage or normalization. PDF read-only skill applies; user log/research directory constraint overrides its generic temporary/output paths. No artifact authoring is performed.

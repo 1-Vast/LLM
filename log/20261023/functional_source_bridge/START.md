@@ -1,0 +1,9 @@
+# New evidence bridge, not a restarted qualification loop
+
+Previous turn PROGRESS: mismatched official HCC mirror ruled out. Full objective ACTIVE / NOT_ACHIEVED. Read the full original goal before work. HEAD47a0e2dea5a7dd42379fa17eb3621caf6bd0114c; existing tracked changes log/README.md and research/REPORT.md retained. No applicable filesystem AGENTS.md found outside experiment/log trees; user-provided Karpathy guidelines apply.
+
+No HCC retry, no PLK1 reopening. Growth agent must first resolve downstream decisions; root discovered later Replogle acquisition STOP before any new network, and agent independently upheld it. No response fitting may occur without a newly authenticated task and frozen experiment. This closed legacy branch consumes no further acquisition budget.
+
+Root checks distinct16-cancer-context paper DOI10.64898/2026.08.24.746802 for current publication/version and original data/code links: API version, Crossref relations, repository discovery. Prior429HTML/XML and500EPMC fulltext routes are not retried. This is source discovery for explicit state/function requirements, not an innovation claim. Stop after at most6root requests unless an actual original manifest names a relevant object. If unchanged and no link, don't stretch into another endpoint loop.
+
+Separate independent frontier agent examines at most one genuinely distinct mechanism using new first-hand2025–2026 evidence, at most4HTTP. No bare conventional-family novelty rejection, no relabelled stopped route. Qualified mechanism would require independent opposing reviews and cross debate before a pre-frozen minimal falsification. All code research/functional_source_bridge_20261023/; all logs/data this phase. No source/tools production changes. Native agent model/usage is unattested. Local byte checks do not repair historical global provenance drift.

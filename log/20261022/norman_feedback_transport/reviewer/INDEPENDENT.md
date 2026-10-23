@@ -1,0 +1,41 @@
+# Independent code and update-question audit
+
+2026-10-22. Reviewer: norman_update_audit. Full goal ACTIVE / NOT_ACHIEVED. Independent review of predecessor artifacts only; no other current reviews read, no HTTP, no fitting, no protected outcomes opened. This is source inspection and recorded-score reconciliation, not independent numerical reproduction. Scoped data-quality skill guidance applied.
+
+## Evidence and predecessor verdict
+
+Read baseline DECISION.md, PROTOCOL.md, calibrate.py, ALL_SCORES.csv and DEVELOPMENT_SELECTED.csv, and numerical-qualification PROTOCOL.md. Numerical inputs themselves were not opened. The reported selected MSE values agree with the selected-score table. There are 17 evaluations per budget: mean, quadratic, nine ridges, six completions; 51 total, of which 48 are fitted predictors. The 2048 RNA completion MSE .0011376020810949434 is lower than identity completion .0015000691702981583 and identity/RNA ridge .0018605441681244469 by approximately 24.16% and 38.86%. These are development-selected comparisons within the declared menu.
+
+Code inspection finds no current protected-label ingestion in calibrate.py: it loads the explicitly named source/development table and asserts split membership. RNA transforms do not use y. Source-only scaler and quadratic fits follow the declared budget. Nuclear completion mirrors both observations and uses an explicit mask, so zeros are retained. The Lipschitz bound ||side||_2^4 is conservative and valid for the masked linear map. The symmetric mirrored objective is implemented consistently, although its penalty scale differs by a factor of two from an upper-triangle-only data-loss convention.
+
+## Code limitations that matter to the next study
+
+1. Medium severity, high confidence: converged=True is only an objective-change heuristic, not an optimality certificate. FISTA objective need not be monotone; adjacent objective values can change little before the proximal gradient is small. Selected candidates meet the declared stopping rule, but 'converge' should be qualified as 'met declared stopping criterion'. For the next solver, record normalized proximal-gradient norm or a suitable primal/dual gap and disclose iteration caps. This does not establish the recorded selected scores are wrong.
+2. Medium severity, high confidence: complete() silently overwrites duplicate unordered edges, and main() trusts prequalified uniqueness, finite values and non-diagonal membership. The upstream contract may guarantee these conditions; the function itself does not enforce them. A new split/update harness should explicitly reject duplicates, overlaps and diagonals before fitting. No claim that such duplicates occurred here.
+3. Medium severity, high confidence: the full eligible source/development y vector lives in main(), although each estimator receives only its legal subset. This is an architectural information boundary, not evidence of fit leakage. A next blinded evaluator should load target outcomes only after sealed predictions; geometry selection must receive only early labels, not closure access to development y.
+4. Medium severity, high confidence: seconds exclude the shared baseline fit, RNA preprocessing/SVD, parsing and selection, as DECISION discloses. They cannot certify equal-total-cost superiority. Ridge menu and identity features do not constitute the strongest ordinary pairwise model; no novelty or algorithmic dominance follows.
+
+## Falsifiable next question
+
+Within this one seen-gene K562 graph, does choosing a bounded RNA kernel geometry using early functional outcomes improve prediction after the same later feedback batch beyond fixed RNA geometry AND an ordinary predictor refitted with all the same labels, under a declared common compute/search budget?
+
+This is ordinary supervised model/geometry selection. It is not task inheritance, RSI, a virtual cell, drug response or a new mechanism. A defensible positive result is a conditional update capability on this graph only.
+
+## Required prospective comparison
+
+Freeze pair IDs and a deterministic early E / later L split before any new fitting. Use identical E and L in every arm and identical RNA, single-growth priors, baseline basis, model initialization, final residual targets and data-loss weighting. Common start means identical fitted early-state predictor where feasible; otherwise explicitly distinguish representation effect from initial-state advantage. A useful primary estimand is final paired MSE difference between calibrated and fixed geometry at identical E union L; also record each arm's pre-L MSE and update gain. Larger update gain alone is insufficient because an initially worse predictor can gain more.
+
+Arm F: fixed RNA geometry, with nuisance regularization selected only through declared legal training-side validation. Arm C: a finite, preregistered kernel menu selected only by E-internal folds, then freeze that geometry and refit the same completion learner on E union L. Arm O: ordinary all-feedback refit of the same kernel-selection-plus-predictor family, using E union L internal folds and the same total search/compute allowance as C; include an ordinary joint/kernel-learning alternative if a distinct rule is proposed. A frozen-RNA ordinary all-label completion fit is necessary but not sufficient as O because it cannot reproduce calibrated geometry choice. All arms keep E labels in their final fits; do not handicap the comparator by training only on L.
+
+Shared E-internal folds and candidate counts should be fixed and matched. Count selection fits, validation labels, preprocessing, refits, iteration caps and wall time. A finite grid and equal candidate count control search opportunity only approximately; they do not equalize actual compute. Declare one hard total compute ceiling and report actual usage, or limit the claim to matched information/search rather than matched cost. Give ordinary refit permission to spend the full accumulated calibration-plus-update budget. No extra post-hoc kernel family or retry after seeing final outcome.
+
+## Strict information traps / stop rules
+
+- Existing 1051 development labels have already influenced model preferences and the next question. They are development evidence, never a fresh independent test. Source labels also previously entered the execution environment; a new early/late split provides procedural restriction, not historical ignorance.
+- Geometry normalization, eigentruncation, bandwidth selection, residualization and fold scalers must be fitted at their declared stage. E-internal held-out labels cannot enter the quadratic baseline used to score those folds; fit that baseline on each fold's training rows. The same rule applies to ordinary refit cross-validation.
+- Do not use L or final evaluation labels to select E geometry, batch composition, seeds, stopping rules or narrative. No adaptive acquisition unless all comparators share exactly the same selected IDs and acquisition cost and the question is revised prospectively.
+- Never infer independent tasks from pair partitions or independent samples from 103 incident-gene summaries. Repeated partitions are sensitivity analyses within one graph, not biological replications. Any uncertainty method must state its dependence assumptions; no naive gene/pair i.i.d. significance claim.
+- Keep protected outcomes sealed until the complete comparison and predictions are frozen under the parent authorization. This audit neither reads nor authorizes their evaluation. Any current development-only contrast remains development-only.
+- Stop transport-superiority claims if calibrated geometry fails to beat the strongest ordinary all-feedback refit under the declared final metric and cost constraint. A win versus fixed geometry alone establishes ordinary calibration value, not a distinct update mechanism. No gain warrants reporting a null capability result, not introducing an agent/editor layer.
+
+Local evidence receipt: log/20261022/norman_baseline_calibration/{DECISION.md,PROTOCOL.md,ALL_SCORES.csv,DEVELOPMENT_SELECTED.csv}; research/norman_baseline_calibration_20261022/calibrate.py; log/20261022/norman_numeric_qualification/PROTOCOL.md. No external-source or contemporary-literature claim made.

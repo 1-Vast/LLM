@@ -1,0 +1,9 @@
+# Qualify a genuinely different functional-update opportunity
+
+2026-10-23. Full objective ACTIVE / NOT_ACHIEVED; previous goal turn PROGRESS: functional_update_operation completed reciprocal review, independently reconstructed exact criterion and sealed34files. No global blocker. HEAD47a0e2dea5a7dd42379fa17eb3621caf6bd0114c; preexisting tracked log/README.md and research/REPORT.md edits preserved. No production change.
+
+This phase first considers feedback transport over drug dose curves, because functional response and next-dose experiments are actionable. It does not assume a new method exists. Early root/agent history inspection immediately located the already stopped profiled potency-shift+OED candidate (early_update_mechanism), ordinary decryptE conditional-function positives and later molecular STOPs. Those exact candidates will not be refit or renamed. No additional equivalence toy is needed to repeat that evidence.
+
+Two independent roles inspect concrete sharing restrictions and ordinary nonlinear same-forward controls; independent originals precede peer exposure and actual cross. Root will seek primary biological/method sources that could supply a genuinely different measurable constraint. Public metadata is a lead, not source authentication or numerical utility. No functional labels will be fitted before a distinct hypothesis, qualified task and frozen protocol. Code research/dose_update_qualification_20261023; all sources/receipts/failures/results here. Native model identities/usage unattested.
+
+Decision gate: advance only a concrete restriction with a lawful distinguishing observation and expected finite-data/cost benefit over same-information nonlinear direct/MAP/EB/meta/active controls. If overlap or missing source semantics prevents this, stop this exact candidate and preserve new source evidence rather than inflate an architecture. The original world/agent/inheritance/joint/improved-improver objective remains intact.

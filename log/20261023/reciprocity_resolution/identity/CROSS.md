@@ -1,0 +1,13 @@
+# Actual cross review and source-faithfulness check
+
+2026-10-23. Independent report/seal completed before reading scope/INDEPENDENT.md. Actual reciprocal questions exchanged with /root/reciprocity_scope: whether historical stronger-on-B assignment is independent biology validation, whether any source mandates selecting RHOXF2 row14112, and whether the old-label alternative should be run. No new responses read for this review.
+
+We independently converge on the source-domain correction: all103 canonical perturbation labels match unique exact unmodified reference symbols. Source only supports interpreting RHOXF2B as the original author's intended perturbation label, not renaming/merging RHOXF2 and RHOXF2B readouts. Scope found no source requiring row14112 instead; I agree. Historical raw-first alternative uses three nomenclature changes and a different RHOX estimand; do not run it as rescue.
+
+Strongest objection retained: the author's stronger-effect statement is historically response-informed. Reusing it now is not fresh response-based selection, but neither is it an independent blind biological target assignment. Both reviewers explicitly agree that only join reconstruction and conditional saved-number algebra can be independently checked; biological input specificity/conjugacy remains unproved. This concern changes wording/interpretation, not operational metadata feasibility.
+
+Static review of root PROTOCOL.md, IDENTITY.json and run.py finds the implementation faithful to this scope: exact raw feature-symbol equality; all103 retained; RHOXF2B14109 and distinct RHOXF214112 asserted; old diagnostic imported rather than altered; no historical alternative, no response-based filtering; function/development/protected access absent. Frozen hashes include the original representation, gene table, author source and reused diagnostic. The protocol correctly limits sign/support/diagonal status versus descriptive cycle diagnostics and does not promote an approximate physical law or predictor.
+
+Minor wording request sent to root: explicitly state that original stronger-on-B assignment was response-informed and is not independent blind biological validation. Existing text already distinguishes prior-source exposure from newly inspected responses, but the extra sentence prevents overclaim. No numeric execution blocker after that clarification. Conditional GO for one saved-coordinate compatibility diagnostic, old STOP preserved; not GO for training, causal inference, novelty, agent or RSI claims.
+
+No substantive unresolved reviewer disagreement. Molecular target specificity, force semantics and uncertainty remain unresolved scientific assumptions, jointly identified rather than settled by reviewer agreement.

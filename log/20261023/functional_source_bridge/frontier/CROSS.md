@@ -1,0 +1,15 @@
+# Actual reciprocal source debate
+
+2026-10-23. Written after independent and addendum seals; neither original changed. Read growth/AUTHOR_SOURCE_REVIEW.md only after sealing my independent review. Messages were sent directly to /root/replogle_growth_source and actual replies received. No network, labels or fits.
+
+Growth challenged my source addendum on label-derived arm covariates, static 16-line task chronology and multiple guide states joined to one functional gene value. I accepted all three qualifications: I have no qualified arm-correction algorithm; Target dependency/Average arm dependency must be excluded from hidden-function correction unless a separately legal prior is explicitly allowed. A static task order can replay sequential information acquisition, not authenticate real adaptive chronology. Claim-specific line/target holdouts must be declared; guide state multiplicity does not increase independent functional n. The addendum already calls for gene-line grouping. Raw QC is not automatically contaminated merely because other covariates are label-derived.
+
+I challenged growth in three directions:
+
+1. Does 'independently assayed historical endpoint' risk asserting statistical independence from target-library choice, correction or cutting effects? Growth agreed the defensible statement is another assay's measured endpoint. Selection and error independence remain unverified.
+2. Does filtering arm-truncation/gain cells in state pseudobulk establish causal transport to external Chronos? Growth agreed no. RNA-side filtering does not clean Chronos, and different guides, copy number and survivor selection remain plausible differences.
+3. Does gene-knockout dependency establish drug response? Growth agreed no. The bounded task is cancer-cell genetic-target dependency prioritization. Same-pair public historical function scores must be strong direct priors when the information contract permits; intentionally hiding them defines restricted retrospective reconstruction rather than unknown-function discovery.
+
+Resolved scope: no requirement for newly collected same-assay wet feedback before a component study; historical externally measured gene effects can be its declared outcome. However actual payload identity, joint coverage, paid state availability and the selected-panel scope still need authentication. Published descriptive correlation scripts do not themselves claim a label-blind benchmark and are not criticized for joining labels for their original purpose. We agree on CONDITIONAL_SOURCE_QUALIFICATION, NOT_METHOD_GO. Neither party supplied a novel restriction or new performance evidence, and the exchange does not constitute algorithm consensus or numerical approval.
+
+Unresolved next checks: precise label/state timing and target selection; upstream correction information dependencies; actual complete line-target joins; legally available historical same-pair priors. These decide whether a useful functional residual task remains. No reason exists here to relaunch previous stopped numerical assets or append RSI modules.

@@ -1,0 +1,290 @@
+[
+  {
+    "projection_index": 3,
+    "tag": "p",
+    "id": "abstract1.1",
+    "text": "This paper presents a lightweight and versatile learned optimizer that dynamically recombines gradient history, represented as averages over disjoint time spans. The optimizer reduces the prediction space to one scalar coefficient per gradient average, shared by multiple parameters. Progressively averaging older gradients minimizes memory cost of long history, while keeping their contributions independently accessible. A 37k-parameter network trained in 0.87 GPU-hours generalizes zero-shot to unseen tasks, lowering validation loss by 9.1% and 0.4% on BERT-Tiny and GPT-Tiny, and improving test accuracy over Adam by 3.5 %p on a Vision Transformer and by 2.7 %p on average across nine graph models, with FLOPs overhead as low as 0.3%."
+  },
+  {
+    "projection_index": 5,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 1: Recombination of gradient history as a learned update. Recombination of history contributions − ∑ h α h g h -\\sum_{h}\\alpha_{h}g_{h} with predicted coefficients α h \\alpha_{h} can redirect the Adam trajectory away from ascent."
+  },
+  {
+    "projection_index": 7,
+    "tag": "p",
+    "id": "S1.p2.1",
+    "text": "Gradient history can serve directly as a useful directional basis for optimizers, as demonstrated by momentum and Adam ( Polyak, 1964 ; Kingma and Ba, 2014 ) . This motivates an adaptive optimizer that learns to dynamically recombine gradients from the past optimization trajectory."
+  },
+  {
+    "projection_index": 12,
+    "tag": "p",
+    "id": "S1.I1.i2.p1.1",
+    "text": "A single trained policy generalizes zero-shot to unseen language, vision, and graph benchmarks, improving validation loss and test accuracy over Adam."
+  },
+  {
+    "projection_index": 37,
+    "tag": "p",
+    "id": "S3.SS1.SSS0.Px1.p1.1",
+    "text": "The 37,389 37{,}389 -parameter learned optimizer is meta-trained on four small networks (under 10,000 10{,}000 parameters). Six history slots (63-step span) were used during optimizer training, where each meta-epoch consists 160 model-training steps. The trained policy is evaluated zero-shot on BERT, GPT, Vision Transformer, and GNN architectures unseen during meta-training. At deployment, the learned optimizer uses history slots with scaling factor r = 2 r=2 to cover the entire target trajectory, referred to as full-span unless otherwise stated. Target network tensors are partitioned into groups of at most 256 coordinates, prioritizing partitions along the output-channel dimension."
+  },
+  {
+    "projection_index": 38,
+    "tag": "p",
+    "id": "S3.SS1.SSS0.Px2.p1.1",
+    "text": "Adam, stochastic gradient descent (SGD), and SGD with momentum (SGDM) use default hyperparameters to all tasks. This setup intends to evaluate the off-the-shelf deployment performance of the learned optimizer. Paired comparisons share the same initialization, data ordering, stochastic streams, training budget, and parameter grouping. Appendix A specifies the group construction, optimizer-training configuration, target protocols, baseline hyperparameters, and metrics."
+  },
+  {
+    "projection_index": 39,
+    "tag": "h3",
+    "id": null,
+    "text": "3.2 Zero-Shot Generalization to Unseen Tasks"
+  },
+  {
+    "projection_index": 40,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Table 1: Overall comparison on tasks unseen during optimizer training. Language models report terminal validation loss. Vision reports test accuracy both at the state with the lowest validation loss and at the terminal state. Graph models report test accuracy from the state with the lowest validation loss within 100 updates on Cora and CiteSeer and 500 updates on PubMed. Bold and underlined values denote the best and second-best result per row. Graph results are mean ± \\pm standard deviation over three seeds."
+  },
+  {
+    "projection_index": 41,
+    "tag": "table",
+    "id": "S3.T1.2",
+    "text": "Data Model Learned Adam SGD SGDM Language modeling Terminal validation loss ↓ \\downarrow Wikipedia–BookCorpus BERT-Tiny (masked-token) 3.463 ∗ 3.810 6.703 6.222 WikiText-103 GPT-Tiny (next-token) 4.250 ∗ 4.268 5.921 4.686 Vision Test accuracy (%) ↑ \\uparrow CIFAR-100 ViT (lowest val. loss) 31.13 27.61 17.29 32.54 ViT (terminal) 31.74 27.95 27.25 31.22 Graph node classification Validation-selected test accuracy (%) ↑ \\uparrow Cora GCN 81.7 ± \\pm .2 79.3 ± \\pm .8 31.8 ± \\pm 10.0 74.9 ± \\pm .9 GraphSAGE 79.6 ± \\pm .4 78.7 ± \\pm .3 24.1 ± \\pm 3.6 76.6 ± \\pm .2 GAT 82.0 ± \\pm .6 78.3 ± \\pm 1.3 47.2 ± \\pm 8.0 79.0 ± \\pm 1.2 CiteSeer GCN 71.0 ± \\pm .8 66.2 ± \\pm 1.6 33.0 ± \\pm 6.2 70.6 ± \\pm .7 GraphSAGE 69.9 ± \\pm .9 65.6 ± \\pm 1.4 34.7 ± \\pm 9.4 70.2 ± \\pm .4 GAT 69.1 ± \\pm .3 66.2 ± \\pm .8 52.9 ± \\pm 1.4 70.4 ± \\pm .8 PubMed GCN 79.1 ± \\pm .2 77.5 ± \\pm .4 51.8 ± \\pm 1.2 67.7 ± \\pm 6.1 GraphSAGE 77.2 ± \\pm .1 75.2 ± \\pm .4 50.2 ± \\pm 13.7 74.7 ± \\pm .4 GAT 78.8 ± \\pm .2 77.1 ± \\pm 1.4 59.2 ± \\pm 6.0 73.3 ± \\pm .2 GNN arithmetic mean across 9 cells 76.47 ± \\pm .24 73.78 ± \\pm .26 42.76 ± \\pm 2.36 73.04 ± \\pm .75"
+  },
+  {
+    "projection_index": 42,
+    "tag": "p",
+    "id": "S3.T1.3",
+    "text": "∗ Embedding and output-head tensors are trained with Adam."
+  },
+  {
+    "projection_index": 43,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 5: The learned optimizer updates all tensors except the embedding and output-head tensors. Adam trains those tensors using the same hyperparameters as the all-Adam baseline. BERT-Tiny follows a 100,000-update protocol with a context transition at update 90,000, while GPT-Tiny is evaluated at 50,000 updates. The GPT magnifies the later trajectory."
+  },
+  {
+    "projection_index": 44,
+    "tag": "p",
+    "id": "S3.SS2.SSS0.Px1.p1.1",
+    "text": "On language models, the learned optimizer successfully generalizes to held-out language tasks 100,000-step horizon despite only being meta-trained seeing 160-steps with six history slots. It reaches the lowest terminal validation loss among all baselines. (Table 1 , Figure 5 ). This section reports the setting which embedding and output-head tensors are delegated to Adam. Applying the learned optimizer to all parameters or exclusively to the embedding and output head also maintain convergence and can even outperform the baselines (Appendix B.1.1 )."
+  },
+  {
+    "projection_index": 45,
+    "tag": "p",
+    "id": "S3.SS2.SSS0.Px2.p1.1",
+    "text": "The learned optimizer further generalizes to unseen graph modalities and node-classication tasks. The learned optimizer is evaluated on Cora, CiteSeer, and PubMed using GCN, GraphSAGE, and GAT Kipf and Welling (2016) ; Hamilton et al. (2017) ; Veličković et al. (2018) ; Sen et al. (2008) . It achieves the highest validation-selected test accuracy in seven of nine comparisons and the highest nine-cell arithmetic mean (Table 1 ). Accounting for inference overhead, it yields lower training loss than Adam at equal cumulative FLOPs on Cora (Figure 6 ). Appendix B.1.2 reports all FLOP-matched trajectories."
+  },
+  {
+    "projection_index": 46,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 6: FLOP-matched Cora training loss under full span. The horizontal axis expresses cumulative FLOPs in units of one Adam step, with a budget equal to 100 Adam updates. Lines show three-seed means, and bands show seed-wise ranges."
+  },
+  {
+    "projection_index": 47,
+    "tag": "p",
+    "id": "S3.SS2.SSS0.Px3.p1.1",
+    "text": "Training a six-block ViT on CIFAR-100 tests generalization to a larger model scale with unseen image dataset. The learned optimizer outperforms Adam in both validation-selected and terminal test accuracy, achieving the highest accuracy overall (Table 1 ). Figure 7 reports the training loss and validation accuracy trajectories."
+  },
+  {
+    "projection_index": 50,
+    "tag": "p",
+    "id": "S3.SS3.SSS0.Px1.p1.1",
+    "text": "Reducing history span to 63-step demonstrates that full-span coverage is not required to maintain convergence across all tasks (Table 2 ). For language models, while full-span achieves lower validation loss compared to 63-step span, both cases are better or comparably to Adam (Appendix B.2.2 ). Vision task shows consistent pattern, with both spans achieving higher test accuracy than Adam. Graph tasks show near-identical arithmetic mean test accuracies across two spans. Appendix B.2.2 reports the all 9 GNN comparisons."
+  },
+  {
+    "projection_index": 51,
+    "tag": "p",
+    "id": "S3.SS3.SSS0.Px2.p1.1",
+    "text": "Figure 8 shows that the learned policy is dynamic and behaves differently from Adam. Following a shared initial trajectory, transitioning to Adam branches to a different solution with higher terminal training loss (Figure 8 a). At this branch, weights assigned to the history slots by the learned optimizer differs from norm-matched Adam update (Figure 8 b,d). The predicted temporal scores and signed contributions vary over the optimization steps, confirming the policy is not static (Figure 8 c,e). Appendix B.2.3 shows the behavioral analysis of other parameter groups."
+  },
+  {
+    "projection_index": 52,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Table 2: Effect of history span. Language models report terminal validation loss. ViT reports validation-selected and terminal test accuracy, and GNNs report validation-selected test accuracy. The GNN row is the unweighted arithmetic mean across nine model–dataset comparisons, reported as mean ± \\pm sample standard deviation across three target seeds. Bold and underlined values mark the best and second-best result in each row."
+  },
+  {
+    "projection_index": 53,
+    "tag": "table",
+    "id": "S3.T2.2",
+    "text": "Target Metric Full span 63-step span Adam BERT-Tiny Val. loss ↓ \\downarrow 3.463 ∗ 3.824 ∗ 3.810 GPT-Tiny Val. loss ↓ \\downarrow 4.250 ∗ 4.261 ∗ 4.268 ViT/CIFAR-100 Test acc. (best val.) (%) ↑ \\uparrow 31.13 30.81 27.61 Test acc. (terminal) (%) ↑ \\uparrow 31.74 30.86 27.95 GNN arithmetic mean across 9 cells Test acc. (%) ↑ \\uparrow 76.44 ± \\pm 0.28 76.47 ± \\pm 0.24 73.78 ± \\pm 0.26"
+  },
+  {
+    "projection_index": 54,
+    "tag": "p",
+    "id": "S3.T2.3",
+    "text": "∗ Embedding and output-head tensors are trained with Adam."
+  },
+  {
+    "projection_index": 55,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 8: Temporal dynamics on GAT/PubMed. (a) Both paths share the trajectory through t = 32 t=32 , with Adam states reconstructed from the learned path. At step t = 33 t=33 , Adam branches and reaches terminal training loss of 0.30 ( t = 500 t=500 ), and 0.25 for learned recombination. (b,d) Red bars show the scale-normalized temporal scores and signed contribution fractions for the layer-1 source-attention group at branch ( t = 33 t=33 ). Signed fractions indicate each slot’s directional contribution to the constructed update. S 1 S_{1} corresponds to the slot with newest gradient, and S 6 S_{6} with the oldest. Gold bars show the closest nonnegative coefficient allocation fitted to the norm-matched Adam direction. (c,e) The learned scores and signed contributions vary over updates 24–55. Dotted boxes mark t = 33 t=33 , and hatching marks unpopulated slots."
+  },
+  {
+    "projection_index": 57,
+    "tag": "p",
+    "id": "S3.SS4.SSS0.Px1.p1.1",
+    "text": "Training the learned policy requires 64 meta-updates and consumes 0.87 0.87 NVIDIA B200 GPU-hours. During deployment, routing all parameters through the learned optimizer requires 1.035 × 1.035\\times and 1.166 × 1.166\\times the Adam FLOPs per step on BERT and GPT, respectively. The corresponding end-to-end step times are 1.135 × 1.135\\times and 2.336 × 2.336\\times the matched Adam baselines (Figure 9 )."
+  },
+  {
+    "projection_index": 58,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 9: Deployment cost relative to Adam in isolated NVIDIA B200 profiles using bfloat16 arithmetic. A value of 1.0 1.0 denotes the matched Adam baseline. FLOPs/step include forward, backward, the learned update, and any update routed to Adam. Time/step measures the same end-to-end boundary. BERT values weight its 128- and 512-token contexts by 0.9 / 0.1 0.9/0.1 . GNN values are geometric means over the nine model–dataset tasks, with min–max error bars. Appendix A.4 reports all profiles for the learned optimizer."
+  },
+  {
+    "projection_index": 59,
+    "tag": "p",
+    "id": "S3.SS4.SSS0.Px2.p1.1",
+    "text": "In the language profiles, persistent optimizer state covers up to 131,071 131{,}071 past gradients, occupying 301 301 MB for BERT and 466 466 MB for GPT. Adam occupies 35 35 MB and 55 55 MB in the matched profiles, respectively. Appendix A.4 specifies the profiling boundaries and state accounting."
+  },
+  {
+    "projection_index": 61,
+    "tag": "p",
+    "id": "S4.p1.1",
+    "text": "This paper demonstrates that a compact temporal recombination policy, meta-trained only on small classification tasks, can generalize to unseen tasks. These results establish recombination of gradient history as a practical design principle for learned optimization."
+  },
+  {
+    "projection_index": 87,
+    "tag": "table",
+    "id": "A1.T5.2",
+    "text": "Item Value Tasks per meta-window All four tasks in Table 4 Model-training batch 128 Reset trajectories / steps per trajectory 4 / 160 Successful meta-update cap 64 TBPTT horizon / meta-update cadence 20 / 10 model-training updates Meta-objective Normalized cumulative held-out-loss change in Equation 2 Meta-gradient full differentiation through exposed paths Meta-optimizer Adam, learning rate 10 − 3 10^{-3} , β 1 = 0.9 \\beta_{1}=0.9 , β 2 = 0.999 \\beta_{2}=0.999 , ϵ = 10 − 8 \\epsilon=10^{-8} , global gradient-norm clipping at 10 Held-out evaluation microbatch 512 Objective schedule Model-training task loss only"
+  },
+  {
+    "projection_index": 89,
+    "tag": "h4",
+    "id": null,
+    "text": "A.3.1 Shared baseline hyperparameters"
+  },
+  {
+    "projection_index": 90,
+    "tag": "p",
+    "id": "A1.SS3.SSS1.p1.1",
+    "text": "Across all evaluation domains, the baseline optimizers use fixed hyperparameters and zero weight decay. Adam uses a learning rate of 10 − 3 10^{-3} , ( β 1 , β 2 ) = ( 0.9 , 0.999 ) (\\beta_{1},\\beta_{2})=(0.9,0.999) , and ϵ = 10 − 8 \\epsilon=10^{-8} . SGD and SGDM use a learning rate of 0.01 0.01 , with momentum 0 0 and 0.9 0.9 , respectively. No domain-specific hyperparameter sweeps are applied, as this evaluation specifically tests deployment performance where exhaustive hyperparameter tuning is computationally prohibitive."
+  },
+  {
+    "projection_index": 95,
+    "tag": "p",
+    "id": "A1.SS3.SSS2.p2.1",
+    "text": "Embeddings and the output head use Adam. Learned recombination updates all other language-model parameters. Paired runs share initialization, data, stochastic streams, and a 20-microbatch validation panel. Validation restores model mode and random-number state, and loss is aggregated over predicted targets."
+  },
+  {
+    "projection_index": 103,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 10: FLOPs and time per training step, reported as ratios to Adam, by history span."
+  },
+  {
+    "projection_index": 104,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 11: FLOPs and time per training step, reported as ratios to Adam, by language-model parameter assignment."
+  },
+  {
+    "projection_index": 106,
+    "tag": "table",
+    "id": "A1.E3",
+    "text": "ρ FLOP = F fb learned + U learned + U Adam , aux F fb Adam + U Adam , all , \\rho_{\\mathrm{FLOP}}=\\frac{F_{\\mathrm{fb}}^{\\mathrm{learned}}+U_{\\mathrm{learned}}+U_{\\mathrm{Adam,aux}}}{F_{\\mathrm{fb}}^{\\mathrm{Adam}}+U_{\\mathrm{Adam,all}}}, (3)"
+  },
+  {
+    "projection_index": 107,
+    "tag": "p",
+    "id": "A1.SS4.p3.1",
+    "text": "In Equation 3 , F fb F_{\\mathrm{fb}} counts the target forward/backward pass and U U counts update arithmetic. Fused Adam kernels omit elementwise arithmetic from the profiler. Both Adam terms use 18 declared scalar operations per updated coordinate. The learned-update term is profiled with Adam disabled before this estimate is added once."
+  },
+  {
+    "projection_index": 108,
+    "tag": "p",
+    "id": "A1.SS4.p4.1",
+    "text": "FLOPs and timing are collected separately. Inputs, gradients, and mature history state are resident on-device before measurement. Data loading, validation, logging, and checkpointing are excluded. For language models, Time/step holds each paired Adam forward/backward interval fixed and replaces only its Adam update interval with the measured learned-optimizer interval; this removes between-process target-compute drift from the reported optimizer overhead. Persistent state is measured after history prefill and includes learned-optimizer state, auxiliary Adam state, and policy parameters."
+  },
+  {
+    "projection_index": 113,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Table 7: Terminal validation loss by language-model parameter assignment. Each row reports the paired Adam baseline. The same trained policy is routed to the listed tensors without separate optimizer training for each assignment. Bold marks the lowest learned-optimizer loss within each model."
+  },
+  {
+    "projection_index": 114,
+    "tag": "table",
+    "id": "A2.T7.2",
+    "text": "Model Learned optimizer updates Adam updates Learned Adam BERT-Tiny All parameters — 3.889 3.815 All except embeddings/output head Embeddings/output head 3.463 3.810 Embeddings/output head All other parameters 3.484 3.811 GPT-Tiny All parameters — 4.299 4.268 All except embeddings/output head Embeddings/output head 4.250 4.268 Embeddings/output head All other parameters 4.309 4.268"
+  },
+  {
+    "projection_index": 115,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 12: Validation loss when the learned optimizer updates all tensors or either complementary parameter partition. Adam updates the tensors not routed to learned recombination using the same hyperparameters as the all-Adam baseline. BERT changes context at update 90,000, and the GPT inset magnifies updates 30,000–50,000."
+  },
+  {
+    "projection_index": 117,
+    "tag": "p",
+    "id": "A2.SS1.SSS2.p1.1",
+    "text": "The graph trajectories separate checkpoint selection from compute-normalized optimization. Figure 13 compares the full-span learned optimizer with Adam at equal cumulative FLOPs, while Figure 14 shows the complete validation signal used to select checkpoints without reference to test accuracy."
+  },
+  {
+    "projection_index": 118,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 13: FLOP-aligned GNN training loss for the full-span learned optimizer and Adam. Rows identify datasets, and columns identify model architectures. The horizontal axis measures cumulative profiler-visible FLOPs in units of one Adam step. Lines show three-seed means, and bands show seedwise ranges. Cora and CiteSeer use budgets of 100 Adam steps, while PubMed uses 500 Adam steps. PubMed learned curves continue beyond the dotted 500-step boundary to show the complete 500-update trajectory."
+  },
+  {
+    "projection_index": 119,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 14: Step-aligned GNN validation loss. Rows identify datasets, and columns identify model architectures. Curves show three-seed means, bands show seedwise ranges, and circles mark the minimum of each seedwise validation trajectory. Checkpoints are selected independently within the fixed 100-update Cora and CiteSeer budgets and 500-update PubMed budget. Test accuracy does not enter checkpoint selection. Figure 13 separately compares training progress at equal cumulative FLOPs."
+  },
+  {
+    "projection_index": 122,
+    "tag": "p",
+    "id": "A2.SS2.SSS1.p1.1",
+    "text": "Table 8 tests deployment regrouping from the output-slice-trained policy and matched training under alternative groupings. Every trajectory remains finite, but effects vary by task and metric. Matched policies use one optimizer-training seed, and the results do not identify a preferred grouping."
+  },
+  {
+    "projection_index": 123,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Table 8: Parameter-grouping ablation. Entries are mean ± \\pm sample standard deviation over three paired target seeds. The group count is measured at deployment. Output and input slices prioritize complete leading- and second-dimension slices, respectively. Tensor-wide and network-wide conditions form one group per parameter tensor and optimizee. Bold marks the best mean within each task and metric. Adam uses the same target initializations and data streams."
+  },
+  {
+    "projection_index": 124,
+    "tag": "table",
+    "id": "A2.T8.2",
+    "text": "Policy training Deployment grouping Deployment groups Train-loss AUC ↓ \\downarrow Terminal MicroLeNet/CIFAR-10 (terminal test loss ↓ \\downarrow ) Output slice Output slice 15 1.820 ± \\pm 0.012 1.743 ± \\pm 0.055 Output slice Input slice 14 1.823 ± \\pm 0.016 1.705 ± \\pm 0.054 Output slice Tensor-wide 8 1.822 ± \\pm 0.014 1.681 ± \\pm 0.028 Output slice Network-wide 1 1.831 ± \\pm 0.017 1.666 ± \\pm 0.018 Input slice Input slice 14 1.873 ± \\pm 0.043 1.748 ± \\pm 0.034 Tensor-wide Tensor-wide 8 1.827 ± \\pm 0.024 1.665 ± \\pm 0.034 Network-wide Network-wide 1 1.844 ± \\pm 0.009 1.693 ± \\pm 0.017 Adam – – 1.972 ± \\pm 0.024 1.804 ± \\pm 0.008 GAT/Cora (terminal test accuracy ↑ \\uparrow ) Output slice Output slice 367 0.195 ± \\pm 0.007 80.93 ± \\pm 0.15 Output slice Input slice 367 0.195 ± \\pm 0.007 81.13 ± \\pm 0.31 Output slice Tensor-wide 8 0.194 ± \\pm 0.007 81.00 ± \\pm 0.26 Output slice Network-wide 1 0.194 ± \\pm 0.007 81.00 ± \\pm 0.10 Input slice Input slice 367 0.182 ± \\pm 0.007 80.90 ± \\pm 0.10 Tensor-wide Tensor-wide 8 0.193 ± \\pm 0.007 81.00 ± \\pm 0.30 Network-wide Network-wide 1 0.186 ± \\pm 0.007 81.00 ± \\pm 0.36 Adam – – 0.515 ± \\pm 0.013 80.37 ± \\pm 1.03"
+  },
+  {
+    "projection_index": 126,
+    "tag": "p",
+    "id": "A2.SS2.SSS2.p1.1",
+    "text": "Table 9 compares the 63-step span with the full span over three paired target seeds. Aggregate accuracy is similar, while the preferred span varies across cells. History depth is fixed before validation and test evaluation."
+  },
+  {
+    "projection_index": 127,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Table 9: GNN history-depth ablation. Entries are test accuracy (%) from the lowest-validation-loss state, reported as mean ± \\pm sample standard deviation over three paired target seeds. The final row is the unweighted arithmetic mean of the nine model–dataset means. Bold marks the best mean, and underlining marks the second-best; tied means are both bold."
+  },
+  {
+    "projection_index": 141,
+    "tag": "p",
+    "id": "A3.SS1.p4.1",
+    "text": "The evaluated construction forms three partitions: the whole tensor, 16 contiguous groups along the first axis, and 16 contiguous groups along the flattened trailing axis. Groups smaller than 64 coordinates are omitted. The pyramid policy matches the representative row-grouped policy across nine unseen graph tasks. Table 10 reports test accuracy from the minimum-validation-loss state. Its arithmetic mean is 76.51%, compared with 76.44% for row grouping and 73.78% for Adam. The two learned policies were trained independently, so the comparison establishes that both grouping constructions function under the evaluated protocol rather than isolating the effect of grouping alone."
+  },
+  {
+    "projection_index": 142,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Table 10: Full-trajectory test accuracy (%) for row and pyramid grouping on unseen graph tasks. Cora and CiteSeer use 100 updates and PubMed uses 500. Entries are mean ± \\pm sample standard deviation over three target seeds. Bold and underlined values mark the best and second-best mean in each row."
+  },
+  {
+    "projection_index": 143,
+    "tag": "table",
+    "id": "A3.T10.2",
+    "text": "Data Model Row Pyramid Adam SGD SGDM Cora GCN 81.70 ± \\pm 0.20 81.57 ± \\pm 0.12 79.27 ± \\pm 0.83 31.80 ± \\pm 10.01 74.93 ± \\pm 0.92 GraphSAGE 79.60 ± \\pm 0.44 80.00 ± \\pm 0.69 78.73 ± \\pm 0.32 24.10 ± \\pm 3.58 76.63 ± \\pm 0.15 GAT 81.97 ± \\pm 0.31 82.03 ± \\pm 0.50 78.27 ± \\pm 1.26 47.23 ± \\pm 8.00 78.97 ± \\pm 1.19 CiteSeer GCN 71.03 ± \\pm 0.81 70.97 ± \\pm 0.67 66.20 ± \\pm 1.61 33.00 ± \\pm 6.22 70.57 ± \\pm 0.71 GraphSAGE 69.87 ± \\pm 0.87 70.13 ± \\pm 0.29 65.57 ± \\pm 1.36 34.67 ± \\pm 9.38 70.23 ± \\pm 0.38 GAT 69.00 ± \\pm 0.26 69.17 ± \\pm 0.32 66.20 ± \\pm 0.82 52.87 ± \\pm 1.42 70.37 ± \\pm 0.78 PubMed GCN 78.67 ± \\pm 0.21 78.53 ± \\pm 0.60 77.50 ± \\pm 0.36 51.77 ± \\pm 1.15 67.67 ± \\pm 6.11 GraphSAGE 77.37 ± \\pm 0.49 77.23 ± \\pm 0.29 75.17 ± \\pm 0.35 50.20 ± \\pm 13.67 74.70 ± \\pm 0.36 GAT 78.73 ± \\pm 0.31 78.97 ± \\pm 0.12 77.10 ± \\pm 1.42 59.23 ± \\pm 5.95 73.30 ± \\pm 0.17 Arithmetic mean across 9 cells 76.44 ± \\pm 0.28 76.51 ± \\pm 0.16 73.78 ± \\pm 0.26 42.76 ± \\pm 2.36 73.04 ± \\pm 0.75"
+  }
+]

@@ -1,0 +1,9 @@
+# 下一可执行研究边界
+
+完整目标ACTIVE / NOT_ACHIEVED。本轮已关闭PLK1当前公开paired合同，不能下轮再次以“尚缺manifest”为由重复GEO/补表caption检查。只有具体新MCF7多target状态文件证据才能重开；不通过读功能数值或screen→screen换题救原合同。
+
+下一来源线索DOI10.64898/2026.08.24.746802已由官方API确认身份，但完整稿尚未获取：bioRxiv官方JATS429，EuropePMC PPR fullTextXML500。不是全局研究阻塞，也不是稿件不存在或数据无效。后续可在访问条件变化后尝试一次有记录的官方全文获取，或寻找实质不同、公开输入可直接认证的遗传扰动state+独立function来源；不要立即重复相同请求或把摘要当全文创新评审。
+
+若取得该16line稿，先核对是否实际有同干预/背景的独立fitness而非仅用essential-gene标签和单细胞存活proxy，以及公开processed payload/guide/line身份。只有支持明确功能应用，才冻结一个强同信息direct对照的小实验；不预设world/agent/RSI优势。若只有转录变化而无功能目标，就如实降低为状态研究线索，不能冒称药物功能收益。
+
+保留两门分开：有限能力研究不需新基础算子先验；算法贡献、跨任务继承和改进策略自身进步则必须另外实证。已有failed配置不换名重跑。

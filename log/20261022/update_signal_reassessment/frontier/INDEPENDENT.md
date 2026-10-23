@@ -1,0 +1,41 @@
+# Update-signal reassessment — independent frontier opinion
+
+Status: NO_READY_ENTRY_IN_AUDITED_LOCAL_ASSETS. This is an asset/contract qualification decision, not an assertion that ordinary methods cannot generate useful capability evidence. No peer drafts were read before this record. Mandatory objective and decision_update_mechanism/CONTINUATION.md read. This phase used historical text/JSON reports only; no HTTP, response arrays, reserves, model fits, or numerical outcome extraction.
+
+## What the historical evidence actually permits
+
+1. `update_value_qualification/DECISION.md`: the executed audit reused exported scores from two synthetic-noise draws; it did not fit a new model or execute the distinct EG-RPT H0 draft. Across 36 complete 64-compound campaigns, the symmetric hindsight ridge/R1 chooser contrast was -0.069444 hits/64. Of 24 strict first-draw signs, 13 retained and 11 reversed. This rejects expansion based on that noisy choice evidence. It does not upper-bound every lawful selector or every update task.
+2. `prism_profile_opportunity/DECISION.md`: STOP_BULK_PROFILE_COVERAGE was a coverage experiment, not a negative model-performance experiment. The fixed one-compound task bought X1 P933/P904 and forecast 433 other contexts, with X2/X3 grading. Qualified source/dev/test counts 54/0/33 failed all five gates; no model was fitted. Do not repair its pools, compound split, dose, replicate choice, or 80% coverage threshold after seeing this result.
+3. `strategy_rethink/RESULT_DECISION.md`: the common-start C4 opportunity screen really ran. The 12-program finite ridge grammar on exposed 978-dimensional route predictions used 96 source plus 96 later solver fits, with 168 trajectories and 672 logical requests. Learned new versus old uniform improvement was -0.00006221794; oracle minus common start was +0.0078787372. This is evidence against that arena/grammar, despite nonzero headroom. It is not an unrun experiment, functional drug efficacy evidence, or a universal RSI refutation. The later S0 audit reconstructed 168/168 deployments without reversing the STOP.
+4. `research/eg_rpt_20261019/PROTOCOL.md`: DRAFT, not frozen or executed. Task-panel generation, selectors, and reliability estimators were not implemented. Its broad method menu and synthetic reliability test cannot become a new ready experiment by renaming the earlier score audit. The noisy-source gate and missing task implementation remain relevant.
+5. `research/observable_state_20261018/REPORT_OBS.md`: 136 MoA families and 272 agent calls were executed; agent-minus-enumerator was +0.022 with interval [-0.022, 0.074]. S2 was not executed, but that alone does not authorize reopening the exposed arena. FAR, autonomous applicability revision, acquisition-program search, same-family substitution, and low-rank Beat AML branches retain their scoped STOPs.
+6. `log/archive/HISTORY.md`: RSD and decoupled calibration have already run development experiments. Within-compound cross-replicate context selection improved, while cross-compound progression did not establish the desired capability. These are useful ordinary-feedback findings, not untouched entries. GDSC2's last audited fitted cache was empty; CTRP and old exposed panels do not become independent by repartitioning. Protected PRISM24Q2 remains unopened.
+
+## The one distinct unmeasured task considered
+
+The earlier update-value decision proposed both (i) whole feedback-compound profiles transferring to disjoint audit compounds and (ii) two pools of one compound forecasting its other contexts. Only (ii) was subsequently coverage-tested. Thus (i) must not be falsely reported as executed or automatically included in the bulk-profile STOP.
+
+Scientific question: can the functional response profiles of a paid set of feedback compounds improve fixed-cost nomination of active compound–cell pairs among chemically disjoint audit compounds, when grading uses held-out released replicate profiles? A small ordinary updater could test useful transfer before any agent/RSI assertion.
+
+Assets exist in the narrow inventory sense: PRISM19Q4 response files and headers, 1,274 resolved/header-complete HTS002 2.5µM triples, 481 STR contexts and 20 assay pools. A full X1 profile costs 20 pool bundles, not one free vector. Feedback, development, and audit assay use must all enter the cost ledger. X1/X2/X3 share normalization/common controls; a retrospective positive would establish conditional released-profile utility, not independent prospective biological replication.
+
+This is **not a qualified runnable experiment yet**. The record does not establish complete whole-profile coverage, a finite feasible source/dev/audit grouping, the effective independent group count, or an honest frozen starting predictor under the proposed task. The chemistry/plate graph is one connected component; 1,274 triples are not 1,274 independent tasks. Existing two-pool failure is neither sufficient proof of full-profile impossibility nor a license to choose better pools using its observed masks. No response/mask reopening was performed here. Consequently I do not submit a new numerical protocol or claim a capability experiment has passed entry conditions.
+
+The minimal missing evidence is a metadata/coverage and exposure contract for this genuinely different application, with assay cost, held-out compounds, complete information sets, and statistical unit fixed before scores. A later authorization to establish that contract would be qualification work, not an empirical biological success. If no prespecified whole-profile unit survives, terminate it rather than relax the old bulk-profile gates. No second local candidate is proposed.
+
+## What ReTTT changes, and what it does not
+
+ReTTT's evolving reflector versus frozen-reflection result (63.57% versus 56.43%) is a concrete positive precedent for in-episode improvement construction. It should not be dismissed merely because the parameter update is SGD. The natural finite causal contrast is a feedback-adaptive construction policy versus the same construction policy frozen, from the same starting predictor and with equal available outcomes, acquisition costs, proposal/evaluation opportunities, and update compute; also include ordinary pooled feedback fitting.
+
+That precedent does not supply a drug lesson validator. Scalar viability supports measured response constraints; it does not certify mechanistic prose. On the only considered task, first establish the ordinary feedback-transfer opportunity. A later adaptive constructor must generate a legal numerical update from observed feedback and beat frozen construction plus ordinary refitting at equal total budget. No such drug-specific operator, lawful feedback stream, or qualified evaluation unit is currently supplied. Therefore no ReTTT-branded mechanism is promoted here.
+
+An eventual positive ordinary experiment could justify further mechanism work while remaining Level 1 adaptation. Even a positive in-episode adaptive-constructor contrast would not by itself establish cross-task inheritance or improved next-generation search efficiency; ReTTT resets its adapter, optimizer, and memory between episodes. Conversely, absent algorithmic novelty is not a reason to refuse the basic capability test once a valid finite contract exists.
+
+## Decision and evidence labels
+
+- VERIFIED as historical execution: synthetic exported-score audit, fixed bulk-profile coverage failure, common-start C4 negative result, OBS experiment, prior RSD development. Their scientific interpretations retain their original limits.
+- HYPOTHESIS / NOT_RUN: whole-feedback-compound to disjoint-compound released-profile transfer under the different contract above.
+- BLOCKED at entry qualification: that task's lawful finite coverage/grouping/start-state contract; this is not FAILED performance.
+- NO_READY_ENTRY: no currently qualified new finite capability experiment identified in the audited local assets. No existing STOP was reopened. No novel core mechanism, WM/agent joint contribution, or RSI inheritance result established.
+
+This independent finding predates the parent's newly supplied PLK1 primary source, which will receive a separate independent source record. Original history remains intact.

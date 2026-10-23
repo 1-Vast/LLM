@@ -1,0 +1,80 @@
+from datetime import date
+import pandas as pd
+import os
+import glob
+import pycytominer
+# load custom collection of functions
+import sys
+sys.path.append('/home/schmiedc/FMP_Docs/Projects/Bioactives_data/notebooks/')
+import utility_functions as UTIL
+parent_directory = "/home/schmiedc/FMP_Docs/Projects/Bioactives_data/"
+
+input_path = parent_directory + "results/"
+output_path = input_path
+# data_HepG2 = pd.read_csv(input_path + "2023-04-11_Bioactives_HepG2_raw.csv")
+file_HepG2_type = '/*[0-9]_' + 'IMTM_HepG2_raw.csv'
+files_HepG2 = glob.glob(input_path + file_HepG2_type)
+
+### gets latest file
+max_file_HepG2 = max(files_HepG2, key=os.path.getctime)
+
+### load file
+data_HepG2 = pd.read_csv(max_file_HepG2)
+data_HepG2.shape
+######
+### helper functions extracts metadata columns and define feature columns
+Features_HepG2 = UTIL.get_feature_vector(data_HepG2)
+Meta_Features_HepG2 = set(data_HepG2.columns) - set(Features_HepG2)
+
+### convert sets to list
+Features_HepG2 = list(Features_HepG2)
+Meta_Features_HepG2 = list(Meta_Features_HepG2)
+
+print("Total number of features:", len(Features_HepG2) )
+### Method to normalize the data:
+#### options - ["standardize", "robustize", "mad_robustize", "spherize"]
+#### defaults to "robustize"
+normalizer = "mad_robustize" 
+
+### we have to normalize each plate seperate
+plates = ["B1001","B1002","B1003","B1004","B1005","B1006","B1007", "Ref_Plate", "FMP_Plate"]
+batches = ["R1", "R2", "R3", "R4"]
+Data_Temp = []
+Data_Norm_Temp = []
+
+for batch in batches:
+    for plate in plates:
+        if len(data_HepG2.loc[(data_HepG2["Metadata_Batch"] == batch) & (data_HepG2["Metadata_Plate"] == plate)]) == 0:
+            continue
+        Data_Temp = pycytominer.normalize(
+                    profiles = data_HepG2.loc[(data_HepG2["Metadata_Batch"] == batch) & (data_HepG2["Metadata_Plate"] == plate)],
+                    features = Features_HepG2,
+                    meta_features = Meta_Features_HepG2,
+                    method = normalizer, ### Method to normalize the data
+                    samples = "Metadata_EOS == 'DMSO'" # normalization performed on neg. controls
+                    )
+        Data_Norm_Temp.append(Data_Temp)
+        print("Batch", batch, "Plate", plate, "normalized")
+        
+print(len(Data_Norm_Temp), "Plates Normalized")
+
+### concat list
+Data_Norm_HepG2 = pd.concat(Data_Norm_Temp)
+Data_Norm_HepG2 = Data_Norm_HepG2.reset_index(drop = True)
+print("Normalized Data has shape:", Data_Norm_HepG2.shape)
+filename_Norm_HepG2 = output_path + str(date.today()) + "_IMTM_HepG2_norm.csv"
+Data_Norm_HepG2.to_csv(filename_Norm_HepG2, index = False)
+## gets feature vector
+Features_Data_Norm_HepG2 = UTIL.get_feature_vector(Data_Norm_HepG2)
+
+## adds the object count as feature column
+Features_Data_Norm_HepG2.append("Metadata_Object_Count") 
+Features_Data_Norm_HepG2 = list(Features_Data_Norm_HepG2)
+Data_HepG2_Norm_Median = pycytominer.consensus(
+        profiles = Data_Norm_HepG2, # A file or pandas DataFrame of profile data
+        replicate_columns = ["Metadata_EOS", "Metadata_Plate", "Metadata_Concentration", "Metadata_Partner"], # Metadata columns indicating which replicates to collapse, defaults to [“Metadata_Plate”, “Metadata_Well”]
+        operation = "median", # (str) – The method used to form consensus profiles, defaults to “median”
+        features = Features_Data_Norm_HepG2, # (str, list) – The features to collapse, defaults to “infer”
+)
+filename_HepG2_Norm_Median = output_path + str(date.today()) + "_IMTM_HepG2_norm_median_full.csv"
+Data_HepG2_Norm_Median.to_csv(filename_HepG2_Norm_Median , index = False)

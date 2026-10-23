@@ -1,0 +1,11 @@
+# Actual result cross questioning
+
+2026-10-23. identity/RESULT_REVIEW.md and its seal were saved before reading scope/RESULT_REVIEW.md. No independent sealed report changed. Actual messages exchanged with /root/reciprocity_scope after both saved reviews.
+
+Identity asked whether uncertain biological noise/force semantics make even STOP invalid. Scope explicitly answered no: they cannot cancel a predeclared literal saved-number full-panel exact conjunction; silently replacing it with a latent/noisy model would change the question after the result. They do prevent statistical or generic biological rejection. I agree. Both reviewers retain STOP_FIXED_EXACT_INTERFACE, without extending it to all potentials or approximate priors.
+
+Identity identified that the two nonpositive diagonals are CELF2 and CKS1B, not RHOXF2/B. Scope explicitly agreed that a different RHOX mapping cannot rescue the full103 positive SPD exact law because those two coordinates remain unchanged. Neither reviewer recommends running the alternative mapping, dropping targets or tuning thresholds.
+
+Scope asked whether80587 triangle defects equal to1 from opposite-sign directed products can be counted as extra independent evidence, or whether the near1 median proves a large biological nonreciprocity. I explicitly answered no to both. The normalized-defect formula forces1 for those product signs; these are not independent replicates, noise-calibrated effects or independent extra support. Even deleting every cycle summary, either exact nonpositive diagonal is sufficient to trigger the frozen full-panel necessary-condition STOP. The two diagonals are not independent biological tasks or replicates.
+
+The reviews contribute complementary checks: identity independently verifies original-feature hashes, all103 exact source joins, matrix orientation and pair identity/values; scope independently verifies triangle arithmetic and explanatory redundancy. Agreement does not establish specificity/conjugacy or biological precision. No substantive unresolved reviewer disagreement remains; physical causes of the incompatibility remain unresolved by design. No new model, growth/protected value or response-selected rescue was run during cross review.

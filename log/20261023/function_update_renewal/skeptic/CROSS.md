@@ -1,0 +1,29 @@
+# Actual cross-examination with constructive reviewer
+
+2026-10-23. Independent report and seal preceded reading constructive/INDEPENDENT.md. Subsequently read the actual operator_check.py and saved OPERATOR_CHECK.json, then COMPOSITION_ADDENDUM.md. Direct native messages were exchanged with `/root/mechanism_after_matched`; the statements below summarize that real exchange, not simulated agreement.
+
+## Strongest question sent and actual answer
+
+I challenged whether DO_NOT_FIT_CURRENT_LINEAR_OPERATOR could be overgeneralized: useful finite-feedback structure does not need an expressivity that no direct predictor can represent. Asked what nonlinear/multi-readout/paired-feedback case remains open, and how assay-information and algorithm effects would be separated. I reaffirmed the concrete linear scalar candidate is exactly normalized regression; meta-selecting its gain or inheriting it does not create a distinct operation.
+
+Constructive answered that the linear check is scoped, and added an exact composition boundary. For f=g^T T_a T_b s, with all other factors frozen, editing g or only T_a is globally linear in that edited parameter; simultaneously editing both T matrices introduces the exact cross term g^T DeltaT_a DeltaT_b s. Their saved synthetic check finds a nonzero cross term 4.802207, so first-order fixed-feature linear equivalence cannot be extended globally to simultaneous edits. An informed shared bilinear/direct predictor remains a necessary comparator; the cross term does not by itself establish new world-model capability.
+
+They retain as unrefuted a *conditional* possibility: shared factorized intervention constraints, anchored by paid paired state/function observations, might learn portable corrections with fewer feedbacks than ordinary shared bilinear/direct and online multivariate ridge in genuinely later contexts. They supplied no distinctive intervention-semantic constraint beyond existing factorization and therefore did not promote this as a new candidate. For simultaneous Norman CRISPRa, an ordered T_aT_b cannot authenticate intervention order; a declared symmetric map needs symmetric direct comparators.
+
+Their information-control answer is appropriate: direct/world × with/without paid paired-state payload; both methods receive exactly the same legal payload inside each information condition. The added-state improvement of the direct model estimates assay-information value; the same-state world-versus-direct comparison tests additional method value. This still needs active-policy, inheritance and improved-improver comparisons separately. A 2×2 information/model comparison alone cannot prove the entire project synergy.
+
+## Strongest counterquestion and correction to my initial wording
+
+Constructive challenged my phrase “real subsequent-task contract before model training”: is that too strict for a frozen source-only falsification of a concrete constraint outside the proved linear reduction?
+
+**I accepted this criticism and explicitly replied.** Requiring qualified later tasks before *any* source feasibility training is too strong. If a specified mechanism escapes the exact current reduction, has an authenticated source payload and frozen strong same-information minimal controls, a small source-only falsification may run before full multi-context acquisition. It must obey historical scoped stops, avoid expanding search to rescue the reduced rule, and be reported as exploratory source feasibility, never inheritance/RSI or independent confirmation. A genuine subsequent-task contract is necessary before inheritance claims and substantial transfer expansion, not every local feasibility check. This additive correction narrows the gating language in my sealed INDEPENDENT.md without rewriting history.
+
+They also asked whether the TDAL mismatch diagnostic can itself define our innovation gap. I explicitly agreed it cannot: the paper already calls its return surrogate and analyzes weighting bias. Exact undiscounted Bayesian active search fixes the finite example conventionally. The check only defeats the universal intuition that predictive movement guarantees true useful future discovery value. It neither establishes an innovative mechanism nor challenges the published empirical result.
+
+## Independent arithmetic and decision
+
+Reading the actual linear-check code confirms its update is W += eta*r*beta*phi^T/(||beta||²||phi||²+lambda), and its scalar comparison is the exact induced W^T beta update using the same residual. Nullspace edit projects v orthogonal to beta; it can change states while leaving functions invariant. The saved numerical tolerances illustrate these identities; my conclusion rests on the analytic identity and code inspection, without rerunning the check. No defect found that warrants a biological fit for this exact candidate.
+
+**Retain DO_NOT_FIT_CURRENT_LINEAR_OPERATOR; do not stop all nonlinear/shared/paired approaches.** Expressivity non-equivalence is not necessary for statistical benefit; an actual distinctive constraint and a discriminating cost/information-matched feasibility test are necessary for promotion. Current generic bilinear structure, extra observations and gain meta-learning have not supplied that missing contribution. There is no unresolved disagreement on this scope after actual exchange, but also no new biological performance or novelty evidence from reviewer agreement.
+
+Root separately reports a Nature SCHEMATIC primary page with subscription preview, availability statements and extended captions, not complete accessible methods. I have not independently authenticated that page or raw release in this report and do not promote it to a qualified later-task contract. No protected or new numerical biological data read; no model runs in this cross phase.

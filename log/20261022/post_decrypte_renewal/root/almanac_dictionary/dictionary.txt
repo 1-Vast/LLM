@@ -1,0 +1,102 @@
+ALMANAC Data Fields
+Name			Type			Comment
+ComboDrugSeq	NUMBER(8)		unique ID for table record
+Screener			VARCHAR2(3)    	identifier of lab that ran experiment
+Study			VARCHAR2(20)	experiment ID
+TestDate			DATE			plan date
+Plate			VARCHAR2(20)	plate ID
+PanelNbr			NUMBER(2)		cell line panel number (not a 1 to 1 mapping to panel)
+CellNbr			NUMBER(3)		cell line cell number ( Panelbr, CellNbr pair is unique key for a cell line)
+Prefix1			VARCHAR2(1)		drug 1 Prefix - should all be 'S' for this data set
+NSC1			NUMBER(7)		drug 1 NSC
+Sample1			NUMBER(3)		drug 1 Sample number
+ConcIndex1		NUMBER(2)		1 -  lowest concentration of drug 1 in experiment
+						     	    	2 -  middle concentration
+								3 -  highest concentration
+								0  - otherwise (record represents data for drug 2, alone)
+Conc1			NUMBER			drug 1 concentration
+ConcUnit1		VARCHAR2(2)		drug 1 concentration unit:
+ 						       		     'M'          Molar
+								     'u'           micrograms/milliliter
+Prefix2			VARCHAR2(1)		drug 2 Prefix - should all be 'S' for this data set
+NSC2			NUMBER(7)		drug 2 NSC
+Sample2			NUMBER(3)		drug 2 Sample number
+ConcIndex2		NUMBER(2)		coding as for ConcIndex1
+Conc2			NUMBER			drug 2 concentration
+ConcUnit2		VARCHAR2(2)		drug 2 concentration unit: coding as for ConcUnit1
+PercentGrowth		NUMBER			percent growth of drug combination against cell line, using time zero in calculation
+PercentGrowthNoTZ NUMBER			percent growth without time zero
+TestValue	  	NUMBER			test mean optical density
+ControlValue		NUMBER			vehicle control mean optical density
+TZValue			NUMBER			time zero mean optical density
+ExpectedGrowth	NUMBER			expected percent growth for combination, based on values for individual drugs
+Score			NUMBER(4)		score, for combination records
+Valid			VARCHAR2(1)		'Y'            if record represents valid data Should all be 'Y for this data file
+Panel			VARCHAR		Panel Name for cell line
+Cellname			VARCAHR                 Cell Name for cell ine
+
+
+
+
+ALMANAC Calculations
+
+ExpectedGrowth:
+ 
+                If the percent growth of at least one of the 2 drugs, tested alone at the same concentration, is negative, then we set ExpectedGrowth to the least of the 2 PercentGrowth values for the individual drugs.
+ 
+                Otherwise:
+ 
+Growth1 <-- the minimum of the PercentGrowth value of drug 1 and 100
+Growth2 <-- the minimum of the PercentGrowth value of drug 2 and 100
+ 
+                   Growth1 * Growth2
+ExpectedGrowth <-- -----------------
+                          100
+ 
+Here is the PL/SQL code:
+ 
+      -- See whether either drug's percent growth is negative.
+ 
+      if (CalcExpectedGrowth.Drug1Growth < 0) or
+         (CalcExpectedGrowth.Drug2Growth < 0)
+      then
+ 
+         -- The percent growth of at least one drug, tested alone,
+         -- is negative.  Set the expected percent growth to the
+         -- minimum of the two values.
+ 
+         ExpectedGrowth :=
+            Least
+            (
+               Nvl (CalcExpectedGrowth.Drug1Growth, 0),
+               Nvl (CalcExpectedGrowth.Drug2Growth, 0)
+            )
+         ;
+ 
+      else
+ 
+         -- Neither percent growth is negative.  Calculate an expected
+         -- value based on both of them.
+ 
+         ExpectedGrowth :=
+            Least (CalcExpectedGrowth.Drug1Growth, 100) *
+            Least (CalcExpectedGrowth.Drug2Growth, 100) /
+            100
+         ;
+ 
+      end if;  -- if either solo growth negative, else
+ 
+ 
+Score:
+ 
+                The score is simply ExpectedGrowth minus PercentGrowth.
+ 
+                Here is the PL/SQL code:
+ 
+      -- The individual score is the difference between the observed percent
+      -- growth and the expected percent growth.  This way, the larger the
+      -- score, the more effective the drug combination is against the cell
+      -- line.
+ 
+      IndivScore := CalcIndivScore.ExpectedGrowth - CalcIndivScore.PercentGrowth;
+ 

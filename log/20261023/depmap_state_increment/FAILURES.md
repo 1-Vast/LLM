@@ -1,0 +1,17 @@
+# Failures and evidence limits
+
+Previous goal turn PROGRESS. No old stopped experiment reopened; no protected response cache read. No actual source methods paper fulltext acquired this phase; source decisions rely on authenticated author code/data and preceding source qualification, not complete manuscript review.
+
+The draft was clarified twice before independent seals (3grouped inner folds,QCzscore). Two reviewers then requested exact kernel definitions/capacity control/inner-refit clarification. New PROTOCOL_RESOLUTION records decisions before numeric parsing. NaN padding exception was derived from author source per-line transcript allzero filtering and outer-concat, added before preparation. It is not post-outcome imputation. Mixed missing counts still fail.
+
+Code-review timing ambiguity: methods initial displayed source preceded bookkeeping changes,but its later seal-time hash already covered revised source. The original phrase initial reviewed SHA was inaccurate; methods/SOURCE_VERSION_ADDENDUM corrects temporal attribution without altering the old review/seal or inventing a snapshot. No current hash drift is claimed repaired. Code-review seals' input metadata and file bindings have distinct roles; FINAL freeze binds actual executed version.
+
+freeze.py was adjusted to use the actual skeptic addendum filename CODE_REVIEW_ADDENDUM.md before execution (no failed freeze command). First read of PREPARED.json returned missing while live run was still parsing; no restart occurred. Same live session18461 was polled to terminal exit0. No model/metric code changed after FREEZE.
+
+Four meaningful synthetic tests passed; rerun once after adding audit fields, because implementation changed before freeze. Preparation/run succeeded on first biological execution. Raw counts padded by author concat were zero-filled only under the prespecified alltargetswithin-line-missing rule. Functional70nonfinite removed by declared finite mask; don't reclassify missing dependency values as nonessential or new resistance. Source gene/control design means these missing pairs are not random by assumption; coverage recorded.
+
+Full matched state artifact1593×34648was acquired and numerically processed; no claim of pristine heldout artifact.1,523finite outcomes evaluated under nested outer holds; this is exploratory retrospective crossvalidation, not external confirmation. Public same-pair Chronos is a lookup oracle, not new unknown efficacy. MeasuredRNA itself has high acquisition cost; no experiment-selection efficiency claim.
+
+Fitting menu opportunity is intentionally unequal: restricted4programs vs full8,each constituent5lambdas; mixtureG uses independently chosen C/E pair (25possible combinations,not25joint-fit searches). Shared inner predictions reduce duplicate computing;528eigendecompositions,2640lambda-solves,22outerfits. Count all source/selection/preparation cost for future comparisons; this screen cannot establish equal-total-budget algorithm superiority. Regression timing includes preparation and output211.9224sec wall; independent audit has separate logs. Deterministic fitting,2BLASthreads; no random seed-based task inflation.
+
+One HTTP request (~39.75MBcompressed member plus4096byte overhead) acquired source bytes; no retries. No DeepSeek/modelAPI,GPU,wet experiments,production changes. Native multi-agent identity/token/currency not available. Historical global provenance drift remains unresolved; local seals cover only their declared paths.

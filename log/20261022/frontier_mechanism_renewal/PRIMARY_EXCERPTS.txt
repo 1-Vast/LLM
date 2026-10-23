@@ -1,0 +1,167 @@
+PAPER sam3rl
+
+t! Learn more × Back to arXiv Why HTML? Report Issue Back to Abstract Download PDF Abstract 1 Introduction 2 Related Work 3 Methodology 3.1 MDP Formulation 3.2 Training the Memory Controller 4 SAM3RL Performance 4.1 VOT(S) Challenges 4.2 VOT Datasets 4.3 VOS Datasets 5 Analysis of Learned Memory Control 6 Discussion References A Extended Results A.1 SAM2RL Performance A.2 Additional Benchmarks A.3 VOS Throughput B Tracker Evaluation Details and Reproducibility Object handling. Port implementation. SAM2Long and SAM3Long are not online 
+
+trackers. Hardware. C Race Condition in SAM 3 D Training Setup E Ablations E.1 Actor Input Features E.2 Object Pointer Selection E.3 Reward Normalization F Extended analysis of learned memory control License: CC BY 4.0 arXiv:2610.19931v1 [cs.CV] 14 Oct 2026 SAM3RL: Memory Control via Reinforcement Learning for Visual Object Tracking Tomáš Čížek Affiliation: Charles University, Prague Affiliation: Project lead Matej Straka Affiliation: Charles University, Prague Illia Volkov Affiliatio
+
+s,janoukl1}@fel.cvut.cz, ervin.macic@pmb.ox.ac.uk * Core contributor Abstract Segment Anything Model 3 (SAM 3) is a foundation model for image and video segmentation that sets the state of the art in visual object tracking.
+
+recent methods improve SAM 2 with hand-crafted memory update rules, each targeting a specific failure mode, such as distractors, occlusions, or object motion. However, their gains transfer only partially to the stronger SAM 3 backbone.
+
+SAM3RL is an extension of the SAM 3 tracker with a lightweight memory controller, trained by reinforcement learning, that decides which frames enter the memory bank in order to maximize tracking performance.
+
+SAM3RL sets a new state of the art on 10 of 12 tracking and video object segmentation benchmarks, outperforming all hand-crafted rules without any runtime overhead.
+
+earance. These challenges are amplified in long videos, where errors can accumulate over time and recovery depends critically on historical context ( Javed et al., 2023 ) . Recent state-of-the-art trackers are built on the Segment Anything Model (SAM) family.
+
+ the tracker should be robust to all of them at the same time. Moreover, these rules are tied to the model generation they were designed for, as all heuristics developed for SAM 2 transfer poorly to the stronger SAM 3. Their gains on tracking benchmarks are limited, and on video object segmentation they even fall below SAM 3 on most benchmarks; see Figure 1 . Figure 1: Gains from hand-crafted rules vs. our learned memory control SAM3RL (left) and SAM2RL (right). Each axis is a tracking or video segmentation benchmark, spanning three
+
+g to that backbone. In this work, we show that memory control should be learned rather than designed. We formulate memory control as a Markov Decision Process (MDP), designing the state, actions, and reward, but leaving the choice of what to remember to the agent.
+
+We introduce SAM3RL , which applies this memory control formulation to SAM 3 and sets a new state
+
+The state describes the content of the bank, the action selects the entry to evict,
+
+and the reward scores the resulting prediction against the annotation.
+
+This formulation allows the memory control to be learned instead of being manually designed. State-of-the-art visual object tracker. We present SAM3RL, which extends SAM 3 with a memory controller obtained by optimizing the introduced MDP with RL.
+
+M3RL achieves this while optimizing the memory control only, whereas most compared methods additionally modify mask selection, prompting, or the number of banks maintained. Online controller without a runtime penalty. The SAM3RL controller is a lightweight MLP evaluated once per memory update.
+
+It reads only values the tracker has already computed, and stays fully online without lookahead or extra feature extraction, unlike other methods.
+
+es ( Matthews et al., 2004 ; Kalal et al., 2012 ; Oh et al., 2019 ; Cui et al., 2022 ; Han and Huang, 2024 ) . Recently, the SAM 2 foundation model ( Ravi et al., 2025 ) set a new state of the art in tracking.
+
+Agents improve over the hand-crafted rules, but do not transfer to unseen videos.
+
+Here, we develop the full method, a single general-purpose policy that generalizes to unseen videos, extends to SAM 3, and sets a new state of the art in visual object tracking. Figure 2: Learned memory control for SAM-based trackers. The frozen tracker (top) embeds the frame x t x_{t} and conditions it through memory attention on the current memory bank B t B_{t} .
+
+Our controller π θ \pi_{\theta} observes the state s t s_{t} , which collects temporal, confidence, semantic, and geometric features of all eight slots, and picks the action a t ∈ { 1 , … , 7 } a_{t}\in\{1,\dots,7\} that removes the corresponding memory (here a t = 3 a_{t}=3 ).
+
+During training, π θ \pi_{\theta} receives the reward r t r_{t} , scoring y ^ t \hat{y}_{t} against the annotation y t y_{t} , and maximizes the expected discounted return 𝔼 π θ ​ [ ∑ k ≥ 0 γ k ​ r t + k + 1 ] \mathbb{E}_{\pi_{\theta}}\!\big[\sum_{k\geq 0}\gamma^{k}r_{t+k+1}\big] .
+
+PAPER metagensim
+
+Back to Abstract Download PDF Abstract 1 Introduction 2 Related Works 3 The Active Generative Simulation Problem 3.1 Generative Simulation and Co-Training 3.2 Problem Formulation: Bilevel Optimization 4 Active Generative Simulation by Meta Learning 4.1 Task-Aware Data Rater Meta-Learning 4.2 Automatic Parameter Selection and Demo Generation 5 Experiments 5.1 Efficacy of Targeted Generation (RQ1) 5.2 Mechanism Analysis: Achieving Automatic Alignment (RQ2) 5.3 Proxy-curated data transfers to VLA fine-tuning (RQ3) 5.4 Handling Irreduc
+
+tor’s data-generation distribution to maximize downstream real-world performance. To solve this problem, we propose MetaGenSim , a meta-learning framework that trains an auxiliary rater network via meta-gradients to automatically discover high-utility data-generation distributions within a user-specified simulation parameter space, without manual parameter alignment. Across simulation and real-world manipulation tasks, MetaGenSim outperforms uniform generation and retrieval baselines, achieves a 150 % 150\% relative improvement i
+
+n real-world full-task success over uniform generation, and matches expert manual alignment. We further show that distributions curated with a lightweight proxy policy transfer to VLA fine-tuning, and that MetaGenSim can exploit partial alignment through atomic skill stitching and object-receptacle composition when exact sim-and-real task alignment is unavailable.
+
+ment (middle), where experts must laboriously tune data generation parameters (such as tasks, object placements, camera poses). We propose MetaGenSim (bottom), which meta-learns a Rater to score synthetic data based on policy utility. This induces a utility landscape over parameters, enabling active generation of targeted simulation data that matches the real-world distribution without manually tuning the generation parameters. 1 Introduction While recent large-scale real-robot datasets have advanced generalist policies [ 1 , 2 ,
+
+a maximizes target-task performance. To efficiently tackle this problem, we propose MetaGenSim , a meta-learning framework that uses a sparse probing dataset to train an auxiliary rater network , which assigns utility scores to simulation samples based on their contribution to real-world validation performance, automatically guiding the active generation of a targeted synthetic dataset.
+
+ shifting simulation data generation from fixed distribution to controllable and targeted synthesis. • We introduce MetaGenSim , a meta-learning framework that trains an auxiliary rater network via meta-gradients to discover high-utility data-generation distributions within a user-specified parameter space, without manual parameter alignment. • We show that MetaGenSim outperforms uniform generation and offline retrieval, achieving a 150 % 150\% relative improvement in real-world full-task success over uniform generation while mat
+
+ching the performance of manual expert alignment. • We demonstrate scalability and generalization of MetaGenSim : proxy-curated datasets transfer to fine-tuning π 0.5 \pi_{0.5} , and MetaGenSim can exploit partially aligned data when exact task alignment is unavailable. 2 Related Works Generative simulation. Recent progress in generative modeling [ 30 , 31 ] , motion synthesis [ 9 , 32 , 33 ] , and procedural environment generation [ 4 , 5 ] has enabled automated s
+
+. Retrieval and attribution methods address this by selecting useful samples from existing datasets using embedding similarity [ 29 , 50 , 47 , 49 ] , rollout outcomes [ 26 ] , or validation loss [ 25 ] . However, these methods are fundamentally limited by the coverage of the static prior dataset and cannot synthesize new target-relevant data. MetaGenSim is complementary: it uses utility estimation to generate new simulation data tailored to the target task. 3 The Active Generative Simulation Problem We formalize Active Generative Sim
+
+e is therefore: How should we choose 𝒮 ϕ \mathcal{S}_{\phi} so that the generated simulation data most improves the policy performance on the target task? 3.2 Problem Formulation: Bilevel Optimization Our goal is to choose a target parameter distribution 𝒮 ϕ ∗ \mathcal{S}_{\phi}^{*} such that a policy co-trained on real data and simulated data sampled from 𝒮 ϕ ∗ \mathcal{S}_{\phi}^{*} maximizes real-world task performance. Let J R ​ ( π ) J_{R}(\pi) denote the real-world performance metric (e.g., success rate). We formulate this ob
+
+(a) Rater network learning: We meta-learn a rater network that weights simulation samples according to their contribution to policy performance on a held-out validation set of real demonstrations.
+
+o-train the final policy on this synthetic data and few-shot real demonstrations to maximize real-world success. 4 Active Generative Simulation by Meta Learning To approximate the bilevel problem in Eq. ( 1 ), we learn an explicit approximation to the optimal target parameter distribution 𝒮 ϕ ∗ \mathcal{S}_{\phi}^{*} . Our framework has two stages: (1) learn an auxiliary rater network that scores simulation samples by their contribution to real-task performance [ 51 , 52 ] , and (2) convert these scores into a parameter distributio
+
+inks each parameter setting to its generated trajectory, enabling us to estimate which regions of Φ \Phi are most useful for constructing 𝒟 S \mathcal{D}_{S} . 4.1 Task-Aware Data Rater Meta-Learning Directly optimizing over the combinatorial space Φ \Phi is intractable, so we learn a rater network R η ​ ( o , a ) R_{\eta}(o,a) that assigns a scalar utility score to any observation-action pair. Weighted Co-training (Inner Loop). At training step t t , we sample a simulation mini-batch ℬ S \mathcal{B}_{S} from 𝒟 probe \mathcal{D}_
+
+{\text{probe}} and a real mini-batch ℬ R \mathcal{B}_{R} from 𝒟 R \mathcal{D}_{R} according to the co-training ratio α \alpha . The rater computes normalized weights w t , i = exp ⁡ R η ​ ( o i , a i ) ∑ j ∈ ℬ S ∪ ℬ R exp ⁡ R η ​ ( o j , a j ) w_{t,i}=\frac{\exp{R_{\eta}(o_{i},a_{i})}}{\sum_{j\in\mathcal{B}_{S}\cup\mathcal{B}_{R}}\exp{R_{\eta}(o_{j},a_{j})}} and updates the policy π θ \pi_{\theta} via the weighted gradient g t = ∇ θ [ ∑ i ∈ ℬ S w t , i ​ ℒ ​ ( θ , o i , a i ) + ∑ j 
+
+{j})\right], where ℒ ⁡ ( θ , o , a ) = ℓ ⁡ ( π θ ​ ( o ) , a ) \mathcal{L}(\theta;o,a)=\ell(\pi_{\theta}(o),a) is the behavior cloning loss, and policy parameters are updated by a gradient descent algorithm as θ t + 1 = Θ ⁡ ( θ t , g t ) \theta_{t+1}=\Theta\big(\theta_{t},\,g_{t}\big) . We apply weights to both simulation and real samples. Meta-Optimization (Outer Loop). To connect training with real-world performance J R J_{R} , we split the real dataset into training and validation subsets and use the validation loss on 𝒟 R , val 
+
+\mathcal{D}_{R,\text{val}} as a differentiable surrogate. The meta-objective is to find η \eta that minimizes the validation loss after unrolling T T steps of inner-loop updates: η ⋆ = arg ⁡ min η ⁡ ℒ ⁡ ( θ T ​ ( η ) , 𝒟 R , val ) . \eta^{\star}=\arg\min_{\eta}\mathcal{L}(\theta_{T}(\eta);\mathcal{D}_{R,\text{val}}). We update η \eta by backpropagating through the T T inner-loop updates and applying an outer-loop gradient descent step on this validation loss.
+
+Thus, R η R_{\eta} acts as a proxy for J R J_{R} , assigning high scores to simulation samples whose gradients reduce prediction error on real-world expert trajectories. The inner-loop policy is used only to provide meta-gradients for learning R η R_{\eta} ; after constructing 𝒮 ^ ϕ \widehat{\mathcal{S}}_{\phi} , we train the final policy on the generated co-training dataset. The full meta-learning procedure is provided in Algorithm 1 in Appendix D . 4.2 
+
+Automatic Parameter Selection and Demo Generation The rater R η R_{\eta} operates on observation-action pairs, but Eq. ( 1 ) requires a distribution 𝒮 ϕ \mathcal{S}_{\phi} over simulator parameters. We bridge this gap by mapping rater scores back to the probing parameters and then constructing 𝒮 ^ ϕ \widehat{\mathcal{S}}_{\phi} . Parameter utility. We define a utility function 𝒰 : Φ → ℝ \mathcal{U}:\Phi\to
+
+\mathbb{R} that maps each generation parameter to its estimated contribution to real-world performance. Since the rater R η R_{\eta} assigns scores to individual observation-action pairs, we estimate the utility of a parameter ϕ i \phi_{i} by aggregating the rater scores along the corresponding synthesized trajectory ξ i = { ( o i , t , a i , t ) } t = 1 T i \xi_{i}=\{(o_{i,t},a_{i,t})\}_{t=1}^{T_{i}} : 𝒰 ⁡ ( ϕ i ) = 1 T i ​ ∑ t = 1 T i R η ​ ( o i , t , a i , t ) 
+
+Q2 (Mechanism): Does MetaGenSim learn target-aware utility scores and data-generation distributions? RQ3 (Cross-architecture transfer): Do distributions curated with a lightweight proxy policy transfer to large VLA policies? RQ4 (Partial alignment): When exact sim-and-real alignment is impossible, can MetaGenSim still exploit partially aligned simulation data to improve target performance? Figure 3: Sim-and-Sim Co-training performance using BC-RNN. Success bars are mean over 3 seeds, showing Standard Error of the Mean (SEM). Diff
+
+baselines are provided in Appendix F . We also compare with RealOnly , where the policy is only trained on real demonstrations. 5.1 Efficacy of Targeted Generation (RQ1) Figure 4: Rater score distribution of the probing and the real dataset ( green for high, red for low). The probing dataset is decomposed into four tasks with representative scored samples. The rater assigns high utility scores to the relevant stackCube task while suppressing scores for misaligned tasks. The vertical lines represent mean scores. We compare MetaGen
+
+PAPER crossfit
+
+s-fitted feedback 3.1 Multi-sample verification 3.2 Cross-fitted proposer feedback 4 Main Experiments 4.1 Experimental Setup 4.2 Main Results 5 Analysis and Ablations 5.1 How Does Cross-Fitting Change the Training Trajectory? 5.2 Why Is Source-Level Exclusion Necessary? 5.3 Fixed-Bank Replay Separates Feedback from Curriculum 5.4 How Do Verification and Cross-Fitting Interact? 6 Related work 7 Conclusion References A Implementation details Optimization. Training configuration. Compute overhead. B Evaluation and audit details Downstream e
+
+candidate. These limitations motivate CrossFit , our main method. It partitions
+
+Qwen3.5-4B and from 8.8% to 7.2% on Qwen3.5-9B, whereas CrossFit reduces it to
+
+ancestry from changes in the generated curriculum. Across seven downstream search benchmarks, CrossFit improves average
+
+et. Figure 2: Co-cheating and its mitigation. (a) Incorrect agreement creates false frontier credit. (b) MSV verifies each proposal with source-aware and source-blind samples. (c) CrossFit scores each source group with a solver trained on the other group. The two interventions target label quality and feedback provenance, respectively. This loop makes agreement an endogenous proxy for correctness ( Amodei et al., 2016 ; Gao et al., 2023 ) . An incorrect pseudo-label can train the solver to repeat the
+
+same source. The right panel of Figure 2 shows our primary intervention, CrossFit . The proposer’s source documents are divided into groups A and B. Along
+
+f-evolution with Qwen3.5-4B and Qwen3.5-9B ( Qwen Team, 2026 ) . Under standard coupled feedback, false-agreement mass reaches 6.1% and 8.8%; MSV lowers it to 5.7% and 7.2%, while CrossFit lowers it to 3.0% and 3.7%. Replaying identical proposals with source-excluded feedback further reduces it to 0.4% and 0.1%, isolating feedback ancestry from curriculum selection. We evaluate each round-end main solver on a fixed 1,325-question suite: 200 each from Natural Questions, TriviaQA, PopQA, HotpotQA, 2WikiMultiHopQA, and MuSiQue, plus 12
+
+ al., 2023 ; Yang et al., 2018 ; Ho et al., 2020 ; Trivedi et al., 2022 ; Press et al., 2023 ) . With one greedy trajectory per question and identical tool and extraction budgets, CrossFit reaches 48.8% at 4B and 51.2% at 9B, improving over coupled self-evolution by 8.8 and 8.4 points and over Search-R1 by 8.7 and 7.8 points, respectively. 2 Diagnosing co-cheating Figure 3: Co-cheating under coupled feedback. (a,b) All 129 steps of label truth T P T_{P} , solver truth T S T_{S} , and agreement A A ; dashes mark round boundaries. (c,
+
+outcome co-cheating ; it does not imply intentional coordination. Figure 4: The CrossFit algorithm. Auxiliary solvers train on one source fold and score the other; the main solver trains on all admitted questions. 3 From verification to cross-fitted feedback The audit motivates two interventions at different points in the self-evolution loop. MSV tests a proposed answer before the example enters training, whereas CrossFit , our main m
+
+It also adds six generations, including their search and coordination cost, per candidate (Table 3 , Appendix A ). 3.2 Cross-fitted proposer feedback CrossFit changes only where the proposer obtains its feedback. As shown from left to right in Figure 4 , the proposer generates questions and pseudo-labels from source documents exactly as in the original loop. We then assign each source document once to fold 0 or fold 1, and every question derived from that document keeps the same assignment throughout se
+
+ses match the adopted label under the original answer matcher, and f ⁡ ( k ) = ( 5 − k ) / 4 f(k)=(5-k)/4 for 0 < k < 5 0<k<5 (zero otherwise) is Dr. Zero’s frontier reward. Thus, CrossFit preserves the original training objective: questions still receive credit according to how difficult they appear to a solver. The only change is which solver supplies that signal. This change breaks the direct self-reinforcing path revealed by our audit. Under coupled feedback, an incorrect pseudo-label from a source can train the solver, be repro
+
+duced by that solver on a later question from the same source, and then return to the proposer as reward. Under CrossFit , the later question is instead evaluated by the complementary solver, whose training history excludes that source. The method does not turn the auxiliary solver into a truth oracle: the two solvers may still share errors inherited from pretraining or overlapping evidence. It does, however, prevent agreement from being rewarded merely because the 
+
+ack that shapes the proposer’s next-round curriculum. When the two interventions are combined, MSV first decides whether a proposal is admitted and which pseudo-label is used, and CrossFit then selects the auxiliary solver that evaluates it. In this sense, MSV improves the supervision entering training, whereas CrossFit prevents that supervision from being directly recycled into proposer reward. 4 Main Experiments 4.1 Experimental Setup Datasets & Models. We evaluate on the seven open-domain question answering benchmarks used by Dr.
+
+n 3 . Dr. Zero ( Yue et al., 2026 ) is the standard coupled loop in which the main solver scores the proposals it later trains on; MSV adds multi-sample verification to this loop; CrossFit replaces coupled feedback with source-excluded feedback; and MSV + CrossFit applies both. For broader comparison, we reproduce the Prompting and R1-Instruct baselines from the Dr. Zero protocol ( Yue et al., 2026 ) , together with Search-R1 ( Jin et al., 2025 ) , on the same Qwen3.5 backbones and evaluate every row on the same 1,325-question set w
+
+.448 0.349 Search-R1 † 0.355 0.650 0.290 0.370 0.510 0.125 0.504 0.401 Dr. Zero 0.390 0.665 0.325 0.365 0.485 0.120 0.448 0.400 MSV 0.400 0.670 0.340 0.375 0.480 0.135 0.448 0.407 CrossFit 0.455 0.730 0.415 0.460 0.575 0.245 0.536 0.488 MSV + CrossFit 0.470 0.730 0.410 0.475 0.575 0.250 0.528 0.491 Qwen3.5-9B Base 0.505 0.710 0.375 0.355 0.295 0.125 0.496 0.409 Prompting † 0.380 0.630 0.260 0.280 0.270 0.115 0.392 0.332 R1-Instruct † 0.445 0.695 0.290 0.310 0.295 0.135 0.480 0.379 Search-R1 † 0.510 0.730 0.395 0.380 0.310 0.180 0.53
+
+6 0.434 Dr. Zero 0.515 0.730 0.400 0.370 0.320 0.150 0.512 0.428 MSV 0.525 0.720 0.400 0.390 0.325 0.155 0.536 0.436 CrossFit 0.580 0.765 0.455 0.490 0.425 0.255 0.616 0.512 MSV + CrossFit 0.570 0.780 0.470 0.485 0.415 0.280 0.608 0.515 4.2 Main Results Cross-fitted feedback improves downstream search at both scales. In Table 1 , coupled self-evolution raises average Cover-EM from 0.384 to 0.400 at 4B and from 0.409 to 0.428 at 9B. CrossFit reaches 0.488 and 0.512: gains of 8.8/8.4 percentage points over Dr. Zero and 8.7/7.8 over Se
+
+ect therefore extends across task difficulty and model scale. Verification alone is insufficient. MSV increases the average by only 0.7–0.8 points over Dr. Zero. Combining it with CrossFit reaches 0.491 on Qwen3.5-4B and 0.515 on Qwen3.5-9B, only 0.3 points above CrossFit alone. These results suggest that changing the provenance of proposer feedback is more consequential than improving pseudo-label quality alone. 5 Analysis and Ablations 5.1 How Does Cross-Fitting Change the Training Trajectory? Figure 5: Training dynamics across th
+
+sed in round 2. This delayed divergence provides a within-run comparison of feedback provenance. Cross-fitted feedback reverses the divergence between agreement and truth. Without cross-fitting, in-loop agreement rises above solver truth while false agreement accumulates at both model scales. Once cross-fitted scoring becomes active, adopted-label truth rises, agreement remains at or below solver truth, and by round 3 false-agreement mass falls below half of the coupled value. MSV alone improves solver truth but does not prevent the agre
+
+ement signal from becoming optimistic; combined with CrossFit , it yields the lowest final false agreement. The trajectory difference predicts downstream gains. Table 5 shows that the downstream advantage of CrossFit over Dr. Zero grows from 4.2 and 4.3 points after round 2 to 8.8 and 8.4 points after round 3. The intervention therefore changes what the loop learns across rounds rather than merely re-ranking
+
+bined treatment. (c) Reduction F Dr . Zero − F F_{\mathrm{Dr.~Zero}}-F . All values are percentage points. Figure 6 summarizes the final-round audit (absolute values in Table 4 ). CrossFit raises adopted-label truth from 0.747 to 0.819 at 4B and from 0.737 to 0.851 at 9B, while reducing false-agreement mass from 0.061 to 0.030 and from 0.088 to 0.037. These changes connect the downstream improvement to the intended mechanism: excluding the evaluated source from the feedback solver prevents same-source errors from being systematicall
+
+PAPER swila
+
+ in GitHub arXiv is now an independent nonprofit! Learn more × Back to arXiv Why HTML? Report Issue Back to Abstract Download PDF Abstract 1 Introduction 2 Background on Test-Time Regression Memorization as regression. Retrieval as function evaluation. Design space. 2.1 Limitations motivating Switching Linear Attention 3 Switching Linear Attention 3.1 Regression Model: Mixture of Linear Regressors 3.2 Optimization Algorithm: Online EM 3.3 Regression Model Extension: Temporal SwiLA 3.4 Regression Model Extension: Gated SwiLA 3.5 Improv
+
+ing the Optimization Algorithm: Load Balancing 4 Related Work 4.1 DeltaNet Chunkwise parallel algorithm 4.2 Mixture-of-Memories 5 Experimental Results 5.1 Approximating Softmax Attention Setup. Results. 5.2 Synthetic Benchmarks Context-Dependent Associative Recall (CDAR). RegBench: In-Context Language Learning. 5.3 Pretraining Language Models Commonsense Reasoning. Recall-Intensive Tasks. 5.4 Throughput Comparison 5.5 Ablation Study 6 Conclusion Limitations Fut
+
+ure Outlook References A Extended Background A.1 Design Space of Test-Time Regression A.2 Mixtures of Linear Regressions B Model Specification Details B.1 Derivation of SwiLA Recurrence B.2 Details of the SwiLA Layer B.3 Temporal SwiLA Details B.4 Gated SwiLA Details Equivalence of the two gating formulations when J = 1 J=1 . Granularity of the gate. C Extended Related Work Test-time regression Efficient attention D Chunkwise Parallel Algorithms D.1 Background on P
+
+We derive the SwiLA recurrence from the test-time regression framework, casting the state update rule as online expectation–maximization in a mixture of linear regressions model.
+
+A useful perspective on this retrieval capability is that softmax attention implicitly fits a nonlinear mapping between inputs and outputs at inference time, a form of test-time regression (TTR) that underlies its expressive in-context learning (ICL) ( Garg et al., 2022 ; Akyürek et al., 2023 ; von Oswald et al., 2023 ; Wang et al., 2025 ) . However, this expressivity comes at a high computational cost.
+
+., 2024b ) . To bridge this gap, we introduce Switching Linear Attention (SwiLA), a novel sequence layer that leverages the TTR framework of Wang et al. (2025) , extending it to a mixture of linear regressors ‡ .
+
+SwiLA divides its recurrent state into J J mixture components, each maintaining its own linear regressor of size O ⁡ ( D 2 ) O(D^{2}) that specializes in different retrieval patterns.
+
+At each timestep, each of the D D output dimensions selects a mixture component based on both a learned gating prior and the prediction errors of the current state, yielding a number of mixtures that scales exponentially as O ⁡ ( J D ) O(J^{D}) , despite having a state size that grows only polynomially as O ⁡ ( J ​ D 2 ) O(JD^{2}) .
+
+We derive the update rule from online expectation maximization ( Cappé and Moulines, 2009 ) : the E-step computes posterior responsibilities based on prediction errors, and the M-step updates each component’s regression weights.
+
+learning, and language modeling, we find that SwiLA performs strongly, narrowing the gap to softmax attention and even surpassing it in several settings. 2 Background on Test-Time Regression A central capability of effective sequence models is in-context associative recall : given a query, retrieve relevant information from previously observed tokens. Wang et al. (2025) formalize in-context associative recall as a two-step process of memorization and retrieval. They show that the memorization step can be cast as an online regression p
+
+roblem, which they call test-time regression (TTR). Memorization as regression. Given a sequence of KV pairs ( k 1 , v 1 ) , … , ( k T , v T ) (k_{1},v_{1}),\ldots,(k_{T},v_{T}) with k t ∈ ℝ D k_{t}\in\mathbb{R}^{D} and v t ∈ ℝ D v_{t}\in\mathbb{R}^{D} , an associative memory is a function m t : ℝ D → ℝ D m_{t}:\mathbb{R}^{D}\to\mathbb{R}^{D} such that m t ​ ( k i ) ≈ v i m_{t}(k_{i})\approx v_{i} for i = 1 , … , t i=1,\ldot
+
+Finding such a map reduces to solving a regression problem: m t ≈ arg ⁡ min ⁡ ∑ i = 1 t m ∈ ℳ ⁡ ‖ v i − m ⁡ ( k i ) ‖ 2 , m_{t}\approx\arg\min_{m\in\mathcal{M}}\sum_{i=1}^{t}\|v_{i}-m(k_{i})\|^{2}, (2.1) where ℳ \mathcal{M} is a chosen function class. Retrieval as function evaluation. Once the regressor m t m_{t} has been fit, memory retrieval is simply function application: given a query q t q_{t
+
+This framework is called test-time regression (TTR): the regressor m t m_{t} is learned in-context from the input tokens and the structure of the recurrence. Commonly, the query q t q_{t} , key k t k_{t} , and value v t v_{t} are all projections of some input x t x_{t} . Design space. In TTR, a sequence layer is specified by the choice of the function class ℳ \mathcal{M} and the optimization 
+
+In the nonparametric case, we recover kernel regression.
+
+SwiLA defines a piecewise linear map that can approximate arbitrary nonlinear functions ( fig. 1 A) by replacing the single linear regressor with a mixture of linear regressors ( fig. 1 B).
+
+ose memory footprint is independent of sequence length. Figure 1: Switching Linear Attention. (A) : When the input–output relationship varies with context, piecewise (”switching”) regression is more expressive than linear regression. (B) :
+
+SwiLA’s state is a mixture of linear regressors.
+
+ep, SwiLA selects which regressor to use based on the current input and previous state. (C) : Test R 2 R^{2} vs. state size for SwiLA and DeltaNet on a synthetic softmax attention regression task, with softmax attention for reference.
+
+Labels mark the best SwiLA configuration ( H = = heads, J = = mixtures).
+
+At every budget, SwiLA better approximates softmax attention. 3 Switching Linear Attention We introduce Switching Linear Attention (SwiLA), a sequence layer based on mixtures of linear regressions.

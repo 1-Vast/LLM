@@ -1,0 +1,9 @@
+# Signed-axis exact result interpretation
+
+At root's explicit request, froze SIGNED_AXIS_PROTOCOL.md, then ran its new exact Fraction script once. Root API_CHECK.json and code remain unread; this is not a rerun of root's three checks. Scope changed after API_REVIEW's seal from analytical examples only to two executed exact synthetic cases; the earlier report remains historical.
+
+Finite epsilon1/10 and lambda_R0: with positive histories (q,3q), mean direction is (40/21,80/21) in coordinates5/6, scalar21/40 gives feedback3 and held2, error0. With histories (q,-q), all mean coordinates are exactly0; no scalar fits feedback3 and held output0 has squared error4. An ordinary rank-one basis taken from a nonzero column of the **same source second moment** fits feedback3 and held2 in both cases. The exact matrix is verified as sum(a_h^2)q q', and q is a nonzero eigenvector. Candidate does not receive a weaker or noisier source than comparator. The eigenvector's scale is irrelevant because target lambda_R0.
+
+The result establishes that collinear signed corrections do not imply a nonzero transferable mean direction. A stable common signed mean assumption can make the candidate work, as the positive case demonstrates. It does not establish negative signed corrections occur in real biology, a general PCA advantage, robustness to noise, computational efficiency, world necessity or inheritance/RSI success. PCA replacement is not the written mean-fit equation. No new biological result or protected endpoint was opened.
+
+The previous FINAL_SEAL.json binds a pre-test snapshot. FINAL_POSTTEST_SEAL.json supplements it without replacing originals. FIRST_SEAL and API_REVIEW_SEAL originals remain; API_REVIEW_SEAL's CROSS hash refers to its pre-append state, transparently noted in FINAL_SEAL. Future audit should treat the append as a disclosed cross-review revision rather than silently claiming every historical seal equals the final appended file.

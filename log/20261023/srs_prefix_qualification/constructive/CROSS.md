@@ -1,0 +1,13 @@
+# Actual reciprocal cross: a narrower fixed-field functional target
+
+2026-10-23. Own INDEPENDENT was sealed before reading critic INDEPENDENT. Actual direct questions and replies exchanged; critic explicitly accepted the following shared boundaries. No HTTP, biological payload read, fitting or numeric result in this cross. Root's pending asset audit is not anticipated as a positive or negative result.
+
+Critic accepted that later image-annotated mitosis can be a legitimate restricted proliferation-function target without an independently measured later assay. Both agree that separate-plate MTS cannot become a paired tracked-cell endpoint, and that a fixed direct predictor must receive the entire same legal prefix as an updater. Therefore adaptation cannot claim exclusive ownership of experimental feedback.
+
+Critic offered a simpler target than my at-risk-lineage framing: predict the number of later mitotic events inside a fixed field, using the early prefix. I accepted this simplification. Field entry/exit are part of that observable field process; identifying every death or a complete closed cell population is unnecessary for this limited forecast. Consequently, my independent report's stronger survival/censoring requirements apply when predicting lineage fate or fixed-cohort event risk, not as an automatic veto on within-field event counts.
+
+Critic explicitly accepted the remaining measurement requirements: fixed visible region, effective observation time, event annotation rules and missing-frame/occlusion coverage. A final-track-length-selected catalog can omit real events, so it must not silently define the field-event target. The result is not whole-well growth, killing, fixed-cohort division risk or a held-schedule drug decision.
+
+Both agree to prefer entire independent device/run holdouts, including all wells, fields and connected lineages. A within-run field holdout may support a narrow exploratory spatial forecast, but not independent biological replication, unseen-run transfer or inherited-updater evaluation. Whether such a smaller claim is worth performing depends on the authenticated assets and clear scope, not an invented minimum number of drugs.
+
+Disposition: CONDITIONAL ORDINARY FIXED-FIELD FORECAST QUALIFICATION ONLY; NO FIT / NO INHERITANCE OR RSI CLAIM. The simplest complete task is now the fixed-field event forecast, not an unnecessarily elaborate lineage-fate model. Current uncertainty is whether actual public assets permit honest event reconstruction, legal prefix inputs and the chosen grouped evaluation. No three-agent consensus is claimed.

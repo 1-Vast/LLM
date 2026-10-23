@@ -1,0 +1,128 @@
+[
+  {
+    "projection_index": 31,
+    "tag": "p",
+    "id": "S4.SS2.p5.1",
+    "text": "Olympiad-level math grading. This domain evaluates an agent’s ability to grade solutions to Olympiad-level math problems. This domain is reserved as a held-out meta-evaluation to test whether DGM-H’s improvements to its self-improvement process transfer across domains and continue to compound over time. We use IMO-GradingBench ( Luong et al., 2025 ) , which consists of International Mathematical Olympiad (IMO)-level problems paired with candidate solutions and expert human grades. For each task, the agent is given an IMO-level problem, a candidate solution, reference solutions, and grading guidelines to predict a discrete score. Performance is measured by the accuracy of the agent’s grades with respect to expert human grades. The representative static baseline for this domain is the ProofAutoGrader from IMO-GradingBench. Section C.4 provides full details on the score labels, dataset splits (train, validation, and test), the staged evaluation protocol (i.e., first evaluating the agent on a 10-task subset to estimate effectiveness before expanding evaluation to a total of 100 tasks), and the baselines for this domain."
+  },
+  {
+    "projection_index": 33,
+    "tag": "p",
+    "id": "S5.p1.1",
+    "text": "For each experiment, we run each method 5 times. We report medians with 95% bootstrap confidence intervals computed from 1,000 resamples, using the notation median (CI: lower – upper ). In line plots, lines show median performance and shaded regions indicate the confidence intervals ( Figures 2 , 3 and 4 ). Bar plots report median performance on held-out test sets, with error bars indicating confidence intervals ( Figures 2 , 3 and 4 ). Statistical significance is assessed using the Wilcoxon signed-rank test. Overall, the DGM-H exhibits general self-improvement at both the task and meta levels. Improvements to the task agent transfer to held-out test tasks within each domain, exceeding open-sourced static baselines ( Section 5.1 ). Meta-level improvements transfer across domains, enabling hyperagents to significantly improve their ability to generate better task agents in previously unseen domains ( Section 5.2 ). Self-improvements learned in one DGM-H run can potentially accelerate learning in subsequent runs and continue to compound as further self-modifications are applied ( Section 5.3 ). All experiment logs are open-sourced in our codebase."
+  },
+  {
+    "projection_index": 41,
+    "tag": "p",
+    "id": "S5.SS1.p6.1",
+    "text": "The DGM-H significantly outperforms the original DGM in both domains (p ¡ 0.05), reflecting the limitations of the original DGM’s fixed instruction-generation mechanism when applied to non-coding tasks ( Figure 2 ). The DGM-H achieves higher median performance than DGM-custom on the test tasks in both domains, although the difference is not statistically significant (p ¿ 0.05) ( Figure 2 ). Notably, in the robotics reward design test task (i.e., design a reward function that trains the robot to maximize its torso height), the DGM-H almost always generates task agents that design reward functions inducing jumping behaviors, rather than getting stuck in the local optimum of standing tall. In contrast, DGM-custom often generates task agents that fail to escape this local optimum. This qualitative difference suggests that metacognitive self-modification can match or exceed handcrafted, domain-specific mechanisms."
+  },
+  {
+    "projection_index": 48,
+    "tag": "p",
+    "id": "S5.SS2.p4.1",
+    "text": "Meta agents optimized in prior DGM-custom runs have little to no ability to generate improved task agents when transferred to a new domain. We evaluate whether self-improvements learned in one setting using the DGM can transfer to new domains. We consider agents optimized in prior DGM-custom runs on the paper review and robotics reward design tasks ( Section 5.1 ). From each run, we select a transfer agent based on the maximum performance gain achieved by its descendants, measured relative to the agent itself and discounted by lineage depth ( Section D.4 ). We apply discounting to favor agents that reliably produce strong improvements within fewer self-modification steps, since improvements occurring many iterations later are less directly attributable to the original agent. We choose transfer agents from DGM-custom rather than from DGM because DGM-custom achieved larger improvements in the previous settings ( Section 5.1 ). For transfer, we carry over the entire agent implementation from the source domain, including both the meta agent and the task agent. Concretely, the transfer meta agent is used as the fixed agent responsible for generating new task agents in the target domain, and the transfer task agent serves as the initial task agent from which new variants are generated. We evaluate whether the transfer meta agents can generate improved task agents in a new domain, Olympiad-level math grading. The transfer task agents (one from each of 5 repeated runs) achieve a test-set score of 0.0 (CI: 0.0 – 0.010). As expected, this performance is low because the agents were optimized for paper review and robotics reward design, which differ substantially from the math grading task. After 50 iterations of DGM w/o self-improve starting from each transfer task agent and holding the transfer meta agent fixed, the best generated task agents (selected based on validation score) achieve a score of 0.0 (CI: 0.0 – 0.020). This corresponds to a imp@50 of 0.0 (CI: 0.0 – 0.010) ( Figure 3 ), showing that the transfer meta agents from DGM-custom runs cannot generate improved task agents in a previously unseen domain. When using DGM w/o self-improve as the agent-generation algorithm, imp@50 for the transfer agents is similar to that of the initial agent (both close to zero). This shows that the task performance improvements observed with DGM-custom rely on domain-specific customizations, rather than on general improvements in the meta ability to generate improved task agents."
+  },
+  {
+    "projection_index": 49,
+    "tag": "p",
+    "id": "S5.SS2.p5.1",
+    "text": "Hyperagents optimized in prior DGM-H runs demonstrate transferable ability to generate improved task agents in a new domain. We repeat the transfer experiments for the DGM-H to assess whether hyperagents enable the learning of general self-improvement mechanisms. From prior DGM-H runs on paper review and robotics reward design ( Section 5.1 ), we select one transfer hyperagent per run using the same lineage-discounted criterion described above ( Section D.4 ). The transfer hyperagents (one from each of 5 repeated runs) achieve an initial test-set score of 0.0 (CI: 0.0 – 0.0), reflecting the domain shift. After 50 iterations of DGM-H w/o self-improve starting from the transfer hyperagents, the best generated agents (selected based on validation score) achieve a test-set score of 0.630 (CI: 0.540 – 0.630). This corresponds to a imp@50 of 0.630 (CI: 0.540 – 0.630) ( Figure 3 ). These results show that transfer hyperagents can generate improved agents in a previously unseen domain. When using DGM-H w/o self-improve as the agent-generation algorithm, imp@50 for the transfer agents is significantly higher than imp@50 for the initial agent (p ¡ 0.05). This indicates that the transfer agents are substantially more effective at generating improved agents, and that the meta-improvements learned through DGM-H in one run are general and transferable, accelerating learning in a different domain."
+  },
+  {
+    "projection_index": 54,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 4: Self-improvements learned by the DGM-H accumulate across domains and runs. We continue running DGM-H on Olympiad-level math grading, starting from transfer hyperagents obtained in prior DGM-H runs, and compare this against DGM-H initialized from the initial agent and from ProofAutoGrader. (Left) Initializing from transferred hyperagents leads to faster progress and higher final performance than initializing from the initial agent, indicating that previously learned self-improvements remain useful and continue to compound in a new domain. (Right) DGM-H initialized from a transferred agent and ProofAutoGrader achieves the highest test performance, surpassing the representative baseline."
+  },
+  {
+    "projection_index": 55,
+    "tag": "p",
+    "id": "S5.SS3.p1.1",
+    "text": "We investigate whether self-improvements learned by DGM-H in one setting continue to accumulate when DGM-H is run in a different setting. From prior DGM-H runs on the paper review and robotics reward design tasks ( Section 5.1 ), we select transfer hyperagents using the same selection mechanism described earlier ( Section 5.2 , Section D.4 ). We then evaluate their ability to continue self-improving in a new domain, Olympiad-level math grading. After 200 iterations of DGM-H starting from these transfer agents (DGM-H + transfer), the best generated agents (selected based on validation score) achieve a test-set score of 0.640 (CI: 0.550 – 0.720). Under the same experimental setup, DGM-H starting from the initial agent achieves a best test-set score of 0.610 (CI: 0.510 – 0.680). Although the difference between DGM-H + transfer and DGM-H is not statistically significant (p ¿ 0.05), DGM-H + transfer achieves a higher median performance and higher confidence intervals than DGM-H starting from the initial agent ( Figure 4 ). Notably, improvements at higher performance levels are increasingly difficult due to saturation effects (e.g., increasing performance from 0.7 to 0.8 is typically more challenging than from 0.0 to 0.1), making these gains meaningful despite their modest absolute magnitude. These results suggest that DGM-H’s self-improvements are reusable and can potentially accumulate across runs, supporting the possibility of compounding self-improvement over time."
+  },
+  {
+    "projection_index": 56,
+    "tag": "p",
+    "id": "S5.SS3.p2.1",
+    "text": "The representative static baseline for Olympiad-level math grading from IMO-GradingBench is ProofAutoGrader ( Luong et al., 2025 ) . We initialize the DGM-H with ProofAutoGrader as the task agent and a transfer meta agent obtained from a prior DGM-H run (on paper review and robotics reward design), and then continue optimizing for Olympiad-level math grading. After 200 iterations, the best discovered agent achieves a test-set score of 0.700, outperforming ProofAutoGrader’s score of 0.670 ( Figure 4 ). We then evaluate both the best discovered agent and ProofAutoGrader on the full IMO-GradingBench to obtain a more accurate estimate of the improvement. On the full IMO-GradingBench, the DGM-H improves ProofAutoGrader’s accuracy from 0.561 to 0.601, and lowers the mean absolute error from 0.178 to 0.175 ( Section E.4 ). We open-source this artifact to support future research and development ( Section E.1.3 ). These results show that the DGM-H can build on strong existing solutions and further improve their performance."
+  },
+  {
+    "projection_index": 61,
+    "tag": "h2",
+    "id": null,
+    "text": "7 Limitations and Conclusion"
+  },
+  {
+    "projection_index": 63,
+    "tag": "p",
+    "id": "S7.p2.1",
+    "text": "Our results suggest that self-improvements can compound across different experimental settings, but this version of DGM-H has limitations that constrain truly unbounded progress. First, it operates with a fixed task distribution. One direction is to co-evolve the task distribution by generating new tasks and curricula that adapt to the agent’s capabilities ( Clune, 2019 ; Zhang et al., 2024 ; Faldor et al., 2025 ; Bolton et al., 2025 ) . Second, components of the open-ended exploration loop (e.g., parent selection, evaluation protocols) remain fixed. Although hyperagents can modify their self-improvement mechanisms, they cannot alter the outer process that determines which agents are selected or how they are evaluated. Keeping these components fixed improves experimental stability and safety, but limits full self-modifiability. Enabling hyperagents to modify these outer-loop components and adapt their own search strategy and evaluation process is another promising direction for future work. Our preliminary results suggest such extensions are feasible ( Section E.5 )."
+  },
+  {
+    "projection_index": 115,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 5: Conceptual comparison of DGM variants, highlighting which components change across settings and how hyperagents address limitations in the original DGM implementation. (First row) The original DGM. The same coding agent serves as both the task agent and the meta agent. Because both evaluation and self-modification are coding tasks, improvements in coding ability translate into improved self-modification, enabling the DGM to improve at improving in coding domains. (Second row) The DGM adapted to non-coding domains. The coding agent remains as the meta agent, but the evaluation tasks are no longer coding tasks, so a separate task agent is required. Task performance no longer reliably reflects the meta agent’s ability to generate better task agents, breaking the alignment that enables the meta agent to improve at improving. (Third row) The DGM-custom baseline. The handcrafted instruction-generation mechanism is customized to the target domain but remains non-modifiable. (Fourth row) The DGM with Hyperagents (DGM-H). A hyperagent integrates a task agent and a meta agent within a single editable program, enabling metacognitive self-modification (i.e., modifying not only task-solving behavior but also the procedure that generates future self-modifications). As a result, the DGM-H can improve its improvement mechanism while optimizing for any computable task."
+  },
+  {
+    "projection_index": 197,
+    "tag": "p",
+    "id": "A3.SS4.p2.1",
+    "text": "Representative static baseline (ProofAutoGrader) from Luong et al. [2025] :"
+  },
+  {
+    "projection_index": 199,
+    "tag": "p",
+    "id": "A4.p1.1",
+    "text": "This appendix provides additional experimental details to support reproducibility of the results. We first summarize the FMs and hyperparameters used for self-modification and task evaluation across domains ( Section D.1 ), followed by an estimate of the computational cost of running the DGM-H in each setting ( Section D.2 ). We then formally define the improvement@k metric used to quantify an agent’s ability to produce improved variants under a fixed budget ( Section D.3 ). Finally, we describe the procedure used to select transfer agents for cross-domain experiments ( Section D.4 )."
+  },
+  {
+    "projection_index": 205,
+    "tag": "p",
+    "id": "A4.SS2.p1.1",
+    "text": "Running the DGM-H for 100 iterations incurs a cost of approximately 33M tokens for the self-modification phase alone (excluding task evaluation). The total cost of an experiment therefore consists of the self-modification cost plus the cost of task evaluation. For the paper review and robotics reward design experiments, the evaluation cost per iteration is 0.506M tokens (0.5M tokens for paper review evaluation + 0.006M tokens for robotics reward design evaluation). Consequently, for a 100-iteration run ( Section 5 ), the estimated total cost is 33M tokens for self-modification plus 0.506M × 100 for evaluation, yielding a total of approximately 88.6M tokens."
+  },
+  {
+    "projection_index": 217,
+    "tag": "h3",
+    "id": null,
+    "text": "D.4 Transfer Agent Selection"
+  },
+  {
+    "projection_index": 234,
+    "tag": "p",
+    "id": "A5.SS1.SSS3.p1.1",
+    "text": "Diff patches contributing to the best task agent, which we refer to as BetterGrader in Section E.4 , discovered by the DGM-H with transfer and from ProofAutoGrader ( Section 5.3 ) for Olympiad-level math grading:"
+  },
+  {
+    "projection_index": 237,
+    "tag": "p",
+    "id": "A5.SS2.p2.1",
+    "text": "Use structured processes, not attitude instructions. In the paper review domain, the DGM-H transitions from behavioral prompting to structurally grounded decision-making Figure 7 . In generation 39, the agent attempted to improve performance by adopting a “rigorous and critical” reviewer persona, encouraging stricter standards and default rejection. Subsequent analysis showed that such attitude-based instructions were unreliable, leading to a key insight in generation 54: “for LLMs, use structured processes, not attitude instructions”. The DGM-H therefore introduced a two-stage evaluation procedure in which the agent first identifies weaknesses using an explicit checklist and only then makes an accept/reject decision based on predefined rules. This shift from behavioral guidance to process-level structure enabled more stable and higher-performing review behavior in later generations."
+  },
+  {
+    "projection_index": 264,
+    "tag": "p",
+    "id": "A5.SS3.SSS5.p3.1",
+    "text": "By abstracting prompts into templates, the system becomes more maintainable and extensible. This infrastructure also provides a foundation for systematic experimentation with different prompting strategies."
+  },
+  {
+    "projection_index": 273,
+    "tag": "p",
+    "id": "A5.SS3.SSS7.p4.1",
+    "text": "By creating external memory storage, the hyperagent effectively extends its cognitive capabilities beyond the limitations of a single inference session. The memory entries reveal sophisticated reasoning patterns. The agent stores not just raw performance numbers, but synthesized insights (“Gen55 has best accuracy but is too harsh”), causal hypotheses (“gen65 changes over-corrected”), and strategic plans (“combine gen55’s critical reasoning with gen64’s balance”). This demonstrates that the hyperagent is not merely logging data, but actively constructing and preserving knowledge that informs future decision-making. This behavior aligns with a growing body of work on agents that autonomously discover and use external memory systems to support long-horizon reasoning and continual improvement [ Wei et al., 2025a , Weng et al., 2026 , Zhang et al., 2026 , Xiong et al., 2026 ] ."
+  },
+  {
+    "projection_index": 275,
+    "tag": "figcaption",
+    "id": null,
+    "text": "Figure 10: Confusion matrices for IMO-level math graders. Comparison between (Left) ProofAutoGrader from Luong et al. [2025] and (Right) BetterGrader discovered automatically by the DGM-H. BetterGrader reduces the collapse of intermediate solutions into extreme labels by correctly identifying more Almost and Partial cases, while maintaining strong performance on Correct and Incorrect . This shift toward better-calibrated intermediate judgments explains the gains in accuracy by BetterGrader."
+  },
+  {
+    "projection_index": 276,
+    "tag": "p",
+    "id": "A5.SS4.p1.1",
+    "text": "BetterGrader is produced automatically by the DGM-H without any domain-specific heuristics or handcrafted rules ( Section 5.3 ). Section E.1.3 shows the code changes that led to the BetterGrader. BetterGrader’s improvements over ProofAutoGrader [ Luong et al., 2025 ] are driven primarily by correcting a grading bias that collapses nuanced solutions into extreme labels. The confusion matrices show that ProofAutoGrader frequently misclassifies intermediate cases as either Correct or Incorrect : for Almost , it predicts Correct 98 times (vs. 70 for BetterGrader) and Incorrect 27 times (vs. 18), and for Partial it over-assigns Incorrect 137 times (vs. 106) ( Figure 10 ). BetterGrader assigns intermediate labels more appropriately, substantially increasing true positives for Almost (43 vs. 13) and Partial (72 vs. 47), which matches the large gains in recall ( Almost : + 18.52 % +18.52\\% , Partial : + 10.50 % +10.50\\% ) and F1 ( Almost : + 0.203 +0.203 , Partial : + 0.109 +0.109 ). Although BetterGrader trades a modest decrease in Correct recall ( − 6.00 % -6.00\\% ), a regime where ProofAutoGrader was already near-saturated at 91.67 % 91.67\\% , the net effect is higher overall accuracy ( + 4.06 % +4.06\\% ), consistent with a grader that better matches human granularity rather than defaulting to all-or-nothing judgments."
+  }
+]

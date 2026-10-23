@@ -1,0 +1,5 @@
+# Matched-guide endpoint qualification
+
+2026-10-22. Full objective ACTIVE / NOT_ACHIEVED. Previous turn PROGRESS3sourceobjects/90nestedfits/reviews. Current intent qualify a distinct chosen-guide functional estimand without replacing originalgene-averageendpoint. All priorSTOPs/protectedoutcomes intact, no fittednewmodel yet. HEAD47a0e2dea5a7dd42379fa17eb3621caf6bd0114c, dirtyglobalindexes preserved. Code research/,sources/data/reviews log/.
+
+Concrete originalauthorpaths pinned3b25109aeb9c0c2026bd70abd50304a0ad4e5395:final_emaps/20180821_guides_chosen_for_perturbseq.csv,data_sharing/samebasename,filter0replicateAverage phenotypeMatrix_abbaAveraged andsinglePhenotypes_abbaAveraged. Originalpopulation source references unfiltered_single_phen/perturbseq_phen_matrix without fulldefinitions, so file-name intent alone cannot certifylineage. Needexactsource-only numericalcomparison to retainedprocessed_perturbseq_fitnesses andchosen_guide_fitness priors. Acquirefiles first, stringheaders/guide mapping only. Do notinspect guide sequence values beyond byte retention; guide IDs sufficient.

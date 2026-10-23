@@ -1,0 +1,750 @@
+{
+  "source": "D:\\MAESTRO\\log\\20261022\\mechanism_gap\\functional\\PMC10628994.pmc.html",
+  "bytes": 388747,
+  "sha256": "38725acba70f7b589f9e370493bf61e44bef22fe9653f0268b3e972a7ae4b399",
+  "matches": [
+    {
+      "tag": "p",
+      "id": "P21",
+      "text": "To compare single-cell transcriptional profiles of clones across split populations, we formulated a metric that we called the ‘mixing coefficient’ ( Methods ), which provides a pairwise comparison of transcriptional similarity between any two clones in principal component space (notably, it is independent of any particular cluster designation). For each pair of clones (twin or non-twin), we measured, for each cell, the number of nearby neighbour cells (from the pair of clones) that were either from the same clone (self-neighbour) or from the pair clone. The mixing coefficient was the averaged fraction of self-neighbours across all cells from the clone pair divided by the averaged fraction of non-self neighbours. A mixing coefficient of 1 signifies a high degree of shared transcriptional similarity between the pair, whereas a mixing coefficient of 0 implies that the two clones are transcriptionally separated in the principal component space (see Methods ). Non-twin clone pairs had low mixing coefficients both within or across the two split populations, but twin clone pairs exhibited high mixing coefficients ( Fig. 4f - h and Supplementary Fig. 14 ). These results show that the adoption of distinct transcriptional and phenotypic types was determined by the intrinsic molecular state of the cells preceding drug exposure, and environmental factors had little to no effect on the type outcomes. Similar results in primary melanocytes and untreated WM989 A6-G3 melanoma cells showed that the intrinsic states of these cells persisted despite a change in a cell’s environment ( Extended Data Figs. 1h and 6 ). Intrinsic predetermination of resistant type also occurred in three other melanoma cell lines (WM983B A6-G3, WM3451 P2G7 and WM3623 P4E7) and the breast cancer cell line tested earlier (MDA-MB-231-D4) ( Extended Data Figs. 4 , 5 and 7 ). The effects were less pronounced in the MDA-MB-231-D4 line ( Extended Data Fig. 7 )."
+    },
+    {
+      "tag": "p",
+      "id": "P30",
+      "text": "We also tested the inhibition of the histone methyltransferase DOT1L for its effects on resistant types. We previously showed that pre-treatment with pinometostat, a DOT1L inhibitor, increased resistance 35 ; FateMap applied to pinometostat-pretreated cells showed that this increase arose from new clones becoming resistant but adopting largely the same types as they did normally ( Extended Data Fig. 10 and Supplementary Discussion )."
+    },
+    {
+      "tag": "p",
+      "id": "P39",
+      "text": "We prepared stock solutions in DMSO of 4 mM vemurafenib (PLX4032, Selleck Chemicals, S1267), 10 mM pinometostat (Selleck Chemicals, S7062), 100 μM trametinib (Selleck Chemicals, S2673), and 4 mM paclitaxel (Life Technologies, P3456). We prepared small aliquots (10-15ul) for each drug and stored them at −20 °C to minimize freeze–thaw cycles. For drug treatment experiments, we diluted the stock solutions in culture medium to a final concentration of 1 μM and 100 nM for vemurafenib; 4 μM for pinometostat; 5 nM, 10 nM and 25 nM for trametinib; and 1 nM for paclitaxel unless otherwise specified."
+    },
+    {
+      "tag": "p",
+      "id": "P41",
+      "text": "WM989 A6-G3 and WM983b E9-C6 cells were treated with either vemurafenib or 5 nM trametinib for 3–4 weeks, and the medium was replaced every 3–4 days. Similarly, MDA-MB-231-D4 cells were treated with paclitaxel for 3–4 weeks, and the medium was replaced every 3–4 days. WM3623 P4E7 cells were treated with 10 nM trametinib for 3–4 weeks, and the medium was replaced every 3–4 days. WM3451 P2G7 cells were treated with 25 nM trametinib for 3-4 weeks, and the medium was replaced every 3–4 days. At the end of the treatment, surviving cells were trypsinized, neutralized, washed with 1× DPBS, and then either (1) pelleted and stored at −20 °C for gDNA extraction, or (2) resuspended in PBS for scRNA-seq experiments. In some cases, cells were also fixed for imaging at the end of the treatment. For pinometostat (DOT1L inhibitor) pre-treatment (before addition of vemurafenib), WM989 A6-G3 cells were treated for five days, replacing medium once at day 3. For continuous–discontinuous dosing experiments, WM989 A6-G3 cells were barcoded and plated as described above. Both arms of the experiment were treated with 1 μM vemurafenib. The continuous dose arm was maintained in 1 μM vemurafenib for the entirety of the experiment, while the discontinuous arm was maintained in 1 μM vemurafenib for 9 days before being switched to culture medium without 1 μM vemurafenib. The discontinuous arm was then maintained in this drug-free culture medium for 25 days before being switched back to culture medium with 1 μM vemurafenib for the final 5 days of the experiment."
+    },
+    {
+      "tag": "p",
+      "id": "P48",
+      "text": "We used SCTransform to normalize and variance-stabilize the dataset and then performed principal component analysis (PCA) using Seurat’s RunPCA command. To get total variance for each dataset (that is, both the naive cell dataset and the drug-resistant cell dataset), we took the sum of the variance estimates per row of the SCT@scale.data matrix (where each row represented a gene). We calculated the eigenvalues by squaring the standard deviations per principal component stored by Seurat following PCA generation. To calculate the fraction of variance explained per principal component, we divided each of our eigenvalues by the total variance, using ggplot2 to plot the fraction of variance explained for each of the first 50 principal components. To estimate how much variance could be explained by pure chance, we also ran PCA on randomized data."
+    },
+    {
+      "tag": "p",
+      "id": "P64",
+      "text": "To transduce WM989 A6-G3, WM983b E9-C6, WM3451 P2G7, WM3623 P4E7, FOM 230-1 and MDA-MB-231-D4 cells, we freshly thawed virus-laden medium on ice, added it to dissociated cells, and plated ~100,000 cells per well in a 6-well plate with ~3 ml of the medium. We then centrifuged the 6-well plate at 1,750 rpm (517 g ) for 25 min. We then incubated the 6-well plate at 37 °C and replaced the medium at ~8 h, washed with 1× DPBS, and added fresh medium (TU2% for WM989, WM983B, WM3451 and WM3623; Melanocyte Growth Media for FOM 230-1; and DMEM with 10% FBS for MDA-MB-231) to each well. After ~24 h, we passaged the cells to 10-cm dishes, at which point we typically combined 2 wells by plating them together in a 10-cm dish. For the FateMap experiments with WM989 A6-G3 melanoma cells exposed to vemurafenib, we planned to start each split with 600,000 barcoded (GFP-positive) cells. The barcoded cells (GFP-positive) were then sorted and plated for a total of 4–5 population doublings until treatment with appropriate drugs. The time to 4–5 population doubling was 11–12 days for FOM 230–1, 10–11 days for WM989, WM3451 and WM3623 6–7 days for WM983B, 5–6 days for MDA-MB-231. The volume of the virus-laden medium was decided by the titre performed on each cell line and target MOI. For scRNA-seq experiments in particular, we targeted for the MOI to be ~10–25% to minimize the fraction of cells with multiple unique barcodes. We found it to be relatively computationally challenging to differentiate multiple-barcoded cells from doublets introduced by gel beads-in-emulsions."
+    },
+    {
+      "tag": "p",
+      "id": "P65",
+      "text": "We used the 10X Genomics scRNA-seq kit v3 to sequence barcoded cells. We resuspended the cells (targeting ~10,000 cells for recovery per sample) in PBS and followed the protocol for the Chromium Next GEM Single Cell 3′ Reagent Kits v3.1 as per manufacturer directions (10X Genomics). In brief, we generated gel beads-in-emulsion (GEMs) using the 10X Chromium system, and subsequently extracted and amplified (11 cycles) barcoded cDNA as per post-GEM RT-cleanup instructions. We then used a fraction of this amplified cDNA (25%) and proceeded with fragmentation, end-repair, poly A-tailing, adapter ligation, and 10X sample indexing per the manufacturer’s protocol. We quantified libraries using the High Sensitivity dsDNA kit (Thermo Fisher Q32854 ) on Qubit 2.0 Fluorometer (Thermo Fisher Q32866 ) and Bioanalyzer 2100 (Agilent G2939BA) analysis prior to sequencing on a NextSeq 500 machine (Illumina) using 28 cycles for read 1, 55 cycles for read 2, and 8 cycles for i7 index. A subset of FateMap sequencing runs (NRAS melanoma samples and Metronomic therapy experiments), we used NextSeq 2000 (Illumina) using 26 cycles for read 1, 124 cycles for read 2, and 8 cycles for i7 index."
+    },
+    {
+      "tag": "p",
+      "id": "P70",
+      "text": "To compare bulk-sequencing data with scRNA-seq datasets, we first extracted differentially expressed genes for each scRNA-seq cluster (SNN = 0.6) using the Seurat command FindAllMarkers, and filtering for adjusted P value <0.05 and avg_logFC > 1. Similarly, we extracted differentially expressed genes for each condition of interest (morphology or invasiveness) and filtering for −1.5 < avg_logFC > 1.5. We then calculated the similarity score, which represents the normalized fraction of overlap of differentially expressed genes for the condition of interest between bulk-sequencing data and each scRNA-seq cluster."
+    },
+    {
+      "tag": "p",
+      "id": null,
+      "text": "where the MOI was estimated for our barcode lentivirus. Barcodes were represented by integer numbers from among 50 million variants of unique barcodes estimated from our lentiviral library diversity (see Methods and Supplementary Fig. 1 ). The subset of barcoded cells was assigned barcodes randomly with replacement from this library. The model simulates expanding cells prior to addition of the drug. Each cell, regardless of barcode status, undergoes a cell division procedure with 4–5 rounds depending on the experimental condition. In each round, a given cell will give rise to a number of progeny sharing the same barcode based on an estimated distribution of cell division. The model plates cells onto separate dishes or splits (total dishes or splits dependent on the experiment) by randomly assigning each cell an integer. The model simulates the formation of resistant colonies assuming a purely stochastic model of resistance. A defined fraction of cells on each plate form resistant colonies based on a resistance efficiency that was calculated as"
+    },
+    {
+      "tag": "p",
+      "id": "P86",
+      "text": "For colony counting, all image processing was done blind to the condition (either drug type or dose, or with or without DOT1L inhibition). The wells (within the 6-well plates) were pseudo-named in a format independent from drug or dose. Nikon-generated nd2 files were first parsed using custom MATLAB scripts (rajlabformattools) to convert them from nd2 format to tiff format (see Code availability ). Images for each well were then stitched using custom MATLAB code and the number of cells in each well was counted using custom MATLAB code with a Gaussian filter consistent across samples being compared (colonycounting_v2). Colonies within each well were manually segmented and MATLAB was used to calculate the total number of colonies, cells per colony, and cells outside of colonies (see Code availability ). The summary average counts for each colony is provided in Supplementary Table 10 . RNA FISH and clampFISH on tissue sections were quantified using a custom built computational pipeline, also used in other previous studies 1 , 29 ."
+    },
+    {
+      "tag": "p",
+      "id": "P88",
+      "text": "We estimated the frequency of drug resistance in MDA-MB-231-D4 by computing the fraction of surviving barcoded colonies upon treatment with paclitaxel as compared to the total number of uniquely barcoded cells in the initial population. From two separate split population experiments, we obtained the frequency to be 1:956 and 1:1,303 (see Data availability and Code availability for the script)."
+    },
+    {
+      "tag": "p",
+      "id": "P115",
+      "text": "a. (left) UMAP of all barcoded treatment-naive cells. Total 16,432 cells (8,420 split A and 8,012 cells in split B) are colored by clusters determined using Seurat’s FindClusters command at a resolution of 0.6 (i.e. “Seurat clusters, resolution = 0.6”). (right) On the UMAP, we recolored each cell by its expression for a select subset of genes that were identified as differentially expressed in drug resistant cells via the Seurat pipeline (Cell counts available in Supplementary Table 11 ). b. Five representative examples demonstrate that a clone (cells sharing the same barcode) is constrained largely in a specific transcriptional cluster such that cells within a clone are more transcriptionally similar to each other than cells in other clones. c. Average pairwise correlation between cells within a clone was estimated based on the expression levels of the top 500 most variable genes. Each point represents the average value for Spearman’s correlation coefficient for all possible pairs of cells within a clone. For each clone, a paired control was created by randomly sampling an equivalent number of cells from the entire population. Higher average correlation coefficient in clones indicates higher transcriptional similarity among cells within a clone, as compared to cells that are not clones. Wilcoxon signed rank exact test (paired, two-sided) was used to compare the difference in average correlation coefficient. d. Fraction of variance explained by the experimental data and randomized data for the top 50 principal components (PCs). The number of PCs needed to explain the actual variance in data (indicated by the dotted line) is a measure of the degrees of freedom of variability of a given dataset. There was an increase (see Extended Data Fig. 1e for statistical testing) in the number of PCs needed to explain the variance in data from resistant cells (43 PCs) as compared to naive (30 PCs) and primed cells (23 PCs), suggesting that there is an increase in overall variability in samples when cells transition to becoming drug resistant. Primed cells were identified as cells where at least 40% of pre-resistant markers identified in (Emert et al. 2021) are higher than their average expression level. e. Average number of PCs needed to explain the variance in resistant, naive and pre-resistant cells. Error bars represent standard deviation over 100 simulations of randomized data. Mann-Whitney U-Test was used to estimate a p-value for pairwise difference in means. f. Comparison of Euclidean distances between clusters across resistant and naive populations of melanoma cells for varying numbers of clusters. We used the first 50 principal components to calculate the Euclidean distance between cells across clusters. We used Wilcoxon signed rank exact test (paired, two-sided) for statistical comparisons. g. Comparison between resistant and naive populations for total number of clusters, given fixed number of cells and shared nearest neighbor (snn) resolution. We used Wilcoxon signed rank exact test (paired, two-sided) for statistical comparisons of average number of clusters across resolutions. h. UMAPs of representative twin clones (sharing the same barcode) across the two splits A and B. The twins largely end up with the same transcriptional fate. This observation suggests that cells have similar transcriptional states prior to drug treatment."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "a. (left) UMAP of all barcoded treatment-naive cells. Total 16,432 cells (8,420 split A and 8,012 cells in split B) are colored by clusters determined using Seurat’s FindClusters command at a resolution of 0.6 (i.e. “Seurat clusters, resolution = 0.6”). (right) On the UMAP, we recolored each cell by its expression for a select subset of genes that were identified as differentially expressed in drug resistant cells via the Seurat pipeline (Cell counts available in Supplementary Table 11 ). b. Five representative examples demonstrate that a clone (cells sharing the same barcode) is constrained largely in a specific transcriptional cluster such that cells within a clone are more transcriptionally similar to each other than cells in other clones. c. Average pairwise correlation between cells within a clone was estimated based on the expression levels of the top 500 most variable genes. Each point represents the average value for Spearman’s correlation coefficient for all possible pairs of cells within a clone. For each clone, a paired control was created by randomly sampling an equivalent number of cells from the entire population. Higher average correlation coefficient in clones indicates higher transcriptional similarity among cells within a clone, as compared to cells that are not clones. Wilcoxon signed rank exact test (paired, two-sided) was used to compare the difference in average correlation coefficient. d. Fraction of variance explained by the experimental data and randomized data for the top 50 principal components (PCs). The number of PCs needed to explain the actual variance in data (indicated by the dotted line) is a measure of the degrees of freedom of variability of a given dataset. There was an increase (see Extended Data Fig. 1e for statistical testing) in the number of PCs needed to explain the variance in data from resistant cells (43 PCs) as compared to naive (30 PCs) and primed cells (23 PCs), suggesting that there is an increase in overall variability in samples when cells transition to becoming drug resistant. Primed cells were identified as cells where at least 40% of pre-resistant markers identified in (Emert et al. 2021) are higher than their average expression level. e. Average number of PCs needed to explain the variance in resistant, naive and pre-resistant cells. Error bars represent standard deviation over 100 simulations of randomized data. Mann-Whitney U-Test was used to estimate a p-value for pairwise difference in means. f. Comparison of Euclidean distances between clusters across resistant and naive populations of melanoma cells for varying numbers of clusters. We used the first 50 principal components to calculate the Euclidean distance between cells across clusters. We used Wilcoxon signed rank exact test (paired, two-sided) for statistical comparisons. g. Comparison between resistant and naive populations for total number of clusters, given fixed number of cells and shared nearest neighbor (snn) resolution. We used Wilcoxon signed rank exact test (paired, two-sided) for statistical comparisons of average number of clusters across resolutions. h. UMAPs of representative twin clones (sharing the same barcode) across the two splits A and B. The twins largely end up with the same transcriptional fate. This observation suggests that cells have similar transcriptional states prior to drug treatment."
+    },
+    {
+      "tag": "p",
+      "id": "P118",
+      "text": "a. (left) For another single-cell derived melanoma cell line WM983B E9-C6, we traced representative resistant cells in Adobe Illustrator and created cartoon schematics based on visual inspection of orientation and density. (right) Brightfield images of resistant colonies exhibiting different types of morphologies. b. We applied the Uniform Manifold Approximation and Projection (UMAP) algorithm within Seurat to the first 50 principal components to visualize differences in gene expression. Cells are colored by clusters determined using Seurat’s FindClusters command at a resolution of 0.5 (i.e. “Seurat clusters, resolution = 0.5”) (13,869 and 11,249 total cells respectively for split A and B). c. On the UMAP, we recolored each cell by its expression for a select subset of genes that were identified as differentially expressed via the Seurat pipeline and marked different clusters. MLANA , which marks melanocytes, is found largely in clusters 1,3, and 5; IFIT2 , which marks type-1 interferon signaling, is found largely in cluster 4; NGFR , which marks neural crest cells, is found largely in cluster 2 and 4; AXL , which is a canonical resistance marker, is found largely in cluster 5 and 7. d. Six examples to demonstrate that a clone (cells sharing the same barcode) is constrained largely in a specific transcriptional cluster such that cells within a clone are more transcriptionally similar to each other than cells in other clones. Some clones are larger in size than others, and some exist as singletons, meaning they survive vemurafenib treatment but do not necessarily divide while exposed to the drug. e. We quantified the preference for a specific cluster across all barcode clones (clone size>4). Specifically, we calculated the fraction of dominant clusters for each clone and found it to be significantly higher (Wilcoxon test, two-sided, unpaired, p-value = 1.49e-15) than that for randomly selected cells. The analysis plotted here is for a cluster resolution of 0.5. f. Painting of singletons and colonies onto the UMAP demonstrated that singletons and colonies belonged to distinct regions and clusters. g. UMAPs of representative twin clones (sharing the same barcode) across the two splits A and B. The twins largely end up with the same transcriptional fate type, invariant of the clone size. This observation suggests that cells are predestined for distinct resistant fate types upon exposure to vemurafenib. h. NRAS mutant cell line WM3623 treated with three different doses of trametinib (10 nM, 20 nM, and 40 nM). Representative brightfield images after 2.5 and 5 weeks of drug treatment are shown for each dose. i. (left) UMAP of all barcoded 3623 cell line cells treated with Trametinib. 6,397 cells are colored by clusters determined using Seurat’s FindClusters command at a resolution of 0.6 (i.e. “Seurat clusters, resolution = 0.6”). (right) On the UMAP, we recolored each cell by its expression for a select subset of genes that were identified as differentially expressed in drug resistant cells via the Seurat pipeline. j. On the UMAP, we recolored each cell by its expression for a select subset of genes that were identified as differentially expressed in drug resistant cells via the Seurat pipeline. k. Five representative examples demonstrate that a clone (cells sharing the same barcode) is constrained largely in a specific transcriptional cluster such that cells within a clone are more transcriptionally similar to each other than cells in other clones. l. UMAPs of representative twin clones (sharing the same barcode) across the two splits A (6,397 cells) and B (7,538 cells). The twins largely end up with the same transcriptional fate type. This observation suggests that drug resistant cells are derived from the same clones having similar transcriptional states and are constrained in the gene expression space. One of the clones appears to be a dominant clone and gives rise to a large fraction of sequenced cells."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "a. (left) For another single-cell derived melanoma cell line WM983B E9-C6, we traced representative resistant cells in Adobe Illustrator and created cartoon schematics based on visual inspection of orientation and density. (right) Brightfield images of resistant colonies exhibiting different types of morphologies. b. We applied the Uniform Manifold Approximation and Projection (UMAP) algorithm within Seurat to the first 50 principal components to visualize differences in gene expression. Cells are colored by clusters determined using Seurat’s FindClusters command at a resolution of 0.5 (i.e. “Seurat clusters, resolution = 0.5”) (13,869 and 11,249 total cells respectively for split A and B). c. On the UMAP, we recolored each cell by its expression for a select subset of genes that were identified as differentially expressed via the Seurat pipeline and marked different clusters. MLANA , which marks melanocytes, is found largely in clusters 1,3, and 5; IFIT2 , which marks type-1 interferon signaling, is found largely in cluster 4; NGFR , which marks neural crest cells, is found largely in cluster 2 and 4; AXL , which is a canonical resistance marker, is found largely in cluster 5 and 7. d. Six examples to demonstrate that a clone (cells sharing the same barcode) is constrained largely in a specific transcriptional cluster such that cells within a clone are more transcriptionally similar to each other than cells in other clones. Some clones are larger in size than others, and some exist as singletons, meaning they survive vemurafenib treatment but do not necessarily divide while exposed to the drug. e. We quantified the preference for a specific cluster across all barcode clones (clone size>4). Specifically, we calculated the fraction of dominant clusters for each clone and found it to be significantly higher (Wilcoxon test, two-sided, unpaired, p-value = 1.49e-15) than that for randomly selected cells. The analysis plotted here is for a cluster resolution of 0.5. f. Painting of singletons and colonies onto the UMAP demonstrated that singletons and colonies belonged to distinct regions and clusters. g. UMAPs of representative twin clones (sharing the same barcode) across the two splits A and B. The twins largely end up with the same transcriptional fate type, invariant of the clone size. This observation suggests that cells are predestined for distinct resistant fate types upon exposure to vemurafenib. h. NRAS mutant cell line WM3623 treated with three different doses of trametinib (10 nM, 20 nM, and 40 nM). Representative brightfield images after 2.5 and 5 weeks of drug treatment are shown for each dose. i. (left) UMAP of all barcoded 3623 cell line cells treated with Trametinib. 6,397 cells are colored by clusters determined using Seurat’s FindClusters command at a resolution of 0.6 (i.e. “Seurat clusters, resolution = 0.6”). (right) On the UMAP, we recolored each cell by its expression for a select subset of genes that were identified as differentially expressed in drug resistant cells via the Seurat pipeline. j. On the UMAP, we recolored each cell by its expression for a select subset of genes that were identified as differentially expressed in drug resistant cells via the Seurat pipeline. k. Five representative examples demonstrate that a clone (cells sharing the same barcode) is constrained largely in a specific transcriptional cluster such that cells within a clone are more transcriptionally similar to each other than cells in other clones. l. UMAPs of representative twin clones (sharing the same barcode) across the two splits A (6,397 cells) and B (7,538 cells). The twins largely end up with the same transcriptional fate type. This observation suggests that drug resistant cells are derived from the same clones having similar transcriptional states and are constrained in the gene expression space. One of the clones appears to be a dominant clone and gives rise to a large fraction of sequenced cells."
+    },
+    {
+      "tag": "p",
+      "id": "P121",
+      "text": "a. Nuclei scans (DAPI-stained) of resistant colonies emerging from treatment of the single-cell derived triple negative breast cancer cell line MDA-MB-231-D4 with 1nM paclitaxel. b. For the MDA-MB-231-D4 cell line, we traced representative resistant cells in Adobe Illustrator and created cartoon schematics based on visual inspection of orientation and density. c. Brightfield images of resistant colonies exhibiting different types of morphologies. d. We applied the Uniform Manifold Approximation and Projection (UMAP) algorithm within Seurat to the first 50 principal components to visualize differences in gene expression. 6,535 cells are colored by clusters determined using Seurat’s FindClusters command (“Seurat clusters, resolution = 0.5”). e. We observed silencing of the transcribed barcodes in a subset of colonies, as revealed by epifluorescence imaging of the GFP signal. The colony on the left is strongly expressing a GFP signal while the colony on the right has a very dim GFP signal. f. Cells with assigned barcodes were evenly distributed throughout the UMAP with no clear bias for any specific resistant fate types. g. Four examples from split A (6,535 cells) demonstrate that a clone is constrained largely in specific UMAP regions such that cells within a clone are more transcriptionally similar to each other than cells in other clones. h. Four examples from split B (8,745 cells) demonstrate that a clone is constrained largely in specific UMAP regions such that cells within a clone are more transcriptionally similar to each other than cells in other clones. i. We quantified the preference for a specific cluster across all barcode clones (clone size>4). Specifically, we calculated the fraction of dominant clusters for each clone and found it to be significantly higher (Wilcoxon, unpaired, two-sided) than that for randomly selected cells. The analysis plotted here is for a cluster resolution of 0.5. j. We found that our UMAP had superclusters defined by cell cycle (S, G1, G2M). Of the 3,720 clonal DEGs, 63 are cell cycle genes. We therefore regressed out cell cycle genes and the cell-cycle-genes-regressed data with UMAP. k. We quantified the preference for a specific cluster across all barcode clones after cell cycle regression (clone size>4). Specifically, we calculated the fraction of dominant clusters for each clone and found it to be significantly higher (Wilcoxon, unpaired, two-sided) than that for randomly selected cells. The analysis plotted here is for a cluster resolution of 0.5. l. UMAPs of representative twin clones across the two splits A and B. The twins largely end up with the same transcriptional fate type, invariant of the clone size. This observation suggests that cells are predestined for distinct resistant fate types upon exposure to chemotherapy drug paclitaxel."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "a. Nuclei scans (DAPI-stained) of resistant colonies emerging from treatment of the single-cell derived triple negative breast cancer cell line MDA-MB-231-D4 with 1nM paclitaxel. b. For the MDA-MB-231-D4 cell line, we traced representative resistant cells in Adobe Illustrator and created cartoon schematics based on visual inspection of orientation and density. c. Brightfield images of resistant colonies exhibiting different types of morphologies. d. We applied the Uniform Manifold Approximation and Projection (UMAP) algorithm within Seurat to the first 50 principal components to visualize differences in gene expression. 6,535 cells are colored by clusters determined using Seurat’s FindClusters command (“Seurat clusters, resolution = 0.5”). e. We observed silencing of the transcribed barcodes in a subset of colonies, as revealed by epifluorescence imaging of the GFP signal. The colony on the left is strongly expressing a GFP signal while the colony on the right has a very dim GFP signal. f. Cells with assigned barcodes were evenly distributed throughout the UMAP with no clear bias for any specific resistant fate types. g. Four examples from split A (6,535 cells) demonstrate that a clone is constrained largely in specific UMAP regions such that cells within a clone are more transcriptionally similar to each other than cells in other clones. h. Four examples from split B (8,745 cells) demonstrate that a clone is constrained largely in specific UMAP regions such that cells within a clone are more transcriptionally similar to each other than cells in other clones. i. We quantified the preference for a specific cluster across all barcode clones (clone size>4). Specifically, we calculated the fraction of dominant clusters for each clone and found it to be significantly higher (Wilcoxon, unpaired, two-sided) than that for randomly selected cells. The analysis plotted here is for a cluster resolution of 0.5. j. We found that our UMAP had superclusters defined by cell cycle (S, G1, G2M). Of the 3,720 clonal DEGs, 63 are cell cycle genes. We therefore regressed out cell cycle genes and the cell-cycle-genes-regressed data with UMAP. k. We quantified the preference for a specific cluster across all barcode clones after cell cycle regression (clone size>4). Specifically, we calculated the fraction of dominant clusters for each clone and found it to be significantly higher (Wilcoxon, unpaired, two-sided) than that for randomly selected cells. The analysis plotted here is for a cluster resolution of 0.5. l. UMAPs of representative twin clones across the two splits A and B. The twins largely end up with the same transcriptional fate type, invariant of the clone size. This observation suggests that cells are predestined for distinct resistant fate types upon exposure to chemotherapy drug paclitaxel."
+    },
+    {
+      "tag": "p",
+      "id": "P124",
+      "text": "a. For each barcode identified by sequencing, we plotted its abundance in corresponding splits A (DMSO control) and B (DOT1L inhibition). Those present in both control and DOT1L splits are colored in dark blue, and those present only in either A (control) and B (DOT1L) are colored in cyan. Those present in both (dark blue; 171) exhibited a strong correlation, suggesting that their ability to survive and become resistant is invariant of drug dose. For those present only in either (cyan), we found them to be much more abundant in DOT1L (B, 43 barcodes) than DMSO control (A, 7 barcodes), suggesting that new barcodes, otherwise unable to survive in the control condition, become drug-resistant in the DOT1L inhibited condition. A total of one biological replicate. b. (left) Combined resistant cells in the control (9,343 cells) and DOT1L (7,044 cells) conditions obtained from UMAP applied to the first 50 principal components. Cells are colored by clusters determined using Seurat’s FindClusters command(“Seurat clusters, resolution = 0.8”). (right) UMAP is split by each condition. c. UMAP where the resistant cells are colored by the associated condition (control vs DOT1L). The arrow represents the UMAP region present predominantly in the control region and missing from the DOT1L-associated UMAP region. d. Quantification of singletons and colonies showed that while the number of resistant colonies is higher in DOT1L, it is accompanied by a reduced number of singletons cells compared to control. e. Painting of singletons and colonies onto the UMAP, colored by the condition, demonstrated that singletons largely belong to the control condition and are present predominantly in cluster 2 ( MLANA -high). Colonies are dispersed more across the UMAP with no particular region enriched for either condition. f. Imaging of the nuclei (DAPI-stained) of resistant colonies emerging from vemurafenib treatment of WM989 A6-G3 cells, either for control or cells lacking DOT1L. g. Quantification of the total number of colonies and singletons from each fate type across n = 3 biological replicates demonstrated a relative increase (3.65-fold; n = 3 biological replicates) in total colonies and reduction in total singletons in the DOT1L and control conditions, respectively. Error bars represent standard error of the mean. h. UMAP is recolored for each cell by its expression for the gene MLANA , a marker for cluster 2, which is relatively enriched in control (as shown with an arrow). i. A pie chart to demonstrate that of all the clones (barcodes) present in the control condition split, only 3.1% were also present in the DOT1L inhibitor pretreatment split. j. Two representative examples of UMAP regions where twins from the MLAN A-high cluster in the control condition go in the DOT1L condition. A cumulative density contour plot capturing the types of fate switches that MLANA -high cluster clones from control adopt in the DOT1L inhibitor-pretreated condition. k. A cumulative density contour plot capturing the types of fate switches that the MLANA -high cluster 2 clones from the control condition split adopt in the DOT1L inhibitor pretreatment split. l. Distribution of cells across clusters for control (top) and DOT1L inhibitor-pretreated (bottom) conditions for clone size>2."
+    },
+    {
+      "tag": "figcaption",
+      "id": null,
+      "text": "a. For each barcode identified by sequencing, we plotted its abundance in corresponding splits A (DMSO control) and B (DOT1L inhibition). Those present in both control and DOT1L splits are colored in dark blue, and those present only in either A (control) and B (DOT1L) are colored in cyan. Those present in both (dark blue; 171) exhibited a strong correlation, suggesting that their ability to survive and become resistant is invariant of drug dose. For those present only in either (cyan), we found them to be much more abundant in DOT1L (B, 43 barcodes) than DMSO control (A, 7 barcodes), suggesting that new barcodes, otherwise unable to survive in the control condition, become drug-resistant in the DOT1L inhibited condition. A total of one biological replicate. b. (left) Combined resistant cells in the control (9,343 cells) and DOT1L (7,044 cells) conditions obtained from UMAP applied to the first 50 principal components. Cells are colored by clusters determined using Seurat’s FindClusters command(“Seurat clusters, resolution = 0.8”). (right) UMAP is split by each condition. c. UMAP where the resistant cells are colored by the associated condition (control vs DOT1L). The arrow represents the UMAP region present predominantly in the control region and missing from the DOT1L-associated UMAP region. d. Quantification of singletons and colonies showed that while the number of resistant colonies is higher in DOT1L, it is accompanied by a reduced number of singletons cells compared to control. e. Painting of singletons and colonies onto the UMAP, colored by the condition, demonstrated that singletons largely belong to the control condition and are present predominantly in cluster 2 ( MLANA -high). Colonies are dispersed more across the UMAP with no particular region enriched for either condition. f. Imaging of the nuclei (DAPI-stained) of resistant colonies emerging from vemurafenib treatment of WM989 A6-G3 cells, either for control or cells lacking DOT1L. g. Quantification of the total number of colonies and singletons from each fate type across n = 3 biological replicates demonstrated a relative increase (3.65-fold; n = 3 biological replicates) in total colonies and reduction in total singletons in the DOT1L and control conditions, respectively. Error bars represent standard error of the mean. h. UMAP is recolored for each cell by its expression for the gene MLANA , a marker for cluster 2, which is relatively enriched in control (as shown with an arrow). i. A pie chart to demonstrate that of all the clones (barcodes) present in the control condition split, only 3.1% were also present in the DOT1L inhibitor pretreatment split. j. Two representative examples of UMAP regions where twins from the MLAN A-high cluster in the control condition go in the DOT1L condition. A cumulative density contour plot capturing the types of fate switches that MLANA -high cluster clones from control adopt in the DOT1L inhibitor-pretreated condition. k. A cumulative density contour plot capturing the types of fate switches that the MLANA -high cluster 2 clones from the control condition split adopt in the DOT1L inhibitor pretreatment split. l. Distribution of cells across clusters for control (top) and DOT1L inhibitor-pretreated (bottom) conditions for clone size>2."
+    }
+  ],
+  "links": [
+    {
+      "tag": "a",
+      "id": null,
+      "text": "",
+      "href": "https://doi.org/10.1038/s41586-023-06342-8"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "10.1038/s41586-023-06342-8",
+      "href": "https://doi.org/10.1038/s41586-023-06342-8"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Nature",
+      "href": "https://doi.org/10.1038/s41586-023-06342-8"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Video 1",
+      "href": "#SD3"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 1",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 1",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Discussion",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Video 1",
+      "href": "#SD3"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 2",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Discussion and Methods",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 3",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 1",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 3",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Figs. 1",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 1",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 3",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Figs. 3",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Discussion",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 2",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 5",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 6",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 6",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Table 4",
+      "href": "#SD2"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Discussion",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 7",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 11",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 8",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 9",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 9",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 10",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 8",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 11",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Figs. 11",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 14",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Table 11",
+      "href": "#SD2"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 6g",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 14",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 15",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Videos 1",
+      "href": "#SD3"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Figs. 13a",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 15",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 15",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Table 11",
+      "href": "#SD2"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 15",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 15",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Table 8",
+      "href": "#SD2"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 15",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 15",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 16",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Discussion",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Videos 1",
+      "href": "#SD3"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Discussion",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 17",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Table 9",
+      "href": "#SD2"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Table 3",
+      "href": "#SD2"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Table 1",
+      "href": "#SD2"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 1",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 6",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 3",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Table 11",
+      "href": "#SD2"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Table 4",
+      "href": "#SD2"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 14",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Table 2",
+      "href": "#SD2"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 2",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Table 6",
+      "href": "#SD2"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Table 7",
+      "href": "#SD2"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 15",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Fig. 1",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Figs. 12",
+      "href": "#SD1"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Table 5",
+      "href": "#SD2"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Table 10",
+      "href": "#SD2"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Table 11",
+      "href": "#SD2"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Supplementary Table 11",
+      "href": "#SD2"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "NIHMS1937493-supplement-Supplementary_Figures.docx",
+      "href": "/articles/instance/10628994/bin/NIHMS1937493-supplement-Supplementary_Figures.docx"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "NIHMS1937493-supplement-Supplementary_Tables.xlsx",
+      "href": "/articles/instance/10628994/bin/NIHMS1937493-supplement-Supplementary_Tables.xlsx"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Download video file",
+      "href": "/articles/instance/10628994/bin/NIHMS1937493-supplement-Supplementary_Video_1.avi"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Download video file",
+      "href": "/articles/instance/10628994/bin/NIHMS1937493-supplement-Supplementary_Video_2.avi"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Download video file",
+      "href": "/articles/instance/10628994/bin/NIHMS1937493-supplement-Supplementary_Video_3.avi"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "https://doi.org/10.1038/s41586-023-06342-8",
+      "href": "https://doi.org/10.1038/s41586-023-06342-8"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "https://doi.org/10.1038/s41586-023-06342-8",
+      "href": "https://doi.org/10.1038/s41586-023-06342-8"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "NIHMS1937493-supplement-Supplementary_Figures.docx",
+      "href": "/articles/instance/10628994/bin/NIHMS1937493-supplement-Supplementary_Figures.docx"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "NIHMS1937493-supplement-Supplementary_Tables.xlsx",
+      "href": "/articles/instance/10628994/bin/NIHMS1937493-supplement-Supplementary_Tables.xlsx"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Download video file",
+      "href": "/articles/instance/10628994/bin/NIHMS1937493-supplement-Supplementary_Video_1.avi"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Download video file",
+      "href": "/articles/instance/10628994/bin/NIHMS1937493-supplement-Supplementary_Video_2.avi"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "Download video file",
+      "href": "/articles/instance/10628994/bin/NIHMS1937493-supplement-Supplementary_Video_3.avi"
+    },
+    {
+      "tag": "a",
+      "id": null,
+      "text": "View on publisher site",
+      "href": "https://doi.org/10.1038/s41586-023-06342-8"
+    }
+  ],
+  "figshare_metadata": {
+    "files": [
+      {
+        "id": 40540232,
+        "name": "gDNA_Barcodes.zip",
+        "size": 4470721017,
+        "is_link_only": false,
+        "download_url": "https://ndownloader.figshare.com/files/40540232",
+        "supplied_md5": "c4c27a7653800c0f3eddba88066ef0c1",
+        "computed_md5": "c4c27a7653800c0f3eddba88066ef0c1",
+        "mimetype": "application/zip"
+      },
+      {
+        "id": 40543547,
+        "name": "Processed_gDNA_BarcodeData.zip",
+        "size": 472449091,
+        "is_link_only": false,
+        "download_url": "https://ndownloader.figshare.com/files/40543547",
+        "supplied_md5": "db4fe8c78841626135b1395307d20601",
+        "computed_md5": "db4fe8c78841626135b1395307d20601",
+        "mimetype": "application/zip"
+      }
+    ],
+    "folder_structure": {},
+    "authors": [
+      {
+        "id": 15454082,
+        "full_name": "Yogesh Goyal",
+        "first_name": "Yogesh",
+        "last_name": "Goyal",
+        "is_active": true,
+        "url_name": "Yogesh_Goyal",
+        "orcid_id": ""
+      },
+      {
+        "id": 439848,
+        "full_name": "Arjun Raj",
+        "first_name": "Arjun",
+        "last_name": "Raj",
+        "is_active": true,
+        "url_name": "Arjun_Raj",
+        "orcid_id": ""
+      }
+    ],
+    "custom_fields": [],
+    "figshare_url": "https://figshare.com/articles/dataset/FateMap_Paper_datasets_3_Goyal_et_al_2021_Biorxiv_/22806494",
+    "download_disabled": false,
+    "description": "<p>Datasets from: https://www.biorxiv.org/content/10.1101/2021.12.08.471833v1.full</p>\n<p><br></p>\n<p>All gDNA barcode sequencing datasets, both raw fastq files and processed data.</p>\n<p><br></p>",
+    "funding": null,
+    "funding_list": [],
+    "version": 1,
+    "status": "public",
+    "size": 4943170108,
+    "created_date": "2023-05-11T21:59:20Z",
+    "modified_date": "2023-06-02T10:38:25Z",
+    "is_public": true,
+    "is_confidential": false,
+    "is_metadata_record": false,
+    "confidential_reason": "",
+    "metadata_reason": "",
+    "license": {
+      "value": 1,
+      "name": "CC BY 4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "tags": [
+      "cancer",
+      "gDNA",
+      "library",
+      "systems biology"
+    ],
+    "keywords": [
+      "cancer",
+      "gDNA",
+      "library",
+      "systems biology"
+    ],
+    "categories": [
+      {
+        "id": 24199,
+        "title": "Sequence analysis",
+        "parent_id": 24181,
+        "path": "/24130/24181/24199",
+        "source_id": "310206",
+        "taxonomy_id": 100
+      }
+    ],
+    "references": [
+      "https://www.biorxiv.org/content/10.1101/2021.12.08.471833v1.full"
+    ],
+    "has_linked_file": false,
+    "citation": "Goyal, Yogesh; Raj, Arjun (2023). FateMap Paper datasets #3 (Goyal et al., 2021, Biorxiv). figshare. Dataset. https://doi.org/10.6084/m9.figshare.22806494.v1",
+    "related_materials": [
+      {
+        "id": 28894973,
+        "identifier": "https://www.biorxiv.org/content/10.1101/2021.12.08.471833v1.full",
+        "title": "",
+        "relation": "References",
+        "identifier_type": "URL",
+        "is_linkout": false,
+        "link": "https://www.biorxiv.org/content/10.1101/2021.12.08.471833v1.full"
+      }
+    ],
+    "is_embargoed": false,
+    "embargo_date": null,
+    "embargo_type": null,
+    "embargo_title": "",
+    "embargo_reason": "",
+    "embargo_options": [],
+    "id": 22806494,
+    "title": "FateMap Paper datasets #3 (Goyal et al., 2021, Biorxiv)",
+    "doi": "10.6084/m9.figshare.22806494.v1",
+    "handle": "",
+    "url": "https://api.figshare.com/v2/articles/22806494",
+    "published_date": "2023-05-11T21:59:20Z",
+    "thumb": "",
+    "defined_type": 3,
+    "defined_type_name": "dataset",
+    "group_id": null,
+    "url_private_api": "https://api.figshare.com/v2/account/articles/22806494",
+    "url_public_api": "https://api.figshare.com/v2/articles/22806494",
+    "url_private_html": "https://figshare.com/account/articles/22806494",
+    "url_public_html": "https://figshare.com/articles/dataset/FateMap_Paper_datasets_3_Goyal_et_al_2021_Biorxiv_/22806494",
+    "timeline": {
+      "posted": "2023-05-11T21:59:20",
+      "firstOnline": "2023-05-11"
+    },
+    "resource_title": null,
+    "resource_doi": null
+  }
+}

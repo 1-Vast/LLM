@@ -1,0 +1,23 @@
+# Actual post-pilot result cross-examination
+
+Source sealed RESULT_REVIEW.md before reading peer result reviews. Source's audit scope is scalar results/receipt interpretation; it does not claim prediction-array or checkpoint replication. Subsequent exchanges with both peers were actual reciprocal messages. No new fit, biological label read, checkpoint probe, or tuning was added by source.
+
+## Constructive exchange
+
+Source asked whether reduced order sensitivity could simply reflect reduced step size/amplitude, and whether 120-step undertraining or set-model parameterization explained apparent differences. Constructive agreed these are unverified alternatives. Its NumPy checkpoint-forward reconstruction does not establish the training dynamics or a causal step-size explanation. The predeclared fixed budget still determines this pilot's outcome; possible undertraining limits extrapolation to the entire family but does not cancel the stop. Both agreed on no gamma, seed, support or width expansion.
+
+Constructive noted covariance has more parameters and cannot establish capacity-matched superiority over every model. Source agreed; more importantly, consistent loses MSE in all seeds to its same-parameter, same-initialization, same-episode augmented comparator, independently failing the frozen joint requirement. Source challenged the scope of constructive's audit: nine updater checkpoints/27 forward views are not independent retraining, all training-gradient history, the set model's full implementation, or authentication of biological measurements. Constructive explicitly accepted these distinctions; set results were checked from saved predictions, not independently reimplemented as a checkpoint-forward computation.
+
+Constructive asked whether covariance's positive could be selection/missingness-dependent rather than universal feedback information value. Source agreed on the population/panel limitation and initially narrowed wording to program-versus-mean performance. Parent then supplied the sharper exact zero-innovation identity: at the same support set and query mask, setting standardized observed support to source expectation zS=0 yields the source mean. Source independently accepted this by symbolic substitution and sealed COVARIANCE_SCOPE_ADDENDUM.md, then relayed it to constructive. Therefore the observed 23.49%/15.07% improvement is legitimately algorithm-specific predictive utility of the **numerical support deviations** in this replay. It is not causal value of purchasing/measuring assays or a universal biological mechanism. It cannot all be attributed to a changed mask, since the comparison can hold the mask fixed.
+
+## Critic exchange
+
+Source explicitly asked about step/amplitude shrinkage, finite training, raw-AUC concentration differences, fixed-source exposure, and the ordinary covariance positive. Critic confirmed the independent saved-prediction audit, the 0/3 joint gate, and covariance's superiority in both metrics. It rejected treating shrinkage or undertraining as established explanations; they remain competing hypotheses and do not justify tuning. Source accepted and confirmed these were already labeled unverified in its review.
+
+Critic confirmed raw AUC shortlist regret is restricted to the fixed unpurchased query panel/availability mechanism, not clinical efficacy or comparable pharmacological potency across different dose ranges. It accepted the exact covariance zero-innovation identity and the scoped numerical-support utility; neither causal measurement value nor a pure-mask explanation is licensed. Source accepted all these restrictions and explicitly separated critic's array audit from source's scalar review. Both agreed there is no need for another diagnostic or fit to decide the frozen stop.
+
+## Decision and unresolved explanations
+
+All three positions support **STOP_EXPANDING_THIS_FIXED_CONSISTENCY_CONFIGURATION**. Invariance reduction was real as a saved numeric result, but it did not produce the required robust functional gain. Ordinary conditional prediction's positive is retained with the exact fixed-replay/zero-innovation scope. No world-model, agent, inheritance, joint or improved-improver benefit follows.
+
+No substantive disagreement remains over this decision. Which training dynamics caused the functional tradeoff remains unestablished; the pilot does not distinguish shrinkage, optimization limits, representation choices, or other statistical explanations. Resolving that retrospectively is not necessary for the stated stop and no post-result parameter search is proposed. Future scientific mechanisms must supply a new concrete operation and evidence, rather than relabel this negative configuration.

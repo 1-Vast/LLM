@@ -1,0 +1,7 @@
+# ALMANAC archive acquisition and metadata scope
+
+2026-10-22. Download official linked2017growth ZIP bytes, preserving headers/redirects/status/hash. First HEAD requests server size, then one GET may obtain the archive with a700MBcap. No retries after non200/rate limit; incomplete bytes remain failure evidence. The actual aggregate compressed size may not be supplied byHEAD. This cap is a resource safeguard, not a userpermission barrier or biological inclusion criterion.
+
+Before scientificvalues: inspect ZIPdirectory and firstCSVheader ONLY; no head/data-row preview. Then a separate metadata reader may semantically access only recordID, Screener, Study, TestDate, Plate, PanelNbr, CellNbr, Prefix/NSC/Sample/ConcIndex/Conc/ConcUnit forbothdrugs, Valid, Panel andCellname. Numeric concentration and identity codes are designmetadata. Allgrowth/OD/expectedgrowth/scorefields stay uninterpreted. CSVtokenization of allfields asstrings forrowlengthvalidation is unavoidable and disclosed; do notoutputwhole rows or responsepayloads. Alloutcomefields must be blocked fromselectedmetadata/artifactoutput.
+
+Do notpromoteStudy/Plate identifiers to independent cultures or biologicalreplicates without source support. Authenticatematchedsolo/combinationlinks bydesignfields; do not assumePanelNbraloneidentifiescellline or stableNSC aloneidentifieschemicalsample. This phase qualifiesavailabledataunit/bundles only. Numericalpilotneedsseparatefrozenprotocol/split/reviews. No protectedreserve is opened, no drugresponselabelsareusedtoselectanasset/subset/method.

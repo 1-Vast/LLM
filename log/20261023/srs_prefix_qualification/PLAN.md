@@ -1,0 +1,11 @@
+# SRS early-feedback source qualification
+
+Previous turn PROGRESS: new original methods, actual cross-review and supplement-page inventory ruled out a snapshot-to-integral-control shortcut. Full goal ACTIVE / NOT_ACHIEVED, no global blocker. Do not revive old GI/count/CDK/projection leads or the failed source-agent task.
+
+Application question: can early label-free live-cell phenotype observations support useful later functional forecasting under a lawful independent experiment split? This is a possible observation contract, not an assumed novel updater. An unseen schedule, independent function assay, many biological tasks or full control-theorem assumptions must not be invented from single-cell tracks.
+
+Root checks the exact author-linked SRS supplementary PDF and public final-publisher supplement metadata, at most4logical GETs initially. Source: preprint10.1101/2025.08.02.668298v1; final metadata DOI10.1021/acs.analchem.5c04806. Preserve complete response/receipts, including access failures. PDF read-only workflow uses pdf skill with evidence/rendered pages under this log directory (user's location instruction overrides generic tmp/output conventions). No editing/publication, author contact or biological endpoint extraction. Movie rendering/reconstruction is not a substitute for missing original grouping/labels.
+
+Constructive and critic independently specify legal prefix tasks and strongest simpler competitors using cached primary evidence before peer conclusions, seal reports and then cross against root's acquired source. These are two review roles; source-role platform failure from the predecessor is not retried or counted as a completed third review.
+
+Stop the specific asset route if author-linked resources do not presently authenticate machine-readable trajectories plus required independent groups/outcomes. State the scope of unavailable versus uninspected material precisely. If those resources do authenticate a bounded task, prospectively define its endpoint, groups, source/support/query masks, common input/compute budget and fixed success/stop rule before numerical casting. No count/feature outcome fit follows automatically; a distinct mechanism still needs opposing novelty/simplicity review.
