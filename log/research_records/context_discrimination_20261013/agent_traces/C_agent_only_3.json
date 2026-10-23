@@ -1,0 +1,164 @@
+{
+  "arm": "C_agent_only",
+  "batch": 3,
+  "indices": [
+    161,
+    48,
+    526,
+    68,
+    279,
+    513,
+    386
+  ],
+  "second": [
+    6,
+    3,
+    3,
+    6,
+    6,
+    6,
+    6
+  ],
+  "fallbacks": [],
+  "initial": {
+    "key": "29d828e4f6c7d40585ddda430c8c14d92b41aa8a5b893d00af907df1f8b4e9cf",
+    "object": {
+      "hypotheses": [
+        {
+          "id": "H1",
+          "text": "Second-line activity is driven by lineage-specific target dependence: AR/androgen-axis compounds (ASC-J9, LXR-623) should differ most in PC3 (AR-) vs MCF7 (ER+), while BTK/MTOR/PI3K compounds differ in hematopoietic-like or PI3K-addicted lines.",
+          "predicts": "line-dependent activity labels track annotated target expression"
+        },
+        {
+          "id": "H2",
+          "text": "Second-line activity is dominated by shared systematic response and vehicle-norm threshold effects, so most compounds show concordant labels across lines regardless of target or tissue.",
+          "predicts": "high cross-line label concordance, weak target-line association"
+        }
+      ],
+      "evidence_gaps": [
+        "No measured target expression or dependency data per line",
+        "No dose-response or vehicle-threshold values",
+        "Repurposing Hub/MAP annotations are weaker than measured responses (S4)",
+        "Activity is vehicle-norm threshold, not viability (S5)",
+        "Transfer coverage and source choice effects unquantified (S1, S2)",
+        "Database verification supports descriptions, not causal proof (S3)"
+      ],
+      "memory": "Batch: 7 compounds, first line A375 fixed. Need one different second line each. Competing: lineage-specific target dependence vs shared systematic response. Discriminating observation: whether AR-axis compounds (ASC-J9, LXR-623) diverge in PC3 vs MCF7 while BTK/MTOR compounds do not. Do not claim viability or causality."
+    },
+    "error": null,
+    "usage": {
+      "prompt_tokens": 1158,
+      "completion_tokens": 327,
+      "total_tokens": 1485,
+      "prompt_cache_hit_tokens": 128,
+      "prompt_cache_miss_tokens": 1030,
+      "model": "deepseek-flash"
+    }
+  },
+  "revision": {
+    "key": "3c776cfc589c97c3de064d9785f71420e225b9b00b281426ad209e186d8dbb53",
+    "object": {
+      "choices": [
+        {
+          "id": "161",
+          "line": "YAPC",
+          "reason": "Lowest empirical and neighbour activity probability; inactive first line, seek discordant label.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "48",
+          "line": "HT29",
+          "reason": "Lowest empirical probability; KAT6B/KAT2B not lineage-linked here.",
+          "source_ids": [
+            "S1",
+            "S4"
+          ]
+        },
+        {
+          "id": "526",
+          "line": "HT29",
+          "reason": "Lowest empirical probability; avoids high neighbour HELA/MCF7.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "68",
+          "line": "YAPC",
+          "reason": "Lowest empirical probability among candidates; AR-axis discordance test.",
+          "source_ids": [
+            "S1",
+            "S4"
+          ]
+        },
+        {
+          "id": "279",
+          "line": "YAPC",
+          "reason": "Lowest empirical probability; BTK not expected in these lines.",
+          "source_ids": [
+            "S1",
+            "S4"
+          ]
+        },
+        {
+          "id": "513",
+          "line": "YAPC",
+          "reason": "Lowest empirical probability; MTOR/PI3K discordance test.",
+          "source_ids": [
+            "S1",
+            "S4"
+          ]
+        },
+        {
+          "id": "386",
+          "line": "YAPC",
+          "reason": "Lowest empirical probability; AR/LXR discordance test.",
+          "source_ids": [
+            "S1",
+            "S4"
+          ]
+        }
+      ],
+      "revised_memory": "A375 first-line labels: active for ASC-J9 (68) and PKI-179 (513); inactive for 161, 48, 526, 279, 386. Active compounds show SQSTM1 up and KIF20A/STMN1/CDK1/CCNA2 down, consistent with stress/autophagy and cell-cycle arrest signatures, not viability. Candidate probabilities are uniformly low for inactive compounds and high for active ones, suggesting shared systematic response may dominate over lineage-specific target dependence. Chose YAPC mostly for lowest empirical probability; this tests whether low-probability lines yield discordant labels. No causal or viability claims.",
+      "unresolved": [
+        "Whether YAPC low empirical probability reflects true inactivity or sparse reference neighbours",
+        "Whether AR-axis compounds (68, 386) diverge in AR- PC3 versus MCF7",
+        "Whether active-compound signatures are target-specific or generic stress response",
+        "Whether norm_neighbour and empirical probabilities should be combined or treated separately",
+        "No measured target expression or dependency data per line"
+      ]
+    },
+    "error": null,
+    "usage": {
+      "prompt_tokens": 3501,
+      "completion_tokens": 549,
+      "total_tokens": 4050,
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 2605,
+      "model": "deepseek-flash"
+    }
+  },
+  "hits": [
+    1,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0
+  ],
+  "margin_hits": [
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0
+  ],
+  "spent_slots": 14.0
+}

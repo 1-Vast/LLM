@@ -1,0 +1,6 @@
+# Audit failures and corrections
+
+- The original final-only acquisition design had zero structural headroom against its superset comparator. Rejected before outcome conversion or freeze; replaced by an explicit two-read repeatability task. See `PRE_FREEZE_REVISIONS.md`.
+- The first metadata-only freeze exited 1 on pipe-delimited multi-anchor concentrations. No response fields were read. The schema correction excludes those out-of-scope records and is pinned in the successful freeze.
+- Initial synthetic integration tests lacked the new revision-document fixture; corrected as a test fixture error, with initial and final reports retained.
+- During independent supplementary auditing, root briefly appended the cost-sensitivity explanation to the already-hashed `SIMPLE_CONTROL_PLAN.md`. This was a root documentation error. Root removed the addition and restored the exact original bytes/hash; the supplementary receipt was never regenerated. Cost sensitivity now has a separate `COST_SENSITIVITY_PLAN.md`. The verifier retained its failed check and then passed on stable files. No frozen primary file, nomination or outcome artifact was changed by this event. Hash agreement demonstrates current binding only, not secure blinding or repaired global provenance.

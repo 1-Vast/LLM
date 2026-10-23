@@ -1,0 +1,171 @@
+{
+  "arm": "C_agent_only",
+  "batch": 7,
+  "indices": [
+    333,
+    596,
+    384,
+    63,
+    456,
+    473,
+    470
+  ],
+  "second": [
+    5,
+    6,
+    1,
+    4,
+    2,
+    6,
+    6
+  ],
+  "fallbacks": [],
+  "initial": {
+    "key": "71cdf9b4ffefcaab021b1cb0e141d6a51f3f0372599d65bf5ac1d1ddc453146e",
+    "object": {
+      "hypotheses": [
+        {
+          "id": "H1",
+          "text": "Second-line activity is driven by lineage-specific target dependence: e.g., BRD4/MYC in MCF7 for JQ1, EGFR in HT29 for osimertinib, DPP4 in HA1E for NVP-DPP728.",
+          "basis": [
+            "S1",
+            "S4"
+          ],
+          "predicts": "Line choice matching target expression/lineage yields one active and one inactive per compound."
+        },
+        {
+          "id": "H2",
+          "text": "Second-line activity is dominated by shared systematic response and vehicle-norm threshold effects, so many lines give concordant labels regardless of target.",
+          "basis": [
+            "S2",
+            "S5"
+          ],
+          "predicts": "Line choice has little effect; active/inactive split is unstable or mostly inactive."
+        }
+      ],
+      "evidence_gaps": [
+        "No measured second-line activity labels yet.",
+        "Target expression and dependence per line are not provided.",
+        "Vehicle-norm thresholds and assay batch effects unknown.",
+        "Repurposing Hub/MAP annotations are weak (S4).",
+        "No causal mechanism can be inferred from two activity labels (S3, S5)."
+      ],
+      "memory": "Batch: 7 compounds, first line A375 fixed. Need one different second line per compound to maximize compounds with one active and one inactive. Competing: lineage-specific target dependence vs shared systematic response. Key gaps: no second-line labels, target expression, threshold/batch effects. Next: observe feedback, then choose second lines that discriminate H1 vs H2."
+    },
+    "error": null,
+    "usage": {
+      "prompt_tokens": 1077,
+      "completion_tokens": 351,
+      "total_tokens": 1428,
+      "prompt_cache_hit_tokens": 128,
+      "prompt_cache_miss_tokens": 949,
+      "model": "deepseek-flash"
+    }
+  },
+  "revision": {
+    "key": "955b4d3a5bdd22e68b733abfd734d40285fb5434df80e0b68fbc9814e7c02c3f",
+    "object": {
+      "choices": [
+        {
+          "id": "333",
+          "line": "PC3",
+          "reason": "Lowest empirical and neighbour activity among candidates; A375 already active.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "596",
+          "line": "YAPC",
+          "reason": "Lowest empirical and neighbour activity; A375 already active.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "384",
+          "line": "HA1E",
+          "reason": "Highest empirical activity among candidates; A375 inactive.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "63",
+          "line": "MCF7",
+          "reason": "Highest neighbour activity; A375 inactive, seeking active split.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "456",
+          "line": "HELA",
+          "reason": "Highest empirical and neighbour activity; A375 inactive.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "473",
+          "line": "YAPC",
+          "reason": "Highest neighbour activity; A375 active, seeking inactive split.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        },
+        {
+          "id": "470",
+          "line": "YAPC",
+          "reason": "Lowest neighbour activity; A375 active, seeking inactive split.",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        }
+      ],
+      "revised_memory": "A375 first-line labels: 333,596,473,470 active; 384,63,456 inactive. Feedback shows empirical and neighbour activity probabilities vary by line, supporting line-dependent rather than uniform response. Chose second lines to oppose A375 status using lowest/highest candidate probabilities. Activity remains vehicle-norm threshold, not viability; no mechanism claimed.",
+      "unresolved": [
+        "Whether chosen second lines actually yield opposite activity labels.",
+        "Whether empirical or neighbour probability better predicts observed activity.",
+        "Target expression/dependence per line remains unmeasured.",
+        "Shared systematic response may still inflate concordance (S2).",
+        "No causal interpretation from two activity labels (S3, S5)."
+      ]
+    },
+    "error": null,
+    "usage": {
+      "prompt_tokens": 3429,
+      "completion_tokens": 454,
+      "total_tokens": 3883,
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 2405,
+      "model": "deepseek-flash"
+    }
+  },
+  "hits": [
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0
+  ],
+  "margin_hits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "spent_slots": 14.0
+}

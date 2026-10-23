@@ -1,0 +1,154 @@
+{
+  "arm": "D_conventional",
+  "batch": 0,
+  "indices": [
+    451,
+    93,
+    358,
+    420,
+    303,
+    366,
+    454
+  ],
+  "second": [
+    6,
+    4,
+    4,
+    5,
+    4,
+    4,
+    2
+  ],
+  "fallbacks": [],
+  "initial": {
+    "key": "473cd9bb218b3c85c6cfdb20d80261897384403776e82ace9186bf279b7ec837",
+    "object": {
+      "hypotheses": [
+        "H1: The fixed A375 first line may yield a vehicle-norm activity label for some compounds, and a second line chosen for tissue contrast (e.g., MCF7 for ER+ or PC3 for AR-) could produce an inactive label, maximizing one-active/one-inactive pairs. This assumes line-specific response differences are real and not shared systematic artifacts.",
+        "H2: The fixed A375 first line may be inactive for some compounds, and a second line with matching target dependence (e.g., MCF7 for azelaic-acid via TYR/AKR1D1/SRD5A2, or MCF7 for MF-101 via CYP19A1) could produce an active label. This assumes target expression or pathway context drives activity."
+      ],
+      "evidence_gaps": [
+        "No measured activity labels are provided; all outcomes are unknown.",
+        "Tissue-specific target dependence is not established (S4).",
+        "Shared systematic response may inflate prediction quality (S2).",
+        "Activity is a vehicle-norm threshold, not viability (S5).",
+        "Database annotations are weaker than measured responses (S3, S4)."
+      ],
+      "memory": "Batch: 7 compounds, all first_line A375. Need one different second line per compound. Choose second lines to create one active and one inactive per compound across two retrievals. Avoid causal or viability claims. Use tissue context and target annotations only as weak priors."
+    },
+    "error": null,
+    "usage": {
+      "prompt_tokens": 1190,
+      "completion_tokens": 301,
+      "total_tokens": 1491,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1190,
+      "model": "deepseek-flash"
+    }
+  },
+  "revision": {
+    "key": "c22544088d93f04ebbeba188c37e275d57af66d14319dc9c98f89eb4e5d1a28d",
+    "object": {
+      "choices": [
+        {
+          "id": "451",
+          "line": "YAPC",
+          "reason": "Lowest empirical and RKT activity probabilities; A375 already inactive.",
+          "source_ids": [
+            "S2",
+            "S5"
+          ]
+        },
+        {
+          "id": "93",
+          "line": "MCF7",
+          "reason": "Lowest RKT activity probability; A375 already inactive.",
+          "source_ids": [
+            "S2",
+            "S5"
+          ]
+        },
+        {
+          "id": "358",
+          "line": "MCF7",
+          "reason": "High norm-neighbour but low RKT; A375 inactive, seek contrast.",
+          "source_ids": [
+            "S2",
+            "S5"
+          ]
+        },
+        {
+          "id": "420",
+          "line": "PC3",
+          "reason": "Low RKT activity probability; A375 already inactive.",
+          "source_ids": [
+            "S2",
+            "S5"
+          ]
+        },
+        {
+          "id": "303",
+          "line": "MCF7",
+          "reason": "RKT specific refusal and low activity probabilities; A375 inactive.",
+          "source_ids": [
+            "S2",
+            "S5"
+          ]
+        },
+        {
+          "id": "366",
+          "line": "MCF7",
+          "reason": "Low RKT activity probability; A375 already inactive.",
+          "source_ids": [
+            "S2",
+            "S5"
+          ]
+        },
+        {
+          "id": "454",
+          "line": "HELA",
+          "reason": "Lowest RKT activity probability among candidates; A375 active.",
+          "source_ids": [
+            "S2",
+            "S5"
+          ]
+        }
+      ],
+      "revised_memory": "A375 first line: 454 active; others inactive. For inactive compounds, choose second lines with low predicted activity to preserve one-active/one-inactive pairs. For active 454, choose HELA as lowest predicted active. Avoid causal or viability claims; activity is vehicle-norm threshold.",
+      "unresolved": [
+        "No measured second-line labels yet.",
+        "Tissue-specific target dependence not established.",
+        "Shared systematic response may inflate predictions.",
+        "RKT refusal for hydroxyurea/MCF7 noted."
+      ]
+    },
+    "error": null,
+    "usage": {
+      "prompt_tokens": 5164,
+      "completion_tokens": 420,
+      "total_tokens": 5584,
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 4012,
+      "model": "deepseek-flash"
+    }
+  },
+  "hits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1
+  ],
+  "margin_hits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1
+  ],
+  "spent_slots": 14.0
+}

@@ -1,0 +1,104 @@
+{
+  "key": "e4f8bb5860ccab29bb32974d0c2bad3ce53fa2b50bd69a1c1ca0d64224844242",
+  "object": {
+    "choices": [
+      {
+        "id": "85",
+        "line": "HT29",
+        "reason": "Highest empirical and neighbour activity; target MTOR/MAPKAP1 lineage test.",
+        "source_ids": [
+          "S1",
+          "S4"
+        ]
+      },
+      {
+        "id": "206",
+        "line": "HELA",
+        "reason": "Highest empirical inactive probability; tests shared-response vs lineage.",
+        "source_ids": [
+          "S2",
+          "S5"
+        ]
+      },
+      {
+        "id": "255",
+        "line": "HELA",
+        "reason": "Highest empirical inactive probability; favipiravir lacks human target.",
+        "source_ids": [
+          "S2",
+          "S5"
+        ]
+      },
+      {
+        "id": "607",
+        "line": "PC3",
+        "reason": "Highest neighbour activity; FFAR1 insulin secretagogue lineage test.",
+        "source_ids": [
+          "S1",
+          "S4"
+        ]
+      },
+      {
+        "id": "624",
+        "line": "HT29",
+        "reason": "Highest neighbour activity; bacterial ribosome MOA unlikely in human cells.",
+        "source_ids": [
+          "S2",
+          "S5"
+        ]
+      },
+      {
+        "id": "558",
+        "line": "MCF7",
+        "reason": "Highest neighbour activity; TYR target lineage test.",
+        "source_ids": [
+          "S1",
+          "S4"
+        ]
+      },
+      {
+        "id": "295",
+        "line": "HA1E",
+        "reason": "Highest empirical inactive probability; demethylase MOA weak evidence.",
+        "source_ids": [
+          "S2",
+          "S5"
+        ]
+      }
+    ],
+    "revised_memory": "A375 first-line: only AZD-2014 active; six inactive. Candidate probabilities are low and similar across lines, consistent with shared systematic response or vehicle-norm threshold rather than strong lineage-specific target dependence. Chose second lines maximizing empirical/neighbour activity for AZD-2014, TAK-875, rucinol (target-based H1) and inactive probability for others (H2). Activity is not viability; MOA annotations remain weak.",
+    "unresolved": [
+      "No second-line labels yet; choices untested.",
+      "Target expression and tissue-specific dependence not established.",
+      "Whether active/inactive calls reflect shared response or lineage cannot be resolved from one observation.",
+      "MOA for dideoxyadenosine, favipiravir, tedizolid, GSK-J2 database-derived, not causal."
+    ]
+  },
+  "error": null,
+  "usage": {
+    "prompt_tokens": 3373,
+    "completion_tokens": 483,
+    "total_tokens": 3856,
+    "prompt_cache_hit_tokens": 896,
+    "prompt_cache_miss_tokens": 2477,
+    "model": "deepseek-flash"
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a scientific research agent. Form competing biological explanations, identify evidence gaps and source IDs. After observed feedback, revise your hypotheses and select discriminating observations. Treat VC disagreement as a question, not a cause. Preserve a concise research memory. Objective: maximize the number of compounds with one recorded active and one inactive line in two profile retrievals each. The first line is fixed by transfer coverage. Choose exactly one different available second line per compound after the first observation. All numeric optimization, outcome scoring and budgets are external. Never claim viability or causality. Return JSON only."
+    },
+    {
+      "role": "user",
+      "content": "{\"sources\": {\"S1\": \"PRESAGE doi:10.1101/2025.06.03.657653: measured cross-system perturbations can transfer; source choice matters.\", \"S2\": \"Systema doi:10.1038/s41587-025-02777-8: shared systematic response may inflate prediction quality.\", \"S3\": \"GeneAgent doi:10.1038/s41592-025-02748-6: database verification supports functional descriptions, not causal proof.\", \"S4\": \"Repurposing Hub/MAP annotations are weaker than measured responses; tissue-specific target dependence is not established here.\", \"S5\": \"Activity is a vehicle-norm threshold in L1000, NOT viability. Two different activity labels do not establish a mechanism.\"}, \"tissues\": {\"A375\": \"melanoma\", \"HA1E\": \"immortalized kidney\", \"HELA\": \"cervical cancer\", \"HT29\": \"colorectal cancer\", \"MCF7\": \"breast cancer, ER+\", \"PC3\": \"prostate cancer, AR-\", \"YAPC\": \"pancreatic cancer\"}, \"compounds\": [{\"id\": \"85\", \"key\": \"azd-2014\", \"name\": \"AZD-2014\", \"targets\": [\"MTOR\", \"MAPKAP1\"], \"moa\": [], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"206\", \"key\": \"dideoxyadenosine\", \"name\": \"dideoxyadenosine\", \"targets\": [], \"moa\": [\"nucleoside reverse transcriptase inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"255\", \"key\": \"favipiravir\", \"name\": \"favipiravir\", \"targets\": [], \"moa\": [\"rna polymerase inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"607\", \"key\": \"tak-875\", \"name\": \"TAK-875\", \"targets\": [\"FFAR1\"], \"moa\": [\"insulin secretagogue\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"624\", \"key\": \"tedizolid\", \"name\": \"tedizolid\", \"targets\": [], \"moa\": [\"bacterial 50s ribosomal subunit inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"558\", \"key\": \"rucinol\", \"name\": \"rucinol\", \"targets\": [\"TYR\"], \"moa\": [\"tyrosinase inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"295\", \"key\": \"gsk-j2\", \"name\": \"GSK-J2\", \"targets\": [], \"moa\": [\"histone demethylase inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HT29\", \"MCF7\", \"PC3\"], \"first_line\": \"A375\"}], \"task\": \"Before seeing feedback, give two competing explanations for this batch and note evidence gaps. Return {hypotheses: [...], evidence_gaps: [...], memory: string}. Maximum 250 words.\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "{\"hypotheses\": [{\"id\": \"H1\", \"text\": \"Second-line activity is driven by lineage-specific target dependence: e.g., MTOR/MAPKAP1 in AZD-2014, FFAR1 in TAK-875, TYR in rucinol. Choose lines matching target expression or lineage.\", \"source_ids\": [\"S1\", \"S4\"]}, {\"id\": \"H2\", \"text\": \"Second-line activity is dominated by shared systematic response or vehicle-norm threshold, so any second line may produce similar active/inactive calls. Choose lines to maximize independent coverage.\", \"source_ids\": [\"S2\", \"S5\"]}], \"evidence_gaps\": [\"No measured second-line activity labels yet; first_line fixed to A375 for all compounds.\", \"Target expression and tissue-specific dependence are not established for these lines.\", \"MOA annotations for dideoxyadenosine, favipiravir, tedizolid, GSK-J2 are database-derived, not causal.\", \"Activity is vehicle-norm threshold in L1000, not viability; two labels do not establish mechanism.\", \"Source choice matters for transfer; no direct comparison of second-line choices.\"], \"memory\": \"Batch: 7 compounds, first_line A375 fixed. Need one different second line per compound. Competing: lineage-specific target dependence vs shared systematic response. Gaps: no second-line labels, target expression unknown, MOA annotations weak, activity not viability. Next: after first observation, choose second lines that discriminate H1 vs H2, e.g., target-expressing vs non-expressing lines, while avoiding redundant shared-response lines.\"}"
+    },
+    {
+      "role": "user",
+      "content": "{\"feedback\": [{\"id\": \"85\", \"observed_line\": \"A375\", \"observed_norm_ratio\": 1.9236, \"observed_active\": true, \"up_landmarks\": [\"SQSTM1\", \"CSNK2A2\", \"IGF2R\", \"FHL2\"], \"down_landmarks\": [\"CCNA2\", \"KIF20A\", \"ITGAE\", \"CDC25A\"], \"candidates\": [{\"line\": \"HA1E\", \"empirical_p_active\": 0.6395, \"norm_neighbour_p_active\": 0.4091}, {\"line\": \"HELA\", \"empirical_p_active\": 0.5722, \"norm_neighbour_p_active\": 0.5909}, {\"line\": \"HT29\", \"empirical_p_active\": 0.6527, \"norm_neighbour_p_active\": 0.7273}, {\"line\": \"MCF7\", \"empirical_p_active\": 0.6109, \"norm_neighbour_p_active\": 0.5909}, {\"line\": \"PC3\", \"empirical_p_active\": 0.5798, \"norm_neighbour_p_active\": 0.6364}, {\"line\": \"YAPC\", \"empirical_p_active\": 0.5191, \"norm_neighbour_p_active\": 0.6818}]}, {\"id\": \"206\", \"observed_line\": \"A375\", \"observed_norm_ratio\": 0.6229, \"observed_active\": false, \"up_landmarks\": [\"NUDT9\", \"HOOK2\", \"CHMP6\", \"USP7\"], \"down_landmarks\": [\"TCTA\", \"DHRS7\", \"RAD51C\", \"DNAJB6\"], \"candidates\": [{\"line\": \"HA1E\", \"empirical_p_active\": 0.0839, \"norm_neighbour_p_active\": 0.1364}, {\"line\": \"HELA\", \"empirical_p_active\": 0.0996, \"norm_neighbour_p_active\": 0.0909}, {\"line\": \"HT29\", \"empirical_p_active\": 0.0688, \"norm_neighbour_p_active\": 0.0909}, {\"line\": \"MCF7\", \"empirical_p_active\": 0.0837, \"norm_neighbour_p_active\": 0.1364}, {\"line\": \"PC3\", \"empirical_p_active\": 0.0756, \"norm_neighbour_p_active\": 0.0909}, {\"line\": \"YAPC\", \"empirical_p_active\": 0.0439, \"norm_neighbour_p_active\": 0.0455}]}, {\"id\": \"255\", \"observed_line\": \"A375\", \"observed_norm_ratio\": 0.6014, \"observed_active\": false, \"up_landmarks\": [\"NFATC4\", \"EGF\", \"ACOT9\", \"PRKX\"], \"down_landmarks\": [\"REEP5\", \"ACAT2\", \"PIK3R3\", \"PUF60\"], \"candidates\": [{\"line\": \"HA1E\", \"empirical_p_active\": 0.0839, \"norm_neighbour_p_active\": 0.0455}, {\"line\": \"HELA\", \"empirical_p_active\": 0.0996, \"norm_neighbour_p_active\": 0.0909}, {\"line\": \"HT29\", \"empirical_p_active\": 0.0688, \"norm_neighbour_p_active\": 0.0455}, {\"line\": \"MCF7\", \"empirical_p_active\": 0.0837, \"norm_neighbour_p_active\": 0.1364}, {\"line\": \"PC3\", \"empirical_p_active\": 0.0756, \"norm_neighbour_p_active\": 0.0455}, {\"line\": \"YAPC\", \"empirical_p_active\": 0.0439, \"norm_neighbour_p_active\": 0.0455}]}, {\"id\": \"607\", \"observed_line\": \"A375\", \"observed_norm_ratio\": 0.7578, \"observed_active\": false, \"up_landmarks\": [\"IDE\", \"GPATCH8\", \"IGHMBP2\", \"SNAP25\"], \"down_landmarks\": [\"GAPDH\", \"COG7\", \"RNF167\", \"TIMM17B\"], \"candidates\": [{\"line\": \"HA1E\", \"empirical_p_active\": 0.0839, \"norm_neighbour_p_active\": 0.1364}, {\"line\": \"HELA\", \"empirical_p_active\": 0.0996, \"norm_neighbour_p_active\": 0.1364}, {\"line\": \"HT29\", \"empirical_p_active\": 0.0688, \"norm_neighbour_p_active\": 0.0455}, {\"line\": \"MCF7\", \"empirical_p_active\": 0.0837, \"norm_neighbour_p_active\": 0.0455}, {\"line\": \"PC3\", \"empirical_p_active\": 0.0756, \"norm_neighbour_p_active\": 0.1818}, {\"line\": \"YAPC\", \"empirical_p_active\": 0.0439, \"norm_neighbour_p_active\": 0.1364}]}, {\"id\": \"624\", \"observed_line\": \"A375\", \"observed_norm_ratio\": 0.741, \"observed_active\": false, \"up_landmarks\": [\"SRC\", \"BMP4\", \"ABHD4\", \"ADO\"], \"down_landmarks\": [\"PRPF4\", \"TUBB6\", \"KIAA1033\", \"TEX10\"], \"candidates\": [{\"line\": \"HA1E\", \"empirical_p_active\": 0.0839, \"norm_neighbour_p_active\": 0.0455}, {\"line\": \"HELA\", \"empirical_p_active\": 0.0996, \"norm_neighbour_p_active\": 0.0455}, {\"line\": \"HT29\", \"empirical_p_active\": 0.0688, \"norm_neighbour_p_active\": 0.1364}, {\"line\": \"MCF7\", \"empirical_p_active\": 0.0837, \"norm_neighbour_p_active\": 0.1364}, {\"line\": \"PC3\", \"empirical_p_active\": 0.0756, \"norm_neighbour_p_active\": 0.0909}, {\"line\": \"YAPC\", \"empirical_p_active\": 0.0439, \"norm_neighbour_p_active\": 0.0909}]}, {\"id\": \"558\", \"observed_line\": \"A375\", \"observed_norm_ratio\": 0.7155, \"observed_active\": false, \"up_landmarks\": [\"MFSD10\", \"MEF2C\", \"KIF5C\", \"TMEM110\"], \"down_landmarks\": [\"DYNLT3\", \"RGS2\", \"DLD\", \"CDKN1B\"], \"candidates\": [{\"line\": \"HA1E\", \"empirical_p_active\": 0.0839, \"norm_neighbour_p_active\": 0.0455}, {\"line\": \"HELA\", \"empirical_p_active\": 0.0996, \"norm_neighbour_p_active\": 0.0909}, {\"line\": \"HT29\", \"empirical_p_active\": 0.0688, \"norm_neighbour_p_active\": 0.0455}, {\"line\": \"MCF7\", \"empirical_p_active\": 0.0837, \"norm_neighbour_p_active\": 0.1818}, {\"line\": \"PC3\", \"empirical_p_active\": 0.0756, \"norm_neighbour_p_active\": 0.0455}, {\"line\": \"YAPC\", \"empirical_p_active\": 0.0439, \"norm_neighbour_p_active\": 0.0909}]}, {\"id\": \"295\", \"observed_line\": \"A375\", \"observed_norm_ratio\": 0.4833, \"observed_active\": false, \"up_landmarks\": [\"LSR\", \"CLPX\", \"ABHD4\", \"RSU1\"], \"down_landmarks\": [\"BAD\", \"NR2F6\", \"YME1L1\", \"GNAS\"], \"candidates\": [{\"line\": \"HA1E\", \"empirical_p_active\": 0.0839, \"norm_neighbour_p_active\": 0.0909}, {\"line\": \"HT29\", \"empirical_p_active\": 0.0688, \"norm_neighbour_p_active\": 0.0909}, {\"line\": \"MCF7\", \"empirical_p_active\": 0.0837, \"norm_neighbour_p_active\": 0.0909}, {\"line\": \"PC3\", \"empirical_p_active\": 0.0756, \"norm_neighbour_p_active\": 0.0455}]}], \"task\": \"Revise your research memory using observed feedback. Choose one second line for every id. Return {choices: [{id: string, line: string, reason: string, source_ids: [string]}], revised_memory: string, unresolved: [string]}. Reasons <=20 words each.\"}"
+    }
+  ]
+}

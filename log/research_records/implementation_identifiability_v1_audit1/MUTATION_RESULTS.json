@@ -1,0 +1,146 @@
+{
+ "results": [
+  {
+   "expected": "pre-purchase (step 0) proposal byte-identical; behaviour differs only after a legal release",
+   "id": "M01",
+   "mutation": "change hidden evaluator outcomes",
+   "observed": {
+    "final_flipped": "stop",
+    "final_published": "still_indistinguishable",
+    "post_release_final_differs": true,
+    "step0_identical": true
+   },
+   "passed": true
+  },
+  {
+   "expected": "mismatched cell, time, readout or genotype refused; dose difference descriptive only; unit never rises",
+   "id": "M02",
+   "mutation": "change cell line, dose, time or readout",
+   "observed": {
+    "baseline": "strict",
+    "cell": "refused",
+    "dose_uM": "descriptive",
+    "genotype": "refused",
+    "readout": "refused",
+    "time_h": "refused",
+    "unit_level_after_cell_change": 2
+   },
+   "passed": true
+  },
+  {
+   "expected": "validator clean for the real labels; violations when JB211 is called inactive or assumed to inhibit",
+   "id": "M03",
+   "mutation": "relabel JB211 as a fully inactive control",
+   "observed": {
+    "assumed_inhibition_violations": [
+     "catalytic inhibition may not be assumed for JB211"
+    ],
+    "baseline_violations": [],
+    "relabelled_violations": [
+     "JB211 mode must stay crbn_null_aurka_binder_control",
+     "JB211 note describes it as inactive"
+    ]
+   },
+   "passed": true
+  },
+  {
+   "expected": "with catalytic-activity evidence EX_CATALYTIC_INHIBITION is refuted by JB211 no_loss; without it, it stays compatible",
+   "id": "M04",
+   "mutation": "remove JB211 catalytic-engagement evidence",
+   "observed": {
+    "with_activity_evidence": [
+     "EX_PROTEIN_LOSS_SCAFFOLD",
+     "OPEN_OR_UNMODELED_EXPLANATION"
+    ],
+    "without_activity_evidence": [
+     "EX_CATALYTIC_INHIBITION",
+     "EX_PROTEIN_LOSS_SCAFFOLD",
+     "OPEN_OR_UNMODELED_EXPLANATION"
+    ]
+   },
+   "passed": true
+  },
+  {
+   "expected": "level and effective counts unchanged; a duplicated bundle is costed once",
+   "id": "M05",
+   "mutation": "duplicate wells or technical replicates",
+   "observed": {
+    "audit_cost_total_unique_wells": 18,
+    "effective_counts_same": true,
+    "finding": "v1 idlib.cost_total double counts a duplicated bundle id; the Evaluator refuses repeat purchases so replay is unaffected; the audit uses cost_total_unique",
+    "level_same": true,
+    "v1_idlib_cost_total_wells_for_duplicate_bundle": 36
+   },
+   "passed": true
+  },
+  {
+   "expected": "L3b fails (it already passes at baseline) and the level cannot rise",
+   "id": "M06",
+   "mutation": "remove proximal evidence",
+   "observed": {
+    "baseline_L3b": true,
+    "dangling_reference_to_removed_records": "refused (fail-closed)",
+    "level": 2,
+    "mutated_L3b": false
+   },
+   "passed": true
+  },
+  {
+   "expected": "no assay separates anything; proposal is still_indistinguishable",
+   "id": "M07",
+   "mutation": "make all legal assay predictions identical",
+   "observed": "still_indistinguishable",
+   "passed": true
+  },
+  {
+   "expected": "every assay fails can_change_terminal_decision; chain does not exist; no purchase proposed",
+   "id": "M08",
+   "mutation": "remove all decision consequences",
+   "observed": {
+    "decision": "same_decision",
+    "failed": {
+     "A_JB211_VIAB": [
+      "can_change_terminal_decision"
+     ],
+     "A_T217D_RESCUE": [
+      "can_change_terminal_decision"
+     ]
+    }
+   },
+   "passed": true
+  },
+  {
+   "expected": "no mismatch at baseline; the changed source hash and the two changed condition identities are named",
+   "id": "M09",
+   "mutation": "change source hashes or condition identities",
+   "observed": {
+    "baseline": [
+     [],
+     []
+    ],
+    "mutated_records": [
+     "S1-R01",
+     "S1-R02"
+    ],
+    "mutated_source": [
+     "S1"
+    ]
+   },
+   "passed": true
+  },
+  {
+   "expected": "clean at baseline; both flag changes are violations while read_by_designer is true",
+   "id": "M10",
+   "mutation": "change a published-case flag to discovery eligible",
+   "observed": {
+    "baseline": [],
+    "mutated": [
+     "S1: designer-read source must be KNOWN_CASE_LOGIC_ONLY, found DISCOVERY_ELIGIBLE",
+     "S2: published case flagged discovery eligible"
+    ]
+   },
+   "passed": true
+  }
+ ],
+ "rule_version": "audit1-rules-1"
+}

@@ -1,0 +1,105 @@
+{
+ "status": "DESIGN_AUDIT: no response value read",
+ "raw_sha256": "02b5ee45ff758c7a401747fddb1c5129c9f681c061f0c5c4b14241691b14ae07",
+ "domain": {
+  "samples": 520,
+  "inhibitors": 165,
+  "measured_pairs": 53571
+ },
+ "raw_design": {
+  "pairs_with_raw_wells": 53571,
+  "dose_points_per_run": {
+   "7": 53587
+  },
+  "wells_per_run": {
+   "7": 45397,
+   "14": 5752,
+   "21": 1212,
+   "28": 431,
+   "35": 671,
+   "42": 97,
+   "49": 13,
+   "56": 7,
+   "63": 3,
+   "70": 3,
+   "77": 1
+  },
+  "runs_per_pair": {
+   "1": 53555,
+   "2": 16
+  },
+  "wells_per_pair_mean": 8.678034757611394,
+  "share_of_pairs_with_more_than_one_profile": 0.15265722125777006,
+  "plates_per_sample": {
+   "median": 4.0,
+   "p10": 1.9000000000000057,
+   "p90": 5.0
+  },
+  "passed_qc_values": [
+   "TRUE"
+  ],
+  "passed_qc_note": "the release contains QC-passed wells only, so QC removals are not visible",
+  "time_of_read": {
+   "median": 24.0,
+   "min": 1.0,
+   "max": 30.0,
+   "note": "units and meaning are not documented in the release; not used"
+  }
+ },
+ "assay_sources": {
+  "tyner_2018": "Tyner et al., Nature 562:526-531 (2018), PMC6280667, Methods: 7-point 3-fold series (10 to 0.0137 uM; 1 to 0.00137 uM for 4 drugs), one well per concentration, 10,000 cells per well in 384-well plates, plated within 24 h of collection, 72 h culture, MTS read; DMSO vehicle and a positive-control combination on each plate; probit fit on 7 points",
+  "bottomly_2022": "Bottomly et al., Cancer Cell 40:850-864 (2022), PMC9378589: same assay as 2018; profiles removed when deviance > 2 and AIC > 12; plates removed when >= 4 concentrations have SD > 25"
+ },
+ "action_mapping": [
+  {
+   "logical_action": "historical AUC query (this replay)",
+   "returns": "one archived probit AUC summary for a (sample, inhibitor) pair, or nothing if the archive has no QC-passed profile",
+   "physical_cost": "none at replay time; it stands for one past 7-dose profile"
+  },
+  {
+   "logical_action": "single-dose measurement",
+   "returns": "viability at one concentration",
+   "physical_cost": "1 treatment well per replicate plus shared plate controls; not what the replay's AUC endpoint can grade"
+  },
+  {
+   "logical_action": "AUC profile measurement",
+   "returns": "a 7-point dose-response curve, probit fit and QC",
+   "physical_cost": "7 treatment wells per replicate, 10,000 cells per well, plus plate controls; profiles can fail curve or plate QC"
+  },
+  {
+   "logical_action": "second experimental round",
+   "returns": "a new batch of profiles chosen from first-round readouts",
+   "physical_cost": "a new plate set with its own controls, about 72 h more culture, and banked cells; the replay assumes the response state is unchanged between rounds, which it cannot test"
+  }
+ ],
+ "per_arm": {
+  "no_bridge (vc0, item, knn)": {
+   "queries": 16,
+   "profiles": 16,
+   "treatment_wells_one_replicate": 112,
+   "rounds": 1,
+   "culture_days_min": 3
+  },
+  "bridged (b_exploit, maestro, b_lookahead, attribution groups B/D/E/F)": {
+   "queries": 16,
+   "profiles": 16,
+   "treatment_wells_one_replicate": 112,
+   "rounds": 2,
+   "culture_days_min": 6,
+   "round_split": "4 profiles then 12"
+  },
+  "attribution groups A/C (probes counted, not used)": {
+   "queries": 16,
+   "profiles": 16,
+   "treatment_wells_one_replicate": 112,
+   "rounds": 1,
+   "culture_days_min": 3
+  }
+ },
+ "notes": [
+  "Paired comparisons at equal query counts are unaffected; only low-cost claims change.",
+  "Cells per sample at one replicate: 16 profiles x 7 wells x 10,000 = 1.12 million, before controls.",
+  "API spend (0.28 USD for 520 LLM calls) is a small part of the cost of a bridged campaign.",
+  "Basal RNA is pre-treatment, but the replay assumes its analysis is available before the first selection; turnaround for RNA-seq is not modelled."
+ ]
+}

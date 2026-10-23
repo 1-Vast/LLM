@@ -1,0 +1,103 @@
+{
+  "key": "87ac299d48c50105d35e1b9b251f9f309d6daa3a8954887f0d168d20c0e1547b",
+  "object": {
+    "choices": [
+      {
+        "id": "608",
+        "line": "YAPC",
+        "reason": "Lowest empirical and rkt p_active; distinct tissue context.",
+        "source_ids": [
+          "S1",
+          "S5"
+        ]
+      },
+      {
+        "id": "155",
+        "line": "HT29",
+        "reason": "Low empirical and rkt p_active; different tissue.",
+        "source_ids": [
+          "S1",
+          "S5"
+        ]
+      },
+      {
+        "id": "314",
+        "line": "HA1E",
+        "reason": "Lowest rkt p_active; distinct kidney context.",
+        "source_ids": [
+          "S1",
+          "S5"
+        ]
+      },
+      {
+        "id": "676",
+        "line": "YAPC",
+        "reason": "High active probabilities but lowest empirical among candidates.",
+        "source_ids": [
+          "S1",
+          "S5"
+        ]
+      },
+      {
+        "id": "164",
+        "line": "YAPC",
+        "reason": "Lowest empirical and rkt p_active; distinct tissue.",
+        "source_ids": [
+          "S1",
+          "S5"
+        ]
+      },
+      {
+        "id": "479",
+        "line": "HA1E",
+        "reason": "Lowest rkt p_active; distinct kidney context.",
+        "source_ids": [
+          "S1",
+          "S5"
+        ]
+      },
+      {
+        "id": "306",
+        "line": "HT29",
+        "reason": "Low empirical and rkt p_active; different tissue.",
+        "source_ids": [
+          "S1",
+          "S5"
+        ]
+      }
+    ],
+    "revised_memory": "A375 first-line labels: 676 and 479 active; others inactive. Second-line candidates show mostly low p_active for inactive compounds, but 676 has high active probabilities across lines. Chose second lines to diversify tissue while favoring lower predicted activity for inactive compounds. Activity is vehicle-norm threshold, not viability; no causal claims.",
+    "unresolved": [
+      "Whether second-line labels will yield one active and one inactive per compound.",
+      "Tissue-specific target dependence remains unestablished.",
+      "Relationship between L1000 activity and mechanism or viability is unknown."
+    ]
+  },
+  "error": null,
+  "usage": {
+    "prompt_tokens": 4955,
+    "completion_tokens": 418,
+    "total_tokens": 5373,
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 3931,
+    "model": "deepseek-flash"
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a scientific research agent. Use the supplied scientific knowledge and virtual-cell tool results to investigate the compounds and choose useful follow-up observations. Keep concise notes between stages. Objective: maximize the number of compounds with one recorded active and one inactive line in two profile retrievals each. The first line is fixed by transfer coverage. Choose exactly one different available second line per compound after the first observation. All numeric optimization, outcome scoring and budgets are external. Never claim viability or causality. Return JSON only."
+    },
+    {
+      "role": "user",
+      "content": "{\"sources\": {\"S1\": \"PRESAGE doi:10.1101/2025.06.03.657653: measured cross-system perturbations can transfer; source choice matters.\", \"S2\": \"Systema doi:10.1038/s41587-025-02777-8: shared systematic response may inflate prediction quality.\", \"S3\": \"GeneAgent doi:10.1038/s41592-025-02748-6: database verification supports functional descriptions, not causal proof.\", \"S4\": \"Repurposing Hub/MAP annotations are weaker than measured responses; tissue-specific target dependence is not established here.\", \"S5\": \"Activity is a vehicle-norm threshold in L1000, NOT viability. Two different activity labels do not establish a mechanism.\"}, \"tissues\": {\"A375\": \"melanoma\", \"HA1E\": \"immortalized kidney\", \"HELA\": \"cervical cancer\", \"HT29\": \"colorectal cancer\", \"MCF7\": \"breast cancer, ER+\", \"PC3\": \"prostate cancer, AR-\", \"YAPC\": \"pancreatic cancer\"}, \"compounds\": [{\"id\": \"608\", \"key\": \"taladegib\", \"name\": \"taladegib\", \"targets\": [\"DHH\", \"IHH\", \"SMO\"], \"moa\": [\"smoothened receptor antagonist\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"155\", \"key\": \"choline-alfoscerate\", \"name\": \"choline-alfoscerate\", \"targets\": [], \"moa\": [\"acetylcholine precursor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"314\", \"key\": \"indobufen\", \"name\": \"indobufen\", \"targets\": [\"PTGS1\", \"PTGS2\"], \"moa\": [\"cyclooxygenase inhibitor\", \"platelet aggregation inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"676\", \"key\": \"valrubicin\", \"name\": \"valrubicin\", \"targets\": [\"TOP2A\", \"TOP2B\"], \"moa\": [\"dna inhibitor\", \"topoisomerase inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"164\", \"key\": \"clinofibrate\", \"name\": \"clinofibrate\", \"targets\": [\"LPL\"], \"moa\": [\"lipase clearing factor inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"479\", \"key\": \"palovarotene\", \"name\": \"palovarotene\", \"targets\": [\"RARG\"], \"moa\": [\"retinoid receptor agonist\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"306\", \"key\": \"ibutamoren\", \"name\": \"ibutamoren\", \"targets\": [\"GHR\", \"GHSR\", \"IGF1\"], \"moa\": [\"growth hormone secretagogue receptor agonist\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}], \"task\": \"Before seeing feedback, give two competing explanations for this batch and note evidence gaps. Return {hypotheses: [...], evidence_gaps: [...], memory: string}. Maximum 250 words.\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "{\"hypotheses\": [\"H1: The first-line A375 activity labels reflect compound-specific responses that may transfer to other lines; choosing a second line with a distinct tissue context could yield one active and one inactive label per compound, maximizing the count of compounds with both labels.\", \"H2: The first-line A375 activity labels are dominated by shared systematic or vehicle-threshold effects, so second-line labels may be largely concordant with A375, producing few compounds with one active and one inactive line.\"], \"evidence_gaps\": [\"No measured second-line activity labels are available yet.\", \"Tissue-specific target dependence is not established for these compounds.\", \"The relationship between L1000 activity and viability or mechanism is not established.\", \"Database annotations and MOA are weaker than measured responses and do not prove causality.\"], \"memory\": \"Batch: 7 compounds, first line fixed A375. Need one different second line per compound. Sources warn transfer depends on source choice, shared response can inflate prediction, and activity is vehicle-norm threshold not viability. Choose second lines to diversify tissue context while avoiding overclaiming mechanism.\"}"
+    },
+    {
+      "role": "user",
+      "content": "{\"feedback\": [{\"id\": \"608\", \"observed_line\": \"A375\", \"observed_norm_ratio\": 0.7379, \"observed_active\": false, \"up_landmarks\": [\"ARPP19\", \"CREB1\", \"RAB4A\", \"CD40\"], \"down_landmarks\": [\"CEBPA\", \"CAST\", \"RTN2\", \"POLG2\"], \"candidates\": [{\"line\": \"HA1E\", \"empirical_p_active\": 0.0839, \"norm_neighbour_p_active\": 0.0909, \"rkt_p_active\": 0.1556, \"rkt_expected_cosine_if_active\": 0.3865, \"rkt_specific_refusal\": false}, {\"line\": \"HELA\", \"empirical_p_active\": 0.0996, \"norm_neighbour_p_active\": 0.0455, \"rkt_p_active\": 0.0734, \"rkt_expected_cosine_if_active\": 0.3394, \"rkt_specific_refusal\": false}, {\"line\": \"HT29\", \"empirical_p_active\": 0.0688, \"norm_neighbour_p_active\": 0.1818, \"rkt_p_active\": 0.0703, \"rkt_expected_cosine_if_active\": 0.3353, \"rkt_specific_refusal\": false}, {\"line\": \"MCF7\", \"empirical_p_active\": 0.0837, \"norm_neighbour_p_active\": 0.1818, \"rkt_p_active\": 0.0617, \"rkt_expected_cosine_if_active\": 0.3819, \"rkt_specific_refusal\": false}, {\"line\": \"PC3\", \"empirical_p_active\": 0.0756, \"norm_neighbour_p_active\": 0.0909, \"rkt_p_active\": 0.0846, \"rkt_expected_cosine_if_active\": 0.3763, \"rkt_specific_refusal\": false}, {\"line\": \"YAPC\", \"empirical_p_active\": 0.0439, \"norm_neighbour_p_active\": 0.1364, \"rkt_p_active\": 0.0722, \"rkt_expected_cosine_if_active\": 0.4259, \"rkt_specific_refusal\": false}]}, {\"id\": \"155\", \"observed_line\": \"A375\", \"observed_norm_ratio\": 0.7151, \"observed_active\": false, \"up_landmarks\": [\"MEF2C\", \"LAMA3\", \"MFSD10\", \"MELK\"], \"down_landmarks\": [\"NR2F6\", \"AKR7A2\", \"AURKB\", \"ADI1\"], \"candidates\": [{\"line\": \"HA1E\", \"empirical_p_active\": 0.0839, \"norm_neighbour_p_active\": 0.0455, \"rkt_p_active\": 0.0689, \"rkt_expected_cosine_if_active\": 0.3304, \"rkt_specific_refusal\": false}, {\"line\": \"HELA\", \"empirical_p_active\": 0.0996, \"norm_neighbour_p_active\": 0.0909, \"rkt_p_active\": 0.0745, \"rkt_expected_cosine_if_active\": 0.3387, \"rkt_specific_refusal\": false}, {\"line\": \"HT29\", \"empirical_p_active\": 0.0688, \"norm_neighbour_p_active\": 0.0455, \"rkt_p_active\": 0.0643, \"rkt_expected_cosine_if_active\": 0.3642, \"rkt_specific_refusal\": false}, {\"line\": \"MCF7\", \"empirical_p_active\": 0.0837, \"norm_neighbour_p_active\": 0.1818, \"rkt_p_active\": 0.0691, \"rkt_expected_cosine_if_active\": 0.3631, \"rkt_specific_refusal\": false}, {\"line\": \"PC3\", \"empirical_p_active\": 0.0756, \"norm_neighbour_p_active\": 0.0455, \"rkt_p_active\": 0.0745, \"rkt_expected_cosine_if_active\": 0.3668, \"rkt_specific_refusal\": false}, {\"line\": \"YAPC\", \"empirical_p_active\": 0.0439, \"norm_neighbour_p_active\": 0.0909, \"rkt_p_active\": 0.1158, \"rkt_expected_cosine_if_active\": 0.3699, \"rkt_specific_refusal\": false}]}, {\"id\": \"314\", \"observed_line\": \"A375\", \"observed_norm_ratio\": 0.8799, \"observed_active\": false, \"up_landmarks\": [\"SMAD3\", \"RBM6\", \"ABHD4\", \"CNPY3\"], \"down_landmarks\": [\"UFM1\", \"CLIC4\", \"RPIA\", \"HACD3\"], \"candidates\": [{\"line\": \"HA1E\", \"empirical_p_active\": 0.0839, \"norm_neighbour_p_active\": 0.1364, \"rkt_p_active\": 0.0415, \"rkt_expected_cosine_if_active\": 0.4535, \"rkt_specific_refusal\": false}, {\"line\": \"HELA\", \"empirical_p_active\": 0.0996, \"norm_neighbour_p_active\": 0.1818, \"rkt_p_active\": 0.0649, \"rkt_expected_cosine_if_active\": 0.4194, \"rkt_specific_refusal\": false}, {\"line\": \"HT29\", \"empirical_p_active\": 0.0688, \"norm_neighbour_p_active\": 0.0909, \"rkt_p_active\": 0.0683, \"rkt_expected_cosine_if_active\": 0.5163, \"rkt_specific_refusal\": false}, {\"line\": \"MCF7\", \"empirical_p_active\": 0.0837, \"norm_neighbour_p_active\": 0.1364, \"rkt_p_active\": 0.241, \"rkt_expected_cosine_if_active\": 0.5356, \"rkt_specific_refusal\": false}, {\"line\": \"PC3\", \"empirical_p_active\": 0.0756, \"norm_neighbour_p_active\": 0.2273, \"rkt_p_active\": 0.1395, \"rkt_expected_cosine_if_active\": 0.5188, \"rkt_specific_refusal\": false}, {\"line\": \"YAPC\", \"empirical_p_active\": 0.0439, \"norm_neighbour_p_active\": 0.1364, \"rkt_p_active\": 0.0956, \"rkt_expected_cosine_if_active\": 0.4837, \"rkt_specific_refusal\": false}]}, {\"id\": \"676\", \"observed_line\": \"A375\", \"observed_norm_ratio\": 3.1798, \"observed_active\": true, \"up_landmarks\": [\"PLA2G15\", \"CEBPA\", \"RELB\", \"INPP1\"], \"down_landmarks\": [\"HMG20B\", \"STMN1\", \"TLE1\", \"CCNA2\"], \"candidates\": [{\"line\": \"HA1E\", \"empirical_p_active\": 0.6395, \"norm_neighbour_p_active\": 0.8636, \"rkt_p_active\": 0.9866, \"rkt_expected_cosine_if_active\": 0.7539, \"rkt_specific_refusal\": false}, {\"line\": \"HELA\", \"empirical_p_active\": 0.5722, \"norm_neighbour_p_active\": 0.9545, \"rkt_p_active\": 0.9203, \"rkt_expected_cosine_if_active\": 0.739, \"rkt_specific_refusal\": false}, {\"line\": \"HT29\", \"empirical_p_active\": 0.6527, \"norm_neighbour_p_active\": 0.9091, \"rkt_p_active\": 0.9801, \"rkt_expected_cosine_if_active\": 0.718, \"rkt_specific_refusal\": false}, {\"line\": \"MCF7\", \"empirical_p_active\": 0.6109, \"norm_neighbour_p_active\": 0.9545, \"rkt_p_active\": 0.9861, \"rkt_expected_cosine_if_active\": 0.709, \"rkt_specific_refusal\": false}, {\"line\": \"PC3\", \"empirical_p_active\": 0.5798, \"norm_neighbour_p_active\": 0.9091, \"rkt_p_active\": 0.9685, \"rkt_expected_cosine_if_active\": 0.744, \"rkt_specific_refusal\": false}, {\"line\": \"YAPC\", \"empirical_p_active\": 0.5191, \"norm_neighbour_p_active\": 0.9545, \"rkt_p_active\": 0.9887, \"rkt_expected_cosine_if_active\": 0.7909, \"rkt_specific_refusal\": false}]}, {\"id\": \"164\", \"observed_line\": \"A375\", \"observed_norm_ratio\": 0.9078, \"observed_active\": false, \"up_landmarks\": [\"AGL\", \"SPP1\", \"RPP38\", \"CAPN1\"], \"down_landmarks\": [\"HEATR1\", \"POLG2\", \"STUB1\", \"CYCS\"], \"candidates\": [{\"line\": \"HA1E\", \"empirical_p_active\": 0.0839, \"norm_neighbour_p_active\": 0.1818, \"rkt_p_active\": 0.0751, \"rkt_expected_cosine_if_active\": 0.3531, \"rkt_specific_refusal\": false}, {\"line\": \"HELA\", \"empirical_p_active\": 0.0996, \"norm_neighbour_p_active\": 0.2273, \"rkt_p_active\": 0.0492, \"rkt_expected_cosine_if_active\": 0.3789, \"rkt_specific_refusal\": false}, {\"line\": \"HT29\", \"empirical_p_active\": 0.0688, \"norm_neighbour_p_active\": 0.2273, \"rkt_p_active\": 0.0581, \"rkt_expected_cosine_if_active\": 0.412, \"rkt_specific_refusal\": false}, {\"line\": \"MCF7\", \"empirical_p_active\": 0.0837, \"norm_neighbour_p_active\": 0.1364, \"rkt_p_active\": 0.0726, \"rkt_expected_cosine_if_active\": 0.4574, \"rkt_specific_refusal\": false}, {\"line\": \"PC3\", \"empirical_p_active\": 0.0756, \"norm_neighbour_p_active\": 0.0909, \"rkt_p_active\": 0.0675, \"rkt_expected_cosine_if_active\": 0.4343, \"rkt_specific_refusal\": false}, {\"line\": \"YAPC\", \"empirical_p_active\": 0.0439, \"norm_neighbour_p_active\": 0.0455, \"rkt_p_active\": 0.0337, \"rkt_expected_cosine_if_active\": 0.343, \"rkt_specific_refusal\": false}]}, {\"id\": \"479\", \"observed_line\": \"A375\", \"observed_norm_ratio\": 1.0204, \"observed_active\": true, \"up_landmarks\": [\"HMOX1\", \"ARHGEF2\", \"GFPT1\", \"MFSD10\"], \"down_landmarks\": [\"MELK\", \"EPHA3\", \"PIN1\", \"ELOVL6\"], \"candidates\": [{\"line\": \"HA1E\", \"empirical_p_active\": 0.6395, \"norm_neighbour_p_active\": 0.4545, \"rkt_p_active\": 0.1214, \"rkt_expected_cosine_if_active\": 0.4818, \"rkt_specific_refusal\": false}, {\"line\": \"HELA\", \"empirical_p_active\": 0.5722, \"norm_neighbour_p_active\": 0.3636, \"rkt_p_active\": 0.4081, \"rkt_expected_cosine_if_active\": 0.598, \"rkt_specific_refusal\": false}, {\"line\": \"HT29\", \"empirical_p_active\": 0.6527, \"norm_neighbour_p_active\": 0.3636, \"rkt_p_active\": 0.2998, \"rkt_expected_cosine_if_active\": 0.5823, \"rkt_specific_refusal\": false}, {\"line\": \"MCF7\", \"empirical_p_active\": 0.6109, \"norm_neighbour_p_active\": 0.5, \"rkt_p_active\": 0.3091, \"rkt_expected_cosine_if_active\": 0.4801, \"rkt_specific_refusal\": false}, {\"line\": \"PC3\", \"empirical_p_active\": 0.5798, \"norm_neighbour_p_active\": 0.1818, \"rkt_p_active\": 0.3828, \"rkt_expected_cosine_if_active\": 0.5823, \"rkt_specific_refusal\": false}, {\"line\": \"YAPC\", \"empirical_p_active\": 0.5191, \"norm_neighbour_p_active\": 0.1818, \"rkt_p_active\": 0.3873, \"rkt_expected_cosine_if_active\": 0.6044, \"rkt_specific_refusal\": false}]}, {\"id\": \"306\", \"observed_line\": \"A375\", \"observed_norm_ratio\": 0.7472, \"observed_active\": false, \"up_landmarks\": [\"RAB11FIP2\", \"RRS1\", \"LAMA3\", \"ADCK3\"], \"down_landmarks\": [\"HSPA1A\", \"PTK2\", \"GNAS\", \"CREB1\"], \"candidates\": [{\"line\": \"HA1E\", \"empirical_p_active\": 0.0839, \"norm_neighbour_p_active\": 0.1818, \"rkt_p_active\": 0.2029, \"rkt_expected_cosine_if_active\": 0.3914, \"rkt_specific_refusal\": false}, {\"line\": \"HELA\", \"empirical_p_active\": 0.0996, \"norm_neighbour_p_active\": 0.0909, \"rkt_p_active\": 0.1541, \"rkt_expected_cosine_if_active\": 0.3257, \"rkt_specific_refusal\": false}, {\"line\": \"HT29\", \"empirical_p_active\": 0.0688, \"norm_neighbour_p_active\": 0.0909, \"rkt_p_active\": 0.1227, \"rkt_expected_cosine_if_active\": 0.3326, \"rkt_specific_refusal\": false}, {\"line\": \"MCF7\", \"empirical_p_active\": 0.0837, \"norm_neighbour_p_active\": 0.0909, \"rkt_p_active\": 0.1106, \"rkt_expected_cosine_if_active\": 0.423, \"rkt_specific_refusal\": false}, {\"line\": \"PC3\", \"empirical_p_active\": 0.0756, \"norm_neighbour_p_active\": 0.0455, \"rkt_p_active\": 0.1471, \"rkt_expected_cosine_if_active\": 0.4191, \"rkt_specific_refusal\": false}, {\"line\": \"YAPC\", \"empirical_p_active\": 0.0439, \"norm_neighbour_p_active\": 0.0909, \"rkt_p_active\": 0.1857, \"rkt_expected_cosine_if_active\": 0.4543, \"rkt_specific_refusal\": false}]}], \"task\": \"Revise your research memory using observed feedback. Choose one second line for every id. Return {choices: [{id: string, line: string, reason: string, source_ids: [string]}], revised_memory: string, unresolved: [string]}. Reasons <=20 words each.\"}"
+    }
+  ]
+}

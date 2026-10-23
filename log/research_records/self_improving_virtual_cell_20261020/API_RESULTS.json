@@ -1,0 +1,606 @@
+{
+ "condition": {
+  "contract": "T",
+  "budget": 16,
+  "seed": 0
+ },
+ "api_ledger": {
+  "model_requests": 3,
+  "http_attempts": 3,
+  "cumulative_tokens": 3046,
+  "limits": {
+   "max_http_attempts": 6,
+   "max_total_tokens": 30000,
+   "max_output_tokens": 1500
+  },
+  "money": "unverified: provider prices were not verified, so no monetary figure is asserted",
+  "no_credentials_or_headers_persisted": true,
+  "receipts": [
+   {
+    "gen": 1,
+    "outcome": "VALID_NO_PROGRAM",
+    "http_attempts": 1,
+    "usage": {
+     "prompt_tokens": 906,
+     "completion_tokens": 87,
+     "total_tokens": 993,
+     "prompt_cache_hit_tokens": 0,
+     "prompt_cache_miss_tokens": 906
+    },
+    "latency_seconds": 1.34,
+    "accepted_for_testing": false,
+    "prompt_sha256": "1a8f21ed069aed05dce72c9ad729c304079a0c2511463ab5caf7bb6e1ea48ad2",
+    "evidence_logged": {
+     "contract": "T",
+     "query_budget_units": 16,
+     "n_released_background_cells": 9,
+     "incumbent_program": {
+      "phi": [
+       {
+        "t": "global"
+       },
+       {
+        "t": "latent",
+        "k": 2
+       }
+      ],
+      "Q": [
+       {
+        "kind": "probe",
+        "frac": 0.5,
+        "rule": "coverage",
+        "cond": null
+       },
+       {
+        "kind": "confirm",
+        "frac": 0.5
+       }
+      ],
+      "f": {
+       "type": "ridge",
+       "inter": [],
+       "lam": 3.0
+      }
+     },
+     "diagnosis": {
+      "verdict": "no_program_explains",
+      "noise_floor": 0.14633,
+      "shared_latent_share_of_residual": 0.286,
+      "incumbent_utility_on_released": 0.7691,
+      "zero_probe_utility_on_released": 0.7687
+     },
+     "evidence": [
+      {
+       "ev": "E1",
+       "class_id": "K0",
+       "unexplained_cell_variation_score": 0.12985,
+       "above_noise_floor": false
+      },
+      {
+       "ev": "E2",
+       "class_id": "K4",
+       "unexplained_cell_variation_score": 0.05672,
+       "above_noise_floor": false
+      },
+      {
+       "ev": "E3",
+       "class_id": "K5",
+       "unexplained_cell_variation_score": 0.02768,
+       "above_noise_floor": false
+      },
+      {
+       "ev": "E4",
+       "class_id": "K7",
+       "unexplained_cell_variation_score": 0.01845,
+       "above_noise_floor": false
+      },
+      {
+       "ev": "E5",
+       "class_id": "K9",
+       "unexplained_cell_variation_score": 0.00356,
+       "above_noise_floor": false
+      }
+     ],
+     "grammar": "Program = {phi: [...], Q: [...], f: {...}}.\nphi entries: {\"t\":\"global\"} | {\"t\":\"latent\",\"k\":1..4} (at most one latent entry) | {\"t\":\"class\",\"id\":\"K<n>\"} (a listed module-class id). At most 8 state entries in total (a latent entry of size k counts k).\nQ stages (fractions sum to 1, 1..3 stages, at least one probe, at most one confirm and it is last): {\"kind\":\"probe\",\"frac\":x,\"rule\":\"random|coverage|variance|aoptimal|witness|exploit\",\"cond\":null} | {\"kind\":\"probe\",\"frac\":x,\"rule\":\"witness\",\"cond\":{\"coord\":<index into the expanded state entries>,\"thr\":number,\"else\":\"coverage|variance|aoptimal|confirm\"}} | {\"kind\":\"confirm\",\"frac\":x}.\nf = {\"type\":\"ridge\",\"inter\":[subset of \"class\",\"anchor\",\"product\"],\"lam\":0.01..1000}.\nA probe measures the full pair-by-cell grid of one pair; the confirm stage spends the remaining budget on top predicted pairs (not available under the transfer contract)."
+    },
+    "model": "deepseek-flash",
+    "response": "{\"cited\": [\"E1\", \"E2\", \"E3\", \"E4\", \"E5\"], \"decision\": \"none\", \"program\": {}, \"rationale\": \"All class-level unexplained variation scores are below the noise floor (0.146), and the verdict is no_program_explains; zero-probe utility (0.7687) nearly equals incumbent (0.7691), so no decision-relevant failure is supported.\"}"
+   },
+   {
+    "gen": 2,
+    "outcome": "VALID_PROGRAM",
+    "http_attempts": 1,
+    "usage": {
+     "prompt_tokens": 904,
+     "completion_tokens": 160,
+     "total_tokens": 1064,
+     "prompt_cache_hit_tokens": 0,
+     "prompt_cache_miss_tokens": 904
+    },
+    "latency_seconds": 1.34,
+    "accepted_for_testing": true,
+    "prompt_sha256": "b33a4dc8cd7c3ccb906919d8a476512e224cbcd053bf51f45d24e468694742ee",
+    "evidence_logged": {
+     "contract": "T",
+     "query_budget_units": 16,
+     "n_released_background_cells": 12,
+     "incumbent_program": {
+      "phi": [
+       {
+        "t": "global"
+       },
+       {
+        "t": "latent",
+        "k": 2
+       }
+      ],
+      "Q": [
+       {
+        "kind": "probe",
+        "frac": 0.5,
+        "rule": "coverage",
+        "cond": null
+       },
+       {
+        "kind": "confirm",
+        "frac": 0.5
+       }
+      ],
+      "f": {
+       "type": "ridge",
+       "inter": [],
+       "lam": 3.0
+      }
+     },
+     "diagnosis": {
+      "verdict": "explainable",
+      "noise_floor": 0.10496,
+      "shared_latent_share_of_residual": 0.3051,
+      "incumbent_utility_on_released": 0.7782,
+      "zero_probe_utility_on_released": 0.7781
+     },
+     "evidence": [
+      {
+       "ev": "E1",
+       "class_id": "K0",
+       "unexplained_cell_variation_score": 0.10795,
+       "above_noise_floor": true
+      },
+      {
+       "ev": "E2",
+       "class_id": "K5",
+       "unexplained_cell_variation_score": 0.03453,
+       "above_noise_floor": false
+      },
+      {
+       "ev": "E3",
+       "class_id": "K4",
+       "unexplained_cell_variation_score": 0.02826,
+       "above_noise_floor": false
+      },
+      {
+       "ev": "E4",
+       "class_id": "K7",
+       "unexplained_cell_variation_score": 0.02059,
+       "above_noise_floor": false
+      },
+      {
+       "ev": "E5",
+       "class_id": "K8",
+       "unexplained_cell_variation_score": 0.00707,
+       "above_noise_floor": false
+      }
+     ],
+     "grammar": "Program = {phi: [...], Q: [...], f: {...}}.\nphi entries: {\"t\":\"global\"} | {\"t\":\"latent\",\"k\":1..4} (at most one latent entry) | {\"t\":\"class\",\"id\":\"K<n>\"} (a listed module-class id). At most 8 state entries in total (a latent entry of size k counts k).\nQ stages (fractions sum to 1, 1..3 stages, at least one probe, at most one confirm and it is last): {\"kind\":\"probe\",\"frac\":x,\"rule\":\"random|coverage|variance|aoptimal|witness|exploit\",\"cond\":null} | {\"kind\":\"probe\",\"frac\":x,\"rule\":\"witness\",\"cond\":{\"coord\":<index into the expanded state entries>,\"thr\":number,\"else\":\"coverage|variance|aoptimal|confirm\"}} | {\"kind\":\"confirm\",\"frac\":x}.\nf = {\"type\":\"ridge\",\"inter\":[subset of \"class\",\"anchor\",\"product\"],\"lam\":0.01..1000}.\nA probe measures the full pair-by-cell grid of one pair; the confirm stage spends the remaining budget on top predicted pairs (not available under the transfer contract)."
+    },
+    "model": "deepseek-flash",
+    "response": "{\"cited\": [\"E1\", \"E2\", \"E3\", \"E4\", \"E5\"], \"decision\": \"propose\", \"program\": {\"Q\": [{\"cond\": null, \"frac\": 0.5, \"kind\": \"probe\", \"rule\": \"coverage\"}, {\"frac\": 0.5, \"kind\": \"confirm\"}], \"f\": {\"inter\": [\"class\"], \"lam\": 3.0, \"type\": \"ridge\"}, \"phi\": [{\"t\": \"global\"}, {\"id\": \"K0\", \"t\": \"class\"}, {\"k\": 2, \"t\": \"latent\"}]}, \"rationale\": \"Only K0 exceeds noise floor (0.108>0.105); other classes are noise. Incumbent lacks class state, so add K0 class entry and class interaction to capture its residual variation while keeping global+latent structure.\"}",
+    "cited": [
+     "E1",
+     "E2",
+     "E3",
+     "E4",
+     "E5"
+    ]
+   },
+   {
+    "gen": 3,
+    "outcome": "VALID_NO_PROGRAM",
+    "http_attempts": 1,
+    "usage": {
+     "prompt_tokens": 907,
+     "completion_tokens": 82,
+     "total_tokens": 989,
+     "prompt_cache_hit_tokens": 0,
+     "prompt_cache_miss_tokens": 907
+    },
+    "latency_seconds": 0.93,
+    "accepted_for_testing": false,
+    "prompt_sha256": "ef71d9e144856da82fbcc7f308d940dcfdb4bed5f22d22601b2f6108e2501a46",
+    "evidence_logged": {
+     "contract": "T",
+     "query_budget_units": 16,
+     "n_released_background_cells": 15,
+     "incumbent_program": {
+      "phi": [
+       {
+        "t": "global"
+       },
+       {
+        "t": "latent",
+        "k": 2
+       }
+      ],
+      "Q": [
+       {
+        "kind": "probe",
+        "frac": 0.5,
+        "rule": "coverage",
+        "cond": null
+       },
+       {
+        "kind": "confirm",
+        "frac": 0.5
+       }
+      ],
+      "f": {
+       "type": "ridge",
+       "inter": [],
+       "lam": 3.0
+      }
+     },
+     "diagnosis": {
+      "verdict": "no_program_explains",
+      "noise_floor": 0.21022,
+      "shared_latent_share_of_residual": 0.3355,
+      "incumbent_utility_on_released": 0.7519,
+      "zero_probe_utility_on_released": 0.7539
+     },
+     "evidence": [
+      {
+       "ev": "E1",
+       "class_id": "K0",
+       "unexplained_cell_variation_score": 0.11454,
+       "above_noise_floor": false
+      },
+      {
+       "ev": "E2",
+       "class_id": "K4",
+       "unexplained_cell_variation_score": 0.09497,
+       "above_noise_floor": false
+      },
+      {
+       "ev": "E3",
+       "class_id": "K5",
+       "unexplained_cell_variation_score": 0.04715,
+       "above_noise_floor": false
+      },
+      {
+       "ev": "E4",
+       "class_id": "K7",
+       "unexplained_cell_variation_score": 0.02123,
+       "above_noise_floor": false
+      },
+      {
+       "ev": "E5",
+       "class_id": "K8",
+       "unexplained_cell_variation_score": 0.0057,
+       "above_noise_floor": false
+      }
+     ],
+     "grammar": "Program = {phi: [...], Q: [...], f: {...}}.\nphi entries: {\"t\":\"global\"} | {\"t\":\"latent\",\"k\":1..4} (at most one latent entry) | {\"t\":\"class\",\"id\":\"K<n>\"} (a listed module-class id). At most 8 state entries in total (a latent entry of size k counts k).\nQ stages (fractions sum to 1, 1..3 stages, at least one probe, at most one confirm and it is last): {\"kind\":\"probe\",\"frac\":x,\"rule\":\"random|coverage|variance|aoptimal|witness|exploit\",\"cond\":null} | {\"kind\":\"probe\",\"frac\":x,\"rule\":\"witness\",\"cond\":{\"coord\":<index into the expanded state entries>,\"thr\":number,\"else\":\"coverage|variance|aoptimal|confirm\"}} | {\"kind\":\"confirm\",\"frac\":x}.\nf = {\"type\":\"ridge\",\"inter\":[subset of \"class\",\"anchor\",\"product\"],\"lam\":0.01..1000}.\nA probe measures the full pair-by-cell grid of one pair; the confirm stage spends the remaining budget on top predicted pairs (not available under the transfer contract)."
+    },
+    "model": "deepseek-flash",
+    "response": "{\"cited\": [\"E1\", \"E2\", \"E3\", \"E4\", \"E5\"], \"decision\": \"none\", \"program\": {}, \"rationale\": \"All class-level unexplained variation scores are below the noise floor, and the verdict is no_program_explains; zero-probe utility (0.7539) matches incumbent (0.7519), so no decision-relevant failure is supported.\"}"
+   }
+  ]
+ },
+ "generation_records": [
+  {
+   "gen": 1,
+   "history_cells": [
+    "MDAMB436",
+    "ZR751",
+    "LOVO",
+    "SKMEL30",
+    "UWB1289BRCA1",
+    "OVCAR3",
+    "CAOV3",
+    "NCIH520",
+    "PA1"
+   ],
+   "diagnosis": {
+    "verdict": "no_program_explains",
+    "failing_classes": [],
+    "class_scores": [
+     0.0,
+     0.01845,
+     0.05672,
+     0.0009,
+     0.00356,
+     0.02768,
+     0.0,
+     0.12985,
+     0.0,
+     0.0
+    ],
+    "noise_floor": 0.14633,
+    "latent_share": 0.286,
+    "incumbent_dev_utility": 0.7691178611111111,
+    "zero_dev_utility": 0.7687498888888888,
+    "direct_dev_utility": null,
+    "decision_relevant_pairs_per_cell": 13
+   },
+   "n_candidates": 0,
+   "candidates": [],
+   "incumbent_dev_mean": 0.7691178611111111,
+   "accepted": null,
+   "reason": "no_program_explains",
+   "incumbent_after": "evo_api-p01"
+  },
+  {
+   "gen": 2,
+   "history_cells": [
+    "MDAMB436",
+    "ZR751",
+    "LOVO",
+    "SKMEL30",
+    "UWB1289BRCA1",
+    "OVCAR3",
+    "CAOV3",
+    "NCIH520",
+    "PA1",
+    "T47D",
+    "A375",
+    "OV90"
+   ],
+   "diagnosis": {
+    "verdict": "explainable",
+    "failing_classes": [
+     7
+    ],
+    "class_scores": [
+     0.0,
+     0.02059,
+     0.02826,
+     0.00707,
+     0.00452,
+     0.03453,
+     0.0,
+     0.10795,
+     0.0,
+     0.0
+    ],
+    "noise_floor": 0.10496,
+    "latent_share": 0.3051,
+    "incumbent_dev_utility": 0.7781892812500001,
+    "zero_dev_utility": 0.7781436666666668,
+    "direct_dev_utility": null,
+    "decision_relevant_pairs_per_cell": 13
+   },
+   "n_candidates": 1,
+   "candidates": [
+    {
+     "op": "api",
+     "spec": {
+      "phi": [
+       {
+        "t": "global"
+       },
+       {
+        "t": "class",
+        "a": 2,
+        "b": 2
+       },
+       {
+        "k": 2,
+        "t": "latent"
+       }
+      ],
+      "Q": [
+       {
+        "kind": "probe",
+        "frac": 0.5,
+        "rule": "coverage",
+        "cond": null
+       },
+       {
+        "kind": "confirm",
+        "frac": 0.5
+       }
+      ],
+      "f": {
+       "type": "ridge",
+       "inter": [
+        "class"
+       ],
+       "lam": 3.0
+      }
+     },
+     "dev_mean": 0.7813307291666667,
+     "gain": 0.0031414479166666696,
+     "wins": 4,
+     "losses": 3,
+     "win_frac": 0.5714285714285714
+    }
+   ],
+   "incumbent_dev_mean": 0.7781892812500001,
+   "accepted": null,
+   "reason": "no candidate met the acceptance rule",
+   "incumbent_after": "evo_api-p01"
+  },
+  {
+   "gen": 3,
+   "history_cells": [
+    "MDAMB436",
+    "ZR751",
+    "LOVO",
+    "SKMEL30",
+    "UWB1289BRCA1",
+    "OVCAR3",
+    "CAOV3",
+    "NCIH520",
+    "PA1",
+    "T47D",
+    "A375",
+    "OV90",
+    "DLD1",
+    "SKOV3",
+    "SW620"
+   ],
+   "diagnosis": {
+    "verdict": "no_program_explains",
+    "failing_classes": [],
+    "class_scores": [
+     0.0,
+     0.02123,
+     0.09497,
+     0.0057,
+     0.00242,
+     0.04715,
+     0.0,
+     0.11454,
+     0.0,
+     0.0
+    ],
+    "noise_floor": 0.21022,
+    "latent_share": 0.3355,
+    "incumbent_dev_utility": 0.7518873750000001,
+    "zero_dev_utility": 0.7538719583333334,
+    "direct_dev_utility": null,
+    "decision_relevant_pairs_per_cell": 13
+   },
+   "n_candidates": 0,
+   "candidates": [],
+   "incumbent_dev_mean": 0.7518873750000001,
+   "accepted": null,
+   "reason": "no_program_explains",
+   "incumbent_after": "evo_api-p01"
+  }
+ ],
+ "library": [
+  {
+   "id": "evo_api-p01",
+   "spec": {
+    "phi": [
+     {
+      "t": "global"
+     },
+     {
+      "t": "latent",
+      "k": 2
+     }
+    ],
+    "Q": [
+     {
+      "kind": "probe",
+      "frac": 0.5,
+      "rule": "coverage",
+      "cond": null
+     },
+     {
+      "kind": "confirm",
+      "frac": 0.5
+     }
+    ],
+    "f": {
+     "type": "ridge",
+     "inter": [],
+     "lam": 3.0
+    }
+   },
+   "parent": null,
+   "op": "base",
+   "gen": 0,
+   "status": "demonstrated",
+   "evidence": {}
+  }
+ ],
+ "final_program": "evo_api-p01",
+ "test_utility_mean": 0.7633603916666666,
+ "refit_test_mean": 0.7633603916666666,
+ "evo_full_test_mean": 0.7606807083333335,
+ "paired_vs_refit": {
+  "n_cells": 15,
+  "mean": 0.0,
+  "median": 0.0,
+  "min": 0.0,
+  "max": 0.0,
+  "wins": 0,
+  "losses": 0,
+  "ties": 15,
+  "sd_cells": 0.0
+ },
+ "paired_vs_evo_full": {
+  "n_cells": 15,
+  "mean": 0.002679683333333342,
+  "median": 0.0,
+  "min": 0.0,
+  "max": 0.013562625000000161,
+  "wins": 5,
+  "losses": 0,
+  "ties": 10,
+  "sd_cells": 0.004436671371040813
+ },
+ "accepted_rejected": [
+  {
+   "gen": 1,
+   "accepted": null,
+   "candidates": []
+  },
+  {
+   "gen": 2,
+   "accepted": null,
+   "candidates": [
+    {
+     "op": "api",
+     "spec": {
+      "phi": [
+       {
+        "t": "global"
+       },
+       {
+        "t": "class",
+        "a": 2,
+        "b": 2
+       },
+       {
+        "k": 2,
+        "t": "latent"
+       }
+      ],
+      "Q": [
+       {
+        "kind": "probe",
+        "frac": 0.5,
+        "rule": "coverage",
+        "cond": null
+       },
+       {
+        "kind": "confirm",
+        "frac": 0.5
+       }
+      ],
+      "f": {
+       "type": "ridge",
+       "inter": [
+        "class"
+       ],
+       "lam": 3.0
+      }
+     },
+     "dev_mean": 0.7813307291666667,
+     "gain": 0.0031414479166666696,
+     "wins": 4,
+     "losses": 3,
+     "win_frac": 0.5714285714285714
+    }
+   ]
+  },
+  {
+   "gen": 3,
+   "accepted": null,
+   "candidates": []
+  }
+ ]
+}

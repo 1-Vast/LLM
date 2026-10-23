@@ -1,0 +1,128 @@
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+Warning messages:
+1: package 'generics' was built under R version 4.5.3 
+2: package 'Biobase' was built under R version 4.5.3 
+$Base
+$urls
+$urls$bioc
+[1] "http://bioconductor.org"
+
+
+$use.widgets
+[1] FALSE
+
+attr(,"class")
+[1] "BioCPkg"
+
+$affy
+$compress.cdf
+[1] FALSE
+
+$compress.cel
+[1] FALSE
+
+$use.widgets
+[1] FALSE
+
+$probesloc
+$probesloc[[1]]
+$probesloc[[1]]$what
+[1] "environment"
+
+$probesloc[[1]]$where
+<environment: R_GlobalEnv>
+
+
+$probesloc[[2]]
+$probesloc[[2]]$what
+[1] "libPath"
+
+$probesloc[[2]]$where
+NULL
+
+
+$probesloc[[3]]
+$probesloc[[3]]$what
+[1] "data"
+
+$probesloc[[3]]$where
+[1] "affy"
+
+
+$probesloc[[4]]
+$probesloc[[4]]$what
+[1] "bioC"
+
+$probesloc[[4]]$where
+[1] "D:/anaconda/envs/maestro/r-library-bioc322"
+
+
+
+$bgcorrect.method
+[1] "mas"
+
+$normalize.method
+[1] "quantiles"
+
+$pmcorrect.method
+[1] "pmonly"
+
+$summary.method
+[1] "liwong"
+
+$xy.offset
+[1] 0
+
+attr(,"class")
+[1] "BioCPkg"
+
+attr(,"class")
+[1] "BioCOptions"
+function (cdfname, where, verbose = TRUE) 
+{
+    if (verbose) 
+        print(paste("Attempting to locate", cdfname, "in specified environment"))
+    if (exists(cdfname, inherits = FALSE, where = where)) 
+        return(as.environment(get(cdfname, inherits = FALSE, 
+            envir = where)))
+    else {
+        if (verbose) 
+            print(paste("Specified environment does not contain", 
+                cdfname))
+        return(list(paste("Specified environment does not contain", 
+            cdfname)))
+    }
+}
+<bytecode: 0x00000161ccb99e70>
+<environment: namespace:affy>
+function (cdfname, lib = NULL, verbose = TRUE) 
+{
+    cdfname <- cleancdfname(cdfname)
+    if (verbose) 
+        print(paste("Checking to see if package", cdfname, "is already installed"))
+    if (length(find.package(cdfname, lib.loc = lib, quiet = TRUE)) == 
+        0) 
+        return(list(paste("Library - package", cdfname, "not installed")))
+    if (cdfname %in% .packages()) {
+        if (verbose) 
+            print(paste("The package", cdfname, "is already loaded"))
+    }
+    else {
+        if (verbose) 
+            print(paste("Attempting to load package", cdfname))
+        do.call(library, list(cdfname, lib.loc = lib, character.only = TRUE))
+        if (!cdfname %in% .packages()) {
+            if (verbose) 
+                print(paste("The package", cdfname, "could not be loaded"))
+            return(list(paste("Library - package", cdfname, "is not loadable")))
+        }
+    }
+    return(get(cdfname, envir = as.environment(paste("package:", 
+        cdfname, sep = ""))))
+}
+<bytecode: 0x00000161ccb58c40>
+<environment: namespace:affy>

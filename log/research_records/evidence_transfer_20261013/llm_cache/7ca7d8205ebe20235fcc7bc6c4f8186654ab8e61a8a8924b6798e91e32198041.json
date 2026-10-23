@@ -1,0 +1,109 @@
+{
+  "key": "7ca7d8205ebe20235fcc7bc6c4f8186654ab8e61a8a8924b6798e91e32198041",
+  "specification": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a scientific agent. Analyze the compound scientifically and use the available information and tools to identify relevant transfer donors. You may select measured reference donors, never fabricate response values. Drug descriptions are pharmacology, not proof of context-specific response. The fixed external decoder transfers donor target-minus-A375 responses, then selects one target cell/feature/sign. Aim for a reproducible histone perturbation (>0.5 log2 vs vehicle). No viability or causal claim. Return JSON only."
+      },
+      {
+        "role": "user",
+        "content": "{\"query\": {\"id\": \"BRD-K51313569\", \"name\": \"PD-0332991\", \"dose_uM\": 0.5, \"exposure_hours\": 24, \"anchor_line\": \"A375\", \"anchor_features\": [{\"id\": \"BI10043\", \"histone_mark\": \"H3K27me3K36me0\", \"standardized\": -7.3116}, {\"id\": \"BI10036\", \"histone_mark\": \"H3K27me1K36me1\", \"standardized\": -2.8338}, {\"id\": \"BI10085\", \"histone_mark\": \"H3K27me0K36me1\", \"standardized\": -2.7127}, {\"id\": \"BI10009\", \"histone_mark\": \"H3K9me1K14ac0\", \"standardized\": 2.3404}, {\"id\": \"BI10010\", \"histone_mark\": \"H3K9me2K14ac0\", \"standardized\": 2.2376}, {\"id\": \"BI10086\", \"histone_mark\": \"H3K27me0K36me2\", \"standardized\": -2.1898}]}, \"query_sources\": [{\"source_id\": \"pubchem:5330286:description:1\", \"text\": \"Palbociclib is a member of the class of pyridopyrimidines that is 2-{[5-(piperazin-1-yl)pyridin-2-yl]amino}pyrido[2,3-d]pyrimidin-7-one bearing additional methyl, acetyl and cyclopentyl substituents at positions 5, 6 and 8 respectively. It is used in combination with letrozole for the treatment of metastatic breast cancer. It has a role as an antineoplastic agent and an EC 2.7.11.22 (cyclin-dependent kinase) inhibitor. It is a member of cyclopentanes, a member of piperidines, an aminopyridine, a pyridopyrimidine, a secondary amino compound, a tertiary amino compound and an aromatic ketone.\", \"provider\": null, \"url\": \"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:85993\"}], \"candidate_donors\": [{\"id\": \"BRD-K01567962\", \"name\": \"SP600125\", \"dose_uM\": 25.0, \"anchor_similarity\": 0.3487, \"structure_similarity\": 0.0843}, {\"id\": \"BRD-K12343256\", \"name\": \"Trametinib\", \"dose_uM\": 0.1, \"anchor_similarity\": 0.2104, \"structure_similarity\": 0.219}, {\"id\": \"BRD-K12502280\", \"name\": \"TG101348\", \"dose_uM\": 8.0, \"anchor_similarity\": 0.4943, \"structure_similarity\": 0.1792}, {\"id\": \"BRD-K13662825\", \"name\": \"Dinaciclib\", \"dose_uM\": 4.5, \"anchor_similarity\": 0.7367, \"structure_similarity\": 0.1743}, {\"id\": \"BRD-K15179879\", \"name\": \"Carfilzomib\", \"dose_uM\": 3.0, \"anchor_similarity\": 0.2594, \"structure_similarity\": 0.1171}, {\"id\": \"BRD-K31283835\", \"name\": \"Tofacitinib\", \"dose_uM\": 0.4, \"anchor_similarity\": 0.0715, \"structure_similarity\": 0.1818}, {\"id\": \"BRD-K31406481\", \"name\": \"VU0155056\", \"dose_uM\": 1.0, \"anchor_similarity\": -0.3957, \"structure_similarity\": 0.1979}, {\"id\": \"BRD-K37798499\", \"name\": \"Etoposide\", \"dose_uM\": 5.0, \"anchor_similarity\": 0.275, \"structure_similarity\": 0.094}, {\"id\": \"BRD-K49328571\", \"name\": \"Dasatinib\", \"dose_uM\": 0.1, \"anchor_similarity\": -0.1912, \"structure_similarity\": 0.1759}, {\"id\": \"BRD-K56343971\", \"name\": \"vemurafenib\", \"dose_uM\": 10.0, \"anchor_similarity\": 0.5406, \"structure_similarity\": 0.1415}, {\"id\": \"BRD-K81528515\", \"name\": \"Nilotinib\", \"dose_uM\": 3.0, \"anchor_similarity\": -0.0571, \"structure_similarity\": 0.1681}, {\"id\": \"BRD-K87737963\", \"name\": \"momelotinib\", \"dose_uM\": 1.0, \"anchor_similarity\": -0.239, \"structure_similarity\": 0.2188}, {\"id\": \"BRD-K87909389\", \"name\": \"flavopiridol\", \"dose_uM\": 0.4, \"anchor_similarity\": 0.6489, \"structure_similarity\": 0.1154}, {\"id\": \"BRD-M45964048\", \"name\": \"Verteporfin\", \"dose_uM\": 5.0, \"anchor_similarity\": 0.2284, \"structure_similarity\": 0.112}], \"task\": \"Choose at most five donor IDs whose pharmacology descriptions should be retrieved. Return {requests:[id,...],donors:[{id:...}],hypotheses:[...],evidence_gap:string}. Initial donors are optional source-free choices; <=5.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "{\"requests\": [\"BRD-K13662825\", \"BRD-K87909389\", \"BRD-K12502280\", \"BRD-K56343971\", \"BRD-K01567962\"], \"donors\": [{\"id\": \"BRD-K13662825\"}, {\"id\": \"BRD-K87909389\"}, {\"id\": \"BRD-K12502280\"}, {\"id\": \"BRD-K56343971\"}, {\"id\": \"BRD-K01567962\"}], \"hypotheses\": [\"CDK4/6 inhibition by PD-0332991 may produce a histone-mark response most similar to other CDK inhibitors (Dinaciclib, flavopiridol), which show the highest anchor similarity among candidates.\", \"JAK2 inhibition (TG101348) may partially phenocopy the PD-0332991 anchor profile, possibly through shared effects on proliferation-associated chromatin states.\", \"BRAF inhibition (vemurafenib) in the A375 anchor line may yield a histone response resembling PD-0332991 due to lineage-specific signaling context rather than direct CDK4/6 inhibition.\", \"JNK inhibition (SP600125) is a weaker candidate but may share stress-responsive chromatin effects with the query.\"], \"evidence_gap\": \"No donor has a pharmacology description explicitly linking its mechanism to the specific H3K27me3K36me0 or H3K9me1K14ac0 histone-mark changes observed for PD-0332991; donor selection is based on anchor similarity and inferred pathway overlap, not on measured histone responses.\"}"
+      },
+      {
+        "role": "user",
+        "content": "{\"retrieved_sources\": {\"BRD-K13662825\": [{\"source_id\": \"pubchem:46926350:description:1\", \"text\": \"Dinaciclib is a pyrazolopyrimidine that is pyrazolo[1,5-a]pyrimidine substituted by ethyl, (2S)-2-(2-hydroxyethyl)piperidin-1-yl, and [(1-oxidopyridin-3-yl)methyl]amino groups at positions 3, 5, and 7, respectively. It is a potent pan-cyclin dependent kinase inhibitor that exhibits antineoplastic activity. It has a role as an antineoplastic agent, an apoptosis inducer and an EC 2.7.11.22 (cyclin-dependent kinase) inhibitor. It is a primary alcohol, a member of piperidines, a member of pyridine N-oxides, a pyrazolopyrimidine, a secondary amino compound and a tertiary amino compound.\", \"provider\": null, \"url\": \"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:95060\"}], \"BRD-K87909389\": [{\"source_id\": \"pubchem:5287969:description:1\", \"text\": \"Alvocidib is a synthetic dihydroxyflavone that is 5,7-dihydroxyflavone which is substituted by a 3-hydroxy-1-methylpiperidin-4-yl group at position 8 and by a chlorine at the 2' position (the ()-3S,4R stereoisomer). A cyclin-dependent kinase 9 (CDK9) inhibitor, it has been studied for the treatment of acute myeloid leukaemia, arthritis and atherosclerotic plaque formation. It has a role as an antineoplastic agent, an antirheumatic drug, an apoptosis inducer and an EC 2.7.11.22 (cyclin-dependent kinase) inhibitor. It is a dihydroxyflavone, a hydroxypiperidine, a tertiary amino compound and a member of monochlorobenzenes. It is a conjugate base of an alvocidib(1+).\", \"provider\": null, \"url\": \"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:47344\"}], \"BRD-K12502280\": [{\"source_id\": \"pubchem:16722836:description:1\", \"text\": \"N-tert-butyl-3-[[5-methyl-2-[4-[2-(1-pyrrolidinyl)ethoxy]anilino]-4-pyrimidinyl]amino]benzenesulfonamide is a sulfonamide.\", \"provider\": null, \"url\": \"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:91408\"}], \"BRD-K56343971\": [{\"source_id\": \"pubchem:42611257:description:1\", \"text\": \"Vemurafenib is a pyrrolopyridine that is 1H-pyrrolo[2,3-b]pyridine which is substituted at position 5 by a p-chlorophenyl group and at positions 3 by a 3-amino-2,6-difluorobenzoyl group, the amino group of which has undergone formal condensation with propane-1-sulfonic acid to give the corresponding sulfonamide. An inhibitor of BRAF and other kinases. It has a role as an antineoplastic agent and a B-Raf inhibitor. It is a sulfonamide, a difluorobenzene, a pyrrolopyridine, an aromatic ketone and a member of monochlorobenzenes.\", \"provider\": null, \"url\": \"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:63637\"}], \"BRD-K01567962\": [{\"source_id\": \"pubchem:8515:description:1\", \"text\": \"Anthra[1,9-cd]pyrazol-6(2H)-one is a member of the class of anthrapyrazoles that is anthra[1,9-cd]pyrazole substituted at position 6 by an oxo group. An inhibitor of c-Jun N-terminal kinase. It has a role as a geroprotector, an antineoplastic agent and a c-Jun N-terminal kinase inhibitor. It is a cyclic ketone, an aromatic ketone and an anthrapyrazole.\", \"provider\": null, \"url\": \"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:90695\"}]}, \"task\": \"Revise donor support. Choose <=5 donors ONLY from retrieved donor IDs; cite supplied source IDs and <=30-word reasons. Abstain with donors:[] if unsupported. Return {donors:[{id,source_ids:[...],reason}],revised_hypotheses:[...],unresolved:[...]}.\"}"
+      }
+    ],
+    "arm": "agent_only:qualify",
+    "query_id": "BRD-K51313569",
+    "donor_ids": [
+      "BRD-K01567962",
+      "BRD-K12502280",
+      "BRD-K13662825",
+      "BRD-K56343971",
+      "BRD-K87909389"
+    ],
+    "source_ids": [
+      "pubchem:16722836:description:1",
+      "pubchem:42611257:description:1",
+      "pubchem:46926350:description:1",
+      "pubchem:5287969:description:1",
+      "pubchem:5330286:description:1",
+      "pubchem:8515:description:1"
+    ],
+    "model": "deepseek-flash",
+    "max_tokens": 900,
+    "stage": "qualify",
+    "model_freeze_sha256": "2e7377bc4f71f5a1e3f0957dd8dad5f93e796f50c3c9641202c2a8e297e25924"
+  },
+  "object": {
+    "donors": [
+      {
+        "id": "BRD-K13662825",
+        "source_ids": [
+          "pubchem:46926350:description:1"
+        ],
+        "reason": "Pan-CDK inhibitor; closest mechanistic match to CDK4/6 inhibitor PD-0332991 and highest anchor similarity."
+      },
+      {
+        "id": "BRD-K87909389",
+        "source_ids": [
+          "pubchem:5287969:description:1"
+        ],
+        "reason": "CDK9 inhibitor; CDK-family overlap with PD-0332991 and high anchor similarity."
+      },
+      {
+        "id": "BRD-K56343971",
+        "source_ids": [
+          "pubchem:42611257:description:1"
+        ],
+        "reason": "BRAF inhibitor active in A375 lineage; anchor similarity may reflect shared melanoma context."
+      },
+      {
+        "id": "BRD-K01567962",
+        "source_ids": [
+          "pubchem:8515:description:1"
+        ],
+        "reason": "JNK inhibitor; weaker but plausible stress-chromatin overlap with query profile."
+      }
+    ],
+    "revised_hypotheses": [
+      "CDK inhibitors (Dinaciclib, flavopiridol) are the strongest mechanistic donors for PD-0332991 histone-mark transfer.",
+      "Vemurafenib may capture A375 lineage-specific chromatin effects independent of CDK4/6.",
+      "SP600125 is a lower-confidence donor based on stress-pathway chromatin overlap."
+    ],
+    "unresolved": [
+      "No retrieved source directly links any donor to H3K27me3K36me0 or H3K9me1K14ac0 changes.",
+      "TG101348 lacks a mechanistic description supporting JAK2 inhibition in the retrieved text."
+    ]
+  },
+  "error": null,
+  "usage": {
+    "prompt_tokens": 2846,
+    "completion_tokens": 327,
+    "total_tokens": 3173,
+    "prompt_cache_hit_tokens": 1408,
+    "prompt_cache_miss_tokens": 1438,
+    "calls": 1,
+    "model": "deepseek-flash"
+  },
+  "response": {
+    "content": "{\"donors\":[{\"id\":\"BRD-K13662825\",\"source_ids\":[\"pubchem:46926350:description:1\"],\"reason\":\"Pan-CDK inhibitor; closest mechanistic match to CDK4/6 inhibitor PD-0332991 and highest anchor similarity.\"},{\"id\":\"BRD-K87909389\",\"source_ids\":[\"pubchem:5287969:description:1\"],\"reason\":\"CDK9 inhibitor; CDK-family overlap with PD-0332991 and high anchor similarity.\"},{\"id\":\"BRD-K56343971\",\"source_ids\":[\"pubchem:42611257:description:1\"],\"reason\":\"BRAF inhibitor active in A375 lineage; anchor similarity may reflect shared melanoma context.\"},{\"id\":\"BRD-K01567962\",\"source_ids\":[\"pubchem:8515:description:1\"],\"reason\":\"JNK inhibitor; weaker but plausible stress-chromatin overlap with query profile.\"}],\"revised_hypotheses\":[\"CDK inhibitors (Dinaciclib, flavopiridol) are the strongest mechanistic donors for PD-0332991 histone-mark transfer.\",\"Vemurafenib may capture A375 lineage-specific chromatin effects independent of CDK4/6.\",\"SP600125 is a lower-confidence donor based on stress-pathway chromatin overlap.\"],\"unresolved\":[\"No retrieved source directly links any donor to H3K27me3K36me0 or H3K9me1K14ac0 changes.\",\"TG101348 lacks a mechanistic description supporting JAK2 inhibition in the retrieved text.\"]}",
+    "finish_reason": "stop",
+    "model": "deepseek-flash",
+    "usage": {
+      "prompt_tokens": 2846,
+      "completion_tokens": 327,
+      "total_tokens": 3173,
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 1438
+    }
+  },
+  "started_at": "2026-10-13T02:44:55.766743+00:00",
+  "finished_at": "2026-10-13T02:44:58.299074+00:00"
+}

@@ -95,3 +95,12 @@ Copies: dataset copies and cached releases retain their source exposure. File-le
 ## Concurrent copies observed during final review
 
 The former `outputs/local_verification/upstream/dataset/raw` path was a Windows junction to `data/raw`, not an independent copy. Recursive scans through it double-counted 40,518,420 workbook bytes. Second-pass cleanup relocated the junction scaffold to `D:/MAESTRO_maintenance_backups/20261020_deep_cleanup/archived/outputs/local_verification/`; canonical data remain in place. Historical ASSETS observations retain the original scan paths; the correction is also recorded in ASSETS.json.
+
+
+## Research record relocation (2026-10-23)
+
+5174 files / 16,965,601,085 bytes were relocated from log storage into raw, external-source and processed-data research subtrees. The base inventory above remains dated as stated. No outcome values were decoded for this maintenance. Exact paths, hashes and operation receipts are in [DATA_LOCATIONS.md](../log/20261023/report_consolidation/DATA_LOCATIONS.md). This is a relocation record, not a new independent dataset or scientific result.
+
+## Evidence-portfolio development (2026-10-23)
+
+`processed/evidence_portfolio_optimization_20261023/` stores the metadata-selected, exposed Jaaks observations and per-arm acquisition choices for the repeatability diagnostic. `external/evidence_portfolio_optimization_20261023/` stores retrieved primary-source bodies and request receipts. Key results and provenance links are in [the study record](../log/20261023/evidence_portfolio_optimization/README.md). This work did not access AZ numeric outcomes or reserves and supplies no new independent biological dataset.

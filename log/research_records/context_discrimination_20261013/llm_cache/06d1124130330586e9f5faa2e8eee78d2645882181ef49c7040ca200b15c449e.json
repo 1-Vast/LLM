@@ -1,0 +1,36 @@
+{
+  "key": "06d1124130330586e9f5faa2e8eee78d2645882181ef49c7040ca200b15c449e",
+  "object": {
+    "hypotheses": [
+      "H1: Second-line activity is driven by lineage-specific target dependence; e.g., MCF7/PC3 may differ for nafamostat (protease/ASIC) or refametinib (MAP2K) because pathway wiring differs by tissue.",
+      "H2: Second-line activity is mostly a shared L1000 systematic response plus vehicle-norm threshold, so line choice changes little; apparent differences reflect assay noise or source-specific transfer rather than mechanism."
+    ],
+    "evidence_gaps": [
+      "No measured second-line activity yet; first_line A375 fixed by transfer coverage.",
+      "Target expression/activity per line is not provided; tissue labels alone do not establish dependence.",
+      "MOA annotations are incomplete (AT-13387 moa empty) and Repurposing Hub/MAP annotations are weaker than measured responses.",
+      "Activity is a vehicle-norm threshold in L1000, not viability; two labels do not establish mechanism.",
+      "Source choice and shared systematic response may inflate transfer quality."
+    ],
+    "memory": "Batch: 7 compounds, first_line A375. Need one different second line per compound to maximize compounds with one active and one inactive line across two retrievals. Competing: lineage-specific target dependence vs shared systematic response/noise. Gaps: no second-line outcomes, no per-line target evidence, weak annotations, activity != viability. Next: after feedback, choose second lines that discriminate H1 vs H2, avoiding lines likely to share systematic response."
+  },
+  "error": null,
+  "usage": {
+    "prompt_tokens": 1107,
+    "completion_tokens": 307,
+    "total_tokens": 1414,
+    "prompt_cache_hit_tokens": 896,
+    "prompt_cache_miss_tokens": 211,
+    "model": "deepseek-flash"
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a scientific research agent. Form competing biological explanations, identify evidence gaps and source IDs. After observed feedback, revise your hypotheses and select discriminating observations. Treat VC disagreement as a question, not a cause. Preserve a concise research memory. Objective: maximize the number of compounds with one recorded active and one inactive line in two profile retrievals each. The first line is fixed by transfer coverage. Choose exactly one different available second line per compound after the first observation. All numeric optimization, outcome scoring and budgets are external. Never claim viability or causality. Return JSON only."
+    },
+    {
+      "role": "user",
+      "content": "{\"sources\": {\"S1\": \"PRESAGE doi:10.1101/2025.06.03.657653: measured cross-system perturbations can transfer; source choice matters.\", \"S2\": \"Systema doi:10.1038/s41587-025-02777-8: shared systematic response may inflate prediction quality.\", \"S3\": \"GeneAgent doi:10.1038/s41592-025-02748-6: database verification supports functional descriptions, not causal proof.\", \"S4\": \"Repurposing Hub/MAP annotations are weaker than measured responses; tissue-specific target dependence is not established here.\", \"S5\": \"Activity is a vehicle-norm threshold in L1000, NOT viability. Two different activity labels do not establish a mechanism.\"}, \"tissues\": {\"A375\": \"melanoma\", \"HA1E\": \"immortalized kidney\", \"HELA\": \"cervical cancer\", \"HT29\": \"colorectal cancer\", \"MCF7\": \"breast cancer, ER+\", \"PC3\": \"prostate cancer, AR-\", \"YAPC\": \"pancreatic cancer\"}, \"compounds\": [{\"id\": \"441\", \"key\": \"nafamostat\", \"name\": \"nafamostat\", \"targets\": [\"ASIC1\", \"ASIC2\", \"ASIC3\", \"C1R\", \"PRSS1\", \"TPSAB1\", \"TRPM7\", \"TMPRSS2\", \"PLG\", \"F2\", \"KLK1\", \"F10\", \"C1S\"], \"moa\": [\"serine protease inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"569\", \"key\": \"sb-683698\", \"name\": \"SB-683698\", \"targets\": [\"ITGA4\", \"ITGAV\", \"ITGB1\", \"ITGB7\"], \"moa\": [\"integrin antagonist\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"71\", \"key\": \"at-13387\", \"name\": \"AT-13387\", \"targets\": [\"HSP90AA1\"], \"moa\": [], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"13\", \"key\": \"acexamic-acid\", \"name\": \"acexamic-acid\", \"targets\": [\"GAST\"], \"moa\": [\"5 alpha reductase inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"337\", \"key\": \"kbg\", \"name\": \"KBG\", \"targets\": [\"MME\"], \"moa\": [\"neprilysin inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"77\", \"key\": \"avagacestat\", \"name\": \"avagacestat\", \"targets\": [\"PSEN1\"], \"moa\": [\"gamma secretase inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}, {\"id\": \"535\", \"key\": \"refametinib\", \"name\": \"refametinib\", \"targets\": [\"MAP2K1\", \"MAP2K2\"], \"moa\": [\"mek inhibitor\"], \"available_lines\": [\"A375\", \"HA1E\", \"HELA\", \"HT29\", \"MCF7\", \"PC3\", \"YAPC\"], \"first_line\": \"A375\"}], \"task\": \"Before seeing feedback, give two competing explanations for this batch and note evidence gaps. Return {hypotheses: [...], evidence_gaps: [...], memory: string}. Maximum 250 words.\"}"
+    }
+  ]
+}

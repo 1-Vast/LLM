@@ -1,0 +1,101 @@
+{
+  "key": "e47ad840720a245f7411d5e5a3702a30d52fd6d2f88d169d655fcdacd43576a5",
+  "specification": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a scientific agent. Analyze the compound scientifically and use the available information and tools to identify relevant transfer donors. You may select measured reference donors, never fabricate response values. Drug descriptions are pharmacology, not proof of context-specific response. The fixed external decoder transfers donor target-minus-A375 responses, then selects one target cell/feature/sign. Aim for a reproducible histone perturbation (>0.5 log2 vs vehicle). No viability or causal claim. Return JSON only."
+      },
+      {
+        "role": "user",
+        "content": "{\"query\": {\"id\": \"BRD-A67788537\", \"name\": \"salermide\", \"dose_uM\": 10.0, \"exposure_hours\": 24, \"anchor_line\": \"A375\", \"anchor_features\": [{\"id\": \"BI10060\", \"histone_mark\": \"H3K79me0\", \"standardized\": 4.7035}, {\"id\": \"BI10061\", \"histone_mark\": \"H3K79me1\", \"standardized\": 4.6976}, {\"id\": \"BI10054\", \"histone_mark\": \"H3K56me0\", \"standardized\": 3.4263}, {\"id\": \"BI10013\", \"histone_mark\": \"H3K9me0K14ac1\", \"standardized\": 1.0217}, {\"id\": \"BI10086\", \"histone_mark\": \"H3K27me0K36me2\", \"standardized\": -0.9084}, {\"id\": \"BI10008\", \"histone_mark\": \"H3K9me0K14ac0\", \"standardized\": 0.7477}]}, \"query_sources\": [], \"candidate_donors\": [{\"id\": \"BRD-A18705706\", \"name\": \"zebularine\", \"dose_uM\": 10.0, \"anchor_similarity\": 0.9427, \"structure_similarity\": 0.0769}, {\"id\": \"BRD-A48881734\", \"name\": \"CPI-169\", \"dose_uM\": 1.0, \"anchor_similarity\": -0.1311, \"structure_similarity\": 0.16}, {\"id\": \"BRD-A69563582\", \"name\": \"EPZ-5676\", \"dose_uM\": 10.0, \"anchor_similarity\": 0.4641, \"structure_similarity\": 0.084}, {\"id\": \"BRD-A79768653\", \"name\": \"sirolimus\", \"dose_uM\": 1.0, \"anchor_similarity\": 0.8662, \"structure_similarity\": 0.0638}, {\"id\": \"BRD-K01567962\", \"name\": \"SP600125\", \"dose_uM\": 25.0, \"anchor_similarity\": 0.6256, \"structure_similarity\": 0.1143}, {\"id\": \"BRD-K15179879\", \"name\": \"Carfilzomib\", \"dose_uM\": 3.0, \"anchor_similarity\": -0.2234, \"structure_similarity\": 0.1667}, {\"id\": \"BRD-K25412176\", \"name\": \"afuresertib\", \"dose_uM\": 2.5, \"anchor_similarity\": 0.492, \"structure_similarity\": 0.125}, {\"id\": \"BRD-K52560704\", \"name\": \"methylstat\", \"dose_uM\": 10.0, \"anchor_similarity\": 0.9459, \"structure_similarity\": 0.1978}, {\"id\": \"BRD-K73261812\", \"name\": \"PRI-724\", \"dose_uM\": 1.7, \"anchor_similarity\": -0.0632, \"structure_similarity\": 0.1789}, {\"id\": \"BRD-K74148702\", \"name\": \"curcumin\", \"dose_uM\": 1.0, \"anchor_similarity\": -0.143, \"structure_similarity\": 0.209}, {\"id\": \"BRD-K79254416\", \"name\": \"decitabine\", \"dose_uM\": 10.0, \"anchor_similarity\": 0.7862, \"structure_similarity\": 0.0595}, {\"id\": \"BRD-K83189926\", \"name\": \"UNC1215\", \"dose_uM\": 1.0, \"anchor_similarity\": 0.6717, \"structure_similarity\": 0.1772}, {\"id\": \"BRD-K88510285\", \"name\": \"Bortezomib\", \"dose_uM\": 0.3, \"anchor_similarity\": -0.2846, \"structure_similarity\": 0.1628}, {\"id\": \"BRD-K93468883\", \"name\": \"IPI145\", \"dose_uM\": 0.5, \"anchor_similarity\": 0.0087, \"structure_similarity\": 0.1667}], \"task\": \"Choose at most five donor IDs whose pharmacology descriptions should be retrieved. Return {requests:[id,...],donors:[{id:...}],hypotheses:[...],evidence_gap:string}. Initial donors are optional source-free choices; <=5.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "{\"requests\": [\"BRD-A18705706\", \"BRD-K52560704\", \"BRD-K79254416\", \"BRD-A69563582\", \"BRD-K83189926\"], \"donors\": [{\"id\": \"BRD-A18705706\"}, {\"id\": \"BRD-K52560704\"}, {\"id\": \"BRD-K79254416\"}, {\"id\": \"BRD-A69563582\"}, {\"id\": \"BRD-K83189926\"}], \"hypotheses\": [\"Salermide is a sirtuin inhibitor with reported effects on histone acetylation and methylation; donor compounds with epigenetic-modifying pharmacology may share histone-mark response patterns.\", \"Zebularine and decitabine are DNA methyltransferase inhibitors that can indirectly alter histone modification states, making them plausible transfer donors for histone perturbation signatures.\", \"Methylstat is a histone demethylase inhibitor and may produce histone methylation changes relevant to the query's H3K79 and H3K27 methylation features.\", \"EPZ-5676 is a DOT1L inhibitor targeting H3K79 methylation, directly relevant to the query's dominant H3K79me0/me1 features.\", \"UNC1215 is a methyl-lysine reader domain inhibitor that may modulate chromatin-associated histone mark readouts.\"], \"evidence_gap\": \"No direct measured histone perturbation response values are available for salermide or the candidate donors in the provided data; donor selection is based on pharmacological class and anchor similarity, not on verified target-minus-A375 histone-mark responses.\"}"
+      },
+      {
+        "role": "user",
+        "content": "{\"retrieved_sources\": {\"BRD-A18705706\": [{\"source_id\": \"pubchem:100016:description:1\", \"text\": \"Zebularine is a member of pyrimidine ribonucleosides.\", \"provider\": null, \"url\": \"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:46938\"}], \"BRD-K52560704\": [], \"BRD-K79254416\": [{\"source_id\": \"pubchem:451668:description:1\", \"text\": \"5-aza-2'-deoxycytidine is a 2'-deoxyribonucleoside.\", \"provider\": null, \"url\": \"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:50131\"}], \"BRD-A69563582\": [{\"source_id\": \"pubchem:57345410:description:1\", \"text\": \"Pinometostat (EPZ-5676) is a potent DOT1L histone methyltransferase inhibitor.\", \"provider\": null, \"url\": \"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:230493\"}], \"BRD-K83189926\": [{\"source_id\": \"pubchem:57339144:description:1\", \"text\": \"[3-anilino-4-[oxo-[4-(1-pyrrolidinyl)-1-piperidinyl]methyl]phenyl]-[4-(1-pyrrolidinyl)-1-piperidinyl]methanone is a member of benzamides and a N-acylpiperidine.\", \"provider\": null, \"url\": \"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:95086\"}]}, \"task\": \"Revise donor support. Choose <=5 donors ONLY from retrieved donor IDs; cite supplied source IDs and <=30-word reasons. Abstain with donors:[] if unsupported. Return {donors:[{id,source_ids:[...],reason}],revised_hypotheses:[...],unresolved:[...]}.\"}"
+      }
+    ],
+    "arm": "agent_only:qualify",
+    "query_id": "BRD-A67788537",
+    "donor_ids": [
+      "BRD-A18705706",
+      "BRD-A69563582",
+      "BRD-K52560704",
+      "BRD-K79254416",
+      "BRD-K83189926"
+    ],
+    "source_ids": [
+      "pubchem:100016:description:1",
+      "pubchem:451668:description:1",
+      "pubchem:57339144:description:1",
+      "pubchem:57345410:description:1"
+    ],
+    "model": "deepseek-flash",
+    "max_tokens": 900,
+    "stage": "qualify",
+    "model_freeze_sha256": "2e7377bc4f71f5a1e3f0957dd8dad5f93e796f50c3c9641202c2a8e297e25924"
+  },
+  "object": {
+    "donors": [
+      {
+        "id": "BRD-A69563582",
+        "source_ids": [
+          "pubchem:57345410:description:1"
+        ],
+        "reason": "Pinometostat is a DOT1L histone methyltransferase inhibitor, directly relevant to H3K79 methylation features in the query."
+      },
+      {
+        "id": "BRD-A18705706",
+        "source_ids": [
+          "pubchem:100016:description:1"
+        ],
+        "reason": "Zebularine is a pyrimidine ribonucleoside with epigenetic-modifying potential, though source lacks histone-specific detail."
+      },
+      {
+        "id": "BRD-K79254416",
+        "source_ids": [
+          "pubchem:451668:description:1"
+        ],
+        "reason": "Decitabine is a deoxyribonucleoside DNA methyltransferase inhibitor that can indirectly alter histone modification states."
+      }
+    ],
+    "revised_hypotheses": [
+      "EPZ-5676 (pinometostat) is the strongest donor candidate because DOT1L inhibition directly perturbs H3K79 methylation, matching the query's dominant H3K79me0/me1 features.",
+      "Zebularine and decitabine may transfer epigenetic-modifying signatures, but retrieved sources only confirm nucleoside chemistry, not histone-mark responses.",
+      "Methylstat and UNC1215 lack retrieved source support and are dropped despite prior pharmacological rationale."
+    ],
+    "unresolved": [
+      "No retrieved source provides measured histone perturbation values for any donor.",
+      "No source directly describes salermide's histone-mark effects or links it to the candidate donors.",
+      "The magnitude and direction of donor target-minus-A375 histone responses remain unknown."
+    ]
+  },
+  "error": null,
+  "usage": {
+    "prompt_tokens": 1995,
+    "completion_tokens": 333,
+    "total_tokens": 2328,
+    "prompt_cache_hit_tokens": 1152,
+    "prompt_cache_miss_tokens": 843,
+    "calls": 1,
+    "model": "deepseek-flash"
+  },
+  "response": {
+    "content": "{\"donors\": [{\"id\": \"BRD-A69563582\", \"source_ids\": [\"pubchem:57345410:description:1\"], \"reason\": \"Pinometostat is a DOT1L histone methyltransferase inhibitor, directly relevant to H3K79 methylation features in the query.\"}, {\"id\": \"BRD-A18705706\", \"source_ids\": [\"pubchem:100016:description:1\"], \"reason\": \"Zebularine is a pyrimidine ribonucleoside with epigenetic-modifying potential, though source lacks histone-specific detail.\"}, {\"id\": \"BRD-K79254416\", \"source_ids\": [\"pubchem:451668:description:1\"], \"reason\": \"Decitabine is a deoxyribonucleoside DNA methyltransferase inhibitor that can indirectly alter histone modification states.\"}], \"revised_hypotheses\": [\"EPZ-5676 (pinometostat) is the strongest donor candidate because DOT1L inhibition directly perturbs H3K79 methylation, matching the query's dominant H3K79me0/me1 features.\", \"Zebularine and decitabine may transfer epigenetic-modifying signatures, but retrieved sources only confirm nucleoside chemistry, not histone-mark responses.\", \"Methylstat and UNC1215 lack retrieved source support and are dropped despite prior pharmacological rationale.\"], \"unresolved\": [\"No retrieved source provides measured histone perturbation values for any donor.\", \"No source directly describes salermide's histone-mark effects or links it to the candidate donors.\", \"The magnitude and direction of donor target-minus-A375 histone responses remain unknown.\"]}",
+    "finish_reason": "stop",
+    "model": "deepseek-flash",
+    "usage": {
+      "prompt_tokens": 1995,
+      "completion_tokens": 333,
+      "total_tokens": 2328,
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 843
+    }
+  },
+  "started_at": "2026-10-13T02:44:18.812858+00:00",
+  "finished_at": "2026-10-13T02:44:21.424467+00:00"
+}

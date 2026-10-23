@@ -1,0 +1,21 @@
+{
+ "study": "context_transfer_20261017",
+ "deviations": [
+  {
+   "when_utc": "2026-10-17T04:43:08Z",
+   "what": "FREEZE.json 'scope' text says P1-P5; the frozen PROTOCOL.md and confirm.py define P1-P6 (P6 = maestro - b_lookahead).",
+   "effect": "none: descriptive field only, not read by confirm.py or verify.py. freeze.py corrected afterwards; FREEZE.json left as written."
+  },
+  {
+   "when_utc": "2026-10-17T05:25:00Z",
+   "what": "Process report error in confirm.py (frozen): run_fold replaces r['maestro'] with the selected procedure's hits but leaves r['maestro_wasted'] (and r['maestro_bridge_hits']) from the lookahead run. RESULTS.json errors.environment_wasted_wells_per_context.maestro = 4.813 is therefore the lookahead's figure. The selected procedure was b_exploit in every fold, so the correct value is b_exploit's 2.533 wasted wells per context (bridge hits 0.396).",
+   "also": "misfit, bridge_measured, misfit_auroc_prior_failure (0.578) and subtask_lookahead_bridge_wells_measured (0.292) are computed on the lookahead bridge, as the protocol's repair variants are; they do not describe the exploit bridge that maestro used.",
+   "effect": "none on P1-P6, claims or verdicts: verify.py recomputes those from the records' 'maestro' hits. RESULTS.json is left as written; the corrected value is reported in README.md and the study report."
+  },
+  {
+   "when_utc": "2026-10-17T07:05:00Z",
+   "what": "Post-run prose (REPORT.md, README.md, research/EVIDENCE.md, src/virtual_cell/bridged_transfer.py) gave the analysed Beat AML matrix as 166 inhibitors. The cached domain has 165 columns: the census's 166 counts the release's paper-inclusion set, and one inhibitor is measured only in samples without RNA-seq. PROTOCOL.md's 166 is the census count and is left as frozen.",
+   "effect": "none on any result: the replay always used the 165-column matrix. Prose corrected; recorded in CLAIMS.json units."
+  }
+ ]
+}

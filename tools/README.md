@@ -1,5 +1,11 @@
 # Tools
 
+## Research promotion and storage
+
+Keep maintained command-line and operational utilities here. Experimental implementations and research tests belong in [research](../research/README.md) until validation relevant to their intended use supports promotion. Record the evidence, limitations and promotion decision in [log](../log/README.md); structure or storage checks alone do not establish scientific validity.
+
+Keep datasets, source bodies and model artifacts in [data](../data/README.md). Follow the [storage policy](../log/STORAGE_POLICY.md). The October 23 consolidation promoted no experimental implementation.
+
 ## Campaign resources and terminal utility
 
 `python -m tools.evaluation.decision_report` reports paired terminal utility and

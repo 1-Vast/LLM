@@ -168,7 +168,7 @@ CJK_PATTERN = re.compile(r"[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]")
 INLINE_CODE = re.compile(r"`[^`]*`")
 MARKDOWN_LINK_DESTINATION = re.compile(r"\]\([^()]*\)")
 PATH_LIKE_GROUP = re.compile(r"\([^()]*/[^()]*\)")
-THIRD_PARTY = ("reference/paper/", "data/external/", ".pytest_cache/", "__pycache__/", ".workbuddy/", ".workbuddy-ai/", "outputs/", "log/20261021/", "log/20261022/", "log/20261023/")
+THIRD_PARTY = ("reference/paper/", "data/external/", ".pytest_cache/", "__pycache__/", ".workbuddy/", ".workbuddy-ai/", "outputs/", "log/research_records/", "log/20261021/", "log/20261022/", "log/20261023/")
 
 
 def _project_markdown():
@@ -265,12 +265,19 @@ def test_repository_has_one_scientific_report_and_no_retired_release_tree():
     studies = registry["studies"]
     names = {study["path"] for study in studies}
     assert len(names) == len(studies), "Study paths must be unique"
+    workspaces = registry.get("workspaces", [])
+    assert len(workspaces) == len(set(workspaces))
+    assert not names & set(workspaces), "Working areas are distinct from registered studies"
+    for name in workspaces:
+        assert Path(name).name == name
+        assert (research / name / "README.md").is_file()
     tracked = subprocess.run(
         ["git", "ls-files", "-z", "--", "research"],
         cwd=ROOT, capture_output=True, text=True, check=True,
     )
     tracked_roots = {name.split("/")[1] for name in tracked.stdout.split("\0") if name}
-    assert tracked_roots == {"REPORT.md", "EVIDENCE.md", "STUDIES.json"} | names
+    assert tracked_roots | {"README.md"} == {"README.md", "REPORT.md", "EVIDENCE.md", "STUDIES.json"} | names | set(workspaces)
+    assert (research / "README.md").is_file()
     for study in studies:
         assert Path(study["path"]).name == study["path"]
         assert study["status"] in {"exploratory", "frozen", "completed"}
