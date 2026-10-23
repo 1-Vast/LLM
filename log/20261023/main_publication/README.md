@@ -1,5 +1,7 @@
 # Main-branch publication and branch cleanup
 
+Completed: content commit `f96f209d7e6b6f0ae08cf581a3d5fb45d378ff61` was pushed to `main`; the incorporated report branch was deleted. Remote and local branch checks showed only `main`. A subsequent receipt-only commit records the operation. See [receipt](RECEIPT.json) and [verification](VERIFICATION.json).
+
 The user requested publication of all relevant accumulated work to `main` and deletion of other branches. The compact report branch is first incorporated into `main`; retained reports, result summaries, experimental code, storage documentation and authorized record/data-layout changes are then included in a reviewed commit. Raw datasets, model checkpoints, downloaded source bodies and disposable run artifacts remain local under the existing storage policy.
 
 The five current experimental/maintenance working areas are listed separately in `research/STUDIES.json`, preserving the 39 registered studies and their frozen records. Working-area registration is not scientific completion or promotion to `src/` or `tools/`.
