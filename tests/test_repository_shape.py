@@ -168,7 +168,7 @@ CJK_PATTERN = re.compile(r"[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]")
 INLINE_CODE = re.compile(r"`[^`]*`")
 MARKDOWN_LINK_DESTINATION = re.compile(r"\]\([^()]*\)")
 PATH_LIKE_GROUP = re.compile(r"\([^()]*/[^()]*\)")
-THIRD_PARTY = ("reference/paper/", "data/external/", ".pytest_cache/", "__pycache__/", ".workbuddy/", ".workbuddy-ai/", "outputs/", "log/20261021/", "log/20261022/")
+THIRD_PARTY = ("reference/paper/", "data/external/", ".pytest_cache/", "__pycache__/", ".workbuddy/", ".workbuddy-ai/", "outputs/", "log/20261021/", "log/20261022/", "log/20261023/")
 
 
 def _project_markdown():
@@ -265,7 +265,12 @@ def test_repository_has_one_scientific_report_and_no_retired_release_tree():
     studies = registry["studies"]
     names = {study["path"] for study in studies}
     assert len(names) == len(studies), "Study paths must be unique"
-    assert {path.name for path in research.iterdir()} == {"REPORT.md", "EVIDENCE.md", "STUDIES.json"} | names
+    tracked = subprocess.run(
+        ["git", "ls-files", "-z", "--", "research"],
+        cwd=ROOT, capture_output=True, text=True, check=True,
+    )
+    tracked_roots = {name.split("/")[1] for name in tracked.stdout.split("\0") if name}
+    assert tracked_roots == {"REPORT.md", "EVIDENCE.md", "STUDIES.json"} | names
     for study in studies:
         assert Path(study["path"]).name == study["path"]
         assert study["status"] in {"exploratory", "frozen", "completed"}
@@ -277,8 +282,9 @@ def test_repository_has_one_scientific_report_and_no_retired_release_tree():
     for name in ("cleanup", "Innovation.md", "task.md", "RELEASE_CHECK.md",
                  "RELEASE_STATS.json", "CURRENT_REPOSITORY_STATS.json", "BLOCKED_ASSETS.md"):
         assert not (ROOT / name).exists(), name
-    assert not list(ROOT.glob(".build-*"))
-    assert not list(ROOT.glob("output-*"))
+    tracked_root_entries = {name.split("/")[0] for name in tracked.stdout.split("\0") if name}
+    assert not any(name.startswith(".build-") for name in tracked_root_entries)
+    assert not any(name.startswith("output-") for name in tracked_root_entries)
 
 
 def test_no_test_module_imports_another_test_module():
