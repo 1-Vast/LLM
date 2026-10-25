@@ -1,0 +1,403 @@
+# MAESTRO research report
+
+Consolidated scientific record, 2026-10-25. The objective remains **ACTIVE / NOT_ACHIEVED**. Evidence supports bounded ordinary prediction, calibration, functional feedback and some allocation benefits. It does not establish a new transferable update core, autonomous-agent advantage, inherited-updater advantage, mutually enhancing dual cores or recursive improvement of the improvement strategy. Current validation is mainly oncology public-measurement replay; general autonomous discovery and clinical efficacy remain unestablished.
+
+This report connects questions, hypotheses, comparisons, results, amendments and adopted/stopped decisions. It combines all 39 registered historical studies with later mechanism, source, literature and paid-repeatability findings. Historical studies are placed under their scientific questions rather than treated as a separate success catalogue. Later explicit amendments govern; superseded optimistic claims remain history. Source access, engineering execution, mathematical witnesses, exposed development and independent biological confirmation are distinct evidence categories.
+
+The original programme has two primary tasks: candidate discovery/repurposing and cellular-context selection with failure analysis. Selectivity requires explicit comparison measurements; mechanism confirmation requires distinguishing evidence. Dose, time and combination work remain gated extensions. The thin `maestro.research_loop` is static replay infrastructure: learned procedure transfer and feedback-driven replanning remain research goals. Joint system utility and positive superadditive component interaction are different claims and require different comparisons.
+
+Read by question: [current repeatability](#current-paid-repeatability-result), [knowledge](#knowledge-and-decision-value), [functional feedback](#functional-feedback-and-acquisition), [source qualification](#source-and-task-qualification), [mechanisms and inheritance](#mechanisms-inheritance-and-self-repair), [literature](#literature-and-source-access), and [reproduction and next work](#reproduction-and-next-work). The separate `STUDY_INDEX.tsv` supports per-study lookup; it is an index, not a second scientific report.
+
+Evidence IDs are durable lookup keys, normally original project-relative paths inside `data/processed/research_records/`. They are not promises that former loose files remain. Read an exact source using `python -m tools.retained_records --show <source-id>`. Unless explicitly overridden, a registered identifier's named source is `log/research_records/<identifier>/<named source>`. For archived executable/data assets, use the package ID and restoration instructions at the end. Different tasks use different outcomes and scales; do not pool their numerical contrasts.
+
+## Current paid-repeatability result
+
+The Jaaks development replay used 5,390 single-anchor units in 78 SIDM clusters. Every strategy paid for 3,234 reads, represented by 22,638 combination wells. The primary endpoint required both purchased measurements to exceed the fixed 0.10 threshold.
+
+| Strategy | Repeated positives | Comparison status |
+|---|---:|---|
+| Original rank after the same initial screen | 675 | Frozen baseline |
+| Ranking by initial-screen numerical feedback | 919 | Frozen tested strategy |
+| Equal-weight original/screen rank mixture | 830 | Frozen descriptive comparison |
+| Equal-cost fixed paired acquisition | 876 | Frozen strong comparator |
+| Binary initial-screen gate, then original rank | 898 | Post-result simple control |
+| Binary gate, then fixed hash rank | 869 | Post-result simple control |
+
+The numerical-feedback result retains a positive development comparison with frozen baselines; the difference from the simple binary-gate control has an interval including zero. Initial screening participates in the endpoint, so removing initial-screen failures can explain substantial improvement without a learned cell-update mechanism. At the lower sensitivity threshold of >0, fixed paired acquisition yielded 1,409 against numerical feedback's 1,061; at the primary threshold but counting only the last positive measurement, the comparison was 1,037 against 919. These are different endpoints, not interchangeable rankings.
+
+Correction (2026-10-25): this synthesis previously attributed 1,409 versus 1,061 to a stricter 0.20 threshold. The retained `log/20261023/evidence_portfolio_optimization/RESULTS.json` records those counts under `summary.direct["0.0"]` and `summary.feedback["0.0"]`. Recounting both purchased observations from the hash-bound `CHOICES.json` and `OBSERVED.npz` reproduced all ten arm/threshold repeat counts. This corrects the summary's threshold attribution; it is not a new experiment or source-table reconstruction.
+
+The data were exposed and the candidate pool was selected by the original study. The cost proxy omits shared controls, plate layout and turnaround. Conditional development intervals are not prospective guarantees. Thresholds, budgets and splits must not be retuned from these observations. Independent source-table recomputation checked selection, charging, counts and 2,000 bootstrap draws; it is not biological replication. A complete comparison with Scientific CI/CD remains limited by inaccessible original text.
+
+Evidence IDs: `log/20261023/evidence_portfolio_optimization/DECISION.md`, `log/20261023/research_progress/README.md`, and the former `log/20261023/report_consolidation/RESEARCH_SUMMARY.md`. Exact source text and its original numerical intervals remain available through the retained-record reader.
+
+## Knowledge and decision value
+
+The early programme separated predictive transfer from the agent decisions it was intended to improve. The studies below explain why information content, endpoint calibration and executable collaboration were retained more narrowly than planning or LLM superiority.
+
+**1. `knowledge_transfer_20261012` — partial prediction transfer, no planning advantage.** (`README.md`.) RKT tested whether structured knowledge helps when transferring across contexts, followed by an eleven-batch, seven-line decision comparison. Pooled prediction improved by +0.218 against a generic reference, but only +0.033 against the context reference. Decision utility was 0.579 for MAESTRO and 0.623 for `sparse_hub`. The retained conclusion is scoped predictive transfer. It does not support a planner or LLM advantage, because the stronger decision comparator already explains or exceeds the operational benefit.
+
+**2. `context_discrimination_20261013` — agent integration did not improve discrimination.** (`README.md`.) A 702-compound deterministic replay and an 84-compound LLM pilot examined opposite-activity cases. Correct cases numbered 16 for the fixed rule, 15 for RKT, 12 for LLM+RKT, and 10 for the integrated configuration. This rejected the proposed agent synergy in the tested setting. The measured endpoint was transcriptional response norm, not viability: these counts cannot establish drug efficacy, clinical utility, or a general inability of agents to reason biologically.
+
+**3. `evidence_transfer_20261013` — transferred evidence did not beat a direct baseline.** (`README.md`.) The histone-response directional task held out 20 compounds. Deterministic ridge/phenotype achieved 14 hits, versus 12 for the integrated method, 12 for a conventional agent, and 10 for agent-only. Development model selection scored 14/27. The comparison did not confirm evidence-transfer synergy. Future reuse should preserve the task and reference performance, rather than present a functioning evidence pipeline as an experimentally established decision improvement.
+
+**4. `collaboration_limits_20261013` — retain the endpoint contract.** (`README.md`.) Endpoint calibration improved decisions to 77/141 from 55/141; precision at q≥0.5 was 0.815 versus 0.379. This supports a scoped endpoint-ranking contract. The new-line tier was examined before freeze, and no laboratory assays or provider calls occurred. The adopted asset is therefore an engineering and evaluation contract; the study does not establish an agent, memory, or newly learned transfer mechanism.
+
+**5. `selective_hit_triage_20261013` — repair the evaluated endpoint before interpreting results.** (`README.md`, `TEST_RESULTS_REGISTERED.json`.) The frozen evaluator dropped half of the registered endpoint, so the corrected registered result governs interpretation; the as-run score is excluded. Decision-review, claim-audit, and triage contracts were promoted as three engineering improvements. No fitted scientific rule was promoted, and LLM arms were not run. The lesson is that evaluator fidelity precedes algorithm ranking: operational contracts can be useful without constituting agent evidence.
+
+**6. `knowledge_reality_20261013` — mechanism-class identity explains the small gain.** (`README.md`.) Cold-start profile correlation rose from 0.0786 to 0.0842. A target/MoA-preserving relabel reproduced +0.0057, essentially the actual +0.0056. The apparent knowledge gain was therefore largely compatible with mechanism-class information rather than the claimed richer identity mechanism. G2 failed; the 24Q2 arena was not run or opened. The negative gate remains the governing decision, while the untouched arena remains distinct from a negative result.
+
+**7. `evaluator_audit_20261013` — audit prospective validity, not just code execution.** (`README.md`.) The unused confirmation evaluator contained test-batch normalization or labels, outcome-derived eligibility and missingness, and unfrozen identity inputs. These are protocol defects that constrain any future confirmation. This audit did not rerun the scientific study or overturn the earlier negative gate. It supplies a reusable qualification checklist: preprocessing, eligibility, identity inputs, and missingness handling must be fixed independently of the held-out outcomes.
+
+**8. `orbit_contrast_20261013` — identity signal does not establish OCEA benefit.** (`README.md`.) The 392-compound cold-start analysis found identity information beyond some nulls, but mechanism-class redundancy and strong ordinary neighbors limited the method claim. For target triage, chemical-neighbor hits@10 were 0.9843 versus OCEA-admitted 0.1864 across 1,148 compounds, and 0.9928 versus 0.0978 among 276 active compounds. No OCEA advantage was established. The absent or unauthorized CRISPR-dependency asset is an evidence-access block, not biological falsification.
+
+## Functional feedback and acquisition
+
+### Historical feedback attribution and acquisition
+
+**13. `context_transfer_20261017` — useful feedback, no selector advantage.** (`REPORT.md`.) The BeatAML study involved 479 patients/520 samples and 16 archived profile queries. MAESTRO−vc0 was +0.073 [0.025, 0.127]. The point estimate exceeds 0.05; it is the interval lower bound that fails the useful-gain threshold. MAESTRO exactly matched exploit-first. The framework's `CONFIRMED` label records its original protocol execution, not independent agent/RNA/selector value. Each “well” was a seven-dose archived AUC query: 16 queries imply 112 treatment wells and an extra round. Corrected posthoc lookahead tied exploitation after the defective implementation was repaired.
+
+**14. `feedback_attribution_20261017` — static RNA plus the same feedback explains the gain.** (`REPORT.md`.) In exposed BeatAML development, the updated RNA-versus-population contrast D−B was +0.065 [0.030, 0.105]. Although positive, its lower bound does not exceed the 0.05 useful threshold. A static RNA ridge model given the same feedback explains the improvement. Preserve the benefit of ordinary functional updating while withholding separate RNA-prior or adaptive-selector credit; unequal feedback access would otherwise create misleading mechanism attribution.
+
+**15. `program_revision_20261017` — seed-library attribution supersedes revision credit.** (`REPORT.md`.) The prewritten seed library explained the apparent benefit. Editable minus fixed was exactly zero; LLM minus enumerator was +0.004 [0, 0.012]. Neither confirms revision or LLM contribution. The original I2 estimate, +0.211 [0.097, 0.340], was superseded by the fixed-library attribution repair. The relevant decision is revision `NO-GO`, with the superseded estimate retained as history rather than reused as current support.
+
+**16. `seed_attribution_20261017` — repaired primary contrasts do not confirm seed gain.** (`REPORT.md`, `ERRATUM_20261018.md`.) Primary pooled I2 was +0.117 [−0.026, +0.248], I1 +0.283 [−0.065, +0.699], and policy +0.356 [−0.088, +0.856]. None was confirmed. A separate equal-lineage secondary bootstrap had incorrectly dropped draw multiplicities. Corrected 100,000-draw intervals were policy +0.057 [−0.206, +0.355], I2 +0.100 [+0.002, +0.202], and I1 +0.076 [−0.105, +0.278]. This secondary repair changes neither primary Holm tests nor stop decisions. Same-feature ridge matched the library; much gain concentrated in skin/BRAF/NRAS, with gate-negative harm −0.318 [−0.500, −0.048]. Scoped feature information remains optional; renewed program search is unsupported.
+
+**17. `beataml_g1_20261017` — low-rank benefit fails the cost-adjusted gate.** (`REPORT.md`.) Candidate versus ridge was +0.098 [0.045, 0.153]. Charging the extra round at 0.05 moves the lower bound to −0.005, and the same-feedback ridge nearly matched the candidate. G1 failed and the low-rank branch stopped. The important inherited constraint is fair feedback and round-cost accounting, not simply whether an uncharged contrast is positive.
+
+**18. `feedback_propagation_20261018` — ordinary propagation helps, repair search does not.** (`REPORT.md`.) Repair R1 reached 2.78 versus ridge+feedback 2.64 and kNN 2.69, without a practically meaningful stable incremental gain across folds and noise conditions. Ordinary feedback to unmeasured pairs gained +1.06 over the prior, while diagnostic AUROC stayed at or below 0.63. The study stopped repair-program search while retaining functional updating as a useful conventional baseline.
+
+**19. `acquisition_program_20261018` — conventional A-optimal acquisition wins.** (`REPORT.md`.) Whole-pool fixed A-optimal achieved 1.822 events per 64 compounds, versus lookahead 1.717, a −0.106 [−0.262, 0.022] contrast; the agent program achieved 1.725. Twelve proposals yielded one accepted agent edit with a small, noisy effect. No held-out strategy-search advantage was established. The fixed acquisition reference should remain the default comparator for future strategy proposals.
+
+**20. `observable_state_20261018` — valid edits are not sufficient efficacy evidence.** (`REPORT_OBS.md`.) Confirmation rates were agent 0.081, enumeration 0.059, and random 0.051. Agent−enumeration was +0.022 [−0.022, 0.074], below the required 0.10 useful margin. All 272 calls were valid, establishing software execution rather than scientific utility. A target-gene rule at 0.088 was exploratory and its decision utility untested. Agent typed-edit claims were withdrawn.
+
+### Historical uncertainty, calibration and substitution
+
+**22. `maestro_far_20261019` — repair can help without validating FAR selection.** (`REPORT.md`.) FAR test−exploit was +0.006 [−0.003, 0.018], failing the lower-bound gate of >0.010. Failure-signature AUROC was approximately 0.5. Assay plus repair improved outcomes, but this did not establish FAR's selection contribution. Conditional agent, 2×2, and transfer stages were unrun; later audit narrowed isolation claims. Preserve the ordinary repair observation and the selector failure as separate findings.
+
+**23. `replicate_decisions_20261019` — within-drug information transfers; cross-drug prior does not.** (`REPORT.md`.) The graded replicate task contained 423 compounds and 130 clusters. Within-drug context D1 was +0.118 [0.084, 0.157], while cross-drug D2 was −0.008 [−0.037, 0.025]. Retain the narrow noise posterior, remove the unhelpful knowledge-graph/chemistry prior from the supported claim, and test the noise assumptions. Supported D1 is not evidence for the rejected D2 mechanism or unrestricted calibration validity.
+
+**24. `heavy_tail_rsd_20261019` — Student-t noise does not repair D2.** (`REPORT.md`.) D2 was +0.015 [−0.014, 0.046]; against Gaussian it was −0.007 [−0.011, −0.003]. D1 +0.043 [0.003, 0.076] remained below the useful threshold 0.078. Selected 80% intervals covered only 0.690 [0.675, 0.707], failing calibration. The stronger practical observation was the value of a second real read, not a rescued heavy-tail prior.
+
+**25. `decoupled_calibration_rsd_20261019` — development calibration leaves decisions unchanged.** (Canonical archived source ID: `packages/historical_artifacts/data/processed/research_results/research_records/decoupled_calibration_rsd_20261019/DEV_RESULT.json`.) The result is `DEVELOPMENT_ONLY` on exposed doses. Decoupling calibration changed uncertainty handling without changing frozen decisions. Confirmation was blocked because no authorized untouched arena was available. This is a useful separation of calibration from policy, but no new confirmed decision effect; use the archived source ID above instead of inventing a `log/` copy or assuming the old loose data path still exists.
+
+**26. `action_substitution_20261019` — reproducibility is partner-conditional.** (`REPORT.md`.) The tested reproducibility was conditional on partner, not established as context-conditional. Refinement reduced interaction error by 17% but flipped as many decisions correctly as incorrectly. Functional similarity beat same-target annotation. The later biological-residual audit limits any “agent upper bound zero” claim to the defined action space. Close this same-family substitution branch without generalizing to all biological information or all possible interventions.
+
+**27. `kinobeads_substitution_20261019` — binding loses to the stronger functional reference.** (`REPORT.md`.) Twenty implementations produced 1,586 partner units. Binding-kernel MSE was 0.000658 versus functional 0.000599; the reported MSE_B5−K contrast was −0.000059 [−0.000115, −0.000010]. Failure AUROC 0.635 [0.476, 0.738] failed its gate. Binding improved over sibling copying but not the strongest reference, so this branch closed rather than attributing baseline-relative improvement to a new useful capability.
+
+**28. `biological_residual_gate_20261019` — insufficient decision headroom in this action space.** (`REPORT.md`.) G1/G2 were underpowered and G3 failed. Annotation added at most about 2.8% beyond function; mismatch AUROC was 0.48. Reproducible decision headroom was 0.012 versus the minimum 0.02. Stop this action space, while preserving underpowered tests separately from failed gates. This is not a universal statement that biological annotation lacks value.
+
+### Later functional and molecular tests
+
+| Study and endpoint | Retained result | Decision and limits |
+|---|---|---|
+| TG-GATEs: development High24h DNA/100 prediction | Candidate DNA MAE **0.027315341**, ordinary weighted refit **0.018951037**. Candidate error is 44.1364% higher. Function-only MAE 0.027358881999 versus both routes 0.027315340892 leaves a very small state-route dependency, not a strong molecular increment. | Stop this linear configuration's expansion. Selected source state MSE worsens from 0.823047127380 to 0.829535475752; no development High-RNA accuracy was measured. Seven development proxy groups and exposed outcomes do not establish donor generalization, toxicity decisions or assay savings. Evidence ID: `log/20261022/tggates_rna_feedback_pilot/RESULT_REVIEW_DECISION.md`. |
+| ALMANAC: FF-laboratory, known-pair transfer to new cell contexts | Source-selected B0 MSE **0.0094443827 → 0.0084953821** after one high×high anchor per pair: **10.05%** reduction, positive in 10/10 development cells. Same-study-excluded MSE remains positive, 0.0100466787 → 0.0094438057. | Retain ordinary direct-prediction value, not novel anchor transport. Sorting is less robust: same-study-excluded top-decile regret **0.0096032022 → 0.0097194522**, worsening in the mean. The main-analysis regret improvement is small and not a substitute for this sensitivity. No new-core promotion. Evidence ID: `log/20261022/almanac_feedback_pilot/DECISION.md`. |
+| decryptE: fixed Jurkat metabolic-activity protocol | One high-dose functional observation improves nested selected MSE **0.028566 → 0.015713**, approximately **45.0%**, with 34/48 drugs improving. B1 passes its development gate; B2 selected portfolio does not. | Retain ordinary Gaussian functional conditioning. This is prediction of released metabolic entries, not cell killing or clinical potency. Evidence ID: `log/20261022/decrypte_feedback_pilot/DECISION.md`. |
+| decryptE: added high-dose protein | Functional portfolio **0.0157126773** versus molecular portfolio **0.0165703321**; molecular risk is approximately 5.46% higher. Primary gain −0.0008576548, fixed-OOF interval [−0.0023243921, 0.0000179299]. Removing uncertain identities in 47- and 46-drug refits does not rescue the gate. | Stop this high-dose protein expansion; retain the previous functional positive. Intervals cross zero: no demonstrated useful positive increment, rather than a universal proof of protein harm or no information. Corrected shared protein keys and the aborted original fit remain documented. Evidence ID: `log/20261022/decrypte_molecular_increment/key_correction/DECISION.md`. |
+| CDK: Middle barcode composition to later function | Composition prediction has a limited signal, but the functional ranking test fails. Abemaciclib condition-averaged ranking loss increases **1/3 → 2/3**; only the WT pair changes from correct to incorrect. Palbociclib is **not estimable** after joint leave-out leaves zero source pairs. | Stop this fixed functional-prefix KRR configuration. Barcode composition is not absolute survival or drug sensitivity; unavailable evaluation must not become a fabricated negative score. Evidence IDs: `log/20261022/cdk_middle_feedback/DECISION.md`; `log/20261022/cdk_functional_increment/DECISION.md`. |
+| Norman: ordinary RNA information and updater contrast | RNA-nuclear improvement over identity-nuclear is **14.0321%** for average-guide and **15.9343%** for chosen-guide tasks; their scales differ. A restricted early-selected mixture has a narrow 1.6464% development improvement against fixed RNA, but its MSE **0.00172147** loses to same-parameter ordinary union KRR **0.00150306** and inner-selected union RNA-nuclear **0.00145290**. | Retain task-specific ordinary RNA information; stop the instantiated distinctive-updater claim. Unequal search opportunities and different endpoints prohibit a pooled or equal-budget superiority claim. Evidence IDs: `log/20261022/norman_matched_guide/DECISION.md`; `log/20261022/norman_feedback_transport/DECISION.md`. |
+| STACK: early SG history to fixed-dose 72h exported marker | Main history gain **0.00796048 (3.50%)**, positive across all three screens; conditional fixed-forecaster interval [0.002736, 0.013613]. | Qualification passes, but the prespecified ≥0.05 **and** ≥10% useful-gain gate fails. Preserve the small observed improvement and stop the registered configuration; do not erase the positive or relabel it a useful dynamic-world result. Evidence ID: `log/20261022/stack_conditional_information/DECISION.md`. |
+| PTPC: HCT116 late protein increment | Primary logistic AP with 6h information **0.194733**, versus added 24h values **0.106504**. V−E = −0.088229; fixed-OOF interval [−0.199048, 0.021708] crosses zero. RBF sensitivity also fails. | Stop the exact late-state screen. Early fusion retains a local positive versus chemistry (AP 0.150449); this does not isolate protein values from masks or prove a new mechanism. The negative late point estimate is not statistically established universal harm. Evidence ID: `log/20261022/ptpc_late_information/DECISION.md`. |
+
+### Paid controls, transport and coverage
+
+**AZ paid-reference transport:** Coverage passes for 96 MASTERs, 644 eligible test episodes and 30,212 finite rows. The structural candidate loses to strong direct prediction: effect MAE **0.077667654 versus 0.066206799**, and five-action utility **0.048597279 versus 0.098467776** for the separately selected without-mono direct comparator. Both primary gates fail with negative gain intervals. A same-capacity functional-coordinate benefit over dose coordinates remains (MAE gain 0.007757754; utility gain 0.010632225), but neither local coordinate performance nor implementation speed establishes a necessary world model. CTG-associated response is not authenticated cell-death prediction. Evidence ID: `log/20261022/az_paid_reference_gate/DECISION.md`.
+
+**CiPA control information:** In five source physical-site folds, raw conditional ridge loss **0.4089838950683987** exceeds ordinary multivariate calibration **0.40214955382416095**. Raw responses nevertheless improve over metadata and response-validity masks by 0.014221938060552608 and 0.014437813401869504, respectively. Retain restricted exploratory information value; stop the exact raw-map expansion. The reported numerical preprocessing caveat, fixed prediction/audit scope and five-site unit must accompany reuse. Evidence ID: `log/20261022/cipa_control_information/DECISION.md`.
+
+**PRISM fixed-profile coverage:** The frozen two-paid-pool/most-of-panel task qualifies only **54 source, 0 development and 33/255 test compounds**, failing all five coverage gates. No predictive model was fitted. This is structured availability failure under this fixed task, not poor predictive accuracy or biological nonresponse. Do not select replacement pools or relaxed thresholds from observed masks and call them untouched confirmation. Evidence ID: `log/20261022/prism_profile_opportunity/DECISION.md`.
+
+**BeatAML:** Ordinary covariance conditioning on eight measured drugs reduces exposed-development MSE by **23.49%** and top-3 regret by **15.07%**. The CD14 stratification screen separately misses its continuation gate. The two findings do not contradict each other: ordinary feedback value is supported locally, whereas that particular stratification rationale and a distinctive reusable updater are not established. Evidence IDs: `log/20261023/functional_state_sufficiency/DECISION.md`; `log/20261023/functional_error_renewal/DECISION.md`.
+
+**Other scoped stops:** Organoid qualification supplies a limited historical later-batch task, but the subsequent fixed-ridge forecast is stopped while ordinary FAC value remains. VUScope moving-midpoint, fixed overlap/mixed-feedback and several inherited-update proposals have configuration-level stops. These are not aggregated into a universal impossibility claim. Their per-study decisions and corrected numerical history remain in the retained source record.
+
+The eight-drug BeatAML positive above and the earlier BeatAML studies answer different protocol-specific questions; neither is independent confirmation of a new reusable updater. Keep actual endpoints, feedback budgets and later attribution repairs attached to each contrast.
+
+## Source and task qualification
+
+Missing identity, an absent workbook and a failed download are not negative biological or predictive experiments. Qualify an actual endpoint and independent unit before fitting a new method.
+
+### Historical task-identifiability and asset gates
+
+**9. `mechanism_falsification_20261014` — biological truth assets are missing.** (`README.md`.) The required matched, measured positive and negative mechanism truth was unavailable, leaving the study `ASSET_BLOCKED`. A1 and algorithm comparisons were not run. The estimated conformal-triage requirement of roughly 500,000 calibration units further limited feasibility. Thirty-five strict checks and a 21-task boundary benchmark demonstrate engineering behavior only. They cannot substitute for measured mechanism truth or justify claiming the hypothesis has been tested and rejected biologically.
+
+**10. `indication_triage_20261016` — exposed development, propagation untested.** (`README.md`.) This remained an unfrozen draft using exposed PRISM19Q4 development data. A later propagation audit showed that 394/395 and 293/293 apparent hits reread previously probed pairs. Those results do not demonstrate transfer to unmeasured compound–context pairs. Preserve the distinction between retrieving known observations and propagating information: neither a frozen confirmation nor a valid propagation experiment was completed here.
+
+**11. `presage_transfer_20261016` — stop the target–pathway adapter at P0.** (`REPORT.md`.) Top-three hit rate was 14.01%, below train mean 14.49%, chemistry 15.77%, and chemistry+target/MoA 16.36%. The incremental contrast against chemistry+mechanism was +0.0028, with interval [−0.0020, +0.0083]. The P0 gate was `NO-GO`; P1–P3 and LLM stages were not run. The data support stopping this adapter configuration, rather than extending conditional stages as if its foundational benefit were established.
+
+**12. `anchor_purchase_20261016` — independent endpoint and cost are unqualified.** (`REPORT.md`.) Of 1,200 cores, only 794 satisfied all three required identity columns; terminal pairing was unknown for 44.5%. Consequently, endpoint independence and physical acquisition cost could not be qualified. No policy was fitted. The closure is an asset and design block, not evidence that anchors cannot help. A valid successor would first resolve identities, pairing, independence, and actual assay-cost accounting.
+
+**21. `eg_rpt_20261019` — a proposal, not an experiment.** (`PROTOCOL.md`.) The protocol was a draft and nothing was executed. H0 repeatability and decision headroom were prerequisites, while the retrospective “131 versus 100” comparison was a best-case illustration rather than experimental evidence. Missing mechanism truth and missing combination-validation assets remain separate barriers. This record should guide prerequisite acquisition and protocol design without contributing a positive or negative effect estimate to the results ledger.
+
+**29. `implementation_identifiability_v1` — logical discrimination lacks matched biology.** (`REPORT.md`.) The AURORA-A known-case logic passed, but there was no matched inhibitor/degrader/CRBN-null terminal endpoint with adequate numbers and lineage information. G2–G5 were not run. Rescue and JB211 evidence remain nonidentifying without the catalytic premise. The retained capability is engineering logic for identifying what evidence would discriminate implementations; it is not a demonstrated Level 3/4 biological result.
+
+**30. `implementation_identifiability_v1_audit1` — mutation checks preserve the asset block.** (`AMENDMENT.md`.) All ten mutation checks passed and replay was byte-identical, strengthening confidence in the implemented logical boundary. The biological asset block remained unchanged and Level 3/4 units remained zero. This amendment prevents a common attribution error: improving test coverage for an inference engine does not supply the absent measurements or raise the scientific evidence level.
+
+### Later source qualification and remaining gaps
+
+| Source/task | Authenticated evidence | Remaining boundary and disposition |
+|---|---|---|
+| HCC organoids, Wong et al., JHEP Reports 2025, DOI 10.1016/j.jhepr.2025.101426 | Original EPMC supplement archive contains 18 members; supplement bodies match JATS sizes/MD5. Methods authenticate CellTiter-Glo3D, 72h exposure, ten-point threefold dilution, controls, Z′ >0.5 and at least two independent runs. Supplement identifies separate Table S7 mean-AUC/SE workbook. | Retrieved archive has no response workbook. Donor/drug IDs, endpoint direction, coverage and summary/raw joins remain unqualified. Ten tumor organoids, eight same-donor 2D cultures and three matched tumor/normal donors are not 23 independent complete tasks. **GO_SOURCE_QUALIFICATION_ONLY / NO_NUMERICAL_GO**. Evidence ID: `log/20261023/hcc_task_qualification/DECISION.md`. |
+| HCC alternate mirror | BioStudies record matches title/DOI, but downloaded purported mmc2 has different size, MD5 and actual table identity from the original HCC DOCX. Independent parsing reproduces the discrepancy. | Reject that object as HCC evidence; no spreadsheet is listed. This is a specific attachment-mapping discrepancy, not proof of global unavailability or a diagnosis of all mirror objects. Do not cycle endpoints or guess attachment names without new evidence. Evidence ID: `log/20261023/hcc_link_recovery/DECISION.md`. |
+| AML pretreatment-to-drug-specific fate | Public source inspection and format diagnostics were performed; the current source cannot authenticate the necessary sample/tag identities for the proposed comparison. | Need experiment-specific FB_bc→GEX_bc identity/chemistry rules, library/GEM routing and sample-tag→culture/treatment/time manifest or equivalent audited annotations. Anonymous tag abundance and generic barcode rules cannot fill the contract. Stop this numerical entry, not all AML data or biology. Evidence ID: `log/20261023/aml_identity_qualification/DECISION.md`. |
+| CellHealth condition-distribution diagnostic | Metadata/schema qualification freezes **306 guide×line conditions, 102 guides and 51 canonical target IDs**, with 51 exclusions. BRAF1-1 and BRAF-2 share ENSG00000157764 and must stay in one target group. Actual inspected ES2 plate metadata matches 384 wells; one well has eight rather than nine images. | Membership/identity qualification only: no new prediction result or 51 independent later tasks. Six unresolved guides are excluded rather than silently repaired. Released vb_percent_dead is a normalized, condition-level measurement; same-cell/cross-assay biological replicate matching and the exact denominator are not fully authenticated. Proceed only to finite extraction/target-processing protocol, canonical-ID grouped evaluation and shared QC handling. Evidence ID: `log/20261023/distribution_health_qualification/DECISION.md`. |
+| CAF mechanics and related neuron assay | 2026 CAF abstract/registry authenticated, but fulltext/raw task release not authenticated. Related 2023 neuron XML, author-linked Zenodo and five small workbooks are available, with source size/MD5 matches. | No authenticated same-run force/activity/function or cross-schedule later-task population; 3D force and 2D function cannot be paired by names. Mathematical pool-model checks do not establish biological value. **NO_CANDIDATE_PROMOTED / STOP_CURRENT_CONFIGURATION**, not universal source nonexistence. Evidence ID: `log/20261022/caf_mechanics_qualification/DECISION.md`. |
+| LIST antibiotic schedules | Author-related Uchicago-TAY/LIST code and Zenodo records 18362221 and 22118144 are authenticated. Versions differ in assets and chamber formats and cannot be silently merged. A Growth CSV and analysis code really exist. | Growth table: 900 rows, 75 nominal dose/type groups, 300 unique time/dose/type keys and 600 repeated identity rows, without authenticated replicate keys. Treatment/run/colony/time identity, measurement origin and image-to-growth join remain missing; a z-stack script is not a persistent time track. Current complete replay configuration stops before modeling. Public data are not denied; reasonable-request full data are not acquired without messaging authorization. Evidence ID: `log/20261022/antibiotic_schedule_qualification/DECISION.md`. |
+| Chemical-genetics adaptation, DOI 10.1038/s41564-024-01857-w | ECK deletion/drug matrix, directed susceptibility pairs and twelve TET lineages over five days are publicly qualified. Published allele-frequency figures are actual genomic observations; WGS filenames nominally match 36 lineage/day keys. | Exact state features, uncertainty, culture identity and prediction cut still need qualification. Frequencies cannot be invented from bubbles or absence treated as zero; nominal filename joins are not physical sample equality. Two proposed core constructs stopped; numerical state-information gain remains untested. Evidence ID: `log/20261022/chemical_genetics_qualification/DECISION.md`. |
+
+The OASIS source audit qualifies 1,085 drug labels across eight doses (8,680 nominal actions), but 72 actions have more than two records and 160 repeated keys remain unexplained. CellPainting source objects exist for 67/68 plate directories without authenticated well-level pairing. One pooled five-donor PHH source does not establish new-donor transfer; no functional values were used or predictive model fitted. Evidence ID: `log/20261021/oasis_source_qualification/REPORT.md`.
+
+Additional recent entries, including SRS prefixes, regrowth pairing, rechallenge and organoid schedules, retain separate task-specific conditions in the source record. A usable public asset is not automatically an independently powered benchmark or an authenticated adaptive history. The consolidated recent evidence IDs are `log/20261023/report_consolidation/studies/LUNA_RECENT_SUMMARY.md` and `log/20261023/report_consolidation/RESEARCH_SUMMARY.md`.
+
+## Mechanisms inheritance and self-repair
+
+An executable lifecycle is necessary engineering infrastructure. Its scientific contribution still requires decision headroom and comparisons with same-information refitting, ordinary planning and fair search. The historical sequence below connects failed hypotheses to the later operation-level checks.
+
+### Historical program evolution and procedure inheritance
+
+**31. `functional_rule_revision_20261020` — configured rule editing remains unsupported.** (`REPORT.md`.) Raw candidate−refit was −0.0005 and all candidate gates rejected; deployment contrasts were zero because the fallback operated. A later audit found that pair-bootstrap draws had been deduplicated. Therefore the original interval [−0.0008, +0.0005] is descriptive and cannot support a formal useful-margin exclusion. Keep the configured branch stopped, classify it as an internal development estimation pilot, and record that the policy experiment was not run.
+
+**32. `self_improving_virtual_cell_20261020` — lifecycle works, effectiveness does not.** (`REPORT.md`.) On exposed O’Neil data, the typed executable program lifecycle functioned. Primary T/B16 `evo_full−refit` was −0.0009; T `evo_proc−refit` was −0.0002 and full−noinherit −0.0009. E direct-confirm headroom was 0.0047 at B8 and 0.0015 at B16, below 0.005. These results establish a prototype, not self-improvement. Synthetic controls cannot supply the absent transfer evidence.
+
+**33. `innovation_validation_20261020` — compute reuse is not inherited scientific capability.** (`REPORT.md`.) Forty-eight synthetic alias+compose streams used a 0.01 margin. Inherited KG−latent A-optimal was +0.0017 with 98.3% interval [−0.0020, 0.0056]; inheritance−restart was approximately zero [−0.0008, 0.0006]; joint gain was −0.0013 [−0.0038, 0.0005]. H4 real pharmacology was not tested. Restart consumed 3.4× candidates and 2.3× CPU for similar utility: this supports computational reuse, not expanded capability.
+
+**34. `innovation_validation_repair1_20261020` — engineering repair does not rerun the original claim.** (`REPORT.md`.) KG estimation was corrected from −0.0010 toward the analytic value approximately 0.1606, and inheritance implementation was repaired. A small 12-drug/66-pair diagnostic gave E inherited 0.836834 versus ordinary latent+corrected KG 0.836844, and T 0.796345 versus 0.798870. It was not a rerun of the old 378-pair experiment. The strict legacy-checkpoint exception remains a failure; real utility, equal-resource capability, and implemented archive reuse were not established.
+
+**35. `procedure_inheritance_20261020` — ordinary planning explains the apparent gain.** (`REPORT.md`.) At B3, inherited planning exceeded one-step by +0.007550, below the 0.01 useful margin; contrasts against lookahead and distillation were only +0.000955 and +0.000153. Primary plan-B3 minus lookahead-B4 was −0.009028: it passed only the specified point gate, not statistical noninferiority. The original decision was `CLOSE`. Ordinary lookahead, distillation, and caching explain the tested benefit; measured utility was not tested.
+
+**36. `procedure_inheritance_20261020_audit1` — correct cost and distinguish an unexercised transplant.** (`REPORT.md`.) The audit replayed all 3,840 behavior rows and checked 70 raw plan IDs. Corrected CPU costs were plan B3/B4 1.873047/2.324219 versus two-step 2.160156/2.230469. Projected break-even uses were 13.26/16.87 against two-step and 949.33/4938.67 against one-step. However, 1,998/2,560 CPU entries were zero, positive resolution was 0.015625 s, and source cost allocation was missing. Four conditions shared two seeds: eight streams were not eight independent worlds. All 112 transplants were rejected, so content inheritance was `NOT_EXERCISED`. The novel regime appeared only in the final batch, leaving no later repair cycle. `CLOSE` remained unchanged.
+
+### Historical self-repair and dual-core attribution
+
+**37. `self_repair_qualification_20261020` — no unit qualifies beyond refitting.** (`QUALIFICATION.md`.) In exposed BeatAML development, a plain per-drug offset repaired the shift with top-five +0.370 [0.257, 0.497] versus a static-covariate reference. The shift and its ordinary repair were real within this development analysis; a structured cause was not identified. No unit qualified for self-repair beyond refitting, and no experiment was proposed. A successor needs measured cause and a transferable alternative, rather than simply a larger model.
+
+**38. `dual_core_innovation_validation_20261021` — stop this task configuration.** (`REPORT.md`.) The exposed PTV1/ProteinTalks replay used seven final lineages and width-16 ppODE. Precision@5 was 0.514 versus B1 0.743, contrast −0.229 [−0.286, −0.200], and −0.171 versus logistic. Functional update−none was −0.029 [−0.086, 0]; molecular update was zero because the phenotype head did not change. No accepted LLM edit meant the combined mechanism was not tested. The results support stopping this configuration, not rejecting every possible dual-core design.
+
+**39. `dual_core_innovation_validation_20261021_repair1` — repaired execution preserves scientific STOP.** (`REPORT.md`.) Repairs supplied deterministic seeding/training, parent-owned cost and outcomes, child-action accounting, correct data/model binding, and 35 functional plus 35 molecular updates that changed predictions. DGM nonwinning ancestry also worked. Neither search arm beat its initial procedure; updated ppODE gained +0.143 hits [0, 0.429] over frozen but remained below strong blend/kernel references. Outcomes were already exposed. Engineering repair therefore did not become confirmation, and the original scientific STOP remained. Verification exit 2 from concurrent historical whole-directory snapshot drift is a separate issue from repaired component behavior.
+
+### What the existing experiments establish
+
+The exposed FPMTB development replay supplied ordinary response prediction and active-selection baselines. At budget 8, W1 with knowledge-gradient selection had mean top-3 regret 0.269159 versus 0.328349 for greedy selection. A subsequent representation check reproduced all existing W1 behavior with same-information weighted residual regression; this was an explanation of that implementation, not another independent performance experiment. The fixed state-interaction configuration did not improve the main loss: D−B = +0.03489097, conditional patient-bootstrap interval [−0.12056075, +0.19471184]. Its configuration-level STOP remains in force. The interval used fixed predictions and overlapping cross-validation training sets; it is neither equivalence evidence nor an independent-patient validation guarantee.
+
+Evidence IDs: `log/20261023/core_algorithm_round/DECISION.md`; `log/20261023/intervention_state_repair/DECISION.md`; `log/20261023/direct_equivalence/DECISION.md`.
+
+These findings motivate stronger direct controls; they do not make state representations intrinsically useless. Joint system utility also need not imply positive superadditive interaction. A claim that two components enhance each other requires the corresponding factorial contrast, whereas a claim that their combined system is useful is a separate proposition.
+
+### Scalar feedback does not uniquely identify a state edit
+
+For fixed pair features φ, latent response z = Wφ and functional head βᵀz, the proposed update
+
+`ΔW = η r β φᵀ / (||β||² ||φ||² + λ)`
+
+has exactly the same functional predictions and sequential updates as scalar regression with w = Wᵀβ and
+
+`Δw = η r ||β||² φ / (||β||² ||φ||² + λ)`.
+
+Five executed checks agreed within 1.24×10⁻¹⁴. A state edit of norm 53.50 in the head's nullspace left functional predictions unchanged within 1.07×10⁻¹⁴. **Stop the distinctness claim for this fixed linear shared operator; do not fit it against weaker controls to rescue that claim.** Simultaneously editing composed operators introduces finite cross terms, so the result is not a proof of fixed-feature linear equivalence for every nonlinear update. Unordered simultaneous perturbations also cannot authenticate treatment-order effects.
+
+Evidence ID: `log/20261023/function_update_renewal/DECISION.md`.
+
+Other attempts exposed the same information issue in different forms. An active-capacity bottleneck example had identical legal observations/support feedback but query losses 1/2 and 0, giving equal-prior irreducible MSE 1/16. An extra lawful feature resolved the ambiguity, but an ordinary same-information non-Gaussian empirical-Bayes model could use it too. Shared-direction Gaussian transfer is already a conditional residual predictor; arbitrary nonlinear mechanisms were not shown equivalent. A velocity/curvature toy gave risks 18 for unregularized refit and 4.5 for both the proposed source-prior rule and its ordinary linear counterpart; changing the target curvature variance reversed the apparent benefit. Exact posterior equality additionally requires the specified linear/Gaussian assumptions.
+
+Evidence IDs: `log/20261023/functional_update_operation/DECISION.md`; `log/20261023/functional_transition_law/ROOT_ASSESSMENT.md`.
+
+### Mixed interventions require mixed-support information
+
+The bare implicit-resolvent update was stopped as a new-core claim. In the executed family
+
+`dx₁/dt = −x₁ + u₁ + c x₁x₂`, `dx₂/dt = −x₂ + u₂`, `c ∈ {−1/2, 0, 1/2}`,
+
+zero-start single-axis dose trajectories agree, but stable unit-combination readouts x₁+x₂ are 5/3, 2 and 3. Single-axis trajectories therefore need not identify mixed curvature. Transverse Jacobians at perturbed axis points differ and can supply the missing information; legal mixed functional feedback was not ruled out.
+
+The later real-data diagonal law, `r_ab,k = θ_k mean_g(s_a,g,k s_b,g,k)`, was a specific ordinary ridge-fitted mixed-curvature restriction. Its test on 73 real double perturbations stopped that shared diagonal-product hypothesis, not all function learning or state models. A nonlinear functional head alone would be ordinary nonlinear regression rather than a new mechanism.
+
+Evidence IDs: `log/20261023/update_law_search/DECISION.md`; `log/20261023/mixed_feedback_estimator/DECISION.md`.
+
+### Decision compression must preserve useful joint observations
+
+A planner that stored probe-wise class-conditional marginals and multiplied them was operationally class-conditional naive Bayes. In its frozen four-world witness, latent bits d,n generated probes n and d XOR n. Each probe alone left terminal risk 1/2; together they reduced risk to zero. With cost 1/8 per probe, the joint objective was 1/4 instead of 1/2 without probes. Marginal factorization lost the decisive correlation, and a one-step positive-gain stopping rule stopped too early. Correct joint class-conditional likelihoods avoid the failure without requiring explicit retention of every latent variable.
+
+Structural-resolution and drug-regret objectives also disagreed in a separate exploratory witness. That check lacked a separate execution-before freeze and must not be promoted to a preregistered biological result. The literal bounded action-rule and inverse-identity-recovery proposals likewise received **NO_NEW_CORE_GO**; actuation restrictions remain possible, but their measurement and response contracts must be supplied.
+
+Evidence IDs: `log/20261023/decision_probe_mechanism/DECISION.md`; `log/20261023/action_rule_search/DECISION.md`.
+
+### An exact potential interface failed its own necessary conditions
+
+The proposed potential restriction used fixed state coordinates, symmetric Hessian H and positive target-conjugate forces. The finite-range quadratic interface required `M = H⁻¹ diag(α)`, α > 0: positive diagonals, reciprocal sign/zero agreement and compatible cycle ratios. These finite-endpoint conditions do not follow from an arbitrary nonlinear potential's local Hessian symmetry.
+
+The completed diagnostic examined 10,609 target-coordinate values and 5,253 reciprocal pairs. Opposite exact signs occurred in 2,498 pairs (47.5538%); 292 had one-sided exact zeros. CELF2 and CKS1B had nonpositive diagonals, −0.025757964707651654 and −0.1753339509397537. **STOP_THIS_FIXED_EXACT_POSITIVE_QUADRATIC_INTERFACE.** Removing targets, changing coordinates or relaxing forces after inspection would revise the hypothesis, not make the original pass. The 10⁻¹² numerical-zero threshold was not a biological tolerance or a statistical rejection level.
+
+Evidence IDs: `log/20261023/intervention_constraint/DECISION.md`; `log/20261023/reciprocity_resolution/DECISION.md`.
+
+### Stable summaries do not certify an unchanged response law
+
+The exact four-atom example D,X ∈ {−1,+1}, Y = DX had identical pooled residual distributions across domains: HSIC(R,D)=0. Yet HSIC((R,X),D)=1/8, conditional response means reversed, pooled prediction MSE was 1 and ordinary domain-interaction prediction MSE was 0. Marginal residual stability alone therefore cannot certify conditional mechanism invariance. This did not replicate or refute the complete CICME method, its Gaussian setting or all adjacency-penalty variants.
+
+The proposed feedback-compatible symmetry-group revision already matched an inspected adaptive-group operation under its noiseless trajectory assumptions. Drug labels, nominal targets and terminal assays did not qualify those assumptions. Adaptive SINDy instead uses observed force-balance residuals; a terminal ATP/AUC response does not provide that target. **Stop the literal symmetry transplant and unrestricted marginal-stability inference**, not all approximate biological sharing.
+
+Evidence ID: `log/20261023/response_law_revision/DECISION.md`.
+
+### Later inheritance and gradient-memory tests
+
+The inherited-direction proposal fitted historical functional increments subject to a tangent control constraint, then calibrated a scalar on current feedback. Its linear toy improved over uninformed minimum norm but exactly matched a same-history rank-one Gaussian prior. Positive Euclidean regularization changed physical predictions under a mere parameter rescaling; a tangent-null constraint preserved a nonlinear control only to first order, with finite leakage 1/16. Histories along q and −q canceled the signed-mean direction while their shared second-moment axis remained useful. These are counterexamples to the literal rule and its guarantees, not to a justified stable same-signed functional relation or all inheritance.
+
+Evidence ID: `log/20261023/inherited_update_renewal/DECISION.md`.
+
+A separate MAE-gradient witness showed that two labels could follow the same two-step parameter path and lose magnitude information. A longer/larger-step scope breaker separated them; loss magnitudes could also disambiguate them. Hence not all multistep MAE adaptation is magnitude-blind. A two-pass canonical/reverse gradient-memory proposal offered approximate order consistency, not full permutation invariance. Its possible finite-budget value remains untested against exact pooled-gradient/set models, ordinary refit, replay and equal-input generated optimizers. The earlier BeatAML consistency failure does not automatically refute this different operation, but does remove a generic “more consistent means more useful” justification.
+
+Evidence IDs: `log/20261023/feedback_sufficiency_renewal/DECISION.md`; `log/20261023/functional_rule_discovery/DECISION.md`.
+
+### Observation contracts and computational cost
+
+Separating population transport, growth/selection and capture is scientifically useful, but those components already occur in ordinary unbalanced-transport/branching models; known-capture correction is ordinary reweighting. Snapshot observations do not automatically identify physical-time dynamics or intervention policy value. The existing residual failures were not shown to be caused by capture or selection. Similarly, FAC benefit with OLA harm did not identify biological drift: a frozen misspecified-regression example worsened despite an unchanged response law. Its moment-balancing proposal was an ordinary importance-weighted refit and was not validated on the biological task.
+
+Evidence IDs: `log/20261023/observation_law_search/DECISION.md`; `log/20261023/grounded_feedback_renewal/DECISION.md`; `log/20261023/feedback_shift_mechanism/DECISION.md`.
+
+Paired descendant reward credit was an ordinary action-independent-baseline policy-gradient/program-search operation under the stated identical grammar, history and cost. Semantic witnesses reduced a stipulated naive toy cost but lost to ordinary coefficient canonicalization; broadening the grammar broke the claimed equivalence. These toy operation counts were not measured biological performance. Detached-target vector updates can differ from gradients of a fixed smooth scalar loss yet still be implemented by ordinary stop-gradient/state-vector optimizers. Source query training must be shared with exact-gradient, refit and query-trained local-update controls; amortization is possible but no deployment break-even advantage was established.
+
+Evidence IDs: `log/20261023/update_strategy_renewal/DECISION.md`; `log/20261023/mechanism_reentry/DECISION.md`; `log/20261023/query_teacher_resolution/DECISION.md`.
+
+## Literature and source access
+
+Three different activities were recorded on 2026-10-23: an interrupted scientific survey, a later targeted follow-up, and a small search-tool integration test. They must not be combined into one completed systematic review. The current abstract-level verdict for both candidate ideas is **Close**, not priority clearance, a verified first contribution or a completed novelty search. The broader research objective remains **ACTIVE / NOT_ACHIEVED**.
+
+### Scientific survey: useful coverage, explicit network stop
+
+The first survey covered intervention-aware cell states, local world-model repair, functional decisions and transferable improvement. Its recent window was 2025-01-01 to 2026-10-23, with a more recent slice from 2025-10-23. Eighteen standard API queries across OpenAlex, arXiv, OpenReview and Europe PMC produced 422 deduplicated records, 375 with abstracts, 13 automatic review flags and 104 records outside the window. Three merge rounds added 144, 150 and 29 automatically high-relevance records. These automatic labels included broad and irrelevant material; they were not paper-quality judgments.
+
+Thirty frontier papers were selected for abstract-level analysis. Three neighboring abstracts and two classic abstracts were also read; one further classic remained metadata-only. PhenoProfiler's preprint and journal version were one method, not independent scientific evidence. None of these counts implies complete full-paper reading or author-result reproduction.
+
+Science's DOI body returned 403. Under the rule adopted for that round, further network requests stopped: **PARTIAL_NETWORK_STOP**, not saturation. Author expansion, citation tracing, review back-search and dedicated unrestricted-year novelty searches were not completed. DeMeo/DrugReflector remained a source-qualification lead; repository identity and checkpoint descriptions did not authenticate a complete round-level functional replay or alternative-policy oracle. GSE306429 and PerturbFate GSE291147 likewise remained leads rather than downloaded, qualified experimental tasks.
+
+Evidence IDs: `log/20261023/literature_surveys/intervention_state_repair/README.md`; `analysis.md`; `field_survey.md`; `novelty.md`; `PROCESS.md` in that same study.
+
+### Targeted follow-up: closer precedents, no qualified eight-paper benchmark
+
+The later local-repair follow-up contained 738 deduplicated records, 673 with abstracts and 26 automatic review flags. Its final merge history was 134, 113, 120, 19, 2 and 58 new automatically high-relevance items. A review-reference query returned 96 records; this is not evidence that all references were individually excluded. OpenReview refusals were skipped after separate authorization; no challenge was bypassed. This later permission does not rewrite the earlier network-stop history.
+
+The follow-up inspected two methods more deeply and retained abstract/metadata evidence for the others. The resource-screening table covered eight journal/main-conference candidates: PerturbedVAE, Needles in the Haystack, PerturbDiff, SCCVAE, GPO-VAE, UniPert-G2CP, Predicting drug responses of unseen cell types, and active-learning-guided CXCL9 modelling. **None was certified as a runnable same-task, same-information, same-cost benchmark.** Missing checks covered training entry points, data identities, splits, numerical results or task compatibility; unknown availability was not recoded as absent code/data.
+
+Preprints, workshops and ICLR 2027 submissions were kept as relevant precedents without being upgraded to accepted main-conference papers. A DOI certificate error or a missing abstract was not evidence that the underlying dataset did not exist. Author benchmark values remain author reports, not project experiments.
+
+Evidence IDs: `log/20261023/literature_surveys/local_repair/analysis.md`; `novelty.md`; `candidates_screened.md`; `99_dropped.md`; `PROCESS.md` in that same study.
+
+The local-repair README preserves its earlier initialization state, including pending groups and the then-unavailable web tools. The executed PROCESS, analysis and candidate screening document later progress. Retaining this distinction prevents an old setup note from overriding the actual follow-up evidence.
+
+### What the two Close verdicts mean
+
+**Identifiable local repair.** Background/response decomposition, structured perturbation extrapolation, residual adaptation, low-rank transfer and reusable mechanism modules already have close precedents. PerturbedVAE, SplitJEPA, VCLMU, Source Information, COHERE, SCCVAE, Latent Causal Diffusions and Few-Shot Residual Adaptation occupy parts of the proposed operation. The inspected PerturbedVAE D.4 counterexample concerns a specified affine-identifiability lemma; it neither invalidates the complete paper nor supplies a new repair algorithm. A defensible advance would require a new justified biological restriction, a lawful measurement contract and an independently tested functional or resource advantage.
+
+**World-model-assisted improvement of the improver.** RSI-Anything, RSIFlow, Meta-TTL, DGM, SEAL, Hyperagents, RIWANav and SWIRL already supply relevant combinations of model-guided selection, descendant credit, retained modifications, workflow adaptation or meta-level editing. The inspected public RSI-Anything chemistry path used a frozen predictor and ordinary expected improvement; it did not establish an isolated G1-versus-G0 capability gain. This is a scoped implementation finding, not a refutation of the entire paper. Naming an editable updater or an archive does not establish either novelty or recursive capability improvement.
+
+Both verdicts remain **Close with residual checks**, not Done or Not-found. Ordinary hierarchical Bayesian design and meta-learning already express broad future-learning objectives; that does not rule out a valuable efficient implementation. The missing contribution is a concrete executable difference and evidence, rather than the ability to describe a desired information flow.
+
+Evidence IDs: the two study `novelty.md` files above; `log/20261023/core_completion_round` for separately attributed theory/code inspections.
+
+### Consequences for experiments and interpretation
+
+Functional drug-selection utility, conditional-distribution accuracy, causal identifiability, updater transfer and improved-improver learning are distinct targets. Expression MSE, differential-expression recovery, morphology FID, mode-of-action classification and known-target retrieval cannot be pooled as one discovery score. Different active strategies may choose different actions, but comparisons need common terminal opportunities, lawful feedback and matched total costs, including source training, tuning, measurements and descendant evaluation.
+
+Existing FPMTB, Emerald, Chronos, decryptE, HCT116, CellHealth, organoid and trajectory records retain their own subsequent qualifications and configuration-level STOPs. Earlier literature leads cannot reopen them automatically. CellHealth conditions are not independent future tasks; repository access is not a qualified response oracle; a dataset with real time labels does not automatically provide lawful action semantics or cross-run inheritance evidence.
+
+### Search-tool integration: successful engineering, not a scientific survey
+
+The native-web validation intentionally used known seeds: SequenTx, DeMeo, DGM, SEAL, DINOv3 and Dreamer. Seven genuine source records merged into six papers. The input retained metadata and locations rather than complete page bodies. DeMeo's 2025-10-23 first-publication date and 2025-11-27 PubMed volume/issue date retained their distinct provenance. Source records stayed metadata-level R; successful open/PDF calls did not automatically confer full-text F status.
+
+The receipt recorded 11 native tool calls containing 10 searches, 8 opens, 3 finds, 1 click and 1 screenshot. Search and official-page/PDF access worked; an academic connector was unauthorized, one publisher route required authentication, some operations failed, and screenshot delivery was not established. Visual-browser control was not exposed. Source-local failures were not grounds for claiming the whole toolchain unavailable or bypassing access controls.
+
+Forty offline checks and an independent temporary-workspace test supported software integration, record merging and provenance retention. The small chosen seed set had been used for development, so it establishes neither blinded scientific confirmation nor general retrieval recall. Its novelty status is **NOT_PERFORMED**; author/citation expansion, review back-search and saturation assessment were not run.
+
+Evidence IDs: `log/20261023/literature_surveys/native_web_validation/README.md`; `analysis.md`; `field_survey.md`; `novelty.md`; `PROCESS.md` in that study; `log/20261023/lit_survey_skill_upgrade/REPORT.md`; `LIVE_TEST_RECEIPT.json` in the upgrade record.
+
+### Source-access and skill validation on October 24
+
+The scGPT preprint identity was linked to its formal publication through bioRxiv/Europe PMC metadata, but PDF access returned 429; this was not full-text review. SequenTx official project materials were authenticated at commit ce976478f5b885e65bf90df89327b6ee38dec043, with four fixed-commit responses byte-identical to the prior main responses. Project material is not the unavailable formal article. CellOT and the PNAS antibiotic-RL paper were separate method references, not substitute SequenTx evidence.
+
+A separate figure-study task inspected 26 distinct journal-paper mechanism figures, excluded result panels as architecture evidence, and delivered an original editable vector diagram rendered directly at 3840×2160. Three image-API attempts returned 1672×941 and were rejected; the vector deliverable is not an API recovery claim or a tested MAESTRO biological model. Independent source-recovery testing fixed request-metadata contamination and a JSON-body regression; final lit-survey tests were 66 passed. These are bounded software/communication checks, not research-performance evidence.
+
+Evidence IDs: `log/20261024/accessible_source_routes/REPORT.md`, `log/20261024/accessible_source_routes/sequentx/REPORT.md`, `log/20261024/skill_iteration_round/REPORT.md`, `log/20261024/lit_survey_multiagent_review/REPORT.md`.
+
+## Reproduction and next work
+
+### Maintained, exploratory and formal assets
+
+The maintained runtime is `src/` plus reusable `tools/` and their registered tests. `research/` contains exploratory implementations and local execution protocols; a retained directory is not a validated method or a runtime promotion. Formal communication artifacts, including the retained DGM presentation and vector figure, are communication outputs rather than scientific validation. Raw/source evidence and protected outcomes retain their designated data boundaries. Organization did not promote experimental algorithms, change frozen thresholds or reverse study-level decisions.
+
+Seven workspaces remain as current local working/replay assets:
+
+| Workspace | Why it remains and what its presence does not establish |
+|---|---|
+| `evidence_portfolio_optimization_20261023` | Latest paid-repeatability readout and its audit dependencies; exposed development, not independent biological confirmation. |
+| `functional_rule_revision_20261020` | Retained rule-editing and gate dependencies; configured branch unsupported, with the bootstrap limitation above. |
+| `self_improving_virtual_cell_20261020` | Executable lifecycle and diagnostic dependencies; prototype execution, not supported self-improvement. |
+| `innovation_validation_20261020` | Synthetic/development controls and retained replay artifacts; no real-pharmacology or inherited-capability confirmation. |
+| `innovation_validation_repair1_20261020` | Repair diagnostics and implementation dependencies; old strict-checkpoint failure and untested equal-resource claim remain. |
+| `procedure_inheritance_20261020` | Procedure/behavior replay dependencies; CLOSE remains in force. |
+| `procedure_inheritance_20261020_audit1` | Saved-cost/behavior audit dependencies; read-only correction, not another independent experiment. |
+
+The registry in `research/STUDIES.json` records the remaining studies' archive state, package and member prefix. Protected records can remain in their original locations even when their surrounding study is archived; do not treat them as unexplained debris or open their payloads for maintenance. Historical code and assets are preserved as three packages under `data/processed/research_packages/`:
+
+| Package | Content at package verification | Access boundary |
+|---|---:|---|
+| `historical_experiments.zip` | 1,391 members; 2,473,835,051 original bytes | Retired experimental code/configuration/local evidence; scientific study identities remain in the registry. |
+| `historical_artifacts.zip` | 3,184 members; 7,573,157,239 original bytes | Historical derived numeric/model/run assets; raw and explicitly protected data are separate. |
+| `workbench.zip` | 168 members; 765,752,294 original bytes | Historical fixed-path workbench/cache assets needed for selective reconstruction. |
+
+Package membership and content hashes are recorded in `data/processed/research_records/INDEX.json`. The corresponding source ID is `packages/<package-name>/<original-relative-path>`; this is an archive locator, not an old-path compatibility alias. For example:
+
+```powershell
+python -m tools.retained_records --show packages/historical_experiments/research/acquisition_program_20261018/ap_analyse.py
+python -m tools.retained_records --list packages/historical_artifacts/data/processed/research_results/research_records/decoupled_calibration_rsd_20261019
+python -m tools.retained_records --restore packages/historical_experiments/research/acquisition_program_20261018 --destination D:/temporary-verification
+```
+
+The last command restores under the selected source-ID prefix in the temporary destination. It does not automatically recreate a runnable project root. Use the registry's package/member prefix to assemble only the needed original relative paths in an isolated replay tree, together with cited exact records, lawful input assets and the required environment. Resolve the asset's current package ID before running any historical verifier; source retention alone is not a claim of immediate execution. No old experiment is authorized to rerun by these navigation instructions. A historical whole-directory snapshot may fail after legitimate reorganization, even when all bound scientific payload bytes match; record that separately from model or component failure.
+
+The procedure-inheritance saved-statistics audit remains at `data/processed/research_results/research_records/procedure_inheritance_20261020_audit1/saved_statistics_audit.json`: all 24 bound input hashes were checked during organization. Invocation accounting was corrected from 12 later tasks to all 16 invocations, including the omitted first batch; the audit also identified a missing primary unit-saving condition in the advance rule. Its projected break-even counts pool four artifact versions. The actual CLOSE label remained unchanged. The complete report remains source ID `log/research_records/procedure_inheritance_20261020_audit1/REPORT.md`; no frozen decision rule was rewritten.
+
+### Scientific next steps and inherited stop conditions
+
+Common-start comparisons of old and new updaters, inheritance on independent later tasks, and equal-budget comparisons of old and new improvement strategies require stronger evidence. Candidate opportunities must have a functional endpoint that is not already the selector, authentic acquisition costs, independent future-task units and detectable headroom. Controls include same-information direct prediction, ordinary conditioning/refitting, active allocation and simple gating/mixtures.
+
+HCC workbooks, AML source identity, SRS prefixes and regrowth matching retain their specific qualification gaps. New data access or source qualification does not itself establish benchmark performance. No new wet-lab experiment was performed by document consolidation; published-measurement replays are computational studies. Existing scoped STOP decisions and frozen thresholds were not changed, and no experimental code was promoted into the maintained runtime.
+
+New work requires a materially distinct falsifiable operation, a qualified task and feedback contract, a supported biological sharing restriction and informed strong controls. A strict operation-level copy cannot support a distinct algorithm claim; belonging to a conventional family does not preclude a specific finite-sample or finite-cost contribution. Compare matched-information ordinary direct prediction/refitting, simple mixtures/gating, relevant continual/active learning, and equal-total-budget search. Include source training, tuning, paid measurements and descendant evaluation in costs.
+
+Model improvement, world/agent contribution, updater inheritance, joint benefit and improvement-strategy improvement require separate comparisons. Improved-improver claims need old/new improvers starting from a common later-task artifact with matched history and budget. Unexercised, unaccepted or blocked components remain NOT_TESTED or NOT_QUALIFIED, not zero-effect measurements. Conditional intervals on fixed predictions exclude some training, selection and assay uncertainty; audit agreement is not an independent biological replicate.
+
+Before outcome-based model selection, freeze endpoint direction, action menu, actual independent unit, grouping, normalization, legal support/query access and acquisition cost. Preserve failures, ambiguity and later corrections. Changed public artifacts can justify requalification; repeated access attempts or renamed hypotheses do not repair missing identity contracts. Retrospective summary-label prediction can be lawful without every raw well, but cannot claim reproduction of dose-response fitting or new wet-lab confirmation.
+
+Historical CDK composition and functional experiments already ran and should not be reopened as absent through another model menu. The discovery-gate protocol remained a prototype: finite null grids and mirrored signals did not establish composite-null calibration. The later Jaaks repeatability diagnostic is not mathematical certification or a new update law. Relevant Evidence IDs: `log/20261023/functional_mechanism_frontier/DECISION.md`; `log/20261023/external_advice_status/ASSESSMENT.md`; `log/20261023/external_advice_status/INDEPENDENT_RECHECK.md`; `log/20261023/certified_discovery_gates/PROTOCOL.md`.
+
+### Reading, verification and evidence limits
+
+This report integrates the complete text of the five preceding thematic syntheses and the detailed chapter covering all 39 registered studies. The historical synthesis read the early summary in full and inspected original-source opening sections plus targeted result/decision passages for every study, with deeper context-transfer inspection and a full reading of the seed-attribution erratum. It does not claim full semantic review of every original source. The earlier recent-study census covered 128 roots: 113 had a final report and 15 lacked a root-level final DECISION/REPORT. That census is not evidence that all later work was fully reviewed or completed. The study index distinguishes reconciled results from attributed source excerpts and missing final records.
+
+The retained reader authenticates retrieved source bytes against its index. Byte equality, ZIP member counts and metadata preservation do not establish semantic completeness or scientific correctness. The exact collection records content hashes, modes and original access/modification times, not full NTFS security descriptors. Detailed former protocols, reviews, errata and logs remain evidence beneath this report, rather than competing current summaries. Historical source IDs include `log/20261023/report_consolidation/studies/LUNA_EARLY_SUMMARY.md`, `log/20261023/report_consolidation/studies/LUNA_RECENT_SUMMARY.md` and `log/20261023/report_consolidation/RESEARCH_SUMMARY.md`; an unquoted later per-study correction still governs.
+
+Numerical and historical execution statements are attributed to the retained studies and amendments, except where an explicit organization-time recount or hash check is described above. Report preparation did not train new models, acquire new biological sources, access sealed payloads or perform a new biological validation. It preserves stopped hypotheses, useful ordinary baselines, prerequisites and uncertainty so that subsequent work can use historical evidence without inheriting disproven claims.
+
+The five preceding thematic syntheses remain exact source IDs under `log/synthesis_before_20261025/FINAL_STATUS.md`, `FINAL_FEEDBACK.md`, `FINAL_MECHANISMS.md`, `FINAL_SOURCES.md` and `FINAL_LITERATURE.md` in the retained-record collection. They are provenance snapshots, not parallel current reports.
+
+## Organization verification (2026-10-25)
+
+This maintenance pass changed storage and corrected the explicit Jaaks threshold attribution; it did not run a new scientific experiment. The default software test suite exited successfully, with two optional tests skipped. The installed `maestro --help` entry point works. The release preflight still reports `BLOCKED/ASSET_MISSING` because no active frozen study/result was supplied; this remains separate from software validity and scientific confirmation.
+
+The same inventory boundary excludes Git internals, installed environments, secrets, linked external trees and registered caches. Before/after physical-file counts are:
+
+| Category | Before | After |
+|---|---:|---:|
+| Reports and documents | 954 | 821 |
+| Code and scripts | 1,816 | 1,375 |
+| Configurations, manifests and tables | 2,320 | 844 |
+| Logs and exact-source records | 440 | 336 |
+| Data, binaries and other files | 7,572 | 4,982 |
+| All files | 13,102 | 8,358 |
+| All subdirectories | 1,364 | 1,373 |
+
+The three packages contain 4,743 members, counted separately from physical loose files. All their former loose sources were verified absent; unchanged whole-package SHA256 confirms the previously verified member bytes remain intact. Text code and a binary NPZ were actually restored to an isolated temporary destination with matching content hashes and modification times. The five preceding thematic reports were read back from their exact-source snapshots before their loose copies were removed. Current navigation links and 198 study-index targets resolve to this report or their declared source records. A separate agent checked selected original evidence and could recover the current conclusion, failure decisions and next prerequisites without using the old chat as evidence; this was a scoped continuity check, not a formal blinded method comparison.
+
+The selected evidence graph in `research/STUDIES.json` has seven objects and nine relations. Six live sources validate without binding errors. An unchanged snapshot reuses all seven objects; changing CHOICES only in an external temporary copy correctly marks five dependent Jaaks/report objects for review while reusing the two procedure-audit objects. This checks dependency propagation, not automatic scientific reassessment.
+
+Directory compaction is incomplete: empty source directories remain, so the higher directory count must not be presented as successful directory reduction. Protected payloads, installed environments and current dependencies remain within their explicit retention boundaries. Semantic reading covered the five complete theme reports and the scoped historical-source review described above; hashing all retained records is not a claim that every original file was semantically reviewed.

@@ -1,5 +1,0 @@
-# Execution context
-
-maestro Python3.11.16,numpy2.4.6,pandas2.3.3,scipy1.17.1,sklearn1.9.0,HEAD47a0e2dea5a7dd42379fa17eb3621caf6bd0114c. Deterministic SVD/zero starts/no random seeds; BLAS threads limited1. Inputs from numerical qualification DECISION and reports. Synthetic completion test passed analytic two-gene shrinkage and observed-zero cases before fitting. Mask protected-sentinel test passed. Actual predecessor raw/QC execution completed terminal session65455, never restarted.
-
-Approximation differences from original:single-only normalization/panel, symmetric quadratic basis, fixed Lipschitz FISTA rather than original backtracking, max2000iterations vs original up to50000, eigendecomposition real PSD sqrt of RNA correlation, explicit masks. Same nuclear objective with sideinformation and quadratic residual. It is a close conventional approximation, not original-result reproduction. Report all nonconverged fits and cannot infer a strong comparison if crucial approximation has not converged. Fresh native review provider unavailable; no independent code-review claim. Existing independently debated contract remains valid.

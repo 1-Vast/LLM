@@ -1,3 +1,0 @@
-# Corrections before any fit
-
-Independent audit found the adapter's initially proposed conventional scheduler diverged from pinned authorutils despite both calledlinearwarmup:author uses integerwarmup,(step+1)/warmup and decayfloor.1. Restored actualauthorformula and shuffleFalse DataLoader before executing datafit; protocol aligned. Zero-warmup short refits use decayingbranch directly, no dividedbyzero. Original scheduler docstring saysdecay0 but executableformula ends.1; actualsource governs fidelity. Also installed canonicalpair,sourceorder,prioruniqueness,G103/source3160/dev1051assertions. No numericalperformance existed when these changed. Initial protocol fitcount arithmetic24 correctedto36beforefit. No failure/result rescue claimed.

@@ -1,5 +1,0 @@
-# Workbook metadata access contract
-
-Before worksheet access: inspect only workbook/sheet names, dimensions and textual cells in rows1–2 of each sheet of the two authenticated supplementary workbooks. Numeric cells and formulas are not exported, converted to response values, summarized or fitted. Shared-string indices may be parsed as integer addresses; those indices are not phenotype values. XML/ZIP libraries may materialize underlying worksheet/shared-string bytes internally; this is a logical text-export restriction, not physical non-decoding. No data body rows, performance statistics or endpoint selection. Goal is locating a barcode-to-clone/culture mapping schema; absence of that schema in headers alone is not proof of absence in all source data.
-
-Read-only OOXML extraction rather than whole-workbook import preserves this narrow access contract. Scientific spreadsheet read-only guidance applied: original files untouched, no export to replacement xlsx, no changed inputs or refreshed formulas. All outputs log/, all extraction code research/ per user's explicit directory requirement.

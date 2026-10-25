@@ -1,3 +1,0 @@
-# Frozen exact arithmetic check
-
-The sealed independent report derives both cases before execution. This check performs exact Fraction arithmetic to verify the two rows and the equal-prior Bayes MSE 1/16. It also verifies a positive prerequisite: if a lawful feature exactly observes c2, ordinary same-information two-point empirical Bayes predicts both queries with zero error. No candidate advantage is expected or claimed. No random numbers, biological labels, model fit, API, or network. No iterations or tuning; execute once after hashing this protocol, the independent report, and the script. Any failure is to be retained and corrected in a new artifact, never overwritten.

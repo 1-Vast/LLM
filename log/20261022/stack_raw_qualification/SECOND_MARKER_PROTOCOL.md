@@ -1,7 +1,0 @@
-# Complete the authenticated compound and second-marker identity fields
-
-IDENTITY_SUMMARY shows two same-time header blocks, separated by a second phenotypic_Marker column: AB in both T98G full tables, BK in U2OS full table. Authorize only these second-marker cells at all data rows, using string decoding; the numeric responses following them remain closed. Also authorize literal metadata decoding for A (Compound) when the first projection blocked a nonstring identity, so a numeric control code or an empty typed cell is represented exactly rather than guessed. This is a column-authenticated identity-field qualification, not permission to read any response.
-
-The TMZ full sheet also has side headers AUC/Norm. AUC/Compound/Targets/Pathway/Plate/Average AUC. Their row alignment and response-selection status are unknown. Do not read their data cells or assign that Plate header to the raw series. It does not establish a plate/run key. No QC membership, assay values, side-table ranking or per-response missingness is read.
-
-Record exact first/second marker identities, second-marker missing/duplicate labels and all blank/nonstring Compound cells. Do not silently equate the 87 missing labels with vehicle controls. No averaging, replicate assignment, exclusion or fitting. The identity extractor's new explicit address policy gets a closed-response perturbation test before real use. The previous projection remains unchanged.

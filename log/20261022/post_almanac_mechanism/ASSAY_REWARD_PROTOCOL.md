@@ -1,9 +1,0 @@
-# AssayLoop stated objective: positive-probability reference check
-
-2026-10-22. Root read the retained primary Methods4.5 and AppendixD.2 and the author's AppendixB terminal-EF ablation before this protocol. Frontier's initial deterministic-reference witness is a valid limiting restriction but does not by itself authenticate the stochastic released implementation. No biological labels/checkpoint will be downloaded for this check.
-
-Fixed synthetic library of four abstract candidates, labels(0,1,0,0), horizon3, batch1. The frozen context-free reference samples one remaining candidate proportional to strictly positive weights(10000,100,1,1), a nondegenerate Plackett–Luce/Gumbel-top1 law. Compare two fixed legal acquisition sequences A=(0,2,1) and B=(2,3,0). Only actual acquisition removes candidates, matching the stated shared-remaining-pool contract. Compute exact expected sum of actual hits minus independently sampled reference hits using Fractions. Check whether A has more hits but lower expected stated reward. This does not replicate authors' actual weights or training results.
-
-Exhaustively check all24 length3 sequences. A fixed potential with terminal value0 must make sum[y+Phi(next)−Phi(current)] equal totalhits−Phi(initial) on every trajectory. This ordinary potential-shaping identity is a faithful conventional repair, not an original MAESTRO algorithm. No claim that it empirically beats author's context reward (the author reports the terminal-EF ablation is worse), or that expected-return ordering fixes every finite-G GRPO update.
-
-An optional bounded official code read may authenticate whether the released reward uses the same remaining-pool/reference-removal contract. It may access repository tree and exact source files only, never biological data/weights. If code differs, preserve that qualification and do not generalize the formula witness to actual implementation. Requests/versions/failures must be saved.

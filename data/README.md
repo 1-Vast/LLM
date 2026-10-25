@@ -8,4 +8,4 @@
 
 Keep key reports and result summaries in [log](../log/README.md), and experimental code and tests in [research](../research/README.md). Record data origin, version, current path and hashes in the corresponding log record. Data must survive routine research-code cleanup.
 
-See the [storage policy](../log/STORAGE_POLICY.md) and [consolidated data locations](../log/20261023/report_consolidation/DATA_LOCATIONS.md). Historical paths may require the migration indexes linked there.
+See the [storage policy](../log/STORAGE_POLICY.md) and [consolidated data locations](../log/README.md). Historical paths may require the migration indexes linked there.

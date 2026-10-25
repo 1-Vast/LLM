@@ -1,5 +1,0 @@
-# Offline source-description semantic scope, before execution
-
-Root explicitly requests source metadata evidence about image acquisition time, time-lapse status, experiment kind and further data/code links for the two exact Zenodo versions. This adds no HTTP request and no image/table/archive access. Only already saved record `metadata.description` strings may be examined by a separate worker.
-
-Export the source-description prose after HTML removal, replacing URL references by citation labels and **redacting numeric tokens**. Separately export literal time-duration strings as source metadata identities, not observed response values, and citation URL strings. The goal is to preserve explicit source statements without exposing quantitative biological responses. A timing word/absence does not prove a full schedule or lack thereof; filename `3hours` is separately identified as a filename, not description acquisition documentation. Preserve both versions independently, including missing/ambiguous time-lapse statements. No claims about completed drug-order branches follow from these paragraphs.

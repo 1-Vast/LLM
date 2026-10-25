@@ -1,7 +1,0 @@
-# Independent report prior-scope clarification after constructive cross
-
-2026-10-23. Constructive actually read the sealed report and correctly challenged a missing distribution assumption. The executed exact risks18,9/2and45/2 follow from the stipulated independent zero-mean variables and second moments alone. The covariance-gain rule and an ordinary linear conditional/LMMSE predictor are identical under those moment assumptions. But equality to a full Bayesian posterior mean is not implied for arbitrary distributions sharing these moments.
-
-For the report's stated Bayesian equality, explicitly additionally stipulate independent Gaussian r,k and observation errors with the specified variances. Under that fully specified linear-Gaussian model, the stated K is the exact posterior-mean update, and the direct conditional mean is identical. Without Gaussian/linear-conditional-mean assumptions, preserve the risk calculation and exact ordinary LMMSE counterpart only; do not claim Bayes optimality or identical posterior mean universally. The script calculates moments, not posterior inference, and its same_prior_bayes_risk label has this added Gaussian scope.
-
-Likewise the target curvature-variance9 calculation keeps the inherited source gain fixed; it is a transfer-risk counterexample, not a claim that correctly target-informed Bayesian adaptation must have that risk. Under target-aware variance the ordinary optimizer could change its gain. No biology, operator novelty or RSI status changes. Preserve the independent seal and this explicit later correction.

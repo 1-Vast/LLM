@@ -1,9 +1,0 @@
-# Final static source review: GO
-
-Current run.py SHA256ad31d0d83df0262de45be328376d3cb2ecaef9b6a326532f9fe24d9c3a36fe11 is unchanged from source/CROSS_SEAL. Plan/amendment scope and previous actual reciprocal cross therefore still apply. Source inspected test_pipeline.py and saved TEST_OUTPUT.txt (3tests,0.865s,OK): the actual test code poisons H/I, checks mirror/control handling, perturbs query responses for all declared model configurations and checks nested supports/common query. This is static review of the tests plus root's saved output, not independent execution or biological verification.
-
-Cached pinned author scripts/scores/3_select_hits.py explicitly selects neg = decipher_scores[condition] < 0 within select_synthetic_lethalities. Its final block excludes controls AAVS/nontargeting, same-gene pairs and reciprocal duplicates. This authenticates the direction and identity exclusions without new data or GET. The diagnostic's bottom20 is ranking more-negative published GI; it is not lowest raw growth or an independently validated synthetic-lethal/clinical outcome. Author final hit calling additionally uses significance/essentiality filters; this diagnostic intentionally does not import those as query eligibility.
-
-No blocking issue remains for the final bound ordinary completed-screen development run after root execution freeze. Lung-score exclusion, identical canonical roles and support/query restrictions remain mandatory. No new model/agent/RSI or wet-saving claim is approved. A549/A427 opening remains unauthorized by any diagnostic outcome.
-
-One local filename lookup mistakenly tried test_access.py after rg had identified test_pipeline.py; it failed, then the actual file was read. No command executed a model or selected response values. Source independently executed only the earlier ID metadata audit, not this test suite. Original reports/seals preserved.

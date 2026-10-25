@@ -1,3 +1,0 @@
-# Post-seal focused historical check
-
-After `INDEPENDENT_SEAL.json`, a focused text search/read of `research/biological_residual_gate_20261019/REPORT.md` independently confirmed the report's already-stated audit corrections: B5 weight includes target Jaccard, and the earlier zero-agent-value statement was limited to epsilon .03 and the fixed refinement weight approximately .2 (fold range .17–.22), with a .15 probe contrast needed to flip a zero prior. These were historical text numbers, not a new dataset decode. This check also confirms seeding dates do not certify independent biological preparations. The original independent seal is preserved unchanged; no new experiment was run.

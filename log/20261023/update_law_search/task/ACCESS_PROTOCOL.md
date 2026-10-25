@@ -1,5 +1,0 @@
-# Independent task opportunity source access
-
-2026-10-23, role /root/later_task_opportunity. No current peer report read. Read full goal file and reciprocity decision before work. Relevant historical MSE, PTPC late-state, functional dynamics, early/update-rule and Replogle STOPs were inspected and remain binding.
-
-One precise source check: SCHEMATIC author-linked Supplementary Data 2 (MOESM4), described in saved primary preview as interaction scores. Acquire at most 12 MB and retain bytes/receipt; emit only sheet names, row counts and textual first-row headers. The entire numeric workbook is downloaded/parsed as XML if successful, so artifact-byte contact occurs; no outcome scalar conversion, distribution, ranking, fit or eligibility selection occurs. No other supplement download or biological experiment authorized by this source check. This confirms whether per-line endpoints actually exist and informs whether a new later-context task is a real option; it does not establish novelty or reopen a stopped configuration.

@@ -99,8 +99,8 @@ The former `outputs/local_verification/upstream/dataset/raw` path was a Windows 
 
 ## Research record relocation (2026-10-23)
 
-5174 files / 16,965,601,085 bytes were relocated from log storage into raw, external-source and processed-data research subtrees. The base inventory above remains dated as stated. No outcome values were decoded for this maintenance. Exact paths, hashes and operation receipts are in [DATA_LOCATIONS.md](../log/20261023/report_consolidation/DATA_LOCATIONS.md). This is a relocation record, not a new independent dataset or scientific result.
+5174 files / 16,965,601,085 bytes were relocated from log storage into raw, external-source and processed-data research subtrees. The base inventory above remains dated as stated. No outcome values were decoded for this maintenance. Exact paths, hashes and operation receipts are in [DATA_LOCATIONS.md](../log/README.md). This is a relocation record, not a new independent dataset or scientific result.
 
 ## Evidence-portfolio development (2026-10-23)
 
-`processed/evidence_portfolio_optimization_20261023/` stores the metadata-selected, exposed Jaaks observations and per-arm acquisition choices for the repeatability diagnostic. `external/evidence_portfolio_optimization_20261023/` stores retrieved primary-source bodies and request receipts. Key results and provenance links are in [the study record](../log/20261023/evidence_portfolio_optimization/README.md). This work did not access AZ numeric outcomes or reserves and supplies no new independent biological dataset.
+`processed/evidence_portfolio_optimization_20261023/` stores the metadata-selected, exposed Jaaks observations and per-arm acquisition choices for the repeatability diagnostic. `external/evidence_portfolio_optimization_20261023/` stores retrieved primary-source bodies and request receipts. Key results and provenance links are in [the study record](../log/README.md). This work did not access AZ numeric outcomes or reserves and supplies no new independent biological dataset.

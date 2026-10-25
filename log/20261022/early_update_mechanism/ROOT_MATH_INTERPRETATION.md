@@ -1,5 +1,0 @@
-# Noise-example scope clarification
-
-The two compatible bounded-noise observations establish that the queried datum cannot identify which coupling hypothesis is correct with guaranteed correct acceptance and rejection. A degenerate policy can always reject every shared-shift proposal; the example does not make that action impossible. It rules out informative error-free discrimination without separation assumptions, not conservative abstention or positive expected decision value. Keep ROOT_MATH_PROTOCOL/RESULT unchanged; this is a scope clarification after the check, not a changed experiment.
-
-Similarly the positive-lambda example qualifies a proposed noiseless exact-recovery assertion; it does not imply regularization is harmful for noisy prediction. Profile/MAP equivalence establishes an ordinary implementation of this exact operation, not impossibility of a novel sample/cost advantage for a materially different structure. None of these mathematical examples measures real assay performance.

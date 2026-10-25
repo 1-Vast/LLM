@@ -1,5 +1,0 @@
-# Actual late critic reciprocal response
-
-After CROSS_SEAL was written, critic sent a directed question and source replied. Critic agreed that endogenous targetRNA cannot be treated as exogenous dose or supplied free to one model, and asked whether its ATPspike observer restriction permits any current numericGO. Source explicitly answered **no**: no authenticated real aliquot/livecount package means future observation-law/design qualification only. The exact rank witness establishes a possible experimental design, not functional performance; all calibration must reach informed joint/direct controls.
-
-Source also answered critic's min/sign question consistently with its constructive exchange: cooperative TF amplification, homeostatic undershoot, realizedCRISPRa and coordinate transformations are strongest counterexamples. Only a lowdimensional, fixed, exposed-state falsifier is conditionally supported; no functionGO, no physicalsaturation inference from violations, no head/gate after sameinput/split directmodel wins. This addendum records actual critic correspondence without rewriting the earlier truthful no-correspondence statement. No new HTTP/labels/fits.

@@ -1,3 +1,0 @@
-**1. 应撤回4332判断。** 所给receipt显示estimator_fits=4336，且逐family计数与摘录代码一致：selected按8个family各留1项，final对7个非refit family各1次feedback_fit_predict（7次），refit对7个dev各1次ordinary_refit（21次），合计final 28次；加null 3、base 602 packs×3? 不展开，但receipt的4336与“final仅rho0”不相容。原“final只有rho0造成4332”与摘录循环和receipt冲突，应撤回。注意：4336是程序计数事实，不是性能实证。
-
-**2. 无必须排除fixed_half_mixture的统计理由，但“ordinary”命名不精确。** 该混合是预先固定的50/50(candidate+selected direct)，作为更强替代基线纳入，属于保守比较选择，不是数据泄漏；rho0 exact copy因同程序合并、mixture因不同程序非同构，这一区分成立。若审查要求“ordinary”仅指单程序基线，则应改称“预注册强混合基线”或类似，而非删除。不得因它更严而事后放松门槛；也不应把命名问题误判为数学bug。可复现事实是：该混合在final中由两个已选预测确定性合成，未用dev标签再选权重。故保留其作为gate合理；仅建议在报告中明确其非“ordinary单模型”含义。其余候选新颖性、单N、开发暴露等局限维持。

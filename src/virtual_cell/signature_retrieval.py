@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import math
 from dataclasses import dataclass, field
@@ -49,12 +50,12 @@ def load_library(directory: Path) -> SignatureLibrary:
     arrays = (directory / "library.npz").read_bytes()
     if hashlib.sha256(arrays).hexdigest() != meta.get("arrays_sha256"):
         raise ValueError("signature_library_digest_mismatch")
-    data = np.load(directory / "library.npz", allow_pickle=False)
-    return SignatureLibrary(
-        genes=tuple(meta["genes"]), lines=tuple(meta["lines"]), doses=tuple(float(d) for d in meta["doses"]),
-        compounds=tuple(meta["compounds"]), profiles=data["profiles"], entry_compound=data["entry_compound"],
-        entry_line=data["entry_line"], entry_dose=data["entry_dose"], systematic=data["systematic"],
-        metadata=meta)
+    with np.load(io.BytesIO(arrays), allow_pickle=False) as data:
+        return SignatureLibrary(
+            genes=tuple(meta["genes"]), lines=tuple(meta["lines"]), doses=tuple(float(d) for d in meta["doses"]),
+            compounds=tuple(meta["compounds"]), profiles=data["profiles"], entry_compound=data["entry_compound"],
+            entry_line=data["entry_line"], entry_dose=data["entry_dose"], systematic=data["systematic"],
+            metadata=meta)
 
 
 def _cosine(a: np.ndarray, b: np.ndarray) -> float:
@@ -238,7 +239,8 @@ class SciPlexResponseRung:
     def __init__(self, config: ResponseRungConfig):
         self.config = config
         self.library: SignatureLibrary = load_library(config.library_directory)
-        calibration = json.loads(Path(config.calibration_file).read_text(encoding="utf-8"))
+        calibration_bytes = Path(config.calibration_file).read_bytes()
+        calibration = json.loads(calibration_bytes.decode("utf-8"))
         self.level = float(calibration["level"])
         self.quantiles: Mapping[str, Mapping[str, float | None]] = calibration["quantiles"]
         self.gene_sets: Mapping[str, Sequence[str]] = calibration["gene_sets"]
@@ -257,11 +259,11 @@ class SciPlexResponseRung:
                            for name, genes in self.gene_sets.items()}
         digest = hashlib.sha256()
         digest.update(str(self.library.metadata.get("arrays_sha256")).encode())
-        digest.update(Path(config.calibration_file).read_bytes())
+        digest.update(calibration_bytes)
         self.model_version = "sciplex3_reference_response_" + digest.hexdigest()[:16]
         # The coverage receipts bind to the exact calibration file bytes they
         # were measured on; a rebuilt or edited file invalidates them by digest.
-        self.calibration_sha256 = hashlib.sha256(Path(config.calibration_file).read_bytes()).hexdigest()
+        self.calibration_sha256 = hashlib.sha256(calibration_bytes).hexdigest()
         self.receipts = tuple(self._receipt(readout) for readout in self.known_readouts)
 
     # ------------------------------------------------------------------ contract

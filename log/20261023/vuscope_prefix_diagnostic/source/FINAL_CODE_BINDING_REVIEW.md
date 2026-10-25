@@ -1,9 +1,0 @@
-# Append-only review of final pre-freeze accounting repairs
-
-Reviewed updated pilot.py sections and the new run_frozen.py as text, and checked response-free SCHEDULE.json structure. No outcome data, model run, or new GET was used. The prior PRE_EXECUTION_REVIEW.md/seal remain unchanged and bind the earlier reviewed bytes; this addendum and its seal bind the current repaired code and schedule.
-
-The changes preserve model functions, fitting parameters, prefix inputs and endpoints. They add explicit unique-well/time completeness checks; six distinct dose entries; nonempty eligible contexts for all four cell labels; PREFIX_ELIGIBILITY saved before prediction seal/outcome access; and assess_gate matching the protocol's3/4-cell, majority-curve and ordinary-opponent requirements. These changes introduce no late selection or new hyperparameter choice. Independent response-free schedule inspection finds four files,19 groups each, and six unique doses/wells per group, with recorded elapsed grid0..120h.
-
-The new wrapper freezes inputs/reviews/code before starting its subprocess, retains console and exit status, and prevents overwriting its freeze. Original synthetic-test success is parent-reported; this reviewer did not rerun the tests. No blocker is identified in the final repaired pilot. The previously recorded nesting/finite-optimizer caution remains: report training SSE and statuses rather than interpret every finite-fit difference as an intrinsic gamma restriction.
-
-The wrapper should include this final binding review/seal in its final freeze; its original two-PRE_EXECUTION_REVIEW-seal counting rule can remain intact because this addendum uses a separate filename. This ensures the frozen review chain points to the latest pilot bytes while preserving the older pre-review seal rather than rewriting history.

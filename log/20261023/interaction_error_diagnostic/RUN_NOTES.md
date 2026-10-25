@@ -1,9 +1,0 @@
-# Execution and limits record
-
-Root executed identifier-only inspection once, three synthetic tests once, one frozen biological-score development run, and one descriptive summary. No training rerun, new value-driven hyperparameter menu, API or HTTP request. Critic separately executed retained-array metric and exact-rank audits; source executed metadata and retained-boundary audits; constructive executed a descriptive result summary. These read-only audit executions are not additional independent biological experiments.
-
-The first environment/cache lookup referenced nonexistent author_aggregate.body; the actual cached file is author_src_decipher_scores_aggregate.py.body. This path error did not load outcomes or change fitting. A shared environment-version command returned a live process handle and was polled to completion; it was not restarted. All actual run/test output is retained. Powershell Tee-Object wraps execution output; completed RESULTS and saved per-pair artifacts, not pipeline status alone, establish successful main completion.
-
-Existing tracked modifications remain exactly14added lines each in log/README.md and research/REPORT.md. No src/tools change, staging or commit. All new experiments/tests are under the dated research directory and all outputs under the dated log directory. Additional final reviews arriving after RUN_FREEZE are post-freeze records, not claimed as prevalue freeze members. Prior seals and error/correction records are preserved.
-
-The SUMMARY.md is a descriptive printer output; its second-budget rows follow first-budget summary paragraphs. The correctly formatted consolidated comparison is in DECISION.md. No numerical content was changed to repair presentation. Exact calibration rank equality is separately checked in critic/CALIBRATION_RANK_AUDIT.json, not inferred from identical score regret.

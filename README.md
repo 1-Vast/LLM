@@ -4,7 +4,7 @@ MAESTRO is a dual-core autonomous research framework for contextual early drug d
 
 The Autonomous Scientific Agent proposes and revises executable research procedures. The Virtual Cell predicts scoped functional responses, candidate differences and model mismatch, then updates supported components from feedback. Their shared task is to learn when previous research experience helps a new decision, when to check its assumptions and when to change the plan. Typed contracts separate predictions from measurements and keep costs and failures visible.
 
-The [research programme](log/archive/HISTORY.md) defines two primary tasks: candidate discovery/repurposing and cellular-context selection with failure analysis. Selectivity needs explicit comparison measurements; mechanism confirmation needs distinguishing evidence. Dose, time and combinations are gated extensions. The programme tests method transfer, within-task feedback, dual-core contributions and selected-candidate reliability separately. The existing thin `maestro.research_loop` is static replay infrastructure; automatic feedback-based replanning and learned procedure transfer remain research goals.
+The [research programme](log/RESEARCH_REPORT.md#current-paid-repeatability-result) defines two primary tasks: candidate discovery/repurposing and cellular-context selection with failure analysis. Selectivity needs explicit comparison measurements; mechanism confirmation needs distinguishing evidence. Dose, time and combinations are gated extensions. The programme tests method transfer, within-task feedback, dual-core contributions and selected-candidate reliability separately. The existing thin `maestro.research_loop` is static replay infrastructure; automatic feedback-based replanning and learned procedure transfer remain research goals.
 
 ## Install and run
 
@@ -21,10 +21,8 @@ Set-Location D:\MAESTRO
 The supported CPU preparation environment is local `.venv`, built from the existing
 `maestro` Python 3.11.16. The pinned Windows/Python-3.11 specification is
 [requirements-preparation.lock](requirements-preparation.lock). See
-[preparation checks and limitations](log/20261020/PREPARATION.md), the
-[actual data inventory](data/INVENTORY.md), [cleanup/recovery](log/20261020/PREPARATION.md)
-and the [next English execution prompt](log/20261020/NEXT_RESEARCH_PROMPT.md).
-The legacy conda environment is retained for historical compatibility and requested tests;
+[actual data inventory](data/INVENTORY.md) and [research records](log/README.md).
+The existing conda environment remains an installed environment outside this source refactor;
 its incomplete arc-state installation is not part of the clean CPU environment.
 
 ```powershell
@@ -37,7 +35,7 @@ The research preflight checks explicitly supplied frozen inputs and outputs. No 
 * Missing or mismatched assets are reported as `BLOCKED/ASSET_MISSING`.
 * Any other freeze schema is refused as `BLOCKED/FREEZE_SCHEMA_UNSUPPORTED`; it is never skipped.
 
-The compact experiment register, failure reasons and next directions are in [`log/`](log/). Authoritative frozen records remain in `research/`.
+The compact experiment register, failure reasons and next directions are in [`log/`](log/README.md). Durable protocols, reports, decisions and provenance records belong in `log/`; experimental implementations and tests remain in `research/`. Historical source IDs are read through the [storage policy and record reader](log/STORAGE_POLICY.md); old execution paths are retired.
 
 Three levels stay separate:
 
@@ -55,8 +53,12 @@ Passing software tests is not a scientific result.
 | `src/maestro/` | Evidence, decisions, authorization, risk and repair contracts |
 | `src/virtual_cell/` | Model identity, applicability, prediction, uncertainty and refusal |
 | `tools/` | Reusable offline tools with stable inputs and outputs |
-| `research/` | Central historical evidence, limits and future explicit protocols |
+| `research/` | Experimental implementations, research tests and study registry |
+| `log/` | Current scientific synthesis, durable study records and evidence navigation |
+| `data/` | Raw inputs, external sources, derived data and model artifacts |
+| `data/processed/research_packages/` | Three verified packages of retired implementations, numeric artifacts and workbench assets |
 | `tests/` | Core contracts and regression checks; research tests run explicitly |
+| `tmp/` | Retained GPU environment, nested DGM checkout, test state and explicitly protected payloads; historical workbench assets are packaged |
 
 Minimal command examples:
 
@@ -68,10 +70,25 @@ python -m tools.research_validation --help
 
 ## Scientific boundary
 
-The model predicts within qualified scope; it does not establish functional endpoints, mechanism, causality or experiment value by itself. The Agent selects and audits evidence and actions; it does not turn language-model output into scientific fact. Current conclusions are in [research/REPORT.md](research/REPORT.md), with numerical results in [research/EVIDENCE.md](research/EVIDENCE.md). The [programme stages](log/archive/HISTORY.md#validation-stages-for-research-method-transfer) separate method value, Agent value, transfer and independent confirmation. PRESAGE P0 remains NO-GO; anchor purchasing value remains blocked by independent-endpoint qualification.
+The model predicts within qualified scope; it does not establish functional endpoints, mechanism, causality or experiment value by itself. The Agent selects and audits evidence and actions; it does not turn language-model output into scientific fact. Current conclusions are in [current research status](log/RESEARCH_REPORT.md#current-paid-repeatability-result), with numerical results in [research/EVIDENCE.md](research/EVIDENCE.md). The [programme boundaries](log/RESEARCH_REPORT.md#current-paid-repeatability-result) separate method value, Agent value, transfer and independent confirmation. PRESAGE P0 remains NO-GO; anchor purchasing value remains blocked by independent-endpoint qualification.
 
-### Latest Research Update (2026-10-21)
+### Current research and literature
 
-The latest dual-core validation on the public PTV-1 / ProteinTalks release ended with `STOP_THIS_TASK_CONFIGURATION`: the re-implemented ppODE was below the strongest conventional predictor, feedback did not improve over ordinary updating, and no LLM program edit was accepted. This is a negative result on one exposed published-label task with seven held-out lineages, not a general test of autonomous discovery. See the [integrated research decisions](research/REPORT.md), [numerical evidence](research/EVIDENCE.md), and [full study record](research/dual_core_innovation_validation_20261021/REPORT.md).
+Start with the [current research synthesis](log/RESEARCH_REPORT.md#current-paid-repeatability-result) for findings, stopped configurations and evidence gaps. The [literature chapter](log/RESEARCH_REPORT.md#literature-and-source-access) distinguishes two incomplete research surveys from a search-tool validation; the [study index](log/STUDY_INDEX.tsv) traces individual decisions. Storage maintenance does not establish new scientific results.
 
-Registered studies retain their protocols, results, deviations and replay code. The current evidence, stop decisions and simplification ledger are in [research/REPORT.md](research/REPORT.md). Frozen research records are separate from the maintained runtime and default software tests.
+### Historical dual-core validation (2026-10-21)
+
+The dual-core validation on the public PTV-1 / ProteinTalks release ended with `STOP_THIS_TASK_CONFIGURATION`: the re-implemented ppODE was below the strongest conventional predictor, feedback did not improve over ordinary updating, and no LLM program edit was accepted. This is a negative result on one exposed published-label task with seven held-out lineages, not a general test of autonomous discovery. See the [integrated research decisions](log/RESEARCH_REPORT.md#functional-feedback-and-acquisition), [numerical evidence](research/EVIDENCE.md), and exact source ID `log/research_records/dual_core_innovation_validation_20261021/REPORT.md` ([reader](log/README.md)).
+
+Registered studies retain their protocols, results, deviations and replay code. The current evidence, stop decisions and simplification ledger are in [current research status](log/RESEARCH_REPORT.md#current-paid-repeatability-result). Frozen research records are separate from the maintained runtime and default software tests.
+
+## Changelog
+
+### 2026-10-25 - Maintenance verification
+
+- Parse signature arrays and calibration from the same bytes used for their hashes.
+- Keep protected inventory entries unverified without reading payloads; stream binary hashes.
+- Distinguish inexpensive Level 5 metadata/receipt checks from an explicit full-content rehash.
+- Add an optional exact-source record reader with single-load lookup and isolated regression fixtures. Local stores and research packages are not bundled.
+- This release preserves historical research through fixed source identities and publishes no new scientific result.
+- Publish the complete key-information refactor: one maintained research report, the study index, current code and pinned historical source identities. Small unique text corrections accompany the manifest; data, models and large research packages stay local. Historical loose files are retired from the current tree while their pinned Git versions remain available.

@@ -1,9 +1,0 @@
-# Actual reciprocal replies and accepted qualifications
-
-After `source_cross.md` was sealed, both independent roles replied to the source auditor's concrete questions. These messages arrived after root executed the frozen diagnostic; this addendum does not portray them as an earlier approval.
-
-Constructive agreed that15queries/7pairs supports a finite global anchor-information screen, not a KRAS-module law. Same-combination source data require query means and all44single joint ordinary predictors with/without anchor. It confirmed logical-export versus physical-decoding limitation. Reverse challenge: strict coverage should stop the entire test rather than deleting missing contexts; source no-label claim must be time-scoped. **Source auditor explicitly accepted:** no complete-case rescue or imputation; the pre-result identity audit was response-blind, but root's new authorization now permits reading DEVELOPMENT artifacts for numerical audit. Original/reserve response values remain uninspected.
-
-Critic agreed that combo-anchor incremental information is a legitimate independent finite question despite differing from its proposed single-drug-group screen. Source identity and matched ridge/nonlinear controls permit execution. Reverse challenge: exact single supports do not identify Bliss/survival or additive main-effect biological meaning. **Source auditor explicitly accepted:** exactness certifies only observation identities; no interaction/synergy law is inferred from four-arm presence. Relative-score arithmetic is a predictor/contrast unless its physical transform is authenticated. Shared-rowgroup caveat remains in force. Strict-coverage failure would be a finite dataset-contract stop, not a general negative.
-
-Root subsequently supplied actual STOP metrics and authorized a development-only independent numerical audit. This is separately recorded in RESULT_AUDIT.md/JSON, without response-directed tuning or reserve opening.

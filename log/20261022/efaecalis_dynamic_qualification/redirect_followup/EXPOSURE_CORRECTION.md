@@ -1,7 +1,0 @@
-# Nonfinite numeric-string guard gap
-
-The original guard withheld finite numeric strings, numerical cells, formula caches and recognized qualitative/binary outcome strings. In the retained broad string projection, supplementary derived-statistics sheet S3 contains string-coded `-Inf`, which the finite numeric regex did not recognize. Those markers were emitted and seen in the tool summary. Therefore the block must not claim that every numeric string remained unexposed. This is a failure of the numeric-string guard, preserved rather than erased.
-
-No finite IC50/OD/AUC array, numeric cell body or finite statistical response has been interpreted/exported by the projector. Nonfinite markers still reveal derived-statistical boundary/missingness information; they are design/exploration-exposed and cannot be used as sealed confirmation. Root was informed immediately. The frozen source projector and original outputs remain unchanged. A later helper reads only the existing approved JSON, removes all recognized nonfinite text markers from its safe working projection, and inventories their coordinates without values. It does not reopen source values or retroactively make the first output blind.
-
-Other unknown pure strings, including labels of statistical/simulation result sections, remain explicitly unclassified-design-exposed. Author narrative annotations can contain analysis settings such as a moving-window size; these are published method/design exposure, not project performance. Sealing, if used, certifies source identities only.

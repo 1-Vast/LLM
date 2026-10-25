@@ -23,7 +23,7 @@ is an asset blocker and must not be represented as an empty dataset.
 `tahoe_phenotypes` builds same-spheroid relative-survival and phase-shift endpoints from Tahoe-100M
 per-cell obs codes. It refuses lines below the declared median treated-cell count as
 `CONTEXT_UNDERCOUNTED`; absolute survival is not identified because spheroid totals did not
-replicate. See the [phenotype-anchor evidence](../../research/EVIDENCE.md#phenotype-anchored-dual-core--2026-10-10).
+replicate. See the [current source and endpoint qualifications](../../data/INVENTORY.md#source-identity-conditions-and-lineage). The historical phenotype-anchor verdict is source identity `ef49d423fcaa:research/EVIDENCE.md`, section "Phenotype-anchored dual core — 2026-10-10"; it is not a live current-report anchor.
 
 `combination_screens` and `evaluation.discovery_replay` remain importable release entry points.
 The former historical parity test is archived because its frozen `research/certified_discovery`

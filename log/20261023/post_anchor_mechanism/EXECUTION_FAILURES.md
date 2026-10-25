@@ -1,9 +1,0 @@
-# Execution failures
-
-Initial primary.py invocation failed at import before any HTTP: maestro does not have bs4. Replaced HTML extraction with standard-library HTMLParser; no dependency installation needed. An unverified hard-coded article-number path in the unexecuted OUP request was replaced with the verified DOI resolver before any HTTP. Metadata title/abstract is not full-method verification. All three root EPMC requests returned503; bodies/receipts retained, no EPMC retry. Crossref alternative succeeded twice. No biological numerical values accessed.
-
-Continuation checkpoint: one PowerShell-embedded python -c command failed with a quoting SyntaxError before reading seal files or making requests. Replaced with an ordinary research/ script. An attempted Get-Content used critic/INDEPENDENT_SEAL.json whereas its actual name is INDEPENDENT.seal.json; no file altered. An unbounded git status produced excessive untracked-path output; no Git mutation.
-
-The first provisional checkpoint reader incorrectly assumed every seal used a files list or a path→hash string dictionary. Several actually use path→{sha256,bytes} or a single file/path+sha256. It reported false drift for object-valued entries and silently counted zero for single-file seals. Corrected the parser to support these authenticated representations and reject unknown/empty representations. This was an audit-tool error, not evidence of source modification. Only the final regenerated VERIFICATION.json is the phase checkpoint; original agent seals remain unchanged.
-
-Two official Springer CDN requests failed TLS; their receipts retained. EuropePMC's official supplementary package succeeded. Logical public requests and retained terminal status counts are in COST_LEDGER.json; HTTP redirects, library retries and transport attempts are not fully attested. No source code was imported/executed and no raw stats data record was exported.

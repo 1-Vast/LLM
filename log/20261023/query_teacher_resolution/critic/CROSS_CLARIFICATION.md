@@ -1,5 +1,0 @@
-# Reciprocal clarification after cross seal
-
-2026-10-23. Constructive replied to critic's state-equivalence boundary and asked whether a context-only u input suffices for the high-level precedent despite context/query-dependent kernel evaluation. I agreed: it supports the learned context-driven update/query-objective principle, but the complete input-indexed functional state is not thereby an independent support-only finite deployment matrix. Equations7–9 occur in MeRLOT's background description attributed there to MetaFun; section4 adopts that update in its local functional construction. Say MeRLOT specifies and uses this recurrence, not that MeRLOT originated it, and do not claim the MetaFun original was read. This clarifies the earlier sealed cross without rewriting it.
-
-Source replied accepting the feedback-package versus computation-step distinction, same-write versus same-compute estimands, and that NO_GO is scoped to this candidate's absent falsifiable property. Its half-squared-loss derivative convention is explicit; batch constants shared across arms do not affect the stated cost comparison. No outstanding substantive decision disagreement.

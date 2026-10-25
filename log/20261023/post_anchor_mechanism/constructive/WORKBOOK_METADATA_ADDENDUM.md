@@ -1,9 +1,0 @@
-# Newly acquired official workbook metadata
-
-2026-10-23. After sealing REPO_JOIN_ADDENDUM, parent acquired the official EuropePMC supplementary ZIP and two paper-named workbooks. I read only parent's `root_sources/AML_HEADERS.json`: worksheet metadata plus text cells in rows1–2; numeric worksheet values and formula text were not exported. Row2 can include the first textual data identifier, so this is not strictly a headers-only read. No additional HTTP, workbook body/response values, fitting or matrices read by this agent.
-
-This is a positive source qualification update. MOESM6 source-data sheets include clone/proportion/group/founder schemas (figure_2D/3E and related sheets); figure_S2A includes sample/dose/viability_corrected; figure_S6A includes dated columns and count1/count2 labels. MOESM3 provides descriptions of differential-expression, module, survival, primer and related supplemental tables. We can no longer describe the source-data workbooks as unacquired or all functional/count table schemas as unverified.
-
-These schemas do not complete the prospective join. They do not demonstrate `GEX_bc`→baseline RNA→founder/clone→independent culture/timepoint mapping, complete treatment/control counts, or assay alignment. The exact lab CSV and HL60 object/sample mapping remain uninstantiated in inspected public artifacts. Column names alone do not establish that counts are viable counts, that clone proportions supply absolute outgrowth, or that any particular curve is matched to the baseline expression cohort.
-
-Decision remains NO_NUMERICAL_GO, with a narrower, concrete remaining join qualification. Any subsequent reading of response numbers requires a frozen endpoint/partition/acquisition contract; do not consume values merely because a workbook has been downloaded. This is an acquisition/metadata positive, not biological predictive evidence or a new updater.

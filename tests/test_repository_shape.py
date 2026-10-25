@@ -1,11 +1,15 @@
 """Package layout, tool scoping, and the English-only language rules."""
 import ast
+import base64
+from contextlib import ExitStack
+import hashlib
 import json
 import os
 import re
 import subprocess
 import sys
 from pathlib import Path
+import zipfile
 
 import pytest
 
@@ -259,6 +263,49 @@ def test_python_sources_are_english_only():
     assert not offenders, "Chinese found in Python sources:\n" + "\n".join(offenders)
 
 
+def _registered_research_assets(registry):
+    for name in registry.get("workspaces", []):
+        yield name, registry.get("workspace_storage", {}).get(name, {}), ["README.md"]
+    for study in registry["studies"]:
+        assert study["status"] in {"exploratory", "frozen", "completed"}
+        required = [study["protocol"], study["verification"]]
+        if study["status"] == "frozen":
+            required.append(study.get("freeze", "FREEZE.json"))
+        yield study["path"], study.get("storage", {}), required
+
+
+def _assert_manifest_source(source_id, manifest):
+    item = manifest["files"][source_id]
+    if item["representation"] == "git_blob":
+        commit = manifest["source_commit"]
+        assert re.fullmatch(r"[0-9a-f]{40}", commit)
+        blob = subprocess.run(
+            ["git", "rev-parse", f"{commit}:{item['git_path']}"],
+            cwd=ROOT, capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        assert blob == item["git_blob"], source_id
+        payload = subprocess.run(
+            ["git", "cat-file", "blob", blob],
+            cwd=ROOT, capture_output=True, check=True,
+        ).stdout
+    else:
+        assert item["representation"] == "exact_supplement", source_id
+        if "live_path" in item:
+            target = (ROOT / item["live_path"]).resolve()
+            assert target.is_relative_to(ROOT)
+            payload = target.read_bytes()
+        else:
+            target = (ROOT / item["record_path"]).resolve()
+            assert target.is_relative_to(ROOT)
+            assert item["offset"] >= 0 and item["length"] > 0
+            with target.open("rb") as stream:
+                stream.seek(item["offset"])
+                record = json.loads(stream.read(item["length"]))
+            payload = record["text"].encode("utf-8") if record["encoding"] == "utf-8" else base64.b64decode(record["base64"], validate=True)
+    assert len(payload) == item["bytes"], source_id
+    assert hashlib.sha256(payload).hexdigest() == item["sha256"], source_id
+
+
 def test_repository_has_one_scientific_report_and_no_retired_release_tree():
     research = ROOT / "research"
     registry = json.loads((research / "STUDIES.json").read_text(encoding="utf-8"))
@@ -268,30 +315,86 @@ def test_repository_has_one_scientific_report_and_no_retired_release_tree():
     workspaces = registry.get("workspaces", [])
     assert len(workspaces) == len(set(workspaces))
     assert not names & set(workspaces), "Working areas are distinct from registered studies"
-    for name in workspaces:
+    manifest = json.loads((ROOT / "log/SOURCE_MANIFEST.json").read_text(encoding="utf-8"))
+    assert manifest["schema_version"] == 1
+    for name, storage, required in _registered_research_assets(registry):
         assert Path(name).name == name
-        assert (research / name / "README.md").is_file()
+        if storage.get("state") != "archived":
+            assert all((research / name / filename).is_file() for filename in required)
+            continue
+        assert storage["prefix"] == f"research/{name}/"
+        for filename in required:
+            original_path = f"research/{name}/{filename}"
+            candidates = (original_path, "packages/historical_experiments/" + original_path)
+            source_id = next((path for path in candidates if path in manifest["files"]), None)
+            assert source_id is not None, f"Missing required archived source identity: {original_path}"
+            _assert_manifest_source(source_id, manifest)
     tracked = subprocess.run(
         ["git", "ls-files", "-z", "--", "research"],
         cwd=ROOT, capture_output=True, text=True, check=True,
     )
-    tracked_roots = {name.split("/")[1] for name in tracked.stdout.split("\0") if name}
-    assert tracked_roots | {"README.md"} == {"README.md", "REPORT.md", "EVIDENCE.md", "STUDIES.json"} | names | set(workspaces)
+    tracked_roots = {name.split("/")[1] for name in tracked.stdout.split("\0") if name and (ROOT / name).is_file()}
+    reports = {"README.md", "EVIDENCE.md", "STUDIES.json"}
+    current_studies = {study["path"] for study in studies if study.get("storage", {}).get("state") != "archived"}
+    current_workspaces = {name for name in workspaces if registry.get("workspace_storage", {}).get(name, {}).get("state") != "archived"}
+    assert tracked_roots <= reports | names | set(workspaces)
+    assert reports | current_studies | current_workspaces <= tracked_roots | {"README.md"}
+    assert (ROOT / "log/RESEARCH_REPORT.md").is_file()
+    assert not (research / "REPORT.md").exists()
     assert (research / "README.md").is_file()
-    for study in studies:
-        assert Path(study["path"]).name == study["path"]
-        assert study["status"] in {"exploratory", "frozen", "completed"}
-        folder = research / study["path"]
-        assert (folder / study["protocol"]).is_file()
-        assert (folder / study["verification"]).is_file()
-        if study["status"] == "frozen":
-            assert (folder / "FREEZE.json").is_file()
     for name in ("cleanup", "Innovation.md", "task.md", "RELEASE_CHECK.md",
                  "RELEASE_STATS.json", "CURRENT_REPOSITORY_STATS.json", "BLOCKED_ASSETS.md"):
         assert not (ROOT / name).exists(), name
     tracked_root_entries = {name.split("/")[0] for name in tracked.stdout.split("\0") if name}
     assert not any(name.startswith(".build-") for name in tracked_root_entries)
     assert not any(name.startswith("output-") for name in tracked_root_entries)
+
+
+@pytest.mark.skipif(os.environ.get("MAESTRO_VERIFY_ARCHIVES") != "1", reason="Local research package integration requires MAESTRO_VERIFY_ARCHIVES=1")
+def test_local_archived_research_assets_match_retained_sources():
+    """Verify local package bytes explicitly; Git source identity is a separate check."""
+    registry = json.loads((ROOT / "research/STUDIES.json").read_text(encoding="utf-8"))
+    source_index = json.loads((ROOT / "data/processed/research_records/INDEX.json").read_text(encoding="utf-8"))
+    archive_sources = {}
+    for item in source_index.get("live_files", {}).values():
+        if "archive_path" in item:
+            key = (item["archive_path"], item["member"])
+            if key in archive_sources:
+                assert (item["bytes"], item["sha256"]) == (archive_sources[key]["bytes"], archive_sources[key]["sha256"])
+            archive_sources[key] = item
+    with ExitStack() as stack:
+        archives = {}
+
+        def assert_research_assets(name, storage, required):
+            assert Path(name).name == name
+            if storage.get("state") != "archived":
+                return
+            package, prefix = storage["package"], storage["prefix"]
+            assert prefix == f"research/{name}/"
+            target = (ROOT / package).resolve()
+            assert target.is_relative_to(ROOT) and target.is_file()
+            if package not in archives:
+                archive = stack.enter_context(zipfile.ZipFile(target))
+                assert len(archive.namelist()) == len(set(archive.namelist())), "Archive members must be unique"
+                archives[package] = archive
+            archive = archives[package]
+            members = {item.filename: item for item in archive.infolist() if item.filename.startswith(prefix)}
+            assert members, f"Archived research has no package members: {name}"
+            for member, info in members.items():
+                if info.is_dir():
+                    continue
+                item = archive_sources[(package, member)]
+                assert item["bytes"] == info.file_size
+            for filename in required:
+                member = prefix + filename
+                assert member in members, f"Missing required archived asset: {member}"
+                item = archive_sources[(package, member)]
+                payload = archive.read(member)
+                assert len(payload) == item["bytes"]
+                assert hashlib.sha256(payload).hexdigest() == item["sha256"]
+
+        for name, storage, required in _registered_research_assets(registry):
+            assert_research_assets(name, storage, required)
 
 
 def test_no_test_module_imports_another_test_module():

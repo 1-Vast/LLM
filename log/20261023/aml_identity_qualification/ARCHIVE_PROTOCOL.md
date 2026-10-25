@@ -1,5 +1,0 @@
-# Author archive manifest check
-
-The finite Zenodo metadata check succeeded and names a real5,590,433byte code archive, checksum md5:a2911704152af9f9312c8e0f419fe12b, with an official file link under record19303230. Follow this concrete new artifact once, at most8MiB compressed, no retry. Retain bytes, request receipt, checksum comparison and ZIP member names/sizes only. Do not extract/open any archive member values, figures, trees or numerical labels in this step. A code archive version may differ from the pinned repository; do not assume byte identity or claim the archive has no mappings without checking its manifest.
-
-If the member list contains a specifically named configuration/annotation/mapping artifact absent from the previously inspected source tree, qualify that new artifact separately before using its content. If it contains only the already studied source paths plus figures/trees, report that scope accurately and maintain the numerical-task STOP pending authenticated sample/chemistry mapping. File-name evidence is not proof of member-content equivalence.

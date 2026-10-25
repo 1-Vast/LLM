@@ -1,7 +1,0 @@
-请独立提出最多一个可执行、可证伪的科研机制；无实质区别就回答NONE，不要生成代码、伪造引用或文献。目标是药物发现的虚拟细胞干预世界模型+科研agent，优先可继承更新器及RSI，但不要求一个小诊断一次完成全目标。
-真正问题：收到新细胞背景少量干预功能反馈后，如何修订跨干预共享的响应规律，让后续更新更有效？必须比同信息、同总成本的普通direct/refit/CL/AL/简单混合/程序搜索有具体潜在优势，而非新名字。
-现有实测：BeatAML揭示8个已测单药七剂量AUC，普通条件预测MSE降低23.49%、top3regret降低15.07%；顺序/分批一致性更新器低一致性误差却功能更差。固定线性Gaussian组分模型与同BCB'+R的direct条件预测相同，direct可共享低秩/Woodbury缓存，不能故意给它dense稻草人。这里只能回放有限真实已测单药菜单，不能问任意组合/顺序/时间。
-真实顺序抗癌数据FAC普通累计ridge MAE16.44→6.56，但OLA8.87→9.77，mean/NN也同向；不能据此推断生物漂移/measurementshift。该25query已暴露，禁在此挑窗口、门控、超参、混合救配置。CDK Middle小幅组成增益未转功能，Abema固定rankloss1/3→2/3；不能再跑噪声修复菜单。Norman两个基因组合的重叠衰减小收益被同参数普通整体收缩超过，RNA不是功能。AZ2024药物组合效应坐标/Bliss残差迁移也已有资格及测试路线，不能当全新构想。
-旧候选：错误→模块mask/query/U选择是普通contextual metaAL，maskedstep是blockgradient；queryweighted refit=KMM/importance weighting；profile nuisance ridge=FWL；laggedoffset/recency/refit/gates均有普通完整实现。所有这些只否具体操作，不否整个家族。普通组件允许，finite approximation/computation差异可有贡献，不必发明新基础数学。
-刚审查的前沿：ActionBED联合designpolicy+terminalpolicy训练依赖真实jointsimulator/pathwise或score；RAED用nuisance-valid结构集合大小选实验，target可改drugclasses。这些是有实质内容的现有对照。终端drugclass充分不等于probe规划充分，但可保存正确jointlaw避免；不能把myopic/factorization失败包装成需要完整mechanism识别。same-sample多药AUC可估指定jointlaw，不需要第二模态，但coverage/missingness/transport须声明。
-请给1个具体F预测器/U更新器/G改进器操作（<=8行公式或伪代码），说明与最近普通完整实现的不同及为什么能降低反馈/计算/迁移误差；需要哪些真实可获得观测、当前缺口；最小失败例和真正可证伪生物任务；共同预测器起点U1/U0及共同baseU起点G1/G0后代效用如何分别测试。不要先增加架构、先加latent再称机制，不要把层级更高当优势。如果只是已有普通方法明确说，允许NONE。2000字以内。

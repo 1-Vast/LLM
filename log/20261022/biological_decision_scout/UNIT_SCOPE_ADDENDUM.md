@@ -1,7 +1,0 @@
-# Concentration-unit scope after reciprocal-review seal
-
-2026-10-22. After CROSS_REPLY.md and REJOINDER.md were sealed, /root/control_information_auditor reported its independent workbook reconstruction: STP/2STP concentration headers state uM, while 3STP through 7STP state uM for small compounds and mg/ml for antibodies. The primary methods retained in MSE_METHOD_CONTRACT.json instead state antibodies at 10 micrograms/ml. Preserve this literal source discrepancy; do not silently convert or repair it.
-
-I inspected the 65 names in the already retained 2STP common-action projection: they are single small-molecule drug entries, with no antibody or combination entry. The narrow common-menu dose claim is therefore 10 micromolar for these 65 named drugs across the six retained plate designs, consistent with the small-compound header and primary methods. It is not an all-panel 10 micromolar claim. Outside-menu antibodies would require separate source resolution before any use. No outside-menu action is added and no numerical response is inspected.
-
-The previous report and seals remain unchanged. The auditor's independent reconstruction is separately attributable; this reviewer checked the common action names and retained primary-method statement, rather than claiming an independent re-extraction of the later headers. Also read the frontier reviewer's BIOLOGICAL_CROSS_REVIEW.md after its direct reply: its attribution of our exchange is accurate, with no remaining substantive disagreement.

@@ -1,3 +1,0 @@
-# Bounded direct-lineage-file header qualification
-
-Read only the first decompressed line (column names) of two exact GEO-declared FLARE .stats.gz files: baseline-associated GSM8791698 founder tags and post-treatment GSM8791703 founder tags. Stream at most1,048,576compressed bytes per request, request first65,536bytes as a Range, stop as soon as header is obtained. Retain compressed prefix and receipt; export only the first line, no cell/UMI/read sequence/count records. Low-level decompress may transiently contain data after the newline; no claim of physical non-decoding. Do not infer clone/treatment joins from a header alone; no new response values, model fits or state features. One request per exact source, no retries or endpoint cycling.

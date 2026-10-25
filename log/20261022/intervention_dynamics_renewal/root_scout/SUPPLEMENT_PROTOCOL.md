@@ -1,7 +1,0 @@
-# Selected supplement: one read-only method PDF
-
-2026-10-22. Primary XML explicitly identifies `msystems.00256-24-s0001.pdf` as additional experiments, conditions, statistical analyses, tables and figures. Main XML contains no explicit repository/data-availability URL in the projected links; this is not evidence that no raw data exist.
-
-Make one exact GET to `https://pmc.ncbi.nlm.nih.gov/articles/instance/11264686/bin/msystems.00256-24-s0001.pdf`, same3MB/25s/no-auto-redirect/no-retry rules. Require PDF magic rather than inferring content from HTTP200. No fallback request in this block. Save source bytes/headers/status/hash; an HTML challenge or302 remains an access failure. If valid, copy identical bytes to a correctly suffixed PDF under this log directory, extract text for method/data identity search and render relevant complete pages with Poppler for visual inspection. No movie, data array or image-derived functional curve digitization. Published figure numbers/qualitative outcomes may become designer-exposed.
-
-The PDF skill is read-only; no artifact-start marker or authoring is required. User-mandated `log/` source/render outputs and `research/` code override generic temporary/output locations. A pre-request path-existence guard and helper-code hash were added to root_search.get before this new request so accidental script repeats cannot replace prior bodies. No earlier request was repeated or overwritten.

@@ -1,3 +1,0 @@
-# Parameter transcription correction; original sealed reviews preserved
-
-Root's result messages to reviewers mistakenly called selected program7 linear lambda .1. The frozen PROGRAMS/IDENTITY_PLAN and independently rebuilt scores identify program7 as linear lambda **1.0** (indices5=.01,6=.1,7=1). Both arms select this in all36outer folds. Any sealed interpretive addendum repeating .1 inherits that root transcription error; preserve original wording and use this correction plus RESULT_AUDIT.json as authoritative parameter identification. Metrics, predictions, frozen program definition and STOP are unchanged. Root notified both reviewers; no fitting was repeated for this correction.

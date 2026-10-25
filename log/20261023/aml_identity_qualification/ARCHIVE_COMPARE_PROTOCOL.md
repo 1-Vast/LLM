@@ -1,3 +1,0 @@
-# Compare identity-source version without decoding biological artifacts
-
-ARCHIVE_MANIFEST confirms code archive5,590,433bytes, declared MD5 verified,102members rooted at mckennalab-AML_lineage_tracing-00a6746. Compare normalized member filenames to the pinned3d5ef9 repository tree. For exactly the three already reviewed Python identity sources and two reviewed R GEX/lineage sources, read bytes only to compute SHA256/Gitblob SHA1 and compare with old bodies; no execution, source-value exports, tree/figure/fasta/guide/worksheet decoding. A byte-identical source cannot supply an omitted mapping absent in that previously inspected source. An unmatched source version warrants separate review, not assumed equivalence.

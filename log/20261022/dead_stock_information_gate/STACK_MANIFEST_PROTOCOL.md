@@ -1,3 +1,0 @@
-# One exact STACK landing-page metadata request
-
-2026-10-22, before this request. Previous scout authenticated Forcina2017 and DOI10.17632/3pnv5wh5jm.2, but a public API route404 did not locate raw file objects. Root may make exactly one GET to https://data.mendeley.com/datasets/3pnv5wh5jm/2 with no automatic retry/redirect, timeout25s,cap3MB, retaining full body/status/hash/UTC. Inspect only landing-page metadata/embedded manifest: filenames, sizes, IDs, public download URLs, description/version. Do not download embedded data files or read response arrays. This is a complementary exact route, not a claim that the prior404 made the data absent. No broader STACK expansion without separately registered scope.

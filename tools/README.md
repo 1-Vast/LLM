@@ -1,5 +1,13 @@
 # Tools
 
+`python -m tools.retained_records --published --show SOURCE_ID` reads published
+key evidence from pinned Git objects or exact text supplements. Without
+`--published`, the full local record store is preferred when present; otherwise
+the published manifest is used. The manifest distinguishes Git-normalized bytes
+from exact local originals. Data, weights and large packages remain external
+dependencies; a missing historical Git object requires the documented explicit
+fetch rather than a silent substitute. See [source access](../log/README.md#published-key-sources).
+
 ## Research promotion and storage
 
 Keep maintained command-line and operational utilities here. Experimental implementations and research tests belong in [research](../research/README.md) until validation relevant to their intended use supports promotion. Record the evidence, limitations and promotion decision in [log](../log/README.md); structure or storage checks alone do not establish scientific validity.
@@ -54,6 +62,10 @@ while responses did not transport, so a passing identity check is not transport 
 `python -m tools.research_inventory --workspace . --out EXTERNAL_TEMP_PATH/inventory.json`
 rebuilds the static path/hash/import inventory. Identical bytes and ASTs are
 cleanup candidates only; this command never deletes files or runs studies.
+Protected payload names and explicit `--protect PROJECT_RELATIVE_PREFIX` remain
+metadata-only and unverified; managed/link scopes are excluded. Non-source binaries
+are hashed as streams rather than materialized in memory. Static candidates do not
+prove unused code, equivalent experiments or safe deletion.
 
 Tools are grouped by responsibility. Each capability keeps its own ID, schema, applicability
 boundary and source hashes. The router discovers `*/manifest.json` and `*/*.manifest.json`;
@@ -83,6 +95,16 @@ python -m tools.case_memory.workflow graphs
 python -m tools.case_memory.audit quality --protocol-freeze PATH
 python -m tools.case_memory.audit figures
 ```
+
+The default `sources` step hashes source metadata and checks the Level 5 size and
+historical checksum receipt. Exit zero means those requested checks passed;
+`verification_mode=metadata_and_receipt` and `verification_ok=false` explicitly
+state that current Level 5 content was not verified. Only an explicitly requested
+`python -m tools.case_memory.workflow sources --rehash-level5` streams the full
+approximately 35 GB Level 5 file and can set content verification true. The receipt,
+size, current digest and stable file identity must match; a stored digest alone
+does not authenticate present bytes. Maintenance testing used tiny synthetic inputs
+and did not run this full-data check.
 
 These replace the former `download_sources`, `build_hypothesis_graph`, `preprocess`,
 `replay` and `evaluate` modules. Run

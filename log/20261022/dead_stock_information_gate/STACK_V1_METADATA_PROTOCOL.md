@@ -1,3 +1,0 @@
-# Exact primary-availability v1 landing after v2 soft404
-
-2026-10-22. Registered v2landing GET returnedHTTP200 but embedded INITIAL_STATE.dataset.status404 ('No snapshot ... version2'), filesempty. This does not establish absence of all STACK data. The retained Forcina primary availability separately points to DOI10.17632/3pnv5wh5jm.1. Authorize exactly one GET to https://data.mendeley.com/datasets/3pnv5wh5jm/1 with the same no-redirect/no-retry/timeout25/cap3MB receipt helper. Parse embedded INITIAL_STATE as JSON, no script execution. Save metadata, exact file records if present; no raw data downloads. Stop this phase's STACK source expansion after this request, irrespective of outcome. No guessed API/bundle crawl or contact.

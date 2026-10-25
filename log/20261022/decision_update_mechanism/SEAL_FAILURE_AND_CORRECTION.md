@@ -1,5 +1,0 @@
-# Request text hash versus Windows persisted bytes
-
-First root seal execution failed at the API request hash assertion, before VERIFICATION.json was written. The API runner hashes the UTF-8 encoding of the in-memory prompt text but saves EXACT_REQUEST.txt with default Windows text newline conversion. These are different byte contracts (LF text versus CRLF persisted bytes). This is a verifier error; the original runner, request, prompt and receipt are preserved, not retroactively edited or a second API call made.
-
-Corrected seal checks universal-newline decoded EXACT_REQUEST text equals decoded API_PROMPT text, and its UTF-8 content hash equals the original receipt hash. It separately records the persisted-file byte hash in VERIFICATION, alongside the normal whole-file binding. Both contracts are visible; do not claim the receipt originally hashed persisted bytes. This correction verifies saved request text, not provider transport payload bytes, which the maintained client does not expose as a separate authenticated request receipt.

@@ -413,9 +413,121 @@ def test_grouped_source_workflow_propagates_integrity_failures(tmp_path, monkeyp
         metadata.write_bytes(b"tampered metadata")
     monkeypatch.setattr(workflow, "ROOT", tmp_path)
     monkeypatch.setattr(workflow, "EXPECTED_LEVEL5_BYTES", matrix.stat().st_size)
-    assert workflow.main(["sources"]) == int(tampered)
-    manifest = json.loads((tmp_path / "outputs/case_memory_integration/external_source_manifest.json").read_text())
+    assert workflow.main(["sources", "--rehash-level5"]) == int(tampered)
+    manifest = json.loads((tmp_path / "data/processed/case_memory_integration/external_source_manifest.json").read_text())
     assert manifest["verification_ok"] is (not tampered)
+    assert not (tmp_path / "outputs").exists()
+
+
+@pytest.mark.parametrize("payload,checksum,strict,exit_code,verified", [
+    (b"correct", "valid", False, 0, False),
+    (b"corrupt", "valid", False, 0, False),
+    (b"correct", "valid", True, 0, True),
+    (b"corrupt", "valid", True, 1, False),
+    (b"correct", None, False, 1, False),
+    (b"correct", None, True, 1, False),
+    (b"correct", "not-a-sha256", False, 1, False),
+])
+def test_source_workflow_distinguishes_receipts_from_current_content(
+        tmp_path, monkeypatch, payload, checksum, strict, exit_code, verified):
+    import hashlib
+    import json
+    from tools.case_memory import sha256, workflow
+
+    source = tmp_path / "data/external/lincs2020"
+    matrix = source / "level5/level5_beta_trt_cp_n720216x12328.gctx"
+    matrix.parent.mkdir(parents=True)
+    matrix.write_bytes(payload)
+    expected = hashlib.sha256(b"correct").hexdigest() if checksum == "valid" else checksum
+    if expected is not None:
+        # Receipt fields are historical claims; they cannot override fresh checks.
+        (matrix.parent / "sha256.json").write_text(json.dumps({
+            "sha256": expected, "bytes": 999, "size_match": True, "content_verified": True,
+        }))
+    metadata = source / "siginfo.txt"
+    metadata.write_bytes(b"metadata")
+    (source / "provenance.json").write_text(json.dumps({"files": {
+        metadata.name: {"sha256": sha256(metadata), "url": "https://example.test/siginfo"},
+    }}))
+    matrix_reads = []
+
+    def guarded_hash(path):
+        if path == matrix:
+            assert strict, "Default source checks read the expensive Level 5 payload"
+            matrix_reads.append(path)
+        return sha256(path)
+
+    monkeypatch.setattr(workflow, "ROOT", tmp_path)
+    monkeypatch.setattr(workflow, "EXPECTED_LEVEL5_BYTES", 7)
+    monkeypatch.setattr(workflow, "sha256", guarded_hash)
+    arguments = ["sources", "--rehash-level5"] if strict else ["sources"]
+    assert workflow.main(arguments) == exit_code
+    manifest = json.loads((tmp_path / "data/processed/case_memory_integration/external_source_manifest.json").read_text())
+    assert manifest["verification_ok"] is verified
+    assert manifest["verification_mode"] == ("content_hash" if strict else "metadata_and_receipt")
+    assert manifest["metadata_receipt_ok"] is (checksum == "valid")
+    assert manifest["level5"]["content_verified"] is verified
+    assert manifest["level5"]["bytes"] == 7
+    assert manifest["level5"]["actual_sha256"] == (hashlib.sha256(payload).hexdigest() if strict and checksum == "valid" else None)
+    assert len(matrix_reads) == int(strict and checksum == "valid")
+
+
+def test_default_source_checks_still_reject_changed_metadata_without_reading_level5(tmp_path, monkeypatch):
+    import json
+    from tools.case_memory import sha256, workflow
+
+    source = tmp_path / "data/external/lincs2020"
+    matrix = source / "level5/level5_beta_trt_cp_n720216x12328.gctx"
+    matrix.parent.mkdir(parents=True)
+    matrix.write_bytes(b"correct")
+    (matrix.parent / "sha256.json").write_text(json.dumps({"sha256": sha256(matrix)}))
+    metadata = source / "siginfo.txt"
+    metadata.write_bytes(b"metadata")
+    (source / "provenance.json").write_text(json.dumps({"files": {
+        metadata.name: {"sha256": sha256(metadata), "url": "https://example.test/siginfo"},
+    }}))
+    metadata.write_bytes(b"tampered")
+
+    def metadata_hash_only(path):
+        assert path != matrix
+        return sha256(path)
+
+    monkeypatch.setattr(workflow, "ROOT", tmp_path)
+    monkeypatch.setattr(workflow, "EXPECTED_LEVEL5_BYTES", 7)
+    monkeypatch.setattr(workflow, "sha256", metadata_hash_only)
+    assert workflow.main(["sources"]) == 1
+    manifest = json.loads((tmp_path / "data/processed/case_memory_integration/external_source_manifest.json").read_text())
+    assert not manifest["metadata_receipt_ok"]
+    assert not manifest["verification_ok"]
+    assert not manifest["checksums"][metadata.name]["match"]
+
+
+def test_level5_rehash_option_is_not_accepted_for_unrelated_steps():
+    from tools.case_memory import workflow
+
+    with pytest.raises(SystemExit) as error:
+        workflow.main(["pack", "--rehash-level5"])
+    assert error.value.code == 2
+
+
+def test_missing_metadata_and_missing_digest_cannot_verify_each_other(tmp_path, monkeypatch):
+    import json
+    from tools.case_memory import sha256, workflow
+
+    source = tmp_path / "data/external/lincs2020"
+    matrix = source / "level5/level5_beta_trt_cp_n720216x12328.gctx"
+    matrix.parent.mkdir(parents=True)
+    matrix.write_bytes(b"correct")
+    (matrix.parent / "sha256.json").write_text(json.dumps({"sha256": sha256(matrix)}))
+    (source / "provenance.json").write_text(json.dumps({"files": {
+        "missing.txt": {"sha256": None, "url": "https://example.test/missing"},
+    }}))
+    monkeypatch.setattr(workflow, "ROOT", tmp_path)
+    monkeypatch.setattr(workflow, "EXPECTED_LEVEL5_BYTES", 7)
+    assert workflow.main(["sources", "--rehash-level5"]) == 1
+    manifest = json.loads((tmp_path / "data/processed/case_memory_integration/external_source_manifest.json").read_text())
+    assert not manifest["verification_ok"]
+    assert not manifest["checksums"]["missing.txt"]["match"]
 
 
 def test_pack_workspace_keeps_test_values_out_of_reference_centroids(tmp_path):

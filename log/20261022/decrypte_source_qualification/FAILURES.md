@@ -1,5 +1,0 @@
-# Source-qualification failures
-
-1. The initial static-content.springer-cdn.com request failed during TLS negotiation. SUPPLEMENT_RECEIPT.json retains the exception and timing. No workbook was retained or decoded.
-2. The alternate publisher media.springernature.com URL returned more than the initial 32MiB bound. The script stopped after reading 32MiB+1, before writing a workbook or decoding cells. SUPPLEMENT_MEDIA_RECEIPT.json retains the exception and timing, but this initial implementation did not capture response headers/status before reading, and the partial bytes were not archived. Do not claim an authenticated body for this failed attempt. Enlarge only the download cap to 256MiB and stream the exact same resource to disk with response metadata captured first. The header-only numerical-access restriction is unchanged.
-3. One exploratory command referred to nonexistent qualify_sources.py in the previous phase; the actual previously used file was fetch_decryptE_text.py. No prior files were changed.

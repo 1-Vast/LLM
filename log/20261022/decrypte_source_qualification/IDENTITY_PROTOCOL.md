@@ -1,7 +1,0 @@
-# Additional identity-only inspection, before execution
-
-The first four rows were inspected as text across all nine sheets; numeric cells were redacted. This nevertheless exposed authors' qualitative Effect labels in sheet2 V2:V4 and some text-stored method numbers/clinical phase (e.g. sheet1 G3). These rows are development-exposed for qualitative annotation. No functional response numeric payload was converted, printed or used. XML parsers necessarily parsed underlying text into memory; 'unread values' means no extraction/semantic analysis of numerical response payloads, not cryptographic blindness to workbook bytes.
-
-Next inspect sheet2 only: extract row identities A (drug), B (cell), U (assay Type), never V (Effect), and structural presence/type/formula flags of J:T without payload. Retain all identity rows and duplicate keys. Resolve sheet IDs using workbook relationships; do not infer the sheet2 identity from its order alone. No functional magnitude, curve parameters, effect labels, model fitting, outcome-based split or response filtering. Enumerating complete identities defines possible drug-level partitions and assays; it does not establish sample-level pairing or functional noise.
-
-The workbook is the authenticated public publisher supplement; SHA256 is recorded in SUPPLEMENT_MEDIA_LARGE_RECEIPT.json. Source-only dynamic-range evaluation is a separate future protocol. This step only answers available menus and structural completeness.

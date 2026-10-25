@@ -1,5 +1,0 @@
-# Retained post-census structural-helper failure
-
-The first JSON-only final structural helper failed at Python parse time because an unnecessary regex with a backslash was placed inside an f-string expression. It opened no input/source values. Replaced that expression with the existing column label. This helper is post-freeze and reads only existing coordinate-presence JSON/census plus the specifically authorized nonnumeric primary drug Table1; it is not part of the original source projector or numerical census freeze. Failure is retained here without changing original frozen files or outputs.
-
-The second run conservatively stopped when a primary Table1 identity/target text contained digits. No Table1 cell values were printed or saved by that failed run. Rather than expanding the numeric literature scope or inferring what those digits mean, the helper now withholds any such full text cell while retaining digit-free drug/abbreviation labels. This correction only affects the optional primary naming projection; the response-presence checks continue to use previously recorded coordinate metadata only.

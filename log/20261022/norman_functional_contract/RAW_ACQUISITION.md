@@ -1,5 +1,0 @@
-# Raw-state acquisition contract
-
-Primary and author code authenticate official GSE133344 state source. HEAD confirms raw matrix 1,442,389,171 compressed bytes, raw identities 2,242,992 bytes and raw genes 264,786 bytes. Acquire these exact objects plus official raw barcodes; do not decompress expression values yet. This is dataset acquisition, not phenotype analysis. Retain original files and streaming receipts; no restart solely on a poll timeout. A successful transfer must match content-length and checksum recorded locally, but no author checksum was provided. Matrix/gene/cell alignment and single-guide classification remain to verify before a fit.
-
-Raw state chosen because original author code uses raw cells with an UMI threshold and multiplet filtering, and explicitly warns cellranger filtered cells may remove low-UMI perturbed states. A future reconstruction must document any deviation and cannot claim direct reproduction solely from matrix acquisition. No pair-level transcriptional output enters the proposed single-only predictor. No RSI or methodological GO is implied.

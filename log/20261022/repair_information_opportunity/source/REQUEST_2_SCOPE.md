@@ -1,3 +1,0 @@
-# Exact request 2 selected from the authenticated landing
-
-Request 1 returned a 530-byte HTML application shell with no data or sample metadata. Its literal module script path is `/assets/index-CxOkyeef.js`. Request 2 reads `https://db.prottalks.com/assets/index-CxOkyeef.js` only as public client-side landing text to identify explicit download/manifest links and statements about the data. It is not executed; no API/data endpoint is queried. The original 1 MB body limit and total three-request bound apply. A capped script body is not evidence of a complete manifest. Root was sent the actual path before this request. No matrix/header acquisition follows automatically.

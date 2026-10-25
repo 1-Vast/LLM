@@ -1,7 +1,0 @@
-# Two exact metadata continuations selected from authenticated manifests
-
-2026-10-22, after source_completion/RECEIPTS.json. Both exact metadata HTTP requests succeeded. BioStudies's study hierarchy explicitly names `table of contents.json` as its file list; Zenodo8000328 explicitly links the author GitHub repository at tagv1.0.0 and a448014618-byte code archive. Do not download the large archive or any experimental response data.
-
-Acquire the named BioStudies file-list JSON through its public study-file route and the GitHub git-tree metadata for the exact author-linked tag. Record raw bytes/hash/status/error; JSON names and objecttype/size/hash are allowed. Tree recursive response must be checked for truncation; a truncated tree cannot prove absence. A file-list description can contain published qualitative results; disclose them as source exposure, not heldout outcomes. Do not interpret response arrays, processed numbers or image files.
-
-The one scientific question remains whether these inventories explicitly supply an FM07 pre-decision timepoint/action/run link absent from the inspected GEO/calibratedgDNA records. If the list yields a small readme/design or analysis-code file specific to the schedule, that exact next file must be fixed before acquiring it. Names alone and an author code expectation do not prove a measurement exists. Negative string search is local to inspected inventories, not global data absence. Keep all original protocols/seals unchanged.

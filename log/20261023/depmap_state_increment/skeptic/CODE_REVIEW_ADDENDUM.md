@@ -1,9 +1,0 @@
-# Static review addendum: final prefit implementation
-
-2026-10-23. Read updated run.py, test_run.py and SYNTHETIC_TESTS_FINAL.txt only; no numeric state/label payloads read, no fitter imported/executed by reviewer. Parent test transcript reports 4/4 pass in0.013s; this is inspected evidence, not a claimed independent rerun.
-
-Updated nested returns full grid_A/B/C/H/D/E/F validation arrays along with selected outputs; caller stores all in inner NPZ. Inner fallback counts, per-gene coverage, dropped-label pair identifiers, batch map/count and scipy/threadpoolctl versions are now stored. Selection cost disclosure distinguishes restricted4/full8, separately tuned G components and eigendecomposition/lambda-fit counters. These repair the substantive storage gaps in CODE_REVIEW. Python/executable/thread2 information can be bound by root execution receipt; no fit change required.
-
-Synthetic tests are meaningful for their narrow scope: outer-query label mutations cannot change predictions or selection; inner-validation label mutations leave an explicit inner all_grid fit/prior unchanged; zero centered linear features reduce B/C/D/E to the gene prior; kernel translation, PSD and off-target gate are checked. They do not independently reconstruct nested inner membership/prior from biological data or certify general absence of all leakage. Static nested logic plus forthcoming numeric audit remain necessary. No contract weakening observed.
-
-No remaining blocker to freeze and execute this finite conventional component screen. Existing interpretation limits remain unchanged. Original CODE_REVIEW.seal.json's run_sha256 is a historical reviewed version reference, not an assertion that current run.py still has those bytes; this addendum and its seal bind the new current version. Original opinions/seals are preserved.

@@ -1,5 +1,0 @@
-# Actual implementation review and disposition
-
-Before response fitting, root reviewed `screen.py` and approved execution after requiring S0 inclusion in the conventional envelope, explicit positive oracle-minus-S0 continuation condition, and precise full-array-decode wording in the deployment seal. The independent cardiac-skeptic agent reviewed source/calibration/development/oracle boundaries as acceptable, and identified that permuting all12logits while excluding S0 changes the11candidate logit multiset; corrected to permute11non-S0 entries and keep S0 fixed. It also required unambiguous numerical-contact wording. All these changes were made before `FREEZE.json` and any real-data scalar fit.
-
-Both reviewers explicitly noted that learned logits rank exactly like ordinary source-best; any uniform-versus-learned gain would therefore be ordinary source-prior learning. This screen carries no novelty claim. Three synthetic/ID boundary checks passed before freeze. Review is actual implementation criticism, not a new candidate-innovation debate or evidence of biological performance.

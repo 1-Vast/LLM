@@ -117,7 +117,7 @@ def validate_forecasts() -> int:
                                "curated annotations and derived readings are proxy labels",
                                "no user-state features or queried outcome signatures enter forecasting"]}
     # Preserve the previously inspected five-outcome experiment and its source artifacts.
-    out = ROOT / "outputs/case_memory_integration/frequency_v3"
+    out = ROOT / "data/processed/case_memory_integration/frequency_v3"
     out.mkdir(parents=True, exist_ok=True)
     (out / "development_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     (out / "development_items.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
@@ -143,7 +143,7 @@ def validate_forecasts() -> int:
 
 def validate_calibration() -> int:
     pack, arrays = load_pack()
-    previous_path = ROOT / "outputs/case_memory_integration/scientific_fix/development_summary.json"
+    previous_path = ROOT / "data/processed/case_memory_integration/scientific_fix/development_summary.json"
     previous = json.loads(previous_path.read_text(encoding="utf-8"))
     evaluation = set(previous["holdout_blocks"])
     available = set(previous["training_blocks"])
@@ -253,7 +253,7 @@ def validate_calibration() -> int:
     split = {"seed": 20260930, "training": sorted(training), "calibration": sorted(calibration), "evaluation": sorted(evaluation),
              "previous_split_sha256": hashlib.sha256(previous_path.read_bytes()).hexdigest()}
     summary["split_sha256"] = hashlib.sha256(json.dumps(split, sort_keys=True).encode()).hexdigest()
-    out = ROOT / "outputs/case_memory_integration/calibration_v3"
+    out = ROOT / "data/processed/case_memory_integration/calibration_v3"
     out.mkdir(parents=True, exist_ok=True)
     for filename, value in (("summary.json", summary), ("profile.json", asdict(profile)), ("split.json", split)):
         (out / filename).write_text(json.dumps(value, indent=2), encoding="utf-8")

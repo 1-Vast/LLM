@@ -1,7 +1,0 @@
-# Explicit narrow source-shape amendment, before request
-
-2026-10-22. The original family MINiML request consumed the original 2,000,000-byte cap and was truncated. Offline recovery stopped before the first Data-Table at byte 10,492 and yielded zero sample/series entries; irrelevant platform rows were not decoded. This is an overly broad source-shape failure, not scientific evidence that the 25 molecular samples or treatment metadata are absent. The initially planned series-only second request was not sent.
-
-Parent/root explicitly authorizes this separate amendment: exactly **one** official sample-only **brief** metadata request, `https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE30516&targ=gsm&form=text&view=brief`, with an additional 65,536-byte body cap. Separate receipt; the first 2 MB are not reclassified or hidden. No platform target, full view, retry or source expansion.
-
-A separate worker stops before the first `!sample_table_begin`. It exports only GSM identity/title, source/organism/characteristics, treatment/growth/extract/label/hybridization/scan/data-processing protocols, platform/series IDs and supplementary filenames. It never exports expression/phenotype rows or full source body. Preserve response-size/cutoff indicators and compare recovered accessions to the official 25-sample scout set. If server ignores brief or coverage is incomplete, report that limit and stop. Numerical dose/time within treatment text are permitted identities, never measured outcomes.

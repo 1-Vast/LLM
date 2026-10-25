@@ -1,3 +1,0 @@
-# Prospective root source scope extension
-
-2026-10-23. Four initial root GETs completed (discovery200, temporal-primary200, SRS500, SRS403). Critic independently found metaDRP2025 original Methods specifying MAE in the inner update, but has only authenticated the author repository tree, not its training implementation. Before testing or making implementation claims, extend root budget by at most two exact author code GETs, bound to the retrieved tree revision, to inspect the training loss and optimizer configuration. Store originals/receipts, read only, never execute downloaded author code. This resolves a concrete paper-versus-implementation uncertainty; no dataset/label retrieval or general search expansion. Total root maximum six logical GETs.

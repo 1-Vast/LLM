@@ -1,3 +1,0 @@
-# Audit failure retained
-
-First final audit exited1 at the API prompt hash comparison. The request receipt hashed the in-memory UTF-8 request string; Windows Path.write_text translated LF to CRLF in the saved prompt. Thus raw byte digest differs, while universal-newline read_text reconstructs the exact request string and matches the original request hash. Corrected the verifier to compare that declared text hash and let the final manifest separately bind actual file bytes. Did not alter the receipt, prompt, API response, scientific results or source files. This is a verifier representation mismatch, not another request or an unreported successful first check.

@@ -1,3 +1,0 @@
-# Independent application renewal scope
-
-Before new requests: inspect historical antibiotic/CDK/currentdecryptE STOPs and inventory; avoid reopening these candidates. Search primary metadata/method text only for one materially different dynamic intervention/function task. No response dataset downloads, no new response matrix, no protected reserves. Public metadata/full-text requests archived with body/hash/failures; no literature abstract is biological reproduction. Candidate mechanism must be an explicit testable operation, not merely renamed filtering/active learning or history-state splitting.

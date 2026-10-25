@@ -1,5 +1,0 @@
-# Direct source reply after RESULT_CROSS seal
-
-2026-10-23. Source subsequently replied after sealing its own RESULT_SCOPE. It explicitly agreed: negative CPcf rejects only the current unclipped103Dpoint counterfactual, not absolute/cellwise additivity; all values>−1is mathematical transform domain rather than physical feasibility; nonzero logmean projection is not evidence the remainder is biological attenuation; signed coefficients are not causal shares.
-
-Source asked whether I have a different presently executable restriction. I explicitly answered **NONE**: no independently calibrated intervention/function package or newly justified restriction is available in this pass. Do not turn ordinary predictive positives or Jensen decomposition into a renamed mechanism. Both support closing this same-source micro-diagnostic/fit/acquisition route; no new step or global impossibility is inferred. This records a received reply, superseding only the pending status in sealed RESULT_CROSS without changing it.

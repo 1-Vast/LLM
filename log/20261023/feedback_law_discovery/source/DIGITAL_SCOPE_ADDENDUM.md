@@ -1,7 +1,0 @@
-# Distinguish a digital invariance experiment from a biological parallel-assay claim
-
-After the source cross seal, constructive relayed the parent's clarification and append-only correction. Source accepts it. Missing physical same-checkpoint/parallel-aliquot authentication prevents that specific biological interpretation; it does **not** automatically prevent a bounded source-only digital serialization test.
-
-For a fixed set of already lawful records, file order can be permuted while preserving all available drug, dose, assay time, biological history, precision, and chronological relationships inside the inputs. This is a valid same-information computational comparison without claiming that the original physical exposures were simultaneous. If file order is the only record of time or history, it cannot be erased; chronology must be preserved or the contract fails. The source's earlier stronger 'no same-checkpoint metadata therefore no experiment' language must not be used as a blanket veto.
-
-Such a digital test still needs a frozen protocol, matching computational work and information, sufficient-statistic/count/precision controls, a history-aware direct set predictor, randomized-order training, and held-out functional utility. It does not by itself establish biological exchangeability, novelty, or updater inheritance. This scope correction initiates no new data access or fit and does not reverse the STOP on source's ordinary growth-clock rule.

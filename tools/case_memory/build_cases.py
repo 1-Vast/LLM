@@ -216,7 +216,7 @@ def main() -> int:
     pack, arrays = XD.load_pack()
     manifest = json.loads((ROOT / "data/processed/case_memory_integration/pack_manifest.json").read_text())
     output = os.environ.get("MAESTRO_CASE_MEMORY_EPISODES_OUT")
-    output = Path(output) if output else ROOT / "outputs/case_memory_integration/episodes/proxy_reference_cases_v3.jsonl.gz"
+    output = Path(output) if output else ROOT / "data/processed/case_memory_integration/episodes/proxy_reference_cases_v3.jsonl.gz"
     store = CM.EpisodeStore(output)
     written = 0
     for episode in build_reference_episodes(pack, arrays, manifest):

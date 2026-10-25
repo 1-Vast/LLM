@@ -1,3 +1,0 @@
-# Guard review before acquisition
-
-The first synthetic run passed 8 tests. Manual review found an untested overly broad parenthetical stripping rule: it could have admitted an exact entity value inside an otherwise generic header. No source had been requested or opened. Removed that rule and added an adversarial test. Unit-bearing headers are also withheld conservatively; only exact generic labels or explicitly labelled identity counters pass. The original synthetic run is retained and the revised run is recorded separately. This is a pre-exposure implementation correction, not a post-hoc source-dependent rule.

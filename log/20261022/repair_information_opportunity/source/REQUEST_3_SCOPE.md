@@ -1,3 +1,0 @@
-# Final third request: exact download-description module
-
-After reviewing the incomplete client result, root explicitly authorizes the final third request to `https://db.prottalks.com/assets/Download-CzW0p0Zk.js`, literally named in the authenticated Vite dependency map. This is a public author-code source for download metadata only, not a matrix permission. Keep the 1MB cap/receipt, do not execute, inspect only schema/manifest/static download links/counts/identity labels. No request4, no target URL follow, no table headers/outcomes. If identities and replicate/label semantics remain absent, record unknown and seal.

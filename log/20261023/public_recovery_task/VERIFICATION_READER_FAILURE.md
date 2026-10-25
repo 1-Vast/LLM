@@ -1,3 +1,0 @@
-# Local verifier path-resolution failure
-
-First verify_phase.py execution exited1 before writing VERIFICATION.json. A seal's files mapping uses a basename CROSS.md relative to the seal directory, but the verifier incorrectly resolved every mapping at workspace root, causing FileNotFoundError D:\MAESTRO\CROSS.md. No experiment or frozen file was changed and no verification success was claimed. Fix only path resolution: existing root-relative/absolute paths retain their interpretation; otherwise resolve basename relative to its seal. Preserve this failure and rerun the byte verifier, not the numerical experiment.

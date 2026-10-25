@@ -1,5 +1,0 @@
-# Actual exact-run result review after cross
-
-2026-10-23. Read root PAIRED_CREDIT_PROTOCOL.md and PAIRED_CREDIT_RESULT.json after the frozen exact enumeration completed. The stipulated signed-action exponential policy has score e at zero; equal-cost2evaluation rows give means1 and variances paired2, antithetic1/2, independent1/2 or5/2 for task variances0or4. Shared additive noise gives paired/antithetic variance0. The action-dependent baseline gives mean0 against true gradient1. These match the already stated analytic cross-review and justify its narrow no-advantage conclusion.
-
-Assumptions are material: both signed edits and baseline are executable, same-task branching is available, evaluation costs are equal, reference is not amortized, and independent versus common additive noise is explicit. Results do not certify cell measurements, real squared-loss covariance, nonlinear/asymmetric program grammars or improved G utility. I reviewed the exact reported rows/algebra; I did not independently rerun root code or create a second biological experiment. Root API failures supply no missing biological restriction or justification to reopen stopped configurations.

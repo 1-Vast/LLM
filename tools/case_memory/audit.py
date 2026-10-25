@@ -88,7 +88,7 @@ def quality_audit(protocol_freeze: Path) -> int:
     del permutation  # the probe is structural: no fitted quantity may reference test labels
 
     # 5. replay results: every reported metric is finite and the item count matches
-    results_path = ROOT / "outputs/case_memory_integration/results.json"
+    results_path = ROOT / "data/processed/case_memory_integration/results.json"
     if not results_path.is_file():
         failures.append("missing:results.json (supply an explicitly generated replay results file)")
     else:
@@ -107,7 +107,7 @@ def quality_audit(protocol_freeze: Path) -> int:
         failures.append("freeze:protocol_hash_mismatch")
 
     report = {"checks": 6, "failures": failures, "ok": not failures}
-    out = ROOT / "outputs/case_memory_integration/quality_audit.json"
+    out = ROOT / "data/processed/case_memory_integration/quality_audit.json"
     out.write_text(json.dumps(report, indent=1))
     print(json.dumps(report, indent=1))
     return 0 if not failures else 1
@@ -119,13 +119,13 @@ if str(ROOT) not in sys.path:
 
 
 
-FIGDIR = ROOT / "outputs/case_memory_integration/figures"
+FIGDIR = ROOT / "data/processed/case_memory_integration/figures"
 ARMS_PLOT = ("scalar", "signed_direction", "pathway_direction", "combined",
              "mechanism_prior_only", "case_memory_only", "full")
 
 
 def _records() -> list[dict]:
-    path = ROOT / "outputs/case_memory_integration/forecast_items.jsonl"
+    path = ROOT / "data/processed/case_memory_integration/forecast_items.jsonl"
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
@@ -146,7 +146,7 @@ def visual_verify() -> int:
     import matplotlib.pyplot as plt
 
     pack, arrays = XD.load_pack()
-    results = json.loads((ROOT / "outputs/case_memory_integration/results.json").read_text())
+    results = json.loads((ROOT / "data/processed/case_memory_integration/results.json").read_text())
     records = _records()
     units = pack["units"]
     reference = sorted(b for b, u in units.items() if not u["unseen"])
@@ -291,7 +291,7 @@ def visual_verify() -> int:
     ax.legend()
     manifest["support_vs_error.png"] = _save(fig, "support_vs_error.png")
 
-    (ROOT / "outputs/case_memory_integration/figures_manifest.json").write_text(
+    (ROOT / "data/processed/case_memory_integration/figures_manifest.json").write_text(
         json.dumps({"figures": manifest, "count": len(manifest)}, indent=1))
     print(json.dumps({"figures": len(manifest), "dir": str(FIGDIR)}))
     return 0
