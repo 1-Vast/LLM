@@ -84,6 +84,13 @@ Registered studies retain their protocols, results, deviations and replay code. 
 
 ## Changelog
 
+### 2026-10-25 - Evidence and navigation review
+
+- Correct 14 main-chapter targets after reviewing all 39 registered studies.
+- Distinguish the KG analytical value from its repaired Monte Carlo estimate; retain the G1 strict margin and population, legacy replay limits and explicit evidence grades.
+- Bind six selected fact contracts to published sources and exact report excerpts, with independent review. Default checks require no local dataset or large package. This does not establish exhaustive semantic coverage or a scientific method advantage.
+- Asset-free clean-checkout software suite: 1,095 passed, 4 skipped. Knowledge continuity is verified separately from data-dependent calculation checking and experimental reproduction.
+
 ### 2026-10-25 - Maintenance verification
 
 - Parse signature arrays and calibration from the same bytes used for their hashes.

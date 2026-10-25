@@ -397,6 +397,31 @@ def test_local_archived_research_assets_match_retained_sources():
             assert_research_assets(name, storage, required)
 
 
+def test_selected_claim_bindings_are_available_without_local_research_data():
+    """Check published source/quote availability, not semantic entailment or review authenticity."""
+    from tools import retained_records
+
+    registry = json.loads((ROOT / 'research/STUDIES.json').read_text(encoding='utf-8'))
+    manifest = retained_records.load_index(ROOT, published=True)
+    report = (ROOT / 'log/RESEARCH_REPORT.md').read_text(encoding='utf-8')
+    coverage = registry['claim_coverage']
+    assert coverage and len({item['id'] for item in coverage}) == len(coverage)
+    tracked_sources = next(obj['source_ids'] for obj in registry['objects'] if obj['id'] == 'MAESTRO-CURRENT-REPORT')
+    cache = {}
+    for claim in coverage:
+        assert claim['review']['status'] == 'approved' and claim['review']['reviewer']
+        assert report.count(claim['report_quote']) == 1
+        assert claim['sources']
+        for source in claim['sources']:
+            sid = source['id']
+            assert sid in tracked_sources, 'Claim source must participate in incremental source tracking'
+            if sid not in cache:
+                cache[sid] = retained_records._read_bytes(sid, ROOT, manifest)
+            payload = cache[sid]
+            assert hashlib.sha256(payload).hexdigest() == source['sha256']
+            assert source['quote'] in payload.decode('utf-8').replace('\r\n', '\n')
+
+
 def test_no_test_module_imports_another_test_module():
     """Test helpers live in `tests/fixtures/`, never in test modules.
 
