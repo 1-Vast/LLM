@@ -93,8 +93,13 @@ def test_gbm_features_keep_missing_as_nan(stream):
 
 
 # ---------------------------------------------------------------- updates after feedback and the worked example
-def test_worked_example_two_outcomes_different_posterior_and_decision():
+def test_worked_example_two_outcomes_different_posterior_and_decision(tmp_path, monkeypatch):
+    frozen = PKG / "WORKED_EXAMPLE.json"
+    original = frozen.read_bytes()
+    monkeypatch.setattr(EXAMPLE, "HERE", tmp_path)
     c = EXAMPLE.main()["checks"]
+    assert (tmp_path / "WORKED_EXAMPLE.json").is_file()
+    assert frozen.read_bytes() == original
     assert c["same_probe"] and c["posterior_differs"] and c["decisions_differ"] and c["mismatch_flagged"]
     assert c["A_support_after_A_outcome"] > 0.9 and c["A_support_after_B_outcome"] < 0.1 and c["B_support_after_B_outcome"] > 0.9
     assert c["variance_only_probe_is_the_decoy"] and c["variance_probe_leaves_posterior_unchanged"]
