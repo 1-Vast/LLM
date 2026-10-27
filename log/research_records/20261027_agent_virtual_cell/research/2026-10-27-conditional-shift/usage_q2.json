@@ -1,0 +1,147 @@
+{
+  "agent_role": "independent design-and-execution runner (R194 analysis A2)",
+  "audit_line": "R194-A2",
+  "task_id": "task-16",
+  "date": "2026-10-27",
+  "protocol": {
+    "path": "research/2026-10-27-conditional-shift/PROTOCOL_Q2.md",
+    "sha256": "0F8D19463ECEA5481C3258293108420ADA59674E9778B95B545B96B575E286CE",
+    "status": "v1 FROZEN (before any Q2 effect estimation)"
+  },
+  "environment": {
+    "os": "Windows (PowerShell pwsh)",
+    "workspace": "D:\\MAESTRO",
+    "output_dir": "research/2026-10-27-conditional-shift",
+    "python": "D:\\anaconda\\envs\\maestro\\python.exe (Python 3.11.16)",
+    "packages": {"numpy": "2.4.6", "pandas": "2.3.3", "scipy": "bundled with the maestro env"}
+  },
+  "runs": [
+    {
+      "command": "python tmp/a2_probe.py",
+      "purpose": "pre-freeze structure probe (identity/design/barcode counts only; no Q values)",
+      "wall_seconds": 12,
+      "status": "ok",
+      "notes": "92,039 obs / 229 condition-pairs / 1,501 cell-pairs; n_i 78-595; m_j 6-134; unique cells; 3 components; 1,312 barcode-calibration quadruples"
+    },
+    {
+      "command": "python tmp/a2_estimator_probe.py",
+      "purpose": "synthetic-data validation of the frozen moment estimator and bootstrap-z power scale (no real Q)",
+      "wall_seconds": 60,
+      "status": "ok",
+      "notes": "unbiased recovery (s=0.2 -> 0.039 / s=0.4 -> 0.158 vs targets 0.04/0.16); synthetic power ~1.0"
+    },
+    {
+      "command": "python q2.py",
+      "purpose": "formal deterministic runner implementing PROTOCOL_Q2.md (design check D1-D4 first)",
+      "wall_seconds": 199.0,
+      "wall_seconds_range": [195.5, 201.0],
+      "status": "ok",
+      "notes": "design_check 15/15 pass; verdict condition_structure_present; share_cond=1.43%"
+    },
+    {
+      "command": "python q2.py (determinism re-run x2, after removing the non-deterministic runtime field)",
+      "purpose": "byte-identical output check",
+      "wall_seconds": 200.5,
+      "status": "ok",
+      "notes": "q2.json SHA256 94C5CD9B...793DE2 identical across the two final runs; q2_rows.csv identical (8494FA08...89DF34). First determinism attempt exposed a non-deterministic design_check.power.runtime_seconds field; it was removed (runtime accounting lives in this file) before the final runs."
+    }
+  ],
+  "downloads": {
+    "data_files": 0,
+    "network": "none",
+    "notes": "all inputs reused read-only from the frozen Jaaks fitted tables and A0 products"
+  },
+  "design_check": {
+    "passed": true,
+    "n_gates": 15,
+    "n_gates_passed": 15,
+    "structure": {
+      "n_observations": 92039,
+      "n_condition_pairs": 229,
+      "n_cell_pairs": 1501,
+      "n_cells": 96,
+      "n_conditions": 291,
+      "condpair_n_cp_min_median_max": [78, 435, 595],
+      "cellpair_n_condpair_min_median_max": [6, 58, 134],
+      "density": 0.267766,
+      "bipartite_components": 3
+    },
+    "noise": {
+      "calibration_quadruples": 1312,
+      "coverage_frac": 0.014255,
+      "sigma2_single_key": 0.003351,
+      "noise_variance_mean_per_observation": 0.011968,
+      "stability_ratio_cellpair_parity": 1.027068,
+      "stability_ratio_conditionpair_parity": 0.79742
+    },
+    "power_type_I": {
+      "test": "two-way bootstrap z = s2_cond/SE; reject if z > 1.645",
+      "power_s0.2": 1.0,
+      "power_s0.4": 1.0,
+      "type_I_s0": 0.0,
+      "split_sensitivity_rho_cellpair_0.2_0.6": [1.0, 1.0]
+    }
+  },
+  "main_analysis": {
+    "computed": true,
+    "sigma2_cond": 0.000371,
+    "sigma2_cond_ci95": [0.000297, 0.000674],
+    "sigma2_cond_se": 9.6e-05,
+    "sigma2_cond_permutation_p": 0.001,
+    "sigma2_cond_permutation_q95": 1e-05,
+    "sigma2_cellpair": 0.001023,
+    "sigma2_interaction": 0.012582,
+    "sigma2_noise": 0.011968,
+    "sigma2_total": 0.025944,
+    "shares": {
+      "condition_pair": 0.014287,
+      "cell_pair": 0.039435,
+      "interaction": 0.484968,
+      "noise": 0.46131
+    },
+    "reliability_primary_at_median_n": 0.867863,
+    "reliability_noise_only": 0.930904,
+    "reliability_with_cellpair_sampling": 0.86311,
+    "reliability_threshold": 0.5,
+    "validation_exploratory": {
+      "condition_level_spearman": 0.176749,
+      "bootstrap_ci95": [0.055102, 0.296176],
+      "n_condition_pairs": 229,
+      "sigma2_cond_validation": 0.000186,
+      "share_cond_validation": 0.009805
+    }
+  },
+  "judgment": {
+    "verdict": "condition_structure_present",
+    "H194a_pass": true,
+    "H194b": "condition-level share is negligible (1.43% < 10%) -> Q is dominated by condition x cell-pair interaction (48.5%) and barcode measurement noise (46.1%); condition structure is mainly cell-specific",
+    "A2_is_not": "an A1 pass, a cross-screen Q replication, or a rescue by re-aggregating the same 96 cells",
+    "branch_per_BRIEF": "condition_structure_present -> any future condition-level replica would need a LARGER independent resource (and better noise calibration); B/C/acquisition not started"
+  },
+  "tokens": {"input_tokens": null, "output_tokens": null, "total_tokens": null,
+             "note": "runtime token accounting is not available to the agent; recorded as null (not 0)"},
+  "cost": {"usd": null, "note": "not available; recorded as null"},
+  "deliverables": {
+    "PROTOCOL_Q2.md": "0F8D19463ECEA5481C3258293108420ADA59674E9778B95B545B96B575E286CE",
+    "q2.py": "083694DADBC53FDA88B8EEC2C4448697FB96ED1026E53633CEDD3C1C39A24769",
+    "q2.json": "94C5CD9B2C2FCACABCB7780A1F5CAAEBCCE81D23B926437682BE4F60D9793DE2",
+    "q2_rows.csv": "8494FA08079EBF0B6ECD7C239EE1DD18E0CDE541EB5E663CE513FAED8589DF34",
+    "report_q2.md": "B20DF17A3479EAE34D06ECADAAC33233464B34A0546F8DBECDD339C30B81FBE8",
+    "record_q2.md": "65182711BED2FC3571EE693324BAB3201698C130FFD4763D6A2163AE45545598",
+    "usage_q2.json": "self (not hashed inside itself)"
+  },
+  "untouched_inputs_verified": {
+    "matched_conditions.csv": true, "a0.json": true, "PROTOCOL_Q.md": true,
+    "ERRATA_A0.md": true, "challenge_A0.md": true, "PROTOCOL_A0.md": true,
+    "q1.json": true, "q1.py": true
+  },
+  "notes": [
+    "design check ran before any H194a/H194b judgment; all 15 gates passed (power at sigma_cond/sigma_total=0.4 is 1.00, type-I 0.00)",
+    "verdict: condition_structure_present by the frozen H194a rule (sigma2_cond>0, CI lower>0, above permutation null, reliability>=0.50) BUT the frozen H194b diagnostic classifies the condition-level share as negligible (1.43% < 10%)",
+    "Q variance is dominated by condition x cell-pair interaction (48.5%) and barcode measurement noise (46.1%); cell-pair main effect 3.9%",
+    "high reliability (0.868) is a consequence of averaging over ~435 cell pairs per condition pair, not of a large condition-level variance share - both must be cited together",
+    "noise calibration covers only 1.43% of observations (barcode repeats); stability ratios pass but stationarity is the main measurement-regime uncertainty; sigma2_cond itself does not depend on the noise calibration",
+    "Validation is exploratory only (condition-level Spearman 0.177, CI [0.055,0.296]); it is NOT a cross-screen Q replication",
+    "all hash values are SHA256"
+  ]
+}

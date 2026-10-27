@@ -1,0 +1,36 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r12",
+  "round": "R12 (goal round 9/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Pre-registered confidence-model test on the dose-grid object; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r12": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the pre-registered hypotheses all failed, so there is no positive claim to challenge. The post-hoc joint rule is explicitly labelled non-claim.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e013_confidence.py"], "runs": 2, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E013_RESULTS.json", "units": "E013_units.csv", "protocol": "PROTOCOL_E013.md"},
+  "results": {
+    "units": 210, "layouts": 9, "compound_pairs": 29, "base_hit3": 0.671,
+    "auc_logit_loo_layout": 0.477, "auc_ci95_layout_bootstrap": [0.373, 0.584],
+    "best_single_feature_auc": 0.595,
+    "single_feature_auc_natural_direction": {
+      "gap2": 0.606, "argmin_agree": 0.595, "dyn_range": 0.492,
+      "edge": 0.500, "n_other": 0.477, "plateau": 0.425
+    },
+    "threshold_rule": {"argmin_agree_ge_0.5": {"coverage": 0.2686, "hit3": 0.893, "regret": 0.0050}},
+    "calibration": "non-monotone; max deviation 0.15",
+    "post_hoc_not_a_claim": {"argmin_agree_ge_0.5_and_gap2_ge_0.3": {"coverage": 0.12, "hit3": 0.96, "regret": 0.0046}}
+  },
+  "decisions": {"H023_trustworthiness_predictable": false, "H024_deployable_subgroup": false,
+                "H025_calibrated": false, "verdict": "average_only_not_deployable"},
+  "lesson": "With only 9 layouts, a 6-feature logistic refitted per fold is unstable (AUC 0.477, worse than chance) while two single features carry the little signal that exists. Multi-feature confidence models need materially more independent layouts.",
+  "mutations_outside_episode": ["research/INDEX.md (added R12 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "method_claimed": false
+  }
+}

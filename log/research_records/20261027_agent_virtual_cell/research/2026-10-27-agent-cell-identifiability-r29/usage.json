@@ -1,0 +1,54 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r29",
+  "round": "R29 (goal round 27/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Leave-one-drug-out test on the locally held GDSC screen; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r29": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round's own R2 recomputation is the challenge that corrected the pre-registered baseline.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e029_leave_one_drug.py", "e029b_r2_baseline.py"], "runs": 2,
+    "folds": 65, "test_rows": 593414, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E029_RESULTS.json", "r2_baseline": "E029B_R2.json",
+                "per_drug": "E029_per_drug.csv", "protocol": "PROTOCOL_E029.md",
+                "correction": "AMENDMENT_013_CONSTANT_BASELINE.md"},
+  "design": {
+    "features": "pathway one-hot for anchor (17) and library (21) plus tissue (3); drug identity never enters",
+    "model": "ridge, lambda = 1.0 fixed, no tuning",
+    "cv": "leave-one-drug-out, 65 folds"
+  },
+  "results": {
+    "spearman_median": 0.200, "spearman_ci95": [0.198, 0.245],
+    "auc_median": 0.682, "auc_ci95": [0.653, 0.702],
+    "r2_model_median": 0.029, "r2_model_ci95": [-0.010, 0.035],
+    "r2_const_median": -0.008,
+    "r2_diff_median": 0.056, "r2_diff_ci95": [0.030, 0.067],
+    "frac_drugs_model_better": 0.80
+  },
+  "baseline_error": {
+    "what": "H070's 'better than the constant' was implemented with Spearman, but a constant prediction has zero rank variance so the statistic is undefined; rho_const was NaN and frac_drugs_model_better was miscomputed as 0.00",
+    "fix": "recomputed with R2 on the same folds; the model beats the constant by +0.056 [+0.030,+0.067] on 80% of drugs"
+  },
+  "decisions": {
+    "H070_unseen_drug_predictable": true,
+    "H070_status": "holds under the corrected baseline",
+    "H071_substantial_0.20": "misses by 0.0004 (median 0.1996); reported as borderline rather than adjusted",
+    "H072_binary_auc": true,
+    "verdict_reported": "weak_but_present"
+  },
+  "headline": "with no data at all about a held-out drug and only its pathway annotation, synergy can be ranked weakly (rho 0.20, AUC 0.68) but its magnitude cannot be predicted (R2 0.03): rankable, not quantifiable",
+  "scope": "annotation-level generalisation: drugs sharing the same pathway remain visible in training, so this is not a fully uninformative new drug",
+  "register_updates": {"C24": "new, exploratory: leave-one-drug-out rho 0.200, AUC 0.682, R2 0.029",
+                       "unseen_drug": "BATCHIE still untestable; GDSC now done"},
+  "next_gates": ["leave-one-cell-line-out on GDSC (125 cells)", "cross-screen replication using the validation screen (4,725 overlapping keys, different concentrations)"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C24 added, unseen-drug status updated)",
+                                "research/INDEX.md (added R29 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "mechanism_claim_made": false
+  }
+}

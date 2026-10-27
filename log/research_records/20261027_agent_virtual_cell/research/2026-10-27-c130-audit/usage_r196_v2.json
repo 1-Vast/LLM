@@ -1,0 +1,116 @@
+{
+  "agent_role": "independent_runner_c130_audit",
+  "audit_line": "R196-v2 (PREGISTERED AMENDMENT-001 + AMENDMENT-002)",
+  "task_id": "task-20",
+  "date": "2026-10-27",
+  "status": "COMPLETED runtime; interpretation PENDING task-32 challenge (i003-challenger); verdict below is the mechanical pre-registered verdict only",
+  "environment": {
+    "os": "Windows (PowerShell pwsh)",
+    "workspace": "D:\\MAESTRO",
+    "output_dir": "research/2026-10-27-c130-audit",
+    "python": "D:\\anaconda\\envs\\maestro\\python.exe (Python 3.11.16)",
+    "packages": {"pandas": "2.3.3", "numpy": "2.4.6", "scipy": "1.17.1"}
+  },
+  "protocols": {
+    "AMENDMENT_R196.md": {"frozen_at": "2026-10-27T18:16 (before r196_v2.py existed)",
+                          "sha256": "6986b008ca799c3456076a630e92a04912bd3ea389ede3f83734a5607e855289"},
+    "AMENDMENT_R196_002.md": {"frozen_at": "2026-10-27T18:34 (before the v2 verdict was written)",
+                              "sha256": "fe1836bd8aa02e5399e03eb022df3e89b18d2edf2ce7d7d019650693b0c68432"},
+    "supersedes": {"v1_protocol": "PROTOCOL_R196.md", "v1_verdict": "replicated_under_audit (WITHDRAWN)",
+                   "revocation": "REVOCATION_R196.md", "challenge": "challenge_R196.md"}
+  },
+  "runs": [
+    {"command": "python r196_v2.py", "purpose": "v2 run-1 (10 drug partitions x 5 folds; drug-cluster primary)",
+     "wall_seconds": 1119.7, "status": "ok",
+     "notes": "artifacts preserved as tmp/r196_v2_run1.json and tmp/r196_v2_rows_run1.csv before the determinism rerun"},
+    {"command": "python r196_v2.py", "purpose": "v2 run-2 determinism check",
+     "wall_seconds": 1078.6, "status": "ok",
+     "notes": "r196_v2.json and r196_v2_rows.csv byte-identical to run-1 -> deterministic"}
+  ],
+  "budget": {
+    "e9_frozen_budget_seconds": 900,
+    "wall_seconds_run1": 1119.7,
+    "wall_seconds_run2": 1078.6,
+    "e9_pass": false,
+    "consequence_applied": "per AMENDMENT-002 section B, E9 failure forces verdict = inconclusive (not re-labelled as a deviation pass)",
+    "cpu_seconds": null,
+    "cpu_observed_last_read": 4184.94,
+    "cpu_note": "run-1 process CPU cumulative was 4184.94 s at the last successful read (18:29:07, wall then ~660 s; multi-threaded BLAS makes CPU >> wall); the process had exited before final CPU could be read, so final CPU is null. E9 uses script stdout wall time per AMENDMENT-002 section B."
+  },
+  "staged_cache": {
+    "note": "post-hoc split of the completed run-1 artefacts (in-flight state was inside one process, so no hot checkpointing); recorded as a runtime deviation in record_r196_v2.md; no rule or number changed",
+    "manifest": {"file": "tmp/r196_v2_stage_manifest.json",
+                 "sha256": "53c2f2b9c0456c3a12c010a4242f14270c44021e96db2883665d9ad171646f16"},
+    "stages": {
+      "tmp/r196_v2_stage_1_design_and_data.json": "b4c5e56b22124b5123e93abaa48140ffb8b6c6a994a6a64b1fc4433359b9053e",
+      "tmp/r196_v2_stage_2_null_models.json": "6749dc20399d2353fb3e39112bf0f3c6b259102e054f062251249289745dcfaa",
+      "tmp/r196_v2_stage_3_treatment_arms.json": "cb6f58366ddbcd33798b63113f51edb07aae5e5b0cee1465107f4a99c46f24a5",
+      "tmp/r196_v2_stage_4_bootstrap_and_judgment.json": "7ea6f4084311b98a626351974571991c596253cfab83d7943588d00a1e1f273b",
+      "tmp/r196_v2_stage_5_runtime_and_E9.json": "a386ca10620757adc7bf9f28d9aefc0b7b236e61169cd18019ebc2e6e25a7e0a"
+    },
+    "run1_copies": {
+      "tmp/r196_v2_run1.json": "bd0ada7be102df430209422995609c1411cbcb6a231f763e6f96121cb4b952a4",
+      "tmp/r196_v2_rows_run1.csv": "576fb1550862b0dc862bd6fc94ce55353ab23189aab84e0fb29f69e9275aea84"
+    }
+  },
+  "tokens": {"input_tokens": null, "output_tokens": null, "total_tokens": null,
+             "note": "runtime token accounting is not available; null, not 0"},
+  "cost": {"usd": null, "note": "not available; recorded as null"},
+  "verdict": {
+    "verdict": "inconclusive",
+    "subtypes": ["design_check_failed (E7: MDE80_design=0.082267 > delta_min=0.05)",
+                 "primary_mde80_gt_delta_min (MDE80_drug=0.085720 > 0.05)",
+                 "e9_wall_gt_900s (1119.7s > 900s per AMENDMENT-002 section B)"],
+    "primary_unit": "held-out drugs (10 independent drug partitions, 50 folds; drug-cluster bootstrap)",
+    "point_estimate": 0.141464,
+    "primary_ci95_drug": [0.062468, 0.182579],
+    "primary_mde80": 0.08572,
+    "ci95_cell": [0.128835, 0.153969], "mde80_cell": 0.018345,
+    "ci95_pair": [0.116415, 0.163036], "mde80_pair": 0.033827,
+    "ci95_twoway": [0.111766, 0.168516], "mde80_twoway": 0.040218,
+    "partition_level": {"per_partition": [0.145022, 0.115611, 0.1746, 0.13867, 0.125094,
+                                           0.158891, 0.154888, 0.129675, 0.099101, 0.173085],
+                        "mean": 0.141464, "sd": 0.024658,
+                        "t_interval_95_df9": [0.123826, 0.159102]},
+    "fold_level_formal_sensitivity": {"n_folds": 50, "sd": 0.083518,
+                                      "t_interval_95_df49": [0.117723, 0.165204],
+                                      "min": -0.03248, "max": 0.301134},
+    "null_arms": {"shuffle_mean_rho": -0.006231, "shuffle_sd": 0.046087,
+                  "capacity_mean_rho": 0.000874, "capacity_sd": 0.00674},
+    "annotation_only_gain": 0.139796,
+    "capacity_contrast_partition0": 0.139692,
+    "h196b": {"difference_rowlevel_minus_grouped_ext": -0.000199,
+              "difference_ci95_drug": [-0.001013, 0.00034],
+              "difference_c130_grid": 6.1e-05,
+              "material_optimism_flag": false},
+    "design_checks": {"E1": true, "E2": true, "E3": true, "E4": true, "E5": true,
+                      "E6": true, "E7": false, "E8": true, "E9": false},
+    "not_claims": ["not an external replication", "not an independent confirmation",
+                   "no decision benefit", "no mechanism", "not a negative result"],
+    "c130_status": "frozen but not externally/audit-level confirmed; not refuted"
+  },
+  "deliverables": {
+    "AMENDMENT_R196.md": "6986b008ca799c3456076a630e92a04912bd3ea389ede3f83734a5607e855289",
+    "AMENDMENT_R196_002.md": "fe1836bd8aa02e5399e03eb022df3e89b18d2edf2ce7d7d019650693b0c68432",
+    "r196_v2.py": "3e4bae43cec54cb06da95774c4c78a762885f757b415c734078c2ac9743c4e17",
+    "r196_v2.json": "bd0ada7be102df430209422995609c1411cbcb6a231f763e6f96121cb4b952a4",
+    "r196_v2_rows.csv": "576fb1550862b0dc862bd6fc94ce55353ab23189aab84e0fb29f69e9275aea84",
+    "report_r196_v2.md": "28c47e3ac61f401be6a4c7da9a04612b9d0fc3dcaeb0070b8160ea738566ad30",
+    "record_r196_v2.md": "354a4cbbaad3503cf86237815e15fcef035ce818561b6caa997f0ff051f65c7e"
+  },
+  "v1_products_untouched": {
+    "PROTOCOL_R196.md": "b7257ea952431211896e0b84b8ff19cefdce52f652b70dc0914af5239763e309",
+    "r196.py": "2c77b7b522f558ffbecc99df96f0ac6184f92c08ca46fbde08b779bb62e6b788",
+    "r196.json": "4732b7cf65b54a200f09dce2d559c0e6d4aacce2e28728a89ec44f36a77e99c3",
+    "r196_rows.csv": "236047b58d919d236adbaf22f692077215badf4f287006272a128d6c84e57bcb",
+    "report_r196.md": "30a8e41501d6b8936b7710cbe7e68da64adfab83c31d1a5061f71de2e812c682",
+    "record_r196.md": "9ce8fa64a50c6906f77a6083d3e34372ac685b70f0431177496b0ae0fd56c0b1",
+    "usage_r196.json": "see this directory (v1 usage; revoked-verdict wording)"
+  },
+  "notes": [
+    "v2 is an audit re-analysis performed AFTER the withdrawn v1 results were known (annotation 0.1447, rowlevel 0.1441, cell CI, drug CI [0.0139,0.2233], drug MDE 0.1527). It is NOT blind, NOT an independent replication, and the peek correction is written into AMENDMENT-002 section C and report_r196_v2.md section 6.",
+    "primary drug-cluster CI lower>0 and partition-level t-CI lower>0, but the pre-registered power condition on the audit-target unit fails (MDE80_drug=0.0857 > delta_min=0.05) and E7/E9 design gates fail -> mechanical verdict inconclusive.",
+    "no thresholds/partitions/grids/units were changed during the v2 analysis; the only runtime deviations are (a) the fast block-Gram engineering rewrite with an explicit equivalence check (max abs diff 7.02e-13), (b) an int8 categorical-code overflow bug fixed before the successful run, (c) the post-hoc stage-cache split, (d) wall-clock overrun recorded as E9 failure.",
+    "all hashes are SHA256 unless stated otherwise"
+  ]
+}

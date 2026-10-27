@@ -1,0 +1,92 @@
+{
+  "agent_role": "endpoint-and-measurement-regime-auditor",
+  "audit_line": "R192-PB2",
+  "task_id": "task-10",
+  "date": "2026-10-27",
+  "follows": "R191-PB (task-8, endpoint_not_usable on power only)",
+  "environment": {
+    "os": "Windows (PowerShell pwsh)",
+    "workspace": "D:\\MAESTRO",
+    "output_dir": "research/2026-10-27-drugcomb-endpoint",
+    "python": "D:\\anaconda\\envs\\maestro\\python.exe (Python 3.11.16)",
+    "packages": {"numpy": "2.4.6", "scipy": "bundled with the maestro env"}
+  },
+  "runs": [
+    {
+      "command": "python pb2.py (first run, pre-registered 6 designs only)",
+      "wall_seconds": 73.7,
+      "status": "ok",
+      "notes": "cross-checks exact: 88,118 annotated units / PA 2,682 / E1 3,739 / 1,418 mapped drugs; pre-registered grid all fail (min two-way MDE80 0.1290, max power@0.1183 0.658)"
+    },
+    {
+      "command": "python pb2.py (with post-freeze supplementary designs)",
+      "wall_seconds": 209.9,
+      "status": "ok_with_print_bug",
+      "notes": "12 designs computed; pb2.json written; final print raised KeyError (print only) -> fixed and re-run"
+    },
+    {
+      "command": "python pb2.py (final)",
+      "wall_seconds": 209.1,
+      "status": "ok",
+      "notes": "STATUS not_reopenable_on_preregistered_grid_but_reopenable_with_new_design; recommended PA_r50"
+    },
+    {
+      "command": "python pb2.py (determinism re-run)",
+      "wall_seconds": 209.3,
+      "status": "ok",
+      "notes": "pb2.json SHA256 identical across the two final runs: CC5047A87F958440D458BD7CE7CD071A0211602290B4988865DF561B79DC198B"
+    }
+  ],
+  "downloads": {
+    "data_files": 0,
+    "note": "no downloads: mapping_table.csv, v1.4 summary and P-B/P-A artifacts were reused read-only",
+    "network": "none"
+  },
+  "tokens": {"input_tokens": null, "output_tokens": null, "total_tokens": null,
+             "note": "runtime token accounting is not available to the agent; recorded as null (not 0)"},
+  "cost": {"usd": null, "note": "not available; recorded as null"},
+  "designs": {
+    "pre_registered_grid": {
+      "PA_r20": {"n_units": 2682, "n_pairs": 515, "n_cells": 97, "n_training": 58788, "mde80_two_way": 0.2374, "power_at_0.1183": 0.090},
+      "PA_r30": {"n_units": 6411, "n_pairs": 1104, "n_cells": 103, "n_training": 46096, "mde80_two_way": 0.1894, "power_at_0.1183": 0.285},
+      "PA_r40": {"n_units": 13795, "n_pairs": 1685, "n_cells": 100, "n_training": 31672, "mde80_two_way": 0.1297, "power_at_0.1183": 0.658},
+      "E1_r20": {"n_units": 3739, "n_pairs": 775, "n_cells": 100, "n_training": 54430, "mde80_two_way": 0.2250, "power_at_0.1183": 0.112},
+      "E1_r30": {"n_units": 7334, "n_pairs": 1615, "n_cells": 98, "n_training": 44413, "mde80_two_way": 0.1658, "power_at_0.1183": 0.407},
+      "E1_r40": {"n_units": 11912, "n_pairs": 2248, "n_cells": 106, "n_training": 34154, "mde80_two_way": 0.1290, "power_at_0.1183": 0.633}
+    },
+    "supplementary_post_freeze": {
+      "PA_r45": {"n_units": 16841, "mde80_two_way": 0.1208, "power_at_0.1183": 0.738, "tier_B_ok": false, "tier_A_ok": false},
+      "PA_r50": {"n_units": 22200, "n_pairs": 2916, "n_training": 21645, "mde80_two_way": 0.1009, "mde80_pair_clustered": 0.0995, "power_at_0.1183": 0.938, "power_at_0.10": 0.778, "power_at_0.05": 0.153, "tier_B_ok": true, "tier_A_ok": false},
+      "PA_r55": {"n_units": 23014, "mde80_two_way": 0.0912, "power_at_0.1183": 0.979, "tier_B_ok": true, "tier_A_ok": true},
+      "E1_r45": {"n_units": 15043, "mde80_two_way": 0.1130, "power_at_0.1183": 0.795, "tier_B_ok": false, "tier_A_ok": false},
+      "E1_r50": {"n_units": 20796, "mde80_two_way": 0.1016, "power_at_0.1183": 0.881, "tier_B_ok": true, "tier_A_ok": false},
+      "E1_r55": {"n_units": 22925, "mde80_two_way": 0.0922, "power_at_0.1183": 0.964, "tier_B_ok": true, "tier_A_ok": true}
+    }
+  },
+  "design_recommendation": {
+    "status": "not_reopenable_on_preregistered_grid_but_reopenable_with_new_design",
+    "recommended_new_design": "PA split, r=0.50 (k=709/1418 holdout drugs), delta_min=0.1183 (frozen headline = replication target)",
+    "mde80_two_way": 0.100873, "power_at_0.1183": 0.938, "n_both_unseen_annotated_units": 22200,
+    "n_training_annotated_units": 21645,
+    "tier_A_alternative": "PA_r55 (r=0.55): MDE80=0.0912, power=0.979, delta_min=0.0947",
+    "minimum_required_annotated_both_unseen_units": {"tier_B_extrapolated": 14387, "tier_A_extrapolated": 22451,
+      "empirical_bracket_tier_B": [16841, 22200], "empirical_verified_tier_A": 23014}
+  },
+  "deliverables": {
+    "PROTOCOL_PB2.md": "87B1EDC9EF7A67899C33FB87207734E659D86CCE8DEDC8525BA6AF155D8989DE",
+    "pb2.py": "6221CF7EB17632E12B89042830E6D78E2BB87D415781A680FB5B5DD358A38FF2",
+    "pb2.json": "CC5047A87F958440D458BD7CE7CD071A0211602290B4988865DF561B79DC198B",
+    "report_pb2.md": "CE96B1CD405124CA02D6E1F77667F493D617690914A9CABD5ECFFAE569F40290",
+    "record_pb2.md": "2D3ADF0FE7B457AF93D30ADEA73C7B935C4D09D168AF3B5EEADB0979746C2A69",
+    "usage_pb2.json": "self (not hashed inside itself)"
+  },
+  "pb_artifacts_unchanged": true,
+  "notes": [
+    "zero-model/power only: no identity/annotation model fitted, no effect estimated, endpoint fixed to synergy_bliss",
+    "annotated universe exact cross-checks: 88,118 cells x pairs (23.16% of 380,418), 1,418 mapped drugs (34.69% of 4,088), 18,258 pairs, 108 cells; PA r=0.20 both-unseen 2,682, E1 3,739 (match P-A exactly)",
+    "pre-registered grid (r in {0.20,0.30,0.40} x PA/E1) is NOT reopenable: min two-way MDE80 0.1290 > frozen effect 0.1183; max power@0.1183 0.658 < 0.80",
+    "post-freeze supplementary r in {0.45,0.50,0.55} (disclosed in record_pb2.md): PA r=0.50 and r=0.55, E1 r=0.50/r=0.55 reach Tier B; PA r=0.55 and E1 r=0.55 reach Tier A (0.0947)",
+    "extrapolation: SE ~ n^-1/2 (alpha fitted -0.41/-0.45, so small-n extrapolation is optimistic by 10-20%; empirical bracket reported instead)",
+    "all hash values are SHA256"
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "kind": "can_the_agent_apply_the_conditional_rule_online",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "probe": 20,
+    "threshold": 0.095,
+    "reps": 3,
+    "priors": {
+      "weak": 0.1,
+      "strong": 1.0
+    },
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "cells_used": 125,
+    "units": 750,
+    "sanity_checks": 750,
+    "top_k_changed": 750,
+    "sanity_passed": true
+  },
+  "by_prior": {
+    "weak": {
+      "n": 375,
+      "mean_estimated_prior": 0.016666666666666666,
+      "frac_decided_personalise": 0.9386666666666666,
+      "never": 0.08973333333333333,
+      "always": 0.10293333333333334,
+      "adaptive": 0.09906666666666668,
+      "adaptive_minus_never": {
+        "n": 375,
+        "mean_diff": 0.009333333333333334,
+        "ci95": [
+          0.0008000000000000007,
+          0.017736666666666647
+        ]
+      },
+      "adaptive_minus_always": {
+        "n": 375,
+        "mean_diff": -0.0038666666666666667,
+        "ci95": [
+          -0.007200000000000001,
+          -0.0013300000000000176
+        ]
+      }
+    },
+    "strong": {
+      "n": 375,
+      "mean_estimated_prior": 0.013333333333333334,
+      "frac_decided_personalise": 0.9706666666666667,
+      "never": 0.10706666666666668,
+      "always": 0.10626666666666669,
+      "adaptive": 0.1072,
+      "adaptive_minus_never": {
+        "n": 375,
+        "mean_diff": 0.00013333333333333226,
+        "ci95": [
+          -0.010400000000000003,
+          0.010533333333333332
+        ]
+      },
+      "adaptive_minus_always": {
+        "n": 375,
+        "mean_diff": 0.0009333333333333333,
+        "ci95": [
+          -0.0010666666666666667,
+          0.004
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r113/e113_agent_rule.py": "178226d39e1d4f05533a2ef900f6f009499ef9308163f25e5a830c9c984d5aeb"
+  },
+  "pooled": {
+    "n": 750,
+    "never": 0.09840000000000002,
+    "always": 0.10459999999999998,
+    "adaptive": 0.10313333333333333,
+    "adaptive_minus_never": {
+      "n": 750,
+      "mean_diff": 0.004733333333333332,
+      "ci95": [
+        -0.0022016666666666677,
+        0.0114
+      ]
+    },
+    "adaptive_minus_always": {
+      "n": 750,
+      "mean_diff": -0.0014666666666666667,
+      "ci95": [
+        -0.0034,
+        0.0006000000000000001
+      ]
+    },
+    "oracle": 0.1302
+  },
+  "decisions": {
+    "sanity_passed": true,
+    "H286_adaptive_beats_both_fixed": false,
+    "H287_adaptive_fails_to_beat_both": true,
+    "oracle_gap": 0.027066666666666683,
+    "verdict": "RUN_INVALID_probe_equals_k_so_the_estimate_is_the_base_rate"
+  },
+  "limits": [
+    "A 20-key probe gives an extremely noisy estimate of the prior's accuracy.",
+    "The two prior strengths bracket the threshold but do not sample it continuously.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "RUN_INVALID": true,
+  "design_bug": {
+    "symptom": "the probe-estimated prior accuracy is 1.3 to 1.7 percent, far below the true prior accuracy of 9 to 11 percent, and the decision to personalise fires in 94 to 97 percent of cases",
+    "cause": "PROBE was set to 20, exactly equal to K. Taking the top-K of a 20-key probe selects every probe key, so the estimate is the base rate of the pool (about 1.4 percent), not the precision@20 of the prior. With an estimate of 1.4 percent the threshold of 9.5 percent trivially fires, so the adaptive arm collapses onto the always-personalise arm.",
+    "fix": "the probe must be materially larger than K, for example 100 keys for K=20, before the estimate carries the information the rule needs"
+  },
+  "what_is_still_informative": {
+    "oracle_gap": 0.0271,
+    "reading": "if the agent knew which of the two actions was better for each cell it would gain 2.71 pp over the best fixed strategy (oracle 13.02 percent against always 10.46). So the decision does matter; this round simply failed to inform it."
+  }
+}

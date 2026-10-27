@@ -1,0 +1,43 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r59",
+  "round": "R59 (goal round 57/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Implementation and test of in-place threshold re-estimation; no literature query."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r59": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round tests its own proposed promotion route and refutes it, including a coin-flip check on the apparent gain.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e059_probe.py"], "runs": 1, "pool_cells": 240, "probe_sizes": 3,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E059_RESULTS.json", "rows": "E059_rows.csv", "protocol": "PROTOCOL_E057.md"},
+  "design": {
+    "procedure": "draw a probe of q labelled keys from the pool, decide mix vs exploit inside the probe at the proportionally scaled budget, then apply that decision to the full pool's top 20",
+    "sizes": [500, 1000, 2000, 4000, 8000, 16000], "probes": [200, 500, 1000], "k": 20
+  },
+  "results": {
+    "agreement_eval": {"200": 0.542, "500": 0.487, "1000": 0.517},
+    "probe_hit": {"200": 0.3104, "500": 0.3387, "1000": 0.3483},
+    "always_exploit": {"200": 0.2904, "500": 0.2744, "1000": 0.2667},
+    "always_mix": {"200": 0.3412, "500": 0.3969, "1000": 0.4175},
+    "coin_flip_expectation": {"200": 0.3158, "500": 0.3357, "1000": 0.3421}
+  },
+  "decisions": {"H149_probe_identifies_strategy": false, "H150_beats_always_exploit": true,
+                "H151_bigger_probe_better": true,
+                "verdict_reported": "in_place_reestimation_fails_at_chance"},
+  "coin_flip_check": "the probe's hit rate matches a 50/50 coin flip between the two fixed strategies to within 0.6 pp, so its apparent gain over always-exploit is the base-rate advantage of the mix, not skill",
+  "why_the_fixed_threshold_did_better": "the fixed threshold was learned from 120 (pool x split) observations, whereas a 500-key probe supplies 500 labels from one pool",
+  "promotion_status": "NOT satisfied and now without a known route: the fixed threshold does not transfer (C38) and in-place re-estimation is at chance (C39)",
+  "register_updates": {"C39": "new and refuted: in-place strategy selection from a small probe is at chance",
+                       "SYNTHESIS": "section 7 rewritten - both promotion routes are now refuted"},
+  "next_gates": ["stop this line; the failure is not sample size but that random in-pool labels carry almost no information about which top-k is better"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C39 added)", "research/SYNTHESIS.md (section 7 rewritten)",
+                                "research/INDEX.md (added R59 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

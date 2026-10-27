@@ -1,0 +1,55 @@
+{
+  "kind": "does_batchie_publish_a_treatment_id_to_drug_name_mapping",
+  "round": "R173",
+  "date": "2026-10-27",
+  "checks_performed": [
+    {
+      "check": "github search for batchie",
+      "result": "found tansey-lab/batchie, the authors' repository, 14 stars"
+    },
+    {
+      "check": "repository file tree",
+      "result": "261 paths; no mapping or annotation file; only nf-core meta.yml files and src/batchie/ code"
+    },
+    {
+      "check": "read src/batchie/cli/extract_screen_metadata.py",
+      "result": "it only counts observed and unobserved plates; it recovers no names"
+    },
+    {
+      "check": "README",
+      "result": "19205 characters; documents that a treatment_names field exists; no de-identification note and no mapping"
+    },
+    {
+      "check": "zenodo record 12764821",
+      "result": "exactly three h5 files, no separate mapping artifact"
+    }
+  ],
+  "verdict": "no mapping is present in the distributed artifacts",
+  "a_harder_obstacle_than_the_missing_table": {
+    "what_is_missing": "the index-to-compound correspondence inside each h5, i.e. which compound occupies slot seven",
+    "why_public_compound_lists_do_not_help": "NCI-ALMANAC, Merck 2016 and GDSC-sq all have public compound lists, but without the slot ordering no list can be attached",
+    "consequence": "the unsaturated merck_2016 readout cannot be made usable within this programme's reach"
+  },
+  "what_i_did_NOT_check": [
+    "the paper PDF and its supplementary material; the bioRxiv API returns metadata only",
+    "the batchie.readthedocs.io documentation site",
+    "the authors themselves"
+  ],
+  "so_the_precise_statement": "I did not find a mapping in the distributed repository, the Zenodo record or the README. That is weaker than the claim that no mapping exists anywhere.",
+  "what_this_closes": {
+    "R172": "the three candidate arenas lack drug identity in their data content",
+    "R173": "the identity cannot be recovered from the accompanying material either",
+    "combined": "cross-dataset replication is exhausted within this machine's reach, and the reason is now pinned: not network, not sample size, not failure to look, but the released artifacts do not contain the identifier information required"
+  },
+  "recommendation": "mark cross-dataset replication as an external dependency and state in the synthesis what artifact would satisfy it: a treatment-id to compound-name table for the released h5 screens",
+  "limits": [
+    "Three sources were checked and three were not; the conclusion is bounded accordingly.",
+    "No model was fitted.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "decisions": {
+    "H410_mapping_exists": false,
+    "H411_no_mapping_in_distributed_artifacts": true,
+    "verdict": "no_id_to_name_mapping_is_published_so_the_one_concrete_path_is_closed"
+  }
+}

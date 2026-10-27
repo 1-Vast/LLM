@@ -1,0 +1,49 @@
+{
+  "experiment": "E144",
+  "round": "R144 (goal round 142/256)",
+  "date": "2026-10-27",
+  "type": "audit of a load-bearing claim in the promotion table",
+  "compute": {
+    "script": "e144_marginal_degeneracy.py",
+    "splits": 60,
+    "conditions": [
+      "both_unseen",
+      "one_unseen"
+    ],
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "results": "E144_RESULTS.json",
+    "protocol": "PROTOCOL_E134.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "headline": "C75's marginal arm is a constant when both drugs are held out, so its win in that pool is a win over a constant",
+  "numbers": {
+    "both_unseen_max_sd": 3.469e-18,
+    "both_unseen_mean_sd": 4.235e-19,
+    "exact_zero_count": 19,
+    "exact_zero_pct": 31.7,
+    "one_unseen_mean_sd": 0.018241
+  },
+  "my_near_miss": {
+    "what": "an exact sd==0 test reported 31.7 percent, which is a floating-point artefact",
+    "rule_added": "degeneracy must be judged with a tolerance, and max and min dispersion must be reported, not only a count"
+  },
+  "disposition": {
+    "promotion_row": "qualified to where marginals are defined; both_unseen excluded",
+    "frozen_claim": "unaffected, since it never compares against marginals",
+    "C75": "not withdrawn, valid on the other two pools"
+  },
+  "degeneracy_count": "fifth instance, after R104, R108, R113 and R135",
+  "next_gate": "redo this comparison with a shrunk marginal baseline, which is non-zero but weak for unseen drugs",
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r138",
+  "round": "R138 (goal round 136/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Does the coarsening gain also grow as identity is removed, under the same tree model?"},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r138": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round tests the previously established monotonicity under a different model family.",
+  "compute": {"python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6, scipy 1.17.1, sklearn 1.9.0",
+              "scripts": ["e138_monotone.py"], "runs": 2, "repeats": 30, "rows": 30,
+              "data_downloads": 0, "wet_lab_experiments": 0},
+  "artifacts": {"results": "E138_RESULTS.json", "rows": "E138_rows.csv", "protocol": "PROTOCOL_E128.md"},
+  "results": {
+    "full_identity": {"identity_rho": 0.4071, "both_rho": 0.4221, "gain": 0.0150, "ci95": [0.0141, 0.0160]},
+    "no_identity": {"identity_rho": 0.0, "both_rho": 0.0322, "gain": 0.0176, "ci95": [-0.0336, 0.0664]},
+    "gain_difference": {"diff": 0.0029, "ci95": [-0.0499, 0.0518]}},
+  "decisions": {"H342_unified_monotone_under_boosting": false, "H343_not_unified": true,
+                "verdict": "the_monotone_decay_and_its_magnitude_are_linear_model_properties_not_information_properties"},
+  "the_monotone_decay_is_linear_model_specific": {
+    "ridge_record": {"full": 0.0, "partial": [0.0198, 0.0249], "absent": [0.1458, 0.1275]},
+    "boosting_record": {"full": 0.0150, "absent": 0.0176},
+    "test": "gain difference +0.0029 [-0.0499, +0.0518], no evidence of growth",
+    "conclusion": "the six-fold decay is a property of the linear model, not of the information structure"},
+  "a_descriptive_gap": {
+    "ridge_absent_rho": 0.13, "boosting_absent_rho": 0.032,
+    "caveat": "cross-model and cross-encoding, not formally tested",
+    "plausible_reason": "a linear model can still combine the pathway block additively for unseen drugs; a tree must place them in a reserved code and split on pathway, which is harder to learn from a small pool"},
+  "what_this_bounds": {
+    "headline_number": "the 0.13 is a ridge number and must be quoted with the model",
+    "still_model_independent": "the pathway is a coarsening of identity, and the coarsening is never worse than identity in the arms measured",
+    "now_conditional": "the magnitude of the substitution and the monotonicity itself"},
+  "a_convention_I_had_to_fix": "in the no_identity condition every evaluation row carries the reserved identity code, so the identity arm predicts a constant and its rank correlation is undefined; a constant scorer carries no rank information, so it is scored zero. This is stated rather than hidden.",
+  "limits": ["thirty splits, and the no_identity interval is wide, so 'no evidence of growth' is not 'no growth'",
+             "the reserved code is one representation of a missing identity",
+             "the cross-model magnitude comparison was not tested formally",
+             "the tree was not tuned, so 'the tree extracts less' remains provisional",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["give the tree a fair chance with more iterations, smaller leaves or a category-aware implementation before concluding that the substitution effect is linear-only"],
+  "register_updates": {"C106": "new: the monotone decay is linear-model specific",
+                       "C105": "annotated", "SYNTHESIS": "second model qualifier added to the frozen section"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C106 added, C105 annotated)",
+                                "research/SYNTHESIS.md (second qualifier in section 2d)",
+                                "research/INDEX.md (added R138 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

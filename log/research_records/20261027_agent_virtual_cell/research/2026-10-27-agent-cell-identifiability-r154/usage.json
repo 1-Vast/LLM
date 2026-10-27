@@ -1,0 +1,68 @@
+{
+  "experiment": "E154",
+  "round": "R154 (goal round 152/256)",
+  "date": "2026-10-27",
+  "type": "partial versus uniform rescaling, and a new mixed-scale check",
+  "compute": {
+    "script": "e154_partial_scale.py",
+    "scenarios": 2,
+    "fits": 4,
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "tool": "research/tools/feature_audit.py",
+    "results": "E154_RESULTS.json",
+    "protocol": "PROTOCOL_E144.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "results": {
+    "s0.01_f0.30": {
+      "ridge_max_abs_delta": 0.01326,
+      "ridge_rho_delta": -0.0113,
+      "tree_max_abs_delta": 0.1683,
+      "tree_rho_delta": -0.0991
+    },
+    "s0.10_f0.30": {
+      "ridge_max_abs_delta": 0.01205,
+      "ridge_rho_delta": -0.0055,
+      "tree_max_abs_delta": 0.1727,
+      "tree_rho_delta": -0.1015
+    }
+  },
+  "the_clean_contrast": {
+    "uniform_scaling": {
+      "ridge": "1e-15 (no effect)",
+      "tree": "exactly 0 (no effect)"
+    },
+    "partial_scaling": {
+      "ridge": "1.3e-2",
+      "tree": "1.7e-1, rho down 0.10"
+    },
+    "reading": "scaling itself is not the problem; a single column holding two scales is"
+  },
+  "new_check": {
+    "name": "MIXED_SCALE",
+    "criterion": "continuous positive column with two clusters at least 2 decades apart, each at least 5 percent",
+    "validated": "constructed 30 percent rescale flags at 2.8 decades, clean column passes",
+    "scope_note": "this project's features are integer codes, so the check cannot fire on the current data; it is prepared for concentration-type features"
+  },
+  "it_corrects_R153s_closing_judgement": "R153 said that if partial scaling also did not matter, scaling could be struck off the list. It does matter and severely, so the correct split is: uniform scaling struck off, partial scaling added",
+  "limits": [
+    "Two scale factors, one fraction, evaluation side only.",
+    "The new check only covers magnitude-type unit mixing.",
+    "Constructed validation is artificially injected.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "next_gate": "generalise MIXED_SCALE from log-space gaps to any bimodality that is separated by a gap, under any monotone scale",
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "note": "changes under research/tools/ only",
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

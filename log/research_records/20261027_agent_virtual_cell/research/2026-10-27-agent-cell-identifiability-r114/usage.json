@@ -1,0 +1,52 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r114",
+  "round": "R114 (goal round 112/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Corrected agent test with a 100-key probe and an identifiability gate."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r114": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round applies the fix and the identifiability gate its predecessor specified, and the answer is a well-founded negative.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e114_agent_rule_fixed.py"], "runs": 1, "cells": 124, "units": 744,
+    "probe": 100, "k": 20, "sanity_checks": 744,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E114_RESULTS.json", "rows": "E114_rows.csv", "protocol": "PROTOCOL_E109.md"},
+  "gates": {"sanity": {"checks": 744, "changed": 744, "passed": true},
+            "identifiability": {"mean_estimated_prior": 0.046, "passed": true}},
+  "results": {
+    "weak": {"true_prior": 0.0875, "estimated_prior": 0.0422, "decide_rate": 0.76,
+             "never": 0.0875, "always": 0.0948, "adaptive": 0.0919},
+    "strong": {"true_prior": 0.1091, "estimated_prior": 0.0500, "decide_rate": 0.72,
+               "never": 0.1091, "always": 0.1003, "adaptive": 0.1019},
+    "pooled": {"never": 0.0983, "always": 0.0975, "adaptive": 0.0969, "oracle": 0.1256,
+               "adaptive_minus_never": {"diff": -0.0014, "ci95": [-0.0067, 0.0039]},
+               "adaptive_minus_always": {"diff": -0.0006, "ci95": [-0.0055, 0.0044]},
+               "oracle_gap": 0.0287}
+  },
+  "decisions": {"H286_adaptive_beats_both_fixed": false,
+                "H287_adaptive_fails_to_beat_both": true,
+                "verdict": "rule_is_real_but_a_100_key_probe_cannot_identify_the_regime"},
+  "why_the_agent_fails": {
+    "gap_to_detect": "2.15 pp between the two regimes",
+    "noise": "the estimate is the hit rate among the top 20 of the 100 probe keys, standard error about 6.7 pp per cell, roughly three times the gap",
+    "consequence": "the decision fires 76 percent versus 72 percent, so it barely separates the regimes, and the adaptive arm matches both fixed strategies",
+    "bias": "both estimates are about half the true level because the best 20 keys inside a random 100-key probe are not the cell's best 20 overall"},
+  "what_this_establishes": "the conditional rule is real but an agent cannot exploit it with a probe of this size, so the 2.87 pp that a correct per-cell decision would be worth stays uncaptured; on this resource the 'minimal evidence' for this decision does not exist",
+  "limits": ["the two regimes differ by only about 2 pp, which is intrinsically hard to separate",
+             "probe size 100, k 20 and threshold 9.5 percent are all choices",
+             "the measurement cost of the probe is not charged, and charging it could only weaken the conclusion",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["close this line: the rule is real but unapplicable online, and larger probes cost more; the actionable statement is to decide from an ex ante estimate of prior strength, not from a probe"],
+  "register_updates": {"C87": "new: the rule is real but cannot be applied with a small probe",
+                       "C86": "annotated as redone", "SYNTHESIS": "row added"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C87 added, C86 annotated)",
+                                "research/SYNTHESIS.md (row added)", "research/INDEX.md (added R114 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

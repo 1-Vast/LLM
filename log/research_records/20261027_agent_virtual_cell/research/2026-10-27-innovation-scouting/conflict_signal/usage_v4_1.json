@@ -1,0 +1,128 @@
+{
+  "task": "task-56",
+  "round": "R199-A1v4.1",
+  "role": "R199-A1 patch: gate fix + coverage bound 106 + config/output alignment + Pancreas-reference disclosure (no effect runs, no real P0a-metadata/relations_check)",
+  "runtime": {
+    "interpreter": "D:\\anaconda\\envs\\maestro\\python.exe",
+    "python": "3.11.16",
+    "network": false,
+    "cwd": "D:\\MAESTRO"
+  },
+  "model": "unknown",
+  "effort": "unknown",
+  "tokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "note": "runtime token accounting not exposed to the acting agent; recorded as null (not 0)"
+  },
+  "cost_usd": null,
+  "agent_turn_elapsed_s": null,
+  "commands": [
+    {
+      "cmd": "team_task_get task-56 + claim",
+      "purpose": "read A1v4.1 patch task and claim ownership",
+      "wall_time_s": 60,
+      "note": "claim returned revision 2"
+    },
+    {
+      "cmd": "read challenge_A1_v4.md + v4 docs + stage0 v4 implementation",
+      "purpose": "absorb 5 must-fixes and the functional gate blocker",
+      "wall_time_s": 900,
+      "note": "read-only; v1-v4 not modified"
+    },
+    {
+      "cmd": "patch stage0/relations_check.py: mode-aware check_run_gate; P0a s_milp_optimum/solver/target/S-SHA outputs; s_milp_optimum_ge_target gate; deterministic _json_safe output; write notes",
+      "purpose": "fix the run-gate blocker and align P0a outputs",
+      "wall_time_s": 1200,
+      "note": "not run on real data"
+    },
+    {
+      "cmd": "patch stage0/relations_check_config.json: schema v4.1, mode-aware gate, 106 provenance, 18-Pancreas note, n-p1 usable flags, gate list aligned",
+      "purpose": "config/audit alignment",
+      "wall_time_s": 300,
+      "note": "no real data read"
+    },
+    {
+      "cmd": "patch stage0/synthetic_selfcheck.py: add gate-mode test (enabled+confirm+--p0a-metadata with utility blocked -> enters metadata branch via stub loader; full mode still blocked) and rerun",
+      "purpose": "prove the P0a-metadata path works after Lead approval while no real data is read",
+      "wall_time_s": 600,
+      "note": "16/16 synthetic tests passed; SELFCHECK deterministic"
+    },
+    {
+      "cmd": "write spec_v4_1.md / REVISION_A1_v4_1.md / record_v4_1.md / usage_v4_1.json + update stage0 README",
+      "purpose": "deliver A1v4.1 patch",
+      "wall_time_s": 1800,
+      "note": "design/audit only; no real data read"
+    },
+    {
+      "cmd": "Get-FileHash + default/confirm-only CLI refusal checks",
+      "purpose": "freeze SHA256 and verify gate refusals",
+      "wall_time_s": 30,
+      "note": "default exit 3, confirm-only exit 3"
+    }
+  ],
+  "deliverables": [
+    "research/2026-10-27-innovation-scouting/conflict_signal/spec_v4_1.md",
+    "research/2026-10-27-innovation-scouting/conflict_signal/REVISION_A1_v4_1.md",
+    "research/2026-10-27-innovation-scouting/conflict_signal/record_v4_1.md",
+    "research/2026-10-27-innovation-scouting/conflict_signal/usage_v4_1.json",
+    "research/2026-10-27-innovation-scouting/conflict_signal/stage0/relations_check.py",
+    "research/2026-10-27-innovation-scouting/conflict_signal/stage0/relations_check_config.json",
+    "research/2026-10-27-innovation-scouting/conflict_signal/stage0/synthetic_selfcheck.py",
+    "research/2026-10-27-innovation-scouting/conflict_signal/stage0/SELFCHECK.json",
+    "research/2026-10-27-innovation-scouting/conflict_signal/stage0/README.md"
+  ],
+  "deliverables_sha256": {
+    "spec_v4_1.md": "2ABDE0F06EDCDF58A4B78106802EE50CE3F423145ACC78320BDFF2902B6C3DBC",
+    "REVISION_A1_v4_1.md": "CC83F914745EC135D044D5308E77B4FD9F0299D0FF69AB865C2025E593BEF272",
+    "stage0/relations_check.py": "90CC80BB5DAD84EB62C283B55FAFEAD40FA2FEB6E6EF545DCF4B7704D44DF447",
+    "stage0/relations_check_config.json": "BB1FE3230B70EB53B5A39EF7D7D37DF256F296E866133939881E0E3E909CF9B4",
+    "stage0/synthetic_selfcheck.py": "5DC94B3AC733D7006F6F149AE2704D5AF7B6B94C7386F095F74A2E5BABAFC64F",
+    "stage0/SELFCHECK.json": "1A8EF75B01EADA1AA9C0C8EE4D1BB28774CE0F97DF46EAA122BA3B7D48E6EEB0",
+    "stage0/README.md": "A6954E43DAA44A6F59094932F6D258D71B4CED5466D0E97F613BEBC840E2E97E",
+    "record_v4_1.md": "self-referential (hash externally)",
+    "usage_v4_1.json": "self-referential (hash externally)"
+  },
+  "v4_untouched_sha256": {
+    "spec_v4.md": "633E1D687C40712BC4843F618A657F888D46487304F39E9AC599E4827FFF16AB",
+    "protocol_draft_v4.md": "F0B2830A50D696B7C2A7115F7B3952B1BE378F96C5A6C05AB37DA08600463F57",
+    "REVISION_A1_v4.md": "B8B727A8CAAD206C29C9D600478261FE5E5F675869DD08F6B0F8FC85BC42E866"
+  },
+  "must_fix_implementation": {
+    "1_run_gate": {
+      "fix": "check_run_gate(cfg, confirm_run, mode='relations_check'|'p0a_metadata') is mode-aware; --p0a-metadata needs only --confirm-run + real_run_enabled=true; full relations_check screens utility only when utility_gate_required_for_run=true; default/confirm-only -> exit 3",
+      "selfcheck_case": "p0a_metadata_gate_mode_allows_when_utility_blocked: enabled+confirm+--p0a-metadata with utility blocked enters metadata branch via stub loader and PASSes; full mode returns blocked_by_utility_definition"
+    },
+    "2_coverage_bound": {
+      "v3_values_status": "114/112 are v3 MILP values under a different S composition; NOT a v4 bound, NOT reachability proof, NOT used as a gate",
+      "v4_recompute": "independent deterministic-letter-order recompute: grid 171, A/B supply 135, S=12/12 max covered = 106 (>=86, margin 20); recorded only",
+      "gate": "actual P0a-metadata counts.s_milp_optimum must be >=86; else data_unavailable before relations_check"
+    },
+    "3_gate_alignment": {
+      "config_gates": ["reference_matched_subset", "reference_size_ok", "three_way_disjoint", "main_tissues_breast_colon", "pancreas_excluded", "tissue_span_non_vacuity", "s_side_cond_cov_ge_12", "precheck_eligible_ge_target", "s_milp_optimum_ge_target", "s_selection_solver"],
+      "p0a_outputs_added": ["counts.s_milp_optimum", "counts.expected_passing_count", "counts.s_solver", "counts.s_splits_sha256", "counts.coverage_denominator", "counts.coverage_target", "counts.reference_cells_note", "counts.v3_reference_values_not_applicable"],
+      "removed": "reference_milp_upper_bound as 'provenance only'; unimplemented old gate names"
+    },
+    "4_disclosure": {
+      "pancreas_reference_cells": "reference 84 = A(17/16/9)+B(16/17/9) includes 18 Pancreas cells (A9+B9); per-tissue Breast/Colon main family (no tissue nuisance) never uses them; retained only to keep 84/24/17; allocation unchanged",
+      "n_p1_unusable": "n=11/k10 and n=7/k7 unusable (n < n_ctx_min=12); n=14/19 unusable (S=12/tissue); only n=12 rows usable; p1<0.9307 -> insufficient_precision"
+    },
+    "5_audit_chain": {
+      "selfcheck": "16/16 synthetic tests passed, deterministic; includes the new gate-mode test; real_data_read=false; network=false",
+      "synthetic_coverage_note": "synthetic tests use a scaled coverage target 56->28 (disclosed); real config keeps 171->86",
+      "approval_preconditions": ["Lead approval recorded", "two-key: --confirm-run AND real_run_enabled=true", "A1v4.1 review passed"],
+      "post_conditions": ["P0a-metadata output SHA frozen before relations_check", "P0a-metadata PASS != relations_check PASS != Stage 1/effect evidence", "loader reads only 6 metadata columns (no endpoint); real_data_read=false until approval"]
+    }
+  },
+  "verdict": "patch_ready_for_p0a_metadata_approval_no_effect_runs",
+  "open_gaps": [
+    "real P0a-metadata not run: actual s_milp_optimum unknown (independent recompute 106); if <86 -> data_unavailable stop",
+    "P0a relations_check / P0b / P0c / P0d not run; P0d blocked_by_utility_definition only blocks Stage 1",
+    "18 Pancreas reference cells unused by main family (disclosed; allocation unchanged)",
+    "only n=12 MDE row usable; p1<0.9307 -> insufficient_precision; n=11/n=7/n=14/n=19 rows unusable",
+    "shrinkage still equal-weight; sign test has no cluster correction (deferred to cluster sensitivity / P0b/P0c)",
+    "no new prior-art search this round (offline patch)"
+  ],
+  "notes": "unavailable values recorded as null, not 0; no effect experiments/training/real P0a-metadata/real relations_check; no response read; v1-v4 untouched; no novelty claim"
+}

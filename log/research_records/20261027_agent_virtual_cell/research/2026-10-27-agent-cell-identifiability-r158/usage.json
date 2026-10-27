@@ -1,0 +1,50 @@
+{
+  "experiment": "E158",
+  "round": "R158 (goal round 156/256)",
+  "date": "2026-10-27",
+  "type": "the expected_uninformative whitelist, which turned into three noise-bug fixes in the audit itself",
+  "compute": {
+    "script": "e158_whitelist.py",
+    "cases": 6,
+    "iterations": 4,
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "tool": "research/tools/feature_audit.py",
+    "results": "E158_RESULTS.json",
+    "protocol": "PROTOCOL_E147_ext.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "cases": {
+    "r157_no_whitelist": true,
+    "r157_with_pathway_whitelisted": true,
+    "r138_masked_no_whitelist": false,
+    "r138_masked_whitelisted": true,
+    "prediction_alarm_with_whitelist": false,
+    "split_alarm_with_whitelist": false
+  },
+  "three_bugs_found_in_my_own_tool": {
+    "constant_on_eval_noise": "fired for every level absent from the evaluation sample, which in a 65-drug one-hot design is most columns",
+    "unseen_codes_on_indicators": "fired on indicator columns where absence is pure sampling",
+    "partial_masking_slipped_through": "a column masked to -1 on some rows and 0 on others is neither constant nor an unseen code, and that is exactly the R138 shape; a new SENTINEL_OUTSIDE_VOCAB check now catches it"
+  },
+  "the_whitelist": {
+    "scope": "feature-level flags only, on named columns only",
+    "cannot_suppress": "prediction-level and split-level alarms, since neither can be intentional",
+    "danger_demonstrated": "the same masked design that is correctly flagged passes once its columns are declared expected",
+    "recommendation": "never whitelist a block whose purpose is to SIMULATE an unavailable feature; whitelist only blocks unavailable by construction"
+  },
+  "reinterprets_R157": "the all-four-arms flag there was mostly the CONSTANT_ON_EVAL noise, not a design defect; under the corrected rules the R157 design passes cleanly",
+  "remaining_blind_spot": "sentinel values on continuous columns, such as -999, are still missed",
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "note": "changes under research/tools/ only",
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

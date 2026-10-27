@@ -1,0 +1,58 @@
+{
+  "kind": "potency_share_versus_transfer_quality",
+  "input_sha256": "56a4e4a195673160edcb1baa209a15409b3639ff6ab0405558cc5ab3198d5f23",
+  "settings": {
+    "top": 10,
+    "n_boot": 1000,
+    "seed": 20261027
+  },
+  "audit": {
+    "cell_pairs_with_both": 25,
+    "non_circular_units_available": 4,
+    "why_only_4": "source agreement needs >=3 cells per layout; only 2 layouts have that"
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r27/PROTOCOL_E027.md": "e51919a04f585cbf294267d37c193b6ecaca7792860f8679ff512cb254ccfba9",
+    "research/2026-10-27-agent-cell-identifiability-r27/e027b_share_vs_transfer.py": "a3de0e86fe86dd472dba96e2425f399a32fa527bb89c2bdbcd5caad8c55b8bd6"
+  },
+  "main_share_loo_summary": {
+    "mean": 0.7069185091866927,
+    "median": 0.6958191890327748
+  },
+  "cross_rho_summary": {
+    "mean": 0.7741206140377832,
+    "median": 0.8162982738199476
+  },
+  "association": {
+    "with_cross_rho": {
+      "spearman": -0.5276923076923077,
+      "ci95": [
+        -0.7642295098513037,
+        -0.0614722464861431
+      ]
+    },
+    "with_cross_p10": {
+      "spearman": -0.06590610045140102,
+      "ci95": [
+        -0.5069909468581223,
+        0.3781650949221712
+      ]
+    }
+  },
+  "decisions": {
+    "H063_potency_share_explains_transfer_rho": false,
+    "H063b_potency_share_explains_transfer_p10": false,
+    "H064_non_circular_source_agreement": null,
+    "H064_status": "UNTESTABLE here: source agreement requires >=3 cells per layout, and only 2 layouts have 3 cells (4 units). Recorded as untestable, NOT as a negative.",
+    "verdict": "potency_share_does_not_explain_transfer"
+  },
+  "circularity_note": "main_share needs the target cell's own data, so this association is explanatory, not a pre-computable scope condition for a new cell",
+  "limits": [
+    "Descriptive and circular for the purpose of predicting a NEW cell: main_share uses both cells' data.",
+    "25 cell pairs from 21 layouts; the cluster bootstrap has few clusters.",
+    "Ranking quality only, not regret-based decision value.",
+    "Unseen combination, not unseen drug; no dose dimension."
+  ],
+  "direction_note": "the pre-registered direction was positive; the observed association is NEGATIVE (-0.528). High potency share means the two cells differ mainly in which compounds are potent, which predicts LESS similar orderings and therefore worse transfer.",
+  "r26_interpretation_correction": "R26's 'transfer works because potency orderings correlate' must be read as 'transfer is better when potency profiles are SIMILAR', i.e. a low potency share of the between-cell difference."
+}

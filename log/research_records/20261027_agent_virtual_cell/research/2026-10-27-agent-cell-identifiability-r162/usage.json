@@ -1,0 +1,97 @@
+{
+  "experiment": "E162",
+  "round": "R162 (goal round 159/256)",
+  "date": "2026-10-27",
+  "type": "inner cross-validated lambda with the Spearman metric, redoing the budget curve",
+  "compute": {
+    "script": "e162_innerv.py",
+    "splits": 20,
+    "inner_folds": 3,
+    "lambda_grid": 8,
+    "budgets": 3,
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "results": "E162_RESULTS.json",
+    "rows": "E162_rows.csv",
+    "protocol": "PROTOCOL_E150.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "results": {
+    "all": {
+      "lam": 56.57,
+      "gain": 0.0213,
+      "ci95": [
+        0.0163,
+        0.0261
+      ]
+    },
+    "k400": {
+      "lam": 52.02,
+      "gain": 0.0223,
+      "ci95": [
+        0.0169,
+        0.0278
+      ]
+    },
+    "k120": {
+      "lam": 84.0,
+      "gain": 0.0216,
+      "ci95": [
+        0.0167,
+        0.0273
+      ]
+    },
+    "spread": 0.001,
+    "largest_mde": 0.0081,
+    "training_keys": [
+      72508,
+      8266,
+      2500
+    ]
+  },
+  "conclusion": "with a tuned penalty the pathway gain is flat at +0.021 across a 29-fold reduction in training keys, and resolvable at every budget",
+  "why_R160_differed": {
+    "fixed_lambda": 1.0,
+    "tuned_lambda_full": 53.82,
+    "reading": "lambda equal to 1 is badly under-regularised for 168 features, so the identity arm saturates and the annotation has no room; the inverted U was that artefact"
+  },
+  "restores": {
+    "C124": "the conclusion returns on a better footing; the original numbers stay withdrawn",
+    "C125": "same; conclusion restored, original evidence not"
+  },
+  "lambda_tracks_n": {
+    "pathway_arm": [
+      56.57,
+      52.02,
+      84.0
+    ],
+    "identity_arm": [
+      53.82,
+      28.92,
+      57.27
+    ],
+    "reading": "lambda does not fall as n falls, so the R161 convention is directionally supported, though the relation is noisy"
+  },
+  "standing_caveat": {
+    "what": "no round before this one tuned lambda; every ridge result in the programme used lambda equal to 1",
+    "still_valid": "arm-versus-arm comparisons at a common lambda, so ordering conclusions are not automatically damaged",
+    "may_not": "absolute magnitudes, and specifically the frozen claim's headline numbers have never been computed at a tuned penalty"
+  },
+  "limits": [
+    "Only ridge and one resource; three inner folds.",
+    "The evaluation pool is one_unseen, not the frozen claim's both-unseen cell.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "next_gate": "recompute the frozen claim's headline number on the both-unseen cell with inner-CV lambda; this is the most important re-check outstanding",
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

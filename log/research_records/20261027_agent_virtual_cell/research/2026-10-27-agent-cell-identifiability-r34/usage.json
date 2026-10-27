@@ -1,0 +1,44 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r34",
+  "round": "R34 (goal round 32/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Sequential active-learning test on the locally held GDSC screen; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r34": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the negative direction is unambiguous and the finite-pool caveat is stated as the main limit.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e034_sequential_al.py"], "runs": 1, "repeats": 10, "rounds": 5, "k": 50,
+    "bootstrap": 1000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E034_RESULTS.json", "rows": "E034_rows.csv", "protocol": "PROTOCOL_E034.md"},
+  "design": {
+    "pool": 21652, "pool_synergy_rate_stable": true, "k": 50, "rounds": 5, "repeats": 10,
+    "feedback": "selected keys' true synergy is merged into the training set and the ridge is refitted each round"
+  },
+  "results": {
+    "per_round_exploit": [0.096, 0.048, 0.074, 0.036, 0.022],
+    "per_round_mix": [0.092, 0.040, 0.050, 0.038, 0.046],
+    "per_round_explore": [0.016, 0.018, 0.036, 0.020, 0.018],
+    "per_round_random": [0.020, 0.012, 0.012, 0.014, 0.024],
+    "cumulative": {"exploit": 0.0552, "mix": 0.0532, "explore": 0.0216, "random": 0.0164},
+    "mix_minus_exploit_cumulative": {"diff": -0.0020, "ci95": [-0.0176, 0.0132]},
+    "explore_minus_exploit_cumulative": {"diff": -0.0336, "ci95": [-0.0440, -0.0232]},
+    "feedback_gain_exploit": {"first": 0.096, "last": 0.022, "diff": -0.074, "ci95": [-0.100, -0.042]}
+  },
+  "decisions": {"H085_feedback_improves_exploit": false, "H086_exploration_valuable_sequentially": false,
+                "H087_gap_widens_with_rounds": true,
+                "verdict": "sequential_feedback_does_not_change_the_answer"},
+  "mechanism": "signal depletion: the top-scoring candidates are consumed in the first rounds, so by round 5 exploitation falls below random (0.022 vs 0.024). The model is not degrading; the pool is.",
+  "finite_pool_caveat": "the pool is fixed at 21,652 already-measured keys; real discovery has an effectively unbounded candidate space where this depletion would not appear the same way, so only the first-k concentration transfers",
+  "synthesis_with_R33": "one-shot exploitation has real decision value (R33, 4.5x base rate); sequential feedback adds nothing and pure exploration never helps; the value sits in the first k picks",
+  "register_updates": {"C29": "new, exploratory: sequential feedback does not change the answer; exploitation exhausts its own signal in a fixed pool"},
+  "next_gates": ["a non-fixed pool or a much smaller k (5-10) would be needed to make the sequential test fair; both are outside this resource"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C29 added)", "research/INDEX.md (added R34 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "mechanism_claim_made": false
+  }
+}

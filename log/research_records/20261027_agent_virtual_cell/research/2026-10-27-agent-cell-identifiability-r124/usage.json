@@ -1,0 +1,62 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r124",
+  "round": "R124 (goal round 122/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "The harshest cell: both drugs unseen and the cell unseen, plus a fix to R123's pool definition."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r124": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round fixes a definitional conflation and finds the increment survives the harshest cell.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e124_hardest.py"], "runs": 1, "repeats": 200, "cells": 2, "arms": 4,
+    "rows": 400, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E124_RESULTS.json", "rows": "E124_rows.csv", "protocol": "PROTOCOL_E117.md"},
+  "results": {
+    "both_seen_cell": {"identity": 0.2430, "plus_path": 0.3287, "plus_tissue": 0.2910, "plus_random": 0.2557,
+                       "mde_80pct": 0.0421,
+                       "pathway": {"diff": 0.0858, "ci95": [0.0560, 0.1175]},
+                       "tissue": {"diff": 0.0480, "ci95": [0.0240, 0.0717]},
+                       "random": {"diff": 0.0127, "ci95": [-0.0062, 0.0312]}},
+    "both_unseen_cell": {"identity": 0.2570, "plus_path": 0.3077, "plus_tissue": 0.2807, "plus_random": 0.2642,
+                         "mde_80pct": 0.0341,
+                         "pathway": {"diff": 0.0508, "ci95": [0.0278, 0.0740]},
+                         "tissue": {"diff": 0.0238, "ci95": [0.0025, 0.0450]},
+                         "random": {"diff": 0.0072, "ci95": [-0.0117, 0.0263]}}
+  },
+  "decisions": {"H309_increment_survives_the_hardest_cell": true,
+                "H310_increment_disappears_when_cell_unseen": false,
+                "hardest_cell_underpowered": false,
+                "verdict": "pathway_increment_survives_an_unseen_cell_so_the_condition_is_about_drugs"},
+  "the_four_seed_record": {
+    "R122": {"gain": 0.0820, "ci95": [0.0507, 0.1128]},
+    "R123": {"gain": 0.0470, "ci95": [0.0175, 0.0783]},
+    "R124_seen_cell": {"gain": 0.0858, "ci95": [0.0560, 0.1175]},
+    "R124_unseen_cell": {"gain": 0.0508, "ci95": [0.0278, 0.0740]},
+    "summary": "four independent split sets, four positive and significant estimates, magnitudes from 4.7 to 8.6 pp, and the matched random block is never significant"},
+  "definitional_fix": {
+    "problem": "R123 coded both_unseen as au and bu without excluding unseen cells, which is not the C74/R101 definition",
+    "fix": "this round splits into both_seen_cell and both_unseen_cell",
+    "consequence": "the increment appears in both, so the conflation did not create the result, but the condition should be stated in terms of drugs only"},
+  "how_this_sits_with_R119": {
+    "R119": "holding out a whole tissue made the blocks worse than identity",
+    "R124": "holding out individual cells while the tissue level stays in training leaves the increment intact",
+    "reconciliation": "the blocks are useful only when the tissue level is in distribution",
+    "status": "a qualifier inferred from two rounds, not tested as a contrast in this round"},
+  "limits": ["dense criterion only, a quartile rather than a clinical endpoint",
+             "magnitudes range from 4.7 to 8.6 pp, so only the interval and direction should be quoted",
+             "the tissue-in-distribution qualifier was not tested directly here",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["test the tissue-in-distribution qualifier directly by contrasting unseen cells in known tissues with unseen tissues in one run"],
+  "register_updates": {"C95": "new: the increment survives an unseen cell, so the condition is about drugs",
+                       "C94": "annotated with the definitional fix", "SYNTHESIS": "evidence rows and headline updated"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C95 added, C94 annotated)",
+                                "research/SYNTHESIS.md (evidence rows and headline updated)",
+                                "research/INDEX.md (added R124 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

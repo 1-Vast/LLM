@@ -1,0 +1,50 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r73",
+  "round": "R73 (goal round 71/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Lambda sweep to test whether R72's negative was a tuning artefact."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r73": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round tries to rescue its own negative by tuning and reports that no lambda rescues it.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e073_lambda_sweep.py"], "runs": 1, "lambdas": 6, "repeats": 40,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E073_RESULTS.json", "rows": "E073_rows.csv", "protocol": "PROTOCOL_E070.md"},
+  "design": {
+    "scope": "joint cell+drug holdout, both_unseen pool, same construction as R72",
+    "lambdas": [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0],
+    "selection": "lambda is chosen on the search half only and reported on the eval half"
+  },
+  "results": {
+    "marginal_eval_hit": 0.0625,
+    "ridge_eval_hit_by_lambda": {"0.01": 0.0437, "0.1": 0.0437, "1": 0.0437, "10": 0.0450, "100": 0.0438, "1000": 0.0437},
+    "eval_gain_vs_marginal": {"0.01": -0.0187, "0.1": -0.0187, "1": -0.0187, "10": -0.0175, "100": -0.0187, "1000": -0.0187},
+    "search_gain_range": [-0.0563, -0.0488],
+    "best_lambda_on_search": 10.0
+  },
+  "decisions": {"H185_no_lambda_wins": true, "H186_best_lambda_does_not_win": true,
+                "best_lambda": 10.0,
+                "verdict": "R72_negative_is_not_a_tuning_artefact"},
+  "robustness_statement": "across five orders of magnitude of regularisation the annotation model never reaches the parameter-free marginal baseline; the search half points the same way (about -5 pp), so the gap is not an evaluation-set accident",
+  "inconsistency_disclosed": {
+    "issue": "the marginal baseline scores 6.25% here versus 7.25% in R72 for the same nominal pool",
+    "cause": "different random streams (same seed, different call order) give different splits",
+    "consequence": "absolute hit rates are not comparable across rounds; only within-round paired comparisons are trustworthy"
+  },
+  "limits": ["only six lambdas were swept",
+             "lambda is selected on the search half, never on eval",
+             "pool sizes and splits drift between rounds",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["the only remaining rescue would be finer features (pathway, target, expression), which are not available locally"],
+  "register_updates": {"C46": "tuning check appended", "C47": "new: the negative is independent of regularisation strength"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C46 annotated, C47 added)",
+                                "research/SYNTHESIS.md (tuning check noted)", "research/INDEX.md (added R73 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

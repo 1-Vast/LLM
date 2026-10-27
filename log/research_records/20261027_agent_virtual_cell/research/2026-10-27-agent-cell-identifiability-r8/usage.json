@@ -1,0 +1,42 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r8",
+  "round": "R8 (goal round 5/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Decision experiment on data in hand; no novelty claim requiring a literature check."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r8": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round's claim is a negative plus three self-diagnosed defects, all preserved in artifacts (invalid version kept). A challenger is required before any future decision-AL re-opening.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e009_decision_value.py (sign convention corrected)", "e009b_sigma_sensitivity.py (VOI vs sigma scaling)"],
+    "runs": "e009 2x (first run invalidated by sign bug), e009b 1x",
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {
+    "valid": "E009_RESULTS.json",
+    "invalid_signs_preserved": "E009_RESULTS_INVALID_SIGNS.json",
+    "invalid_per_cell": "E009_per_cell_INVALID_SIGNS.csv",
+    "sigma_sensitivity": "E009B_SIGMA_SENSITIVITY.json",
+    "protocol": "PROTOCOL_E009.md",
+    "corrections": "AMENDMENT_006_DESIGN_AND_SIGN_FIXES.md"
+  },
+  "self_corrections": [
+    "Sign bug: picks['exploit'] used argsort(-p), which selects the LARGEST predicted viability (the worst regimens). The same sign error affected contender and exploit_instab. First-run results renamed *_INVALID_SIGNS* and not cited.",
+    "VOI and exploit are analytically identical under a homoscedastic Gaussian prior: P(u is best) is a strictly decreasing function of p_u, so ranking by it equals ranking by p. Three arms agree to 0.0000 in the corrected run. E009 therefore does NOT test decision-theoretic active learning.",
+    "Replace-by-measurement is not a Bayesian update: swapping a multi-cell prior (sigma ~ 0.13/sqrt(13)) for a single-cell measurement (sigma ~ 0.03-0.04) lowers precision, which explains the k=1,2 penalty. Not evidence that acquisition is useless."
+  ],
+  "result": {
+    "verdict": "no acquisition strategy beats not buying / exploitation under this implementation",
+    "H013a_instability_decision_value": false,
+    "H013b_voi_decision_value": false,
+    "instability_minus_exploit_regret_by_k": {"1": -0.0170, "2": 0.0028, "4": 0.0087, "8": 0.0201},
+    "exploit_minus_none_hit_rate_by_k": {"1": -0.02, "2": 0.0, "4": 0.18, "8": 0.28}
+  },
+  "mutations_outside_episode": ["research/INDEX.md (added R8 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "claimed_active_learning_is_invalid": false
+  }
+}

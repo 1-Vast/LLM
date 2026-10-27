@@ -1,0 +1,43 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r16",
+  "round": "R16 (goal round 14/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Conformal test on data in hand; the conformal-prediction prior area was identified at snippet level in R15."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r16": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the result is a mixed but conservative one (pooled-valid bound, uninformative widths) and is reported with the per-layout heterogeneity visible.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e016_conformal.py"], "runs": 1, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E016_RESULTS.json", "units": "E016_units.csv", "protocol": "PROTOCOL_E016.md"},
+  "results": {
+    "units": 210, "layouts": 9,
+    "plain_conformal_coverage": {
+      "0.05": {"nominal": 0.95, "empirical": 0.943, "ci": [0.902, 0.978], "q_median": 0.1516},
+      "0.10": {"nominal": 0.90, "empirical": 0.900, "ci": [0.831, 0.960], "q_median": 0.0760},
+      "0.20": {"nominal": 0.80, "empirical": 0.800, "ci": [0.682, 0.901], "q_median": 0.0342},
+      "0.30": {"nominal": 0.70, "empirical": 0.714, "ci": [0.568, 0.839], "q_median": 0.0166},
+      "0.50": {"nominal": 0.50, "empirical": 0.533, "ci": [0.414, 0.636], "q_median": 0.0}
+    },
+    "per_layout_coverage_alpha_0.2_range": [0.0, 1.0],
+    "adaptive_conformal_coverage": {"0.05": 0.948, "0.10": 0.890, "0.20": 0.805, "0.30": 0.714, "0.50": 0.533},
+    "spread_vs_regret_spearman": {"point": -0.121, "ci": [-0.4445, 0.0884]},
+    "selective_prediction": {"aurc_width": 0.0394, "aurc_random": 0.0262, "diff": 0.0132}
+  },
+  "decisions": {"H032_coverage_valid_pooled": true, "H033_selective_better_than_random": false,
+                "H034_width_informative": false, "verdict": "valid_coverage_but_no_ordering"},
+  "scoping": "H032 passes only on the pre-registered pooled criterion; per-layout coverage spans 0.0-1.0, so it is NOT a per-layout guarantee and must not be reported as one.",
+  "register_updates": {
+    "C10": "revised: per-instance trustworthiness is not judgeable - hand-built logistic fails AND conformal widths cannot rank (abstaining by width is worse than random)",
+    "C14": "new: conformal gives a pooled-valid error bound (alpha=0.20: nominal 0.80, empirical 0.800, bound 0.0342) - the program's first calibrated uncertainty statement, exploratory and pooled-only"
+  },
+  "next_gate": "predict which layout will break coverage (Mondrian/group conformal) using layout-level observables; if that fails, conformal is usable only for coarse planning",
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C10 revised, C14 added)", "research/INDEX.md (added R16 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "drug_choice_evaluated": false, "mechanism_claim_made": false
+  }
+}

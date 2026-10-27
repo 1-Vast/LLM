@@ -1,0 +1,112 @@
+{
+  "kind": "can_prior_strength_be_estimated_ex_ante_from_tissue",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "m": 200,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "cells": 125,
+    "tissues": [
+      "Breast",
+      "Colon",
+      "Pancreas"
+    ]
+  },
+  "by_tissue": {
+    "Breast": {
+      "n": 51,
+      "prior": 0.17058823529411768,
+      "prior_ci": [
+        0.12450980392156862,
+        0.21666666666666667
+      ],
+      "sd": 0.17093170290739962,
+      "gain": -0.06078431372549019,
+      "gain_ci": [
+        -0.10098039215686275,
+        -0.025490196078431372
+      ]
+    },
+    "Colon": {
+      "n": 45,
+      "prior": 0.016666666666666666,
+      "prior_ci": [
+        0.008888888888888889,
+        0.025555555555555557
+      ],
+      "sd": 0.030151134457776372,
+      "gain": 0.04555555555555555,
+      "gain_ci": [
+        0.021111111111111112,
+        0.07666666666666666
+      ]
+    },
+    "Pancreas": {
+      "n": 29,
+      "prior": 0.12931034482758622,
+      "prior_ci": [
+        0.08448275862068964,
+        0.18275862068965515
+      ],
+      "sd": 0.13263621123969013,
+      "gain": 0.04827586206896552,
+      "gain_ci": [
+        0.020689655172413796,
+        0.07758620689655174
+      ]
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r115/PROTOCOL_E110.md": "fd7f868fc23ff3c4fa729176f53facf35cb2f677b5bf3968234b5785497c307c",
+    "research/2026-10-27-agent-cell-identifiability-r115/e115_ex_ante.py": "704f7651f71a9b8f821be8eb17acdb2617c8aee183d661135b87186059ecc2f5"
+  },
+  "variance": {
+    "grand_prior": 0.10560000000000001,
+    "icc_tissue": 0.2276610721722194,
+    "min_tissue_prior": 0.016666666666666666,
+    "max_tissue_prior": 0.17058823529411768
+  },
+  "decisions": {
+    "icc": 0.2276610721722194,
+    "tissue_spread_crosses_11pct": true,
+    "H288_tissue_identifies_regime": false,
+    "H289_tissue_cannot": true,
+    "verdict": "regime_is_largely_idiosyncratic_so_ex_ante_application_fails"
+  },
+  "limits": [
+    "Only three tissues, so the between-group estimate is very coarse.",
+    "Tissue and prior strength may both be confounded with other cell properties.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "what_the_data_shows": {
+    "tissue_level_pattern_matches_C85_in_two_of_three": {
+      "Colon": {
+        "prior": 0.0167,
+        "gain": 0.0456,
+        "predicted": "positive, since the prior is far below 11%"
+      },
+      "Breast": {
+        "prior": 0.1706,
+        "gain": -0.0608,
+        "predicted": "negative, since the prior is far above 11%"
+      },
+      "Pancreas": {
+        "prior": 0.1293,
+        "gain": 0.0483,
+        "predicted": "about zero or slightly negative, but observed strongly positive"
+      },
+      "score": "2 of 3 agree in sign with the C85 rule, and both agreements are significant"
+    },
+    "but_the_decisive_problem_is_within_tissue_spread": {
+      "Breast_sd": 0.1709,
+      "Breast_mean": 0.1706,
+      "reading": "the standard deviation of prior strength inside Breast equals its mean, so some Breast cells sit near 2% and others near 30%. A tissue-level rule cannot assign a particular cell to a regime when the within-group spread is that large."
+    },
+    "icc": 0.2277,
+    "honest_verdict": "ex ante application by tissue is not established. Tissue is not uninformative, but the regime a cell is in is largely idiosyncratic, so knowing the tissue does not tell you whether to personalise."
+  }
+}

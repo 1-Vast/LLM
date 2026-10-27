@@ -1,0 +1,46 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r11",
+  "round": "R11 (goal round 8/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Prediction experiment on the corrected dose-grid object; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r11": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the main results are a strong descriptive prediction, a small boundary shift and a negative for the GP; the two degenerate arms are disclosed rather than claimed. A challenger is warranted before any of these is upgraded.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e012_dose_grid.py (comparators + boundary)", "e012b_gp_tuning.py (GP inner search + EB shrinkage)"],
+    "runs": "2", "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {
+    "main": "E012_RESULTS.json", "per_prediction": "E012_per_prediction.csv", "boundary": "E012_boundary.csv",
+    "gp_tuned": "E012B_GP_TUNED.json", "protocol": "PROTOCOL_E012.md"
+  },
+  "results": {
+    "heldout_units": 210, "compound_pairs": 29, "layouts": 9,
+    "comparators": {
+      "mean_surface": {"hit_at3": 0.671, "regret": 0.0259, "rank_corr": 0.812},
+      "gp_tuned_L1.0_n0.02": {"hit_at3": 0.481, "regret": 0.0558, "rank_corr": 0.799},
+      "gp_fixed": {"hit_at3": 0.386, "regret": 0.0720, "rank_corr": 0.793},
+      "random": {"hit_at3": 0.044, "regret": 0.4866},
+      "corners": {"hit_at3": 0.000, "regret": 0.6933}
+    },
+    "boundary_movement": {"within_cell": 0.810, "cross_cell": 0.725, "drop": 0.086,
+                          "ci95_layout_clustered": [0.0376, 0.1369], "frac_units_with_drop": 0.808, "n_units": 26},
+    "chance_hit_at3": 0.0476
+  },
+  "decisions": {"H020_gp_adds_rank_corr": false, "H020b_static_is_enough": true,
+                "H021_boundary_moves": true, "H022_predictability_exists": true},
+  "disclosed_degenerate_arms": [
+    "hier == mean_surface: a held-out cell has no estimable cell effect, so the additive hierarchical model collapses into the cross-cell mean. The hierarchical/retrained comparator was therefore NOT actually tested.",
+    "shrunk_w == mean_surface for all w: grand + w*grid_effect is an affine transform, so argmin and rank correlation are invariant. Shrinkage is a no-op for these metrics."
+  ],
+  "heterogeneity": {"per_layout_hit_at3_range": [0.0, 0.857], "per_compound_pair_hit_at3_range": [0.0, 1.0],
+                    "note": "four pairs perfectly predictable (hit 1.0, regret ~0), three pairs at 0 with n=3"},
+  "mutations_outside_episode": ["research/INDEX.md (added R11 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "drug_choice_evaluated": false, "mechanism_claim_made": false
+  }
+}

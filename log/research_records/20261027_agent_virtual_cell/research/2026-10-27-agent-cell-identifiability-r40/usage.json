@@ -1,0 +1,41 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r40",
+  "round": "R40 (goal round 38/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Fixed-dimension strength manipulation attempt on the locally held GDSC screen."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r40": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round reports its own manipulation as failed and explicitly labels the hypothesis untested rather than negative.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e040_noise_sweep.py"], "runs": 1, "noise_levels": 6, "repeats": 40,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E040_RESULTS.json", "rows": "E040_rows.csv", "protocol": "PROTOCOL_E040.md"},
+  "design": {
+    "fixed_features": 41, "manipulation": "replace a fraction of TRAINING labels with resampled values",
+    "noise_levels": [0.0, 0.15, 0.30, 0.50, 0.70, 0.90]
+  },
+  "results": {
+    "prediction_rho_by_noise": {"0.0": 0.3252, "0.15": 0.3249, "0.30": 0.3241,
+                                "0.50": 0.3231, "0.70": 0.3177, "0.90": 0.2731},
+    "rho_span": 0.0521, "required_span": 0.15,
+    "valid_control_noise0": {"k50_search": 0.028, "k50_eval": 0.051}
+  },
+  "decisions": {"H103_strength_manipulated_cleanly": false, "H104_intermediate_band": null,
+                "H105_weak_end_no_difference": null,
+                "verdict_reported": "manipulation_failed_hypothesis_untested",
+                "script_verdict_is_misleading": "no_intermediate_band_relationship"}
+  ,
+  "why_manipulation_failed": "86,607 training rows against 41 parameters: even at 90% corruption about 8,660 clean labels remain, so ridge averages the noise out",
+  "methodological_conclusion": "at n much greater than p, training-label noise is not a valid strength manipulation; use training-set size or feature noise instead",
+  "register_updates": {"C33": "annotated as UNTESTED rather than refuted; R39 confounded dimension with strength and R40's manipulation did not move strength"},
+  "next_gates": ["manipulate strength by TRAINING-SET SIZE (200/500/2000/8000/86000) at fixed 41 features - the only clean path identified"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C33 annotated as untested)", "research/INDEX.md (added R40 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "mechanism_claim_made": false
+  }
+}

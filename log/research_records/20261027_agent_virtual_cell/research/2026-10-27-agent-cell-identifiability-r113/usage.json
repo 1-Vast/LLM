@@ -1,0 +1,47 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r113",
+  "round": "R113 (goal round 111/256)",
+  "date": "2026-10-27",
+  "RUN_INVALID": true,
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Attempt to make the R112 conditional rule actionable by an online probe-and-decide agent."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r113": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round is invalidated by a degeneracy signature, and it records a new standing check rather than a scientific result.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e113_agent_rule.py"], "runs": 1, "cells": 125, "units": 750,
+    "sanity_checks": 750, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E113_RESULTS_INVALID.json", "rows": "E113_rows_INVALID.csv",
+                "protocol": "PROTOCOL_E108.md"},
+  "design_bug": {
+    "symptom": "the probe-estimated prior accuracy is 1.33 to 1.67 percent against a true 9 to 11 percent, and the decision to personalise fires in 94 to 97 percent of cases",
+    "cause": "PROBE was set to 20, exactly equal to K, so taking the top-K of a 20-key probe selects every probe key and the estimate becomes the pool base rate of about 1.4 percent",
+    "consequence": "the adaptive arm collapses onto the always-personalise arm, so the agent question is not answered",
+    "fix": "the probe must be materially larger than K, for example 100 keys for K=20"},
+  "what_is_still_informative": {
+    "oracle": 0.1302, "best_fixed": 0.1046, "oracle_gap": 0.0271,
+    "reading": "if the agent knew which action was better per cell it would gain 2.71 pp, so the decision itself has value; this round simply failed to inform it"},
+  "decisions": {"H286_adaptive_beats_both_fixed": "not testable - invalid design",
+                "H287_adaptive_fails_to_beat_both": "withdrawn",
+                "verdict": "RUN_INVALID_probe_equals_k_so_the_estimate_is_the_base_rate"},
+  "recurring_pattern": {
+    "R104": "identity and identity+gene identical - three changes made at once",
+    "R108": "personalisation arm identical to prior - a constant cannot reorder",
+    "R113": "decision rate 94 to 97 percent - probe equals K so the estimate is the base rate",
+    "common_fault": "not asking in advance whether the quantity can carry the intended information: whether the change can alter the result, or whether the estimate can reflect what it is meant to estimate",
+    "new_standing_check": "any estimator must be shown to be non-degenerate by design before it is allowed to drive a decision"},
+  "limits": ["the agent question is unanswered",
+             "probe size 20 and threshold 9.5 percent were both unvalidated choices",
+             "the two prior levels bracket the threshold rather than sampling it",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["rerun with a 100-key probe and K=20, first checking that the estimate lands near 9-11 percent, then whether the adaptive arm beats both fixed strategies"],
+  "register_updates": {"C86": "new: the run is invalid and the estimator was degenerate by construction"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C86 added)", "research/INDEX.md (added R113 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

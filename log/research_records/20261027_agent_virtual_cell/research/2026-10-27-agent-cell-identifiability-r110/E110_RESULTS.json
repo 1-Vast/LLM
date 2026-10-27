@@ -1,0 +1,191 @@
+{
+  "kind": "higher_power_personalisation_penalty_on_a_strong_prior",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "ms": [
+      10,
+      25,
+      50,
+      100,
+      200
+    ],
+    "draws": 120,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "units": 575,
+    "sanity_checks": 1150,
+    "top_k_changed": 1150,
+    "sanity_passed": true
+  },
+  "by_m": {
+    "10": {
+      "n": 115,
+      "marginal_prior": 0.08434782608695653,
+      "marginal_pers": 0.09086956521739131,
+      "combo_prior": 0.10999999999999999,
+      "combo_pers": 0.1017391304347826,
+      "marginal_gain": {
+        "n": 115,
+        "mean_diff": 0.006521739130434785,
+        "ci95": [
+          -0.004347826086956522,
+          0.017826086956521735
+        ]
+      },
+      "combo_gain": {
+        "n": 115,
+        "mean_diff": -0.008260869565217394,
+        "ci95": [
+          -0.02043478260869565,
+          0.002173913043478258
+        ]
+      }
+    },
+    "25": {
+      "n": 115,
+      "marginal_prior": 0.08608695652173914,
+      "marginal_pers": 0.08869565217391305,
+      "combo_prior": 0.11,
+      "combo_pers": 0.09652173913043478,
+      "marginal_gain": {
+        "n": 115,
+        "mean_diff": 0.002608695652173913,
+        "ci95": [
+          -0.01391304347826087,
+          0.01956521739130435
+        ]
+      },
+      "combo_gain": {
+        "n": 115,
+        "mean_diff": -0.013478260869565217,
+        "ci95": [
+          -0.03304347826086956,
+          0.0034782608695652175
+        ]
+      }
+    },
+    "50": {
+      "n": 115,
+      "marginal_prior": 0.08695652173913045,
+      "marginal_pers": 0.08608695652173914,
+      "combo_prior": 0.11130434782608696,
+      "combo_pers": 0.09260869565217392,
+      "marginal_gain": {
+        "n": 115,
+        "mean_diff": -0.0008695652173913046,
+        "ci95": [
+          -0.020869565217391303,
+          0.019130434782608695
+        ]
+      },
+      "combo_gain": {
+        "n": 115,
+        "mean_diff": -0.018695652173913044,
+        "ci95": [
+          -0.0400108695652174,
+          0.002173913043478258
+        ]
+      }
+    },
+    "100": {
+      "n": 115,
+      "marginal_prior": 0.09130434782608696,
+      "marginal_pers": 0.0965217391304348,
+      "combo_prior": 0.11043478260869564,
+      "combo_pers": 0.10652173913043478,
+      "marginal_gain": {
+        "n": 115,
+        "mean_diff": 0.005217391304347825,
+        "ci95": [
+          -0.011750000000000002,
+          0.022173913043478256
+        ]
+      },
+      "combo_gain": {
+        "n": 115,
+        "mean_diff": -0.003913043478260868,
+        "ci95": [
+          -0.026086956521739126,
+          0.01565217391304348
+        ]
+      }
+    },
+    "200": {
+      "n": 115,
+      "marginal_prior": 0.0908695652173913,
+      "marginal_pers": 0.10652173913043478,
+      "combo_prior": 0.1117391304347826,
+      "combo_pers": 0.12478260869565219,
+      "marginal_gain": {
+        "n": 115,
+        "mean_diff": 0.01565217391304348,
+        "ci95": [
+          -0.0021739130434782583,
+          0.03304347826086957
+        ]
+      },
+      "combo_gain": {
+        "n": 115,
+        "mean_diff": 0.013043478260869565,
+        "ci95": [
+          -0.00652173913043478,
+          0.03173913043478261
+        ]
+      }
+    }
+  },
+  "files": {},
+  "thresholds": {
+    "marginal": null,
+    "combo": null
+  },
+  "decisions": {
+    "sanity_passed": true,
+    "H279_bar_raised": false,
+    "H280_bar_lowered": false,
+    "H281_same": true,
+    "verdict": "strong_prior_penalised_for_m_at_or_below_100_ambiguous_at_200",
+    "H282_penalty_becomes_significant": false,
+    "H283_still_not_significant": true
+  },
+  "limits": [
+    "Per-drug residuals from m measured keys are noisy for small m.",
+    "Only five m values and 30 draws, so thresholds are coarse and low-powered.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "two_round_consistency": {
+    "combo_gains_R109": [
+      -0.0179,
+      -0.0214,
+      -0.0232,
+      -0.0036,
+      -0.0054
+    ],
+    "combo_gains_R110": [
+      -0.0083,
+      -0.0135,
+      -0.0187,
+      -0.0039,
+      0.013
+    ],
+    "m_at_or_below_100": "negative in 8 of 8 round-by-m combinations",
+    "m_200": "R109 -0.0054, R110 +0.0130: the sign flips, so m=200 is unresolved",
+    "reading": "the penalty on the strong prior for small personal samples is reproducible; the recovery at 200 is not yet established"
+  },
+  "the_decision_rule_it_supports": "with a prior already reaching about 11%, correcting it with 100 or fewer of a cell's own measurements reliably makes it worse by 0.4 to 2.3 pp; 200 measurements may help but that is not established",
+  "marginal_prior_shape": {
+    "gains": [
+      0.0065,
+      0.0026,
+      -0.0009,
+      0.0052,
+      0.0157
+    ],
+    "reading": "no clean shape: positive at m=10 and m=200, slightly negative at m=50, and no interval excludes zero"
+  },
+  "still_no_significant_threshold": "no m reaches significance for either prior even at 575 units, so the rule above is a direction-of-effect statement, not a tested threshold"
+}

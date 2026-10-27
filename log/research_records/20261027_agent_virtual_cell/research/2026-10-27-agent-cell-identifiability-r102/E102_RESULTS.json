@@ -1,0 +1,112 @@
+{
+  "kind": "equal_budget_three_way_for_a_conditional_rule",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "repeats": 70,
+    "holdout": 0.2,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 420
+  },
+  "by_pool": {
+    "one_unseen": {
+      "n": 70,
+      "marginal": 0.06285714285714285,
+      "identity": 0.08499999999999998,
+      "identity_pathway": 0.11285714285714284,
+      "combo_minus_marginal": {
+        "n": 70,
+        "mean_diff": 0.04999999999999999,
+        "ci95": [
+          0.02714285714285714,
+          0.07214285714285713
+        ]
+      },
+      "marginal_minus_combo": {
+        "n": 70,
+        "mean_diff": -0.04999999999999999,
+        "ci95": [
+          -0.07357142857142855,
+          -0.025714285714285714
+        ]
+      }
+    },
+    "cell_unseen": {
+      "n": 70,
+      "marginal": 0.07499999999999997,
+      "identity": 0.08785714285714286,
+      "identity_pathway": 0.10214285714285712,
+      "combo_minus_marginal": {
+        "n": 70,
+        "mean_diff": 0.027142857142857142,
+        "ci95": [
+          0.003571428571428569,
+          0.049999999999999996
+        ]
+      },
+      "marginal_minus_combo": {
+        "n": 70,
+        "mean_diff": -0.027142857142857142,
+        "ci95": [
+          -0.04928571428571429,
+          -0.003571428571428572
+        ]
+      }
+    },
+    "both_unseen": {
+      "n": 70,
+      "marginal": 0.011428571428571429,
+      "identity": 0.010714285714285714,
+      "identity_pathway": 0.031428571428571424,
+      "combo_minus_marginal": {
+        "n": 70,
+        "mean_diff": 0.02,
+        "ci95": [
+          0.003571428571428572,
+          0.038571428571428576
+        ]
+      },
+      "marginal_minus_combo": {
+        "n": 70,
+        "mean_diff": -0.02,
+        "ci95": [
+          -0.039285714285714285,
+          -0.003571428571428572
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r102/PROTOCOL_E097.md": "cb6ff6c04047f2459948e6e113d473a469b11cecfebefa82ce7faa6cfae5be0e",
+    "research/2026-10-27-agent-cell-identifiability-r102/e102_three_way.py": "c76ba6fc8c9449e2502f50c4f486d0a84193efb17dacc1bba52633773d2719ed"
+  },
+  "decisions": {
+    "H263_combo_beats_marginal_when_drugs_unseen": true,
+    "H264_marginal_not_worse_when_combos_novel": false,
+    "H265_conditional_rule_holds": false,
+    "verdict": "combo_dominates_marginals_in_all_three_pools"
+  },
+  "limits": [
+    "The three pools share one training set.",
+    "The both-unseen pool is small.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "criterion_bug": {
+    "H264_as_written": "marginal - combo CI contains 0 or is positive",
+    "what_the_code_checked": "ci95[0] <= 0, which is also true for an entirely negative interval",
+    "observed": "in one_unseen, marginal - combo = -5.00 pp [-7.36, -2.57], an interval entirely below zero",
+    "so_H264_is": false,
+    "consequence": "the pre-registered conditional rule ('marginals when drugs are seen') does not hold, because the combined model beats marginals there too"
+  },
+  "corrected_reading": {
+    "one_unseen": "+5.00 pp for identity+pathway over marginals [+2.71,+7.21]",
+    "cell_unseen": "+2.71 pp [+0.36,+5.00]",
+    "both_unseen": "+2.00 pp [+0.36,+3.86]",
+    "conclusion": "identity+pathway is significantly better than the marginal predictor in every pool tested, so there is no condition under which the programme's previously recommended algorithm is preferable"
+  }
+}

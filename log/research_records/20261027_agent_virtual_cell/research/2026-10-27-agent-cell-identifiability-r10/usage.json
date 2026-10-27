@@ -1,0 +1,41 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r10",
+  "round": "R10 (goal round 7/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Resource audit plus a readout-channel check using files already on disk; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r10": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round is an audit/correction with one robustness check; the correction was itself prompted by the R7 challenger, which had already flagged 'drug pair' as over-specified.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e011_adequacy_and_channel.py"],
+    "runs": 1,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E011_RESULTS.json", "protocol": "PROTOCOL_E011.md"},
+  "corrections": [
+    "The analysed unit is a DOSE COMBINATION, not a compound pair: each validation file holds 252 double-drug wells, only 4 compound pairs, each a 7x9 dose grid. Across the 9 analysed layouts there are 29 distinct compound pairs and 23 compounds.",
+    "R6's 'reversal concentrates on the drug-pair side (ICC 0.294)' mislabels the grouping: it was over unit pairs (pairs of dose combinations), not compound pairs. No compound-level conclusion is supportable.",
+    "R7's challenger had already flagged that 'drug pair' over-specifies (it is a regimen crossing its partners'); this round's audit confirms it."
+  ],
+  "adequacy_verdict": {
+    "drug_x_cell_crossing": "met (18 multi-cell layouts, 54,642 comparable units, but only 29 compound pairs)",
+    "target_engagement_or_genetic_reference": "NOT met (annotation usable for 2 of 23 compounds; 0 of 29 compound pairs both-annotated; 0 same-mechanism pairs; whole annotation table only 2.74% usable 'moa')",
+    "independent_functional_endpoint": "NOT met (single normalised viability readout)",
+    "replication": "NOT met beyond duplicate plates (no batch key; 0/2457 identity overlap across layouts)"
+  },
+  "readout_channel_robustness": {
+    "reversal_rate_viability": 0.0329, "reversal_rate_rawcount": 0.0330,
+    "difference": 0.0001, "ci95_layout_clustered": [0.0000128, 0.0002],
+    "n_pairs": 2285376,
+    "interpretation": "not a normalisation artefact; the difference is 1/300 of the effect of interest"
+  },
+  "consequence": "mechanism inference and unseen-drug transfer are not addressable with this resource; only dose-combination ordering questions remain",
+  "mutations_outside_episode": ["research/INDEX.md (added R10 row; annotated R6 and R7 wording)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "mechanism_claim_made": false
+  }
+}

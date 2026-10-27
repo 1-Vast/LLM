@@ -1,0 +1,56 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r33",
+  "round": "R33 (goal round 31/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Budgeted decision evaluation on the locally held GDSC screen; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r33": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round's own sign check caught the first-run error, and the exploration result is reported with its condition (k>=50) and its caveat (rank-sum heuristic, not EI).",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e033_decision.py"], "runs": "2 (sign-inverted first run preserved as INVALID)",
+    "repeats": 10, "bootstrap": 1000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {
+    "results": "E033_RESULTS.json", "rows": "E033_rows.csv",
+    "invalid_first_run": ["E033_RESULTS_INVALID_SIGNS.json", "E033_rows_INVALID_SIGNS.csv"],
+    "protocol": "PROTOCOL_E033.md", "correction": "AMENDMENT_014_SIGN_INVERSION.md"
+  },
+  "sign_error": {
+    "what": "the first run treated lower SYNERGY_DELTA_AUC as more synergistic; the column is EXP - OBS so POSITIVE means synergism (Syngery=True mean +0.1445 vs False -0.0034, corr +0.449)",
+    "symptom": "exploit scored exactly 0.0000 on the binary flag and was significantly worse than random",
+    "fix": "exploit selects the highest predicted delta_AUC; strong = top decile",
+    "precedent": "third sign/direction error in the programme (R7 argsort, R9 prior variance, R22 paired direction), each caught by an implausible result rather than by process"
+  },
+  "results": {
+    "keys": 108259, "cells": 125, "base_synergy_rate": 0.0143,
+    "exploit_precision_syn": {"k20": 0.065, "k50": 0.072, "k100": 0.063, "k200": 0.0555},
+    "random_precision_syn": {"k20": 0.015, "k50": 0.022, "k100": 0.014, "k200": 0.0155},
+    "exploit_minus_random_pp": {"k20": [0.050, 0.015, 0.090], "k50": [0.050, 0.034, 0.064],
+                                "k100": [0.049, 0.034, 0.068], "k200": [0.040, 0.0325, 0.047]},
+    "explore_precision_syn": {"k20": 0.015, "k50": 0.026, "k100": 0.025, "k200": 0.0295},
+    "mix_precision_syn": {"k20": 0.045, "k50": 0.110, "k100": 0.090, "k200": 0.068},
+    "mix_minus_exploit_pp": {"k20": [-0.020, -0.040, 0.005], "k50": [0.038, 0.006, 0.068],
+                             "k100": [0.027, 0.009, 0.045], "k200": [0.0125, 0.002, 0.021]}
+  },
+  "decisions": {
+    "H082_exploit_beats_random": true,
+    "H083_exploration_beats_exploit_at_every_k": false,
+    "H083_note": "pure explore is significantly WORSE at all four k; the mix strategy beats exploit only at k>=50",
+    "H084_stable_across_k": true,
+    "verdict_reported": "exploitation_has_real_decision_value_and_a_mix_adds_a_small_gain_at_larger_budgets"
+  },
+  "significance": "first positive decision result in the programme measured on realised outcomes rather than a ranking proxy; it reopens the decision line that R8/R9 had stopped on BATCHIE for lack of power",
+  "limit_not_claimed": ["one-shot budgeted selection, not sequential active learning", "retrospective", "annotation features only", "mix is a rank-sum heuristic, not EI", "base rate 1.43% so 4.5x is still only 6.5%"],
+  "register_updates": {"C27": "new: exploitation has real decision value", "C28": "new: pure exploration is worse; a mix helps only at k>=50",
+                       "decision_line": "reopened on GDSC and completed for the one-shot case; sequential AL still untested"},
+  "next_gates": ["sequential active learning on GDSC (reveal the candidate pool in batches, update between batches) - the only untested link"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C27, C28 added; decision-line stop replaced)",
+                                "research/INDEX.md (added R33 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "mechanism_claim_made": false
+  }
+}

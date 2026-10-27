@@ -1,0 +1,57 @@
+{
+  "kind": "gdsc_external_synergy_combination_vs_cell",
+  "input_sha256": {
+    "Original screen_All tissues_fitted data.csv": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278"
+  },
+  "settings": {
+    "metric": "SYNERGY_DELTA_AUC",
+    "n_perm": 200,
+    "n_split": 20,
+    "seed": 20261027
+  },
+  "audit": {
+    "rows": 296707,
+    "cells": 125,
+    "tissues": 3,
+    "combos": 2025,
+    "units": 4628,
+    "cells_per_unit_median": 45.0,
+    "grand_mean": 0.001259401134830656,
+    "total_var": 0.0033348983360123163
+  },
+  "results": {
+    "between_unit_share": 0.304120433617072,
+    "within_unit_sd_median": 0.04399743703039635,
+    "split_half_reliability": {
+      "mean": 0.904198119803252,
+      "ci95": [
+        0.9006686151135636,
+        0.9074424144934785
+      ],
+      "n_splits": 20
+    },
+    "permutation_null": {
+      "mean": 0.0155635224652423,
+      "q975": 0.016170900170168548
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r28/PROTOCOL_E028.md": "11164fca0e9d19ad3c2d048ed5a6cfc1da01519ea5b2341889f540317f6d3824",
+    "research/2026-10-27-agent-cell-identifiability-r28/e028_gdsc_synergy.py": "346beba1c49e1da772c78ecfa3129731c13dcc9b37f2ac648c6a6664e0dca38a"
+  },
+  "decisions": {
+    "H067_combination_is_the_main_property": false,
+    "H068_beats_permutation_null": true,
+    "H069_cell_variation_is_not_negligible": true,
+    "verdict": "synergy_is_mainly_a_cell_property",
+    "verdict_mechanical": "synergy_is_mainly_a_cell_property",
+    "verdict_reported": "combination_component_reliable_but_cell_variance_larger",
+    "false_dichotomy_note": "H067 required BOTH a >=0.50 variance share and a >=0.70 reliability. The reliability passed strongly (0.904) while the share did not (0.304); the 0.50 threshold had no theoretical basis, so the binary verdict misrepresents a continuous fact. See AMENDMENT-012."
+  },
+  "limits": [
+    "GDSC uses a single concentration pair per row, not a dose grid; this is a different design from BATCHIE.",
+    "SYNERGY_DELTA_AUC is a model-fitted quantity, not a raw measurement.",
+    "Only three tissues; tissue is not a cell line.",
+    "Descriptive external check; no mechanism, no clinical or drug-choice claim."
+  ]
+}

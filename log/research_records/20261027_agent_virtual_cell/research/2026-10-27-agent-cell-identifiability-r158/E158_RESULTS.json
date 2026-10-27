@@ -1,0 +1,152 @@
+{
+  "kind": "validate_the_expected_uninformative_whitelist",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "seed": 20261060,
+    "n_held_drugs": 10,
+    "n_eval": 1867
+  },
+  "audit": {
+    "keys": 108259
+  },
+  "cases": {
+    "r157_no_whitelist": {
+      "passed": true,
+      "expected": true,
+      "ok": true,
+      "flags": [],
+      "suppressed": []
+    },
+    "r157_with_pathway_whitelisted": {
+      "passed": true,
+      "expected": true,
+      "ok": true,
+      "flags": [],
+      "suppressed": []
+    },
+    "r138_masked_no_whitelist": {
+      "passed": false,
+      "expected": false,
+      "ok": true,
+      "flags": [
+        "feature a_Dabrafenib: SENTINEL_OUTSIDE_VOCAB -1 on 0.072 of rows",
+        "feature a_Dasatinib: SENTINEL_OUTSIDE_VOCAB -1 on 0.047 of rows",
+        "feature a_Gemcitabine: SENTINEL_OUTSIDE_VOCAB -1 on 0.225 of rows",
+        "feature a_OSI-027: SENTINEL_OUTSIDE_VOCAB -1 on 0.221 of rows",
+        "feature a_PD173074: SENTINEL_OUTSIDE_VOCAB -1 on 0.174 of rows",
+        "feature a_SB216763: SENTINEL_OUTSIDE_VOCAB -1 on 0.072 of rows",
+        "feature a_SB505124: SENTINEL_OUTSIDE_VOCAB -1 on 0.072 of rows",
+        "feature a_SCH772984: SENTINEL_OUTSIDE_VOCAB -1 on 0.118 of rows",
+        "feature b_Dabrafenib: SENTINEL_OUTSIDE_VOCAB -1 on 0.148 of rows",
+        "feature b_Dasatinib: SENTINEL_OUTSIDE_VOCAB -1 on 0.045 of rows",
+        "feature b_Gemcitabine: SENTINEL_OUTSIDE_VOCAB -1 on 0.091 of rows",
+        "feature b_JQ1: SENTINEL_OUTSIDE_VOCAB -1 on 0.076 of rows",
+        "feature b_OSI-027: SENTINEL_OUTSIDE_VOCAB -1 on 0.100 of rows",
+        "feature b_PD173074: SENTINEL_OUTSIDE_VOCAB -1 on 0.054 of rows",
+        "feature b_SB216763: SENTINEL_OUTSIDE_VOCAB -1 on 0.149 of rows",
+        "feature b_SB505124: SENTINEL_OUTSIDE_VOCAB -1 on 0.071 of rows",
+        "feature b_SCH772984: SENTINEL_OUTSIDE_VOCAB -1 on 0.190 of rows",
+        "feature b_Tozasertib: SENTINEL_OUTSIDE_VOCAB -1 on 0.077 of rows"
+      ],
+      "suppressed": []
+    },
+    "r138_masked_whitelisted": {
+      "passed": true,
+      "expected": true,
+      "ok": true,
+      "flags": [],
+      "suppressed": [
+        "feature a_Dabrafenib: SENTINEL_OUTSIDE_VOCAB -1 on 0.072 of rows",
+        "feature a_Dasatinib: SENTINEL_OUTSIDE_VOCAB -1 on 0.047 of rows",
+        "feature a_Gemcitabine: SENTINEL_OUTSIDE_VOCAB -1 on 0.225 of rows",
+        "feature a_OSI-027: SENTINEL_OUTSIDE_VOCAB -1 on 0.221 of rows",
+        "feature a_PD173074: SENTINEL_OUTSIDE_VOCAB -1 on 0.174 of rows",
+        "feature a_SB216763: SENTINEL_OUTSIDE_VOCAB -1 on 0.072 of rows",
+        "feature a_SB505124: SENTINEL_OUTSIDE_VOCAB -1 on 0.072 of rows",
+        "feature a_SCH772984: SENTINEL_OUTSIDE_VOCAB -1 on 0.118 of rows",
+        "feature b_Dabrafenib: SENTINEL_OUTSIDE_VOCAB -1 on 0.148 of rows",
+        "feature b_Dasatinib: SENTINEL_OUTSIDE_VOCAB -1 on 0.045 of rows",
+        "feature b_Gemcitabine: SENTINEL_OUTSIDE_VOCAB -1 on 0.091 of rows",
+        "feature b_JQ1: SENTINEL_OUTSIDE_VOCAB -1 on 0.076 of rows",
+        "feature b_OSI-027: SENTINEL_OUTSIDE_VOCAB -1 on 0.100 of rows",
+        "feature b_PD173074: SENTINEL_OUTSIDE_VOCAB -1 on 0.054 of rows",
+        "feature b_SB216763: SENTINEL_OUTSIDE_VOCAB -1 on 0.149 of rows",
+        "feature b_SB505124: SENTINEL_OUTSIDE_VOCAB -1 on 0.071 of rows",
+        "feature b_SCH772984: SENTINEL_OUTSIDE_VOCAB -1 on 0.190 of rows",
+        "feature b_Tozasertib: SENTINEL_OUTSIDE_VOCAB -1 on 0.077 of rows"
+      ]
+    },
+    "prediction_alarm_with_whitelist": {
+      "passed": false,
+      "expected": false,
+      "ok": true,
+      "flags": [
+        "arm dead: CONSTANT_PREDICTION"
+      ],
+      "suppressed": []
+    },
+    "split_alarm_with_whitelist": {
+      "passed": false,
+      "expected": false,
+      "ok": true,
+      "flags": [
+        "split: evaluation keys overlap training (1.000)"
+      ],
+      "suppressed": []
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r158/PROTOCOL_E147_ext.md": "fbedaa635d6c938536ae7ac6d9921902dacace2203cf5c1897c237e65e7cb467",
+    "research/2026-10-27-agent-cell-identifiability-r158/e158_whitelist.py": "4334d5dee03284a7cf1c2c39d1999c01be8e3707876a3c3ed5b01c4e565cec86",
+    "research/tools/feature_audit.py": "33218b72b83b8ead5c2b8f0b2bdfd2fbf37f3d303257469c04fb74c04b4f9eb4"
+  },
+  "the_danger_it_introduces": {
+    "case": "r138_masked_whitelisted",
+    "what_happens": "the masked identity block is declared expected, so the audit passes. But that block still enters the model and still consumes splits, which is precisely the defect that cost two rounds to find in R147 and R148.",
+    "so": "the whitelist buys quiet at the price of trusting the declaration of intent, and intent declarations can be wrong"
+  },
+  "what_still_works": {
+    "prediction_level": "a constant arm is still flagged with the whitelist in place",
+    "split_level": "training and evaluation overlap is still flagged with the whitelist in place",
+    "scope": "suppression is confined to feature-level flags on the named columns"
+  },
+  "decisions": {
+    "H382_whitelist_behaves_as_designed": true,
+    "H383_it_over_or_under_suppresses": false,
+    "verdict": "the_whitelist_behaves_as_designed_and_the_round_also_fixed_three_noise_bugs_in_the_audit"
+  },
+  "limits": [
+    "Intent declarations are the operator's, and they can be wrong.",
+    "Only feature-level flags can be suppressed; that is by design.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "three_real_bugs_in_my_own_audit_were_found_by_testing_it_on_a_real_design": {
+    "bug_1": {
+      "what": "CONSTANT_ON_EVAL fired for every level simply absent from the evaluation sample",
+      "why_it_matters": "in a 65-drug one-hot design that is most columns, so the check was mostly noise",
+      "fix": "it now requires the constant value to be NON-ZERO, which is what a filled-in placeholder looks like"
+    },
+    "bug_2": {
+      "what": "UNSEEN_CODES fired on indicator columns",
+      "why_it_matters": "a one-hot column for a drug absent from evaluation never contains that drug's value in training either, so it reported unseen codes purely as sampling",
+      "fix": "the unseen-code test now applies only to genuine multi-level code columns"
+    },
+    "bug_3": {
+      "what": "a PARTIALLY masked column slipped through both checks",
+      "why_it_matters": "masking -1 on some rows and 0 on others is neither constant nor an unseen code on an indicator column, and that is precisely the shape of the R138 defect",
+      "fix": "a new SENTINEL_OUTSIDE_VOCAB check flags any value outside {0,1} in an indicator column"
+    },
+    "how_they_were_found": "R157's design went through the audit and flagged all four arms; chasing that false alarm one case at a time produced these three fixes"
+  },
+  "the_whitelist_and_its_danger": {
+    "what_it_does": "suppresses FEATURE-level flags only, and only on columns the caller names as expected to be uninformative",
+    "what_it_cannot_do": "prediction-level and split-level alarms still fire with the whitelist in place, because neither can be intentional",
+    "the_danger_demonstrated": {
+      "case_3": "a design masking the held drug's column to -1, no whitelist: correctly FLAGGED",
+      "case_4": "the SAME design with those columns declared expected: PASSES",
+      "so": "the whitelist buys quiet at the price of trusting the declaration of intent, and R138 is a case where that declaration looked reasonable and the design was still broken"
+    },
+    "recommendation": "never whitelist a block whose purpose is to simulate an unavailable feature; whitelist only blocks that are unavailable by construction"
+  },
+  "what_this_means_for_R157": "the all-four-arms flag in R157 was mostly the CONSTANT_ON_EVAL noise described above, not a defect in that design. Under the corrected rules the R157 design passes cleanly."
+}

@@ -1,0 +1,56 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r97",
+  "round": "R97 (goal round 95/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Second same-class audit: is C65's transfer cost target-tissue specific or a data-volume effect?"},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r97": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round adds the control that C65 lacked and finds the claim holds even against an optimistic control.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e097_volume_control.py"], "runs": 1, "tissues": 3, "subsamples": 40,
+    "arms": 3, "units": 120, "bootstrap": 2000,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E097_RESULTS.json", "rows": "E097_rows.csv", "protocol": "PROTOCOL_E092.md"},
+  "audit_target": "C65: adding the target tissue's own data lifts the score by +6.25/+7.75 pp, read as 'transfer costs about half'",
+  "the_confound_tested": "the ceiling arm had strictly MORE keys than the transfer arm, so the gain could be a volume effect rather than target-tissue-specific information",
+  "the_control": "volume-matched arm: same key count as the ceiling but built only from the other tissues by bootstrap resampling",
+  "results": {
+    "Breast": {"transfer": 0.0788, "volume_matched": 0.0750, "ceiling": 0.1175,
+               "ceiling_minus_transfer": {"diff": 0.0387, "ci95": [0.0200, 0.0588]},
+               "ceiling_minus_volume": {"diff": 0.0425, "ci95": [0.0225, 0.0638]}},
+    "Colon": {"transfer": 0.0225, "volume_matched": 0.0175, "ceiling": 0.0312,
+              "ceiling_minus_transfer": {"diff": 0.0088, "ci95": [-0.0013, 0.0175]},
+              "ceiling_minus_volume": {"diff": 0.0138, "ci95": [0.0038, 0.0238]}},
+    "Pancreas": {"transfer": 0.0975, "volume_matched": 0.1025, "ceiling": 0.1612,
+                 "ceiling_minus_transfer": {"diff": 0.0638, "ci95": [0.0362, 0.0900]},
+                 "ceiling_minus_volume": {"diff": 0.0588, "ci95": [0.0300, 0.0887]}}
+  },
+  "decisions": {"H249_gain_is_target_specific": true,
+                "H250_gain_is_just_volume": false,
+                "H251_more_data_never_hurts": true,
+                "verdict": "transfer_cost_is_target_tissue_specific"},
+  "outcome": {
+    "C65_status": "passes the audit and is strengthened: giving the other tissues the same number of keys does not recover the gain",
+    "the_test_is_conservative": "bootstrap resampling understates the variance of the volume-matched arm, making it optimistic, so a significant result against it is a conservative finding",
+    "inconsistency_to_respect": "Colon's ceiling minus transfer is not significant while ceiling minus volume is; the two contrasts must not be quoted interchangeably"},
+  "two_audits_summary": {
+    "R96": "C42 passed",
+    "R97": "C65 passed and strengthened",
+    "interpretation": "two audits found no defect, which suggests the errors in R93 and R94 were local mistakes rather than a systematic bias across the register"},
+  "limits": ["bootstrap understates the variance of the volume-matched arm",
+             "three tissues and 120 units",
+             "Colon's transfer arm is itself weak, so neither contrast should be extrapolated from it",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "register_updates": {"C70": "new: C65's transfer cost is target-tissue specific",
+                       "C65": "annotated as audited", "SYNTHESIS": "row updated"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C70 added, C65 annotated)",
+                                "research/SYNTHESIS.md (row updated)", "research/INDEX.md (added R97 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

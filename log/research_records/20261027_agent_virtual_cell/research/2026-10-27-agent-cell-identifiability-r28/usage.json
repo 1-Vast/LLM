@@ -1,0 +1,54 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r28",
+  "round": "R28 (goal round 26/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Resource audit plus an external descriptive test on a locally held published dataset."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r28": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the amendment documents the false dichotomy and the result is a descriptive external check with explicit design limits.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e028_gdsc_synergy.py"], "runs": "1 (permutation loop ran in the background)",
+    "permutations": 200, "split_halves": 20, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E028_RESULTS.json", "protocol": "PROTOCOL_E028.md",
+                "correction": "AMENDMENT_012_FALSE_DICHOTOMY.md"},
+  "new_resource": {
+    "name": "GDSC combination screen (Jaaks 2022 figshare), locally held, no download",
+    "rows": 296707, "cell_lines": 125, "combinations": 2025, "drugs": 65, "tissues": 3,
+    "cells_per_combination_median": 45,
+    "metric": "SYNERGY_DELTA_AUC (published, model-fitted)",
+    "validation_screen": {"cells": 97, "combinations": 131, "key_overlap_with_original": 4725,
+                          "concentration_overlap": 0}
+  },
+  "results": {
+    "units": 4628,
+    "between_unit_variance_share": 0.304,
+    "permutation_null": {"mean": 0.0156, "q975": 0.0162},
+    "split_half_reliability": {"mean": 0.904, "ci95": [0.9007, 0.9074]},
+    "between_unit_sd": 0.032, "within_unit_sd_median": 0.044, "ratio": 1.38
+  },
+  "decisions": {
+    "H067_combination_is_the_main_property": false,
+    "H068_beats_permutation_null": true,
+    "H069_cell_variation_is_not_negligible": true,
+    "verdict_mechanical": "synergy_is_mainly_a_cell_property",
+    "verdict_reported": "combination_component_reliable_but_cell_variance_larger",
+    "false_dichotomy_note": "the 0.50 variance-share threshold had no theoretical basis and compressed a continuous fact into a wrong opposition; reliability was 0.904"
+  },
+  "headline": "synergy has a stable, highly reproducible combination-level component (30% of variance, split-half 0.90, 19x the permutation null), yet within-combination cell-to-cell variation (sd 0.044) is larger than between-combination variation (sd 0.032)",
+  "scope_change": "the standing 'unseen drug is untestable' verdict now applies to BATCHIE only; GDSC has 65 drugs and supports a leave-one-drug-out test, which this round did not run",
+  "register_updates": {
+    "F8": "new resource fact: GDSC combination screen characteristics",
+    "C23": "new, exploratory: external corroboration of C12 with a published synergy metric",
+    "unseen_drug": "narrowed to BATCHIE"
+  },
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (F8, C23 added; unseen-drug scope narrowed)",
+                                "research/INDEX.md (added R28 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "mechanism_claim_made": false
+  }
+}

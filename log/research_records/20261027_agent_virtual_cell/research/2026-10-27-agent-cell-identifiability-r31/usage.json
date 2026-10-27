@@ -1,0 +1,38 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r31",
+  "round": "R31 (goal round 29/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Cross-screen replication with an attribution baseline on the locally held GDSC screen; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r31": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the noise asymmetry between the two arms is disclosed in the record and report, and the conclusion is stated as 'no evidence of extra screen decay' rather than 'cross-screen is better'.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e031_cross_screen.py"], "runs": "2 (unstack bug, then fixed)",
+    "bootstrap": 1000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E031_RESULTS.json", "protocol": "PROTOCOL_E031.md"},
+  "design": {
+    "baseline": "within the original screen every (cell, combination) has two anchor concentrations; agreement between those two isolates the concentration effect (n=107,714)",
+    "cross_screen": "original mean vs validation mean on the 4,725 overlapping (cell, combination)",
+    "why": "comparing screens directly would bundle a concentration change with a screen change"
+  },
+  "results": {
+    "baseline": {"pearson": 0.6096, "ci95": [0.6049, 0.6155], "n": 107714, "bool_agreement": 0.965},
+    "cross_screen": {"pearson": 0.6888, "ci95": [0.6698, 0.7061], "n": 4725, "bool_agreement": 0.907},
+    "corr_ratio": 1.130, "agreement_ratio": 0.940
+  },
+  "decisions": {"H076_cross_screen_replicates": true, "H077_no_extra_screen_decay": true,
+                "H078_binary_replicates": true, "verdict": "cross_screen_replication_without_extra_decay"},
+  "interpretation": "the cross-screen correlation is at least as large as the within-screen concentration-change correlation, so there is no evidence of screen-level decay beyond concentration. The ratio above 1 is partly a noise asymmetry: the baseline values are single concentrations while the cross-screen values are means of two.",
+  "selection_caveat": "the validation screen covers only 4,725 of 108,259 keys (4.4%) and is very likely a selected subset, which would inflate agreement; 0.689 is therefore an upper-style estimate",
+  "register_updates": {"F9": "new fact: validation screen coverage and its likely selection", "C26": "new, exploratory: cross-screen replication r 0.689 with no extra screen decay"},
+  "next_gates": ["random-subset control inside the original screen at the same n, to test whether the validation subset was cherry-picked"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (F9, C26 added)", "research/INDEX.md (added R31 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "mechanism_claim_made": false
+  }
+}

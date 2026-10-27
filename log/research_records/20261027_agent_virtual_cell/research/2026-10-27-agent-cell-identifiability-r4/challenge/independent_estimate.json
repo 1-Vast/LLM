@@ -1,0 +1,474 @@
+{
+  "analysis_id": "stage1_independent_noise_and_identifiability",
+  "written_before_reading_any_result_file": true,
+  "date": "2026-10-27",
+  "input": "D:\\MAESTRO\\research\\eight_directions_20261026\\evidence_audit\\raw\\PAIR_SCREEN.csv",
+  "n_rows": 139764,
+  "contrast": "d = Viability(w1) - Viability(w2) within one file; dbar = mean over K=2 files",
+  "hazards": {
+    "n_rows": 139764,
+    "n_well_viability_eq_0": 6646,
+    "n_well_viability_eq_1": 30259,
+    "frac_viability_clipped_0_or_1": 0.2641,
+    "n_viability_outside_0_1": 0,
+    "n_nan_viability": 0,
+    "n_duplicate_well_within_file": 0,
+    "n_exact_duplicate_rows": 0,
+    "n_failed_qc": 3828,
+    "frac_files_all_hc_exactly_1": 0.615,
+    "frac_files_all_lc_exactly_0": 0.615,
+    "n_lc_not_zero": 2329,
+    "n_lc": 8576,
+    "n_hc_not_one": 2528,
+    "n_hc": 8576
+  },
+  "normalisation": {
+    "n_files": 371,
+    "slope_over_HC_minus_LC_median": 1.0039,
+    "slope_over_HC_minus_LC_iqr": [
+      0.9982,
+      1.0139
+    ],
+    "intercept_minus_LC_median": -13.7
+  },
+  "noise_model": "Var(d_i) = Vd = 2*sigma^2*(1-rho); SE(dbar) = sqrt(Vd/K); author's case rho=0, SE = sigma*sqrt(2/K)",
+  "primary_estimator": {
+    "name": "P_contrast_var",
+    "definition": "Vd = Var(diff(w1)-diff(w2))/2, diff = V(file1,well)-V(file2,well); E[D]=0 by construction so no true drug effect enters",
+    "value_Vd_adjacent_column": 0.0035156237743521742,
+    "sd_contrast_adjacent_column": 0.05929269579258624,
+    "n_well_pairs": 5355
+  },
+  "all_noise_estimates": {
+    "P_contrast_var_adjacent_column": {
+      "Vd": 0.003516,
+      "sigma_equiv": 0.041926,
+      "n_pairs": 5355,
+      "mean_D": -0.000999,
+      "Vd_robust": 0.002382,
+      "sigma_equiv_robust": 0.034513
+    },
+    "P_contrast_var_adjacent_row": {
+      "Vd": 0.00441,
+      "sigma_equiv": 0.046959,
+      "n_pairs": 5264,
+      "mean_D": 0.002571,
+      "Vd_robust": 0.003241,
+      "sigma_equiv_robust": 0.040252
+    },
+    "P_contrast_var_adjacent_column_stage11": {
+      "Vd": 0.002601,
+      "sigma_equiv": 0.036059,
+      "n_pairs": 955,
+      "mean_D": 0.000999,
+      "Vd_robust": 0.002096,
+      "sigma_equiv_robust": 0.032376
+    },
+    "E1_replicate_plate_all": {
+      "sigma": 0.047202,
+      "n": 35674,
+      "sd_of_diff": 0.066754,
+      "mean_diff": 0.004322,
+      "sigma_robust": 0.019806
+    },
+    "E1_replicate_plate_stage11": {
+      "sigma": 0.036306,
+      "n": 6048,
+      "sd_of_diff": 0.051344,
+      "mean_diff": -0.001802,
+      "sigma_robust": 0.021299
+    },
+    "E1_replicate_plate_band": {
+      "sigma": 0.057152,
+      "n": 11089,
+      "sd_of_diff": 0.080825,
+      "mean_diff": 0.005269,
+      "sigma_robust": 0.045514
+    },
+    "E2_within_dup_all": {
+      "sigma": 0.038173,
+      "n": 10248,
+      "sigma_robust": 0.018932,
+      "frac_both_at_1": 0.213407
+    },
+    "E2_within_dup_0.75_1": {
+      "sigma": 0.034701,
+      "n": 6981,
+      "sigma_robust": 0.015503,
+      "frac_both_at_1": 0.313279
+    },
+    "E2_within_dup_band": {
+      "sigma": 0.053188,
+      "n": 2550,
+      "sigma_robust": 0.042679,
+      "frac_both_at_1": 0.0
+    },
+    "E3_adjacent_control_columns": {
+      "sigma": 0.050894,
+      "n": 2664,
+      "mean_offset": -0.000975,
+      "offset_by_col": {
+        "col1": {
+          "mean": -0.00139,
+          "n": 1992
+        },
+        "col11": {
+          "mean": -0.00441,
+          "n": 224
+        },
+        "col12": {
+          "mean": 0.00423,
+          "n": 224
+        },
+        "col13": {
+          "mean": 0.00095,
+          "n": 224
+        }
+      },
+      "n_files": 143
+    },
+    "E4_poisson_floor": {
+      "sigma": 0.003689,
+      "n": 70036
+    }
+  },
+  "positional": {
+    "hc_row_profile": {
+      "A": 0.0239,
+      "B": 0.0201,
+      "C": 0.014,
+      "D": 0.01379,
+      "E": 0.01105,
+      "F": 0.01244,
+      "G": 0.01759,
+      "H": 0.01346,
+      "I": 0.00493,
+      "J": -0.00353,
+      "K": -0.01085,
+      "L": -0.02554,
+      "M": -0.03389,
+      "N": -0.02848,
+      "O": -0.01976,
+      "P": -0.01067
+    },
+    "hc_row_profile_sd": 0.01897,
+    "hc_within_row_sd": 0.0591,
+    "rowO_minus_rowN": {
+      "mean": 0.00822,
+      "sd": 0.07236,
+      "n": 368,
+      "t": 2.18002
+    },
+    "note": "rows and columns of the primary screen ARE Drug2 and Drug1 identity, so a positional effect is not separable from a compound effect at a single well"
+  },
+  "probes": [
+    {
+      "cell": "A673",
+      "plate": "Plate 157",
+      "w1": "O1",
+      "w2": "O2",
+      "combo1": "Dexrazoxane 0.1 + Axitinib 0.1",
+      "combo2": "Lestaurtinib 0.1 + Axitinib 0.1",
+      "v1": 0.9343294159333844,
+      "v2": 0.6311935274316424,
+      "raw1": 51649.0,
+      "raw2": 36250.0,
+      "fq1": false,
+      "fq2": false,
+      "d": 0.303135888501742
+    },
+    {
+      "cell": "A673",
+      "plate": "Plate 158",
+      "w1": "O1",
+      "w2": "O2",
+      "combo1": "Dexrazoxane 0.1 + Axitinib 0.1",
+      "combo2": "Lestaurtinib 0.1 + Axitinib 0.1",
+      "v1": 0.9370612344276265,
+      "v2": 0.6852453029257801,
+      "raw1": 50352.0,
+      "raw2": 37941.0,
+      "fq1": false,
+      "fq2": false,
+      "d": 0.25181593150184634
+    },
+    {
+      "cell": "BJ",
+      "plate": "Plate 147",
+      "w1": "N22",
+      "w2": "O22",
+      "combo1": "Axitinib 0.1 + Dexrazoxane 0.1",
+      "combo2": "Axitinib 0.1 + Lestaurtinib 0.1",
+      "v1": 0.8790778891519334,
+      "v2": 0.8995959285970027,
+      "raw1": 55935.0,
+      "raw2": 56289.0,
+      "fq1": false,
+      "fq2": false,
+      "d": -0.020518039445069247
+    },
+    {
+      "cell": "BJ",
+      "plate": "Plate 148",
+      "w1": "N22",
+      "w2": "O22",
+      "combo1": "Axitinib 0.1 + Dexrazoxane 0.1",
+      "combo2": "Axitinib 0.1 + Lestaurtinib 0.1",
+      "v1": 0.8584440599392772,
+      "v2": 0.9069964777457572,
+      "raw1": 56156.0,
+      "raw2": 60250.0,
+      "fq1": false,
+      "fq2": false,
+      "d": -0.04855241780648001
+    }
+  ],
+  "readout_cross_check_raw_counts": [
+    {
+      "cell": "A673",
+      "plate": "Plate 157",
+      "d_viability": 0.303136,
+      "d_raw_span": 0.312533,
+      "diff": -0.009397,
+      "hc_minus_lc": 49271.625
+    },
+    {
+      "cell": "A673",
+      "plate": "Plate 158",
+      "d_viability": 0.251816,
+      "d_raw_span": 0.25508,
+      "diff": -0.003264,
+      "hc_minus_lc": 48655.375
+    },
+    {
+      "cell": "BJ",
+      "plate": "Plate 147",
+      "d_viability": -0.020518,
+      "d_raw_span": -0.005905,
+      "diff": -0.014613,
+      "hc_minus_lc": 59946.5625
+    },
+    {
+      "cell": "BJ",
+      "plate": "Plate 148",
+      "d_viability": -0.048552,
+      "d_raw_span": -0.064161,
+      "diff": 0.015609,
+      "hc_minus_lc": 63807.75
+    }
+  ],
+  "verdicts": {
+    "A673": {
+      "per_file_d": {
+        "Plate 157": 0.303136,
+        "Plate 158": 0.251816
+      },
+      "dbar_K2": 0.27747591000179417,
+      "tests": {
+        "P_contrast_var_adjacent_column": {
+          "sd_contrast": 0.059293,
+          "SE": 0.041926,
+          "t": 6.618,
+          "p_two_sided": 0.0,
+          "detectable_at_0.05": true,
+          "n_source": 5355
+        },
+        "P_contrast_var_adjacent_row": {
+          "sd_contrast": 0.06641,
+          "SE": 0.046959,
+          "t": 5.909,
+          "p_two_sided": 0.0,
+          "detectable_at_0.05": true,
+          "n_source": 5264
+        },
+        "P_contrast_var_adjacent_column_stage11": {
+          "sd_contrast": 0.050995,
+          "SE": 0.036059,
+          "t": 7.695,
+          "p_two_sided": 0.0,
+          "detectable_at_0.05": true,
+          "n_source": 955
+        },
+        "E1_replicate_plate_all": {
+          "sd_contrast": 0.066754,
+          "SE": 0.047202,
+          "t": 5.878,
+          "p_two_sided": 0.0,
+          "detectable_at_0.05": true,
+          "n_source": 35674
+        },
+        "E1_replicate_plate_stage11": {
+          "sd_contrast": 0.051344,
+          "SE": 0.036306,
+          "t": 7.643,
+          "p_two_sided": 0.0,
+          "detectable_at_0.05": true,
+          "n_source": 6048
+        },
+        "E1_replicate_plate_band": {
+          "sd_contrast": 0.080825,
+          "SE": 0.057152,
+          "t": 4.855,
+          "p_two_sided": 0.0,
+          "detectable_at_0.05": true,
+          "n_source": 11089
+        },
+        "E2_within_dup_all": {
+          "sd_contrast": 0.053984,
+          "SE": 0.038173,
+          "t": 7.269,
+          "p_two_sided": 0.0,
+          "detectable_at_0.05": true,
+          "n_source": 10248
+        },
+        "E2_within_dup_0.75_1": {
+          "sd_contrast": 0.049074,
+          "SE": 0.034701,
+          "t": 7.996,
+          "p_two_sided": 0.0,
+          "detectable_at_0.05": true,
+          "n_source": 6981
+        },
+        "E2_within_dup_band": {
+          "sd_contrast": 0.075219,
+          "SE": 0.053188,
+          "t": 5.217,
+          "p_two_sided": 0.0,
+          "detectable_at_0.05": true,
+          "n_source": 2550
+        },
+        "E3_adjacent_control_columns": {
+          "sd_contrast": 0.071975,
+          "SE": 0.050894,
+          "t": 5.452,
+          "p_two_sided": 0.0,
+          "detectable_at_0.05": true,
+          "n_source": 2664
+        },
+        "E4_poisson_floor": {
+          "sd_contrast": 0.005217,
+          "SE": 0.003689,
+          "t": 75.211,
+          "p_two_sided": 0.0,
+          "detectable_at_0.05": true,
+          "n_source": 70036
+        }
+      }
+    },
+    "BJ": {
+      "per_file_d": {
+        "Plate 147": -0.020518,
+        "Plate 148": -0.048552
+      },
+      "dbar_K2": -0.03453522862577463,
+      "tests": {
+        "P_contrast_var_adjacent_column": {
+          "sd_contrast": 0.059293,
+          "SE": 0.041926,
+          "t": -0.824,
+          "p_two_sided": 0.4101,
+          "detectable_at_0.05": false,
+          "n_source": 5355
+        },
+        "P_contrast_var_adjacent_row": {
+          "sd_contrast": 0.06641,
+          "SE": 0.046959,
+          "t": -0.735,
+          "p_two_sided": 0.46207,
+          "detectable_at_0.05": false,
+          "n_source": 5264
+        },
+        "P_contrast_var_adjacent_column_stage11": {
+          "sd_contrast": 0.050995,
+          "SE": 0.036059,
+          "t": -0.958,
+          "p_two_sided": 0.33819,
+          "detectable_at_0.05": false,
+          "n_source": 955
+        },
+        "E1_replicate_plate_all": {
+          "sd_contrast": 0.066754,
+          "SE": 0.047202,
+          "t": -0.732,
+          "p_two_sided": 0.46438,
+          "detectable_at_0.05": false,
+          "n_source": 35674
+        },
+        "E1_replicate_plate_stage11": {
+          "sd_contrast": 0.051344,
+          "SE": 0.036306,
+          "t": -0.951,
+          "p_two_sided": 0.34148,
+          "detectable_at_0.05": false,
+          "n_source": 6048
+        },
+        "E1_replicate_plate_band": {
+          "sd_contrast": 0.080825,
+          "SE": 0.057152,
+          "t": -0.604,
+          "p_two_sided": 0.54566,
+          "detectable_at_0.05": false,
+          "n_source": 11089
+        },
+        "E2_within_dup_all": {
+          "sd_contrast": 0.053984,
+          "SE": 0.038173,
+          "t": -0.905,
+          "p_two_sided": 0.36562,
+          "detectable_at_0.05": false,
+          "n_source": 10248
+        },
+        "E2_within_dup_0.75_1": {
+          "sd_contrast": 0.049074,
+          "SE": 0.034701,
+          "t": -0.995,
+          "p_two_sided": 0.31962,
+          "detectable_at_0.05": false,
+          "n_source": 6981
+        },
+        "E2_within_dup_band": {
+          "sd_contrast": 0.075219,
+          "SE": 0.053188,
+          "t": -0.649,
+          "p_two_sided": 0.51614,
+          "detectable_at_0.05": false,
+          "n_source": 2550
+        },
+        "E3_adjacent_control_columns": {
+          "sd_contrast": 0.071975,
+          "SE": 0.050894,
+          "t": -0.679,
+          "p_two_sided": 0.49741,
+          "detectable_at_0.05": false,
+          "n_source": 2664
+        },
+        "E4_poisson_floor": {
+          "sd_contrast": 0.005217,
+          "SE": 0.003689,
+          "t": -9.361,
+          "p_two_sided": 0.0,
+          "detectable_at_0.05": true,
+          "n_source": 70036
+        }
+      }
+    }
+  },
+  "conclusion": {
+    "A673": {
+      "dbar": 0.277476,
+      "all_estimators_detectable": true,
+      "no_estimator_detectable": false,
+      "n_detectable": 11,
+      "n_estimators": 11,
+      "dbar_over_primary_sd_contrast": 4.68
+    },
+    "BJ": {
+      "dbar": -0.034535,
+      "all_estimators_detectable": false,
+      "no_estimator_detectable": false,
+      "n_detectable": 1,
+      "n_estimators": 11,
+      "dbar_over_primary_sd_contrast": -0.58
+    }
+  }
+}

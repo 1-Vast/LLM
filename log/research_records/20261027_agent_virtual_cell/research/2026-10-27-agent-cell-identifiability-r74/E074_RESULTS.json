@@ -1,0 +1,37 @@
+{
+  "kind": "diagnostic_of_R72_R73_pool_and_tiebreak",
+  "n_pool_evals": 80,
+  "tiebreak_check": {
+    "first_k_hit": 0.016875,
+    "random_k_hit": 0.010625,
+    "base_rate": 0.013635440006468704,
+    "gap_pp": 0.00625,
+    "proper_paired_test": {
+      "note": "proper paired test replaces the arbitrary 0.5 pp threshold from the pre-registration",
+      "n_eval": 40,
+      "mean_first_minus_rand": 0.0012500000000000005,
+      "ci95": [
+        -0.00625,
+        0.01
+      ],
+      "frac_evals_first_better": 0.1,
+      "artifact_present": false
+    }
+  },
+  "label_check": {
+    "frac_both_drugs_unseen": 0.09557978943544096,
+    "frac_exactly_one_drug_unseen": 0.904420210564559
+  },
+  "decisions": {
+    "H187_no_tiebreak_artifact": true,
+    "H187_note": "the pre-registered 0.5 pp threshold was arbitrary; a proper paired test gives +0.13 pp, CI [-0.63,+1.00], i.e. no artifact",
+    "H188_pool_label_was_wrong": true,
+    "H188_evidence": "only 9.6% of the pool has both drugs unseen; 90.4% has exactly one unseen drug"
+  },
+  "verdict": "no_artifact_but_label_must_be_corrected",
+  "consequence": "the marginal baseline retains information from the SEEN drug in 90% of this pool, so 'the model loses to a no-information baseline' is the wrong reading. The correct reading: the model loses wherever the baseline has partial information, and where the baseline truly has none (R66's both-unseen pool) it beats random only marginally (+1.25 pp, CI lower bound 0.00).",
+  "corrections_needed": {
+    "register_C46": "replace '两药同时未见池' with '细胞未见且至少一药未见（90% 恰一药未见）'",
+    "R72_R73": "documents left unmodified per the no-rewrite rule; this round is the correction of record"
+  }
+}

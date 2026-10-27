@@ -1,0 +1,50 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r76",
+  "round": "R76 (goal round 74/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Minimal-evidence question answered against the marginal baseline established in R70-R75."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r76": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round re-asks an old question against the newly established strong baseline and finds that small amounts of personal data are harmful.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e076_minimal_evidence.py"], "runs": 1, "repeats": 20, "cells": 125,
+    "ms": [10, 25, 50, 100, 200, 400], "bootstrap": 2000,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E076_RESULTS.json", "rows": "E076_rows.csv", "protocol": "PROTOCOL_E073.md"},
+  "design": {
+    "baseline": "drug pair marginals estimated from training cells only; the held-out cell contributes nothing",
+    "personal_arm": "estimate cell-specific drug residuals from m measured rows and add them to the marginal score",
+    "metric": "hit rate at k=20 on the UNMEASURED remainder of the cell's pool"
+  },
+  "results": {
+    "m10": {"B0": 0.0708, "Bm": 0.0549, "gain": -0.0159, "ci95": [-0.0192, -0.0126], "cells_improved": 0.47},
+    "m25": {"B0": 0.0710, "Bm": 0.0587, "gain": -0.0123, "ci95": [-0.0157, -0.0090], "cells_improved": 0.46},
+    "m50": {"gain": 0.0008, "ci95": [-0.0026, 0.0044], "cells_improved": 0.55},
+    "m100": {"B0": 0.0703, "Bm": 0.0867, "gain": 0.0164, "ci95": [0.0131, 0.0198], "cells_improved": 0.55},
+    "m200": {"B0": 0.0696, "Bm": 0.0958, "gain": 0.0262, "ci95": [0.0234, 0.0294], "cells_improved": 0.63},
+    "m400": {"gain": 0.0207, "ci95": [0.0165, 0.0250], "cells_improved": 0.60, "n": 960}
+  },
+  "decisions": {"H192_threshold_exists": true, "H193_threshold_small": false,
+                "first_significant_m": 100, "roughly_monotone": false,
+                "verdict": "own_data_beats_marginals_only_at_large_m"},
+  "headline": "below about 50 measured combinations a new cell's own data makes decisions WORSE (m=10: -1.59 pp, m=25: -1.23 pp, both CIs exclude zero); the crossover is near 50 and significance arrives at m=100 (+1.64 pp), with m=200 best at +2.62 pp",
+  "mechanism_reading": "with few measurements each drug gets less than one or two data points, so the estimated residual is noise that perturbs an otherwise correct marginal ranking",
+  "relation_to_R22": "R22 showed pooling was already near the ceiling but did not show that too little personal data is actively harmful; this round supplies the cost curve",
+  "limits": ["the m=400 arm has only 960 observations because many cell pools are too small, so its non-monotonicity is a sample effect",
+             "the personal arm's estimator (per-drug residual mean) is one reasonable construction; other constructions may shift the threshold",
+             "drug marginals come from training cells only, which keeps the baseline clean",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["test whether the threshold scales with the cell's pool size, which would turn the fixed 100 into a proportion"],
+  "register_updates": {"C50": "new, exploratory: minimal personal evidence is about 100 measurements, and below 50 it is harmful",
+                       "SYNTHESIS": "a row added to the evidence table"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C50 added)", "research/SYNTHESIS.md (evidence row added)",
+                                "research/INDEX.md (added R76 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

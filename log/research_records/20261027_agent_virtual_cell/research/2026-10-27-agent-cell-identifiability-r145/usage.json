@@ -1,0 +1,73 @@
+{
+  "experiment": "E145",
+  "round": "R145 (goal round 143/256)",
+  "date": "2026-10-27",
+  "type": "which grouping is the better prior for an unseen drug",
+  "why_not_the_previous_gate": "R144 asked for a shrunk marginal baseline, but an unseen drug has n = 0 so any shrinkage collapses to the grand mean; the only source of information is a grouping, so the meaningful competitor is a different grouping",
+  "compute": {
+    "script": "e145_groupings.py",
+    "splits": 200,
+    "arms": 5,
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "results": "E145_RESULTS.json",
+    "rows": "E145_rows.csv",
+    "protocol": "PROTOCOL_E135.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "results": {
+    "identity": -0.0007,
+    "plus_pathway": 0.1269,
+    "plus_target": 0.0598,
+    "plus_both": 0.1296,
+    "plus_random": -0.0008,
+    "pathway_minus_identity": [
+      0.1254,
+      0.113,
+      0.1381
+    ],
+    "target_minus_identity": [
+      0.0536,
+      0.0425,
+      0.0649
+    ],
+    "target_minus_pathway": [
+      -0.0685,
+      -0.0823,
+      -0.0541
+    ],
+    "both_minus_pathway": [
+      0.0027,
+      -0.0008,
+      0.006
+    ]
+  },
+  "answer": "use pathway, not target; adding target on top is not worth the dimensions",
+  "what_this_rules_out": {
+    "target_levels": 98,
+    "pathway_levels": 38,
+    "point": "target is the finer partition and performs worse, so a granularity explanation is excluded, independently supporting C108"
+  },
+  "what_this_settles": {
+    "earlier": "R106 compared pathway against target and found only one of three pools significant",
+    "why": "it used the sparse boolean criterion which cannot resolve this in that pool (R122, R131)"
+  },
+  "degeneracy_note": "no arm here was degenerate; all five have non-zero dispersion and the random grouping sits at zero",
+  "limits": [
+    "Only this resource and only ridge.",
+    "Target has 98 levels against pathway's 38; this round uses that as an argument rather than treating it as a defect.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "next_gate": "test whether pathway remains the best substitute under cross-tissue transfer",
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "kind": "per_pool_correlation_between_the_two_criteria",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "holdout": 0.2,
+    "seed": 20261034
+  },
+  "audit": {
+    "keys": 108259
+  },
+  "by_pool": {
+    "all": {
+      "n": 108259,
+      "synergy_rate": 0.014317516326587166,
+      "emax_quartile_rate": 0.2500023092768269,
+      "rho_flag_vs_raw_emax": 0.1985260237216481,
+      "rho_flag_vs_quartile": 0.20443879958667074,
+      "jaccard": 0.056332828823507694,
+      "both_positive": 1526
+    },
+    "one_unseen": {
+      "n": 29431,
+      "synergy_rate": 0.020046889334375317,
+      "emax_quartile_rate": 0.26818660595970234,
+      "rho_flag_vs_raw_emax": 0.23272743318026326,
+      "rho_flag_vs_quartile": 0.229700221686818,
+      "jaccard": 0.07311827956989247,
+      "both_positive": 578
+    },
+    "cell_unseen": {
+      "n": 8375,
+      "synergy_rate": 0.020417910447761194,
+      "emax_quartile_rate": 0.2594626865671642,
+      "rho_flag_vs_raw_emax": 0.2344644012710439,
+      "rho_flag_vs_quartile": 0.2381270139235094,
+      "jaccard": 0.07720588235294118,
+      "both_positive": 168
+    },
+    "both_seen_cell": {
+      "n": 3410,
+      "synergy_rate": 0.03167155425219941,
+      "emax_quartile_rate": 0.3217008797653959,
+      "rho_flag_vs_raw_emax": 0.2851117050236911,
+      "rho_flag_vs_quartile": 0.25543837031169775,
+      "jaccard": 0.09645131938125569,
+      "both_positive": 106
+    },
+    "both_unseen_cell": {
+      "n": 865,
+      "synergy_rate": 0.035838150289017344,
+      "emax_quartile_rate": 0.2832369942196532,
+      "rho_flag_vs_raw_emax": 0.2923513063009354,
+      "rho_flag_vs_quartile": 0.29289477862529645,
+      "jaccard": 0.12195121951219512,
+      "both_positive": 30
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r130/PROTOCOL_E121.md": "877b34ba4d84d5fc4ab02df34104390d262f182ca022f9ad2efa1b4318aa8382",
+    "research/2026-10-27-agent-cell-identifiability-r130/e130_perpool.py": "87a8ef18c9db109682caaaffa0ca00fe3c7d7a10723e58ebdba7a145d9442636"
+  },
+  "decisions": {
+    "global_rho": 0.1985260237216481,
+    "small_pool_rho": 0.2923513063009354,
+    "H325_small_pool_lower": false,
+    "H326_all_pools_high": false,
+    "verdict": "the_two_criteria_are_largely_independent_so_R129s_redundancy_rule_must_be_withdrawn"
+  },
+  "limits": [
+    "Pool masks are key-level and keys are not independent within a cell or a drug.",
+    "Covers only this resource.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "RUN_CORRECTS_R129": true,
+  "my_error_in_R129": {
+    "what_I_said": "the boolean Synergy flag and the delta EMAX quartile correlate at about 0.83, so counting criteria is redundancy",
+    "what_R128_actually_measured": "the FOUR continuous delta metrics (delta AUC, delta EMAX, delta fAUC, delta XMID) correlate at 0.806 to 0.967 among themselves; delta AUC versus delta EMAX is 0.831",
+    "what_this_round_measures": "the BOOLEAN FLAG versus the delta EMAX quartile correlates at only 0.199 overall and 0.292 in the smallest pool",
+    "the_conflation": "I carried the number 0.83 from a continuous-versus-continuous comparison into a boolean-versus-quartile claim without measuring it",
+    "severity": "the R129 reading rule is wrong and inverts the correct reading"
+  },
+  "the_correct_facts": {
+    "fact_1_continuous_metrics_are_redundant": "the four delta metrics measured 0.806 to 0.967 apart (R128) - they are four scalings of one readout",
+    "fact_2_the_two_criteria_are_largely_independent": {
+      "rho_overall": 0.199,
+      "rho_by_pool": {
+        "one_unseen": 0.233,
+        "cell_unseen": 0.234,
+        "both_seen_cell": 0.285,
+        "both_unseen_cell": 0.292
+      },
+      "jaccard": {
+        "all": 0.056,
+        "both_seen_cell": 0.096,
+        "both_unseen_cell": 0.122
+      },
+      "reading": "the boolean flag fires on 1.4 percent of keys while the quartile fires on 25 percent, and their overlap is only 5.6 to 12.2 percent, so they index different things"
+    },
+    "consequence": "multi-criteria phrasing was substantially correct after all; the two criteria carry largely independent information, and R129 over-corrected in the opposite direction"
+  },
+  "what_survives_and_what_falls": {
+    "falls": "the CRITERION_REDUNDANCY rule added in R129, and the claim in C98 that the two criteria were never independent",
+    "survives": "the C98 finding that the four continuous delta metrics are not independent endpoints (0.806 to 0.967), which is what the objective's 'independent functional endpoints' requirement turns on",
+    "unaffected": "the frozen claim, which rests on the dense criterion plus random, permuted and dead-block controls"
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "agent_role": "independent-runner (R193 analysis A; not a protocol/challenge author)",
+  "audit_line": "R193-A1",
+  "cost": {
+    "note": "not available; recorded as null",
+    "usd": null
+  },
+  "date": "2026-10-27",
+  "deliverables": {
+    "q1.json": "064AD3C3A7AEF6D9BF67C139B144503A3EA2BACBDAF39F240F40113140903534",
+    "q1.py": "F21592C450D9445FF72D2DBF38C1AEFB7AB47A188D323634F29C712560A58B04",
+    "q1_rows.csv": "EDECB0355C6FE8D66B5B3CF37679C3F472A8724BEF2CC5562EDC234F506524D6",
+    "record_q1.md": "53870CAA3B6A880E64F201BE170F87F52BC64AF7FBF03C1082D480BF838606F3",
+    "report_q1.md": "03885F2CCB447C452A64A8B003FF0761A08D9814CEAB160B0FB90DD9E71634A0",
+    "usage_q1.json": "self (not hashed inside itself)",
+    "verdict": "inconclusive"
+  },
+  "design_check": {
+    "delta_min_latent": 0.1,
+    "delta_min_obs_conservative_rels": 0.089286,
+    "delta_min_obs_point_rels": 0.079977,
+    "joint_power_latent_0.10": 0.174,
+    "joint_power_latent_0.30": 0.896,
+    "mde80_obs_debiased_sensitivity": 0.152326,
+    "mde80_obs_iid_analytic_sensitivity": 0.072337,
+    "mde80_obs_n_eff": 189.158,
+    "mde80_obs_primary": 0.204241,
+    "mde80_obs_zero_model_shares": {
+      "0.00": 0.076322,
+      "0.25": 0.264223,
+      "0.50": 0.278819,
+      "0.75": 0.293537
+    },
+    "n_cell_pairs": 1501,
+    "n_common_cells": 96,
+    "n_conditions": 291,
+    "n_controlled_anchor_quadruples": 92039,
+    "rel_A_original": {
+      "n_cp_split": 61,
+      "n_keys_ge2": 1593,
+      "r_split_half": 0.760074,
+      "spearman_brown": 0.863684
+    },
+    "rel_B_validation": {
+      "n_cp_split": 1501,
+      "n_keys_ge2": 8974,
+      "r_split_half": 0.588033,
+      "spearman_brown": 0.74058
+    },
+    "type_I": 0.018
+  },
+  "downloads": {
+    "data_files": 0,
+    "network": "none",
+    "notes": "all inputs reused read-only from the frozen Jaaks fitted tables (data/external/gdsc_combinations/jaaks2022_figshare) and A0 products"
+  },
+  "environment": {
+    "os": "Windows (PowerShell pwsh)",
+    "output_dir": "research/2026-10-27-conditional-shift",
+    "packages": {
+      "numpy": "2.4.6",
+      "pandas": "2.3.3",
+      "scipy": "bundled with the maestro env"
+    },
+    "python": "D:\\anaconda\\envs\\maestro\\python.exe (Python 3.11.16)",
+    "workspace": "D:\\MAESTRO"
+  },
+  "judgment": {
+    "design_check_passed": false,
+    "fail_gates": [
+      "mde80_obs_le_delta_min_obs"
+    ],
+    "failure_category": "design_check_failed:MDE80_obs > delta_min_obs",
+    "h193b_computed": false,
+    "main_q_computed": false,
+    "pass_gates": 10,
+    "secondary_statistics_computed": false,
+    "selection_bias_diagnostics_computed": false,
+    "total_gates": 11,
+    "verdict": "inconclusive"
+  },
+  "notes": [
+    "design check ran before any cross-screen Q statistic; no Q_A-Q_B alignment was computed or written (protocol section 7 gate; q1.py hard assertion before writing)",
+    "10/11 design gates pass; the only failure is MDE80_obs=0.2042 > delta_min_obs=0.0893",
+    "effective sample size is cell-limited: n_eff about 189 from 1,501 cell pairs built on only 96 cells (cell-cluster bootstrap SE is about 2.8x the iid SE)",
+    "H193b, selection-bias diagnostics and secondary statistics were NOT run because the protocol forbids entering the Q retest after a failed design check (single-agent columns verified available; nothing was 'not doable')",
+    "zero-model cell-share MDEs are reported only as a pessimistic dependence bound (additive cell main effects cancel exactly in the Q double difference)",
+    "A0 cited together with ERRATA_A0.md and challenge_A0.md throughout",
+    "all hash values are SHA256"
+  ],
+  "protocol": {
+    "path": "research/2026-10-27-conditional-shift/PROTOCOL_Q.md",
+    "sha256": "74FA675A77031E6DF1D68831615E8753EADDA13F41F27AB23096D836091ED1CF",
+    "status": "v1 FROZEN"
+  },
+  "runs": [
+    {
+      "command": "python tmp/a1_probe.py",
+      "purpose": "structure-only probe: A0 counts, 96 cells, 9,154 keys, 92,039 controlled_anchor quadruples, 1,501 cp (no response values)",
+      "status": "ok",
+      "wall_seconds": 12
+    },
+    {
+      "command": "python tmp/a1_design_probe.py",
+      "purpose": "structure-only probe of design SE/MDE scale under zero-model cell-share structures (no response values)",
+      "status": "ok",
+      "wall_seconds": 15
+    },
+    {
+      "command": "python tmp/a1_rel_probe.py",
+      "purpose": "within-screen barcode split-half reliability probe (allowed design-check read of y; NO cross-screen Q_A-Q_B alignment)",
+      "status": "ok",
+      "wall_seconds": 40
+    },
+    {
+      "command": "python q1.py",
+      "notes": "design_check_passed=False at mde80_obs_le_delta_min_obs; main Q not computed (protocol section 7 gate)",
+      "purpose": "formal deterministic runner implementing PROTOCOL_Q.md (design check first)",
+      "status": "ok",
+      "wall_seconds": 59.4,
+      "wall_seconds_range": [
+        59.4,
+        70.9
+      ]
+    },
+    {
+      "command": "python q1.py (determinism re-run)",
+      "notes": "q1.json and q1_rows.csv identical across the two final runs; q1.json SHA256 064AD3C3...140903534",
+      "purpose": "byte-identical output check",
+      "status": "ok",
+      "wall_seconds": 60
+    }
+  ],
+  "task_id": "task-15",
+  "tokens": {
+    "input_tokens": null,
+    "note": "runtime token accounting is not available to the agent; recorded as null (not 0)",
+    "output_tokens": null,
+    "total_tokens": null
+  }
+}

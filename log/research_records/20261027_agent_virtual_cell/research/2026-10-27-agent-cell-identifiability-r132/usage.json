@@ -1,0 +1,45 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r132",
+  "round": "R132 (goal round 130/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Cross-document consistency audit after two rounds reversed the same reading rule."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r132": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round scans the documents themselves for contradictions the two reversals could have left behind.",
+  "compute": {"runs": 0, "data_downloads": 0, "wet_lab_experiments": 0},
+  "artifacts": {"synthesis": "research/SYNTHESIS.md", "audit": "research/CLAIM_STATUS_AUDIT.md",
+                "record": "research/2026-10-27-agent-cell-identifiability-r132/record.md",
+                "report": "research/2026-10-27-agent-cell-identifiability-r132/report.md"},
+  "contradiction_found": {
+    "location": "SYNTHESIS.md line 81, inside the evidence table",
+    "statement": "it still read 'multiple criteria are redundancy, rho about 0.83, so 2 of 3 criteria is not two independent tests'",
+    "conflict": "the reading rule two sections above (line 33) already says that conclusion was withdrawn at R130",
+    "so": "the same document asserted the rule and its retraction, and the surviving assertion also carried the wrong number",
+    "fixed": "replaced with the corrected row: criteria rho about 0.20 (complementary), metrics rho 0.806 to 0.967 (redundant)"},
+  "audit_was_stale": {
+    "register_claims": 100, "audit_rows_before": 97,
+    "missing": ["C98", "C99", "C100"],
+    "rebuilt": {"stands": 46, "stands_with_qualification": 30, "frozen": 4,
+                "withdrawn_or_refuted": 11, "invalid": 3, "unjudgeable": 6, "total": 100},
+    "C98_status": "partially retracted: the finding that the four metrics are not independent endpoints stands, while the sentence claiming the two criteria were never independent was withdrawn by C99"},
+  "decisions": {"H329_no_residual_contradictions": false, "H330_audit_covers_every_claim": false,
+                "H331_covers_and_contradiction_free_after_fix": true},
+  "why_this_audit_was_worth_running": {
+    "setup": "the documents are annotate-don't-delete, which preserves history but leaves withdrawn conclusions lying in tables",
+    "consequence_without_it": "a reader would meet the retraction and then, immediately below, the retracted claim presented as fact with a wrong number",
+    "new_standing_rule": "after any rule-type conclusion is withdrawn, scan every document for places where it still appears as a statement of fact; annotation alone does not prevent contradiction"},
+  "limits": ["the scan is keyword based and could miss rephrasings",
+             "only the four main documents were scanned, not each round's record and report",
+             "the classification remains my judgement",
+             "retrospective and read-only; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["split the thirty 'stands with important qualification' claims into wording-narrowed versus magnitude-or-direction-changed, since mixing them hides the difference in citation risk"],
+  "mutations_outside_episode": ["research/SYNTHESIS.md (line 81 corrected)",
+                                "research/CLAIM_STATUS_AUDIT.md (rebuilt to 100 claims)",
+                                "research/INDEX.md (added R132 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

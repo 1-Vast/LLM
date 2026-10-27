@@ -1,0 +1,48 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r71",
+  "round": "R71 (goal round 69/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Four-predictor attribution test on GDSC: annotation ridge, drug marginals, two-way additive, combo lookup."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r71": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round delivers a decisive negative on the programme's own model and rewrites the synthesis promotion verdict to 'nothing to promote'.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e071_four_predictors.py"], "runs": "2 (key-name fix, then final)",
+    "repeats": 40, "settings": 2, "predictors": 4, "bootstrap": 2000,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E071_RESULTS.json", "rows": "E071_rows.csv", "protocol": "PROTOCOL_E068.md"},
+  "design": {
+    "predictors": ["ridge on pathway+tissue (41 dims)", "drug pair marginals", "two-way additive (drug + cell marginals)", "combo lookup with additive fallback"],
+    "holdout": "20% of drugs; both settings share the same training rows so only the scoring rule differs",
+    "k": 20
+  },
+  "results": {
+    "seen": {"combo_seen_frac": 1.0, "ridge": 0.0388, "drug_marg": 0.0537, "additive": 0.0763, "combo_marg": 0.3925},
+    "unseen": {"combo_seen_frac": 0.0, "ridge": 0.0575, "drug_marg": 0.0600, "additive": 0.1588},
+    "unseen_ridge_minus_additive": {"diff": -0.1012, "ci95": [-0.1337, -0.0688]},
+    "seen_ridge_minus_combo": {"diff": -0.3537, "ci95": [-0.3962, -0.3038]},
+    "additive_minus_drug_marg": {"seen": 0.0225, "unseen": 0.0987}
+  },
+  "decisions": {"H179_memory_matches_or_beats_model": true,
+                "H180_cell_marginals_help": true,
+                "H181_model_wins_only_where_combo_unseen": false,
+                "verdict": "model_has_no_identified_advantage"},
+  "leakage_flag": "the 39.25% combo-lookup result in the seen setting is NOT a fair baseline: every combination in that pool appears in training under other cells (combo_seen = 1.00), so lookup is memorisation across the key-level split, exactly the issue R43 raised",
+  "clean_result": "in the unseen pool no combination appears in training (combo_seen = 0.00), and there the two-way additive model reaches 15.88% against the annotation ridge's 5.75%, a 10.12 pp gap",
+  "consistency_with_prior": "C19 already measured the additive model at rho = 0.941 on unseen combinations; this round shows the same additive structure also wins at the decision level",
+  "consequence": "the annotation model has no setting in which it is identified as better; the synthesis promotion verdict changed from 'A promotable but not ours' to 'nothing is worth promoting'",
+  "limits": ["the seen-setting comparison is contaminated by key-level repetition and is reported only as a reference",
+             "the additive baseline still requires the cell to appear in training, so it is not a cold-start-cell baseline",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["run the same four-predictor comparison under a joint cell+drug holdout, where the additive model loses its cell marginals"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C45 added)", "research/SYNTHESIS.md (sections 1, 7, 8, 9 rewritten)",
+                                "research/INDEX.md (added R71 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

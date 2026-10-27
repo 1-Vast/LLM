@@ -1,0 +1,57 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r72",
+  "round": "R72 (goal round 70/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Four-predictor comparison under joint cell+drug holdout on GDSC."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r72": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round delivers the programme's decisive negative on its own modelling route and rewrites the synthesis accordingly.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e072_joint_four.py"], "runs": "3 (two wiring fixes, then final)",
+    "repeats": 40, "settings": 3, "predictors": 4, "bootstrap": 2000,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E072_RESULTS.json", "rows": "E072_rows.csv", "protocol": "PROTOCOL_E069.md"},
+  "design": {
+    "holdout": "20% of 125 cells and 20% of 65 drugs jointly",
+    "training": "seen cells x both-seen drugs",
+    "settings": ["cell_unseen", "drug_unseen", "both_unseen"],
+    "predictors": ["ridge (pathway+tissue)", "drug pair marginals", "two-way additive", "combo lookup"],
+    "k": 20
+  },
+  "results": {
+    "cell_unseen": {"ridge": 0.0488, "drug_marg": 0.0525, "ridge_minus_drug_marg": {"diff": -0.0038, "ci95": [-0.0263, 0.0175]}},
+    "drug_unseen": {"ridge": 0.0512, "drug_marg": 0.0912, "additive": 0.1050,
+                    "ridge_minus_drug_marg": {"diff": -0.0400, "ci95": [-0.0712, -0.0138]},
+                    "ridge_minus_additive": {"diff": -0.0538, "ci95": [-0.0862, -0.0225]}},
+    "both_unseen": {"ridge": 0.0475, "drug_marg": 0.0725, "additive": 0.0725,
+                    "ridge_minus_drug_marg": {"diff": -0.0250, "ci95": [-0.0462, -0.0050]}}
+  },
+  "decisions": {"H182_model_wins_under_joint_holdout": false,
+                "H183_additive_degrades_to_drug_marg": true,
+                "H184_both_beat_random": true,
+                "additive_vs_drug_marg_gap": 0.0,
+                "verdict": "annotation_model_has_no_measured_advantage_anywhere"},
+  "final_negative": {
+    "across_all_tested_conditions_the_annotation_model_loses": {
+      "drugs_seen_R71": "-1.50 pp vs drug marginals",
+      "unseen_combinations_R71_clean": "-10.12 pp vs two-way additive",
+      "joint_holdout_R72": "-2.50 pp vs drug marginals"},
+    "sharpest_single_contrast": "on the unseen-drug pool the marginal baseline fills an unseen drug with 0 ('unknown') and still scores 9.12%, while the annotation model, for which the pathway annotation IS available for that drug, scores 5.12%",
+    "implication": "knowing a drug's pathway is worth less than knowing the average synergy of the drug it is paired with"},
+  "what_is_NOT_claimed": "this does not say synergy is unpredictable - it is clearly predictable (drug marginals 9.12%, two-way additive 15.88%); it says the pathway-annotation modelling route adds nothing at the decision level",
+  "limits": ["the pathway annotation is coarse (38 pathway levels), so the finding may be about this granularity rather than about pathways in general",
+             "drug marginals require each drug to appear in training; unseen drugs fall back to zero",
+             "tissue is still mostly seen even under the joint holdout",
+             "single dataset; retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["either obtain a finer annotation (not available locally) or accept that this modelling route does not work"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C46 added)", "research/SYNTHESIS.md (sections 1, 7, 8, 9 rewritten)",
+                                "research/INDEX.md (added R72 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

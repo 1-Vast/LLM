@@ -1,0 +1,44 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r43",
+  "round": "R43 (goal round 41/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Group split by combination on the locally held GDSC screen; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r43": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: this round overturns both the previous round's causal explanation and part of R37's support, and both are recorded as retractions.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e043_group_split.py"], "runs": 1, "alphas": 5, "repeats": 40,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E043_RESULTS.json", "rows": "E043_rows.csv", "protocol": "PROTOCOL_E043.md"},
+  "design": {
+    "group_split": "candidate-pool combinations can be entirely absent from training (alpha=0) or partly present (alpha>0)",
+    "alphas": [1.0, 0.75, 0.5, 0.25, 0.0],
+    "pool_target": 21600
+  },
+  "results": {
+    "rho_by_alpha": {"1.0": 0.3156, "0.75": 0.3112, "0.5": 0.3069, "0.25": 0.3151, "0.0": 0.3076},
+    "span": 0.008,
+    "no_alpha_had_both_halves_significant": true,
+    "alpha1_k50": {"search": 0.006, "search_ci": [-0.024, 0.034], "eval": 0.039, "eval_ci": [-0.009, 0.094]}
+  },
+  "decisions": {"H112_strength_swept": false, "H113_lower_boundary_exists": false,
+                "H114_weak_end_no_difference": false,
+                "verdict_reported": "fourth_manipulation_failure_and_R42_cause_retracted"},
+  "retractions": {
+    "R42_cause": "the residual signal was NOT memorisation of repeated (cell, combination) keys; even with pool combinations entirely absent from training rho stays at 0.3076, because pathway-level features generalise to unseen combinations (consistent with R29's leave-one-drug rho of 0.20)",
+    "C28_scope": "the mix budget rule is significant only under the KEY-LEVEL split; under the grouped split no alpha or k reaches significance, so R37's gain depends on the pool containing the same combination across several cells"
+  },
+  "status_of_the_band_hypothesis": "still untested after four failed manipulations (feature swap, label noise, label permutation, group split); rho never went below 0.186",
+  "interpretation": "annotation-level signal is robust and genuinely generalisable, which makes 'weak prediction' hard to construct on this resource by any sampling manipulation",
+  "register_updates": {"C28": "narrowed again - key-level split only", "C33": "root cause corrected; lower boundary still unestablished"},
+  "next_gates": ["the only untried strength manipulation is to randomise the features themselves (assign each drug a random pathway), though the scientific value is now low"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C28 narrowed, C33 cause corrected)", "research/INDEX.md (added R43 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "mechanism_claim_made": false
+  }
+}

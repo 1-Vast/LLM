@@ -1,0 +1,97 @@
+{
+  "kind": "identity_arm_added_to_the_R89_residual_test",
+  "input_sha256": "56a4e4a195673160edcb1baa209a15409b3639ff6ab0405558cc5ab3198d5f23",
+  "settings": {
+    "k": 20,
+    "repeats": 60,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "units": 240,
+    "cells": 12,
+    "mean_cv_r2_of_additive_null": 0.650664683184496,
+    "R88_units": 48
+  },
+  "summary": {
+    "n": 240,
+    "gene": 0.2810416666666667,
+    "random": 0.256875,
+    "identity": 0.09854166666666667,
+    "base": 0.25087187625823226,
+    "gene_minus_random": {
+      "n": 240,
+      "mean_diff": 0.024166666666666684,
+      "ci95": [
+        -0.012499999999999995,
+        0.060421874999999986
+      ]
+    },
+    "gene_minus_identity": {
+      "n": 240,
+      "mean_diff": 0.1825,
+      "ci95": [
+        0.15833333333333333,
+        0.207296875
+      ]
+    },
+    "identity_minus_random": {
+      "n": 240,
+      "mean_diff": -0.15833333333333333,
+      "ci95": [
+        -0.1808333333333333,
+        -0.13728645833333333
+      ]
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r89/PROTOCOL_E084.md": "5f5615d4a173cbf26e5204a507f7ac54d9f9b2cb41c40ae86c02ae1c80914c1f",
+    "research/2026-10-27-agent-cell-identifiability-r89/e089_high_power.py": "dcbb26d803fb9dd92c8ad0b63d931cd6217dd21e49f4b3855d6d141fb78386fb"
+  },
+  "decisions": {
+    "H224_residual_learnable": true,
+    "H227_gain_becomes_significant_with_power": false,
+    "H228_gain_ruled_out_above_2pp": false,
+    "verdict": "identity_is_degenerate_in_this_arena_and_gene_vs_chance_remains_unestablished",
+    "H272_reproduction_holds": true,
+    "H273_identity_is_a_usable_baseline": false,
+    "H274_annotation_adds_beyond_identity": "not assessable - baseline is worse than chance"
+  },
+  "limits": [
+    "Even 60 repeats per layout draws held-out cells with replacement, so units are not independent.",
+    "Each drug still has only a few concentration points.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "reproduction_check": {
+    "R89_gene": 0.281,
+    "R105_gene": 0.281,
+    "R89_random": 0.2569,
+    "R105_random": 0.2569,
+    "identical_to_four_decimals": true,
+    "meaning": "the pipeline is unchanged and only the identity arm was added, which is exactly what the 'change one thing at a time' rule was meant to guarantee"
+  },
+  "the_identity_arm_is_degenerate": {
+    "identity_hit_rate": 0.0985,
+    "chance_level": 0.2509,
+    "reading": "identity scores far BELOW the 25% chance level, so it is anti-predictive of the additivity residual. The additive null already absorbs per-drug intercepts and dose slopes, so what remains for identity to fit is approximately noise, and the ranking ends up inverted.",
+    "consequence": "'gene beats identity by 18.25 pp' is NOT evidence for annotation value, because the identity baseline is worse than chance; beating a broken baseline proves nothing"
+  },
+  "what_remains_unestablished": {
+    "gene_minus_random": {
+      "diff": 0.0242,
+      "ci95": [
+        -0.0125,
+        0.0604
+      ]
+    },
+    "note": "this is exactly the R89 result and still does not exclude zero"
+  },
+  "cross_dataset_status": {
+    "verdict": "not achievable with BATCHIE",
+    "raw_viability_arena": "saturates (R86): all predictors about 0.89",
+    "residual_arena_identity": "degenerate: anti-predictive at 0.0985 against 0.25 chance (this round)",
+    "residual_arena_gene": "0.2810 against 0.2569 random, not significant (R89 and this round)",
+    "so": "neither arena on this resource can test whether annotation adds beyond identity",
+    "promotion": "stays closed on the cross-dataset requirement"
+  }
+}

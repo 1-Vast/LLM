@@ -1,0 +1,51 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r27",
+  "round": "R27 (goal round 25/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Scope-condition test on data in hand; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r27": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round is a structural limitation plus a direction-reversing descriptive result, both recorded with explicit status labels.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e027_source_agreement.py (non-circular, n=4)", "e027b_share_vs_transfer.py (descriptive, n=25)"],
+    "runs": 2, "bootstrap": 1000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"untestable": "E027_RESULTS.json", "descriptive": "E027B_RESULTS.json",
+                "merged": "E027B_merged.csv", "protocol": "PROTOCOL_E027.md"},
+  "part_1_non_circular": {
+    "design": "source agreement among the source cells only, so no target-cell data is used",
+    "units": 4,
+    "status": "UNTESTABLE, NOT NEGATIVE",
+    "why": "source agreement needs >=3 cells per layout; only 2 layouts have 3 cells, giving 4 units"
+  },
+  "part_2_descriptive": {
+    "units": 25,
+    "association_with_cross_rho": {"spearman": -0.528, "ci95": [-0.764, -0.061]},
+    "association_with_cross_p10": {"spearman": -0.066, "ci95": [-0.507, 0.378]},
+    "pre_registered_direction": "positive",
+    "observed_direction": "negative",
+    "circular": true
+  },
+  "decisions": {
+    "H063_as_pre_registered": false,
+    "H063b_precision10": false,
+    "H064_to_H066": null,
+    "verdict_mechanical": "potency_share_does_not_explain_transfer",
+    "interpretation": "the negative sign is coherent: a high potency share means the two cells differ mainly in which compounds are potent, which predicts less similar orderings and worse transfer. R26's phrasing must be read as 'transfer is better when potency profiles are similar'."
+  },
+  "circularity": "main_share needs both cells' data, so this association cannot serve as a pre-computable scope condition for a new cell; it is explanatory only",
+  "register_updates": {
+    "C22": "new, exploratory and circular: potency share vs cross-cell rho = -0.528 [-0.764,-0.061]; no association with precision@10",
+    "C21": "interpretation corrected: a higher share means the potency profiles differ more and transfer is worse",
+    "untestable_added": "source-agreement pre-condition needs >=3 cells per layout; only 2 layouts qualify"
+  },
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C22 added, C21 interpretation corrected, untestable item added)",
+                                "research/INDEX.md (added R27 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "mechanism_claim_made": false, "pre_computable_condition_claimed": false
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "kind": "what_defines_the_Synergy_label",
+  "keys": 108259,
+  "n_positive": 1550,
+  "base_rate": 0.014317516326587166,
+  "by_metric": {
+    "SYNERGY_DELTA_AUC": {
+      "auc_vs_synergy": 0.9821189554105392,
+      "point_biserial": 0.35254890873768957,
+      "n": 108259
+    },
+    "SYNERGY_DELTA_EMAX": {
+      "auc_vs_synergy": 0.9824190600968145,
+      "point_biserial": 0.36949688974209693,
+      "n": 108259
+    },
+    "SYNERGY_DELTA_fAUC": {
+      "auc_vs_synergy": 0.9841761329198281,
+      "point_biserial": 0.3990142384365227,
+      "n": 108259
+    },
+    "SYNERGY_DELTA_XMID": {
+      "auc_vs_synergy": 0.9901142480045975,
+      "point_biserial": 0.34313274980540265,
+      "n": 108259
+    }
+  },
+  "spearman_between_metrics": {
+    "SYNERGY_DELTA_AUC": {
+      "SYNERGY_DELTA_AUC": 1.0,
+      "SYNERGY_DELTA_EMAX": 0.8309019680122095,
+      "SYNERGY_DELTA_fAUC": 0.8483313851792732,
+      "SYNERGY_DELTA_XMID": 0.8063294901426367
+    },
+    "SYNERGY_DELTA_EMAX": {
+      "SYNERGY_DELTA_AUC": 0.8309019680122095,
+      "SYNERGY_DELTA_EMAX": 1.0,
+      "SYNERGY_DELTA_fAUC": 0.9674716035702929,
+      "SYNERGY_DELTA_XMID": 0.960725629729271
+    },
+    "SYNERGY_DELTA_fAUC": {
+      "SYNERGY_DELTA_AUC": 0.8483313851792732,
+      "SYNERGY_DELTA_EMAX": 0.9674716035702929,
+      "SYNERGY_DELTA_fAUC": 1.0,
+      "SYNERGY_DELTA_XMID": 0.9380531566663497
+    },
+    "SYNERGY_DELTA_XMID": {
+      "SYNERGY_DELTA_AUC": 0.8063294901426367,
+      "SYNERGY_DELTA_EMAX": 0.960725629729271,
+      "SYNERGY_DELTA_fAUC": 0.9380531566663497,
+      "SYNERGY_DELTA_XMID": 1.0
+    }
+  },
+  "decisions": {
+    "H232_label_defined_by_one_metric": false,
+    "H233_label_is_a_consensus": false,
+    "dAUC_auc": 0.9821189554105392,
+    "best_other_auc": 0.9901142480045975,
+    "verdict": "the_flag_is_metric_robust_at_the_extreme_but_metrics_diverge_in_the_bulk"
+  },
+  "limits": [
+    "this is association, not the label's generating rule, which lives in upstream code not present locally",
+    "the four metrics are highly correlated, which compresses AUC differences",
+    "retrospective; no mechanism, clinical or drug-choice claim"
+  ],
+  "preregistered_criteria_failed": {
+    "H232": "required dAUC AUC >= 0.90 and >= 0.05 above the others; dAUC is 0.982 but dXMID is higher at 0.990, so it fails",
+    "H233": "required all AUCs inside 0.75-0.95 with spread < 0.05; all four exceed 0.98, so the ceiling I set was simply too low",
+    "honest_note": "both criteria were mine and both missed; the data says something sharper than either"
+  },
+  "the_real_finding": {
+    "all_four_metrics_classify_the_flag_at_AUC_0.98_to_0.99": true,
+    "interpretation": "the published Synergy flag is consistent with all four metrics simultaneously, i.e. at the extreme where the flag lives, the four definitions agree",
+    "why_R90_flipped_then": "R90's criterion was the top quartile of each metric, which lives in the BULK, not at the extreme. The metrics agree at the extreme (AUC 0.98+) but diverge in the bulk, and the annotation model happens to predict the dEMAX bulk better than the dAUC bulk.",
+    "resolution": "the decision-relevant target is the published extreme call, and there the metric choice does not matter; R90's sign flip measures a different and less decision-relevant quantity"
+  }
+}

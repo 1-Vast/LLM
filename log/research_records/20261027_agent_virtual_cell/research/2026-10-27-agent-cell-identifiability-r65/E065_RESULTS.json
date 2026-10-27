@@ -1,0 +1,63 @@
+{
+  "kind": "recomputation_of_prose_only_register_numbers",
+  "purpose": "R64 reported three numbers that exist only in report prose; the register forbids rewriting old records, so they are recomputed here from what IS stored",
+  "C2_validation": {
+    "n_cellpairs": 192,
+    "n_layouts": 7,
+    "recomputed_median_tau_half": 0.8907177181122607,
+    "recomputed_median_tau_cross": 0.7366992307054481,
+    "recomputed_median_diff": 0.1391701261598992,
+    "recomputed_layout_clustered_ci95_of_median_diff": [
+      0.1154904902928805,
+      0.21685612681124888
+    ],
+    "prose_values": {
+      "tau_half": 0.891,
+      "tau_cross": 0.712,
+      "ci": [
+        0.116,
+        0.291
+      ]
+    },
+    "match_tau_half": true,
+    "match_tau_cross": false,
+    "ci_overlaps_prose": true,
+    "bootstrap_note": "4000 layout-resamplings, seed 20261027; the original seed is unknown, so the CI endpoints are not expected to match to the digit"
+  },
+  "C23_between_sd": {
+    "between_unit_share": 0.304120433617072,
+    "total_var": 0.0033348983360123163,
+    "within_unit_sd_median": 0.04399743703039635,
+    "recomputed_between_unit_sd": 0.03184667530554669,
+    "prose_value": 0.032,
+    "match": true,
+    "recomputed_ratio_within_over_between": 1.3815394105749363,
+    "prose_ratio": 1.38,
+    "ratio_match": true,
+    "formula": "between_sd = sqrt(between_share * total_var), which is the only way the stored fields determine it"
+  },
+  "decisions": {
+    "H164_prose_numbers_reproducible": false
+  },
+  "limits": [
+    "recomputation uses the stored per-cell data and the stored variance components; if either was itself computed with an unknown seed, small differences are expected",
+    "the bootstrap CI endpoints depend on the seed and are compared by overlap, not equality",
+    "read-only with respect to old records: nothing in E006 or E028 was modified"
+  ],
+  "verdict": "partially_reproducible",
+  "outcome": {
+    "reproduced": [
+      "C2 tau_half 0.891 (got 0.8907)",
+      "C2 CI lower bound 0.116 (got 0.1155 under layout-clustered median bootstrap)",
+      "C23 between-unit sd 0.032 (got 0.0318)",
+      "C23 ratio 1.38 (got 1.382)"
+    ],
+    "not_reproduced": [
+      "C2 tau_cross 0.712 (overall median is 0.7367; median of per-layout medians is 0.7088; no definition gave 0.712)",
+      "C2 CI upper bound 0.291 (best layout-clustered median bootstrap gives 0.2169; layout-clustered MEAN gives 0.2642)"
+    ],
+    "interpretation": "the substantive conclusion of C2 is untouched - tau_half exceeds tau_cross in 192/192 pairs with a median gap of 0.1392 and a layout-clustered CI of [0.1155,0.2169] - but two supporting figures in the register cannot be regenerated from the stored per-cell data",
+    "likely_cause": "the layout clustering has only 7 clusters, one of which holds 3 cell pairs; a bootstrap upper bound in that configuration is highly seed- and grouping-sensitive, so 0.291 is plausibly an artefact of a different grouping or seed that was never stored",
+    "consequence": "the register should cite the reproducible figures; the unreproducible ones should not be quoted as if verifiable"
+  }
+}

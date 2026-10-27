@@ -1,0 +1,127 @@
+{
+  "kind": "which_grouping_is_the_better_prior",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "repeats": 200,
+    "holdout": 0.2,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261048
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 200,
+    "dims": {
+      "identity": 130,
+      "pathway": 38,
+      "target": 98
+    }
+  },
+  "arms": {
+    "identity": -0.0007219028170460691,
+    "plus_pathway": 0.12686976649365833,
+    "plus_target": 0.05981637945312139,
+    "plus_both": 0.1295886959410608,
+    "plus_random": -0.0007947466693538445
+  },
+  "contrasts": {
+    "pathway_minus_identity": {
+      "n": 163,
+      "mean_diff": 0.12539176262146873,
+      "ci95": [
+        0.1130044288615412,
+        0.1381208381571167
+      ]
+    },
+    "target_minus_identity": {
+      "n": 163,
+      "mean_diff": 0.05364488916139757,
+      "ci95": [
+        0.042538483063633635,
+        0.06488922410228204
+      ]
+    },
+    "both_minus_identity": {
+      "n": 163,
+      "mean_diff": 0.12672213494921622,
+      "ci95": [
+        0.11411244622229014,
+        0.13904136194728595
+      ]
+    },
+    "random_minus_identity": {
+      "n": 163,
+      "mean_diff": 0.00018595064578558204,
+      "ci95": [
+        -0.0031740586348950185,
+        0.003362684845715282
+      ]
+    },
+    "target_minus_pathway": {
+      "n": 198,
+      "mean_diff": -0.06846285412107139,
+      "ci95": [
+        -0.08233705855379797,
+        -0.05413302118536199
+      ]
+    },
+    "both_minus_pathway": {
+      "n": 200,
+      "mean_diff": 0.0027189294474024555,
+      "ci95": [
+        -0.000846962044370289,
+        0.006044914177351729
+      ]
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r145/PROTOCOL_E135.md": "4b5b6a34d3b6da34f40e6e65835e3b8f11547c2f14794c68e228c776f4616bac",
+    "research/2026-10-27-agent-cell-identifiability-r145/e145_groupings.py": "84004b8497b6e6b78cc324e1fc5675f56aa801d79ea71e9c1ed9d673e28fc30f"
+  },
+  "decisions": {
+    "target_vs_pathway_diff": -0.06846285412107139,
+    "H356_groupings_differ": true,
+    "H357_groupings_equivalent": false,
+    "which_is_better": "pathway",
+    "verdict": "pathway_is_the_better_prior_than_target_and_target_adds_nothing_on_top"
+  },
+  "limits": [
+    "Only this resource and only ridge.",
+    "Target has 40+58 levels against pathway's 38, so the dimension differs and is reported.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "the_answer": {
+    "which_to_use": "pathway, not target",
+    "numbers": {
+      "pathway_gain": 0.1254,
+      "target_gain": 0.0536,
+      "target_minus_pathway": -0.0685
+    },
+    "target_adds_nothing_on_top": {
+      "both_minus_pathway": {
+        "n": 200,
+        "mean_diff": 0.0027189294474024555,
+        "ci95": [
+          -0.000846962044370289,
+          0.006044914177351729
+        ]
+      }
+    },
+    "reading": "both groupings carry real signal and a random grouping carries none, so the effect is not merely 'any grouping'. But pathway is worth about two and a third times as much as target, and target adds nothing once pathway is present."
+  },
+  "this_rules_out_the_granularity_explanation": {
+    "pathway_levels": 38,
+    "target_levels": 98,
+    "point": "target is the FINER partition, with more than twice the levels, and it performs worse. So 'more resolution is better' is excluded here, which independently supports C108's conclusion that the specific partition is what carries the value.",
+    "contrast_with_C108": "C108 compared the real pathway against a random partition of the same shape; this compares it against another real but different partition"
+  },
+  "this_settles_the_older_ambiguity": {
+    "earlier": "R106 compared pathway against target and found only one of three pools significant, which left the question open",
+    "now": "on the dense criterion in the both-unseen cell, with proper baselines and a fresh seed, the difference is large and clearly significant",
+    "why_the_earlier_round_was_ambiguous": "it used the sparse boolean criterion, which R122 and R131 showed cannot resolve this question in that pool"
+  },
+  "what_this_adds_to_the_practitioner_rule": {
+    "rule": "when a drug is unseen, substitute its pathway membership; adding target annotation on top is not worth the dimensions",
+    "caveat": "this is a ridge result on one resource, and C106/C107 showed the magnitude is model-dependent"
+  }
+}

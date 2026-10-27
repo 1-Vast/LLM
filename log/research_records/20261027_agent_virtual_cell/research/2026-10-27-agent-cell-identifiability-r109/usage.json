@@ -1,0 +1,50 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r109",
+  "round": "R109 (goal round 107/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Corrected minimal-evidence test using R76's per-drug residual construction, against two priors."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r109": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round executes its predecessor's prescribed fix and adds the sanity gate that R108 lacked.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e109_prior_bar.py"], "runs": 1, "units": 140, "draws": 30,
+    "sanity_checks": 280, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E109_RESULTS.json", "rows": "E109_rows.csv", "protocol": "PROTOCOL_E104.md"},
+  "sanity_gate": {"checks": 280, "top_k_changed": 280, "passed": true,
+                  "meaning": "unlike R108, the personalisation arm really does reorder candidates"},
+  "results": {
+    "m10": {"marginal": {"prior": 0.0821, "pers": 0.0768, "gain": -0.0054}, "combo": {"prior": 0.0964, "pers": 0.0786, "gain": -0.0179}},
+    "m25": {"marginal": {"prior": 0.0875, "pers": 0.0804, "gain": -0.0071}, "combo": {"prior": 0.0964, "pers": 0.0750, "gain": -0.0214}},
+    "m50": {"marginal": {"prior": 0.0839, "pers": 0.0821, "gain": -0.0018}, "combo": {"prior": 0.1000, "pers": 0.0768, "gain": -0.0232}},
+    "m100": {"marginal": {"prior": 0.0946, "pers": 0.0982, "gain": 0.0036}, "combo": {"prior": 0.1000, "pers": 0.0964, "gain": -0.0036}},
+    "m200": {"marginal": {"prior": 0.0893, "pers": 0.0964, "gain": 0.0071}, "combo": {"prior": 0.1036, "pers": 0.0982, "gain": -0.0054}}
+  },
+  "decisions": {"H279_bar_raised": false, "H280_bar_lowered": false,
+                "H281_same": "literally true only because neither prior has a threshold",
+                "verdict": "stronger_prior_is_hurt_by_personalisation_at_every_m"},
+  "the_real_finding": {
+    "combo_negative_at_every_m": true,
+    "combo_gains": [-0.0179, -0.0214, -0.0232, -0.0036, -0.0054],
+    "marginal_gains": [-0.0054, -0.0071, -0.0018, 0.0036, 0.0071],
+    "ratio_at_m50": "the combined prior is degraded 13 times as much as the marginal prior",
+    "reading": "the answer is not that the bar was raised but that there is no benefit at these sample sizes; a predictor already reaching about 10% is pulled down by 0.36 to 2.32 pp when corrected with 200 or fewer of the cell's own measurements"},
+  "relation_to_R76": "R76's threshold of about 5-8% of the pool for the marginal prior is not contradicted: this round's marginal gains at m=100 and 200 point the same way but lack power with 30 draws against R76's 125 cells by 20 repeats",
+  "what_is_hard_here": "the combined prior's 5 of 5 negative direction is the firmest observation, although each individual interval contains zero",
+  "limits": ["30 draws is low power, so no individual combo interval excludes zero",
+             "only five m values",
+             "per-drug residuals are noisy at small m, which is precisely the mechanism that hurts a strong prior",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["raise the draws from 30 to about 120 and see whether the 5 of 5 negative direction becomes a significant negative, which would give a clean rule: do not personalise on small samples when the prior is strong"],
+  "register_updates": {"C82": "new: a stronger prior is hurt by personalisation at every tested m",
+                       "C81": "annotated as redone by R109", "SYNTHESIS": "row added"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C82 added, C81 annotated)",
+                                "research/SYNTHESIS.md (row added)", "research/INDEX.md (added R109 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

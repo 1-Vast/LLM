@@ -1,0 +1,160 @@
+{
+  "kind": "boundary_of_the_identity_degeneracy",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "repeats": 200,
+    "holdout": 0.2,
+    "n_boot": 2000,
+    "seed": 20261038
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 1000
+  },
+  "by_pool": {
+    "one_unseen": {
+      "n": 200,
+      "identity_const_rate": 0.0,
+      "pathway_const_rate": 0.0,
+      "identity_rho": 0.253037741777148,
+      "pathway_rho": 0.27285886530251025,
+      "rho_gain": {
+        "n": 200,
+        "mean_diff": 0.019821123525362236,
+        "ci95": [
+          0.01725928603135604,
+          0.02222985177031049
+        ]
+      }
+    },
+    "cell_unseen": {
+      "n": 200,
+      "identity_const_rate": 0.0,
+      "pathway_const_rate": 0.0,
+      "identity_rho": 0.22914597482246413,
+      "pathway_rho": 0.2540439687016424,
+      "rho_gain": {
+        "n": 200,
+        "mean_diff": 0.02489799387917827,
+        "ci95": [
+          0.022015505096461555,
+          0.027663914050281648
+        ]
+      }
+    },
+    "one_seen_only": {
+      "n": 200,
+      "identity_const_rate": 0.0,
+      "pathway_const_rate": 0.0,
+      "identity_rho": 0.3851006495160737,
+      "pathway_rho": 0.3851006882135741,
+      "rho_gain": {
+        "n": 200,
+        "mean_diff": 3.869750043544728e-08,
+        "ci95": [
+          -1.117345624500471e-07,
+          1.9834047080147928e-07
+        ]
+      }
+    },
+    "both_seen_cell": {
+      "n": 200,
+      "identity_const_rate": 0.1,
+      "pathway_const_rate": 0.0,
+      "identity_rho": -0.0018780336431271267,
+      "pathway_rho": 0.13352347721730065,
+      "rho_gain": {
+        "n": 135,
+        "mean_diff": 0.1458118009826898,
+        "ci95": [
+          0.12994640653227363,
+          0.16231429687855217
+        ]
+      }
+    },
+    "both_unseen_cell": {
+      "n": 200,
+      "identity_const_rate": 0.105,
+      "pathway_const_rate": 0.0,
+      "identity_rho": -0.000343265919967723,
+      "pathway_rho": 0.1297675561040361,
+      "rho_gain": {
+        "n": 139,
+        "mean_diff": 0.12750435015516953,
+        "ci95": [
+          0.10875500500478717,
+          0.14705459935625995
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r135/PROTOCOL_E125.md": "764af18b9d43dd9b91edfcce1c7fc9152d8ffda1ae8ded3fb806f60ba81e7434",
+    "research/2026-10-27-agent-cell-identifiability-r135/e135_boundary.py": "d5cb49c238c1c4bb7176862d7b1092b4c809676cd2ed783c17f7c9c5140f8e44"
+  },
+  "decisions": {
+    "low_pool_rates": {
+      "one_unseen": 0.0,
+      "cell_unseen": 0.0,
+      "one_seen_only": 0.0
+    },
+    "high_pool_rates": {
+      "both_seen_cell": 0.1,
+      "both_unseen_cell": 0.105
+    },
+    "H336_degeneracy_only_when_both_drugs_unseen": false,
+    "H337_degeneracy_broader": false,
+    "verdict": "degeneracy_is_confined_to_both_unseen_pools_at_about_ten_percent_and_the_increment_is_six_times_larger_there"
+  },
+  "limits": [
+    "Only this resource; pools are key-level cuts.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "two_problems_with_this_run": {
+    "the_one_seen_only_pool_is_dead": {
+      "definition": "both drugs seen and cell seen, which is a subset of the training rows",
+      "symptom": "identity and pathway predictions have identical dispersion (sd 0.030637 for both) and the rho difference averages 4e-8 with sd 1.2e-6 over 200 splits",
+      "diagnosis": "an in-sample pool makes the two arms numerically indistinguishable, so the zero gain is guaranteed by construction rather than measured",
+      "action": "this row must be excluded from every conclusion; it is the third instance of the dead-arm signature (R104, R108, R113)"
+    },
+    "R134s_degeneracy_figure_was_an_overcount": {
+      "R134_said": "identity produced a constant score in 65 of 200 splits",
+      "this_round_measures": "10.0 percent in both_seen_cell and 10.5 percent in both_unseen_cell, using an explicit std==0 test",
+      "likely_cause": "R134 recorded a NaN rank correlation without checking whether it came from a constant prediction or a constant truth vector, so it counted more cases than were actually degenerate",
+      "correction": "the degeneracy rate is about 10 percent, not 32.5 percent"
+    }
+  },
+  "the_honest_table": {
+    "one_unseen": {
+      "identity_const": 0.0,
+      "identity_rho": 0.253,
+      "pathway_rho": 0.2729,
+      "gain": 0.0198
+    },
+    "cell_unseen": {
+      "identity_const": 0.0,
+      "identity_rho": 0.2291,
+      "pathway_rho": 0.254,
+      "gain": 0.0249
+    },
+    "both_seen_cell": {
+      "identity_const": 0.1,
+      "identity_rho": -0.0019,
+      "pathway_rho": 0.1335,
+      "gain": 0.1458
+    },
+    "both_unseen_cell": {
+      "identity_const": 0.105,
+      "identity_rho": -0.0003,
+      "pathway_rho": 0.1298,
+      "gain": 0.1275
+    },
+    "excluded": "one_seen_only, in-sample and dead"
+  },
+  "the_refinement_this_forces": {
+    "old_framing": "pathway adds only when both drugs are unseen",
+    "what_the_ranking_data_show": "pathway improves the global ranking in every measurable pool, but by a factor of about six more where identity fails: +0.020 and +0.025 when one drug is seen, against +0.146 and +0.128 when neither is",
+    "why_it_matters": "the hit-rate criterion could not see the small gains in the seen pools because the head was already near its ceiling, but the global rank correlation can. So the condition is about magnitude, not about presence",
+    "corrected_claim": "the annotation helps the ranking everywhere, and it substitutes for identity precisely where identity has none"
+  }
+}

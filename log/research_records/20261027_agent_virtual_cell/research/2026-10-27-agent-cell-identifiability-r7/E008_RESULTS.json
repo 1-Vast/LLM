@@ -1,0 +1,77 @@
+{
+  "kind": "leave_two_cells_out_prediction_of_reversal",
+  "input_sha256": "56a4e4a195673160edcb1baa209a15409b3639ff6ab0405558cc5ab3198d5f23",
+  "settings": {
+    "floor": 0.1,
+    "pairs_per_layout": 300,
+    "alpha_shrink": 5.0,
+    "n_boot": 400,
+    "seed": 20261027
+  },
+  "audit": {
+    "layouts": 9,
+    "heldout_cellpairs": 176,
+    "median_pairs_per_heldout": 118.0,
+    "median_prevalence": 0.020113199919142913,
+    "median_train_support": 13.422090934217799
+  },
+  "auc": {
+    "M0_constant": {
+      "weighted_mean": 0.5
+    },
+    "M1_spacing": {
+      "weighted_mean": 0.8277482038743736
+    },
+    "M2_drugpair": {
+      "weighted_mean": 0.9160932976704499
+    },
+    "M3_both": {
+      "weighted_mean": 0.9231505455076164
+    }
+  },
+  "differences": {
+    "M2_minus_M0": {
+      "weighted_mean": 0.4160932976704497,
+      "ci95_layout_clustered": [
+        0.35924022408402484,
+        0.44760484346873586
+      ],
+      "frac_cellpairs_positive": 0.9705882352941176,
+      "n": 136
+    },
+    "M3_minus_M1": {
+      "weighted_mean": 0.09540234163324272,
+      "ci95_layout_clustered": [
+        0.05870276341360691,
+        0.12559781734349082
+      ],
+      "frac_cellpairs_positive": 0.8235294117647058,
+      "n": 136
+    },
+    "M2_minus_M1": {
+      "weighted_mean": 0.08834509379607612,
+      "ci95_layout_clustered": [
+        0.03851965135385335,
+        0.1251005933931705
+      ],
+      "frac_cellpairs_positive": 0.7867647058823529,
+      "n": 136
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r7/PROTOCOL_E008.md": "e1b9c1aaafd322b0b79418801782e6ab7c590da61a534678f4f32c38ea683c21",
+    "research/2026-10-27-agent-cell-identifiability-r7/e008_loco_prediction.py": "2a848e23bf9ddd17b6abd2f89e0c2a2d0a555082d5e6302ecde9acc5bfd492f8",
+    "research\\eight_directions_20261026\\evidence_audit\\raw\\PAIR_SCREEN.csv": "56a4e4a195673160edcb1baa209a15409b3639ff6ab0405558cc5ab3198d5f23"
+  },
+  "decisions": {
+    "H012a_drugpair_transfers": true,
+    "H012b_not_just_spacing": true,
+    "verdict": "drugpair_fragility_transfers_across_cells"
+  },
+  "limits": [
+    "Reversal of a functional viability ordering, not death rate, mechanism, selectivity or clinical benefit.",
+    "Validation plates already used as scoring endpoints by an earlier round; cross-cell comparisons also cross days. Exploratory, not confirmatory.",
+    "Drug pairs are layout-specific, so this tests transfer across unseen CELLS, not unseen drugs.",
+    "AUC is computed per held-out cell pair on its readable unit pairs; cell pairs are dependent within a layout, and only 9 layouts exist, so intervals are wide by construction."
+  ]
+}

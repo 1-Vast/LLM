@@ -1,0 +1,47 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r142",
+  "round": "R142 (goal round 140/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Drug-level leave-one-out test of whether pathway membership predicts a drug's behaviour."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r142": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round tests the mechanism directly and its own gate turns out to ask the wrong question.",
+  "compute": {"python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6, scipy 1.17.1",
+              "scripts": ["e142_drug_level.py"], "runs": 1, "drug_instances": 111,
+              "permutations": 1000, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0},
+  "artifacts": {"results": "E142_RESULTS.json", "drugs": "E142_drugs.csv", "protocol": "PROTOCOL_E132.md"},
+  "results": {
+    "anchor": {"n": 40, "r2_pathway": 0.0846, "pearson": 0.453, "perm_p": 0.004},
+    "library": {"n": 58, "r2_pathway": -0.1531, "pearson": 0.246, "perm_p": 0.086},
+    "both": {"n": 107, "r2_pathway": 0.1511, "pearson": 0.440, "perm_p": 0.000}},
+  "my_decision_rule_was_mismatched": {
+    "the_question": "does pathway membership predict a drug's behaviour",
+    "what_i_gated_on": "whether a leave-one-out group mean beats the grand mean in mean squared error",
+    "why_different": "association and estimation are not the same thing; with about five drugs per pathway a leave-one-out mean is extremely noisy",
+    "data_says": "permutation p of 0.000 and a correlation of 0.44, so the association is real",
+    "corrected_verdict": "the grouping carries real behavioural signal, but a crude five-drug mean is too noisy to exploit it"},
+  "why_this_explains_the_model_level_result": {
+    "ridge_shrinks": "ridge pools information across all keys and shrinks group effects, so the same grouping that fails as a raw mean becomes usable",
+    "so": "the prior is real; exploiting it requires shrinkage",
+    "unexplained": "the anchor-versus-library asymmetry is recorded but not decomposed"},
+  "the_fourth_gate_mismatch": {
+    "instances": ["R103 demanded every pool pass", "R107 demanded four of five streams in every pool",
+                  "R112 demanded a crossover spanning the whole range", "R142 demanded the MSE criterion as well as association"],
+    "new_standing_rule": "before writing a gate, ask whether the statistic answers the question being asked, not only whether it is significant"},
+  "limits": ["111 drug instances, and a drug mean averages away cell-to-cell variation",
+             "21 levels with about five drugs each makes leave-one-out estimation inherently noisy",
+             "the permutation calibrates the R2 and not the MSE",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["replace the crude mean with a shrinkage estimator, a random-effects or empirical-Bayes fit on pathway, and see whether the shrunk prediction beats the grand mean at the drug level"],
+  "register_updates": {"C110": "new: the prior carries real signal but needs shrinkage",
+                       "C109": "annotated", "SYNTHESIS": "mechanism evidence added to the frozen section"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C110 added, C109 annotated)",
+                                "research/SYNTHESIS.md (mechanism evidence added)",
+                                "research/INDEX.md (added R142 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

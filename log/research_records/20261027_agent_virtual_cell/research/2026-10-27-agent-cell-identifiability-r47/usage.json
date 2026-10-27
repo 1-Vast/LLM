@@ -1,0 +1,48 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r47",
+  "round": "R47 (goal round 45/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Within-data mechanism test of the split-dependence claim; no literature query."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r47": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round refutes a mechanism advanced two rounds earlier and downgrades the corresponding candidate contribution.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e047_repetition.py"], "runs": 1, "rs": 4, "repeats": 40,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E047_RESULTS.json", "rows": "E047_rows.csv", "protocol": "PROTOCOL_E046.md"},
+  "design": {
+    "pool_size": "fixed at about 4000 keys (2025 at r=1 because that is the number of combinations)",
+    "repetition_depths": [1, 2, 4, 8],
+    "question": "does the mix advantage grow with the number of cells through which the same combination repeats in the pool?"
+  },
+  "results": {
+    "mix_minus_exploit_k50_all": {"r1": -0.0235, "r2": -0.0105, "r4": 0.0010, "r8": -0.0020},
+    "r1_ci": [-0.0350, -0.0120],
+    "diff_of_diffs_r8_minus_r1": {"diff": 0.0215, "ci95": [0.0015, 0.0410]},
+    "non_monotone": true
+  },
+  "decisions": {"H121_mix_grows_with_repetition": false, "H122_no_advantage_at_r1": false,
+                "verdict_reported": "repetition_mechanism_refuted_and_R37_advantage_not_reproduced"},
+  "key_finding": "the mix never beats exploitation at any repetition depth; increasing r only removes the harm, and R37's positive advantage does not reproduce under this pool construction at any r",
+  "confound": "at r=1 the pool holds 2,025 keys versus 4,000 for r>=2, so repetition and pool size are not separated at that point",
+  "retraction": {
+    "claim": "the failure boundary of the budget rule is explained by cross-cell repetition depth",
+    "status": "mechanism refuted",
+    "candidate_contribution_2": "downgraded to 'the same rule gives different answers under different splits or pool constructions, cause undetermined, and the positive advantage is fragile'",
+    "candidate_contributions_remaining": 2
+  },
+  "register_updates": {"C28": "marked not reproduced; R37's positive advantage should no longer be treated as a stable conclusion",
+                       "section_7": "candidate contributions reduced from 3 to 2"},
+  "next_gates": ["a direct replication of R37's pool construction to establish whether its positive advantage exists only there"],
+  "mutations_outside_episode": ["research/POSITIONING.md (candidate #2 downgraded)",
+                                "research/EVIDENCE_REGISTER.md (C28 and section 7 updated)",
+                                "research/INDEX.md (added R47 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

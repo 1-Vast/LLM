@@ -1,0 +1,43 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r64",
+  "round": "R64 (goal round 62/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Final block of the register numeric audit; no literature query."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r64": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round completes the audit and reports three numbers that exist only in prose as an artefact defect rather than a numerical error.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16",
+    "scripts": ["e064_audit4.py"], "runs": "1", "checks": 24,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E064_RESULTS.json", "protocol": "PROTOCOL_E062.md"},
+  "claims_covered": ["C2", "C23", "C32", "C37", "C39"],
+  "audit_result": {"n_checks": 24, "n_ok": 21, "n_mismatch": 0, "n_not_located": 3},
+  "prose_only_numbers": [
+    {"claim": "C2", "values": "validation tau 0.891 vs 0.712 and the layout-clustered CI [0.116,0.291]",
+     "source": "CANDIDATE_I003.md", "why": "E006_RESULTS.json stores per-cell and per-pair values plus a differently-clustered bootstrap CI [0.0915,0.2049]; 0.116 and 0.291 appear nowhere in that file"},
+    {"claim": "C23", "values": "between-unit sd 0.032",
+     "source": "R28 report", "why": "the JSON stores the variance SHARE 0.304 and the within-unit sd 0.044, but not the between-unit sd"}],
+  "defect_class": "these are not wrong values - they match their reports - but they were never stored as fields, so they cannot be re-verified by machine",
+  "chain_totals": {"rounds": ["R60", "R62", "R63", "R64"], "checks": 104, "mismatches": 0,
+                   "omissions_found_and_fixed": 1, "prose_only": 3},
+  "decisions": {"H162_no_wrong_values": true, "H163_locating_complete": false},
+  "claims_audited_total": 33,
+  "still_unaudited": ["C9", "C10", "C13", "C15", "C16", "C22", "C31", "F1-F9"],
+  "risk_note": "C10, C13 and C15 are already refuted pre-registered hypotheses; a decimal error would not reverse a refutation, so their audit risk is low but they are still unaudited",
+  "limits": ["only claims with explicit numbers were checked",
+             "tolerances were chosen by me",
+             "numerical agreement is not interpretive correctness",
+             "the three prose-only numbers can only be checked by hand against the reports",
+             "retrospective and read-only; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["store the three prose-only numbers as fields in their result JSONs",
+                 "audit C9/C10/C13/C15/C16/C22/C31 and F1-F9 for completeness"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (R64 changelog)", "research/INDEX.md (added R64 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

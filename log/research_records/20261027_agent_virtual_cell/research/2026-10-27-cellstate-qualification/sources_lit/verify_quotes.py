@@ -1,0 +1,137 @@
+# Verify that every quoted string in prior_art.md appears verbatim (whitespace-normalized)
+# in the cited local source extract. Audit artifact for R190-D prior-art check.
+import re
+import sys
+
+sys.stdout.reconfigure(encoding="utf-8")
+
+
+def norm(t):
+    # strip inline-LaTeX delimiters that the HTML->text extraction kept around numbers
+    t = t.replace("\\(", "").replace("\\)", "")
+    t = re.sub(r"\\mathrm\{([^{}]*)\}", r"\1", t)
+    return re.sub(r"\s+", " ", t)
+
+
+checks = [
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/deepsynergy_2018.txt",
+     "we performed stratified cross validation to determine the generalization ability of methods for novel drugs"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/deepsynergy_2018.txt",
+     "the MSEs for the prediction of novel cell lines range between 387 and 461"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/deepsynergy_2018.txt",
+     "Correlation coefficients of the set of cell lines analyzed range from 0.56 to 0.84."),
+    ("research/2026-10-27-agent-cell-identifiability-r180/raw/onehot.txt",
+     "LCO Drug & cell feature 161.68±1.50 0.52±0.013 0.45±0.012"),
+    ("research/2026-10-27-agent-cell-identifiability-r180/raw/onehot.txt",
+     "One-hot-encoding 158.11±1.45 0.53±0.012 0.46±0.012"),
+    ("research/2026-10-27-agent-cell-identifiability-r180/raw/onehot.txt",
+     "Leave-Cell-Line-Out (LCO): This strategy sets aside test data based on cell lines."),
+    ("research/2026-10-27-agent-cell-identifiability-r180/raw/onehot.txt",
+     "our results highlight the need for better strategies to learn from intended features and to generalize to unseen drugs and cell lines."),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/synverse_2025.txt",
+     "Our analysis revealed that no model outperformed a baseline using one-hot encoding."),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/synverse_2025.txt",
+     "All models showed poor generalization to unseen drugs and cell lines."),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/synverse_2025.txt",
+     "four data-splitting methods: (i) leave triplet, (ii) leave drug pair, (iii) leave drug, and (iv) leave cell line"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/synverse_2025.txt",
+     "However, their performance fell short"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/synverse_2025.txt",
+     "All models exhibited poor performance"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/pdtsyn_2026.txt",
+     "none of the cell lines in the validation and test sets appear in the training data, ensuring evaluation on entirely novel cellular environments"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/synprotx_2025.txt",
+     "The leave-cell-lines-out validation (Fig. 13 ), simulating predictions in previously unseen biological systems, presented the most difficult setting."),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/synprotx_2025.txt",
+     "the model with only protein-level data achieved a PCC of 0.801 compared to 0.728 without protein data"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/baptista_systematic_eval_2023.txt",
+     "leave-cell-lines out validation scheme would likely result in lower performance scores"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/baptista_systematic_eval_2023.txt",
+     "the expression features are mainly being used by the models as a way to distinguish between cell lines, just as the cell line identifiers."),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/baptista_systematic_eval_2023.txt",
+     "Drug features appeared to be more predictive of drug response"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/bmc_coldstart_2026.txt",
+     "balanced accuracy falls to 0.694 for unseen drugs and to 0.482 for unseen cell lines"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/bmc_coldstart_2026.txt",
+     "a per-(cell line, drug) base-rate lookup recovers 0.778 balanced accuracy, within 0.027 of the full model"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/bmc_coldstart_2026.txt",
+     "most of the standard-split performance reflects conditional memorization rather than learned pharmacology"),
+    ("research/2026-10-27-agent-cell-identifiability-r180/raw/onehot.txt",
+     "The model fails to generalize to the case when both drugs in the test data are new, the LDO setup."),
+    ("research/2026-10-27-agent-cell-identifiability-r180/raw/onehot.txt",
+     "constructing a truly zero-shot triplet set, where the members of the triplets are never seen in the training, is not possible with the current datasets."),
+    ("research/2026-10-27-agent-cell-identifiability-r180/raw/onehot.txt",
+     "LDO Drug & cell feature 237.42±3.34 0.13±0.012 0.14±0.010"),
+    ("research/2026-10-27-agent-cell-identifiability-r180/raw/onehot.txt",
+     "One-hot-encoding 223.57±3.18 0.10±0.009 0.10±0.008"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/dipx_elife_2025.txt",
+     "while DIPx performed worse with a median correlation of –0.03"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/dipx_elife_2025.txt",
+     "The Spearman’s correlation coefficients between predicted and observed drug synergy were 0.50"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/abstracts/regulon_context_2026_ppr1330660.txt",
+     "We evaluated three group-held-out generalization settings: unseen cell lines, unseen drug scaffolds, and simultaneous exclusion of both"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/abstracts/regulon_context_2026_ppr1330660.txt",
+     "the same addition reduced the mean under joint context and scaffold exclusion"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/abstracts/regulon_context_2026_ppr1330660.txt",
+     "Pathways plus regulons achieved the highest mean Macro-F1 on unseen cell lines (0.4737, compared with 0.4503 for expression alone)"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/abstracts/regulon_context_2026_ppr1330660.txt",
+     "adding regulons increased mean Macro-F1 by 0.0153 on unseen cell lines"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/tahoe_loco_basal_2026.txt",
+     "does the basal (untreated) transcriptome of a completely held-out cell line predict the context-specific component of its drug response"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/tahoe_loco_basal_2026.txt",
+     "the residual after removing the drug’s mean effect across training contexts"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/tahoe_loco_basal_2026.txt",
+     "the best overall model (metadata ridge) attains a mean reliability-weighted residual R² of only + 0.004, and the primary basal-PC ridge model scores − 0.068"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/tahoe_loco_basal_2026.txt",
+     "the median reliability is only 0.067 and just 4 drugs exceed 0.2"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/tahoe_loco_basal_2026.txt",
+     "no prior work uses the training-context drug mean as a residualized endpoint"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/abstracts/separating_main_effects_2026_ppr1290788.txt",
+     "held-out Spearman ρ ≈ 0.05 against a within-tissue permutation null"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/abstracts/separating_main_effects_2026_ppr1290788.txt",
+     "a tissue-only baseline outscores the molecular model on the same target"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/abstracts/separating_main_effects_2026_ppr1290788.txt",
+     "a small personalization signal that survives removal of tissue-of-origin structure"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/arxiv_2605.20885.txt",
+     "which isolates within-drug cell ranking, reveals that no drug encoding improves over cell-only features across four independent datasets."),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/arxiv_2605.20885.txt",
+     "Cell-blind CV on held-out cell lines inverts the conventional ranking: familiar cells enable accurate ranking without drug information, but unfamiliar cells cannot be ranked even when the drug is known"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/arxiv_2605.20885.txt",
+     "between-drug potency ranking and within-drug cell ranking"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/arxiv_2605.20885.txt",
+     "abstract away in vivo pharmacokinetics, tumor microenvironment effects, clonal heterogeneity, and drug combinations"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/arxiv_2605.20885.txt",
+     "RNA-seq alone achieves per-drug r"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/arxiv_2605.20885.txt",
+     "mutations and further modalities each add"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/beyond_synergy_scores_2025.txt",
+     "For the combination CMax viability (26,946 drug-drug-cell line combinations), we obtained similar results that are depicted in Figures 5 C and 5D."),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/beyond_synergy_scores_2025.txt",
+     "provide drug-/combination-specific correlations"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/beyond_synergy_scores_2025.txt",
+     "the drug-specific PCC is only 0.1"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/beyond_synergy_scores_2025.txt",
+     "the derived measures only indicate a general trend in sensitivity but cannot be used to compare the effect of a drug monotherapy on different cell lines"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/forge_2026.txt",
+     "For the test set, Pearson r was 0.68 and 0.31 for the dependency and IC 50 values, respectively"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/forge_2026.txt",
+     "the joint modeling achieved significantly higher concordance than independent models"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/abstracts/vcat_2026_doi_10.1093_bib_bbag559.txt",
+     "Ablation analyses showed that CRISPR-derived vulnerability features complement baseline gene expression"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/cellline_embedding_2025.txt",
+     "the ZIP score prediction task in DrugComb showed a 0.4% increase"),
+    ("research/2026-10-27-cellstate-qualification/sources_lit/raw/fulltext/cellline_embedding_2025.txt",
+     "fold-specific weights that excluded each target cell line during training"),
+    ("lit/report.md",
+     'For *which cell lines* respond, agreement is "modest": 12 (Spearman) and 15 (Pearson) of 29 combinations above ρ > 0.25.'),
+    ("lit/report.md", 'Spearman\'s ρ = 0.61, P = 0.00069.'),
+]
+
+fails = 0
+for path, needle in checks:
+    txt = norm(open(path, encoding="utf-8", errors="replace").read())
+    ok = norm(needle) in txt
+    if not ok:
+        fails += 1
+    print(("OK  " if ok else "MISS"), path.split("/")[-1], "|", needle[:78])
+print("TOTAL", len(checks), "FAILS", fails)

@@ -1,0 +1,139 @@
+{
+  "kind": "global_ranking_vs_head_only",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "repeats": 200,
+    "holdout": 0.2,
+    "topks": [
+      20,
+      50,
+      100
+    ],
+    "n_boot": 2000,
+    "seed": 20261037
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 200
+  },
+  "primary": {
+    "identity_rho": -0.0014993921573720967,
+    "plus_pathway_rho": 0.1279170967423338,
+    "plus_random_rho": 0.0015767170938765875,
+    "pathway_minus_identity": {
+      "n": 135,
+      "mean_diff": 0.13193195647171357,
+      "sd": 0.0774552557759255,
+      "ci95": [
+        0.11874482453863906,
+        0.14532438658849936
+      ]
+    },
+    "random_minus_identity": {
+      "n": 135,
+      "mean_diff": 0.001859055984685506,
+      "sd": 0.02960355833985798,
+      "ci95": [
+        -0.003161391368700758,
+        0.006792577307469872
+      ]
+    },
+    "mde_plus_pathway": 0.015346312074674259,
+    "mde_plus_random": 0.015346312074674259
+  },
+  "secondary": {
+    "20": {
+      "identity": 0.25675000000000003,
+      "plus_pathway": 0.32625,
+      "plus_random": 0.2455,
+      "pathway_gain": {
+        "n": 200,
+        "mean_diff": 0.0695,
+        "sd": 0.215934919471669,
+        "ci95": [
+          0.039749999999999994,
+          0.09774999999999999
+        ]
+      }
+    },
+    "50": {
+      "identity": 0.2545,
+      "plus_pathway": 0.3145,
+      "plus_random": 0.2464,
+      "pathway_gain": {
+        "n": 200,
+        "mean_diff": 0.06,
+        "sd": 0.16644071786319017,
+        "ci95": [
+          0.0368975,
+          0.08340499999999999
+        ]
+      }
+    },
+    "100": {
+      "identity": 0.24955,
+      "plus_pathway": 0.31295,
+      "plus_random": 0.24645,
+      "pathway_gain": {
+        "n": 200,
+        "mean_diff": 0.0634,
+        "sd": 0.12313917443854752,
+        "ci95": [
+          0.04564875,
+          0.08015249999999999
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r134/PROTOCOL_E124.md": "f9f0559b1d12b039f5513e2b7813547465c2ed7deacc4bfdadadeda0cc05f384",
+    "research/2026-10-27-agent-cell-identifiability-r134/e134_ranking.py": "8df3f4d3b4ecabf1d24e95018a455cde2fd4f98eb759f999427644d1ca8354ce"
+  },
+  "decisions": {
+    "spearman_pathway_gain": 0.13193195647171357,
+    "H334_ranking_improves_globally": true,
+    "H335_only_the_head_improves": false,
+    "verdict": "identity_collapses_to_a_constant_in_a_third_of_splits_while_pathway_ranks_globally"
+  },
+  "limits": [
+    "Only the both_unseen cell.",
+    "A single rank correlation can hide local shape.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "the_cleanest_statement_yet": {
+    "identity_global_rho": -0.0014993921573720967,
+    "reading": "in the both-unseen pool drug identity carries essentially zero rank information about delta EMAX (rho -0.0015). The pathway annotation lifts it to 0.128, and a matched random block leaves it at 0.002.",
+    "why_it_is_cleaner": "the hit-rate numbers are threshold artifacts to some degree, but a rank correlation over the whole evaluation set is not. This is the plainest form of the finding so far."
+  },
+  "it_corrects_my_R133_reasoning": {
+    "what_I_said_in_R133": "the gain grows as the threshold loosens, therefore the annotation improves the whole ranking rather than the tail",
+    "what_R134_shows": {
+      "top20_gain": 0.0695,
+      "top50_gain": 0.06,
+      "top100_gain": 0.0634,
+      "reading": "the gain is flat across prediction-set sizes, not increasing"
+    },
+    "so": "the conclusion survives but the reasoning was partly wrong: the monotone increase in R133 was mostly the hit-rate metric drifting toward tau, which is exactly the hole the protocol flagged. The global rank correlation is the evidence, not the growth pattern.",
+    "corrected_statement": "annotation improves the whole ranking; the improvement is broad and roughly constant, not increasing with the cut"
+  },
+  "what_this_adds_to_the_frozen_claim": {
+    "a_seventh_check": "global rank correlation, which depends on no threshold at all",
+    "identity_is_the_control_that_matters": "identity scoring -0.0015 shows the pool really is one where identity carries no signal, which is the premise the whole claim rests on"
+  },
+  "the_degeneracy_is_the_headline": {
+    "identity_constant_splits": 65,
+    "identity_defined_splits": 135,
+    "identity_mean_abs_rho_when_defined": 0.0178,
+    "identity_rho_range_when_defined": [
+      -0.0614,
+      0.0607
+    ],
+    "pathway_nan_splits": 0,
+    "pathway_rho": 0.1279,
+    "random_nan_splits": 0,
+    "random_rho": 0.0016,
+    "reading": "in 65 of 200 splits the identity score is a constant, because both drugs are held out and every identity column for the evaluation keys is zero, so the prediction collapses to the training mean. A rank correlation is undefined there. In the 135 remaining splits the mean absolute rank correlation is 1.8 percent, i.e. noise.",
+    "why_it_matters": "this is the strongest available form of the premise the frozen claim rests on: identity does not merely perform badly in this pool, it produces a constant. Adding the pathway block removes the degeneracy entirely - zero of 200 splits are constant - and gives a rank correlation of 0.128."
+  },
+  "caveat_on_power": "the paired rank-correlation contrast rests on 135 of 200 splits, since 65 are undefined for identity. The hit-rate contrasts, which do not require a defined rank correlation, use all 200 and agree in sign and significance, so the conclusion does not depend on the reduced sample."
+}

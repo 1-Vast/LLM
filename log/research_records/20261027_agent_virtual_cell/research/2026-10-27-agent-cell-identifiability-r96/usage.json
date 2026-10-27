@@ -1,0 +1,51 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r96",
+  "round": "R96 (goal round 94/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Same-class audit of C42, applying the lesson written in R95."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r96": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round hunts for a flaw of the kind found twice in a row, does not find one, and says so plainly.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["r96.py"], "runs": 1, "sizes": 4, "rules": 2, "draws": 60,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E096_RESULTS.json", "rows": "E096_rows.csv", "protocol": "PROTOCOL_E091.md"},
+  "audit_target": "C42: 'decision value of a weak signal is insensitive to pool size (with a proportional budget)' - the parenthetical was the tell",
+  "design": {
+    "manipulation": "pool size only, via uniform subsampling of keys from 2,000 to 20,000, so composition is held fixed",
+    "rules": ["proportional k = 5% of the pool", "fixed k = 20"],
+    "predictor": "drug marginals computed once on the full pool so that only the evaluation pool varies"
+  },
+  "results": {
+    "proportional": {"2000": 0.0917, "5000": 0.0935, "10000": 0.0973, "20000": 0.0949,
+                     "small_vs_large": {"diff": -0.0032, "ci95": [-0.0096, 0.0035]}},
+    "fixed": {"2000": 0.0942, "5000": 0.1083, "10000": 0.1317, "20000": 0.1092,
+              "small_vs_large": {"diff": -0.0150, "ci95": [-0.0375, 0.0058]}}
+  },
+  "decisions": {"H246_fixed_k_degrades_with_pool": false,
+                "H247_proportional_is_flat": true,
+                "H248_C42_is_constructural": false,
+                "verdict": "C42_holds"},
+  "audit_outcome": {
+    "hypothesis": "C42's insensitivity might be produced by its proportional-budget rule",
+    "result": "not confirmed - the fixed-budget rule is also flat, so insensitivity is not a budget-rule artefact",
+    "C42_status": "strengthened by the audit"},
+  "why_it_is_flat_regardless_of_rule": "the top-20 is dominated by the one or two highest-marginal drug pairs (R81 found a median of 2 distinct pairs), and the identity and quality of that best pair do not depend on how many keys the pool holds",
+  "honest_note": "I went looking for a flaw and did not find one. That matters because R93 and R94 did find flaws; an audit that only ever confirms suspicion would be worth nothing.",
+  "limits": ["uniform subsampling keeps composition fixed, whereas real pools also differ in composition",
+             "the 13.17% at the 10k fixed-budget level is noise and must not be read as 'a medium pool is best'",
+             "only 65 drugs",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["other claims carrying a parenthetical qualifier are candidates for the same audit, one per round, and each must be genuinely able to fail"],
+  "register_updates": {"C69": "new: C42 survives the same-class audit",
+                       "C42": "annotated as audited"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C69 added, C42 annotated)", "research/INDEX.md (added R96 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

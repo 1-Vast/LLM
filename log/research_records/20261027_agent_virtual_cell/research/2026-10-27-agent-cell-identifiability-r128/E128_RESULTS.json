@@ -1,0 +1,112 @@
+{
+  "kind": "resource_capability_audit",
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r128/PROTOCOL_E120.md": "436ddfae6c964eab68b03ef1428d46f45bbb586f9511d2ad9a0621fbc77790f0",
+    "research/2026-10-27-agent-cell-identifiability-r128/e128_resource_audit.py": "ec2d7709d9440c1090a1836b45a71119a80b2062e14ac7085de0eadaec30f623"
+  },
+  "cross": {
+    "cells": 125,
+    "combos": 2025,
+    "observed_keys": 108259,
+    "full_cross": 253125,
+    "coverage": 0.4276898765432099,
+    "keys_per_cell": {
+      "min": 288,
+      "median": 650.0,
+      "max": 1275,
+      "sd": 295.82086929369507
+    },
+    "cells_per_combo": {
+      "min": 28,
+      "median": 47.0,
+      "max": 124
+    },
+    "keys_per_tissue": {
+      "Breast": 60670,
+      "Colon": 28944,
+      "Pancreas": 18645
+    }
+  },
+  "targets": {
+    "anchor_target_levels": 40,
+    "library_target_levels": 58,
+    "interpretation": "annotation only; no binding, occupancy or engagement measurement exists in this file"
+  },
+  "metric_independence": {
+    "n": 108259,
+    "spearman": {
+      "SYNERGY_DELTA_AUC vs SYNERGY_DELTA_EMAX": 0.8309019680122095,
+      "SYNERGY_DELTA_AUC vs SYNERGY_DELTA_fAUC": 0.8483313851792732,
+      "SYNERGY_DELTA_AUC vs SYNERGY_DELTA_XMID": 0.8063294901426367,
+      "SYNERGY_DELTA_EMAX vs SYNERGY_DELTA_fAUC": 0.9674716035702929,
+      "SYNERGY_DELTA_EMAX vs SYNERGY_DELTA_XMID": 0.960725629729271,
+      "SYNERGY_DELTA_fAUC vs SYNERGY_DELTA_XMID": 0.9380531566663497
+    },
+    "abs_median": 0.8931922709228115,
+    "abs_min": 0.8063294901426367,
+    "abs_max": 0.9674716035702929
+  },
+  "replication": {
+    "layouts": 113,
+    "cellpair_observations": 58828,
+    "measured_in_more_than_one_layout": 1788,
+    "frac_replicated": 0.030393690079553955,
+    "max_layouts_per_cellpair": 11
+  },
+  "decisions": {
+    "H318_cross_is_sparse": false,
+    "H319_metrics_not_independent": true,
+    "H320_replication_low": true,
+    "verdict": "two_of_the_four_verification_items_are_unmet_and_the_two_criteria_were_never_independent"
+  },
+  "consequences": {
+    "cross": "the cross is dense enough that the sampling pattern is not a first-order concern.",
+    "metrics": "the four synergy metrics move together, so they are four scalings of one functional readout rather than four independent endpoints. The objective's request for independent functional endpoints is therefore unmet by this resource.",
+    "replication": "technical replication is the exception rather than the rule, so reproducibility claims can only be made for the minority of cell-pair combinations that appear on more than one plate."
+  },
+  "what_this_resource_cannot_support": {
+    "independent_functional_endpoints": "all four metrics derive from one viability matrix",
+    "target_engagement": "annotation only, no occupancy measurement",
+    "genetic_perturbation_reference": "no CRISPR or RNAi data on this machine",
+    "true_replication": "one primary screen for GDSC; BATCHIE offers only plate-level technical repeats"
+  },
+  "limits": [
+    "Covers only the two resources on this machine.",
+    "Coverage structure is examined at tissue and combo level only.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "the_four_verification_items_answered": {
+    "drug_by_cell_cross": {
+      "verdict": "partial",
+      "coverage": 0.4277,
+      "detail": "125 cells by 2,025 combos would be 253,125 keys; 108,259 are observed. Keys per cell range from 288 to 1,275 and cells per combo from 28 to 124, so the design is not a full cross and is strongly unbalanced.",
+      "consequence": "any claim aggregated across cells inherits this pattern and must say so"
+    },
+    "target_engagement": {
+      "verdict": "unmet",
+      "detail": "40 anchor plus 58 library annotation levels; there is no binding, occupancy or engagement measurement"
+    },
+    "genetic_perturbation_reference": {
+      "verdict": "absent",
+      "detail": "no CRISPR or RNAi data exists on this machine"
+    },
+    "independent_functional_endpoints": {
+      "verdict": "unmet",
+      "median_abs_rho": 0.893,
+      "detail": "the four synergy metrics correlate between 0.81 and 0.97; EMAX versus fAUC reaches 0.967",
+      "consequence": "they are four scalings of one viability readout, not four endpoints"
+    },
+    "replication": {
+      "verdict": "unmet",
+      "frac_replicated": 0.0304,
+      "detail": "of 58,828 cell-pair observations only 1,788 appear on more than one plate",
+      "consequence": "reproducibility can only be claimed for a three percent minority"
+    }
+  },
+  "the_self_implication": {
+    "problem": "across many rounds the register describes results as passing on two criteria, the boolean Synergy flag and the delta EMAX quartile. but those two correlate at about 0.83, so they were never independent tests.",
+    "effect": "statements of the form 'passed in 2 of 3 pools by 2 of 3 criteria' overstate the evidence, because the second criterion carries little information beyond the first.",
+    "what_still_holds": "the frozen claim rests mainly on the delta EMAX quantile criterion with its own random, permuted and dead-block controls, and those controls are independent of the criterion choice. So the frozen claim is not weakened by this, but the multi-criteria language elsewhere in the programme must be read as redundancy rather than replication.",
+    "going_forward": "report one criterion and its controls rather than counting criteria as if they were replications"
+  }
+}

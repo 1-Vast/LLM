@@ -4,6 +4,7 @@ Read the [integrated research report](RESEARCH_REPORT.md) for the current scient
 
 | Question | Report chapter |
 |---|---|
+| Latest Agent/virtual-cell audits, ten directions and four conditional mechanisms | [2026-10-27 research](RESEARCH_REPORT.md#latest-agent-and-virtual-cell-research-2026-10-27) |
 | Latest paid-repeatability result and threshold correction | [Current result](RESEARCH_REPORT.md#current-paid-repeatability-result) |
 | Knowledge, ordinary feedback and decision value | [Knowledge](RESEARCH_REPORT.md#knowledge-and-decision-value), [feedback](RESEARCH_REPORT.md#functional-feedback-and-acquisition) |
 | Mechanisms, inheritance and scoped stops | [Mechanisms](RESEARCH_REPORT.md#mechanisms-inheritance-and-self-repair) |

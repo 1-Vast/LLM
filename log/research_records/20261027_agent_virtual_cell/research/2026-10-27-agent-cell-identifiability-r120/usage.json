@@ -1,0 +1,72 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r120",
+  "round": "R120 (goal round 118/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Decisive decomposition: does the annotation increment come from pathway or from tissue?"},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r120": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round executes the decisive test it promised in R119 and overturns its own main positive claim.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e120_decomposition.py"], "runs": 1, "repeats": 60, "pools": 3,
+    "criteria": 2, "arms": 5, "rows": 720, "bootstrap": 2000,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E120_RESULTS.json", "rows": "E120_rows.csv", "protocol": "PROTOCOL_E113.md"},
+  "dimensions": {"identity": 130, "pathway": 38, "tissue": 3},
+  "results_primary_Synergy": {
+    "one_unseen": {"identity": 0.0942, "plus_path": 0.0833, "plus_tissue": 0.1050, "plus_both": 0.1125,
+                   "path_minus_id": {"diff": -0.0108, "ci95": [-0.0383, 0.0183]},
+                   "tissue_minus_id": {"diff": 0.0108, "ci95": [-0.0117, 0.0333]}},
+    "cell_unseen": {"identity": 0.0800, "plus_path": 0.0850, "plus_tissue": 0.1050, "plus_both": 0.0983,
+                    "path_minus_id": {"diff": 0.0050, "ci95": [-0.0175, 0.0258]},
+                    "tissue_minus_id": {"diff": 0.0250, "ci95": [0.0058, 0.0450]}},
+    "both_unseen": {"identity": 0.0158, "plus_path": 0.0117, "plus_tissue": 0.0283, "plus_both": 0.0292,
+                    "path_minus_id": {"diff": -0.0042, "ci95": [-0.0167, 0.0083]},
+                    "tissue_minus_id": {"diff": 0.0125, "ci95": [0.0008, 0.0242]}}
+  },
+  "results_secondary_dEMAX": {
+    "one_unseen": {"path_minus_id": {"diff": -0.0208, "ci95": [-0.0734, 0.0292]},
+                   "tissue_minus_id": {"diff": 0.0283, "ci95": [-0.0167, 0.0767]}},
+    "cell_unseen": {"path_minus_id": {"diff": 0.0017, "ci95": [-0.0333, 0.0408]},
+                    "tissue_minus_id": {"diff": 0.0233, "ci95": [-0.0058, 0.0542]}},
+    "both_unseen": {"path_minus_id": {"diff": 0.0858, "ci95": [0.0258, 0.1459]},
+                    "tissue_minus_id": {"diff": 0.0342, "ci95": [-0.0075, 0.0758]}}
+  },
+  "decisions": {"H299_pathway_carries_independent_signal": false,
+                "H300_increment_is_mainly_tissue": true,
+                "pathway_wins": {"Synergy": 0, "dEMAX": 1},
+                "tissue_wins": {"Synergy": 2, "dEMAX": 0},
+                "verdict": "the_increment_is_tissue_not_pathway_and_C74_must_be_rewritten"},
+  "what_this_overturns": {
+    "the_claim": "C74 and C80 attributed the increment to pathway annotation",
+    "the_decomposition": "pathway is significant in 0 of 3 primary pools and negative in 2 of them, while tissue is significant in 2 of 3",
+    "so": "what helps beyond drug identity is the cell's tissue, a three-level metadata field, which outperforms a thirty-eight-level pathway block",
+    "consequence": "the programme's only positive modelling claim shrinks from 'annotation carries complementary information' to 'tissue carries information', which is close to a known confounder"},
+  "the_unresolved_contradiction": {
+    "primary": "pathway adds nothing (0/3)",
+    "secondary": "pathway adds +8.58 pp [2.58, 14.59] in both_unseen",
+    "consequence": "no claim that pathway is entirely useless may be written until this is resolved"},
+  "the_fourth_attribution_error": {
+    "R99": "attributed the increment to annotation when it was granularity",
+    "R102": "attributed the baseline's edge to marginals when it was lack of shrinkage",
+    "R119": "the increment reversed under tissue holdout",
+    "R120": "the increment is tissue itself",
+    "common_fix": "remove one factor at a time"},
+  "limits": ["pathway has 38 levels and tissue 3, so tissue may simply be better estimated rather than more informative",
+             "the three pools share one training set",
+             "the two criteria contradict each other on pathway",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["resolve the primary-versus-secondary contradiction on pathway before writing that pathway is useless"],
+  "register_updates": {"C91": "new and decisive: the increment is tissue, not pathway",
+                       "C74": "annotated as overturned in attribution", "SYNTHESIS": "headline rewritten"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C91 added, C74 annotated)",
+                                "research/SYNTHESIS.md (headline and evidence table rewritten)",
+                                "research/INDEX.md (added R120 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "kind": "does_the_target_annotation_carry_content_or_only_group_size",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "reps": 20,
+    "n_rand_draws": 5,
+    "seed": 20261078,
+    "lambdas": [
+      0.1,
+      0.3,
+      1.0,
+      3.0,
+      10.0,
+      30.0,
+      100.0,
+      300.0,
+      1000.0
+    ],
+    "folds": 3,
+    "n_boot": 2000
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 20
+  },
+  "arms": {
+    "identity": -0.005132264063823953,
+    "pathway": 0.12064847316834357,
+    "target": 0.05664196492779448,
+    "path_rand": -0.00022094998460354883,
+    "target_rand": 0.0034864139323082777
+  },
+  "contrasts": {
+    "pathway_minus_identity": {
+      "mean": 0.12578073723216754,
+      "ci95": [
+        0.0889625796961593,
+        0.15964572975350239
+      ],
+      "mde_80pct": 0.05176684589373233
+    },
+    "target_minus_identity": {
+      "mean": 0.061774228991618454,
+      "ci95": [
+        0.03278728213776835,
+        0.09309261143213456
+      ],
+      "mde_80pct": 0.044334405857904935
+    },
+    "path_rand_minus_identity": {
+      "mean": 0.0049113140792204045,
+      "ci95": [
+        -0.015728617564686215,
+        0.023368330073561466
+      ],
+      "mde_80pct": 0.02927463604482067
+    },
+    "target_rand_minus_identity": {
+      "mean": 0.008618677996132232,
+      "ci95": [
+        -0.0067158588967113205,
+        0.024120774317640387
+      ],
+      "mde_80pct": 0.02233841617157807
+    },
+    "pathway_minus_path_rand": {
+      "mean": 0.12086942315294716,
+      "ci95": [
+        0.07131672429339367,
+        0.17127453371511528
+      ],
+      "mde_80pct": 0.07342546096923161
+    },
+    "target_minus_target_rand": {
+      "mean": 0.053155550995486224,
+      "ci95": [
+        0.020932482101033302,
+        0.0836200419791044
+      ],
+      "mde_80pct": 0.04596533025102723
+    },
+    "pathway_minus_target": {
+      "mean": 0.0640065082405491,
+      "ci95": [
+        0.02793127575776796,
+        0.10410714348717615
+      ],
+      "mde_80pct": 0.05655115360600683
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r186/PROTOCOL_E174.md": "51c312d107fc6d872d1a27f0372fbda568e04b042189d03020ac36cb14c4ecae",
+    "research/2026-10-27-agent-cell-identifiability-r186/e186_target_null.py": "723c0db915e536fbdda8d6402f6883080f1ce96e6a13c6fa5703a462367b8143"
+  },
+  "decisions": {
+    "target_minus_own_null": 0.053155550995486224,
+    "H436_target_also_carries_content": true,
+    "H437_target_is_only_group_size": false,
+    "verdict": "both_annotations_carry_content_and_pathway_is_worth_about_twice_as_much_as_target"
+  },
+  "limits": [
+    "Matching is on drug counts per level, not on training rows.",
+    "Only ridge and one resource.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "the_answer_refines_C113": {
+    "finding": "both annotations beat their own size-matched nulls, so neither gain is a bin-size artefact",
+    "numbers": {
+      "pathway_own_gain": 0.1258,
+      "pathway_over_its_null": 0.1209,
+      "target_own_gain": 0.0618,
+      "target_over_its_null": 0.0532,
+      "pathway_minus_target": 0.064
+    },
+    "reading": "both real partitions add value that a size-matched random partition does not (+0.005 and +0.009, both spanning zero). So pathway versus target is a MAGNITUDE difference, roughly two to one, not a difference between content and no content."
+  },
+  "this_changes_the_practical_rule": {
+    "before": "use pathway, not target",
+    "after": "prefer pathway because it is worth about twice as much, and treat target as a genuine, weaker fallback when a drug has no pathway label. Target is not worthless; it is just half as informative.",
+    "what_would_have_made_it_the_simpler_rule": "if target had failed to beat its own null, the rule would have been 'only pathway carries content'",
+    "why_that_mattered": "the two rules give different advice for a drug that has a target annotation but no pathway annotation"
+  },
+  "the_nulls_are_both_near_zero": {
+    "path_rand_gain": 0.0049,
+    "target_rand_gain": 0.0086,
+    "reading": "matching the size distribution of a random partition leaves it indistinguishable from identity, for both annotation types. That is the control doing its job twice."
+  },
+  "a_bug_i_caught_before_filing": {
+    "symptom": "every contrast involving the identity arm came out as NaN in the first run",
+    "cause": "the identity arm's prediction is constant on this pool, so spearmanr returns NaN, and I had not guarded that for the three main arms",
+    "fix": "record 0 when the correlation is undefined, as I do elsewhere",
+    "note": "the three contrasts that did not touch identity were already correct, which is why the substantive answer was visible before the fix"
+  }
+}

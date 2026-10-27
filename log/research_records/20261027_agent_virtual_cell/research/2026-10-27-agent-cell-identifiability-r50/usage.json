@@ -1,0 +1,45 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r50",
+  "round": "R50 (goal round 48/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Cross-task test of the pool-size mechanism on BATCHIE; no literature query."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r50": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round unifies four earlier results under one mechanism and states the scale caveat explicitly.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e050_batchie_pools.py"], "runs": 1, "units": 43, "pool_sizes": 3,
+    "repeats": 20, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E050_RESULTS.json", "rows": "E050_rows.csv", "protocol": "PROTOCOL_E049.md"},
+  "design": {
+    "task": "BATCHIE high-diversity, 43 cell units, compound one-hot features, k=20",
+    "pool_sizes": [80, 160, 320],
+    "hit": "true bottom-quartile viability, chance 25%"
+  },
+  "results": {
+    "S80": {"exploit": 0.8374, "mix": 0.5281, "diff": -0.3094, "ci95": [-0.3313, -0.2848]},
+    "S160": {"exploit": 0.8976, "mix": 0.6634, "diff": -0.2342, "ci95": [-0.2573, -0.2087]},
+    "S320": {"exploit": 0.8822, "mix": 0.6270, "diff": -0.2551, "ci95": [-0.2716, -0.2386]},
+    "S320_minus_S80": 0.0542
+  },
+  "decisions": {"H127_direction_matches_GDSC": true, "H128_all_negative_small_pools": true,
+                "verdict_reported": "pool_size_mechanism_replicates_in_direction_not_scale"},
+  "unification": "R37/R48 (+2.9 to +4.0 pp at pool 21,652), R49 (+0.05 at 8,000; -2.55 at 2,000), R47 (-2.0 to +1.0 at 4,000) and R38/R50 (-23 to -31 pp at 80-320) all lie on one pool-size relationship",
+  "C32_revision": "from 'decision rules do not transfer across tasks' to 'the same rule transfers, but the pool size differs'; BATCHIE's failure is the extreme left end of the curve, not a different task",
+  "caveats": {
+    "non_monotone": "S=160 is best (-23.4 pp) while S=320 is slightly worse (-25.5 pp)",
+    "scale_mismatch": "GDSC's small-pool value is -2.55 pp at S=2,000 versus BATCHIE's -30.9 pp at S=80; hit definitions and features differ, so only the direction is comparable",
+    "ceiling": "BATCHIE pools max out at 351 pairs, so the positive region cannot be reached"
+  },
+  "register_updates": {"C32": "unified under pool size", "positioning": "candidate contribution restated"},
+  "next_gates": ["a single-task pool sweep from about 100 to 20,000 to turn the direction into a quantitative law"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C32 unified)", "research/POSITIONING.md (candidate restated)",
+                                "research/INDEX.md (added R50 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

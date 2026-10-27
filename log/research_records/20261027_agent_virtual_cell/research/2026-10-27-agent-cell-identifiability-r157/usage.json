@@ -1,0 +1,88 @@
+{
+  "experiment": "E157A",
+  "round": "R157 (goal round 155/256)",
+  "date": "2026-10-27",
+  "type": "asymmetric starvation: degrade the visible drug's identity while its pathway stays intact",
+  "compute": {
+    "script": "e157_asymmetric.py",
+    "splits": 30,
+    "ks": 4,
+    "arms": 2,
+    "mean_eval": 3066,
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "results": "E157A_RESULTS.json",
+    "rows": "E157A_rows.csv",
+    "protocol": "PROTOCOL_E147.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "gains": {
+    "all": [
+      0.036,
+      0.0226,
+      0.0498
+    ],
+    "k200": [
+      0.0317,
+      0.0193,
+      0.0456
+    ],
+    "k50": [
+      0.0294,
+      0.0154,
+      0.0444
+    ],
+    "k20": [
+      0.0312,
+      0.0192,
+      0.0444
+    ]
+  },
+  "k20_minus_all": [
+    -0.0048,
+    -0.0241,
+    0.0134
+  ],
+  "starvation_did_work": {
+    "rho_identity": [
+      0.2272,
+      0.1562
+    ],
+    "relative_drop": "29 percent",
+    "rho_pathway": [
+      0.2632,
+      0.1874
+    ]
+  },
+  "conclusion": "NEGATIVE, with power (MDE about 0.02 against a true change of about 0.005). Starving the visible drug tenfold drops identity by 31 percent, but the pathway prior falls by 29 percent, so the gap does not move.",
+  "what_it_sharpens": {
+    "rule": "the pathway's value depends on whether identity is available at all, not on how much of it there is",
+    "shape": "a step function rather than a gradient",
+    "practical": "no need to estimate the visible drug's sample size before deciding to use the annotation; ask only whether the drug has been seen",
+    "consistent_with": "C103, where the gain was near zero with identity fully available and largest with none"
+  },
+  "tool_limitation_exposed": {
+    "what": "feature_audit flagged all four arms as CONSTANT_ON_EVAL on every held-out drug's identity column",
+    "is_it_a_defect": "no; a held-out drug's identity column is all zeros on evaluation by construction, which is what an unseen drug means",
+    "consequence": "the audit will flag every substitution experiment, burying real alarms under expected ones",
+    "needed": "a way to declare blocks that are intentionally uninformative"
+  },
+  "limits": [
+    "The evaluation pool mixes many held-out partners, so the correlation is computed on that mixture.",
+    "Only ridge and one resource.",
+    "Going to much smaller k would leave both arms uninformative, so the comparison stops meaning anything there.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "next_gate": "add an expected_uninformative whitelist to feature_audit, the one gap left since R149",
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

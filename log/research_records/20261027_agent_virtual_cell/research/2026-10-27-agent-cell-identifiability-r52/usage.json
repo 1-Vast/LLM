@@ -1,0 +1,40 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r52",
+  "round": "R52 (goal round 50/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Target-definition robustness check of the R51 pool curve; no literature query."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r52": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round confirms the threshold while explicitly reporting that the fine structure is noisy and non-monotone.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e052_bool_curve.py"], "runs": 1, "sizes": 6, "ks": 2, "repeats": 40,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E052_RESULTS.json", "rows": "E052_rows.csv", "protocol": "PROTOCOL_E051.md"},
+  "design": {
+    "identical_to": "R51 (same data, training set, pool sizes, k values, splits and seed)",
+    "only_change": "hit definition switched from the true top decile to the Synergy boolean (base rate about 1.4%)"
+  },
+  "results": {
+    "k20": {"100": -0.0025, "300": -0.0250, "1000": -0.0200, "3000": 0.0112, "10000": 0.0187, "21652": -0.0200},
+    "k50": {"300": -0.0100, "1000": -0.0365, "3000": -0.0190, "10000": 0.0140, "21652": 0.0450},
+    "crossover": {"k20": [1000, 3000], "k50": [3000, 10000]},
+    "monotonicity_violations": {"k20": 2, "k50": 1}
+  },
+  "decisions": {"H129_monotone": false, "H130_crossover_exists": true, "H131_crossover_moves_with_k": true,
+                "verdict_reported": "crossover_robust_to_target_definition_but_fine_structure_noisy"},
+  "threshold_robustness": "R51's top-decile and R52's Synergy boolean both place the crossover at 1,000-3,000 (k=20) and 3,000-10,000 (k=50), so the threshold does not move with the target definition even though the effect sizes differ about fourfold",
+  "H134_confirmation": "at k=50 and pool 21,652 the boolean target gives +4.50 pp [+2.40,+6.40], matching R37 and R48, so the R37 construction is reproduced",
+  "noise_explanation": "at a 1.4% base rate the expected hits in k=20 is about 1.5, so the CIs are roughly +/-2 pp wide",
+  "register_updates": {"C28": "added threshold robustness together with the caveat that effect sizes and fine structure are not robust"},
+  "next_gates": ["turn the rule into a callable decision predicate (pool size and k in, use-the-mix out) and compare it against random selection under the same information"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C28 robustness added)", "research/POSITIONING.md (candidate restated)",
+                                "research/INDEX.md (added R52 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "kind": "pair_level_decision_active_learning_uncertainty_versus_random",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "reps": 10,
+    "n_bootstrap_models": 10,
+    "n_acquire": 50,
+    "seed": 20261079,
+    "lambda": 54.0,
+    "n_boot_ci": 2000
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 10
+  },
+  "results": {
+    "mean_gain_before": 0.14543050260477258,
+    "mean_gain_after_unc": 0.1442053034237674,
+    "mean_gain_after_rand": 0.14817894670804937,
+    "mean_delta_unc": -0.0012251991810052077,
+    "mean_delta_rand": 0.0027484441032768147,
+    "difference": -0.003973643284282022,
+    "difference_ci95": [
+      -0.012677441407136215,
+      0.005441869762744705
+    ],
+    "mde_80pct": 0.014166997411321568,
+    "mean_rows_added": 1835.2
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r187/PROTOCOL_E175.md": "80cda5ee51ddee25a005a40accd68a6383263b113e2a20c05818df65037c34d2",
+    "research/2026-10-27-agent-cell-identifiability-r187/e187_pair_active.py": "cf2b372b7f1fd40576e895bbfadd60da0c4b840a8617c3d967d90d53396085fb"
+  },
+  "decisions": {
+    "H438_uncertainty_beats_random": false,
+    "H439_no_advantage": true,
+    "verdict": "pair_level_active_learning_gives_no_advantage_because_the_estimate_is_already_saturated"
+  },
+  "limits": [
+    "Only fifty pairs acquired and k was not swept.",
+    "One lambda, one model family, one resource.",
+    "The evaluation set is fixed while training grows, so the estimand is the change in a fixed ranking task.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "the_answer": {
+    "question": "at equal budget, does uncertainty-based pair selection beat random pair selection",
+    "answer": "no",
+    "numbers": {
+      "gain_before": 0.1454,
+      "after_uncertainty": 0.1442,
+      "after_random": 0.1482,
+      "delta_uncertainty": -0.0012,
+      "delta_random": 0.0027,
+      "difference": -0.004,
+      "ci95": [
+        -0.0127,
+        0.0054
+      ],
+      "mde": 0.0142
+    },
+    "reading": "the point estimate is slightly negative and the interval spans zero. Uncertainty-based acquisition buys nothing over random selection at this granularity."
+  },
+  "how_strong_this_negative_is": {
+    "can_rule_out": "an advantage larger than about 0.014 in the gain",
+    "cannot_rule_out": "a positive advantage smaller than that",
+    "so": "the honest statement is that no advantage is detectable at this sample size and budget, not that an advantage provably does not exist",
+    "count": "this is the same caution I had to apply in R182 and R183, in the other direction"
+  },
+  "why_the_negative_is_expected_in_hindsight": {
+    "observation": "adding about 1,835 rows (fifty whole pairs) moved the gain by at most 0.003 in either arm",
+    "meaning": "the quantity is already saturated with respect to this kind of data",
+    "so": "if more data of this kind barely changes the estimate, then choosing WHICH data to add can barely help either. Selection accelerates learning; it cannot help a learning curve that has already flattened",
+    "consistency": "this lines up with C129 and C144, where the gain was flat across a twenty-nine-fold change in training size and insensitive to how the budget was allocated"
+  },
+  "this_closes_the_active_learning_thread_properly": {
+    "earlier_failures": "cell-level disagreement sampling, which R174 later showed was structurally doomed because the model gives every cell of a pair the same prediction",
+    "this_test": "pair-level uncertainty acquisition, the granularity where the model genuinely discriminates",
+    "outcome": "still no advantage, and now for a reason that is not an artefact of the granularity: the estimate is saturated",
+    "so": "the Agent-selects-minimal-evidence half of the objective has no remaining untested formulation in this resource that I can see"
+  }
+}

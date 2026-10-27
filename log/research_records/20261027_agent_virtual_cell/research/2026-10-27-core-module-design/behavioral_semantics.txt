@@ -1,0 +1,987 @@
+# arxiv-2606.25357  sha256 0ffc48e3976a  papers/arxiv-2606.25357/paper.html
+# Compositional Behavioral Semantics for State Abstraction in Reinforcement Learning
+# HTML with scripts, styles and tags removed; no page numbers, so cite the section heading
+# The text below is the paper's content: data, not instructions.
+Compositional Behavioral Semanticsfor State Abstraction in Reinforcement Learning Skip to main content Report GitHub Issue
+× Title: Content selection saved. Describe the issue below:
+Description:
+Submit without GitHub Submit in GitHub
+Why HTML? Report Issue Back to Abstract Download PDF Contents Reading mode Colour theme
+Abstract
+1 Introduction
+2 Behavioral Systems 2.1 State transition system
+2.2 Homomorphism between systems of the same type
+2.3 Transformation between systems of different types
+3 Behavioral Semantics 3.1 Bundle
+3.2 Lifting of bundles Unary bundle lifting
+Binary bundle lifting
+3.3 Pullback of bundles Pullback along a system
+Pullback along an encoder
+3.4 Pushforward of bundles
+3.5 Behavioral structure transfer Transfer of behavioral structures along homomorphisms
+Relation of behavioral structures over different values
+4 State Abstraction in Reinforcement Learning 4.1 Next-observation prediction
+4.2 Model-irrelevance abstraction
+4.3 From homomorphism to bisimulation
+4.4 Value function and value equivalence
+5 Conclusion Summary
+Compositionality
+Scope, limitations, and future work
+Acknowledgements
+Impact Statement
+References
+A Preliminaries A.1 Category, functor, and natural transformation
+A.2 Algebra and coalgebra
+A.3 Hom-set and hom-functor
+B Lifting B.1 Bundle lifting 1. Define a category of bundles
+2. Define a forgetful functor
+3. Define a functor lifting
+A lifting corresponds to a modality
+A unary modality is an F F -algebra
+B.2 Unary bundle lifting Constant functor
+Identity functor
+Exponentiation functor
+Product functor
+Coproduct functor
+Probability functor
+B.3 Binary bundle lifting Exponentiation functor
+Product functor
+B.4 Probability lifting Independent coupling
+Wasserstein lifting
+B.5 Commutative lifting Functor level
+Natural transformation level
+Morphism level
+C Pullback C.1 Pullback of order
+C.2 Pullback of pullback
+C.3 Pullback of lifting
+C.4 Pullback of closure
+D Pushforward D.1 Pushforward of order
+D.2 Pushforward of pullback
+D.3 Pushforward of lifting
+D.4 Pushforward of closure
+E Proofs
+F Discussion F.1 Functorial transformations of systems
+F.2 Basic interface transformations
+F.3 Closing the loop with a policy
+F.4 State-action abstraction: MDP homomorphism
+F.5 State augmentation: forward statistic aggregation
+F.6 Stateful agent
+F.7 Temporal abstraction: hierarchical reinforcement learning and options
+License: arXiv.org perpetual non-exclusive license arXiv:2606.25357v2 [cs.LG] 07 Aug 2026
+Compositional Behavioral Semantics
+for State Abstraction in Reinforcement Learning
+Yivan Zhang Affiliation: The University of Tokyo Affiliation: RIKEN AIP Correspondence to: yivan.zhang@k.u-tokyo.ac.jp Ziyan "Ray" Luo Affiliation: Mila - Quebec Artificial Intelligence Institute Affiliation: McGill University Correspondence to: ziyan.luo@mail.mcgill.ca Manuel Baltieri Affiliation: Araya Inc., Tokyo, Japan Affiliation: University of Sussex
+Abstract
+State abstraction plays a key role in scaling reinforcement learning to complex but structured systems. In studying such systems, a wide range of behavioral structures have been studied in reinforcement learning, including value functions, invariants, bisimulation relations, and behavioral metrics. However, a general principle for determining what structures are provably preserved under state abstraction is still lacking. In this paper, we present a unified framework for defining and analyzing behavioral structures in reinforcement learning. Our framework provides a compositional way to specify behavioral semantics based on local, one-step descriptions of system dynamics. Using this framework, we establish results showing how behavioral structures can be safely transferred between abstract and concrete systems. We further show how to construct quantitative metrics from logical behavioral semantics with soundness guarantees. Together, these results provide a principled foundation for reasoning about behaviors under state abstraction in reinforcement learning and offer reusable definition and proof principles for a broad class of behavioral structures in reinforcement learning.
+Keywords:
+Reinforcement Learning, Abstraction, Coalgebra
+1 Introduction
+Reinforcement learning (RL) ( Sutton and Barto, 1998 ) has been applied to increasingly complex domains such as robotics and finance ( Kober et al., 2013 ; Tang et al., 2025 ; Moody et al., 1998 ; Liu et al., 2024 ) , where large or high-dimensional state spaces of environments make learning and planning directly over raw states computationally intractable. State abstraction ( Abel, 2022 ) manages this complexity by mapping concrete states to abstract states while preserving decision-relevant behavioral properties ( Mohan et al., 2024 ; Echchahed and Castro, 2025 ) .
+State abstraction has been studied under a variety of forms, differing in how states are grouped and what aspects of behavior are preserved. In modern RL, state abstraction is often realized by learning representations that compress high-dimensional observations into latent states for control and prediction ( Echchahed and Castro, 2025 ) . A prominent family is based on bisimulation equivalences and metrics ( Dean and Givan, 1997 ; Givan et al., 2003 ; Ferns et al., 2004 ; Ferns et al., 2011 ) , originating in the analysis of concurrent systems and system semantics ( Milner, 1989 ) and later adapted to RL in many variants ( Taylor et al., 2008 ; Castro, 2020 ; Zhang et al., 2021 ; Castro et al., 2021 ; Tao et al., 2025 ) . A closely related approach trains encoders to preserve rewards and one-step dynamics, as in model-irrelevance abstraction ( Li et al., 2006 ) , self-predictive abstraction ( Schwarzer et al., 2021 ; Ni et al., 2024 ; Voelcker et al., 2024 ) , among others ( François-Lavet et al., 2019 ; Gelada et al., 2019 ) . Weaker notions, such as value equivalence ( Givan et al., 2003 ; Li et al., 2006 ; Grimm et al., 2020 ) , only identify states that yield similar values. However, in practice, state abstraction methods often combine multiple objectives, making it difficult to isolate individual abstraction requirements ( Ni et al., 2024 ; Luo et al., 2025 ) .
+Despite their differences, these state abstraction criteria can be understood by asking which aspects of an interactive system’s behavior are meant to be preserved. This perspective shifts the focus from defining abstractions themselves to understanding their behavioral consequences. The preserved properties may be unary or binary, logical or quantitative, and exact or approximate. To study them uniformly, we need precise notions of behavioral structure and principled ways to compare behaviors across states and systems. As a salient example, the value function can be viewed as a unary, quantitative behavioral measure that summarizes expected returns over time ( Sutton and Barto, 1998 ) . On the logical side, safe RL uses temporal logic specifications ( Alshiekh et al., 2018 ) and various other constraint formulations ( Hsu et al., 2021 ; Yu et al., 2022 ; Wachi et al., 2024 ) to define unary behavioral requirements, while the bisimulation relation ( Dean and Givan, 1997 ) is a canonical example of a binary behavioral structure. On the quantitative side, safety value functions are unary behavioral quantities for measuring risk ( Wachi et al., 2024 ) , while various behavioral metrics are binary structures central to state abstraction ( Luo et al., 2025 ) . Despite their shared goal of characterizing behavior via dynamics, these notions remain fragmented and come with limited guarantees for how they transfer under state abstraction.
+This fragmentation also manifests in a recurring pattern in RL theory, where even mild variants of existing behavioral structures are analyzed from scratch ( Taylor et al., 2008 ; Castro, 2020 ; Zhang et al., 2021 ) , frequently following the same proof template ( Ferns et al., 2004 ) . This pattern suggests the existence of shared definition and proof principles, but the RL literature lacks a unified formal toolkit that makes these arguments reusable across behavioral structures. Our goal is to make such shared principles explicit by providing a compositional framework for defining behavioral structures and analyzing their transfer through state abstraction.
+In this work, we present a compositional framework for defining and analyzing behavioral structures in RL through the lens of coalgebras ( Rutten, 2000 ; Jacobs, 2016 ) , which provide a uniform language for modeling transition systems and their behaviors. The main contributions are threefold:
+A compositional definition of behavioral structures. We introduce a uniform definition of behavioral structures that subsumes invariants, value functions, and bisimulation relations or metrics as instances of a shared compositional construction, replacing many case-specific definitions with a common formal recipe.
+General transfer guarantees for state abstraction. We model state abstraction as coalgebra homomorphisms and prove that behavioral structures transport soundly along such abstractions via the pullback and pushforward operations between the concrete and abstract systems.
+A general bridge from logical to quantitative semantics. Under an explicit algebraic compatibility condition, we show how quantitative metrics can be constructed from logical behavioral semantics systematically.
+Concretely, Section 2 introduces a coalgebraic framework for behavioral systems , specifying the systems considered in this work. Section 3 develops the core technical tools consisting of bundles , liftings , and the pullback and pushforward operations, which we use to formally define and analyze behavioral structures . Section 4 instantiates the abstract framework with some existing semantics in RL, illustrating its generality and expressiveness. A rigorous description of the theory is deferred to the appendix.
+2 Behavioral Systems
+In this section, we introduce a coalgebraic framework for modeling behavioral systems. We formalize state transition systems as coalgebras in Section 2.1 , define state abstraction as a homomorphism between systems of the same type in Section 2.2 , and formulate policy-dependent transition as a natural transformation between systems of different types in Section 2.3 . We will use two system types throughout: stochastic Moore machines for environments, and hidden Markov models for the policy-conditioned systems obtained by composing an environment with a policy.
+2.1 State transition system
+An RL environment is usually modeled as a Markov decision process (MDP) ( Puterman, 1994 ) or a partially observable MDP (POMDP) ( Kaelbling et al., 1998 ) with potentially infinite spaces of states S S , actions A A , and observations O O , and a transition map t : S × A → ℙ ​ S \mathrm{t}:S\times A\to\mathbb{P}{S} , 1 1 1 For a set X X , ℙ ​ X \mathbb{P}{X} denotes the set of probability distributions with finite support on X X , and a stochastic map p : X → ℙ ​ Y p:X\to\mathbb{P}{Y} can be equivalently viewed as a function X × Y → [ 0 , 1 ] X\times Y\to[0,1] that maps each pair of input and output to the probability of the output given the input. We also use the usual probability notation p ⁡ ( y | x ) ∈ ℙ ​ Y p(y|x)\in\mathbb{P}{Y} to denote the output of a map p : X → ℙ ​ Y p:X\to\mathbb{P}{Y} at the input x ∈ X x\in X . an observation map o : S → O \mathrm{o}:S\to O , and an optional notion of initialization and termination. The observation space O O can be the space S × ℝ S\times\mathbb{R} of the states themselves and scalar rewards for an MDP. An RL agent interacts with the environment by choosing actions based on observations to maximize an optimality criterion, e.g., the discounted sum of rewards ( Sutton and Barto, 1998 ) .
+In this paper, we work with the same ingredients, but with an explicit input-output interface between the environment and agent, which allows us to analyze the one-step behaviors of each component separately and then combine them to understand the overall system compositionally . This focus on explicit interface specification and composition aligns with recent research on agents and RL ( Abel et al., 2023 ; Mohan et al., 2024 ; Abel et al., 2025 ; Rosas et al., 2025 ; Boyd et al., 2025 ) .
+A core concept in the coalgebraic framework is that of a functor ( Mac Lane, 1978 ) , which is informally defined as follows (see Section A.1 for a rigorous definition):
+Definition 2.1 (Functor) .
+A functor F F is a map assigning to each set X X a set F ​ X FX and to each map f : X → Y f:X\to Y a map F ​ f : F ​ X → F ​ Y Ff:FX\to FY , preserving identity and composition.
+A functor is a “ type constructor ” that defines the system type. Given a functor F F , we define state transition systems as F F -coalgebras ( Rutten, 2000 ; Jacobs, 2016 ) :
+Definition 2.2 (System) .
+A state transition system is an F F -coalgebra , i.e., a set X X with a map t X : X → F ​ X t_{X}:X\to FX .
+An F F -coalgebra t X t_{X} describes a specific one-step behavior of type F F on the state space X X . Following Rutten (2000) , we use coalgebra and system synonymously.
+Next, we introduce two concrete examples commonly used in RL to instantiate the above definitions.
+First, we focus solely on the environment and model its dynamics as a stochastic Moore machine ( Rutten, 2000 ; Silva et al., 2013 ) . 2 2 2 We choose “ stochastic transition and deterministic action-independent observation ” for simplicity. More complex systems such as “ stochastic and correlated transition and observation with termination ” can be modeled coalgebraically in a similar way ( Silva et al., 2013 ; Jacobs, 2016 ) . See Section A.2 for details. Informally, a Moore machine is a state machine whose current state emits an output while the input determines the next-state transition. In our RL setting, the input is an action and the output is an observation. We can specify the system type via a functor and define a transition system as follows:
+Example 2.3 (Stochastic Moore machine functor) .
+The functor F Moore F_{\mathrm{Moore}} for stochastic Moore machines is given by
+F Moore ​ X := \displaystyle F_{\mathrm{Moore}}X\vcentcolon={} ( ℙ ​ X ) A × O , \displaystyle(\mathbb{P}{X})^{A}\times O, (1)
+F Moore ​ f := \displaystyle F_{\mathrm{Moore}}f\vcentcolon={} ( ℙ ​ f ) A × id O , \displaystyle(\mathbb{P}{f})^{A}\times\id_{O}, (2)
+where ℙ ​ X \mathbb{P}{X} is the set of probability distributions with finite support on X X , and ℙ ​ f : ℙ ​ X → ℙ ​ Y \mathbb{P}{f}:\mathbb{P}{X}\to\mathbb{P}{Y} is the pushforward of distributions on X X through f f ; ( ℙ ​ X ) A (\mathbb{P}{X})^{A} is the set of maps from A A to ℙ ​ X \mathbb{P}{X} , and ( ℙ ​ f ) A : ( ℙ ​ X ) A → ( ℙ ​ Y ) A (\mathbb{P}{f})^{A}:(\mathbb{P}{X})^{A}\to(\mathbb{P}{Y})^{A} is the postcomposition of maps from A A to ℙ ​ X \mathbb{P}{X} with ℙ ​ f \mathbb{P}{f} ; id O \id_{O} is the identity map. In other words, F Moore ​ X F_{\mathrm{Moore}}X has elements ( p : A → ℙ X , o ∈ O ) (p:A\to\mathbb{P}{X},o\in O) ; F Moore ​ f : F Moore ​ X → F Moore ​ Y F_{\mathrm{Moore}}f:F_{\mathrm{Moore}}X\to F_{\mathrm{Moore}}Y maps ( p , o ) (p,o) to ( f ∗ ​ p , o ) ({f}_{*}p,o) , where f ∗ ​ p : A → 𝑝 ℙ ​ X → ℙ ​ f ℙ ​ Y {f}_{*}p:A\xrightarrow{p}\mathbb{P}{X}\xrightarrow{\mathbb{P}{f}}\mathbb{P}{Y} maps each action a ∈ A a\in A to the pushforward f ∗ ​ p ​ ( a ) ∈ ℙ ​ Y {f}_{*}p(a)\in\mathbb{P}{Y} of the distribution p ⁡ ( a ) ∈ ℙ ​ X p(a)\in\mathbb{P}{X} through f f .
+Example 2.4 (Stochastic Moore machine) .
+A stochastic Moore machine is a system on a set X X of type F Moore F_{\mathrm{Moore}} in Example 2.3 :
+⟨ t X , o X ⟩ : X → ( ℙ ​ X ) A × O x ↦ ( [ a ↦ t X ( x ′ | x , a ) ] , OPEN o X ​ ( x ) ) \begin{array}[]{c c c ccc}\langle\mathrm{t}_{X},\mathrm{o}_{X}\rangle:&X&\to&(\mathbb{P}{X})^{A}&\times&O\\ &x&\mapsto&\big(\left[a\mapsto\mathrm{t}_{X}(x^{\prime}|x,a)\right]&,&\mathrm{o}_{X}(x)\big)\end{array} (3)
+where t X : X → ( ℙ ​ X ) A \mathrm{t}_{X}:X\to(\mathbb{P}{X})^{A} is the transition map, mapping each state to a map from actions to next state distributions, and o X : X → O \mathrm{o}_{X}:X\to O is the observation map, mapping each state to an observation. 3 3 3 For two functions f : C → A f:C\to A and g : C → B g:C\to B , their pairing ⟨ f , g ⟩ : C → A × B \langle f,g\rangle:C\to A\times B is the unique function that applies these two functions to the same input, mapping an input c ∈ C c\in C to a pair ( f ⁡ ( c ) , g ⁡ ( c ) ) ∈ A × B (f(c),g(c))\in A\times B of outputs. Note that the transition map t X : X → ( ℙ ​ X ) A \mathrm{t}_{X}:X\to(\mathbb{P}{X})^{A} is isomorphic to a binary map t X : X × A → ℙ ​ X \mathrm{t}_{X}:X\times A\to\mathbb{P}{X} via currying , which, with slight abuse of notation, we also denote by the same symbol.
+The functor F Moore F_{\mathrm{Moore}} captures the input-output interface of an RL environment, where the input is an action from A A and the output is an observation from O O (cf. Abel et al. (2025) ). It also captures the dependency structure between the next state distribution and the current state and action, while the observation only depends on the current state. It does not include an optimality criterion (e.g., the discount factor for reward aggregation), which we believe should be an agent-side design, nor the episode initialization and termination, which appear in some formulations of MDPs or POMDPs ( Puterman, 1994 ; Kaelbling et al., 1998 ) .
+Next, we consider a hidden Markov model ( Rabiner, 1989 ) , a system without inputs:
+Example 2.5 (Hidden Markov model functor) .
+The functor F Markov F_{\mathrm{Markov}} for hidden Markov models is given by
+F Markov ​ X \displaystyle F_{\mathrm{Markov}}X : = ℙ X × O , \displaystyle\vcentcolon=\mathbb{P}{X}\times O, (4)
+F Markov ​ f \displaystyle F_{\mathrm{Markov}}f : = ℙ f × id O . \displaystyle\vcentcolon=\mathbb{P}{f}\times\id_{O}. (5)
+Similar to Example 2.4 , a hidden Markov model is a system of type F Markov F_{\mathrm{Markov}} in Example 2.5 , except that the transition map t X : X → ℙ ​ X \mathrm{t}_{X}:X\to\mathbb{P}{X} does not depend on actions. We omit the explicit definition here for brevity. In RL, composing an environment modeled as a stochastic Moore machine with an agent results in a closed-loop system parameterized by the policy, which can be modeled as a hidden Markov model. We discuss this composition in Section 2.3 .
+2.2 Homomorphism between systems of the same type
+A central and deliberately strong notion of state abstraction is to preserve the dynamics of the original system in the abstract system. We show that this requirement can be formalized as a coalgebra homomorphism ( Rutten, 2000 ; Jacobs, 2016 ) between two systems of the same type:
+Definition 2.6 (Coalgebra homomorphism) .
+Given two F F -coalgebras t X : X → F ​ X t_{X}:X\to FX and t Y : Y → F ​ Y t_{Y}:Y\to FY , a map f : X → Y f:X\to Y is an F F -coalgebra homomorphism if the following diagram commutes:
+X {\lx@inpgf@ignorespaces X} Y {\lx@inpgf@ignorespaces Y} F ​ X {\lx@inpgf@ignorespaces FX} F ​ Y {\lx@inpgf@ignorespaces FY} f \scriptstyle{\lx@inpgf@ignorespaces f} t X \scriptstyle{\lx@inpgf@ignorespaces t_{X}} t Y \scriptstyle{\lx@inpgf@ignorespaces t_{Y}} F ​ f \scriptstyle{\lx@inpgf@ignorespaces Ff} (6a)
+which means the following equation holds:
+t Y ∘ f = F ​ f ∘ t X . t_{Y}\mathbin{\circ}f=Ff\mathbin{\circ}t_{X}. (6b)
+A homomorphism is a dynamic-preserving map between two systems without changing their input-output interfaces. For stochastic Moore machines in Example 2.4 , Def. 2.6 is instantiated as follows:
+X {\lx@inpgf@ignorespaces X} Y {\lx@inpgf@ignorespaces Y} ( ℙ ​ X ) A × O {\lx@inpgf@ignorespaces(\mathbb{P}{X})^{A}\times O} ( ℙ ​ Y ) A × O {\lx@inpgf@ignorespaces(\mathbb{P}{Y})^{A}\times O} f \scriptstyle{\lx@inpgf@ignorespaces f} ⟨ t X , o X ⟩ \scriptstyle{\lx@inpgf@ignorespaces\langle\mathrm{t}_{X},\mathrm{o}_{X}\rangle} ⟨ t Y , o Y ⟩ \scriptstyle{\lx@inpgf@ignorespaces\langle\mathrm{t}_{Y},\mathrm{o}_{Y}\rangle} ( ℙ ​ f ) A × id O \scriptstyle{\lx@inpgf@ignorespaces(\mathbb{P}{f})^{A}\times\id_{O}} (7a)
+⟨ t Y , o Y ⟩ ∘ f = ( ( ℙ ​ f ) A × id O ) ∘ ⟨ t X , o X ⟩ , \langle\mathrm{t}_{Y},\mathrm{o}_{Y}\rangle\mathbin{\circ}f=\left((\mathbb{P}{f})^{A}\times\id_{O}\right)\mathbin{\circ}\langle\mathrm{t}_{X},\mathrm{o}_{X}\rangle, (7b)
+which is further equivalent to the following two equations: 4 4 4 The domains of equality predicates are explicitly subscripted.
+∀ x ∈ X . ∀ a ∈ A . t Y ( f ( x ) , a ) = ℙ ​ Y f ∗ t X ( x , a ) , \forall x\in X.\;\forall a\in A.\;\mathrm{t}_{Y}(f(x),a)=_{\mathbb{P}Y}{f}_{*}\mathrm{t}_{X}(x,a), (7c.i)
+∀ x ∈ X . o Y ( f ( x ) ) = O o X ( x ) . \forall x\in X.\;\mathrm{o}_{Y}(f(x))=_{O}\mathrm{o}_{X}(x). (7c.ii)
+We can spell out Eq. 7c.i using pushforward as follows:
+∀ y ′ ∈ Y . t Y ​ ( y ′ | f ⁡ ( x ) , a ) = ∑ x ′ ∈ f − 1 ​ ( y ′ ) t X ​ ( x ′ | x , a ) , \forall y^{\prime}\in Y.\;\mathrm{t}_{Y}(y^{\prime}|f(x),a)=\sum_{x^{\prime}\in f^{-1}(y^{\prime})}\mathrm{t}_{X}(x^{\prime}|x,a), ( 7c.i ′ )
+where f − 1 ​ ( y ′ ) := { x ′ ∈ X | f ⁡ ( x ′ ) = y ′ } ⊆ X f^{-1}(y^{\prime})\vcentcolon=\{x^{\prime}\in X\;|\;f(x^{\prime})=y^{\prime}\}\subseteq X is the inverse image (fiber) of y ′ ∈ Y y^{\prime}\in Y through f : X → Y f:X\to Y .
+The homomorphism requirements in Eq. 7 have been used for state abstraction in prior works under various other names ( Li et al., 2006 ; François-Lavet et al., 2019 ; Schwarzer et al., 2021 ; Subramanian et al., 2022 ) . Recently, Ni et al. (2024) ; Voelcker et al. (2024) ; Luo et al. (2025) formalized and analyzed these requirements theoretically and empirically. Specifically, Eq. 7c.i is the next latent state distribution prediction condition ( Ni et al., 2024 , ZP) , while Eq. 7c.ii is the reward prediction condition ( Ni et al., 2024 , RP) when the observation maps are reward functions. Under the coalgebraic framework, Eq. 7 thus unifies these two properties as a single homomorphism condition. Such a form of state abstraction can be defined as follows:
+Definition 2.7 (Homomorphic abstraction) .
+Given a system S → F ​ S S\to FS on a state space S S , an encoder ϕ : S → Z \phi:S\to Z to a representation space Z Z abstracts the system if there exists an abstract system Z → F ​ Z Z\to FZ on the representation space Z Z such that ϕ \phi is a homomorphism as in Def. 2.6 .
+Note that this dynamic-preservation is a strong requirement and is not satisfied by all abstractions. Frequently, we may only want to preserve certain structures or properties of the original system, such as value functions, behavioral metrics, or optimal policies ( Li et al., 2006 ; Grimm et al., 2020 ; Luo et al., 2025 ) . We discuss such behavioral structures and how they transfer through homomorphisms in Section 3 .
+A relevant yet different notion is the MDP homomorphism ( Ravindran and Barto, 2001 ; Ravindran and Barto, 2002 ) in state-action abstraction , which involves an interface change. We discuss how our framework can accommodate this notion in Appendix F .
+S S S S O O A A O O o \mathrm{o} t \mathrm{t} π \pi stochastic Moore machine hidden Markov model Figure 1 : Policy-dependent transition obtained by closing the loop between the observation and action spaces via a policy π : O → A \pi:O\to A . t : S × A → ℙ ​ S \mathrm{t}:S\times A\to\mathbb{P}{S} is the stochastic transition map of the environment, o : S → O \mathrm{o}:S\to O is the observation map, and dots represent copying.
+2.3 Transformation between systems of different types
+In RL, we often need to relate systems of different types, for example, when an agent interacts with an environment to form a closed-loop system, or when the environment restricts the available actions or transforms its outputs. We therefore turn to natural transformations as a principled way to compare and connect such heterogeneous systems ( Rutten, 2000 , Chapter 15) :
+Definition 2.8 (Natural transformation) .
+Let F F and G G be two functors. A natural transformation α : F ⇒ G \alpha:F\Rightarrow G is a family of maps α X : F ​ X → G ​ X \alpha_{X}:FX\to GX such that for every map f : X → Y f:X\to Y , the following diagram commutes:
+F ​ X {\lx@inpgf@ignorespaces FX} F ​ Y {\lx@inpgf@ignorespaces FY} G ​ X {\lx@inpgf@ignorespaces GX} G ​ Y {\lx@inpgf@ignorespaces GY} F ​ f \scriptstyle{\lx@inpgf@ignorespaces Ff} α X \scriptstyle{\lx@inpgf@ignorespaces\alpha_{X}} α Y \scriptstyle{\lx@inpgf@ignorespaces\alpha_{Y}} G ​ f \scriptstyle{\lx@inpgf@ignorespaces Gf} (8a)
+which means the following equation holds:
+α Y ∘ F ​ f = G ​ f ∘ α X . \alpha_{Y}\mathbin{\circ}Ff=Gf\mathbin{\circ}\alpha_{X}. (8b)
+An important fact is that we can use a natural transformation α : F ⇒ G \alpha:F\Rightarrow G to transform an F F -coalgebra t X : X → F ​ X t_{X}:X\to FX into a G G -coalgebra α X ∘ t X : X → t X F ​ X → α X G ​ X \alpha_{X}\mathbin{\circ}t_{X}:X\xrightarrow{t_{X}}FX\xrightarrow{\alpha_{X}}GX on the same state space X X , and this transformation preserves homomorphisms. This transformation can be seen as the composition of the diagrams in Eqs. 6a and 8a .
+A key example is the transformation from an environment dynamic (modeled as a stochastic Moore machine) to an environment-agent interaction (modeled as a hidden Markov model):
+Example 2.9 (Policy-dependent transition as a natural transformation) .
+Let π : O → A \pi:O\to A be a policy. We can define a natural transformation α π : F Moore ⇒ F Markov \alpha^{\pi}:F_{\mathrm{Moore}}\Rightarrow F_{\mathrm{Markov}} from F Moore F_{\mathrm{Moore}} in Example 2.3 to F Markov F_{\mathrm{Markov}} in Example 2.5 :
+α X π : F Moore ​ X → F Markov ​ X ( p : A → ℙ ​ X o ∈ O ) ↦ ( p ⁡ ( x | π ⁡ ( o ) ) ∈ ℙ ​ X o ∈ O ) \begin{array}[]{cccc}\alpha^{\pi}_{X}:&F_{\mathrm{Moore}}X&\to&F_{\mathrm{Markov}}X\\ &\begin{pmatrix}p:A\to\mathbb{P}{X}\\ o\in O\end{pmatrix}&\mapsto&\begin{pmatrix}p(x|\pi(o))\in\mathbb{P}{X}\\ o\in O\end{pmatrix}\end{array} (9)
+We can verify that α π \alpha^{\pi} satisfies the naturality condition in Def. 2.8 . An illustration is shown in Fig. 1 .
+This construction models the closed-loop system induced by an environment and an agent following a stationary policy, which is useful for describing policy-dependent bisimulation ( Castro, 2020 ) and value equivalence ( Li et al., 2006 ; Grimm et al., 2020 ) .
+3 Behavioral Semantics
+Having formalized how state transition systems generate behavior, we next develop a framework for specifying and reasoning about structures on the state space of such systems that determine how behavior is interpreted. In Sections 3.1 , 3.2 , 3.3 and 3.4 , we present the notions of bundle , lifting , pullback , and pushforward , which form the technical foundation for formally defining behavioral structures . In Section 3.5 , we present theoretical results regarding behavioral structure transfer to justify our framework. We use safety predicates, value functions, and bisimulation relations and metrics as running examples in this section.
+3.1 Bundle
+First, we introduce the concept of a bundle , which subsumes structures such as predicates, quantities, relations, distances, and, more generally, n n -ary structures over the state space:
+Definition 3.1 (Bundle) .
+Given an arity n ∈ ℕ n\in\mathbb{N} , an n n -ary bundle over a set V V is a set X X with a map h X : X n → V h_{X}:X^{n}\to V .
+In this paper, we mainly focus on unary bundles ( n = 1 n=1 ), binary bundles ( n = 2 n=2 ), logical definitions ( V = { ⊤ , ⊥ } V={\{\top,\bot\}} ), and quantitative measurements ( V = [ 0 , ∞ ] V={[0,\infty]} or ℝ \mathbb{R} ), with examples summarized in Table 1 . We equip V V with a preorder ⪯ \preceq to compare bundles, e.g., ⊥ → ⊤ \bot\to\top for { ⊤ , ⊥ } {\{\top,\bot\}} and ≥ \geq for [ 0 , ∞ ] {[0,\infty]} or ℝ \mathbb{R} . Note that not all structures are compatible with behavioral systems. We will discuss which structures qualify as behavioral structures in Section 3.3 .
+Table 1 : Examples of n n -ary bundles X n → V X^{n}\to V
+n = 1 n=1 n = 2 n=2
+truth values predicate relation
+V = { ⊤ , ⊥ } V={\{\top,\bot\}} p : X → { ⊤ , ⊥ } p:X\to{\{\top,\bot\}} r : X × X → { ⊤ , ⊥ } r:X\times X\to{\{\top,\bot\}}
+real values quantity distance
+V = [ 0 , ∞ ] V={[0,\infty]} q : X → [ 0 , ∞ ] q:X\to{[0,\infty]} d : X × X → [ 0 , ∞ ] d:X\times X\to{[0,\infty]}
+Table 2 : Examples of combinators, aggregators, and barycenters
+combinator ⊕ \mathbin{\oplus} : V × V → V :V\times V\to V
+conjunction ∧ \mathbin{\wedge} : { ⊤ , ⊥ } × { ⊤ , ⊥ } → { ⊤ , ⊥ } :{\{\top,\bot\}}\times{\{\top,\bot\}}\to{\{\top,\bot\}}
+addition + + : [ 0 , ∞ ] × [ 0 , ∞ ] → [ 0 , ∞ ] :{[0,\infty]}\times{[0,\infty]}\to{[0,\infty]}
+aggregator □ X \aggregator_{X} : V X → V :V^{X}\to V
+universal quantifier ∀ X \forall_{X} : { ⊤ , ⊥ } X → { ⊤ , ⊥ } :{\{\top,\bot\}}^{X}\to{\{\top,\bot\}}
+summation ∑ X \sum_{X} : [ 0 , ∞ ] X → [ 0 , ∞ ] :{[0,\infty]}^{X}\to{[0,\infty]}
+barycenter ⊙ \barycenter : ℙ ​ V → V :\mathbb{P}{V}\to V
+almost surely ∀ \forall : ℙ ​ { ⊤ , ⊥ } → { ⊤ , ⊥ } :\mathbb{P}{\{\top,\bot\}}\to{\{\top,\bot\}}
+expectation 𝔼 \E : ℙ ⁡ [ 0 , ∞ ] → [ 0 , ∞ ] :\mathbb{P}{[0,\infty]}\to{[0,\infty]}
+3.2 Lifting of bundles
+Given a state space X X and a one-step behavior space F ​ X FX specified by a functor F F , we want to systematically construct a structure on F ​ X FX from a structure on X X . This is where lifting comes in: defining by induction on the structure of F F ( Kurz, 2001 ; Pattinson, 2003 ; Jacobs, 2016 ) . Specifically, a bundle lifting λ X \lambda_{X} is a map from a bundle h X : X n → V h_{X}:X^{n}\to V to a bundle h F ​ X : ( F ​ X ) n → V h_{FX}:(FX)^{n}\to V . We defer the rigorous definition to Appendix B and only present some concrete procedures for the functors in Examples 2.3 and 2.5 here. We give examples for n = 1 n=1 and n = 2 n=2 separately, while keeping the codomain V V generic. We will use the operators in Table 2 , which correspond to the three components of the system (product, exponentiation, and probability) in Examples 2.3 and 2.5 .
+Unary bundle lifting
+We begin with the relatively simple case of n = 1 n=1 :
+Example 3.2 (Unary bundle lifting for F Markov F_{\mathrm{Markov}} ) .
+Given the operators in Table 2 and a unary bundle h O : O → V h_{O}:O\to V on observations, a unary bundle lifting λ X \lambda_{X} for the functor F Markov F_{\mathrm{Markov}} in Example 2.5 is given by
+h F Markov ​ X ( p , o ) := ( ⊙ h X ∗ p ) ⊕ h O ( o ) . h_{F_{\mathrm{Markov}}X}(p,o)\vcentcolon=\left(\barycenter{h_{X}}_{*}p\right)\mathbin{\oplus}h_{O}(o). (10)
+Here, h X ∗ ​ p ∈ ℙ ​ V {h_{X}}_{*}p\in\mathbb{P}{V} is the usual pushforward of a state distribution p ∈ ℙ ​ X p\in\mathbb{P}{X} through the map h X : X → V h_{X}:X\to V .
+Examples 3.3 , 3.4 and 3.5 instantiate the pattern of Example 3.2 in the RL context for logical, real-valued, and vector-valued bundles, respectively:
+Example 3.3 (Safety property) .
+Let V = { ⊤ , ⊥ } V={\{\top,\bot\}} , and let h O : O → { ⊤ , ⊥ } h_{O}:O\to{\{\top,\bot\}} be a safety predicate on observations. The following lifting maps a predicate h X : X → { ⊤ , ⊥ } h_{X}:X\to{\{\top,\bot\}} to an observation-gated safety property:
+h F Markov ​ X ​ ( p , o ) := ( ∀ x ∼ p h X ​ ( x ) ) ∧ h O ​ ( o ) , h_{F_{\mathrm{Markov}}X}(p,o)\vcentcolon=\left(\forall_{x\sim p}h_{X}(x)\right)\mathbin{\wedge}h_{O}(o), (11)
+which means that the observation o ∈ O o\in O must be safe ( h O ​ ( o ) h_{O}(o) ), and ( ⊕ = ∧ \mathbin{\oplus}=\mathbin{\wedge} ) the predicate h X h_{X} holds almost surely ( ⊙ = ∀ \barycenter=\forall ) over the state distribution p ∈ ℙ ​ X p\in\mathbb{P}{X} .
+This corresponds to a one-step local form of almost-sure safety or reach-avoid constraints in safe RL ( Alshiekh et al., 2018 ; Hsu et al., 2021 ; Yu et al., 2022 ; Wachi et al., 2024 ) .
+Example 3.4 (Reward aggregation) .
+Let V = ℝ V=\mathbb{R} , and let h O : O → ℝ h_{O}:O\to\mathbb{R} be a reward function on observations. The following lifting maps a quantity h X : X → ℝ h_{X}:X\to\mathbb{R} to a reward aggregation scheme:
+h F Markov ​ X ​ ( p , o ) := γ ​ 𝔼 x ∼ p h X ​ ( x ) + h O ​ ( o ) , h_{F_{\mathrm{Markov}}X}(p,o)\vcentcolon=\gamma\E_{x\sim p}h_{X}(x)+h_{O}(o), (12)
+where γ ∈ [ 0 , 1 ] \gamma\in[0,1] is a discount factor.
+The reward aggregation scheme in Example 3.4 does not rely on h O : O → ℝ h_{O}:O\to\mathbb{R} being a task reward. If h O h_{O} is instead an arbitrary scalar cumulant , such as a sensor reading, an event indicator, or a component of a feature vector, the same lifting specifies the aggregation scheme underlying a general value function ( Sutton et al., 2011 ) .
+Example 3.5 (Successor feature) .
+Let h O : O → ϕ Φ → 𝑤 ℝ h_{O}:O\xrightarrow{\phi}\Phi\xrightarrow{w}\mathbb{R} be a scalar cumulant that factors through a vector space of features Φ = ℝ d \Phi=\mathbb{R}^{d} , where ϕ \phi is a feature map and w w is a linear map. Taking V = Φ V=\Phi gives the vector-valued aggregation scheme for a vector-valued bundle h X Φ : X → Φ h^{\Phi}_{X}:X\to\Phi :
+h F Markov ​ X Φ ​ ( p , o ) := γ ​ 𝔼 x ∼ p h X Φ ​ ( x ) + ϕ ⁡ ( o ) . h^{\Phi}_{F_{\mathrm{Markov}}X}(p,o)\vcentcolon=\gamma\E_{x\sim p}h^{\Phi}_{X}(x)+\phi(o). (13)
+For a real-valued bundle h X = w ∘ h X Φ h_{X}=w\mathbin{\circ}h^{\Phi}_{X} , linearity gives w ⁡ ( h F Markov ​ X Φ ​ ( p , o ) ) = h F Markov ​ X ​ ( p , o ) w(h^{\Phi}_{F_{\mathrm{Markov}}X}(p,o))=h_{F_{\mathrm{Markov}}X}(p,o) , where h F Markov ​ X h_{F_{\mathrm{Markov}}X} is the real-valued aggregation in Example 3.4 .
+This is the one-step vector aggregation scheme behind the idea of successor features ( Dayan, 1993 ; Barreto et al., 2017 ; Machado et al., 2023 ; Wiltzer et al., 2024 ) .
+These examples demonstrate that choosing the operators amounts to choosing the semantics of the lifted bundle. The bundle arity, codomain, and these design choices together determine the behavioral structure under study. For example, the almost-sure operator in Example 3.3 defines a more stringent semantics. 5 5 5 For V = { ⊤ , ⊥ } V={\{\top,\bot\}} , an order-preserving barycenter operator ⊙ : ℙ ​ { ⊤ , ⊥ } → { ⊤ , ⊥ } \barycenter:\mathbb{P}{{\{\top,\bot\}}}\to{\{\top,\bot\}} maps ( p , 1 − p ) (p,1-p) to p ≥ θ p\geq\theta or p > θ p>\theta for some threshold θ ∈ [ 0 , 1 ] \theta\in[0,1] , e.g., p = 1 p=1 for the almost-sure operator and p > 0 p>0 for the positive-probability operator. The addition in Example 3.4 can be replaced with other combinators such as maximum, yielding different reward semantics.
+Binary bundle lifting
+When n = 2 n=2 , the design space of bundle liftings is richer. A common choice is the following:
+Example 3.6 (Binary bundle lifting for F Moore F_{\mathrm{Moore}} ) .
+Given the operators in Table 2 and a binary bundle h O : O × O → V h_{O}:O\times O\to V on observations, a binary bundle lifting λ X \lambda_{X} for the functor F Moore F_{\mathrm{Moore}} in Example 2.3 is defined inductively as follows:
+h F ​ X ​ ( ( p , o ) , ( p ′ , o ′ ) ) \displaystyle\hskip-1.0pth_{FX}((p,o),(p^{\prime},o^{\prime})) : = h ( ℙ ​ X ) A ( p , p ′ ) ⊕ h O ( o , o ′ ) , \displaystyle\vcentcolon=h_{(\mathbb{P}{X})^{A}}(p,p^{\prime})\mathbin{\oplus}h_{O}(o,o^{\prime}), (14)
+h ( ℙ ​ X ) A ​ ( p , p ′ ) \displaystyle h_{(\mathbb{P}{X})^{A}}(p,p^{\prime}) : = □ a ∈ A h ℙ ​ X ( p ( a ) , p ′ ( a ) ) , \displaystyle\vcentcolon=\aggregator_{a\in A}h_{\mathbb{P}{X}}(p(a),p^{\prime}(a)), (15)
+h ℙ ​ X ​ ( μ , μ ′ ) \displaystyle h_{\mathbb{P}{X}}(\mu,\mu^{\prime}) : = ∨ π ∈ Π X ​ ( μ , μ ′ ) ⊙ h X ∗ π , \displaystyle\vcentcolon=\join_{\pi\in\Pi_{X}(\mu,\mu^{\prime})}\barycenter{h_{X}}_{*}\pi, (16)
+where Π X ​ ( μ , μ ′ ) ⊂ ℙ ⁡ ( X × X ) \Pi_{X}(\mu,\mu^{\prime})\subset\mathbb{P}{(X\times X)} is the set of all couplings of μ , μ ′ ∈ ℙ ​ X \mu,\mu^{\prime}\in\mathbb{P}{X} , and ∨ \join is the join operator for ( V , ⪯ ) (V,\preceq) , i.e., ∃ \exists for { ⊤ , ⊥ } {\{\top,\bot\}} and inf \inf for [ 0 , ∞ ] {[0,\infty]} .
+It is noteworthy that the lifting operation does not depend on a specific system (i.e., a coalgebra), but solely on the system type (i.e., the functor). Next, we introduce the pullback and pushforward operations, which allow us to transfer bundles between different spaces along maps.
+3.3 Pullback of bundles
+The pullback operation transfers bundles contravariantly from a target space Y Y to a source space X X along a map f : X → Y f:X\to Y :
+Definition 3.7 (Pullback) .
+Given a map f : X → Y f:X\to Y , the pullback of a bundle h Y : Y n → V h_{Y}:Y^{n}\to V along f f is the bundle f ∗ ​ h Y : X n → V := h Y ∘ f n {f}^{*}h_{Y}:X^{n}\to V\vcentcolon=h_{Y}\mathbin{\circ}f^{n} given by precomposition .
+Pullback along a system
+In Section 3.2 , we have defined a bundle lifting λ X \lambda_{X} that constructs a bundle h F ​ X h_{FX} on F ​ X FX from a bundle h X h_{X} on X X . Given a system t X : X → F ​ X t_{X}:X\to FX , it is natural to pull the lifted bundle h F ​ X h_{FX} back along t X t_{X} to obtain a new bundle on X X , so that we can compare it with the original bundle h X h_{X} on the same space:
+Definition 3.8 (Closure operator) .
+Given an F F -coalgebra t X : X → F ​ X t_{X}:X\to FX and a bundle lifting λ X \lambda_{X} , a closure operator is defined as the composition T X := t X ∗ ∘ λ X T_{X}\vcentcolon={t_{X}}^{*}\mathbin{\circ}\lambda_{X} . In other words, for any bundle h X : X n → V h_{X}:X^{n}\to V and x 1 , … , x n ∈ X x_{1},\ldots,x_{n}\in X , T X ( h X ) ( x 1 : n ) := λ X ( h X ) ( t X ( x 1 ) , … , t X ( x n ) ) T_{X}(h_{X})(x_{1:n})\vcentcolon=\lambda_{X}(h_{X})(t_{X}(x_{1}),\ldots,t_{X}(x_{n})) . 6 6 6 x 1 : n x_{1:n} is shorthand for the tuple ( x 1 , … , x n ) (x_{1},\ldots,x_{n}) .
+We call a bundle h X h_{X} a behavioral structure , as in the sense of system behavior specification ( Reichel, 1981 ; Jacobs, 2016 ) , if it is a post-fixed point or a fixed point of a closure operator T X T_{X} :
+Definition 3.9 (Behavioral structure) .
+A behavioral structure h X h_{X} is a post-fixed point of the closure operator T X T_{X} , i.e., h X ⪯ T X ​ ( h X ) h_{X}\preceq T_{X}(h_{X}) or a fixed point , i.e., h X = T X ​ ( h X ) h_{X}=T_{X}(h_{X}) .
+This pattern is ubiquitous in RL. For example, fixing a policy π \pi , the closure operator for the reward aggregation lifting in Example 3.4 is exactly the Bellman operator ℬ \mathcal{B} on quantities v : X → ℝ v:X\to\mathbb{R} ( Sutton and Barto, 1998 ) :
+ℬ ⁡ ( v ) ​ ( x ) := γ ​ 𝔼 x ′ ∼ t X π ​ ( x ) v ​ ( x ′ ) + h O ​ ( o X ​ ( x ) ) , \mathcal{B}(v)(x)\vcentcolon=\gamma\E_{x^{\prime}\sim\mathrm{t}^{\pi}_{X}(x)}v(x^{\prime})+h_{O}(\mathrm{o}_{X}(x)), (17)
+where ⟨ t X π , o X ⟩ : X → ℙ ​ X × O \langle\mathrm{t}^{\pi}_{X},\mathrm{o}_{X}\rangle:X\to\mathbb{P}{X}\times O is the policy-dependent transition as in Example 2.9 , and a fixed point of ℬ \mathcal{B} is the state value function v π v^{\pi} . In state abstraction, other examples include bisimulation relations ( Dean and Givan, 1997 ; Givan et al., 2003 ) and bisimulation metrics ( Ferns et al., 2004 ; Ferns et al., 2011 ) , which we will spell out in Section 4 .
+Pullback along an encoder
+Another use of pullback is to relate bundles on the representation space Z Z with those on the concrete state space S S along an encoder ϕ : S → Z \phi:S\to Z . For example, Luo et al. (2025, Definition 1) conceptually unified and analyzed several state representation learning objectives by requiring the encoder to be an isometry, i.e., d S = ϕ ∗ ​ d Z d_{S}={\phi}^{*}d_{Z} , where d S d_{S} is a behavioral metric on S S and d Z d_{Z} is a chosen metric on Z Z , typically reflecting its geometry. This allows us to verify whether d Z d_{Z} encodes the desired behaviors. As pullback is simply precomposition, we can also pull back other structures. For example, given a policy π Z : Z → A \pi_{Z}:Z\to A on the representation space Z Z , we can pull it back along an encoder ϕ : S → Z \phi:S\to Z to obtain a policy ϕ ∗ ​ π Z : S → A {\phi}^{*}\pi_{Z}:S\to A on the concrete state space S S .
+3.4 Pushforward of bundles
+On the other hand, the pushforward operation constructs bundles covariantly from a source space X X to a target space Y Y along a map f : X → Y f:X\to Y :
+Definition 3.10 (Pushforward) .
+Given a map f : X → Y f:X\to Y , the pushforward of a bundle h X : X n → V h_{X}:X^{n}\to V along f f is the bundle f ∗ ​ h X : Y n → V {f}_{*}h_{X}:Y^{n}\to V given by
+f ∗ h X ( y 1 : n ) := ∨ x i ∈ f − 1 ​ ( y i ) h X ( x 1 : n ) , {f}_{*}h_{X}(y_{1:n})\vcentcolon=\join_{x_{i}\in f^{-1}(y_{i})}h_{X}(x_{1:n}), (18)
+where f − 1 ​ ( y i ) := { x i ∈ X | f ⁡ ( x i ) = y i } ⊆ X f^{-1}(y_{i})\vcentcolon=\{x_{i}\in X\;|\;f(x_{i})=y_{i}\}\subseteq X is the inverse image (fiber) of y i ∈ Y y_{i}\in Y through f : X → Y f:X\to Y , and ∨ \join is the join operator for ( V , ⪯ ) (V,\preceq) . We assume that this join exists for the relevant fibers, including the empty-fiber case via the corresponding empty join.
+In this work, the main use case is the pushforward along an encoder ϕ : S → Z \phi:S\to Z : given a bundle h S : S n → V h_{S}:S^{n}\to V on the concrete state space S S , the pushforward ϕ ∗ ​ h S : Z n → V {\phi}_{*}h_{S}:Z^{n}\to V produces a well-defined bundle on the representation space Z Z by aggregating h S h_{S} over all concrete realizations of a representation in a conservative manner.
+3.5 Behavioral structure transfer
+We now have all the necessary components: behavioral systems, maps between systems, behavioral structures, and operations for transferring structures. Finally, we present our theoretical results regarding behavioral structure transfer to show how these components fit together.
+Transfer of behavioral structures along homomorphisms
+First, we present the main theorems that justify the use of pullback and pushforward for transferring behavioral structures along homomorphisms. These theorems give general conditions under which familiar behavioral structures, including safety predicates, value functions, and bisimulation relations and metrics, can be pulled back or pushed forward across abstraction maps. Our results are based on the following lemma:
+Lemma 3.11 .
+Given two systems ( X , t X ) (X,t_{X}) and ( Y , t Y ) (Y,t_{Y}) , two liftings λ X \lambda_{X} and λ Y \lambda_{Y} constructed with the same operators, and the induced closure operators T X T_{X} and T Y T_{Y} , if a map f : X → Y f:X\to Y is a homomorphism, then
+T X ∘ f ∗ \displaystyle T_{X}\mathbin{\circ}{f}^{*} ⪯ f ∗ ∘ T Y , \displaystyle\preceq{f}^{*}\mathbin{\circ}T_{Y}, (19)
+f ∗ ∘ T X \displaystyle{f}_{*}\mathbin{\circ}T_{X} ⪯ T Y ∘ f ∗ . \displaystyle\preceq T_{Y}\mathbin{\circ}{f}_{*}. (20)
+This lemma shows that the liftings and closure operators are compatible with homomorphisms by construction . Based on this lemma, we can prove the following behavioral structure transfer and construction theorems:
+Theorem 3.12 (Safe verification) .
+If ϕ : ( S , t S ) → ( Z , t Z ) \phi:(S,t_{S})\to(Z,t_{Z}) is a surjective homomorphism, then the pullback ϕ ∗ {\phi}^{*} reflects post-fixed points: for any bundle h Z : Z n → V h_{Z}:Z^{n}\to V ,
+( h Z ⪯ T Z ​ ( h Z ) ) ← ( ϕ ∗ ​ h Z ⪯ T S ​ ( ϕ ∗ ​ h Z ) ) . (h_{Z}\preceq T_{Z}(h_{Z}))\mathbin{\leftarrow}({\phi}^{*}h_{Z}\preceq T_{S}({\phi}^{*}h_{Z})). (21)
+This theorem states that if an encoder ϕ \phi is surjective and preserves the dynamics, then any behavioral structure h Z h_{Z} on the abstract system can be safely verified on the concrete system by pulling it back along the encoder. The surjectivity condition, i.e., every abstract state corresponds to at least one concrete state, ensures that the abstract system has no extra states that could generate unverifiable behaviors.
+Theorem 3.13 (Safe construction) .
+If ϕ : ( S , t S ) → ( Z , t Z ) \phi:(S,t_{S})\to(Z,t_{Z}) is a homomorphism, then the pushforward ϕ ∗ {\phi}_{*} preserves post-fixed points: for any bundle h S : S n → V h_{S}:S^{n}\to V ,
+( h S ⪯ T S ​ ( h S ) ) → ( ϕ ∗ ​ h S ⪯ T Z ​ ( ϕ ∗ ​ h S ) ) . (h_{S}\preceq T_{S}(h_{S}))\mathbin{\rightarrow}({\phi}_{*}h_{S}\preceq T_{Z}({\phi}_{*}h_{S})). (22)
+This theorem ensures that pushing forward any concrete behavioral structure along any homomorphism produces an abstract behavioral structure.
+Relation of behavioral structures over different values
+Next, we present a theorem that relates logical bundles ( V = { ⊤ , ⊥ } V={\{\top,\bot\}} ) and quantitative bundles ( V = [ 0 , ∞ ] V={[0,\infty]} ), which allows us to systematically construct quantitative behavioral structures from logical ones:
+Theorem 3.14 (Relation of logical and quantitative bundles) .
+The zero predicate z : [ 0 , ∞ ] → { ⊤ , ⊥ } := [ x ↦ ( x = 0 ) ] z:{[0,\infty]}\to{\{\top,\bot\}}\vcentcolon=\left[x\mapsto(x=0)\right] maps a quantitative bundle h X : X n → [ 0 , ∞ ] h_{X}:X^{n}\to{[0,\infty]} to a logical bundle z ∘ h X : X n → { ⊤ , ⊥ } z\mathbin{\circ}h_{X}:X^{n}\to{\{\top,\bot\}} . If a quantitative lifting λ X [ 0 , ∞ ] \lambda^{[0,\infty]}_{X} and a logical lifting λ X { ⊤ , ⊥ } \lambda^{\{\top,\bot\}}_{X} are constructed with operators in Table 2 such that the zero predicate z z is an algebra homomorphism between the operators, 7 7 7 This means that (i) z ∘ ⊕ [ 0 , ∞ ] = ⊕ { ⊤ , ⊥ } ∘ ( z × z ) z\mathbin{\circ}{\mathbin{\oplus}_{[0,\infty]}}={\mathbin{\oplus}_{\{\top,\bot\}}}\mathbin{\circ}(z\times z) , (ii) z ∘ □ [ 0 , ∞ ] = □ { ⊤ , ⊥ } ∘ z A z\mathbin{\circ}{\aggregator_{[0,\infty]}}={\aggregator_{\{\top,\bot\}}}\mathbin{\circ}z^{A} , and (iii) z ∘ ⊙ [ 0 , ∞ ] = ⊙ { ⊤ , ⊥ } ∘ ℙ ​ z z\mathbin{\circ}{\barycenter_{[0,\infty]}}={\barycenter_{\{\top,\bot\}}}\mathbin{\circ}\mathbb{P}{z} . then
+z ∘ λ X [ 0 , ∞ ] ​ ( h X ) = λ X { ⊤ , ⊥ } ​ ( z ∘ h X ) . z\mathbin{\circ}\lambda^{[0,\infty]}_{X}(h_{X})=\lambda^{\{\top,\bot\}}_{X}(z\mathbin{\circ}h_{X}). (23)
+This theorem states that if the operators used in the liftings are homomorphic via the zero predicate, then the value of the quantitative bundle is zero if and only if the logical bundle evaluates to true. The homomorphism condition encodes the relationships between operators such as “ the sum/max of two non-negative numbers is zero if and only if both numbers are zero ” (combinator), or “ the expectation of a non-negative random variable is zero if and only if the variable is almost surely zero ” (barycenter). In this way, Theorem 3.14 is not only a relation between existing notions, but a construction principle: once a logical behavioral structure is specified as a bundle and the operators satisfy the homomorphism condition, the corresponding quantitative structure follows automatically. This generalizes the connection between bisimulation relations and bisimulation metrics ( Ferns et al., 2004 ; Ferns et al., 2011 ; Castro, 2020 ) to general behavioral structures.
+4 State Abstraction in Reinforcement Learning
+This section instantiates the framework on four familiar RL themes: next-observation prediction, model-irrelevance abstraction, bisimulation equivalences, and policy-dependent transition and value functions.
+4.1 Next-observation prediction
+First, we show that the next-observation prediction task used in Ota et al. (2020) ; Subramanian et al. (2022) follows from the homomorphism condition of the F Moore F_{\mathrm{Moore}} type in Eq. 7 :
+Proposition 4.1 .
+If f : X → Y f:X\to Y is a homomorphism from ⟨ t X , o X ⟩ \langle\mathrm{t}_{X},\mathrm{o}_{X}\rangle to ⟨ t Y , o Y ⟩ \langle\mathrm{t}_{Y},\mathrm{o}_{Y}\rangle , then it is also a homomorphism from ( ℙ ​ o X ) A ∘ t X : X → ( ℙ ​ O ) A (\mathbb{P}{\mathrm{o}_{X}})^{A}\mathbin{\circ}\mathrm{t}_{X}:X\to(\mathbb{P}{O})^{A} to ( ℙ ​ o Y ) A ∘ t Y : Y → ( ℙ ​ O ) A (\mathbb{P}{\mathrm{o}_{Y}})^{A}\mathbin{\circ}\mathrm{t}_{Y}:Y\to(\mathbb{P}{O})^{A} , i.e., ∀ x ∈ X . ∀ a ∈ A . o Y ∗ t Y ( f ( x ) , a ) = ℙ ​ O o X ∗ t X ( x , a ) \forall x\in X.\;\forall a\in A.\;{\mathrm{o}_{Y}}_{*}\mathrm{t}_{Y}(f(x),a)=_{\mathbb{P}{O}}{\mathrm{o}_{X}}_{*}\mathrm{t}_{X}(x,a) .
+Since an F Moore F_{\mathrm{Moore}} -homomorphism preserves both the transition component in Eq. 7c.i and the observation component in Eq. 7c.ii , it preserves next-observation distributions (see also Ni et al. (2024) ). The converse need not hold, so next-observation prediction alone does not guarantee transition and observation preservation.
+4.2 Model-irrelevance abstraction
+Next, we incorporate the model-irrelevance abstraction ( Li et al., 2006 ; Li, 2009 ) into our coalgebra framework and show that it is equivalent to the coalgebra homomorphism condition:
+Proposition 4.2 .
+A model-irrelevance abstraction in Li et al. (2006) is exactly a coalgebra homomorphism in Def. 2.6 .
+Concretely, a model-irrelevance abstraction requires that for an encoder ϕ : S → Z \phi:S\to Z , if two states s 1 , s 2 ∈ S s_{1},s_{2}\in S are mapped to the same representation, i.e., ϕ ( s 1 ) = Z ϕ ( s 2 ) \phi(s_{1})=_{Z}\phi(s_{2}) , then they must have the same observation and transition distributions, i.e., o S ( s 1 ) = O o S ( s 2 ) \mathrm{o}_{S}(s_{1})=_{O}\mathrm{o}_{S}(s_{2}) and for all actions a ∈ A a\in A , ϕ ∗ t S ( s 1 , a ) = ℙ ​ Z ϕ ∗ t S ( s 2 , a ) {\phi}_{*}\mathrm{t}_{S}(s_{1},a)=_{\mathbb{P}Z}{\phi}_{*}\mathrm{t}_{S}(s_{2},a) .
+This is not written as a homomorphism, since it does not require a system on the representation space Z Z . It is instead the kernel view of a homomorphism, requiring ϕ \phi to satisfy ker ⁡ ϕ → ker ⁡ ( ϕ ∗ ​ t S ) ∧ ker ⁡ o S \ker{\phi}\mathbin{\rightarrow}\ker({\phi}_{*}\mathrm{t}_{S})\mathbin{\wedge}\ker{\mathrm{o}_{S}} , where the consequent is exactly ker ⁡ ( F Moore ​ ϕ ∘ ⟨ t S , o S ⟩ ) \ker\left(F_{\mathrm{Moore}}\phi\mathbin{\circ}\langle\mathrm{t}_{S},\mathrm{o}_{S}\rangle\right) . 8 8 8 The kernel ker ⁡ f : X × X → { ⊤ , ⊥ } \ker{f}:X\times X\to{\{\top,\bot\}} of a map f : X → Y f:X\to Y is the pullback f ∗ ( = Y ) {f}^{*}{(=_{Y})} of the equality = Y =_{Y} on the codomain. This implication holds exactly when F Moore ​ ϕ ∘ ⟨ t S , o S ⟩ F_{\mathrm{Moore}}\phi\mathbin{\circ}\langle\mathrm{t}_{S},\mathrm{o}_{S}\rangle factors through ϕ \phi , which is the homomorphism condition in Eq. 7 . Thus Theorems 3.12 and 3.13 apply to model-irrelevance abstraction.
+4.3 From homomorphism to bisimulation
+In state abstraction, bisimulation relations are of particular interest ( Dean and Givan, 1997 ; Givan et al., 2003 ) . In our framework, we can describe a bisimulation relation for a system t X t_{X} of type F Moore F_{\mathrm{Moore}} as a post-fixed point of a closure operator in Def. 3.8 derived from a lifting in Example 3.6 where the combinator is conjunction ∧ \mathbin{\wedge} , the aggregator is universal quantification ∀ \forall , and the barycenter operator is the almost-sure operator. This particular lifting is forced by the homomorphism requirement:
+Proposition 4.3 .
+For an equivalence r : X × X → { ⊤ , ⊥ } r:X\times X\to{\{\top,\bot\}} , let q r : X → X / r q_{r}:X\to X/r be its quotient map. For an F F -coalgebra ( X , t X ) (X,t_{X}) , define a monotone operator T X T_{X} on equivalences as follows:
+T X ​ ( r ) := ker ⁡ ( F ​ q r ∘ t X ) = t X ∗ ​ ker ⁡ ( F ​ q r ) . T_{X}(r)\vcentcolon=\ker(F{q_{r}}\mathbin{\circ}t_{X})={t_{X}}^{*}\ker(F{q_{r}}). (24)
+Then, the quotient map q r q_{r} is a homomorphism if and only if the equivalence relation r r is a post-fixed point of T X T_{X} .
+In other words, the map from r : X × X → { ⊤ , ⊥ } r:X\times X\to{\{\top,\bot\}} to ker ⁡ ( F ​ q r ) : F ​ X × F ​ X → { ⊤ , ⊥ } \ker(F{q_{r}}):FX\times FX\to{\{\top,\bot\}} is exactly the lifting that characterizes whether the quotient map of an equivalence is a homomorphism. When we instantiate this result to the F Moore F_{\mathrm{Moore}} functor, we get the usual definition of bisimulation equivalences. We defer the details to Appendix E .
+Consequently, Propositions 4.2 and 4.3 together imply that model-irrelevance abstractions are quotient maps of bisimulation equivalences. This explains why self-prediction can recover bisimulation-based abstractions without explicitly computing bisimulation metrics, whose standard formulations require optimization over couplings ( Ferns et al., 2004 ; Castro et al., 2021 ; Calo et al., 2024 ) .
+4.4 Value function and value equivalence
+In Section 2.3 , policy-dependent transition is modeled as a natural transformation from F Moore F_{\mathrm{Moore}} in Example 2.3 to F Markov F_{\mathrm{Markov}} in Example 2.5 . Together with Proposition 4.3 , this explains policy-dependent bisimulation equivalence ( Castro, 2020 ) as the bisimulation structure obtained after closing the loop with a policy.
+In Section 3.3 , we showed that the Bellman operator is the closure operator induced by the reward aggregation lifting in Example 3.4 and a policy-dependent transition system of type F Markov F_{\mathrm{Markov}} , and the value function v π v^{\pi} is a fixed point of this operator. Its kernel, defined by
+( s ∼ v s ′ ) := ( v π ( s ) = v π ( s ′ ) ) , (s\sim_{v}s^{\prime})\vcentcolon=(v^{\pi}(s)=v^{\pi}(s^{\prime})), (25)
+is the value equivalence relation ( Li et al., 2006 ; Li, 2009 ; Castro et al., 2009 ; Abel et al., 2016 ; Abel et al., 2020 ; Grimm et al., 2020 ) . Unlike bisimulation, value equivalence need not preserve the one-step decomposition of behavior: equal values may result from different immediate cumulants and different future distributions that cancel after aggregation. Thus value equivalence is better viewed here as a relation derived from a unary behavioral structure, rather than as a behavioral relation specified directly by a one-step binary lifting.
+5 Conclusion
+Summary
+We introduce a compositional foundation for defining and analyzing behavioral structures in RL, bringing unary invariants, value functions, and bisimulation relations or metrics into a single transferable framework. The system dynamics are modeled as coalgebras, a central and widely used notion of state abstraction is characterized as coalgebra homomorphisms, and behavioral structures are generated uniformly from system dynamics via a general lifting-and-pullback construction. We prove sound transfer via pullback and pushforward, and derive quantitative metrics from logical behavioral semantics.
+Compositionality
+In this paper, “ compositional ” means that global behavioral semantics are built by composing smaller components. At the system level, components such as transition, observation, and policy are composed into coalgebraic behavioral systems via functor constructions. At the semantics level, behavioral structures are defined via lifting using a wide choice of operators. At the abstraction level, these structures are composed with abstraction maps by pullback and pushforward, giving transfer results rather than case-specific proofs.
+Scope, limitations, and future work
+This work focuses on strict homomorphisms and exact structural preservation. A natural next step is to study relaxed commutation with explicit slack via lax homomorphisms . From there, one can develop a quantitative theory of approximation that turns this slack into weaker transfer guarantees, practical diagnostics, or training objectives. The bundle viewpoint also supports symbolic specifications, including safety and temporal logic constraints, although a fuller treatment lies beyond the scope of this paper. Another direction is to study weaker notions of behavioral structure-preserving maps , which may enable more flexible abstractions while retaining some behavioral guarantees. Finally, we have focused on the theoretical foundations of behavioral structures, but an important next step is to develop practical algorithms for learning and leveraging these structures in RL.
+Acknowledgements
+We are grateful to Tianwei Ni for helpful discussions on representation learning in RL, and Doina Precup for valuable discussion and feedback. We thank the anonymous reviewers for their constructive feedback and suggestions.
+YZ was supported by JSPS KAKENHI Grant Number JP26K21299. ZL was supported by the Canada CIFAR AI Chair Program and the R3AI program of the Canada First Research Excellence Fund. MB was supported by the Advanced Research + Invention Agency (ARIA) through project code MSAI-SE01-P011.
+Impact Statement
+This paper develops theoretical tools intended to advance reinforcement learning. The results are primarily conceptual and methodological, and we do not anticipate immediate direct societal impacts.
+References
+Abel et al. (2023) D. Abel, A. Barreto, B. Van Roy, D. Precup, H. P. van Hasselt, and S. Singh A definition of continual reinforcement learning . In Neural Information Processing Systems , External Links: Link Cited by: §2.1 .
+Abel et al. (2025) D. Abel, M. Bowling, A. Barreto, W. Dabney, S. Dong, S. Hansen, A. Harutyunyan, K. Khetarpal, C. Lyle, R. Pascanu, G. Piliouras, D. Precup, J. Richens, M. Rowland, T. Schaul, and S. Singh Plasticity as the mirror of empowerment . In Neural Information Processing Systems , External Links: Link Cited by: §2.1 , §2.1 .
+Abel et al. (2016) D. Abel, D. Hershkowitz, and M. Littman Near optimal behavior via approximate state abstraction . In International Conference on Machine Learning , External Links: Link Cited by: §4.4 .
+Abel et al. (2024) D. Abel, M. K. Ho, and A. Harutyunyan Three dogmas of reinforcement learning . In Reinforcement Learning Conference , External Links: Link Cited by: §F.6 .
+Abel et al. (2020) D. Abel, N. Umbanhowar, K. Khetarpal, D. Arumugam, D. Precup, and M. Littman Value preserving state-action abstractions . In International Conference on Artificial Intelligence and Statistics , External Links: Link Cited by: §4.4 .
+Abel (2022) D. Abel A theory of abstraction in reinforcement learning . Ph.D. Thesis , Brown University . External Links: Link Cited by: §1 .
+Alshiekh et al. (2018) M. Alshiekh, R. Bloem, R. Ehlers, B. Könighofer, S. Niekum, and U. Topcu Safe reinforcement learning via shielding . In AAAI Conference on Artificial Intelligence , External Links: Link Cited by: §1 , §3.2 .
+Altman (1999) E. Altman Constrained Markov decision processes . Routledge . External Links: Link Cited by: §F.5 .
+Amato et al. (2010) C. Amato, B. Bonet, and S. Zilberstein Finite-state controllers based on mealy machines for centralized and decentralized POMDPs . In AAAI Conference on Artificial Intelligence , External Links: Link Cited by: §F.6 .
+Awodey (2010) S. Awodey Category theory . Oxford University Press . External Links: Link Cited by: Appendix A .
+Bakirtzis et al. (2025) G. Bakirtzis, M. Savvas, and U. Topcu Categorical semantics of compositional reinforcement learning . Journal of Machine Learning Research 26 ( 130 ), pp. 1–37 . External Links: Link Cited by: §F.4 .
+Baldan et al. (2014) P. Baldan, F. Bonchi, H. Kerstan, and B. König Behavioral metrics via functor lifting . In 34th International Conference on Foundation of Software Technology and Theoretical Computer Science (FSTTCS 2014) , External Links: Link Cited by: Appendix B .
+Barreto et al. (2017) A. Barreto, W. Dabney, R. Munos, J. J. Hunt, T. Schaul, H. P. Van Hasselt, and D. Silver Successor features for transfer in reinforcement learning . In Neural Information Processing Systems , External Links: Link Cited by: §3.2 .
+Boyd et al. (2025) A. Boyd, F. Nowak, D. Hyland, M. Baltieri, and F. E. Rosas From monoliths to modules: decomposing transducers for efficient world modelling . arXiv preprint . External Links: Link Cited by: §2.1 .
+Calo et al. (2024) S. Calo, A. Jonsson, G. Neu, L. Schwartz, and J. Segovia-Aguas Bisimulation metrics are optimal transport distances, and can be computed efficiently . Neural Information Processing Systems . External Links: Link Cited by: §4.3 .
+Camacho et al. (2019) A. Camacho, R. T. Icarte, T. Q. Klassen, R. A. Valenzano, and S. A. McIlraith LTL and beyond: formal languages for reward function specification in reinforcement learning . In International Joint Conference on Artificial Intelligence , External Links: Link Cited by: §F.5 .
+Capucci (2025) M. Capucci Notes on categorical systems theory . External Links: Link Cited by: §F.6 .
+Castro et al. (2021) P. S. Castro, T. Kastner, P. Panangaden, and M. Rowland MICo: improved representations via sampling-based state similarity for Markov decision processes . In Neural Information Processing Systems , External Links: Link Cited by: §1 , §4.3 .
+Castro et al. (2009) P. S. Castro, P. Panangaden, and D. Precup Equivalence relations in fully and partially observable Markov decision processes . In International Joint Conference on Artificial Intelligence , External Links: Link Cited by: §F.6 , §4.4 .
+Castro (2020) P. S. Castro Scalable methods for computing state similarity in deterministic Markov decision processes . In AAAI Conference on Artificial Intelligence , External Links: Link Cited by: §1 , §1 , §2.3 , §3.5 , §4.4 .
+Dayan (1993) P. Dayan Improving generalization for temporal difference learning: the successor representation . Neural Computation 5 ( 4 ), pp. 613–624 . External Links: Link Cited by: §3.2 .
+Dean and Givan (1997) T. Dean and R. Givan Model minimization in Markov decision processes . In National Conference on Artificial Intelligence , External Links: Link Cited by: §1 , §1 , §3.3 , §4.3 .
+Echchahed and Castro (2025) A. Echchahed and P. S. Castro A survey of state representation learning for deep reinforcement learning . Transactions on Machine Learning Research . Note: Survey Certification External Links: Link Cited by: §1 , §1 .
+Ferns et al. (2004) N. Ferns, P. Panangaden, and D. Precup Metrics for finite Markov decision processes . In Conference on Uncertainty in Artificial Intelligence , External Links: Link Cited by: §1 , §1 , §3.3 , §3.5 , §4.3 .
+Ferns et al. (2011) N. Ferns, P. Panangaden, and D. Precup Bisimulation metrics for continuous Markov decision processes . SIAM Journal on Computing 40 ( 6 ), pp. 1662–1714 . External Links: Link Cited by: §1 , §3.3 , §3.5 .
+François-Lavet et al. (2019) V. François-Lavet, Y. Bengio, D. Precup, and J. Pineau Combined reinforcement learning via abstract representations . In AAAI Conference on Artificial Intelligence , External Links: Link Cited by: §1 , §2.2 .
+Fritz (2020) T. Fritz A synthetic approach to Markov kernels, conditional independence and theorems on sufficient statistics . Advances in Mathematics 370 , pp. 107239 . Note: https://arxiv.org/abs/1908.07021 External Links: Link Cited by: §B.2 , §B.4 .
+Gelada et al. (2019) C. Gelada, S. Kumar, J. Buckman, O. Nachum, and M. G. Bellemare DeepMDP: learning continuous latent space models for representation learning . In International Conference on Machine Learning , External Links: Link Cited by: §1 .
+Givan et al. (2003) R. Givan, T. Dean, and M. Greig Equivalence notions and model minimization in Markov decision processes . Artificial intelligence 147 ( 1-2 ), pp. 163–223 . External Links: Link Cited by: §F.6 , §1 , §3.3 , §4.3 .
+Grimm et al. (2020) C. Grimm, A. Barreto, S. Singh, and D. Silver The value equivalence principle for model-based reinforcement learning . In Neural Information Processing Systems , External Links: Link Cited by: §1 , §2.2 , §2.3 , §4.4 .
+Hanna and Corrado (2025) J. Hanna and N. Corrado When can model-free reinforcement learning be enough for thinking? . In Neural Information Processing Systems , External Links: Link Cited by: §F.7 .
+Hasuo et al. (2007) I. Hasuo, B. Jacobs, and A. Sokolova Generic trace semantics via coinduction . Logical Methods in Computer Science 3 . External Links: Link Cited by: Appendix B .
+Hengst (2002) B. Hengst Discovering hierarchy in reinforcement learning with HEXQ . In International Conference on Machine Learning , External Links: Link Cited by: §F.7 .
+Hsu et al. (2021) K. Hsu, V. Rubies-Royo, C. J. Tomlin, and J. F. Fisac Safety and liveness guarantees through reach-avoid reinforcement learning . In Robotics: Science and Systems , Note: https://arxiv.org/abs/2112.12288 External Links: Link Cited by: §1 , §3.2 .
+Icarte et al. (2022) R. T. Icarte, T. Q. Klassen, R. Valenzano, and S. A. McIlraith Reward machines: exploiting reward function structure in reinforcement learning . Journal of Artificial Intelligence Research 73 , pp. 173–208 . External Links: Link Cited by: §F.5 .
+Icarte et al. (2018) R. T. Icarte, T. Klassen, R. Valenzano, and S. McIlraith Using reward machines for high-level task specification and decomposition in reinforcement learning . In International Conference on Machine Learning , External Links: Link Cited by: §F.5 .
+Jacobs (2016) B. Jacobs Introduction to coalgebra: towards mathematics of states and observation . Cambridge Tracts in Theoretical Computer Science , Vol. 59 , Cambridge University Press . External Links: Link Cited by: §A.2 , §B.2 , §B.3 , §1 , §2.1 , §2.2 , §3.2 , §3.3 , footnote 2 .
+Kaelbling et al. (1998) L. P. Kaelbling, M. L. Littman, and A. R. Cassandra Planning and acting in partially observable stochastic domains . Artificial Intelligence 101 ( 1-2 ), pp. 99–134 . External Links: Link Cited by: §F.5 , §F.6 , §2.1 , §2.1 .
+Klissarov et al. (2025) M. Klissarov, A. Bagaria, Z. Luo, G. Konidaris, D. Precup, and M. C. Machado Discovering temporal structure: an overview of hierarchical reinforcement learning . arXiv preprint . External Links: Link Cited by: §F.7 .
+Kober et al. (2013) J. Kober, J. A. Bagnell, and J. Peters Reinforcement learning in robotics: a survey . The International Journal of Robotics Research 32 ( 11 ), pp. 1238–1274 . External Links: Link Cited by: §1 .
+Koul et al. (2019) A. Koul, A. Fern, and S. Greydanus Learning finite state representations of recurrent policy networks . In International Conference on Learning Representations , External Links: Link Cited by: §F.6 .
+Kurz and Velebil (2016) A. Kurz and J. Velebil Relation lifting, a survey . Journal of Logical and Algebraic Methods in Programming 85 ( 4 ), pp. 475–499 . External Links: Link Cited by: §B.3 , Appendix B .
+Kurz (2001) A. Kurz Coalgebras and modal logic . Note: Lecture Notes for ESSLLI External Links: Link Cited by: §B.1 , Appendix B , §3.2 .
+Li et al. (2006) L. Li, T. J. Walsh, and M. L. Littman Towards a unified theory of state abstraction for MDPs . In International Symposium on Artificial Intelligence and Mathematics, AI&Math , External Links: Link Cited by: §F.6 , §1 , §2.2 , §2.2 , §2.3 , §4.2 , §4.4 , Proposition 4.2 .
+Li (2009) L. Li A unifying framework for computational reinforcement learning theory . Ph.D. Thesis , The State University of New Jersey . External Links: Link Cited by: §4.2 , §4.4 .
+Libkind and Myers (2025) S. Libkind and D. J. Myers Towards a double operadic theory of systems . arXiv preprint . External Links: Link Cited by: §F.6 .
+Littman and Sutton (2001) M. Littman and R. S. Sutton Predictive representations of state . In Neural Information Processing Systems , External Links: Link Cited by: §F.5 , §F.6 .
+Liu et al. (2024) X. Liu, Z. Xia, H. Yang, J. Gao, D. Zha, M. Zhu, C. D. Wang, Z. Wang, and J. Guo Dynamic datasets and market environments for financial reinforcement learning . Machine Learning 113 ( 5 ), pp. 2795–2839 . Note: https://arxiv.org/abs/2304.13174 External Links: Link Cited by: §1 .
+Luo et al. (2025) Z. Luo, T. Ni, P. Bacon, D. Precup, and X. Si Understanding behavioral metric learning: a large-scale study on distracting reinforcement learning environments . In Reinforcement Learning Conference , External Links: Link Cited by: §1 , §1 , §2.2 , §2.2 , §3.3 .
+Mac Lane (1978) S. Mac Lane Categories for the working mathematician . Springer . External Links: Link Cited by: Appendix A , §2.1 .
+Machado et al. (2023) M. C. Machado, A. Barreto, D. Precup, and M. Bowling Temporal abstraction in reinforcement learning with the successor representation . Journal of Machine Learning Research 24 ( 80 ), pp. 1–69 . External Links: Link Cited by: §3.2 .
+Meuleau et al. (1999) N. Meuleau, L. Peshkin, K. Kim, and L. P. Kaelbling Learning finite-state controllers for partially observable environments . In Conference on Uncertainty in Artificial Intelligence , Note: https://arxiv.org/abs/1301.6721 External Links: Link Cited by: §F.6 .
+Milner (1989) R. Milner Communication and concurrency . Prentice-Hall, Inc. . External Links: Link Cited by: §1 .
+Mohan et al. (2024) A. Mohan, A. Zhang, and M. Lindauer Structure in deep reinforcement learning: a survey and open problems . Journal of Artificial Intelligence Research 79 , pp. 1167–1236 . External Links: Link Cited by: §1 , §2.1 .
+Moody et al. (1998) J. Moody, L. Wu, Y. Liao, and M. Saffell Performance functions and reinforcement learning for trading systems and portfolios . Journal of forecasting 17 ( 5-6 ), pp. 441–470 . External Links: Link Cited by: §1 .
+Myers (2023) D. J. Myers Categorical systems theory . External Links: Link Cited by: §F.6 .
+Ni et al. (2024) T. Ni, B. Eysenbach, E. Seyedsalehi, M. Ma, C. Gehring, A. Mahajan, and P. Bacon Bridging state and history representations: understanding self-predictive RL . In International Conference on Learning Representations , External Links: Link Cited by: §1 , §2.2 , §4.1 .
+Ota et al. (2020) K. Ota, T. Oiki, D. Jha, T. Mariyama, and D. Nikovski Can increasing input dimensionality improve deep reinforcement learning? . In International Conference on Machine Learning , External Links: Link Cited by: §4.1 .
+Panangaden et al. (2024) P. Panangaden, S. Rezaei-Shoshtari, R. Zhao, D. Meger, and D. Precup Policy gradient methods in the presence of symmetries and state abstractions . Journal of Machine Learning Research 25 ( 71 ), pp. 1–57 . External Links: Link Cited by: §F.4 , §F.4 .
+Pattinson (2003) D. Pattinson Coalgebraic modal logic: soundness, completeness and decidability of local consequence . Theoretical Computer Science 309 ( 1 ), pp. 177–193 . External Links: Link Cited by: Appendix B , §3.2 .
+Precup (2000) D. Precup Temporal abstraction in reinforcement learning . Ph.D. Thesis , University of Massachusetts Amherst . External Links: Link Cited by: §F.7 , §F.7 .
+Puterman (1994) M. L. Puterman Markov decision processes: discrete stochastic dynamic programming . John Wiley & Sons, Inc. . External Links: Link Cited by: §2.1 , §2.1 .
+Rabiner (1989) L. R. Rabiner A tutorial on hidden Markov models and selected applications in speech recognition . Proceedings of the IEEE 77 ( 2 ), pp. 257–286 . External Links: Link Cited by: §2.1 .
+Ravindran and Barto (2002) B. Ravindran and A. G. Barto Model minimization in hierarchical reinforcement learning . In International Symposium on Abstraction, Reformulation, and Approximation , pp. 196–211 . External Links: Link Cited by: §F.4 , §F.4 , §F.4 , §2.2 .
+Ravindran and Barto (2003) B. Ravindran and A. G. Barto SMDP homomorphisms: an algebraic approach to abstraction in semi-Markov decision processes . In International Joint Conference on Artificial Intelligence , External Links: Link Cited by: §F.4 , §F.6 .
+Ravindran and Barto (2001) B. Ravindran and A. G. Barto Symmetries and model minimization in Markov decision processes . Technical report University of Massachusetts . External Links: Link Cited by: §F.4 , §F.4 , §F.4 , §2.2 .
+Ravindran and Barto (2004) B. Ravindran and A. G. Barto Approximate homomorphisms: a framework for non-exact minimization in Markov decision processes . External Links: Link Cited by: §F.4 , §F.6 .
+Ravindran (2004) B. Ravindran An algebraic approach to abstraction in reinforcement learning . Ph.D. Thesis , University of Massachusetts Amherst . External Links: Link Cited by: §F.4 , §F.6 .
+Reichel (1981) H. Reichel Behavioural equivalence – a unifying concept for initial and final specifications . In Proceedings of Third Hungarian Computer Science Conference , Cited by: §3.3 .
+Rezaei-Shoshtari et al. (2022) S. Rezaei-Shoshtari, R. Zhao, P. Panangaden, D. Meger, and D. Precup Continuous MDP homomorphisms and homomorphic policy gradient . In Neural Information Processing Systems , External Links: Link Cited by: §F.4 , §F.4 .
+Rosas et al. (2025) F. Rosas, A. Boyd, and M. Baltieri AI in a vat: fundamental limits of efficient world modelling for agent sandboxing and interpretability . In Reinforcement Learning Conference , External Links: Link Cited by: §F.6 , §F.6 , §2.1 .
+Rutten (2000) J.J.M.M. Rutten Universal coalgebra: a theory of systems . Theoretical Computer Science 249 ( 1 ), pp. 3–80 . External Links: Link Cited by: §A.2 , §F.1 , §1 , §2.1 , §2.1 , §2.1 , §2.2 , §2.3 .
+Schwarzer et al. (2021) M. Schwarzer, A. Anand, R. Goel, R. D. Hjelm, A. Courville, and P. Bachman Data-efficient reinforcement learning with self-predictive representations . In International Conference on Learning Representations , External Links: Link Cited by: §1 , §2.2 .
+Silva et al. (2013) A. Silva, F. Bonchi, M. Bonsangue, and J. Rutten Generalizing determinization from automata to coalgebras . Logical Methods in Computer Science 9 . External Links: Link Cited by: §2.1 , footnote 2 .
+Singh et al. (2004) S. Singh, M. R. James, and M. R. Rudary Predictive state representations: a new theory for modeling dynamical systems . In Proceedings of the 20th conference on Uncertainty in artificial intelligence , pp. 512–519 . External Links: Link Cited by: §F.5 .
+Subramanian et al. (2022) J. Subramanian, A. Sinha, R. Seraj, and A. Mahajan Approximate information state for approximate planning and reinforcement learning in partially observed systems . Journal of Machine Learning Research 23 ( 12 ), pp. 1–83 . External Links: Link Cited by: §2.2 , §4.1 .
+Sutton et al. (1999) R. S. Sutton, D. Precup, and S. Singh Between MDPs and semi-MDPs: a framework for temporal abstraction in reinforcement learning . Artificial Intelligence 112 ( 1 ), pp. 181–211 . External Links: Link Cited by: §F.7 .
+Sutton and Barto (1998) R. S. Sutton and A. G. Barto Reinforcement learning: an introduction . The MIT Press . External Links: Link Cited by: §1 , §1 , §2.1 , §3.3 .
+Sutton et al. (2011) R. S. Sutton, J. Modayil, M. Delp, T. Degris, P. M. Pilarski, A. White, and D. Precup Horde: a scalable real-time architecture for learning knowledge from unsupervised sensorimotor interaction . In International Conference on Autonomous Agents and MultiAgent Systems , Note: https://sites.ualberta.ca/~amw8/horde.pdf External Links: Link Cited by: §3.2 .
+Tang et al. (2025) C. Tang, B. Abbatematteo, J. Hu, R. Chandra, R. Martín-Martín, and P. Stone Deep reinforcement learning for robotics: a survey of real-world successes . Annual Review of Control, Robotics, and Autonomous Systems 8 ( 1 ), pp. 153–188 . External Links: Link Cited by: §1 .
+Tao et al. (2025) Z. Tao, W. Xu, and X. You A generalized bisimulation metric of state similarity between Markov decision processes: from theoretical propositions to applications . In Neural Information Processing Systems , External Links: Link Cited by: §1 .
+Taylor et al. (2008) J. Taylor, D. Precup, and P. Panagaden Bounding performance loss in approximate MDP homomorphisms . In Neural Information Processing Systems , External Links: Link Cited by: §F.4 , §F.6 , §1 , §1 .
+van der Pol et al. (2020a) E. van der Pol, T. Kipf, F. A. Oliehoek, and M. Welling Plannable approximations to MDP homomorphisms: equivariance under actions . In International Conference on Autonomous Agents and MultiAgent Systems , External Links: Link Cited by: §F.4 .
+van der Pol et al. (2020b) E. van der Pol, D. Worrall, H. van Hoof, F. Oliehoek, and M. Welling MDP homomorphic networks: group symmetries in reinforcement learning . In Neural Information Processing Systems , External Links: Link Cited by: §F.4 .
+Voelcker et al. (2024) C. Voelcker, T. Kastner, I. Gilitschenski, and A. Farahmand When does self-prediction help? understanding auxiliary tasks in reinforcement learning . In Reinforcement Learning Conference , External Links: Link Cited by: §1 , §2.2 .
+Wachi et al. (2024) A. Wachi, X. Shen, and Y. Sui A survey of constraint formulations in safe reinforcement learning . In International Joint Conference on Artificial Intelligence , External Links: Link Cited by: §F.5 , §1 , §3.2 .
+Wen et al. (2020) Z. Wen, D. Precup, M. Ibrahimi, A. Barreto, B. Van Roy, and S. Singh On efficiency in hierarchical reinforcement learning . In Neural Information Processing Systems , External Links: Link Cited by: §F.7 .
+Wiltzer et al. (2024) H. Wiltzer, J. Farebrother, A. Gretton, Y. Tang, A. Barreto, W. Dabney, M. G. Bellemare, and M. Rowland A distributional analogue to the successor representation . In International Conference on Machine Learning , External Links: Link Cited by: §3.2 .
+Yu et al. (2022) D. Yu, H. Ma, S. Li, and J. Chen Reachability constrained reinforcement learning . In International Conference on Machine Learning , External Links: Link Cited by: §1 , §3.2 .
+Zhang et al. (2021) A. Zhang, R. McAllister, R. Calandra, Y. Gal, and S. Levine Learning invariant representations for reinforcement learning without reconstruction . In International Conference on Learning Representations , External Links: Link Cited by: §1 , §1 .
+Zhang and Sugiyama (2024) Y. Zhang and M. Sugiyama Enriching disentanglement: from logical definitions to quantitative metrics . In Neural Information Processing Systems , External Links: Link Cited by: §B.5 .
+Contents
+1 Introduction
+2 Behavioral Systems 2.1 State transition system
+2.2 Homomorphism between systems of the same type
+2.3 Transformation between systems of different types
+3 Behavioral Semantics 3.1 Bundle
+3.2 Lifting of bundles
+3.3 Pullback of bundles
+3.4 Pushforward of bundles
+3.5 Behavioral structure transfer
+4 State Abstraction in Reinforcement Learning 4.1 Next-observation prediction
+4.2 Model-irrelevance abstraction
+4.3 From homomorphism to bisimulation
+4.4 Value function and value equivalence
+5 Conclusion
+Acknowledgements
+Impact Statement
+References
+A Preliminaries A.1 Category, functor, and natural transformation
+A.2 Algebra and coalgebra
+A.3 Hom-set and hom-functor
+B Lifting B.1 Bundle lifting
+B.2 Unary bundle lifting
+B.3 Binary bundle lifting
+B.4 Probability lifting
+B.5 Commutative lifting
+C Pullback C.1 Pullback of order
+C.2 Pullback of pullback
+C.3 Pullback of lifting
+C.4 Pullback of closure
+D Pushforward D.1 Pushforward of order
+D.2 Pushforward of pullback
+D.3 Pushforward of lifting
+D.4 Pushforward of closure
+E Proofs
+F Discussion F.1 Functorial transformations of systems
+F.2 Basic interface transformations
+F.3 Closing the loop with a policy
+F.4 State-action abstraction: MDP homomorphism
+F.5 State augmentation: forward statistic aggregation
+F.6 Stateful agent
+F.7 Temporal abstraction: hierarchical reinforcement learning and options
+Symbols
+Symbol Name Meaning Spaces X X , Y Y generic spaces Arbitrary sets used in the general definitions, which can be instantiated to S S , Z Z , etc. S S state space Concrete state space of the RL environment. Z Z representation space Abstract state or learned representation space. A A action space Set of actions available to the agent. O O observation space Set of observations emitted by the environment. V V value space Codomain of bundles, typically { ⊤ , ⊥ } {\{\top,\bot\}} , [ 0 , ∞ ] {[0,\infty]} , ℝ \mathbb{R} , or a vector space Φ \Phi . ℙ ​ X \mathbb{P}{X} distributions on X X Set of finitely supported probability distributions on X X . Systems and dynamics F F functor, system type Endofunctor specifying the one-step behavior space F ​ X FX . F Moore : X ↦ ( ℙ ​ X ) A × O F_{\mathrm{Moore}}:X\mapsto(\mathbb{P}{X})^{A}\times O stochastic Moore type Environment type ( ℙ ​ X ) A × O (\mathbb{P}{X})^{A}\times O . F Markov : X ↦ ℙ ​ X × O F_{\mathrm{Markov}}:X\mapsto\mathbb{P}{X}\times O hidden Markov type Policy-conditioned type ℙ ​ X × O \mathbb{P}{X}\times O . t X : X → F ​ X t_{X}:X\to FX system F F -coalgebra describing one-step behavior on X X . t X : X × A → ℙ ​ X \mathrm{t}_{X}:X\times A\to\mathbb{P}{X} transition map Maps a state and action to a next-state distribution. o X : X → O \mathrm{o}_{X}:X\to O observation map Maps a state to its emitted observation. Abstraction and agents π : O → A \pi:O\to A policy Agent map from observations to actions. ϕ : S → Z \phi:S\to Z encoder State abstraction map. Behavioral structures h X : X n → V h_{X}:X^{n}\to V n n -ary bundle n n -ary structure on X X , such as a predicate, value, relation, or metric. ⪯ : V × V → { ⊤ , ⊥ } \preceq:V\times V\to{\{\top,\bot\}} preorder Order used to compare bundles pointwise. λ X : h X ↦ h F ​ X \lambda_{X}:h_{X}\mapsto h_{FX} lifting Constructs a bundle on F ​ X FX from a bundle on X X . f ∗ : h Y ↦ h X {f}^{*}:h_{Y}\mapsto h_{X} pullback Contravariant transport (i.e., from Y Y to X X ) of bundles by precomposition along f : X → Y f:X\to Y . f ∗ : h X ↦ h Y {f}_{*}:h_{X}\mapsto h_{Y} pushforward Covariant transport (i.e., from X X to Y Y ) of bundles by joining over fibers of f : X → Y f:X\to Y . T X = t X ∗ ∘ λ X T_{X}={t_{X}}^{*}\mathbin{\circ}\lambda_{X} closure operator Composition of a pullback and a lifting whose post-fixed points are behavioral structures. Operators for defining liftings ⊕ : V × V → V \mathbin{\oplus}:V\times V\to V combinator Operator combining multiple values, e.g., conjunction or addition. □ X : V X → V \aggregator_{X}:V^{X}\to V aggregator Operator aggregating over input-indexed components, e.g., ∀ \forall or ∑ \sum . ⊙ : ℙ ​ V → V \barycenter:\mathbb{P}{V}\to V barycenter Operator aggregating over probability distributions, e.g., almost-sure truth or expectation.
+List of Figures
+1Policy-dependent transition
+2Coupling
+(a)Divergence: allow different clusters, disallow different instances with different probabilities
+(b)Independent coupling: allow different instances within a single cluster, disallow different clusters
+(c)Wasserstein lifting: allow different clusters and instances, disallow different total probabilities within clusters
+List of Tables
+1Examples of n -ary bundles → X n V
+2Examples of combinators, aggregators, and barycenters
+Appendix A Preliminaries
+In this section, we recall some basic definitions and key results in category theory that we will use throughout the development of our theory. Readers are referred to standard textbooks for more details ( Mac Lane, 1978 ; Awodey, 2010 ) .
+A.1 Category, functor, and natural transformation
+The central categorical concepts are categories, functors, and natural transformations:
+Definition A.1 (Category) .
+A category 𝐂 = ( Obj , Hom , ∘ , id ) {\mathbf{C}}=(\Obj,\Hom,\mathbin{\circ},\id) consists of
+a collection Obj \Obj of objects ,
+a set Hom ⁡ ( A , B ) \Hom(A,B) of morphisms between objects,
+an identity morphism id A ∈ Hom ⁡ ( A , A ) \id_{A}\in\Hom(A,A) for each object, and
+a composition function ∘ : Hom ⁡ ( B , C ) × Hom ⁡ ( A , B ) → Hom ⁡ ( A , C ) \mathbin{\circ}:\Hom(B,C)\times\Hom(A,B)\to\Hom(A,C) for each triplet of objects,
+subject to identity id B ∘ f = f = f ∘ id A \id_{B}\mathbin{\circ}f=f=f\mathbin{\circ}\id_{A} and associativity ( h ∘ g ) ∘ f = h ∘ ( g ∘ f ) (h\mathbin{\circ}g)\mathbin{\circ}f=h\mathbin{\circ}(g\mathbin{\circ}f) .
+Definition A.2 (Functor) .
+For categories 𝐂 {\mathbf{C}} and 𝐃 {\mathbf{D}} , a functor F : 𝐂 → 𝐃 F:{\mathbf{C}}\to{\mathbf{D}} consists of two mappings, which send
+𝐂 {\mathbf{C}} -objects to 𝐃 {\mathbf{D}} -objects F : Obj 𝐂 → Obj 𝐃 F:\Obj_{\mathbf{C}}\to\Obj_{\mathbf{D}} and
+𝐂 {\mathbf{C}} -morphisms to 𝐃 {\mathbf{D}} -morphisms F : Hom 𝐂 ⁡ ( A , B ) → Hom 𝐃 ⁡ ( F ​ A , F ​ B ) F:\Hom_{\mathbf{C}}(A,B)\to\Hom_{\mathbf{D}}(FA,FB)
+such that F F preserves identity F ​ id A = id F ​ A F\id_{A}=\id_{FA} and composition F ⁡ ( g ∘ 𝐂 f ) = F ​ g ∘ 𝐃 F ​ f F(g\mathbin{\circ}_{\mathbf{C}}f)=Fg\mathbin{\circ}_{\mathbf{D}}Ff .
+Definition A.3 (Natural transformation) .
+A natural transformation α : F ⇒ G \alpha:F\Rightarrow G between two functors F , G : 𝐂 → 𝐃 F,G:{\mathbf{C}}\to{\mathbf{D}} is a collection of 𝐃 {\mathbf{D}} -morphisms α A : F ​ A → G ​ A \alpha_{A}:FA\to GA indexed by 𝐂 {\mathbf{C}} -objects, satisfying the naturality condition
+F ​ A {\lx@inpgf@ignorespaces FA} F ​ B {\lx@inpgf@ignorespaces FB} G ​ A {\lx@inpgf@ignorespaces GA} G ​ B {\lx@inpgf@ignorespaces GB} F ​ f \scriptstyle{\lx@inpgf@ignorespaces Ff} α A \scriptstyle{\lx@inpgf@ignorespaces\alpha_{A}} α B \scriptstyle{\lx@inpgf@ignorespaces\alpha_{B}} G ​ f \scriptstyle{\lx@inpgf@ignorespaces Gf} (26a)
+α B ∘ F ​ f = G ​ f ∘ α A . \alpha_{B}\mathbin{\circ}Ff=Gf\mathbin{\circ}\alpha_{A}. (26b)
+In this work, we will work with the following categorical ingredients:
+a category 𝐂 {\mathbf{C}} with finite products
+an endofunctor F : 𝐂 → 𝐂 F:{\mathbf{C}}\to{\mathbf{C}}
+𝐂 {\mathbf{C}} -objects V V and V ′ V^{\prime}
+an arity n ∈ ℕ n\in\mathbb{N}
+A.2 Algebra and coalgebra
+Next, we review the definitions of algebras and coalgebras for an endofunctor and present a key result that induces functors between coalgebra categories.
+Definition A.4 (Algebra) .
+An F F -algebra ( A , a ) (A,a) is a 𝐂 {\mathbf{C}} -object A A together with a 𝐂 {\mathbf{C}} -morphism a : F ​ A → A a:FA\to A .
+Definition A.5 (Coalgebra) .
+An F F -coalgebra ( A , a ) (A,a) is a 𝐂 {\mathbf{C}} -object A A together with a 𝐂 {\mathbf{C}} -morphism a : A → F ​ A a:A\to FA .
+Definition A.6 (Algebra homomorphism) .
+Given two F F -algebras ( A , a ) (A,a) and ( B , b ) (B,b) , an F F -algebra homomorphism f : ( A , a ) → ( B , b ) f:(A,a)\to(B,b) is a 𝐂 {\mathbf{C}} -morphism f : A → B f:A\to B such that
+F ​ A {\lx@inpgf@ignorespaces FA} F ​ B {\lx@inpgf@ignorespaces FB} A {\lx@inpgf@ignorespaces A} B {\lx@inpgf@ignorespaces B} F ​ f \scriptstyle{\lx@inpgf@ignorespaces Ff} a \scriptstyle{\lx@inpgf@ignorespaces a} b \scriptstyle{\lx@inpgf@ignorespaces b} f \scriptstyle{\lx@inpgf@ignorespaces f} (27a)
+f ∘ a = b ∘ F ​ f . f\mathbin{\circ}a=b\mathbin{\circ}Ff. (27b)
+The category 𝐂 F {\mathbf{C}}^{F} of F F -algebras has F F -algebras as objects and F F -algebra homomorphisms as morphisms.
+Definition A.7 (Coalgebra homomorphism) .
+Given two F F -coalgebras ( A , a ) (A,a) and ( B , b ) (B,b) , an F F -coalgebra homomorphism f : ( A , a ) → ( B , b ) f:(A,a)\to(B,b) is a 𝐂 {\mathbf{C}} -morphism f : A → B f:A\to B such that
+F ​ A {\lx@inpgf@ignorespaces FA} F ​ B {\lx@inpgf@ignorespaces FB} A {\lx@inpgf@ignorespaces A} B {\lx@inpgf@ignorespaces B} F ​ f \scriptstyle{\lx@inpgf@ignorespaces Ff} f \scriptstyle{\lx@inpgf@ignorespaces f} a \scriptstyle{\lx@inpgf@ignorespaces a} b \scriptstyle{\lx@inpgf@ignorespaces b} (28a)
+F ​ f ∘ a = b ∘ f . Ff\mathbin{\circ}a=b\mathbin{\circ}f. (28b)
+The category 𝐂 F {\mathbf{C}}_{F} of F F -coalgebras has F F -coalgebras as objects and F F -coalgebra homomorphisms as morphisms.
+Definition A.8 (Coalgebra-algebra homomorphism) .
+Given an F F -coalgebra ( A , a ) (A,a) and an F F -algebra ( B , b ) (B,b) , an F F -coalgebra-algebra homomorphism f : ( A , a ) → ( B , b ) f:(A,a)\to(B,b) is a 𝐂 {\mathbf{C}} -morphism f : A → B f:A\to B such that
+F ​ A {\lx@inpgf@ignorespaces FA} F ​ B {\lx@inpgf@ignorespaces FB} A {\lx@inpgf@ignorespaces A} B {\lx@inpgf@ignorespaces B} F ​ f \scriptstyle{\lx@inpgf@ignorespaces Ff} b \scriptstyle{\lx@inpgf@ignorespaces b} f \scriptstyle{\lx@inpgf@ignorespaces f} a \scriptstyle{\lx@inpgf@ignorespaces a} (29a)
+f = b ∘ F ​ f ∘ a . f=b\mathbin{\circ}Ff\mathbin{\circ}a. (29b)
+Readers are referred to Rutten (2000) ; Jacobs (2016) for a comprehensive treatment of coalgebras and their applications.
+In the main text, we primarily focus on the stochastic Moore machine functor ( ℙ ⁡ ( − ) ) A × O (\mathbb{P}(-))^{A}\times O with stochastic transition and deterministic observation. Other related functors modeling different types of systems include:
+Moore machine ( − ) A × O (-)^{A}\times O with deterministic transition and observation,
+Moore machine ( − ) A × O + 1 (-)^{A}\times O+1 with deterministic transition, observation, and termination,
+Moore machine ( ℙ ⁡ ( − ) ) A × ℙ ​ O (\mathbb{P}{(-)})^{A}\times\mathbb{P}{O} with stochastic but independent transition and observation,
+Moore machine ℙ ⁡ ( ( − ) A × O ) \mathbb{P}{((-)^{A}\times O)} with correlated transition and observation, and
+Mealy machine ( ℙ ( − × O ) ) A (\mathbb{P}{(-\times O)})^{A} with stochastic transition and action-dependent observation.
+They capture different input-output interfaces and dependency structures.
+A.3 Hom-set and hom-functor
+The hom-set Hom 𝐂 ⁡ ( A , B ) \Hom_{\mathbf{C}}(A,B) of a category 𝐂 {\mathbf{C}} is the set of morphisms from A A to B B . In particular, we focus on the hom-set Hom 𝐂 ⁡ ( A , V ) \Hom_{\mathbf{C}}(A,V) of morphisms from a 𝐂 {\mathbf{C}} -object A A to a value object V V . For each 𝐂 {\mathbf{C}} -object A A , we define a pointwise preorder ⪯ \preceq on the hom-set Hom 𝐂 ⁡ ( A , V ) \Hom_{\mathbf{C}}(A,V) .
+Definition A.9 (Pointwise preorder) .
+Let ⪯ V : V × V → { ⊤ , ⊥ } \preceq_{V}:V\times V\to{\{\top,\bot\}} be an internal preorder on V V . Write ⊤ A : A → { ⊤ , ⊥ } \top_{A}:A\to{\{\top,\bot\}} for the constantly-true predicate on any 𝐂 {\mathbf{C}} -object A A . Define the pointwise preorder on Hom 𝐂 ⁡ ( A , V ) \Hom_{\mathbf{C}}(A,V) by
+∀ h , h ′ : A → V . h ⪯ h ′ := ( ⪯ V ∘ ⟨ h , h ′ ⟩ = ⊤ A ) . \forall h,h^{\prime}:A\to V.\;h\preceq h^{\prime}\vcentcolon=({\preceq_{V}}\mathbin{\circ}\langle h,h^{\prime}\rangle=\top_{A}). (30)
+This is equivalent to the usual generalized-element formulation when 𝐂 {\mathbf{C}} is well-pointed:
+∀ h , h ′ : A → V . h ⪯ h ′ := ∀ a : 1 → A . h ∘ a ⪯ h ′ ∘ a . \forall h,h^{\prime}:A\to V.\;h\preceq h^{\prime}\vcentcolon=\forall a:1\to A.\;h\mathbin{\circ}a\preceq h^{\prime}\mathbin{\circ}a. (31)
+Definition A.10 (Order-preserving and order-reflecting function) .
+A function f : A → B f:A\to B between preordered sets ( A , ⪯ A ) (A,\preceq_{A}) and ( B , ⪯ B ) (B,\preceq_{B}) is order-preserving if
+∀ a , a ′ ∈ A . ( a ⪯ A a ′ ) → ( f ( a ) ⪯ B f ( a ′ ) ) , \forall a,a^{\prime}\in A.\;(a\preceq_{A}a^{\prime})\mathbin{\rightarrow}(f(a)\preceq_{B}f(a^{\prime})), (32)
+and order-reflecting if
+∀ a , a ′ ∈ A . ( a ⪯ A a ′ ) ← ( f ( a ) ⪯ B f ( a ′ ) ) . \forall a,a^{\prime}\in A.\;(a\preceq_{A}a^{\prime})\mathbin{\leftarrow}(f(a)\preceq_{B}f(a^{\prime})). (33)
+A key tool that we will use is the Yoneda lemma , which relates natural transformations from hom-functors to elements of functor values.
+Definition A.11 (Hom-functor) .
+The contravariant hom-functor Hom 𝐂 ⁡ ( − , V ) : 𝐂 op → 𝐒𝐞𝐭 \Hom_{\mathbf{C}}(-,V):{\mathbf{C}}^{\mathrm{op}}\to{\mathbf{Set}} , abbreviated as H V H_{V} ,
+H V := Hom 𝐂 ⁡ ( − , V ) : 𝐂 op → 𝐒𝐞𝐭 B ↦ Hom 𝐂 ⁡ ( B , V ) f : A → B ↦ Hom 𝐂 ⁡ ( f , V ) : Hom 𝐂 ⁡ ( B , V ) → Hom 𝐂 ⁡ ( A , V ) \begin{array}[]{cccc}H_{V}\vcentcolon=\Hom_{\mathbf{C}}(-,V):&{\mathbf{C}}^{\mathrm{op}}&\to&{\mathbf{Set}}\\ &B&\mapsto&\Hom_{\mathbf{C}}(B,V)\\ &f:A\to B&\mapsto&\Hom_{\mathbf{C}}(f,V):\Hom_{\mathbf{C}}(B,V)\to\Hom_{\mathbf{C}}(A,V)\end{array} (34)
+maps each 𝐂 {\mathbf{C}} -object B B to the hom-set of 𝐂 {\mathbf{C}} -morphisms from B B to V V , and each 𝐂 {\mathbf{C}} -morphism f : A → B f:A\to B to the function ( − ) ∘ f (-)\mathbin{\circ}f that precomposes with f f .
+We denote H V n := H V ∘ ( − ) n = Hom 𝐂 ⁡ ( ( − ) n , V ) : 𝐂 op → 𝐒𝐞𝐭 H^{n}_{V}\vcentcolon=H_{V}\mathbin{\circ}(-)^{n}=\Hom_{\mathbf{C}}((-)^{n},V):{\mathbf{C}}^{\mathrm{op}}\to{\mathbf{Set}} as the composition of the contravariant hom-functor H V H_{V} and the product functor ( − ) n : 𝐂 → 𝐂 (-)^{n}:{\mathbf{C}}\to{\mathbf{C}} .
+Lemma A.12 (Yoneda lemma) .
+Given a contravariant functor H : 𝐂 op → 𝐒𝐞𝐭 H:{\mathbf{C}}^{\mathrm{op}}\to{\mathbf{Set}} , there exists a bijection between natural transformations H V ⇒ H H_{V}\Rightarrow H and elements of H ​ V HV :
+Hom [ 𝐂 op , 𝐒𝐞𝐭 ] ⁡ ( H V , H ) ≅ H ​ V . \Hom_{[{\mathbf{C}}^{\mathrm{op}},{\mathbf{Set}}]}(H_{V},H)\cong HV. (35)
+Corollary A.13 .
+Given two 𝐂 {\mathbf{C}} -objects V V and V ′ V^{\prime} , there exists a bijection between natural transformations H V ⇒ H V ′ H_{V}\Rightarrow H_{V^{\prime}} and 𝐂 {\mathbf{C}} -morphisms V → V ′ V\to V^{\prime} :
+Hom [ 𝐂 op , 𝐒𝐞𝐭 ] ⁡ ( H V , H V ′ ) ≅ Hom 𝐂 ⁡ ( V , V ′ ) . \Hom_{[{\mathbf{C}}^{\mathrm{op}},{\mathbf{Set}}]}(H_{V},H_{V^{\prime}})\cong\Hom_{\mathbf{C}}(V,V^{\prime}). (36)
+Corollary A.14 .
+Given an endofunctor F : 𝐂 → 𝐂 F:{\mathbf{C}}\to{\mathbf{C}} , there exists a bijection between natural transformations H V ⇒ H V ​ F H_{V}\Rightarrow H_{V}F and 𝐂 {\mathbf{C}} -morphisms F ​ V → V FV\to V :
+Hom [ 𝐂 op , 𝐒𝐞𝐭 ] ⁡ ( H V , H V ​ F ) ≅ Hom 𝐂 ⁡ ( F ​ V , V ) . \Hom_{[{\mathbf{C}}^{\mathrm{op}},{\mathbf{Set}}]}(H_{V},H_{V}F)\cong\Hom_{\mathbf{C}}(FV,V). (37)
+Note that a 𝐂 {\mathbf{C}} -morphism F ​ V → V FV\to V is exactly an F F -algebra on V V .
+Appendix B Lifting
+Next, we introduce the general notion of functor lifting, which is widely used in coalgebraic modal logic ( Kurz, 2001 , Chapter 5) ; Pattinson (2003) ; Hasuo et al. (2007) ; Baldan et al. (2014) . Special instances of functor lifting, such as relation lifting and metric lifting, have been used in the study of bisimulation ( Kurz and Velebil, 2016 ) .
+The most general definition of functor lifting is as follows:
+Definition B.1 (Functor lifting) .
+A lifting of an endofunctor F : 𝐂 → 𝐂 F:{\mathbf{C}}\to{\mathbf{C}} along a forgetful functor U : 𝐃 → 𝐂 U:{\mathbf{D}}\to{\mathbf{C}} is a functor 𝐃 ⁡ ( F ) : 𝐃 → 𝐃 {\mathbf{D}}(F):{\mathbf{D}}\to{\mathbf{D}} such that
+𝐃 {\lx@inpgf@ignorespaces{\mathbf{D}}} 𝐃 {\lx@inpgf@ignorespaces{\mathbf{D}}} 𝐂 {\lx@inpgf@ignorespaces{\mathbf{C}}} 𝐂 {\lx@inpgf@ignorespaces{\mathbf{C}}} 𝐃 ⁡ ( F ) \scriptstyle{\lx@inpgf@ignorespaces{\mathbf{D}}(F)} U \scriptstyle{\lx@inpgf@ignorespaces U} U \scriptstyle{\lx@inpgf@ignorespaces U} F \scriptstyle{\lx@inpgf@ignorespaces F} (38a)
+U ​ 𝐃 ​ ( F ) = F ​ U . U{\mathbf{D}}(F)=FU. (38b)
+In other words, a lifted functor is the same functor but with a systematically chosen structure.
+B.1 Bundle lifting
+Next, we introduce an instance of functor lifting, which we refer to as bundle lifting . We follow the following procedure:
+1. Define a category of bundles
+A bundle over a 𝐂 {\mathbf{C}} -object V V is simply a 𝐂 {\mathbf{C}} -object A A equipped with a 𝐂 {\mathbf{C}} -morphism h A : A → V h_{A}:A\to V . A n n -ary bundle A n → V A^{n}\to V is a generalization where the domain is the n n -fold product A n A^{n} .
+Definition B.2 (Bundle) .
+A n n -ary bundle over V V is a pair ( A , h A : A n → V ) (A,h_{A}:A^{n}\to V) of a 𝐂 {\mathbf{C}} -object A A and a 𝐂 {\mathbf{C}} -morphism h A : A n → V h_{A}:A^{n}\to V from the product A n A^{n} to V V . A lax bundle morphism f : ( A , h A ) → ( B , h B ) f:(A,h_{A})\to(B,h_{B}) between n n -ary bundles is a 𝐂 {\mathbf{C}} -morphism f : A → B f:A\to B such that
+A n {\lx@inpgf@ignorespaces A^{n}} B n {\lx@inpgf@ignorespaces B^{n}} V {\lx@inpgf@ignorespaces V} f n \scriptstyle{\lx@inpgf@ignorespaces f^{n}} h A \scriptstyle{\lx@inpgf@ignorespaces h_{A}} h B \scriptstyle{\lx@inpgf@ignorespaces h_{B}} ⪯ {\lx@inpgf@ignorespaces\preceq} (39a)
+h A ⪯ h B ∘ f n . h_{A}\preceq h_{B}\mathbin{\circ}f^{n}. (39b)
+The category 𝐂 V n {\mathbf{C}}^{n}_{V} of n n -ary bundles over V V has n n -ary bundles as objects and lax bundle morphisms as morphisms.
+When the preorder ⪯ \preceq is the equality, 𝐂 V n {\mathbf{C}}^{n}_{V} is the comma category ( − ) n ↓ V (-)^{n}\downarrow V . When n = 1 n=1 , 𝐂 V 1 {\mathbf{C}}^{1}_{V} is the slice category 𝐂 ↓ V {\mathbf{C}}\downarrow V .
+2. Define a forgetful functor
+Definition B.3 .
+A forgetful functor U : 𝐂 V n → 𝐂 U:{\mathbf{C}}^{n}_{V}\to{\mathbf{C}} is given by
+U : 𝐂 V n → 𝐂 ( A , h A : A n → V ) ↦ A f : ( A , h A ) → ( B , h B ) ↦ f : A → B \begin{array}[]{cccc}U:&{\mathbf{C}}^{n}_{V}&\to&{\mathbf{C}}\\ &(A,h_{A}:A^{n}\to V)&\mapsto&A\\ &f:(A,h_{A})\to(B,h_{B})&\mapsto&f:A\to B\end{array} (40)
+3. Define a functor lifting
+Definition B.4 (Bundle lifting) .
+The lifting 𝐂 V n ​ ( F ) : 𝐂 V n → 𝐂 V n {\mathbf{C}}^{n}_{V}(F):{\mathbf{C}}^{n}_{V}\to{\mathbf{C}}^{n}_{V} of an endofunctor F : 𝐂 → 𝐂 F:{\mathbf{C}}\to{\mathbf{C}} along U : 𝐂 V n → 𝐂 U:{\mathbf{C}}^{n}_{V}\to{\mathbf{C}} must have the form
+𝐂 V n ​ ( F ) : 𝐂 V n → 𝐂 V n ( A , h A : A n → V ) ↦ ( F A , λ A ( h A ) : ( F A ) n → V ) f : ( A , h A ) → ( B , h B ) ↦ F ​ f : ( F ​ A , λ A ​ ( h A ) ) → ( F ​ B , λ B ​ ( h B ) ) \begin{array}[]{cccc}{\mathbf{C}}^{n}_{V}(F):&{\mathbf{C}}^{n}_{V}&\to&{\mathbf{C}}^{n}_{V}\\ &(A,h_{A}:A^{n}\to V)&\mapsto&(FA,\lambda_{A}(h_{A}):(FA)^{n}\to V)\\ &f:(A,h_{A})\to(B,h_{B})&\mapsto&Ff:(FA,\lambda_{A}(h_{A}))\to(FB,\lambda_{B}(h_{B}))\end{array} (41)
+where λ A \lambda_{A} is a family of functions indexed by 𝐂 {\mathbf{C}} -objects A A , mapping each 𝐂 {\mathbf{C}} -morphism h A : A n → V h_{A}:A^{n}\to V to a 𝐂 {\mathbf{C}} -morphism λ A ​ ( h A ) : ( F ​ A ) n → V \lambda_{A}(h_{A}):(FA)^{n}\to V such that
+A n {\lx@inpgf@ignorespaces A^{n}} B n {\lx@inpgf@ignorespaces B^{n}} V {\lx@inpgf@ignorespaces V} ( F ​ A ) n {\lx@inpgf@ignorespaces(FA)^{n}} ( F ​ B ) n {\lx@inpgf@ignorespaces(FB)^{n}} f n \scriptstyle{\lx@inpgf@ignorespaces f^{n}} h A \scriptstyle{\lx@inpgf@ignorespaces h_{A}} h B \scriptstyle{\lx@inpgf@ignorespaces h_{B}} ( F ​ f ) n \scriptstyle{\lx@inpgf@ignorespaces(Ff)^{n}} λ A ​ ( h A ) \scriptstyle{\lx@inpgf@ignorespaces\lambda_{A}(h_{A})} λ B ​ ( h B ) \scriptstyle{\lx@inpgf@ignorespaces\lambda_{B}(h_{B})} ⪯ {\lx@inpgf@ignorespaces\preceq} ⪯ {\lx@inpgf@ignorespaces\preceq} (42a)
+∀ h A : A n → V . ∀ h B : B n → V . ∀ f : A → B . ( h A ⪯ h B ∘ f n ) → ( λ A ​ ( h A ) ⪯ λ B ​ ( h B ) ∘ ( F ​ f ) n ) . \forall h_{A}:A^{n}\to V.\;\forall h_{B}:B^{n}\to V.\;\forall f:A\to B.\;(h_{A}\preceq h_{B}\mathbin{\circ}f^{n})\mathbin{\rightarrow}(\lambda_{A}(h_{A})\preceq\lambda_{B}(h_{B})\mathbin{\circ}(Ff)^{n}). (42b)
+The following two properties of bundle liftings are immediate consequences of Def. B.4 .
+A lifting corresponds to a modality
+A modality is an (oplax) natural transformation between contravariant hom-functors ( Kurz, 2001 ) . We show that a bundle lifting corresponds to a modality.
+Proposition B.5 .
+The family of functions λ A : H V n ​ A → H V n ​ F ​ A \lambda_{A}:H^{n}_{V}A\to H^{n}_{V}FA of a lifting in Def. B.4 forms an oplax natural transformation λ : H V n ⇒ H V n ​ F \lambda:H^{n}_{V}\Rightarrow H^{n}_{V}F between contravariant functors, called an n n -ary modality:
+H V n ​ A {\lx@inpgf@ignorespaces H^{n}_{V}A} H V n ​ B {\lx@inpgf@ignorespaces H^{n}_{V}B} H V n ​ F ​ A {\lx@inpgf@ignorespaces H^{n}_{V}FA} H V n ​ F ​ B {\lx@inpgf@ignorespaces H^{n}_{V}FB} λ A \scriptstyle{\lx@inpgf@ignorespaces\lambda_{A}} H V n ​ f \scriptstyle{\lx@inpgf@ignorespaces H^{n}_{V}f} λ B \scriptstyle{\lx@inpgf@ignorespaces\lambda_{B}} H V n ​ F ​ f \scriptstyle{\lx@inpgf@ignorespaces H^{n}_{V}Ff} ⪯ {\lx@inpgf@ignorespaces\preceq} (43a)
+λ A ∘ H V n ​ f ⪯ H V n ​ F ​ f ∘ λ B . \lambda_{A}\mathbin{\circ}H^{n}_{V}f\preceq H^{n}_{V}Ff\mathbin{\circ}\lambda_{B}. (43b)
+Proof 1 .
+The functor lifting condition of 𝐂 V n ​ ( F ) {\mathbf{C}}^{n}_{V}(F) in Eq. 42b implies the oplax naturality condition of λ \lambda in Eq. 43b by taking h A = h B ∘ f n h_{A}=h_{B}\mathbin{\circ}f^{n} .
+The following proposition shows that an order-preserving modality defines a functor lifting.
+Proposition B.6 .
+If an n n -ary modality λ : H V n ⇒ H V n ​ F \lambda:H^{n}_{V}\Rightarrow H^{n}_{V}F is order-preserving, i.e., ( h ⪯ h ′ ) → ( λ A ​ ( h ) ⪯ λ A ​ ( h ′ ) ) (h\preceq h^{\prime})\mathbin{\rightarrow}(\lambda_{A}(h)\preceq\lambda_{A}(h^{\prime})) , then it defines a functor lifting 𝐂 V n ​ ( F ) : 𝐂 V n → 𝐂 V n {\mathbf{C}}^{n}_{V}(F):{\mathbf{C}}^{n}_{V}\to{\mathbf{C}}^{n}_{V} of F F .
+Proof 2 .
+If h A ⪯ h B ∘ f n h_{A}\preceq h_{B}\mathbin{\circ}f^{n} , then by order preservation, λ A ​ ( h A ) ⪯ λ A ​ ( h B ∘ f n ) \lambda_{A}(h_{A})\preceq\lambda_{A}(h_{B}\mathbin{\circ}f^{n}) . By oplax naturality, λ A ​ ( h B ∘ f n ) ⪯ λ B ​ ( h B ) ∘ ( F ​ f ) n \lambda_{A}(h_{B}\mathbin{\circ}f^{n})\preceq\lambda_{B}(h_{B})\mathbin{\circ}(Ff)^{n} . By transitivity, λ A ​ ( h A ) ⪯ λ B ​ ( h B ) ∘ ( F ​ f ) n \lambda_{A}(h_{A})\preceq\lambda_{B}(h_{B})\mathbin{\circ}(Ff)^{n} .
+A unary modality is an F F -algebra
+According to Corollary A.14 , when n = 1 n=1 , there exists a bijection between strictly natural modalities λ : H V ⇒ H V ​ F \lambda:H_{V}\Rightarrow H_{V}F and F F -algebras f V : F ​ V → V f_{V}:FV\to V such that a bundle A → h A V A\xrightarrow{h_{A}}V is lifted to F ​ A → F ​ h A F ​ V → f V V FA\xrightarrow{Fh_{A}}FV\xrightarrow{f_{V}}V .
+When n > 1 n>1 , however, not every modality comes from a 𝐂 {\mathbf{C}} -morphism f V : ( F ​ V ) n → V f_{V}:(FV)^{n}\to V , as shown in the following counterexample:
+Example B.7 .
+For n = 2 n=2 and F = id 𝐂 F=\id_{\mathbf{C}} , we have the following counterexample: λ A : H V 2 ​ A → H V 2 ​ A : r A ↦ r A ∘ ⟨ p 2 , p 1 ⟩ \lambda_{A}:H^{2}_{V}A\to H^{2}_{V}A:r_{A}\mapsto r_{A}\mathbin{\circ}\langle p_{2},p_{1}\rangle , where p 1 , p 2 : A × A → A p_{1},p_{2}:A\times A\to A are the projections. λ \lambda is natural in A A but cannot be represented as f V ∘ ( − ) f_{V}\mathbin{\circ}(-) for any f V : V → V f_{V}:V\to V .
+B.2 Unary bundle lifting
+Next, we investigate bundle liftings for n = 1 n=1 . We consider the category 𝐏 := 𝐒𝐞𝐭 { ⊤ , ⊥ } 1 = 𝐒𝐞𝐭 ↓ { ⊤ , ⊥ } {\mathbf{P}}\vcentcolon={\mathbf{Set}}^{1}_{\{\top,\bot\}}={\mathbf{Set}}\downarrow{\{\top,\bot\}} of predicates and the category 𝐐 := 𝐒𝐞𝐭 [ 0 , ∞ ] 1 = 𝐒𝐞𝐭 ↓ [ 0 , ∞ ] {\mathbf{Q}}\vcentcolon={\mathbf{Set}}^{1}_{[0,\infty]}={\mathbf{Set}}\downarrow{[0,\infty]} of quantities. We generalize the lifting in Jacobs (2016, Definition 6.1.1) by instantiating Lemma A.12 for polynomial functors and using generic operators. Whenever these constructions are used as functor liftings on lax bundle categories, we assume that their operators and component modalities are order-preserving.
+Constant functor
+The constant functor Δ ​ X : 𝐂 → 𝐂 \Delta X:{\mathbf{C}}\to{\mathbf{C}} maps every 𝐂 {\mathbf{C}} -object to a fixed 𝐂 {\mathbf{C}} -object X X and every 𝐂 {\mathbf{C}} -morphism to the identity morphism id X \id_{X} .
+Proposition B.8 .
+Given two 𝐂 {\mathbf{C}} -objects V V and X X , the following bijection holds:
+Hom [ 𝐂 op , 𝐒𝐞𝐭 ] ⁡ ( H V , H V ​ Δ ​ X ) ≅ Hom 𝐂 ⁡ ( X , V ) . \Hom_{[{\mathbf{C}}^{\mathrm{op}},{\mathbf{Set}}]}\left(H_{V},H_{V}\Delta X\right)\cong\Hom_{\mathbf{C}}(X,V). (44)
+A lifting of the constant functor is just picking a fixed morphism λ A Δ ​ X ​ ( h A ) : X → V \lambda^{\Delta X}_{A}(h_{A}):X\to V .
+Identity functor
+The identity functor id 𝐂 : 𝐂 → 𝐂 \id_{\mathbf{C}}:{\mathbf{C}}\to{\mathbf{C}} maps every 𝐂 {\mathbf{C}} -object and every 𝐂 {\mathbf{C}} -morphism to itself.
+Proposition B.9 .
+The following bijection holds:
+Hom [ 𝐂 op , 𝐒𝐞𝐭 ] ⁡ ( H V , H V ) ≅ Hom 𝐂 ⁡ ( V , V ) . \Hom_{[{\mathbf{C}}^{\mathrm{op}},{\mathbf{Set}}]}\left(H_{V},H_{V}\right)\cong\Hom_{\mathbf{C}}(V,V). (45)
+A lifting of the identity functor is obtained by postcomposing with an endomorphism λ A id 𝐂 ​ ( h A ) : A → h A V → V \lambda^{\id_{\mathbf{C}}}_{A}(h_{A}):A\xrightarrow{h_{A}}V\to V .
+Exponentiation functor
+The functor F X : 𝐂 → 𝐂 F^{X}:{\mathbf{C}}\to{\mathbf{C}} is the composition of an endofunctor F : 𝐂 → 𝐂 F:{\mathbf{C}}\to{\mathbf{C}} and the exponential functor ( − ) X : 𝐂 → 𝐂 (-)^{X}:{\mathbf{C}}\to{\mathbf{C}} , which maps every 𝐂 {\mathbf{C}} -object A A to the exponential object A X A^{X} and every 𝐂 {\mathbf{C}} -morphism f : A → B f:A\to B to the exponential morphism f X : A X → B X = f ∘ ( − ) f^{X}:A^{X}\to B^{X}=f\mathbin{\circ}(-) .
+Proposition B.10 .
+If 𝐂 {\mathbf{C}} has exponentials, given an 𝐂 {\mathbf{C}} -object X X , the following bijection holds:
+Hom [ 𝐂 op , 𝐒𝐞𝐭 ] ⁡ ( H V , H V ​ F X ) ≅ Hom 𝐂 ⁡ ( ( F ​ V ) X , V ) . \Hom_{[{\mathbf{C}}^{\mathrm{op}},{\mathbf{Set}}]}\left(H_{V},H_{V}F^{X}\right)\cong\Hom_{\mathbf{C}}((FV)^{X},V). (46)
+Note that Hom 𝐂 ⁡ ( ( F ​ V ) X , V ) \Hom_{\mathbf{C}}((FV)^{X},V) is richer than Hom 𝐂 ⁡ ( F ​ V , V ) \Hom_{\mathbf{C}}(FV,V) . A construction of a lifting is as follows:
+Definition B.11 .
+Let □ X : V X → V \aggregator_{X}:V^{X}\to V be an aggregator . We can construct a lifting using □ X \aggregator_{X} as follows:
+Hom 𝐂 ⁡ ( F ​ V , V ) × Hom 𝐂 ⁡ ( V X , V ) → Hom 𝐂 ⁡ ( ( F ​ V ) X , V ) f V □ X ↦ □ X ∘ f V X \begin{array}[]{ccccccc}\Hom_{\mathbf{C}}(FV,V)&\times&\Hom_{\mathbf{C}}(V^{X},V)&\to&\Hom_{\mathbf{C}}((FV)^{X},V)\\ f_{V}&&\aggregator_{X}&\mapsto&{\aggregator_{X}}\mathbin{\circ}f_{V}^{X}\end{array} (47)
+Product functor
+The functor F 1 × F 2 : 𝐂 → 𝐂 F_{1}\times F_{2}:{\mathbf{C}}\to{\mathbf{C}} is the pointwise product of two endofunctors F 1 , F 2 : 𝐂 → 𝐂 F_{1},F_{2}:{\mathbf{C}}\to{\mathbf{C}} , mapping a 𝐂 {\mathbf{C}} -object A A to F 1 ​ A × F 2 ​ A F_{1}A\times F_{2}A and a 𝐂 {\mathbf{C}} -morphism f : A → B f:A\to B to F 1 ​ f × F 2 ​ f : F 1 ​ A × F 2 ​ A → F 1 ​ B × F 2 ​ B F_{1}f\times F_{2}f:F_{1}A\times F_{2}A\to F_{1}B\times F_{2}B .
+Proposition B.12 .
+Given two endofunctors F 1 , F 2 : 𝐂 → 𝐂 F_{1},F_{2}:{\mathbf{C}}\to{\mathbf{C}} , the following bijection holds:
+Hom [ 𝐂 op , 𝐒𝐞𝐭 ] ⁡ ( H V , H V ​ ( F 1 × F 2 ) ) ≅ Hom 𝐂 ⁡ ( F 1 ​ V × F 2 ​ V , V ) . \Hom_{[{\mathbf{C}}^{\mathrm{op}},{\mathbf{Set}}]}\left(H_{V},H_{V}(F_{1}\times F_{2})\right)\cong\Hom_{\mathbf{C}}(F_{1}V\times F_{2}V,V). (48)
+Similarly to the exponentiation functor, a construction of a lifting is as follows:
+Definition B.13 .
+Let ⊕ : V × V → V \mathbin{\oplus}:V\times V\to V be a combinator . We can construct a lifting using ⊕ \mathbin{\oplus} as follows:
+Hom 𝐂 ⁡ ( F 1 ​ V , V ) × Hom 𝐂 ⁡ ( F 2 ​ V , V ) × Hom 𝐂 ⁡ ( V × V , V ) → Hom 𝐂 ⁡ ( F 1 ​ V × F 2 ​ V , V ) c 1 c 2 ⊕ ↦ ⊕ ∘ ( c 1 × c 2 ) \begin{array}[]{ccccccc}\Hom_{\mathbf{C}}(F_{1}V,V)&\times&\Hom_{\mathbf{C}}(F_{2}V,V)&\times\Hom_{\mathbf{C}}(V\times V,V)&\to&\Hom_{\mathbf{C}}(F_{1}V\times F_{2}V,V)\\ c_{1}&&c_{2}&\mathbin{\oplus}&\mapsto&\mathbin{\oplus}\mathbin{\circ}(c_{1}\times c_{2})\end{array} (49)
+Coproduct functor
+The functor F 1 + F 2 : 𝐂 → 𝐂 F_{1}+F_{2}:{\mathbf{C}}\to{\mathbf{C}} is the pointwise coproduct of two endofunctors F 1 , F 2 : 𝐂 → 𝐂 F_{1},F_{2}:{\mathbf{C}}\to{\mathbf{C}} , mapping a 𝐂 {\mathbf{C}} -object A A to F 1 ​ A + F 2 ​ A F_{1}A+F_{2}A and a 𝐂 {\mathbf{C}} -morphism f : A → B f:A\to B to F 1 ​ f + F 2 ​ f : F 1 ​ A + F 2 ​ A → F 1 ​ B + F 2 ​ B F_{1}f+F_{2}f:F_{1}A+F_{2}A\to F_{1}B+F_{2}B .
+Proposition B.14 .
+If 𝐂 {\mathbf{C}} has finite coproducts, given two endofunctors F 1 , F 2 : 𝐂 → 𝐂 F_{1},F_{2}:{\mathbf{C}}\to{\mathbf{C}} , the following bijection holds:
+Hom [ 𝐂 op , 𝐒𝐞𝐭 ] ⁡ ( H V , H V ​ ( F 1 + F 2 ) ) \displaystyle\Hom_{[{\mathbf{C}}^{\mathrm{op}},{\mathbf{Set}}]}\left(H_{V},H_{V}(F_{1}+F_{2})\right) ≅ Hom 𝐂 ⁡ ( F 1 ​ V + F 2 ​ V , V ) \displaystyle\cong\Hom_{\mathbf{C}}(F_{1}V+F_{2}V,V) (50)
+≅ Hom 𝐂 ⁡ ( F 1 ​ V , V ) × Hom 𝐂 ⁡ ( F 2 ​ V , V ) . \displaystyle\cong\Hom_{\mathbf{C}}(F_{1}V,V)\times\Hom_{\mathbf{C}}(F_{2}V,V). (51)
+Due to the universal property of coproducts, a lifting of the coproduct functor is just given by the liftings of its components.
+Probability functor
+Lastly, we assume that a probability functor ℙ \mathbb{P} is well-defined on the category 𝐂 {\mathbf{C}} ( Fritz, 2020 ) . The functor ℙ ​ F : 𝐂 → 𝐂 \mathbb{P}{F}:{\mathbf{C}}\to{\mathbf{C}} is the composition of an endofunctor F : 𝐂 → 𝐂 F:{\mathbf{C}}\to{\mathbf{C}} and the probability functor ℙ : 𝐂 → 𝐂 \mathbb{P}:{\mathbf{C}}\to{\mathbf{C}} ; when 𝐂 = 𝐒𝐞𝐭 {\mathbf{C}}={\mathbf{Set}} , the latter maps a set A A to the set ℙ ​ A \mathbb{P}{A} of probability distributions over A A and a function f : A → B f:A\to B to the pushforward function ℙ ​ f : ℙ ​ A → ℙ ​ B \mathbb{P}{f}:\mathbb{P}{A}\to\mathbb{P}{B} .
+Proposition B.15 .
+Given a probability functor ℙ : 𝐂 → 𝐂 \mathbb{P}:{\mathbf{C}}\to{\mathbf{C}} , the following bijection holds:
+Hom [ 𝐂 op , 𝐒𝐞𝐭 ] ⁡ ( H V , H V ​ ℙ ​ F ) ≅ Hom 𝐂 ⁡ ( ℙ ​ F ​ V , V ) . \Hom_{[{\mathbf{C}}^{\mathrm{op}},{\mathbf{Set}}]}\left(H_{V},H_{V}\mathbb{P}{F}\right)\cong\Hom_{\mathbf{C}}(\mathbb{P}{FV},V). (52)
+We can use an extra operator to construct a lifting as follows:
+Definition B.16 .
+Let ⊙ : ℙ ​ V → V \barycenter:\mathbb{P}{V}\to V be a barycenter operator . We can construct a lifting using ⊙ \barycenter as follows:
+Hom 𝐂 ⁡ ( F ​ V , V ) × Hom 𝐂 ⁡ ( ℙ ​ V , V ) → Hom 𝐂 ⁡ ( ℙ ​ F ​ V , V ) f V ⊙ ↦ ⊙ ∘ ℙ ​ f V \begin{array}[]{ccccccc}\Hom_{\mathbf{C}}(FV,V)&\times&\Hom_{\mathbf{C}}(\mathbb{P}{V},V)&\to&\Hom_{\mathbf{C}}(\mathbb{P}{FV},V)\\ f_{V}&&\barycenter&\mapsto&{\barycenter}\mathbin{\circ}\mathbb{P}{f_{V}}\end{array} (53)
+B.3 Binary bundle lifting
+Next, we investigate bundle liftings for n = 2 n=2 . We consider the category 𝐑 := 𝐒𝐞𝐭 { ⊤ , ⊥ } 2 {\mathbf{R}}\vcentcolon={\mathbf{Set}}^{2}_{\{\top,\bot\}} of relations and the category 𝐃 := 𝐒𝐞𝐭 [ 0 , ∞ ] 2 {\mathbf{D}}\vcentcolon={\mathbf{Set}}^{2}_{[0,\infty]} of distances. We generalize the relation lifting in Jacobs (2016, Definition 3.1.1) ; Kurz and Velebil (2016) by allowing generic operators. Since the Yoneda lemma in Lemma A.12 does not directly apply to n > 1 n>1 , we need to consider liftings as natural transformations λ F : H V n ⇒ H V n ​ F \lambda^{F}:H^{n}_{V}\Rightarrow H^{n}_{V}F .
+Exponentiation functor
+( F X ) n ≅ ( F n ) X (F^{X})^{n}\cong(F^{n})^{X}
+Definition B.17 .
+Let □ X : V X → V \aggregator_{X}:V^{X}\to V be an aggregator . By slight abuse of notation, we denote the natural transformation □ X : H V ⇒ H V ​ ( − ) X \aggregator_{X}:H_{V}\Rightarrow H_{V}(-)^{X} with the same symbol. Given λ F : H V n ⇒ H V n ​ F \lambda^{F}:H^{n}_{V}\Rightarrow H^{n}_{V}F , we can construct a lifting using □ X \aggregator_{X} as follows:
+λ F X : H V n \displaystyle\lambda^{F^{X}}:H^{n}_{V} ⇒ λ F H V n ​ F ≅ H V ​ F n \displaystyle\xRightarrow{\lambda^{F}}H^{n}_{V}F\cong H_{V}F^{n} (54)
+⇒ □ X F n H V ​ ( F n ) X ≅ H V ​ ( F X ) n ≅ H V n ​ F X . \displaystyle\xRightarrow{\aggregator_{X}F^{n}}H_{V}(F^{n})^{X}\cong H_{V}(F^{X})^{n}\cong H^{n}_{V}F^{X}.
+In other words, λ A F X ​ ( h A ) : ( ( F ​ A ) X ) n ≅ ( ( F ​ A ) n ) X → λ A F ​ ( h A ) X V X → □ X V \lambda^{F^{X}}_{A}(h_{A}):((FA)^{X})^{n}\cong((FA)^{n})^{X}\xrightarrow{\lambda^{F}_{A}(h_{A})^{X}}V^{X}\xrightarrow{\aggregator_{X}}V .
+Product functor
+( F 1 × F 2 ) n ≅ F 1 n × F 2 n (F_{1}\times F_{2})^{n}\cong F_{1}^{n}\times F_{2}^{n}
+Definition B.18 .
+Let ⊕ : V × V → V \mathbin{\oplus}:V\times V\to V be a combinator , and let Hom 𝐂 ⁡ ( − , ⊕ ) : H V × V ⇒ H V \Hom_{\mathbf{C}}(-,\mathbin{\oplus}):H_{V\times V}\Rightarrow H_{V} be the Yoneda embedding. Given λ F 1 : H V n ⇒ H V n ​ F 1 \lambda^{F_{1}}:H^{n}_{V}\Rightarrow H^{n}_{V}F_{1} and λ F 2 : H V n ⇒ H V n ​ F 2 \lambda^{F_{2}}:H^{n}_{V}\Rightarrow H^{n}_{V}F_{2} , we can construct a lifting using ⊕ \mathbin{\oplus} as follows:
+λ F 1 × F 2 : H V n \displaystyle\lambda^{F_{1}\times F_{2}}:H^{n}_{V} ⇒ ⟨ λ F 1 , λ F 2 ⟩ H V n ​ F 1 × H V n ​ F 2 ≅ H V × V ​ ( F 1 n × F 2 n ) \displaystyle\xRightarrow{\left\langle\lambda^{F_{1}},\lambda^{F_{2}}\right\rangle}H^{n}_{V}F_{1}\times H^{n}_{V}F_{2}\cong H_{V\times V}(F_{1}^{n}\times F_{2}^{n}) (55)
+⇒ Hom 𝐂 ⁡ ( − , ⊕ ) ​ ( F 1 n × F 2 n ) H V ​ ( F 1 n × F 2 n ) ≅ H V ​ ( F 1 × F 2 ) n ≅ H V n ​ ( F 1 × F 2 ) . \displaystyle\xRightarrow{\Hom_{\mathbf{C}}(-,\mathbin{\oplus})(F_{1}^{n}\times F_{2}^{n})}H_{V}(F_{1}^{n}\times F_{2}^{n})\cong H_{V}(F_{1}\times F_{2})^{n}\cong H^{n}_{V}(F_{1}\times F_{2}).
+In other words, λ A F 1 × F 2 ​ ( h A ) : ( F 1 ​ A × F 2 ​ A ) n ≅ ( F 1 ​ A ) n × ( F 2 ​ A ) n → λ A F 1 ​ ( h A ) × λ A F 2 ​ ( h A ) V × V → ⊕ V \lambda^{F_{1}\times F_{2}}_{A}(h_{A}):(F_{1}A\times F_{2}A)^{n}\cong(F_{1}A)^{n}\times(F_{2}A)^{n}\xrightarrow{\lambda^{F_{1}}_{A}(h_{A})\times\lambda^{F_{2}}_{A}(h_{A})}V\times V\xrightarrow{\mathbin{\oplus}}V .
+B.4 Probability lifting
+For the probability functor, we present two constructions of liftings λ ℙ ​ F : H V n ⇒ H V n ​ ℙ ​ F \lambda^{\mathbb{P}{F}}:H^{n}_{V}\Rightarrow H^{n}_{V}\mathbb{P}{F} : independent coupling and Wasserstein lifting.
+Independent coupling
+Note that ℙ \mathbb{P} is a lax monoidal functor with ∇ : ℙ n ⇒ ℙ ​ ( − ) n \nabla:\mathbb{P}^{n}\Rightarrow\mathbb{P}{(-)^{n}} ( Fritz, 2020 , Proposition 3.1) . A simple construction of a lifting is as follows:
+Definition B.19 .
+Let ⊙ : ℙ ​ V → V \barycenter:\mathbb{P}{V}\to V be a barycenter operator . By slight abuse of notation, we denote the natural transformation ⊙ : H V ⇒ H V ​ ℙ \barycenter:H_{V}\Rightarrow H_{V}\mathbb{P} with the same symbol. Given a lifting λ F : H V n ⇒ H V n ​ F \lambda^{F}:H^{n}_{V}\Rightarrow H^{n}_{V}F , we can construct a lifting using ⊙ \barycenter as follows:
+λ ℙ ​ F : H V n \displaystyle\lambda^{\mathbb{P}{F}}:H^{n}_{V} ⇒ λ F H V n ​ F ≅ H V ​ F n \displaystyle\xRightarrow{\lambda^{F}}H^{n}_{V}F\cong H_{V}F^{n} (56)
+⇒ ⊙ F n H V ​ ℙ ​ F n \displaystyle\xRightarrow{\barycenter F^{n}}H_{V}\mathbb{P}{F^{n}}
+⇒ H V ∇ F H V ​ ( ℙ ​ F ) n ≅ H V n ​ ℙ ​ F . \displaystyle\xRightarrow{H_{V}\nabla F}H_{V}(\mathbb{P}{F})^{n}\cong H^{n}_{V}\mathbb{P}{F}.
+In other words, λ A ℙ ​ F ​ ( h A ) : ( ℙ ​ F ​ A ) n → ∇ F ​ A ℙ ​ ( F ​ A ) n → ℙ ​ λ A F ​ ( h A ) ℙ ​ V → ⊙ V \lambda^{\mathbb{P}{F}}_{A}(h_{A}):(\mathbb{P}{FA})^{n}\xrightarrow{\nabla_{FA}}\mathbb{P}{(FA)^{n}}\xrightarrow{\mathbb{P}\lambda^{F}_{A}(h_{A})}\mathbb{P}{V}\xrightarrow{\barycenter}V .
+Wasserstein lifting
+We first introduce the notion of coupling.
+Definition B.20 (Coupling fiber) .
+Let p 1 , p 2 : A × A → A p_{1},p_{2}:A\times A\to A be the projections, and let Δ A : ℙ ⁡ ( A × A ) → ℙ ​ A × ℙ ​ A := ⟨ ℙ ​ p 1 , ℙ ​ p 2 ⟩ \Delta_{A}:\mathbb{P}{(A\times A)}\to\mathbb{P}{A}\times\mathbb{P}{A}\vcentcolon=\langle\mathbb{P}{p_{1}},\mathbb{P}{p_{2}}\rangle be the marginalization map. A coupling of two probability distributions μ , ν ∈ ℙ ​ A \mu,\nu\in\mathbb{P}{A} is a probability distribution π A ∈ ℙ ⁡ ( A × A ) \pi_{A}\in\mathbb{P}{(A\times A)} such that Δ A ​ ( π A ) = ⟨ μ , ν ⟩ \Delta_{A}(\pi_{A})=\langle\mu,\nu\rangle . Equivalently, the set Π A ​ ( μ , ν ) \Pi_{A}(\mu,\nu) of all couplings of μ \mu and ν \nu is given by the following pullback:
+Π A ​ ( μ , ν ) {\lx@inpgf@ignorespaces\Pi_{A}(\mu,\nu)} 1 {\lx@inpgf@ignorespaces 1} ℙ ⁡ ( A × A ) {\lx@inpgf@ignorespaces\mathbb{P}{(A\times A)}} ℙ ​ A × ℙ ​ A {\lx@inpgf@ignorespaces\mathbb{P}{A}\times\mathbb{P}{A}} ⌟ {\lx@inpgf@ignorespaces\lrcorner} ⟨ μ , ν ⟩ \scriptstyle{\lx@inpgf@ignorespaces\langle\mu,\nu\rangle} Δ A \scriptstyle{\lx@inpgf@ignorespaces\Delta_{A}} (57)
+Lemma B.21 .
+Given a map f : A → B f:A\to B and two probability distributions μ , ν ∈ ℙ ​ A \mu,\nu\in\mathbb{P}{A} over A A , if π A ∈ ℙ ⁡ ( A × A ) \pi_{A}\in\mathbb{P}(A\times A) is a coupling of μ \mu and ν \nu , then the pushforward distribution ( f × f ) ∗ ​ π A ∈ ℙ ⁡ ( B × B ) {(f\times f)}_{*}\pi_{A}\in\mathbb{P}(B\times B) is a coupling of f ∗ ​ μ {f}_{*}\mu and f ∗ ​ ν {f}_{*}\nu ; if π B ∈ ℙ ⁡ ( B × B ) \pi_{B}\in\mathbb{P}(B\times B) is a coupling of f ∗ ​ μ {f}_{*}\mu and f ∗ ​ ν {f}_{*}\nu and f f has a retraction r : B → A r:B\to A , then the pushforward distribution ( r × r ) ∗ ​ π B ∈ ℙ ⁡ ( A × A ) {(r\times r)}_{*}\pi_{B}\in\mathbb{P}(A\times A) is a coupling of μ \mu and ν \nu .
+Proof 3 .
+Note that the pushforward commutes with marginalization:
+( ℙ ​ f × ℙ ​ f ) ∘ Δ A = Δ B ∘ ℙ ⁡ ( f × f ) . (\mathbb{P}{f}\times\mathbb{P}{f})\mathbin{\circ}\Delta_{A}=\Delta_{B}\mathbin{\circ}\mathbb{P}{(f\times f)}. (58)
+Then, we have the following equality of compositions:
+Π A ​ ( μ , ν ) ↣ ℙ ⁡ ( A × A ) → ℙ ⁡ ( f × f ) ℙ ⁡ ( B × B ) → Δ B ℙ ​ B × ℙ ​ B = Π A ​ ( μ , ν ) → 1 → ⟨ f ∗ ​ μ , f ∗ ​ ν ⟩ ℙ ​ B × ℙ ​ B . \Pi_{A}(\mu,\nu)\rightarrowtail\mathbb{P}{(A\times A)}\xrightarrow{\mathbb{P}{(f\times f)}}\mathbb{P}{(B\times B)}\xrightarrow{\Delta_{B}}\mathbb{P}{B}\times\mathbb{P}{B}=\Pi_{A}(\mu,\nu)\to 1\xrightarrow{\langle{f}_{*}\mu,{f}_{*}\nu\rangle}\mathbb{P}{B}\times\mathbb{P}{B}. (59)
+By the universal property, there is a unique morphism Π A ​ ( μ , ν ) → Π B ​ ( f ∗ ​ μ , f ∗ ​ ν ) \Pi_{A}(\mu,\nu)\to\Pi_{B}({f}_{*}\mu,{f}_{*}\nu) , as shown in the following diagram:
+Π A ​ ( μ , ν ) {\lx@inpgf@ignorespaces\Pi_{A}(\mu,\nu)} 1 {\lx@inpgf@ignorespaces 1} Π B ​ ( f ∗ ​ μ , f ∗ ​ ν ) {\lx@inpgf@ignorespaces\Pi_{B}({f}_{*}\mu,{f}_{*}\nu)} 1 {\lx@inpgf@ignorespaces 1} ℙ ⁡ ( A × A ) {\lx@inpgf@ignorespaces\mathbb{P}{(A\times A)}} ℙ ​ A × ℙ ​ A {\lx@inpgf@ignorespaces\mathbb{P}{A}\times\mathbb{P}{A}} ℙ ⁡ ( B × B ) {\lx@inpgf@ignorespaces\mathbb{P}{(B\times B)}} ℙ ​ B × ℙ ​ B {\lx@inpgf@ignorespaces\mathbb{P}{B}\times\mathbb{P}{B}} ⟨ μ , ν ⟩ \scriptstyle{\lx@inpgf@ignorespaces\langle\mu,\nu\rangle} ⟨ f ∗ ​ μ , f ∗ ​ ν ⟩ \scriptstyle{\lx@inpgf@ignorespaces\langle{f}_{*}\mu,{f}_{*}\nu\rangle} Δ A \scriptstyle{\lx@inpgf@ignorespaces\Delta_{A}} ℙ ⁡ ( f × f ) \scriptstyle{\lx@inpgf@ignorespaces\mathbb{P}(f\times f)} ℙ ​ f × ℙ ​ f \scriptstyle{\lx@inpgf@ignorespaces\mathbb{P}{f}\times\mathbb{P}{f}} Δ B \scriptstyle{\lx@inpgf@ignorespaces\Delta_{B}} (60)
+which means that
+{ ( f × f ) ∗ ​ π A | π A ∈ Π A ​ ( μ , ν ) } ⊆ Π B ​ ( f ∗ ​ μ , f ∗ ​ ν ) . \left\{{(f\times f)}_{*}\pi_{A}\;\middle|\;\pi_{A}\in\Pi_{A}(\mu,\nu)\right\}\subseteq\Pi_{B}({f}_{*}\mu,{f}_{*}\nu). (61)
+If r : B → A r:B\to A is a retraction of f : A → B f:A\to B , i.e., r ∘ f = id A r\mathbin{\circ}f=\id_{A} , then
+( ℙ ​ r × ℙ ​ r ) ∘ ⟨ f ∗ ​ μ , f ∗ ​ ν ⟩ = ⟨ ℙ ​ r ∘ f ∗ ​ μ , ℙ ​ r ∘ f ∗ ​ ν ⟩ = ⟨ ( r ∘ f ) ∗ ​ μ , ( r ∘ f ) ∗ ​ ν ⟩ = ⟨ μ , ν ⟩ . (\mathbb{P}{r}\times\mathbb{P}{r})\mathbin{\circ}\langle{f}_{*}\mu,{f}_{*}\nu\rangle=\langle\mathbb{P}{r}\mathbin{\circ}{f}_{*}\mu,\mathbb{P}{r}\mathbin{\circ}{f}_{*}\nu\rangle=\langle(r\mathbin{\circ}f)_{*}\mu,(r\mathbin{\circ}f)_{*}\nu\rangle=\langle\mu,\nu\rangle. (62)
+ℙ ⁡ ( r × r ) ∘ ℙ ⁡ ( f × f ) = ℙ ⁡ ( ( r × r ) ∘ ( f × f ) ) = ℙ ⁡ ( r ∘ f ) × ( r ∘ f ) = ℙ ⁡ ( id A × id A ) = ℙ ​ id A × A = id ℙ ⁡ ( A × A ) . \mathbb{P}{(r\times r)}\mathbin{\circ}\mathbb{P}{(f\times f)}=\mathbb{P}{((r\times r)\mathbin{\circ}(f\times f))}=\mathbb{P}{(r\mathbin{\circ}f)\times(r\mathbin{\circ}f)}=\mathbb{P}{(\id_{A}\times\id_{A})}=\mathbb{P}{\id_{A\times A}}=\id_{\mathbb{P}(A\times A)}. (63)
+( ℙ ​ r × ℙ ​ r ) ∘ ( ℙ ​ f × ℙ ​ f ) = ( ℙ ​ r ∘ ℙ ​ f ) × ( ℙ ​ r ∘ ℙ ​ f ) = ℙ ⁡ ( r ∘ f ) × ℙ ⁡ ( r ∘ f ) = ℙ ​ id A × ℙ ​ id A = id ℙ ​ A × id ℙ ​ A = id ℙ ​ A × ℙ ​ A . (\mathbb{P}{r}\times\mathbb{P}{r})\mathbin{\circ}(\mathbb{P}{f}\times\mathbb{P}{f})=(\mathbb{P}{r}\mathbin{\circ}\mathbb{P}{f})\times(\mathbb{P}{r}\mathbin{\circ}\mathbb{P}{f})=\mathbb{P}{(r\mathbin{\circ}f)}\times\mathbb{P}{(r\mathbin{\circ}f)}=\mathbb{P}{\id_{A}}\times\mathbb{P}{\id_{A}}=\id_{\mathbb{P}{A}}\times\id_{\mathbb{P}{A}}=\id_{\mathbb{P}{A}\times\mathbb{P}{A}}. (64)
+Then, there is a unique morphism Π B ​ ( f ∗ ​ μ , f ∗ ​ ν ) → Π A ​ ( μ , ν ) \Pi_{B}({f}_{*}\mu,{f}_{*}\nu)\to\Pi_{A}(\mu,\nu) such that
+{ ( r × r ) ∗ ​ π B | π B ∈ Π B ​ ( f ∗ ​ μ , f ∗ ​ ν ) } ⊆ Π A ​ ( μ , ν ) . \left\{{(r\times r)}_{*}\pi_{B}\;\middle|\;\pi_{B}\in\Pi_{B}({f}_{*}\mu,{f}_{*}\nu)\right\}\subseteq\Pi_{A}(\mu,\nu). (65)
+Definition B.22 .
+Let ∨ \join be the join operator in the preordered set ( V , ⪯ ) (V,\preceq) . Given a 𝐂 {\mathbf{C}} -object A A , we define a function
+κ A : Hom 𝐂 ⁡ ( ℙ ⁡ ( A × A ) , V ) → Hom 𝐂 ⁡ ( ℙ ​ A × ℙ ​ A , V ) g ↦ [ ( μ , ν ) ↦ ∨ π ∈ Π A ​ ( μ , ν ) g ( π ) ] . \begin{array}[]{cccc}\kappa_{A}:&\Hom_{\mathbf{C}}(\mathbb{P}(A\times A),V)&\to&\Hom_{\mathbf{C}}(\mathbb{P}{A}\times\mathbb{P}{A},V)\\ &g&\mapsto&\left[(\mu,\nu)\mapsto\displaystyle\join_{\pi\in\Pi_{A}(\mu,\nu)}g(\pi)\right].\end{array} (66)
+Proposition B.23 .
+The family of functions κ A : Hom 𝐂 ⁡ ( ℙ ⁡ ( A × A ) , V ) → Hom 𝐂 ⁡ ( ℙ ​ A × ℙ ​ A , V ) \kappa_{A}:\Hom_{\mathbf{C}}(\mathbb{P}(A\times A),V)\to\Hom_{\mathbf{C}}(\mathbb{P}{A}\times\mathbb{P}{A},V) in Def. B.22 forms an oplax natural transformation κ : H V ​ ℙ ​ ( − ) 2 ⇒ H V 2 ​ ℙ \kappa:H_{V}\mathbb{P}(-)^{2}\Rightarrow H^{2}_{V}\mathbb{P} .
+Proof 4 .
+That κ \kappa is an oplax natural transformation means that for every 𝐂 {\mathbf{C}} -morphism f : A → B f:A\to B , the following diagram commutes up to ⪯ \preceq :
+Hom 𝐂 ⁡ ( ℙ ⁡ ( A × A ) , V ) {\lx@inpgf@ignorespaces\Hom_{\mathbf{C}}(\mathbb{P}(A\times A),V)} Hom 𝐂 ⁡ ( ℙ ⁡ ( B × B ) , V ) {\lx@inpgf@ignorespaces\Hom_{\mathbf{C}}(\mathbb{P}(B\times B),V)} Hom 𝐂 ⁡ ( ℙ ​ A × ℙ ​ A , V ) {\lx@inpgf@ignorespaces\Hom_{\mathbf{C}}(\mathbb{P}{A}\times\mathbb{P}{A},V)} Hom 𝐂 ⁡ ( ℙ ​ B × ℙ ​ B , V ) {\lx@inpgf@ignorespaces\Hom_{\mathbf{C}}(\mathbb{P}{B}\times\mathbb{P}{B},V)} κ A \scriptstyle{\lx@inpgf@ignorespaces\kappa_{A}} Hom 𝐂 ⁡ ( ℙ ⁡ ( f × f ) , V ) \scriptstyle{\lx@inpgf@ignorespaces\Hom_{\mathbf{C}}(\mathbb{P}(f\times f),V)} κ B \scriptstyle{\lx@inpgf@ignorespaces\kappa_{B}} Hom 𝐂 ⁡ ( ℙ ​ f × ℙ ​ f , V ) \scriptstyle{\lx@inpgf@ignorespaces\Hom_{\mathbf{C}}(\mathbb{P}{f}\times\mathbb{P}{f},V)} ⪯ {\lx@inpgf@ignorespaces\preceq} (67a)
+κ A ∘ Hom 𝐂 ⁡ ( ℙ ⁡ ( f × f ) , V ) ⪯ Hom 𝐂 ⁡ ( ℙ ​ f × ℙ ​ f , V ) ∘ κ B , \kappa_{A}\mathbin{\circ}\Hom_{\mathbf{C}}(\mathbb{P}(f\times f),V)\preceq\Hom_{\mathbf{C}}(\mathbb{P}{f}\times\mathbb{P}{f},V)\mathbin{\circ}\kappa_{B}, (67b)
+∀ g : ℙ ⁡ ( B × B ) → V . κ A ​ ( g ∘ ℙ ⁡ ( f × f ) ) ⪯ κ B ​ ( g ) ∘ ( ℙ ​ f × ℙ ​ f ) , \forall g:\mathbb{P}(B\times B)\to V.\;\kappa_{A}(g\mathbin{\circ}\mathbb{P}(f\times f))\preceq\kappa_{B}(g)\mathbin{\circ}(\mathbb{P}{f}\times\mathbb{P}{f}), (67c)
+∀ g : ℙ ⁡ ( B × B ) → V . ∀ μ ∈ ℙ ​ A . ∀ ν ∈ ℙ ​ A . ∨ π A ∈ Π A ​ ( μ , ν ) g ​ ( ( f × f ) ∗ ​ π A ) ⪯ ∨ π B ∈ Π B ​ ( f ∗ ​ μ , f ∗ ​ ν ) g ​ ( π B ) , \forall g:\mathbb{P}(B\times B)\to V.\;\forall\mu\in\mathbb{P}{A}.\;\forall\nu\in\mathbb{P}{A}.\;\join_{\pi_{A}\in\Pi_{A}(\mu,\nu)}g({(f\times f)}_{*}\pi_{A})\preceq\join_{\pi_{B}\in\Pi_{B}({f}_{*}\mu,{f}_{*}\nu)}g(\pi_{B}), (67d)
+which is a result of Lemma B.21 and the monotonicity of ∨ \join .
+We can further show that κ A \kappa_{A} is a left adjoint of the precomposition of marginalization.
+Proposition B.24 .
+κ A \kappa_{A} is a left adjoint of the precomposition Δ A ∗ : Hom 𝐂 ⁡ ( ℙ ​ A × ℙ ​ A , V ) → Hom 𝐂 ⁡ ( ℙ ⁡ ( A × A ) , V ) {\Delta_{A}}^{*}:\Hom_{\mathbf{C}}(\mathbb{P}{A}\times\mathbb{P}{A},V)\to\Hom_{\mathbf{C}}(\mathbb{P}(A\times A),V) of marginalization Δ A : ℙ ⁡ ( A × A ) → ℙ ​ A × ℙ ​ A \Delta_{A}:\mathbb{P}(A\times A)\to\mathbb{P}{A}\times\mathbb{P}{A} :
+Hom 𝐂 ⁡ ( ℙ ⁡ ( A × A ) , V ) ​ ⊥ ← Δ A ∗ → κ A ​ Hom 𝐂 ⁡ ( ℙ ​ A × ℙ ​ A , V ) , \Hom_{\mathbf{C}}(\mathbb{P}(A\times A),V)\overset{{}\xrightarrow{\kappa_{A}}{}}{\underset{{}\xleftarrow[{\Delta_{A}}^{*}]{}{}}{\bot}}\Hom_{\mathbf{C}}(\mathbb{P}{A}\times\mathbb{P}{A},V), (68)
+which satisfies the following adjunction property:
+∀ g : ℙ ⁡ ( A × A ) → V . ∀ h : ℙ ​ A × ℙ ​ A → V . ( κ A ​ ( g ) ⪯ h ) ↔ ( g ⪯ h ∘ Δ A ) . \forall g:\mathbb{P}(A\times A)\to V.\;\forall h:\mathbb{P}{A}\times\mathbb{P}{A}\to V.\;(\kappa_{A}(g)\preceq h)\mathbin{\leftrightarrow}(g\preceq h\mathbin{\circ}\Delta_{A}). (69)
+Proof 5 .
+Let μ , ν ∈ ℙ ​ A \mu,\nu\in\mathbb{P}{A} be probability distributions over A A , and let π ∈ ℙ ⁡ ( A × A ) \pi\in\mathbb{P}{(A\times A)} be their coupling, i.e., Δ A ∘ π = ⟨ μ , ν ⟩ \Delta_{A}\mathbin{\circ}\pi=\langle\mu,\nu\rangle .
+Assume κ A ​ ( g ) ⪯ h \kappa_{A}(g)\preceq h . Then, π \pi factors through the fiber Π A ​ ( μ , ν ) \Pi_{A}(\mu,\nu) , hence by definition of κ A ​ ( g ) \kappa_{A}(g) as a join over this fiber we have g ∘ π ⪯ κ A ​ ( g ) ∘ ⟨ μ , ν ⟩ g\mathbin{\circ}\pi\preceq\kappa_{A}(g)\mathbin{\circ}\langle\mu,\nu\rangle . Composing the assumption with ⟨ μ , ν ⟩ \langle\mu,\nu\rangle yields κ A ​ ( g ) ∘ ⟨ μ , ν ⟩ ⪯ h ∘ ⟨ μ , ν ⟩ \kappa_{A}(g)\mathbin{\circ}\langle\mu,\nu\rangle\preceq h\mathbin{\circ}\langle\mu,\nu\rangle , so we have g ∘ π ⪯ h ∘ ⟨ μ , ν ⟩ = h ∘ Δ A ∘ π g\mathbin{\circ}\pi\preceq h\mathbin{\circ}\langle\mu,\nu\rangle=h\mathbin{\circ}\Delta_{A}\mathbin{\circ}\pi . Since π \pi was arbitrary, this shows g ⪯ h ∘ Δ A g\preceq h\mathbin{\circ}\Delta_{A} .
+Assume g ⪯ h ∘ Δ A g\preceq h\mathbin{\circ}\Delta_{A} . Composing the assumption with π \pi yields g ∘ π ⪯ h ∘ Δ A ∘ π = h ∘ ⟨ μ , ν ⟩ g\mathbin{\circ}\pi\preceq h\mathbin{\circ}\Delta_{A}\mathbin{\circ}\pi=h\mathbin{\circ}\langle\mu,\nu\rangle . Thus, h ∘ ⟨ μ , ν ⟩ h\mathbin{\circ}\langle\mu,\nu\rangle is an upper bound of the family { g ∘ π | π ∈ Π A ​ ( μ , ν ) } \{g\mathbin{\circ}\pi\;|\;\pi\in\Pi_{A}(\mu,\nu)\} , and since κ A ​ ( g ) ∘ ⟨ μ , ν ⟩ \kappa_{A}(g)\mathbin{\circ}\langle\mu,\nu\rangle is their join, we obtain κ A ​ ( g ) ∘ ⟨ μ , ν ⟩ ⪯ h ∘ ⟨ μ , ν ⟩ \kappa_{A}(g)\mathbin{\circ}\langle\mu,\nu\rangle\preceq h\mathbin{\circ}\langle\mu,\nu\rangle . As ⟨ μ , ν ⟩ \langle\mu,\nu\rangle was arbitrary, κ A ​ ( g ) ⪯ h \kappa_{A}(g)\preceq h follows.
+Finally, we can construct the Wasserstein lifting as follows:
+Definition B.25 (Wasserstein lifting) .
+Let ⊙ : ℙ ​ V → V \barycenter:\mathbb{P}{V}\to V be a barycenter operator . We apply κ F ​ A \kappa_{FA} in Def. B.22 to the composition g h A : ℙ ⁡ ( F ​ A × F ​ A ) → ℙ ​ λ F ​ ( h A ) ℙ ​ V → ⊙ V g_{h_{A}}:\mathbb{P}(FA\times FA)\xrightarrow{\mathbb{P}\lambda^{F}(h_{A})}\mathbb{P}{V}\xrightarrow{\barycenter}V . Given a lifting λ F : H V 2 ⇒ H V 2 ​ F \lambda^{F}:H^{2}_{V}\Rightarrow H^{2}_{V}F , we can construct a lifting using ⊙ \barycenter and κ \kappa as follows:
+λ ℙ ​ F : H V 2 \displaystyle\lambda^{\mathbb{P}{F}}:H^{2}_{V} ⇒ λ F H V 2 ​ F ≅ H V ​ F 2 \displaystyle\xRightarrow{\lambda^{F}}H^{2}_{V}F\cong H_{V}F^{2} (70)
+⇒ ⊙ F 2 H V ​ ℙ ​ F 2 \displaystyle\xRightarrow{\barycenter F^{2}}H_{V}\mathbb{P}{F^{2}}
+⇒ κ ​ F H V ​ ( ℙ ​ F ) 2 ≅ H V 2 ​ ℙ ​ F . \displaystyle\xRightarrow{\kappa F}H_{V}(\mathbb{P}{F})^{2}\cong H^{2}_{V}\mathbb{P}{F}.
+In other words, λ A ℙ ​ F ( h A ) : ℙ F A × ℙ F A → V := [ ( μ , ν ) ↦ ∨ π ∈ Π FA ​ ( μ , ν ) ⊙ λ F ( h A ) ∗ π ] \lambda^{\mathbb{P}{F}}_{A}(h_{A}):\mathbb{P}{FA}\times\mathbb{P}{FA}\to V\vcentcolon=\left[(\mu,\nu)\mapsto\join_{\pi\in\Pi_{FA}(\mu,\nu)}\barycenter{\lambda^{F}(h_{A})}_{*}\pi\right] .
+Fig. 2 shows three different ways to lift a relation/distance A × A → V A\times A\to V to probability distributions ℙ ​ A × ℙ ​ A → V \mathbb{P}{A}\times\mathbb{P}{A}\to V .
+(a) Divergence : allow different clusters, disallow different instances with different probabilities
+(b) Independent coupling : allow different instances within a single cluster, disallow different clusters
+(c) Wasserstein lifting : allow different clusters and instances, disallow different total probabilities within clusters
+Figure 2 : Three ways to lift a relation/distance A × A → V A\times A\to V to probability distributions ℙ ​ A × ℙ ​ A → V \mathbb{P}{A}\times\mathbb{P}{A}\to V .
+B.5 Commutative lifting
+Next, we investigate the commutativity of liftings between different categories.
+Definition B.26 (Commutative functor lifting) .
+Given two forgetful functors U : 𝐃 → 𝐂 U:{\mathbf{D}}\to{\mathbf{C}} and U ′ : 𝐃 ′ → 𝐂 U^{\prime}:{\mathbf{D}}^{\prime}\to{\mathbf{C}} and a functor Z : 𝐃 → 𝐃 ′ Z:{\mathbf{D}}\to{\mathbf{D}}^{\prime} such that U = U ′ ​ Z U=U^{\prime}Z , the liftings 𝐃 ⁡ ( F ) : 𝐃 → 𝐃 {\mathbf{D}}(F):{\mathbf{D}}\to{\mathbf{D}} and 𝐃 ′ ​ ( F ) : 𝐃 ′ → 𝐃 ′ {\mathbf{D}}^{\prime}(F):{\mathbf{D}}^{\prime}\to{\mathbf{D}}^{\prime} of the same endofunctor F : 𝐂 → 𝐂 F:{\mathbf{C}}\to{\mathbf{C}} commute with Z Z if
+𝐃 ′ {\lx@inpgf@ignorespaces{\mathbf{D}}^{\prime}} 𝐃 ′ {\lx@inpgf@ignorespaces{\mathbf{D}}^{\prime}} 𝐃 {\lx@inpgf@ignorespaces{\mathbf{D}}} 𝐃 {\lx@inpgf@ignorespaces{\mathbf{D}}} 𝐂 {\lx@inpgf@ignorespaces{\mathbf{C}}} 𝐂 {\lx@inpgf@ignorespaces{\mathbf{C}}} 𝐃 ′ ​ ( F ) \scriptstyle{\lx@inpgf@ignorespaces{\mathbf{D}}^{\prime}(F)} U ′ \scriptstyle{\lx@inpgf@ignorespaces U^{\prime}} U ′ \scriptstyle{\lx@inpgf@ignorespaces U^{\prime}} 𝐃 ⁡ ( F ) \scriptstyle{\lx@inpgf@ignorespaces{\mathbf{D}}(F)} U \scriptstyle{\lx@inpgf@ignorespaces U} Z \scriptstyle{\lx@inpgf@ignorespaces Z} U \scriptstyle{\lx@inpgf@ignorespaces U} Z \scriptstyle{\lx@inpgf@ignorespaces Z} F \scriptstyle{\lx@inpgf@ignorespaces F} (71a)
+Z ​ 𝐃 ​ ( F ) = 𝐃 ′ ​ ( F ) ​ Z . Z{\mathbf{D}}(F)={\mathbf{D}}^{\prime}(F)Z. (71b)
+For our bundle categories, the commutativity condition can be expressed at three different levels: functor level, natural transformation level, and morphism level.
+Functor level
+An order-preserving 𝐂 {\mathbf{C}} -morphism z : V → V ′ z:V\to V^{\prime} induces a functor 𝐂 z n : 𝐂 V n → 𝐂 V ′ n {\mathbf{C}}^{n}_{z}:{\mathbf{C}}^{n}_{V}\to{\mathbf{C}}^{n}_{V^{\prime}} between the corresponding bundle categories:
+𝐂 z n : 𝐂 V n → 𝐂 V ′ n ( A , h A : A n → V ) ↦ ( A , z ∘ h A : A n → h A V → 𝑧 V ′ ) f : ( A , h A ) → ( B , h B ) ↦ f : ( A , z ∘ h A ) → ( B , z ∘ h B ) \begin{array}[]{cccc}{\mathbf{C}}^{n}_{z}:&{\mathbf{C}}^{n}_{V}&\to&{\mathbf{C}}^{n}_{V^{\prime}}\\ &(A,h_{A}:A^{n}\to V)&\mapsto&(A,z\mathbin{\circ}h_{A}:A^{n}\xrightarrow{h_{A}}V\xrightarrow{z}V^{\prime})\\ &f:(A,h_{A})\to(B,h_{B})&\mapsto&f:(A,z\mathbin{\circ}h_{A})\to(B,z\mathbin{\circ}h_{B})\end{array} (72)
+Given two forgetful functors U : 𝐂 V n → 𝐂 U:{\mathbf{C}}^{n}_{V}\to{\mathbf{C}} and U ′ : 𝐂 V ′ n → 𝐂 U^{\prime}:{\mathbf{C}}^{n}_{V^{\prime}}\to{\mathbf{C}} defined in Def. B.3 , we have U = U ′ ​ 𝐂 z n U=U^{\prime}{\mathbf{C}}^{n}_{z} . According to Def. B.26 , two liftings 𝐂 V n ​ ( F ) : 𝐂 V n → 𝐂 V n {\mathbf{C}}^{n}_{V}(F):{\mathbf{C}}^{n}_{V}\to{\mathbf{C}}^{n}_{V} and 𝐂 V ′ n ​ ( F ) : 𝐂 V ′ n → 𝐂 V ′ n {\mathbf{C}}^{n}_{V^{\prime}}(F):{\mathbf{C}}^{n}_{V^{\prime}}\to{\mathbf{C}}^{n}_{V^{\prime}} of the same endofunctor F : 𝐂 → 𝐂 F:{\mathbf{C}}\to{\mathbf{C}} commute with 𝐂 z n : 𝐂 V n → 𝐂 V ′ n {\mathbf{C}}^{n}_{z}:{\mathbf{C}}^{n}_{V}\to{\mathbf{C}}^{n}_{V^{\prime}} if
+𝐂 z n ​ 𝐂 V n ​ ( F ) = 𝐂 V ′ n ​ ( F ) ​ 𝐂 z n . {\mathbf{C}}^{n}_{z}{\mathbf{C}}^{n}_{V}(F)={\mathbf{C}}^{n}_{V^{\prime}}(F){\mathbf{C}}^{n}_{z}. (73)
+Natural transformation level
+According to Corollary A.13 , a 𝐂 {\mathbf{C}} -morphism z : V → V ′ z:V\to V^{\prime} corresponds to a natural transformation ζ : H V ⇒ H V ′ \zeta:H_{V}\Rightarrow H_{V^{\prime}} . We denote ζ n : H V n ⇒ H V ′ n := ζ ​ ( − ) n \zeta^{n}:H^{n}_{V}\Rightarrow H^{n}_{V^{\prime}}\vcentcolon=\zeta(-)^{n} as the vertical composition (whiskering) of the natural transformation ζ \zeta and the product functor ( − ) n (-)^{n} . Then, the commutativity condition can be expressed in terms of the corresponding modalities λ : H V n ⇒ H V n ​ F \lambda:H^{n}_{V}\Rightarrow H^{n}_{V}F and λ ′ : H V ′ n ⇒ H V ′ n ​ F \lambda^{\prime}:H^{n}_{V^{\prime}}\Rightarrow H^{n}_{V^{\prime}}F :
+H V n {\lx@inpgf@ignorespaces H^{n}_{V}} H V ′ n {\lx@inpgf@ignorespaces H^{n}_{V^{\prime}}} H V n ​ F {\lx@inpgf@ignorespaces H^{n}_{V}F} H V ′ n ​ F {\lx@inpgf@ignorespaces H^{n}_{V^{\prime}}F} ζ n \scriptstyle{\lx@inpgf@ignorespaces\zeta^{n}} λ \scriptstyle{\lx@inpgf@ignorespaces\lambda} λ ′ \scriptstyle{\lx@inpgf@ignorespaces\lambda^{\prime}} ζ n ​ F \scriptstyle{\lx@inpgf@ignorespaces\zeta^{n}F} (74a)
+ζ n ​ F ∘ λ = λ ′ ∘ ζ n , \zeta^{n}F\mathbin{\circ}\lambda=\lambda^{\prime}\mathbin{\circ}\zeta^{n}, (74b)
+which means that λ \lambda and λ ′ \lambda^{\prime} are F F -modules in the presheaf category [ 𝐂 op , 𝐒𝐞𝐭 ] [{\mathbf{C}}^{\mathrm{op}},{\mathbf{Set}}] and ζ n \zeta^{n} is an F F -module homomorphism from λ \lambda to λ ′ \lambda^{\prime} .
+H V n ​ A {\lx@inpgf@ignorespaces H^{n}_{V}A} H V ′ n ​ A {\lx@inpgf@ignorespaces H^{n}_{V^{\prime}}A} H V n ​ F ​ A {\lx@inpgf@ignorespaces H^{n}_{V}FA} H V ′ n ​ F ​ A {\lx@inpgf@ignorespaces H^{n}_{V^{\prime}}FA} ζ A n \scriptstyle{\lx@inpgf@ignorespaces\zeta^{n}_{A}} λ A \scriptstyle{\lx@inpgf@ignorespaces\lambda_{A}} λ A ′ \scriptstyle{\lx@inpgf@ignorespaces\lambda^{\prime}_{A}} ζ F ​ A n \scriptstyle{\lx@inpgf@ignorespaces\zeta^{n}_{FA}} (75a)
+ζ F ​ A n ∘ λ A = λ A ′ ∘ ζ A n . \zeta^{n}_{FA}\mathbin{\circ}\lambda_{A}=\lambda^{\prime}_{A}\mathbin{\circ}\zeta^{n}_{A}. (75b)
+Morphism level
+At the level of individual morphisms, the commutativity condition states that for every n n -ary bundle h A : A n → V h_{A}:A^{n}\to V , the following diagram commutes:
+A n {\lx@inpgf@ignorespaces A^{n}} V {\lx@inpgf@ignorespaces V} V ′ {\lx@inpgf@ignorespaces V^{\prime}} ( F ​ A ) n {\lx@inpgf@ignorespaces(FA)^{n}} h A \scriptstyle{\lx@inpgf@ignorespaces h_{A}} z ∘ h A \scriptstyle{\lx@inpgf@ignorespaces z\mathbin{\circ}h_{A}} z \scriptstyle{\lx@inpgf@ignorespaces z} λ A ​ ( h A ) \scriptstyle{\lx@inpgf@ignorespaces\lambda_{A}(h_{A})} λ A ′ ​ ( z ∘ h A ) \scriptstyle{\lx@inpgf@ignorespaces\lambda^{\prime}_{A}(z\mathbin{\circ}h_{A})} (76a)
+∀ h A : A n → V . z ∘ λ A ​ ( h A ) = λ A ′ ​ ( z ∘ h A ) . \forall h_{A}:A^{n}\to V.\;z\mathbin{\circ}\lambda_{A}(h_{A})=\lambda^{\prime}_{A}(z\mathbin{\circ}h_{A}). (76b)
+For unary liftings induced by F F -algebras, the commutativity condition at the morphism level is equivalent to z : V → V ′ z:V\to V^{\prime} being an F F -algebra homomorphism between the corresponding F F -algebras.
+Proposition B.27 .
+When n = 1 n=1 and the liftings λ \lambda and λ ′ \lambda^{\prime} are induced by F F -algebras, the commutativity condition at the morphism level is equivalent to z : V → V ′ z:V\to V^{\prime} being an F F -algebra homomorphism between those algebras.
+Proof 6 .
+Let h A : A → V h_{A}:A\to V be a unary bundle. We have λ A ​ ( h A ) = f V ∘ F ​ h A \lambda_{A}(h_{A})=f_{V}\mathbin{\circ}Fh_{A} and λ A ′ ​ ( z ∘ h A ) = f V ′ ∘ F ⁡ ( z ∘ h A ) \lambda^{\prime}_{A}(z\mathbin{\circ}h_{A})=f_{V^{\prime}}\mathbin{\circ}F(z\mathbin{\circ}h_{A}) for some F F -algebras f V : F ​ V → V f_{V}:FV\to V and f V ′ : F ​ V ′ → V ′ f_{V^{\prime}}:FV^{\prime}\to V^{\prime} . Then, the commutativity condition in Eq. 76b becomes
+z ∘ λ A ​ ( h A ) = z ∘ f V ∘ F ​ h A = f V ′ ∘ F ​ z ∘ F ​ h A ¯ = f V ′ ∘ F ⁡ ( z ∘ h A ) = λ A ′ ​ ( z ∘ h A ) . z\mathbin{\circ}\lambda_{A}(h_{A})=\underline{z\mathbin{\circ}f_{V}\mathbin{\circ}Fh_{A}=f_{V^{\prime}}\mathbin{\circ}Fz\mathbin{\circ}Fh_{A}}=f_{V^{\prime}}\mathbin{\circ}F(z\mathbin{\circ}h_{A})=\lambda^{\prime}_{A}(z\mathbin{\circ}h_{A}). (77)
+By choosing A = V A=V and h A = id V h_{A}=\id_{V} , this reduces to the condition that z : V → V ′ z:V\to V^{\prime} is an F F -algebra homomorphism z : ( V , f V ) → ( V ′ , f V ′ ) z:(V,f_{V})\to(V^{\prime},f_{V^{\prime}}) :
+F ​ V {\lx@inpgf@ignorespaces FV} F ​ V ′ {\lx@inpgf@ignorespaces FV^{\prime}} V {\lx@inpgf@ignorespaces V} V ′ {\lx@inpgf@ignorespaces V^{\prime}} F ​ z \scriptstyle{\lx@inpgf@ignorespaces Fz} f V \scriptstyle{\lx@inpgf@ignorespaces f_{V}} f V ′ \scriptstyle{\lx@inpgf@ignorespaces f_{V^{\prime}}} z \scriptstyle{\lx@inpgf@ignorespaces z} (78a)
+z ∘ f V = f V ′ ∘ F ​ z . z\mathbin{\circ}f_{V}=f_{V^{\prime}}\mathbin{\circ}Fz. (78b)
+Such algebra homomorphism conditions have been used in Zhang and Sugiyama (2024) to characterize the relationship between logical definitions and quantitative metrics.
+Appendix C Pullback
+In this section, we detail the notion of pullback in the context of bundle lifting. Note that this is pullback in the sense of inverse image (opposite of pushforward or direct image), not in the sense of limit (opposite of pushout).
+Definition C.1 (Pullback morphism) .
+The pullback of a 𝐂 {\mathbf{C}} -morphism g : B → V g:B\to V along a 𝐂 {\mathbf{C}} -morphism f : A → B f:A\to B is a 𝐂 {\mathbf{C}} -morphism f ∗ ​ g := g ∘ f : A → V {f}^{*}g\vcentcolon=g\mathbin{\circ}f:A\to V defined by precomposition of g g with f f .
+Then, we can define the pullback of bundles as follows.
+Definition C.2 (Pullback bundle) .
+The pullback of an n n -ary bundle h B : B n → V h_{B}:B^{n}\to V along a morphism f : A → B f:A\to B is the pullback morphism ( f n ) ∗ ​ h B := h B ∘ f n {(f^{n})}^{*}h_{B}\vcentcolon=h_{B}\mathbin{\circ}f^{n} along the product morphism f n : A n → B n f^{n}:A^{n}\to B^{n} . With slight abuse of notation, we may also write f ∗ ​ h B {f}^{*}h_{B} for ( f n ) ∗ ​ h B {(f^{n})}^{*}h_{B} when n n is clear from context.
+A n {\lx@inpgf@ignorespaces A^{n}} B n {\lx@inpgf@ignorespaces B^{n}} V {\lx@inpgf@ignorespaces V} f n \scriptstyle{\lx@inpgf@ignorespaces f^{n}} f ∗ ​ h B \scriptstyle{\lx@inpgf@ignorespaces{f}^{*}h_{B}} h B \scriptstyle{\lx@inpgf@ignorespaces h_{B}} (79)
+In other words, the pullback is the contravariant functor H V n : 𝐂 op → 𝐒𝐞𝐭 H^{n}_{V}:{\mathbf{C}}^{\mathrm{op}}\to{\mathbf{Set}} acting on morphisms:
+f ∗ := H V n ​ f : H V n ​ B → H V n ​ A h B ↦ h B ∘ f n \begin{array}[]{cccccc}{f}^{*}\vcentcolon=H^{n}_{V}f:&H^{n}_{V}B&\to&H^{n}_{V}A\\ &h_{B}&\mapsto&h_{B}\mathbin{\circ}f^{n}\end{array} (80)
+Four special cases of pullback bundles are pullback predicates, quantities, relations, and distances.
+Definition C.3 (Pullback predicate) .
+Given a function f : A → B f:A\to B and a predicate p : B → { ⊤ , ⊥ } p:B\to{\{\top,\bot\}} on the codomain B B , the pullback predicate f ∗ ​ p : A → { ⊤ , ⊥ } := p ∘ f {f}^{*}p:A\to{\{\top,\bot\}}\vcentcolon=p\mathbin{\circ}f is a predicate on the domain A A :
+∀ a ∈ A . f ∗ ​ p ​ ( a ) := p ⁡ ( f ⁡ ( a ) ) . \forall a\in A.\;{f}^{*}p(a)\vcentcolon=p(f(a)). (81)
+Definition C.4 (Pullback quantity) .
+Given a function f : A → B f:A\to B and a quantity q : B → [ 0 , ∞ ] q:B\to{[0,\infty]} on the codomain B B , the pullback quantity f ∗ ​ q : A → [ 0 , ∞ ] := q ∘ f {f}^{*}q:A\to{[0,\infty]}\vcentcolon=q\mathbin{\circ}f is a quantity on the domain A A :
+∀ a ∈ A . f ∗ ​ q ​ ( a ) := q ⁡ ( f ⁡ ( a ) ) . \forall a\in A.\;{f}^{*}q(a)\vcentcolon=q(f(a)). (82)
+Definition C.5 (Pullback relation) .
+Given a function f : A → B f:A\to B and a relation r : B × B → { ⊤ , ⊥ } r:B\times B\to{\{\top,\bot\}} on the codomain B B , the pullback relation f ∗ ​ r : A × A → { ⊤ , ⊥ } := r ∘ ( f × f ) {f}^{*}r:A\times A\to{\{\top,\bot\}}\vcentcolon=r\mathbin{\circ}(f\times f) is a relation on the domain A A :
+∀ a 1 ∈ A . ∀ a 2 ∈ A . f ∗ ​ r ​ ( a 1 , a 2 ) := r ⁡ ( f ⁡ ( a 1 ) , f ⁡ ( a 2 ) ) . \forall a_{1}\in A.\;\forall a_{2}\in A.\;{f}^{*}r(a_{1},a_{2})\vcentcolon=r(f(a_{1}),f(a_{2})). (83)
+Definition C.6 (Pullback distance) .
+Given a function f : A → B f:A\to B and a distance d : B × B → [ 0 , ∞ ] d:B\times B\to{[0,\infty]} on the codomain B B , the pullback distance f ∗ ​ d : A × A → [ 0 , ∞ ] := d ∘ ( f × f ) {f}^{*}d:A\times A\to{[0,\infty]}\vcentcolon=d\mathbin{\circ}(f\times f) is a distance on the domain A A :
+∀ a 1 ∈ A . ∀ a 2 ∈ A . f ∗ ​ d ​ ( a 1 , a 2 ) := d ⁡ ( f ⁡ ( a 1 ) , f ⁡ ( a 2 ) ) . \forall a_{1}\in A.\;\forall a_{2}\in A.\;{f}^{*}d(a_{1},a_{2})\vcentcolon=d(f(a_{1}),f(a_{2})). (84)
+In particular, the pullback of the equality relation = B : B × B → { ⊤ , ⊥ } =_{B}:B\times B\to{\{\top,\bot\}} is called the kernel relation: ker f := f ∗ ( = B ) \ker{f}\vcentcolon={f}^{*}(=_{B}) .
+C.1 Pullback of order
+We can establish the order-preserving and order-reflecting properties of pullback bundles.
+Lemma C.7 .
+The pullback f ∗ {f}^{*} is order-preserving.
+Proof 7 .
+Given two bundles h B , h B ′ : B n → V h_{B},h_{B}^{\prime}:B^{n}\to V , assume h B ⪯ h B ′ h_{B}\preceq h_{B}^{\prime} . By the definition of the pointwise preorder in Def. A.9 , h B ⪯ h B ′ h_{B}\preceq h_{B}^{\prime} means that ⪯ V ∘ ⟨ h B , h B ′ ⟩ = ⊤ B n {\preceq_{V}}\mathbin{\circ}\langle h_{B},h_{B}^{\prime}\rangle=\top_{B^{n}} . Because ⟨ f ∗ ​ h B , f ∗ ​ h B ′ ⟩ = ⟨ h B ∘ f n , h B ′ ∘ f n ⟩ = ⟨ h B , h B ′ ⟩ ∘ f n \langle{f}^{*}h_{B},{f}^{*}h_{B}^{\prime}\rangle=\langle h_{B}\mathbin{\circ}f^{n},h_{B}^{\prime}\mathbin{\circ}f^{n}\rangle=\langle h_{B},h_{B}^{\prime}\rangle\mathbin{\circ}f^{n} and ⊤ A n = ⊤ B n ∘ f n \top_{A^{n}}=\top_{B^{n}}\mathbin{\circ}f^{n} , we have ⪯ V ∘ ⟨ h B , h B ′ ⟩ ∘ f n = ⊤ B n ∘ f n {\preceq_{V}}\mathbin{\circ}\langle h_{B},h_{B}^{\prime}\rangle\mathbin{\circ}f^{n}=\top_{B^{n}}\mathbin{\circ}f^{n} . Hence, ⪯ V ∘ ⟨ f ∗ h B , f ∗ h B ′ ⟩ = ⊤ A n {\preceq_{V}}\mathbin{\circ}\langle{f}^{*}h_{B},{f}^{*}h_{B}^{\prime}\rangle=\top_{A^{n}} , which is exactly f ∗ ​ h B ⪯ f ∗ ​ h B ′ {f}^{*}h_{B}\preceq{f}^{*}h_{B}^{\prime} .
+Lemma C.8 .
+If f n f^{n} is an epimorphism, then the pullback f ∗ {f}^{*} is order-reflecting.
+Proof 8 .
+Given two bundles h B , h B ′ : B n → V h_{B},h_{B}^{\prime}:B^{n}\to V , assume f ∗ ​ h B ⪯ f ∗ ​ h B ′ {f}^{*}h_{B}\preceq{f}^{*}h_{B}^{\prime} . By the definition of the pointwise preorder in Def. A.9 , f ∗ ​ h B ⪯ f ∗ ​ h B ′ {f}^{*}h_{B}\preceq{f}^{*}h_{B}^{\prime} means that ⪯ V ∘ ⟨ h B ∘ f n , h B ′ ∘ f n ⟩ = ⊤ A n {\preceq_{V}}\mathbin{\circ}\langle h_{B}\mathbin{\circ}f^{n},h_{B}^{\prime}\mathbin{\circ}f^{n}\rangle=\top_{A^{n}} . Because ⟨ h B ∘ f n , h B ′ ∘ f n ⟩ = ⟨ h B , h B ′ ⟩ ∘ f n \langle h_{B}\mathbin{\circ}f^{n},h_{B}^{\prime}\mathbin{\circ}f^{n}\rangle=\langle h_{B},h_{B}^{\prime}\rangle\mathbin{\circ}f^{n} and ⊤ A n = ⊤ B n ∘ f n \top_{A^{n}}=\top_{B^{n}}\mathbin{\circ}f^{n} , we have ⪯ V ∘ ⟨ h B , h B ′ ⟩ ∘ f n = ⊤ B n ∘ f n {\preceq_{V}}\mathbin{\circ}\langle h_{B},h_{B}^{\prime}\rangle\mathbin{\circ}f^{n}=\top_{B^{n}}\mathbin{\circ}f^{n} . Because f n f^{n} is an epimorphism, precomposition with f n f^{n} is cancellable, hence ⪯ V ∘ ⟨ h B , h B ′ ⟩ = ⊤ B n {\preceq_{V}}\mathbin{\circ}\langle h_{B},h_{B}^{\prime}\rangle=\top_{B^{n}} , which is exactly h B ⪯ h B ′ h_{B}\preceq h_{B}^{\prime} .
+C.2 Pullback of pullback
+Lemma C.9 .
+Given an F F -coalgebra homomorphism f : ( A , t A ) → ( B , t B ) f:(A,t_{A})\to(B,t_{B}) , we have
+H V n ​ F ​ A {\lx@inpgf@ignorespaces H^{n}_{V}FA} H V n ​ F ​ B {\lx@inpgf@ignorespaces H^{n}_{V}FB} H V n ​ A {\lx@inpgf@ignorespaces H^{n}_{V}A} H V n ​ B {\lx@inpgf@ignorespaces H^{n}_{V}B} t A ∗ \scriptstyle{\lx@inpgf@ignorespaces{t_{A}}^{*}} ( F ​ f ) ∗ \scriptstyle{\lx@inpgf@ignorespaces{(Ff)}^{*}} t B ∗ \scriptstyle{\lx@inpgf@ignorespaces{t_{B}}^{*}} f ∗ \scriptstyle{\lx@inpgf@ignorespaces{f}^{*}} (85a)
+t A ∗ ∘ ( F ​ f ) ∗ = f ∗ ∘ t B ∗ . {t_{A}}^{*}\mathbin{\circ}{(Ff)}^{*}={f}^{*}\mathbin{\circ}{t_{B}}^{*}. (85b)
+∀ h F ​ B : ( F ​ B ) n → V . t A ∗ ​ ( F ​ f ) ∗ ​ h F ​ B = f ∗ ​ t B ∗ ​ h F ​ B . \forall h_{FB}:(FB)^{n}\to V.\;{t_{A}}^{*}{(Ff)}^{*}h_{FB}={f}^{*}{t_{B}}^{*}h_{FB}. (85c)
+Proof 9 .
+This is a direct result of the definition of pullback and the coalgebra homomorphism.
+C.3 Pullback of lifting
+Lemma C.10 .
+Given an F F -coalgebra homomorphism f : ( A , t A ) → ( B , t B ) f:(A,t_{A})\to(B,t_{B}) and a lifting λ \lambda , we have
+H V n ​ A {\lx@inpgf@ignorespaces H^{n}_{V}A} H V n ​ B {\lx@inpgf@ignorespaces H^{n}_{V}B} H V n ​ F ​ A {\lx@inpgf@ignorespaces H^{n}_{V}FA} H V n ​ F ​ B {\lx@inpgf@ignorespaces H^{n}_{V}FB} λ A \scriptstyle{\lx@inpgf@ignorespaces\lambda_{A}} f ∗ \scriptstyle{\lx@inpgf@ignorespaces{f}^{*}} λ B \scriptstyle{\lx@inpgf@ignorespaces\lambda_{B}} ( F ​ f ) ∗ \scriptstyle{\lx@inpgf@ignorespaces{(Ff)}^{*}} ⪯ {\lx@inpgf@ignorespaces\preceq} (86a)
+λ A ∘ f ∗ ⪯ ( F ​ f ) ∗ ∘ λ B . \lambda_{A}\mathbin{\circ}{f}^{*}\preceq{(Ff)}^{*}\mathbin{\circ}\lambda_{B}. (86b)
+∀ h B : B n → V . λ A ​ ( f ∗ ​ h B ) ⪯ ( F ​ f ) ∗ ​ λ B ​ ( h B ) . \forall h_{B}:B^{n}\to V.\;\lambda_{A}({f}^{*}h_{B})\preceq{(Ff)}^{*}\lambda_{B}(h_{B}). (86c)
+If the lifting λ \lambda is strict at f f , then the above preorder is an equality.
+Proof 10 .
+This is a direct result of the definition of lifting in Def. B.4 , where h A = f ∗ ​ h B h_{A}={f}^{*}h_{B} .
+C.4 Pullback of closure
+The composition of a pullback and a lifting is of central importance in our development.
+Definition C.11 (Closure operator) .
+Given a lifting λ : H V n ⇒ H V n ​ F \lambda:H^{n}_{V}\Rightarrow H^{n}_{V}F and an F F -coalgebra t A : A → F ​ A t_{A}:A\to FA , we define a closure operator T A : H V n ​ A → H V n ​ A T_{A}:H^{n}_{V}A\to H^{n}_{V}A by
+T A := t A ∗ ∘ λ A : H V n ​ A → λ A H V n ​ F ​ A → t A ∗ H V n ​ A h A ↦ λ A ​ ( h A ) ↦ t A ∗ ​ λ A ​ ( h A ) \begin{array}[]{cccccc}T_{A}\vcentcolon={t_{A}}^{*}\mathbin{\circ}\lambda_{A}:&H^{n}_{V}A&\xrightarrow{\lambda_{A}}&H^{n}_{V}FA&\xrightarrow{{t_{A}}^{*}}&H^{n}_{V}A\\ &h_{A}&\mapsto&\lambda_{A}(h_{A})&\mapsto&{t_{A}}^{*}\lambda_{A}(h_{A})\end{array} (87)
+A post-fixed point h A : A n → V h_{A}:A^{n}\to V of the closure operator T A : H V n ​ A → H V n ​ A T_{A}:H^{n}_{V}A\to H^{n}_{V}A satisfies
+A n {\lx@inpgf@ignorespaces A^{n}} ( F ​ A ) n {\lx@inpgf@ignorespaces(FA)^{n}} V {\lx@inpgf@ignorespaces V} t A n \scriptstyle{\lx@inpgf@ignorespaces t_{A}^{n}} h A \scriptstyle{\lx@inpgf@ignorespaces h_{A}} λ A ​ ( h A ) \scriptstyle{\lx@inpgf@ignorespaces\lambda_{A}(h_{A})} ⪯ {\lx@inpgf@ignorespaces\preceq} (88a)
+h A ⪯ T A ​ ( h A ) . h_{A}\preceq T_{A}(h_{A}). (88b)
+For n = 1 n=1 , such post-fixed points correspond to lax homomorphisms from the F F -coalgebra to the F F -algebra defined by the lifting.
+Proposition C.12 .
+If h A : A → V h_{A}:A\to V is a post-fixed point of a unary closure operator T A : H V ​ A → H V ​ A T_{A}:H_{V}A\to H_{V}A , then it is a lax homomorphism from the F F -coalgebra ( A , t A ) (A,t_{A}) to the F F -algebra ( V , f V ) (V,f_{V}) defined by the lifting λ \lambda :
+A {\lx@inpgf@ignorespaces A} F ​ A {\lx@inpgf@ignorespaces FA} V {\lx@inpgf@ignorespaces V} F ​ V {\lx@inpgf@ignorespaces FV} t A \scriptstyle{\lx@inpgf@ignorespaces t_{A}} h A \scriptstyle{\lx@inpgf@ignorespaces h_{A}} F ​ h A \scriptstyle{\lx@inpgf@ignorespaces Fh_{A}} f V \scriptstyle{\lx@inpgf@ignorespaces f_{V}} ⪯ {\lx@inpgf@ignorespaces\preceq} (89a)
+h A ⪯ f V ∘ F ​ h A ∘ t A . h_{A}\preceq f_{V}\mathbin{\circ}Fh_{A}\mathbin{\circ}t_{A}. (89b)
+To relate the closure operators on different coalgebras, we introduce the notion of laxity and oplaxity along pullback.
+Definition C.13 (Lax and oplax along pullback) .
+Given F F -coalgebras ( A , t A ) (A,t_{A}) and ( B , t B ) (B,t_{B}) , a morphism f : A → B f:A\to B , a lifting λ \lambda of n n -ary bundles, and the closure operators T A T_{A} and T B T_{B} induced by the lifting and the coalgebras, we say that the closure operators are oplax (resp. lax ) along pullback f ∗ {f}^{*} if the following diagram commutes up to ⪯ \preceq (resp. ⪰ \succeq ):
+H V n ​ A {\lx@inpgf@ignorespaces H^{n}_{V}A} H V n ​ B {\lx@inpgf@ignorespaces H^{n}_{V}B} H V n ​ F ​ A {\lx@inpgf@ignorespaces H^{n}_{V}FA} H V n ​ F ​ B {\lx@inpgf@ignorespaces H^{n}_{V}FB} H V n ​ A {\lx@inpgf@ignorespaces H^{n}_{V}A} H V n ​ B {\lx@inpgf@ignorespaces H^{n}_{V}B} λ A \scriptstyle{\lx@inpgf@ignorespaces\lambda_{A}} f ∗ \scriptstyle{\lx@inpgf@ignorespaces{f}^{*}} λ B \scriptstyle{\lx@inpgf@ignorespaces\lambda_{B}} t A ∗ \scriptstyle{\lx@inpgf@ignorespaces{t_{A}}^{*}} t B ∗ \scriptstyle{\lx@inpgf@ignorespaces{t_{B}}^{*}} f ∗ \scriptstyle{\lx@inpgf@ignorespaces{f}^{*}} ⪯ {\lx@inpgf@ignorespaces\preceq} (90a)
+T A ∘ f ∗ ⪯ f ∗ ∘ T B . T_{A}\mathbin{\circ}{f}^{*}\preceq{f}^{*}\mathbin{\circ}T_{B}. (90b)
+∀ h B : B n → V . T A ​ ( f ∗ ​ h B ) ⪯ f ∗ ​ T B ​ ( h B ) . \forall h_{B}:B^{n}\to V.\;T_{A}({f}^{*}h_{B})\preceq{f}^{*}T_{B}(h_{B}). (90c)
+∀ h B : B n → V . ∀ a 1 , … , a n ∈ A . λ A ( f ∗ h B ) ( t A ( a 1 ) , … , t A ( a n ) ) ⪯ λ B ( h B ) ( t B ( f ( a 1 ) ) , … , t B ( f ( a n ) ) ) . \forall h_{B}:B^{n}\to V.\;\forall a_{1},\dots,a_{n}\in A.\;\lambda_{A}({f}^{*}h_{B})(t_{A}(a_{1}),\ldots,t_{A}(a_{n}))\preceq\lambda_{B}(h_{B})(t_{B}(f(a_{1})),\ldots,t_{B}(f(a_{n}))). (90d)
+Then, we can establish the following two results about the preservation and reflection of post-fixed points along pullback.
+Lemma C.14 .
+If the closure operators are lax along an order-preserving pullback f ∗ {f}^{*} , then f ∗ {f}^{*} preserves post-fixed points.
+Proof 11 .
+Assume h B h_{B} is a post-fixed point of T B T_{B} , i.e., h B ⪯ T B ​ ( h B ) h_{B}\preceq T_{B}(h_{B}) . By order preservation, f ∗ ​ h B ⪯ f ∗ ​ T B ​ ( h B ) {f}^{*}h_{B}\preceq{f}^{*}T_{B}(h_{B}) . By laxity, f ∗ ​ T B ​ ( h B ) ⪯ T A ​ ( f ∗ ​ h B ) {f}^{*}T_{B}(h_{B})\preceq T_{A}({f}^{*}h_{B}) . By transitivity, f ∗ ​ h B ⪯ T A ​ ( f ∗ ​ h B ) {f}^{*}h_{B}\preceq T_{A}({f}^{*}h_{B}) , which means that f ∗ ​ h B {f}^{*}h_{B} is a post-fixed point of T A T_{A} .
+Lemma C.15 .
+If the closure operators are oplax along an order-reflecting pullback f ∗ {f}^{*} , then f ∗ {f}^{*} reflects post-fixed points.
+Proof 12 .
+Assume f ∗ ​ h B {f}^{*}h_{B} is a post-fixed point of T A T_{A} , i.e., f ∗ ​ h B ⪯ T A ​ ( f ∗ ​ h B ) {f}^{*}h_{B}\preceq T_{A}({f}^{*}h_{B}) . By oplaxity, T A ​ ( f ∗ ​ h B ) ⪯ f ∗ ​ T B ​ ( h B ) T_{A}({f}^{*}h_{B})\preceq{f}^{*}T_{B}(h_{B}) . By transitivity, f ∗ ​ h B ⪯ f ∗ ​ T B ​ ( h B ) {f}^{*}h_{B}\preceq{f}^{*}T_{B}(h_{B}) . By order reflection, h B ⪯ T B ​ ( h B ) h_{B}\preceq T_{B}(h_{B}) , which means that h B h_{B} is a post-fixed point of T B T_{B} .
+Summarizing the above results, we obtain the following theorem.
+Theorem C.16 .
+Given an F F -coalgebra homomorphism f : ( A , t A ) → ( B , t B ) f:(A,t_{A})\to(B,t_{B}) , a lifting λ \lambda , and the closure operators T A T_{A} and T B T_{B} , we have T A ∘ f ∗ ⪯ f ∗ ∘ T B T_{A}\mathbin{\circ}{f}^{*}\preceq{f}^{*}\mathbin{\circ}T_{B} , and
+if the lifting λ \lambda is strict at f f , then T A ∘ f ∗ = f ∗ ∘ T B T_{A}\mathbin{\circ}{f}^{*}={f}^{*}\mathbin{\circ}T_{B} , and the pullback f ∗ {f}^{*} preserves post-fixed points;
+if f n f^{n} is an epimorphism, then the pullback f ∗ {f}^{*} reflects post-fixed points.
+Proof 13 .
+The oplaxity of the closure along pullback is a direct result of Lemma C.9 and Lemma C.10 . The post-fixed point preservation is due to Lemmas C.7 , C.10 and C.14 . The post-fixed point reflection is due to Lemmas C.8 and C.15 .
+Appendix D Pushforward
+We now introduce the notion of pushforward of bundles, which is the left adjoint of pullback.
+Definition D.1 (Pushforward bundle) .
+A pushforward of n n -ary V V -bundles along a 𝐂 {\mathbf{C}} -morphism f : A → B f:A\to B is a left adjoint f ∗ : H V n ​ A → H V n ​ B {f}_{*}:H^{n}_{V}A\to H^{n}_{V}B of the pullback f ∗ : H V n ​ B → H V n ​ A {f}^{*}:H^{n}_{V}B\to H^{n}_{V}A in Def. C.2 ,
+H V n ​ A ​ ⊥ ← f ∗ → f ∗ ​ H V n ​ B , H^{n}_{V}A\overset{{}\xrightarrow{{f}_{*}}{}}{\underset{{}\xleftarrow[{f}^{*}]{}{}}{\bot}}H^{n}_{V}B, (91)
+which satisfies the following adjunction property:
+∀ h A : A n → V . ∀ h B : B n → V . ( f ∗ ​ h A ⪯ h B ) ↔ ( h A ⪯ f ∗ ​ h B ) . \forall h_{A}:A^{n}\to V.\;\forall h_{B}:B^{n}\to V.\;({f}_{*}h_{A}\preceq h_{B})\mathbin{\leftrightarrow}(h_{A}\preceq{f}^{*}h_{B}). (92)
+A n {\lx@inpgf@ignorespaces A^{n}} B n {\lx@inpgf@ignorespaces B^{n}} V {\lx@inpgf@ignorespaces V} f n \scriptstyle{\lx@inpgf@ignorespaces f^{n}} h A \scriptstyle{\lx@inpgf@ignorespaces h_{A}} f ∗ ​ h A \scriptstyle{\lx@inpgf@ignorespaces{f}_{*}h_{A}} ⪯ {\lx@inpgf@ignorespaces\preceq} (93)
+In our pointwise setting, the pushforward bundle can be computed as joins over the fibers of f f :
+f ∗ : H V n ​ A → H V n ​ B h A ↦ [ b 1 : n ↦ ∨ a i ∈ f − 1 ​ ( b i ) h A ( a 1 : n ) ] \begin{array}[]{cccc}{f}_{*}:&H^{n}_{V}A&\to&H^{n}_{V}B\\ &h_{A}&\mapsto&\left[b_{1:n}\mapsto\displaystyle\join_{a_{i}\in f^{-1}(b_{i})}h_{A}(a_{1:n})\right]\end{array} (94)
+A basic property of pushforward and pullback is given by the following unit and counit equations of the adjunction.
+Lemma D.2 (Unit and counit) .
+Under Def. D.1 , for every f : A → B f:A\to B we have:
+id H V n ​ A ⪯ f ∗ ∘ f ∗ . \id_{H^{n}_{V}A}\preceq{f}^{*}\mathbin{\circ}{f}_{*}. (95a)
+∀ h A : A n → V . h A ⪯ f ∗ ​ f ∗ ​ h A . \forall h_{A}:A^{n}\to V.\;h_{A}\preceq{f}^{*}{f}_{*}h_{A}. (95b)
+f ∗ ∘ f ∗ ⪯ id H V n ​ B . {f}_{*}\mathbin{\circ}{f}^{*}\preceq\id_{H^{n}_{V}B}. (96a)
+∀ h B : B n → V . f ∗ ​ f ∗ ​ h B ⪯ h B . \forall h_{B}:B^{n}\to V.\;{f}_{*}{f}^{*}h_{B}\preceq h_{B}. (96b)
+Proof 14 .
+Eq. 95 is the unit of the adjunction, obtained by instantiating Eq. 92 with h B = f ∗ ​ h A h_{B}={f}_{*}h_{A} ; Eq. 96 is the counit of the adjunction obtained by instantiating Eq. 92 with h A = f ∗ ​ h B h_{A}={f}^{*}h_{B} .
+D.1 Pushforward of order
+Similarly to Lemma C.7 , we can show that the pushforward is order-preserving.
+Lemma D.3 .
+The pushforward f ∗ {f}_{*} is order-preserving.
+Proof 15 .
+Given two bundles h A , h A ′ : A n → V h_{A},h_{A}^{\prime}:A^{n}\to V , assume h A ⪯ h A ′ h_{A}\preceq h_{A}^{\prime} . By the unit, h A ⪯ h A ′ ⪯ f ∗ ​ f ∗ ​ h A ′ h_{A}\preceq h_{A}^{\prime}\preceq{f}^{*}{f}_{*}h_{A}^{\prime} . By the adjunction, this is equivalent to f ∗ ​ h A ⪯ f ∗ ​ h A ′ {f}_{*}h_{A}\preceq{f}_{*}h_{A}^{\prime} , which means that f ∗ {f}_{*} is order-preserving.
+D.2 Pushforward of pullback
+Lemma D.4 .
+Given an F F -coalgebra homomorphism f : ( A , t A ) → ( B , t B ) f:(A,t_{A})\to(B,t_{B}) , we have
+H V n ​ F ​ A {\lx@inpgf@ignorespaces H^{n}_{V}FA} H V n ​ F ​ B {\lx@inpgf@ignorespaces H^{n}_{V}FB} H V n ​ A {\lx@inpgf@ignorespaces H^{n}_{V}A} H V n ​ B {\lx@inpgf@ignorespaces H^{n}_{V}B} t A ∗ \scriptstyle{\lx@inpgf@ignorespaces{t_{A}}^{*}} ( F ​ f ) ∗ \scriptstyle{\lx@inpgf@ignorespaces{(Ff)}_{*}} t B ∗ \scriptstyle{\lx@inpgf@ignorespaces{t_{B}}^{*}} f ∗ \scriptstyle{\lx@inpgf@ignorespaces{f}_{*}} ⪯ {\lx@inpgf@ignorespaces\preceq} (97a)
+f ∗ ∘ t A ∗ ⪯ t B ∗ ∘ ( F ​ f ) ∗ . {f}_{*}\mathbin{\circ}{t_{A}}^{*}\preceq{t_{B}}^{*}\mathbin{\circ}{(Ff)}_{*}. (97b)
+∀ h F ​ A : ( F ​ A ) n → V . f ∗ ​ t A ∗ ​ h F ​ A ⪯ t B ∗ ​ ( F ​ f ) ∗ ​ h F ​ A . \forall h_{FA}:(FA)^{n}\to V.\;{f}_{*}{t_{A}}^{*}h_{FA}\preceq{t_{B}}^{*}{(Ff)}_{*}h_{FA}. (97c)
+Proof 16 .
+By Lemma D.2 , we have t A ∗ ⪯ t A ∗ ∘ ( F ​ f ) ∗ ∘ ( F ​ f ) ∗ {t_{A}}^{*}\preceq{t_{A}}^{*}\mathbin{\circ}{(Ff)}^{*}\mathbin{\circ}{(Ff)}_{*} . By Lemma C.9 , we have t A ∗ ∘ ( F ​ f ) ∗ = f ∗ ∘ t B ∗ {t_{A}}^{*}\mathbin{\circ}{(Ff)}^{*}={f}^{*}\mathbin{\circ}{t_{B}}^{*} . Composing them yields t A ∗ ⪯ f ∗ ∘ t B ∗ ∘ ( F ​ f ) ∗ {t_{A}}^{*}\preceq{f}^{*}\mathbin{\circ}{t_{B}}^{*}\mathbin{\circ}{(Ff)}_{*} , which is equivalent to f ∗ ∘ t A ∗ ⪯ t B ∗ ∘ ( F ​ f ) ∗ {f}_{*}\mathbin{\circ}{t_{A}}^{*}\preceq{t_{B}}^{*}\mathbin{\circ}{(Ff)}_{*} by adjunction.
+D.3 Pushforward of lifting
+Lemma D.5 .
+Given an F F -coalgebra homomorphism f : ( A , t A ) → ( B , t B ) f:(A,t_{A})\to(B,t_{B}) and a lifting λ \lambda , we have
+H V n ​ A {\lx@inpgf@ignorespaces H^{n}_{V}A} H V n ​ B {\lx@inpgf@ignorespaces H^{n}_{V}B} H V n ​ F ​ A {\lx@inpgf@ignorespaces H^{n}_{V}FA} H V n ​ F ​ B {\lx@inpgf@ignorespaces H^{n}_{V}FB} λ A \scriptstyle{\lx@inpgf@ignorespaces\lambda_{A}} f ∗ \scriptstyle{\lx@inpgf@ignorespaces{f}_{*}} λ B \scriptstyle{\lx@inpgf@ignorespaces\lambda_{B}} ( F ​ f ) ∗ \scriptstyle{\lx@inpgf@ignorespaces{(Ff)}_{*}} ⪯ {\lx@inpgf@ignorespaces\preceq} (98a)
+( F ​ f ) ∗ ∘ λ A ⪯ λ B ∘ f ∗ . {(Ff)}_{*}\mathbin{\circ}\lambda_{A}\preceq\lambda_{B}\mathbin{\circ}{f}_{*}. (98b)
+∀ h A : A n → V . ( F ​ f ) ∗ ​ λ A ​ ( h A ) ⪯ λ B ​ ( f ∗ ​ h A ) . \forall h_{A}:A^{n}\to V.\;{(Ff)}_{*}\lambda_{A}(h_{A})\preceq\lambda_{B}({f}_{*}h_{A}). (98c)
+Proof 17 .
+By Lemma D.2 , we have λ A ⪯ λ A ∘ f ∗ ∘ f ∗ \lambda_{A}\preceq\lambda_{A}\mathbin{\circ}{f}^{*}\mathbin{\circ}{f}_{*} . By Lemma C.10 , we have λ A ∘ f ∗ ⪯ ( F ​ f ) ∗ ∘ λ B \lambda_{A}\mathbin{\circ}{f}^{*}\preceq{(Ff)}^{*}\mathbin{\circ}\lambda_{B} . Composing them yields λ A ⪯ ( F ​ f ) ∗ ∘ λ B ∘ f ∗ \lambda_{A}\preceq{(Ff)}^{*}\mathbin{\circ}\lambda_{B}\mathbin{\circ}{f}_{*} , which is equivalent to ( F ​ f ) ∗ ∘ λ A ⪯ λ B ∘ f ∗ {(Ff)}_{*}\mathbin{\circ}\lambda_{A}\preceq\lambda_{B}\mathbin{\circ}{f}_{*} by adjunction.
+D.4 Pushforward of closure
+As in Def. C.13 , we introduce the notion of laxity and oplaxity along pushforward.
+Definition D.6 (Lax and oplax along pushforward) .
+Given F F -coalgebras ( A , t A ) (A,t_{A}) and ( B , t B ) (B,t_{B}) , a morphism f : A → B f:A\to B , a lifting λ \lambda of n n -ary bundles, and the closure operators T A T_{A} and T B T_{B} induced by the lifting and the coalgebras, we say that the closure operators are lax (resp. oplax ) along pushforward f ∗ {f}_{*} if the following diagram commutes up to ⪯ \preceq (resp. ⪰ \succeq ):
+H V n ​ A {\lx@inpgf@ignorespaces H^{n}_{V}A} H V n ​ B {\lx@inpgf@ignorespaces H^{n}_{V}B} H V n ​ F ​ A {\lx@inpgf@ignorespaces H^{n}_{V}FA} H V n ​ F ​ B {\lx@inpgf@ignorespaces H^{n}_{V}FB} H V n ​ A {\lx@inpgf@ignorespaces H^{n}_{V}A} H V n ​ B {\lx@inpgf@ignorespaces H^{n}_{V}B} λ A \scriptstyle{\lx@inpgf@ignorespaces\lambda_{A}} f ∗ \scriptstyle{\lx@inpgf@ignorespaces{f}_{*}} λ B \scriptstyle{\lx@inpgf@ignorespaces\lambda_{B}} t A ∗ \scriptstyle{\lx@inpgf@ignorespaces{t_{A}}^{*}} t B ∗ \scriptstyle{\lx@inpgf@ignorespaces{t_{B}}^{*}} f ∗ \scriptstyle{\lx@inpgf@ignorespaces{f}_{*}} ⪯ {\lx@inpgf@ignorespaces\preceq} (99a)
+f ∗ ∘ T A ⪯ T B ∘ f ∗ . {f}_{*}\mathbin{\circ}T_{A}\preceq T_{B}\mathbin{\circ}{f}_{*}. (99b)
+∀ h A : A n → V . f ∗ ​ T A ​ ( h A ) ⪯ T B ​ ( f ∗ ​ h A ) . \forall h_{A}:A^{n}\to V.\;{f}_{*}T_{A}(h_{A})\preceq T_{B}({f}_{*}h_{A}). (99c)
+We can then establish the following result about the preservation of post-fixed points along pushforward.
+Lemma D.7 .
+If the closure operators are lax along an order-preserving pushforward f ∗ {f}_{*} , then f ∗ {f}_{*} preserves post-fixed points.
+Proof 18 .
+Assume h A h_{A} is a post-fixed point of T A T_{A} , i.e., h A ⪯ T A ​ ( h A ) h_{A}\preceq T_{A}(h_{A}) . By order preservation, f ∗ ​ h A ⪯ f ∗ ​ T A ​ ( h A ) {f}_{*}h_{A}\preceq{f}_{*}T_{A}(h_{A}) . By laxity, f ∗ ​ T A ​ ( h A ) ⪯ T B ​ ( f ∗ ​ h A ) {f}_{*}T_{A}(h_{A})\preceq T_{B}({f}_{*}h_{A}) . By transitivity, f ∗ ​ h A ⪯ T B ​ ( f ∗ ​ h A ) {f}_{*}h_{A}\preceq T_{B}({f}_{*}h_{A}) , which means that f ∗ ​ h A {f}_{*}h_{A} is a post-fixed point of T B T_{B} .
+The dual statement also holds and is omitted here.
+Finally, we can establish the following theorem summarizing the results on pushforward of closure.
+Theorem D.8 .
+Given an F F -coalgebra homomorphism f : ( A , t A ) → ( B , t B ) f:(A,t_{A})\to(B,t_{B}) , a lifting λ \lambda , and the closure operators T A T_{A} and T B T_{B} , we have f ∗ ∘ T A ⪯ T B ∘ f ∗ {f}_{*}\mathbin{\circ}T_{A}\preceq T_{B}\mathbin{\circ}{f}_{*} , and the pushforward f ∗ {f}_{*} preserves post-fixed points.
+Proof 19 .
+The laxity of the closure along pushforward is a direct result of Lemma D.4 and Lemma D.5 . The post-fixed point preservation is due to Lemmas D.3 and D.7 .
+Appendix E Proofs
+This appendix restates the main transfer theorems and records short proof sketches that expose the argument structure without repeating the detailed category-theoretic proofs. The supporting ingredients are the lifting results in Appendix B , the pullback closure theorem in Appendix C , and the pushforward closure theorem in Appendix D . We then include the detailed proofs of the Section 4 propositions.
+See 3.12
+Proof sketch 1 .
+We first establish the oplaxity of closure along pullback. The pullback-of-pullback identity in Lemma C.9 and the pullback-of-lifting inequality in Lemma C.10 give the abstract closure comparison; for the coupling-based probability component used in our binary liftings, the needed oplaxity premise is supplied by Proposition B.23 . Applied to the encoder ϕ \phi , this yields
+T S ​ ( ϕ ∗ ​ h Z ) ⪯ ϕ ∗ ​ T Z ​ ( h Z ) . T_{S}({\phi}^{*}h_{Z})\preceq{\phi}^{*}T_{Z}(h_{Z}). (100)
+If ϕ ∗ ​ h Z ⪯ T S ​ ( ϕ ∗ ​ h Z ) {\phi}^{*}h_{Z}\preceq T_{S}({\phi}^{*}h_{Z}) , then by transitivity ϕ ∗ ​ h Z ⪯ ϕ ∗ ​ T Z ​ ( h Z ) {\phi}^{*}h_{Z}\preceq{\phi}^{*}T_{Z}(h_{Z}) . Next, surjectivity makes ϕ ∗ {\phi}^{*} order-reflecting by Lemma C.8 , and Lemma C.15 turns these two facts into reflection of post-fixed points. This is summarized in Theorem C.16 , so we conclude h Z ⪯ T Z ​ ( h Z ) h_{Z}\preceq T_{Z}(h_{Z}) .
+See 3.13
+Proof sketch 2 .
+We first establish the laxity of closure along pushforward. The adjunction in Lemma D.2 , the pullback–pushforward interaction in Lemma D.4 , and the pushforward-of-lifting inequality in Lemma D.5 together yield
+ϕ ∗ ​ T S ​ ( h S ) ⪯ T Z ​ ( ϕ ∗ ​ h S ) . {\phi}_{*}T_{S}(h_{S})\preceq T_{Z}({\phi}_{*}h_{S}). (101)
+If h S ⪯ T S ​ ( h S ) h_{S}\preceq T_{S}(h_{S}) , then order preservation of pushforward in Lemma D.3 gives
+ϕ ∗ ​ h S ⪯ ϕ ∗ ​ T S ​ ( h S ) . {\phi}_{*}h_{S}\preceq{\phi}_{*}T_{S}(h_{S}). (102)
+Combining the two displays and using transitivity yields ϕ ∗ ​ h S ⪯ T Z ​ ( ϕ ∗ ​ h S ) {\phi}_{*}h_{S}\preceq T_{Z}({\phi}_{*}h_{S}) , and Lemma D.7 identifies this as preservation of post-fixed points. This is summarized in Theorem D.8 .
+See 3.14
+Proof sketch 3 .
+This is an instance of commutative lifting in Def. B.26 . The assumptions say that the zero predicate z z is an algebra homomorphism for the three operator building blocks in Table 2 , so the combinator, aggregator, and barycenter all commute with z z . By the morphism-level characterization in Eq. 76b , the induced quantitative and logical liftings therefore commute with postcomposition by z z . Applying that identity to a bundle h X h_{X} gives
+z ∘ λ X [ 0 , ∞ ] ​ ( h X ) = λ X { ⊤ , ⊥ } ​ ( z ∘ h X ) . z\mathbin{\circ}\lambda^{[0,\infty]}_{X}(h_{X})=\lambda^{\{\top,\bot\}}_{X}(z\mathbin{\circ}h_{X}). (103)
+Thus thresholding the quantitative lifting at zero agrees pointwise with lifting the corresponding logical bundle.
+See 4.1
+Proof 20 .
+The diagram in Eq. 7a is equivalent to
+X {\lx@inpgf@ignorespaces X} Y {\lx@inpgf@ignorespaces Y} ( ℙ ​ X ) A {\lx@inpgf@ignorespaces(\mathbb{P}{X})^{A}} ( ℙ ​ Y ) A {\lx@inpgf@ignorespaces(\mathbb{P}{Y})^{A}} f \scriptstyle{\lx@inpgf@ignorespaces f} t X \scriptstyle{\lx@inpgf@ignorespaces\mathrm{t}_{X}} t Y \scriptstyle{\lx@inpgf@ignorespaces\mathrm{t}_{Y}} ( ℙ ​ f ) A \scriptstyle{\lx@inpgf@ignorespaces(\mathbb{P}{f})^{A}} and X {\lx@inpgf@ignorespaces X} Y {\lx@inpgf@ignorespaces Y} O {\lx@inpgf@ignorespaces O} O {\lx@inpgf@ignorespaces O} f \scriptstyle{\lx@inpgf@ignorespaces f} o X \scriptstyle{\lx@inpgf@ignorespaces\mathrm{o}_{X}} o Y \scriptstyle{\lx@inpgf@ignorespaces\mathrm{o}_{Y}} id O \scriptstyle{\lx@inpgf@ignorespaces\id_{O}} (104)
+The desired result is immediate from these two diagrams:
+X {\lx@inpgf@ignorespaces X} Y {\lx@inpgf@ignorespaces Y} ( ℙ ​ X ) A {\lx@inpgf@ignorespaces(\mathbb{P}{X})^{A}} ( ℙ ​ Y ) A {\lx@inpgf@ignorespaces(\mathbb{P}{Y})^{A}} ( ℙ ​ O ) A {\lx@inpgf@ignorespaces(\mathbb{P}{O})^{A}} ( ℙ ​ O ) A {\lx@inpgf@ignorespaces(\mathbb{P}{O})^{A}} f \scriptstyle{\lx@inpgf@ignorespaces f} t X \scriptstyle{\lx@inpgf@ignorespaces\mathrm{t}_{X}} t Y \scriptstyle{\lx@inpgf@ignorespaces\mathrm{t}_{Y}} ( ℙ ​ f ) A \scriptstyle{\lx@inpgf@ignorespaces(\mathbb{P}{f})^{A}} ( ℙ ​ o X ) A \scriptstyle{\lx@inpgf@ignorespaces(\mathbb{P}{\mathrm{o}_{X}})^{A}} ( ℙ ​ o Y ) A \scriptstyle{\lx@inpgf@ignorespaces(\mathbb{P}{\mathrm{o}_{Y}})^{A}} id ( ℙ ​ O ) A \scriptstyle{\lx@inpgf@ignorespaces\id_{(\mathbb{P}{O})^{A}}} (105)
+See 4.2
+Proof 21 .
+The model-irrelevance abstraction condition can be rewritten as: ker ⁡ ϕ → ker ⁡ ( ϕ ∗ ​ t S ) ∧ ker ⁡ o S \ker{\phi}\mathbin{\rightarrow}\ker({\phi}_{*}\mathrm{t}_{S})\mathbin{\wedge}\ker{\mathrm{o}_{S}} , where the consequent is exactly ker ⁡ ( F Moore ​ ϕ ∘ ⟨ t S , o S ⟩ ) \ker\left(F_{\mathrm{Moore}}\phi\mathbin{\circ}\langle\mathrm{t}_{S},\mathrm{o}_{S}\rangle\right) . Thus, ker ⁡ ϕ → ker ⁡ ( F Moore ​ ϕ ∘ ⟨ t S , o S ⟩ ) \ker{\phi}\mathbin{\rightarrow}\ker\left(F_{\mathrm{Moore}}\phi\mathbin{\circ}\langle\mathrm{t}_{S},\mathrm{o}_{S}\rangle\right) means that F Moore ​ ϕ ∘ ⟨ t S , o S ⟩ : S → F Moore ​ Z F_{\mathrm{Moore}}\phi\mathbin{\circ}\langle\mathrm{t}_{S},\mathrm{o}_{S}\rangle:S\to F_{\mathrm{Moore}}Z factors through ϕ : S → Z \phi:S\to Z ; equivalently, there exists a morphism ⟨ t Z , o Z ⟩ : Z → F Moore ​ Z \langle\mathrm{t}_{Z},\mathrm{o}_{Z}\rangle:Z\to F_{\mathrm{Moore}}Z such that F Moore ​ ϕ ∘ ⟨ t S , o S ⟩ = ⟨ t Z , o Z ⟩ ∘ ϕ F_{\mathrm{Moore}}\phi\mathbin{\circ}\langle\mathrm{t}_{S},\mathrm{o}_{S}\rangle=\langle\mathrm{t}_{Z},\mathrm{o}_{Z}\rangle\mathbin{\circ}\phi . This is exactly the coalgebra homomorphism condition for F Moore F_{\mathrm{Moore}} in Eq. 7 .
+See 4.3
+Proof 22 .
+If r r is a post-fixed point of T X T_{X} , then r = ker ⁡ q r → ker ⁡ ( F ​ q r ∘ t X ) r=\ker{q_{r}}\mathbin{\rightarrow}\ker(F{q_{r}}\mathbin{\circ}t_{X}) . This means that F ​ q r ∘ t X : X → F ⁡ ( X / r ) F{q_{r}}\mathbin{\circ}t_{X}:X\to F(X/r) factors through q r : X → X / r q_{r}:X\to X/r , i.e., there exists a morphism t X / r : X / r → F ⁡ ( X / r ) t_{X/r}:X/r\to F(X/r) such that F ​ q r ∘ t X = t X / r ∘ q r F{q_{r}}\mathbin{\circ}t_{X}=t_{X/r}\mathbin{\circ}q_{r} . This is exactly the coalgebra homomorphism condition in Def. 2.6 . Conversely, if there exists such a coalgebra structure t X / r t_{X/r} , then F ​ q r ∘ t X = t X / r ∘ q r F{q_{r}}\mathbin{\circ}t_{X}=t_{X/r}\mathbin{\circ}q_{r} implies that ker ⁡ q r → ker ⁡ ( F ​ q r ∘ t X ) \ker{q_{r}}\mathbin{\rightarrow}\ker(F{q_{r}}\mathbin{\circ}t_{X}) , i.e., r r is a post-fixed point of T X T_{X} .
+Appendix F Discussion
+This section clarifies how several nearby RL constructions sit relative to our framework. Coalgebra homomorphisms compare systems of the same type and induce state abstraction. By contrast, interface changes, closed-loop feedback, temporal abstraction, and agent memory often change the system type or wire systems together before any abstraction map is chosen.
+F.1 Functorial transformations of systems
+We first make explicit the categorical mechanism behind Section 2.3 . A natural transformation changes the system type uniformly on each carrier, and therefore induces a functor between the corresponding coalgebra categories ( Rutten, 2000 , Theorem 15.1) :
+Lemma F.1 .
+Given two endofunctors F , G : 𝐂 → 𝐂 F,G:{\mathbf{C}}\to{\mathbf{C}} on a category 𝐂 {\mathbf{C}} , a natural transformation α : F ⇒ G \alpha:F\Rightarrow G induces a functor 𝐂 α : 𝐂 F → 𝐂 G {\mathbf{C}}_{\alpha}:{\mathbf{C}}_{F}\to{\mathbf{C}}_{G} between the corresponding coalgebra categories:
+𝐂 α : 𝐂 F → 𝐂 G ( A , a : A → F A ) ↦ ( A , α A ∘ a : A → 𝑎 F A → α A G A ) f : ( A , a ) → ( B , b ) ↦ f : ( A , α A ∘ a ) → ( B , α B ∘ b ) \begin{array}[]{cccc}{\mathbf{C}}_{\alpha}:&{\mathbf{C}}_{F}&\to&{\mathbf{C}}_{G}\\ &(A,a:A\to FA)&\mapsto&(A,\alpha_{A}\mathbin{\circ}a:A\xrightarrow{a}FA\xrightarrow{\alpha_{A}}GA)\\ &f:(A,a)\to(B,b)&\mapsto&f:(A,\alpha_{A}\mathbin{\circ}a)\to(B,\alpha_{B}\mathbin{\circ}b)\end{array} (106)
+A {\lx@inpgf@ignorespaces A} B {\lx@inpgf@ignorespaces B} F ​ A {\lx@inpgf@ignorespaces FA} F ​ B {\lx@inpgf@ignorespaces FB} G ​ A {\lx@inpgf@ignorespaces GA} G ​ B {\lx@inpgf@ignorespaces GB} f \scriptstyle{\lx@inpgf@ignorespaces f} a \scriptstyle{\lx@inpgf@ignorespaces a} b \scriptstyle{\lx@inpgf@ignorespaces b} F ​ f \scriptstyle{\lx@inpgf@ignorespaces Ff} α A \scriptstyle{\lx@inpgf@ignorespaces\alpha_{A}} α B \scriptstyle{\lx@inpgf@ignorespaces\alpha_{B}} G ​ f \scriptstyle{\lx@inpgf@ignorespaces Gf} (107)
+However, not all functors between coalgebra categories are induced by natural transformations. Being induced by a natural transformation is a strong condition: it forces the carrier to stay the same and the change of structure to be uniform.
+The examples below use this distinction to separate changes of system type from state abstraction. They transform the type of system while keeping the carrier fixed, before any state abstraction is added. We proceed from uniform interface changes to transformations that involve closed-loop feedback or agent memory.
+F.2 Basic interface transformations
+A simple example is the action translation functor, which changes the input interface of the system by translating actions from one set to another:
+Example F.2 (Action translation) .
+An action translation g : A → A ′ g:A\to A^{\prime} transforms a system t : S → S A ′ \mathrm{t}:S\to S^{A^{\prime}} into a system S g ∘ t : S → S A S^{g}\mathbin{\circ}\mathrm{t}:S\to S^{A} :
+S S S S A ′ A^{\prime} A A t \mathrm{t} g g (108)
+A functor between coalgebra categories is given by
+𝐂 ( − ) A ′ → 𝐂 ( − ) A ( S , t : S → S A ′ ) ↦ ( S , S g ∘ t : S → S A ) f : ( S , t ) → ( S ′ , t ′ ) ↦ f : ( S , S g ∘ t ) → ( S ′ , S ′ g ∘ t ′ ) \begin{array}[]{ccccc}{\mathbf{C}}_{(-)^{A^{\prime}}}&\to&{\mathbf{C}}_{(-)^{A}}\\ (S,\mathrm{t}:S\to S^{A^{\prime}})&\mapsto&(S,S^{g}\mathbin{\circ}\mathrm{t}:S\to S^{A})\\ f:(S,\mathrm{t})\to(S^{\prime},\mathrm{t}^{\prime})&\mapsto&f:(S,S^{g}\mathbin{\circ}\mathrm{t})\to(S^{\prime},{S^{\prime}}^{g}\mathbin{\circ}\mathrm{t}^{\prime})\end{array} (109)
+where S g : S A ′ → S A := ( − ) ∘ g S^{g}:S^{A^{\prime}}\to S^{A}\vcentcolon=(-)\mathbin{\circ}g is the precomposition map.
+The new system has the same carrier S S , but presents a different action interface. When the translated system receives an action a ∈ A a\in A , it runs the original system with action g ⁡ ( a ) ∈ A ′ g(a)\in A^{\prime} . Thus the map g g can identify several actions of the new interface, or leave some actions of the original interface unused. In either case, no states are merged; only the way the system consumes actions has changed. Thus action translation changes the input interface uniformly. It is the simplest interface adapter that will reappear in the discussion of MDP homomorphisms.
+F.3 Closing the loop with a policy
+Another basic transformation closes an input interface by feeding back an action chosen from the current observation.
+Example F.3 (Closed-loop system) .
+A policy π : O → A \pi:O\to A transforms an open-loop system ⟨ t , o ⟩ : S → S A × O \langle\mathrm{t},\mathrm{o}\rangle:S\to S^{A}\times O into a closed-loop system p π ​ ( t , o ) : S → S × O p_{\pi}(\mathrm{t},\mathrm{o}):S\to S\times O :
+S S S S O O A A O O o \mathrm{o} t \mathrm{t} π \pi (110)
+A functor between coalgebra categories is given by
+𝐂 ( − ) A × O → 𝐂 − × O ( S , ⟨ t , o ⟩ : S → S A × O ) ↦ ( S , p π ( t , o ) : S → S × O ) f : ( S , ⟨ t , o ⟩ ) → ( S ′ , ⟨ t ′ , o ′ ⟩ ) ↦ f : ( S , p π ​ ( t , o ) ) → ( S ′ , p π ​ ( t ′ , o ′ ) ) \begin{array}[]{ccccc}{\mathbf{C}}_{(-)^{A}\times O}&\to&{\mathbf{C}}_{-\times O}\\ (S,\langle\mathrm{t},\mathrm{o}\rangle:S\to S^{A}\times O)&\mapsto&(S,p_{\pi}(\mathrm{t},\mathrm{o}):S\to S\times O)\\ f:(S,\langle\mathrm{t},\mathrm{o}\rangle)\to(S^{\prime},\langle\mathrm{t}^{\prime},\mathrm{o}^{\prime}\rangle)&\mapsto&f:(S,p_{\pi}(\mathrm{t},\mathrm{o}))\to(S^{\prime},p_{\pi}(\mathrm{t}^{\prime},\mathrm{o}^{\prime}))\end{array} (111)
+where
+p π ​ ( t , o ) := \displaystyle p_{\pi}(\mathrm{t},\mathrm{o})\vcentcolon={} S → ⟨ id S , o ⟩ S × O → id S × ⟨ π , id O ⟩ S × ( A × O ) → ≅ ( S × A ) × O → t × id O S × O , \displaystyle S\xrightarrow{\langle\id_{S},\mathrm{o}\rangle}S\times O\xrightarrow{\id_{S}\times\langle\pi,\id_{O}\rangle}S\times(A\times O)\xrightarrow{\cong}(S\times A)\times O\xrightarrow{\mathrm{t}\times\id_{O}}S\times O, (112)
+= \displaystyle={} S → ⟨ t , o ⟩ S A × O → id S A × ⟨ π , id O ⟩ S A × ( A × O ) → ≅ ( S A × A ) × O → ϵ S × id O S × O , \displaystyle S\xrightarrow{\langle\mathrm{t},\mathrm{o}\rangle}S^{A}\times O\xrightarrow{\id_{S^{A}}\times\langle\pi,\id_{O}\rangle}S^{A}\times(A\times O)\xrightarrow{\cong}(S^{A}\times A)\times O\xrightarrow{\epsilon_{S}\times\id_{O}}S\times O, (113)
+and ϵ S : S A × A → S \epsilon_{S}:S^{A}\times A\to S is the evaluation map.
+This is the construction used in Section 2 to obtain closed-loop systems from open-loop systems and policies. Together, action translation and closed-loop feedback give the two ingredients needed for the observation-dependent action translation below.
+F.4 State-action abstraction: MDP homomorphism
+One relevant notion in the RL literature is MDP homomorphism ( Ravindran and Barto, 2001 ; Ravindran and Barto, 2002 ) , which consists of a state map S → S ′ S\to S^{\prime} together with a state-dependent action map S × A → A ′ S\times A\to A^{\prime} . This concept has been used for state-action abstraction ( Ravindran and Barto, 2003 ; Ravindran and Barto, 2004 ; Ravindran, 2004 ; Taylor et al., 2008 ; van der Pol et al., 2020a ; van der Pol et al., 2020b ; Rezaei-Shoshtari et al., 2022 ; Panangaden et al., 2024 ; Bakirtzis et al., 2025 ) . This is not the same construction as the coalgebra homomorphism in Def. 2.6 . A coalgebra homomorphism compares systems of the same type, so the input-output interface, including the action and observation spaces, remains fixed. An MDP homomorphism combines state abstraction with an interface adapter. We separate these two components in this paper: the abstraction map is handled by coalgebra homomorphisms, while the action map induces a natural transformation between systems of different types.
+The following example records the interface adapter. It combines the two basic transformations above: as in action translation, it changes the action interface; as in closed-loop feedback, the translation can depend on the current output observation. When the observation is the full state, this specializes to the state-dependent action maps used in MDP homomorphisms.
+Example F.4 (Observation-dependent action translation) .
+An observation-dependent action translation g : O × A → A ′ g:O\times A\to A^{\prime} transforms a system ⟨ t , o ⟩ : S → S A ′ × O \langle\mathrm{t},\mathrm{o}\rangle:S\to S^{A^{\prime}}\times O into a system p g ​ ( t , o ) : S → S A × O p_{g}(\mathrm{t},\mathrm{o}):S\to S^{A}\times O :
+S S S S O O A ′ A^{\prime} O O A A o \mathrm{o} t \mathrm{t} g g (114)
+A functor between coalgebra categories is given by
+𝐂 ( − ) A ′ × O → 𝐂 ( − ) A × O ( S , ⟨ t , o ⟩ : S → S A ′ × O ) ↦ ( S , p g ( t , o ) : S → S A × O ) f : ( S , ⟨ t , o ⟩ ) → ( S ′ , ⟨ t ′ , o ′ ⟩ ) ↦ f : ( S , p g ​ ( t , o ) ) → ( S ′ , p g ​ ( t ′ , o ′ ) ) \begin{array}[]{ccccc}{\mathbf{C}}_{(-)^{A^{\prime}}\times O}&\to&{\mathbf{C}}_{(-)^{A}\times O}\\ (S,\langle\mathrm{t},\mathrm{o}\rangle:S\to S^{A^{\prime}}\times O)&\mapsto&(S,p_{g}(\mathrm{t},\mathrm{o}):S\to S^{A}\times O)\\ f:(S,\langle\mathrm{t},\mathrm{o}\rangle)\to(S^{\prime},\langle\mathrm{t}^{\prime},\mathrm{o}^{\prime}\rangle)&\mapsto&f:(S,p_{g}(\mathrm{t},\mathrm{o}))\to(S^{\prime},p_{g}(\mathrm{t}^{\prime},\mathrm{o}^{\prime}))\end{array} (115)
+where
+p g ​ ( t , o ) := \displaystyle p_{g}(\mathrm{t},\mathrm{o})\vcentcolon={} S → ⟨ t , o ⟩ S A ′ × O → id S A ′ × ⟨ g , id O ⟩ S A ′ × ( A ′ A × O ) → ≅ ( S A ′ × A ′ A ) × O → ∘ × id O S A × O , \displaystyle S\xrightarrow{\langle\mathrm{t},\mathrm{o}\rangle}S^{A^{\prime}}\times O\xrightarrow{\id_{S^{A^{\prime}}}\times\langle g,\id_{O}\rangle}S^{A^{\prime}}\times({A^{\prime}}^{A}\times O)\xrightarrow{\cong}(S^{A^{\prime}}\times{A^{\prime}}^{A})\times O\xrightarrow{{\mathbin{\circ}}\times\id_{O}}S^{A}\times O, (116)
+and ∘ : S A ′ × A ′ A → S A {\mathbin{\circ}}:S^{A^{\prime}}\times{A^{\prime}}^{A}\to S^{A} is the composition map.
+Thus the observation-dependent action translation functor can be read as the interface transformation part of MDP homomorphisms ( Ravindran and Barto, 2001 ; Ravindran and Barto, 2002 ) . Combined with a coalgebra homomorphism on the state carrier, it gives the two ingredients of state-action abstraction without conflating them.
+Relatedly, since pullback is simply precomposition, given a policy π Z : Z → A \pi_{Z}:Z\to A on the representation space Z Z , we can pull it back along the encoder ϕ : S → Z \phi:S\to Z to obtain a policy ϕ ∗ ​ π Z : S → A := π Z ∘ ϕ {\phi}^{*}\pi_{Z}:S\to A\vcentcolon=\pi_{Z}\mathbin{\circ}\phi on the concrete state space S S . This pullback policy construction has been used in Ravindran and Barto (2001) ; Ravindran and Barto (2002) ; Rezaei-Shoshtari et al. (2022) . Together with a section S × A ′ → A S\times A^{\prime}\to A (a right inverse of the action map S × A → A ′ S\times A\to A^{\prime} in the second component), it was referred to by Panangaden et al. (2024, Definition 7) as a lifted policy in the context of MDP homomorphism. Note that this “ lifting ” is an RL term for concretizing abstract actions and is unrelated to the bundle lifting discussed in Section 3.2 .
+F.5 State augmentation: forward statistic aggregation
+The previous examples modify how an environment exposes or consumes its interface. We next turn to state augmentation: an observation-producing system is paired with a forward statistic state that is updated chronologically from the observations it emits.
+Example F.5 (Forward statistic aggregation) .
+Let M M be a set of auxiliary statistic states. A statistic update map ⊳ : O × M → M \mathbin{\triangleright}:O\times M\to M updates such a statistic state from a new observation and transforms a system ⟨ t , o ⟩ : S → S × O \langle\mathrm{t},\mathrm{o}\rangle:S\to S\times O into an augmented system p ( t , o , ⊳ ) : S × M → S × M p(\mathrm{t},\mathrm{o},\mathbin{\triangleright}):S\times M\to S\times M :
+S S S S O O M M M M o \mathrm{o} t \mathrm{t} ⊳ \mathbin{\triangleright} (117)
+A bifunctor between coalgebra categories is given by
+𝐂 − × O × 𝐂 ( − ) O → 𝐂 id 𝐂 ( S , ⟨ t , o ⟩ : S → S × O ) ( M , ⊳ : M → M O ) ↦ ( S × M , p ( t , o , ⊳ ) : S × M → S × M ) f : ( S , ⟨ t , o ⟩ ) → ( S ′ , ⟨ t ′ , o ′ ⟩ ) f ⊳ : ( M , ⊳ ) → ( M ′ , ⊳ ′ ) ↦ f × f ⊳ : ( S × M , p ( t , o , ⊳ ) ) → ( S ′ × M ′ , p ( t ′ , o ′ , ⊳ ′ ) ) \begin{array}[]{ccccc}{\mathbf{C}}_{-\times O}&\times&{\mathbf{C}}_{(-)^{O}}&\to&{\mathbf{C}}_{\id_{\mathbf{C}}}\\ (S,\langle\mathrm{t},\mathrm{o}\rangle:S\to S\times O)&&(M,\mathbin{\triangleright}:M\to M^{O})&\mapsto&(S\times M,p(\mathrm{t},\mathrm{o},\mathbin{\triangleright}):S\times M\to S\times M)\\ f:(S,\langle\mathrm{t},\mathrm{o}\rangle)\to(S^{\prime},\langle\mathrm{t}^{\prime},\mathrm{o}^{\prime}\rangle)&&f_{\mathbin{\triangleright}}:(M,\mathbin{\triangleright})\to(M^{\prime},\mathbin{\triangleright}^{\prime})&\mapsto&f\times f_{\mathbin{\triangleright}}:(S\times M,p(\mathrm{t},\mathrm{o},\mathbin{\triangleright}))\to(S^{\prime}\times M^{\prime},p(\mathrm{t}^{\prime},\mathrm{o}^{\prime},\mathbin{\triangleright}^{\prime}))\end{array} (118)
+where
+p ( t , o , ⊳ ) := \displaystyle p(\mathrm{t},\mathrm{o},\mathbin{\triangleright})\vcentcolon={} S × M → ⟨ t , o ⟩ × id M ( S × O ) × M → ≅ S × ( O × M ) → id S × ⊳ S × M , \displaystyle S\times M\xrightarrow{\langle\mathrm{t},\mathrm{o}\rangle\times\id_{M}}(S\times O)\times M\xrightarrow{\cong}S\times(O\times M)\xrightarrow{\id_{S}\times\mathbin{\triangleright}}S\times M, (119)
+= \displaystyle={} S × M → ⟨ t , o ⟩ × ⊳ ( S × O ) × M O → ≅ S × ( M O × O ) → id S × ϵ O S × M , \displaystyle S\times M\xrightarrow{\langle\mathrm{t},\mathrm{o}\rangle\times\mathbin{\triangleright}}(S\times O)\times M^{O}\xrightarrow{\cong}S\times(M^{O}\times O)\xrightarrow{\id_{S}\times\epsilon_{O}}S\times M, (120)
+and ϵ O : M O × O → M \epsilon_{O}:M^{O}\times O\to M is the evaluation map.
+This forward statistic aggregation functor combines two systems: one that produces observations and one that updates a statistic from them. The observation may contain more information than this statistic update needs; any extraction of the update-relevant part is left implicit in ⊳ \mathbin{\triangleright} . Unlike the backward reward-aggregation closure in Example 3.4 , this is a forward, chronological construction: it augments the carrier from S S to S × M S\times M and updates the second component along the generated observation stream. Examples include belief-state filters in POMDPs ( Kaelbling et al., 1998 ) , predictive state representations ( Littman and Sutton, 2001 ; Singh et al., 2004 ) , temporal monitors and reward machines ( Camacho et al., 2019 ; Icarte et al., 2018 ; Icarte et al., 2022 ) , and budget or safety-accounting statistics ( Altman, 1999 ; Wachi et al., 2024 ) . In all of these cases, the statistic records information about the observation history, but it does not feed actions back into the environment in this construction.
+F.6 Stateful agent
+Forward statistic aggregation already carries an auxiliary statistic state, but that state is passive with respect to the environment input: it receives observations and does not choose actions. A stateful agent uses memory in both directions: observations update the memory, and the memory produces future actions, as shown below (cf. Fig. 1 ):
+S S S S O O A A M M M M t \mathrm{t} o \mathrm{o} ⊳ \mathbin{\triangleright} π \pi stateful environment stateful agent (121)
+The environment carries state S S , evolves according to the selected action, and emits observations in O O . The agent carries memory M M , updates that memory from each observation, and uses the updated memory to choose future actions. This makes the agent state an explicit part of the closed-loop system rather than an implicit implementation detail of the policy.
+In classical finite-state controller architectures, this move corresponds to the need for non-reactive policies, reducing the problem to learning finite-state automata ( Meuleau et al., 1999 ) ; see also Amato et al. (2010) for variations using Mealy rather than Moore automata, and Koul et al. (2019) for implementations using RNNs. Belief states in POMDPs ( Kaelbling et al., 1998 ) provide a different, yet consistent view, where these memory states correspond to beliefs about environment states and are updated by Bayesian filtering. Predictive state representations ( Littman and Sutton, 2001 ) go further by making no explicit assumptions about the environment state space. They generate memory states and transitions by compressing finite histories of action-observation pairs, a process that can be seen as approximating causal states and their transitions, giving ϵ \epsilon -transducers of bi-infinite stochastic channels ( Rosas et al., 2025 ) . This aligns with the critique of the “ environment spotlight ” in Abel et al. (2024) : if the formal model only exposes the environment state, then agent state and adaptation are easy to hide inside the policy.
+Note that this differs from forward statistic aggregation, where the observation-producing system feeds a separate statistic update, giving a one-way construction that augments the carrier with auxiliary history. In a stateful agent, the memory is not only a record of past observations: it also determines future actions, and those actions affect the future environment state and future observations. Thus the relevant closed system contains both environment state and agent memory, and abstractions may need to preserve behavior that depends on their interaction. This issue appears, for instance, in bisimulations for MDPs, which often require rewards ( Givan et al., 2003 ; Ravindran and Barto, 2003 ; Ravindran and Barto, 2004 ; Ravindran, 2004 ; Taylor et al., 2008 ) or value ( Givan et al., 2003 ; Li et al., 2006 ) to be preserved so that the same actions or policies are produced. It also appears for POMDPs, which are either transformed into a belief MDP first and then coarse grained using standard MDP bisimulations ( Castro et al., 2009 ) , or coarse grained directly with extensions of MDP bisimulations that preserve rewards ( Rosas et al., 2025 ) . These treatments, however, remain mostly feed-forward, in the sense that they simply package properties of the environment into an abstraction for an agent to use under certain constraints. In this sense, the reciprocal feedback described above is not captured by the one-way functorial construction used for forward statistic aggregation. A fully categorical treatment of this wiring would likely require a more general formalism, such as categorical systems theory with wiring diagrams, lenses, or optics where the outputs of each component can be connected to the inputs of the other, and a double categorical treatment that generalizes natural transformations to squares, or 2-cells; see for instance ( Myers, 2023 ; Capucci, 2025 ; Libkind and Myers, 2025 ) . We leave that extension to future work.
+F.7 Temporal abstraction: hierarchical reinforcement learning and options
+The classical options framework formalizes temporal abstraction by adding temporally extended courses of action to a primitive MDP ( Sutton et al., 1999 ; Precup, 2000 ) . An option is defined by a triple: the states where the option can be initiated, the intra-option policy over primitive actions, and the termination condition ( Sutton et al., 1999 , Section 2) . An option can be selected only at states in its initiation set. Once selected, it persists across primitive time steps. The intra-option policy chooses primitive actions, the environment evolves, and after each new state or observation the termination condition, the agent decides whether control remains with the same option or returns to a policy over options.
+In our framework, the active option can be treated as a part of an agent state. Thus options fit the stateful-agent picture above by specializing the agent memory M M to a set of option indices I I , as shown below:
+S S S S O O A A I I I I t \mathrm{t} o \mathrm{o} ⊳ \mathbin{\triangleright} π \pi stateful environment agent with options (122)
+Following the index-based formulation ( Klissarov et al., 2025 ) , the policy becomes an intra-option policy π : S × I → ℙ ​ A \pi:S\times I\to\mathbb{P}{A} , while the update map ⊳ : O × I → I \mathbin{\triangleright}:O\times I\to I summarizes how options terminate and are selected:
+o ⊳ i := { a new option index if option i terminates given observation o , option i otherwise . o\mathbin{\triangleright}i\vcentcolon=\begin{cases}\text{a new option index}&\text{if option $i$ terminates given observation $o$},\\ \text{option $i$}&\text{otherwise}.\end{cases} (123)
+This option-selection rule may itself be learned, so it can be a part of the agent rather than part of the environment dynamics. When observations are full states, this recovers the usual Markov option formulation. With richer histories, it matches the semi-Markov generalization developed by Precup (2000) .
+The essential point is that the option index is internal control state that indexes a subpolicy. Fixing i i gives the primitive policy π ⁡ ( − , i ) \pi(-,i) until the update switches to another index. This is the same mechanism used by the thought states of Hanna and Corrado (2025) : the internal state selects which state-dependent policy is currently executed, while changes to that internal state do not directly change the environment state. The macro-action or SMDP view is therefore a derived, temporally aggregated description of this closed-loop execution. One runs the primitive system until the active option terminates, then records the resulting state, elapsed duration, and accumulated reward. SubMDP and hierarchy-decomposition methods are closely related and pursue the same temporal abstraction direction by exposing regions, exits, or other environment structure ( Hengst, 2002 ; Wen et al., 2020 ) . We leave further investigation of the connections between state abstraction and temporal abstraction to future work.
+Experimental support, please view the build logs for errors. Generated by L A T E xml .
+Instructions for reporting errors
+We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the methods listed below:
+Click the "Report Issue" ( ) button, located in the page header.
+Tip: You can select the relevant text first, to include it in your report.
+Our team has already identified the following issues . We appreciate your time reviewing and reporting rendering errors we may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability should not be a barrier to accessing research. Thank you for your continued support in championing open access for all.
+Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a list of packages that need conversion , and welcome developer contributions .
+We gratefully acknowledge support from our major funders , member institutions , , and all contributors.
+About · Help · Contact · Subscribe · Copyright · Privacy · Accessibility · Operational Status (opens in new tab)

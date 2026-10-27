@@ -1,0 +1,108 @@
+{
+  "kind": "does_annotation_add_anything_beyond_drug_identity",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "repeats": 40,
+    "holdout": 0.2,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "drugs": 65,
+    "identity_dims": 130,
+    "pathway_dims": 41,
+    "n_eval": 40
+  },
+  "summary": {
+    "base": 0.013958376384993119,
+    "identity": 0.07874999999999999,
+    "pathway": 0.075,
+    "identity_pathway": 0.10874999999999999,
+    "additive": 0.06,
+    "identity_minus_pathway": {
+      "n": 40,
+      "mean_diff": 0.0037500000000000007,
+      "ci95": [
+        -0.025,
+        0.03375
+      ]
+    },
+    "combined_minus_identity": {
+      "n": 40,
+      "mean_diff": 0.030000000000000006,
+      "ci95": [
+        0.004999999999999999,
+        0.05874999999999999
+      ]
+    },
+    "additive_minus_identity": {
+      "n": 40,
+      "mean_diff": -0.01875,
+      "ci95": [
+        -0.045000000000000005,
+        0.005
+      ]
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r98/PROTOCOL_E093.md": "b1e5b20ab61dc3b045347ed8e0a881c6745c9c6f04ddeefd77d8a1b7e4be2a3c",
+    "research/2026-10-27-agent-cell-identifiability-r98/e098_granularity.py": "1540f368040f84b2ba542e014e2c1e446d5e62829249949ab32980dbb4d96a06"
+  },
+  "decisions": {
+    "H252_annotation_adds_nothing_beyond_identity": false,
+    "H253_annotation_does_add": "not established",
+    "H254_C45_is_a_granularity_comparison": false,
+    "verdict": "C45_is_a_granularity_comparison_but_annotation_value_is_indeterminate"
+  },
+  "limits": [
+    "Only 65 drugs, so the 130-dim identity block can overfit small training sets even with ridge.",
+    "The pathway annotation is coarse (about 38 levels), so its information ceiling is low by construction.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "capacity_control": {
+    "kind": "capacity_control_for_the_annotation_gain",
+    "n_eval": 40,
+    "identity": 0.06875,
+    "identity_plus_pathway": 0.1,
+    "identity_plus_random": 0.08,
+    "pathway_minus_identity": {
+      "n": 40,
+      "mean_diff": 0.03125,
+      "ci95": [
+        0.0012499999999999983,
+        0.06375
+      ]
+    },
+    "random_minus_identity": {
+      "n": 40,
+      "mean_diff": 0.011250000000000001,
+      "ci95": [
+        -0.0125,
+        0.034999999999999996
+      ]
+    },
+    "pathway_minus_random": {
+      "n": 40,
+      "mean_diff": 0.019999999999999997,
+      "ci95": [
+        -0.015031250000000001,
+        0.05375
+      ]
+    },
+    "decisions": {
+      "annotation_gain_real_if_pathway_beats_random_addition": false,
+      "capacity_artifact_if_random_also_gains": false,
+      "verdict": "indeterminate_after_capacity_control"
+    },
+    "honest_reading": {
+      "uncontrolled": "identity+pathway beats identity by +3.12 pp [+0.12,+6.38]",
+      "capacity_control": "identity+41 random features gains +1.13 pp [-1.25,+3.50], not significant",
+      "head_to_head": "identity+pathway minus identity+random = +2.00 pp [-1.50,+5.37], NOT significant",
+      "conclusion": "random features absorb about a third of the apparent annotation gain, and the remainder is not distinguishable from a capacity effect at this sample size. So neither 'annotation adds real signal' nor 'the gain is merely capacity' is established. The honest status is indeterminate.",
+      "my_pre_registered_H253_was_based_on_the_uncontrolled_contrast": true
+    }
+  }
+}

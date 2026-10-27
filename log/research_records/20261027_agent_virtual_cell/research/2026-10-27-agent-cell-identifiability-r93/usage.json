@@ -1,0 +1,48 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r93",
+  "round": "R93 (goal round 91/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Attempt to make coverage an operative condition by masking a fraction of drugs."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r93": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round ends by declaring its own design unable to answer the question, and refuses to report the numbers as a finding.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e093_coverage.py", "concentration check", "full-pool corrected run"],
+    "runs": 3, "repeats": 40, "coverage_levels": 7, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E093_RESULTS.json", "full_pool": "E093_FULLPOOL.json",
+                "concentration": "E093_CONCENTRATION.json", "protocol": "PROTOCOL_E088.md"},
+  "design_flaws": {
+    "flaw_1": "the pre-registered analysis evaluated only on covered keys, which removes exactly the penalty that coverage is supposed to impose, making H239 trivially true",
+    "flaw_2_decisive": "the top-20 contains only about 2 distinct drug pairs at every coverage level, so the hit rate is a statistic about which pair won that draw rather than about the algorithm's quality at that coverage"
+  },
+  "results_summary": {
+    "preregistered_axis": "hit rate rose from 7.75% at full coverage to 11.87% at 25% coverage",
+    "full_pool_correction": "hit rate still rose (6.25% at 0.98 coverage to 15.25% at 0.25), and the top-20 was almost entirely scored (0.975-1.00) because unseen drugs score exactly zero and never enter the top-20",
+    "concentration_by_coverage": {"1.00": 2.0, "0.80": 2.0, "0.64": 2.0, "0.49": 1.95, "0.36": 1.88, "0.25": 1.90, "0.16": 1.78},
+    "standard_error": "about 5 pp with 40 draws, the same size as the differences between coverage levels"
+  },
+  "decisions": {"H237_value_falls_with_coverage": false,
+                "H238_failure_point_exists": false,
+                "H239_still_useful_at_25pct_coverage": true,
+                "H239_note": "true by construction under the flawed design, therefore not a finding",
+                "verdict": "coverage_sensitivity_not_measurable_with_this_design"},
+  "what_this_round_does_NOT_establish": "nothing about coverage; the numbers must not be quoted as evidence of coverage-insensitivity or of coverage improving performance",
+  "how_to_do_it_properly": ["evaluate at the combination level (top-m distinct pairs with m fixed), not key-level top-20",
+                            "draw independent splits per coverage level rather than repeating top-k on one pool",
+                            "report the identity distribution of the pairs actually picked"],
+  "limits": ["masking is artificial and real missingness carries selection bias",
+             "40 draws is far too few for a two-pair statistic",
+             "only 65 drugs",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "register_updates": {"C66": "new, methodological negative: the coverage experiment cannot answer its question"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C66 added)", "research/INDEX.md (added R93 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false,
+    "synthesis_not_updated_because": "the round produced no coverage finding to record"
+  }
+}

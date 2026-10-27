@@ -1,0 +1,138 @@
+{
+  "date": "2026-10-27",
+  "timezone": "Asia/Shanghai",
+  "task": "task-26 R198-A3 dynamic route: Mix-seq metadata-only qualification + design draft",
+  "agent": "cellstate-lit",
+  "scope": {
+    "metadata_only": true,
+    "expression_matrix_read": false,
+    "response_values_read": false,
+    "model_training_runs": 0,
+    "time_prediction_runs": 0,
+    "effect_statistics_runs": 0,
+    "wet_lab_experiments": 0,
+    "production_code_promotions": 0,
+    "other_directories_modified": 0
+  },
+  "inputs": {
+    "mixseq_h5ad": {
+      "path": "data/external/mixseq_scperturb/mcfarland_2020.h5ad",
+      "bytes": 1459410830,
+      "sha256": "94a7240047b9ce6822dc2aa1e7a66c1fd8b00be842e5a95fc72cbeb6f2834d2c",
+      "read": "obs/var metadata only (column names, design-column values, counts, QC flags, DepMap identity); X shape/encoding only, no values"
+    },
+    "mixseq_design_census": {
+      "path": "research/eight_directions_20261026/evidence_audit/mixseq_design_census.csv",
+      "bytes": 54253,
+      "sha256": "0ef7b1c7a907c0fdc456b3f0910363de874eb3131265d1d82b1ea5165256d625",
+      "read": "design metadata columns time/perturbation/cell_line/channel/cells only"
+    },
+    "depmap_sample_info": {
+      "path": "data/external/depmap_19q4/sample_info.csv",
+      "read": "DepMap_ID/stripped_cell_line_name/COSMIC_ID/disease/lineage columns only, for identity join"
+    },
+    "prism_metadata": {
+      "paths": [
+        "data/external/prism_19q4/raw/primary-screen-replicate-collapsed-treatment-info.csv",
+        "data/external/prism_19q4/raw/primary-screen-cell-line-info.csv",
+        "data/external/prism_19q4/raw/secondary-screen-replicate-collapsed-treatment-info.csv",
+        "data/external/prism_19q4/raw/secondary-screen-cell-line-info.csv"
+      ],
+      "read": "drug name/dose/target/moa columns and DepMap_ID columns only; logfold-change response matrices NOT opened"
+    },
+    "cadence_paper": {
+      "url": "https://arxiv.org/html/2605.23470v1",
+      "local": [
+        "tmp/cadence_2605.23470v1.html",
+        "tmp/cadence_2605.23470v1.txt"
+      ],
+      "bytes": [519952, 88732],
+      "sha256": [
+        "8b7b07163c4588dfe7fe1b9e941b8133146501fa42b851917fcbd7ae63366a3c",
+        "fe5a576294422c85e91b6275ba565445d04fe78c6bb269a6bced906e0a5db87e"
+      ],
+      "note": "only network fetch this round; <20 MB; HTML->text anchors in cadence_evidence.md"
+    },
+    "prior_metadata_replay": {
+      "path": "research/2026-10-27-cross-domain-directions/mixseq_metadata_check.json",
+      "role": "prior-round 285-key reference; this round re-derived from h5ad obs and census and matched exactly"
+    }
+  },
+  "outputs": {
+    "qualification.md": {"bytes": 20666, "sha256": "13272b01000102b1c3cd8612cdee8eb6f9eca50b2b3d862c1d3c7c364d0c65d5"},
+    "a3_meta.json": {"bytes": 52766, "sha256": "fcf56d459b3e78433b7efdb49ee29e0f9a65107b41b435e87664c4354c254000"},
+    "protocol_draft.md": {"bytes": 21521, "sha256": "9d7ae195224259a93defb57a7358752dbc7018b0562fb6dcdc2fb7cf09d4eedc"},
+    "cadence_evidence.md": {"bytes": 6388, "sha256": "0b6bdcc3cddadba68b4b2e51f2782fe046562c39c3d3f759739fc1128e169fd6"},
+    "a3_inspect.py": {"bytes": 29844, "sha256": "09e334417fecd389842000ffd6a48a0b105de441680ec9e4789d469854c7faa0"},
+    "record.md": {"self_hashed": false}
+  },
+  "script_runs": {
+    "a3_inspect.py": {
+      "final_success": true,
+      "total_invocations": 5,
+      "invocations": [
+        "v1 script: success, wrote an earlier a3_meta.json (later superseded)",
+        "v2 script: failed on pandas itertuples underscore-column naming; no write",
+        "v2 script: failed on sample_info column name; no write",
+        "v2 script: success, wrote a3_meta.json (superseded by v3)",
+        "v3 script: success, wrote the current a3_meta.json (final)"
+      ],
+      "purpose": "metadata-only census; no expression/response values read"
+    }
+  },
+  "verification": {
+    "common_keys_h5ad_vs_prior": [285, 285],
+    "common_keys_census_vs_h5ad_identical": true,
+    "per_drug_common_keys": {"BRD3379": 98, "Bortezomib": 24, "Idasanutlin": 24, "Trametinib": 24, "control": 115},
+    "common_cell_lines": 115,
+    "census_cells_sum_equals_h5ad_n_obs": [182875, 182875],
+    "hashed_arm_cells_partition": "17553 single + 2339 combo + 136 unresolved = 20028",
+    "functional_endpoint_columns_found": false,
+    "json_parse_ok": true
+  },
+  "findings_summary": {
+    "qualification_verdict": "design_data_partial",
+    "decision_level_executable": false,
+    "reasons": [
+      "no independent functional endpoint (viability/apoptosis) in local asset",
+      "no batch/plate/run metadata; channel missing for all 6h cells and only partly present at 24h",
+      "dose metadata is single placeholder-like value per arm (BRD3379 0.0; hashed arm DMSO also 0.1)",
+      "destructive snapshots without individual/lineage links",
+      "hashed Trametinib time-course requires hash re-interpretation and field-conflict cleaning"
+    ],
+    "development_layer_supported": [
+      "4 drugs + control x 115 cell lines x exact 6h/24h (285 keys; 282 keys >=10 normal cells both times)",
+      "Trametinib 5-timepoint arm (3/6/12/24/48h) + time-matched DMSO for 24 cell lines via hash_assignment single tags (17,553 cells; 13,713 normal QC)",
+      "9 additional 24h-only drug arms (94-98 cell lines each) for static external layer"
+    ],
+    "external_functional_candidate": "PRISM primary/secondary metadata has Bortezomib/Trametinib/Idasanutlin (focal24 fully covered) but no BRD3379; assay/time/dose mismatched, external validation only"
+  },
+  "budget": {
+    "network_fetches": 1,
+    "network_domains": ["arxiv.org"],
+    "downloaded_bytes": 519952,
+    "search_passes": 0,
+    "datasets_downloaded": 0,
+    "new_biological_experiments": 0
+  },
+  "model": {
+    "model_effective": "unknown",
+    "reasoning_effort_effective": "unknown",
+    "tokens": null,
+    "cost": null
+  },
+  "limitations": [
+    "Metadata-only: no expression read, no response statistics, no time prediction, no model training.",
+    "Hash assignment/treatment/time labels are re-interpreted from the original processing, not re-derived.",
+    "No batch/run/donor/passage/replicate metadata; time is confounded with channel availability.",
+    "Dose is a single field value per arm and contains placeholder/contradictory values (BRD3379 0.0; DMSO 0.1).",
+    "Prior derived caches (kinetic_horizon npz) listed only; provenance/splits/values not audited.",
+    "CADENCE references are based on the user report (P-level) plus this round's HTML re-read; theorem details not verified."
+  ],
+  "next_steps": [
+    "Do not start decision-level (L2) dynamic route on this asset; no functional endpoint and batch/dose unverified.",
+    "If development layer is desired: freeze protocol_draft.md §4 endpoints/comparators/splits, compute reliability ceilings first, then decide.",
+    "If decision layer is required: obtain matched functional endpoints (same cell lines/drugs/doses/times, >=2 independent cultures) and batch/run metadata per protocol_draft.md §6.",
+    "Do not claim dynamic world model / true-path recovery; keep dynamic route separate from R197 A0/B."
+  ]
+}

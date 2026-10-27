@@ -1,0 +1,46 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r36",
+  "round": "R36 (goal round 34/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Budget-boundary scan with search/evaluation split on the locally held GDSC screen."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r36": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the search/evaluation split is the internal control and it is what overturns the previous round's strength claim.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e036_budget_boundary.py"], "runs": "2 (paired input-type fix, then final)",
+    "ks": 9, "repeats": 10, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E036_RESULTS.json", "rows": "E036_rows.csv", "protocol": "PROTOCOL_E036.md"},
+  "design": {
+    "ks": [10, 20, 30, 50, 75, 100, 150, 200, 300],
+    "search_splits": [0, 1, 2, 3, 4], "eval_splits": [5, 6, 7, 8, 9],
+    "boundary_rule": "smallest k whose search-split mix-minus-exploit CI lower bound exceeds zero, then validated on the eval splits"
+  },
+  "results": {
+    "k_star_from_search": 200,
+    "eval_at_k_star": {"diff": 0.007, "ci95": [-0.001, 0.016]},
+    "sign_pattern": {"below_50": "mix minus exploit <= 0 on both halves at every k (k=30 significantly negative)",
+                     "at_or_above_50": ">= 0 on both halves at 5 of 6 k values"},
+    "eval_split_significant_window": {"k50": 0.048, "k75": 0.037, "k100": 0.018, "k150": 0.012},
+    "search_split_same_window": {"k50": 0.020, "k75": 0.029, "k100": 0.020, "k150": 0.001, "note": "none of these CI exclude zero"}
+  },
+  "decisions": {"H091_boundary_exists": true, "H092_boundary_transfers": false,
+                "H093_exploit_better_below": false, "verdict": "boundary_not_transferable"},
+  "corrections": {
+    "C28": "downgraded: direction stable at k>=50 but the strength cannot be pinned; the search half never reaches significance",
+    "C30": "downgraded: R35's +3.6 pp is split-dependent - the same k=50 gives only +2.0 [-1.6,+7.2] on the search half",
+    "C27": "unaffected: exploitation beats random at every k on both halves"
+  },
+  "interpretation": "the crossover is qualitatively at k about 50 and the sign is consistent across both halves, but the effect (0-4.8 pp) is the same size as split noise, so no validated boundary rule can be stated",
+  "register_updates": {"C31": "new and refuted: the mix budget boundary cannot be located",
+                       "C28_C30": "downgraded", "C27": "unchanged"},
+  "next_gates": ["raise the split count from 5/5 to 20/20 to resolve a 2 pp difference, or move to a task with a larger effect"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C28, C30 downgraded; C31 added)", "research/INDEX.md (added R36 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "meta_learning_attempted": false
+  }
+}

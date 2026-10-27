@@ -1,0 +1,55 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r74",
+  "round": "R74 (goal round 72/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Self-diagnostic of the R72/R73 pool definition and tie-breaking."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r74": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round audits its own two previous rounds, finds a mislabelled pool and an overly strict pre-registered threshold.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e074_diagnose_pool.py", "tiebreak_r74.py"], "runs": 2,
+    "repeats": 40, "bootstrap": 4000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E074_RESULTS.json", "tiebreak": "E074_TIEBREAK_TEST.json", "protocol": "PROTOCOL_E071.md"},
+  "findings": {
+    "label_error": {
+      "what_i_wrote": "both drugs unseen",
+      "what_the_pool_actually_is": "unseen cell AND at least one unseen drug",
+      "composition": {"exactly_one_drug_unseen": 0.9044, "both_drugs_unseen": 0.0956},
+      "cause": "the code's drug_seen requires BOTH drugs seen, so its negation means at least one is unseen"
+    },
+    "tiebreak_check": {
+      "pre_registered_threshold": "first_k - random_k < 0.5 pp",
+      "observed_gap": 0.00625,
+      "pre_registered_verdict": "artifact present",
+      "proper_paired_test": {"mean_diff": 0.00125, "ci95": [-0.00625, 0.01], "frac_first_better": 0.1},
+      "corrected_verdict": "no artifact",
+      "disclosure": "the 0.5 pp threshold was arbitrary and noise-sized; I replaced it with a paired test and record that replacement here"
+    }
+  },
+  "decisions": {"H187_no_tiebreak_artifact": true,
+                "H187_note": "true under the paired test, false under the over-strict pre-registered threshold; both recorded",
+                "H188_pool_label_was_wrong": true,
+                "verdict": "no_artifact_but_label_must_be_corrected"},
+  "consequence_for_R72_R73": {
+    "direction_unchanged": "the annotation ridge still loses to the marginal baseline",
+    "reading_narrowed": "because 90% of that pool retains one seen drug, the marginal baseline is NOT information-free there; the correct claim is 'the model loses wherever the baseline has partial information, and where the baseline has none (R66's both-unseen pool) it beats random only marginally at +1.25 pp with a CI lower bound of 0.00'"
+  },
+  "corrections_made": ["the register's C46 wording corrected", "a new claim C48 records the mislabelling and the tie-break test",
+                       "R72 and R73 documents left unmodified per the no-rewrite rule; this round is the correction of record"],
+  "methodological_lesson": "a pre-registered threshold that is the same size as the noise must be re-tested statistically afterwards, and the substitution must be recorded rather than silently applied",
+  "limits": ["only this one pool was diagnosed; other rounds' pools are not yet re-checked",
+             "the paired test uses 40 evaluation splits, so the CI is wide (about +/-0.8 pp)",
+             "the pre-registered criterion was replaced after seeing the data, which weakens rather than strengthens the claim",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["re-check the pool labels in R66 (both_unseen) and R68 (strict) to establish whether 'both drugs unseen' was ever actually tested"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C46 corrected, C48 added)",
+                                "research/SYNTHESIS.md (reading narrowed)", "research/INDEX.md (added R74 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "old_round_documents_modified": false, "started_background_service_or_loop": false,
+    "new_wet_experiments": false, "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

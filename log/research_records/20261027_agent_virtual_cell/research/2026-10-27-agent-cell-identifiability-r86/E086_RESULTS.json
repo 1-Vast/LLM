@@ -1,0 +1,90 @@
+{
+  "kind": "main_conclusion_replicated_on_BATCHIE",
+  "input_sha256": "56a4e4a195673160edcb1baa209a15409b3639ff6ab0405558cc5ab3198d5f23",
+  "settings": {
+    "k": 20,
+    "repeats": 20,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "units": 360,
+    "cells": 15,
+    "drugs_annotated_with_pathway": 131
+  },
+  "summary": {
+    "n": 360,
+    "marginal": 0.8881944444444444,
+    "ridge_identity": 0.8883333333333334,
+    "ridge_pathway": 0.8930882352941176,
+    "random": 0.25277777777777777,
+    "base": 0.25079978060820973,
+    "marginal_minus_pathway": {
+      "n": 340,
+      "mean_diff": 0.004264705882352941,
+      "ci95": [
+        -0.0066213235294117646,
+        0.016176470588235296
+      ]
+    },
+    "marginal_minus_identity": {
+      "n": 360,
+      "mean_diff": -0.00013888888888888962,
+      "ci95": [
+        -0.001388888888888889,
+        0.0012499999999999972
+      ]
+    },
+    "identity_minus_pathway": {
+      "n": 340,
+      "mean_diff": 0.004411764705882352,
+      "ci95": [
+        -0.0069154411764705895,
+        0.016474264705882334
+      ]
+    },
+    "pathway_minus_random": {
+      "n": 340,
+      "mean_diff": 0.64,
+      "ci95": [
+        0.6220588235294118,
+        0.6573566176470588
+      ]
+    },
+    "marginal_minus_random": {
+      "n": 360,
+      "mean_diff": 0.6354166666666666,
+      "ci95": [
+        0.6201388888888889,
+        0.6509722222222222
+      ]
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r86/PROTOCOL_E081.md": "3d49d780037b6bd31cf35af99cbf89bb85e871f51207c9e15370941e1306567e",
+    "research/2026-10-27-agent-cell-identifiability-r86/e086_second_resource.py": "9fe229a8bde6275ca91fdd851a07a17edb55ebfa94837916517c564c130b16cf"
+  },
+  "decisions": {
+    "H218_marginal_beats_pathway_on_BATCHIE": false,
+    "H219_marginal_close_to_identity": true,
+    "H220_pathway_no_better_than_random": false,
+    "verdict": "BATCHIE_saturates_and_cannot_adjudicate"
+  },
+  "limits": [
+    "BATCHIE has 351 pairs per plate and 23 compounds, so pathway coverage is thin.",
+    "Viability and the GDSC synergy score are different quantities; only ordering is compared.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "saturation": {
+    "base_rate": 0.2508,
+    "random": 0.2528,
+    "ridge_pathway": 0.8931,
+    "marginal": 0.8882,
+    "ridge_identity": 0.8883,
+    "reading": "all three predictors reach about 0.89 against a 0.25 base, and differ from one another by less than 0.5 pp, so this resource cannot discriminate between them",
+    "why": "BATCHIE has only about 23 compounds per layout and 351 pairs, and low viability is dominated by drug potency, which marginals, identity and gene annotation all capture"
+  },
+  "correction": "the automatic verdict 'main_conclusion_is_GDSC_specific' is too strong: H218 failing here is not evidence that marginals lose outside GDSC, it is evidence that BATCHIE cannot tell the predictors apart. The correct statement is that the GDSC conclusion has NOT been cross-validated, and this resource cannot do it.",
+  "genuine_finding": "one thing is informative: on BATCHIE the gene-annotation model is not worse than marginals (+0.43 pp, CI [-0.66,+1.62]), whereas on GDSC it lost by 10-12 pp. So the GDSC result cannot be assumed to generalise; the question is open."
+}

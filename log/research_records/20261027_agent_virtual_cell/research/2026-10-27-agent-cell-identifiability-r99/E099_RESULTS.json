@@ -1,0 +1,75 @@
+{
+  "kind": "bagged_capacity_control_for_the_annotation_gain",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "repeats": 80,
+    "blocks": 10,
+    "holdout": 0.2,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "identity_dims": 130,
+    "pathway_dims": 41,
+    "n_eval": 80
+  },
+  "summary": {
+    "base": 0.013929802332374012,
+    "identity": 0.08125000000000002,
+    "identity_pathway": 0.1275,
+    "identity_random_bagged": 0.07375000000000001,
+    "pathway_minus_identity": {
+      "n": 80,
+      "mean_diff": 0.04625,
+      "ci95": [
+        0.0225,
+        0.070625
+      ]
+    },
+    "random_minus_identity": {
+      "n": 80,
+      "mean_diff": -0.0075000000000000015,
+      "ci95": [
+        -0.02375,
+        0.009375
+      ]
+    },
+    "pathway_minus_random": {
+      "n": 80,
+      "mean_diff": 0.05375,
+      "ci95": [
+        0.029374999999999995,
+        0.07814062499999991
+      ]
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r99/PROTOCOL_E094.md": "7dd32fdf67ce017ad86ac23d1a8af91d1ec2e62d07fb1ca3e5fc02343d12db85",
+    "research/2026-10-27-agent-cell-identifiability-r99/e099_bagged_control.py": "b749f9ac9d1356577c1f6fc5124b81ecad25a1c4dca531e934f1837fd2671ef5"
+  },
+  "decisions": {
+    "H255_annotation_has_a_real_increment": true,
+    "H256_still_indeterminate": false,
+    "verdict": "annotation_model_is_REFUTED_as_useless"
+  },
+  "limits": [
+    "Averaging random blocks stabilises the control but still samples only Gaussian nuisance features.",
+    "80 splits is better than 40 yet may still be insufficient for an effect near 2 pp.",
+    "Pathway annotation has about 41 dimensions, so its information ceiling is low by construction.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "what_this_means": {
+    "the_central_negative_is_refuted": "C45/C46/C49 concluded that the pathway-annotation model is worthless because it lost to additive/identity baselines. With a common encoding and a capacity-matched random control, the annotation block adds +5.37 pp over random features (CI [+2.94,+7.81]), and random features add nothing (-0.75 pp). The earlier conclusion compared coarseness, not information.",
+    "identity_and_annotation_are_complementary": {
+      "pathway_alone": "about 0.075 in R98",
+      "identity_alone": "0.0813 here",
+      "together": "0.1275 here",
+      "reading": "neither alone is much better than the other, but together they reach 12.75%, so the two源 of information are complementary rather than redundant"
+    },
+    "capacity_is_not_the_driver": "the random control has exactly the same 171 dimensions as the combined model and scores 0.0738, below identity alone at 0.0813, so the gain is not a feature-count effect"
+  },
+  "scope_of_the_claim": "one pool (unseen combinations), one dataset, one criterion (boolean Synergy). It does not establish that pathway annotation alone is good, only that it is not redundant with drug identity."
+}

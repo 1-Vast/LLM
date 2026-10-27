@@ -1,0 +1,45 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r137",
+  "round": "R137 (goal round 135/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Nonlinear replication of R136's exact zero, to test whether the redundancy is model-specific."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r137": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round puts the previous claim under a different model family and narrows it.",
+  "compute": {"python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6, scipy 1.17.1, sklearn 1.9.0",
+              "scripts": ["e137_nonlinear.py"], "runs": 1, "repeats": 30, "rows": 30,
+              "data_downloads": 0, "wet_lab_experiments": 0},
+  "artifacts": {"results": "E137_RESULTS.json", "rows": "E137_rows.csv", "protocol": "PROTOCOL_E127.md"},
+  "results": {
+    "ridge_onehot": {"identity_rho": 0.3775, "both_rho": 0.3775, "gain": -0.0, "mde": 0.0},
+    "boosting_integer": {"identity_rho": 0.4071, "both_rho": 0.4224, "gain": 0.0152,
+                         "ci95": [0.0146, 0.0159], "mde": 0.0010}},
+  "decisions": {"H340_redundancy_is_model_specific": true, "H341_redundancy_is_feature_algebra": false,
+                "verdict": "the_coarsening_is_informationally_redundant_but_functionally_useful_to_nonlinear_models"},
+  "what_survives_and_what_is_narrowed": {
+    "survives": "the algebraic fact: each drug maps to one pathway level, so pathway one-hots are a linear transform of drug one-hots and span no new directions for a linear model",
+    "narrowed": "the functional claim 'substitute, never complement' holds only for linear models; under boosting the coarsening adds +0.0152, fifteen times its minimum detectable effect",
+    "corrected": "pathway carries no additional information, but its coarser granularity is a useful inductive bias for a nonlinear model"},
+  "why_boosting_can_use_it": {
+    "ridge": "adding a linear transform of existing columns leaves the column space unchanged",
+    "boosting": "the same information at a coarser granularity enables splits that generalise across all drugs in a pathway, which a split on drug identity cannot do",
+    "consequence": "redundant features can still help nonlinear models; no new information does not mean no use"},
+  "how_big": {"gain": 0.0152, "comparable_to": "the +0.020 and +0.025 rank gains when one drug was seen (C103)",
+              "reading": "small but on the same footing as the substitute effect in the partially-informed regime"},
+  "limits": ["only thirty splits, so power is lower, though the interval is narrow",
+             "integer coding suits trees, so the ridge integer rows are references only",
+             "the boosting hyperparameters were not tuned and could change the magnitude",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["test whether the boosting gain also falls monotonically with how much identity is supplied, which would give one unified statement"],
+  "register_updates": {"C105": "new: the zero is a linear-model artefact, not a feature-algebra fact",
+                       "C104": "narrowed", "SYNTHESIS": "qualifier added inside the frozen section"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C105 added, C104 annotated)",
+                                "research/SYNTHESIS.md (qualifier added in section 2d)",
+                                "research/INDEX.md (added R137 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

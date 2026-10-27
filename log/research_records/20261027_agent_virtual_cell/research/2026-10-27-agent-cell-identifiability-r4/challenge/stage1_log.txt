@@ -1,0 +1,118 @@
+rows=139764 files=371 cells=19 iters=20
+
+HAZARDS {
+ "n_rows": 139764,
+ "n_well_viability_eq_0": 6646,
+ "n_well_viability_eq_1": 30259,
+ "frac_viability_clipped_0_or_1": 0.2641,
+ "n_viability_outside_0_1": 0,
+ "n_nan_viability": 0,
+ "n_duplicate_well_within_file": 0,
+ "n_exact_duplicate_rows": 0,
+ "n_failed_qc": 3828,
+ "frac_files_all_hc_exactly_1": 0.615,
+ "frac_files_all_lc_exactly_0": 0.615,
+ "n_lc_not_zero": 2329,
+ "n_lc": 8576,
+ "n_hc_not_one": 2528,
+ "n_hc": 8576
+}
+
+NORMALISATION {"n_files": 371, "slope_over_HC_minus_LC_median": 1.0039, "slope_over_HC_minus_LC_iqr": [0.9982, 1.0139], "intercept_minus_LC_median": -13.7}
+
+same-layout same-cell-line file pairs: 120 (240 files)
+replicate-plate same-well differences (non-control): 35674 in 120 pairs
+
+E1 same-well across replicate plates (sigma = sd(diff)/sqrt(2)):
+   all                        sigma=0.04720 robust=0.01981 n= 35674 mean_offset=+0.00432
+   stage11                    sigma=0.03631 robust=0.02130 n=  6048 mean_offset=-0.00180
+   band_0.55_0.95_unclipped   sigma=0.05715 robust=0.04551 n= 11089 mean_offset=+0.00527
+P adjacent_column_same_row       Vd=0.003516 -> per-well sigma_equiv=0.04193 (robust 0.03451) n_pairs=5355 meanD=-0.00100
+P adjacent_row_same_column       Vd=0.004410 -> per-well sigma_equiv=0.04696 (robust 0.04025) n_pairs=5264 meanD=+0.00257
+P adjacent_column_same_row_wide  Vd=0.002430 -> per-well sigma_equiv=0.03486 (robust 0.02352) n_pairs=19722 meanD=+0.00031
+P adjacent_column_same_row [stage11]  Vd=0.002601 sigma_equiv=0.03606 n_pairs=955
+
+within-plate duplicate pairs: drug=10248 control=234240; geometry {(0, 1): 4290, (1, 1): 1950, (1, 0): 1754, (0, 12): 196, (8, 0): 196, (2, 2): 168}
+   both wells ==1: 0.213; any clipped: 0.431; median vbar 0.950
+E2 within-plate same-condition duplicates:
+   all_levels                 sigma=0.03817 robust=0.01893 n= 10248 frac_both_at_1=0.21340749414519905
+   window_0.75_1              sigma=0.03470 robust=0.01550 n=  6981 frac_both_at_1=0.31327889987107865
+   band_0.55_0.95_unclipped   sigma=0.05319 robust=0.04268 n=  2550 frac_both_at_1=0.0
+
+E3 adjacent high-control columns: sigma=0.05089 n=2664 files=143 mean offset=-0.00098
+   offset by column pair: {"col1": {"mean": -0.00139, "n": 1992}, "col11": {"mean": -0.00441, "n": 224}, "col12": {"mean": 0.00423, "n": 224}, "col13": {"mean": 0.00095, "n": 224}}
+
+E4 Poisson read-noise floor sigma=0.00369 (median, n=70036)
+
+HC row profile (viability units): A:+0.024, B:+0.020, C:+0.014, D:+0.014, E:+0.011, F:+0.012, G:+0.018, H:+0.013, I:+0.005, J:-0.004, K:-0.011, L:-0.026, M:-0.034, N:-0.028, O:-0.020, P:-0.011
+   sd across rows=0.01897; within-row sd across plates=0.05910
+   rowO-rowN offset +0.00822 (sd 0.07236, n=368, t=2.18)
+
+PROBE WELLS
+cell     plate  w1                         combo1       v1  w2                          combo2       v2         d
+A673 Plate 157  O1 Dexrazoxane 0.1 + Axitinib 0.1 0.934329  O2 Lestaurtinib 0.1 + Axitinib 0.1 0.631194  0.303136
+A673 Plate 158  O1 Dexrazoxane 0.1 + Axitinib 0.1 0.937061  O2 Lestaurtinib 0.1 + Axitinib 0.1 0.685245  0.251816
+  BJ Plate 147 N22 Axitinib 0.1 + Dexrazoxane 0.1 0.879078 O22 Axitinib 0.1 + Lestaurtinib 0.1 0.899596 -0.020518
+  BJ Plate 148 N22 Axitinib 0.1 + Dexrazoxane 0.1 0.858444 O22 Axitinib 0.1 + Lestaurtinib 0.1 0.906996 -0.048552
+          mean       min       max  count
+cell                                     
+A673  0.277476  0.251816  0.303136      2
+BJ   -0.034535 -0.048552 -0.020518      2
+
+=== VERDICTS  (SE = sd_contrast/sqrt(K), K=2) ===
+
+A673  dbar=+0.27748   per-file d={'Plate 157': 0.303136, 'Plate 158': 0.251816}
+   P_contrast_var_adjacent_column           sd_d=0.05929 SE=0.04193 t=  +6.62 p=0  DETECTABLE
+   P_contrast_var_adjacent_row              sd_d=0.06641 SE=0.04696 t=  +5.91 p=0  DETECTABLE
+   P_contrast_var_adjacent_column_stage11   sd_d=0.05099 SE=0.03606 t=  +7.70 p=0  DETECTABLE
+   E1_replicate_plate_all                   sd_d=0.06675 SE=0.04720 t=  +5.88 p=0  DETECTABLE
+   E1_replicate_plate_stage11               sd_d=0.05134 SE=0.03631 t=  +7.64 p=0  DETECTABLE
+   E1_replicate_plate_band                  sd_d=0.08082 SE=0.05715 t=  +4.86 p=0  DETECTABLE
+   E2_within_dup_all                        sd_d=0.05398 SE=0.03817 t=  +7.27 p=0  DETECTABLE
+   E2_within_dup_0.75_1                     sd_d=0.04907 SE=0.03470 t=  +8.00 p=0  DETECTABLE
+   E2_within_dup_band                       sd_d=0.07522 SE=0.05319 t=  +5.22 p=0  DETECTABLE
+   E3_adjacent_control_columns              sd_d=0.07197 SE=0.05089 t=  +5.45 p=0  DETECTABLE
+   E4_poisson_floor                         sd_d=0.00522 SE=0.00369 t= +75.21 p=0  DETECTABLE
+
+BJ  dbar=-0.03454   per-file d={'Plate 147': -0.020518, 'Plate 148': -0.048552}
+   P_contrast_var_adjacent_column           sd_d=0.05929 SE=0.04193 t=  -0.82 p=0.4101  not detectable
+   P_contrast_var_adjacent_row              sd_d=0.06641 SE=0.04696 t=  -0.73 p=0.4621  not detectable
+   P_contrast_var_adjacent_column_stage11   sd_d=0.05099 SE=0.03606 t=  -0.96 p=0.3382  not detectable
+   E1_replicate_plate_all                   sd_d=0.06675 SE=0.04720 t=  -0.73 p=0.4644  not detectable
+   E1_replicate_plate_stage11               sd_d=0.05134 SE=0.03631 t=  -0.95 p=0.3415  not detectable
+   E1_replicate_plate_band                  sd_d=0.08082 SE=0.05715 t=  -0.60 p=0.5457  not detectable
+   E2_within_dup_all                        sd_d=0.05398 SE=0.03817 t=  -0.91 p=0.3656  not detectable
+   E2_within_dup_0.75_1                     sd_d=0.04907 SE=0.03470 t=  -0.99 p=0.3196  not detectable
+   E2_within_dup_band                       sd_d=0.07522 SE=0.05319 t=  -0.65 p=0.5161  not detectable
+   E3_adjacent_control_columns              sd_d=0.07197 SE=0.05089 t=  -0.68 p=0.4974  not detectable
+   E4_poisson_floor                         sd_d=0.00522 SE=0.00369 t=  -9.36 p=0  DETECTABLE
+
+READOUT CROSS-CHECK (raw-count contrast vs Viability contrast)
+cell     plate  d_viability  d_raw_span      diff  hc_minus_lc
+A673 Plate 157     0.303136    0.312533 -0.009397   49271.6250
+A673 Plate 158     0.251816    0.255080 -0.003264   48655.3750
+  BJ Plate 147    -0.020518   -0.005905 -0.014613   59946.5625
+  BJ Plate 148    -0.048552   -0.064161  0.015609   63807.7500
+      d_viability  d_raw_span      diff
+cell                                   
+A673     0.277476    0.283806 -0.006330
+BJ      -0.034535   -0.035033  0.000498
+
+CONCLUSION {
+ "A673": {
+  "dbar": 0.277476,
+  "all_estimators_detectable": true,
+  "no_estimator_detectable": false,
+  "n_detectable": 11,
+  "n_estimators": 11,
+  "dbar_over_primary_sd_contrast": 4.68
+ },
+ "BJ": {
+  "dbar": -0.034535,
+  "all_estimators_detectable": false,
+  "no_estimator_detectable": false,
+  "n_detectable": 1,
+  "n_estimators": 11,
+  "dbar_over_primary_sd_contrast": -0.58
+ }
+}

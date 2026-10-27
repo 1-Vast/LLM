@@ -1,0 +1,49 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r107",
+  "round": "R107 (goal round 105/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Five independent random streams to quantify the instability between R101 and R106."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r107": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round spends its budget on the one number that makes every prior estimate quotable, and records a repeated gate-design error.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e107_streams.py"], "runs": 1, "streams": 5, "splits_per_stream": 40,
+    "random_blocks": 8, "pools": 3, "rows": 1200, "ridge_fits": 2000,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E107_RESULTS.json", "rows": "E107_rows.csv", "protocol": "PROTOCOL_E102.md"},
+  "between_stream": {
+    "one_unseen": {"mean": 0.0492, "sd": 0.0208, "min": 0.0312, "max": 0.0775, "n_significant": 4},
+    "cell_unseen": {"mean": 0.0303, "sd": 0.0144, "min": 0.0087, "max": 0.0450, "n_significant": 4},
+    "both_unseen": {"mean": 0.0185, "sd": 0.0083, "min": 0.0063, "max": 0.0262, "n_significant": 3}
+  },
+  "decisions": {"H277_robust_sig_in_4_of_5": false,
+                "H278_fragile_sig_in_2_or_fewer": false,
+                "significant_streams_per_pool": [4, 4, 3],
+                "verdict": "direction_robust_magnitude_variable_significance_pool_dependent"},
+  "the_most_informative_number": {
+    "positive_in_every_stream_and_pool": true,
+    "count": "15/15 positive",
+    "reading": "the sign never flips; what varies is magnitude (sd 0.83 to 2.08 pp) and whether a given run reaches significance, which depends on pool size"},
+  "explains_the_R101_R106_gap": {
+    "cell_unseen_mean": 0.0303, "sd": 0.0144, "R101": 0.0287, "R106": 0.0033,
+    "reading": "both sit within one sd of the same distribution, so the discrepancy is sampling variation rather than contradiction"},
+  "my_gate_was_too_strict_again": "H277 demanded 4 of 5 streams be significant in every pool, which the both-unseen pool of about 1,830 keys cannot be expected to meet; this is the third instance of a per-pool gate that punishes the smallest pool",
+  "quotable_numbers": "quote the stream means with their sd (one_unseen +4.92 +/- 2.08, cell_unseen +3.03 +/- 1.44, both_unseen +1.85 +/- 0.83 pp); do not quote single-run magnitudes such as +5.37 or +0.33 as precise",
+  "limits": ["five streams reveal spread but cannot estimate the distribution",
+             "the three pools share a training set within a stream",
+             "only eight capacity blocks per split versus R101's ten",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["replace the single-run magnitudes in the register and synthesis with these stream-level estimates"],
+  "register_updates": {"C80": "new: the direction is robust, the magnitude and significance are not fixed",
+                       "SYNTHESIS": "quotable numbers refined"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C80 added)",
+                                "research/SYNTHESIS.md (quotable numbers refined)", "research/INDEX.md (added R107 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

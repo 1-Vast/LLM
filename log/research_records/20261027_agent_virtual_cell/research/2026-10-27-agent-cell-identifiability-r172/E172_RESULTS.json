@@ -1,0 +1,84 @@
+{
+  "kind": "obtain_the_candidate_third_arenas_and_check_whether_they_can_support_the_claim",
+  "round": "R172",
+  "date": "2026-10-27",
+  "reachability": {
+    "endpoint": "https://zenodo.org/api/records/12764821",
+    "method": "Invoke-WebRequest HEAD",
+    "status": 200,
+    "note": "this contradicts my earlier generalisation from C58 that the network was unreachable; that finding applied to the web_fetch tool, and I had over-extended it"
+  },
+  "downloads": {
+    "nci_almanac.screen.h5": {
+      "bytes": 15028403,
+      "sha256": "97B3E5A6428FE54DEC6C42264EF7CAF425DE7FCF5DBDD2147FB2EA64C2719C01"
+    },
+    "merck_2016.screen.h5": {
+      "bytes": 2957309,
+      "sha256": "ACC892180D481E01C5AF42F5CC59E5A8B56BAAED0677874FC2B50F31235DE9C6"
+    },
+    "gdsc_sq.screen.h5": {
+      "bytes": 19750480,
+      "sha256": "17F82FAA65D95EC557A03A5113EB3834263448B34F2EB14FAE2F84CAE71FEEFE"
+    }
+  },
+  "new_download_this_round": true,
+  "survey": {
+    "nci_almanac": {
+      "treatments": 837,
+      "samples": 60,
+      "rows": 3686475,
+      "obs_mean": 0.8565,
+      "obs_median": 0.9592,
+      "real_drug_names": false
+    },
+    "merck_2016": {
+      "treatments": 447,
+      "samples": 39,
+      "rows": 385584,
+      "obs_mean": 0.5429,
+      "obs_median": 0.5579,
+      "real_drug_names": false
+    },
+    "gdsc_sq": {
+      "treatments": 554,
+      "samples": 126,
+      "rows": 3648018,
+      "obs_mean": 0.7086,
+      "obs_median": 0.7857,
+      "real_drug_names": false
+    }
+  },
+  "the_decisive_fact": {
+    "what": "all three files carry integer codes in treatment_mapping_names and sample_mapping_names, and contain no annotation fields at all",
+    "examples": "treatment names read as ['-1','0','0','0','0','0'] and sample names as ['0','1','10','11',...]",
+    "so": "there is no drug identity to attach a pathway label to, hence the pathway claim cannot be tested on any of them regardless of readout quality"
+  },
+  "even_the_best_readout_is_unusable": {
+    "screen": "merck_2016",
+    "obs_mean": 0.5429,
+    "reading": "its readout is not saturated, which was the failure mode of PAIR. But without knowing which drugs were tested, the annotation cannot be attached and the claim still cannot be tested."
+  },
+  "the_two_data_surfaces_have_complementary_defects": {
+    "zenodo_screens": "readout present, drug identity absent",
+    "batchie_pair": "drug identity present (Drug 1 / Drug 2 are real names), pathway annotation never obtained",
+    "so": "no single arena has all three of a usable readout, drug identity, and annotation"
+  },
+  "this_upgrades_the_block": {
+    "before": "there might be a third arena in files not yet downloaded",
+    "now": "the three candidate files were obtained and surveyed; all lack drug identity, so the unfreeze condition fails on verified data content rather than on access",
+    "significance": "this is a real exclusion rather than another note"
+  },
+  "limits": [
+    "Structure survey only; no model was fitted and no transfer was attempted.",
+    "Whether the integer ids can be mapped back to real names via the BATCHIE paper or repository was not checked.",
+    "Downloads are new this round and are declared; sealed data untouched.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "decisions": {
+    "H408_usable_arena_found": false,
+    "H409_all_lack_identity_or_readout": true,
+    "verdict": "all_three_candidate_arenas_arrived_and_none_carries_drug_identity_so_the_claim_cannot_be_tested_on_them"
+  },
+  "next_gate": "check whether the BATCHIE paper or repository publishes a treatment-id to real-name mapping; merck_2016 is unsaturated and would become usable if it does"
+}

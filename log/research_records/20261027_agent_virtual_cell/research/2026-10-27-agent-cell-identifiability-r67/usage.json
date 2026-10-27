@@ -1,0 +1,49 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r67",
+  "round": "R67 (goal round 65/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Small-pool robustness of the R66 weak-signal decision gain."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r67": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round reports that the fixed-k sequence is confounded by relative depth and that only the fixed-depth column is a clean comparison.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e067_small_pool.py"], "runs": 1, "repeats": 40, "pool_sizes": 4,
+    "budget_definitions": 2, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E067_RESULTS.json", "rows": "E067_rows.csv", "protocol": "PROTOCOL_E065.md"},
+  "design": {
+    "construction": "as in R66: 20% of drugs held out, training uses only both-seen combinations",
+    "pool_sizes": [200, 500, 2000, "all(~20278)"],
+    "budgets": ["fixed k=20", "fixed 5% relative depth"]
+  },
+  "results": {
+    "abs_k20_gain": {"200": 0.0212, "500": 0.0400, "2000": 0.0563, "all": 0.0300},
+    "abs_k20_ci": {"200": [0.0100, 0.0325], "500": [0.0250, 0.0563]},
+    "rel5_gain": {"200": 0.0500, "500": 0.0604, "2000": 0.0420, "all": 0.0426},
+    "rel5_ci": {"200": [0.0250, 0.0800], "500": [0.0375, 0.0854], "2000": [0.0305, 0.0535], "all": [0.0367, 0.0486]}
+  },
+  "decisions": {"H168_gain_survives_small_pools": true,
+                "H169_gain_non_increasing_with_size": false,
+                "H170_relative_depth_holds": true,
+                "verdict": "weak_signal_decision_value_is_pool_robust"},
+  "reading": "the fixed-k column is confounded because k=20 is a 10% cut at S=200 and a 0.1% cut at S=20278; at a fixed 5% depth the gain is essentially flat at +4.2 to +6.0 pp across a 100-fold pool range",
+  "contrast_established": {
+    "ranking_value_C27_C41": "insensitive to pool size (flat across 100x at fixed depth)",
+    "uncertainty_bonus_C28_C36": "sensitive to pool size (R49: -2.55 pp at S=2000 rising to +2.90 pp at S=21652)",
+    "implication": "a ranking signal is worth using even in a small pool, whereas an uncertainty bonus must first be checked against pool size"
+  },
+  "limits": ["subsampling changes pool composition; a 200-key pool may contain very few distinct drug pairs",
+             "at S=200 a fixed k=20 is a 10% cut, so the H169 non-monotonicity is an artefact of the budget definition, not a finding",
+             "still a drug-level holdout with overlapping cells",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "register_updates": {"C42": "new, exploratory: ranking value is pool-size robust whereas the uncertainty bonus is not"},
+  "next_gates": ["hold out cells and drugs jointly to see how much of the gain survives when neither is seen"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C42 added)", "research/INDEX.md (added R67 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

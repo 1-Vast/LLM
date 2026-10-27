@@ -1,0 +1,53 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r128",
+  "round": "R128 (goal round 126/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Read-only audit of the four verification items the objective names: drug-by-cell cross, target engagement, independent endpoints, replication."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r128": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round measures resource facts that had been treated as premises and finds two of them unmet.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6, scipy 1.17.1",
+    "scripts": ["e128_resource_audit.py"], "runs": 2, "gdsc_keys": 108259,
+    "pair_observations": 58828, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E128_RESULTS.json", "protocol": "PROTOCOL_E120.md"},
+  "the_four_items": {
+    "drug_by_cell_cross": {"verdict": "partial", "observed": 108259, "full": 253125, "coverage": 0.4277,
+      "imbalance": "keys per cell 288 to 1275, cells per combo 28 to 124",
+      "consequence": "claims aggregated across cells inherit this pattern"},
+    "target_engagement": {"verdict": "unmet", "levels": {"anchor": 40, "library": 58},
+      "detail": "annotation only, no binding or occupancy measurement"},
+    "genetic_perturbation": {"verdict": "absent", "detail": "no CRISPR or RNAi data on this machine"},
+    "independent_endpoints": {"verdict": "unmet", "median_abs_rho": 0.893, "range": [0.806, 0.967],
+      "detail": "the four delta metrics are four scalings of one viability readout"},
+    "replication": {"verdict": "unmet", "replicated": 1788, "observations": 58828, "frac": 0.0304}
+  },
+  "decisions": {"H318_cross_is_sparse": false, "H319_metrics_not_independent": true,
+                "H320_replication_low": true,
+                "verdict": "two_of_the_four_verification_items_are_unmet_and_the_two_criteria_were_never_independent"},
+  "the_self_implication": {
+    "problem": "many rounds describe results as passing on two criteria, the boolean flag and the delta EMAX quartile, but those correlate at about 0.83",
+    "effect": "phrases like '2 of 3 criteria' overstate the evidence, since the second criterion adds little beyond the first",
+    "what_still_holds": "the frozen claim rests on one criterion plus controls that are independent of criterion choice (random block, permuted mapping, dead-block zero), so it is not weakened",
+    "going_forward": "report one criterion and its controls instead of counting criteria as replications"},
+  "what_this_resource_cannot_answer": {
+    "independent_functional_endpoints": "no second readout exists",
+    "target_engagement": "annotation only",
+    "reproducibility": "only for the three percent of observations measured twice",
+    "what_it_can_answer": "decision value inside the dataset, which is exactly the frozen claim"},
+  "limits": ["covers only the two resources on this machine",
+             "coverage structure examined at tissue and combo level only",
+             "the metric correlation is statistical; it does not prove biological identity, but it does rule out treating them as independent checks",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["rewrite every '2 of 3 criteria' phrasing in the synthesis and register as redundancy at rho of 0.83, not replication"],
+  "register_updates": {"C98": "new: the resource facts and the criterion-redundancy finding"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C98 added)",
+                                "research/SYNTHESIS.md (two rows added)", "research/INDEX.md (added R128 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r69",
+  "round": "R69 (goal round 67/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Consolidation update of SYNTHESIS.md to absorb C41/C42/C43; no new computation."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r69": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round reclassifies the algorithm into two components and revises the promotion verdict accordingly.",
+  "compute": {"runs": 0, "data_downloads": 0, "wet_lab_experiments": 0},
+  "artifacts": {"synthesis": "research/SYNTHESIS.md",
+                "record": "research/2026-10-27-agent-cell-identifiability-r69/record.md",
+                "report": "research/2026-10-27-agent-cell-identifiability-r69/report.md"},
+  "core_change": {
+    "before": "the algorithm was presented as one chain whose rules had all failed to promote",
+    "after": "the algorithm splits into A (ranking, no threshold, robust in six settings) and B (uncertainty bonus, needs an in-place threshold, fragile in three independent ways)",
+    "why_it_matters": "the previous synthesis read ten rounds of threshold failures as invalidating the whole algorithm; those failures all live in B"
+  },
+  "new_evidence_absorbed": {
+    "C41": "ranking still has decision value on unseen drugs (+3.50 pp at k=20), so R2=0.029 does not mean worthless",
+    "C42": "ranking value is pool-size robust (+4.2 to +6.0 pp flat across a 100-fold pool range at fixed depth), unlike the uncertainty bonus",
+    "C43": "transfer boundary along joint novelty: unseen cell +6.88, unseen drug +5.00, both +4.00, strict +1.18 (CI includes 0, underpowered)"
+  },
+  "promotion_verdict_revised": {
+    "A_ranking": "promotable, but only as a baseline - it has no threshold and any off-the-shelf predictor does the same thing, so promotable is not the same as novel",
+    "B_uncertainty": "not promotable - does not transfer across populations (C38), in-place estimation is at chance (C39), harmful at small pools (C28)"
+  },
+  "decisions": {"H174_old_synthesis_consistent_with_new_evidence": false,
+                "H175_consistent_after_split": true},
+  "unchanged_sections": ["3 refuted list (11 claims)", "4 untestable (5 classes)",
+                          "5 meta-learning/RSI still not attempted", "6 stop list"],
+  "limits": ["this is a reclassification, not a new experiment; any numerical error remains the responsibility of the original round",
+             "C41/C42/C43 are still exploratory (single dataset, retrospective, no independent batch), so 'A promotable' means 'fit for research code', not production ready",
+             "the C2 numeric issue from R65 (C40) is untouched",
+             "retrospective and read-only; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["if A is to become research code, the minimum is a rank_by_prediction function plus a test that reproduces C27/C41/C42 on a held-out pool - and it must be labelled a baseline, not a contribution"],
+  "mutations_outside_episode": ["research/SYNTHESIS.md (sections 0-2, 7, 8, 9 rewritten)", "research/EVIDENCE_REGISTER.md (pointer updated)",
+                                "research/INDEX.md (added R69 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

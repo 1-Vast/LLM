@@ -1,0 +1,114 @@
+{
+  "agent_role": "annotation-mapping-and-coverage-auditor",
+  "audit_line": "R191-PA",
+  "task_id": "task-7",
+  "date": "2026-10-27",
+  "environment": {
+    "os": "Windows (PowerShell pwsh)",
+    "workspace": "D:\\MAESTRO",
+    "output_dir": "research/2026-10-27-drugcomb-annotation",
+    "python": "D:\\anaconda\\envs\\maestro\\python.exe (Python 3.11.16)",
+    "packages": {
+      "pandas": "2.3.3",
+      "numpy": "2.4.6",
+      "scipy": "1.17.1"
+    }
+  },
+  "protocol": {
+    "file": "PROTOCOL_PA.md",
+    "version": "v2",
+    "frozen_at": "2026-10-27T14:07:51+08:00",
+    "frozen_before_pa_py_existed": true,
+    "sha256": "16c40f9f61765637185bd061b1aeb4e62886bdfa027b8baf509830775bae607d",
+    "note": "v1 written 14:06:31; v2 written 14:07:51 after Lead's pre-run amendment (rule A/B + hypergeometric z + deterministic switch + tokenisation); no threshold value changed after either freeze"
+  },
+  "runs": [
+    {
+      "command": "python pa.py",
+      "purpose": "offline deterministic mapping + coverage audit (implements PROTOCOL_PA.md v2)",
+      "wall_seconds": 20.98,
+      "wall_seconds_range": [20.98, 44.1],
+      "status": "ok",
+      "notes": "first successful run after 2 implementation-bug fixes (array-valued hypergeometric sd comparison; missing zmax assignment); no product was written by the failed run"
+    },
+    {
+      "command": "python pa.py (repeat runs for determinism)",
+      "purpose": "determinism verification",
+      "runs": 9,
+      "status": "ok",
+      "notes": "pa.json / mapping_table.csv / mapping_table_rules_AB.csv SHA256 identical across repeated runs of the same script version (checked at each of 4 script revisions)"
+    }
+  ],
+  "downloads": {
+    "formal_total_bytes": 148696,
+    "formal_total_kb": 145.2,
+    "budget_mb": 50,
+    "files": {
+      "c2.cp.kegg.v2023.1.Hs.symbols.gmt": {
+        "bytes": 100047,
+        "url": "https://data.broadinstitute.org/gsea-msigdb/msigdb/release/2023.1.Hs/c2.cp.kegg.v2023.1.Hs.symbols.gmt",
+        "sha256": "48de51190366ee388dffe34fa2931e590de43ee5e2a4c27c50c0fc33b9d194fc",
+        "version": "MSigDB release 2023.1.Hs, c2.cp.kegg (KEGG legacy gene sets, symbols), 186 sets"
+      },
+      "h.all.v2023.1.Hs.symbols.gmt": {
+        "bytes": 48649,
+        "url": "https://data.broadinstitute.org/gsea-msigdb/msigdb/release/2023.1.Hs/h.all.v2023.1.Hs.symbols.gmt",
+        "sha256": "27e48f776cda235ad5b63acaecc3136853ee79c6447d883ce2b070a4d2d47b75",
+        "version": "MSigDB release 2023.1.Hs, h.all (Hallmark, symbols), 50 sets"
+      }
+    }
+  },
+  "tokens": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "total_tokens": null,
+    "note": "runtime token accounting is not available to the agent; recorded as null (not 0)"
+  },
+  "cost": {
+    "usd": null,
+    "note": "not available; recorded as null"
+  },
+  "verdict": "mapping_qualified",
+  "primary_strategy": {
+    "library": "S1 (KEGG, 186 gene sets)",
+    "rule": "A (raw argmax |T_j intersect P|, ties by pathway name)",
+    "switch_decision": "rule A retained for all three libraries (max single-level share 9.39-13.12% < 40%; analyzable levels 42-74 >= 12)"
+  },
+  "key_numbers": {
+    "analysis_universe_U": 4088,
+    "analysis_universe_D1_after_C155_collision_removal": 4076,
+    "mapped_drugs": 1418,
+    "coverage_pct_of_4088": 34.6869,
+    "analyzable_levels_pa_split": 62,
+    "analyzable_levels_e1_split": 63,
+    "both_unseen_annotated_units_pa_split": 2682,
+    "both_unseen_annotated_units_e1_split": 3739,
+    "both_unseen_units_r030": 6411,
+    "both_unseen_units_r040": 13795,
+    "training_annotated_units": 85436,
+    "strict_training_annotated_units": 58788,
+    "levels_total": 123,
+    "tie_rate_ruleA": 60.9309,
+    "single_gene_hit_rate_ruleA": 52.3272,
+    "mapped_drugs_source_only_I2_target_name": 95,
+    "mapped_drugs_source_only_I3_DRH_target": 1175,
+    "mapped_drugs_source_both": 148,
+    "tokenisation_T0_to_T1_lost_mappings": 0,
+    "e1_crosscheck_all_match": true
+  },
+  "deliverables": {
+    "PROTOCOL_PA.md": "16c40f9f61765637185bd061b1aeb4e62886bdfa027b8baf509830775bae607d",
+    "pa.py": "25e64208a95b0c92b126823020e361ad208e517eef95c4f093f6be835ff470f3",
+    "pa.json": "f5559d26a86679bd7be77ffd00fc5c4195be50eb611e8677a87434fb842c9fa3",
+    "mapping_table.csv": "45ede63521dc44fefec52d717765b4d2ba7d08ec3fde4372811c4d516de038d4",
+    "mapping_table_rules_AB.csv": "96f1f51be78f970c28bb6409d240db99e4a568dea7a9b1a2144414c5329db87c",
+    "report.md": "1b3f0f087d0881357d13a759d7d69b1dc754a24f5c32a6f3015218def90c8e68",
+    "record.md": "4afe7fce8fb232dcffbc806f0ba7ae1257649f873d9ec732544755cefc62b559"
+  },
+  "notes": [
+    "DrugComb response values were never read: v1.4 parsed with csv.reader and positional access to identity columns only; the 12 response/derived columns appear solely as header-name strings",
+    "coverage is a conservative lower bound by design: no synonym/alias inference (e.g. 5-FU), no protein-name -> gene-symbol mapping, C155 collision keys removed",
+    "rule A labels are gene-set co-membership, not mechanism; 60.93% of mapped drugs have a tie at argmax and 52.33% rest on a single gene symbol -- interpretation constraints are listed in report.md section 11",
+    "all hash values are SHA256 unless a name says otherwise"
+  ]
+}

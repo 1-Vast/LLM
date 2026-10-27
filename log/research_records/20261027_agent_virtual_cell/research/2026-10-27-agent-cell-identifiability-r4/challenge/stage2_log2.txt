@@ -1,0 +1,45 @@
+==============================================================================
+I. THE AMENDMENT'S FACTUAL COUNTS
+total files in archive                = 371
+files containing high control rows    = 371
+distribution of high controls/file    = {16: 231, 24: 6, 32: 120, 64: 14}
+files with exactly 16 high controls   = 231   [amendment says '462 files']
+high-control rows = 8576, low-control rows = 8576, sum = 17152  [audit n_anchor_rows=17152]
+pairs with both wells high control    = 117120
+pairs with both wells low control     = 117120
+total both-anchor pairs               = 234240   [amendment says '~5.5e4']
+share of all naive pairs (233696)     = 1.0023  [audit 0.9625]
+naive pairs n=233696; |d| median=0.000333 MAD-SD=0.000493 |d| q90=0.037996
+   [amendment: median 0.0003, MAD-SD 0.0003, q90 0.0380]
+   inside anchor blocks: exact-zero share = 0.4376   [amendment: 99%]
+
+==============================================================================
+J. sigma_b THE CORRECT WAY (between-file-pair variance of the MEAN delta, Viability basis)
+file pairs used = 116  median wells/pair = 237
+mean |plate offset|                    = 0.01139   [audit mean_abs_plate_offset 0.011578]
+SD of the MEAN delta across file pairs = 0.01601  -> sigma_b = 0.01132
+mean WITHIN-pair SD across wells       = 0.05559   [audit 0.055830]
+   author's var_b = -0.000116 -> reported sigma_b = 0.0
+   the offset is one constant per file pair, so it is invisible to a variance taken across WELLS;
+   the reported sigma_b = 0 is a structural artefact of the formula, not evidence of no offset.
+   cross-check Var(mean delta) = 2*sigma_b^2 + 2*sigma_e^2/n = 0.000270 vs observed 0.000256
+
+==============================================================================
+K. IS THE TRUNCATION-FREE RAW-COUNT CONTRAST SD A SPATIAL-GRADIENT ARTEFACT?
+raw-count contrast SD, as measured        = 0.08968 (n=6424)
+raw-count contrast SD, row+col detrended  = 0.09467 (n=2594)
+   -> the gap between the Viability-based 0.0593 and the raw-based value is mostly a
+      row/column gradient in RAW counts that the published Viability has already removed.
+
+==============================================================================
+L. VERDICTS ACROSS THE WHOLE SPREAD OF DEFENSIBLE SD(CONTRAST)
+author level-matched sqrt2*0.040762            SD=0.05765 SE=0.04076 t(A673)= +6.81 t(BJ)= -0.85 -> A673 sig, BJ ns
+my direct adjacent-column (probe band)         SD=0.05929 SE=0.04193 t(A673)= +6.62 t(BJ)= -0.82 -> A673 sig, BJ ns
+my direct adjacent-row                         SD=0.06641 SE=0.04696 t(A673)= +5.91 t(BJ)= -0.74 -> A673 sig, BJ ns
+truncation-free raw (upper bound)              SD=0.08968 SE=0.06341 t(A673)= +4.38 t(BJ)= -0.54 -> A673 sig, BJ ns
+truncation-free raw detrended                  SD=0.09467 SE=0.06694 t(A673)= +4.15 t(BJ)= -0.52 -> A673 sig, BJ ns
+author pooled all-levels sqrt2*0.044587        SD=0.06306 SE=0.04459 t(A673)= +6.22 t(BJ)= -0.77 -> A673 sig, BJ ns
+my level-mix sqrt(s(.63)^2+s(.93)^2)           SD=0.07161 SE=0.05064 t(A673)= +5.48 t(BJ)= -0.68 -> A673 sig, BJ ns
+my E2 duplicate band unclipped sqrt2*0.05319   SD=0.07522 SE=0.05319 t(A673)= +5.22 t(BJ)= -0.65 -> A673 sig, BJ ns
+
+A673 significant under 8/8; BJ significant under 0/8

@@ -1,0 +1,51 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r95",
+  "round": "R95 (goal round 93/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Audit of R94's identity-stability statistic before letting it into the synthesis."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r95": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round audits its own predecessor and retracts the interpretation rather than adding to it.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e095_identity_confound.py"], "runs": 2, "levels": 3, "masks": 20,
+    "key_bootstraps": 100, "units": 60, "bootstrap": 2000,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E095_RESULTS.json", "rows": "E095_rows.csv",
+                "h245_by_level": "E095_H245_BY_LEVEL.json", "protocol": "PROTOCOL_E090.md"},
+  "the_flaw_in_R94": "R94 compared top-5 sets across draws that used different masks, i.e. different available drugs, so the sets had to change; that measures input sensitivity, not ranking stability",
+  "results": {
+    "overlap_with_fixed_mask": {"1.00": 0.836, "0.36": 0.820, "0.16": 0.757},
+    "overlap_across_masks_R94_method": {"1.00": 0.948, "0.36": 0.201, "0.16": 0.067},
+    "fixed_minus_varying": {"1.00": {"diff": -0.112, "ci95": [-0.131, -0.094]},
+                            "0.36": {"diff": 0.620, "ci95": [0.566, 0.669]},
+                            "0.16": {"diff": 0.690, "ci95": [0.616, 0.761]}},
+    "hit_under_fixed_information": {"1.00": 0.1220, "0.36": 0.0949, "0.16": 0.0832}
+  },
+  "decisions": {"H243_reproducible_at_full_coverage": true,
+                "H244_low_coverage_reduces_reproducibility": false,
+                "H245_R94_identity_statistic_was_confounded": true,
+                "H245_note": "false at full coverage, where masks barely alter the leading drugs and R94's method is therefore optimistic; true at 36% and 16%, which is where the claim was made",
+                "verdict": "R94_identity_reading_must_be_retracted"},
+  "corrected_reading": {
+    "reproducibility_given_fixed_information": "top-5 overlap 0.836 / 0.820 / 0.757 at full, 36% and 16% coverage, with no significant decay",
+    "what_R94_measured": "the effect of changing which drugs are available, which is not irreproducibility",
+    "what_survives_from_R94": "the hit rate under fixed information still falls 12.20% -> 9.49% -> 8.32%, so the mild coverage cost stands"},
+  "methodological_lesson": "R93 and R94 make the same mistake: treating a quantity fixed by the construction as a finding. Before reporting any stability or sensitivity statistic, ask what else changed in that comparison.",
+  "limits": ["bootstrapping keys double-counts, so marginal variance is understated and the overlap rates are optimistic",
+             "only 20 masks per level",
+             "only 65 drugs and 2,025 combinations",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "register_updates": {"C68": "new correction: R94's irreproducibility reading is retracted",
+                       "C67": "annotated with the retraction",
+                       "SYNTHESIS": "the identity figure replaced with the corrected one"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C68 added, C67 annotated)",
+                                "research/SYNTHESIS.md (identity figure corrected)", "research/INDEX.md (added R95 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

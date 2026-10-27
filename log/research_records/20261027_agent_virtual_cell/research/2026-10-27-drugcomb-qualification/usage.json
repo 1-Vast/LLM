@@ -1,0 +1,77 @@
+{
+  "agent_role": "data-resource-qualification-auditor",
+  "audit_line": "R190-E1",
+  "task_id": "task-6",
+  "date": "2026-10-27",
+  "environment": {
+    "os": "Windows (PowerShell pwsh)",
+    "workspace": "D:\\MAESTRO",
+    "output_dir": "research/2026-10-27-drugcomb-qualification",
+    "python": "D:\\anaconda\\envs\\maestro\\python.exe (Python 3.11.16)",
+    "packages": {
+      "pandas": "2.3.3",
+      "numpy": "2.4.6",
+      "pypdf": "6.18.0",
+      "requests": "2.34.2",
+      "openpyxl": "3.1.5",
+      "pyarrow": "21.0.0"
+    }
+  },
+  "runs": [
+    {
+      "command": "python fetch_data.py",
+      "purpose": "deterministic retrieval: full v1.4 summary + v1.5 identifiers + EPMC supplementary + fixed 60x1MB byte-range sample of v1.5 summary",
+      "wall_seconds": 201.6,
+      "status": "ok",
+      "notes": "one transient Zenodo SSL UNEXPECTED_EOF on a range chunk; retried 3x with backoff, 60/60 chunks verified"
+    },
+    {
+      "command": "python e1.py",
+      "purpose": "offline deterministic audit (implements PROTOCOL_E1.md)",
+      "wall_seconds": 24.1,
+      "wall_seconds_range": [22.5, 27.2],
+      "status": "ok",
+      "notes": "e1.json SHA256 identical across repeated runs (2FD636D84E8BEC816BCC429B691D962ED90D4B07FFF88608DB99C2BB49219DDB)"
+    }
+  ],
+  "downloads": {
+    "formal_total_bytes": 260015829,
+    "formal_total_mb": 260.0,
+    "budget_mb": 300,
+    "files": {
+      "v1.4_summary_table": 193184734,
+      "v1.5_drug_identifiers": 5856350,
+      "v1.5_cell_line_identifiers": 161434,
+      "epmc_supplementary_pmc8218202": 813311,
+      "v1.5_summary_chunk_sample": 60000000,
+      "v1.5_summary_full_file_reported_bytes": 1421694989
+    },
+    "additional_aux_bytes": 208064,
+    "additional_aux_note": "two Europe PMC fullTextXML files in tmp/ (reported facts only; not inputs)",
+    "combined_mb": 260.2
+  },
+  "tokens": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "total_tokens": null,
+    "note": "runtime token accounting is not available to the agent; recorded as null (not 0)"
+  },
+  "cost": {
+    "usd": null,
+    "note": "not available; recorded as null"
+  },
+  "deliverables": {
+    "PROTOCOL_E1.md": "48f310028de08f3d11b634d9998ea20055d8a3de41dcf45afb6d347a61cca890",
+    "fetch_data.py": "3C39D6669B8AEF31925447929497F4873F83892F914CB4FFC5E6459215E45122",
+    "download_receipt.json": "8A9A52BA55890000DE1304A9E3C88D0E27D18C294B709493FDA6E6641AC69CF2",
+    "e1.py": "7684556DD766F0A0ADB0FEC030BCFE69177B99D30195863EF9F5C7FED5D2D916",
+    "e1.json": "2FD636D84E8BEC816BCC429B691D962ED90D4B07FFF88608DB99C2BB49219DDB",
+    "report.md": "EE35028A2FA85141A95B82E6403146671E9FF20E1E713B15EC20B4097F5FD798",
+    "verdict": "eligible_with_conditions"
+  },
+  "notes": [
+    "response values were never read/aggregated (identity/annotation/unit-string columns only)",
+    "v1.5 summary full file (1,421,694,989 B) exceeds the ~300 MB budget -> fixed 4.22% byte-range sample; file-level SHA256 null",
+    "all hash values are SHA256 unless a name says md5"
+  ]
+}

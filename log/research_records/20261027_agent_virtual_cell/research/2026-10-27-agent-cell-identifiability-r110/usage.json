@@ -1,0 +1,48 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r110",
+  "round": "R110 (goal round 108/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Higher-power rerun of the personalisation-penalty test on a strong prior."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r110": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round raises power on one question and reports a reproducible direction without a significant interval.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e110_highpower.py"], "runs": 1, "draws": 120, "units": 575,
+    "sanity_checks": 1150, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E110_RESULTS.json", "rows": "E110_rows.csv", "protocol": "PROTOCOL_E105.md"},
+  "sanity_gate": {"checks": 1150, "top_k_changed": 1150, "passed": true},
+  "results": {
+    "m10": {"marginal_gain": 0.0065, "combo_prior": 0.1100, "combo_pers": 0.1017, "combo_gain": -0.0083},
+    "m25": {"marginal_gain": 0.0026, "combo_prior": 0.1100, "combo_pers": 0.0965, "combo_gain": -0.0135},
+    "m50": {"marginal_gain": -0.0009, "combo_prior": 0.1113, "combo_pers": 0.0926, "combo_gain": -0.0187},
+    "m100": {"marginal_gain": 0.0052, "combo_prior": 0.1104, "combo_pers": 0.1065, "combo_gain": -0.0039},
+    "m200": {"marginal_gain": 0.0157, "combo_prior": 0.1117, "combo_pers": 0.1248, "combo_gain": 0.0130}
+  },
+  "decisions": {"H282_penalty_becomes_significant": false,
+                "H283_still_not_significant": true,
+                "verdict": "strong_prior_penalised_for_m_at_or_below_100_ambiguous_at_200"},
+  "two_round_consistency": {
+    "combo_gains_R109": [-0.0179, -0.0214, -0.0232, -0.0036, -0.0054],
+    "combo_gains_R110": [-0.0083, -0.0135, -0.0187, -0.0039, 0.0130],
+    "m_at_or_below_100": "negative in 8 of 8 round-by-m combinations",
+    "m_200": "the sign flips between rounds, so it is unresolved"},
+  "the_decision_rule_it_supports": "with a prior already reaching about 11%, correcting it with 100 or fewer of a cell's own measurements reliably makes it worse by 0.4 to 2.3 pp; 200 measurements may begin to help but that is not established",
+  "marginal_prior_shape": "gains of +0.65, +0.26, -0.09, +0.52, +1.57 are not monotone and no interval excludes zero, so R76's marginal threshold is neither reproduced nor refuted here",
+  "limits": ["only 12 cells, and the 120 draws sample them with replacement, so units are not independent and the CIs are optimistic; even so no threshold is significant",
+             "only five m values",
+             "per-drug residuals are noisy at small m, which is the mechanism behind the penalty",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["settle m=200 with a design that targets m in {150,200,300,400} on a larger cell sample"],
+  "register_updates": {"C83": "new: the strong prior is penalised for m at or below 100 across two rounds",
+                       "C82": "annotated", "SYNTHESIS": "row updated"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C83 added, C82 annotated)",
+                                "research/SYNTHESIS.md (row updated)", "research/INDEX.md (added R110 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

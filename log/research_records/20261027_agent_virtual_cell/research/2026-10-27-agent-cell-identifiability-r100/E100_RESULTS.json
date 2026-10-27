@@ -1,0 +1,137 @@
+{
+  "kind": "does_the_annotation_increment_replicate_across_pools_and_criteria",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "repeats": 30,
+    "blocks": 6,
+    "holdout": 0.2,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "identity_dims": 130,
+    "pathway_dims": 41,
+    "rows": 360
+  },
+  "by_criterion": {
+    "Synergy": {
+      "one_unseen": {
+        "n": 30,
+        "identity": 0.07333333333333333,
+        "identity_pathway": 0.12333333333333332,
+        "identity_random": 0.08833333333333333,
+        "pathway_minus_random": {
+          "n": 30,
+          "mean_diff": 0.034999999999999996,
+          "ci95": [
+            -0.005041666666666664,
+            0.075
+          ]
+        }
+      },
+      "cell_unseen": {
+        "n": 30,
+        "identity": 0.065,
+        "identity_pathway": 0.08833333333333333,
+        "identity_random": 0.06999999999999999,
+        "pathway_minus_random": {
+          "n": 30,
+          "mean_diff": 0.018333333333333333,
+          "ci95": [
+            -0.006666666666666667,
+            0.045000000000000005
+          ]
+        }
+      },
+      "both_unseen": {
+        "n": 30,
+        "identity": 0.018333333333333333,
+        "identity_pathway": 0.026666666666666675,
+        "identity_random": 0.016666666666666666,
+        "pathway_minus_random": {
+          "n": 30,
+          "mean_diff": 0.010000000000000002,
+          "ci95": [
+            -0.006666666666666667,
+            0.030000000000000006
+          ]
+        }
+      }
+    },
+    "SYNERGY_DELTA_EMAX": {
+      "one_unseen": {
+        "n": 30,
+        "identity": 0.6033333333333334,
+        "identity_pathway": 0.6033333333333334,
+        "identity_random": 0.59,
+        "pathway_minus_random": {
+          "n": 30,
+          "mean_diff": 0.013333333333333315,
+          "ci95": [
+            -0.07,
+            0.08837499999999977
+          ]
+        }
+      },
+      "cell_unseen": {
+        "n": 30,
+        "identity": 0.56,
+        "identity_pathway": 0.565,
+        "identity_random": 0.5616666666666666,
+        "pathway_minus_random": {
+          "n": 30,
+          "mean_diff": 0.003333333333333331,
+          "ci95": [
+            -0.04504166666666668,
+            0.051666666666666645
+          ]
+        }
+      },
+      "both_unseen": {
+        "n": 30,
+        "identity": 0.2416666666666667,
+        "identity_pathway": 0.31500000000000006,
+        "identity_random": 0.23500000000000001,
+        "pathway_minus_random": {
+          "n": 30,
+          "mean_diff": 0.08,
+          "ci95": [
+            -0.004999999999999993,
+            0.16670833333333313
+          ]
+        }
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r100/PROTOCOL_E095.md": "2f72292b889f701802da59d632a304120aef451eca3199a31691bc27540e39f7",
+    "research/2026-10-27-agent-cell-identifiability-r100/e100_replication.py": "32f934627ca92cf5769dfeeca53b209b72392a4f2d62897e7d9087fbaa75a654"
+  },
+  "decisions": {
+    "H257_replicates_across_pools": false,
+    "H258_replicates_on_second_criterion": false,
+    "H259_pool_specific": true,
+    "wins_primary": 0,
+    "wins_secondary": 0,
+    "verdict": "R99_refutation_withdrawn_status_is_positive_direction_not_established"
+  },
+  "limits": [
+    "The three pools share one training set, so they are not independent.",
+    "The both-unseen pool is small (about 1,830 keys) and has the least power.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "honest_reconciliation": {
+    "R99": "80 splits x 10 blocks -> pathway - random = +5.37 pp [2.94, 7.81], significant",
+    "R100": "30 splits x 6 blocks -> pathway - random = +3.50 pp [-0.50, 7.50] on the same pool, not significant",
+    "is_this_a_contradiction": "no - the point estimates are compatible (5.37 vs 3.50) and R100's interval is much wider (8.0 pp vs 4.9 pp) because it has less than half the power",
+    "but_it_is_a_failure_to_confirm": "the replication I demanded of myself did not confirm, so R99's word 'refuted' was premature and must be withdrawn"
+  },
+  "signal_that_survives": {
+    "direction": "all six contrasts (3 pools x 2 criteria) have a positive point estimate for pathway minus random",
+    "weak_inference": "a 6/6 sign pattern is weak evidence of a real positive effect, but the contrasts are not independent and significance was only reached in the highest-powered run",
+    "so": "the honest status is 'positive direction, not established' rather than either 'refuted as useless' or 'proven valuable'"
+  }
+}

@@ -84,6 +84,13 @@ Registered studies retain their protocols, results, deviations and replay code. 
 
 ## Changelog
 
+### 2026-10-27 - Agent and virtual-cell research sources
+
+- Integrate the R196v2/R197v2 inconclusive audits, R199/Q0 qualification stops, and the ON3 authorization/peek boundary in the maintained research report.
+- Preserve the recent research source lineage, negative results, amendments and independent reviews through exact source IDs; retain Chinese originals in the source layer and English maintained navigation.
+- Publish ten research directions and four conditional mechanism candidates. None is promoted to runtime or certified as a new algorithm, biological mechanism, transfer result, decision benefit or RSI.
+- Keep datasets, environments, protected outcomes, third-party full papers and author-code checkouts local. The source manifest enables knowledge recovery; complete experiment replay requires separately supplied assets.
+
 ### 2026-10-25 - Evidence and navigation review
 
 - Correct 14 main-chapter targets after reviewing all 39 registered studies.

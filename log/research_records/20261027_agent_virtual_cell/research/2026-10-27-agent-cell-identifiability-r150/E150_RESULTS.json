@@ -1,0 +1,74 @@
+{
+  "kind": "validate_the_near_degenerate_tier",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "seed": 20261053,
+    "ratio_threshold": 0.05,
+    "dominant_threshold": 0.95,
+    "dominant_train_below": 0.8
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 54145
+  },
+  "cases": {
+    "clean_design": {
+      "passed": true,
+      "expected": true,
+      "flags": []
+    },
+    "dead_code": {
+      "passed": false,
+      "expected": false,
+      "flags": [
+        "feature a_code: CONSTANT_ON_EVAL; UNSEEN_CODES 1.000",
+        "feature b_code: CONSTANT_ON_EVAL; UNSEEN_CODES 1.000"
+      ]
+    },
+    "near_degenerate": {
+      "passed": false,
+      "expected": false,
+      "flags": [
+        "feature ap_code: DOMINATED_ON_EVAL 0.990 (train 0.147)"
+      ]
+    },
+    "dominated": {
+      "passed": false,
+      "expected": false,
+      "flags": [
+        "feature lp_code: DOMINATED_ON_EVAL 0.960 (train 0.605)"
+      ]
+    }
+  },
+  "new_tier_flags": [
+    "near_degenerate -> feature ap_code: DOMINATED_ON_EVAL 0.990 (train 0.147)",
+    "dominated -> feature lp_code: DOMINATED_ON_EVAL 0.960 (train 0.605)"
+  ],
+  "decisions": {
+    "H366_new_tier_works_without_false_positives": true,
+    "H367_false_positive_or_miss": false,
+    "verdict": "the_dominance_branch_is_validated_the_ratio_branch_remains_untested"
+  },
+  "decisions_verdict": "the_near_degenerate_tier_fires_where_expected_and_leaves_the_clean_design_untouched",
+  "limits": [
+    "The two constructed cases are artificially injected and do not correspond to a real design seen here.",
+    "The 0.05 and 0.95 thresholds are chosen, not optimised; this round only shows they do not false-positive on the clean design.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r150/PROTOCOL_E140.md": "1b2aa307041674313baacc21590b57a4f5592bdb0522b0e2ba6977cdc04c3ee8",
+    "research/2026-10-27-agent-cell-identifiability-r150/e150_near_degenerate.py": "9942348d1cb6cb8dcce88b092ccb05f13f35036a36f2bdfba1173a637fbd316f",
+    "research/tools/feature_audit.py": "c065f5467c0cab7968018fd557ffcc1adc56d1be52373df7ff0d16084e77a524"
+  },
+  "one_of_the_two_new_branches_went_untested": {
+    "what_happened": "both constructed cases fired DOMINATED_ON_EVAL, not NEAR_DEGENERATE. Zeroing 99 percent of a column makes it dominated by the remaining value, so the dominance rule fires first and the ratio rule is never reached.",
+    "so": "the NEAR_DEGENERATE branch (evaluation dispersion below 5 percent of training dispersion) is implemented but not exercised by this round",
+    "what_would_exercise_it": "a column that keeps its spread but shrinks in scale, for example a continuous feature multiplied by 0.01 on the evaluation set",
+    "why_I_am_recording_it": "reporting the tier as validated would overstate what was tested; one branch of two remains untested"
+  },
+  "what_did_get_validated": {
+    "clean_design_passes": "no false positive on the R148-style design, which is the property that matters most since a noisy check would be ignored",
+    "dead_code_still_flagged": "the original tier still fires on the reserved-code case",
+    "dominance_rule_works": "flags at 0.990 against a training rate of 0.147, and at 0.960 against 0.605"
+  }
+}

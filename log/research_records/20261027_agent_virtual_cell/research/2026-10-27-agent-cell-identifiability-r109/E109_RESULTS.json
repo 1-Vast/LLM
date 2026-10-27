@@ -1,0 +1,181 @@
+{
+  "kind": "does_a_stronger_prior_raise_the_personalisation_bar_corrected",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "ms": [
+      10,
+      25,
+      50,
+      100,
+      200
+    ],
+    "draws": 30,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "units": 140,
+    "sanity_checks": 280,
+    "top_k_changed": 280,
+    "sanity_passed": true
+  },
+  "by_m": {
+    "10": {
+      "n": 28,
+      "marginal_prior": 0.08214285714285714,
+      "marginal_pers": 0.07678571428571428,
+      "combo_prior": 0.09642857142857142,
+      "combo_pers": 0.07857142857142858,
+      "marginal_gain": {
+        "n": 28,
+        "mean_diff": -0.005357142857142857,
+        "ci95": [
+          -0.025,
+          0.014285714285714282
+        ]
+      },
+      "combo_gain": {
+        "n": 28,
+        "mean_diff": -0.01785714285714286,
+        "ci95": [
+          -0.05178571428571429,
+          0.008928571428571428
+        ]
+      }
+    },
+    "25": {
+      "n": 28,
+      "marginal_prior": 0.0875,
+      "marginal_pers": 0.08035714285714286,
+      "combo_prior": 0.09642857142857142,
+      "combo_pers": 0.075,
+      "marginal_gain": {
+        "n": 28,
+        "mean_diff": -0.0071428571428571435,
+        "ci95": [
+          -0.03571428571428571,
+          0.021428571428571425
+        ]
+      },
+      "combo_gain": {
+        "n": 28,
+        "mean_diff": -0.021428571428571425,
+        "ci95": [
+          -0.06964285714285715,
+          0.017901785714285474
+        ]
+      }
+    },
+    "50": {
+      "n": 28,
+      "marginal_prior": 0.08392857142857142,
+      "marginal_pers": 0.08214285714285716,
+      "combo_prior": 0.09999999999999999,
+      "combo_pers": 0.0767857142857143,
+      "marginal_gain": {
+        "n": 28,
+        "mean_diff": -0.0017857142857142883,
+        "ci95": [
+          -0.03571428571428572,
+          0.03571428571428571
+        ]
+      },
+      "combo_gain": {
+        "n": 28,
+        "mean_diff": -0.02321428571428571,
+        "ci95": [
+          -0.06964285714285715,
+          0.014285714285714282
+        ]
+      }
+    },
+    "100": {
+      "n": 28,
+      "marginal_prior": 0.09464285714285714,
+      "marginal_pers": 0.09821428571428571,
+      "combo_prior": 0.09999999999999999,
+      "combo_pers": 0.09642857142857143,
+      "marginal_gain": {
+        "n": 28,
+        "mean_diff": 0.003571428571428573,
+        "ci95": [
+          -0.03035714285714286,
+          0.03571428571428572
+        ]
+      },
+      "combo_gain": {
+        "n": 28,
+        "mean_diff": -0.0035714285714285687,
+        "ci95": [
+          -0.06607142857142857,
+          0.04821428571428571
+        ]
+      }
+    },
+    "200": {
+      "n": 28,
+      "marginal_prior": 0.08928571428571429,
+      "marginal_pers": 0.09642857142857143,
+      "combo_prior": 0.10357142857142858,
+      "combo_pers": 0.09821428571428571,
+      "marginal_gain": {
+        "n": 28,
+        "mean_diff": 0.00714285714285714,
+        "ci95": [
+          -0.02857142857142857,
+          0.0375
+        ]
+      },
+      "combo_gain": {
+        "n": 28,
+        "mean_diff": -0.005357142857142855,
+        "ci95": [
+          -0.05892857142857143,
+          0.03392857142857143
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r109/e109_prior_bar.py": "d0ace198f28190e92b472d454f7fc35182faa486982961d0a8e63f0f4c99c368"
+  },
+  "thresholds": {
+    "marginal": null,
+    "combo": null
+  },
+  "decisions": {
+    "sanity_passed": true,
+    "H279_bar_raised": false,
+    "H280_bar_lowered": false,
+    "H281_same": true,
+    "verdict": "stronger_prior_is_hurt_by_personalisation_at_every_m"
+  },
+  "limits": [
+    "Per-drug residuals from m measured keys are noisy for small m.",
+    "Only five m values and 30 draws, so thresholds are coarse and low-powered.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "the_real_finding": {
+    "combo_prior_negative_at_all_m": true,
+    "gains": {
+      "10": -0.0179,
+      "25": -0.0214,
+      "50": -0.0232,
+      "100": -0.0036,
+      "200": -0.0054
+    },
+    "marginal_gains": {
+      "10": -0.0054,
+      "25": -0.0071,
+      "50": -0.0018,
+      "100": 0.0036,
+      "200": 0.0071
+    },
+    "ratio_at_m50": "the combined prior is degraded 13 times as much as the marginal prior (-2.32 vs -0.18 pp)",
+    "reading": "the answer is not that the bar was raised but that there is no benefit at all at these sample sizes: a predictor that already reaches about 10% is pulled DOWN by 36 to 232 hundredths of a point when corrected with 200 or fewer of the cell's own measurements"
+  },
+  "relation_to_R76": "R76 found a threshold of about 5-8% of the pool for the marginal prior; this round's marginal gains at m=100 and 200 (+0.36 and +0.71 pp) point the same way but are not significant because this round has 30 draws against R76's 125 cells by 20 repeats, so R76 is not contradicted, only under-powered here",
+  "what_is_hard_here": "the combined prior's 5/5 negative direction is the firmest observation, though each individual CI contains zero"
+}

@@ -1,0 +1,100 @@
+==============================================================================
+A. PROBE RECONSTRUCTION (independent, to 4 dp)
+cell plate well        drug1  conc1        drug2  conc2 iteration        y
+A673   157   O1  Dexrazoxane    0.1     Axitinib    0.1        11 0.934329
+A673   157   O2 Lestaurtinib    0.1     Axitinib    0.1        11 0.631194
+A673   158   O1  Dexrazoxane    0.1     Axitinib    0.1        11 0.937061
+A673   158   O2 Lestaurtinib    0.1     Axitinib    0.1        11 0.685245
+  BJ   147  N22     Axitinib    0.1  Dexrazoxane    0.1        11 0.879078
+  BJ   147  O22     Axitinib    0.1 Lestaurtinib    0.1        11 0.899596
+  BJ   148  N22     Axitinib    0.1  Dexrazoxane    0.1        11 0.858444
+  BJ   148  O22     Axitinib    0.1 Lestaurtinib    0.1        11 0.906996
+max |y - y_author| over 8 wells = 0.00e+00
+cell plate      y_a      y_b         d   d_4dp
+A673   157 0.934329 0.631194  0.303136  0.3031
+A673   158 0.937061 0.685245  0.251816  0.2518
+  BJ   147 0.879078 0.899596 -0.020518 -0.0205
+  BJ   148 0.858444 0.906996 -0.048552 -0.0486
+drug pair identical across the two cells? True
+Drug1/Drug2 roles swapped between cells: True
+
+==============================================================================
+B. REPRODUCE THE AUDITED sigma_e
+naive (anchors in): n_pairs=233696 sigma_e=0.018023   [author 233696 / 0.018023]
+   exact-equal fraction=0.4293 [author 0.4293]
+corrected pooled: n_pairs=4883 n_files=140 sigma_e=0.044587  [author 4883 / 140 / 0.044587]
+corrected double-drug: n_pairs=1666 sigma_e=0.046111  [author 1666 / 0.046111]
+level-matched [0.75,1]: n=2453 sigma_e=0.040762  [author 2453 / 0.040762]
+level-matched double-drug: n=510 sigma_e=0.047953  [author 510 / 0.047953]
+   by level [0,.25): n=  667 sigma_e=0.028983
+   by level [.25,.5): n=  789 sigma_e=0.045352
+   by level [.5,.75): n=  974 sigma_e=0.058878
+   by level [.75,1]: n= 2453 sigma_e=0.040762
+
+SAME window [0.75,1] but KEEPING clipped wells: n=6316 sigma_e=0.034894  (drop-clipped value 0.040762)
+   of those, both wells at exactly 1.0: 0.2994
+
+==============================================================================
+C. WHICH PLATE FORMATS SUPPLY THE DUPLICATES
+fmt
+primary/validation (Plate N_...)     3009
+Batchie Project_Validation (xlsx)    1874
+iteration of each supplying file (top): {'validation (ews hits, round 15)': 1874, 'validation (osteo hits, round 15)': 1521, 'validation (round 10)': 1048, 'validation (ews ex vivo hits, round 15)': 440}
+probe files' iteration = {'11'}; duplicate files' iterations = ['validation (ews ex vivo hits, round 15)', 'validation (ews hits, round 15)', 'validation (osteo hits, round 15)', 'validation (round 10)']
+do ANY duplicate pairs come from the 4 probe files? False
+
+==============================================================================
+D. TRUNCATION-FREE NOISE FROM RAW COUNTS (replicate plates)
+raw-count adjacent-column contrast pairs in band 0.55-0.95: n=6424
+   SD of contrast (truncation-free) = 0.08968; sigma_equiv = 0.06341
+   Var(d) = 0.008042
+   (raw counts are never clipped, so this number contains no truncation artefact at all)
+
+==============================================================================
+E. IS sigma_b ESTIMABLE BY THE AUDITED N2 FORMULA?
+mean within-file-pair SD of delta across wells = 0.06236   [author 0.055830]
+author: var_b = sd_within^2/2 - sigma_e^2 = +0.000283 -> clipped to 0
+   sqrt(2)*sigma_e_primary = 0.05765, i.e. the two terms are the same quantity up to noise;
+   the plate offset is a CONSTANT inside a file pair, so it cannot enter a variance taken ACROSS wells.
+correct route: SD across file pairs of the MEAN delta = 0.06370 -> sigma_b = 0.04505; mean|offset| = 0.02711  [author mean_abs_plate_offset 0.011578]
+
+==============================================================================
+F. LEVEL MIX: the A673 pair, at 0.63 and 0.93, is NOT inside the [0.75,1] window
+   sigma_e[0,.25) = 0.02898
+   sigma_e[.25,.5) = 0.04535
+   sigma_e[.5,.75) = 0.05888
+   sigma_e[.75,1] = 0.04076
+A673 wells sit one in [.5,.75) (0.631) and one in [.75,1] (0.934):
+   sqrt(sigma_e(.63)^2 + sigma_e(.93)^2) = 0.07161  vs author's sqrt(2)*sigma_e_primary = 0.05765
+BJ wells both in [.75,1] (0.86-0.91): level-matched window is the right window for BJ.
+
+==============================================================================
+G. DIFFERENCE OF DIFFERENCES  (does the ORDER DIFFER between contexts?)
+d_A673 - d_BJ = 0.31201; SE under author's sigma = 0.05765; t = 5.41; p = 6.21e-08
+                     SE under my direct estimates (adj col / adj row) = 0.06295; t = 4.96; p = 7.18e-07
+   NB this establishes that the two contexts DIFFER, not that the sign reverses;
+   a reversal needs d_BJ < 0, which is the audited criterion.
+
+==============================================================================
+H. POWER / DETECTABILITY ARITHMETIC
+   K= 2 SE=0.04076 min|d|95%=0.07989 min|d|80%1sided=0.10135
+   K= 3 SE=0.03328 min|d|95%=0.06523 min|d|80%1sided=0.08275
+   K= 4 SE=0.02882 min|d|95%=0.05649 min|d|80%1sided=0.07167
+   K= 6 SE=0.02353 min|d|95%=0.04613 min|d|80%1sided=0.05852
+   K= 8 SE=0.02038 min|d|95%=0.03995 min|d|80%1sided=0.05068
+   K=12 SE=0.01664 min|d|95%=0.03262 min|d|80%1sided=0.04138
+   [author K=2: SE 0.040762, 95% 0.079891, 80% 0.101354]
+plates for BJ at 80% one-sided: 2*s^2*(ZA+ZB)^2/dB^2 = 17.226  [author 17.226]
+plates for BJ at 80% TWO-sided (consistent with the 1.96 criterion): 21.868
+plates for A673: 0.267  [author 0.2668]  <- below 1: 'fewer than one plate' is not a reportable quantity; the answer is 'already detected with K=2'
+min|d| needed with K=2 at 80% power one-sided: 0.10135; two-sided: 0.11420
+
+==============================================================================
+SUMMARY NUMBERS USED IN REVIEW.md
+  author sigma_e primary          = 0.040762
+  author implied SD(contrast)     = 0.05765
+  my direct SD(contrast) adj col  = 0.059293
+  my direct SD(contrast) adj row  = 0.066409
+  my truncation-free SD(contrast) = 0.08968
+  author t: A673 6.81  BJ -0.85
+  mine   : A673 6.62  BJ -0.74

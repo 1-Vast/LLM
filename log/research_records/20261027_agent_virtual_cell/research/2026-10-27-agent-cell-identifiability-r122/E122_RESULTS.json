@@ -1,0 +1,147 @@
+{
+  "kind": "powered_test_of_pathway_increment_on_both_unseen_dense_criterion",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "repeats": 200,
+    "holdout": 0.2,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261029
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 400,
+    "identity_dims": 130,
+    "pathway_dims": 38
+  },
+  "by_criterion": {
+    "dEMAX": {
+      "n": 200,
+      "identity": 0.2425,
+      "plus_pathway": 0.3245,
+      "plus_tissue": 0.29074999999999995,
+      "plus_random": 0.2545,
+      "pathway_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.08199999999999999,
+        "sd": 0.22282110813645054,
+        "ci95": [
+          0.050743750000000004,
+          0.11275
+        ]
+      },
+      "tissue_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.04825,
+        "sd": 0.15065831253428533,
+        "ci95": [
+          0.02775,
+          0.06925
+        ]
+      },
+      "random_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.012000000000000002,
+        "sd": 0.14108695063042137,
+        "ci95": [
+          -0.007999999999999998,
+          0.0325
+        ]
+      },
+      "mde_80pct": 0.0441478402986508
+    },
+    "Synergy": {
+      "n": 200,
+      "identity": 0.013000000000000003,
+      "plus_pathway": 0.018500000000000003,
+      "plus_tissue": 0.018250000000000002,
+      "plus_random": 0.009000000000000001,
+      "pathway_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.0055000000000000005,
+        "sd": 0.05155618489575257,
+        "ci95": [
+          -0.0012562500000000004,
+          0.0125
+        ]
+      },
+      "tissue_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.0052499999999999995,
+        "sd": 0.040535826947672576,
+        "ci95": [
+          -0.0004999999999999999,
+          0.010750000000000003
+        ]
+      },
+      "random_minus_identity": {
+        "n": 200,
+        "mean_diff": -0.004,
+        "sd": 0.03412951978277771,
+        "ci95": [
+          -0.0085,
+          0.0007562499999999663
+        ]
+      },
+      "mde_80pct": 0.010214894972120725
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r122/PROTOCOL_E115.md": "7f9e2a3324429bb2c5cfebad926031bf664b739c25c81645a78a71533563a201",
+    "research/2026-10-27-agent-cell-identifiability-r122/e122_powered.py": "983ca167d6c2ffe5324f31234d968e4a7ab3b7cdcc6dc2330dcbb1b68415798a"
+  },
+  "decisions": {
+    "H303_pathway_adds_on_this_cell": true,
+    "H304_pathway_adds_while_tissue_does_not": false,
+    "H305_no_increment": false,
+    "verdict": "pathway_annotation_adds_8.2pp_when_both_drugs_are_unseen_on_the_dense_criterion"
+  },
+  "limits": [
+    "A single pool and a single dense criterion; nothing here transfers to other settings.",
+    "The dense criterion is a quartile, not a clinical endpoint.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "the_h304_coding_error": {
+    "what_i_wrote": "h304 = h303 and tissue_minus_identity.ci95[1] > 0",
+    "why_it_is_wrong": "an upper bound above zero is true almost always, so the condition tested nothing; the intended condition was that tissue's interval contains zero, i.e. ci95[0] <= 0 <= ci95[1]",
+    "what_the_data_actually_show": "tissue also adds significantly, +4.83 pp [2.78, 6.93], so H304 would be FALSE even if coded correctly",
+    "class_of_error": "same class as the H264 criterion bug in R102, where a one-sided bound was checked instead of a two-sided containment",
+    "consequence_for_this_round": "none for the main result, because H303 does not depend on H304; but the wrong condition must not stand as if it had passed"
+  },
+  "the_corrected_reading": {
+    "dense_criterion_both_unseen": {
+      "identity": 0.2425,
+      "plus_pathway": 0.3245,
+      "plus_tissue": 0.2907,
+      "plus_random": 0.2545,
+      "pathway_gain": 0.082,
+      "pathway_ci95": [
+        0.0507,
+        0.1128
+      ],
+      "tissue_gain": 0.0483,
+      "tissue_ci95": [
+        0.0278,
+        0.0693
+      ],
+      "random_gain": 0.012,
+      "random_ci95": [
+        -0.008,
+        0.0325
+      ],
+      "mde_80pct": 0.0441,
+      "reading": "both blocks add beyond identity and neither is explained by capacity, since a matched random block adds nothing significant; pathway adds more than tissue, though the pathway-versus-tissue difference itself was not tested"
+    },
+    "sparse_criterion_both_unseen": {
+      "identity": 0.013,
+      "pathway_gain": 0.0055,
+      "pathway_ci95": [
+        -0.0013,
+        0.0125
+      ],
+      "mde_80pct": 0.0102,
+      "reading": "with identity at 1.30 percent and a minimum detectable effect of 1.02 pp, the whole outcome range is about one percentage point, so the sparse criterion cannot resolve this question at all; that, not the pathway block, is why R120 and R121 disagreed"
+    }
+  }
+}

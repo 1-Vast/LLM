@@ -1,0 +1,199 @@
+{
+  "kind": "three_pool_table_on_the_dense_criterion",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "repeats": 200,
+    "holdout": 0.2,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261030
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 600,
+    "identity_dims": 130,
+    "pathway_dims": 38
+  },
+  "by_pool": {
+    "one_unseen": {
+      "n": 200,
+      "identity": 0.5465000000000001,
+      "plus_pathway": 0.5545,
+      "plus_tissue": 0.57425,
+      "plus_random": 0.545,
+      "pathway_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.007999999999999995,
+        "sd": 0.22581176845742418,
+        "ci95": [
+          -0.02351250000000001,
+          0.038506249999999964
+        ]
+      },
+      "tissue_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.027749999999999993,
+        "sd": 0.17216457447314062,
+        "ci95": [
+          0.0037437499999999923,
+          0.05025624999999996
+        ]
+      },
+      "random_minus_identity": {
+        "n": 200,
+        "mean_diff": -0.0015000000000000091,
+        "sd": 0.14070086591184047,
+        "ci95": [
+          -0.021756250000000005,
+          0.01700624999999996
+        ]
+      },
+      "room": 0.2965000000000001,
+      "mde_80pct": 0.04474038377598152
+    },
+    "cell_unseen": {
+      "n": 200,
+      "identity": 0.5589999999999999,
+      "plus_pathway": 0.56675,
+      "plus_tissue": 0.5539999999999999,
+      "plus_random": 0.54,
+      "pathway_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.00775,
+        "sd": 0.15644427620654244,
+        "ci95": [
+          -0.015,
+          0.0285
+        ]
+      },
+      "tissue_minus_identity": {
+        "n": 200,
+        "mean_diff": -0.004999999999999994,
+        "sd": 0.1419533506784684,
+        "ci95": [
+          -0.024749999999999998,
+          0.014750000000000001
+        ]
+      },
+      "random_minus_identity": {
+        "n": 200,
+        "mean_diff": -0.019,
+        "sd": 0.14314837507436876,
+        "ci95": [
+          -0.03874999999999999,
+          0.0007499999999999973
+        ]
+      },
+      "room": 0.30899999999999994,
+      "mde_80pct": 0.030996510965087567
+    },
+    "both_unseen": {
+      "n": 200,
+      "identity": 0.25625,
+      "plus_pathway": 0.30324999999999996,
+      "plus_tissue": 0.28675,
+      "plus_random": 0.245,
+      "pathway_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.047,
+        "sd": 0.21569334271240795,
+        "ci95": [
+          0.0175,
+          0.07825624999999997
+        ]
+      },
+      "tissue_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.0305,
+        "sd": 0.1728267788202596,
+        "ci95": [
+          0.005749999999999998,
+          0.05424999999999999
+        ]
+      },
+      "random_minus_identity": {
+        "n": 200,
+        "mean_diff": -0.01125,
+        "sd": 0.14331305123144344,
+        "ci95": [
+          -0.030756250000000002,
+          0.008499999999999997
+        ]
+      },
+      "room": 0.006249999999999978,
+      "mde_80pct": 0.04273560672590429
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r123/PROTOCOL_E116.md": "c73665bd101446528d90a0d18883c176feb1c5d56d98f2b45f42e3351f87f215",
+    "research/2026-10-27-agent-cell-identifiability-r123/e123_three_pool.py": "e021cbe53fffcab1195ac5a9ccac524cd35bb5716116406a478aa97e3ea679c1"
+  },
+  "decisions": {
+    "pathway_significant_pools": [
+      "both_unseen"
+    ],
+    "H306_general_increment": false,
+    "H307_increment_only_when_both_unseen": true,
+    "H308_no_stable_increment": false,
+    "verdict": "pathway_adds_only_when_both_drugs_are_unseen_and_identity_is_at_chance"
+  },
+  "limits": [
+    "Dense criterion only; nothing here speaks to the sparse flag.",
+    "The both_unseen pool has the fewest keys.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "the_conditional_result": {
+    "statement": "the pathway annotation adds decision value only when both drugs are unseen, which is exactly the pool where drug identity sits at chance (25.62 percent against 25 percent)",
+    "evidence": {
+      "both_unseen": {
+        "pathway_gain": 0.047,
+        "ci95": [
+          0.0175,
+          0.0783
+        ],
+        "room": 0.0062
+      },
+      "one_unseen": {
+        "pathway_gain": 0.008,
+        "ci95": [
+          -0.0235,
+          0.0385
+        ],
+        "room": 0.2965
+      },
+      "cell_unseen": {
+        "pathway_gain": 0.0077,
+        "ci95": [
+          -0.015,
+          0.0285
+        ],
+        "room": 0.309
+      }
+    },
+    "cross_seed_magnitudes": {
+      "R122": 0.082,
+      "R123": 0.047,
+      "reading": "both significant and both confined to the same pool, but the magnitude ranges from 4.7 to 8.2 pp, which is the same lesson as C80: quote the direction and the condition, not a single magnitude"
+    },
+    "capacity_control_is_clean": "the matched random block is never significant in any pool or round (R123: -0.15, -1.90, -1.12 pp)",
+    "tissue_where_it_does_appear": {
+      "one_unseen": [
+        0.0277,
+        0.0037,
+        0.0503
+      ],
+      "both_unseen": [
+        0.0305,
+        0.0057,
+        0.0542
+      ],
+      "cell_unseen": "not significant"
+    }
+  },
+  "what_this_settles": {
+    "C74": "right in substance, but its condition must be stated as both drugs unseen rather than at least one",
+    "C91": "still wrong: pathway is the larger contributor in the pool where either block can matter",
+    "the_R120_R121_fight": "was a criterion problem, and the sparse table is now retired"
+  }
+}

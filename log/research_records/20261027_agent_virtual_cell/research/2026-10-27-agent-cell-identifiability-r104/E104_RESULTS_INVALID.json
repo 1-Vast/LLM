@@ -1,0 +1,76 @@
+{
+  "kind": "cross_dataset_replication_on_BATCHIE_residual_arena",
+  "input_sha256": "56a4e4a195673160edcb1baa209a15409b3639ff6ab0405558cc5ab3198d5f23",
+  "settings": {
+    "k": 20,
+    "repeats": 8,
+    "blocks": 5,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "units": 32,
+    "cells": 11,
+    "genes_used": 4889,
+    "drugs_annotated": 173527,
+    "in_sample_r2_additive_null": 0.6569865457137951
+  },
+  "summary": {
+    "n": 32,
+    "identity": 0.1359375,
+    "identity_gene": 0.1359375,
+    "identity_random": 0.278125,
+    "gene_minus_identity": {
+      "n": 32,
+      "mean_diff": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    "gene_minus_random": {
+      "n": 32,
+      "mean_diff": -0.14218750000000002,
+      "ci95": [
+        -0.2,
+        -0.0796875
+      ]
+    },
+    "random_minus_identity": {
+      "n": 32,
+      "mean_diff": 0.14218750000000002,
+      "ci95": [
+        0.0796875,
+        0.2
+      ]
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r104/PROTOCOL_E099.md": "a62b969388ee1e110bbb96a1eb3fd062114a43e03cb96cc40e8c2c917598d7f2",
+    "research/2026-10-27-agent-cell-identifiability-r104/e104_cross_dataset.py": "d5b45e28abcb3464e37a8f832dc871845fd87b883d6bbdd8297719d0159477dd"
+  },
+  "decisions": {
+    "H269_replicates_cross_dataset": "not testable - run invalid",
+    "H270_annotation_beats_capacity_control": "not testable - run invalid",
+    "H271_does_not_replicate": "not established - the automated verdict is withdrawn",
+    "verdict": "RUN_INVALID_no_cross_dataset_conclusion"
+  },
+  "limits": [
+    "BATCHIE has about 23 compounds per layout and gene annotation covers 131 of 209 compounds.",
+    "The residual arena is not the same target as GDSC's synergy call, so only the relative contrast is comparable.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "RUN_INVALID": true,
+  "why_invalid": {
+    "symptom_1": "identity and identity+gene give hit rates identical to four decimal places (difference exactly 0.0000 with a zero-width CI), which cannot happen if the gene block had any effect",
+    "symptom_2": "both sit at 13.59% while the base rate for a bottom-quartile target is 25%, i.e. far BELOW chance, meaning the ranking is systematically inverted relative to the target",
+    "symptom_3": "the random block scores 27.81%, about chance, and beats both real arms, which is the opposite of what a capacity control should show",
+    "technical_cause": "the lean rewrite of the additive null uses an in-sample fit for the training residual and an out-of-sample fit for the held-out residual, so the two residual scales differ; combined with a 4,889-dimension gene block solved at a fixed alpha, the predictions are not comparable, and the ranking becomes anti-correlated with the target",
+    "consequence": "this run cannot be used as evidence for or against the cross-dataset claim"
+  },
+  "promotion_status": {
+    "promoted": false,
+    "cross_dataset_check": "unresolved - BATCHIE is hard because the raw arena saturates (R86) and the residual arena is hard to fit (this round)",
+    "note": "the earlier dose-aware run (R88/R89) did work with RidgeCV and a smaller gene set; this round's rewrite broke comparability"
+  }
+}

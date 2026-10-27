@@ -1,0 +1,108 @@
+{
+  "kind": "joint_unseen_cell_and_drug_transfer",
+  "input_sha256": {
+    "Original screen_All tissues_fitted data.csv": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278"
+  },
+  "settings": {
+    "lambda": 1.0,
+    "k": 20,
+    "repeats": 40,
+    "holdout": 0.2,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "drugs": 65,
+    "cells": 125,
+    "reps_used": 40,
+    "train_size_median": 54256.0
+  },
+  "by_pool": {
+    "cell_unseen": {
+      "n_eval": 40,
+      "base": 0.014790840831316382,
+      "exploit": 0.08750000000000001,
+      "random": 0.01875,
+      "gain_pp": 0.06875,
+      "paired": {
+        "n": 40,
+        "mean_diff": 0.06875,
+        "ci95": [
+          0.04375,
+          0.095
+        ]
+      },
+      "n_pool_median": 6866.5
+    },
+    "drug_unseen": {
+      "n_eval": 40,
+      "base": 0.013325667738855356,
+      "exploit": 0.06500000000000002,
+      "random": 0.015000000000000003,
+      "gain_pp": 0.05,
+      "paired": {
+        "n": 40,
+        "mean_diff": 0.05,
+        "ci95": [
+          0.028750000000000005,
+          0.07250000000000001
+        ]
+      },
+      "n_pool_median": 15980.5
+    },
+    "both_unseen": {
+      "n_eval": 40,
+      "base": 0.013123023783702633,
+      "exploit": 0.053750000000000006,
+      "random": 0.013750000000000002,
+      "gain_pp": 0.039999999999999994,
+      "paired": {
+        "n": 40,
+        "mean_diff": 0.039999999999999994,
+        "ci95": [
+          0.02,
+          0.061250000000000006
+        ]
+      },
+      "n_pool_median": 4081.0
+    },
+    "strict": {
+      "n_eval": 38,
+      "base": 0.011067224499250012,
+      "exploit": 0.027631578947368424,
+      "random": 0.01578947368421053,
+      "gain_pp": 0.011842105263157899,
+      "paired": {
+        "n": 38,
+        "mean_diff": 0.011842105263157899,
+        "ci95": [
+          -0.003947368421052632,
+          0.027631578947368424
+        ]
+      },
+      "n_pool_median": 449.0
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r68/PROTOCOL_E066.md": "e6d24af65b5675d847be537fbfe5827a949f2de1b1fb98808f8eac8e9b557721",
+    "research/2026-10-27-agent-cell-identifiability-r68/e068_joint_unseen.py": "a304e487b76ecea4a1772dc11acdcef1fecb5ec0ab729882e9b1b59c3629208d"
+  },
+  "decisions": {
+    "H171_strict_pool_still_works": false,
+    "H172_gain_degrades_stepwise": true,
+    "H173_cell_unseen_not_the_bottleneck": true,
+    "gains": {
+      "cell_unseen": 0.06875,
+      "drug_unseen": 0.05,
+      "both_unseen": 0.039999999999999994,
+      "strict": 0.011842105263157899
+    },
+    "verdict": "ranking_value_needs_at_least_one_side_seen"
+  },
+  "limits": [
+    "The joint holdout shrinks the training set to about 64% of keys, so part of any drop is weaker training, not novelty per se.",
+    "Tissue is still seen for held-out cells, so 'completely unfamiliar' is not achieved.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ]
+}

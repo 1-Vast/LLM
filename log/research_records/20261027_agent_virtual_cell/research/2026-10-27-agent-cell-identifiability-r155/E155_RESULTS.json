@@ -1,0 +1,124 @@
+{
+  "kind": "does_the_seen_drugs_support_moderate_the_pathway_gain",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "repeats": 200,
+    "holdout": 0.2,
+    "seed": 20261056,
+    "n_boot": 2000
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 600
+  },
+  "by_band": {
+    "low": {
+      "n": 200,
+      "support_med": 1875.51,
+      "rho_identity": 0.18985250714714866,
+      "rho_pathway": 0.22204196185547026,
+      "gain": {
+        "n": 200,
+        "mean_diff": 0.03218945470832162,
+        "ci95": [
+          0.02836732079863789,
+          0.0358670447395804
+        ]
+      }
+    },
+    "mid": {
+      "n": 200,
+      "support_med": 3948.645,
+      "rho_identity": 0.28984778280129125,
+      "rho_pathway": 0.30368032257491356,
+      "gain": {
+        "n": 200,
+        "mean_diff": 0.013832539773622275,
+        "ci95": [
+          0.01173036505784424,
+          0.015933897373922357
+        ]
+      }
+    },
+    "high": {
+      "n": 200,
+      "support_med": 5757.53,
+      "rho_identity": 0.23298223243416197,
+      "rho_pathway": 0.2561259926429548,
+      "gain": {
+        "n": 200,
+        "mean_diff": 0.02314376020879285,
+        "ci95": [
+          0.020732437862842835,
+          0.02565236815341522
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r155/PROTOCOL_E145.md": "4927ebac292c8c8ba53c02295d934f67f5af9ef7ecde5dd7c3fc769bab700a3e",
+    "research/2026-10-27-agent-cell-identifiability-r155/e155_support.py": "46ee93f949645d088e6f7472c639967bc8e957b9ddad5d278e08c21fe20eb0ee"
+  },
+  "low_minus_high": {
+    "n": 200,
+    "mean_diff": 0.009045694499528772,
+    "ci95": [
+      0.005503110457494036,
+      0.012485462290117887
+    ]
+  },
+  "decisions": {
+    "gain_low": 0.03218945470832162,
+    "gain_mid": 0.013832539773622275,
+    "gain_high": 0.02314376020879285,
+    "low_minus_high": 0.009045694499528772,
+    "H376_support_moderates": true,
+    "H377_no_moderation": false,
+    "verdict": "literal_pass_but_the_hypothesis_is_not_established_because_the_regime_was_never_sampled"
+  },
+  "limits": [
+    "Bands are within-split terciles, so only within-split comparisons are meaningful.",
+    "Only ridge and only this resource.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "the_literal_gate_passed": {
+    "gate": "low-band gain minus high-band gain, CI lower bound above zero",
+    "observed": {
+      "n": 200,
+      "mean_diff": 0.009045694499528772,
+      "ci95": [
+        0.005503110457494036,
+        0.012485462290117887
+      ]
+    },
+    "result": "passed"
+  },
+  "but_I_decline_to_read_it_as_support": {
+    "reason_1_support_range": {
+      "what": "the stratification variable spans 921 to 7305 training observations, with median 3308 and no drug below 921",
+      "so": "every band is informationally rich. The hypothesis was about a poorly characterised seen drug, and this resource contains no such drug, so the weak-information regime was never sampled."
+    },
+    "reason_2_non_monotone": {
+      "what": "the gains are low 0.0322, mid 0.0138, high 0.0231",
+      "so": "the middle band has the smallest gain. A mechanism about information quality predicts a monotone decline, and this is not monotone."
+    },
+    "reason_3_bands_differ_in_baseline": {
+      "what": "identity rank correlation is 0.1899 in the low band, 0.2898 in the middle and 0.2330 in the high",
+      "so": "the bands are not comparable populations; they differ in how much the identity model already achieves"
+    },
+    "conclusion": "this is a literal pass that does not establish the hypothesis. It should be recorded as a negative with a false-positive gate, not as a supported moderation."
+  },
+  "the_resource_cannot_test_this_hypothesis": {
+    "why": "with 921 minimum support there is no weak-information regime to contrast against",
+    "what_would_be_needed": "a resource with narrow-spectrum or rarely screened drugs, or a deliberate subsampling that artificially starves a drug's support",
+    "status": "the question stays open by resource limitation, not by evidence"
+  },
+  "this_is_the_third_vacuous_comparison": {
+    "instances": [
+      "R135: a pool defined inside the training rows, so both arms were identical",
+      "R144: a marginal arm that is constant when both drugs are unseen",
+      "R155: a stratification over a range where the variable never reaches the regime of interest"
+    ],
+    "rule": "before stratifying, verify the stratifier spans the regime the hypothesis is about; and after a gate passes, ask whether the design could have produced the opposite result"
+  }
+}

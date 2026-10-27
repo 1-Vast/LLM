@@ -1,0 +1,108 @@
+{
+  "kind": "transferable_interaction_residual_for_the_tail",
+  "input_sha256": "56a4e4a195673160edcb1baa209a15409b3639ff6ab0405558cc5ab3198d5f23",
+  "settings": {
+    "lambda": 1.0,
+    "top": 10,
+    "n_boot": 1000,
+    "seed": 20261027
+  },
+  "audit": {
+    "units": 44,
+    "layouts": 21,
+    "residual_pairs": 25
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r24/PROTOCOL_E024.md": "dd0c7f8f8c1938000a56567669342db894f45ef77c723fdc09b6a720239642ab",
+    "research/2026-10-27-agent-cell-identifiability-r24/e024_residual_transfer.py": "e68bfee05bd23e24a35ca436c11404309b7c3426cd2ae67151b6d7997388f82b"
+  },
+  "residual_conservation": {
+    "n": 25,
+    "mean": 0.5963880848589261,
+    "median": 0.6241530874785591,
+    "ci95": [
+      0.5313236342794975,
+      0.6617366937981892
+    ],
+    "frac_positive": 1.0
+  },
+  "baseline_A": {
+    "precision10": {
+      "n": 44,
+      "mean": 0.225,
+      "median": 0.2,
+      "ci95": [
+        0.17954545454545454,
+        0.2727272727272727
+      ]
+    },
+    "spearman": {
+      "n": 44,
+      "mean": 0.9368957767938924,
+      "median": 0.9413891185917327,
+      "ci95": [
+        0.9290336588684401,
+        0.9447681922540896
+      ]
+    }
+  },
+  "treatment_B": {
+    "precision10": {
+      "n": 44,
+      "mean": 0.2772727272727273,
+      "median": 0.3,
+      "ci95": [
+        0.22727272727272724,
+        0.32954545454545453
+      ]
+    },
+    "spearman": {
+      "n": 44,
+      "mean": 0.9239271781993477,
+      "median": 0.9287519655249663,
+      "ci95": [
+        0.9145981415294963,
+        0.9323269448862932
+      ]
+    }
+  },
+  "paired": {
+    "precision10_B_minus_A": {
+      "n": 44,
+      "mean": 0.052272727272727276,
+      "median": 0.0,
+      "ci95": [
+        1.2458468600197078e-18,
+        0.10454545454545454
+      ]
+    },
+    "spearman_B_minus_A": {
+      "n": 44,
+      "mean": -0.012968598594544994,
+      "median": -0.00987152903954197,
+      "ci95": [
+        -0.020854214498158816,
+        -0.005712159767321933
+      ]
+    }
+  },
+  "decisions": {
+    "H055_residual_conserved": true,
+    "H056_transfer_fixes_tail": false,
+    "H057_gain_concentrated_in_tail": false,
+    "verdict": "tail_is_transferable_interaction",
+    "H056_status": "MECHANICAL FLAG ONLY: the paired precision@10 CI lower bound is 1.2e-18, a floating-point boundary, not evidence. 41% of units improve, 25% are unchanged, 34% get worse and the median gain is 0, so H056 is recorded as NOT established.",
+    "verdict_reported": "tail_is_not_robustly_transferable",
+    "H056_mechanical_flag_raw": true,
+    "H056_note": "the raw criterion (paired CI lower bound > 0) fired at 1.2e-18, a floating-point boundary. Robustness: 41% of units improve, 25% unchanged, 34% worse, median gain 0. Recorded as NOT established; see H056_status."
+  },
+  "limits": [
+    "The residual is a deviation from additivity, not a mechanism or a target effect.",
+    "This is an unseen COMBINATION, not an unseen drug.",
+    "No dose dimension; viability is clipped at 1.0 (17.9% exactly 1.0), which coarsens the top-10.",
+    "The additive model is fitted per cell with a fixed ridge penalty and no tuning.",
+    "Exploratory: plates were used as scoring endpoints earlier and cells cross days."
+  ],
+  "trade_off": "transferring the residual raises the top-10 point estimate (0.225 -> 0.277) while lowering the global Spearman (0.937 -> 0.924, CI excludes 0): additive ordering is best for the bulk, the interaction lives in the tail",
+  "operational_difference_from_R13": "R13 measured the residual against Bliss single-agent additivity on validation plates (29 compound pairs, rho 0.353); here the residual is against a FITTED additive model on 351-pair plates (25 cell pairs, rho 0.596). Same family, different operationalisation."
+}

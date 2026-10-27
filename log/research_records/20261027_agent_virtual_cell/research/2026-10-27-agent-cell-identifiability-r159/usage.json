@@ -1,0 +1,65 @@
+{
+  "experiment": "E159",
+  "round": "R159 (goal round 157/256)",
+  "date": "2026-10-27",
+  "type": "continuous-column sentinel detection, the last recorded blind spot in the audit",
+  "compute": {
+    "script": "e159_sentinel.py",
+    "cases": 5,
+    "rule_versions": 2,
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "tool": "research/tools/feature_audit.py",
+    "results": "E159_RESULTS.json",
+    "protocol": "PROTOCOL_E148.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "cases": {
+    "clean_continuous": true,
+    "minus999": false,
+    "zero_fill": false,
+    "legit_capped": true,
+    "clean_onehot_design": true
+  },
+  "the_first_rule_failed": {
+    "rule": "outside the rest's range and farther from it than half the range",
+    "missed": "a zero fill among log-normal concentrations, which sits only micro-units below the minimum in absolute terms",
+    "fix": "compare with the column median; off-scale by more than a hundredfold",
+    "ratios_after_the_fix": {
+      "zero_fill": 0.0,
+      "minus999": 2545736.0,
+      "legit_capped": "a few times the median"
+    }
+  },
+  "the_tool_is_complete": {
+    "feature_level": 6,
+    "split_level": 1,
+    "prediction_level": 1,
+    "whitelist": "feature-level only, named columns only",
+    "blind_spots_recorded_since_R149": "closed"
+  },
+  "an_honest_characterisation": {
+    "what_it_is": "a catalogue of the mistakes actually made in this programme",
+    "why": "every rule was reverse-engineered from a failure rather than derived from theory",
+    "consequence": "good at catching those mistakes again, poor at catching mistakes nobody here has made yet"
+  },
+  "not_targeted": "a sentinel in the middle of a distribution, such as a missing value filled with the mean, which is numerically indistinguishable from a real value",
+  "limits": [
+    "The 2 percent and hundredfold thresholds are chosen, not optimised.",
+    "Only extreme-value sentinels are covered.",
+    "All rules are empirically derived with no independent guarantee."
+  ],
+  "next_gate": "close the tool line and return to science: combine the criterion-resolution matrix with the data-volume robustness result into a decision table for which criterion to use at what sample size",
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "note": "changes under research/tools/ only",
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

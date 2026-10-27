@@ -1,0 +1,57 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r106",
+  "round": "R106 (goal round 104/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "First use of the target-gene columns to test whether annotation granularity drives the finding."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r106": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round closes a limitation that had been carried in the register since C46, using a column the programme had never touched.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e106_granularity.py"], "runs": 1, "pools": 3, "repeats": 60, "arms": 5,
+    "rows": 360, "pathway_levels": 38, "target_levels": 86,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E106_RESULTS.json", "rows": "E106_rows.csv", "protocol": "PROTOCOL_E101.md"},
+  "dimensions": {"identity": 130, "pathway_block": 41, "target_block": 175},
+  "results": {
+    "one_unseen": {"identity": 0.0867, "plus_pathway": 0.0983, "plus_target": 0.1192, "plus_both": 0.1075, "plus_random": 0.0667,
+                   "pathway_minus_identity": {"diff": 0.0117, "ci95": [-0.0125, 0.0367]},
+                   "target_minus_identity": {"diff": 0.0325, "ci95": [0.0100, 0.0583]},
+                   "target_minus_pathway": {"diff": 0.0208, "ci95": [-0.0058, 0.0475]}},
+    "cell_unseen": {"identity": 0.0867, "plus_pathway": 0.0900, "plus_target": 0.1033, "plus_both": 0.1050, "plus_random": 0.0733,
+                    "pathway_minus_identity": {"diff": 0.0033, "ci95": [-0.0150, 0.0233]},
+                    "target_minus_identity": {"diff": 0.0167, "ci95": [-0.0042, 0.0375]},
+                    "target_minus_pathway": {"diff": 0.0133, "ci95": [0.0000, 0.0267]},
+                    "both_minus_pathway": {"diff": 0.0150, "ci95": [0.0042, 0.0258]}},
+    "both_unseen": {"identity": 0.0100, "plus_pathway": 0.0342, "plus_target": 0.0317, "plus_both": 0.0408, "plus_random": 0.0108,
+                    "pathway_minus_identity": {"diff": 0.0242, "ci95": [0.0058, 0.0442]},
+                    "target_minus_identity": {"diff": 0.0217, "ci95": [0.0033, 0.0467]},
+                    "target_minus_pathway": {"diff": -0.0025, "ci95": [-0.0217, 0.0167]}}},
+  "decisions": {"H275_target_more_informative_than_pathway": false,
+                "H276_pathway_not_subsumed_by_target": false,
+                "pathway_wins_over_identity": 1, "target_wins_over_identity": 2,
+                "verdict": "both_granularities_carry_signal_neither_dominates"},
+  "what_this_resolves": {
+    "the_C46_limitation": "the annotation signal is not an artefact of using a coarse annotation, since the finer target block gives the same order of signal rather than a decisive improvement",
+    "combining_never_hurts": "plus_both is at or above plus_pathway in all three pools"},
+  "robustness_concern_flagged": {
+    "contrast": "pathway minus identity on cell_unseen",
+    "R101": "+2.87 pp, significant",
+    "R106": "+0.33 pp, not significant",
+    "cause": "different random streams, because the capacity block consumes the RNG differently, giving different splits",
+    "implication": "the magnitude of this contrast is not stable between runs and should only be quoted from the highest-powered run"},
+  "limits": ["target strings mix genes and complexes, so the target block is not a clean gene set",
+             "the three pools share one training set",
+             "the capacity control uses a single block, weaker than R101's ten-block average",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["robustness is now the main weakness: run the same contrast under five independent random streams and report the between-stream spread"],
+  "register_updates": {"C79": "new: granularity is not the driver", "C46": "granularity limitation lifted"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C79 added, C46 annotated)", "research/INDEX.md (added R106 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

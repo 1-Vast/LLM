@@ -1,0 +1,44 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r91",
+  "round": "R91 (goal round 89/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Measures which synergy metric defines the dataset's Synergy boolean, to settle what 'decision value' should mean."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r91": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round settles a definitional question with one measurement, and records that both of its own pre-registered criteria missed.",
+  "compute": {"python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6, scikit-learn 1.9.0",
+              "scripts": ["r91.py"], "runs": 1, "data_downloads": 0, "wet_lab_experiments": 0},
+  "artifacts": {"results": "E091_RESULTS.json", "protocol": "PROTOCOL_E086.md"},
+  "results": {
+    "keys": 108259, "n_positive": 1550, "base_rate": 0.0143,
+    "auc_vs_synergy": {"dAUC": 0.9821, "dEMAX": 0.9824, "dfAUC": 0.9842, "dXMID": 0.9901}
+  },
+  "preregistered_criteria_failed": {
+    "H232_label_defined_by_one_metric": false,
+    "why": "dAUC is 0.982 but dXMID is 0.990, so dAUC is not 0.05 above the rest",
+    "H233_label_is_a_consensus": false,
+    "why": "my ceiling of 0.95 was too low; all four exceed 0.98",
+    "honest_note": "both criteria were mine and both missed; the data is sharper than either"}
+  ,
+  "resolution_of_R90": {
+    "finding": "all four metrics classify the published flag at AUC 0.98-0.99, so at the extreme where the flag lives the four definitions agree",
+    "why_R90_flipped": "R90 used the top quartile of each metric, which lives in the bulk; the metrics agree at the extreme but diverge in the bulk",
+    "implication": "the sign flip measures a bulk property, not the decision-relevant extreme"},
+  "decision_criterion_now_fixed": "the dataset's own boolean Synergy call (the extreme), because it is dataset-provided rather than invented here, it matches what a screen actually asks, and all four metrics agree there",
+  "consequence": "the C45-type comparisons using the boolean criterion remain the decision-relevant ones; R90's quartile analysis becomes a bulk sensitivity analysis that does not overturn the extreme-level result",
+  "limits": ["this is association, not the label's generating rule, which is upstream code not present locally",
+             "the metrics are so correlated that the 0.982 versus 0.990 difference should not be read as dXMID being better",
+             "only 1,550 positives, so extreme-region estimates are affected by rarity",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["write the fixed criterion into the synthesis so the headline statement can be finalised"],
+  "register_updates": {"C64": "new: the flag is metric-robust at the extreme and the metrics diverge in the bulk",
+                       "C63": "located - the flip is a bulk phenomenon"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C64 added, C63 located)",
+                                "research/SYNTHESIS.md (section 2c extended)", "research/INDEX.md (added R91 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

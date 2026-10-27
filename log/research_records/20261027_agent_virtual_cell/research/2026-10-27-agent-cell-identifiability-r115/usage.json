@@ -1,0 +1,47 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r115",
+  "round": "R115 (goal round 113/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Tests whether tissue, known before any measurement, predicts prior strength well enough to apply the rule."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r115": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round walks the last remaining application route and closes it with a clear diagnosis.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e115_ex_ante.py"], "runs": 1, "cells": 125,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E115_RESULTS.json", "rows": "E115_rows.csv", "protocol": "PROTOCOL_E110.md"},
+  "results": {
+    "Colon": {"n": 45, "prior": 0.0167, "prior_ci": [0.0089, 0.0256], "sd": 0.0302, "gain": 0.0456, "gain_ci": [0.0211, 0.0767]},
+    "Pancreas": {"n": 29, "prior": 0.1293, "prior_ci": [0.0845, 0.1828], "sd": 0.1326, "gain": 0.0483, "gain_ci": [0.0207, 0.0776]},
+    "Breast": {"n": 51, "prior": 0.1706, "prior_ci": [0.1245, 0.2167], "sd": 0.1709, "gain": -0.0608, "gain_ci": [-0.1010, -0.0255]},
+    "grand_prior": 0.1056, "icc_tissue": 0.2277,
+    "tissue_spread": [0.0167, 0.1706], "crosses_11pct": true
+  },
+  "decisions": {"H288_tissue_identifies_regime": false, "H289_tissue_cannot": true,
+                "verdict": "regime_is_largely_idiosyncratic_so_ex_ante_application_fails"},
+  "what_the_data_shows": {
+    "tissue_level_pattern_matches_C85_in_two_of_three": "Colon at 1.67% gains +4.56 pp and Breast at 17.06% loses 6.08 pp, both significant and both as the rule predicts; Pancreas at 12.93% gains +4.83 pp, which the rule does not predict",
+    "decisive_problem": "Breast's within-tissue standard deviation of prior strength (0.171) equals its mean (0.171), so some Breast cells sit near 2% and others near 30%",
+    "icc": 0.2277,
+    "honest_verdict": "tissue is not uninformative, but the regime a cell is in is largely idiosyncratic, so tissue does not tell you whether to personalise"},
+  "closure": {
+    "both_application_routes_are_now_closed": "online probing fails on noise (C87) and ex ante assignment fails on within-group spread (this round)",
+    "consequence": "the conditional rule stands as an explanation but cannot be used as an operating rule on this resource",
+    "only_remaining_direction": "find features that predict a cell's individual prior strength; this machine has neither expression data nor more than three tissues"},
+  "limits": ["only three tissues make the between-group estimate very coarse",
+             "the ICC of 0.228 is not far from the 0.30 threshold I pre-registered, so a lower threshold would have flipped the verdict",
+             "prior strength and tissue may both be confounded with other cell properties",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "register_updates": {"C88": "new: the regime is largely idiosyncratic, so ex ante application fails",
+                       "C87": "annotated", "SYNTHESIS": "row added"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C88 added, C87 annotated)",
+                                "research/SYNTHESIS.md (row added)", "research/INDEX.md (added R115 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

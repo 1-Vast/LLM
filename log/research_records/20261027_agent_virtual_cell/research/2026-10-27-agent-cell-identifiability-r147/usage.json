@@ -1,0 +1,89 @@
+{
+  "experiment": "E147",
+  "round": "R147 (goal round 145/256)",
+  "date": "2026-10-27",
+  "type": "pathway versus target under a tree model, plus an invalid first attempt",
+  "runs": {
+    "invalid_first_attempt": {
+      "design": "drug identity codes plus grouping codes fed to the tree",
+      "why_invalid": "held-out drugs take integer code values unseen in training, so the tree routes them arbitrarily and identity scores 0.081 where it can carry no information",
+      "preserved_as": "E147_RESULTS_INVALID.json"
+    },
+    "corrected": {
+      "design": "grouping codes only, no drug identity features",
+      "splits": 60,
+      "seed": 20261050
+    }
+  },
+  "compute": {
+    "script": "e147_tree_groupings.py",
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "results": "E147_RESULTS.json",
+    "rows": "E147_rows.csv",
+    "invalid": "E147_RESULTS_INVALID.json",
+    "protocol": "PROTOCOL_E137.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "results": {
+    "pathway_only": 0.1074,
+    "target_only": 0.0502,
+    "random_only": 0.0017,
+    "pathway_minus_target": [
+      0.0572,
+      0.034,
+      0.0807
+    ],
+    "pathway_minus_random": [
+      0.1057,
+      0.075,
+      0.1339
+    ],
+    "target_minus_random": [
+      0.0485,
+      0.018,
+      0.0781
+    ],
+    "mde_pathway_minus_target": 0.0335
+  },
+  "conclusion_1": "the pathway-over-target ranking is model-independent: both groupings beat a random grouping and pathway beats target under both families",
+  "conclusion_2": {
+    "what": "C106 is now suspect",
+    "why": "the tree reaches 0.1074 with the grouping alone, close to ridge's 0.1254, whereas R138's tree reached only 0.032",
+    "likely_cause": "R138's tree carried drug identity codes that were all the reserved code -1 on the evaluation rows, a dead feature that consumes splits and distorts routing",
+    "status": "C106 must be re-tested with dead features removed before being quoted again"
+  },
+  "an_underpowered_intermediate": {
+    "splits": 20,
+    "observed": 0.0255,
+    "mde": 0.0525,
+    "action": "raised to 60 splits rather than reporting an underpowered null"
+  },
+  "recurring_failure_class": {
+    "instances": [
+      "R135 in-sample pool",
+      "R144 constant marginal arm",
+      "R147 invalid first attempt",
+      "R138 suspected dead identity block"
+    ],
+    "rule": "before comparing arms, confirm that every feature present in every arm actually carries information in the evaluation condition"
+  },
+  "limits": [
+    "Sixty splits and one untuned tree configuration.",
+    "Grouping codes are integer-coded rather than native categorical, so an encoding effect cannot be excluded.",
+    "One resource.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "next_gate": "re-test C106 with the corrected design, no dead features on either side",
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

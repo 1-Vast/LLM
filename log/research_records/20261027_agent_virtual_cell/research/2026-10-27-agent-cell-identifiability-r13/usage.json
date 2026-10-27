@@ -1,0 +1,48 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r13",
+  "round": "R13 (goal round 10/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Standard additivity nulls (Bliss/HSA) applied to data in hand; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r13": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched. The pre-registered single-metric verdict was superseded by a documented reinterpretation (AMENDMENT-008); a challenger would be warranted before the interaction-conservation number is used as a capability claim.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e014_additivity.py"], "runs": 1, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {
+    "results": "E014_RESULTS.json", "per_prediction": "E014_per_prediction.csv",
+    "interactions": "E014_interactions.csv", "protocol": "PROTOCOL_E014.md",
+    "reinterpretation": "AMENDMENT_008_METRIC_DISSOCIATION.md"
+  },
+  "results": {
+    "heldout_units": 210, "layouts": 9, "compound_pairs": 29,
+    "comparators": {
+      "bliss_other": {"rmse": 0.1353, "rank_corr": 0.761, "hit3": 0.471, "regret": 0.0632},
+      "hsa": {"rmse": 0.1837, "rank_corr": 0.492, "hit3": 0.205, "regret": 0.2297},
+      "bliss": {"rmse": 0.1839, "rank_corr": 0.500, "hit3": 0.171, "regret": 0.2058},
+      "mean_other": {"rmse": 0.1943, "rank_corr": 0.812, "hit3": 0.671, "regret": 0.0259},
+      "const_other": {"rmse": 0.2832, "hit3": 0.0, "regret": 0.6933}
+    },
+    "paired_rmse": {
+      "mean_other_minus_bliss": {"diff": 0.0104, "ci": [-0.0419, 0.0526]},
+      "bliss_other_minus_bliss": {"diff": -0.0486, "ci": [-0.0863, -0.0228]},
+      "bliss_other_minus_mean_other": {"diff": -0.0590, "ci": [-0.0901, -0.0316]},
+      "bliss_minus_const": {"diff": -0.0993, "ci": [-0.1504, -0.0460]}
+    },
+    "interaction_conservation": {"cross_cell_rho": 0.3526, "ci95": [0.2637, 0.5084],
+                                 "frac_positive": 0.8606, "n_pairs": 746, "split_half_ceiling": 0.7202},
+    "metric_dissociation": "RMSE favours additivity+transferred interaction (171/210 units); regret and hit@3 favour cross-cell pooling (8/9 layouts)"
+  },
+  "decisions": {"H026_mean_other_beats_bliss_rmse": false, "H027_interaction_conserved": true,
+                "H028_bliss_plus_transferable_interaction_best_rmse": true,
+                "literal_rule_output": "transfer_is_additive_baseline",
+                "reported_interpretation": "metric-dependent: additivity captures the level, pooling captures the ordering"},
+  "mutations_outside_episode": ["research/INDEX.md (added R13 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "mechanism_claim_made": false
+  }
+}

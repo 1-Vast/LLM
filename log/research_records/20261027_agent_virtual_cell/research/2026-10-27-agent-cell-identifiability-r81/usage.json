@@ -1,0 +1,50 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r81",
+  "round": "R81 (goal round 79/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Validity check on the programme's own metric: what does ranking by drug marginals actually select?"},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r81": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round audits the breadth of the metric behind the programme's positive results and finds it far narrower than k.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e081_concentration.py"], "runs": 1, "repeats": 40,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E081_RESULTS.json", "rows": "E081_rows.csv", "protocol": "PROTOCOL_E078.md"},
+  "design": {
+    "question": "when the score is constant within a combination (as drug marginals are), does the top-k contain k distinct discoveries?",
+    "comparisons": ["distinct combinations in the top-20", "distinct drugs", "largest single-combination share", "de-duplicated hit rate", "random top-20 as a control"]
+  },
+  "results": {
+    "n_combos_median": 2.0, "n_combos_mean": 2.0, "n_drugs_median": 2.0,
+    "max_single_combo_median": 11.0, "max_single_combo_share": 0.566,
+    "rand_n_combos_median": 20.0,
+    "raw_hit": 0.0663, "dedup_hit": 0.0682,
+    "raw_minus_dedup": {"diff": -0.0019, "ci95": [-0.0056, 0.0017]},
+    "n_pool_median": 35034
+  },
+  "decisions": {"H205_topk_is_concentrated": true, "H206_dedup_reduces_value": false,
+                "H207_random_is_not_concentrated": true,
+                "verdict": "concentration_present_but_value_holds"},
+  "reading": {
+    "good_news": "de-duplicating does not lower the hit rate (6.82% versus 6.63%, difference CI includes zero), so the value is not inflated by counting one lucky cell many times",
+    "bad_news": "the top-20 covers only 2 combinations and 2 drugs, so '20 high-scoring candidates' really means 'the same one or two combinations recommended across many cells'",
+    "consequence_for_the_programme": "every top-k number reported earlier has an effective number of independent discoveries far below k; and a strategy whose entire output is 'these 1-2 combinations are best' is closer to a single recommendation than to a selection algorithm"
+  },
+  "limits": ["the pool is key-level, which is precisely what produces the concentration; a grouped pool would not concentrate this way but marginals degrade there",
+             "the de-duplicated rate is a combination-level quantity and is not directly comparable with the key-level rate",
+             "one dataset, 40 splits",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["measure breadth properly with a combination-level top-m curve, m running from 1 to 20"],
+  "register_updates": {"C55": "new, exploratory: the marginal top-k has very low breadth",
+                       "SYNTHESIS": "the breadth limitation noted next to the attribution finding"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C55 added)", "research/SYNTHESIS.md (breadth noted)",
+                                "research/INDEX.md (added R81 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

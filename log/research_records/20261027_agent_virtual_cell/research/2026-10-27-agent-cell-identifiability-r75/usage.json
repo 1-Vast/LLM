@@ -1,0 +1,57 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r75",
+  "round": "R75 (goal round 73/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Data-based verification of pool labels plus the genuine both-drugs-unseen head-to-head."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r75": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round verifies its own labels by data rather than by reading code, then closes the last untested comparison.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e075_genuine_both_unseen.py"], "runs": 1, "repeats": 40, "pools": 3,
+    "predictors": 3, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E075_RESULTS.json", "rows": "E075_rows.csv", "protocol": "PROTOCOL_E072.md"},
+  "label_verification": {
+    "seen": {"frac_both_drugs_unseen": 0.0, "correct": true},
+    "any_unseen": {"frac_both_drugs_unseen": 0.10, "correct": true},
+    "both_unseen": {"frac_both_drugs_unseen": 1.0, "correct": true}
+  },
+  "results": {
+    "seen": {"ridge": 0.0288, "marginal": 0.0663, "random": 0.0125,
+             "ridge_minus_random": {"diff": 0.0163, "ci95": [-0.0013, 0.0350]},
+             "ridge_minus_marginal": {"diff": -0.0375, "ci95": [-0.0588, -0.0150]}},
+    "any_unseen": {"ridge": 0.0525, "marginal": 0.0700, "random": 0.0200,
+                   "ridge_minus_random": {"diff": 0.0325, "ci95": [0.0112, 0.0550]},
+                   "ridge_minus_marginal": {"diff": -0.0175, "ci95": [-0.0400, 0.0038]}},
+    "both_unseen": {"n_pool_median": 1830, "ridge": 0.0250, "marginal": 0.0063, "random": 0.0125,
+                    "ridge_minus_random": {"diff": 0.0125, "ci95": [-0.0063, 0.0375]},
+                    "ridge_minus_marginal": {"diff": 0.0187, "ci95": [0.0025, 0.0400]},
+                    "marginal_minus_random": {"diff": -0.0062, "ci95": [-0.0150, 0.0013]}}
+  },
+  "decisions": {"H189_R66_label_correct": true,
+                "H190_model_wins_where_baseline_is_blind": false,
+                "H191_marginal_is_constant_there": true,
+                "verdict": "annotation_model_ties_random_even_where_the_baseline_is_blind"},
+  "key_detail": "the constant marginal baseline scores 0.63%, BELOW random at 1.25%, because tie-breaking takes the first k rows; so beating it is not evidence of skill and random is the correct reference",
+  "complete_picture": {
+    "both_drugs_seen": "model loses to marginals by 3.75 pp and does not beat random",
+    "one_drug_unseen": "model beats random by 3.25 pp but loses to marginals (not significantly)",
+    "both_drugs_unseen": "model does not establish a gain over random (+1.25 pp, CI includes 0) even though it is the only predictor with information there"
+  },
+  "conclusion": "in no pool does the annotation model both beat random significantly AND beat the marginal baseline",
+  "limits": ["the both-unseen pool holds about 1,830 keys, so its CI is wide and 'not established' is not 'zero'",
+             "tissue is still mostly seen",
+             "the constant baseline's tie-breaking is arbitrary, which is why random is used as the reference",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["the annotation line has now been tested in three information regimes with consistent results; further variants add little without finer features or a new resource"],
+  "register_updates": {"C49": "new, decisive: three-regime comparison of the annotation model"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C49 added)", "research/SYNTHESIS.md (three-regime table noted)",
+                                "research/INDEX.md (added R75 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r19",
+  "round": "R19 (goal round 17/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Replication test of the previous round's positive claim on 21 layouts with a permutation null."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r19": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round's own retest is the challenge.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e019_retest.py"], "runs": "3 (index-concat fix, permutation implementation, final)",
+    "permutations": 500, "bootstrap": 1000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E019_RESULTS.json", "protocol": "PROTOCOL_E019.md"},
+  "result": {
+    "layouts": 21, "layouts_with_3_cells": 2, "layouts_with_2_cells": 19,
+    "rev_rate_shared_pooled": 0.0647, "rev_rate_disjoint_pooled": 0.0828,
+    "mean_per_layout_diff": -0.0102, "ci95_layout_bootstrap": [-0.0191, -0.0007],
+    "frac_layouts_positive": 0.381,
+    "permutation_null_q975": 0.0074, "permutation_null_mean": 0.000006,
+    "separation_diff_pooled": 0.0099
+  },
+  "decisions": {"H040_effect_holds_over_21_layouts": false, "H041_beats_gene_label_permutation": false,
+                "H042_direction_consistent": false, "verdict": "effect_does_not_hold_at_21_layouts"},
+  "retraction": {
+    "claim": "C16 (shared annotated target -> more cross-cell order instability, +1.76 pp)",
+    "status": "withdrawn",
+    "reason": "sign reverses on 21 layouts; only 38% of layouts positive; observed value sits in the negative tail of the gene-label permutation null",
+    "mechanism_of_the_original_error": "the inclusion rule '>=3 QC-passing cells' left only 2 layouts, and those two are the most positive of the 21; selecting on cell count selected on a variable correlated with the effect"
+  },
+  "not_concluded": "the pooled negative direction is NOT attributed to target overlap: the two groups also differ in separation (+0.0099) in the same direction as the outcome",
+  "methodological_constraint_added": "target-conditional analyses need >=6 independent layouts and must not select layouts on a variable correlated with the effect (such as cell count)",
+  "register_updates": {"C16": "withdrawn (not downgraded to a hypothesis)", "F6": "correction retained - annotation-level target reference does exist (67.8% of compounds)"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C16 withdrawn, constraint added)", "research/INDEX.md (added R19 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "mechanism_claim_made": false
+  }
+}

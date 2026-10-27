@@ -1,0 +1,70 @@
+{
+  "experiment": "E150",
+  "round": "R150 (goal round 148/256)",
+  "date": "2026-10-27",
+  "type": "extend the preflight audit with a near-degenerate tier and validate it",
+  "compute": {
+    "script": "e150_near_degenerate.py",
+    "cases": 4,
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "tool": "research/tools/feature_audit.py",
+    "results": "E150_RESULTS.json",
+    "protocol": "PROTOCOL_E140.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "new_flags": {
+    "NEAR_DEGENERATE": "evaluation std below a threshold fraction of training std",
+    "DOMINATED_ON_EVAL": "one level above 0.95 on evaluation while below 0.80 in training"
+  },
+  "cases": {
+    "clean_design": {
+      "passed": true,
+      "expected": true,
+      "note": "no false positive, which is the property that matters most"
+    },
+    "dead_code": {
+      "passed": false,
+      "expected": false,
+      "via": "original tier"
+    },
+    "near_degenerate": {
+      "passed": false,
+      "expected": false,
+      "via": "DOMINATED_ON_EVAL 0.990 against 0.147"
+    },
+    "dominated": {
+      "passed": false,
+      "expected": false,
+      "via": "DOMINATED_ON_EVAL 0.960 against 0.605"
+    }
+  },
+  "honest_caveat": {
+    "what": "both constructed cases fired the dominance branch, so the ratio branch was never executed",
+    "why": "zeroing 99 percent of a column also makes it dominated, and that rule fires first",
+    "what_would_exercise_it": "a column that keeps its spread but shrinks in scale, for example a continuous feature multiplied by 0.01 on the evaluation set",
+    "status": "the tool is one branch validated and one branch untested"
+  },
+  "value_and_risk": {
+    "value": "catches the near-degenerate shape that exact criteria miss",
+    "risk": "a check that cries wolf gets ignored, so the clean_design PASS is the most important result of this round"
+  },
+  "limits": [
+    "The constructed cases are artificially injected.",
+    "The 0.05, 0.95 and 0.80 thresholds are chosen rather than optimised.",
+    "The ratio branch is untested.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "note": "changes are under research/tools/, not src/ or the root tools/",
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

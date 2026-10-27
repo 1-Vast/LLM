@@ -1,0 +1,51 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r104",
+  "round": "R104 (goal round 102/256)",
+  "date": "2026-10-27",
+  "RUN_INVALID": true,
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Attempted cross-dataset replication on BATCHIE's dose-aware residual arena; the run was invalid."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r104": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round fails technically, refuses to use its own numbers, and records why.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e104_cross_dataset.py"], "runs": 2,
+    "first_run": "killed after ~40 minutes because RidgeCV inside a 10-block loop was too slow",
+    "second_run": "completed but invalid",
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E104_RESULTS_INVALID.json", "rows": "E104_rows_INVALID.csv",
+                "protocol": "PROTOCOL_E099.md"},
+  "invalid_evidence": {
+    "identity": 0.1359, "identity_gene": 0.1359, "identity_random": 0.2781,
+    "symptom_1": "identity and identity+gene agree to four decimals with a zero-width confidence interval",
+    "symptom_2": "both are 13.59% while a bottom-quartile target has a 25% base rate, i.e. far below chance",
+    "symptom_3": "the random capacity control scores 27.81%, about chance, and beats both real arms"},
+  "technical_cause": {
+    "change_1": "RidgeCV replaced by a closed-form solve at a fixed alpha for speed",
+    "change_2": "the gene block was left at 4,889 dimensions instead of a restricted set, so at that alpha its coefficients were flattened",
+    "change_3": "the training residual came from an in-sample fit while the held-out residual came from an out-of-sample fit, making their scales incomparable",
+    "result": "the ranking became anti-correlated with the target, reproducing none of the R88/R89 behaviour",
+    "all_three_changes_at_once": "this is why the failure could not be attributed to a single cause"},
+  "decisions": {"H269": "not testable - run invalid", "H270": "not testable - run invalid",
+                "H271": "not established - the automated verdict is withdrawn",
+                "verdict": "RUN_INVALID_no_cross_dataset_conclusion"},
+  "promotion_status": {
+    "promoted": false,
+    "equal_budget_vs_marginals": "passed (R102)",
+    "leakage_review": "favourable but the pre-registered gate failed in the small pool (C76)",
+    "cross_dataset": "unresolved; this round produced nothing usable"},
+  "lesson": "changing a validated pipeline in three places at once to save time is the worst version of this mistake; the right move is one change at a time, checked against a known number on a small sample before scaling up",
+  "next_gates": ["return to the R88/R89 implementation (RidgeCV, restricted gene set), add only an identity arm, and first check on a small sample that the gene arm still reproduces about 28% before scaling"],
+  "limits": ["no comparable numbers were produced this round",
+             "the BATCHIE residual arena was usable in R88/R89; this round's rewrite is what broke",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "register_updates": {"C77": "new: the cross-dataset run is invalid and must not be quoted"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C77 added)", "research/INDEX.md (added R104 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

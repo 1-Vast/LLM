@@ -1,0 +1,158 @@
+{
+  "date": "2026-10-27",
+  "timezone": "Asia/Shanghai",
+  "task": "task-47 R198-A3v2 dynamic route L1 development asset revision (per challenge_A3 revise, 5 must-fix)",
+  "agent": "cellstate-lit",
+  "revision_of": "R198-A3 (task-26): qualification.md / protocol_draft.md / cadence_evidence.md / record.md / usage.json (v1, unchanged)",
+  "disposition": "A3v2 remains 'side-question' L1 development asset only; NOT a candidate; L2 decision layer NOT entered",
+  "scope": {
+    "metadata_only": true,
+    "expression_matrix_read": false,
+    "response_values_read": false,
+    "model_training_runs": 0,
+    "time_prediction_runs": 0,
+    "effect_statistics_runs": 0,
+    "network_fetches": 0,
+    "wet_lab_experiments": 0,
+    "v1_files_modified": 0,
+    "other_directories_modified": 0,
+    "novelty_claimed": false
+  },
+  "five_must_fix_mapping": {
+    "1_delivery_completeness": {
+      "spec_md_added": true,
+      "spec_md_path": "research/2026-10-27-innovation-scouting/dynamic_route/spec.md",
+      "choice": "add spec.md (not merge into qualification/protocol)",
+      "v1_sha_registry": "REVISION_A3.md §4 (7 files; 5/5 match v1 record table; record/usage backfilled)",
+      "kinetic_horizon_reading_authoritative": "file names/bytes identified; npz keys/shapes/dtypes only for response-cache triage; no array values read; provenance/splits not audited",
+      "v1_inconsistent_wording": "not edited; superseded by v2 authoritative description (spec.md §2, REVISION_A3.md §1)"
+    },
+    "2_l1_gate_and_c3_leak": {
+      "delta_min": 0.10,
+      "gate_order": ["G0 eligibility", "G1 split-half reliability", "G2 room", "G3 MDE80", "G4 primary effect", "G5 leakage audit"],
+      "g1_rule": "Spearman-Brown split-half reliability rho_sb >= delta_min + MDE80",
+      "g2_rule": "room = rho_oracle - rho_C1 >= max(delta_min, MDE80)",
+      "g3_rule": "MDE80(paired delta, cell-line cluster bootstrap) <= delta_min",
+      "g3_prerun_upper_bound_2.802_sqrt_2_over_n_minus_1": {"n95": 0.41, "n22": 0.86, "n24": 0.83, "n15": 1.06},
+      "required_cross_model_error_correlation_for_delta_0.10": {"n95": 0.940, "n22": 0.987, "n24": 0.985, "n15": 0.991},
+      "g4_rule": "mean_d rho(C2_d)-rho(C1_d) point >= 0.10 and 95% CI lower > 0",
+      "g5_leakage_audit": "V1 model set fixed {C0,C1,C2,C5,C6}; no target-time/future-time inputs; train-fold-only preprocessing; cell-line-grouped folds; V1/C3 code-level assertion",
+      "c3_scope": "V2 only (inputs strictly earlier than target: 12h uses 3h+6h; 48h uses 3/6/12/24h); V1 forbids any 24h-derived input",
+      "fail_semantics": "G1/G2/G3 fail => evaluation_cannot_distinguish; G0 => data_unavailable; G5 => design_invalid; all pass + G4 pass => development_increment_present (L1 only)",
+      "v2_status": "exploratory only (strict eligible n=15<20); no verdict, no cross-drug inference"
+    },
+    "3_q_table_fixes": {
+      "Q2": "renamed to 'early vs late state-associated proxy ranking'; not responder; functional responder requires L2",
+      "Q5": "control measured at both 6h and 24h (115 keys/time), so time-matched control exists; channel/batch cannot be matched; hashed arm has DMSO 5 time points; support M*",
+      "Q7": "support downgraded to M*: requires new cell-state annotation/scoring (h5ad has no state annotation)",
+      "static_two_snapshot_sufficient_list_added": true,
+      "Q8_Q9_Q10": "remain unsupported (no washout, no dose series, no individual trajectories)"
+    },
+    "4_precedents_and_boundaries": {
+      "bounded_precedents": [
+        "arXiv:2604.27646 virtual-cell in-the-wild benchmark (P; local reference HTML; line anchors 186/269; includes McFarland2020; linear baselines)",
+        "CellFlow morphology (P; evidence_notes.md:19; interpolation t != physical time)",
+        "State (Cell 2026, DOI 10.1016/j.cell.2026.07.052; registry A; full text restricted)",
+        "XPert (Nat Mach Intell 2026, DOI 10.1038/s42256-025-01165-w; P; handoff audit report:25)",
+        "BATCHIE (P; conditional combination model + plate design)",
+        "CADENCE (P + local HTML re-read; identifiability conditions)",
+        "target-identifiability SSRN 7368638 (A; 403 unread)"
+      ],
+      "boundaries": {
+        "C174": "1.43% is additive conditional main-effect share only; dynamic route does not use old C172/C174 interpretation as premise",
+        "C176": "R196 replicated_under_audit revoked -> inconclusive; original numbers retained",
+        "C177": "R197 v1 protocol revoked; v1 results not interpretable; low-rank question still untested",
+        "not_reopen": "R196v2/R197v2 not reopened before completion",
+        "decoupled_from": ["A1", "A2", "A4", "A5"]
+      },
+      "no_novelty_claim": true,
+      "zero_hit_rule": "miss != absence"
+    },
+    "5_record_and_wording_consistency": {
+      "record_v2_created": true,
+      "usage_v2_created": true,
+      "forbidden_claim_template_preserved": "no dynamic world model / no true-trajectory recovery / no multi-snapshot path recovery / no decision benefit / L1 does not unlock L2",
+      "negative_not_written_as_absence": true,
+      "failure_classes_aligned_with_challenge": ["data_unavailable", "design_invalid", "evaluation_cannot_distinguish", "no_increment", "exploratory_only", "decision_layer_blocked", "identifiability_unsupported"]
+    }
+  },
+  "inputs_read": {
+    "challenge_A3.md": {"bytes": 18890, "sha256": "04ff07f91af558564f7d6839cbbaca2fe03a8c10b375b6983e022f0c0fa8b87f"},
+    "v1_files_sha_registry": {
+      "a3_inspect.py": {"bytes": 29844, "sha256": "09e334417fecd389842000ffd6a48a0b105de441680ec9e4789d469854c7faa0"},
+      "a3_meta.json": {"bytes": 52766, "sha256": "fcf56d459b3e78433b7efdb49ee29e0f9a65107b41b435e87664c4354c254000"},
+      "qualification.md": {"bytes": 20666, "sha256": "13272b01000102b1c3cd8612cdee8eb6f9eca50b2b3d862c1d3c7c364d0c65d5"},
+      "protocol_draft.md": {"bytes": 21521, "sha256": "9d7ae195224259a93defb57a7358752dbc7018b0562fb6dcdc2fb7cf09d4eedc"},
+      "cadence_evidence.md": {"bytes": 6388, "sha256": "0b6bdcc3cddadba68b4b2e51f2782fe046562c39c3d3f759739fc1128e169fd6"},
+      "record.md": {"bytes": 9283, "sha256": "873c0cb1dd0e791f7a2ac0b142e6c4f83d2cd22c51b3f4e58531928071941b76"},
+      "usage.json": {"bytes": 7170, "sha256": "31d56cdaa4b8f32f6601ddc532c097826f3d4fa6765b5cef54a0aa69855dfee8"}
+    },
+    "v1_hashes_match_v1_record_table": true,
+    "mixseq_h5ad_metadata_only": {
+      "path": "data/external/mixseq_scperturb/mcfarland_2020.h5ad",
+      "bytes": 1459410830,
+      "sha256": "94a7240047b9ce6822dc2aa1e7a66c1fd8b00be842e5a95fc72cbeb6f2834d2c",
+      "read": "obs design metadata + cell_quality counts only; no expression/obsm/layers/response"
+    },
+    "other_local_reads": [
+      "research/2026-10-27-innovation-round-r198/record.md (read-only; spec.md link path and challenge disposition)",
+      "research/EVIDENCE_REGISTER.md C174/C176/C177 entries",
+      "research/2026-10-27-cross-domain-directions/{report.md,evidence_notes.md,directions_v2.md}",
+      "reference/papers.tsv + reference/papers/arxiv-2604.27646/paper.html",
+      "research/2026-10-27-handoff-method-audit/report.md (XPert reading)"
+    ],
+    "network_fetches": 0
+  },
+  "outputs": {
+    "spec.md": {"bytes": 19330, "sha256": "1fc255b4485d369da3ca0dbe57e907c9890fb741883987d0d667c3d50a805121"},
+    "protocol_draft_v2.md": {"bytes": 17875, "sha256": "c58e522b6b450f0f9286053c9a131ccf2c2d2168c00cfda7cbcf6f344daeb89b"},
+    "REVISION_A3.md": {"bytes": 16796, "sha256": "d8a5ecd1e1272a8bc052e25f641f5605332afabaeb3bcd118d38fd3f6b45557d"},
+    "record_v2.md": {"bytes": 9017, "sha256": "4a63b5904a95d0afa97a3e25a4a531e81bec3059f123405c2276f73203b1576f"},
+    "usage_v2.json": {"self_hashed": false},
+    "tmp/a3v2_eligibility.py": {"bytes": 7748, "sha256": "f9e09b196de678a987f03c0cd9577e4d665d248f5ea52748f5edc340d21de7be"},
+    "tmp/a3v2_eligibility.json": {"bytes": 6082, "sha256": "0e9178338fdadb8934555e3079e46e39d297c48f5c045294572b853ed23a172c"},
+    "tmp/arxiv_2604.27646.txt": {"bytes": 85942, "sha256": "1c4a0fff5dd88a4eb25163e8d88773c6c02599dc65fbc0478bc9988297d34840"}
+  },
+  "script_runs": {
+    "tmp/a3v2_eligibility.py": {
+      "runs": 3,
+      "run_log": [
+        "run1: failed on itertuples underscore-column naming; no output written",
+        "run2: success; wrote initial tmp/a3v2_eligibility.json (no strict V2 target eligibility yet)",
+        "run3: success; wrote final tmp/a3v2_eligibility.json with V1 per-drug eligible lines + V2 strict target eligibility"
+      ],
+      "purpose": "L1 eligible-unit counts (V1 per-drug; V2 strict targets) + v1 SHA verification"
+    }
+  },
+  "l1_eligibility_facts": {
+    "v1_confirmatory_eligible_lines_with_matched_control": {"BRD3379": 95, "Bortezomib": 22, "Idasanutlin": 24, "Trametinib": 24},
+    "v2_exploratory_strict_eligible_lines": {"target_12h": 15, "target_48h": 15},
+    "v2_conditions_ge20_normal": "231/264",
+    "min_normal_cells_per_condition": 20,
+    "unit": "cell line (not key/cell/timepoint)"
+  },
+  "verification": {
+    "json_parse_ok": true,
+    "v1_unchanged": true,
+    "v1_sha_5_of_5_match": true,
+    "no_expression_read": true,
+    "no_response_read": true,
+    "no_training": true,
+    "no_time_prediction": true,
+    "no_network": true
+  },
+  "limitations": [
+    "L1 not run (task forbids training/prediction/expression read); gates are frozen pre-registration rules, MDE/reliability not measured.",
+    "V2 strict eligible n=15<20 => exploratory only; no verdict/cross-drug inference.",
+    "L2 still blocked (no functional endpoint, batch/dose/dose-series unverified, no independent cultures).",
+    "Precedents are bounded reading (not systematic); State full text restricted (A), XPert (P), benchmark 2604.27646 (P local HTML).",
+    "R198 record not modified (write scope); spec.md existence resolves its link; registry update is Lead-side if desired.",
+    "v1 wording inconsistency not edited; v2 authoritative description in spec.md §2 / REVISION_A3.md §1."
+  ],
+  "model": {
+    "model_effective": "unknown",
+    "reasoning_effort_effective": "unknown",
+    "tokens": null,
+    "cost": null
+  }
+}

@@ -1,0 +1,108 @@
+{
+ "allocation": {
+  "A": 42,
+  "A_cells": null,
+  "B": 42,
+  "B_cells": null,
+  "S": 24,
+  "S_cells": null,
+  "U": 17,
+  "U_cells": null,
+  "reference_warnings": [],
+  "splits": {
+   "A": {
+    "n": 42,
+    "sha256": "C4DF821DC507A7C0C3AE9C9F7A77D92991C6307422146807981BEC88B95809C5",
+    "tissues": {
+     "Breast": 17,
+     "Colon": 16,
+     "Pancreas": 9
+    }
+   },
+   "B": {
+    "n": 42,
+    "sha256": "C0EAFCDD82C08126DEE8A714FAF405B9F5B4CAA3C1115D9C44940C41A2E9D5C8",
+    "tissues": {
+     "Breast": 16,
+     "Colon": 17,
+     "Pancreas": 9
+    }
+   },
+   "S": {
+    "n": 24,
+    "sha256": "34C4B9D7198CC451822AC8C4A3A553825D917CE0B56D16D9851AAD96BA9783D1",
+    "tissues": {
+     "Breast": 12,
+     "Colon": 12,
+     "Pancreas": 0
+    }
+   },
+   "U": {
+    "n": 17,
+    "sha256": "EAA922839C0C2512424A76E982C4BF2CA4A2CBEB9EE099C20B0C2D988BA5854E",
+    "tissues": {
+     "Breast": 6,
+     "Colon": 0,
+     "Pancreas": 11
+    }
+   }
+  }
+ },
+ "config_sha256": "BCFCE1B15E27699B7E842723A4A2F7A3364052B8A6D22885954B04FCD0384AF9",
+ "counts": {
+  "ab_supply_candidates": 135,
+  "candidate_grid_by_tissue": {
+   "Breast": 134,
+   "Colon": 37
+  },
+  "candidate_grid_total": 171,
+  "coverage_denominator": 171,
+  "coverage_target": 86,
+  "expected_passing_count": 106,
+  "precheck_eligible": 106,
+  "precheck_eligible_by_tissue": {
+   "Breast": 79,
+   "Colon": 27
+  },
+  "reference_cells_note": "reference 84 includes A9+B9=18 Pancreas cells that are NOT used by the per-tissue Breast/Colon main family (no tissue nuisance in the main model); retained only to keep the frozen 84/24/17 composition",
+  "s_milp_optimum": 106,
+  "s_selection": {
+   "covered_candidates": 106,
+   "n_ctx_min": 12,
+   "per_tissue_counts": {
+    "Breast": 12,
+    "Colon": 12
+   },
+   "s_target": 24,
+   "solver": "milp"
+  },
+  "s_solver": "milp",
+  "s_splits_sha256": "34C4B9D7198CC451822AC8C4A3A553825D917CE0B56D16D9851AAD96BA9783D1",
+  "v3_reference_values_not_applicable": {
+   "note": "v3 MILP values under a DIFFERENT S composition (24 taken from the 41 leftover pool, possibly cross-tissue); they are NOT a v4 bound, NOT a reachability proof, and are NOT used as a gate. v4 uses the actual s_milp_optimum.",
+   "v3_upper_bound_all_candidates": 114,
+   "v3_upper_bound_breast_colon": 112
+  }
+ },
+ "gates": {
+  "main_tissues_breast_colon": true,
+  "pancreas_excluded": true,
+  "precheck_eligible_ge_target": true,
+  "reference_matched_subset": true,
+  "reference_size_ok": true,
+  "s_milp_optimum_ge_target": true,
+  "s_selection_solver": "milp",
+  "s_side_cond_cov_ge_12": true,
+  "three_way_disjoint": true,
+  "tissue_span_non_vacuity": true
+ },
+ "notes": [
+  "P0a-metadata PASS is NOT relations_check PASS and NOT Stage 1 / effect evidence.",
+  "real_data_read: false for this metadata-only step; loader only reads the 6 metadata columns (no endpoint)",
+  "reference 84 contains 18 Pancreas cells (A9+B9) that are not used by the per-tissue Breast/Colon main family",
+  "the only source of truth for the coverage gate is the actual s_milp_optimum (counts.s_milp_optimum), not the v3 114/112 reference values"
+ ],
+ "reasons": [],
+ "schema": "r198-a1-stage0-p0a-metadata-v4",
+ "status": "pass"
+}

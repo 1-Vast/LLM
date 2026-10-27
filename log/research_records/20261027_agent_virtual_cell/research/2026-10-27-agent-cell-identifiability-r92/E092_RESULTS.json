@@ -1,0 +1,108 @@
+{
+  "kind": "cross_tissue_transfer_of_the_final_algorithm",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "subsamples": 40,
+    "n_boot": 2000,
+    "seed": 20261027,
+    "criterion": "dataset boolean Synergy (fixed by R91)"
+  },
+  "audit": {
+    "units": 120,
+    "tissues": [
+      "Breast",
+      "Colon",
+      "Pancreas"
+    ]
+  },
+  "by_tissue": {
+    "Breast": {
+      "n": 40,
+      "base": 0.0115125,
+      "random": 0.01125,
+      "transfer": 0.05874999999999999,
+      "ceiling": 0.12125000000000001,
+      "coverage": 0.32405,
+      "transfer_minus_random": {
+        "n": 40,
+        "mean_diff": 0.0475,
+        "ci95": [
+          0.03375,
+          0.0625
+        ]
+      },
+      "ceiling_minus_transfer": {
+        "n": 40,
+        "mean_diff": 0.0625,
+        "ci95": [
+          0.04375,
+          0.08125
+        ]
+      }
+    },
+    "Colon": {
+      "n": 40,
+      "base": 0.012837500000000002,
+      "random": 0.0125,
+      "transfer": 0.027500000000000004,
+      "ceiling": 0.030000000000000006,
+      "coverage": 0.6459750000000001,
+      "transfer_minus_random": {
+        "n": 40,
+        "mean_diff": 0.015000000000000003,
+        "ci95": [
+          0.0025000000000000005,
+          0.028749999999999998
+        ]
+      },
+      "ceiling_minus_transfer": {
+        "n": 40,
+        "mean_diff": 0.0024999999999999996,
+        "ci95": [
+          -0.0075000000000000015,
+          0.0125
+        ]
+      }
+    },
+    "Pancreas": {
+      "n": 40,
+      "base": 0.024237500000000002,
+      "random": 0.025,
+      "transfer": 0.08249999999999999,
+      "ceiling": 0.16,
+      "coverage": 0.5839624999999999,
+      "transfer_minus_random": {
+        "n": 40,
+        "mean_diff": 0.05750000000000001,
+        "ci95": [
+          0.03375,
+          0.08125
+        ]
+      },
+      "ceiling_minus_transfer": {
+        "n": 40,
+        "mean_diff": 0.07749999999999999,
+        "ci95": [
+          0.05,
+          0.1075
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r92/PROTOCOL_E087.md": "f8bb97d3756c0ea9c12757b38b8a4670929fa4a28514d2a8eb6768cd21a5aa06",
+    "research/2026-10-27-agent-cell-identifiability-r92/e092_cross_tissue.py": "1095369db52e295d2b966dfc5b3cde1e5b5d2e1b36f5742bcf27eb23f85986ee"
+  },
+  "decisions": {
+    "H234_transfers_in_every_tissue": true,
+    "H235_transfer_costs_something": true,
+    "H236_fails_somewhere": false,
+    "verdict": "algorithm_transfers_but_at_a_cost"
+  },
+  "limits": [
+    "Only three tissues, so leave-one-tissue-out gives three folds; within-fold subsampling makes units non-independent and the CIs optimistic.",
+    "Drugs absent from the training tissues fall back to no information, which is a genuine transfer difficulty and is reported as coverage.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ]
+}

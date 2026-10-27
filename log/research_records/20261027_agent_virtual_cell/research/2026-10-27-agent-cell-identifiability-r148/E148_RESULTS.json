@@ -1,0 +1,94 @@
+{
+  "kind": "re_test_of_C106_without_dead_features",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "repeats": 60,
+    "holdout": 0.2,
+    "seed": 20261051,
+    "tree_config": {
+      "max_iter": 200,
+      "learning_rate": 0.08,
+      "max_depth": 4,
+      "min_samples_leaf": 40
+    },
+    "n_boot": 2000
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 60,
+    "usable": 60
+  },
+  "rho": {
+    "A_drug_only": 0.40650234506196103,
+    "A_drug_path": 0.42166920822681414,
+    "B_pathway_only": 0.0984006975919324,
+    "B_random_only": 0.00037791940828668587
+  },
+  "gains": {
+    "gain_A": {
+      "mean": 0.015166863164853097,
+      "ci95": [
+        0.01463605781372774,
+        0.015697708664140733
+      ]
+    },
+    "gain_B": {
+      "mean": 0.0984006975919324
+    }
+  },
+  "gain_difference_AB": {
+    "n": 60,
+    "mean_diff": 0.0832338344270793,
+    "sd": 0.09100359381730119,
+    "ci95": [
+      0.05946914857850797,
+      0.10621593012244636
+    ]
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r148/PROTOCOL_E138.md": "198a5f78a11e9dec605793dea577e277f38a1cc847c8eec9d460ba250c2e69ce",
+    "research/2026-10-27-agent-cell-identifiability-r148/e148_retest_c106.py": "5cb53d2fe01a7c332205df7bdc8d16e48a1b13a4b6441b91d47ea4e2b9c1b5ac"
+  },
+  "decisions": {
+    "gain_A_fully_informed": 0.015166863164853097,
+    "gain_B_identity_absent": 0.0984006975919324,
+    "gain_difference": 0.0832338344270793,
+    "H362_decay_holds_under_tree_too": true,
+    "H363_decay_still_linear_only": false,
+    "verdict": "the_decay_is_model_independent_and_C106_C107_are_withdrawn"
+  },
+  "limits": [
+    "Sixty splits, one untuned tree configuration, integer coding.",
+    "Conditions A and B use different evaluation pools, so this compares gains rather than arms within one pool.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "C106_and_C107_are_withdrawn": {
+    "what_they_claimed": "the monotone decay of the coarsening gain is specific to linear models; under boosting there was no growth (+0.0150 fully informed against +0.0176 absent, difference +0.0029)",
+    "what_the_corrected_run_shows": {
+      "gain_fully_informed": 0.0152,
+      "gain_identity_absent": 0.0984,
+      "difference": 0.0832,
+      "ci95": [
+        0.0595,
+        0.1062
+      ]
+    },
+    "the_shape_is_the_same_as_ridge": {
+      "ridge": "0.000 fully informed to 0.13 absent",
+      "tree": "0.015 fully informed to 0.098 absent"
+    },
+    "why_the_earlier_null_arose": "R138 and R139 both put drug identity codes into the no-identity arm. On the evaluation rows every one of those codes was the reserved code -1, a dead feature. That is now measured directly: with the grouping alone the tree reaches 0.0984, against the 0.032 that the dead-feature design produced.",
+    "so": "the decay is a general property of the setup, not of the model family, and the defect was in my encoding rather than in the trees"
+  },
+  "what_survives": {
+    "C105": "the claim that the fully-informed redundancy is exact only for linear models. R137 measured +0.0152 for the tree in that very condition and this run reproduces exactly +0.0152, so C105 rests on a clean comparison and stands.",
+    "C115": "pathway beats target under both families, measured with grouping-only features, so it is unaffected",
+    "C113_C114": "pathway over target, ridge rounds, unaffected",
+    "the_frozen_claim": "unaffected: it is a ridge result and always said so"
+  },
+  "the_lesson": {
+    "class": "a dead feature in one arm silently changes what a flexible model does, and it can manufacture a model-family difference",
+    "how_to_avoid": "before comparing arms across model families, confirm every feature carries information in the evaluation condition; the check is cheap and I skipped it twice",
+    "count": "fifth instance of this class in the programme"
+  }
+}

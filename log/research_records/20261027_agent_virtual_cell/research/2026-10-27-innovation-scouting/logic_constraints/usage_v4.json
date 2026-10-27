@@ -1,0 +1,108 @@
+{
+  "task": "task-51",
+  "round": "R198-A2v4",
+  "role": "constraint-library / constructive-discrimination support module for R198-A1 (v4 pre-merge patch)",
+  "status": "v4 patch delivered; DRAFT; mergeable into A1 freeze after re-review; no effect/simulator runs",
+  "date": "2026-10-27",
+  "timezone": "Asia/Shanghai",
+  "derived_from": {
+    "v3_files": ["spec_v3.md", "protocol_draft_v3.md", "REVISION_A2_v3.md", "record_v3.md", "usage_v3.json"],
+    "challenge": "challenge_A2_v3.md",
+    "challenge_verdict": "revise (5 short patches; no rerun needed)"
+  },
+  "new_files": ["spec_v4.md", "protocol_draft_v4.md", "REVISION_A2_v4.md", "record_v4.md", "usage_v4.json", "constructive_sim_v4.py", "state_z.json"],
+  "artifact_sha256": {
+    "state_z.json": "8A475BB6442CACCE811423953E777675CB125B4915B3C187CD27134FFA603872",
+    "constructive_sim_v4.py": "3F5D4C3747D32320CAE8498E06146A31B1E3DF96EF6750CBE6BB20984C202464",
+    "spec_v4.md": "FC78E8EC1061BA6CCF1086B6A7DD0A77A52EDF2A76DE61517B8F9AED8A10F59F",
+    "protocol_draft_v4.md": "6DD1EE08C4C8BB9F5E8497920625EA85CFACF7A46D924EF9DEE83996D36EC495",
+    "REVISION_A2_v4.md": "0444DF5B0063D3D98E2BED2D4186BFAA39EF9F88F6A82DA7E3FD9811D3FD4F6A"
+  },
+  "v1_v2_v3_files_untouched_sha256": {
+    "spec.md": "139282B4E36677ED6019856C86AB68E46679CE92C90B6FBD550D63C1A521848B",
+    "spec_v2.md": "0467FA0F85423189",
+    "spec_v3.md": "E638955CA0CF8DE2",
+    "protocol_draft.md": "587E2675DD51E9E4",
+    "protocol_draft_v2.md": "DEFDD8EB7BDF7E9E",
+    "protocol_draft_v3.md": "1EE0A4F5A96D1269",
+    "prior_art.md": "8C484393B223B4CD",
+    "record.md": "49136AD5F7220F40",
+    "record_v2.md": "FC3B866819038790",
+    "record_v3.md": "E3BA46924121",
+    "usage.json": "ADD8C70276CAAF8F",
+    "usage_v2.json": "33D05E3A682C413B",
+    "usage_v3.json": "8BE3A04E8F31",
+    "REVISION_A2.md": "CA2B3CDF8B552715",
+    "REVISION_A2_v3.md": "326F8A88E45C",
+    "folds.json": "3546E34EBA1CAF41",
+    "constraints_check.json": "B35018F70C97BF2A",
+    "constructive_sim.py": "2D9E0D61C753EAE6"
+  },
+  "runtime": {
+    "interpreter": "D:\\anaconda\\envs\\maestro\\python.exe (pandas + numpy; metadata/identity/annotation/design columns only)",
+    "network": "none this round",
+    "cwd": "D:\\MAESTRO"
+  },
+  "model": "unknown",
+  "effort": "unknown",
+  "tokens": {"input": null, "output": null, "total": null, "note": "runtime token accounting not exposed; null not 0"},
+  "cost_usd": null,
+  "effects_runs": 0,
+  "training_runs": 0,
+  "replay_runs": 0,
+  "simulator_runs": 0,
+  "simulator_syntax_compile_only": true,
+  "responses_read_for_effect": false,
+  "novelty_claimed": false,
+  "patch_1_simulator": {
+    "file": "constructive_sim_v4.py",
+    "implemented": ["load_units", "make_world (real y)", "sample_batch k=6/12/20/24/36", "classify rules 1-5", "endpoints E1-E4/E4b/null-gate", "verdict partial/fail", "mde_plan", "--confirm-run gate"],
+    "not_run": true,
+    "runtime_estimate": "<=5 min is an UNVERIFIED PLANNING VALUE (not measured)",
+    "stub_markers_removed": ["DESIGN_STUB_NOT_IMPLEMENTED", "NotImplementedError"]
+  },
+  "patch_2_state_z": {
+    "file": "state_z.json",
+    "unit": "cell x directed_pair (108,259 units)",
+    "row_rule": "BARCODE digits -> int -> mod 2; coverage 296,707/296,707 = 100%",
+    "unit_rule": "majority parity within unit; tie -> parity of smallest numeric BARCODE; fallback none (0 units)",
+    "z_balance": {"0": 54251, "1": 54008},
+    "tie_units": 5967,
+    "q_unit_rule": "4-key majority, tie -> lexicographically smallest (cell,condition) key (dormant; R193-A0 quadruples not used)",
+    "collinearity_cramers_v": {"cell_groups_8": 0.0214, "tissue": 0.0138, "drug_type_same_diff": 0.0107},
+    "freeze_gate": "V<=0.30 else replace z",
+    "same_file_for_generator_and_classifier": true
+  },
+  "patch_3_e3_rule_choice": {
+    "choice": "(a) null unresolvable rate <= 0.50 (null resolved >= 0.50) as design-check gate",
+    "E3": "null false-class rate <= 0.10; null abstention counts as no false class",
+    "E1_weights": "class-balanced: I=0.5, pooled{II,III}=0.5 (II,III 0.25 each); denominator=all non-null worlds; abstention=error",
+    "E2_weights": "II vs III 0.5/0.5; abstention=error",
+    "E4b": "per-class resolved >= 0.85 for I/II/III only (null excluded; null governed by null gate)"
+  },
+  "patch_4_units_and_verdict": {
+    "unordered_canonical_group_rule": "canonical direction by drug-name lexicographic order (smaller=p1, larger=p2); group label=(p1 pathway, p2 pathway)",
+    "unordered_groups_canonical": {"total": 320, "ge2": 209, "ge4": 119, "ge4_covered_unordered_pairs": 971},
+    "v3_unordered_retracted": {"total": 305, "ge2": 215, "ge4": 117, "reason": "non-canonical .first() direction, not reproducible"},
+    "directed_primary_unchanged": {"total_groups": 331, "ge2": 275, "ge4": 165, "ge4_covered_pairs": 1698, "ge4_units": 90589},
+    "k6_z_reading": "z_total is across 6 units (z=0 total 3, z=1 total 3), NOT per-stratum 3/3; III not judged at k=6",
+    "partial_fail": {"E1_fail": "constructive_fail", "E1_pass_E2_fail": "constructive_partial", "E3_or_E4_or_E4b_or_null_gate_fail": "constructive_fail"}
+  },
+  "patch_5_freeze_text": {
+    "simulator_v4_checkbox": "[x] implemented on disk, NOT run",
+    "v3_skeleton_checkbox": "[x] historical skeleton, no longer an executable deliverable",
+    "state_z_entry_added": true,
+    "runtime_budget_label": "UNVERIFIED PLANNING VALUE",
+    "forbidden_wording": "must not write 'executable on disk', 'constructive passed', or any effect claim"
+  },
+  "limitations": [
+    "constructive check and MDE NOT run (forbidden this round); E1-E4 reachability, MDE<=delta_min, and <=5 min runtime remain unverified",
+    "simulator only syntax-compiled (compile()), no --plan/--confirm-run execution",
+    "SYNERGY_DELTA_EMAX column semantics cited from R198 record, not independently re-audited",
+    "A1 updater/attribution schema not provided; a2_to_a1/v3 remains A2-side contract",
+    "A4 state resources unknown; III real-data certification remains A4",
+    "general-ML prior art remains metadata-level only",
+    "state_z.json is a metadata-only artifact (BARCODE-derived); the 22MB self-hash issue was avoided by not embedding self SHA (actual SHA recorded in record_v4/usage_v4)"
+  ],
+  "next_entry": "v4 re-review; then merge into A1 freeze; post-freeze first run of constructive check + MDE (>=1000 batches) with measured runtime replacing the unverified planning value; replay only descriptive after constructive_pass"
+}

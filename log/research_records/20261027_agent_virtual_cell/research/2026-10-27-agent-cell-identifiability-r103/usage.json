@@ -1,0 +1,56 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r103",
+  "round": "R103 (goal round 101/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Leakage review: permute the drug-to-pathway mapping and check the increment disappears."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r103": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round refuses to relax its own pre-registered gate even though the substantive reading is favourable.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e103_leakage.py"], "runs": 1, "pools": 2, "repeats": 70, "arms": 3,
+    "rows": 280, "pathways": 21, "pathway_block_dims": 47,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E103_RESULTS.json", "rows": "E103_rows.csv", "protocol": "PROTOCOL_E098.md"},
+  "results": {
+    "one_unseen": {"identity": 0.0721, "real": 0.1107, "permuted": 0.0871,
+                   "real_minus_identity": {"diff": 0.0386, "ci95": [0.0129, 0.0636]},
+                   "permuted_minus_identity": {"diff": 0.0150, "ci95": [-0.0021, 0.0321]},
+                   "real_gain_minus_perm_gain": {"diff": 0.0236, "ci95": [0.0029, 0.0443]}},
+    "both_unseen": {"identity": 0.0143, "real": 0.0286, "permuted": 0.0129,
+                    "real_minus_identity": {"diff": 0.0143, "ci95": [-0.0029, 0.0343]},
+                    "permuted_minus_identity": {"diff": -0.0014, "ci95": [-0.0114, 0.0093]},
+                    "real_gain_minus_perm_gain": {"diff": 0.0157, "ci95": [-0.0014, 0.0364]}}
+  },
+  "decisions": {"H266_real_gain_exceeds_permuted_gain": false,
+                "H266_note": "written as 'in every pool'; held in one_unseen and failed only in the underpowered both_unseen",
+                "H267_no_gain_after_permutation": true,
+                "H268_leakage_review_passed": false,
+                "verdict": "leakage_not_indicated_but_gate_failed_in_the_underpowered_pool_so_promotion_stays_closed"},
+  "what_the_data_actually_says": {
+    "permutation_destroys_the_gain": "the permuted arm gains nothing (+1.50 ns and -0.14 ns), exactly as a clean feature should behave",
+    "real_mapping_matters_where_power_exists": "in one_unseen the real gain exceeds the permuted gain by +2.36 pp [+0.29,+4.43]",
+    "where_it_is_merely_directional": "in both_unseen the same contrast is +1.57 pp [-0.14,+3.64], right direction but only about 1,830 keys",
+    "leakage_indicated": false},
+  "criticism_of_my_own_gate": "requiring significance in every pool makes the gate unsatisfiable for a small pool; a combined or power-weighted criterion would have been the right pre-registration. Recorded so the next gate is designed against power.",
+  "promotion_status": {
+    "promoted": false,
+    "cleared": "the specific leak hypothesis that feature count or a structural artefact drives the gain",
+    "outstanding": ["higher power in the both-unseen pool", "replication on a second dataset"]},
+  "limits": ["only two pools were run, not cell_unseen",
+             "only 21 pathways, giving a 47-dimension pathway block",
+             "permutation preserves the marginal pathway distribution while destroying the pairing, which is the intended cut",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["cross-dataset replication on BATCHIE is the last promotion requirement"],
+  "register_updates": {"C76": "new: no leakage indicated, but the pre-registered gate failed in the small pool",
+                       "SYNTHESIS": "promotion text qualified"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C76 added)", "research/SYNTHESIS.md (promotion text qualified)",
+                                "research/INDEX.md (added R103 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

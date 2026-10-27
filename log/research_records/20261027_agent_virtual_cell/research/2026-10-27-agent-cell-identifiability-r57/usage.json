@@ -1,0 +1,46 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r57",
+  "round": "R57 (goal round 55/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Natural-variation test of the strength moderator; no literature query."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r57": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round gives the first fair test of a hypothesis four manipulations could not reach, and refutes it.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e057_natural_variation.py"], "runs": 1, "folds": 125,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E057_RESULTS.json", "cells": "E057_cells.csv", "protocol": "PROTOCOL_E056.md"},
+  "design": {
+    "folds": "leave one cell line out (125 folds); training on all other cells, pool = that cell's keys",
+    "features": "pathway + tissue, 41 dims", "k": 20,
+    "measured": "prediction rho and mix-minus-exploit per fold"
+  },
+  "results": {
+    "rho_range": [0.099, 0.591],
+    "pool_range": [288, 1275],
+    "spearman_rho_vs_diff": -0.173, "ci95": [-0.338, -0.005],
+    "partial_controlling_pool_size": -0.203,
+    "spearman_pool_vs_diff": -0.308,
+    "quartiles": {"Q1": {"rho": 0.210, "diff": 0.0094}, "Q2": {"rho": 0.286, "diff": -0.0161},
+                  "Q3": {"rho": 0.346, "diff": -0.0532}, "Q4": {"rho": 0.435, "diff": -0.0935}},
+    "quartile_gap": -0.1029
+  },
+  "decisions": {"H146_strength_moderates": false, "H147_survives_pool_control": false,
+                "H148_quartile_gap": false,
+                "verdict_reported": "strength_moderator_refuted_in_the_opposite_direction"},
+  "refutation": "stronger prediction makes the mix MORE harmful, the opposite of the hypothesis, with a Q4-Q1 gap of -10.29 pp",
+  "reconciliation_with_R37": "R37/R48 had pool 21,652 at rho about 0.32 with the mix helping; this round at rho about 0.35 has pool about 825 with the mix hurting. Pools differ 20-fold and R51's curve predicts negativity for small pools, so rho effects and pool-size effects are distinct.",
+  "register_updates": {"C33": "changed from UNTESTED to REFUTED with the direction reversed",
+                       "positioning": "the moderator is no longer a candidate contribution"},
+  "next_gates": ["stop adding variants on this axis; consolidate 57 rounds into what holds, what fails and why"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C33 refuted)", "research/POSITIONING.md (section 2.3a added)",
+                                "research/INDEX.md (added R57 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

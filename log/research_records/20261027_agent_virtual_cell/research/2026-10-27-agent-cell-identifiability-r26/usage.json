@@ -1,0 +1,36 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r26",
+  "round": "R26 (goal round 24/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Variance decomposition on data in hand; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r26": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the capacity caveat is stated in the results JSON and the report, and H063 is left explicitly untested.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e026_variance_split.py"], "runs": "2 (in-sample, then LOO added)",
+    "bootstrap": 1000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E026_RESULTS.json", "cell_pairs": "E026_cell_pairs.csv", "protocol": "PROTOCOL_E026.md"},
+  "question": "what actually distinguishes two cell lines - potency of the compounds (additive main effects) or the interaction residual?",
+  "results": {
+    "cell_pairs": 25, "layouts": 21,
+    "main_share_loo": {"median": 0.696, "mean": 0.707, "ci95": [0.675, 0.739], "frac_above_half": 1.0},
+    "main_share_insample": {"median": 0.725, "mean": 0.734},
+    "resid_share": {"median": 0.275, "ci95": [0.237, 0.296]},
+    "variance_levels": {"var_diff": 0.0495, "var_main": 0.0359, "var_resid": 0.0096, "cov": 0.0020}
+  },
+  "decisions": {"H061_main_effect_dominates": true, "H062_consistent": true,
+                "H063_share_predicts_transfer": null,
+                "H063_status": "untested, not false"},
+  "synthesis": "the ~70% potency share ties the programme together: cross-cell prediction works because potency orderings correlate (C2 0.816); own data buys little because ~37 potency parameters need many measurements (C18, C20); the 30% interaction is the tail and, though conserved at 0.60 (C12, C24), does not robustly improve ranking (C24)",
+  "capacity_caveat": "the share mixes model capacity with data structure - 37 free parameters on 351 observations necessarily absorb part of the between-cell difference, so 0.70 means 'the share a 37-parameter potency model explains', not a biological partition",
+  "register_updates": {"C21": "new, exploratory: main-effect share 0.696 (25/25 above 0.5), residual 0.275, with the capacity caveat recorded"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C21 added)", "research/INDEX.md (added R26 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "mechanism_claim_made": false
+  }
+}

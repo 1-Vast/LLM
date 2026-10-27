@@ -1,0 +1,39 @@
+{
+  "experiment": "E144_c75_marginal_arm_degeneracy",
+  "round": "R144",
+  "date": "2026-10-27",
+  "question": "Is C75's 'identity+pathway beats marginals in all three pools' meaningful in the both-unseen pool?",
+  "design": "Reproduce the two-way additive marginal predictor under the same drug-holdout protocol and measure its prediction dispersion inside the both_unseen and one_unseen evaluation pools. 60 splits, seed 20261047.",
+  "results": {
+    "both_unseen": {
+      "reps": 60,
+      "exactly_zero_sd": 19,
+      "max_sd": 3.469e-18,
+      "mean_sd": 4.235e-19,
+      "all_below_1e-12": true
+    },
+    "one_unseen": {
+      "reps": 60,
+      "exactly_zero_sd": 0,
+      "mean_sd": 0.018241,
+      "min_sd": 0.014203
+    }
+  },
+  "finding": {
+    "statement": "When both drugs are held out, neither drug's marginal mean exists in the training data, so both marginal terms are zero and the predictor equals the grand mean. Its dispersion is 4e-19, floating-point zero, in every one of 60 splits.",
+    "so_C75_is_vacuous_in_that_pool": "identity+pathway beats a constant trivially. The comparison is arithmetically true and evidentially empty for the both-unseen pool. It remains meaningful for one_unseen and cell_unseen, where at least one marginal exists (dispersion 0.018).",
+    "why_an_exact_test_understated_it": "an exact sd == 0 test caught only 19 of 60 splits, because the remaining 41 differ from zero at the 1e-18 level. Degeneracy must be judged with a tolerance.",
+    "near_miss": "had I only run the exact-zero test I would have written 31.7 percent degenerate, which is an artefact of the test rather than a property of the data"
+  },
+  "consequences": {
+    "promotion_table": "the same-budget-against-marginals check must read 'where marginals are defined', with the both-unseen pool excluded",
+    "frozen_claim_unaffected": "the frozen claim compares against identity and against random, permuted and dead blocks, not against marginals",
+    "C75": "not withdrawn; valid on the other two pools",
+    "degeneracy_count": "fifth instance, after R104, R108, R113 and R135"
+  },
+  "limits": [
+    "Sixty splits on one resource.",
+    "The marginal implementation is a two-way additive drug-mean model; another specification might not degenerate, and that is untested.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ]
+}

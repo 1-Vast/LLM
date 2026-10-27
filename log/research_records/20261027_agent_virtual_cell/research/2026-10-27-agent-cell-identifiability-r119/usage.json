@@ -1,0 +1,54 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r119",
+  "round": "R119 (goal round 117/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Cross-tissue transfer of identity+pathway, the last untested cell of the transfer grid."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r119": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round fills the last gap in the transfer grid and the answer implicates tissue inside the annotation block.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e119_combo_transfer.py"], "runs": 1, "tissues": 3, "subsamples": 60,
+    "units": 180, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E119_RESULTS.json", "rows": "E119_rows.csv", "protocol": "PROTOCOL_E112.md"},
+  "results": {
+    "Breast": {"base": 0.0117, "marginal": 0.0575, "identity": 0.0517, "combo": 0.0400, "random": 0.0117,
+               "combo_minus_random": {"diff": 0.0283, "ci95": [0.0133, 0.0425]},
+               "combo_minus_identity": {"diff": -0.0117, "ci95": [-0.0200, -0.0042]},
+               "combo_minus_marginal": {"diff": -0.0175, "ci95": [-0.0275, -0.0075]}},
+    "Colon": {"base": 0.0126, "marginal": 0.0283, "identity": 0.0175, "combo": 0.0183, "random": 0.0108,
+              "combo_minus_random": {"diff": 0.0075, "ci95": [-0.0025, 0.0167]},
+              "combo_minus_identity": {"diff": 0.0008, "ci95": [0.0000, 0.0025]},
+              "combo_minus_marginal": {"diff": -0.0100, "ci95": [-0.0183, -0.0017]}},
+    "Pancreas": {"base": 0.0234, "marginal": 0.0950, "identity": 0.1842, "combo": 0.1633, "random": 0.0200,
+                 "combo_minus_random": {"diff": 0.1433, "ci95": [0.1233, 0.1625]},
+                 "combo_minus_identity": {"diff": -0.0208, "ci95": [-0.0333, -0.0092]},
+                 "combo_minus_marginal": {"diff": 0.0683, "ci95": [0.0517, 0.0858]}}
+  },
+  "decisions": {"H296_transfers_everywhere": false, "H297_annotation_increment_survives": false,
+                "H298_combo_beats_marginal_under_transfer": false,
+                "combo_beats_identity_pools": 0,
+                "verdict": "recommended_model_does_not_transfer_and_its_increment_may_be_tissue_mediated"},
+  "the_suspicion_this_raises": {
+    "observation": "under tissue holdout the annotation block makes things worse than identity alone, significantly in two of three tissues",
+    "why": "tissue is itself one of the features inside the annotation block, so a held-out tissue contributes only unused dimensions while the pathway columns alone may be weaker",
+    "implication_for_C74": "every pool in C74 and C80 had tissue fully observed, so that increment may be substantially tissue information rather than pathway information",
+    "decisive_test": "repeat C74's comparison with only pathway features and no tissue in the annotation block",
+    "stated_before_running_it": true},
+  "limits": ["only three tissues and therefore three folds",
+             "holding tissue out removes a feature the model was trained to use, so some transfer failure is expected",
+             "the unshrunk marginal predictor actually does best in Breast and Colon, so it does not suffer from the tissue extrapolation",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["run the decisive test: C74's three pools by two criteria with the tissue feature removed from the annotation block"],
+  "register_updates": {"C90": "new and strongly qualifying: the recommended model does not transfer and its increment may be tissue-mediated",
+                       "C74": "annotated", "SYNTHESIS": "the C74 row is qualified"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C90 added, C74 annotated)",
+                                "research/SYNTHESIS.md (C74 row qualified)", "research/INDEX.md (added R119 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

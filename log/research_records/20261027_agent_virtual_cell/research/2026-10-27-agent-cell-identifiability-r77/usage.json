@@ -1,0 +1,46 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r77",
+  "round": "R77 (goal round 75/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Refines R76's minimal-evidence threshold using the saved per-cell rows."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r77": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round refines a threshold and states clearly that the evidence for the refinement is weak.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["r77.py"], "runs": 1, "reads": "E076_rows.csv (no new simulation)",
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E077_RESULTS.json", "protocol": "PROTOCOL_E074.md"},
+  "design": {
+    "per_cell_threshold": "smallest m at which the mean gain over reps is positive",
+    "tests": ["Spearman(pool, absolute threshold)", "Spearman(pool, threshold as a fraction of pool)", "tercile summary by pool size"]
+  },
+  "results": {
+    "n_cells": 123, "n_with_crossover": 91, "n_never_benefiting": 32,
+    "pool_range": [600, 1275],
+    "spearman_pool_vs_abs": 0.2333, "spearman_pool_vs_frac": -0.1910,
+    "terciles": {"small": {"n": 55, "pool": 647, "m_abs": 33.0, "m_frac": 0.0509},
+                 "medium": {"n": 6, "pool": 1167.8, "m_abs": 92.5, "m_frac": 0.0774},
+                 "large": {"n": 30, "pool": 1251.5, "m_abs": 91.5, "m_frac": 0.0729}}
+  },
+  "decisions": {"H195_threshold_grows_with_pool": true, "H196_proportional_rule": true,
+                "verdict": "rule_is_a_fraction_of_the_pool"},
+  "headline": "the minimal-evidence threshold is closer to 5-8% of the candidate pool (about 33 rows for a 650-key pool, 92 for a 1,250-key pool) than to a fixed 100; R76's 100 is a large-pool-dominated aggregate",
+  "strength_caveat": "both correlations are weak (+0.233 and -0.191), the pool range spans only a factor of two because R76 filtered pools below 600 keys, and the middle tercile holds just 6 cells; the finding is suggestive, not established",
+  "second_finding": "32 of 123 cells (26%) never showed a positive crossover even at m=400, i.e. for a quarter of cells personal data never beat the drug marginals",
+  "limits": ["the per-cell threshold resolution is limited to R76's six m values",
+             "only 20 repetitions per cell",
+             "the narrow pool range limits leverage",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["characterise the 26% of cells that never benefit, so that 'do not personalise' can be predicted in advance"],
+  "register_updates": {"C51": "new, exploratory and explicitly suggestive: the threshold is roughly a fraction of the pool",
+                       "C50": "annotated with the refinement"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C51 added, C50 annotated)", "research/INDEX.md (added R77 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

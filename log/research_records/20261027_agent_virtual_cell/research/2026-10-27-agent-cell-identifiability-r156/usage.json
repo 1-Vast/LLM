@@ -1,0 +1,103 @@
+{
+  "experiment": "E156/E157",
+  "round": "R156 (goal round 154/256)",
+  "date": "2026-10-27",
+  "type": "artificially starving the training budget, to reach the information-poor regime R155 could not sample",
+  "compute": {
+    "scripts": [
+      "e156_starve.py",
+      "e157_starve_powered.py"
+    ],
+    "reps": [
+      20,
+      40
+    ],
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "results_e156": "E156_RESULTS.json",
+    "results_e157": "E157_RESULTS.json",
+    "rows": [
+      "E156_rows.csv",
+      "E157_rows.csv"
+    ],
+    "protocol": "PROTOCOL_E146.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "E156": {
+    "design": "starve one visible drug, evaluate on a single drug pair",
+    "n_eval_per_cell": 78,
+    "mde": "about 0.04",
+    "outcome": "uninformative: the minimum detectable effect exceeds the effects being compared",
+    "my_own_bug": {
+      "symptom": "the k20-minus-all interval was [-0.0124,-0.0124], zero width",
+      "cause": "the bootstrap reseeded its generator inside the loop, so every resample was identical",
+      "after_fix": [
+        -0.0399,
+        0.0471
+      ],
+      "count": "seventh instance of this failure class in the programme",
+      "new_gap": "feature_audit inspects features, splits and predictions, so it cannot see a reseeded bootstrap"
+    }
+  },
+  "E157": {
+    "design": "reduce every drug's training keys to k, evaluate on all keys containing a held-out drug",
+    "n_eval_per_cell": 15378,
+    "splits": 40,
+    "gains": {
+      "all": [
+        0.0211,
+        0.0152,
+        0.028
+      ],
+      "k400": [
+        0.0214,
+        0.0141,
+        0.0285
+      ],
+      "k120": [
+        0.0233,
+        0.0175,
+        0.0295
+      ],
+      "k40": [
+        0.0176,
+        0.0115,
+        0.0242
+      ]
+    },
+    "training_keys": {
+      "all": 92881,
+      "k400": 9393,
+      "k120": 2828,
+      "k40": 943
+    },
+    "rho_identity": {
+      "all": 0.2591,
+      "k40": 0.1971
+    },
+    "rho_pathway": {
+      "all": 0.2802,
+      "k40": 0.2146
+    }
+  },
+  "what_can_be_said": "the pathway gain is stable across a 98-fold reduction in training data, 0.0211 to 0.0176, all four points significant and mutually overlapping; so the frozen claim is not an artefact of abundant data",
+  "what_cannot_be_said": "that information scarcity makes the pathway relatively more valuable. Uniform starvation degrades identity by 24 percent but also degrades the pathway prior, so the two fall together and the gap stays put. The asymmetric version is E156, which lacked power.",
+  "status_of_the_question": "still open, now known to require a much larger evaluation set than a single drug pair",
+  "limits": [
+    "k=12 could not run: about 280 training keys is too few for 168 features, so the low end is bounded by model feasibility.",
+    "Uniform starvation is not the asymmetry the hypothesis is about.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "next_gate": "scale the asymmetric design: starve S while leaving its pathway-mates intact, and pool evaluation over many held-out partners to lift n_eval from 78 into the thousands",
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

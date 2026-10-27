@@ -1,0 +1,113 @@
+{
+  "agent_role": "annotation-mapping-and-coverage-auditor",
+  "audit_line": "R192-PA2",
+  "task_id": "task-9",
+  "date": "2026-10-27",
+  "environment": {
+    "os": "Windows (PowerShell pwsh)",
+    "workspace": "D:\\MAESTRO",
+    "output_dir": "research/2026-10-27-drugcomb-annotation",
+    "python": "D:\\anaconda\\envs\\maestro\\python.exe (Python 3.11.16)",
+    "packages": {
+      "pandas": "2.3.3",
+      "numpy": "2.4.6",
+      "scipy": "1.17.1"
+    }
+  },
+  "protocol": {
+    "file": "PROTOCOL_PA2.md",
+    "version": "v1",
+    "frozen_at": "2026-10-27T14:34:03+08:00",
+    "frozen_before_pa2_py_existed": true,
+    "sha256": "447ca67e787f7648ee3c274372bc3fd81c8cedb1288049fad1c225395d8ed1a0"
+  },
+  "runs": [
+    {
+      "command": "python pa2.py",
+      "purpose": "HGNC alias/name resolution layer + frozen S1-A re-run (implements PROTOCOL_PA2.md v1)",
+      "wall_seconds": 23.9,
+      "status": "ok",
+      "notes": "3 earlier attempts failed on implementation KeyErrors (pa.read_v14_identity has no e1_split key; target_stats lacks two v1-appended fields; jaaks stats lacks overlap_D1); all failed after mapping_table_v2.csv was written but before pa2.json; no rule/threshold changes were made, final successful run overwrote the table"
+    },
+    {
+      "command": "python pa2.py (repeat run for determinism)",
+      "purpose": "determinism verification",
+      "runs": 2,
+      "status": "ok",
+      "notes": "pa2.json and mapping_table_v2.csv SHA256 identical across repeated runs of the same script version; sys.dont_write_bytecode=True so no __pycache__ is created in the study dir"
+    }
+  ],
+  "downloads": {
+    "formal_total_bytes": 16982321,
+    "formal_total_mb": 16.2,
+    "budget_mb": 50,
+    "files": {
+      "hgnc_complete_set.txt": {
+        "bytes": 16982321,
+        "url": "https://storage.googleapis.com/public-download-files/hgnc/tsv/tsv/hgnc_complete_set.txt",
+        "url_alternative_unused": "https://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/tsv/hgnc_complete_set.txt",
+        "sha256": "12363916be36f8f6f91879b0faade4eeaac973722de7136ec61329b77f2c2f91",
+        "version": "HGNC complete set, 45277 data rows, all Approved; version date max(date_modified) = 2026-10-15",
+        "local_path": "research/2026-10-27-drugcomb-annotation/resources_hgnc/hgnc_complete_set.txt"
+      }
+    }
+  },
+  "tokens": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "total_tokens": null,
+    "note": "runtime token accounting is not available to the agent; recorded as null (not 0)"
+  },
+  "cost": {
+    "usd": null,
+    "note": "not available; recorded as null"
+  },
+  "verdict": "mapping_v2_qualified",
+  "primary_variant": "V2-A (base v1 exact + token-symbol + token-alias/prev + segment-name/alias_name; ambiguity resolved only when it cannot change downstream argmax)",
+  "key_numbers": {
+    "v1_mapped_drugs": 1418,
+    "v1_coverage_pct_of_4088": 34.6869,
+    "v2_mapped_drugs": 1800,
+    "v2_coverage_pct_of_4088": 44.0313,
+    "delta_mapped_drugs": 382,
+    "delta_coverage_pp": 9.3444,
+    "v1_analyzable_levels_pa": 62,
+    "v2_analyzable_levels_pa": 79,
+    "v2_analyzable_levels_e1_split": 72,
+    "v1_both_unseen_units_pa": 2682,
+    "v2_both_unseen_units_pa": 3056,
+    "v1_both_unseen_units_e1_split": 3739,
+    "v2_both_unseen_units_e1_split": 4654,
+    "v1_train_units_pa": 85436,
+    "v2_train_units_pa": 117106,
+    "v2_strict_train_units_pa": 83684,
+    "v2_levels_total": 125,
+    "ambiguous_drugs": 211,
+    "ambiguous_drugs_pct_of_D1": 5.18,
+    "ambiguous_entities_total": 284,
+    "ambiguous_entities_resolved": 206,
+    "ambiguous_entities_unresolved": 78,
+    "ambiguous_drugs_capped_by_enumeration_limit": 4,
+    "drugs_gaining_new_symbols": 930,
+    "new_symbols_total": 2935,
+    "v1_products_unmodified": true,
+    "v1_recomputation_match": true
+  },
+  "deliverables": {
+    "PROTOCOL_PA2.md": "447ca67e787f7648ee3c274372bc3fd81c8cedb1288049fad1c225395d8ed1a0",
+    "pa2.py": "65e1113adfa50d4eda8915647e102f3ff4b1623d80ffe022e0faf35954e65f4d",
+    "pa2.json": "41edb023e8fffc20607a5eff9048fb1bc9560108c50c818715a43a145b697c61",
+    "mapping_table_v2.csv": "705a5e6476319b587c9b5e852590baef817cec7b8c4d69b0a54ec7cc686ed015",
+    "report_pa2.md": "131d8ac8c177426d2e7c592e071d5aa8e2b14d1dd91d551cfc4680750b293be6",
+    "record_pa2.md": "560f459f3a09858dd246f84404bf4a23388772f85e607c2a7d74a350cba3f5f1",
+    "resources_hgnc/hgnc_complete_set.txt": "12363916be36f8f6f91879b0faade4eeaac973722de7136ec61329b77f2c2f91"
+  },
+  "notes": [
+    "response values were never read: v1.4 parsed with csv.reader and positional access to identity columns only; the 12 response/derived columns appear solely as header-name strings; grep on mapping_table_v2.csv for response column names returns 0 matches",
+    "P-A v1 products were not modified (SHA256 before/after equal, audit A5); v1 S1-A numbers were recomputed inside pa2.py and equal the frozen pa.json values (audit A3)",
+    "v2 gain is driven mainly by the protein-full-name layer (590 drugs, 322 exclusive) rather than token alias/prev (533, 271 exclusive); generic short HGNC aliases (52 tokens with hnorm len<=3) are a known precision risk: dropping len<=2 changes 55 labels and dropping len<=3 changes 111 labels -- reported as pre-registered sensitivity V2-D and diagnostics",
+    "both-unseen unit counts are not monotone in mapping coverage because the PA split is defined on the mapped-drug list; V2-B (segment-name only) has both-unseen PA 2078 < v1 2682 despite higher coverage -- reported explicitly",
+    "rule A semantics (gene-set co-membership, not mechanism) is unchanged by v2; taxane->tubulin family bias persists",
+    "all hash values are SHA256 unless a name says otherwise"
+  ]
+}

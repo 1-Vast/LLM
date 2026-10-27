@@ -1,0 +1,123 @@
+{
+  "kind": "does_scaling_lambda_with_n_remove_the_inverted_U",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "reps": 40,
+    "ks": [
+      "all",
+      400,
+      120,
+      40
+    ],
+    "seed": 20261063,
+    "lambda_schedule": "lambda proportional to n, so lambda/n constant",
+    "n_boot": 2000
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 160
+  },
+  "by_k": {
+    "-1": {
+      "n": 40,
+      "mean_train": 71593.05,
+      "lambda": 1.0,
+      "gain": -0.001012420107654971,
+      "ci95": [
+        -0.005560478763531161,
+        0.0033404725797389133
+      ],
+      "mde_80pct": 0.006717973400601872
+    },
+    "400": {
+      "n": 40,
+      "mean_train": 8270.25,
+      "lambda": 0.11584092484340007,
+      "gain": 0.005490385781243277,
+      "ci95": [
+        0.001687303933545994,
+        0.009593208497569223
+      ],
+      "mde_80pct": 0.0056354717746682015
+    },
+    "120": {
+      "n": 40,
+      "mean_train": 2507.625,
+      "lambda": 0.03512533506100831,
+      "gain": 0.0035825188271465607,
+      "ci95": [
+        -0.0014765379165980939,
+        0.008554347479157207
+      ],
+      "mde_80pct": 0.007275695453911306
+    },
+    "40": {
+      "n": 40,
+      "mean_train": 836.175,
+      "lambda": 0.011713140260795719,
+      "gain": 0.004931524254488834,
+      "ci95": [
+        0.0008221087547565332,
+        0.008894694621186767
+      ],
+      "mde_80pct": 0.005875135001648511
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r160/PROTOCOL_E149.md": "9e56ac9379510e2729a181a51efc69975f7a9f6bea087b44b8491373433cd9c3",
+    "research/2026-10-27-agent-cell-identifiability-r161/e161_lambda_scaled.py": "1fc462bcf07cf8599f409347f3c8e947dcb12065b2c771ae8949b80fa1d02558"
+  },
+  "decisions": {
+    "gains": [
+      -0.001012420107654971,
+      0.005490385781243277,
+      0.0035825188271465607,
+      0.004931524254488834
+    ],
+    "ci_lower_bounds": [
+      -0.005560478763531161,
+      0.001687303933545994,
+      -0.0014765379165980939,
+      0.0008221087547565332
+    ],
+    "spread": 0.006502805888898248,
+    "all_resolvable": false,
+    "shape_flat_within_mde": true,
+    "verdict": "the_inverted_U_was_a_regularisation_artefact_and_the_starvation_family_needs_a_controlled_schedule"
+  },
+  "limits": [
+    "Only the dense criterion and the top-20 percent hit-rate metric.",
+    "Lambda proportional to n is one corrected schedule, not the only defensible one; inner cross-validation would be better.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "what_this_round_establishes": {
+    "finding_1": {
+      "what": "the inverted U in E160 was largely a regularisation artefact",
+      "evidence": "the k=120 peak falls from +0.0086 to +0.0036 once lambda is scaled with n",
+      "reading": "holding lambda at 1.0 while n falls from 71,572 to 836 regularises each parameter about eighty-five times more heavily, which collapses drug-level coefficients and lets group structure take over the ranking"
+    },
+    "finding_2": {
+      "what": "a residual pattern survives the correction",
+      "evidence": {
+        "all": -0.001,
+        "k400": 0.0055,
+        "k120": 0.0036,
+        "k40": 0.0049
+      },
+      "reading": "with full data the annotation adds nothing to the top-20 percent hit rate, and at every reduced budget it adds about half a percentage point. Three of four budgets agree in direction.",
+      "status": "suggestive, not established: the spread is 0.0065 against a maximum minimum-detectable effect of 0.0073, so it is not resolvable as a shaped curve"
+    },
+    "finding_3": {
+      "what": "the decision table this round set out to build does not exist in the form hoped",
+      "why": "the answer is not 'use criterion X below budget Y'. Both criteria lose resolution at small budgets in the hit-rate metric, and the annotation effect itself is around 0.001 to 0.009 in that metric, which is at or below the minimum detectable effect everywhere except the intermediate budgets.",
+      "so": "the round produced a methodological correction instead of a table"
+    }
+  },
+  "this_invalidates_the_interpretation_of_R156_and_R157": {
+    "what_they_did": "reduced the training budget and read changes in the annotation gain as changes in the value of information",
+    "the_confound": "lambda was held fixed at 1.0 while n varied, so the effective regularisation per parameter changed with the budget. The manipulation moved two things at once.",
+    "consequence": "C124 and C125 must be downgraded to unestablished until they are repeated with lambda controlled",
+    "what_survives": "the arithmetic of those rounds is correct; what is unsafe is the reading of the change as an information effect",
+    "the_fix": "scale lambda with n, or tune it by inner cross-validation on the training set only"
+  }
+}

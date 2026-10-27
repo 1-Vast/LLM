@@ -1,0 +1,41 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r54",
+  "round": "R54 (goal round 52/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Bidirectional cross-task transfer test of the R53 predicate; no literature query."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r54": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round reports that its own transfer test has low discriminative power rather than presenting the success as validation.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e054_transfer.py"], "runs": 1, "units": 43, "pool_sizes": 3, "repeats": 20,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E054_RESULTS.json", "rows": "E054_rows.csv", "protocol": "PROTOCOL_E053.md"},
+  "design": {
+    "direction_A": "GDSC threshold 3,000 applied unchanged to BATCHIE pools of 80/160/320",
+    "direction_B": "check whether a threshold could be learned from BATCHIE at all",
+    "hit": "true bottom-quartile viability, chance 25%, k=20"
+  },
+  "results": {
+    "batchie_mix_minus_exploit": {"80": -0.3094, "160": -0.2342, "320": -0.2551},
+    "direction_A_prediction_holds": true,
+    "direction_B_threshold_learnable": false
+  },
+  "decisions": {"H127_direction_matches_GDSC": true, "H128_all_negative_small_pools": true,
+                "H138_transfer_A_holds": true, "H139_transfer_B_unlearnable": true,
+                "H140_directional_transfer": true,
+                "verdict_reported": "predicate_transfers_one_way_with_low_discriminative_power"},
+  "headline": "the rule transfers only from a task whose pool range spans the crossover; BATCHIE cannot learn it",
+  "discriminative_power": "BATCHIE's largest pool is 320, an order of magnitude below the threshold, so any threshold above 320 gives the same prediction and would be 'confirmed' by this data; it cannot validate 3,000 and can only falsify thresholds at or below 320",
+  "requirement_for_a_real_cross_task_test": "a second task whose pool range spans roughly 1,000 to 10,000",
+  "register_updates": {"C36": "transfer caveat added", "C37": "new, exploratory: transfer is directional and one-way tests have limited power"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C36 caveat, C37 added)", "research/POSITIONING.md (candidate restated)",
+                                "research/INDEX.md (added R54 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

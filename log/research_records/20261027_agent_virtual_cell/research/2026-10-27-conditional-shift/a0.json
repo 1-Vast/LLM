@@ -1,0 +1,624 @@
+{
+  "condition_definition": "directed (ANCHOR_ID -> LIBRARY_ID, ANCHOR_CONC uM, LIBRARY_CONC highest uM)",
+  "dose_layout_comparability": {
+    "anchor_conc_common": 20,
+    "anchor_conc_levels": {
+      "original": [
+        "0.00025",
+        "0.000625",
+        "0.001",
+        "0.0025",
+        "0.01",
+        "0.0125",
+        "0.025",
+        "0.05",
+        "0.0625",
+        "0.1",
+        "0.125",
+        "0.2",
+        "0.25",
+        "0.5",
+        "0.625",
+        "0.8",
+        "1",
+        "1.25",
+        "2",
+        "2.5",
+        "4",
+        "5",
+        "7.5",
+        "8",
+        "10",
+        "30"
+      ],
+      "validation": [
+        "0.000625",
+        "0.0025",
+        "0.01",
+        "0.0125",
+        "0.025",
+        "0.05",
+        "0.0625",
+        "0.1",
+        "0.125",
+        "0.2",
+        "0.25",
+        "0.5",
+        "0.625",
+        "1",
+        "1.25",
+        "2",
+        "2.5",
+        "4",
+        "5",
+        "10"
+      ]
+    },
+    "common_cell_condition_keys": 9154,
+    "common_key_share_of_validation": 0.948699,
+    "library_conc_common": 10,
+    "library_conc_levels": {
+      "original": [
+        "0.0125",
+        "0.02",
+        "0.1",
+        "0.2",
+        "1",
+        "2",
+        "4",
+        "5",
+        "8",
+        "10",
+        "20",
+        "30"
+      ],
+      "validation": [
+        "0.0125",
+        "0.1",
+        "0.2",
+        "1",
+        "2",
+        "4",
+        "5",
+        "6",
+        "8",
+        "10",
+        "20"
+      ]
+    },
+    "pairs_with_multiple_common_design_tuples": 127
+  },
+  "estimability_notes": {
+    "batch_confounding": "Original vs Validation are separate screens (disjoint barcodes); screen identity is confounded with measurement batch and cannot be separated from \"independent group\"",
+    "dose_layout": "only ANCHOR_CONC and LIBRARY_CONC(highest) are published in the fitted table; full library dose-point sets are not available, and no raw Validation layout file exists locally -> dose-layout equivalence verified only at the design-column level",
+    "minimal_loop": "a matched quadruple is exactly a 4-cycle (loop) in the cell x condition bipartite graph; trees cannot identify non-additivity, 2x2 is the minimal loop",
+    "replicate_plates": "Original has repeated barcode measurements for some (cell,condition) keys; fitted table has no plate date/batch, so barcode-level independence is weaker than cross-screen",
+    "single_agent_reference": "single-agent fitted columns exist (ANCHOR_VIABILITY, LIBRARY_EMAX/XMID/AUC/fAUC) but their values are DENY in A0; H193b adjusted-Q needs them in A1"
+  },
+  "independent_groups": {
+    "primary": {
+      "G1": "Original screen fitted table",
+      "G2": "Validation screen fitted table",
+      "barcode_sets_disjoint": true
+    },
+    "secondary_barcode_split": {
+      "replicated_keys": 31019,
+      "rule": "per (cell,condition) key with >=2 distinct Original barcodes: sorted ascending, A=first ceil(n/2), B=rest"
+    }
+  },
+  "inputs": {
+    "glossary": {
+      "bytes": 12193,
+      "path": "data\\external\\gdsc_combinations\\jaaks2022_figshare\\Glossary.xlsx",
+      "sha256": "e29d8d2dccf230ce5e17b530c1a012389659142fdf78ae20c55b20a4c34619ce"
+    },
+    "original_fitted": {
+      "bytes": 198893607,
+      "path": "data\\external\\gdsc_combinations\\jaaks2022_figshare\\Original screen_All tissues_fitted data.csv",
+      "sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278"
+    },
+    "validation_fitted": {
+      "bytes": 11774397,
+      "path": "data\\external\\gdsc_combinations\\jaaks2022_figshare\\Validation screen_All tissues_fitted data.csv",
+      "sha256": "dcbd4c3108d212fa771c52ae977c8e1c01a421162a2232cdc4273faf257b2775"
+    }
+  },
+  "limitations": [
+    "metadata-only matching; no response values read; Q not estimated",
+    "library dose-point sets not published in fitted table -> dose-layout match only at published design columns",
+    "no raw Validation plate layout available locally -> cannot verify per-well layout equality across screens",
+    "Original repeated plates lack date/batch metadata -> barcode split independence weaker than cross-screen",
+    "text/ID matching does not prove biological identity",
+    "matching qualification does not imply Q is stable or transferable; that is A1"
+  ],
+  "mde_note": {
+    "brier": "BRIEF default 500 frozen; no post-hoc change",
+    "iid_spearman_note": "n=500 gives ~80% power (two-sided alpha=.05) for Spearman rho~=0.125 under iid; effective n is lower after clustering by cell/pair, so 500 is a floor, not a power guarantee (A1 must report clustered MDE)",
+    "threshold_units": 500
+  },
+  "method": {
+    "deterministic": "sorted JSON keys, no timestamps, no random draws (declared seed unused)",
+    "endpoint_access": "streaming empty-string existence only (no numeric conversion/aggregation); matching is response-blind",
+    "matching_uses": "identity/direction/dose-layout/endpoint-availability/screen only",
+    "numpy": "2.4.6",
+    "pandas": "2.3.3",
+    "python": "3.11.16",
+    "response_values_read": false
+  },
+  "overlap_original_validation": {
+    "barcode_ranges": {
+      "original": [
+        14482,
+        39392
+      ],
+      "validation": [
+        33044,
+        63257
+      ]
+    },
+    "barcode_sets_disjoint": true,
+    "cell_condition_keys": {
+      "common": 9154,
+      "original": 211504,
+      "validation": 9649
+    },
+    "cells": {
+      "common": 96,
+      "original": 125,
+      "validation": 97
+    },
+    "directed_pairs": {
+      "common": 130,
+      "original": 1975,
+      "validation": 130
+    }
+  },
+  "primary_endpoint": "SYNERGY_DELTA_EMAX",
+  "protocol": {
+    "path": "research\\2026-10-27-conditional-shift\\PROTOCOL_A0.md",
+    "sha256": "d77316ed9983d803d0671ef0c7d51f58bcdd439cfccf253110bea9b19539aa93"
+  },
+  "quadruples": {
+    "G1_only_quadruples": {
+      "cell_pairs_with_ge2_shared": 7750,
+      "quadruples": 4415971041
+    },
+    "G2_only_quadruples": {
+      "cell_pairs_with_ge2_shared": 4656,
+      "quadruples": 7301337
+    },
+    "R3_half_matches": 802445,
+    "R4_common_primary": 6223367,
+    "barcode_split_R4": 43208857,
+    "barcode_split_levels": {
+      "4": 43208857
+    },
+    "cell_degree_summary": {
+      "max": 165672,
+      "median": 128333.0,
+      "min": 33814,
+      "n_cells": 96
+    },
+    "cells_used_tissue_counts": {
+      "Breast": 33,
+      "Colon": 35,
+      "Pancreas": 28
+    },
+    "coverage_R4": {
+      "anchors_used": 31,
+      "cell_pairs_used": 3418,
+      "cells_used": 96,
+      "conditions_used": 291,
+      "directed_pairs_used": 98,
+      "libraries_used": 38
+    },
+    "csv": {
+      "matched_conditions_rows": 9154,
+      "note": "if R4 > cap the CSV holds the lexicographically first cap rows (frozen rule); full count above; full list regenerable by a0.py enumeration",
+      "quadruples_csv_cap": 200000,
+      "quadruples_csv_rows_written": 200000
+    },
+    "csv_sha256": {
+      "matched_conditions.csv": "73fd5085a7586bb1f33768e34a587668953da4c13735693dcf2fcccbc51353ff",
+      "matched_quadruples.csv": "881a0dfc62a7d70de158f5795ae1f2766e8ea1091bf6ed4f7280ba4a8211ccf9"
+    },
+    "directed_pair_degree_summary": {
+      "max": 353268,
+      "median": 90997.0,
+      "min": 39733,
+      "n_pairs": 98
+    },
+    "matched_replication_graph": {
+      "edges_cell_condition_keys": 9154,
+      "loops_4_cycles": 6223367,
+      "node_cells": 96,
+      "node_conditions": 291,
+      "nodes_total": 387,
+      "note": "each matched quadruple is exactly a 4-cycle; trees cannot identify non-additivity"
+    },
+    "replication_level_counts_common": {
+      "0": 4034637772,
+      "1": 177515510,
+      "2": 214664684,
+      "3": 802445,
+      "4": 6223367
+    },
+    "strata_R4": {
+      "controlled_anchor": 92039,
+      "cross_tissue": 5814,
+      "disjoint_pairs": 5345987,
+      "same_anchor_any_conc": 568029,
+      "same_library": 309351,
+      "same_tissue": 6217553
+    },
+    "top_anchors_by_degree": [
+      [
+        "1011",
+        2020200
+      ],
+      [
+        "1005",
+        1279155
+      ],
+      [
+        "1053",
+        1021350
+      ],
+      [
+        "1179",
+        726737
+      ],
+      [
+        "1022",
+        694144
+      ],
+      [
+        "1510",
+        674344
+      ],
+      [
+        "1558",
+        557655
+      ],
+      [
+        "1372",
+        502490
+      ],
+      [
+        "1083",
+        486069
+      ],
+      [
+        "1564",
+        482959
+      ]
+    ],
+    "top_cells_by_degree": [
+      [
+        "aspc1",
+        165672
+      ],
+      [
+        "bxpc3",
+        165672
+      ],
+      [
+        "dang",
+        165672
+      ],
+      [
+        "hs766t",
+        165672
+      ],
+      [
+        "hupt3",
+        165672
+      ],
+      [
+        "kp1n",
+        165672
+      ],
+      [
+        "kp2",
+        165672
+      ],
+      [
+        "kp4",
+        165672
+      ],
+      [
+        "miapaca2",
+        165672
+      ],
+      [
+        "mz1pc",
+        165672
+      ]
+    ],
+    "top_directed_pairs_by_degree": [
+      [
+        "1022:1073",
+        353268
+      ],
+      [
+        "1053:1564",
+        339018
+      ],
+      [
+        "1011:1372",
+        334197
+      ],
+      [
+        "1053:1372",
+        330060
+      ],
+      [
+        "1372:1561",
+        324083
+      ],
+      [
+        "1510:1564",
+        288024
+      ],
+      [
+        "1003:1022",
+        265964
+      ],
+      [
+        "1022:1190",
+        262965
+      ],
+      [
+        "1022:1179",
+        258968
+      ],
+      [
+        "1561:1564",
+        240806
+      ]
+    ],
+    "top_libraries_by_degree": [
+      [
+        "1053",
+        1241403
+      ],
+      [
+        "1564",
+        941930
+      ],
+      [
+        "1372",
+        896458
+      ],
+      [
+        "1022",
+        861006
+      ],
+      [
+        "1549",
+        788760
+      ],
+      [
+        "1011",
+        719187
+      ],
+      [
+        "1079",
+        614104
+      ],
+      [
+        "1561",
+        592060
+      ],
+      [
+        "1003",
+        532028
+      ],
+      [
+        "1510",
+        486612
+      ]
+    ]
+  },
+  "qualification": {
+    "failed_gates": [],
+    "gates": {
+      "Q1_primary_common_quadruples_ge_500": true,
+      "Q2_two_independent_groups": true,
+      "Q3_each_group_ge_500_quadruples": true,
+      "Q4_coverage_cells_ge_10_pairs_ge_10": true,
+      "Q5_primary_endpoint_available": true
+    },
+    "judgment": "matching_qualified",
+    "qualified": true,
+    "required_measurement_specs_if_not_qualified": [],
+    "threshold": {
+      "min_cells": 10,
+      "min_directed_pairs": 10,
+      "primary_common_quadruples": 500
+    }
+  },
+  "script": {
+    "path": "research/2026-10-27-conditional-shift/a0.py",
+    "sha256": "444e939cddd2f2dbdad805c298f73b89a538320ce1a4a6c2e7037c8cb66c3525"
+  },
+  "structure": {
+    "cell_name_collisions_over_union": {},
+    "drug_name_collisions_over_union": {
+      "afatinibtrametinib": [
+        "Afatinib | Trametinib",
+        "Afatinib|Trametinib"
+      ]
+    },
+    "endpoint_availability_isna_counts": {
+      "original": {
+        "SYNERGY_DELTA_AUC": 0,
+        "SYNERGY_DELTA_EMAX": 0,
+        "SYNERGY_DELTA_XMID": 0,
+        "SYNERGY_DELTA_fAUC": 0
+      },
+      "validation": {
+        "SYNERGY_DELTA_AUC": 0,
+        "SYNERGY_DELTA_EMAX": 0,
+        "SYNERGY_DELTA_XMID": 0,
+        "SYNERGY_DELTA_fAUC": 0
+      }
+    },
+    "exclusion_breakdown": {
+      "original": {
+        "composite_pipe": 5527,
+        "design_missing": 0,
+        "endpoint_empty": 0,
+        "identity_missing": 0,
+        "rows_total": 296707,
+        "valid": 291180
+      },
+      "validation": {
+        "composite_pipe": 158,
+        "design_missing": 0,
+        "endpoint_empty": 0,
+        "identity_missing": 0,
+        "rows_total": 23505,
+        "valid": 23347
+      }
+    },
+    "filter_rules": {
+      "composite_pipe_rows": "excluded",
+      "endpoint_missing_rows": "excluded",
+      "missing_identity_or_design": "excluded",
+      "normalized_cell_collisions": []
+    },
+    "glossary_term_count": 46,
+    "glossary_terms": [
+      "BARCODE\t",
+      "COMBI_ID",
+      "Tissue",
+      "CELL_LINE_NAME\t",
+      "SIDM\t",
+      "COSMIC_ID",
+      "ANCHOR_ID",
+      "ANCHOR_NAME\t",
+      "ANCHOR_TARGET\t",
+      "ANCHOR_PATHWAY\t",
+      "ANCHOR_DRUG_TYPE",
+      "ANCHOR_Clin_Rel",
+      "ANCHOR_CONC",
+      "LIBRARY_ID",
+      "LIBRARY_NAME\t",
+      "LIBRARY_TARGET\t",
+      "LIBRARY_PATHWAY\t",
+      "LIBRARY_DRUG_TYPE",
+      "LIBRARY_Clin_Rel",
+      "LIBRARY_CONC",
+      "ANCHOR_VIABILITY\t",
+      "LIBRARY_RMSE\t",
+      "LIBRARY_EMAX\t",
+      "LIBRARY_XMID\t",
+      "LIBRARY_XMID_uM",
+      "LIBRARY_AUC\t",
+      "LIBRARY_fAUC",
+      "SYNERGY_RMSE\t",
+      "SYNERGY_EXP_EMAX\t",
+      "SYNERGY_OBS_EMAX\t",
+      "SYNERGY_DELTA_EMAX\t",
+      "SYNERGY_XMID\t",
+      "SYNERGY_XMID_uM",
+      "SYNERGY_DELTA_XMID",
+      "SYNERGY_DELTA_XMID_uM",
+      "SYNERGY_EXP_AUC\t",
+      "SYNERGY_OBS_AUC\t",
+      "SYNERGY_DELTA_AUC\t",
+      "SYNERGY_OBS_fAUC",
+      "SYNERGY_EXP_fAUC",
+      "SYNERGY_DELTA_fAUC",
+      "Synergy",
+      "DAY1_NORM_MEAN",
+      "DAY1_NORM_SD",
+      "GROWTH_RATE",
+      "DOUBLING_TIME"
+    ],
+    "original": {
+      "barcodes": 3106,
+      "barcodes_per_key_hist": {
+        "1": 180485,
+        "10": 1357,
+        "2": 10940,
+        "3": 8053,
+        "4": 8501,
+        "5": 306,
+        "6": 246,
+        "7": 13,
+        "8": 442,
+        "9": 1161
+      },
+      "cells": 125,
+      "composite_rows": 5527,
+      "conditions": 4528,
+      "conditions_per_cell": {
+        "max": 2550,
+        "median": 1299,
+        "min": 576
+      },
+      "directed_pairs": 1975,
+      "rows_per_key_hist": {
+        "1": 180485,
+        "10": 1357,
+        "2": 10940,
+        "3": 8053,
+        "4": 8501,
+        "5": 306,
+        "6": 246,
+        "7": 13,
+        "8": 442,
+        "9": 1161
+      },
+      "rows_total": 296707,
+      "tissues": [
+        "Breast",
+        "Colon",
+        "Pancreas"
+      ],
+      "unordered_pairs": 1269,
+      "valid_rows": 291180
+    },
+    "validation": {
+      "barcodes": 454,
+      "barcodes_per_key_hist": {
+        "1": 211,
+        "2": 6212,
+        "3": 2412,
+        "4": 682,
+        "5": 66,
+        "6": 44,
+        "7": 22
+      },
+      "cells": 97,
+      "composite_rows": 158,
+      "conditions": 295,
+      "conditions_per_cell": {
+        "max": 118,
+        "median": 102,
+        "min": 76
+      },
+      "directed_pairs": 130,
+      "rows_per_key_hist": {
+        "1": 211,
+        "2": 6212,
+        "3": 2412,
+        "4": 682,
+        "5": 66,
+        "6": 44,
+        "7": 22
+      },
+      "rows_total": 23505,
+      "tissues": [
+        "Breast",
+        "Colon",
+        "Pancreas"
+      ],
+      "unordered_pairs": 98,
+      "valid_rows": 23347
+    }
+  },
+  "task": "R193-A0 matched-quadruple qualification audit"
+}

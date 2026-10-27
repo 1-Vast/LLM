@@ -1,0 +1,95 @@
+{
+  "kind": "does_the_boosting_gain_also_grow_as_identity_is_removed",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "repeats": 30,
+    "holdout": 0.2,
+    "seed": 20261041,
+    "n_boot": 2000
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 30
+  },
+  "by_condition": {
+    "full_identity": {
+      "identity_rho": 0.4070748124312201,
+      "both_rho": 0.42211434108197615,
+      "gain": {
+        "n": 30,
+        "mean_diff": 0.015039528650755954,
+        "sd": 0.002794398196866486,
+        "ci95": [
+          0.014109172778047721,
+          0.016028375161670567
+        ]
+      }
+    },
+    "no_identity": {
+      "identity_rho": 0.0,
+      "both_rho": 0.03224514091894069,
+      "gain": {
+        "n": 12,
+        "mean_diff": 0.01756815172896808,
+        "sd": 0.09282600640486374,
+        "ci95": [
+          -0.03363050120637534,
+          0.066399135048234
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r138/PROTOCOL_E128.md": "02e55adec968be79bb3031656b7c48785b71f1ff01d6b8b10b807e6d76a9e800",
+    "research/2026-10-27-agent-cell-identifiability-r138/e138_monotone.py": "ff0d87f0bf92158e058b0f30595a1cfd08274c928e17f84ce92163e264051bda"
+  },
+  "gain_difference": {
+    "n": 12,
+    "mean_diff": 0.0028688309708240997,
+    "sd": 0.0934279684589375,
+    "ci95": [
+      -0.04987259693930096,
+      0.051756486866167274
+    ]
+  },
+  "decisions": {
+    "H342_unified_monotone_under_boosting": false,
+    "H343_not_unified": true,
+    "verdict": "the_monotone_decay_and_its_magnitude_are_linear_model_properties_not_information_properties"
+  },
+  "limits": [
+    "A reserved code of -1 is one way to represent a drug with no identity information, not the only one.",
+    "Thirty splits.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "the_monotone_decay_is_linear_model_specific": {
+    "ridge_record": {
+      "full_information": 0.0,
+      "partial": [
+        0.0198,
+        0.0249
+      ],
+      "identity_absent": [
+        0.1458,
+        0.1275
+      ]
+    },
+    "boosting_record": {
+      "full_information": 0.015,
+      "identity_absent": 0.0176
+    },
+    "test": "gain difference (absent minus full) = +0.0029 with interval [-0.0499, +0.0518], so no evidence of growth",
+    "conclusion": "the six-fold decay established across R133 to R136 is a property of the linear model, not of the information structure. Under boosting the coarsening contributes a small, roughly constant amount and does not substitute."
+  },
+  "a_descriptive_gap_worth_record": {
+    "ridge_absent_case_rho": 0.13,
+    "boosting_absent_case_rho": 0.032,
+    "caveat": "this is a cross-model, cross-encoding comparison and was not tested formally, so it is descriptive only. It suggests that how much the coarsening substitutes for a missing identity depends on the model family, with ridge extracting far more than boosting.",
+    "why_plausible": "with both drugs unseen a linear model can still use the pathway block additively, while a tree has to place the unseen drugs into the reserved code and then split on pathway, which is a harder function to learn from 30 splits of a small pool"
+  },
+  "what_this_bounds": {
+    "the_frozen_claim": "its headline rank correlation of about 0.13 is a ridge number. The model-independent part is that the pathway is a coarsening of identity; how much that coarsening is worth is model-dependent and must be stated with the model.",
+    "what_stays_true": "the feature algebra (C104), and the fact that the coarsening is never worse than identity in any arm measured here",
+    "what_becomes_conditional": "the magnitude of the substitution, and the monotone decay itself"
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "kind": "is_the_redundancy_a_linear_model_artefact",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "repeats": 30,
+    "seed": 20261040,
+    "n_boot": 2000
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 30
+  },
+  "by_model": {
+    "ridge_oh": {
+      "identity_rho": 0.37747433728582824,
+      "both_rho": 0.3774742453484297,
+      "gain": {
+        "n": 30,
+        "mean_diff": -9.193739855158553e-08,
+        "sd": 1.8712217528302125e-06,
+        "ci95": [
+          -8.472591244010342e-07,
+          4.400994496639442e-07
+        ]
+      },
+      "mde_80pct": 9.572662800875792e-07
+    },
+    "boost": {
+      "identity_rho": 0.4071152302804126,
+      "both_rho": 0.42236199745036485,
+      "gain": {
+        "n": 30,
+        "mean_diff": 0.015246767169952406,
+        "sd": 0.0018886169958910145,
+        "ci95": [
+          0.014603670626040116,
+          0.015917986395365794
+        ]
+      },
+      "mde_80pct": 0.0009661652144820983
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r137/PROTOCOL_E127.md": "83de9d124c6d831e4da5ce203666ef4f5529e0d5ef45b7d32dd4276d6db6b4f3",
+    "research/2026-10-27-agent-cell-identifiability-r137/e137_nonlinear.py": "58eb1279225e1efd02330b5d4236ae55bc394a817efeb09624a2eafe4c02c3ff"
+  },
+  "decisions": {
+    "H340_redundancy_is_model_specific": true,
+    "H341_redundancy_is_feature_algebra": false,
+    "verdict": "the_coarsening_is_informationally_redundant_but_functionally_useful_to_nonlinear_models"
+  },
+  "limits": [
+    "Integer coding suits trees and not linear models, so the ridge rows are references only.",
+    "Only thirty splits, so power is lower than in the ridge rounds.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "what_survives_and_what_must_be_narrowed": {
+    "survives": "the algebraic fact: each drug maps to exactly one pathway level, so the pathway one-hots are a linear transform of the drug one-hots and for a linear model they span no new directions. Ridge reproduces the exact zero (-0.0000).",
+    "must_be_narrowed": "the functional claim 'substitute, never complement' holds only for linear models. Under gradient boosting the coarsening adds +0.0152 in rank correlation [0.0146, 0.0159], fifteen times the minimum detectable effect of 0.0010.",
+    "corrected_statement": "pathway carries no additional INFORMATION, but its coarser granularity is a useful inductive bias for a nonlinear model: it offers splits that generalise across drugs."
+  },
+  "why_boosting_can_use_it": {
+    "ridge": "adding a linear transform of existing columns cannot change the column space, so the fit is unchanged",
+    "boosting": "the same information presented at a coarser granularity enables different splits. A tree that splits on pathway generalises across all drugs in that pathway, which a split on drug identity cannot do. So the gain comes from inductive bias, not from information.",
+    "consequence": "redundant features can still help nonlinear models, and 'no new information' does not imply 'no use'"
+  },
+  "how_big": {
+    "boosting_gain": 0.0152,
+    "comparison_to_the_seen_pools": "the same order as the +0.020 and +0.025 rank gains found when one drug was seen (C103)",
+    "reading": "small, but it is the same size as the substitute effect in the partially-informed regime, which puts it on the same footing rather than dismissing it"
+  }
+}

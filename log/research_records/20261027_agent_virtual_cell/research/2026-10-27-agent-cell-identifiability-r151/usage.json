@@ -1,0 +1,57 @@
+{
+  "experiment": "E151",
+  "round": "R151 (goal round 149/256)",
+  "date": "2026-10-27",
+  "type": "threshold sensitivity of the near-degenerate tier, and exercise the previously untested ratio branch",
+  "compute": {
+    "script": "e151_thresholds.py",
+    "splits": 20,
+    "threshold_pairs": 9,
+    "scenarios": 4,
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "tool": "research/tools/feature_audit.py",
+    "results": "E151_RESULTS.json",
+    "protocol": "PROTOCOL_E141.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "headline": {
+    "clean_false_positive_rate": 0.0,
+    "across_all_nine_pairs": true,
+    "ratio_branch_detection": 1.0,
+    "passing_pairs": 6
+  },
+  "both_branches_validated": {
+    "ratio": "20 of 20 splits at every ratio threshold",
+    "dominance": "fires on zeroed and dominated, and correctly abstains at 0.99 where the constructed 0.96 is below the cut"
+  },
+  "why_false_positives_matter_most": "a check that cries wolf gets ignored, and an ignored check protects nothing",
+  "recommended_defaults": {
+    "ratio_threshold": 0.05,
+    "dominant_threshold": 0.95
+  },
+  "honest_gap": {
+    "what": "the ratio thresholds were not discriminated",
+    "why": "the scale-shrink construction multiplies by 0.01, which is below all three candidate cuts, so all three detect it",
+    "what_would_discriminate": "scale factors of about 0.03 and 0.08",
+    "status": "the branch works; the cut value is chosen, not derived"
+  },
+  "limits": [
+    "Constructed scenarios, injected artificially.",
+    "Twenty splits give the false-positive rate a resolution of about five points.",
+    "The ratio threshold is undiscriminated.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "note": "changes under research/tools/ only",
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "agent_role": "endpoint-and-measurement-regime-auditor",
+  "audit_line": "R191-PB",
+  "task_id": "task-8",
+  "date": "2026-10-27",
+  "environment": {
+    "os": "Windows (PowerShell pwsh)",
+    "workspace": "D:\\MAESTRO",
+    "output_dir": "research/2026-10-27-drugcomb-endpoint",
+    "python": "D:\\anaconda\\envs\\maestro\\python.exe (Python 3.11.16)",
+    "packages": {
+      "numpy": "2.4.6",
+      "pandas": "2.3.3",
+      "scipy": "bundled with the maestro env"
+    }
+  },
+  "runs": [
+    {
+      "command": "python tmp/pb_structure_prepass.py",
+      "purpose": "pre-protocol STRUCTURAL pass (identity/design columns only, no response values)",
+      "wall_seconds": 6.3,
+      "status": "ok",
+      "notes": "v1.4 combo blocks 466,033 / cell x pair 380,418 / both-unseen r=0.20 = 16,078 units (matches R190-E1)"
+    },
+    {
+      "command": "python pb.py",
+      "purpose": "formal deterministic audit implementing PROTOCOL_PB.md (final version)",
+      "wall_seconds": 77.5,
+      "wall_seconds_range": [77.5, 103.1],
+      "status": "ok",
+      "notes": "pb.json SHA256 identical across the two final runs (ED5D6C95...AD104B); endpoint_audit.csv identical too (7EAAFFCD...C8FE2E)"
+    },
+    {
+      "command": "python tmp/pb_identity_segments.py",
+      "purpose": "auxiliary identity-only validation of the block_id study proxy (never reads response values)",
+      "wall_seconds": 12,
+      "status": "ok"
+    },
+    {
+      "command": "python tmp/pb_mde_diag.py",
+      "purpose": "auxiliary decomposition of the MDE bootstrap SE (imports pb.read_v14; uses synergy_bliss only)",
+      "wall_seconds": 45,
+      "status": "ok"
+    }
+  ],
+  "downloads": {
+    "data_files": 0,
+    "note": "no data downloaded in this audit: v1.4 summary, v1.5 chunk sample and v1.5 identifiers were reused from the frozen R190-E1 downloads (read-only)",
+    "fetched_text_bytes_approx": 400000,
+    "fetched_text": {
+      "nar2021_fulltext_xml_PMC8218202": 100166,
+      "nar2019_fulltext_xml_PMC6602441": 107898,
+      "malyutina2019_fulltext_xml_PMC6544320": 154518,
+      "synergyfinder_R_sources_8_files": 37912,
+      "github_zenodo_api_metadata_json": "a few KB",
+      "budget_note": "text fetches total <0.5 MB, far below the 2 GB data budget; raw dose-level DrugComb file (2,008,117,325 B) NOT downloaded (listed as a reopen option only)"
+    }
+  },
+  "tokens": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "total_tokens": null,
+    "note": "runtime token accounting is not available to the agent; recorded as null (not 0)"
+  },
+  "cost": {
+    "usd": null,
+    "note": "not available; recorded as null"
+  },
+  "deliverables": {
+    "PROTOCOL_PB.md": "1667F89CEF91162D2A84D98690370CF90F739968545DA15F5C7A39F557882823",
+    "pb.py": "5170E16FD3054090E2B4DBB4A2C9441241476B882AE0D58E3548EF64D3E35276",
+    "pb.json": "ED5D6C951A3477E2F9A2A2BF57C79374117559F7248E701DE4EAD33EC3AD104B",
+    "endpoint_audit.csv": "7EAAFFCDBEBB73F7F1325E3EA3EAA6041C7C121730AC5E2EEB7504D624C8FE2E",
+    "report.md": "1B5EDCE572CB480877F50DD7CD32977E0B0B3513CE779BF71D83C094D29FCE46",
+    "record.md": "EE5425D87D8E8DF1308BB225A42B99F9F83B326786260146B5C1C25649D046E3",
+    "usage.json": "self (not hashed inside itself)",
+    "verdict": "endpoint_not_usable",
+    "failure_category": "evaluation_cannot_distinguish",
+    "primary_endpoint": "synergy_bliss (block mean within cell x unordered drug pair)",
+    "mde80_two_way_r020": 0.114851,
+    "delta_min": 0.03
+  },
+  "notes": [
+    "no model was fitted; no effect (including pathway-minus-identity) was estimated; response values used only for the PROTOCOL_PB section 1 whitelist",
+    "primary endpoint: synergy_bliss, the only candidate sharing the Bliss-independence null model with Jaaks SYNERGY_DELTA_EMAX",
+    "saturation: synergy_bliss/zip/hsa/loewe/S all non-saturated at block and unit level; css fails (unit edge mass 22.11% > 20% and 10.90% outside its published [0,100] construction bound)",
+    "semantic identities verified exactly: css = mean(css_row,css_col); S = css - (ri_row + ri_col) (i.e. the Malyutina S_sum sensitivity composite, not an interaction residual)",
+    "MDE80 >> delta_min under every clustered operationalization: two-way 0.1149, pair-cluster 0.1061, permutation 0.0780, pair-level 0.0759 (iid 0.0221 is reference-only); r=0.30/0.40 do not rescue (0.0811/0.0614)",
+    "power at the frozen headline effect 0.1183 is about 0.78; at delta_min=0.03 it is 0.024",
+    "all hash values are SHA256 unless a name says otherwise"
+  ]
+}

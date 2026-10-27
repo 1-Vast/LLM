@@ -1,0 +1,40 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r38",
+  "round": "R38 (goal round 36/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Cross-task transfer test of the R37 budget rule; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r38": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the result is a decisive non-transfer with a stated moderator, and the confound between task and prediction strength is disclosed.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e038_transfer.py"], "runs": 1, "units": 44, "repeats": 20, "rows": 17600,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E038_RESULTS.json", "rows": "E038_rows.csv", "protocol": "PROTOCOL_E038.md"},
+  "design": {
+    "task": "BATCHIE high-diversity design: 37 compound one-hot features, train 100 / pool 251 per unit",
+    "hit_definition": "selected pair in the true bottom quartile of the pool (chance 25%)",
+    "ks": [5, 10, 20, 40, 60]
+  },
+  "results": {
+    "exploit_hit": {"k5": 0.972, "k10": 0.949, "k20": 0.916, "k40": 0.883, "k60": 0.823},
+    "mix_minus_exploit": {"k5": -0.119, "k10": -0.148, "k20": -0.190, "k40": -0.271, "k60": -0.281},
+    "crossover_k": null
+  },
+  "decisions": {"H097_rule_shape_transfers": false, "H099_rule_does_not_transfer": true,
+                "verdict": "rule_is_gdsc_specific"},
+  "moderator": "prediction strength: GDSC's point prediction comes from pathway/tissue annotation (rho about 0.20) and the mix helps at large k; BATCHIE's comes from compound identity (rho about 0.94) and pure exploitation wins at every k",
+  "correction_to_C28": "the budget boundary is not a universal rule; it holds only when the point prediction is weak. The corrected statement is more useful because prediction strength can be checked before deployment.",
+  "consistency_with_C19": "C19 says the bulk is additive and the tail is not: deciding whether a pair is in the bottom quartile is easy (97% here) while deciding which pair is best is hard (R23 precision@10 0.225)",
+  "confound_disclosed": "prediction strength and task are not fully separable in this comparison, because the two tasks also differ in feature type and hit definition",
+  "register_updates": {"C28": "premise added (only when the point prediction is weak)", "C32": "new and refuted: the decision rule does not transfer across tasks"},
+  "next_gates": ["manipulate prediction strength WITHIN one task (GDSC with tissue-only vs tissue+pathway features) to test the moderator rather than observe it"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C28 premise, C32 added)", "research/INDEX.md (added R38 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "mechanism_claim_made": false
+  }
+}

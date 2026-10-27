@@ -1,0 +1,168 @@
+{
+  "kind": "in_place_strategy_selection_from_labelled_probe",
+  "input_sha256": {
+    "Original screen_All tissues_fitted data.csv": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278"
+  },
+  "settings": {
+    "sizes": [
+      500,
+      1000,
+      2000,
+      4000,
+      8000,
+      16000
+    ],
+    "probes": [
+      200,
+      500,
+      1000
+    ],
+    "k": 20,
+    "repeats": 40,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "cells": 240
+  },
+  "by_probe": {
+    "200": {
+      "agreement_all": 0.5541666666666667,
+      "agreement_eval": 0.5416666666666666,
+      "n": 240,
+      "probe_minus_exploit": {
+        "n": 120,
+        "mean_diff": 0.02,
+        "ci95": [
+          0.006666666666666669,
+          0.035416666666666666
+        ]
+      },
+      "probe_minus_mix": {
+        "n": 120,
+        "mean_diff": -0.030833333333333334,
+        "ci95": [
+          -0.059583333333333335,
+          -0.002083333333333334
+        ]
+      },
+      "probe_minus_best_fixed": {
+        "n": 120,
+        "mean_diff": -0.08041666666666666,
+        "ci95": [
+          -0.10209375000000001,
+          -0.06000000000000001
+        ]
+      },
+      "mean_probe_hit": 0.3104166666666667,
+      "mean_exploit_hit": 0.2904166666666666,
+      "mean_mix_hit": 0.34124999999999994,
+      "mean_best_fixed": 0.3908333333333333
+    },
+    "500": {
+      "agreement_all": 0.475,
+      "agreement_eval": 0.4875,
+      "n": 160,
+      "probe_minus_exploit": {
+        "n": 80,
+        "mean_diff": 0.06437499999999999,
+        "ci95": [
+          0.03937500000000001,
+          0.09
+        ]
+      },
+      "probe_minus_mix": {
+        "n": 80,
+        "mean_diff": -0.058125,
+        "ci95": [
+          -0.08625000000000001,
+          -0.03125
+        ]
+      },
+      "probe_minus_best_fixed": {
+        "n": 80,
+        "mean_diff": -0.076875,
+        "ci95": [
+          -0.1025,
+          -0.05375
+        ]
+      },
+      "mean_probe_hit": 0.33875,
+      "mean_exploit_hit": 0.274375,
+      "mean_mix_hit": 0.39687500000000003,
+      "mean_best_fixed": 0.415625
+    },
+    "1000": {
+      "agreement_all": 0.5333333333333333,
+      "agreement_eval": 0.5166666666666667,
+      "n": 120,
+      "probe_minus_exploit": {
+        "n": 60,
+        "mean_diff": 0.08166666666666668,
+        "ci95": [
+          0.05081249999999999,
+          0.11666666666666667
+        ]
+      },
+      "probe_minus_mix": {
+        "n": 60,
+        "mean_diff": -0.06916666666666667,
+        "ci95": [
+          -0.10083333333333334,
+          -0.04000000000000001
+        ]
+      },
+      "probe_minus_best_fixed": {
+        "n": 60,
+        "mean_diff": -0.08083333333333334,
+        "ci95": [
+          -0.11000000000000001,
+          -0.05333333333333334
+        ]
+      },
+      "mean_probe_hit": 0.34833333333333333,
+      "mean_exploit_hit": 0.26666666666666666,
+      "mean_mix_hit": 0.4175000000000001,
+      "mean_best_fixed": 0.42916666666666675
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r59/PROTOCOL_E057.md": "d28e72e4063afc496ae72e5684c78f0db821f5c1cb64e5d601500ffe7819c92d",
+    "research/2026-10-27-agent-cell-identifiability-r59/e059_probe.py": "694138cd05abff159539ddd38df147abe79bfc6dad24f0a7455a46fe98a29555"
+  },
+  "decisions": {
+    "H149_probe_identifies_strategy": false,
+    "H150_beats_always_exploit": true,
+    "H151_bigger_probe_better": true,
+    "agreement_by_probe": [
+      0.5416666666666666,
+      0.4875,
+      0.5166666666666667
+    ],
+    "verdict": "in_place_selection_fails",
+    "verdict_reported": "in_place_reestimation_fails_at_chance"
+  },
+  "cost": "the probe consumes q labelled evaluations on top of the k picks; q is reported, not netted out",
+  "limits": [
+    "The probe's k_q is scaled proportionally to the pool, an approximation of the full-pool budget.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "coin_flip_check": {
+    "q200": {
+      "expected_if_random": 0.3158,
+      "observed": 0.3104
+    },
+    "q500": {
+      "expected_if_random": 0.3357,
+      "observed": 0.3387
+    },
+    "q1000": {
+      "expected_if_random": 0.3421,
+      "observed": 0.3483
+    },
+    "reading": "the probe's hit rate matches a 50/50 coin flip between the two fixed strategies to within 0.6 pp, so its apparent gain over always-exploit is the base-rate advantage of the mix, not skill"
+  },
+  "why_the_fixed_threshold_did_better": "the fixed threshold was learned from 120 (pool x split) observations in the search half, whereas a 500-key probe supplies 500 labels from one pool; the information gap is more than an order of magnitude",
+  "promotion_status": "NOT satisfied and now without a known route: the fixed threshold does not transfer (C38) and in-place re-estimation is at chance (this round)"
+}

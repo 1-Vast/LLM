@@ -1,0 +1,100 @@
+{
+  "kind": "content_or_any_coarsening",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "repeats": 200,
+    "holdout": 0.2,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261043
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 200
+  },
+  "arms": {
+    "identity": 0.000567091127117789,
+    "plus_pathway": 0.1318415387683554,
+    "plus_randomcoarse": 0.004724084383074471,
+    "plus_noise": -0.0008171037319979704
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r140/PROTOCOL_E130.md": "a6f2d4c8fbf7509c6b289b0d9abba20b89d82ef26ba2888e68c915db2d82a8ad",
+    "research/2026-10-27-agent-cell-identifiability-r140/e140_content.py": "c71fc4119dfac157d9934ae2cec1b33b3519406df08e68047ab667290f86844b"
+  },
+  "contrasts": {
+    "pathway_minus_identity": {
+      "n": 172,
+      "mean_diff": 0.13425413476433176,
+      "sd": 0.08481093036485737,
+      "ci95": [
+        0.12127211395945352,
+        0.14681886584133014
+      ]
+    },
+    "randomcoarse_minus_identity": {
+      "n": 172,
+      "mean_diff": 0.00464255322656565,
+      "sd": 0.10522787672537716,
+      "ci95": [
+        -0.010879247596314822,
+        0.019498509315053807
+      ]
+    },
+    "noise_minus_identity": {
+      "n": 172,
+      "mean_diff": -0.001816735697208456,
+      "sd": 0.024299034229469257,
+      "ci95": [
+        -0.005298003150854407,
+        0.001866626757073178
+      ]
+    },
+    "pathway_minus_randomcoarse": {
+      "n": 200,
+      "mean_diff": 0.1271174543852809,
+      "sd": 0.1291370584160871,
+      "ci95": [
+        0.10895967515675169,
+        0.1438363038650424
+      ]
+    }
+  },
+  "decisions": {
+    "H346_content_matters": true,
+    "H347_any_coarsening_would_do": false,
+    "verdict": "the_pathway_is_a_meaningful_prior_over_drugs_not_merely_a_coarser_encoding"
+  },
+  "limits": [
+    "Only the both-unseen condition and only ridge.",
+    "The random coarsening is redrawn per split, which integrates over groupings.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "what_this_establishes": {
+    "the_design": "a random coarsening assigns each drug to a group with the same cardinality and group-size structure as the real pathway blocks. The geometry of the encoding is therefore identical; only the content differs.",
+    "the_result": {
+      "real_pathway": 0.1318,
+      "random_coarsening": 0.0047,
+      "noise": -0.0008,
+      "identity": 0.0006,
+      "pathway_minus_random_coarsening": [
+        0.1271,
+        0.109,
+        0.1438
+      ]
+    },
+    "reading": "the substitution is about which drugs share a group, not about compressing a 65-level one-hot into 38 levels. A structurally identical random grouping is indistinguishable from noise."
+  },
+  "this_restores_substance_after_R136": {
+    "R136_said": "the pathway is a coarsening of identity and adds no information",
+    "true_but_incomplete": "true in the strict sense: pathway is a deterministic function of the drug, so it cannot add information ABOUT THE DRUG. But that framing made the result sound like mere dimensionality reduction.",
+    "the_sharper_statement": "the pathway is a PRIOR OVER DRUGS: a scientifically meaningful grouping that lets an unseen drug inherit its group's behaviour. Its value is not information but structured sharing, and the random-coarsening control shows the structure must be the real one.",
+    "why_this_matters": "it separates 'coarsening' from 'any coarsening', which R136 could not do"
+  },
+  "the_final_picture_for_this_claim": {
+    "what_is_false": "the annotation carries information beyond the drug identity - false, and provably so (C104, exact zero in the fully informed case)",
+    "what_is_true": "the annotation is a meaningful partition of drugs, and replacing a missing drug by its partition membership recovers a usable ranking; a random partition of the same shape recovers nothing (C108)",
+    "what_is_model_dependent": "the size of that recovery, which is a ridge property (C106/C107) and must be quoted with the model",
+    "one_sentence": "pathway annotation is not extra knowledge about a drug, it is a prior that says which drugs should behave alike; that prior is informative exactly where the drug itself is not seen"
+  }
+}

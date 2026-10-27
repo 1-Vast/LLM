@@ -1,0 +1,168 @@
+{
+  "kind": "does_a_stronger_prior_raise_the_personalisation_bar",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "ms": [
+      10,
+      25,
+      50,
+      100,
+      200
+    ],
+    "draws": 30,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "units": 140
+  },
+  "by_m": {
+    "10": {
+      "n": 28,
+      "marginal_prior": 0.08214285714285714,
+      "marginal_pers": 0.08214285714285714,
+      "combo_prior": 0.09642857142857142,
+      "combo_pers": 0.09642857142857142,
+      "combo_prior_minus_marginal_prior": {
+        "n": 28,
+        "mean_diff": 0.01428571428571429,
+        "ci95": [
+          -0.02142857142857143,
+          0.05357142857142858
+        ]
+      },
+      "combo_pers_minus_combo_prior": {
+        "n": 28,
+        "mean_diff": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "25": {
+      "n": 28,
+      "marginal_prior": 0.0875,
+      "marginal_pers": 0.0875,
+      "combo_prior": 0.09642857142857142,
+      "combo_pers": 0.09642857142857142,
+      "combo_prior_minus_marginal_prior": {
+        "n": 28,
+        "mean_diff": 0.008928571428571426,
+        "ci95": [
+          -0.026785714285714284,
+          0.04647321428571404
+        ]
+      },
+      "combo_pers_minus_combo_prior": {
+        "n": 28,
+        "mean_diff": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "50": {
+      "n": 28,
+      "marginal_prior": 0.08392857142857142,
+      "marginal_pers": 0.08392857142857142,
+      "combo_prior": 0.09999999999999999,
+      "combo_pers": 0.09999999999999999,
+      "combo_prior_minus_marginal_prior": {
+        "n": 28,
+        "mean_diff": 0.01607142857142857,
+        "ci95": [
+          -0.019642857142857146,
+          0.05714285714285714
+        ]
+      },
+      "combo_pers_minus_combo_prior": {
+        "n": 28,
+        "mean_diff": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "100": {
+      "n": 28,
+      "marginal_prior": 0.09464285714285714,
+      "marginal_pers": 0.09464285714285714,
+      "combo_prior": 0.09999999999999999,
+      "combo_pers": 0.09999999999999999,
+      "combo_prior_minus_marginal_prior": {
+        "n": 28,
+        "mean_diff": 0.005357142857142855,
+        "ci95": [
+          -0.02678571428571428,
+          0.04107142857142857
+        ]
+      },
+      "combo_pers_minus_combo_prior": {
+        "n": 28,
+        "mean_diff": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "200": {
+      "n": 28,
+      "marginal_prior": 0.08928571428571429,
+      "marginal_pers": 0.08928571428571429,
+      "combo_prior": 0.10357142857142858,
+      "combo_pers": 0.10357142857142858,
+      "combo_prior_minus_marginal_prior": {
+        "n": 28,
+        "mean_diff": 0.014285714285714282,
+        "ci95": [
+          -0.01785714285714286,
+          0.05178571428571428
+        ]
+      },
+      "combo_pers_minus_combo_prior": {
+        "n": 28,
+        "mean_diff": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r108/PROTOCOL_E103.md": "940cc6a269079d87adfcbdf5ee22c0f0e191d394c4ac94b2e420607665407e62",
+    "research/2026-10-27-agent-cell-identifiability-r108/e108_prior_strength.py": "7d93f5eae5df95f4af48be773cd65582eb8485bda1fff46002a69c0e9bd9820e"
+  },
+  "thresholds": {
+    "marginal": null,
+    "combo": null
+  },
+  "decisions": {
+    "H279_bar_raised": "not testable - invalid design",
+    "H280_bar_lowered": "not testable - invalid design",
+    "H281_same": "not established - the automated verdict is withdrawn",
+    "verdict": "RUN_INVALID_personalisation_arm_is_a_constant"
+  },
+  "limits": [
+    "The personalisation arm is a single cell-level offset estimated from the m measured keys; other constructions may shift the threshold.",
+    "Only five m values, so the threshold resolution is coarse.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "RUN_INVALID": true,
+  "design_bug": {
+    "symptom": "comboPers minus comboPrior is exactly +0.0000 with a zero-width CI at every m, and the same holds for the marginal arm",
+    "cause": "the personalisation arm added a SINGLE constant offset to every candidate score. Adding the same constant to all scores cannot change a ranking, so the top-k is identical to the prior by construction. The experiment could never have detected a personalisation effect.",
+    "how_it_was_caught": "an exact zero with a zero-width interval is the same signature that exposed the invalid R104 run, so it was caught immediately rather than reported as a null result",
+    "the_fix": "estimate per-drug residual effects from the m measured keys (as R76 did), not a single cell-level offset, so the correction actually reorders candidates"
+  },
+  "interesting_byproduct": {
+    "combo_prior_minus_marginal_prior": "positive at all five m (+0.54 to +1.61 pp) but never significant",
+    "reading": "consistent with C80: the combined prior is better than marginals by a small amount that a 30-draw design cannot resolve"
+  }
+}

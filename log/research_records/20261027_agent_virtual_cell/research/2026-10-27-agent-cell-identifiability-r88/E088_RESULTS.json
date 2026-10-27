@@ -1,0 +1,52 @@
+{
+  "kind": "dose_aware_additive_null_on_BATCHIE",
+  "input_sha256": "56a4e4a195673160edcb1baa209a15409b3639ff6ab0405558cc5ab3198d5f23",
+  "settings": {
+    "k": 20,
+    "repeats": 12,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "units": 48,
+    "cells": 11,
+    "mean_cv_r2_of_additive_null": 0.6512862505888637,
+    "note": "R87's additive null had CV R2 -0.034; this one includes per-drug log-dose slopes"
+  },
+  "summary": {
+    "n": 48,
+    "gene": 0.29062499999999997,
+    "random": 0.2625,
+    "base": 0.2509800908853876,
+    "gene_minus_random": {
+      "n": 48,
+      "mean_diff": 0.028124999999999997,
+      "ci95": [
+        -0.05416666666666666,
+        0.11875000000000002
+      ]
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r88/PROTOCOL_E083.md": "8bce246392378996d59604a7295acf3ed39083803f28e9e3dfae55b56fe52cff",
+    "research/2026-10-27-agent-cell-identifiability-r88/e088_dose_aware.py": "64b7ff3c7eb7280d858d4ee759f5e8c6f7d6c412000f31798af65c7f37aedaf2"
+  },
+  "decisions": {
+    "H224_residual_now_learnable": true,
+    "H225_annotation_wins": false,
+    "H226_annotation_loses": true,
+    "verdict": "no_established_annotation_gain_on_dose_aware_residuals"
+  },
+  "limits": [
+    "Each drug has only a few concentration points, so the slope estimates are unstable.",
+    "Residuals may still be dominated by well-level noise.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "correction_to_R87": {
+    "R87_claim": "the additivity residual is noise (CV R2 = -0.034), so BATCHIE cannot test the question",
+    "what_was_actually_wrong": "R87 averaged every (pair, dose) well into one value per pair, discarding the dose structure; the negative R2 measured a weak null model, not an unlearnable residual",
+    "R88_evidence": "adding per-drug log-dose slopes raises the null's CV R2 from -0.034 to +0.651",
+    "consequence": "BATCHIE CAN discriminate; R87's 'resource unusable' verdict was wrong on the residual arm"
+  },
+  "honest_reading_of_the_comparison": "with the gate now passed, the annotation model scores 29.06% against random 26.25%, a point estimate of +2.81 pp whose CI [-5.42, +11.88] includes zero. So the correct statement is 'no established gain', not 'the model loses' - the pre-registered H226 criterion only licensed 'not significantly better', and with 48 units the test is underpowered."
+}

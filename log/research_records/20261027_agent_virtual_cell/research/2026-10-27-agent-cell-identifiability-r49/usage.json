@@ -1,0 +1,42 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r49",
+  "round": "R49 (goal round 47/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Pool-size sweep resolving the R37 versus R47 contradiction; no literature query."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r49": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round resolves the prior two rounds' contradiction with a monotone dose-response in pool size.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e049_pool_size.py"], "runs": 1, "sizes": 3, "repeats": 40,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E049_RESULTS.json", "rows": "E049_rows.csv", "protocol": "PROTOCOL_E048.md"},
+  "design": {
+    "fixed": "training set identical to R37 (80% of keys); sampling = R37's random keys",
+    "varied": "evaluation pool size S in {2000, 8000, 21652}",
+    "k_definitions": ["absolute k=50", "relative depth 0.23% (k = 5, 18, 50)"]
+  },
+  "results": {
+    "abs_k50_mix_minus_exploit_pp": {"2000": -0.0255, "8000": 0.0005, "21652": 0.0290},
+    "abs_k50_ci": {"2000": [-0.0385, -0.0125], "8000": [-0.0110, 0.0120], "21652": [0.0140, 0.0445]},
+    "rel_depth_diffs_pp": [0.0150, 0.0139, 0.0290],
+    "monotone_span_pp": 0.0545
+  },
+  "decisions": {"H125_abs_advantage_grows_with_pool": true,
+                "H126_relative_depth_is_the_driver": false,
+                "H126_note": "the relative-depth range was 1.51 pp against a 1.5 pp threshold, missing by 0.0001; reported as borderline",
+                "verdict_reported": "pool_size_is_the_determinant"},
+  "resolution_of_R37_vs_R47": "R47 used a 4,000-key pool, which on this curve sits between -2.55 pp (S=2,000) and +0.05 pp (S=8,000), i.e. the negative-to-neutral regime. The gap is pool size, not sampling or seed.",
+  "C28_final": "the 50/50 mix beats exploitation at k=50 only when the candidate pool is large: +2.90 pp at S=21,652, neutral at 8,000, significantly worse (-2.55 pp) at 2,000",
+  "register_updates": {"C28": "refined from split-sensitivity to a pool-size condition", "positioning": "candidate statement updated"},
+  "next_gates": ["use a much larger pool (all keys, S=108,259) to separate absolute size from relative depth completely"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C28 refined)", "research/POSITIONING.md (candidate updated)",
+                                "research/INDEX.md (added R49 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

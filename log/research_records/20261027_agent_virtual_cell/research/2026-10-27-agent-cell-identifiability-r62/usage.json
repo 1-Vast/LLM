@@ -1,0 +1,39 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r62",
+  "round": "R62 (goal round 60/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Read-only numeric audit of the remaining register claims; no literature query."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r62": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round audits the register's numbers three-state (ok/mismatch/not_located) and refuses to count a wrong path as a wrong number.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16",
+    "scripts": ["e062_audit2.py"], "runs": "3 (four path corrections, then two derived checks added)",
+    "checks": 27, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E062_RESULTS.json", "protocol": "PROTOCOL_E060.md"},
+  "claims_covered": ["C7", "C8", "C11", "C12", "C14", "C17", "C18", "C19", "C20", "C21", "C30"],
+  "audit_result": {"n_checks": 27, "n_ok": 27, "n_mismatch": 0, "n_not_located": 0},
+  "path_corrections": {
+    "C7": "comparators.mean -> comparators.mean_surface",
+    "C12_validation": "interaction_corr.mean -> interaction_conservation.mean_interaction_rho_cross_cell",
+    "C12_highdiversity": "interaction_corr.mean -> residual_conservation.mean",
+    "C14_bound": "coverage[a].q does not exist as an aggregate; the register's bound is the median of the per-layout quantiles (0.034247 for alpha 0.2, 0.075980 for alpha 0.1)"
+  },
+  "substantive_finding": "the C14 'bound' in the register is a DERIVED quantity (median of nine per-layout conformal quantiles), not a stored aggregate; now flagged derived:true in the audit",
+  "register_corrections_needed": 0,
+  "decisions": {"H158_no_wrong_values": true, "H159_locating_complete": true},
+  "known_gap": "C1, C3, C4, C5 and C6 were not audited; the early rounds store their numbers in more complex structures (C3's null distribution lives in E007C_SHARED_ORDER_NULL.json). This is a stated gap, not a pass.",
+  "lesson_applied": "after two rounds of blaming data for my own checker bugs, this round inspected each source structure before writing assertions and used a three-state result so that a wrong path cannot masquerade as a wrong number",
+  "limits": ["only claims with explicit numbers in the register were checked",
+             "tolerances were chosen by me, not by a statistical test",
+             "retrospective and read-only; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["audit C1/C3/C4/C5/C6 using the auxiliary files such as E007C_SHARED_ORDER_NULL.json"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (R62 changelog)", "research/INDEX.md (added R62 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

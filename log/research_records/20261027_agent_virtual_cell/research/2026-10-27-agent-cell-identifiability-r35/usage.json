@@ -1,0 +1,46 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r35",
+  "round": "R35 (goal round 33/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Equal-budget program search on the locally held GDSC screen; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r35": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the search/evaluation split is the internal control, and the round states explicitly that the result is not meta-learning.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e035_program_search.py"], "runs": 1, "programs": 54, "search_splits": 5,
+    "eval_splits": 5, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E035_RESULTS.json", "rows": "E035_rows.csv", "protocol": "PROTOCOL_E035.md"},
+  "objective_gate": "the objective authorises exploring meta-learning/RSI and equal-budget program search only after independent decision benefit and cross-task transfer are established; R33 (decision benefit) plus R30-R32 (cross-design consistency) met that gate, so this round executes the program-search part and deliberately does NOT attempt meta-learning",
+  "design": {
+    "features": ["pred (ridge prediction)", "var (posterior variance)", "rare (combination rarity)", "tissue (tissue minority)"],
+    "program_space": "54 weighted rank combinations",
+    "k": 50, "search_splits": [0, 1, 2, 3, 4], "eval_splits": [5, 6, 7, 8, 9]
+  },
+  "results": {
+    "searched_program": {"a_pred": 0.5, "b_var": 0.5, "c_rare": 0.0, "d_tissue": 0.0},
+    "search_hit": 0.120, "eval_hit": 0.128,
+    "eval_exploit": 0.092, "eval_random": 0.020, "eval_explore": 0.040,
+    "searched_minus_exploit": {"diff": 0.036, "ci95": [0.016, 0.056]},
+    "eval_rank_of_searched": 5, "n_programs": 54,
+    "program_space_spread_p90_p10": 0.0628
+  },
+  "decisions": {"H088_search_beats_best_fixed": true, "H089_beats_random": true,
+                "H090_program_space_has_spread": true, "verdict": "program_search_adds_value"},
+  "not_claimed": [
+    "this is not meta-learning and not program synthesis - the winner is a 50/50 mix of two existing signals",
+    "the diversity features (rare, tissue) received zero weight, so they carry no value here",
+    "the space has only 54 programs and k was fixed at 50; the gain is budget-conditional (R33 showed the mix loses at k=20)",
+    "no evidence supports more complex program synthesis on this resource"
+  ],
+  "register_updates": {"C30": "new, exploratory: equal-budget program search yields +3.6 pp over the best fixed rule on held-out splits, ranking 5/54"},
+  "next_gates": ["systematic k scan {10,20,50,100,200} to locate the threshold where the mix beats pure exploitation"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C30 added)", "research/INDEX.md (added R35 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "meta_learning_attempted": false, "rsi_attempted": false
+  }
+}

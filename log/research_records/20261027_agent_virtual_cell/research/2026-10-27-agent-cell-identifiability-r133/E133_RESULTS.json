@@ -1,0 +1,199 @@
+{
+  "kind": "threshold_sensitivity_of_the_frozen_claim",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "repeats": 200,
+    "taus": [
+      0.1,
+      0.2,
+      0.25,
+      0.33,
+      0.5
+    ],
+    "n_boot": 2000,
+    "seed": 20261036
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 1000
+  },
+  "by_tau": {
+    "0.10": {
+      "n": 200,
+      "identity": 0.098,
+      "plus_pathway": 0.1515,
+      "plus_random": 0.09449999999999999,
+      "pathway_gain": {
+        "n": 200,
+        "mean_diff": 0.0535,
+        "sd": 0.16935511736848838,
+        "ci95": [
+          0.030999999999999996,
+          0.07725
+        ]
+      },
+      "random_gain": {
+        "n": 200,
+        "mean_diff": -0.0035000000000000005,
+        "sd": 0.09956059239372245,
+        "ci95": [
+          -0.016506250000000007,
+          0.010506249999999967
+        ]
+      },
+      "mde_80pct": 0.03355455296795648
+    },
+    "0.20": {
+      "n": 200,
+      "identity": 0.19325000000000003,
+      "plus_pathway": 0.28075,
+      "plus_random": 0.19575000000000004,
+      "pathway_gain": {
+        "n": 200,
+        "mean_diff": 0.0875,
+        "sd": 0.2215041091080678,
+        "ci95": [
+          0.05799374999999999,
+          0.11725000000000002
+        ]
+      },
+      "random_gain": {
+        "n": 200,
+        "mean_diff": 0.0024999999999999996,
+        "sd": 0.12638677972973383,
+        "ci95": [
+          -0.015499999999999998,
+          0.020499999999999997
+        ]
+      },
+      "mde_80pct": 0.0438869015426021
+    },
+    "0.25": {
+      "n": 200,
+      "identity": 0.24425,
+      "plus_pathway": 0.34149999999999997,
+      "plus_random": 0.24725000000000003,
+      "pathway_gain": {
+        "n": 200,
+        "mean_diff": 0.09725000000000002,
+        "sd": 0.23356519647632673,
+        "ci95": [
+          0.06499375,
+          0.12825624999999996
+        ]
+      },
+      "random_gain": {
+        "n": 200,
+        "mean_diff": 0.0030000000000000005,
+        "sd": 0.13788058339150555,
+        "ci95": [
+          -0.016249999999999994,
+          0.021
+        ]
+      },
+      "mde_80pct": 0.04627658070457762
+    },
+    "0.33": {
+      "n": 200,
+      "identity": 0.32725000000000004,
+      "plus_pathway": 0.43,
+      "plus_random": 0.3235,
+      "pathway_gain": {
+        "n": 200,
+        "mean_diff": 0.10275000000000001,
+        "sd": 0.2479664783228961,
+        "ci95": [
+          0.06999375,
+          0.137
+        ]
+      },
+      "random_gain": {
+        "n": 200,
+        "mean_diff": -0.0037499999999999994,
+        "sd": 0.1486908955251138,
+        "ci95": [
+          -0.024006250000000003,
+          0.01775
+        ]
+      },
+      "mde_80pct": 0.04912992568780453
+    },
+    "0.50": {
+      "n": 200,
+      "identity": 0.498,
+      "plus_pathway": 0.6092500000000001,
+      "plus_random": 0.50475,
+      "pathway_gain": {
+        "n": 200,
+        "mean_diff": 0.11125,
+        "sd": 0.24517645681197525,
+        "ci95": [
+          0.07625,
+          0.14475
+        ]
+      },
+      "random_gain": {
+        "n": 200,
+        "mean_diff": 0.0067500000000000025,
+        "sd": 0.15479582110365828,
+        "ci95": [
+          -0.014256250000000002,
+          0.028249999999999997
+        ]
+      },
+      "mde_80pct": 0.04857713504277056
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r133/PROTOCOL_E123.md": "4dd6afe021b0447db8d7bf1ac518649ef96bb8f3c84a4985f5e0c8e1191cb670",
+    "research/2026-10-27-agent-cell-identifiability-r133/e133_thresholds.py": "dff8ea70b609c5c62ea0fddbfd202391e346dc3192cda77b076b428af1c46d7e"
+  },
+  "decisions": {
+    "pathway_significant_taus": [
+      "0.10",
+      "0.20",
+      "0.25",
+      "0.33",
+      "0.50"
+    ],
+    "random_significant_taus": [],
+    "H332_robust_across_taus": true,
+    "H333_threshold_dependent": false,
+    "verdict": "the_frozen_claim_is_robust_across_thresholds_and_gains_a_sixth_check"
+  },
+  "limits": [
+    "Only the both_unseen cell; elsewhere identity has no headroom.",
+    "Extreme thresholds shrink the hit rate and may lose power.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "what_this_rules_out": {
+    "the_worry": "the frozen claim was measured against the top quartile of delta EMAX and the 25 percent cut was never justified, which is exactly where threshold mining would hide",
+    "the_result": "the pathway gain is positive and significant at every threshold tried, from the top decile through the median, and the matched random block is never significant",
+    "conclusion": "the claim is not a product of the cut point"
+  },
+  "the_shape_is_informative": {
+    "gains_by_tau": {
+      "0.10": 0.0535,
+      "0.20": 0.0875,
+      "0.25": 0.0973,
+      "0.33": 0.1028,
+      "0.50": 0.1113
+    },
+    "reading": "the gain grows monotonically as the threshold loosens, so the annotation improves the ranking broadly rather than only the extreme tail. A tail-only effect would have shrunk toward the median, not grown.",
+    "why_it_matters": "this distinguishes 'finds the few best pairs' from 'orders the whole list better', and the data say the latter"
+  },
+  "the_updated_magnitude_range": {
+    "previous_range": "4.7 to 8.6 pp across seven estimates",
+    "now": "4.7 to 11.1 pp, because this round contributes 5.35 at the decile and 9.73 at the quartile",
+    "guidance": "report the range, never a point estimate, and note that looser thresholds give larger gains by construction of the sweep"
+  },
+  "the_frozen_claim_now_has_six_checks": [
+    "direction: eight independent split sets, all positive",
+    "capacity: matched random block never significant",
+    "structure: permuted drug-to-pathway mapping never significant, real minus permuted significant",
+    "condition: present only when both drugs are unseen",
+    "internal control: dead tissue block delivers exactly zero",
+    "threshold: significant at all five cut points, with no random-block significance at any of them"
+  ]
+}

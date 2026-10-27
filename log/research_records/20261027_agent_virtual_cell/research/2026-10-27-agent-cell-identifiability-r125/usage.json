@@ -1,0 +1,66 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r125",
+  "round": "R125 (goal round 123/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Direct test of the tissue-in-distribution qualifier, contrasting known-tissue and held-tissue holdouts in one run."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r125": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round puts both holdouts side by side and both the qualifier and R119's reversal fall.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e125_qualifier.py"], "runs": 1, "repeats": 200, "pools": 2, "arms": 4,
+    "rows": 395, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E125_RESULTS.json", "rows": "E125_rows.csv", "protocol": "PROTOCOL_E118.md"},
+  "results": {
+    "known_tissue": {"identity": 0.2462, "plus_path": 0.3023, "plus_tissue": 0.2717, "plus_random": 0.2495,
+                     "mde_80pct": 0.0313,
+                     "pathway": {"diff": 0.0561, "ci95": [0.0348, 0.0785]},
+                     "tissue": {"diff": 0.0255, "ci95": [0.0058, 0.0449]},
+                     "random": {"diff": 0.0033, "ci95": [-0.0154, 0.0227]}},
+    "held_tissue": {"identity": 0.2396, "plus_path": 0.3208, "plus_tissue": 0.2396, "plus_random": 0.2426,
+                    "mde_80pct": 0.0414,
+                    "pathway": {"diff": 0.0812, "ci95": [0.0515, 0.1114]},
+                    "tissue": {"diff": 0.0000, "ci95": [-0.0104, 0.0102]},
+                    "random": {"diff": 0.0030, "ci95": [-0.0175, 0.0226]}}
+  },
+  "decisions": {"H311_qualifier_confirmed": false,
+                "H312_qualifier_wrong_both_positive": true,
+                "held_tissue_underpowered": false,
+                "verdict": "the_pathway_increment_transfers_to_unseen_tissue_and_C90_must_be_retracted"},
+  "the_qualifier_is_wrong": "pathway gives +5.61 pp with a known tissue and +8.12 pp with an unseen tissue, so the increment does not depend on the tissue being in distribution",
+  "why_R119_was_wrong": {
+    "design": "it used the sparse boolean flag with k equal to 20 and its combo arm carried the tissue block",
+    "two_problems": ["the sparse criterion has no resolution, with identity at 1.30 percent against a minimum detectable effect of 1.02 pp",
+                     "the tissue block's columns are dead under tissue holdout, so the reversal was about a dead block plus an unresolvable criterion"],
+    "consequence": "C90 is retracted and the qualifier is removed from the condition statement"},
+  "a_clean_internal_control": {
+    "observation": "in the held-tissue pool the tissue block delivers exactly +0.0000 [-0.0104, +0.0102]",
+    "why_it_matters": "a block whose columns never appear in training must contribute nothing, and the apparatus reproduces that exactly, while the pathway block in the same pool gives +8.12 pp",
+    "reading": "the two blocks are cleanly separated and the pipeline can detect a dead block"},
+  "the_stable_picture": {
+    "six_dense_criterion_estimates": [0.0820, 0.0470, 0.0858, 0.0508, 0.0561, 0.0812],
+    "all_positive_and_significant": true,
+    "range": "4.7 to 8.6 pp",
+    "statement": "when both drugs are unseen the pathway annotation adds 4.7 to 8.6 pp, and whether the cell or the tissue has been seen does not change this"},
+  "the_meta_lesson": {
+    "span": "the confusion from R119 to R124 traces back to one criterion choice in R119",
+    "mechanism": "the sparse criterion mixed cases where identity sits at chance with cases where identity is far above chance, so each later round split an already-wrong table",
+    "new_standing_rule": "before declaring a block useless or a conclusion reversed, report that criterion's minimum detectable effect and how far identity sits above chance"},
+  "limits": ["dense criterion only, a quartile rather than a clinical endpoint",
+             "magnitudes range from 4.7 to 8.6 pp across the six estimates",
+             "only three tissues, one held out per split",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "register_updates": {"C96": "new: the increment transfers to unseen tissue and C90 is retracted",
+                       "C90": "retracted", "C95": "annotated with two more cells",
+                       "SYNTHESIS": "conditional statement simplified and the qualifier removed"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C96 added, C90 retracted, C95 annotated)",
+                                "research/SYNTHESIS.md (conditional statement simplified)",
+                                "research/INDEX.md (added R125 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

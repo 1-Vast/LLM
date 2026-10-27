@@ -1,0 +1,50 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r53",
+  "round": "R53 (goal round 51/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Turns the pool-size finding into a callable predicate; no literature query."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r53": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round reports its own off-by-one, keeps the pre-registered result primary and labels the corrected variant as a secondary analysis.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e053_predicate.py"], "runs": 1, "sizes": 6, "repeats": 40,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E053_RESULTS.json", "secondary": "E053_SECONDARY_ge.json",
+                "rows": "E053_rows.csv", "protocol": "PROTOCOL_E052.md"},
+  "design": {
+    "threshold_learning": "search half only (reps 0-19): S* = smallest size with mix - exploit > 0",
+    "predicate": "use the mix when S > S*, else exploitation",
+    "baselines": ["always exploit", "always mix", "random at the same k"],
+    "eval": "held-out half (reps 20-39)"
+  },
+  "results": {
+    "S_star": 3000,
+    "preregistered_gt": {"vs_exploit": {"diff": 0.0717, "ci95": [0.0492, 0.0963]},
+                         "vs_mix": {"diff": 0.0062, "ci95": [-0.0142, 0.0267]},
+                         "vs_random": {"diff": 0.2442, "ci95": [0.2188, 0.2704]},
+                         "vs_oracle": {"diff": -0.0338, "ci95": [-0.0475, -0.0212]}},
+    "secondary_ge": {"vs_exploit": {"diff": 0.0933, "ci95": [0.0696, 0.1179]},
+                     "vs_mix": {"diff": 0.0279, "ci95": [0.0142, 0.0425]},
+                     "vs_random": {"diff": 0.2658, "ci95": [0.2388, 0.2929]},
+                     "matches_best_fixed_at_all_sizes": true}
+  },
+  "decisions": {"H135_predicate_beats_always_exploit": true,
+                "H136_predicate_not_worse_than_always_mix": false,
+                "H137_predicate_below_oracle": true,
+                "verdict_reported": "predicate_has_decision_value_secondary_ge_variant_stronger"},
+  "implementation_flaw": "the pre-registered rule S > S* excluded S* itself, routing S=3,000 to exploit while the mix was 13 pp better there",
+  "caveats": ["single dataset", "the threshold is chosen from only six candidate sizes",
+              "6/6 reflects the search and eval halves agreeing on the same crossover",
+              "the oracle (per-instance best) is still 3.38 pp higher"],
+  "register_updates": {"C36": "new, exploratory: the pool-size predicate has decision value"},
+  "next_gates": ["transfer the GDSC-learned threshold to BATCHIE (pools of 80-320) and check that it predicts always-exploit there"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C36 added)", "research/INDEX.md (added R53 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "kind": "permutation_test_of_the_pathway_mapping",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "repeats": 200,
+    "holdout": 0.2,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261033
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 400,
+    "identity_dims": 130,
+    "pathway_dims": 38
+  },
+  "by_pool": {
+    "seen_cell": {
+      "n": 200,
+      "identity": 0.24224999999999997,
+      "plus_pathway": 0.33175,
+      "plus_permuted": 0.252,
+      "plus_random": 0.25125,
+      "pathway_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.0895,
+        "sd": 0.2074970484744979,
+        "ci95": [
+          0.06125,
+          0.11826249999999992
+        ]
+      },
+      "permuted_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.009749999999999998,
+        "sd": 0.19514828146513094,
+        "ci95": [
+          -0.01725,
+          0.03600624999999997
+        ]
+      },
+      "random_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.009000000000000001,
+        "sd": 0.14473680844413064,
+        "ci95": [
+          -0.012749999999999997,
+          0.029506249999999967
+        ]
+      },
+      "pathway_minus_permuted": {
+        "n": 200,
+        "mean_diff": 0.07975,
+        "sd": 0.2455174772970174,
+        "ci95": [
+          0.045,
+          0.11300624999999997
+        ]
+      }
+    },
+    "unseen_cell": {
+      "n": 200,
+      "identity": 0.26325,
+      "plus_pathway": 0.31074999999999997,
+      "plus_permuted": 0.26825000000000004,
+      "plus_random": 0.25975000000000004,
+      "pathway_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.0475,
+        "sd": 0.1620960382863835,
+        "ci95": [
+          0.025000000000000005,
+          0.07075
+        ]
+      },
+      "permuted_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.005000000000000002,
+        "sd": 0.17392888282688138,
+        "ci95": [
+          -0.01825625,
+          0.03125
+        ]
+      },
+      "random_minus_identity": {
+        "n": 200,
+        "mean_diff": -0.0034999999999999996,
+        "sd": 0.13557156132908565,
+        "ci95": [
+          -0.022499999999999996,
+          0.01475
+        ]
+      },
+      "pathway_minus_permuted": {
+        "n": 200,
+        "mean_diff": 0.0425,
+        "sd": 0.20720380567312738,
+        "ci95": [
+          0.014493749999999993,
+          0.072
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r126/PROTOCOL_E119.md": "f025050c1ba83bfd34affc405efc2eb126c97f8c632bc6f905865fa3fd6994c1",
+    "research/2026-10-27-agent-cell-identifiability-r126/e126_permutation.py": "b78d0c39a560b2e933e3415aa86b194569e5f0f7043504a935fc97314fdfa9c8"
+  },
+  "decisions": {
+    "real_significant_pools": [
+      "seen_cell",
+      "unseen_cell"
+    ],
+    "permuted_significant_pools": [],
+    "H313_gain_from_the_real_mapping": true,
+    "H314_permuted_also_gains": false,
+    "verdict": "the_gain_requires_the_real_mapping_and_the_within_dataset_case_is_now_complete"
+  },
+  "limits": [
+    "Permutation preserves the marginal level distribution but not every structural property of the block.",
+    "Dense criterion only.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "what_this_establishes": {
+    "the_check_that_was_missing": "the random block controls capacity but is white noise, so it cannot tell 'any structured block of this width helps' from 'this particular mapping helps'. Permuting the drug-to-pathway assignment keeps the width and the level distribution and breaks only the assignment.",
+    "result": {
+      "seen_cell": {
+        "real": 0.0895,
+        "permuted": 0.0097,
+        "random": 0.009,
+        "real_minus_permuted": 0.0798
+      },
+      "unseen_cell": {
+        "real": 0.0475,
+        "permuted": 0.005,
+        "random": -0.0035,
+        "real_minus_permuted": 0.0425
+      }
+    },
+    "reading": "the permuted block behaves exactly like the random one, and the direct real-versus-permuted contrast is significant in both pools, so the gain comes from the specific drug-pathway assignment"
+  },
+  "the_full_case_for_the_claim": {
+    "direction": "eight independent split sets, all positive and significant (R122 through R126)",
+    "capacity": "a matched random block is never significant in any pool or round",
+    "structure": "a permuted block of the same width and level distribution is never significant, and real minus permuted is significant",
+    "condition": "present only when both drugs are unseen; with one drug seen, identity already reaches 55 to 56 percent and the block adds nothing",
+    "internal_control": "the tissue block delivers exactly zero when its columns are absent, showing the pipeline can detect a dead block"
+  },
+  "what_this_means_for_promotion": {
+    "within_dataset_checks": "exhausted: direction, capacity, structure, condition and dead-block control have all been run",
+    "remaining_blocker": "only the missing second dataset, which C78 and C89 established cannot be built from BATCHIE across three arenas and three units",
+    "honest_status": "the claim is as well supported as this machine allows and still not promotable, because the promotion rule requires cross-dataset replication and no usable second resource exists"
+  }
+}

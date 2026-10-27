@@ -1,0 +1,138 @@
+{
+  "kind": "metric_dependence_of_the_main_conclusion",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "metrics": [
+      "SYNERGY_DELTA_AUC",
+      "SYNERGY_DELTA_EMAX",
+      "SYNERGY_DELTA_fAUC",
+      "SYNERGY_DELTA_XMID"
+    ],
+    "k": 20,
+    "repeats": 40,
+    "holdout": 0.2,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "drugs": 65
+  },
+  "by_metric": {
+    "SYNERGY_DELTA_AUC": {
+      "n": 40,
+      "base": 0.2500230175672522,
+      "ridge": 0.49250000000000005,
+      "marginal": 0.53375,
+      "additive": 0.53375,
+      "additive_minus_ridge": {
+        "n": 40,
+        "mean_diff": 0.04125000000000001,
+        "ci95": [
+          -0.031249999999999983,
+          0.11375000000000002
+        ]
+      },
+      "marginal_minus_ridge": {
+        "n": 40,
+        "mean_diff": 0.04125000000000001,
+        "ci95": [
+          -0.03250000000000001,
+          0.1125
+        ]
+      }
+    },
+    "SYNERGY_DELTA_EMAX": {
+      "n": 40,
+      "base": 0.2500208102025373,
+      "ridge": 0.56875,
+      "marginal": 0.49124999999999996,
+      "additive": 0.49124999999999996,
+      "additive_minus_ridge": {
+        "n": 40,
+        "mean_diff": -0.07750000000000001,
+        "ci95": [
+          -0.16378125000000002,
+          0.0038124999999996677
+        ]
+      },
+      "marginal_minus_ridge": {
+        "n": 40,
+        "mean_diff": -0.07750000000000001,
+        "ci95": [
+          -0.1625,
+          0.012499999999999999
+        ]
+      }
+    },
+    "SYNERGY_DELTA_fAUC": {
+      "n": 40,
+      "base": 0.2500194727040154,
+      "ridge": 0.52125,
+      "marginal": 0.5475,
+      "additive": 0.5475,
+      "additive_minus_ridge": {
+        "n": 40,
+        "mean_diff": 0.026250000000000006,
+        "ci95": [
+          -0.05249999999999999,
+          0.11124999999999999
+        ]
+      },
+      "marginal_minus_ridge": {
+        "n": 40,
+        "mean_diff": 0.026250000000000006,
+        "ci95": [
+          -0.055031250000000004,
+          0.10625
+        ]
+      }
+    },
+    "SYNERGY_DELTA_XMID": {
+      "n": 40,
+      "base": 0.25002237009555744,
+      "ridge": 0.5325,
+      "marginal": 0.50625,
+      "additive": 0.50625,
+      "additive_minus_ridge": {
+        "n": 40,
+        "mean_diff": -0.02624999999999999,
+        "ci95": [
+          -0.09753125,
+          0.04878124999999983
+        ]
+      },
+      "marginal_minus_ridge": {
+        "n": 40,
+        "mean_diff": -0.02624999999999999,
+        "ci95": [
+          -0.09628124999999998,
+          0.0475
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r90/PROTOCOL_E085.md": "bdc1dd580da0f41bf3743aae4cacc4c4f419633b47b6948bb3471e18df22a68d",
+    "research/2026-10-27-agent-cell-identifiability-r90/e090_metrics.py": "99c828c6f4d47035613abcf00ad7d7536e08a94b787e108f206f5fb5865df31e"
+  },
+  "decisions": {
+    "H229_holds_on_at_least_3_of_4": false,
+    "H230_metric_specific": true,
+    "H231_same_sign_everywhere": false,
+    "n_metrics_with_significant_additive_win": 0,
+    "verdict": "main_conclusion_is_metric_and_criterion_specific"
+  },
+  "limits": [
+    "The four metrics are highly correlated, so this is not four independent replications.",
+    "Missingness differs per metric, so pool membership differs slightly.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "critical_notes": {
+    "hit_definition_differs_from_C45": "C45 used the boolean 'Synergy' flag as the success criterion; this round uses the top quartile of each continuous metric. So this round does NOT reproduce C45's -10.12 pp and does not contradict it either - it shows that the comparison's sign depends on how success is defined.",
+    "marginal_equals_additive_here": "in this pool the marginal score 0.5*(a+b)+grand and the two-way additive score a+b+grand are monotone transforms of one another, so they rank identically; the numbers are identical by construction, not by accident",
+    "what_the_round_actually_compares": "drug-effect-based ranking (marginal equivalent to additive here) versus the pathway-annotation ridge",
+    "nothing_is_significant_under_quartile_criteria": "all four comparisons have CIs containing zero, so no metric shows a significant winner"
+  }
+}

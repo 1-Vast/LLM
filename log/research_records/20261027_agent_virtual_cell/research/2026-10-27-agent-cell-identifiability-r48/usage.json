@@ -1,0 +1,39 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r48",
+  "round": "R48 (goal round 46/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Seed-robustness test of R37 on the locally held GDSC screen; no literature query."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r48": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round resolves the R37 versus R47 contradiction by showing the difference is construction, not randomness.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e048_seed_robustness.py"], "runs": 1, "seed_sets": 10, "splits": 400,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E048_RESULTS.json", "rows": "E048_rows.csv", "protocol": "PROTOCOL_E047.md"},
+  "design": {
+    "construction": "identical to R37: key-level 80/20 split, pathway features, lambda=1, k=50",
+    "varied": "random seed only - 10 independent seed sets, 20 search + 20 eval splits each"
+  },
+  "results": {
+    "per_seed_diff_pp": [4.0, 2.7, 3.9, 2.7, 4.2, 4.2, 5.0, 3.1, 4.8, 4.9],
+    "mean_diff": 0.0395, "ci95_over_seeds": [0.0342, 0.0444],
+    "frac_seeds_positive": 1.0, "range": [0.027, 0.05]
+  },
+  "decisions": {"H123_robust_across_seeds": true, "H124_seed_dependent": false,
+                "verdict_reported": "R37_advantage_robust_across_seeds_but_construction_dependent"},
+  "resolution": "R37's advantage is not seed luck (10/10 positive); R47's null therefore comes from the pool construction",
+  "construction_differs_in_two_ways": "pool size (4,000 vs 21,652) and sampling scheme (per-r uniform vs random keys) both changed at once, so which matters is unresolved",
+  "C28_status": "restored as robust WITHIN R37's construction while remaining absent under R47's construction; which construction resembles real deployment is undetermined",
+  "register_updates": {"C28": "restored with the construction caveat", "positioning": "candidate statement replaced by the construction-dependence claim"},
+  "next_gates": ["sweep pool size under R37's sampling scheme (2,000 / 8,000 / 21,652) to separate pool size from sampling"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C28 restored)", "research/POSITIONING.md (candidate statement replaced)",
+                                "research/INDEX.md (added R48 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

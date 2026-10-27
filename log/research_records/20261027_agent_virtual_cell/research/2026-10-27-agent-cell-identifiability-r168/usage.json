@@ -1,0 +1,75 @@
+{
+  "experiment": "E168",
+  "round": "R168 (goal round 165/256)",
+  "date": "2026-10-27",
+  "type": "turn R167's two lessons into a shared utility and validate it on real data",
+  "compute": {
+    "script": "e168_validate_guards.py",
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0,
+    "refits": 0
+  },
+  "artifacts": {
+    "tool": "research/tools/effect_audit.py",
+    "results": "E168_RESULTS.json",
+    "protocol": "PROTOCOL_E156.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "result": {
+    "groups_total": 21,
+    "kept": 18,
+    "dropped": [
+      "Chromatin other",
+      "JNK and p38 signaling",
+      "Cytoskeleton"
+    ],
+    "degenerate_intervals_among_kept": 0,
+    "interval_reversals": 0,
+    "sign_only_negatives": [
+      "DNA replication"
+    ]
+  },
+  "my_assertions_were_wrong": {
+    "predicted": {
+      "dropped": 1,
+      "degenerate": 1
+    },
+    "actual": {
+      "dropped": 3,
+      "degenerate": 0
+    },
+    "why": "the filter removed all three thin groups, and the only zero-width interval belonged to one of them, so it never reached the reporting stage",
+    "status": "H400 false as literally written; the goal it was written for is met"
+  },
+  "the_ordering_insight": {
+    "filter": "removes the CAUSE (too few resamples)",
+    "degenerate_check": "reports the SYMPTOM (a zero-width interval)",
+    "consequence": "applied in that order the symptom check becomes a backstop rather than a primary detector",
+    "why_eight_instances_occurred": "the filter was prose in a protocol rather than a step in the pipeline"
+  },
+  "sign_counting_overstates": {
+    "sign_only": 1,
+    "interval_supported": 0,
+    "example": "DNA replication, 27 splits, -0.0055 with an interval spanning zero"
+  },
+  "standard_three_steps": [
+    "min_reps_filter",
+    "interval-supported reversals only",
+    "degenerate check as backstop"
+  ],
+  "limits": [
+    "Validated on the 21 groups of E167 only.",
+    "min_reps of five is chosen, not optimised.",
+    "The utility handles the per-group effect shape only."
+  ],
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "note": "new file under research/tools/",
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

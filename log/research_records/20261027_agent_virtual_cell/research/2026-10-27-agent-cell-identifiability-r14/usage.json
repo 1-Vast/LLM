@@ -1,0 +1,43 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r14",
+  "round": "R14 (goal round 11/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Shrinkage and parameterisation of the transferred interaction on data in hand; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r14": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: all three pre-registered hypotheses failed, so there is no positive claim to challenge.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e015_interaction_transfer.py"], "runs": 1, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E015_RESULTS.json", "per_prediction": "E015_per_prediction.csv", "protocol": "PROTOCOL_E015.md"},
+  "results": {
+    "units": 210, "layouts": 9,
+    "lambda_selected": {"I_mean": 0.75, "I_col": 0.75, "I_row": 0.5, "I_diag": 0.5},
+    "comparators": {
+      "I_mean_lam0.75": {"rmse": 0.1342, "rank_corr": 0.764, "hit3": 0.505, "regret": 0.0554},
+      "bliss_lam1.0": {"rmse": 0.1353, "rank_corr": 0.761, "hit3": 0.471, "regret": 0.0632},
+      "I_col_lam0.75": {"rmse": 0.1433, "rank_corr": 0.720, "hit3": 0.605, "regret": 0.0525},
+      "I_diag_lam0.5": {"rmse": 0.1613, "rank_corr": 0.639, "hit3": 0.471, "regret": 0.0673},
+      "I_row_lam0.5": {"rmse": 0.1724, "rank_corr": 0.533, "hit3": 0.248, "regret": 0.1680},
+      "mean_other": {"rmse": 0.1943, "rank_corr": 0.812, "hit3": 0.671, "regret": 0.0259}
+    },
+    "paired": {
+      "best_shrunk_minus_lam1_rmse": {"diff": -0.0011, "ci": [-0.0044, 0.0020]},
+      "I_col_minus_I_mean_regret": {"diff": -0.0107, "ci": [-0.0439, 0.0336]},
+      "I_row_minus_I_mean_regret": {"diff": 0.1048, "ci": [0.0260, 0.1963]},
+      "mean_other_minus_best_shrunk_regret": {"diff": -0.0294, "ci": [-0.0421, -0.0169]}
+    }
+  },
+  "decisions": {"H029_shrinkage_helps": false, "H030_lowdim_better_regret": false,
+                "H031_pooling_still_best_for_ordering": true},
+  "optimistic_by_construction": "lambda was tuned on 25% of the same units that were then evaluated, so the shrinkage gain is an upper bound; even so it is not significant",
+  "stop_condition_met": "the interaction-transfer line is closed on this resource: shrinkage, dimensionality and the pooling comparison are all exhausted with negative results",
+  "mutations_outside_episode": ["research/INDEX.md (added R14 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "mechanism_claim_made": false
+  }
+}

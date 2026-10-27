@@ -1,0 +1,49 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r83",
+  "round": "R83 (goal round 81/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Extended combination-level breadth curve to m=500 to locate the capacity limit."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r83": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round looks for a failure point, does not find one, and characterises capacity by the lift ratio instead.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e083_breadth_ext.py"], "runs": 1, "repeats": 40,
+    "ms": [1, 5, 10, 20, 50, 100, 200, 500], "bootstrap": 2000,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E083_RESULTS.json", "rows": "E083_rows.csv", "protocol": "PROTOCOL_E080.md"},
+  "results": {
+    "m1": {"marginal": 0.0236, "ridge": 0.0322, "random": 0.0080, "lift": 2.9},
+    "m5": {"marginal": 0.0756, "random": 0.0181, "lift": 4.2},
+    "m10": {"marginal": 0.0850, "random": 0.0118, "lift": 7.2},
+    "m20": {"marginal": 0.0781, "random": 0.0153, "lift": 5.1},
+    "m50": {"marginal": 0.0734, "random": 0.0150, "lift": 4.9},
+    "m100": {"marginal": 0.0675, "random": 0.0136, "lift": 5.0},
+    "m200": {"marginal": 0.0515, "random": 0.0144, "lift": 3.6},
+    "m500": {"marginal": 0.0284, "random": 0.0140, "lift": 2.0, "n_keys": 13954}
+  },
+  "decisions": {"H211_failure_point_exists": false, "H212_capacity_at_most_200": false,
+                "H213_failure_is_saturation_not_noise": false, "first_failing_m": null,
+                "verdict": "capacity_exceeds_a_quarter_of_the_space"},
+  "honest_characterisation": "there is no hard failure point up to m=500 (a quarter of the combination space), but the lift decays from 7.2x at m=10 to 2.0x at m=500; a usable capacity is roughly 100-200 combinations (3.6-5x)",
+  "model_verdict": "the annotation model loses at m=5 through m=200, ties at m=500, and is nominally ahead at m=1 with only 22 keys and a CI that includes zero, so it has no advantage at any breadth",
+  "inconsistency_disclosed": {
+    "issue": "m=1 marginal is 2.36% here versus 4.89% in R82",
+    "cause": "changing the m grid changes the random-stream consumption and therefore the splits",
+    "consequence": "absolute levels are not comparable across rounds; only within-round comparisons are trustworthy, and m=1 rests on 22 keys"
+  },
+  "limits": ["combination-level aggregation removes within-combination cell differences",
+             "m=500 is already 25% of the space, so larger m is no longer a selection problem",
+             "m=1 is extremely noisy with 22 keys",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["the marginal strategy line is now characterised and can be closed"],
+  "register_updates": {"C57": "new, exploratory: capacity is 100-200 combinations at 3.6-5x lift, with no hard failure point"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C57 added)", "research/INDEX.md (added R83 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

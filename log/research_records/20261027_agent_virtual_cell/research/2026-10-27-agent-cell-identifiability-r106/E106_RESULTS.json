@@ -1,0 +1,172 @@
+{
+  "kind": "pathway_versus_target_granularity",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "repeats": 60,
+    "holdout": 0.2,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "drugs": 65,
+    "pathway_levels": 38,
+    "target_levels": 86,
+    "identity_dims": 130,
+    "pathway_block": 41,
+    "target_block": 175,
+    "rows": 360
+  },
+  "by_pool": {
+    "one_unseen": {
+      "n": 60,
+      "identity": 0.08666666666666668,
+      "plus_pathway": 0.09833333333333333,
+      "plus_target": 0.11916666666666667,
+      "plus_both": 0.1075,
+      "plus_random": 0.06666666666666667,
+      "pathway_minus_identity": {
+        "n": 60,
+        "mean_diff": 0.011666666666666665,
+        "ci95": [
+          -0.0125,
+          0.03666666666666667
+        ]
+      },
+      "target_minus_identity": {
+        "n": 60,
+        "mean_diff": 0.0325,
+        "ci95": [
+          0.010000000000000002,
+          0.058333333333333334
+        ]
+      },
+      "target_minus_pathway": {
+        "n": 60,
+        "mean_diff": 0.020833333333333332,
+        "ci95": [
+          -0.005833333333333334,
+          0.0475
+        ]
+      },
+      "both_minus_pathway": {
+        "n": 60,
+        "mean_diff": 0.009166666666666667,
+        "ci95": [
+          -0.0125,
+          0.03333333333333333
+        ]
+      }
+    },
+    "cell_unseen": {
+      "n": 60,
+      "identity": 0.08666666666666667,
+      "plus_pathway": 0.09,
+      "plus_target": 0.10333333333333332,
+      "plus_both": 0.10500000000000001,
+      "plus_random": 0.07333333333333333,
+      "pathway_minus_identity": {
+        "n": 60,
+        "mean_diff": 0.0033333333333333335,
+        "ci95": [
+          -0.014999999999999998,
+          0.02333333333333333
+        ]
+      },
+      "target_minus_identity": {
+        "n": 60,
+        "mean_diff": 0.016666666666666666,
+        "ci95": [
+          -0.004166666666666664,
+          0.03752083333333322
+        ]
+      },
+      "target_minus_pathway": {
+        "n": 60,
+        "mean_diff": 0.013333333333333334,
+        "ci95": [
+          4.625929269271486e-19,
+          0.02666666666666667
+        ]
+      },
+      "both_minus_pathway": {
+        "n": 60,
+        "mean_diff": 0.015000000000000001,
+        "ci95": [
+          0.0041666666666666675,
+          0.025833333333333337
+        ]
+      }
+    },
+    "both_unseen": {
+      "n": 60,
+      "identity": 0.01,
+      "plus_pathway": 0.034166666666666665,
+      "plus_target": 0.03166666666666667,
+      "plus_both": 0.04083333333333334,
+      "plus_random": 0.010833333333333335,
+      "pathway_minus_identity": {
+        "n": 60,
+        "mean_diff": 0.024166666666666666,
+        "ci95": [
+          0.005833333333333333,
+          0.04416666666666666
+        ]
+      },
+      "target_minus_identity": {
+        "n": 60,
+        "mean_diff": 0.021666666666666667,
+        "ci95": [
+          0.0033125000000000003,
+          0.04666666666666667
+        ]
+      },
+      "target_minus_pathway": {
+        "n": 60,
+        "mean_diff": -0.0024999999999999974,
+        "ci95": [
+          -0.021666666666666664,
+          0.01666666666666667
+        ]
+      },
+      "both_minus_pathway": {
+        "n": 60,
+        "mean_diff": 0.006666666666666669,
+        "ci95": [
+          -0.009166666666666667,
+          0.023333333333333334
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r106/e106_granularity.py": "576f183751414f1e2332820b715c1f83a776c561b9de4e36296b3f583b487c27"
+  },
+  "decisions": {
+    "pathway_wins": 1,
+    "target_wins": 2,
+    "target_beats_pathway_count": 1,
+    "H275_target_more_informative_than_pathway": false,
+    "H276_pathway_not_subsumed_by_target": false,
+    "verdict": "both_granularities_carry_signal_neither_dominates"
+  },
+  "limits": [
+    "Target strings mix genes and complexes (for example 'Proteasome'), so the target block is not a clean gene set.",
+    "The three pools share one training set.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "what_this_resolves": {
+    "the_C46_limitation": "C46 worried the finding might be about pathway granularity. Comparing pathways (38 levels) with target strings (86 levels) shows both beat identity in some pools (+2.42 and +2.17 in both_unseen) and neither decisively beats the other (the direct contrast is significant in 1 of 3 pools, favouring targets), so the signal is not an artefact of using a coarse annotation",
+    "combining_never_hurts": "+pathway+target is at or above +pathway in all three pools"
+  },
+  "robustness_concern_flagged": {
+    "contrast": "pathway minus identity on the cell_unseen pool",
+    "R101": "+2.87 pp, significant",
+    "R106": "+0.33 pp, not significant",
+    "explanation": "different random streams (the random-capacity block consumes RNG differently) give different splits",
+    "implication": "the absolute level of this contrast is not stable between runs, so its size should be quoted only from the highest-powered run and never as a tight number",
+    "this_is_consistent_with": "the standing caveat that absolute hit rates are not comparable across rounds and only within-round paired contrasts are trustworthy"
+  }
+}

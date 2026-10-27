@@ -1,0 +1,62 @@
+{
+  "kind": "read_the_full_text_of_the_key_prior_work_and_test_the_two_claimed_differences",
+  "round": "R180",
+  "date": "2026-10-27",
+  "corpus": {
+    "file": "raw/onehot.pdf",
+    "bytes": 2507785,
+    "pages": 12,
+    "chars_extracted": 65736,
+    "venue": "Bioinformatics 2026, 42(3), btag040",
+    "published": "2026-01-24",
+    "doi": "10.1093/bioinformatics/btag040"
+  },
+  "keyword_counts": {
+    "power": 0,
+    "sample size": 0,
+    "number of measurements": 0,
+    "how many": 0,
+    "prioriti": 2,
+    "unseen drug": 9,
+    "cold start": 0
+  },
+  "the_two_claimed_differences_both_hold": {
+    "step_shape": {
+      "in_their_paper": "one-hot is reported as comparable or even slightly better than features",
+      "what_is_absent": "the split into exactly zero contribution when identity is available and +0.118 when both drugs are unseen",
+      "status": "absent, so the step shape remains a difference"
+    },
+    "verification_cost": {
+      "in_their_paper": "no mention of power, sample size or how many measurements",
+      "what_is_absent": "the roughly 1,600-measurement estimate and its allocation insensitivity",
+      "status": "absent, so the cost estimate remains a difference"
+    },
+    "pathway_versus_target": "absent from their paper",
+    "model_family_separation": "absent from their paper",
+    "measured_capability_boundary": "they have the scope remark, not the measurement"
+  },
+  "a_claim_of_mine_i_must_correct": {
+    "what_I_implied": "that my both-unseen regime is a regime they did not touch",
+    "what_the_full_text_shows": "they review the split taxonomy and explicitly note that when neither drug appears in training, all models degrade, citing Li et al. 2024",
+    "so": "the regime is acknowledged in their literature review even though their own experiments sit in the panel setting",
+    "corrected_statement": "they cite the both-unseen regime as the hardest split; their experiments are the panel-level one-hot substitution; this programme measured what remains usable inside that hard regime and what verifying it costs"
+  },
+  "the_regimes_are_distinct": {
+    "their_leave-drug-pair-out": "both drugs appear in training, merely never together, so identity still carries information",
+    "their_leave-one-drug-out": "one drug absent",
+    "both_drugs_absent": "mentioned only as a citation, not run as an experiment",
+    "my_both_unseen": "both drugs absent entirely, identity at chance (rho +0.0001), annotation worth +0.118",
+    "consequence": "their experiments sit where identity works; mine sit where it does not, so the two results are complementary rather than overlapping"
+  },
+  "the_positioning_that_now_stands": "their finding is that features are largely redundant with one-hot inside a tested panel; mine is when the feature matters, how much, and what it would cost to verify",
+  "an_honest_remaining_risk": {
+    "who": "Li et al. 2024, the source they cite for the all-models-degrade-in-the-both-absent-regime claim",
+    "why": "if that work already quantified the annotation's value in that regime, my difference narrows to the step shape alone",
+    "status": "not checked; recorded as the next gate"
+  },
+  "decisions": {
+    "H424_both_differences_hold": true,
+    "H425_one_already_covered": false,
+    "verdict": "both_claimed_differences_hold_and_my_regime_overlap_wording_needed_correcting"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r141",
+  "round": "R141 (goal round 139/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Dose-response of the substitution value to the fraction of drugs whose group assignment is corrupted."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r141": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round turns the previous binary contrast into a graded curve.",
+  "compute": {"python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6, scipy 1.17.1",
+              "scripts": ["e141_dose.py"], "runs": 1, "repeats": 200, "fractions": 5,
+              "rows": 200, "data_downloads": 0, "wet_lab_experiments": 0},
+  "artifacts": {"results": "E141_RESULTS.json", "rows": "E141_rows.csv", "protocol": "PROTOCOL_E131.md"},
+  "results_by_corruption": {
+    "0.00": {"rho": 0.1259, "vs_identity": [0.1227, 0.1094, 0.1361]},
+    "0.25": {"rho": 0.0742, "vs_identity": [0.0724, 0.0569, 0.0878], "vs_uncorrupted": [-0.0517, -0.0667, -0.0379]},
+    "0.50": {"rho": 0.0364, "vs_identity": [0.0343, 0.0172, 0.0510], "vs_uncorrupted": [-0.0895, -0.1081, -0.0724]},
+    "0.75": {"rho": 0.0000, "vs_identity": [0.0008, -0.0157, 0.0166], "vs_uncorrupted": [-0.1259, -0.1427, -0.1079]},
+    "1.00": {"rho": -0.0123, "vs_identity": [-0.0117, -0.0285, 0.0035], "vs_uncorrupted": [-0.1383, -0.1596, -0.1166]},
+    "identity_baseline": -0.0002},
+  "decisions": {"monotone": true, "significant_drops_vs_uncorrupted": 4,
+                "H348_graded_dose_response": true, "H349_threshold_like": false,
+                "verdict": "the_substitution_value_is_a_graded_function_of_how_much_of_the_grouping_is_real"},
+  "the_shape": {
+    "steps": {"0_to_25": -0.0517, "25_to_50": -0.0376, "50_to_75": -0.0364, "75_to_100": -0.0123},
+    "front_loaded": "the first quarter costs the most",
+    "floor": "by 75 percent corruption rho has reached 0.0000, the identity level, so the last step is small because the curve has hit the noise floor rather than continuing to fall"},
+  "what_this_adds": {
+    "before": "content matters, established at two endpoints only",
+    "now": "content matters in proportion, with all four quarter-steps significant",
+    "so": "the pathway's value is carried by its specific assignments, not by the presence of a plausible-looking block"},
+  "limits": ["only the both-unseen condition and only ridge",
+             "proportional random reassignment slightly changes group sizes, though the marginal group distribution is preserved",
+             "no multiple-comparison correction across the four steps",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["move on: the content question is now at the dose-response level; a natural next step would be rebuilding the grouping from data rather than annotation"],
+  "register_updates": {"C109": "new: the substitution value is graded in content correctness",
+                       "C108": "quantified", "SYNTHESIS": "frozen section extended with the graded curve"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C109 added, C108 annotated)",
+                                "research/SYNTHESIS.md (frozen section extended)",
+                                "research/INDEX.md (added R141 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "experiment": "E155",
+  "round": "R155 (goal round 153/256)",
+  "date": "2026-10-27",
+  "type": "does the reliability of the visible drug's information moderate the pathway gain",
+  "compute": {
+    "script": "e155_support.py",
+    "splits": 200,
+    "bands": 3,
+    "arms": 2,
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "results": "E155_RESULTS.json",
+    "rows": "E155_rows.csv",
+    "protocol": "PROTOCOL_E145.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "by_band": {
+    "low": {
+      "support_med": 1876,
+      "rho_identity": 0.1899,
+      "rho_pathway": 0.222,
+      "gain": 0.0322
+    },
+    "mid": {
+      "support_med": 3949,
+      "rho_identity": 0.2898,
+      "rho_pathway": 0.3037,
+      "gain": 0.0138
+    },
+    "high": {
+      "support_med": 5758,
+      "rho_identity": 0.233,
+      "rho_pathway": 0.2561,
+      "gain": 0.0231
+    },
+    "low_minus_high": [
+      0.009,
+      0.0055,
+      0.0125
+    ]
+  },
+  "verdict": "NEGATIVE. The pre-registered literal gate passed, but the hypothesis was not tested and I decline to read the pass as support.",
+  "why_not_support": {
+    "support_range": "921 to 7305 with minimum 921 and no drug below it, so every band is informationally rich and the weak-information regime was never sampled",
+    "non_monotone": "gains are 0.0322, 0.0138, 0.0231; the middle band is smallest, which a monotone information-quality mechanism does not predict",
+    "bands_not_comparable": "identity correlation differs across bands at 0.19, 0.29 and 0.23"
+  },
+  "third_vacuous_comparison": {
+    "earlier": [
+      "R135 pool inside the training rows",
+      "R144 constant marginal arm"
+    ],
+    "rule_10": "before stratifying, confirm the stratifier spans the regime the hypothesis is about; and when a gate passes, ask whether the design could have produced the opposite result"
+  },
+  "status_of_the_question": "open by resource limitation, not by evidence",
+  "what_would_test_it": "starve a visible drug's support artificially by keeping only k training keys, k in {20, 50, 200, all}",
+  "limits": [
+    "Bands are within-split terciles and not comparable across splits.",
+    "The support count includes both anchor and library roles, which inflates it, though the minimum of 921 is unaffected.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

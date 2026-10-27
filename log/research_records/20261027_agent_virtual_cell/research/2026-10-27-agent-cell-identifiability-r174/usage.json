@@ -1,0 +1,55 @@
+{
+  "experiment": "E174",
+  "round": "R174 (goal round 171/256)",
+  "date": "2026-10-27",
+  "type": "does the ranking carry cell-level information or only combination-level",
+  "compute": {
+    "script": "e174_cell_axis_v2.py",
+    "splits": 20,
+    "arms": 2,
+    "inner_folds": 3,
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "results": "E174_RESULTS.json",
+    "rows": "E174_rows.csv",
+    "protocol": "PROTOCOL_E162.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "finding": "the prediction is constant across the cells of each drug pair, so the model ranks combinations only",
+  "numbers": {
+    "identity_pathway": {
+      "rho": 0.1516,
+      "max_within_pair_spread": 1.388e-17,
+      "frac_pairs_varying": 0.0
+    },
+    "identity": {
+      "rho": 0.0018,
+      "max_within_pair_spread": 3.469e-18,
+      "frac_pairs_varying": 0.0
+    }
+  },
+  "my_second_ratio_artefact": {
+    "first_version_reported": 0.309,
+    "why_impossible": "identity has no cell feature",
+    "cause": "residue divided by a near-zero total variance",
+    "fix": "report the raw within-pair range",
+    "rule_11": "when a denominator can approach zero, report the raw quantity alongside the ratio"
+  },
+  "limits": [
+    "Only ridge and one resource; two feature sets.",
+    "The conclusion follows from the feature design rather than being measured.",
+    "Lifting it needs a cell-level covariate usable when both drugs are unseen, which this resource cannot supply."
+  ],
+  "next_gate": "write the boundary into the synthesis applicability section and check whether any citation of the headline implies cell-level ranking",
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

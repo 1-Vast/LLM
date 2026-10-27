@@ -1,0 +1,103 @@
+{
+  "kind": "pathway_versus_target_under_a_tree_with_the_grouping_as_the_only_input",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "repeats": 60,
+    "holdout": 0.2,
+    "seed": 20261050,
+    "tree_config": {
+      "max_iter": 200,
+      "learning_rate": 0.08,
+      "max_depth": 4,
+      "min_samples_leaf": 40
+    },
+    "n_boot": 2000
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 60
+  },
+  "arms": {
+    "pathway_only": 0.107436293323769,
+    "target_only": 0.05022443483263509,
+    "random_only": 0.0017118189477605017
+  },
+  "contrasts": {
+    "pathway_minus_target": {
+      "n": 60,
+      "mean_diff": 0.05721185849113389,
+      "sd": 0.09264262839611304,
+      "ci95": [
+        0.03398474004157037,
+        0.080690295901362
+      ],
+      "mde_80pct": 0.03351223353698443
+    },
+    "pathway_minus_random": {
+      "n": 60,
+      "mean_diff": 0.10572447437600847,
+      "sd": 0.11357956505662069,
+      "ci95": [
+        0.07501813897673641,
+        0.13389697756720867
+      ],
+      "mde_80pct": 0.04108589075141447
+    },
+    "target_minus_random": {
+      "n": 60,
+      "mean_diff": 0.048512615884874585,
+      "sd": 0.11701746273393328,
+      "ci95": [
+        0.018006206829350984,
+        0.07806314372455865
+      ],
+      "mde_80pct": 0.04232950432146286
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r147/PROTOCOL_E137.md": "b920b22cddaf48b684453c6455e01d715f08387bd2f48004d2a6d7627821dd5f",
+    "research/2026-10-27-agent-cell-identifiability-r147/e147_tree_groupings.py": "dd45306dfca428c58a6143d20aab34fbac46072156df25796fe28b960449c0de"
+  },
+  "decisions": {
+    "pathway_minus_target": 0.05721185849113389,
+    "underpowered": false,
+    "H360_ranking_robust_across_models": true,
+    "H361_ranking_is_model_specific": false,
+    "verdict": "pathway_beats_target_under_a_tree_too_and_C106_needs_retesting_without_the_dead_identity_block"
+  },
+  "limits": [
+    "Twenty splits, so power is lower than the ridge rounds.",
+    "One untuned tree configuration; a null here would need a capacity check before being believed.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "the_ranking_is_model_independent": {
+    "ridge_R145": {
+      "pathway": 0.1254,
+      "target": 0.0536,
+      "pathway_minus_target": 0.0685
+    },
+    "tree_here": {
+      "pathway": 0.1074,
+      "target": 0.0502,
+      "pathway_minus_target": 0.0572
+    },
+    "reading": "both groupings work under both model families, both beat the random grouping significantly, and pathway beats target in both. The gap is slightly smaller under the tree but clearly resolvable (MDE 0.0335 against an effect of 0.0572)."
+  },
+  "this_forces_a_correction_to_C106": {
+    "what_C106_said": "under boosting the coarsening does not substitute for a missing identity (the tree reached only about 0.032)",
+    "what_this_round_shows": "with the grouping as the only input the tree reaches 0.1074, close to ridge's 0.1254",
+    "the_likely_cause": "R138's tree carried the drug identity codes, all of which were the reserved code -1 on the evaluation rows. That is a dead feature which consumes splits and distorts the routing, so the tree was handicapped by the encoding rather than by its model family.",
+    "how_I_found_it": "the first attempt of this very round had the same defect: with integer drug codes fed to the tree, 'identity' scored 0.081 in a condition where identity can carry no information. Removing the dead feature fixed both problems.",
+    "status_of_C106": "must be re-tested with grouping-only features on both sides before it can be quoted again"
+  },
+  "the_pattern_that_keeps_recurring": {
+    "class": "a feature that carries no information in the evaluation condition still changes what a flexible model does",
+    "instances": [
+      "R135 one_seen_only: in-sample, two arms numerically identical",
+      "R144: marginal arm constant when both drugs unseen",
+      "R147 first attempt: integer identity codes give held-out drugs arbitrary scores, identity 'scoring' 0.081",
+      "R138, now suspected: the dead identity block handicaps the tree's use of the grouping"
+    ],
+    "rule": "before comparing arms, check that every feature present in every arm actually carries information in the evaluation condition"
+  }
+}

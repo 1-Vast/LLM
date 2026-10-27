@@ -1,0 +1,138 @@
+{
+  "kind": "inner_cv_lambda_with_spearman_metric",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "reps": 20,
+    "ks": [
+      "all",
+      400,
+      120
+    ],
+    "seed": 20261064,
+    "lambdas": [
+      0.03,
+      0.1,
+      0.3,
+      1.0,
+      3.0,
+      10.0,
+      30.0,
+      100.0
+    ],
+    "folds": 3,
+    "n_boot": 2000
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 60
+  },
+  "by_k": {
+    "-1": {
+      "n": 20,
+      "mean_train": 72508.35,
+      "lam_identity": 53.81500000000001,
+      "lam_pathway": 56.57299999999999,
+      "rho_identity": 0.2583521124909859,
+      "rho_pathway": 0.2796093839936059,
+      "gain": 0.021257271502620034,
+      "ci95": [
+        0.01631454039488658,
+        0.0261246887582113
+      ],
+      "mde_80pct": 0.007608630042447346
+    },
+    "400": {
+      "n": 20,
+      "mean_train": 8266.0,
+      "lam_identity": 28.921000000000003,
+      "lam_pathway": 52.02,
+      "rho_identity": 0.25035683365543776,
+      "rho_pathway": 0.2726224419947502,
+      "gain": 0.02226560833931245,
+      "ci95": [
+        0.016866041437246636,
+        0.027772655554782755
+      ],
+      "mde_80pct": 0.008106541177122045
+    },
+    "120": {
+      "n": 20,
+      "mean_train": 2500.15,
+      "lam_identity": 57.26649999999999,
+      "lam_pathway": 84.0,
+      "rho_identity": 0.23416137554838254,
+      "rho_pathway": 0.2557731699481734,
+      "gain": 0.021611794399790878,
+      "ci95": [
+        0.016665628099113487,
+        0.02731543579863837
+      ],
+      "mde_80pct": 0.007903745556769185
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r162/PROTOCOL_E150.md": "90bc630572d33427ed0ee6557e73c985a739536810aae0bbe138d10519815d19",
+    "research/2026-10-27-agent-cell-identifiability-r162/e162_innerv.py": "34b9c1bb05a52ac03b6a850367d31ffe38ef54dc0ae829b25ee9f757c29409b8"
+  },
+  "decisions": {
+    "H388_resolvable_everywhere": true,
+    "H389_vanishes_with_full_data": false,
+    "verdict": "with_a_tuned_penalty_the_gain_is_flat_and_resolvable_at_every_budget"
+  },
+  "does_lambda_track_n": {
+    "lam_at_full": 56.57299999999999,
+    "lam_at_k400": 52.02,
+    "lam_at_k120": 84.0,
+    "means": "increases with n",
+    "note": "if lambda rises with n, the R161 convention of lambda proportional to n is supported by the data rather than imposed"
+  },
+  "limits": [
+    "Only ridge and one resource; three inner folds.",
+    "The evaluation pool is one_unseen, not the frozen claim's both-unseen cell.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "what_this_shows": {
+    "the_gain_is_flat_and_resolvable_at_every_budget": {
+      "all": 0.0213,
+      "k400": 0.0223,
+      "k120": 0.0216
+    },
+    "spread": 0.001,
+    "largest_mde": 0.0081,
+    "reading": "a 29-fold reduction in training keys moves the gain by one thousandth, well inside the minimum detectable effect of about eight thousandths. The pathway gain is genuinely insensitive to data volume on this pool and metric."
+  },
+  "why_R160_looked_the_opposite_way": {
+    "the_fixed_value": 1.0,
+    "the_tuned_value": {
+      "all": 53.82,
+      "k400": 28.92,
+      "k120": 57.27
+    },
+    "reading": "at full data the inner cross-validation picks lambda near 54, more than fifty times the fixed value used in R160. With lambda 1 the model is badly over-fitted for this feature count, so the identity arm already saturates and the annotation has no room. Tuning removes that artefact.",
+    "so": "the inverted U and the near-zero full-data gain were both consequences of an untuned penalty"
+  },
+  "this_partly_restores_what_R160_and_R161_downgraded": {
+    "C124": "said the gain survives a large data reduction. That conclusion now holds again, but on a different basis: inner-CV lambda with the Spearman metric rather than fixed lambda with a hit-rate metric. The original numbers stay withdrawn; the conclusion returns.",
+    "C125": "said the gain does not depend on how much data the visible drug has. Same status: the conclusion returns, the original evidence does not.",
+    "the_honest_framing": "two rounds were spent withdrawing a claim and one restoring it. The restored version is better founded, but the sequence is worth remembering"
+  },
+  "lambda_tracks_n": {
+    "observed": {
+      "all": 56.57,
+      "k400": 52.02,
+      "k120": 84.0
+    },
+    "on_identity_arm": {
+      "all": 53.82,
+      "k400": 28.92,
+      "k120": 57.27
+    },
+    "reading": "lambda does not fall as n falls, so the R161 convention of scaling lambda with n is at least directionally supported by the data rather than imposed. The relation is noisy, though: the k=120 arm picks a larger lambda than the full-data arm."
+  },
+  "a_caveat_this_exposes_for_everything_earlier": {
+    "what": "no round before this one tuned lambda. Every ridge result in this programme used lambda equal to 1.",
+    "what_stays_valid": "arm-versus-arm comparisons at a common lambda remain comparisons; the ordering conclusions are not automatically damaged",
+    "what_may_not": "absolute magnitudes. If lambda near 54 is right for this feature count, the reported effect sizes elsewhere may be understated, and the frozen claim's headline numbers have never been computed at a tuned penalty",
+    "status": "recorded as a standing caveat; needs a re-check on the both-unseen cell"
+  }
+}

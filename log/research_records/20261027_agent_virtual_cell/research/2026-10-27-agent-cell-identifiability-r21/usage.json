@@ -1,0 +1,47 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r21",
+  "round": "R21 (goal round 19/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Cross-plate replication on the high-diversity design; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r21": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: eight comparisons with a matched control, reported per comparison with the underpowered arm labelled.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e021_cross_plate.py"], "runs": 1, "bootstrap": 1000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E021_RESULTS.json", "comparisons": "E021_comparisons.csv", "protocol": "PROTOCOL_E021.md"},
+  "design": {
+    "comparisons": 8,
+    "shared_compound_pairs_per_comparison": "21-43",
+    "cell_lines": ["TC-71", "SAOS-2", "SJSA-1", "RPE", "Wit49"],
+    "note": "Layout pairs that share a cell line AND at least 20 compound pairs; a cross-cell control is measured on the same compound pairs."
+  },
+  "results": {
+    "cross_plate_same_cell": {"n": 8, "mean": 0.779, "median": 0.851, "ci95": [0.672, 0.872]},
+    "same_plate_file_ceiling": {"n": 2, "mean": 0.793, "ci95": [0.717, 0.869]},
+    "cross_cell_same_pairs": {"n": 8, "mean": 0.632, "median": 0.750, "ci95": [0.383, 0.807]},
+    "cross_plate_minus_cross_cell": {"n": 8, "mean": 0.147, "ci95": [0.0074, 0.3008]}
+  },
+  "decisions": {"H046_cross_plate_reproduces": true, "H047_plate_below_file_ceiling": false,
+                "H048_cell_is_a_bigger_source_than_plate": true, "verdict": "mixed"},
+  "underpowered_arm": "H047 rests on only 2 comparisons with a file ceiling and those two point in opposite directions; its failure is a power problem, not evidence that plate effects are negligible.",
+  "interpretation": "same cell across plates (0.851) agrees better than different cells on the same plate (0.750), so the cross-cell drops the program has measured cannot be mainly a plate/batch artefact",
+  "register_updates": {
+    "F5": "annotated: cross-batch testing is impossible on validation plates but possible on high-diversity plates (8 comparisons)",
+    "C17": "new, exploratory: cross-plate same-cell 0.851 vs same-plate cross-cell 0.750, difference +0.147 [+0.007,+0.301]"
+  },
+  "limitations": [
+    "Only eight comparisons, each with 21-43 shared compound pairs; individual correlations are noisy.",
+    "The two layouts in each comparison come from different compound libraries, so the shared pairs may be a non-random subset.",
+    "No dose dimension in this design.",
+    "Exploratory: plates were used as scoring endpoints earlier and cells cross days."
+  ],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (F5 annotated, C17 added)", "research/INDEX.md (added R21 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "mechanism_claim_made": false
+  }
+}

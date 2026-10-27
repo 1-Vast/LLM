@@ -1,0 +1,87 @@
+{
+  "kind": "validate_the_preflight_audit_against_historical_failures",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "seed": 20261052,
+    "holdout": 0.2
+  },
+  "audit": {
+    "keys": 108259,
+    "tool": "research/tools/feature_audit.py"
+  },
+  "cases": {
+    "r147_attempt1": {
+      "passed": false,
+      "expected": false,
+      "flags": [
+        "feature a_code: UNSEEN_CODES 1.000",
+        "feature b_code: UNSEEN_CODES 1.000",
+        "feature lp_code: UNSEEN_CODES 0.062"
+      ]
+    },
+    "r138_no_identity": {
+      "passed": false,
+      "expected": false,
+      "flags": [
+        "feature a_code: CONSTANT_ON_EVAL; UNSEEN_CODES 1.000",
+        "feature b_code: CONSTANT_ON_EVAL; UNSEEN_CODES 1.000",
+        "feature lp_code: UNSEEN_CODES 0.062"
+      ]
+    },
+    "r144_marginal": {
+      "passed": false,
+      "expected": false,
+      "flags": [
+        "arm marginal: CONSTANT_PREDICTION"
+      ]
+    },
+    "r135_one_seen_only": {
+      "passed": false,
+      "expected": false,
+      "flags": [
+        "split: evaluation keys overlap training (1.000)"
+      ]
+    },
+    "r148_clean": {
+      "passed": true,
+      "expected": true,
+      "flags": []
+    }
+  },
+  "decisions": {
+    "H364_audit_catches_all": true,
+    "H365_some_missed": false,
+    "verdict": "the_preflight_audit_reproduces_all_five_failures_and_passes_the_clean_design"
+  },
+  "decisions_verdict": "the_audit_reproduces_all_five_historical_failures_and_passes_the_clean_design",
+  "limits": [
+    "The audit is necessary, not sufficient: passing does not make a design correct.",
+    "It handles the shapes this programme uses (integer codes, key sets, prediction arrays).",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r149/PROTOCOL_E139.md": "106780a238e4f56018962bddd5d49a53a12069e6e0eb84789c0b8c3dee6beee7",
+    "research/2026-10-27-agent-cell-identifiability-r149/e149_validate_audit.py": "f95448c2054dfba444569d3581b38d39dbec32658562e2809db1138ca0916820",
+    "research/tools/feature_audit.py": "125b12d6868c5f1173c2348f99b713bb4dc6976b6b77b3110f0e47e31e50ba5d"
+  },
+  "the_audit_works": {
+    "r147_attempt1": "FLAG on a_code and b_code: 100 percent of evaluation rows carry drug codes unseen in training",
+    "r138_no_identity": "FLAG twice over: the codes are constant on evaluation AND 100 percent unseen",
+    "r144_marginal": "FLAG at the prediction level: the marginal arm's prediction is constant",
+    "r135_one_seen_only": "FLAG at the split level: evaluation keys overlap training completely",
+    "r148_clean": "PASS",
+    "reading": "each of the five historical failures is reproduced by a mechanical check that takes seconds to run"
+  },
+  "a_new_detail_it_surfaced": {
+    "observation": "in the both-unseen cases the library pathway code is unseen for 6.2 percent of evaluation rows",
+    "why": "some held-out library drugs belong to a pathway that no training library drug shares, so the grouping does not cover them either. The pathway prior therefore has slightly less coverage than it appears to.",
+    "how_big": "6.2 percent of rows, and only on the library side in these cases",
+    "why_it_matters": "it means the pathway arm is mildly handicapped in exactly the condition where it is supposed to help, which makes the measured substitution effect a slight underestimate rather than an overestimate",
+    "status": "recorded as a resource detail, not tested as a separate hypothesis"
+  },
+  "what_the_audit_is_and_is_not": {
+    "is": "a necessary pre-flight check that takes seconds and reports three levels: feature dispersion and unseen codes, split overlap, prediction dispersion",
+    "is_not": "sufficient. Passing it does not make a design correct; it only removes one specific failure mode that has occurred five times here",
+    "where_it_lives": "research/tools/feature_audit.py, callable as run(features=..., split=..., preds=...) returning a dict with a passed flag"
+  }
+}

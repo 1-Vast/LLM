@@ -1,0 +1,105 @@
+{
+  "task": "task-43",
+  "round": "R198-A2v3",
+  "role": "constraint-library / constructive-discrimination support module for R198-A1 (pre-merge revision; design only)",
+  "status": "v3 revision delivered; DRAFT; not independently frozen; merge into A1 freeze after re-review; no effect/simulator runs",
+  "date": "2026-10-27",
+  "timezone": "Asia/Shanghai",
+  "derived_from": {
+    "v2_files": ["spec_v2.md", "protocol_draft_v2.md", "REVISION_A2.md", "record_v2.md", "usage_v2.json"],
+    "challenge": "challenge_A2_v2.md",
+    "challenge_verdict": "revise (5 must-fix; mergeable into A1 freeze after 1-4)",
+    "lead_disposition": "A2 downgraded to A1 support module; v3 fixes before merge"
+  },
+  "new_files": [
+    "spec_v3.md", "protocol_draft_v3.md", "REVISION_A2_v3.md", "record_v3.md", "usage_v3.json",
+    "folds.json", "constraints_check.json", "constructive_sim.py"
+  ],
+  "design_artifacts_sha256": {
+    "folds.json": "3546E34EBA1CAF41C206F3C5742905F908C27083CDCF354265E055EE193C9DD7",
+    "constraints_check.json": "B35018F70C97BF2A67FC473B708654501A8BE6B6E454D40F8D58B28271E93039",
+    "constructive_sim.py": "2D9E0D61C753EAE6EE85352864E904F2A5758B7B624292ED84C5DCEC5C621AE6",
+    "spec_v3.md": "E638955CA0CF8DE2A53B1CC50011A0FAEADA21A04B47CB1787577D60B3406D10",
+    "protocol_draft_v3.md": "1EE0A4F5A96D1269DFE1C1B0E64D13EB512A055B3EDF396444052AB7BEF45011"
+  },
+  "v1_v2_files_untouched_sha256": {
+    "spec.md": "139282B4E36677ED6019856C86AB68E46679CE92C90B6FBD550D63C1A521848B",
+    "protocol_draft.md": "587E2675DD51E9E431CE0025691E14102A7ED7C8F3DF62E5FBC043CFEC1D227C",
+    "prior_art.md": "8C484393B223B4CDB70109EFB5DFA3869D629BD0B3465DCD4DC39FE02ADFA66C",
+    "record.md": "49136AD5F7220F40A7E20B83A8C32D794177804ABFB561DD9A36F44302F7379E",
+    "usage.json": "ADD8C70276CAAF8F1CCB0BEC222D0AC85D25C7DFEC92C949B8C82993E7EBD13E"
+  },
+  "runtime": {
+    "interpreter": "D:\\anaconda\\envs\\maestro\\python.exe (pandas; metadata/identity/annotation/design columns only)",
+    "network": "none this round",
+    "cwd": "D:\\MAESTRO"
+  },
+  "model": "unknown",
+  "effort": "unknown",
+  "tokens": {"input": null, "output": null, "total": null, "note": "runtime token accounting not exposed; null not 0"},
+  "cost_usd": null,
+  "effects_runs": 0,
+  "training_runs": 0,
+  "replay_runs": 0,
+  "simulator_runs": 0,
+  "responses_read_for_effect": false,
+  "novelty_claimed": false,
+  "fixed_design_values_v3": {
+    "endpoint": "SYNERGY_DELTA_EMAX",
+    "annotation_source": "GDSC per-arm labels only (ANCHOR_PATHWAY 17 / LIBRARY_PATHWAY 21; TARGET 40/58); P-A2 mapping NOT used",
+    "split": "drug-level 5 folds x 13 drugs; seed 20261027; folds.json design artifact",
+    "units": {
+      "directed_pairs_total": 2025,
+      "unordered_pairs_total": 1294,
+      "cell_x_directed_pair_units_total": 108259,
+      "fold_both_unseen_directed": [45, 66, 72, 82, 108],
+      "fold_both_unseen_unordered": [33, 49, 48, 49, 58],
+      "fold_cell_x_pair_units": [1898, 3693, 3588, 4613, 6232]
+    },
+    "pathway_pair_groups_directed": {"total": 331, "ge2": 275, "ge4": 165, "ge4_covered_pairs": 1698, "ge4_units": 90589},
+    "pathway_pair_groups_unordered_sensitivity": {"total": 305, "ge2": 215, "ge4": 117},
+    "S24": "24 distinct directed pairs and 24 distinct unordered pairs, response-blind",
+    "U_unordered": [9, 25, 24, 25, 34],
+    "U_directed_robustness": [21, 42, 48, 58, 84],
+    "topk": "unordered top-k=10 (fold0 top-k=5); directed-U top-k=10 robustness",
+    "III_state": "BARCODE-derived 2-level observable unmodeled metadata state (candidate list <=6, max-stat permutation)",
+    "constructive_endpoints": {"E1": 0.80, "E2": 0.70, "E3": 0.10, "E4": 0.10, "E4b_per_class_resolved": 0.85},
+    "delta_min_same_unit": {"E1": 0.30, "E2": 0.20, "E3": 0.05, "E4": 0.10},
+    "abstention_accounting": "E1/E2 denominator = all non-null worlds, abstention = error; E4 unresolvable <=0.10; per-class resolved >=0.85; E3 null abstention counts as no-false-class, null resolved <=0.50 descriptive",
+    "k_allocation": {
+      "6": "3 in/3 out; z 3/3; I vs null",
+      "12": "6 in/6 out; z 3/3; I+III",
+      "20": "10 in/10 out; z 5/5; I+II+III (structured batch)",
+      "24": "20 structured + 4 reserve; replay I+II",
+      "36": "20 structured + 16 confirm (8/8; z 4/4); stability only, no threshold relaxation"
+    },
+    "mde": ">=1000 batches per endpoint; MDE = detectable accuracy/rate difference (same unit as delta_min); MDE<=delta_min required",
+    "budget": {"estimated_runtime_min": "<=5", "hard_cap_min": 30, "gpu": false}
+  },
+  "interface": {
+    "schema": "a2_to_a1/v3",
+    "fields": ["constraint_id", "group_key{ directed, unordered }", "n_pairs", "n_units", "stat", "ci_low", "ci_high", "null_p", "bh_q", "sign_flip_contexts", "in_condition_units", "out_condition_units", "candidate_states[]", "identified_state|null", "residual_structure{name,stat,p}", "fixed_probe_list[{cell,pair}]"],
+    "kappa_rule": "kappa>=0.60 is compatibility check only; A1/A2 same-class discriminants are not mutual validation; X_flip/delta_scope are alignment only"
+  },
+  "handoffs": {
+    "C3_c130": "R196v2",
+    "C5_single_agent_explanation": "R197v2 / calibration line",
+    "III_state_representation": "R198-A4",
+    "acquisition_probe_benefit": "R198-A5",
+    "replay_primary_attribution": "R198-A1"
+  },
+  "citations_status_only": {
+    "C176": "R196 replicated_under_audit withdrawn; C130 audit-level reliability not established",
+    "C177": "R197 v1 protocol void; low-rank structure still untested",
+    "C172_C174": "1.43% is additive condition main-effect share only; Q2 weighted moments/dependence/reliability need rechecking"
+  },
+  "limitations": [
+    "constructive simulator and MDE NOT run (forbidden this round); E1-E4 reachability and MDE<=delta_min remain unverified until post-freeze execution",
+    "SYNERGY_DELTA_EMAX column semantics cited from R198 record, not independently re-audited",
+    "A1 updater/attribution schema not provided yet; a2_to_a1/v3 is A2-side contract",
+    "A4 state resources unknown; III real-data certification remains A4",
+    "general-ML prior art remains metadata-level only",
+    "design artifacts are metadata-only (no synthetic world generated, no response values read)"
+  ],
+  "next_entry": "independent challenge review of v3; then merge into A1 freeze; post-freeze run constructive check + MDE (>=1000 batches); replay only after constructive_pass and only descriptive"
+}

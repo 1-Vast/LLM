@@ -1,0 +1,69 @@
+{
+  "experiment": "E146",
+  "round": "R146 (goal round 144/256)",
+  "date": "2026-10-27",
+  "type": "robustness of the pathway-over-target ranking under a distribution shift",
+  "compute": {
+    "script": "e146_transfer.py",
+    "splits": 196,
+    "arms": 4,
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "results": "E146_RESULTS.json",
+    "rows": "E146_rows.csv",
+    "protocol": "PROTOCOL_E136.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "results": {
+    "identity": 0.0023,
+    "plus_pathway": 0.1319,
+    "plus_target": 0.055,
+    "plus_random": 0.0014,
+    "pathway_minus_identity": [
+      0.1349,
+      0.1108,
+      0.1588
+    ],
+    "target_minus_identity": [
+      0.0606,
+      0.0396,
+      0.0807
+    ],
+    "pathway_minus_target": [
+      0.0765,
+      0.0526,
+      0.0998
+    ],
+    "random_minus_identity": [
+      -0.0008,
+      -0.0086,
+      0.0071
+    ],
+    "mde_pathway_minus_target": 0.0331,
+    "mean_eval_size": 1401
+  },
+  "conclusion": "pathway remains the better prior under tissue holdout, so the R145 recommendation generalises",
+  "not_underpowered": "the observed contrast 0.0765 is 2.3 times the minimum detectable effect 0.0331",
+  "pathway_does_not_degrade": {
+    "in_distribution": 0.1254,
+    "under_holdout": 0.1349,
+    "caveat": "different seeds and evaluation pools, so descriptive only"
+  },
+  "limits": [
+    "Only ridge and one resource.",
+    "The double holdout shrinks the evaluation set; the minimum detectable effect is reported.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "next_gate": "put the pathway-versus-target comparison into a tree model, since C106 and C107 showed the two model families behave differently",
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

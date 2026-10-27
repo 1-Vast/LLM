@@ -1,0 +1,171 @@
+{
+  "schema": "r198-a1-stage0-relations-check-config-v4.1",
+  "stage0_role": "R199-A1v4.1 Stage 0 relation qualification audit (engineering implementation; NOT executed on real data in this round)",
+  "design_documents": {
+    "relations_check_design": "research/2026-10-27-innovation-scouting/conflict_signal/relations_check_design.md",
+    "spec_v4": "research/2026-10-27-innovation-scouting/conflict_signal/spec_v4.md",
+    "spec_v4_1": "research/2026-10-27-innovation-scouting/conflict_signal/spec_v4_1.md",
+    "protocol_draft_v4": "research/2026-10-27-innovation-scouting/conflict_signal/protocol_draft_v4.md",
+    "challenge_A1_v3": "research/2026-10-27-innovation-scouting/conflict_signal/challenge_A1_v3.md",
+    "challenge_A1_v4": "research/2026-10-27-innovation-scouting/conflict_signal/challenge_A1_v4.md"
+  },
+  "run_gate": {
+    "require_confirm_run_flag": true,
+    "confirm_flag": "--confirm-run",
+    "real_run_enabled": false,
+    "mode_aware": true,
+    "note": "Two-key gate + mode awareness (v4.1): --p0a-metadata needs only --confirm-run AND real_run_enabled=true (utility/P0d blocked does NOT block it); full relations_check additionally requires utility only when utility.utility_gate_required_for_run=true (currently false); default or --confirm-run alone -> exit 3. Real run only after A1v4.1 review passes + Lead approval + two-key."
+  },
+  "data": {
+    "original_fitted_csv": "data/external/gdsc_combinations/jaaks2022_figshare/Original screen_All tissues_fitted data.csv",
+    "validation_fitted_csv": "data/external/gdsc_combinations/jaaks2022_figshare/Validation screen_All tissues_fitted data.csv",
+    "matched_conditions_csv": "research/2026-10-27-conditional-shift/matched_conditions.csv",
+    "original_fitted_sha256_expected": "1188968CE7FDCFB66D03791CF266515B7C7A2794E1FC73C966DBA40266FFA278",
+    "original_fitted_bytes_expected": 198893607,
+    "matched_conditions_sha256_expected": "73FD5085A7586BB1F33768E34A587668953DA4C13735693DCF2FCCCBC51353FF",
+    "endpoint": "SYNERGY_DELTA_EMAX",
+    "cell_column": "CELL_LINE_NAME",
+    "tissue_column": "Tissue",
+    "anchor_id_column": "ANCHOR_ID",
+    "library_id_column": "LIBRARY_ID",
+    "anchor_conc_column": "ANCHOR_CONC",
+    "library_conc_column": "LIBRARY_CONC",
+    "require_sha_match": true,
+    "require_matched_conditions_subset": true,
+    "aggregate_duplicate_rows": "median"
+  },
+  "cell_allocation": {
+    "source": "Original fitted metadata CELL_LINE_NAME/Tissue + matched_conditions.csv cell set (A0 matched 96)",
+    "total_expected_cells": 125,
+    "matched_expected_cells": 96,
+    "reference_total": 84,
+    "half_A": 42,
+    "half_B": 42,
+    "feedback_S": 24,
+    "unqueried_U": 17,
+    "stratify_by": "Tissue",
+    "seed": 20261027,
+    "record_cell_names": false,
+    "record_cell_split_sha256": true,
+    "reference_must_be_matched_subset": true,
+    "explicit_tissue_counts": {
+      "note": "explicit deterministic composition for A1v4 plan A: matched B33/C35/P28; S only Breast/Colon (12/12) so per-tissue Stage-1 contexts are >=12; Pancreas excluded from the main family and gets no S cells.",
+      "A": {"Breast": 17, "Colon": 16, "Pancreas": 9},
+      "B": {"Breast": 16, "Colon": 17, "Pancreas": 9},
+      "S": {"Breast": 12, "Colon": 12, "Pancreas": 0},
+      "U": {"Breast": 6, "Colon": 0, "Pancreas": 11}
+    }
+  },
+  "candidate_enumeration": {
+    "direction": "anchor_to_library",
+    "context_mode": "per_tissue",
+    "main_family_tissues": ["Breast", "Colon"],
+    "excluded_tissues": ["Pancreas"],
+    "require_same_anchor": true,
+    "require_same_anchor_conc": true,
+    "require_same_library_conc": true,
+    "min_libraries_per_group": 2,
+    "min_cells_half_A": 12,
+    "min_cells_half_B": 12,
+    "max_candidates_tested": 200,
+    "non_vacuity_gate": "each main-family candidate must have tissue span == 1 and at least one A and one B cell; a claimed pooled relation (span>=2) is not allowed in the v4 main family",
+    "known_metadata_facts": {
+      "matched_candidate_grid_total": 229,
+      "matched_grid_by_tissue": {"Breast": 134, "Colon": 37, "Pancreas": 58},
+      "matched_grid_main_Breast_Colon": 171,
+      "multi_tissue_candidates_in_matched_grid": 0,
+      "pancreas_infeasible_reason": "reference A/B >=12 each + S>=12 per tissue = 36 > Pancreas 29 (Original) / 28 (matched) cells",
+      "v4_s_milp_optimum_independent_recompute": 106,
+      "v4_s_milp_optimum_provenance": "challenge_A1_v4 independent deterministic-letter-order recompute (A/B-gated, S=12 Breast/12 Colon): max covered = 106 (>=86, margin 20); actual gate must use P0a-metadata counts.s_milp_optimum",
+      "reference_note": "reference 84 includes A9+B9=18 Pancreas cells; per-tissue Breast/Colon main family (no tissue nuisance) never uses them; retained only to keep the frozen 84/24/17 composition"
+    }
+  },
+  "coverage": {
+    "denominator": 171,
+    "coverage_min": 0.50,
+    "coverage_min_abs": 86,
+    "denominator_definition": "post-precheck main-family (Breast+Colon) matched candidate grid 171; pass >= ceil(0.50*171)=86; R_min=20 retained; Pancreas structurally excluded",
+    "v4_recompute_max_covered_not_a_gate": {"value": 106, "provenance": "challenge_A1_v4 independent recompute under v4 S=12/12; >=86 reachable, margin 20; NOT a frozen gate and NOT a reachability proof for the real data", "v3_values_not_applicable": {"all_candidates": 114, "Breast_Colon": 112, "note": "v3 MILP under a different S composition (24 from the 41-leftover pool, possibly cross-tissue); NOT a v4 bound, NOT used"}},
+    "s_selection_rule": "metadata-only coverage maximization (MILP if scipy.optimize.milp available, deterministic greedy fallback), tie-break by frozen cell order; the operational gate is the actual s_milp_optimum (counts.s_milp_optimum); if s_milp_optimum < 86 -> data_unavailable before relations_check"
+  },
+  "statistics": {
+    "n_ctx_min": 12,
+    "alpha_per_relation": 0.01,
+    "bh_q": 0.10,
+    "primary_family_max": 10,
+    "direction_agreement_min": 0.90,
+    "stability_bootstrap": 500,
+    "interval_bootstrap": 1000,
+    "interval_sigma_mult": 2.0,
+    "interval_utility_frac": 0.10,
+    "interval_utility_check_enabled": false,
+    "mu_min_sigma_mult": 0.5,
+    "bootstrap_seed": 20261027,
+    "test_statistic": "exact_one_sided_sign_test_on_half_B",
+    "mde": {
+      "n_ctx_default": 12,
+      "mde_80pct_p1_n12": 0.930743,
+      "mde_80pct_p1_n12_note": "n=12, k>=11, exact p=0.00317383, power=0.7998",
+      "conservative_target": {"p1": 0.95, "n": 12, "k": 11, "power": 0.88164},
+      "n_p1_table": [
+        {"n": 12, "k": 11, "p1": 0.9307, "alpha": 0.00317383, "power": 0.7998},
+        {"n": 12, "k": 11, "p1": 0.95, "alpha": 0.00317383, "power": 0.88164},
+        {"n": 11, "k": 10, "p1": 0.95, "alpha": 0.00585938, "power": 0.8981, "usable": false, "note": "n=11 < n_ctx_min=12 -> reference only, not usable"},
+        {"n": 11, "k": 10, "p1": 0.93, "alpha": 0.00585938, "power": 0.8228, "usable": false, "note": "n=11 < n_ctx_min=12 -> reference only, not usable"},
+        {"n": 14, "k": 12, "p1": 0.90, "alpha": 0.00646973, "power": 0.8416, "usable": false, "note": "S=12/tissue -> max 12 contexts; not reachable"},
+        {"n": 19, "k": 15, "p1": 0.85, "alpha": 0.00960541, "power": 0.8556, "usable": false, "note": "S=12/tissue -> max 12 contexts; not reachable"},
+        {"n": 7, "k": 7, "p1": 0.98, "alpha": 0.0078125, "power": 0.8681, "usable": false, "note": "n=7 < n_ctx_min=12 -> reference only, not usable"}
+      ],
+      "context_availability_link": "n_ctx_min=12 hard floor: n=11/k=10 and n=7/k=7 rows are BELOW the minimum context count -> reference only, NOT usable in the main plan. S=24 split 12 Breast/12 Colon -> n=14/19 rows also unusable. Only the n=12 rows are usable; if expected p1<0.9307 -> insufficient_precision (do not relax alpha, do not trade n=12 for n=11)."
+    }
+  },
+  "utility": {
+    "utility_range": null,
+    "delta_min_state": "blocked_by_utility_definition",
+    "utility_gate_required_for_run": false,
+    "note": "A1v4: P0a uses only 2.0*sigma_r interval width; utility moved to P0d. Real Stage-0 P0a can run without utility once two-key gate is enabled; P0d remains blocked for Stage 1."
+  },
+  "global_acceptance": {
+    "R_min": 20,
+    "R_max": 200,
+    "coverage_denominator": 171,
+    "coverage_min_abs": 86,
+    "primary_family_max": 10,
+    "min_relations_per_tissue": null,
+    "min_relations_per_tissue_note": "removed in v4: main family is per-tissue Breast/Colon; coverage target 86/171 replaces the per-tissue >=3 rule"
+  },
+  "p0a_metadata": {
+    "budget_max_seconds": 600,
+    "output": "p0a_metadata.json",
+    "gates": ["reference_matched_subset", "reference_size_ok", "three_way_disjoint", "main_tissues_breast_colon", "pancreas_excluded", "tissue_span_non_vacuity", "s_side_cond_cov_ge_12", "precheck_eligible_ge_target", "s_milp_optimum_ge_target", "s_selection_solver"],
+    "gate_semantics": "these are the exact keys written by run_p0a_metadata(result['gates']); booleans must be true, s_selection_solver is informational (milp/greedy) and not a pass/fail gate",
+    "execution_preconditions": ["A1v4.1 review passed", "Lead approval recorded", "--confirm-run", "run_gate.real_run_enabled=true"],
+    "post_conditions": ["P0a-metadata output SHA frozen; only then may relations_check run", "P0a-metadata PASS is NOT relations_check PASS and NOT Stage 1 / effect evidence"],
+    "failure_categories": ["data_unavailable", "design_invalid"]
+  },
+  "outputs": {
+    "output_dir": "research/2026-10-27-innovation-scouting/conflict_signal/stage0/real_run",
+    "relations_csv": "relations.csv",
+    "relations_check_json": "relations_check.json",
+    "relation_splits_json": "relation_splits.json",
+    "write_sha256_sidecar": true
+  },
+  "budget": {
+    "p0a_metadata_max_seconds": 600,
+    "relations_check_max_seconds": 1800,
+    "note": "Stage 0 total <=30 min for relations_check; P0a-metadata <=10 min; elapsed over budget -> design_invalid"
+  },
+  "failure_categories": [
+    "pass",
+    "data_unavailable",
+    "design_invalid",
+    "insufficient_precision",
+    "blocked_by_utility_definition"
+  ],
+  "synthetic_selfcheck": {
+    "output_SELFCHECK": "research/2026-10-27-innovation-scouting/conflict_signal/stage0/SELFCHECK.json",
+    "tmp_outputs_dir": "tmp/stage0_selfcheck_runs",
+    "real_data_read": false,
+    "network": false
+  }
+}

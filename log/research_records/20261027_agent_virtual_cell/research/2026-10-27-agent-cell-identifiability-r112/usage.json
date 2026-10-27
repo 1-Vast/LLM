@@ -1,0 +1,49 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r112",
+  "round": "R112 (goal round 110/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Prior strength manipulated by training the prior on a fraction of the other cells."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r112": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round converts a concomitant variable into a manipulated one and resolves a two-round conflict.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e112_prior_strength.py"], "runs": 1, "cells_used": 124, "fractions": 4,
+    "reps": 3, "units": 1488, "sanity_checks": 1488,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E112_RESULTS.json", "rows": "E112_rows.csv", "protocol": "PROTOCOL_E107.md"},
+  "sanity_gate": {"checks": 1488, "top_k_changed": 1488, "passed": true},
+  "results": {
+    "frac_0.10": {"keep_cells": 12, "prior": 0.0863, "pers": 0.1078, "gain": 0.0215, "ci95": [0.0118, 0.0312]},
+    "frac_0.25": {"keep_cells": 31, "prior": 0.1046, "pers": 0.1027, "gain": -0.0019, "ci95": [-0.0125, 0.0095]},
+    "frac_0.50": {"keep_cells": 62, "prior": 0.1099, "pers": 0.1112, "gain": 0.0012, "ci95": [-0.0090, 0.0118]},
+    "frac_1.00": {"keep_cells": 124, "prior": 0.1086, "pers": 0.1156, "gain": 0.0070, "ci95": [-0.0034, 0.0172]}
+  },
+  "decisions": {"prior_strength_rises_with_data": true,
+                "H285_sign_crossover": false,
+                "verdict": "personalisation_benefit_decays_as_the_prior_strengthens"},
+  "the_three_point_curve": {
+    "R76_prior_7pct": "gain +1.64/+2.62 pp, significant",
+    "R112_prior_8_63pct": "gain +2.15 pp [1.18, 3.12], significant",
+    "R112_prior_10_to_11pct": "gains -0.19/+0.12/+0.70, all intervals contain zero",
+    "R111_prior_12_to_17pct": "gains -1.32 to -6.35 pp, all significantly negative",
+    "combined": "the gain falls monotonically with prior strength, with a crossover near 11%"},
+  "resolution_of_the_R76_conflict": "R76 and R111 are not in conflict; they sit on opposite sides of a crossover near 11% prior strength, and this round fills in the middle",
+  "H285_was_too_narrow": "the pre-registered crossover test required a significant positive and a significant negative inside one manipulation, but this manipulation spans only 8.6 to 11% prior strength, so it cannot contain the negative end; this is the fourth instance of a gate whose requirement exceeds the experiment's range",
+  "limits": ["weakening the prior by training on fewer cells also changes its noise structure, not only its strength",
+             "m is fixed at 200",
+             "this manipulation cannot build a prior as strong as R111's 17%, which came from that round's pool construction",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["write the conditional rule into the synthesis with the explicit note that the 11% crossover was assembled across three rounds rather than measured in one"],
+  "register_updates": {"C85": "new conditional rule: personalisation pays only when the prior is weak",
+                       "C84": "annotated", "SYNTHESIS": "row rewritten as a conditional rule"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C85 added, C84 annotated)",
+                                "research/SYNTHESIS.md (row rewritten)", "research/INDEX.md (added R112 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r86",
+  "round": "R86 (goal round 84/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Cross-resource test of the main conclusion on BATCHIE, the second resource."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r86": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round tests whether the programme's headline negative generalises, finds the second resource is saturated, and corrects its own automatic verdict.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e086_second_resource.py"], "runs": 2, "cells": 15, "repeats": 20,
+    "predictors": 4, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E086_RESULTS.json", "rows": "E086_rows.csv", "protocol": "PROTOCOL_E081.md"},
+  "input_sha256_verified": "56a4e4a195673160edcb1baa209a15409b3639ff6ab0405558cc5ab3198d5f23",
+  "design": {
+    "resource": "BATCHIE high-diversity layouts, leave-one-cell-out, 360 units from 15 cells",
+    "predictors": ["drug marginals", "ridge on compound identity", "ridge on gene annotation (131/209 compounds annotated)", "random"],
+    "metric": "hit rate at k=20 against the true lowest-viability quartile",
+    "note": "pathway mapping was unavailable in MAPKG, so gene-level annotation was used, which is finer and therefore a stronger test for the annotation arm"
+  },
+  "results": {
+    "base": 0.2508, "random": 0.2528,
+    "ridge_pathway_gene": 0.8931, "marginal": 0.8882, "ridge_identity": 0.8883,
+    "marginal_minus_annotation": {"diff": 0.0043, "ci95": [-0.0066, 0.0162]},
+    "marginal_minus_identity": {"diff": -0.0001, "ci95": [-0.0014, 0.0012]},
+    "annotation_minus_random": {"diff": 0.6400, "ci95": [0.6221, 0.6574]}
+  },
+  "decisions": {"H218_marginal_beats_annotation_on_BATCHIE": false,
+                "H219_marginal_close_to_identity": true,
+                "H220_annotation_no_better_than_random": false,
+                "verdict": "BATCHIE_saturates_and_cannot_adjudicate"},
+  "self_correction": {
+    "automatic_verdict_was": "main_conclusion_is_GDSC_specific",
+    "why_too_strong": "H218 failing here is not evidence that marginals lose outside GDSC; it is evidence that BATCHIE cannot separate the three predictors",
+    "corrected_statement": "the GDSC conclusion has not been cross-validated, and this resource cannot do it"},
+  "saturation": {
+    "evidence": "all three predictors land within 0.5 pp of each other at about 0.89, against a 0.25 base",
+    "cause": "about 23 compounds per layout and 351 pairs, with low viability dominated by drug potency, which marginals, identity and gene annotation all capture"},
+  "genuinely_informative_part": "on BATCHIE the gene-annotation model is not worse than marginals, while on GDSC it lost by 10-12 pp; so the GDSC result cannot be assumed to generalise and the question stays open",
+  "limits": ["BATCHIE has about 23 compounds per layout and thin annotation (median 6 genes per drug)",
+             "viability and the GDSC synergy score are different quantities, so only ordering is compared",
+             "the 360 units come from only 15 cells, limiting independence",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["a genuine cross-resource test needs a second resource that is neither saturated nor the training source, which is the same obstacle as C37"],
+  "register_updates": {"C59": "new: the main conclusion is not cross-validated; BATCHIE saturates",
+                       "SYNTHESIS": "section 2b added and a do-not-believe item added",
+                       "POSITIONING": "the main conclusion is neither novel nor general"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C59 added)",
+                                "research/SYNTHESIS.md (section 2b, item 6b)",
+                                "research/POSITIONING.md (R86 note)", "research/INDEX.md (added R86 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

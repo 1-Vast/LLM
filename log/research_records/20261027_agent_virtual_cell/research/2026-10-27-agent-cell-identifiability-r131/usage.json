@@ -1,0 +1,49 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r131",
+  "round": "R131 (goal round 129/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Resolution matrix: three pools by two criteria, each with its own MDE."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r131": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round fills a six-cell table so that where each criterion resolves is on record.",
+  "compute": {"python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+              "scripts": ["e131_matrix.py"], "runs": 1, "repeats": 200, "rows": 1200,
+              "data_downloads": 0, "wet_lab_experiments": 0},
+  "artifacts": {"results": "E131_RESULTS.json", "rows": "E131_rows.csv", "protocol": "PROTOCOL_E122.md"},
+  "the_matrix": {
+    "Synergy|one_unseen": {"chance": 0.0140, "identity": 0.0935, "room": 0.0795, "mde": 0.0223, "resolvable": true, "pathway": -0.0115},
+    "Synergy|cell_unseen": {"chance": 0.0143, "identity": 0.0862, "room": 0.0720, "mde": 0.0153, "resolvable": true, "pathway": 0.0008},
+    "Synergy|both_unseen": {"chance": 0.0128, "identity": 0.0135, "room": 0.0007, "mde": 0.0078, "resolvable": false, "pathway": 0.0028},
+    "dEMAX|one_unseen": {"chance": 0.25, "identity": 0.5670, "room": 0.3170, "mde": 0.0454, "resolvable": true, "pathway": -0.0065},
+    "dEMAX|cell_unseen": {"chance": 0.25, "identity": 0.5650, "room": 0.3150, "mde": 0.0290, "resolvable": true, "pathway": 0.0100},
+    "dEMAX|both_unseen": {"chance": 0.25, "identity": 0.2490, "room": -0.0010, "mde": 0.0407, "resolvable": false, "pathway": 0.0795}},
+  "decisions": {"H327_boolean_underpowered_only_in_both_unseen": true,
+                "H328_boolean_underpowered_everywhere": false,
+                "verdict": "the_boolean_criterion_is_underpowered_only_in_both_unseen_and_both_criteria_agree_elsewhere"},
+  "correction_to_R122": {
+    "what_R122_said": "the sparse criterion has no resolution, written as a general statement",
+    "actual": "it resolves in one_unseen and cell_unseen and fails only in both_unseen",
+    "corrected": "underpowered in the both_unseen pool specifically"},
+  "why_this_strengthens": {
+    "identity_at_chance_on_both_criteria": "in both_unseen, Synergy identity is 1.35 percent against 1.28 chance and dEMAX identity is 24.90 against 25.00, so two criteria correlating at only 0.20 agree",
+    "both_criteria_agree_where_resolvable": "in one_unseen and cell_unseen both criteria independently find no pathway gain",
+    "so": "the mechanism statement now rests on two largely independent criteria that agree"},
+  "relation_to_the_frozen_claim": {
+    "cell_used": "dEMAX by both_unseen, pathway +7.95 pp [5.13, 10.75]",
+    "why_only_this_cell": "in every other cell identity already sits 7 to 32 pp above chance, leaving no room to improve, so this is the only cell with headroom rather than the only cell that was reported"},
+  "limits": ["two arms only; the random, permuted and dead-block controls were established in R126",
+             "covers only this resource",
+             "not resolvable does not mean zero effect, only unmeasurable here",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["the criterion side now has no loose ends; only changing resource or changing question remains, and R127 judged the resource exhausted"],
+  "register_updates": {"C100": "new: the resolution matrix", "C99": "annotated", "SYNTHESIS": "reading rule and evidence row updated"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C100 added, C99 annotated)",
+                                "research/SYNTHESIS.md (reading rule and evidence row updated)",
+                                "research/INDEX.md (added R131 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

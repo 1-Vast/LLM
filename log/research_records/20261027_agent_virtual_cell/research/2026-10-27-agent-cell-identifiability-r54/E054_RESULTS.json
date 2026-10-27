@@ -1,0 +1,107 @@
+{
+  "kind": "bidirectional_transfer_of_pool_size_predicate",
+  "input_sha256": "56a4e4a195673160edcb1baa209a15409b3639ff6ab0405558cc5ab3198d5f23",
+  "settings": {
+    "sizes": [
+      80,
+      160,
+      320
+    ],
+    "k": 20,
+    "repeats": 20,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "units": 43,
+    "rows": 2580,
+    "cells_scored": 43
+  },
+  "by_size": {
+    "80": {
+      "exploit": 0.8374418604651163,
+      "mix": 0.5280813953488372,
+      "diff": -0.30936046511627907,
+      "paired": {
+        "n": 43,
+        "mean_diff": -0.30936046511627907,
+        "ci95": [
+          -0.33127906976744187,
+          -0.2848226744186047
+        ]
+      }
+    },
+    "160": {
+      "exploit": 0.8976162790697675,
+      "mix": 0.6634302325581395,
+      "diff": -0.23418604651162786,
+      "paired": {
+        "n": 43,
+        "mean_diff": -0.23418604651162786,
+        "ci95": [
+          -0.2573255813953489,
+          -0.20871947674418606
+        ]
+      }
+    },
+    "320": {
+      "exploit": 0.8821511627906978,
+      "mix": 0.6270348837209303,
+      "diff": -0.2551162790697674,
+      "paired": {
+        "n": 43,
+        "mean_diff": -0.2551162790697674,
+        "ci95": [
+          -0.27157122093023256,
+          -0.23860319767441865
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r50/PROTOCOL_E049.md": "6efea7fd47228798e14b9cf1e09da18e24174b11319d0f38a7121df25c6621b1",
+    "research/2026-10-27-agent-cell-identifiability-r50/e050_batchie_pools.py": "3faee982552be9fe20298f2527f48dc08209122661d07df4383b702660e41dac"
+  },
+  "transfer_A_gdsc_to_batchie": {
+    "gdsc_threshold": 3000,
+    "predicted_action_by_size": {
+      "80": "exploit",
+      "160": "exploit",
+      "320": "exploit"
+    },
+    "all_pools_below_threshold": true,
+    "actual_exploit_wins_by_size": {
+      "80": true,
+      "160": true,
+      "320": true
+    },
+    "prediction_holds": true
+  },
+  "transfer_B_batchie_to_gdsc": {
+    "sizes_available": [
+      80,
+      160,
+      320
+    ],
+    "any_positive_diff": false,
+    "threshold_learnable": false,
+    "note": "with only pools of 80-320 the smallest positive size does not exist, so the GDSC threshold cannot be learned from BATCHIE"
+  },
+  "decisions": {
+    "H127_direction_matches_GDSC": true,
+    "H128_all_negative_small_pools": true,
+    "H138_transfer_A_holds": true,
+    "H139_transfer_B_unlearnable": true,
+    "H140_directional_transfer": true,
+    "verdict": "predicate_transfers_one_way",
+    "verdict_reported": "predicate_transfers_one_way_with_low_discriminative_power"
+  },
+  "limits": [
+    "BATCHIE pools max out at 351 pairs, far below GDSC's 21,652, so only the small-pool regime is probed.",
+    "The hit definitions differ between tasks (synergy flag vs bottom-quartile viability); only the direction is comparable.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "discriminative_power": "BATCHIE's largest pool is 320, an order of magnitude below the 3,000 threshold, so ANY threshold above 320 gives the same prediction and would be 'confirmed' by this data. The transfer therefore shows only that BATCHIE sits in the exploit regime; it cannot validate the value 3,000. BATCHIE can only falsify thresholds at or below 320.",
+  "requirement_for_a_real_cross_task_test": "the target task's pool range must span the threshold (roughly 1,000 to 10,000)"
+}

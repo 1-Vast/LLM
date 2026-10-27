@@ -1,0 +1,88 @@
+{
+  "kind": "hierarchical_partial_pooling_vs_flat_ridge",
+  "input_sha256": {
+    "Original screen_All tissues_fitted data.csv": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278"
+  },
+  "settings": {
+    "lambda_base": 1.0,
+    "lambda_inter": 20.0,
+    "lambda_sensitivity": [
+      5.0,
+      50.0
+    ],
+    "repeats": 40,
+    "split": "grouped by combination",
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "combos": 2025,
+    "base_dims": 41,
+    "inter_dims": 114,
+    "reps_used": 40
+  },
+  "summary": {
+    "rho_flat": {
+      "mean": 0.31034407930346186,
+      "median": 0.3122811219352553
+    },
+    "rho_hier": {
+      "mean": 0.31670909096931144,
+      "median": 0.3160438539820942
+    },
+    "paired_rho": {
+      "n": 40,
+      "mean_diff": 0.006365011665849589,
+      "ci95": [
+        0.00470805492275541,
+        0.007941533580070412
+      ]
+    },
+    "paired_p10": {
+      "n": 40,
+      "mean_diff": -0.007376409677572614,
+      "ci95": [
+        -0.012303436928791612,
+        -0.002283428247068901
+      ]
+    },
+    "frac_reps_hier_better": 0.875,
+    "sensitivity_rho_hier": {
+      "lam5": 0.3166611306637144,
+      "lam50": 0.3168745124132367
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r44/PROTOCOL_E044.md": "f207f6a9b93a7aab2b2ef2eedcf5f0e7b4bb149c87f49c6d5322c6c5a99bb93f",
+    "research/2026-10-27-agent-cell-identifiability-r44/e044_hierarchical.py": "82721298a68109fd6c02e6c438d8d9cfb19cabbafbcefe83f073914c02b8bdef"
+  },
+  "per_tissue": {
+    "Breast": {
+      "n": 40,
+      "mean_diff": 0.0029133648930742425
+    },
+    "Colon": {
+      "n": 40,
+      "mean_diff": 0.00494757019223067
+    },
+    "Pancreas": {
+      "n": 40,
+      "mean_diff": 0.001146898295352905
+    }
+  },
+  "decisions": {
+    "H115_hierarchical_beats_flat_rho": true,
+    "H116_gain_in_most_tissues": true,
+    "H117_hierarchical_beats_flat_p10": false,
+    "verdict": "hierarchical_adds_value",
+    "verdict_reported": "hierarchical_helps_bulk_but_hurts_the_decision_tail",
+    "script_verdict_is_misleading": "hierarchical_adds_value - it keys only on the rho test; precision@10 moves the other way and that is the decision metric"
+  },
+  "limits": [
+    "The hierarchy is tissue-level only; cell-level random effects are unavailable for a held-out cell, which is exactly where R11's hierarchical arm degenerated.",
+    "lambda_inter is a fixed prior value; the two sensitivity values are reported but not used for selection.",
+    "Retrospective candidate pool; SYNERGY_DELTA_AUC is a model-fitted quantity.",
+    "No mechanistic, clinical or drug-choice claim; no meta-learning or RSI."
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "task": "task-13",
+  "round": "R193-A0",
+  "role": "A0 matching-qualification auditor (independent; no effect analysis, no Q estimate)",
+  "runtime": {
+    "interpreter": "D:\\anaconda\\envs\\maestro\\python.exe",
+    "python": "3.11.16",
+    "pandas": "2.3.3",
+    "numpy": "2.4.6",
+    "openpyxl": "3.1.5",
+    "network": false,
+    "cwd": "D:\\MAESTRO"
+  },
+  "model": "unknown",
+  "effort": "unknown",
+  "tokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "note": "runtime token accounting not exposed to the acting agent; recorded as null (not 0)"
+  },
+  "cost_usd": null,
+  "agent_turn_elapsed_s": null,
+  "commands": [
+    {
+      "cmd": "python tmp\\a0_probe1.py",
+      "purpose": "fitted-table metadata structure reconnaissance",
+      "wall_time_s": 3.4,
+      "note": "aborted on composite ANCHOR_ID value '1032|1372'; no outputs"
+    },
+    {
+      "cmd": "python tmp\\a0_probe2.py",
+      "purpose": "plate / condition / duplicate structure reconnaissance",
+      "wall_time_s": 4.4,
+      "note": "aborted on composite ANCHOR_CONC value '0.125|0.003'; no outputs"
+    },
+    {
+      "cmd": "python tmp\\a0_probe3.py",
+      "purpose": "metadata-only overlap and quadruple feasibility reconnaissance",
+      "wall_time_s": 6.7,
+      "note": "produced tmp/a0_probe3.json; common cell-condition key count from that run (4,690) was superseded by canonical float formatting; verified as 9,154 by an independent check"
+    },
+    {
+      "cmd": "python -c \"...\" (endpoint availability / barcode disjointness / name collision check)",
+      "purpose": "verify endpoint existence (empty-string check only), barcode-set disjointness, cell/drug name collisions",
+      "wall_time_s": 10.0,
+      "note": "approximate; 4 delta endpoints 0 empty values in both files; barcode intersection 0; zero cell-name collisions; one drug-name normalization collision (labels only)"
+    },
+    {
+      "cmd": "python research\\2026-10-27-conditional-shift\\a0.py",
+      "purpose": "final frozen audit run (first)",
+      "wall_time_s": 35.3,
+      "note": "wrote a0.json + both CSVs; discovered count_levels defaultdict pollution of overlap cell counts (126/126/126), fixed"
+    },
+    {
+      "cmd": "python research\\2026-10-27-conditional-shift\\a0.py",
+      "purpose": "run after cell-set fix",
+      "wall_time_s": 30.0,
+      "note": "overlap cells corrected to 125/97/96; counts unchanged"
+    },
+    {
+      "cmd": "python research\\2026-10-27-conditional-shift\\a0.py (twice, determinism check)",
+      "purpose": "final frozen audit run + byte-level determinism check",
+      "wall_time_s": 33.0,
+      "note": "two consecutive runs identical SHA256 for a0.json and both CSVs; internal elapsed_s 32.7 and 25.8"
+    },
+    {
+      "cmd": "Get-FileHash / Select-String / python -c checks",
+      "purpose": "record output hashes, verify script/protocol hashes, inspect CSV samples",
+      "wall_time_s": 5.0,
+      "note": "a0.json = 72BBAF6DF9BF80BBD19BF946A8D7A369003861FF21BD95561BC6DA48021ECA22"
+    }
+  ],
+  "deliverables": [
+    "research/2026-10-27-conditional-shift/PROTOCOL_A0.md",
+    "research/2026-10-27-conditional-shift/a0.py",
+    "research/2026-10-27-conditional-shift/a0.json",
+    "research/2026-10-27-conditional-shift/matched_conditions.csv",
+    "research/2026-10-27-conditional-shift/matched_quadruples.csv",
+    "research/2026-10-27-conditional-shift/report.md",
+    "research/2026-10-27-conditional-shift/record.md",
+    "research/2026-10-27-conditional-shift/usage.json"
+  ],
+  "verdict": "matching_qualified",
+  "key_numbers": {
+    "R4_common_quadruples": 6223367,
+    "R3_half_matches": 802445,
+    "cells_used": 96,
+    "directed_pairs_used": 98,
+    "conditions_used": 291,
+    "cell_pairs_used": 3418,
+    "barcode_split_R4": 43208857,
+    "replicated_keys_across_screens": 9154
+  },
+  "notes": "unavailable values recorded as null, not 0; no network; no response values read (response columns only empty-string existence checks); matching is response-blind; matching qualification does not imply Q stability or transferability (A1 question)"
+}

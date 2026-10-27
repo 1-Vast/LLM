@@ -1,0 +1,130 @@
+{
+  "kind": "can_the_agent_apply_the_conditional_rule_online_with_an_identifiable_probe",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "probe": 100,
+    "threshold": 0.095,
+    "reps": 3,
+    "priors": {
+      "weak": 0.1,
+      "strong": 1.0
+    },
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "cells_used": 124,
+    "units": 744,
+    "sanity_checks": 744,
+    "top_k_changed": 744,
+    "sanity_passed": true
+  },
+  "by_prior": {
+    "weak": {
+      "n": 372,
+      "mean_estimated_prior": 0.04220430107526882,
+      "frac_decided_personalise": 0.7634408602150538,
+      "never": 0.0875,
+      "always": 0.09475806451612903,
+      "adaptive": 0.09193548387096775,
+      "adaptive_minus_never": {
+        "n": 372,
+        "mean_diff": 0.004435483870967742,
+        "ci95": [
+          -0.0022849462365591394,
+          0.01102486559139783
+        ]
+      },
+      "adaptive_minus_always": {
+        "n": 372,
+        "mean_diff": -0.0028225806451612906,
+        "ci95": [
+          -0.008736559139784945,
+          0.003897849462365591
+        ]
+      }
+    },
+    "strong": {
+      "n": 372,
+      "mean_estimated_prior": 0.05,
+      "frac_decided_personalise": 0.717741935483871,
+      "never": 0.10913978494623656,
+      "always": 0.10026881720430109,
+      "adaptive": 0.10188172043010753,
+      "adaptive_minus_never": {
+        "n": 372,
+        "mean_diff": -0.007258064516129032,
+        "ci95": [
+          -0.015725806451612902,
+          0.0008098118279569707
+        ]
+      },
+      "adaptive_minus_always": {
+        "n": 372,
+        "mean_diff": 0.0016129032258064507,
+        "ci95": [
+          -0.005779569892473119,
+          0.009811827956989245
+        ]
+      }
+    }
+  },
+  "files": {},
+  "pooled": {
+    "n": 744,
+    "never": 0.09831989247311829,
+    "always": 0.09751344086021504,
+    "adaptive": 0.09690860215053765,
+    "adaptive_minus_never": {
+      "n": 744,
+      "mean_diff": -0.0014112903225806455,
+      "ci95": [
+        -0.006654905913978496,
+        0.003897849462365591
+      ]
+    },
+    "adaptive_minus_always": {
+      "n": 744,
+      "mean_diff": -0.000604838709677419,
+      "ci95": [
+        -0.005512432795698925,
+        0.004435483870967742
+      ]
+    },
+    "oracle": 0.12560483870967742
+  },
+  "identifiability_check": {
+    "mean_estimated_prior": 0.046102150537634404,
+    "passed": true
+  },
+  "decisions": {
+    "sanity_passed": true,
+    "identifiability_passed": true,
+    "H286_adaptive_beats_both_fixed": false,
+    "H287_adaptive_fails_to_beat_both": true,
+    "oracle_gap": 0.028696236559139776,
+    "verdict": "rule_is_real_but_a_100_key_probe_cannot_identify_the_regime"
+  },
+  "limits": [
+    "A 20-key probe gives an extremely noisy estimate of the prior's accuracy.",
+    "The two prior strengths bracket the threshold but do not sample it continuously.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "why_the_agent_fails": {
+    "true_priors": {
+      "weak": 0.0875,
+      "strong": 0.1091
+    },
+    "estimated_priors": {
+      "weak": 0.0422,
+      "strong": 0.05
+    },
+    "the_gap_to_detect": "2.15 percentage points between the two regimes",
+    "the_noise": "the estimate is the hit rate among the top 20 of the 100 probe keys, so its standard error is about 6.7 percentage points per cell: roughly three times the gap it must detect",
+    "consequence": "the decision fires at 76 percent in the weak regime and 72 percent in the strong one, so it barely distinguishes them, and the adaptive arm ends up level with both fixed strategies",
+    "systematic_bias_also_present": "both estimates are about half the true level, because the prior's best 20 keys within a random 100-key probe are not its best 20 overall"
+  },
+  "what_this_establishes": "the conditional rule from C85 is real, but an agent cannot exploit it with a probe of this size: the evidence needed to identify which regime a cell is in exceeds what a small probe provides, so the 2.87 pp that a correct per-cell decision would be worth stays uncaptured"
+}

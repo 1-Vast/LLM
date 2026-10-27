@@ -1,0 +1,54 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r105",
+  "round": "R105 (goal round 103/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Re-run of the R89 pipeline with exactly one change: an identity arm added."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r105": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round follows its predecessor's prescription literally, changing one thing and checking against a known number first.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6, scikit-learn 1.9.0",
+    "scripts": ["e105_identity_arm.py"], "runs": 2,
+    "small_sample": "REPEATS=6, 24 units", "full": "REPEATS=60, 240 units",
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E105_RESULTS.json", "rows": "E105_rows.csv", "protocol": "PROTOCOL_E100.md"},
+  "reproduction_check": {
+    "R89_gene": 0.2810, "R105_gene": 0.2810,
+    "R89_random": 0.2569, "R105_random": 0.2569,
+    "identical": true,
+    "small_sample_gene": 0.3687,
+    "meaning": "the full run reproduces R89 to four decimals, which confirms that only the identity arm was added"},
+  "results": {"base": 0.2509, "random": 0.2569, "gene": 0.2810, "identity": 0.0985,
+              "gene_minus_identity": {"diff": 0.1825, "ci95": [0.1583, 0.2073]},
+              "gene_minus_random": {"diff": 0.0242, "ci95": [-0.0125, 0.0604]}},
+  "decisions": {"H272_reproduction_holds": true,
+                "H273_identity_is_a_usable_baseline": false,
+                "H274_annotation_adds_beyond_identity": "not assessable - the baseline is worse than chance",
+                "verdict": "identity_is_degenerate_in_this_arena_and_gene_vs_chance_remains_unestablished"},
+  "why_identity_is_below_chance": {
+    "identity_hit_rate": 0.0985, "chance": 0.2509,
+    "explanation": "the additive null already absorbs per-drug intercepts and log-dose slopes, so what is left for identity to fit is essentially noise, and its ranking ends up inverted",
+    "consequence": "beating a baseline that is worse than chance proves nothing, so the +18.25 pp margin is not evidence for annotation value"},
+  "cross_dataset_status": {
+    "verdict": "not achievable with BATCHIE",
+    "raw_viability_arena": "saturates at about 0.89 for all predictors (R86)",
+    "residual_arena_identity": "degenerate at 0.0985 against 0.25 chance (this round)",
+    "residual_arena_gene": "0.2810 against 0.2569 random, not significant (R89 and this round)",
+    "promotion": "stays closed on the cross-dataset requirement, not for lack of effort but for lack of a usable resource"},
+  "methodological_gain": "one change at a time plus a small-sample check worked: the small sample gave 36.87% while the full run gave 28.10%, but the full run matched R89 exactly, which is what proved the change was isolated",
+  "limits": ["12 cells and 240 units, with only about a dozen layout clusters",
+             "the residual arena is not the same target as GDSC's synergy call",
+             "identity degeneracy may also reflect my symmetric two-sided encoding being ill-suited to a residual target",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["cross-dataset validation is exhausted on this machine (same obstacle as C37); promotion would need a resource that is neither saturated nor the training source"],
+  "register_updates": {"C78": "new: BATCHIE cannot test the question in either arena",
+                       "INDEX": "row added"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C78 added)", "research/INDEX.md (added R105 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

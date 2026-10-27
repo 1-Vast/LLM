@@ -1,0 +1,61 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r101",
+  "round": "R101 (goal round 99/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Full-power replication of the annotation increment across three pools and two criteria."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r101": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round spends compute on the one comparison that could settle a contradiction its own previous two rounds created.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e101_fullpower.py"], "runs": 1, "repeats": 80, "random_blocks": 10,
+    "pools": 3, "criteria": 2, "eval_units": 960,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E101_RESULTS.json", "rows": "E101_rows.csv", "protocol": "PROTOCOL_E096.md"},
+  "results": {
+    "Synergy": {
+      "one_unseen": {"identity": 0.0881, "combo": 0.1094, "random": 0.0875, "diff": 0.0219, "ci95": [-0.0025, 0.0456]},
+      "cell_unseen": {"identity": 0.0844, "combo": 0.1131, "random": 0.0850, "diff": 0.0281, "ci95": [0.0094, 0.0469]},
+      "both_unseen": {"identity": 0.0100, "combo": 0.0431, "random": 0.0144, "diff": 0.0288, "ci95": [0.0112, 0.0512]}},
+    "SYNERGY_DELTA_EMAX": {
+      "one_unseen": {"diff": 0.0425, "ci95": [-0.0144, 0.0975]},
+      "cell_unseen": {"diff": 0.0500, "ci95": [0.0169, 0.0856]},
+      "both_unseen": {"diff": 0.1144, "ci95": [0.0625, 0.1681]}}
+  },
+  "decisions": {"H260_replicates_across_pools": true,
+                "H261_replicates_on_second_criterion": true,
+                "H262_not_established": false,
+                "wins_primary": 2, "wins_secondary": 2,
+                "verdict": "refutation_holds_across_pools_and_criteria"},
+  "the_scientifically_coherent_pattern": {
+    "observation": "the increment is largest exactly where drug identity fails",
+    "both_unseen": "identity reaches only 1.00% while identity+pathway reaches 4.31%, a factor of 4.3; on the secondary criterion 24.00% to 35.88%",
+    "reading": "annotation is not a substitute for identity but its stand-in when the drug has not been seen, which is precisely the role annotation should play"},
+  "the_irony": "R99's 'best evidence' came from one_unseen, which at full power is the only pool that fails; so R99 not only announced early, it picked the weakest pool, and R100's low power then inflated that weak signal into 'nothing works'. Both were wrong, in opposite directions.",
+  "why_this_time_is_different": {
+    "R99": "1 pool, 1 criterion, one significant run",
+    "R101": "3 pools, 2 criteria, significant in 2/3 of each, all six point estimates positive, plus a coherent mechanism",
+    "still_limited": "the three pools share one training set and one dataset, and one_unseen is not significant"},
+  "promotion_status": {
+    "candidate": "identity+pathway as a stand-in for unseen drugs",
+    "not_promoted": true,
+    "requirements_before_promotion": ["replicate on a second dataset (BATCHIE, same construction)",
+                                      "leakage review",
+                                      "equal-budget comparison against drug marginals"]},
+  "limits": ["one_unseen is not significant, so 'holds in all pools' is false",
+             "the pools share a training set and are not independent",
+             "the both-unseen pool holds only about 1,830 keys",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "register_updates": {"C74": "new and established: the annotation increments across pools and criteria, largest where identity fails",
+                       "C73": "marked resolved by R101",
+                       "SYNTHESIS": "banner finalised"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C74 added, C73 resolved)",
+                                "research/SYNTHESIS.md (banner finalised)", "research/INDEX.md (added R101 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

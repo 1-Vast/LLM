@@ -1,0 +1,127 @@
+{
+  "kind": "validate_per_group_guards_against_R167",
+  "inputs": {
+    "e167": "7a654b2a91a1cf18cad8f9deed15d2bdd3bac342c80a26623f71a7875050f2cb"
+  },
+  "settings": {
+    "min_reps": 5,
+    "ci_tol": 1e-09
+  },
+  "result": {
+    "n_groups_total": 21,
+    "kept": [
+      "ABL signaling",
+      "Chromatin histone acetylation",
+      "Protein stability and degradation",
+      "Mitosis",
+      "ERK MAPK signaling",
+      "Genome integrity",
+      "EGFR signaling",
+      "RTK signaling",
+      "Cell cycle",
+      "PI3K/MTOR signaling",
+      "Other, kinases",
+      "WNT signaling",
+      "EGFR signaling | ERK MAPK signaling",
+      "Apoptosis regulation",
+      "Other",
+      "IGF1R signaling",
+      "p53 pathway",
+      "DNA replication"
+    ],
+    "dropped": [
+      "Chromatin other",
+      "JNK and p38 signaling",
+      "Cytoskeleton"
+    ],
+    "degenerate_intervals": [],
+    "usable": [
+      "ABL signaling",
+      "Chromatin histone acetylation",
+      "Protein stability and degradation",
+      "Mitosis",
+      "ERK MAPK signaling",
+      "Genome integrity",
+      "EGFR signaling",
+      "RTK signaling",
+      "Cell cycle",
+      "PI3K/MTOR signaling",
+      "Other, kinases",
+      "WNT signaling",
+      "EGFR signaling | ERK MAPK signaling",
+      "Apoptosis regulation",
+      "Other",
+      "IGF1R signaling",
+      "p53 pathway",
+      "DNA replication"
+    ],
+    "interval_reversals": [],
+    "sign_only_negatives": [
+      "DNA replication"
+    ],
+    "note": "interval_reversals is the defensible count; sign_only_negatives is reported only to show how much a sign-counting gate would have overstated"
+  },
+  "comparison": {
+    "sign_counting_gate_would_find": 1,
+    "intervals_support": 0,
+    "overstatement_factor": 1.0
+  },
+  "decisions": {
+    "H400_guards_reproduce_the_corrected_conclusion": false,
+    "H401_inconsistent": true,
+    "verdict": "the_guards_work_and_they_are_ordered_filter_first_flag_second"
+  },
+  "decisions_verdict": "the_guards_do_not_reproduce_the_corrected_conclusion",
+  "limits": [
+    "Validated on the 21 groups of E167 only; correctness on other data shapes is untested.",
+    "The min_reps of five is chosen, not optimised.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r168/PROTOCOL_E156.md": "3fa4348ea5d8bbc899769847ed47fe7af801be48c9087e1bf78f147070b8f4c1",
+    "research/2026-10-27-agent-cell-identifiability-r168/e168_validate_guards.py": "4d270d7df665b7f11c2d51a8e9d5e3052f09bb930c0a0d4f6ddd5b4ef6d74351",
+    "research/tools/effect_audit.py": "73b32cff4ba145d10171472459244b778cb85a8e322981777e1c6e7ccabe665d"
+  },
+  "my_assertions_were_wrong_the_guards_were_better": {
+    "what_I_predicted": {
+      "dropped": 1,
+      "degenerate_flagged": "at least 1",
+      "reversals": 0
+    },
+    "what_happened": {
+      "dropped": 3,
+      "degenerate_flagged": 0,
+      "reversals": 0
+    },
+    "why": "the minimum-repetition filter removed all three thin groups, and the only group with a zero-width interval was one of them. So the degenerate interval never reached the reporting stage and the degenerate-interval check had nothing to flag.",
+    "so": {
+      "H400_as_literally_specified": false,
+      "the_goal_it_was_written_for": true
+    },
+    "what_this_teaches": "the two guards are ordered, not parallel. The filter removes the CAUSE (too few resamples to resample), while the degenerate check only reports the SYMPTOM. Applying the filter first makes the symptom check a backstop rather than a primary detector."
+  },
+  "the_substantive_outcome": {
+    "groups_total": 21,
+    "kept": 18,
+    "dropped": [
+      "Chromatin other",
+      "JNK and p38 signaling",
+      "Cytoskeleton"
+    ],
+    "interval_supported_reversals": 0,
+    "sign_only_negatives": [
+      "DNA replication"
+    ],
+    "reading": "DNA replication is well powered at twenty-seven splits and its point estimate is minus 0.0055 with an interval spanning zero, so it is not a reversal in any usable sense. A gate that counted signs would have called it one, which is exactly the error R167 made.",
+    "overstatement_shown_directly": "sign counting gives 1 reversal, intervals give 0"
+  },
+  "what_should_now_be_standard": {
+    "per_group_analysis_order": [
+      "apply min_reps_filter",
+      "report interval-based reversals only",
+      "treat the degenerate check as a backstop"
+    ],
+    "why": "eight zero-width intervals occurred because the filter was prose rather than a step; the ordering insight only became visible once the filter was actually applied",
+    "where_it_lives": "research/tools/effect_audit.py, callable as summarise(groups, diff_key, ci_key, min_reps)"
+  }
+}

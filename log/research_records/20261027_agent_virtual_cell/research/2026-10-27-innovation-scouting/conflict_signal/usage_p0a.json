@@ -1,0 +1,216 @@
+{
+  "task": "task-57",
+  "round": "R199-A1v4.1-P0a-metadata",
+  "role": "approved metadata-only P0a execution (after Lead APPROVAL_P0A.md); no effect runs, no full relations_check, no response read",
+  "approval": {
+    "file": "research/2026-10-27-innovation-scouting/conflict_signal/APPROVAL_P0A.md",
+    "three_preconditions": ["A1v4 review must-fixes done", "two-key gate (--confirm-run + real_run_enabled=true)", "Lead approval recorded"],
+    "scope": "only --confirm-run --p0a-metadata; full relations_check NOT run"
+  },
+  "runtime": {
+    "interpreter": "D:\\anaconda\\envs\\maestro\\python.exe",
+    "python": "3.11.16",
+    "network": false,
+    "cwd": "D:\\MAESTRO"
+  },
+  "model": "unknown",
+  "effort": "unknown",
+  "tokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "note": "runtime token accounting not exposed to the acting agent; recorded as null (not 0)"
+  },
+  "cost_usd": null,
+  "agent_turn_elapsed_s": null,
+  "commands": [
+    {
+      "cmd": "baseline gate checks: default and --confirm-run (real_run_enabled=false)",
+      "purpose": "record pre-approval-window gate refusals",
+      "wall_time_s": 3,
+      "exit_codes": {"default": 3, "confirm_only": 3}
+    },
+    {
+      "cmd": "write real_run_enabled=true into config (only key changed)",
+      "purpose": "open the approved two-key window",
+      "wall_time_s": 1,
+      "enabled_config_sha256": "B60CC8D0E8B567322F831DA3E8D83A11B1042A617B4AC36D95A68A890803D946"
+    },
+    {
+      "cmd": "relations_check.py --confirm-run --p0a-metadata (attempt 1)",
+      "purpose": "approved metadata-only P0a",
+      "wall_time_s": 0.9,
+      "exit_code": 1,
+      "result": "data_unavailable metadata_load_error:matched_conditions_missing_columns (loader schema bug)",
+      "frozen": false
+    },
+    {
+      "cmd": "code fix 1: matched_conditions lower-case column aliases (metadata-only loader)",
+      "purpose": "align A0 matched CSV schema",
+      "wall_time_s": 60
+    },
+    {
+      "cmd": "relations_check.py --confirm-run --p0a-metadata (attempt 2)",
+      "purpose": "approved metadata-only P0a after fix 1",
+      "wall_time_s": 2.8,
+      "exit_code": 1,
+      "result": "design_invalid: reference_size_ok false, grid 0 (pandas usecols returns FILE order; positional mapping wrong)",
+      "frozen": false
+    },
+    {
+      "cmd": "code fix 2: explicit column reorder after pandas read_csv(usecols=...)",
+      "purpose": "fix positional metadata mapping",
+      "wall_time_s": 60
+    },
+    {
+      "cmd": "relations_check.py --confirm-run --p0a-metadata (attempt 3)",
+      "purpose": "approved metadata-only P0a after fix 2",
+      "wall_time_s": 142.2,
+      "exit_code": 1,
+      "result": "design_invalid: grid 30488 (candidate enumeration used all-Original union instead of A0 matched-condition keys)",
+      "frozen": false
+    },
+    {
+      "cmd": "code fix 3: candidate universe = union of per-cell matched_conditions keys (A0/challenge definition) + concentration canonicalization; candidate cells still from all Original metadata for S coverage",
+      "purpose": "match frozen grid 229/171",
+      "wall_time_s": 300
+    },
+    {
+      "cmd": "synthetic selfcheck after API/enumeration changes",
+      "purpose": "confirm 16/16 still passes on synthetic data",
+      "wall_time_s": 3.6,
+      "note": "one transient failure while real_run_enabled=true (run_gate_refusal expects disabled config); final rerun after revert is 16/16"
+    },
+    {
+      "cmd": "relations_check.py --confirm-run --p0a-metadata (final valid run)",
+      "purpose": "approved metadata-only P0a with corrected candidate universe",
+      "wall_time_s": 3.0,
+      "cpu": "single process, wall≈CPU (pandas metadata reads dominate)",
+      "exit_code": 0,
+      "status": "pass",
+      "elapsed_s_in_script": 2.8
+    },
+    {
+      "cmd": "revert real_run_enabled=false; verify default/confirm exit 3; verify output sidecar SHA",
+      "purpose": "close approved window and freeze output",
+      "wall_time_s": 3,
+      "exit_codes": {"default": 3, "confirm_only": 3}
+    },
+    {
+      "cmd": "synthetic selfcheck rerun after revert; inspect frozen p0a_metadata.json",
+      "purpose": "refresh final SELFCHECK and validate output",
+      "wall_time_s": 3.24
+    }
+  ],
+  "gate_status": {
+    "baseline_config_sha256": "BB1FE3230B70EB53B5A39EF7D7D37DF256F296E866133939881E0E3E909CF9B4",
+    "enabled_config_sha256": "B60CC8D0E8B567322F831DA3E8D83A11B1042A617B4AC36D95A68A890803D946",
+    "reverted_config_sha256": "BB1FE3230B70EB53B5A39EF7D7D37DF256F296E866133939881E0E3E909CF9B4",
+    "only_key_changed_in_window": "run_gate.real_run_enabled",
+    "default_exit": 3,
+    "confirm_only_exit": 3,
+    "full_relations_check_run": false
+  },
+  "result": {
+    "status": "pass",
+    "judge": "p0a_metadata_pass",
+    "judge_rule": "s_milp_optimum >= 86 AND 9 boolean gates all true",
+    "s_milp_optimum": 106,
+    "expected_passing_count": 106,
+    "candidate_grid_total": 171,
+    "candidate_grid_by_tissue": {"Breast": 134, "Colon": 37},
+    "ab_supply_candidates": 135,
+    "precheck_eligible": 106,
+    "precheck_eligible_by_tissue": {"Breast": 79, "Colon": 27},
+    "coverage_denominator": 171,
+    "coverage_target": 86,
+    "coverage_actual_fraction": 0.6198830409356725,
+    "s_solver": "milp",
+    "s_splits_sha256": "34C4B9D7198CC451822AC8C4A3A553825D917CE0B56D16D9851AAD96BA9783D1",
+    "gates": {
+      "reference_matched_subset": true,
+      "reference_size_ok": true,
+      "three_way_disjoint": true,
+      "main_tissues_breast_colon": true,
+      "pancreas_excluded": true,
+      "tissue_span_non_vacuity": true,
+      "s_side_cond_cov_ge_12": true,
+      "precheck_eligible_ge_target": true,
+      "s_milp_optimum_ge_target": true,
+      "s_selection_solver": "milp"
+    },
+    "allocation": {
+      "A": 42, "B": 42, "S": 24, "U": 17,
+      "A_tissues": {"Breast": 17, "Colon": 16, "Pancreas": 9},
+      "B_tissues": {"Breast": 16, "Colon": 17, "Pancreas": 9},
+      "S_tissues": {"Breast": 12, "Colon": 12, "Pancreas": 0},
+      "U_tissues": {"Breast": 6, "Colon": 0, "Pancreas": 11},
+      "split_sha256": {
+        "A": "C4DF821DC507A7C0C3AE9C9F7A77D92991C6307422146807981BEC88B95809C5",
+        "B": "C0EAFCDD82C08126DEE8A714FAF405B9F5B4CAA3C1115D9C44940C41A2E9D5C8",
+        "S": "34C4B9D7198CC451822AC8C4A3A553825D917CE0B56D16D9851AAD96BA9783D1",
+        "U": "EAA922839C0C2512424A76E982C4BF2CA4A2CBEB9EE099C20B0C2D988BA5854E"
+      }
+    },
+    "pancreas_reference_disclosure": "reference 84 includes A9+B9=18 Pancreas cells not used by the per-tissue Breast/Colon main family; retained only to keep the frozen 84/24/17 composition (counts.reference_cells_note)",
+    "v3_reference_values": "114/112 marked provenance-only in counts.v3_reference_values_not_applicable; not used as gates",
+    "wall_time_s": 3.0,
+    "budget_max_seconds": 600,
+    "budget_ok": true
+  },
+  "frozen_output": {
+    "path": "research/2026-10-27-innovation-scouting/conflict_signal/stage0/real_run/p0a_metadata.json",
+    "sha256": "338A234E931E11C27105952839BC69F9681D4D8516419B4B78D2F81C36F58247",
+    "sidecar_sha256": "338A234E931E11C27105952839BC69F9681D4D8516419B4B78D2F81C36F58247",
+    "sidecar_matches": true,
+    "schema": "r198-a1-stage0-p0a-metadata-v4",
+    "relations_csv_generated": false,
+    "relations_check_json_generated": false
+  },
+  "file_sha256_final": {
+    "stage0/relations_check.py": "88ACAFD2E5A75865E8A9771006D7DFF58F38F1638BDB9677A93A0D83F76E06C0",
+    "stage0/relations_check_config.json": "BB1FE3230B70EB53B5A39EF7D7D37DF256F296E866133939881E0E3E909CF9B4",
+    "stage0/synthetic_selfcheck.py": "0A0455EDA438B51A9A0A0AD0AEAA74BE55D0BE28B7149E5FE0A14757E11242F8",
+    "stage0/SELFCHECK.json": "8836AD8A088819A00FBA6F1DB1FAB902F85F7363A8AE1FD0271259E77023AFFE",
+    "stage0/README.md": "A6954E43DAA44A6F59094932F6D258D71B4CED5466D0E97F613BEBC840E2E97E",
+    "stage0/real_run/p0a_metadata.json": "338A234E931E11C27105952839BC69F9681D4D8516419B4B78D2F81C36F58247"
+  },
+  "execution_time_fixes": [
+    {
+      "id": "fix1_matched_csv_columns",
+      "problem": "matched_conditions.csv uses lower-case schema (cell,anchor_id,library_id,anchor_conc,library_conc); loader expected fitted-table names",
+      "fix": "explicit lower-case aliases for A0 matched CSV; metadata-only",
+      "invalid_attempt": "metadata_load_error (attempt 1)"
+    },
+    {
+      "id": "fix2_pandas_usecols_order",
+      "problem": "pandas read_csv(usecols=...) returns columns in FILE order, not requested order; positional unpacking mapped Tissue as cell -> only 3 pseudo-cells",
+      "fix": "explicit reorder to [cell, tissue, anchor, ac, lc, library] before positional access",
+      "invalid_attempt": "grid 0, reference_size_ok false (attempt 2)"
+    },
+    {
+      "id": "fix3_candidate_universe_definition",
+      "problem": "candidate grid from all-Original union -> 30,488 candidates (should be A0 matched-key union 229 / main 171)",
+      "fix": "candidate keys from matched_conditions per-cell key union with canonical concentrations; candidate cells from all Original metadata for S coverage",
+      "invalid_attempt": "grid 30488, s_milp_optimum 6172 (attempt 3)"
+    }
+  ],
+  "invalid_attempts_discarded": [
+    "p0a_metadata.json SHA 85F1F2BF42BF143022F77E44E96CD1B671889A003A6988409D447570FFC38576 (grid 0)",
+    "p0a_metadata.json SHA 5B1B64F6E9E478EA2B7E7CE04C233374ADB02F8F5AA57F339E04B967C6DB20D8 (grid 30488)"
+  ],
+  "verdict": "p0a_metadata_pass",
+  "interpretation": [
+    "P0a-metadata PASS only means the metadata-only preconditions (allocation/grid/S coverage/non-vacuity/eligible>=86) are met",
+    "it is NOT relation existence, NOT relations_check PASS, NOT Stage 1, NOT effect/migration/decision evidence",
+    "S=24 split 12/12 -> main relations have at most 12 S contexts; n=14/19 MDE rows unusable; p1<0.9307 -> insufficient_precision",
+    "Pancreas excluded; 18 Pancreas reference cells not used by the main family (disclosed); no extrapolation",
+    "P0d (delta_min/utility) still blocked and only blocks Stage 1"
+  ],
+  "next_steps": [
+    "Lead review of record_p0a.md + frozen output SHA + the 3 execution-time loader/enumeration fixes",
+    "if approved, separately authorize P0a relations_check (reference responses readable, <=30 min); do not run full before approval",
+    "never lower the 86/171 denominator, never add Pancreas back, never change S size, never relax alpha"
+  ],
+  "notes": "unavailable values recorded as null, not 0; no endpoint/S-U response read; full relations_check not run; no effect experiments/training; no novelty claim; v1-v4 docs untouched (execution-time fixes only to stage0 code + API-adapted selfcheck)"
+}

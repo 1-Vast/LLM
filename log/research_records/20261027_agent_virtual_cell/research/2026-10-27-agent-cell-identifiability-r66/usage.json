@@ -1,0 +1,47 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r66",
+  "round": "R66 (goal round 64/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Bridges C24 (weak unseen-drug prediction) with C27 (decision value) on GDSC."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r66": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round tests a never-asked bridge question and flags the confound in its own secondary comparison.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e066_unseen_drug_decision.py"], "runs": 1, "repeats": 40,
+    "pools": 3, "ks": 2, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E066_RESULTS.json", "rows": "E066_rows.csv", "protocol": "PROTOCOL_E064.md"},
+  "design": {
+    "holdout": "20% of the 65 drugs held out; training uses only keys whose two drugs are both seen",
+    "pools": ["any_unseen (~20,278 keys)", "both_unseen (~2,126 keys)", "seen_only (~33,852 keys, restricted-model control"],
+    "ks": [20, 50], "features": "pathway + tissue (41 dims), ridge lambda=1"
+  },
+  "results": {
+    "any_unseen_k20": {"base": 0.0148, "exploit": 0.0488, "random": 0.0138, "gain": 0.0350, "ci95": [0.0150, 0.0588]},
+    "any_unseen_k50": {"gain": 0.0455, "ci95": [0.0310, 0.0615]},
+    "both_unseen_k20": {"gain": 0.0125, "ci95": [0.0000, 0.0263]},
+    "seen_only_k20": {"gain": 0.0037, "ci95": [-0.0113, 0.0213]},
+    "seen_only_k50": {"gain": 0.0425, "ci95": [0.0280, 0.0560]}
+  },
+  "decisions": {"H165_unseen_pool_exploit_beats_random": true,
+                "H166_gain_smaller_than_seen": false,
+                "H167_both_unseen_holds": false,
+                "verdict": "weak_signal_still_has_decision_value"},
+  "headline": "a prediction with R2 = 0.029 still lifts top-20 hits from 1.38% to 4.88% on drugs never seen in training - a 3.5x gain",
+  "significance": "this separates 'is the prediction accurate' from 'is it useful for decisions': near-zero variance explained coexists with a large decision gain",
+  "confound_disclosed": "the seen_only control is much weaker here (+0.37 pp at k=20) than C27's 6.50% because training excludes every key containing a held-out drug; H166 must therefore not be read as 'unseen is better than seen'",
+  "limits": ["drug-level holdout with cells still overlapping: this is unseen-drug, not unseen-cell",
+             "the both-unseen subset is marginal (CI lower bound exactly 0.0000)",
+             "pool sizes vary with the number of held-out drugs",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "register_updates": {"C41": "new, exploratory: the weak unseen-drug signal has decision value"},
+  "next_gates": ["test whether the gain survives when the pool shrinks to a few hundred candidates"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C41 added)", "research/INDEX.md (added R66 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

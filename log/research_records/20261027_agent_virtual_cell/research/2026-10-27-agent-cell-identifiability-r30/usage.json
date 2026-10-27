@@ -1,0 +1,42 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r30",
+  "round": "R30 (goal round 28/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Leave-one-cell-line-out test on the locally held GDSC screen; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r30": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the effect is small and consistently positive, and the round states both the positive condition and its size limit.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e030_leave_one_cell.py"], "runs": 1, "bootstrap": 1000,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E030_RESULTS.json", "per_cell": "E030_per_cell.csv", "protocol": "PROTOCOL_E030.md"},
+  "design": {
+    "cells": 125, "combos": 2025, "tissues": {"Breast": 51, "Colon": 45, "Pancreas": 29},
+    "prediction": "mean synergy of other cells (all, or same tissue only), scored per held-out cell by Spearman",
+    "min_sources": 5
+  },
+  "results": {
+    "rho_all": {"median": 0.502, "mean": 0.518, "iqr": 0.154, "ci95": [0.500, 0.536]},
+    "rho_same_tissue": {"median": 0.526, "mean": 0.544, "iqr": 0.170, "ci95": [0.524, 0.563]},
+    "rho_diff": {"median": 0.0247, "mean": 0.0260, "ci95": [0.0219, 0.0299]},
+    "frac_cells_same_tissue_better": 0.92,
+    "by_tissue_median": {"Breast": {"all": 0.500, "same": 0.514, "n": 51},
+                         "Colon": {"all": 0.470, "same": 0.490, "n": 45},
+                         "Pancreas": {"all": 0.651, "same": 0.714, "n": 29}}
+  },
+  "decisions": {"H073_unseen_cell_predictable": true, "H074_tissue_is_a_scope_condition": true,
+                "H075_heterogeneous": false, "verdict": "tissue_is_a_usable_scope_condition"},
+  "significance": "this is the first scope condition in the programme that both works (92% of cells agree) and is statistically supported (CI excludes zero); earlier attempts (R12 confidence model, R16 conformal width, R17 rule boundary, R27 source agreement) all failed or were untestable",
+  "size_limit": "the gain is only +0.025 in rank correlation; three coarse tissues; it concerns ranking, not magnitude",
+  "register_updates": {"C25": "new, exploratory: unseen-cell rho 0.502; same-tissue +0.0247 with 92% of cells agreeing"},
+  "next_gates": ["cross-screen replication using the validation screen (4,725 overlapping keys at different concentrations) - attribution of any non-replication to concentration vs irreproducibility must be designed first"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C25 added)", "research/INDEX.md (added R30 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "mechanism_claim_made": false, "magnitude_claim_made": false
+  }
+}

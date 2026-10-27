@@ -1,0 +1,43 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r23",
+  "round": "R23 (goal round 21/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Unseen-combination test on data in hand; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r23": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round's finding is a dissociation that is reported with both metrics and the untreated confound (membership vs fine structure) named.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e023_unseen_pair.py"], "runs": 1, "bootstrap": 1000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E023_RESULTS.json", "units": "E023_units.csv", "protocol": "PROTOCOL_E023.md"},
+  "design": {
+    "units": 44, "layouts": 21,
+    "median_pairs_per_unit": 351, "median_compounds_per_unit": 37,
+    "archive_totals": {"distinct_compound_pairs": 6595, "distinct_compounds": 207, "median_pairs_per_compound": 64},
+    "model": "y = mu + a_A + a_B, ridge lambda = 1.0 fixed (no tuning)",
+    "loo": "exact via the hat-matrix identity resid_loo_i = e_i / (1 - H_ii)"
+  },
+  "results": {
+    "rho_additive": {"mean": 0.937, "median": 0.941, "ci95": [0.929, 0.944]},
+    "precision10_additive": {"mean": 0.225, "median": 0.20, "ci95": [0.177, 0.273], "chance": 0.029, "lift": 7.8},
+    "cross_cell_control_median_rho": 0.818,
+    "within_unit_corr_between_the_two_metrics": -0.02
+  },
+  "decisions": {"H052_beats_constant": true, "H053_substantial": true,
+                "H054_improves_with_coverage": false,
+                "H054_status": "not assessable - coverage is nearly constant (36-76), so the tercile split collapses and the test has no information",
+                "verdict": "unseen_pair_predictable"},
+  "headline": "the bulk ordering of an unseen compound pair is almost perfectly additive (rho 0.941), while the ten most effective pairs are largely not (precision@10 0.225, 7.8x chance); the two metrics are uncorrelated within units (corr -0.02), so additivity explains the level and the interaction lives in the tail",
+  "not_claimed": "this is an unseen COMBINATION (both compounds seen elsewhere), NOT an unseen drug; the unseen-drug question remains untestable in this archive (F2/F5)",
+  "confound_not_treated": "part of rho may come from membership (a potent compound makes all its pairs low) rather than fine structure; that decomposition was not run",
+  "register_updates": {"C19": "new, exploratory: unseen combination additive rho 0.941 vs precision@10 0.225, uncorrelated",
+                       "F2_F5": "unchanged; unseen drug remains untestable"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C19 added)", "research/INDEX.md (added R23 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "unseen_drug_claim_made": false, "mechanism_claim_made": false
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r102",
+  "round": "R102 (goal round 100/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Equal-budget comparison against drug marginals, required for promotion."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r102": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round completes the promotion checklist and discloses a bug in its own pre-registered criterion.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e102_three_way.py"], "runs": 1, "pools": 3, "repeats": 70, "arms": 3,
+    "rows": 420, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E102_RESULTS.json", "rows": "E102_rows.csv", "protocol": "PROTOCOL_E097.md"},
+  "results": {
+    "one_unseen": {"marginal": 0.0629, "identity": 0.0850, "combo": 0.1129,
+                   "combo_minus_marginal": {"diff": 0.0500, "ci95": [0.0271, 0.0721]}},
+    "cell_unseen": {"marginal": 0.0750, "identity": 0.0879, "combo": 0.1021,
+                    "combo_minus_marginal": {"diff": 0.0271, "ci95": [0.0036, 0.0500]}},
+    "both_unseen": {"marginal": 0.0114, "identity": 0.0107, "combo": 0.0314,
+                    "combo_minus_marginal": {"diff": 0.0200, "ci95": [0.0036, 0.0386]}}
+  },
+  "criterion_bug": {
+    "H264_as_written": "marginal minus combo CI contains 0 or is positive",
+    "what_the_code_checked": "ci95[0] <= 0, which is also true for an entirely negative interval",
+    "observed": "one_unseen gives marginal minus combo = -5.00 pp [-7.36,-2.57], wholly below zero",
+    "so_H264_is": false,
+    "consequence": "the pre-registered conditional rule does not hold, because the combined model also wins where marginals are strongest"},
+  "decisions": {"H263_combo_beats_marginal_when_drugs_unseen": true,
+                "H264_marginal_not_worse_when_combos_novel": false,
+                "H265_conditional_rule_holds": false,
+                "verdict": "combo_dominates_marginals_in_all_three_pools"},
+  "what_replaces_the_recommended_algorithm": "the synthesis's section 1 recommendation ('rank by drug marginals') no longer holds; identity+pathway is significantly better in every pool tested",
+  "why_identity_alone_beats_marginals": "marginals are an unshrunk mean over few keys for rare drugs, while identity is a jointly fitted ridge with lambda=1 that shrinks them, so about 2.2 pp of the identity-over-marginal gap is stabilisation rather than new information",
+  "promotion_status": {
+    "checked": "equal-budget comparison against marginals - passed, combo wins all three pools",
+    "still_missing": ["replication on a second dataset (BATCHIE, same construction)", "leakage review"],
+    "promoted": false},
+  "limits": ["the three pools share one training set",
+             "the both-unseen pool holds about 1,830 keys",
+             "only the boolean Synergy criterion was used this round",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["leakage review first: shuffle or destroy the annotation and check that the increment disappears"],
+  "register_updates": {"C75": "new: the combo model dominates marginals in all three pools",
+                       "C74": "annotated", "SYNTHESIS": "the recommended algorithm is marked as superseded"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C75 added, C74 annotated)",
+                                "research/SYNTHESIS.md (recommendation superseded)", "research/INDEX.md (added R102 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

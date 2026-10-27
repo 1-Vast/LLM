@@ -1,0 +1,39 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r60",
+  "round": "R60 (goal round 58/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Read-only numerical audit of the synthesis document; no literature query."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r60": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round audits its own main deliverable, finds one omission, and also discloses that the audit tool itself produced ten false positives on first run.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16",
+    "scripts": ["e060_audit.py"], "runs": "2 (first run had wrong key paths, then fixed)",
+    "checks": 36, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E060_RESULTS.json", "protocol": "PROTOCOL_E058.md"},
+  "audit": {
+    "source_numbers_checked": 21, "source_numbers_consistent": 21,
+    "quoted_strings_checked": 15, "quoted_strings_present_after_fix": 15,
+    "total_checks": 36, "passed": 36
+  },
+  "finding": {
+    "omission": "the synthesis quoted +9.33 pp against always-exploit but omitted +2.79 pp against always-mix, which is the figure showing the predicate beats BOTH fixed strategies",
+    "action": "added to SYNTHESIS.md section 1.1"
+  },
+  "process_failure_disclosed": "the audit script failed 10 checks on its first run because I guessed the JSON key names wrongly (e.g. summary.rho rather than summary.rho_model.median); the data were fine. Automated auditing produces false positives too.",
+  "decisions": {"H152_numbers_consistent": true, "H153_quotes_consistent": true},
+  "limits": ["only the 21 numbers explicitly quoted in the synthesis were checked, not all 39 claims",
+             "tolerances were chosen by me, not by a statistical test",
+             "the correctness of the audit script itself rests on a manual inspection of the JSON structures - that step is not automated",
+             "retrospective and read-only; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["check that the status wording of all 39 register claims (verified / exploratory / refuted / stopped / untestable) matches the latest round"],
+  "mutations_outside_episode": ["research/SYNTHESIS.md (added +2.79 pp)", "research/EVIDENCE_REGISTER.md (R60 note)",
+                                "research/INDEX.md (added R60 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

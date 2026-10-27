@@ -1,0 +1,44 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r42",
+  "round": "R42 (goal round 40/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Third attempt at a strength manipulation on the locally held GDSC screen."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r42": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round reports its own manipulation as failed, fixes four implementation bugs before reporting results, and names the structural cause.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e042_permute_labels.py"], "runs": "5 (four implementation fixes, then final)",
+    "fracs": 5, "repeats": 40, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E042_RESULTS.json", "rows": "E042_rows.csv", "protocol": "PROTOCOL_E042.md"},
+  "design": {
+    "manipulation": "permute pathway labels across drugs (anchor labels among anchor drugs, library labels among library drugs), dimension fixed at 41",
+    "fracs": [0.0, 0.25, 0.5, 0.75, 1.0]
+  },
+  "results": {
+    "rho_ladder": {"0.0": 0.3252, "0.25": 0.2938, "0.5": 0.2647, "0.75": 0.2493, "1.0": 0.2398},
+    "span": 0.085,
+    "ks_with_both_halves_positive": {"0.0": [50, 75, 100, 150, 200], "0.25": [], "0.5": [], "0.75": [], "1.0": []}
+  },
+  "decisions": {"H109_strength_swept_to_zero": false, "H110_intermediate_band": false,
+                "H111_strong_end_exploit_not_worse": false,
+                "verdict_reported": "third_manipulation_failure_structural_cause_identified"},
+  "structural_cause": "the unit key is (cell, combination), so the same compound pair appears in both the training set and the candidate pool under different cells; any feature that identifies the drug set retains signal, which is why rho stays at 0.24 even with fully permuted labels (tissue-only would be about 0.10)",
+  "required_fix": "a group split by combination so that no compound pair is shared between training and the candidate pool",
+  "implementation_bugs_fixed_before_results": [
+    "permuting pathway LEVEL names is only a column permutation, leaving ridge unchanged (identical rho at all fractions)",
+    "mixing anchor and library roles raised KeyError for drugs that only appear as library agents",
+    "the fix permutes within each role separately"
+  ],
+  "side_observation": "for every fraction above zero, no k had both halves positive; the mix advantage vanishes as labels are perturbed, consistent with 'the mix needs real signal', but this is not a clean test",
+  "register_updates": {"C33": "structural cause added; the lower boundary remains unestablished after three failed manipulations"},
+  "next_gates": ["group split by combination, optionally combined with subsampling or label permutation, to finally reach rho near zero"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C33 structural cause)", "research/INDEX.md (added R42 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "mechanism_claim_made": false
+  }
+}

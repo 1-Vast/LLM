@@ -1,0 +1,45 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r108",
+  "round": "R108 (goal round 106/256)",
+  "date": "2026-10-27",
+  "RUN_INVALID": true,
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Attempt to re-ask the minimal-evidence question against the stronger prior; the design could not have detected an effect."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r108": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round is invalidated by its own zero-difference signature, which is now a standing check in this programme.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e108_prior_strength.py"], "runs": 1, "units": 140,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E108_RESULTS_INVALID.json", "rows": "E108_rows_INVALID.csv",
+                "protocol": "PROTOCOL_E103.md"},
+  "design_bug": {
+    "symptom": "personalised minus prior is exactly +0.0000 with a zero-width CI at every m, for both priors",
+    "cause": "the arm added one constant offset to all candidate scores, and a constant cannot change a ranking, so the top-k equals the prior by construction",
+    "consequence": "the experiment could never have detected a personalisation effect",
+    "how_caught": "an exact zero with a zero-width interval is the same signature that exposed the invalid R104 run",
+    "the_fix": "estimate per-drug residual effects from the m measured keys as R76 did, rather than a single cell-level offset"},
+  "decisions": {"H279_bar_raised": "not testable - invalid design",
+                "H280_bar_lowered": "not testable - invalid design",
+                "H281_same": "not established - automated verdict withdrawn",
+                "verdict": "RUN_INVALID_personalisation_arm_is_a_constant"},
+  "byproduct_worth_noting": {
+    "contrast": "combo prior minus marginal prior",
+    "values": "positive at all five m (+0.54 to +1.61 pp), never significant with 30 draws",
+    "reading": "consistent with C80: the combined prior really is better, by an amount this design cannot resolve; usable only as corroboration"},
+  "standing_check_now_in_use": "an exact zero difference with a zero-width confidence interval means the design should be inspected, not reported as a negative result",
+  "limits": ["no threshold numbers were produced",
+             "30 draws per level is low power in any case",
+             "only five m values",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["redo with R76's per-drug residual construction, and verify on a small sample that the personalised arm differs from the prior before scaling"],
+  "register_updates": {"C81": "new: the run is invalid and must not be quoted"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C81 added)", "research/INDEX.md (added R108 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

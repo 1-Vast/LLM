@@ -1,0 +1,45 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r22",
+  "round": "R22 (goal round 20/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Minimal-evidence experiment on data in hand; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r22": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round's own amendment documents the decision-rule error, and the effect sizes are small enough that no positive claim needs challenging.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e022_minimal_evidence.py"], "runs": 1, "reps_per_m": 20, "bootstrap": 1000,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E022_RESULTS.json", "units": "E022_units.csv",
+                "protocol": "PROTOCOL_E022.md", "correction": "AMENDMENT_010_SIGN_DIRECTION.md"},
+  "design": {
+    "layouts": 21, "cell_units": 42, "pairs_per_layout": 351,
+    "predictor": "cross-cell mean of the other cells; own-data arm adds a 2-parameter affine calibration fitted on m measured pairs",
+    "metric": "precision@10 on the unmeasured remainder; chance 2.9-4.2%"
+  },
+  "results": {
+    "m0": {"precision10": 0.333, "ci95": [0.257, 0.412], "lift_over_chance": 11.3},
+    "m5": 0.334, "m10": 0.345, "m25": 0.359, "m50": 0.383, "m100": 0.425,
+    "gain_m10_over_m0_pp": 1.19, "gain_m10_over_m0_ci_pp": [0.42, 2.11],
+    "gain_m100_over_m0_pp": 9.20, "gain_m100_over_m0_ci_pp": [6.11, 12.64],
+    "saturation": "none observed; the 10->25 gain (1.38 pp) exceeds the 0->10 gain (1.19 pp)"
+  },
+  "decision_rule_error": {
+    "what": "paired(m1,m2) returns precision(m1) - precision(m2); both H050 and H051 were written in the wrong direction",
+    "consequence": "the script's printed verdict 'pooling_is_already_the_ceiling' and flag H051_saturates_by_25 = true are artefacts of the mis-specified rule and are not conclusions",
+    "corrected": "H050 holds (m=10 better by 1.19 pp, CI excludes 0) with a small effect; H051 is refuted (no saturation)"
+  },
+  "decisions_corrected": {"H049_zero_evidence_beats_chance": true, "H050_ten_measurements_help": true,
+                          "H051_saturates_by_25": false,
+                          "verdict": "pooling_is_strong_and_own_data_gains_slowly_without_saturation"},
+  "interpretation": "cross-cell pooling already reaches 33% precision@10 (11x chance); the target cell's own measurements buy about 1.2 pp per ten and roughly 9 pp at a hundred, so minimal evidence is not small on this design. The calibration model is deliberately weak (two parameters), so this is a statement about weak calibration, not about the uselessness of own data.",
+  "register_updates": {"C18": "new, exploratory: pooling precision@10 0.333 (11.3x), own-data gains 1.19 pp at m=10 and 9.20 pp at m=100, no saturation"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C18 added)", "research/INDEX.md (added R22 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "decision_value_claimed": false, "mechanism_claim_made": false
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "kind": "prior_strength_manipulated_personalisation_sign",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "m": 200,
+    "fractions": [
+      0.1,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "reps": 3,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "cells_used": 124,
+    "units": 1488,
+    "sanity_checks": 1488,
+    "top_k_changed": 1488,
+    "sanity_passed": true
+  },
+  "by_fraction": {
+    "0.10": {
+      "n": 372,
+      "mean_keep_cells": 12.0,
+      "prior": 0.08629032258064516,
+      "pers": 0.10779569892473119,
+      "gain": {
+        "n": 372,
+        "mean_diff": 0.021505376344086023,
+        "ci95": [
+          0.011827956989247313,
+          0.03118279569892473
+        ]
+      }
+    },
+    "0.25": {
+      "n": 372,
+      "mean_keep_cells": 31.0,
+      "prior": 0.10456989247311829,
+      "pers": 0.10268817204301076,
+      "gain": {
+        "n": 372,
+        "mean_diff": -0.0018817204301075285,
+        "ci95": [
+          -0.0125,
+          0.009543010752688172
+        ]
+      }
+    },
+    "0.50": {
+      "n": 372,
+      "mean_keep_cells": 62.0,
+      "prior": 0.1099462365591398,
+      "pers": 0.11115591397849463,
+      "gain": {
+        "n": 372,
+        "mean_diff": 0.0012096774193548375,
+        "ci95": [
+          -0.009008736559139786,
+          0.011827956989247308
+        ]
+      }
+    },
+    "1.00": {
+      "n": 372,
+      "mean_keep_cells": 124.0,
+      "prior": 0.10860215053763442,
+      "pers": 0.11559139784946236,
+      "gain": {
+        "n": 372,
+        "mean_diff": 0.006989247311827958,
+        "ci95": [
+          -0.003360215053763441,
+          0.017204301075268817
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r112/e112_prior_strength.py": "57563ce753eff10c6139e7493293570eba1bddcbf6fe6c901187d90ff0f327ce"
+  },
+  "decisions": {
+    "sanity_passed": true,
+    "prior_strength_rises_with_data": true,
+    "prior_levels": [
+      0.0863,
+      0.1046,
+      0.1099,
+      0.1086
+    ],
+    "gains": [
+      0.0215,
+      -0.0019,
+      0.0012,
+      0.007
+    ],
+    "sig_positive_fractions": [
+      0.1
+    ],
+    "sig_negative_fractions": [],
+    "H285_sign_crossover": false,
+    "verdict": "personalisation_benefit_decays_as_the_prior_strengthens"
+  },
+  "limits": [
+    "Weakening the prior by training on fewer cells also changes its noise structure, not only its strength.",
+    "m is fixed at 200, so the result is specific to that sample size.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "the_three_point_curve": {
+    "weakest_prior_here": {
+      "prior": 0.0863,
+      "gain": 0.0215,
+      "ci95": [
+        0.0118,
+        0.0312
+      ],
+      "reading": "significantly positive"
+    },
+    "mid_priors_here": {
+      "priors": [
+        0.1046,
+        0.1099,
+        0.1086
+      ],
+      "gains": [
+        -0.0019,
+        0.0012,
+        0.007
+      ],
+      "reading": "indistinguishable from zero"
+    },
+    "strongest_prior_R111": {
+      "prior": "0.12 to 0.17",
+      "gains": "-0.0132 to -0.0635, all significantly negative",
+      "reading": "significantly harmful"
+    },
+    "combined": "across three experiments on the same dataset the personalisation gain falls monotonically with prior strength: +2.15 pp at 8.6%, about 0 at 10-11%, -1.3 to -6.4 pp at 12-17%"
+  },
+  "H285_was_too_narrow": "the pre-registered crossover test required both a significant positive and a significant negative inside this single manipulation, but this manipulation only spans 8.6-11% prior strength, so it can show the positive-to-zero part only. The zero-to-negative part is what R111 supplied at much stronger priors.",
+  "resolution_of_the_R76_conflict": {
+    "R76": "prior about 7%, personalisation +1.64/+2.62 pp, positive",
+    "R112": "prior 8.6% gives +2.15 pp positive; prior 10-11% gives about zero",
+    "R111": "prior 12-17% gives -1.3 to -6.4 pp, negative",
+    "conclusion": "R76 and R111 are not in conflict; they sit on opposite sides of a crossover near 11% prior strength, and this round fills in the middle"
+  }
+}

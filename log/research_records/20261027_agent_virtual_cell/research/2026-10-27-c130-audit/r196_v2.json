@@ -1,0 +1,2980 @@
+{
+ "data": {
+  "anchor_pathway_levels": 17,
+  "annotation_dim": 38,
+  "csv_rows": 296707,
+  "endpoint": {
+   "max": 0.692859,
+   "mean": 0.000556,
+   "min": -0.755946,
+   "sd": 0.076765
+  },
+  "feature_sha256": {
+   "id_codes": "8721d03131195a1d9f0de1770c9d4a861fbb2a8e9dffc65fbf8b958a49cb0e32",
+   "path_codes": "286be6c4b985ff54eef3091d46fd44ac57d24689c88b3fbc5dd3ef73654b4ed3"
+  },
+  "identity_dim": 130,
+  "library_pathway_levels": 21,
+  "n_anchor_drugs": 46,
+  "n_cells": 125,
+  "n_drugs": 65,
+  "n_library_drugs": 65,
+  "n_pairs_directed": 2025,
+  "n_units": 108259
+ },
+ "design_checks": {
+  "E1_fold_structure": {
+   "pass": true,
+   "value": {
+    "n_folds": 5,
+    "n_partitions": 10,
+    "per_partition_n_test_per_fold": [
+     [
+      5772,
+      2664,
+      2538,
+      5223,
+      4540
+     ],
+     [
+      4854,
+      5123,
+      3844,
+      2456,
+      4090
+     ],
+     [
+      3249,
+      1791,
+      4972,
+      4008,
+      6019
+     ],
+     [
+      6083,
+      3703,
+      1918,
+      4585,
+      4530
+     ],
+     [
+      4644,
+      3525,
+      3769,
+      5152,
+      2520
+     ],
+     [
+      5400,
+      2224,
+      2954,
+      5933,
+      3470
+     ],
+     [
+      3523,
+      2004,
+      2977,
+      7476,
+      4565
+     ],
+     [
+      4781,
+      3250,
+      3661,
+      5045,
+      3275
+     ],
+     [
+      4317,
+      5553,
+      2988,
+      2215,
+      4909
+     ],
+     [
+      3607,
+      3015,
+      3870,
+      4667,
+      4325
+     ]
+    ],
+    "per_partition_n_test_total": [
+     20737,
+     20367,
+     20039,
+     20819,
+     19610,
+     19981,
+     20545,
+     20012,
+     19982,
+     19484
+    ],
+    "pooled_test_cells": 125,
+    "total_fold_test_rows": 201576,
+    "train_drugs_per_fold_min": 52
+   }
+  },
+  "E2_inner_overlap_and_both_unseen": {
+   "pass": true,
+   "value": "assertions passed for all 50 outer folds: inner-held disjoint from inner-train drugs; inner-validation rows have both drugs in inner-held"
+  },
+  "E3_unified_inner_metric": {
+   "pass": true,
+   "value": "grouped and row-level both use the mean of the 3 per-inner-fold Spearman values; scaler fitted inside each inner training fold (see record_r196_v2.md)"
+  },
+  "E4_lambda_grids": {
+   "pass": true,
+   "value": {
+    "L_C130": [
+     0.1,
+     0.3,
+     1.0,
+     3.0,
+     10.0,
+     30.0,
+     100.0,
+     300.0,
+     1000.0
+    ],
+    "L_EXT": [
+     0.1,
+     0.3,
+     1.0,
+     3.0,
+     10.0,
+     30.0,
+     100.0,
+     300.0,
+     1000.0,
+     3000.0,
+     10000.0
+    ]
+   }
+  },
+  "E5_test_label_reads": {
+   "pass": true,
+   "value": {
+    "count": 800,
+    "expected": 800,
+    "note": "test labels are read only in the scoring step; lambda selection and prediction generation receive a training-only label view whose non-training entries are NaN (asserted finite wherever used)"
+   }
+  },
+  "E6_null_calibration": {
+   "pass": true,
+   "value": {
+    "capacity": {
+     "max": 0.009211,
+     "mean": 0.000874,
+     "min": -0.013071,
+     "n_seeds": 10,
+     "q025": -0.011122,
+     "q975": 0.008807,
+     "sd": 0.00674
+    },
+    "shuffle": {
+     "max": 0.049324,
+     "mean": -0.006231,
+     "min": -0.10396,
+     "n_seeds": 10,
+     "q025": -0.089544,
+     "q975": 0.048069,
+     "sd": 0.046087
+    }
+   }
+  },
+  "E7_mde_design_drug_unit": {
+   "pass": false,
+   "value": {
+    "boot_mean": 0.028179,
+    "boot_sd": 0.02936,
+    "ci95": [
+     -0.027922,
+     0.086636
+    ],
+    "mde80": 0.082267
+   }
+  },
+  "E8_engine_equivalence": {
+   "pass": true,
+   "value": {
+    "max_abs_diff_main": 7.02179633882416e-13,
+    "max_abs_diff_path": 1.971825480673317e-13
+   }
+  }
+ },
+ "deterministic": {
+  "json_sort_keys": true,
+  "random": false,
+  "timestamps": false
+ },
+ "deviations": [],
+ "input": {
+  "bytes": 198893607,
+  "path": "data/external/gdsc_combinations/jaaks2022_figshare/Original screen_All tissues_fitted data.csv",
+  "sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278"
+ },
+ "judgment": {
+  "annotation_only_ci95_drug": [
+   0.068056,
+   0.186094
+  ],
+  "annotation_only_gain": 0.139796,
+  "c130_reference_not_a_comparison_interval": {
+   "ci95": [
+    0.09471202625415462,
+    0.14085000835904368
+   ],
+   "gain": 0.11831576209676734,
+   "note": "C130 used 40 overlapping random splits and row-level inner tuning with lambda<=1000; this amendment uses 10 independent drug partitions, drug-grouped inner tuning and lambda<=10000. Its CI is NOT a reference interval for this audit."
+  },
+  "capacity_contrast": {
+   "annotation_partition0_gain": 0.145022,
+   "capacity_seed0_partition0_gain": 0.00533,
+   "difference": 0.139692,
+   "note": "descriptive zero-model specificity contrast; capacity was run on partition 0 only"
+  },
+  "ci95_cell": [
+   0.128835,
+   0.153969
+  ],
+  "ci95_pair": [
+   0.116415,
+   0.163036
+  ],
+  "ci95_twoway": [
+   0.111766,
+   0.168516
+  ],
+  "delta_min": 0.05,
+  "delta_min_operational": "rho=0.05 <=> Kendall tau=(2/pi)asin(0.05)=0.0318 <=> ~1.59 pp higher chance of correctly ordering a random pair of unseen combinations; a reliability minimum, not a utility threshold",
+  "fold_dispersion_formal_sensitivity": {
+   "max": 0.301134,
+   "mean": 0.141464,
+   "min": -0.03248,
+   "n_folds": 50,
+   "note": "formal sensitivity (AMENDMENT section 4/6); primary inference uses the drug-cluster bootstrap, not this t-interval",
+   "per_fold_gain": [
+    0.08191,
+    0.295175,
+    0.268134,
+    0.068095,
+    0.011798,
+    0.017452,
+    0.207464,
+    0.078719,
+    0.052358,
+    0.222062,
+    0.245649,
+    0.035886,
+    0.156153,
+    0.267829,
+    0.167482,
+    0.114791,
+    0.104669,
+    0.301134,
+    0.06877,
+    0.103986,
+    0.090244,
+    0.099729,
+    0.152724,
+    0.099132,
+    0.18364,
+    0.193213,
+    0.168352,
+    0.257624,
+    0.057154,
+    0.118113,
+    0.128308,
+    0.252917,
+    0.051274,
+    0.227884,
+    0.114059,
+    0.123423,
+    0.173088,
+    0.210685,
+    0.106939,
+    0.034243,
+    0.025302,
+    0.208584,
+    0.176723,
+    -0.03248,
+    0.117375,
+    0.284609,
+    0.145549,
+    0.187489,
+    0.1996,
+    0.048181
+   ],
+   "sd": 0.083518,
+   "se": 0.011811,
+   "t_interval_95_df49": [
+    0.117723,
+    0.165204
+   ]
+  },
+  "h196b": {
+   "difference_c130": 6.1e-05,
+   "difference_c130_ci95_drug": [
+    -0.000113,
+    0.00033
+   ],
+   "difference_ext": -0.000199,
+   "difference_ext_ci95_drug": [
+    -0.001013,
+    0.00034
+   ],
+   "grouped_c130_gain": 0.141261,
+   "grouped_ext_gain": 0.141464,
+   "grouped_ext_lambdas_head": [
+    10000.0,
+    3000.0,
+    1000.0,
+    3000.0,
+    0.1,
+    1000.0,
+    10000.0,
+    10000.0,
+    3000.0,
+    10000.0
+   ],
+   "material_optimism_flag_ext": false,
+   "note": "H196b is a reliability qualifier only; it does not change the pre-registered verdict rule (AMENDMENT section 5). Both schemes now use the identical fold-mean inner metric; the c130-grid variants are the C130 bridge.",
+   "rowlevel_c130_gain": 0.141323,
+   "rowlevel_c130_lambda_ceiling_hits": 43,
+   "rowlevel_ext_gain": 0.141264,
+   "rowlevel_ext_lambda_ceiling_hits": 31,
+   "rowlevel_ext_lambdas_head": [
+    3000.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    3000.0,
+    10000.0,
+    3000.0,
+    10000.0,
+    10000.0,
+    3000.0
+   ]
+  },
+  "large_gain_flag_descriptive_only": false,
+  "mde80_cell": 0.018345,
+  "mde80_pair": 0.033827,
+  "mde80_twoway": 0.040218,
+  "not_claims": [
+   "not an external replication",
+   "not an independent confirmation",
+   "no decision benefit",
+   "no mechanism"
+  ],
+  "null_arms": {
+   "capacity": {
+    "max": 0.009211,
+    "mean": 0.000874,
+    "min": -0.013071,
+    "n_seeds": 10,
+    "q025": -0.011122,
+    "q975": 0.008807,
+    "sd": 0.00674
+   },
+   "shuffle": {
+    "max": 0.049324,
+    "mean": -0.006231,
+    "min": -0.10396,
+    "n_seeds": 10,
+    "q025": -0.089544,
+    "q975": 0.048069,
+    "sd": 0.046087
+   }
+  },
+  "partition_dispersion": {
+   "leave_one_partition_out": [
+    {
+     "left_out_partition": 0,
+     "mean_gain": 0.141068
+    },
+    {
+     "left_out_partition": 1,
+     "mean_gain": 0.144336
+    },
+    {
+     "left_out_partition": 2,
+     "mean_gain": 0.137782
+    },
+    {
+     "left_out_partition": 3,
+     "mean_gain": 0.141774
+    },
+    {
+     "left_out_partition": 4,
+     "mean_gain": 0.143283
+    },
+    {
+     "left_out_partition": 5,
+     "mean_gain": 0.139527
+    },
+    {
+     "left_out_partition": 6,
+     "mean_gain": 0.139972
+    },
+    {
+     "left_out_partition": 7,
+     "mean_gain": 0.142774
+    },
+    {
+     "left_out_partition": 8,
+     "mean_gain": 0.146171
+    },
+    {
+     "left_out_partition": 9,
+     "mean_gain": 0.13795
+    }
+   ],
+   "max": 0.1746,
+   "mean": 0.141464,
+   "min": 0.099101,
+   "per_partition_gain": [
+    0.145022,
+    0.115611,
+    0.1746,
+    0.13867,
+    0.125094,
+    0.158891,
+    0.154888,
+    0.129675,
+    0.099101,
+    0.173085
+   ],
+   "sd": 0.024658,
+   "se": 0.007798,
+   "t_interval_95_df9": [
+    0.123826,
+    0.159102
+   ]
+  },
+  "point_estimate": 0.141464,
+  "primary_boot_sd": 0.030592,
+  "primary_ci95_drug": [
+   0.062468,
+   0.182579
+  ],
+  "primary_estimator": "mean of 50 fold-level gains (10 partitions x 5 folds)",
+  "primary_mde80": 0.08572,
+  "primary_unit": "held-out drugs (10 independent drug partitions; drug-cluster bootstrap)",
+  "stability_band": "no upper bound (AMENDMENT section 5); large_gain_flag recorded only",
+  "subtypes": [
+   "design_check_failed",
+   "primary_mde80_gt_delta_min"
+  ],
+  "verdict": "inconclusive",
+  "verdict_rule": "inconclusive if primary MDE80>delta_min or any design check fails; replicated if primary drug-cluster CI lower>0 and point>=delta_min and MDE80<=delta_min and design checks pass; weakened otherwise",
+  "wording_template": {
+   "inconclusive": "may not be written as a negative result; only as \"underpowered at the audit target unit / design check failed, unresolved\"",
+   "replicated_under_audit": "allowed only as: within AMENDMENT-001, the fixed 10 drug partitions and the declared primary unit (held-out drugs), the both-unseen gain point estimate is >=delta_min with drug-cluster CI lower>0 and primary MDE80<=delta_min; must be reported together with the drug CI/MDE and partition/fold dispersion; no claim of C130 replication/confirmation/magnitude recovery/decision use",
+   "weakened": "may not be written as C130 refuted or annotation useless; only as \"did not meet the audit-level minimum standard under this protocol\""
+  }
+ },
+ "log": [
+  "[1/12] verify input + load data ...",
+  "    units=108259 cells=125 drugs=65 pairs=2025 | ID=130 ANN=38",
+  "[2/12] build 10 independent drug partitions x 5 folds + inner folds ...",
+  "    total fold-level test rows across 10 partitions = 201576; pooled cells = 125",
+  "[3/12] block engine + equivalence check (E8) ...",
+  "    engine equivalence max|dense-engine| main=7.02e-13 path=1.97e-13",
+  "[4/12] identity-arm constancy check (partition 0) ...",
+  "    identity constant in 5/5 partition-0 folds -> rho=0.0 explicit convention for all folds",
+  "[5/12] null calibration: shuffle x10 (full design) + capacity x10 (partition 0) ...",
+  "    shuffle seed0 mean_rho=+0.0308 ceiling_hits=21",
+  "    shuffle seed1 mean_rho=-0.0045 ceiling_hits=22",
+  "    shuffle seed2 mean_rho=+0.0493 ceiling_hits=21",
+  "    shuffle seed3 mean_rho=-0.0399 ceiling_hits=23",
+  "    shuffle seed4 mean_rho=+0.0216 ceiling_hits=21",
+  "    shuffle seed5 mean_rho=-0.1040 ceiling_hits=13",
+  "    shuffle seed6 mean_rho=-0.0297 ceiling_hits=25",
+  "    shuffle seed7 mean_rho=-0.0133 ceiling_hits=17",
+  "    shuffle seed8 mean_rho=-0.0165 ceiling_hits=19",
+  "    shuffle seed9 mean_rho=+0.0437 ceiling_hits=16",
+  "    capacity seed0 mean_rho=+0.0053 (partition 0)",
+  "    capacity seed1 mean_rho=-0.0027 (partition 0)",
+  "    capacity seed2 mean_rho=+0.0035 (partition 0)",
+  "    capacity seed3 mean_rho=+0.0074 (partition 0)",
+  "    capacity seed4 mean_rho=+0.0059 (partition 0)",
+  "    capacity seed5 mean_rho=-0.0044 (partition 0)",
+  "    capacity seed6 mean_rho=-0.0131 (partition 0)",
+  "    capacity seed7 mean_rho=-0.0016 (partition 0)",
+  "    capacity seed8 mean_rho=-0.0009 (partition 0)",
+  "    capacity seed9 mean_rho=+0.0092 (partition 0)",
+  "[6/12] design checks + MDE design gate (E7) ...",
+  "    MDE80_design(drug, shuffle seed0) = 0.0823 (sd 0.0294) -> E7=False",
+  "    design gate (pre-scoring) = False",
+  "[7/12] treatment arms ...",
+  "    annotation=0.1415 (identity=0.0 explicit) gain=0.1415 | annonly=0.1398 | rowlevel_ext=0.1413 | rowlevel_c130=0.1413 | grouped_c130=0.1413",
+  "[8/12] primary drug bootstrap + cluster sensitivities ...",
+  "[9/12] partition-level + fold-level dispersion ...",
+  "    partition mean 0.1415 sd 0.0247 t-CI [0.1238,0.1591] | fold sd 0.0835",
+  "[10/12] H196b row-level vs grouped (paired drug bootstrap) ...",
+  "    rowlevel_ext - grouped_ext = -0.0002 CI [-0.001013, 0.00034] | c130-grid diff +0.0001",
+  "[11/12] capacity contrast + verdict ...",
+  "[12/12] write artefacts ..."
+ ],
+ "null_arms_per_seed": {
+  "capacity": {
+   "0": {
+    "mean_rho": 0.00533,
+    "n_defined": 5
+   },
+   "1": {
+    "mean_rho": -0.002698,
+    "n_defined": 5
+   },
+   "2": {
+    "mean_rho": 0.003539,
+    "n_defined": 5
+   },
+   "3": {
+    "mean_rho": 0.007415,
+    "n_defined": 5
+   },
+   "4": {
+    "mean_rho": 0.005896,
+    "n_defined": 5
+   },
+   "5": {
+    "mean_rho": -0.004411,
+    "n_defined": 5
+   },
+   "6": {
+    "mean_rho": -0.013071,
+    "n_defined": 5
+   },
+   "7": {
+    "mean_rho": -0.001613,
+    "n_defined": 5
+   },
+   "8": {
+    "mean_rho": -0.000855,
+    "n_defined": 5
+   },
+   "9": {
+    "mean_rho": 0.009211,
+    "n_defined": 5
+   }
+  },
+  "shuffle": {
+   "0": {
+    "lambda_ceiling_hits": 21,
+    "mean_rho": 0.030779,
+    "n_defined": 50
+   },
+   "1": {
+    "lambda_ceiling_hits": 22,
+    "mean_rho": -0.004468,
+    "n_defined": 50
+   },
+   "2": {
+    "lambda_ceiling_hits": 21,
+    "mean_rho": 0.049324,
+    "n_defined": 50
+   },
+   "3": {
+    "lambda_ceiling_hits": 23,
+    "mean_rho": -0.039889,
+    "n_defined": 50
+   },
+   "4": {
+    "lambda_ceiling_hits": 21,
+    "mean_rho": 0.021558,
+    "n_defined": 50
+   },
+   "5": {
+    "lambda_ceiling_hits": 13,
+    "mean_rho": -0.10396,
+    "n_defined": 50
+   },
+   "6": {
+    "lambda_ceiling_hits": 25,
+    "mean_rho": -0.029653,
+    "n_defined": 50
+   },
+   "7": {
+    "lambda_ceiling_hits": 17,
+    "mean_rho": -0.013258,
+    "n_defined": 50
+   },
+   "8": {
+    "lambda_ceiling_hits": 19,
+    "mean_rho": -0.016491,
+    "n_defined": 50
+   },
+   "9": {
+    "lambda_ceiling_hits": 16,
+    "mean_rho": 0.043746,
+    "n_defined": 50
+   }
+  }
+ },
+ "partitions": [
+  {
+   "folds": [
+    {
+     "fold": 0,
+     "n_held": 13,
+     "n_inner_train": [
+      25734,
+      29447,
+      28876
+     ],
+     "n_inner_val": [
+      7854,
+      5867,
+      6197
+     ],
+     "n_test": 5772,
+     "n_test_cells": 125,
+     "n_train": 64139,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 1,
+     "n_held": 13,
+     "n_inner_train": [
+      29572,
+      31699,
+      38090
+     ],
+     "n_inner_val": [
+      9671,
+      8441,
+      5812
+     ],
+     "n_test": 2664,
+     "n_test_cells": 125,
+     "n_train": 75437,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 2,
+     "n_held": 13,
+     "n_inner_train": [
+      24341,
+      32700,
+      44794
+     ],
+     "n_inner_val": [
+      13521,
+      8283,
+      3361
+     ],
+     "n_test": 2538,
+     "n_test_cells": 125,
+     "n_train": 76670,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 3,
+     "n_held": 13,
+     "n_inner_train": [
+      34186,
+      27301,
+      21936
+     ],
+     "n_inner_val": [
+      3754,
+      6817,
+      9583
+     ],
+     "n_test": 5223,
+     "n_test_cells": 125,
+     "n_train": 63269,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 4,
+     "n_held": 13,
+     "n_inner_train": [
+      19271,
+      33550,
+      35161
+     ],
+     "n_inner_val": [
+      12705,
+      4737,
+      4541
+     ],
+     "n_test": 4540,
+     "n_test_cells": 125,
+     "n_train": 65999,
+     "n_train_drugs": 52
+    }
+   ],
+   "held": {
+    "0": [
+     "AZD4547",
+     "Afatinib",
+     "Afatinib|Trametinib",
+     "Dactolisib",
+     "Galunisertib",
+     "LGK974",
+     "Lapatinib",
+     "MK-2206",
+     "Oxaliplatin",
+     "Palbociclib",
+     "Pictilisib",
+     "Ruxolitinib",
+     "Taselisib"
+    ],
+    "1": [
+     "AZD8055",
+     "BI-2536",
+     "Crizotinib",
+     "Irinotecan",
+     "JQ1",
+     "KU-55933",
+     "PF-4708671",
+     "SB216763",
+     "Sapitinib",
+     "Temozolomide",
+     "Vorinostat",
+     "Wee1 Inhibitor",
+     "ZM447439"
+    ],
+    "2": [
+     "Alisertib",
+     "Axitinib",
+     "Cisplatin",
+     "Dasatinib",
+     "Doramapimod",
+     "Entinostat",
+     "Erlotinib",
+     "GSK269962A",
+     "Olaparib",
+     "PD173074",
+     "SCH772984",
+     "Tozasertib",
+     "Uprosertib"
+    ],
+    "3": [
+     "5-Fluorouracil",
+     "AZD6482",
+     "BMS-754807",
+     "Bortezomib",
+     "Gemcitabine",
+     "Luminespib",
+     "MK-1775",
+     "NU7441",
+     "Nutlin-3a (-)",
+     "Ribociclib",
+     "SB505124",
+     "Sorafenib",
+     "Trametinib"
+    ],
+    "4": [
+     "AZD7762",
+     "Alpelisib",
+     "Camptothecin",
+     "Dabrafenib",
+     "Docetaxel",
+     "Linsitinib",
+     "Navitoclax",
+     "Nilotinib",
+     "OSI-027",
+     "Paclitaxel",
+     "RO-3306",
+     "Venetoclax",
+     "Vinorelbine"
+    ]
+   },
+   "mean_test_rows_per_fold": 4147.4,
+   "n_test_total": 20737,
+   "partition": 0
+  },
+  {
+   "folds": [
+    {
+     "fold": 0,
+     "n_held": 13,
+     "n_inner_train": [
+      26795,
+      28214,
+      30471
+     ],
+     "n_inner_val": [
+      7531,
+      6868,
+      5792
+     ],
+     "n_test": 4854,
+     "n_test_cells": 125,
+     "n_train": 65289,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 1,
+     "n_held": 13,
+     "n_inner_train": [
+      27431,
+      30616,
+      26896
+     ],
+     "n_inner_val": [
+      7100,
+      5608,
+      8083
+     ],
+     "n_test": 5123,
+     "n_test_cells": 125,
+     "n_train": 64152,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 2,
+     "n_held": 13,
+     "n_inner_train": [
+      24240,
+      29433,
+      37152
+     ],
+     "n_inner_val": [
+      10388,
+      7448,
+      4149
+     ],
+     "n_test": 3844,
+     "n_test_cells": 125,
+     "n_train": 68840,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 3,
+     "n_held": 13,
+     "n_inner_train": [
+      34111,
+      38136,
+      32000
+     ],
+     "n_inner_val": [
+      8889,
+      7742,
+      9304
+     ],
+     "n_test": 2456,
+     "n_test_cells": 122,
+     "n_train": 78312,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 4,
+     "n_held": 13,
+     "n_inner_train": [
+      26917,
+      33423,
+      29782
+     ],
+     "n_inner_val": [
+      8757,
+      5693,
+      7121
+     ],
+     "n_test": 4090,
+     "n_test_cells": 125,
+     "n_train": 68551,
+     "n_train_drugs": 52
+    }
+   ],
+   "held": {
+    "0": [
+     "AZD7762",
+     "Axitinib",
+     "Camptothecin",
+     "Crizotinib",
+     "Entinostat",
+     "JQ1",
+     "MK-1775",
+     "PD173074",
+     "Ribociclib",
+     "Tozasertib",
+     "Trametinib",
+     "Venetoclax",
+     "Vinorelbine"
+    ],
+    "1": [
+     "5-Fluorouracil",
+     "AZD4547",
+     "Afatinib",
+     "Alpelisib",
+     "BI-2536",
+     "Cisplatin",
+     "MK-2206",
+     "Navitoclax",
+     "OSI-027",
+     "PF-4708671",
+     "Pictilisib",
+     "Temozolomide",
+     "Uprosertib"
+    ],
+    "2": [
+     "AZD6482",
+     "AZD8055",
+     "Afatinib|Trametinib",
+     "Docetaxel",
+     "Doramapimod",
+     "Galunisertib",
+     "Lapatinib",
+     "Linsitinib",
+     "Luminespib",
+     "Nutlin-3a (-)",
+     "Ruxolitinib",
+     "Sapitinib",
+     "ZM447439"
+    ],
+    "3": [
+     "Alisertib",
+     "BMS-754807",
+     "Dabrafenib",
+     "Dactolisib",
+     "Dasatinib",
+     "Erlotinib",
+     "NU7441",
+     "Nilotinib",
+     "Olaparib",
+     "Oxaliplatin",
+     "Paclitaxel",
+     "SB216763",
+     "SB505124"
+    ],
+    "4": [
+     "Bortezomib",
+     "GSK269962A",
+     "Gemcitabine",
+     "Irinotecan",
+     "KU-55933",
+     "LGK974",
+     "Palbociclib",
+     "RO-3306",
+     "SCH772984",
+     "Sorafenib",
+     "Taselisib",
+     "Vorinostat",
+     "Wee1 Inhibitor"
+    ]
+   },
+   "mean_test_rows_per_fold": 4073.4,
+   "n_test_total": 20367,
+   "partition": 1
+  },
+  {
+   "folds": [
+    {
+     "fold": 0,
+     "n_held": 13,
+     "n_inner_train": [
+      26358,
+      27936,
+      40230
+     ],
+     "n_inner_val": [
+      9917,
+      9425,
+      4168
+     ],
+     "n_test": 3249,
+     "n_test_cells": 125,
+     "n_train": 71014,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 1,
+     "n_held": 13,
+     "n_inner_train": [
+      31055,
+      33933,
+      39579
+     ],
+     "n_inner_val": [
+      10224,
+      8825,
+      6052
+     ],
+     "n_test": 1791,
+     "n_test_cells": 125,
+     "n_train": 79466,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 2,
+     "n_held": 13,
+     "n_inner_train": [
+      31161,
+      28542,
+      25695
+     ],
+     "n_inner_val": [
+      5656,
+      6660,
+      8086
+     ],
+     "n_test": 4972,
+     "n_test_cells": 125,
+     "n_train": 64996,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 3,
+     "n_held": 13,
+     "n_inner_train": [
+      31016,
+      30573,
+      28852
+     ],
+     "n_inner_val": [
+      6559,
+      7381,
+      8121
+     ],
+     "n_test": 4008,
+     "n_test_cells": 125,
+     "n_train": 68380,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 4,
+     "n_held": 13,
+     "n_inner_train": [
+      25354,
+      25424,
+      29173
+     ],
+     "n_inner_val": [
+      6905,
+      6831,
+      5255
+     ],
+     "n_test": 6019,
+     "n_test_cells": 125,
+     "n_train": 60960,
+     "n_train_drugs": 52
+    }
+   ],
+   "held": {
+    "0": [
+     "Alpelisib",
+     "Camptothecin",
+     "Crizotinib",
+     "Dabrafenib",
+     "Dasatinib",
+     "Entinostat",
+     "JQ1",
+     "Nutlin-3a (-)",
+     "PF-4708671",
+     "RO-3306",
+     "SCH772984",
+     "Taselisib",
+     "Tozasertib"
+    ],
+    "1": [
+     "AZD4547",
+     "AZD6482",
+     "Alisertib",
+     "Axitinib",
+     "BI-2536",
+     "Bortezomib",
+     "Doramapimod",
+     "Irinotecan",
+     "NU7441",
+     "Palbociclib",
+     "SB505124",
+     "Sorafenib",
+     "Vinorelbine"
+    ],
+    "2": [
+     "AZD7762",
+     "AZD8055",
+     "Afatinib",
+     "Afatinib|Trametinib",
+     "Erlotinib",
+     "GSK269962A",
+     "Gemcitabine",
+     "LGK974",
+     "OSI-027",
+     "Oxaliplatin",
+     "PD173074",
+     "Trametinib",
+     "Uprosertib"
+    ],
+    "3": [
+     "BMS-754807",
+     "Cisplatin",
+     "Galunisertib",
+     "KU-55933",
+     "Luminespib",
+     "MK-1775",
+     "MK-2206",
+     "Paclitaxel",
+     "Pictilisib",
+     "Ruxolitinib",
+     "Sapitinib",
+     "Venetoclax",
+     "Wee1 Inhibitor"
+    ],
+    "4": [
+     "5-Fluorouracil",
+     "Dactolisib",
+     "Docetaxel",
+     "Lapatinib",
+     "Linsitinib",
+     "Navitoclax",
+     "Nilotinib",
+     "Olaparib",
+     "Ribociclib",
+     "SB216763",
+     "Temozolomide",
+     "Vorinostat",
+     "ZM447439"
+    ]
+   },
+   "mean_test_rows_per_fold": 4007.8,
+   "n_test_total": 20039,
+   "partition": 2
+  },
+  {
+   "folds": [
+    {
+     "fold": 0,
+     "n_held": 13,
+     "n_inner_train": [
+      26888,
+      31360,
+      23352
+     ],
+     "n_inner_val": [
+      6458,
+      4722,
+      8527
+     ],
+     "n_test": 6083,
+     "n_test_cells": 125,
+     "n_train": 61893,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 1,
+     "n_held": 13,
+     "n_inner_train": [
+      33222,
+      30423,
+      29171
+     ],
+     "n_inner_val": [
+      6218,
+      7761,
+      8282
+     ],
+     "n_test": 3703,
+     "n_test_cells": 125,
+     "n_train": 70555,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 2,
+     "n_held": 13,
+     "n_inner_train": [
+      32015,
+      36823,
+      33837
+     ],
+     "n_inner_val": [
+      9205,
+      6912,
+      8444
+     ],
+     "n_test": 1918,
+     "n_test_cells": 124,
+     "n_train": 78114,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 3,
+     "n_held": 13,
+     "n_inner_train": [
+      24547,
+      30545,
+      33561
+     ],
+     "n_inner_val": [
+      9786,
+      6333,
+      5410
+     ],
+     "n_test": 4585,
+     "n_test_cells": 125,
+     "n_train": 67124,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 4,
+     "n_held": 13,
+     "n_inner_train": [
+      33307,
+      35448,
+      20946
+     ],
+     "n_inner_val": [
+      5373,
+      4514,
+      11904
+     ],
+     "n_test": 4530,
+     "n_test_cells": 125,
+     "n_train": 67910,
+     "n_train_drugs": 52
+    }
+   ],
+   "held": {
+    "0": [
+     "5-Fluorouracil",
+     "Cisplatin",
+     "Dabrafenib",
+     "JQ1",
+     "Lapatinib",
+     "NU7441",
+     "Nutlin-3a (-)",
+     "OSI-027",
+     "Pictilisib",
+     "Sorafenib",
+     "Taselisib",
+     "Tozasertib",
+     "Vorinostat"
+    ],
+    "1": [
+     "AZD6482",
+     "Afatinib|Trametinib",
+     "Alpelisib",
+     "Axitinib",
+     "BMS-754807",
+     "Crizotinib",
+     "Erlotinib",
+     "GSK269962A",
+     "Galunisertib",
+     "Irinotecan",
+     "LGK974",
+     "MK-2206",
+     "Palbociclib"
+    ],
+    "2": [
+     "AZD4547",
+     "BI-2536",
+     "Dactolisib",
+     "Doramapimod",
+     "Gemcitabine",
+     "Paclitaxel",
+     "Ribociclib",
+     "Ruxolitinib",
+     "SB216763",
+     "SCH772984",
+     "Sapitinib",
+     "Venetoclax",
+     "Wee1 Inhibitor"
+    ],
+    "3": [
+     "AZD7762",
+     "Afatinib",
+     "Dasatinib",
+     "Docetaxel",
+     "Entinostat",
+     "Luminespib",
+     "MK-1775",
+     "Nilotinib",
+     "PD173074",
+     "RO-3306",
+     "Temozolomide",
+     "Trametinib",
+     "Uprosertib"
+    ],
+    "4": [
+     "AZD8055",
+     "Alisertib",
+     "Bortezomib",
+     "Camptothecin",
+     "KU-55933",
+     "Linsitinib",
+     "Navitoclax",
+     "Olaparib",
+     "Oxaliplatin",
+     "PF-4708671",
+     "SB505124",
+     "Vinorelbine",
+     "ZM447439"
+    ]
+   },
+   "mean_test_rows_per_fold": 4163.8,
+   "n_test_total": 20819,
+   "partition": 3
+  },
+  {
+   "folds": [
+    {
+     "fold": 0,
+     "n_held": 13,
+     "n_inner_train": [
+      29178,
+      28866,
+      29218
+     ],
+     "n_inner_val": [
+      7241,
+      6879,
+      7133
+     ],
+     "n_test": 4644,
+     "n_test_cells": 125,
+     "n_train": 66009,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 1,
+     "n_held": 13,
+     "n_inner_train": [
+      30535,
+      33977,
+      28146
+     ],
+     "n_inner_val": [
+      7573,
+      5795,
+      8773
+     ],
+     "n_test": 3525,
+     "n_test_cells": 125,
+     "n_train": 70517,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 2,
+     "n_held": 13,
+     "n_inner_train": [
+      25774,
+      29474,
+      35924
+     ],
+     "n_inner_val": [
+      9700,
+      7536,
+      4754
+     ],
+     "n_test": 3769,
+     "n_test_cells": 125,
+     "n_train": 69182,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 3,
+     "n_held": 13,
+     "n_inner_train": [
+      21754,
+      25416,
+      37773
+     ],
+     "n_inner_val": [
+      9997,
+      8075,
+      2798
+     ],
+     "n_test": 5152,
+     "n_test_cells": 125,
+     "n_train": 64073,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 4,
+     "n_held": 13,
+     "n_inner_train": [
+      34260,
+      28664,
+      35478
+     ],
+     "n_inner_val": [
+      7250,
+      10003,
+      6543
+     ],
+     "n_test": 2520,
+     "n_test_cells": 124,
+     "n_train": 74606,
+     "n_train_drugs": 52
+    }
+   ],
+   "held": {
+    "0": [
+     "AZD4547",
+     "Axitinib",
+     "BMS-754807",
+     "Cisplatin",
+     "Dabrafenib",
+     "Doramapimod",
+     "OSI-027",
+     "Olaparib",
+     "Paclitaxel",
+     "Palbociclib",
+     "Ruxolitinib",
+     "SB216763",
+     "SB505124"
+    ],
+    "1": [
+     "Afatinib",
+     "Bortezomib",
+     "Dactolisib",
+     "Docetaxel",
+     "Galunisertib",
+     "JQ1",
+     "LGK974",
+     "Lapatinib",
+     "MK-2206",
+     "Nilotinib",
+     "Sapitinib",
+     "Sorafenib",
+     "Venetoclax"
+    ],
+    "2": [
+     "5-Fluorouracil",
+     "AZD6482",
+     "AZD8055",
+     "Alpelisib",
+     "BI-2536",
+     "Gemcitabine",
+     "Linsitinib",
+     "NU7441",
+     "Oxaliplatin",
+     "Pictilisib",
+     "RO-3306",
+     "SCH772984",
+     "Vinorelbine"
+    ],
+    "3": [
+     "AZD7762",
+     "Afatinib|Trametinib",
+     "Dasatinib",
+     "Luminespib",
+     "Navitoclax",
+     "Nutlin-3a (-)",
+     "PD173074",
+     "PF-4708671",
+     "Temozolomide",
+     "Tozasertib",
+     "Trametinib",
+     "Vorinostat",
+     "Wee1 Inhibitor"
+    ],
+    "4": [
+     "Alisertib",
+     "Camptothecin",
+     "Crizotinib",
+     "Entinostat",
+     "Erlotinib",
+     "GSK269962A",
+     "Irinotecan",
+     "KU-55933",
+     "MK-1775",
+     "Ribociclib",
+     "Taselisib",
+     "Uprosertib",
+     "ZM447439"
+    ]
+   },
+   "mean_test_rows_per_fold": 3922.0,
+   "n_test_total": 19610,
+   "partition": 4
+  },
+  {
+   "folds": [
+    {
+     "fold": 0,
+     "n_held": 13,
+     "n_inner_train": [
+      29872,
+      31741,
+      21227
+     ],
+     "n_inner_val": [
+      5410,
+      4676,
+      9906
+     ],
+     "n_test": 5400,
+     "n_test_cells": 125,
+     "n_train": 62848,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 1,
+     "n_held": 13,
+     "n_inner_train": [
+      32627,
+      37496,
+      30879
+     ],
+     "n_inner_val": [
+      8539,
+      6173,
+      9571
+     ],
+     "n_test": 2224,
+     "n_test_cells": 125,
+     "n_train": 76719,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 2,
+     "n_held": 13,
+     "n_inner_train": [
+      35261,
+      26775,
+      33765
+     ],
+     "n_inner_val": [
+      5973,
+      10336,
+      6648
+     ],
+     "n_test": 2954,
+     "n_test_cells": 125,
+     "n_train": 72844,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 3,
+     "n_held": 13,
+     "n_inner_train": [
+      24515,
+      28866,
+      28398
+     ],
+     "n_inner_val": [
+      7761,
+      5607,
+      6888
+     ],
+     "n_test": 5933,
+     "n_test_cells": 125,
+     "n_train": 61523,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 4,
+     "n_held": 13,
+     "n_inner_train": [
+      35257,
+      26518,
+      31291
+     ],
+     "n_inner_val": [
+      5497,
+      9602,
+      7143
+     ],
+     "n_test": 3470,
+     "n_test_cells": 125,
+     "n_train": 70824,
+     "n_train_drugs": 52
+    }
+   ],
+   "held": {
+    "0": [
+     "Afatinib|Trametinib",
+     "Bortezomib",
+     "Camptothecin",
+     "Cisplatin",
+     "Crizotinib",
+     "Dactolisib",
+     "LGK974",
+     "Navitoclax",
+     "OSI-027",
+     "Oxaliplatin",
+     "Ribociclib",
+     "SB216763",
+     "Temozolomide"
+    ],
+    "1": [
+     "AZD8055",
+     "BI-2536",
+     "Docetaxel",
+     "Doramapimod",
+     "Entinostat",
+     "GSK269962A",
+     "Irinotecan",
+     "JQ1",
+     "MK-2206",
+     "Nilotinib",
+     "Olaparib",
+     "Ruxolitinib",
+     "Sorafenib"
+    ],
+    "2": [
+     "AZD7762",
+     "Alisertib",
+     "Alpelisib",
+     "Axitinib",
+     "Erlotinib",
+     "NU7441",
+     "Nutlin-3a (-)",
+     "Paclitaxel",
+     "RO-3306",
+     "SCH772984",
+     "Sapitinib",
+     "Uprosertib",
+     "Venetoclax"
+    ],
+    "3": [
+     "Afatinib",
+     "Dasatinib",
+     "KU-55933",
+     "Linsitinib",
+     "MK-1775",
+     "Palbociclib",
+     "Pictilisib",
+     "SB505124",
+     "Taselisib",
+     "Trametinib",
+     "Vinorelbine",
+     "Wee1 Inhibitor",
+     "ZM447439"
+    ],
+    "4": [
+     "5-Fluorouracil",
+     "AZD4547",
+     "AZD6482",
+     "BMS-754807",
+     "Dabrafenib",
+     "Galunisertib",
+     "Gemcitabine",
+     "Lapatinib",
+     "Luminespib",
+     "PD173074",
+     "PF-4708671",
+     "Tozasertib",
+     "Vorinostat"
+    ]
+   },
+   "mean_test_rows_per_fold": 3996.2,
+   "n_test_total": 19981,
+   "partition": 5
+  },
+  {
+   "folds": [
+    {
+     "fold": 0,
+     "n_held": 13,
+     "n_inner_train": [
+      27982,
+      31254,
+      33653
+     ],
+     "n_inner_val": [
+      8896,
+      7097,
+      6100
+     ],
+     "n_test": 3523,
+     "n_test_cells": 125,
+     "n_train": 70796,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 1,
+     "n_held": 13,
+     "n_inner_train": [
+      41774,
+      32461,
+      30481
+     ],
+     "n_inner_val": [
+      5821,
+      9432,
+      10355
+     ],
+     "n_test": 2004,
+     "n_test_cells": 125,
+     "n_train": 79108,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 2,
+     "n_held": 13,
+     "n_inner_train": [
+      33940,
+      32011,
+      29374
+     ],
+     "n_inner_val": [
+      6469,
+      7411,
+      8706
+     ],
+     "n_test": 2977,
+     "n_test_cells": 125,
+     "n_train": 72739,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 3,
+     "n_held": 13,
+     "n_inner_train": [
+      28251,
+      20997,
+      24123
+     ],
+     "n_inner_val": [
+      4166,
+      7446,
+      5924
+     ],
+     "n_test": 7476,
+     "n_test_cells": 125,
+     "n_train": 55835,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 4,
+     "n_held": 13,
+     "n_inner_train": [
+      22951,
+      38242,
+      27398
+     ],
+     "n_inner_val": [
+      10460,
+      3290,
+      7997
+     ],
+     "n_test": 4565,
+     "n_test_cells": 125,
+     "n_train": 66844,
+     "n_train_drugs": 52
+    }
+   ],
+   "held": {
+    "0": [
+     "5-Fluorouracil",
+     "Bortezomib",
+     "JQ1",
+     "Linsitinib",
+     "Luminespib",
+     "MK-2206",
+     "NU7441",
+     "RO-3306",
+     "Ruxolitinib",
+     "SB216763",
+     "Tozasertib",
+     "Uprosertib",
+     "Wee1 Inhibitor"
+    ],
+    "1": [
+     "AZD8055",
+     "BI-2536",
+     "BMS-754807",
+     "Camptothecin",
+     "Dactolisib",
+     "Docetaxel",
+     "Erlotinib",
+     "GSK269962A",
+     "Galunisertib",
+     "Irinotecan",
+     "PF-4708671",
+     "Palbociclib",
+     "SB505124"
+    ],
+    "2": [
+     "AZD4547",
+     "AZD6482",
+     "Afatinib",
+     "Afatinib|Trametinib",
+     "Dasatinib",
+     "Doramapimod",
+     "LGK974",
+     "Lapatinib",
+     "MK-1775",
+     "OSI-027",
+     "Pictilisib",
+     "Ribociclib",
+     "ZM447439"
+    ],
+    "3": [
+     "Alisertib",
+     "Cisplatin",
+     "Crizotinib",
+     "Dabrafenib",
+     "Gemcitabine",
+     "Navitoclax",
+     "Nilotinib",
+     "Olaparib",
+     "Oxaliplatin",
+     "Sapitinib",
+     "Taselisib",
+     "Temozolomide",
+     "Vinorelbine"
+    ],
+    "4": [
+     "AZD7762",
+     "Alpelisib",
+     "Axitinib",
+     "Entinostat",
+     "KU-55933",
+     "Nutlin-3a (-)",
+     "PD173074",
+     "Paclitaxel",
+     "SCH772984",
+     "Sorafenib",
+     "Trametinib",
+     "Venetoclax",
+     "Vorinostat"
+    ]
+   },
+   "mean_test_rows_per_fold": 4109.0,
+   "n_test_total": 20545,
+   "partition": 6
+  },
+  {
+   "folds": [
+    {
+     "fold": 0,
+     "n_held": 13,
+     "n_inner_train": [
+      30702,
+      32661,
+      22933
+     ],
+     "n_inner_val": [
+      6128,
+      5368,
+      9723
+     ],
+     "n_test": 4781,
+     "n_test_cells": 125,
+     "n_train": 65077,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 1,
+     "n_held": 13,
+     "n_inner_train": [
+      29881,
+      36857,
+      30285
+     ],
+     "n_inner_val": [
+      8951,
+      5710,
+      8830
+     ],
+     "n_test": 3250,
+     "n_test_cells": 125,
+     "n_train": 73532,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 2,
+     "n_held": 13,
+     "n_inner_train": [
+      28688,
+      33936,
+      29759
+     ],
+     "n_inner_val": [
+      8397,
+      6194,
+      7619
+     ],
+     "n_test": 3661,
+     "n_test_cells": 125,
+     "n_train": 70173,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 3,
+     "n_held": 13,
+     "n_inner_train": [
+      23080,
+      30593,
+      31399
+     ],
+     "n_inner_val": [
+      9779,
+      5938,
+      5119
+     ],
+     "n_test": 5045,
+     "n_test_cells": 125,
+     "n_train": 64236,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 4,
+     "n_held": 13,
+     "n_inner_train": [
+      30142,
+      34311,
+      29899
+     ],
+     "n_inner_val": [
+      8017,
+      6163,
+      8401
+     ],
+     "n_test": 3275,
+     "n_test_cells": 125,
+     "n_train": 71771,
+     "n_train_drugs": 52
+    }
+   ],
+   "held": {
+    "0": [
+     "Afatinib|Trametinib",
+     "Camptothecin",
+     "Entinostat",
+     "Gemcitabine",
+     "Linsitinib",
+     "Navitoclax",
+     "OSI-027",
+     "Paclitaxel",
+     "RO-3306",
+     "SCH772984",
+     "Sapitinib",
+     "Uprosertib",
+     "ZM447439"
+    ],
+    "1": [
+     "5-Fluorouracil",
+     "Afatinib",
+     "BI-2536",
+     "Cisplatin",
+     "Dactolisib",
+     "Erlotinib",
+     "KU-55933",
+     "LGK974",
+     "Ribociclib",
+     "Ruxolitinib",
+     "Sorafenib",
+     "Taselisib",
+     "Tozasertib"
+    ],
+    "2": [
+     "AZD8055",
+     "Axitinib",
+     "BMS-754807",
+     "Docetaxel",
+     "Doramapimod",
+     "Irinotecan",
+     "JQ1",
+     "Lapatinib",
+     "Pictilisib",
+     "SB216763",
+     "SB505124",
+     "Temozolomide",
+     "Trametinib"
+    ],
+    "3": [
+     "AZD4547",
+     "Alpelisib",
+     "Bortezomib",
+     "Dabrafenib",
+     "Dasatinib",
+     "MK-1775",
+     "MK-2206",
+     "Nilotinib",
+     "Olaparib",
+     "Palbociclib",
+     "Venetoclax",
+     "Vinorelbine",
+     "Vorinostat"
+    ],
+    "4": [
+     "AZD6482",
+     "AZD7762",
+     "Alisertib",
+     "Crizotinib",
+     "GSK269962A",
+     "Galunisertib",
+     "Luminespib",
+     "NU7441",
+     "Nutlin-3a (-)",
+     "Oxaliplatin",
+     "PD173074",
+     "PF-4708671",
+     "Wee1 Inhibitor"
+    ]
+   },
+   "mean_test_rows_per_fold": 4002.4,
+   "n_test_total": 20012,
+   "partition": 7
+  },
+  {
+   "folds": [
+    {
+     "fold": 0,
+     "n_held": 13,
+     "n_inner_train": [
+      27611,
+      30016,
+      30797
+     ],
+     "n_inner_val": [
+      7868,
+      6533,
+      6846
+     ],
+     "n_test": 4317,
+     "n_test_cells": 125,
+     "n_train": 67177,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 1,
+     "n_held": 13,
+     "n_inner_train": [
+      22075,
+      34090,
+      27979
+     ],
+     "n_inner_val": [
+      10176,
+      4407,
+      6524
+     ],
+     "n_test": 5553,
+     "n_test_cells": 125,
+     "n_train": 63037,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 2,
+     "n_held": 13,
+     "n_inner_train": [
+      34563,
+      32575,
+      28719
+     ],
+     "n_inner_val": [
+      6433,
+      7225,
+      9540
+     ],
+     "n_test": 2988,
+     "n_test_cells": 125,
+     "n_train": 72659,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 3,
+     "n_held": 13,
+     "n_inner_train": [
+      27701,
+      31473,
+      43016
+     ],
+     "n_inner_val": [
+      11480,
+      9078,
+      4573
+     ],
+     "n_test": 2215,
+     "n_test_cells": 125,
+     "n_train": 77059,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 4,
+     "n_held": 13,
+     "n_inner_train": [
+      29181,
+      25693,
+      30533
+     ],
+     "n_inner_val": [
+      6416,
+      8084,
+      6080
+     ],
+     "n_test": 4909,
+     "n_test_cells": 125,
+     "n_train": 64827,
+     "n_train_drugs": 52
+    }
+   ],
+   "held": {
+    "0": [
+     "AZD7762",
+     "Afatinib",
+     "Alpelisib",
+     "GSK269962A",
+     "Galunisertib",
+     "Luminespib",
+     "MK-1775",
+     "Nutlin-3a (-)",
+     "PF-4708671",
+     "RO-3306",
+     "SB216763",
+     "Taselisib",
+     "Venetoclax"
+    ],
+    "1": [
+     "5-Fluorouracil",
+     "BI-2536",
+     "Bortezomib",
+     "Docetaxel",
+     "Doramapimod",
+     "Irinotecan",
+     "JQ1",
+     "Lapatinib",
+     "Linsitinib",
+     "MK-2206",
+     "Olaparib",
+     "Temozolomide",
+     "Uprosertib"
+    ],
+    "2": [
+     "Afatinib|Trametinib",
+     "BMS-754807",
+     "Cisplatin",
+     "Dabrafenib",
+     "Dasatinib",
+     "Entinostat",
+     "Erlotinib",
+     "PD173074",
+     "SCH772984",
+     "Tozasertib",
+     "Trametinib",
+     "Vorinostat",
+     "Wee1 Inhibitor"
+    ],
+    "3": [
+     "AZD4547",
+     "AZD6482",
+     "Alisertib",
+     "Dactolisib",
+     "KU-55933",
+     "Navitoclax",
+     "Nilotinib",
+     "Pictilisib",
+     "Ruxolitinib",
+     "SB505124",
+     "Sapitinib",
+     "Sorafenib",
+     "Vinorelbine"
+    ],
+    "4": [
+     "AZD8055",
+     "Axitinib",
+     "Camptothecin",
+     "Crizotinib",
+     "Gemcitabine",
+     "LGK974",
+     "NU7441",
+     "OSI-027",
+     "Oxaliplatin",
+     "Paclitaxel",
+     "Palbociclib",
+     "Ribociclib",
+     "ZM447439"
+    ]
+   },
+   "mean_test_rows_per_fold": 3996.4,
+   "n_test_total": 19982,
+   "partition": 8
+  },
+  {
+   "folds": [
+    {
+     "fold": 0,
+     "n_held": 13,
+     "n_inner_train": [
+      29601,
+      29113,
+      33441
+     ],
+     "n_inner_val": [
+      8049,
+      8157,
+      5924
+     ],
+     "n_test": 3607,
+     "n_test_cells": 125,
+     "n_train": 70025,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 1,
+     "n_held": 13,
+     "n_inner_train": [
+      30382,
+      37467,
+      28178
+     ],
+     "n_inner_val": [
+      8479,
+      5274,
+      9414
+     ],
+     "n_test": 3015,
+     "n_test_cells": 125,
+     "n_train": 72860,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 2,
+     "n_held": 13,
+     "n_inner_train": [
+      24873,
+      36435,
+      29815
+     ],
+     "n_inner_val": [
+      10160,
+      4492,
+      7510
+     ],
+     "n_test": 3870,
+     "n_test_cells": 125,
+     "n_train": 68961,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 3,
+     "n_held": 13,
+     "n_inner_train": [
+      34695,
+      27827,
+      23973
+     ],
+     "n_inner_val": [
+      4149,
+      7208,
+      9586
+     ],
+     "n_test": 4667,
+     "n_test_cells": 125,
+     "n_train": 65552,
+     "n_train_drugs": 52
+    },
+    {
+     "fold": 4,
+     "n_held": 13,
+     "n_inner_train": [
+      30416,
+      29546,
+      28547
+     ],
+     "n_inner_val": [
+      6406,
+      7405,
+      7835
+     ],
+     "n_test": 4325,
+     "n_test_cells": 125,
+     "n_train": 66863,
+     "n_train_drugs": 52
+    }
+   ],
+   "held": {
+    "0": [
+     "AZD6482",
+     "Axitinib",
+     "BMS-754807",
+     "Crizotinib",
+     "Dasatinib",
+     "Doramapimod",
+     "Linsitinib",
+     "MK-2206",
+     "Ribociclib",
+     "Sapitinib",
+     "Tozasertib",
+     "Uprosertib",
+     "Wee1 Inhibitor"
+    ],
+    "1": [
+     "5-Fluorouracil",
+     "Afatinib",
+     "Bortezomib",
+     "Docetaxel",
+     "Erlotinib",
+     "JQ1",
+     "Navitoclax",
+     "Nilotinib",
+     "PF-4708671",
+     "Ruxolitinib",
+     "SB505124",
+     "Temozolomide",
+     "Venetoclax"
+    ],
+    "2": [
+     "Afatinib|Trametinib",
+     "Alisertib",
+     "BI-2536",
+     "Camptothecin",
+     "Cisplatin",
+     "Dabrafenib",
+     "Galunisertib",
+     "LGK974",
+     "Lapatinib",
+     "Pictilisib",
+     "SB216763",
+     "Sorafenib",
+     "Trametinib"
+    ],
+    "3": [
+     "AZD4547",
+     "Dactolisib",
+     "Entinostat",
+     "GSK269962A",
+     "Gemcitabine",
+     "Irinotecan",
+     "Nutlin-3a (-)",
+     "OSI-027",
+     "Olaparib",
+     "RO-3306",
+     "SCH772984",
+     "Taselisib",
+     "Vorinostat"
+    ],
+    "4": [
+     "AZD7762",
+     "AZD8055",
+     "Alpelisib",
+     "KU-55933",
+     "Luminespib",
+     "MK-1775",
+     "NU7441",
+     "Oxaliplatin",
+     "PD173074",
+     "Paclitaxel",
+     "Palbociclib",
+     "Vinorelbine",
+     "ZM447439"
+    ]
+   },
+   "mean_test_rows_per_fold": 3896.8,
+   "n_test_total": 19484,
+   "partition": 9
+  }
+ ],
+ "protocol": {
+  "path": "AMENDMENT_R196.md",
+  "sha256": "6986b008ca799c3456076a630e92a04912bd3ea389ede3f83734a5607e855289"
+ },
+ "script": {
+  "path": "r196_v2.py",
+  "sha256": "3e4bae43cec54cb06da95774c4c78a762885f757b415c734078c2ac9743c4e17"
+ },
+ "settings": {
+  "const_tol": 1e-09,
+  "delta_min": 0.05,
+  "identity_convention": "rho(identity)=0.0 at both-unseen test (constant predictions; asserted on partition 0, constructive for all folds)",
+  "lambdas_c130": [
+   0.1,
+   0.3,
+   1.0,
+   3.0,
+   10.0,
+   30.0,
+   100.0,
+   300.0,
+   1000.0
+  ],
+  "lambdas_ext": [
+   0.1,
+   0.3,
+   1.0,
+   3.0,
+   10.0,
+   30.0,
+   100.0,
+   300.0,
+   1000.0,
+   3000.0,
+   10000.0
+  ],
+  "large_gain_flag_threshold": 0.2,
+  "material_optimism_threshold": 0.05,
+  "n_boot_primary": 2000,
+  "n_boot_sensitivity": 1000,
+  "n_folds": 5,
+  "n_inner_folds": 3,
+  "n_null_seeds": 10,
+  "n_partitions": 10,
+  "primary_estimator": "mean of 50 fold-level gains (10 partitions x 5 drug folds)",
+  "seed_boot_drug": 20961027,
+  "seed_cap_base": 20265027,
+  "seed_inner_base": 20761027,
+  "seed_part_base": 20261027,
+  "seed_row_base": 20861027,
+  "seed_shuf_base": 20266027
+ },
+ "supersedes": {
+  "challenge": "challenge_R196.md",
+  "revocation": "REVOCATION_R196.md",
+  "v1_protocol": "PROTOCOL_R196.md",
+  "v1_verdict_withdrawn": "replicated_under_audit"
+ },
+ "treatment": {
+  "annotation": {
+   "fold_rhos": [
+    0.08191,
+    0.295175,
+    0.268134,
+    0.068095,
+    0.011798,
+    0.017452,
+    0.207464,
+    0.078719,
+    0.052358,
+    0.222062,
+    0.245649,
+    0.035886,
+    0.156153,
+    0.267829,
+    0.167482,
+    0.114791,
+    0.104669,
+    0.301134,
+    0.06877,
+    0.103986,
+    0.090244,
+    0.099729,
+    0.152724,
+    0.099132,
+    0.18364,
+    0.193213,
+    0.168352,
+    0.257624,
+    0.057154,
+    0.118113,
+    0.128308,
+    0.252917,
+    0.051274,
+    0.227884,
+    0.114059,
+    0.123423,
+    0.173088,
+    0.210685,
+    0.106939,
+    0.034243,
+    0.025302,
+    0.208584,
+    0.176723,
+    -0.03248,
+    0.117375,
+    0.284609,
+    0.145549,
+    0.187489,
+    0.1996,
+    0.048181
+   ],
+   "lambda_ceiling_hits": 26,
+   "lambdas_per_fold": [
+    10000.0,
+    3000.0,
+    1000.0,
+    3000.0,
+    0.1,
+    1000.0,
+    10000.0,
+    10000.0,
+    3000.0,
+    10000.0,
+    10000.0,
+    300.0,
+    1000.0,
+    3000.0,
+    10000.0,
+    3000.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    0.1,
+    10000.0,
+    10000.0,
+    3000.0,
+    100.0,
+    10000.0,
+    3000.0,
+    10000.0,
+    10000.0,
+    1000.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    1000.0,
+    10000.0,
+    3000.0,
+    1000.0,
+    10000.0,
+    0.1,
+    3000.0,
+    0.1,
+    10000.0,
+    10000.0,
+    1000.0,
+    10000.0,
+    10000.0,
+    1000.0,
+    0.1
+   ],
+   "mean_rho": 0.141464,
+   "n_constant": 0,
+   "n_fallback": 0,
+   "n_folds": 50
+  },
+  "annotation_only": {
+   "fold_rhos": [
+    0.082983,
+    0.29648,
+    0.289288,
+    0.067626,
+    0.007402,
+    0.01719,
+    0.207491,
+    0.072326,
+    0.057338,
+    0.227033,
+    0.24329,
+    0.03653,
+    0.154885,
+    0.269286,
+    0.162804,
+    0.121225,
+    0.103765,
+    0.28123,
+    0.067916,
+    0.10207,
+    0.077132,
+    0.106103,
+    0.153388,
+    0.102734,
+    0.182472,
+    0.191686,
+    0.171706,
+    0.259119,
+    0.036341,
+    0.116533,
+    0.117128,
+    0.248463,
+    0.053346,
+    0.229754,
+    0.110773,
+    0.121476,
+    0.170114,
+    0.21106,
+    0.094783,
+    0.035157,
+    0.026981,
+    0.201915,
+    0.176861,
+    -0.040306,
+    0.114114,
+    0.279326,
+    0.145735,
+    0.189312,
+    0.199537,
+    0.038887
+   ],
+   "lambda_ceiling_hits": 19,
+   "lambdas_per_fold": [
+    1000.0,
+    0.1,
+    100.0,
+    0.1,
+    0.1,
+    10000.0,
+    3000.0,
+    10000.0,
+    3000.0,
+    10000.0,
+    10000.0,
+    3000.0,
+    10000.0,
+    3000.0,
+    0.1,
+    300.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    0.1,
+    10000.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    0.1,
+    300.0,
+    1000.0,
+    10000.0,
+    0.1,
+    0.1,
+    3000.0,
+    10000.0,
+    0.1,
+    3000.0,
+    3000.0,
+    0.1,
+    3000.0,
+    10000.0,
+    0.1,
+    3000.0,
+    10000.0,
+    0.1,
+    3000.0,
+    1000.0,
+    10000.0,
+    10000.0,
+    0.1,
+    0.1,
+    0.1
+   ],
+   "mean_rho": 0.139796,
+   "n_constant": 0,
+   "n_fallback": 0,
+   "n_folds": 50
+  },
+  "grouped_c130_grid": {
+   "fold_rhos": [
+    0.082129,
+    0.295175,
+    0.268134,
+    0.066202,
+    0.011798,
+    0.017452,
+    0.207464,
+    0.077523,
+    0.052078,
+    0.220775,
+    0.243646,
+    0.035886,
+    0.156153,
+    0.267238,
+    0.167811,
+    0.114791,
+    0.104697,
+    0.299559,
+    0.068927,
+    0.103986,
+    0.090768,
+    0.09848,
+    0.152882,
+    0.099132,
+    0.18364,
+    0.193213,
+    0.168352,
+    0.25588,
+    0.057154,
+    0.118484,
+    0.127391,
+    0.253393,
+    0.051274,
+    0.228072,
+    0.111639,
+    0.123423,
+    0.173088,
+    0.211663,
+    0.106939,
+    0.034243,
+    0.025302,
+    0.209345,
+    0.176723,
+    -0.03248,
+    0.117343,
+    0.284609,
+    0.14612,
+    0.187791,
+    0.1996,
+    0.048181
+   ],
+   "lambda_ceiling_hits": 29,
+   "lambdas_per_fold": [
+    1000.0,
+    1000.0,
+    1000.0,
+    0.1,
+    0.1,
+    1000.0,
+    0.1,
+    1000.0,
+    1000.0,
+    1000.0,
+    0.1,
+    300.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    300.0,
+    1000.0,
+    0.1,
+    0.1,
+    0.1,
+    1000.0,
+    0.1,
+    1000.0,
+    100.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    0.1,
+    300.0,
+    1000.0,
+    0.1,
+    1000.0,
+    1000.0,
+    300.0,
+    0.1,
+    1000.0,
+    0.1,
+    0.1,
+    1000.0,
+    0.1,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    300.0,
+    1000.0,
+    0.1
+   ],
+   "mean_rho": 0.141261,
+   "n_constant": 0,
+   "n_fallback": 0,
+   "n_folds": 50
+  },
+  "identity": {
+   "convention": "explicit constant-prediction convention",
+   "mean_rho": 0.0,
+   "n_constant": 50
+  },
+  "rowlevel_c130_grid": {
+   "fold_rhos": [
+    0.082129,
+    0.295175,
+    0.268134,
+    0.068095,
+    0.011798,
+    0.017452,
+    0.207464,
+    0.077523,
+    0.052078,
+    0.220775,
+    0.243646,
+    0.035886,
+    0.156153,
+    0.267238,
+    0.167811,
+    0.114791,
+    0.104697,
+    0.299559,
+    0.068927,
+    0.104389,
+    0.090768,
+    0.099729,
+    0.152882,
+    0.099132,
+    0.18364,
+    0.193213,
+    0.168352,
+    0.25588,
+    0.057154,
+    0.118484,
+    0.127391,
+    0.252917,
+    0.051274,
+    0.228072,
+    0.111639,
+    0.123423,
+    0.173088,
+    0.211663,
+    0.106939,
+    0.034243,
+    0.025302,
+    0.209345,
+    0.176723,
+    -0.03248,
+    0.117343,
+    0.284609,
+    0.14612,
+    0.187791,
+    0.1996,
+    0.048181
+   ],
+   "lambda_ceiling_hits": 43,
+   "lambdas_per_fold": [
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    30.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    10.0,
+    300.0,
+    1000.0,
+    1000.0,
+    300.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    300.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    10.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    300.0
+   ],
+   "mean_rho": 0.141323,
+   "n_constant": 0,
+   "n_fallback": 0,
+   "n_folds": 50
+  },
+  "rowlevel_ext": {
+   "fold_rhos": [
+    0.082113,
+    0.293376,
+    0.265406,
+    0.068171,
+    0.011798,
+    0.016632,
+    0.207464,
+    0.078719,
+    0.052796,
+    0.221372,
+    0.243646,
+    0.033989,
+    0.156153,
+    0.267719,
+    0.167811,
+    0.114791,
+    0.104669,
+    0.301134,
+    0.069032,
+    0.104608,
+    0.090244,
+    0.099729,
+    0.156706,
+    0.099132,
+    0.18364,
+    0.192734,
+    0.168352,
+    0.257624,
+    0.057154,
+    0.118484,
+    0.128308,
+    0.252917,
+    0.051274,
+    0.227884,
+    0.114059,
+    0.121698,
+    0.173088,
+    0.210364,
+    0.106994,
+    0.034243,
+    0.025302,
+    0.208584,
+    0.176723,
+    -0.03248,
+    0.117375,
+    0.284609,
+    0.145549,
+    0.187489,
+    0.1996,
+    0.044447
+   ],
+   "lambda_ceiling_hits": 31,
+   "lambdas_per_fold": [
+    3000.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    3000.0,
+    10000.0,
+    3000.0,
+    10000.0,
+    10000.0,
+    3000.0,
+    3000.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    300.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    3000.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    300.0,
+    3000.0,
+    10000.0,
+    10000.0,
+    3000.0,
+    10.0,
+    1000.0,
+    10000.0,
+    10000.0,
+    3000.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    3000.0,
+    10000.0,
+    3000.0,
+    3000.0,
+    10000.0,
+    3000.0,
+    10000.0,
+    3000.0,
+    10000.0,
+    10000.0,
+    10000.0,
+    3000.0
+   ],
+   "mean_rho": 0.141264,
+   "n_constant": 0,
+   "n_fallback": 0,
+   "n_folds": 50
+  }
+ }
+}

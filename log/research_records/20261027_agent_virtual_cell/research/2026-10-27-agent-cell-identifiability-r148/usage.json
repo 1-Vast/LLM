@@ -1,0 +1,65 @@
+{
+  "experiment": "E148",
+  "round": "R148 (goal round 146/256)",
+  "date": "2026-10-27",
+  "type": "re-test of C106 and C107 with the dead feature removed",
+  "compute": {
+    "script": "e148_retest_c106.py",
+    "splits": 60,
+    "conditions": 2,
+    "arms": 2,
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "results": "E148_RESULTS.json",
+    "rows": "E148_rows.csv",
+    "protocol": "PROTOCOL_E138.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "results": {
+    "A_drug_only": 0.4065,
+    "A_drug_path": 0.4217,
+    "gain_A": 0.0152,
+    "B_pathway_only": 0.0984,
+    "B_random_only": 0.0004,
+    "gain_B": 0.0984,
+    "difference_B_minus_A": [
+      0.0832,
+      0.0595,
+      0.1062
+    ]
+  },
+  "withdrawn": {
+    "C106": "the decay is linear-model specific",
+    "C107": "the fair-tree hardening, which rested on the same dead-feature design"
+  },
+  "kept": {
+    "C105": "the fully-informed redundancy is exact only for linear models; R137 gave +0.0152 and this run reproduces +0.0152 exactly, so it rests on a clean comparison",
+    "C115": "pathway over target under both families, measured with grouping-only features",
+    "C113_C114": "pathway over target in the ridge rounds",
+    "frozen claim": "unaffected, it is a ridge result and was always labelled as such"
+  },
+  "why_the_earlier_null_arose": "R138 and R139 put drug identity codes into the no-identity arm, and on evaluation rows every one of those codes was the reserved -1, a dead feature",
+  "new_finding": "the decay shape is the same in both families: near zero when fully informed (0.000 ridge, 0.015 tree) and near 0.1 when absent (0.13 ridge, 0.098 tree)",
+  "lesson": {
+    "class": "a dead feature in one arm can manufacture a model-family difference",
+    "count": "fifth instance in the programme",
+    "escalation": "the ninth rule was written down two rounds before it was actually executed, so it must become check code rather than prose"
+  },
+  "limits": [
+    "Sixty splits, one untrained-free tree configuration, integer coding.",
+    "Conditions A and B use different evaluation pools, so this compares gains rather than arms in one pool.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "next_gate": "write a reusable check that reports each feature's dispersion on the evaluation set before any multi-arm comparison",
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

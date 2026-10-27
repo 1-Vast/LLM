@@ -1,0 +1,52 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r61",
+  "round": "R61 (goal round 59/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Structural repair of the evidence register; no literature query."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r61": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round repairs the register and discloses that its own checker produced three false failures in a row.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16",
+    "scripts": ["e061_register_repair.py", "e061b_verify.py"], "runs": "3 (two checker fixes)",
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"first_pass": "E061_RESULTS.json", "verified": "E061B_RESULTS.json",
+                "protocol": "PROTOCOL_E059.md", "backup": "tmp/EVIDENCE_REGISTER.bak.md"},
+  "problems_fixed": [
+    "the title said 'as of R14' while the table already contained C39 and a changelog through R60",
+    "changelog entries R46-R60 were filed inside section 7 (the literature-relationship section)",
+    "section 5's whitelist stopped at C34 and omitted C33/C35/C36/C38/C39",
+    "C15 and C16 sat after C39, and F7 sat after F9",
+    "table rows and changelog bullets were interleaved, breaking the tables"],
+  "repair_actions": [
+    "title set to R60",
+    "F rows (9) and C rows (39) sorted by number",
+    "all 45 changelog bullets moved into section 6",
+    "the stale whitelist replaced by an auto-generated status summary",
+    "section 7's candidate list now carries the C36/C38/C39 qualification"],
+  "verification": {
+    "n_checks": 11, "n_passed": 11,
+    "authorised_replacements": 4, "unauthorised_replacements": 0,
+    "claim_rows_before": 39, "claim_rows_after": 39, "claim_rows_identical_as_set": true,
+    "changelog_bullets_before": 45, "changelog_bullets_after": 45
+  },
+  "checker_failures_disclosed": [
+    "H154 as written forbade the four replacements the same protocol authorised - a criterion design error",
+    "the section-7 index was located in the old line list and used to slice the new one - an index error",
+    "claim_rows_unchanged compared ordered lists while reordering was the point - a false failure fixed by comparing sets"],
+  "lesson": "a failed automated audit should first be blamed on the tool, not the data; this is the second consecutive round where the checker was the problem",
+  "no_status_change": true,
+  "limits": ["structure and wording only; no claim's status judgement was re-decided",
+             "the CONTENT of the 39 claims was not re-checked against each round's JSON (R60 covered only the 21 numbers quoted in the synthesis)",
+             "backup retained at tmp/EVIDENCE_REGISTER.bak.md for rollback",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["check the numerical content of all 39 register claims against each round's result JSON"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (restructured)", "research/INDEX.md (added R61 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

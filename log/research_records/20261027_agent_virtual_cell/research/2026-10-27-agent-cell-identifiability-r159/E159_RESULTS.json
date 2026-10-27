@@ -1,0 +1,100 @@
+{
+  "kind": "validate_the_continuous_column_sentinel_check",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "seed": 20261061,
+    "min_frac": 0.02,
+    "off_scale_factor": 100.0
+  },
+  "audit": {
+    "keys": 108259
+  },
+  "cases": {
+    "clean_continuous": {
+      "passed": true,
+      "expected": true,
+      "ok": true,
+      "flags": []
+    },
+    "minus999": {
+      "passed": false,
+      "expected": false,
+      "ok": true,
+      "flags": [
+        "feature conc_a: SENTINEL_SPIKE value -999 on 0.030 of rows (2545736x the column median)"
+      ]
+    },
+    "zero_fill": {
+      "passed": false,
+      "expected": false,
+      "ok": true,
+      "flags": [
+        "feature conc_b: SENTINEL_SPIKE value 0 on 0.030 of rows (0x the column median)"
+      ]
+    },
+    "legit_capped": {
+      "passed": true,
+      "expected": true,
+      "ok": true,
+      "flags": []
+    },
+    "clean_onehot_design": {
+      "passed": true,
+      "expected": true,
+      "ok": true,
+      "flags": []
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r159/PROTOCOL_E148.md": "ec7a635145ae5a3d4e192ba8db3a8321b2f419b92e1dabab9d71700da66021e9",
+    "research/2026-10-27-agent-cell-identifiability-r159/e159_sentinel.py": "a791346a98a56a0a77d2849fec6a60f1b4b879dc01078ef415ddca9c35547e7c",
+    "research/tools/feature_audit.py": "b5cc2f1fe1b9d86e3fa3c93ca5083883b4290b4c5becd42675bcf3b38e96d93b"
+  },
+  "what_it_targets": {
+    "targets": "a value that recurs on at least 2 percent of rows, lies outside the range of the remaining values, and is more than 100 times off-scale relative to the column median",
+    "does_not_target": "a sentinel in the middle of a distribution, such as a missing value filled with the mean, which is numerically indistinguishable from a real value",
+    "the_third_condition": "is what protects a legitimately capped feature, which sits at a few times the median rather than a hundred",
+    "an_earlier_version_that_failed": "an absolute-gap version missed a zero fill among log-normal concentrations, because the fill sits only micro-units below the minimum"
+  },
+  "decisions": {
+    "H384_check_works_without_false_positives": true,
+    "H385_false_positive_or_miss": false,
+    "verdict": "the_last_known_blind_spot_is_closed_and_the_tool_line_is_complete"
+  },
+  "status_of_the_tool": "with this, the known blind spots recorded since R149 are closed and feature_audit is in a handover-able state",
+  "limits": [
+    "The 2 percent and hundredfold thresholds are chosen, not optimised.",
+    "Only extreme-value sentinels are covered; mid-distribution ones are not detectable in principle.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "the_first_attempt_failed_and_that_is_the_useful_part": {
+    "first_rule": "a sentinel is a repeated value outside the rest's range, farther from it than half the range",
+    "what_it_missed": "a zero fill among log-normal concentrations, because zero sits only micro-units below the minimum in absolute terms, even though it is plainly a filled-in placeholder",
+    "fix": "compare against the column's own median instead: a sentinel is off-scale by more than a hundredfold",
+    "why_the_fix_works": "a zero fill has ratio 0 and a -999 fill has ratio 2.5 million, while a legitimate cap sits at a few times the median",
+    "note": "this is the fourth time in this tool line that a rule looked sensible and failed on contact with real-shaped data"
+  },
+  "the_tool_is_now_handoverable": {
+    "feature_level": [
+      "constant at a non-zero value (masking)",
+      "unseen codes, restricted to genuine multi-level code columns",
+      "values outside the vocabulary of an indicator column",
+      "sentinel spikes on continuous columns",
+      "mixed scale within one column",
+      "one level dominating on evaluation but not in training"
+    ],
+    "split_level": [
+      "training and evaluation key overlap"
+    ],
+    "prediction_level": [
+      "constant arm predictions"
+    ],
+    "whitelist": "expected_uninformative, confined to feature-level flags on named columns",
+    "not_targeted_by_design": "a sentinel in the middle of a distribution, such as a missing value filled with the mean, is numerically indistinguishable from a real value",
+    "blind_spots_recorded_since_R149": "closed"
+  },
+  "what_remains_untested": {
+    "note": "every rule in this tool was derived from a failure rather than from theory, so the tool is best understood as a catalogue of the mistakes made in this programme",
+    "consequence": "it is well suited to catching those mistakes again and poorly suited to catching mistakes nobody here has made yet"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r18",
+  "round": "R18 (goal round 16/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Annotation-resource audit plus a target-conditional test on data in hand."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r18": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched. The positive signal rests on only two layout clusters and is reported as hypothesis-generating; a challenger would be needed before any confirmation wording.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e018_target_sharing.py (compound-pair level, underpowered)", "e018b_target_overlap.py (well-pair level, 351-pair plates)"],
+    "runs": "e018b 4x (reference-file fix, layout-key fix, newline syntax fix, final)", "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {
+    "main": "E018B_RESULTS.json", "rows": "E018B_rows.csv",
+    "first_attempt_underpowered": "E018_RESULTS.json",
+    "protocol": "PROTOCOL_E018.md", "unit_correction": "AMENDMENT_009_UNIT_CORRECTION.md"
+  },
+  "annotation_correction": {
+    "previous": "F6 said the target reference is unavailable (moa covers 2 of 23 compounds)",
+    "corrected": "BATCHIE drug name -> PubChem ID -> ENSG genes via the two local MAPKG tables covers 61 of 90 analysed compounds (67.8%); 297 of 659 compound pairs are both-annotated and 54 share at least one gene",
+    "still_missing": "no measured target engagement, no genetic-perturbation reference"
+  },
+  "results": {
+    "units": "well pairs on the 351-pair random-combination plates",
+    "shared_target": {"n": 3834, "reversal_rate": 0.0574, "mean_separation": 0.4726},
+    "disjoint_annotated": {"n": 7271, "reversal_rate": 0.0417, "mean_separation": 0.4736},
+    "difference": 0.0176, "ci95_layout_clustered": [0.00838, 0.02684],
+    "separation_confound_diff": -0.0010,
+    "layouts": 2,
+    "per_layout_diffs": [0.00838, 0.02684]
+  },
+  "decisions": {"H038_prime_shared_target_more_unstable": true,
+                "verdict": "target_overlap_associated_with_instability",
+                "status": "hypothesis_generating_not_confirmed"},
+  "limitations": [
+    "Only two layout clusters (three cells each), so the cluster bootstrap is a range, not a reliable interval.",
+    "Annotation-level target overlap is not measured engagement, not a genetic-perturbation reference, not a mechanism claim.",
+    "Interaction types are pooled; two drugs sharing a gene may act in opposite directions.",
+    "The first attempt used the validation-plate design and had only 3 shared-target units; it is preserved as E018_RESULTS.json and is underpowered, not negative."
+  ],
+  "register_updates": {"F6": "corrected to annotation-level-available / measurement-level-unavailable", "C16": "new, exploratory, 2 clusters"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (F6 corrected, C16 added)", "research/INDEX.md (added R18 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "mechanism_claim_made": false
+  }
+}

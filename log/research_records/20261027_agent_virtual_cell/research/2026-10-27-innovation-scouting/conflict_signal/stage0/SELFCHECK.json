@@ -1,0 +1,424 @@
+{
+ "config_sha256": "BB1FE3230B70EB53B5A39EF7D7D37DF256F296E866133939881E0E3E909CF9B4",
+ "evidence_status": "synthetic_not_evidence",
+ "network": false,
+ "notes": [
+  "all tests use purely synthetic metadata (mimicking Original 125 / matched 96 tissue counts) and synthetic y values",
+  "no Jaaks fitted table, no real response field, and no network resource is opened by this script",
+  "the synthetic coverage target is scaled (56->28) for mechanical testing only; the real config keeps 171->86",
+  "v4.1 mode-aware gate: --p0a-metadata needs only --confirm-run + real_run_enabled=true (utility/P0d blocked does not block it); full relations_check screens utility only when utility_gate_required_for_run=true",
+  "P0a-metadata PASS is NOT relations_check PASS and NOT Stage 1 / effect evidence",
+  "SELFCHECK.json is deterministic; re-running the script reproduces it byte-for-byte",
+  "real Stage 0 remains gated by --confirm-run + run_gate.real_run_enabled=true (two-key gate)"
+ ],
+ "real_data_read": false,
+ "schema": "r198-a1-stage0-selfcheck-v2-v4.1",
+ "script_sha256": {
+  "relations_check.py": "0694A4F3B6206277240668D3CD2ED897AB7DFA4A419C832353FC079D5CDD0B2E",
+  "relations_check_config.json": "BB1FE3230B70EB53B5A39EF7D7D37DF256F296E866133939881E0E3E909CF9B4",
+  "synthetic_selfcheck.py": "914CDFC61F0FDE140C0FA5623F7DB96972FA7F1EFB413788F216CB2D7BA21EE8"
+ },
+ "stage0_design": "v4: per-tissue Breast/Colon main family, Pancreas excluded; P0a-metadata precheck first",
+ "summary": {
+  "all_passed": true,
+  "deterministic_outputs": true,
+  "failure_branches_covered": [
+   "coverage_unreachable",
+   "non_vacuity",
+   "insufficient_nctx",
+   "interval_too_wide",
+   "bh_none_significant",
+   "R_below_min",
+   "R_above_max",
+   "budget_exceeded",
+   "blocked_by_utility_definition",
+   "run_gate_refusal",
+   "p0a_metadata_gate_mode"
+  ],
+  "n_passed": 16,
+  "n_tests": 16,
+  "selfcheck_budget_ok": true
+ },
+ "synthetic": true,
+ "synthetic_data_only": true,
+ "tests": [
+  {
+   "details": {
+    "counts": {
+     "ab_supply_candidates": 56,
+     "candidate_grid_by_tissue": {
+      "Breast": 28,
+      "Colon": 28
+     },
+     "candidate_grid_total": 56,
+     "coverage_denominator": 56,
+     "coverage_target": 28,
+     "expected_passing_count": 56,
+     "precheck_eligible": 56,
+     "precheck_eligible_by_tissue": {
+      "Breast": 28,
+      "Colon": 28
+     },
+     "reference_cells_note": "reference 84 includes A9+B9=18 Pancreas cells that are NOT used by the per-tissue Breast/Colon main family (no tissue nuisance in the main model); retained only to keep the frozen 84/24/17 composition",
+     "s_milp_optimum": 56,
+     "s_selection": {
+      "covered_candidates": 56,
+      "n_ctx_min": 12,
+      "per_tissue_counts": {
+       "Breast": 12,
+       "Colon": 12
+      },
+      "s_target": 24,
+      "solver": "milp"
+     },
+     "s_solver": "milp",
+     "s_splits_sha256": "C19BD04CBB71622600A01D76578D87D2390CE1866A51C74F6C5DDB340A32820D",
+     "v3_reference_values_not_applicable": {
+      "note": "v3 MILP values under a DIFFERENT S composition (24 taken from the 41 leftover pool, possibly cross-tissue); they are NOT a v4 bound, NOT a reachability proof, and are NOT used as a gate. v4 uses the actual s_milp_optimum.",
+      "v3_upper_bound_all_candidates": 114,
+      "v3_upper_bound_breast_colon": 112
+     }
+    },
+    "gates": {
+     "main_tissues_breast_colon": true,
+     "pancreas_excluded": true,
+     "precheck_eligible_ge_target": true,
+     "reference_matched_subset": true,
+     "reference_size_ok": true,
+     "s_milp_optimum_ge_target": true,
+     "s_selection_solver": "milp",
+     "s_side_cond_cov_ge_12": true,
+     "three_way_disjoint": true,
+     "tissue_span_non_vacuity": true
+    },
+    "s_selection": {
+     "covered_candidates": 56,
+     "n_ctx_min": 12,
+     "per_tissue_counts": {
+      "Breast": 12,
+      "Colon": 12
+     },
+     "s_target": 24,
+     "solver": "milp"
+    },
+    "status": "pass"
+   },
+   "expected": "status=pass, all metadata gates true",
+   "id": "p0a_metadata_pass",
+   "passed": true,
+   "purpose": "v4 P0a-metadata: reference 84 subset of matched 96, per-tissue Breast/Colon grid, S-side Cond_r coverage, non-vacuity",
+   "synthetic": true
+  },
+  {
+   "details": {
+    "n_S": 24,
+    "tissues": {
+     "Breast": 12,
+     "Colon": 12,
+     "Pancreas": 0
+    }
+   },
+   "expected": "no Pancreas S cells, S size 24, 12 Breast + 12 Colon",
+   "id": "p0a_no_pancreas_s_cells",
+   "passed": true,
+   "purpose": "S selection contains no Pancreas cells (main family excludes Pancreas)",
+   "synthetic": true
+  },
+  {
+   "details": {
+    "gate_confirm_only": [
+     "refused",
+     "refused: run_gate.real_run_enabled=false in config; Lead must set it true after (a) A1v4.1 review passes, (b) Lead approval, (c) two-key run approval"
+    ],
+    "gate_default": [
+     "refused",
+     "refused: --confirm-run flag is required; default mode never reads real data"
+    ],
+    "gate_ok_when_enabled": [
+     null,
+     null
+    ],
+    "main_output_status": "refused",
+    "main_rc": 3
+   },
+   "expected": "refused(status=refused), real_data_read=false, main() rc=3",
+   "id": "run_gate_refusal",
+   "passed": true,
+   "purpose": "default mode refuses to read real data; --confirm-run alone insufficient while real_run_enabled=false",
+   "synthetic": true
+  },
+  {
+   "details": {
+    "gate_full_mode": [
+     "blocked_by_utility_definition",
+     "blocked_by_utility_definition: utility_range/delta_min not frozen; the full relations_check requires the utility gate when utility_gate_required_for_run=true. Fill config.utility.utility_range (and delta_min_state) after P0d/A5, or run the metadata-only precheck with --p0a-metadata."
+    ],
+    "gate_p0a_mode": [
+     null,
+     null
+    ],
+    "gates": {
+     "main_tissues_breast_colon": true,
+     "pancreas_excluded": true,
+     "precheck_eligible_ge_target": true,
+     "reference_matched_subset": true,
+     "reference_size_ok": true,
+     "s_milp_optimum_ge_target": true,
+     "s_selection_solver": "milp",
+     "s_side_cond_cov_ge_12": true,
+     "three_way_disjoint": true,
+     "tissue_span_non_vacuity": true
+    },
+    "main_rc": 0,
+    "main_status": "pass",
+    "output_exists": true,
+    "s_milp_optimum": 56
+   },
+   "expected": "p0a mode->(None,None), full mode->blocked, main rc=0, P0a status=pass, p0a_metadata.json written",
+   "id": "p0a_metadata_gate_mode_allows_when_utility_blocked",
+   "passed": true,
+   "purpose": "v4.1 mode-aware gate: enabled+confirm+--p0a-metadata with utility blocked enters the metadata branch; full relations_check mode is still blocked",
+   "synthetic": true
+  },
+  {
+   "details": {
+    "reasons": [
+     "blocked_by_utility_definition: utility_range/delta_min not frozen"
+    ],
+    "status": "blocked_by_utility_definition"
+   },
+   "expected": "status=blocked_by_utility_definition, relations=0",
+   "id": "blocked_utility_branch",
+   "passed": true,
+   "purpose": "utility/delta_min unfrozen with utility_gate_required_for_run=true -> blocked_by_utility_definition",
+   "synthetic": true
+  },
+  {
+   "details": {
+    "accepted": 56,
+    "counts": {
+     "accepted_relations": 56,
+     "alpha_pass_relations": 56,
+     "candidates_evaluable": 56,
+     "candidates_tested": 56,
+     "exploratory_relations": 46,
+     "primary_bh_pass_relations": 10,
+     "primary_relations": 10,
+     "rejected_reasons": {},
+     "strict_full_family_bh_pass_sensitivity": 56
+    },
+    "gates": {
+     "R_max": 200,
+     "R_min": 20,
+     "accepted_by_group": {
+      "Breast": 28,
+      "Colon": 28
+     },
+     "coverage": 1.0,
+     "coverage_denominator": 56,
+     "coverage_min": 0.5,
+     "coverage_target_count": 28,
+     "gates": {
+      "R_within_min_max": true,
+      "context_mode": "per_tissue",
+      "coverage_ok": true,
+      "primary_family_ok": true
+     },
+     "utility_branch": "deferred_to_P0d"
+    },
+    "outputs_sha256": {
+     "relation_splits_json": "9D5196AB6B163B4E57789C30038C2159BCA0EBAB8FEC136ACFF9792D93F92632",
+     "relations_check_json": "D101C9D4621F6A6D3B8FA363A66B1DD1F5616DE476B76368D316C0A973A66898",
+     "relations_csv": "A372550B667E6D40456B7F0382862FDC60F44B6385BE4200766AAD3D24ECA990"
+    },
+    "status": "pass"
+   },
+   "expected": "status=pass, accepted>=20, coverage_ok, context_mode=per_tissue",
+   "id": "pass_pipeline_synthetic",
+   "passed": true,
+   "purpose": "per-tissue Breast/Colon stable synthetic contrasts recovered; R/coverage gates pass on the scaled synthetic grid",
+   "synthetic": true
+  },
+  {
+   "details": {
+    "identical": true,
+    "relations_csv_sha256": "A372550B667E6D40456B7F0382862FDC60F44B6385BE4200766AAD3D24ECA990",
+    "sha_consistent": true
+   },
+   "expected": "identical=True, sha_consistent=True",
+   "id": "determinism_and_sha",
+   "passed": true,
+   "purpose": "two independent pipeline runs produce byte-identical outputs; relations_check.json SHA matches files",
+   "synthetic": true
+  },
+  {
+   "details": {
+    "counts": {
+     "ab_supply_candidates": 56,
+     "candidate_grid_by_tissue": {
+      "Breast": 28,
+      "Colon": 28
+     },
+     "candidate_grid_total": 56,
+     "coverage_denominator": 56,
+     "coverage_target": 100,
+     "expected_passing_count": 56,
+     "precheck_eligible": 56,
+     "precheck_eligible_by_tissue": {
+      "Breast": 28,
+      "Colon": 28
+     },
+     "reference_cells_note": "reference 84 includes A9+B9=18 Pancreas cells that are NOT used by the per-tissue Breast/Colon main family (no tissue nuisance in the main model); retained only to keep the frozen 84/24/17 composition",
+     "s_milp_optimum": 56,
+     "s_selection": {
+      "covered_candidates": 56,
+      "n_ctx_min": 12,
+      "per_tissue_counts": {
+       "Breast": 12,
+       "Colon": 12
+      },
+      "s_target": 24,
+      "solver": "milp"
+     },
+     "s_solver": "milp",
+     "s_splits_sha256": "C19BD04CBB71622600A01D76578D87D2390CE1866A51C74F6C5DDB340A32820D",
+     "v3_reference_values_not_applicable": {
+      "note": "v3 MILP values under a DIFFERENT S composition (24 taken from the 41 leftover pool, possibly cross-tissue); they are NOT a v4 bound, NOT a reachability proof, and are NOT used as a gate. v4 uses the actual s_milp_optimum.",
+      "v3_upper_bound_all_candidates": 114,
+      "v3_upper_bound_breast_colon": 112
+     }
+    },
+    "reasons": [
+     "gate_failed:precheck_eligible_ge_target",
+     "gate_failed:s_milp_optimum_ge_target"
+    ],
+    "status": "data_unavailable"
+   },
+   "expected": "status=data_unavailable, gate precheck_eligible_ge_target=false",
+   "id": "p0a_fail_coverage_unreachable",
+   "passed": true,
+   "purpose": "coverage target above the post-precheck eligible pool -> data_unavailable before relations_check",
+   "synthetic": true
+  },
+  {
+   "details": {
+    "reasons": [
+     "gate_failed:tissue_span_non_vacuity",
+     "gate_failed:s_side_cond_cov_ge_12",
+     "gate_failed:precheck_eligible_ge_target",
+     "gate_failed:s_milp_optimum_ge_target"
+    ],
+    "status": "design_invalid"
+   },
+   "expected": "status=design_invalid, gate tissue_span_non_vacuity=false",
+   "id": "p0a_fail_non_vacuity",
+   "passed": true,
+   "purpose": "candidate grid empty (one library per group) -> non-vacuity gate fails and design is invalid before running",
+   "synthetic": true
+  },
+  {
+   "details": {
+    "counts": {
+     "candidates_evaluable": 0
+    },
+    "reasons": [
+     "insufficient_contexts: no candidate relation has >= n_ctx_min cells in both A and B halves"
+    ],
+    "status": "data_unavailable"
+   },
+   "expected": "status=data_unavailable, reason includes insufficient_contexts",
+   "id": "fail_insufficient_nctx",
+   "passed": true,
+   "purpose": "too few cells per tissue -> no candidate has n_ctx_min cells in both halves -> data_unavailable",
+   "synthetic": true
+  },
+  {
+   "details": {
+    "reasons": [
+     "R_below_min",
+     "coverage_below_min"
+    ],
+    "rejected_reasons": {
+     "interval_too_wide": 56
+    },
+    "status": "data_unavailable"
+   },
+   "expected": "status=data_unavailable, rejected_reasons includes interval_too_wide",
+   "id": "fail_interval_too_wide",
+   "passed": true,
+   "purpose": "interval-width acceptance tightened -> all relations rejected at interval_too_wide",
+   "synthetic": true
+  },
+  {
+   "details": {
+    "reasons": [
+     "R_below_min",
+     "coverage_below_min"
+    ],
+    "rejected_reasons": {
+     "alpha_not_significant": 55,
+     "direction_agreement_B_low": 1
+    },
+    "status": "data_unavailable"
+   },
+   "expected": "status=data_unavailable, rejected_reasons includes alpha_not_significant",
+   "id": "fail_bh_none_significant",
+   "passed": true,
+   "purpose": "random-sign synthetic data -> no relation passes the per-relation alpha=0.01 gate",
+   "synthetic": true
+  },
+  {
+   "details": {
+    "accepted": 12,
+    "reasons": [
+     "R_below_min"
+    ],
+    "status": "data_unavailable"
+   },
+   "expected": "status=data_unavailable, reason includes R_below_min",
+   "id": "fail_R_below_min",
+   "passed": true,
+   "purpose": "only 12 accepted relations -> below R_min=20 -> data_unavailable R_below_min",
+   "synthetic": true
+  },
+  {
+   "details": {
+    "accepted": 56,
+    "reasons": [
+     "R_above_max"
+    ],
+    "status": "design_invalid"
+   },
+   "expected": "status=design_invalid, reason includes R_above_max",
+   "id": "fail_R_above_max",
+   "passed": true,
+   "purpose": "accepted relations exceed a lowered R_max -> design_invalid R_above_max",
+   "synthetic": true
+  },
+  {
+   "details": {
+    "reasons": [
+     "budget_exceeded"
+    ],
+    "status": "design_invalid"
+   },
+   "expected": "status=design_invalid, reason includes budget_exceeded",
+   "id": "fail_budget_exceeded",
+   "passed": true,
+   "purpose": "elapsed > budget.max_seconds -> design_invalid budget_exceeded",
+   "synthetic": true
+  },
+  {
+   "details": {
+    "pandas_imported": false,
+    "real_data_readers_not_called": true
+   },
+   "expected": "real_data_readers_not_called=True, pandas_not_imported=True",
+   "id": "isolation_no_real_data",
+   "passed": true,
+   "purpose": "self-check never calls the real-data loaders; pandas (real loader dependency) is never imported",
+   "synthetic": true
+  }
+ ],
+ "warning": "Engineering self-check only. Synthetic data with a SCALED synthetic coverage target (56->28, not the real 171->86). No biological evidence. No relation is claimed. No real data was read. v4.1 adds a mode-aware run-gate test: --p0a-metadata is allowed with two-key + utility blocked; full relations_check remains blocked while the utility gate is required."
+}

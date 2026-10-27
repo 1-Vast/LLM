@@ -1,0 +1,57 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r122",
+  "round": "R122 (goal round 120/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Powered test of the one surviving cell: both_unseen by the dense criterion, 200 splits."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r122": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round spends its whole budget on one cell and the answer identifies the criterion, not the feature, as the bottleneck.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e122_powered.py"], "runs": 2, "repeats": 200, "arms": 4, "criteria": 2,
+    "rows": 400, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E122_RESULTS.json", "rows": "E122_rows.csv", "protocol": "PROTOCOL_E115.md"},
+  "results_dense_dEMAX": {
+    "identity": 0.2425, "plus_pathway": 0.3245, "plus_tissue": 0.2907, "plus_random": 0.2545,
+    "pathway_minus_identity": {"diff": 0.0820, "ci95": [0.0507, 0.1128]},
+    "tissue_minus_identity": {"diff": 0.0483, "ci95": [0.0278, 0.0693]},
+    "random_minus_identity": {"diff": 0.0120, "ci95": [-0.0080, 0.0325]},
+    "mde_80pct": 0.0441},
+  "results_sparse_Synergy": {
+    "identity": 0.0130,
+    "pathway_minus_identity": {"diff": 0.0055, "ci95": [-0.0013, 0.0125]},
+    "tissue_minus_identity": {"diff": 0.0052, "ci95": [-0.0005, 0.0108]},
+    "mde_80pct": 0.0102},
+  "decisions": {"H303_pathway_adds_on_this_cell": true,
+                "H304_pathway_adds_while_tissue_does_not": false,
+                "H305_no_increment": false,
+                "verdict": "pathway_annotation_adds_8.2pp_when_both_drugs_are_unseen_on_the_dense_criterion"},
+  "why_R120_and_R121_disagreed": "not the pathway block but the criterion: on the sparse flag, identity sits at 1.30 percent and the minimum detectable effect is 1.02 pp, so the entire outcome range is about one percentage point and nothing can be resolved",
+  "my_own_error_this_round": {
+    "what_i_wrote": "h304 = h303 and tissue_ci95[1] > 0",
+    "why_wrong": "an upper bound above zero is nearly always true, so the condition tested nothing; the intended test was that tissue's interval contains zero",
+    "same_class_as": "the H264 criterion bug in R102, a one-sided bound checked where a two-sided containment was meant",
+    "corrected_to": false,
+    "effect_on_the_main_result": "none, since H303 does not depend on H304"},
+  "what_this_restores_and_what_it_kills": {
+    "restores": "C74 in substance: annotation adds when both drugs are unseen, now confirmed with 200 splits on a criterion that can resolve it",
+    "kills": "C91's claim that the increment is tissue only: pathway adds more than tissue (+8.20 against +4.83)",
+    "does_not_establish": "the pathway-versus-tissue difference itself was not tested, and the result covers one cell of the grid only"},
+  "limits": ["one pool and one criterion, so nothing here extrapolates",
+             "the dense criterion is an artificial quartile, not a clinical endpoint",
+             "the pathway-minus-tissue contrast was not tested",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["redo the full three-pool table on the dense criterion at 200 splits, since the sparse-criterion table is uninformative and should be retired"],
+  "register_updates": {"C93": "new and well powered: the bottleneck is the criterion",
+                       "C92": "annotated", "SYNTHESIS": "headline and evidence rows rewritten"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C93 added, C92 annotated)",
+                                "research/SYNTHESIS.md (headline and evidence rows rewritten)",
+                                "research/INDEX.md (added R122 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

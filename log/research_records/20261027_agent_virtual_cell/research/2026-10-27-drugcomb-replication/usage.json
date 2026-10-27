@@ -1,0 +1,127 @@
+{
+  "agent_role": "independent-runner",
+  "cost": {
+    "note": "not available; recorded as null",
+    "usd": null
+  },
+  "date": "2026-10-27",
+  "deliverables": {
+    "preflight.json": "B6D337704E46DF3586D46C45D0E5DEE17FE5BF212E4E88A0C0CC3BA5DECE22FA",
+    "preflight.py": "893FC1106154596532CF1407964A07008C9DF67023C503C842FD83708372E8A7",
+    "rows.csv": "A6FA3FC38EF406A6314C9C99D252AC035EA1F640B19FA3305ADDCC86D7ACD4D0",
+    "s2lib.py": "B39BEA1D7A62FA70CCCD8F9ECDEB2AA6C67789E15B7D0670FB07CB9257CBBCAF",
+    "stage2.json": "89C34E3C5F602244847D01CAE9929FFB9B4CD7E86E6EC8BF98DF3FCE730C05CF",
+    "stage2.py": "1649FD0ACC6019942F669F8EF31900239BB2CE603512C20334CF93BE17017B3E"
+  },
+  "design_selected": {
+    "N_mapped_drugs": 1800,
+    "delta_min": 0.0947,
+    "k_holdout": 990,
+    "ladder": "r=0.50 F3(b) failed (primary literal joint power 0.767 < 0.80) -> r=0.55 passed F1-F4 (F3(a) MDE80 0.067032 <= 0.0947; F3(b) primary 0.8335 / alternative reading 0.8525)",
+    "r": 0.55,
+    "split_sha256": "BBEB1FFB6E637B378F1CC960DCE7C2BA4082CDFAADF55EF08F34EA3402C687B5",
+    "strict_train_units": 17683,
+    "test_cells": 106,
+    "test_pairs": 7961,
+    "test_units": 45138
+  },
+  "determinism": {
+    "json_sorted_keys": true,
+    "rows_csv_identical_across_runs": true,
+    "seeds_fixed": true,
+    "stage2_json_identical_across_runs": true,
+    "timestamps": false
+  },
+  "downloads": {
+    "new_downloads_bytes": 0,
+    "note": "all inputs are pre-existing local read-only files; no network acquisition in this task"
+  },
+  "environment": {
+    "os": "Windows-10-10.0.26200-SP0",
+    "output_dir": "research/2026-10-27-drugcomb-replication",
+    "packages": {
+      "numpy": "2.4.6",
+      "pandas": "2.3.3",
+      "scipy": "1.17.1"
+    },
+    "python": "D:\\anaconda\\envs\\maestro\\python.exe (Python 3.11.16)",
+    "workspace": "D:\\MAESTRO"
+  },
+  "implementation_choices": [
+    "F3(b) se_null read literally from AMENDMENT-002 section 1 step 1 (se_null = SE_two_way for the primary joint-power computation); the alternative reading (se_null = SE/sqrt(10) because R3's zero-model arm is the mean of 10 seeds) is reported; selected design r=0.55 passes F3 under both readings",
+    "F3(a) bootstrap B=2000 with P-B2 design seed rule; F3(b) 2000 analytic draws with P-B2 power seed rule (+7), master-seed value also reported",
+    "R2/R3 primary CI = P-B2 Regime-B pair x cell two-way cluster bootstrap, B=1000, seed 20261027 (v3 final)",
+    "held-out-drug clustering sensitivity implemented as held-out-drug two-way (anchor-drug x library-drug) cluster bootstrap",
+    "study proxy = P-B design-era proxy: block_id 20-quantile bins with unit modal bin",
+    "inner 3 folds = round-robin [k::3] over the sorted training-drug list (deterministic reading of 'sort training drugs then split 3 folds')"
+  ],
+  "line": "R192-R2 stage 2 reproduction (DrugComb external replication)",
+  "notes": [
+    "response columns used: synergy_bliss only (frozen P-B aggregation); other response columns never read",
+    "test labels used only for final scoring / cluster bootstrap CIs / adjusted descriptive analyses; never for standardisation, lambda selection, features, splitting or arm selection",
+    "preflight gating is asserted at stage2 runtime (aborts if preflight gates do not pass)"
+  ],
+  "protocol": {
+    "amendment_001_sha256": "AA1562B88D337275B052EB5746A113020485C243246A09F470282B9AA3B0BD95",
+    "amendment_002_sha256": "FAFAE127362AEB74F3E37CFF379E4535FC88D28B1AFC35B563E85DB472381E75",
+    "governing": "v3 (final AMENDMENT-002: pair x cell two-way cluster bootstrap for R2/R3 and F3; one-step pre-registered ladder r=0.50->0.55)",
+    "protocol_stage2_v1_sha256": "AEF22C7283F756A675DAC630CF0B67ED910110FDA5A9292D71FC1C7F135F77EC",
+    "version": "v3 = PROTOCOL_STAGE2 v1 + AMENDMENT-001 + AMENDMENT-002 (final)"
+  },
+  "protocol_deviations": [],
+  "runs": [
+    {
+      "command": "python preflight.py",
+      "outputs": [
+        "preflight.json"
+      ],
+      "purpose": "stage A: F1-F4 on r=0.50; pre-registered one-step ladder to r=0.55; design selection written to preflight.json",
+      "status": "ok",
+      "wall_seconds": 35.4
+    },
+    {
+      "command": "python stage2.py",
+      "outputs": [
+        "stage2.json",
+        "rows.csv"
+      ],
+      "purpose": "stage B: Xboth / annotation_only / identity_only / Xboth_random x10 / Xboth_capacity / constant; pair x cell bootstrap; sensitivities; adjusted",
+      "status": "ok",
+      "wall_seconds": 212.4,
+      "wall_seconds_second_run": 224.0
+    },
+    {
+      "command": "python stage2.py (determinism re-run)",
+      "note": "stage2.json and rows.csv SHA256 identical across runs",
+      "purpose": "byte-identical output verification",
+      "status": "ok",
+      "wall_seconds": null
+    }
+  ],
+  "task_id": "task-12",
+  "tokens": {
+    "input_tokens": null,
+    "note": "runtime token accounting is not available to the agent; recorded as null (not 0)",
+    "output_tokens": null,
+    "total_tokens": null
+  },
+  "verdict": {
+    "R1_point_ge_delta_min": false,
+    "R2_pair_cell_ci_lower_gt0": false,
+    "R3_control_ci_lower_gt0": false,
+    "confounding": "adjusted partial rho controlling study proxy = 0.010246 (CI [-0.026928, 0.046315]); controlling cell = 0.023425 (CI [-0.012324, 0.059115]) -> apparent association disappears after adjustment",
+    "diff_vs_random_ci_pair_cell_95": [
+      -0.024944,
+      0.177368
+    ],
+    "diff_vs_random_point": 0.084659,
+    "power_calibration_limitation": "preflight F3(a) MDE80 = 0.067032, but realised SE for the fitted Xboth prediction vector = 0.053568 (MDE80-equivalent 0.150075); P-B MDE self-check at delta=0.1149 had empirical power 0.708 (<0.80); design cannot claim adequate power; not_replicated = 'not detected in this setting', construct/power/true-negative not separated",
+    "random_mean_rho": 0.009981,
+    "rho_xboth": 0.09464,
+    "verdict": "not_replicated",
+    "xboth_ci_pair_cell_95": [
+      -0.007016,
+      0.179018
+    ]
+  }
+}

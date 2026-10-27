@@ -1,0 +1,54 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r90",
+  "round": "R90 (goal round 88/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Tests whether the main conclusion depends on the single synergy metric used throughout."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r90": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round checks whether the programme's headline claim survives a change of target definition, and it does not.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e090_metrics.py"], "runs": 1, "metrics": 4, "repeats": 40,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E090_RESULTS.json", "rows": "E090_rows.csv", "protocol": "PROTOCOL_E085.md"},
+  "design": {
+    "pool": "clean unseen-combination pool (the one where C45 found the annotation model losing by 10.12 pp)",
+    "metrics": ["SYNERGY_DELTA_AUC", "SYNERGY_DELTA_EMAX", "SYNERGY_DELTA_fAUC", "SYNERGY_DELTA_XMID"],
+    "hit_criterion": "top quartile of each metric within the pool",
+    "predictors": ["drug-effect ranking", "pathway-annotation ridge"]
+  },
+  "results": {
+    "dAUC": {"ridge": 0.4925, "drug_effect": 0.5337, "diff": 0.0413, "ci95": [-0.0312, 0.1138]},
+    "dEMAX": {"ridge": 0.5687, "drug_effect": 0.4912, "diff": -0.0775, "ci95": [-0.1638, 0.0038]},
+    "dfAUC": {"ridge": 0.5212, "drug_effect": 0.5475, "diff": 0.0263, "ci95": [-0.0525, 0.1112]},
+    "dXMID": {"ridge": 0.5325, "drug_effect": 0.5062, "diff": -0.0262, "ci95": [-0.0975, 0.0488]}
+  },
+  "decisions": {"H229_holds_on_at_least_3_of_4": false,
+                "H230_metric_specific": true,
+                "H231_same_sign_everywhere": false,
+                "n_metrics_with_significant_drug_effect_win": 0,
+                "verdict": "main_conclusion_is_metric_and_criterion_specific"},
+  "critical_notes": {
+    "hit_definition_differs_from_C45": "C45 used the boolean Synergy flag; this round uses the top quartile of each continuous metric, so it neither reproduces nor contradicts C45",
+    "drug_effect_equals_additive_here": "marginal = 0.5(a+b)+grand and additive = a+b+grand are monotone transforms, so they rank identically; the round therefore compares drug-effect ranking against the annotation ridge",
+    "nothing_significant_under_quartile_criteria": "all four intervals contain zero, so no metric yields a significant winner"
+  },
+  "consequence_for_the_headline": "the statement 'the annotation model loses to trivial baselines' is restricted to the boolean Synergy criterion and the dAUC metric; under quartile criteria on four continuous metrics nothing is significant and the sign reverses on dEMAX and dXMID",
+  "limits": ["the four metrics are highly correlated, so this is not four independent replications",
+             "missingness differs per metric, so pool membership differs slightly",
+             "moving to a quartile criterion lowers power (about a quarter of each pool is positive)",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["decide and fix what 'decision value' means before running further experiments, since a free choice of criterion can flip the conclusion"],
+  "register_updates": {"C63": "new and decisive as a qualification: the main conclusion is metric- and criterion-specific",
+                       "C46": "annotated with the qualification"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C63 added, C46 annotated)",
+                                "research/SYNTHESIS.md (refuted-table row and headline caveat)",
+                                "research/INDEX.md (added R90 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

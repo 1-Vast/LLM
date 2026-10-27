@@ -1,0 +1,128 @@
+{
+  "kind": "is_the_transfer_cost_target_tissue_specific",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "subsamples": 40,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "units": 120,
+    "tissues": [
+      "Breast",
+      "Colon",
+      "Pancreas"
+    ]
+  },
+  "by_tissue": {
+    "Breast": {
+      "n": 40,
+      "transfer": 0.07875,
+      "ceiling": 0.11750000000000001,
+      "volume_matched": 0.075,
+      "random": 0.00875,
+      "ceiling_minus_transfer": {
+        "n": 40,
+        "mean_diff": 0.03875,
+        "ci95": [
+          0.02,
+          0.058750000000000004
+        ]
+      },
+      "ceiling_minus_volume_matched": {
+        "n": 40,
+        "mean_diff": 0.0425,
+        "ci95": [
+          0.0225,
+          0.06375
+        ]
+      },
+      "volume_matched_minus_transfer": {
+        "n": 40,
+        "mean_diff": -0.003749999999999999,
+        "ci95": [
+          -0.013749999999999998,
+          0.005000000000000001
+        ]
+      }
+    },
+    "Colon": {
+      "n": 40,
+      "transfer": 0.0225,
+      "ceiling": 0.03125,
+      "volume_matched": 0.0175,
+      "random": 0.0075000000000000015,
+      "ceiling_minus_transfer": {
+        "n": 40,
+        "mean_diff": 0.00875,
+        "ci95": [
+          -0.00125,
+          0.017531249999999835
+        ]
+      },
+      "ceiling_minus_volume_matched": {
+        "n": 40,
+        "mean_diff": 0.013750000000000002,
+        "ci95": [
+          0.0037500000000000007,
+          0.02375
+        ]
+      },
+      "volume_matched_minus_transfer": {
+        "n": 40,
+        "mean_diff": -0.005,
+        "ci95": [
+          -0.015000000000000003,
+          0.0037500000000000007
+        ]
+      }
+    },
+    "Pancreas": {
+      "n": 40,
+      "transfer": 0.0975,
+      "ceiling": 0.16124999999999998,
+      "volume_matched": 0.10250000000000001,
+      "random": 0.03375,
+      "ceiling_minus_transfer": {
+        "n": 40,
+        "mean_diff": 0.06375,
+        "ci95": [
+          0.03625,
+          0.09
+        ]
+      },
+      "ceiling_minus_volume_matched": {
+        "n": 40,
+        "mean_diff": 0.058750000000000004,
+        "ci95": [
+          0.029999999999999992,
+          0.08875
+        ]
+      },
+      "volume_matched_minus_transfer": {
+        "n": 40,
+        "mean_diff": 0.005000000000000001,
+        "ci95": [
+          -0.009999999999999998,
+          0.02375
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r97/PROTOCOL_E092.md": "dc6b7503c02fc1890a9f00bbb80d82c55db6734593b33752b40d013161e6d8ce",
+    "research/2026-10-27-agent-cell-identifiability-r97/e097_volume_control.py": "a4ce788a571d6b0ff6f88a437f92cc5d1cc84c17cfeda42ce893da65cd9e9025"
+  },
+  "decisions": {
+    "H249_gain_is_target_specific": true,
+    "H250_gain_is_just_volume": false,
+    "H251_more_data_never_hurts": true,
+    "verdict": "transfer_cost_is_target_tissue_specific"
+  },
+  "limits": [
+    "Bootstrap resampling double-counts, so the volume-matched arm is if anything optimistic, which makes H249 a conservative test.",
+    "Only three tissues.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ]
+}

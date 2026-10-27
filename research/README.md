@@ -8,8 +8,15 @@ The evidence supports bounded ordinary prediction, calibration and functional-fe
 
 Eight-drug BeatAML feedback improves ordinary covariance predictions on exposed development data. CDK composition gains have not established functional benefit. The CD14 source rationale failed its preset continuation gate. CellHealth membership qualification is complete, but no new predictive fit or RSI gain follows from it. Existing study-level stops remain binding within their stated scope; later explicit amendments supersede earlier optimistic readings.
 
+## 2026-10-27 virtual-cell Agent research
+
+The [maintained latest chapter](../log/RESEARCH_REPORT.md#latest-agent-and-virtual-cell-research-2026-10-27) governs current interpretation. The retained [research synthesis](../log/research_records/20261027_agent_virtual_cell/research/SYNTHESIS.md) and [claim-status audit](../log/research_records/20261027_agent_virtual_cell/research/CLAIM_STATUS_AUDIT.md) preserve attributed snapshots and corrections. R196v2 and R197v2 are inconclusive; R199-Q0 did not qualify an independent source-to-target comparison. The O'Neil internal development path has a conditional qualification and an authorized ON3 v1.1 execution, not an established effect; check its [execution record](../log/research_records/20261027_agent_virtual_cell/research/2026-10-27-core-module-design/oneil_dev/APPROVAL_ON3_V1_1.md) for subsequent results and the mandatory peek disclosure.
+
+The [ten directions and four mechanism candidates](../log/research_records/20261027_agent_virtual_cell/research/2026-10-27-direction-mechanism-expansion/report.md) are research proposals, not validated algorithms. Read the [core design](../log/research_records/20261027_agent_virtual_cell/research/2026-10-27-core-module-design/report.md) with its [v3 correction](../log/research_records/20261027_agent_virtual_cell/research/2026-10-27-core-module-design/candidate_v3.md), the [cross-domain reassessment](../log/research_records/20261027_agent_virtual_cell/research/2026-10-27-cross-domain-directions/report.md), and the earlier [independent reassessment](../log/research_records/20261027_agent_virtual_cell/research/2026-10-27-independent-reassessment/report.md) within their stated snapshot dates.
+
 ## Read first
 
+- [Recent qualification, stops and stage-2 protocol](../log/RESEARCH_REPORT.md#recent-resource-qualification-and-replication-design-2026-10-27).
 - [Current status](../log/RESEARCH_REPORT.md#current-paid-repeatability-result).
 - [Functional feedback and prediction](../log/RESEARCH_REPORT.md#functional-feedback-and-acquisition).
 - [Mechanisms and scoped decisions](../log/RESEARCH_REPORT.md#mechanisms-inheritance-and-self-repair).

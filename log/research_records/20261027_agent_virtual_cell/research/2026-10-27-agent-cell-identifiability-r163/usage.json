@@ -1,0 +1,70 @@
+{
+  "experiment": "E163",
+  "round": "R163 (goal round 160/256)",
+  "date": "2026-10-27",
+  "type": "recompute the frozen claim's headline magnitude with a tuned penalty",
+  "compute": {
+    "script": "e163_tuned_headline.py",
+    "splits": 40,
+    "inner_folds": 3,
+    "lambda_grid": 9,
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "results": "E163_RESULTS.json",
+    "rows": "E163_rows.csv",
+    "protocol": "PROTOCOL_E151.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "results": {
+    "both_unseen": {
+      "gain": 0.1183,
+      "ci95": [
+        0.0947,
+        0.1409
+      ],
+      "mde": 0.0344,
+      "rho_identity": 0.0001,
+      "lam_identity": 243.5,
+      "lam_pathway": 875.0
+    },
+    "one_unseen": {
+      "gain": 0.0174,
+      "ci95": [
+        0.0127,
+        0.0221
+      ],
+      "rho_identity": 0.2408
+    }
+  },
+  "historical_vs_new": {
+    "historical_at_lambda_1": 0.13,
+    "new_at_tuned_lambda": 0.1183,
+    "relative_change": -0.09,
+    "tolerance": 0.2
+  },
+  "conclusion": "the headline magnitude stands under a tuned penalty; a nine percent change, well inside the pre-registered twenty percent tolerance",
+  "what_it_confirms_incidentally": {
+    "identity_at_chance": "rho identity is 0.0001 in the both-unseen cell, the cleanest measurement of the premise so far",
+    "signal_survives_heavy_shrinkage": "the pathway contribution persists at a penalty of 875, so the block carries structure rather than fitting noise",
+    "the_two_pools_are_the_claim": "one-unseen: identity 0.2408 plus annotation 0.0174; both-unseen: identity 0.0001 plus annotation 0.1183"
+  },
+  "closes": "the standing caveat that the headline had never been computed at a tuned penalty",
+  "does_not_close": "the wider caveat that other absolute magnitudes were computed at lambda 1; orderings are unaffected, magnitudes are unverified",
+  "limits": [
+    "The historical value came from different seeds and a different split implementation, so this compares magnitudes rather than exact numbers.",
+    "Only ridge and one resource; three inner folds.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "next_gate": "sweep the remaining key magnitudes, especially C103's 0.253 and 0.229 and the pathway-versus-target gap in C113, for lambda sensitivity",
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

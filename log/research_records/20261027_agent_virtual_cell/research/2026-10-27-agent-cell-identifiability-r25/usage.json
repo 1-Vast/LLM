@@ -1,0 +1,44 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r25",
+  "round": "R25 (goal round 23/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Design-of-experiments question on data in hand; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r25": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the amendment covers the two rule problems and the effect is confined to the smallest budget.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e025_dopt.py"], "runs": 1, "random_reps": 20, "bootstrap": 1000,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E025_RESULTS.json", "rows": "E025_rows.csv",
+                "protocol": "PROTOCOL_E025.md", "correction": "AMENDMENT_011_BASELINE_AND_VERDICT.md"},
+  "question_changed": "R22 asked whether to spend budget on calibration; this round asks which measurements to spend it on, holding the budget fixed",
+  "results": {
+    "m5": {"dopt": 0.161, "random": 0.086, "diff": 0.075, "ci95": [0.023, 0.134]},
+    "m10": {"dopt": 0.175, "random": 0.134, "diff": 0.041, "ci95": [-0.006, 0.085]},
+    "m25": {"dopt": 0.227, "random": 0.205, "diff": 0.022, "ci95": [-0.016, 0.059]},
+    "m50": {"dopt": 0.225, "random": 0.233, "diff": -0.008, "ci95": [-0.046, 0.035]},
+    "units": 44, "layouts": 21
+  },
+  "decisions": {
+    "H058_dopt_beats_random_at_every_m": false,
+    "H058_m5_effect_is_real": true,
+    "H059_note": "MIS-SPECIFIED: the implemented rule compared against the chance rate 0.029 rather than an m=0 baseline, so it has no power and is not counted as evidence",
+    "H060_gain_shrinks_with_budget": true,
+    "verdict_reported": "selection_helps_only_at_tiny_budget_and_still_loses_to_free_pooling"
+  },
+  "cross_round_baseline": {
+    "source": "R22 (E022)", "m0_pooling_precision10": 0.333,
+    "comparison": "every own-data arm in this round (0.161-0.233) is below the free pooling baseline; this is a cross-round comparison between different arms, not an in-experiment arm"
+  },
+  "headline": "at the smallest budget, choosing which measurements to take is worth +7.5 pp over choosing them at random, but no amount of own-data design (up to 50 of 351) matches what other cells give for free",
+  "register_updates": {"C20": "new, exploratory: D-optimal beats random only at m=5; all own-data arms below the R22 pooling baseline"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C20 added)", "research/INDEX.md (added R25 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "decision_value_claimed": false, "r9_stop_condition_touched": false
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r89",
+  "round": "R89 (goal round 87/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Power increase for the BATCHIE dose-aware residual test."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r89": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round spends its effort on statistical power rather than a new idea, which is what the previous round's width demanded.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6, scikit-learn 1.9.0",
+    "scripts": ["e089_high_power.py"], "runs": 1, "cells": 12, "repeats": 60, "units": 240,
+    "bootstrap": 2000, "speedup": "gene features were being rebuilt inside the repeat loop in R88; hoisting them made a 5x repeat count affordable",
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E089_RESULTS.json", "rows": "E089_rows.csv", "protocol": "PROTOCOL_E084.md"},
+  "input_sha256_verified": "56a4e4a195673160edcb1baa209a15409b3639ff6ab0405558cc5ab3198d5f23",
+  "results": {
+    "units": 240, "cells": 12,
+    "cv_r2_of_additive_null": 0.6507,
+    "base": 0.2509, "random": 0.2569, "gene": 0.2810,
+    "gene_minus_random": {"diff": 0.0242, "ci95": [-0.0125, 0.0604]},
+    "R88_comparison": {"units": 48, "diff": 0.0281, "ci_width": 0.173, "R89_ci_width": 0.073}
+  },
+  "decisions": {"H224_residual_learnable": true,
+                "H227_gain_becomes_significant_with_power": false,
+                "H228_gain_ruled_out_above_2pp": false,
+                "verdict": "still_undetermined_after_power_increase"},
+  "what_was_bought": {
+    "point_estimate_stable": "+2.81 pp became +2.42 pp with five times the units, so it is not a sampling accident",
+    "interval_halved": "CI width fell from 17.3 pp to 7.3 pp",
+    "what_can_now_be_said": "if the annotation model has any gain on BATCHIE residuals it is below about 6 pp",
+    "what_still_cannot_be_said": "that it has a gain, because the interval still contains zero"},
+  "serious_weakness": "held-out cells are drawn with replacement within a layout, so units are not independent and this CI is narrower than nominal, i.e. optimistic; the fact that it still fails to reach significance therefore strengthens rather than weakens the negative",
+  "limits": ["units are not independent (see the weakness note)",
+             "each drug still has only a few concentration points",
+             "only 12 cells, and only about a dozen layout clusters",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["more layouts, not more repeats, would be needed; BATCHIE's 21 high-diversity layouts are exhausted"],
+  "register_updates": {"C62": "new: still undetermined but the gain is bounded below 6 pp",
+                       "C61": "annotated with the power increase"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C62 added, C61 annotated)",
+                                "research/SYNTHESIS.md (C62 noted)", "research/INDEX.md (added R89 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

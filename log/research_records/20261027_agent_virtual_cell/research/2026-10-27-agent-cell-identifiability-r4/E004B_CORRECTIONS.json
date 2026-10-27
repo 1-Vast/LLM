@@ -1,0 +1,131 @@
+{
+  "kind": "corrections_after_independent_review",
+  "input_sha256": "56a4e4a195673160edcb1baa209a15409b3639ff6ab0405558cc5ab3198d5f23",
+  "review": "challenge/REVIEW.md",
+  "C1_duplicate_provenance": {
+    "n_pairs": 4883,
+    "pairs_by_iteration": {
+      "-1": 4883
+    },
+    "probe_stage_is_11": true,
+    "pairs_at_stage_11": 0,
+    "verdict": "Duplicates come only from the iteration(s) shown; if 11 is absent, the probe's own stage contributes no duplicate pairs, so sigma_e is borrowed across plate formats."
+  },
+  "C2_plate_offset": {
+    "n_replicate_pairs": 115,
+    "mean_offset": -0.0032598107839896533,
+    "sd_of_offset_across_files": 0.016639868110466548,
+    "mean_abs_offset": 0.011577541938262744,
+    "observed_var_of_pair_mean": 2.390258346022748e-05,
+    "predicted_var_of_pair_mean_from_sigma_e": null,
+    "correction": "The frozen analysis's sigma_b = 0 was a structural artefact: a file offset is constant within a file pair, so it cannot be estimated from a variance taken across wells. Report mean|offset| and sd(offset) instead.",
+    "note": "predicted vs observed variance of the pair mean is not directly comparable across pairs with different n; the informative quantities are the offset distribution and the fact that offsets are shared inside a file."
+  },
+  "C3_level_mixed_se": {
+    "bin_sigma": {
+      "[0,.25)": 0.02898345980975808,
+      "[.25,.5)": 0.04535202236224081,
+      "[.5,.75)": 0.05887792521905318,
+      "[.75,1]": 0.04076155120138758
+    },
+    "cells": {
+      "A673": {
+        "per_well_sigma": [
+          {
+            "well_y": 0.9343294159333844,
+            "level": "[.75,1]",
+            "sigma": 0.04076155120138758
+          },
+          {
+            "well_y": 0.6311935274316424,
+            "level": "[.5,.75)",
+            "sigma": 0.05887792521905318
+          },
+          {
+            "well_y": 0.9370612344276265,
+            "level": "[.75,1]",
+            "sigma": 0.04076155120138758
+          },
+          {
+            "well_y": 0.6852453029257801,
+            "level": "[.5,.75)",
+            "sigma": 0.05887792521905318
+          }
+        ],
+        "se_level_mixed": 0.05063651910648954,
+        "dbar": 0.27747591000179417,
+        "t_level_mixed": 5.479758776827791,
+        "t_uniform_sigma": 6.8072951549583935
+      },
+      "BJ": {
+        "per_well_sigma": [
+          {
+            "well_y": 0.8790778891519334,
+            "level": "[.75,1]",
+            "sigma": 0.04076155120138758
+          },
+          {
+            "well_y": 0.8995959285970027,
+            "level": "[.75,1]",
+            "sigma": 0.04076155120138758
+          },
+          {
+            "well_y": 0.8584440599392772,
+            "level": "[.75,1]",
+            "sigma": 0.04076155120138758
+          },
+          {
+            "well_y": 0.9069964777457572,
+            "level": "[.75,1]",
+            "sigma": 0.04076155120138758
+          }
+        ],
+        "se_level_mixed": 0.04076155120138758,
+        "dbar": -0.03453522862577463,
+        "t_level_mixed": -0.8472501072186625,
+        "t_uniform_sigma": -0.8472501072186625
+      }
+    },
+    "note": "Matching on the pair mean mis-assigns A673's O2 (0.63) to the [.75,1] bin; matching on each well's own level gives a larger SE for A673. No decision flips."
+  },
+  "C4_power": {
+    "sigma_e": 0.04076155120138758,
+    "min_detectable_d_K2_two_sided_95": 0.0798911729388764,
+    "min_detectable_d_K2_80pct_power_two_sided": 0.11419609442996419,
+    "plates_for_bj_mixed_criterion_old": 17.225968862830626,
+    "plates_for_bj_consistent_two_sided": 21.867937649012102,
+    "correction": "The frozen analysis paired a one-sided power z with a two-sided 1.96 criterion; the consistent figure is larger by (2.8016/2.4865)^2 = 1.269. Any plates-needed number also conditions on the observed dbar as if it were the true effect, which is not established for BJ.",
+    "a673_plates_needed": "not reportable (effect is ~10x the K=2 floor; the formula returns a fraction)"
+  },
+  "C5_placement": {
+    "reference": "within-file same-condition duplicate |d| at level [0.75,1], n=2453",
+    "cells": {
+      "A673": {
+        "dbar": 0.27747591000179417,
+        "scale_matched_single_plate_value": 0.39241019515635367,
+        "pctile_of_scale_matched_in_duplicate_abs_d": 0.9995923359152059,
+        "pctile_of_raw_dbar_in_duplicate_abs_d_WRONG_SCALE": 0.9991846718304117
+      },
+      "BJ": {
+        "dbar": -0.03453522862577463,
+        "scale_matched_single_plate_value": 0.04884018870222603,
+        "pctile_of_scale_matched_in_duplicate_abs_d": 0.7068895230330208,
+        "pctile_of_raw_dbar_in_duplicate_abs_d_WRONG_SCALE": 0.5727680391357521
+      }
+    },
+    "correction": "The frozen JSON reported the percentile of |dbar| against a null whose scale is sqrt(2)*sigma_e. The scale-matched statistic is |dbar|*sqrt(2). Both are descriptive yardsticks, not p-values."
+  },
+  "C6_row_effect_blind_spot": {
+    "n_files": 26,
+    "mean_rowO_minus_rowN_high_control": -0.0029485004602146734,
+    "se": 0.006620714484709681,
+    "bj_probe_rows": "N22 vs O22 differ by exactly one row",
+    "threshold_that_would_explain_bj_entirely": 0.03453522862577463,
+    "note": "A row offset cancels from sigma_e (duplicates share positions) and from an identical-layout comparison, yet enters the BJ contrast directly. Bounding it from high-control strips is the only handle available; if its bound is well below the BJ effect the negative survives, but the design cannot see this component."
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r4/e004b_corrections.py": "e6262687073f594a6b4297d19cddbf97b2773e60946d207ee338dad331a103b8",
+    "research/2026-10-27-agent-cell-identifiability-r4/challenge/REVIEW.md": "c24a1f85209df6e54f7f38e87b0f66beb4dd6716eb32dd6baee464f3616341a2",
+    "research/eight_directions_20261026/evidence_audit/raw/PAIR_SCREEN.csv": "56a4e4a195673160edcb1baa209a15409b3639ff6ab0405558cc5ab3198d5f23"
+  }
+}

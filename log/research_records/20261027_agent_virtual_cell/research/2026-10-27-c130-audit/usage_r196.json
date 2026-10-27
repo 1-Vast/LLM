@@ -1,0 +1,72 @@
+{
+  "agent_role": "independent_runner_c130_audit",
+  "audit_line": "R196-v1",
+  "task_id": "task-20",
+  "date": "2026-10-27",
+  "status": "VERDICT WITHDRAWN by REVOCATION_R196.md; v2 supersedes. v1 numbers preserved unchanged.",
+  "environment": {
+    "os": "Windows (PowerShell pwsh)",
+    "workspace": "D:\\MAESTRO",
+    "output_dir": "research/2026-10-27-c130-audit",
+    "python": "D:\\anaconda\\envs\\maestro\\python.exe (Python 3.11.16)",
+    "packages": {"pandas": "2.3.3", "numpy": "2.4.6", "scipy": "1.17.1"}
+  },
+  "protocol": {
+    "file": "PROTOCOL_R196.md",
+    "frozen_at": "2026-10-27T17:50:09+08:00",
+    "frozen_before_r196_py_existed": true,
+    "sha256": "b7257ea952431211896e0b84b8ff19cefdce52f652b70dc0914af5239763e309"
+  },
+  "runs": [
+    {
+      "command": "python r196.py",
+      "purpose": "v1 audit run (cell-clustered primary inference unit; row-level control)",
+      "wall_seconds_range": [280.7, 288.2],
+      "status": "ok",
+      "notes": "two runs produced identical r196.json / r196_rows.csv SHA256; wall below the 15-min budget"
+    }
+  ],
+  "tokens": {"input_tokens": null, "output_tokens": null, "total_tokens": null,
+             "note": "runtime token accounting is not available; null, not 0"},
+  "cost": {"usd": null, "note": "not available; recorded as null"},
+  "registered_verdict_after_revocation": {
+    "verdict": ["inconclusive", "weakened"],
+    "inconclusive_reason": "audit-target unit = held-out drugs: MDE80_drug = 0.152731 > delta_min = 0.05",
+    "weakened_reason": "5-fold t-CI [-0.014399, 0.303714] includes 0; only a single 5-fold drug partition",
+    "not": "replicated_under_audit (withdrawn)",
+    "c130_status": "frozen but not externally/audit-level confirmed; not refuted"
+  },
+  "v1_key_numbers": {
+    "main_gain": 0.144657,
+    "cell_cluster_ci95": [0.121304, 0.166746],
+    "cell_cluster_mde80": 0.032044,
+    "pair_cluster_ci95": [0.08977, 0.187583],
+    "twoway_cluster_ci95": [0.087238, 0.1958],
+    "drug_cluster_ci95": [0.0139, 0.223292],
+    "drug_cluster_mde80": 0.152731,
+    "fold_gains": [0.082042, 0.295175, 0.268173, 0.066128, 0.011767],
+    "fold_t_interval_95_df4": [-0.014399, 0.303714],
+    "identity_rho": 0.0,
+    "annotation_only_rho": 0.148764,
+    "shuffle_null_mean": 0.00769,
+    "capacity_null_mean": 0.000931
+  },
+  "deliverables": {
+    "PROTOCOL_R196.md": "b7257ea952431211896e0b84b8ff19cefdce52f652b70dc0914af5239763e309",
+    "r196.py": "2c77b7b522f558ffbecc99df96f0ac6184f92c08ca46fbde08b779bb62e6b788",
+    "r196.json": "4732b7cf65b54a200f09dce2d559c0e6d4aacce2e28728a89ec44f36a77e99c3",
+    "r196_rows.csv": "236047b58d919d236adbaf22f692077215badf4f287006272a128d6c84e57bcb",
+    "report_r196.md": "30a8e41501d6b8936b7710cbe7e68da64adfab83c31d1a5061f71de2e812c682",
+    "record_r196.md": "9ce8fa64a50c6906f77a6083d3e34372ac685b70f0431177496b0ae0fd56c0b1"
+  },
+  "audit_context_readonly": {
+    "challenge_R196.md": "task-29 independent challenge (revise); not written by this runner",
+    "REVOCATION_R196.md": "Lead revocation; not written by this runner"
+  },
+  "notes": [
+    "v1 verdict replicated_under_audit is WITHDRAWN; do not cite v1 as audit-level reliability",
+    "pre-freeze peek was disclosed in PROTOCOL_R196 section 2 (annotation-only mechanism prototype ~0.149); main arm/identity/row-level were not run before freeze",
+    "drug-cluster bootstrap and fold dispersion were added to r196.py AFTER the first v1 run -- disclosed in record_r196.md; this informed the AMENDMENT-001 primary unit",
+    "v1 products are preserved unchanged; v2 rerun under AMENDMENT-001/002 is in r196_v2.json / report_r196_v2.md"
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "kind": "does_pathway_stay_the_better_prior_under_tissue_holdout",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "repeats": 200,
+    "holdout": 0.2,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261049
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 196,
+    "mean_eval": 1401.454081632653
+  },
+  "arms": {
+    "identity": 0.0023169336373159983,
+    "plus_pathway": 0.13190057313833733,
+    "plus_target": 0.05502116741145844,
+    "plus_random": 0.0013999694295895428
+  },
+  "contrasts": {
+    "pathway_minus_identity": {
+      "n": 134,
+      "mean_diff": 0.1348696159909035,
+      "sd": 0.1382757620633839,
+      "ci95": [
+        0.1108395362686358,
+        0.15879532129956506
+      ],
+      "mde_80pct": 0.02767490609297155
+    },
+    "target_minus_identity": {
+      "n": 128,
+      "mean_diff": 0.06060570162761973,
+      "sd": 0.11873108828573183,
+      "ci95": [
+        0.03960077568383175,
+        0.08073235843440021
+      ],
+      "mde_80pct": 0.023763179241187184
+    },
+    "pathway_minus_target": {
+      "n": 184,
+      "mean_diff": 0.07650749883080697,
+      "sd": 0.16524945116940476,
+      "ci95": [
+        0.052635459802505224,
+        0.0997624071890658
+      ],
+      "mde_80pct": 0.033073497298333726
+    },
+    "random_minus_identity": {
+      "n": 134,
+      "mean_diff": -0.0008093655483071512,
+      "sd": 0.04604375770774424,
+      "ci95": [
+        -0.008630454398825593,
+        0.00708979568345227
+      ],
+      "mde_80pct": 0.009215329221221383
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r146/PROTOCOL_E136.md": "d6bb8ff2c2251834b8844fdd6cf879b70e86126fd01a46576933c4c96f369ccc",
+    "research/2026-10-27-agent-cell-identifiability-r146/e146_transfer.py": "ca1c2af2546eef1088351dded50c6f14bcf57dad66c138d5fadebfd82459f13d"
+  },
+  "decisions": {
+    "pathway_minus_target": 0.07650749883080697,
+    "underpowered": false,
+    "H358_ranking_preserved": true,
+    "H359_ranking_not_preserved": false,
+    "verdict": "pathway_stays_the_better_prior_under_tissue_holdout_so_C113_generalises"
+  },
+  "limits": [
+    "The double holdout leaves a small evaluation set, so the minimum detectable effect is reported.",
+    "Only ridge.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "the_ranking_is_robust_to_the_shift": {
+    "in_distribution_R145": {
+      "pathway": 0.1254,
+      "target": 0.0536,
+      "pathway_minus_target": -0.0685
+    },
+    "under_tissue_holdout_here": {
+      "pathway": 0.1349,
+      "target": 0.0606,
+      "pathway_minus_target": 0.0765
+    },
+    "reading": "the sign and rough magnitudes are preserved: pathway is roughly twice target's contribution in both regimes, and the pathway-minus-target contrast is significant in the new direction with a minimum detectable effect of 0.033 against an observed 0.0765, so this is not an underpowered null.",
+    "note_on_sign": "the R145 entry is written as target-minus-pathway and this one as pathway-minus-target, which is why the signs differ"
+  },
+  "pathway_does_not_degrade_under_the_shift": {
+    "in_distribution": 0.1254,
+    "under_tissue_holdout": 0.1349,
+    "reading": "the pathway gain is slightly larger here than within distribution, consistent with R125's finding that the increment survives an unseen tissue",
+    "caveat": "the two rounds use different seeds and different evaluation pools, so the difference is descriptive"
+  },
+  "what_this_adds": {
+    "to_C113": "the recommendation to use pathway rather than target now holds under a distribution shift, not only within distribution",
+    "to_the_practitioner_rule": "for an unseen drug, substitute its pathway membership; this remains preferable to target even when the tissue has never been seen",
+    "limits_that_remain": "still one resource and still ridge"
+  }
+}

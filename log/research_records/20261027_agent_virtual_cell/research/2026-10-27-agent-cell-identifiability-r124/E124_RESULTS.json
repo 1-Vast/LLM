@@ -1,0 +1,157 @@
+{
+  "kind": "hardest_cell_both_drugs_and_cell_unseen",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "repeats": 200,
+    "holdout": 0.2,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261031
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 400,
+    "identity_dims": 130,
+    "pathway_dims": 38
+  },
+  "by_pool": {
+    "both_seen_cell": {
+      "n": 200,
+      "identity": 0.24299999999999997,
+      "plus_pathway": 0.32875,
+      "plus_tissue": 0.29100000000000004,
+      "plus_random": 0.25575,
+      "pathway_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.08575,
+        "sd": 0.21250938495385877,
+        "ci95": [
+          0.055999999999999994,
+          0.1175
+        ]
+      },
+      "tissue_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.048,
+        "sd": 0.16826337335876262,
+        "ci95": [
+          0.023993749999999994,
+          0.07175
+        ]
+      },
+      "random_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.01275,
+        "sd": 0.13496672770701562,
+        "ci95": [
+          -0.006249999999999997,
+          0.031249999999999997
+        ]
+      },
+      "room": -0.007000000000000034,
+      "mde_80pct": 0.04210476497209701
+    },
+    "both_unseen_cell": {
+      "n": 200,
+      "identity": 0.257,
+      "plus_pathway": 0.30774999999999997,
+      "plus_tissue": 0.28075,
+      "plus_random": 0.26425,
+      "pathway_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.05075,
+        "sd": 0.17229441175385823,
+        "ci95": [
+          0.027750000000000004,
+          0.07400624999999998
+        ]
+      },
+      "tissue_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.023750000000000007,
+        "sd": 0.1542478508682939,
+        "ci95": [
+          0.002493750000000003,
+          0.04500624999999996
+        ]
+      },
+      "random_minus_identity": {
+        "n": 200,
+        "mean_diff": 0.0072499999999999995,
+        "sd": 0.14295846640048251,
+        "ci95": [
+          -0.011749999999999997,
+          0.02625624999999997
+        ]
+      },
+      "room": 0.007000000000000006,
+      "mde_80pct": 0.03413691924465844
+    }
+  },
+  "files": {},
+  "decisions": {
+    "H309_increment_survives_the_hardest_cell": true,
+    "H310_increment_disappears_when_cell_unseen": false,
+    "hardest_cell_underpowered": false,
+    "hardest_mde_pct": 0.03413691924465844,
+    "hardest_observed_gain": 0.05075,
+    "verdict": "pathway_increment_survives_an_unseen_cell_so_the_condition_is_about_drugs"
+  },
+  "limits": [
+    "Dense criterion only; nothing here speaks to the sparse flag.",
+    "The both_unseen pool has the fewest keys.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "the_four_seed_record": {
+    "R122_both_unseen_mixed_cells": {
+      "gain": 0.082,
+      "ci95": [
+        0.0507,
+        0.1128
+      ],
+      "seed": 20261029
+    },
+    "R123_both_unseen_mixed_cells": {
+      "gain": 0.047,
+      "ci95": [
+        0.0175,
+        0.0783
+      ],
+      "seed": 20261030
+    },
+    "R124_both_seen_cell": {
+      "gain": 0.0858,
+      "ci95": [
+        0.056,
+        0.1175
+      ],
+      "seed": 20261031
+    },
+    "R124_both_unseen_cell": {
+      "gain": 0.0508,
+      "ci95": [
+        0.0278,
+        0.074
+      ],
+      "seed": 20261031
+    },
+    "summary": "four independent split sets, four positive and significant estimates, magnitudes from 4.7 to 8.6 pp"
+  },
+  "definitional_fix": {
+    "problem": "R123's both_unseen pool was coded as au and bu without excluding unseen cells, which is not the C74/R101 definition",
+    "fix": "this round splits it into both_seen_cell and both_unseen_cell and reports both",
+    "consequence": "the increment is present in both, so the earlier conflation did not create the result, but the condition should now be stated in terms of drugs only",
+    "magnitudes": {
+      "both_seen_cell": 0.0858,
+      "both_unseen_cell": 0.0508,
+      "reading": "an unseen cell reduces the increment but does not remove it"
+    }
+  },
+  "how_this_sits_with_R119": {
+    "R119": "holding out a whole TISSUE made the annotation blocks worse than identity (-1.17 and -2.08 pp)",
+    "R124": "holding out individual CELLS while the tissue level remains in the training data leaves the increment intact (+5.08 pp)",
+    "reconciliation": "the annotation blocks are useful only when the tissue level is in distribution. An unseen cell within a known tissue still benefits; an unseen tissue does not.",
+    "status": "stated as a qualifier, not tested as a separate contrast in this round"
+  }
+}

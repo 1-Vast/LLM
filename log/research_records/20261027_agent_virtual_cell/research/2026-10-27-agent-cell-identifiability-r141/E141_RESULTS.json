@@ -1,0 +1,161 @@
+{
+  "kind": "dose_response_of_substitution_to_content_corruption",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "repeats": 200,
+    "holdout": 0.2,
+    "fractions": [
+      0.0,
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "n_boot": 2000,
+    "seed": 20261044
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 200
+  },
+  "by_fraction": {
+    "f0.00": {
+      "rho": 0.12593913243436616,
+      "vs_identity": {
+        "n": 168,
+        "mean_diff": 0.12266188147924975,
+        "ci95": [
+          0.10935675013621027,
+          0.13607332631571217
+        ]
+      }
+    },
+    "f0.25": {
+      "rho": 0.07419893602561217,
+      "vs_identity": {
+        "n": 168,
+        "mean_diff": 0.07244518670205402,
+        "ci95": [
+          0.056871648843619324,
+          0.08776307374355607
+        ]
+      },
+      "vs_uncorrupted": {
+        "n": 200,
+        "mean_diff": -0.051740196408754005,
+        "ci95": [
+          -0.06672503072920018,
+          -0.0379240724581774
+        ]
+      }
+    },
+    "f0.50": {
+      "rho": 0.036391340836387114,
+      "vs_identity": {
+        "n": 168,
+        "mean_diff": 0.034338403519268944,
+        "ci95": [
+          0.01715206952597953,
+          0.05095145638718158
+        ]
+      },
+      "vs_uncorrupted": {
+        "n": 200,
+        "mean_diff": -0.08954779159797907,
+        "ci95": [
+          -0.10810726183920481,
+          -0.0724201310408749
+        ]
+      }
+    },
+    "f0.75": {
+      "rho": 2.471803883527135e-05,
+      "vs_identity": {
+        "n": 168,
+        "mean_diff": 0.0007986623335996991,
+        "ci95": [
+          -0.015651545225913128,
+          0.016584380422318322
+        ]
+      },
+      "vs_uncorrupted": {
+        "n": 200,
+        "mean_diff": -0.12591441439553092,
+        "ci95": [
+          -0.14269756523924138,
+          -0.10789964370007782
+        ]
+      }
+    },
+    "f1.00": {
+      "rho": -0.012337022345654083,
+      "vs_identity": {
+        "n": 168,
+        "mean_diff": -0.011659074793594102,
+        "ci95": [
+          -0.02850332128381915,
+          0.0035056391149233474
+        ]
+      },
+      "vs_uncorrupted": {
+        "n": 200,
+        "mean_diff": -0.13827615478002026,
+        "ci95": [
+          -0.15960935108991803,
+          -0.11658393259352519
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r141/PROTOCOL_E131.md": "dc071860ee834c5f9be05cf67b2ab062a6e067bee01a01d12c864542385e8229",
+    "research/2026-10-27-agent-cell-identifiability-r141/e141_dose.py": "c955c14af0d615dfcd385b747ad0523632d03bf8c0db7615e84841557b1061a7"
+  },
+  "identity_rho": -0.0001902884172093749,
+  "decisions": {
+    "rhos": [
+      0.12593913243436616,
+      0.07419893602561217,
+      0.036391340836387114,
+      2.471803883527135e-05,
+      -0.012337022345654083
+    ],
+    "monotone": true,
+    "significant_drops_vs_uncorrupted": 4,
+    "H348_graded_dose_response": true,
+    "H349_threshold_like": false,
+    "verdict": "the_substitution_value_is_a_graded_function_of_how_much_of_the_grouping_is_real"
+  },
+  "limits": [
+    "Corruption is by proportion and slightly changes group sizes.",
+    "Only the both-unseen condition and only ridge.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "the_curve": {
+    "rho_by_corruption": {
+      "f0.00": 0.12593913243436616,
+      "f0.25": 0.07419893602561217,
+      "f0.50": 0.036391340836387114,
+      "f0.75": 2.471803883527135e-05,
+      "f1.00": -0.012337022345654083
+    },
+    "identity_baseline": -0.0001902884172093749,
+    "steps": {
+      "0_to_25": -0.05174019640875399,
+      "25_to_50": -0.03780759518922506,
+      "50_to_75": -0.036366622797551845,
+      "75_to_100": -0.012361740384489355
+    },
+    "reading": "the decay is monotone and every quarter of corruption costs a significant amount, so the substitution value is a graded function of how much of the grouping is genuinely informative rather than an all-or-nothing property"
+  },
+  "the_shape_is_front_loaded": {
+    "largest_step": "the first quarter, -0.0517",
+    "then": "roughly steady at -0.038 and -0.036",
+    "last_step": "only -0.0123, because by 75 percent corruption the benefit is already gone (rho 0.0000, the identity level)",
+    "interpretation": "losing a quarter of the true grouping is the most damaging relative to what is left, and once three quarters are corrupted the real structure no longer carries anything - the curve has reached the noise floor rather than continuing to fall"
+  },
+  "what_this_adds_to_C108": {
+    "before": "content matters, established only at the two endpoints",
+    "now": "content matters in proportion: rho falls from 0.126 to -0.012 across the corruption sweep, with four of four quarter-steps significant. So the pathway's value is carried by its specific assignments, not merely by having a plausible-looking block"
+  }
+}

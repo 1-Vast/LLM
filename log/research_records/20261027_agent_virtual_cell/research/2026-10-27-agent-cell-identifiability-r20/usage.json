@@ -1,0 +1,40 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r20",
+  "round": "R20 (goal round 18/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Replication of the program's central negative claim on a never-analysed design in the same archive."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r20": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the replication is a direct test and its direction is unambiguous (9/9 layouts).",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e020_replicate.py"], "runs": 1, "bootstrap": 1000, "permutation_draws": 25,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E020_RESULTS.json", "cross_cell": "E020_cross_cell.csv",
+                "same_cell": "E020_same_cell.csv", "protocol": "PROTOCOL_E020.md"},
+  "design": {
+    "layouts": 21, "pairs_per_layout": 351, "cells_per_layout": "2 or 3",
+    "layouts_with_same_cell_replicate": 9, "distinct_cell_lines": 13,
+    "note": "The ordering here is across different compound pairs at one dose each, not across dose ratios within a grid: same family, different object from R5."
+  },
+  "results": {
+    "cross_cell": {"n": 25, "mean_rho": 0.774, "median_rho": 0.816, "ci95": [0.719, 0.830]},
+    "same_cell_ceiling": {"n": 14, "mean_rho": 0.931, "median_rho": 0.947, "ci95": [0.905, 0.967]},
+    "independence_null": {"n": 25, "mean_rho": 0.035},
+    "gap": {"n_layouts": 9, "mean_gap": 0.1395, "ci95": [0.1015, 0.1735], "layouts_positive": 9},
+    "per_layout_cross_cell_median_range": [-0.095, 0.915]
+  },
+  "decisions": {"H043_same_cell_exceeds_cross_cell": true, "H044_cross_cell_not_zero": true,
+                "H045_magnitude_matches_validation_plates": true, "verdict": "replicates_on_high_diversity_design"},
+  "interpretation": "the direction replicates (gap +0.14 vs +0.18 on validation plates) but the absolute cross-cell agreement is high (0.816), so the claim must read 'largely shared yet systematically below the reproducibility ceiling by 0.14-0.18', not 'ordering is inconsistent'",
+  "register_updates": {"C2": "upgraded to replicated on two independent designs, with the sharpened wording",
+                       "unchanged": "C3-C5 stay exploratory; they rest on the validation-plate dose-grid unit and are not transferred by this result"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C2 upgraded)", "research/INDEX.md (added R20 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "mechanism_claim_made": false
+  }
+}

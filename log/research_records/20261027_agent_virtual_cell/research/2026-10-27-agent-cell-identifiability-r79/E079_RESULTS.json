@@ -1,0 +1,93 @@
+{
+  "kind": "three_feature_advance_model_for_never_benefiting_cells",
+  "n_cells": 123,
+  "n_never": 32,
+  "features": [
+    "B0",
+    "base",
+    "tissue"
+  ],
+  "loo_auc_three_feature": 0.7888049450549451,
+  "ci_three": [
+    0.7008060672580257,
+    0.8717186905405676
+  ],
+  "loo_auc_B0_only": 0.5614697802197801,
+  "ci_B0": [
+    0.43131578947368415,
+    0.6892363288052943
+  ],
+  "diff_mean_ci": [
+    0.22790817728676846,
+    [
+      0.07507821268237924,
+      0.3894230769230769
+    ]
+  ],
+  "tissue_levels": [
+    "Breast",
+    "Colon",
+    "Pancreas"
+  ],
+  "decisions": {
+    "H200_three_feature_reaches_065": true,
+    "H201_beats_B0_alone": true,
+    "verdict": "advance_rule_is_usable_for_triage_but_not_for_exclusion"
+  },
+  "limits": [
+    "32 positives in 123 cells makes the AUC variance large; bootstrap CIs are reported.",
+    "No feature search was performed, to avoid overfitting the 32 positives.",
+    "Tissue has only three levels, so it contributes at most a small offset.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "operating_points": [
+    {
+      "threshold": 0.2,
+      "n_flagged": 68,
+      "precision": 0.4411764705882353,
+      "recall": 0.9375,
+      "flagged_frac": 0.5528455284552846
+    },
+    {
+      "threshold": 0.3,
+      "n_flagged": 44,
+      "precision": 0.4772727272727273,
+      "recall": 0.65625,
+      "flagged_frac": 0.35772357723577236
+    },
+    {
+      "threshold": 0.4,
+      "n_flagged": 28,
+      "precision": 0.5,
+      "recall": 0.4375,
+      "flagged_frac": 0.22764227642276422
+    },
+    {
+      "threshold": 0.5,
+      "n_flagged": 12,
+      "precision": 0.5,
+      "recall": 0.1875,
+      "flagged_frac": 0.0975609756097561
+    },
+    {
+      "threshold": 0.6,
+      "n_flagged": 9,
+      "precision": 0.4444444444444444,
+      "recall": 0.125,
+      "flagged_frac": 0.07317073170731707
+    },
+    {
+      "threshold": 0.7,
+      "n_flagged": 4,
+      "precision": 0.5,
+      "recall": 0.0625,
+      "flagged_frac": 0.032520325203252036
+    }
+  ],
+  "base_rate_never_benefit": 0.26,
+  "practical_reading": {
+    "auc_vs_precision_gap": "the LOO AUC is 0.789 but precision never exceeds about 0.50 at any threshold, against a 0.26 base rate. The model ranks well but does not separate cleanly, so 'flag as never-benefiting' is wrong about half the time.",
+    "what_it_is_good_for": "triage: at threshold 0.2 it flags 55% of cells and captures 94% of the truly never-benefiting ones, so it can prioritise which cells to skip when measuring is expensive",
+    "what_it_is_not_good_for": "certifying that a given cell will not benefit - precision 0.44-0.50 is too low for an exclusion rule"
+  }
+}

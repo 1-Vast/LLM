@@ -1,0 +1,49 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r39",
+  "round": "R39 (goal round 37/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Within-task manipulation of prediction strength on the locally held GDSC screen."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r39": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: this round is itself the challenge to R38's attribution, and it retracts it per the pre-registered rule.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e039_strength.py"], "runs": 1, "repeats": 40, "feature_sets": 3,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E039_RESULTS.json", "rows": "E039_rows.csv", "protocol": "PROTOCOL_E039.md"},
+  "design": {
+    "task_held_fixed": "GDSC one-shot budgeted selection, same hit definition, same splits",
+    "feature_sets": {"tissue": 3, "pathway": 41, "full": 139},
+    "goal": "manipulate prediction strength within one task and see whether the mix/exploit crossover moves"
+  },
+  "results": {
+    "prediction_rho": {"tissue": 0.098, "pathway": 0.325, "full": 0.375},
+    "k_star_search": {"tissue": null, "pathway": 50, "full": 20},
+    "pathway_at_50": {"search": 0.028, "eval": 0.051},
+    "full_at_75": {"search": -0.023, "eval": -0.027},
+    "full_at_100": {"search": -0.038, "eval": -0.040},
+    "tissue_degenerate": "prediction is constant within a tissue, so exploit and mix differ by exactly 0.0000 at every k"
+  },
+  "decisions": {"H100_strength_manipulated": true, "H101_crossover_moves_with_strength": false,
+                "H102_no_crossover_when_strong": false, "verdict": "moderator_not_supported"},
+  "retraction": {
+    "claim": "R38's attribution that prediction strength is the moderator of the budget rule",
+    "status": "retracted per the pre-registered rule (H101 failed)",
+    "replacement": "cross-task difference, cause undetermined"
+  },
+  "kept": [
+    "R37's rule still holds under the pathway feature set (k=50: search +2.8 pp, eval +5.1 pp)",
+    "more features is not monotonically better: the full set has a higher exploit level but a narrower mix window that reverses at k>=75"
+  ],
+  "method_gap": "the feature-set replacement changes dimensionality (3/41/139) together with strength, so strength and dimension are not separable; a proper test needs a fixed-dimension strength manipulation (e.g. noise injection into pathway features)",
+  "register_updates": {"C28": "narrowed to GDSC + the pathway feature set", "C32": "R38's moderator attribution retracted",
+                       "C33": "new and refuted: the moderator is not supported"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C28 narrowed, C32 revised, C33 added)", "research/INDEX.md (added R39 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "mechanism_claim_made": false
+  }
+}

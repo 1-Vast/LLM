@@ -1,0 +1,42 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r32",
+  "round": "R32 (goal round 30/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Same-keys control for the R31 cross-screen comparison; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r32": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: this round is itself the control for R31 and the noise asymmetry is disclosed.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e032_same_keys.py"], "runs": 1, "bootstrap": 1000,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E032_RESULTS.json", "protocol": "PROTOCOL_E032.md"},
+  "design": {
+    "confound_removed": "R31 compared arms on different key sets; this round restricts BOTH arms to the 4,725 overlapping keys",
+    "arms": {"within_screen": "the two anchor concentrations inside the original screen, on those keys",
+             "cross_screen": "original mean vs validation mean on the same keys"}
+  },
+  "results": {
+    "within_screen": {"pearson": 0.6126, "ci95": [0.5884, 0.6360], "n": 4686, "bool_agreement": 0.826},
+    "cross_screen": {"pearson": 0.6888, "ci95": [0.6698, 0.7061], "n": 4725, "bool_agreement": 0.907},
+    "ratio": 1.124,
+    "subset_minus_full_baseline": 0.0030,
+    "composition": {"subset": {"Breast": 0.344, "Colon": 0.365, "Pancreas": 0.292},
+                    "full": {"Breast": 0.408, "Colon": 0.360, "Pancreas": 0.232},
+                    "cells_in_subset": 96, "cells_total": 125}
+  },
+  "decisions": {"H079_no_extra_decay_same_keys": true, "H080_subset_not_easier": true,
+                "H081_composition_differs": true, "verdict": "cross_screen_decay_holds_on_same_keys"},
+  "interpretation": "R31's conclusion survives the same-keys control: cross-screen agreement is at least as large as within-screen concentration-change agreement, and the validation subset is not noticeably easier. The ratio above 1 and the higher binary agreement are explained by a noise asymmetry (means of two concentrations vs single concentrations), NOT by screens being more stable than concentrations.",
+  "register_updates": {"C26": "updated to the same-keys version (0.6888 vs 0.6126, ratio 1.124)",
+                       "F9": "updated: subset covers 96/125 cells, slightly enriched in Pancreas, no detectable selection on difficulty"},
+  "next_gates": ["a genuine decision evaluation on GDSC (choose k cell-combination pairs to confirm, score realised synergy hits), where the power problem that stopped R8/R9 may no longer apply"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C26, F9 updated)", "research/INDEX.md (added R32 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "mechanism_claim_made": false
+  }
+}

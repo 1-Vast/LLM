@@ -1,0 +1,50 @@
+{
+  "experiment": "E153",
+  "round": "R153 (goal round 151/256)",
+  "date": "2026-10-27",
+  "type": "does a tree react to uniform rescaling of one block; if not, delete the scale warning",
+  "compute": {
+    "script": "e153_tree_scale.py",
+    "scales": 5,
+    "tree_fits": 5,
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "tool": "research/tools/feature_audit.py",
+    "results": "E153_RESULTS.json",
+    "protocol": "PROTOCOL_E143.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "results": {
+    "max_abs_delta_all_scales": 0.0,
+    "rho_all_scales": 0.425233,
+    "rho_delta_all_scales": 0.0
+  },
+  "conclusion": "the tree is bit-for-bit invariant to uniform rescaling, so together with R152 the scale warning is a pure false alarm for both model families used here",
+  "mechanism": "splits preserve ordering and HistGradientBoosting bins by quantile, so every bin contains exactly the same rows after rescaling",
+  "action": "SCALE_SHRUNK removed from the tool; std_ratio is still reported as data but raises nothing; constant columns are still flagged",
+  "the_arc": {
+    "R150": "added the ratio warning without validating its relevance",
+    "R151": "validated the implementation and found zero false positives on real designs",
+    "R152": "found it measures something unrelated to predictions for linear models",
+    "R153": "confirmed the same for trees, so it was deleted"
+  },
+  "lesson": "the fourth-round question applies to checks themselves: does what this measures relate to any consequence",
+  "limits": [
+    "One tree configuration and one encoding.",
+    "Only uniform rescaling was tested; scaling a subset of rows WOULD change ordering and was not tested.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "next_gate": "test partial rescaling, where only 30 percent of evaluation rows are scaled, since that does change ordering",
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "note": "changes under research/tools/ only",
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

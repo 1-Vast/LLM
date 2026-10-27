@@ -1,0 +1,55 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r80",
+  "round": "R80 (goal round 78/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Nested validation of the R79 triage rule, with threshold selection inside each outer fold."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r80": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round overturns its own previous verdict by validating the threshold honestly.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, scikit-learn 1.9.0",
+    "scripts": ["e080_nested.py"], "runs": 1,
+    "logistic_fits": "about 15,000 (123 outer x 122 inner)",
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E080_RESULTS.json", "folds": "E080_folds.csv", "protocol": "PROTOCOL_E077.md"},
+  "design": {
+    "outer": "leave one cell out of 123",
+    "inner": "leave-one-out within the 122 training cells to select the threshold",
+    "threshold_rule": "fixed in advance: among thresholds with precision >= 0.50 take the best recall; otherwise take the best precision",
+    "reported": "precision and recall of the flagged set on the outer folds only"
+  },
+  "results": {
+    "n_outer_folds": 123, "n_positive": 32, "base_rate": 0.260,
+    "n_flagged": 37, "flagged_frac": 0.301, "true_positives": 17,
+    "nested_precision": 0.459, "nested_recall": 0.531,
+    "in_sample_R79": {"precision": 0.44, "recall": 0.94},
+    "thresholds_chosen": {"mean": 0.353, "min": 0.281, "max": 0.419},
+    "inner_self_estimate": {"precision": 0.507, "recall": 0.571}
+  },
+  "decisions": {"H202_precision_drops_when_nested": false,
+                "H203_still_useful_for_triage": false,
+                "H204_usable_for_exclusion": false,
+                "verdict": "rule_does_not_survive_nested_validation"},
+  "overturns": "R79 concluded the rule was usable for triage because at threshold 0.2 it flagged 55% of cells and captured 94% of the never-benefiting ones; that threshold was read off the same LOO predictions, and honest inner selection collapses recall to 0.531 while flagging only 30% of cells",
+  "why": "the R79 threshold captured the tail of one particular sample; the inner folds hold only about 31 positives, so the selected threshold itself varies widely (0.281-0.419)",
+  "line_status": {
+    "R78": "single features: AUC 0.63, below the 0.65 bar",
+    "R79": "three features: AUC 0.79 but precision 0.50, claimed triage-only",
+    "R80": "nested validation: recall 0.53 and precision 0.46, so not even triage",
+    "conclusion": "advance identification of which cells to personalise is closed as not achievable on this resource"
+  },
+  "limits": ["32 positives make every nested estimate noisy (precision CI roughly +/-0.16)",
+             "the threshold rule was fixed before running, which removes tuning freedom but may not be the best rule",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "register_updates": {"C54": "new and decisive: the triage rule fails nested validation",
+                       "C53": "marked as overturned by R80"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C54 added, C53 marked overturned)",
+                                "research/INDEX.md (added R80 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

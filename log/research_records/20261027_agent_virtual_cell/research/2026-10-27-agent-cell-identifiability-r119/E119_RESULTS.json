@@ -1,0 +1,143 @@
+{
+  "kind": "can_identity_plus_pathway_transfer_to_an_unseen_tissue",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "subsamples": 60,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "units": 180,
+    "tissues": [
+      "Breast",
+      "Colon",
+      "Pancreas"
+    ]
+  },
+  "by_tissue": {
+    "Breast": {
+      "n": 60,
+      "base": 0.011733333333333333,
+      "marginal": 0.0575,
+      "identity": 0.051666666666666666,
+      "combo": 0.04,
+      "random": 0.011666666666666667,
+      "combo_minus_random": {
+        "n": 60,
+        "mean_diff": 0.028333333333333332,
+        "ci95": [
+          0.013333333333333334,
+          0.042499999999999996
+        ]
+      },
+      "combo_minus_identity": {
+        "n": 60,
+        "mean_diff": -0.011666666666666665,
+        "ci95": [
+          -0.02,
+          -0.004166666666666667
+        ]
+      },
+      "combo_minus_marginal": {
+        "n": 60,
+        "mean_diff": -0.0175,
+        "ci95": [
+          -0.027500000000000007,
+          -0.007499999999999999
+        ]
+      }
+    },
+    "Colon": {
+      "n": 60,
+      "base": 0.012566666666666665,
+      "marginal": 0.028333333333333335,
+      "identity": 0.0175,
+      "combo": 0.018333333333333333,
+      "random": 0.010833333333333335,
+      "combo_minus_random": {
+        "n": 60,
+        "mean_diff": 0.0075000000000000015,
+        "ci95": [
+          -0.0025000000000000005,
+          0.016666666666666666
+        ]
+      },
+      "combo_minus_identity": {
+        "n": 60,
+        "mean_diff": 0.0008333333333333334,
+        "ci95": [
+          0.0,
+          0.00252083333333322
+        ]
+      },
+      "combo_minus_marginal": {
+        "n": 60,
+        "mean_diff": -0.010000000000000002,
+        "ci95": [
+          -0.018333333333333333,
+          -0.0016666666666666668
+        ]
+      }
+    },
+    "Pancreas": {
+      "n": 60,
+      "base": 0.023416666666666665,
+      "marginal": 0.09499999999999999,
+      "identity": 0.18416666666666667,
+      "combo": 0.16333333333333336,
+      "random": 0.02,
+      "combo_minus_random": {
+        "n": 60,
+        "mean_diff": 0.14333333333333337,
+        "ci95": [
+          0.12333333333333332,
+          0.1625
+        ]
+      },
+      "combo_minus_identity": {
+        "n": 60,
+        "mean_diff": -0.020833333333333332,
+        "ci95": [
+          -0.033333333333333326,
+          -0.009166666666666663
+        ]
+      },
+      "combo_minus_marginal": {
+        "n": 60,
+        "mean_diff": 0.06833333333333333,
+        "ci95": [
+          0.05166666666666667,
+          0.0858333333333333
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r119/PROTOCOL_E112.md": "88952deb8f7998139958bc17fddc807c9403f0c47fdf65a34c21cf333859aca0",
+    "research/2026-10-27-agent-cell-identifiability-r119/e119_combo_transfer.py": "282896439a4a7b40cb4060dc9fa43f97a3d29a623c8c4b65717d7de828ff471b"
+  },
+  "decisions": {
+    "combo_beats_random_pools": 2,
+    "combo_beats_identity_pools": 0,
+    "combo_beats_marginal_pools": 1,
+    "H296_transfers_everywhere": false,
+    "H297_annotation_increment_survives": false,
+    "H298_combo_beats_marginal_under_transfer": false,
+    "verdict": "recommended_model_does_not_transfer_and_its_increment_may_be_tissue_mediated"
+  },
+  "limits": [
+    "Only three tissues, so three folds.",
+    "Tissue is one of the combo model's own features, so holding it out removes a feature it was trained to use.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "the_suspicion_this_raises": {
+    "observation": "under tissue holdout the annotation block makes things WORSE than identity alone (Breast -1.17 pp, Pancreas -2.08 pp, both significant)",
+    "why_that_is_suspicious": "tissue is one of the features INSIDE the annotation block. When a tissue is held out, its one-hot columns never appear in training, so they contribute nothing but 3 useless dimensions while the pathway columns alone may be weaker.",
+    "what_it_implies_for_C74": "every pool in C74/C80 had tissue fully observed (cells seen, or tissue known from metadata), so the annotation increment there may be substantially TISSUE information rather than pathway information.",
+    "the_decisive_test": "repeat C74's comparison with the pathway block containing ONLY pathway features and no tissue, and see whether the increment survives",
+    "stated_before_running_it": true
+  }
+}

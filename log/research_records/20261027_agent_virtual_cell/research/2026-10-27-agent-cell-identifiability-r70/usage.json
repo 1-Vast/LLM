@@ -1,0 +1,56 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r70",
+  "round": "R70 (goal round 68/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Annotation model versus a trivial marginal-mean baseline on GDSC."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r70": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round overturns the attribution of the programme's main positive result and rewrites the synthesis accordingly.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e070_marginal_baseline.py"], "runs": 1, "repeats": 40, "settings": 2,
+    "predictors": 3, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E070_RESULTS.json", "rows": "E070_rows.csv", "protocol": "PROTOCOL_E067.md"},
+  "design": {
+    "baseline": "per-drug mean synergy from the training rows; pair score = mean of the two drug means; unseen drugs filled with the training median, i.e. ranked in the middle",
+    "settings": ["all drugs seen (~35,042-key pool)", "at least one drug unseen (~19,088-key pool)"],
+    "k": 20
+  },
+  "results": {
+    "seen": {"base": 0.0152, "ridge": 0.0388, "marginal": 0.0537, "random": 0.0225,
+             "ridge_minus_marginal": {"diff": -0.0150, "ci95": [-0.0350, 0.0063]},
+             "ridge_minus_random": {"diff": 0.0162, "ci95": [-0.0025, 0.0375]},
+             "marginal_minus_random": {"diff": 0.0312, "ci95": [0.0150, 0.0462]}},
+    "unseen": {"base": 0.0126, "ridge": 0.0575, "marginal": 0.0675, "random": 0.0187,
+               "ridge_minus_marginal": {"diff": -0.0100, "ci95": [-0.0350, 0.0187]},
+               "ridge_minus_random": {"diff": 0.0388, "ci95": [0.0175, 0.0613]},
+               "marginal_minus_random": {"diff": 0.0488, "ci95": [0.0312, 0.0675]}}
+  },
+  "decisions": {"H176_marginal_matches_ridge_on_seen": true,
+                "H177_ridge_unique_on_unseen": false,
+                "H178_both_beat_random": false,
+                "verdict": "marginal_baseline_dominates_somewhere"},
+  "attribution_change": {
+    "before": "C27/C41's decision value was attributed to the pathway-annotated ridge",
+    "after": "the value is largely attributable to per-drug mean synergy; the annotation model adds no independent decision value, and on seen-drug pools its advantage over random is not even established (CI [-0.25,+3.75])",
+    "where_the_model_is_unique": "only when both drugs are unseen, and there R66 measured just +1.25 pp with a CI lower bound of exactly 0"
+  },
+  "why_the_marginal_baseline_works_on_unseen_pools": "the any-unseen pool is mostly pairs with one seen and one unseen drug, so the marginal mean still carries information from the seen side",
+  "register_updates": {"C44": "new, negative attribution finding", "C27": "attribution note added",
+                       "C41": "attribution note added", "SYNTHESIS": "sections 1, 7, 8, 9 rewritten"},
+  "limits": ["the marginal-mean baseline is the one I constructed, not the best in the literature",
+             "unseen drugs are filled with the training median by design",
+             "the seen-pool ridge-minus-marginal CI still includes 0, so the correct statement is 'cannot claim the model is better', not 'the model is proven worse'",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["build a full marginal baseline (cell-side marginals plus drug x cell interactions) and compare it against the annotation model at the same budget"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C44 added; C27/C41 annotated)",
+                                "research/SYNTHESIS.md (sections 1, 7, 8, 9 rewritten)",
+                                "research/INDEX.md (added R70 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

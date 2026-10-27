@@ -1,0 +1,55 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r139",
+  "round": "R139 (goal round 137/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Give the tree a fair chance, sweeping capacity and adding native categorical handling, before hardening or withdrawing C106."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r139": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round discharges a caveat the previous round attached to its own claim.",
+  "compute": {"python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6, scipy 1.17.1, sklearn 1.9.0",
+              "scripts": ["e139_fair_tree.py"], "runs": 1, "repeats": 20, "configs": 3,
+              "rows": 240, "tree_fits": 240, "data_downloads": 0, "wet_lab_experiments": 0},
+  "artifacts": {"results": "E139_RESULTS.json", "rows": "E139_rows.csv", "protocol": "PROTOCOL_E129.md"},
+  "results": {
+    "base": {"full": {"identity_rho": 0.4069, "both_rho": 0.4222, "gain": 0.0152, "ci95": [0.0145, 0.0160]},
+             "absent": {"identity_rho": 0.0, "both_rho": 0.0300, "gain": 0.0275, "ci95": [-0.0734, 0.1151]},
+             "gain_difference": [0.0123, -0.0915, 0.1011]},
+    "strong": {"full": {"identity_rho": 0.4518, "both_rho": 0.4684, "gain": 0.0167, "ci95": [0.0160, 0.0174]},
+               "absent": {"identity_rho": 0.0, "both_rho": 0.0241, "gain": 0.0139, "ci95": [-0.0269, 0.0529]},
+               "gain_difference": [-0.0025, -0.0444, 0.0380]},
+    "categorical": {"full": {"identity_rho": 0.4953, "both_rho": 0.4953, "gain": -0.0, "ci95": [-0.0001, 0.0001]},
+                    "absent": {"identity_rho": 0.0, "both_rho": -0.0311, "gain": -0.0350, "ci95": [-0.0978, 0.0000]},
+                    "gain_difference": [-0.0350, -0.0978, 0.0001]}},
+  "decisions": {"H344_substitution_appears_when_fair": false, "H345_still_no_substitution": true,
+                "verdict": "C106_hardened_substitution_is_specific_to_linear_models_after_a_fair_tree"},
+  "the_fair_chance_was_real": {
+    "identity_rho_by_config": {"base": 0.4069, "strong": 0.4518, "categorical": 0.4953},
+    "reading": "the tree improved substantially without the coarsening, so the absence of substitution is not a capacity artefact"},
+  "no_substitution_anywhere": {
+    "all_three_intervals_contain_zero": true,
+    "best_absent_case_rho_tree": 0.0300,
+    "ridge_absent_case_rho": 0.13},
+  "two_side_findings": {
+    "categorical_full_identity_zero": "with native categorical splits the coarsening adds -0.0000, the tree analogue of the ridge zero: redundant once the drug is itself a native category",
+    "categorical_absent_negative": "the coarsening gives -0.0311 but the gain-difference interval [-0.0978, +0.0001] just includes zero, so it is recorded as an anomaly and not as harm"},
+  "what_C106_becomes": {
+    "before": "the monotone decay is a linear-model property, with the caveat that the tree was untuned",
+    "after": "the caveat is discharged; substitution is specific to the linear model family, holding the features fixed",
+    "still_open": "no configuration puts both models in one framework, so the mechanism behind the difference remains descriptive"},
+  "limits": ["twenty splits, so power is limited and the absent-case intervals are wide",
+             "the reserved category id is one encoding of a missing identity",
+             "the categorical absent-case negative value is not significant and must not be read as a finding",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["close this line: three configurations failed to recover substitution for the tree, so further hyperparameter work would be repetition"],
+  "register_updates": {"C107": "new: the fair tree still shows no substitution",
+                       "C106": "hardened", "SYNTHESIS": "second qualifier strengthened"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C107 added, C106 annotated)",
+                                "research/SYNTHESIS.md (qualifier strengthened)",
+                                "research/INDEX.md (added R139 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

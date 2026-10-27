@@ -1,0 +1,61 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r126",
+  "round": "R126 (goal round 124/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Permutation test of the drug-to-pathway mapping on the strongest claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r126": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round adds the one control the strongest claim was missing and the within-dataset case closes.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e126_permutation.py"], "runs": 1, "repeats": 200, "pools": 2, "arms": 4,
+    "rows": 400, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E126_RESULTS.json", "rows": "E126_rows.csv", "protocol": "PROTOCOL_E119.md"},
+  "results": {
+    "seen_cell": {"identity": 0.2422, "real": 0.3317, "permuted": 0.2520, "random": 0.2512,
+                  "real_minus_identity": {"diff": 0.0895, "ci95": [0.0612, 0.1183]},
+                  "permuted_minus_identity": {"diff": 0.0097, "ci95": [-0.0173, 0.0360]},
+                  "random_minus_identity": {"diff": 0.0090, "ci95": [-0.0127, 0.0295]},
+                  "real_minus_permuted": {"diff": 0.0798, "ci95": [0.0450, 0.1130]}},
+    "unseen_cell": {"identity": 0.2632, "real": 0.3107, "permuted": 0.2683, "random": 0.2598,
+                    "real_minus_identity": {"diff": 0.0475, "ci95": [0.0250, 0.0707]},
+                    "permuted_minus_identity": {"diff": 0.0050, "ci95": [-0.0183, 0.0312]},
+                    "random_minus_identity": {"diff": -0.0035, "ci95": [-0.0225, 0.0147]},
+                    "real_minus_permuted": {"diff": 0.0425, "ci95": [0.0145, 0.0720]}}
+  },
+  "decisions": {"H313_gain_from_the_real_mapping": true,
+                "H314_permuted_also_gains": false,
+                "real_significant_pools": ["seen_cell", "unseen_cell"],
+                "permuted_significant_pools": [],
+                "verdict": "the_gain_requires_the_real_mapping_and_the_within_dataset_case_is_now_complete"},
+  "what_this_establishes": {
+    "the_missing_check": "a random block controls capacity but is white noise, so it cannot separate 'any structured block of this width helps' from 'this mapping helps'",
+    "result": "the permuted block behaves exactly like the random one while the real-minus-permuted contrast is significant in both pools",
+    "reading": "the gain comes from the specific drug-pathway assignment"},
+  "the_full_case_for_the_claim": {
+    "direction": "eight independent split sets, all positive and significant",
+    "capacity": "a matched random block is never significant",
+    "structure": "a permuted block of the same width is never significant, and real minus permuted is significant",
+    "condition": "present only when both drugs are unseen",
+    "internal_control": "the tissue block delivers exactly zero when its columns are absent"},
+  "what_this_means_for_promotion": {
+    "within_dataset": "exhausted: direction, capacity, structure, condition and the dead-block control have all been run",
+    "remaining_blocker": "only the missing second dataset, which C78 and C89 established cannot be built from BATCHIE across three arenas and three units",
+    "honest_status": "the claim is as well supported as this machine allows and still not promotable, because the rule requires cross-dataset replication and no usable second resource exists",
+    "distinction": "this is a resource limit, not an evidence limit, and the two must be stated separately"},
+  "limits": ["permutation preserves the marginal distribution but not every structural property of the block",
+             "dense criterion only, a quartile rather than a clinical endpoint",
+             "magnitudes range from 4.25 to 8.95 pp",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["freeze this conditional claim in the synthesis, note explicitly what would unfreeze it (a second resource that is neither saturated nor a training source), and move on"],
+  "register_updates": {"C97": "new: the permutation test passes", "C96": "annotated", "SYNTHESIS": "row added"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C97 added, C96 annotated)",
+                                "research/SYNTHESIS.md (row added)", "research/INDEX.md (added R126 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

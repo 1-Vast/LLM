@@ -1,0 +1,47 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r68",
+  "round": "R68 (goal round 66/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Joint unseen cell and drug holdout on GDSC."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r68": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round establishes a transfer boundary and explicitly labels the strictest cell as underpowered rather than null.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e068_joint_unseen.py"], "runs": 1, "repeats": 40, "pools": 4,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E068_RESULTS.json", "rows": "E068_rows.csv", "protocol": "PROTOCOL_E066.md"},
+  "design": {
+    "holdout": "20% of 125 cells and 20% of 65 drugs jointly",
+    "training": "seen cells x both-seen drugs only (about 54,256 keys, roughly 50% of the data)",
+    "pools": ["cell_unseen", "drug_unseen", "both_unseen", "strict (unseen cell x both drugs unseen)"],
+    "k": 20
+  },
+  "results": {
+    "cell_unseen": {"n_pool": 6866, "exploit": 0.0875, "random": 0.0187, "gain": 0.0688, "ci95": [0.0437, 0.0950]},
+    "drug_unseen": {"n_pool": 15980, "exploit": 0.0650, "random": 0.0150, "gain": 0.0500, "ci95": [0.0288, 0.0725]},
+    "both_unseen": {"n_pool": 4081, "exploit": 0.0538, "random": 0.0138, "gain": 0.0400, "ci95": [0.0200, 0.0613]},
+    "strict": {"n_pool": 449, "exploit": 0.0276, "random": 0.0158, "gain": 0.0118, "ci95": [-0.0039, 0.0276], "n_eval": 38}
+  },
+  "decisions": {"H171_strict_pool_still_works": false,
+                "H172_gain_degrades_stepwise": true,
+                "H173_cell_unseen_not_the_bottleneck": true,
+                "verdict": "ranking_value_needs_at_least_one_side_seen"},
+  "headline": "ranking value holds whenever at least one side is seen (unseen cell +6.88 pp, unseen drug +5.00 pp, both +4.00 pp) but is not established when the cell and both drugs are simultaneously unseen (+1.18 pp, CI includes 0)",
+  "notable": "the unseen-CELL pool shows the LARGEST gain of the four (+6.88 pp), so the cell side is not the bottleneck",
+  "power_caveat": "the strict pool has only 449 keys (an order of magnitude smaller than the others), only 38 of 40 splits yielded data, and the CI upper bound is +2.76 pp; this is underpowered, not a demonstrated null",
+  "limits": ["the joint holdout shrinks training to about 50% of keys, so part of the drop is weaker training rather than novelty",
+             "tissue is still seen for held-out cells, so complete unfamiliarity is not achieved",
+             "the strict cell is underpowered",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "register_updates": {"C43": "new, exploratory: transfer boundary along the joint-novelty axis"},
+  "next_gates": ["raise power on the strict cell by widening it to 'unseen cell x at least one drug unseen' (already established at +4.00 pp) or by using cross-screen data, which is smaller still"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C43 added)", "research/INDEX.md (added R68 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

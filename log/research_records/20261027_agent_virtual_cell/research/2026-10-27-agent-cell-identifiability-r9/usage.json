@@ -1,0 +1,57 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r9",
+  "round": "R9 (goal round 6/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Implementation re-run of a pre-registered decision experiment; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r9": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the deliverable is an implementation-corrected, underpowered result with all defects preserved; no positive claim is made that would need independent challenge.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e010_fair_decision.py"],
+    "runs": "3 (prior-variance fix, argmin-mean rule, P-best rule)",
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {
+    "valid_cited": "E010_RESULTS_VALID_argmin_mean.json",
+    "void_pbest_rule": "E010_RESULTS.json",
+    "invalid_prior_sd": "E010_RESULTS_INVALID_PRIOR_SD.json",
+    "per_cell_valid": "E010_per_cell_VALID_argmin_mean.csv",
+    "protocol": "PROTOCOL_E010.md",
+    "corrections_and_stop": "AMENDMENT_007_THREE_FIXES_AND_STOP.md"
+  },
+  "self_corrections": [
+    "Prior variance used s/sqrt(n) (standard error of the cross-cell mean) instead of the predictive variance for a new cell s^2(1+1/n): 0.036 vs 0.135. First run preserved as INVALID_PRIOR_SD.",
+    "Decision rule must match the loss: under regret the Bayes rule is argmin posterior mean, not P(best); the P-best run failed the pre-registered implementation check H016 and is void.",
+    "H015 was initially mis-summarised as holding in the valid run; it fails literally (instability is -0.023 at k=1, +0.020 at k=8, all intervals include 0). Corrected in report, record and amendment."
+  ],
+  "result": {
+    "verdict": "underpowered_on_this_resource_not_a_negative",
+    "H014_ei_beats_exploit": false,
+    "H015_instability_has_no_positive_value_literal": false,
+    "H016_implementation_check_on_cited_run": true,
+    "ei_minus_exploit_regret_all_k": 0.0,
+    "instability_minus_exploit_regret_by_k": {"1": -0.0228, "2": -0.0031, "4": 0.0087, "8": 0.0201},
+    "exploit_regret_by_k": {"1": 0.0934, "2": 0.0813, "4": 0.0664, "8": 0.0546},
+    "none_regret_all_k": 0.0667
+  },
+  "stop_conditions_met": [
+    "Effect sizes <= 0.03 regret, the same order as sampling error with 50 held-out cells",
+    "Conclusions flip with the decision rule (H016 passes under argmin-mean, fails under P-best)",
+    "Pre-registered stop condition: line stopped on this resource"
+  ],
+  "reopen_requirements": [
+    "materially more held-out cells than 50 (external data or a new plate batch)",
+    "genuinely heterogeneous prior uncertainty across units, otherwise decision-AL is mathematically identical to exploitation",
+    "decision rule matched to the evaluation loss and pre-registered",
+    "implementation checks such as H016 must pass first"
+  ],
+  "mutations_outside_episode": ["research/INDEX.md (added R9 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "claimed_active_learning_is_invalid": false,
+    "claim": "underpowered on this resource, not a negative result about acquisition strategies"
+  }
+}

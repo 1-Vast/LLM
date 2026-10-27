@@ -1,0 +1,45 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r118",
+  "round": "R118 (goal round 116/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Third cross-dataset attempt, this time at the pair level on BATCHIE."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r118": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round changes the unit of analysis rather than the model, and a third independent design lands on the same verdict.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6, scipy 1.17.1",
+    "scripts": ["e118_pair_level.py"], "runs": 2, "pairs": 1301, "test": 274,
+    "layouts": 10, "genes": 682, "bootstrap": 2000,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E118_RESULTS.json", "pairs": "E118_pairs.csv", "protocol": "PROTOCOL_E111.md"},
+  "results": {
+    "identity": {"rho": -0.1651, "r2": -0.2916},
+    "identity_gene": {"rho": -0.1637, "r2": -0.2923},
+    "rho_diff": {"mean": 0.0014, "ci95": [-0.0014, 0.0044]}
+  },
+  "decisions": {"H293_arena_has_signal": false, "H294_annotation_adds": false,
+                "H295_no_annotation_increment": true,
+                "verdict": "pair_level_arena_also_has_no_signal_so_C78_is_confirmed_by_a_third_design"},
+  "what_this_adds": {
+    "third_distinct_design": "key-level raw viability saturated (R86); key-level residual had identity anti-predicting (R105); pair-level residual has both arms anti-correlating (this round)",
+    "arena_has_no_positive_signal": "identity's Spearman rho on the pair-level target is -0.165, so even the gate that the arena must carry positive signal fails",
+    "consequence": "C78 is confirmed across three arenas and three units, so the 'cannot replicate' verdict no longer rests on a single design"},
+  "caveat_that_stays": "the negative rho matches the R105 signature and may again be a modelling artefact from ridge overfitting 23 compounds; either way it blocks the cross-dataset test, so the promotion verdict is unchanged",
+  "limits": ["only 1,301 pairs with 274 on the test side",
+             "the residual target still depends on the additive-null specification",
+             "only 10 layouts contributed, the rest having fewer than four cells",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["the cross-dataset route is now formally closed: three arenas, three units, same failure shape; only a new resource with neither saturation nor anti-prediction could reopen it"],
+  "register_updates": {"C89": "new: the pair-level arena also has no signal",
+                       "C78": "annotated with the third confirmation", "SYNTHESIS": "limitation and promotion rows updated"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C89 added, C78 annotated)",
+                                "research/SYNTHESIS.md (limitation and promotion rows updated)",
+                                "research/INDEX.md (added R118 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

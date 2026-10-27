@@ -1,0 +1,47 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r44",
+  "round": "R44 (goal round 42/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Hierarchical comparator required by the objective; no novelty claim."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r44": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the two metrics disagree and both are reported, with the script's rho-only verdict flagged as misleading.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e044_hierarchical.py"], "runs": 1, "repeats": 40,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E044_RESULTS.json", "rows": "E044_rows.csv", "protocol": "PROTOCOL_E044.md"},
+  "design": {
+    "flat": "tissue + anchor pathway + library pathway (41 dims), lambda = 1.0",
+    "hierarchical": "flat plus a tissue x pathway interaction block (114 dims) penalised at lambda_inter = 20, i.e. partial pooling of tissue-specific pathway effects",
+    "split": "grouped by combination (the setting R43 showed is closer to deployment)",
+    "sensitivity": [5.0, 50.0]
+  },
+  "results": {
+    "rho_flat": 0.3103, "rho_hier": 0.3167,
+    "paired_rho": {"diff": 0.0064, "ci95": [0.0047, 0.0079]},
+    "p10_flat": 0.2675, "p10_hier": 0.2601,
+    "paired_p10": {"diff": -0.0074, "ci95": [-0.0123, -0.0023]},
+    "frac_reps_hier_better_rho": 0.88,
+    "per_tissue_rho_diff": {"Breast": 0.0029, "Colon": 0.0049, "Pancreas": 0.0011},
+    "sensitivity_rho": {"lam5": 0.3167, "lam20": 0.3167, "lam50": 0.3169}
+  },
+  "decisions": {"H115_hierarchical_beats_flat_rho": true, "H116_gain_in_most_tissues": true,
+                "H117_hierarchical_beats_flat_p10": false,
+                "verdict_reported": "hierarchical_helps_bulk_but_hurts_the_decision_tail",
+                "script_verdict_is_misleading": "hierarchical_adds_value - keys only on rho"},
+  "significance": "this completes the objective's required comparator list: random (many rounds), GP (R11), decision-AL (R33-R37), retraining/program search (R35) and now hierarchical (R44). None of them stably beats the simplest rule on the decision metric.",
+  "limits": ["hierarchy is tissue-level only; cell-level random effects are unavailable for a held-out cell, which is exactly where R11 degenerated",
+             "the effect size is tiny (0.006)",
+             "lambda_inter is a fixed prior value with a sensitivity report only",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "register_updates": {"C34": "new, exploratory: hierarchical improves bulk rho by 0.0064 but worsens precision@10 by 0.0074"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C34 added)", "research/INDEX.md (added R44 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "mechanism_claim_made": false
+  }
+}

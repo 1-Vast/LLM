@@ -1,0 +1,63 @@
+{
+  "experiment": "E152",
+  "round": "R152 (goal round 150/256)",
+  "date": "2026-10-27",
+  "type": "is the SCALE_SHRUNK warning a false alarm for a model that standardises its inputs",
+  "compute": {
+    "script": "e152_scale_noop.py",
+    "scales": 5,
+    "downloads": 0,
+    "paid_llm_calls": 0,
+    "wet_lab": 0
+  },
+  "artifacts": {
+    "tool": "research/tools/feature_audit.py",
+    "results": "E152_RESULTS.json",
+    "protocol": "PROTOCOL_E142.md",
+    "record": "record.md",
+    "report": "report.md"
+  },
+  "results": {
+    "0.500": {
+      "max_abs_delta": 0.0,
+      "identical": true
+    },
+    "0.100": {
+      "max_abs_delta": 1.305e-15,
+      "identical": true
+    },
+    "0.010": {
+      "max_abs_delta": 1.055e-15,
+      "identical": true
+    },
+    "0.001": {
+      "max_abs_delta": 5.69e-16,
+      "identical": true
+    },
+    "0.000": {
+      "max_abs_delta": 5.563e-07,
+      "identical": false
+    }
+  },
+  "conclusion": "uniformly rescaling a column is exactly a no-op for a model that standardises each input column, so the ratio rule flagged a condition that cannot change any prediction",
+  "action": "the ratio rule is demoted from a flag to an informational note; it no longer affects the passed field",
+  "what_it_corrects": {
+    "R150": "the ratio branch was implemented and its implementation validated, but it measures something unrelated to predictions",
+    "R151": "the ratio threshold is not merely unpicked, it is unanchorable for this model family since there is no behaviour to anchor to"
+  },
+  "where_it_still_matters": "trees on unstandardised inputs, distance-based methods, and anything sensitive to feature scale; the note is retained for those callers to promote if they wish",
+  "limits": [
+    "Proven only for standardised linear models.",
+    "At scale zero the delta is 5.6e-07, but a fully zeroed column changes the design matrix rank so it should be reported; the existing CONSTANT_ON_EVAL rule does that.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "next_gate": "run the same test under a tree; if the tree is also nearly invariant the note can be removed, and if not it should stay as an optional flag",
+  "scope_declaration": {
+    "modified_src_or_tools": false,
+    "note": "changes under research/tools/ only",
+    "promoted_code": false,
+    "sealed_data_read": false,
+    "new_downloads": false,
+    "novelty_claim": false
+  }
+}

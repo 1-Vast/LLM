@@ -1,0 +1,169 @@
+{
+  "kind": "direct_test_of_the_tissue_in_distribution_qualifier",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "repeats": 200,
+    "holdout_drugs": 0.2,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261032
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 395,
+    "identity_dims": 130,
+    "pathway_dims": 38,
+    "tissues": [
+      "Breast",
+      "Colon",
+      "Pancreas"
+    ]
+  },
+  "by_pool": {
+    "known_tissue": {
+      "n": 198,
+      "identity": 0.24621212121212122,
+      "plus_pathway": 0.3022727272727273,
+      "plus_tissue": 0.2717171717171717,
+      "plus_random": 0.2494949494949495,
+      "pathway_minus_identity": {
+        "n": 198,
+        "mean_diff": 0.05606060606060606,
+        "sd": 0.15735322340961855,
+        "ci95": [
+          0.03484848484848485,
+          0.07853535353535354
+        ]
+      },
+      "tissue_minus_identity": {
+        "n": 198,
+        "mean_diff": 0.02550505050505051,
+        "sd": 0.14238183265002302,
+        "ci95": [
+          0.005808080808080807,
+          0.04494949494949494
+        ]
+      },
+      "random_minus_identity": {
+        "n": 198,
+        "mean_diff": 0.00328282828282828,
+        "sd": 0.13405745721747458,
+        "ci95": [
+          -0.015404040404040408,
+          0.022727272727272717
+        ]
+      },
+      "mde_80pct": 0.031333663834976606
+    },
+    "held_tissue": {
+      "n": 197,
+      "identity": 0.23959390862944163,
+      "plus_pathway": 0.3208121827411168,
+      "plus_tissue": 0.23959390862944163,
+      "plus_random": 0.24263959390862944,
+      "pathway_minus_identity": {
+        "n": 197,
+        "mean_diff": 0.08121827411167512,
+        "sd": 0.2073337496549602,
+        "ci95": [
+          0.05152284263959391,
+          0.11142766497461927
+        ]
+      },
+      "tissue_minus_identity": {
+        "n": 197,
+        "mean_diff": 1.1271299742387375e-18,
+        "sd": 0.07508498586295942,
+        "ci95": [
+          -0.010406091370558375,
+          0.010152284263959394
+        ]
+      },
+      "random_minus_identity": {
+        "n": 197,
+        "mean_diff": 0.0030456852791878168,
+        "sd": 0.1447759103882175,
+        "ci95": [
+          -0.017512690355329947,
+          0.02258883248730964
+        ]
+      },
+      "mde_80pct": 0.04139091430842524
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r125/PROTOCOL_E118.md": "b0237c62194f2c9b92aa544bce42dfdebaf53ecb8f66eebb5898d2b7771e8f3b",
+    "research/2026-10-27-agent-cell-identifiability-r125/e125_qualifier.py": "30a27caae564870d9431e8fbae33dc2c1b3f70f21acb0f97596b11aef74706ea"
+  },
+  "decisions": {
+    "known_tissue_pathway_positive": true,
+    "held_tissue_pathway_not_positive": false,
+    "held_tissue_underpowered": false,
+    "H311_qualifier_confirmed": false,
+    "H312_qualifier_wrong_both_positive": true,
+    "verdict": "the_pathway_increment_transfers_to_unseen_tissue_and_C90_must_be_retracted"
+  },
+  "limits": [
+    "Only three tissues, so one is held out per split.",
+    "Removing a tissue also removes its one-hot column, which is part of the design.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "the_qualifier_is_wrong": {
+    "predicted": "pathway positive when the tissue is known and not positive when the tissue is held out",
+    "observed": {
+      "known_tissue": {
+        "gain": 0.0561,
+        "ci95": [
+          0.0348,
+          0.0785
+        ]
+      },
+      "held_tissue": {
+        "gain": 0.0812,
+        "ci95": [
+          0.0515,
+          0.1114
+        ]
+      }
+    },
+    "conclusion": "the pathway increment is present, and if anything larger, when the tissue has never been seen. The qualifier inferred from R119 was wrong."
+  },
+  "why_R119_was_wrong": {
+    "R119_design": "it used the sparse boolean Synergy flag with k equal to 20 on subsamples, and the combo arm included the tissue block",
+    "two_problems": [
+      "the sparse criterion has no resolution: R122 measured identity at 1.30 percent against a minimum detectable effect of 1.02 pp",
+      "the combo arm carried the tissue block, whose columns are dead under tissue holdout, so the reversal was about the dead block plus an unresolvable criterion, not about transfer"
+    ],
+    "consequence": "C90 should be retracted. The 'tissue must be in distribution' qualifier is wrong and must be removed from the condition statement."
+  },
+  "a_clean_internal_control": {
+    "observation": "in the held-tissue pool the tissue block delivers exactly +0.0000 [-0.0104, +0.0102]",
+    "why_it_matters": "a block whose columns never appear in training contributes nothing, and the design recovers that exactly. So the apparatus can detect a dead block, and the pathway block is not dead.",
+    "reading": "the pathway gain in the same pool is +8.12 pp, so the two blocks are cleanly separated"
+  },
+  "the_stable_picture": {
+    "six_dense_criterion_estimates_all_positive": [
+      0.082,
+      0.047,
+      0.0858,
+      0.0508,
+      0.0561,
+      0.0812
+    ],
+    "seeds": [
+      20261029,
+      20261030,
+      20261031,
+      20261031,
+      20261032,
+      20261032
+    ],
+    "range": "4.7 to 8.6 pp",
+    "controls_that_behave": {
+      "random_block": "never significant in any pool or round",
+      "tissue_block_under_holdout": "exactly zero, as it must be"
+    },
+    "statement": "when both drugs are unseen, the pathway annotation adds 4.7 to 8.6 pp, and this holds whether the cell is seen, unseen, or from an unseen tissue"
+  }
+}

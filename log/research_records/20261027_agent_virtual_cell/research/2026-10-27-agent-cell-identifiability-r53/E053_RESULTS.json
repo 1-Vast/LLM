@@ -1,0 +1,189 @@
+{
+  "kind": "callable_pool_size_predicate_versus_baselines",
+  "input_sha256": {
+    "Original screen_All tissues_fitted data.csv": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278"
+  },
+  "settings": {
+    "sizes": [
+      100,
+      300,
+      1000,
+      3000,
+      10000,
+      21652
+    ],
+    "k": 20,
+    "repeats": 40,
+    "search_halves": "reps 0-19",
+    "eval_halves": "reps 20-39",
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "threshold_learned_on": "search half only",
+    "S_star": 3000
+  },
+  "search_half_by_size": {
+    "100": {
+      "exploit": 0.195,
+      "mix": 0.17250000000000001,
+      "diff": -0.022499999999999992
+    },
+    "300": {
+      "exploit": 0.28500000000000003,
+      "mix": 0.1975,
+      "diff": -0.08750000000000002
+    },
+    "1000": {
+      "exploit": 0.355,
+      "mix": 0.2625,
+      "diff": -0.09249999999999997
+    },
+    "3000": {
+      "exploit": 0.3,
+      "mix": 0.3625,
+      "diff": 0.0625
+    },
+    "10000": {
+      "exploit": 0.325,
+      "mix": 0.45999999999999996,
+      "diff": 0.13499999999999995
+    },
+    "21652": {
+      "exploit": 0.2575,
+      "mix": 0.44749999999999995,
+      "diff": 0.18999999999999995
+    }
+  },
+  "eval_by_size": {
+    "100": {
+      "exploit": 0.2525,
+      "mix": 0.22000000000000003,
+      "random": 0.1075,
+      "predicate": 0.2525,
+      "oracle": 0.265
+    },
+    "300": {
+      "exploit": 0.2975,
+      "mix": 0.21749999999999997,
+      "random": 0.10250000000000001,
+      "predicate": 0.2975,
+      "oracle": 0.3075
+    },
+    "1000": {
+      "exploit": 0.34500000000000003,
+      "mix": 0.29,
+      "random": 0.09,
+      "predicate": 0.34500000000000003,
+      "oracle": 0.375
+    },
+    "3000": {
+      "exploit": 0.26749999999999996,
+      "mix": 0.3975,
+      "random": 0.0925,
+      "predicate": 0.26749999999999996,
+      "oracle": 0.4125
+    },
+    "10000": {
+      "exploit": 0.2725,
+      "mix": 0.4425,
+      "random": 0.125,
+      "predicate": 0.4425,
+      "oracle": 0.44749999999999995
+    },
+    "21652": {
+      "exploit": 0.215,
+      "mix": 0.475,
+      "random": 0.0975,
+      "predicate": 0.475,
+      "oracle": 0.475
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r53/PROTOCOL_E052.md": "8ad70663da971eca169838a57853f92f6f0fc4e943ad385522554486ed0b9e36",
+    "research/2026-10-27-agent-cell-identifiability-r53/e053_predicate.py": "7f6f70fcff7fce385f2911f51ea18fb62d30650512ade48ab8cbebbd17fe9db5"
+  },
+  "comparisons": {
+    "predicate_minus_exploit": {
+      "n": 120,
+      "mean_diff": 0.07166666666666668,
+      "ci95": [
+        0.04916666666666667,
+        0.09625
+      ]
+    },
+    "predicate_minus_mix": {
+      "n": 120,
+      "mean_diff": 0.006249999999999997,
+      "ci95": [
+        -0.014583333333333334,
+        0.026666666666666665
+      ]
+    },
+    "predicate_minus_random": {
+      "n": 120,
+      "mean_diff": 0.24416666666666667,
+      "ci95": [
+        0.2175,
+        0.27166666666666667
+      ]
+    },
+    "predicate_minus_oracle": {
+      "n": 120,
+      "mean_diff": -0.03375000000000001,
+      "ci95": [
+        -0.0475,
+        -0.021249999999999998
+      ]
+    },
+    "mix_minus_random": {
+      "n": 120,
+      "mean_diff": 0.2379166666666667,
+      "ci95": [
+        0.21082291666666667,
+        0.2654166666666667
+      ]
+    }
+  },
+  "decisions": {
+    "H135_predicate_beats_always_exploit": true,
+    "H136_predicate_not_worse_than_always_mix": false,
+    "H137_predicate_below_oracle": true,
+    "verdict": "predicate_has_decision_value",
+    "verdict_reported": "predicate_has_decision_value_secondary_ge_variant_stronger"
+  },
+  "limits": [
+    "Single dataset; the threshold is chosen from only six candidate pool sizes.",
+    "Search and eval halves come from the same distribution and differ only by split.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "implementation_flaw": "the pre-registered rule used S > S*, but S* was itself the first positive size, so S=3,000 was routed to exploit while the mix was 13 pp better there",
+  "secondary_analysis": {
+    "file": "E053_SECONDARY_ge.json",
+    "pre_registered": false,
+    "rule": "S >= S*",
+    "predicate_minus_exploit": {
+      "diff": 0.0933,
+      "ci95": [
+        0.0696,
+        0.1179
+      ]
+    },
+    "predicate_minus_mix": {
+      "diff": 0.0279,
+      "ci95": [
+        0.0142,
+        0.0425
+      ]
+    },
+    "predicate_minus_random": {
+      "diff": 0.2658,
+      "ci95": [
+        0.2388,
+        0.2929
+      ]
+    },
+    "matches_best_fixed_at_all_sizes": true
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r56",
+  "round": "R56 (goal round 54/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Robustness rerun of the R55 negative with the tissue feature retained."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r56": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round confirms its own prior negative under the corrected configuration and recommends stopping this line.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e056_tissue_with_feature.py"], "runs": 1, "folds": 3, "sizes": 4,
+    "repeats": 20, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E056_RESULTS.json", "protocol": "PROTOCOL_E055.md"},
+  "design": {
+    "identical_to_R55_except": "the training design retains the tissue one-hot; the held-out tissue column is constant zero in training, so its coefficient is zero and prediction equals a tissue-adjusted pathway model",
+    "sizes": [500, 1000, 2000, 3500], "k": 20, "features": 41
+  },
+  "results": {
+    "agreement_rate": 0.625,
+    "R55_agreement_rate": 0.50,
+    "crossover_shift": {"Breast": "2000 -> 2000", "Colon": "500 -> 500", "Pancreas": "500 -> 3500"},
+    "colon": {"training_threshold": null, "heldout_diffs": [0.0375, -0.0100, 0.1000, 0.1075]},
+    "breast": {"training_threshold": 1000, "crossover": 2000},
+    "pancreas": {"training_threshold": 2000, "crossover": 3500}
+  },
+  "decisions": {"H141_crossover_in_heldout": true, "H142_threshold_transfers": false,
+                "H143_positions_close": true,
+                "verdict_reported": "negative_holds_with_tissue_feature_but_configuration_matters"},
+  "reading": "the R55 negative is not a pure feature artefact (62.5% < 75%), but the estimate is configuration-sensitive: Pancreas's crossover moves 500 to 3,500 and agreement rises 12.5 points",
+  "stable_counterexample": "the Colon fold fails in both configurations: training tissues show no positive size while the held-out Colon shows +10.00 and +10.75 pp",
+  "register_updates": {"C38": "revised with both configurations and marked a stable negative boundary"},
+  "recommendation": "stop adding experiments on this line; record 'valid within a population, does not transfer across populations' as an explicit negative boundary",
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C38 revised)", "research/POSITIONING.md (candidate reduced)",
+                                "research/INDEX.md (added R56 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

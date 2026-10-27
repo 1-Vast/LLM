@@ -1,0 +1,100 @@
+{
+  "kind": "seed_robustness_of_R37_advantage",
+  "input_sha256": {
+    "Original screen_All tissues_fitted data.csv": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278"
+  },
+  "settings": {
+    "k": 50,
+    "n_seeds": 10,
+    "splits_per_seed": 40,
+    "half": 20,
+    "n_boot": 2000,
+    "base_seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "eval_splits_total": 200
+  },
+  "per_seed_diff": {
+    "0": 0.04,
+    "1": 0.027000000000000003,
+    "2": 0.039,
+    "3": 0.026999999999999996,
+    "4": 0.042,
+    "5": 0.042,
+    "6": 0.05,
+    "7": 0.031,
+    "8": 0.048,
+    "9": 0.049
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r48/PROTOCOL_E047.md": "a3878ba02758cbe8f3de2fe7bb5b9ef041584c8588d8337d29b69623cc936b57",
+    "research/2026-10-27-agent-cell-identifiability-r48/e048_seed_robustness.py": "57d550bef467886d9a7481ff272711bc2cb932d07dcd8f784c093ff9248412ff"
+  },
+  "summary": {
+    "mean_diff": 0.0395,
+    "ci95_over_seeds": [
+      0.0342,
+      0.044399999999999995
+    ],
+    "frac_seeds_positive": 1.0,
+    "min": 0.026999999999999996,
+    "max": 0.05
+  },
+  "per_seed_levels": {
+    "0": {
+      "exploit": 0.08,
+      "mix": 0.12
+    },
+    "1": {
+      "exploit": 0.082,
+      "mix": 0.10900000000000001
+    },
+    "2": {
+      "exploit": 0.074,
+      "mix": 0.11299999999999999
+    },
+    "3": {
+      "exploit": 0.077,
+      "mix": 0.10400000000000001
+    },
+    "4": {
+      "exploit": 0.08,
+      "mix": 0.122
+    },
+    "5": {
+      "exploit": 0.071,
+      "mix": 0.11300000000000002
+    },
+    "6": {
+      "exploit": 0.069,
+      "mix": 0.119
+    },
+    "7": {
+      "exploit": 0.08299999999999999,
+      "mix": 0.11400000000000002
+    },
+    "8": {
+      "exploit": 0.078,
+      "mix": 0.126
+    },
+    "9": {
+      "exploit": 0.073,
+      "mix": 0.122
+    }
+  },
+  "decisions": {
+    "H123_robust_across_seeds": true,
+    "H124_seed_dependent": false,
+    "verdict": "R37_advantage_robust_across_seeds",
+    "verdict_reported": "R37_advantage_robust_across_seeds_but_construction_dependent"
+  },
+  "limits": [
+    "Only k=50 is tested; the full k sweep is not repeated.",
+    "Single dataset and feature set; the seed changes only the split, not the data.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "resolution": "R37's k=50 advantage is NOT seed luck: 10 independent seed sets all give a positive eval-half difference (mean +3.95 pp, CI [+3.42,+4.44], range +2.70 to +5.00). The null in R47 therefore comes from the pool construction, not from randomness.",
+  "construction_differs_in_two_ways": "pool size (4,000 vs 21,652) and sampling scheme (per-r uniform vs random keys) both changed at once, so which one matters is still open",
+  "C28_status": "restored as robust WITHIN R37's construction (10/10 seeds positive), while remaining absent under R47's construction; which construction is closer to real deployment is undetermined"
+}

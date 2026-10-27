@@ -1,0 +1,52 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r87",
+  "round": "R87 (goal round 85/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Attempt to build a discriminating arena on BATCHIE by predicting additivity residuals."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r87": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round defines a gate in advance, fails it, and therefore refuses to draw the conclusion the raw numbers would have suggested.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6, scikit-learn 1.9.0",
+    "scripts": ["e087_residual_arena.py"], "runs": 1, "cells": 12, "repeats": 20,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E087_RESULTS.json", "rows": "E087_rows.csv", "protocol": "PROTOCOL_E082.md"},
+  "input_sha256_verified": "56a4e4a195673160edcb1baa209a15409b3639ff6ab0405558cc5ab3198d5f23",
+  "design": {
+    "arena": "additivity residual r = y - two-way additive prediction; marginals are blind to r by construction, so this is where the annotation model should win",
+    "gate": "the residual must itself be learnable (cross-validated R2 > 0) before any comparison is meaningful",
+    "predictors": ["gene-annotation ridge trained on training-cell residuals", "random"]
+  },
+  "results": {
+    "units": 80, "cells": 12,
+    "mean_cv_r2_of_residual_model": -0.0338,
+    "base": 0.2509, "random": 0.2606, "gene": 0.0412,
+    "gene_minus_random": {"diff": -0.2194, "ci95": [-0.2406, -0.1981]}
+  },
+  "decisions": {"H221_annotation_predicts_residual": false,
+                "H222_annotation_cannot_predict_residual": true,
+                "H223_residual_has_learnable_signal": false,
+                "verdict": "not_interpretable_residual_is_noise"},
+  "refusal_to_conclude": "the raw numbers show the annotation model 22 pp below random, but the pre-registered gate failed (negative cross-validated R2), so that number reflects a model fitting noise rather than the annotation model being bad; this round therefore says nothing about the annotation model",
+  "resource_verdict": {
+    "raw_viability_R86": "saturated - all three predictors near 0.89 against a 0.25 base, differing by under 0.5 pp",
+    "additivity_residual_R87": "noise - cross-validated R2 of -0.034",
+    "conclusion": "BATCHIE cannot test the main conclusion in either direction; cross-resource validation is exhausted on the available resources"
+  },
+  "limits": ["the residual task is a single cell on a single concentration grid, so noise is expected",
+             "12 cells and 80 units limit independence",
+             "a negative R2 may also reflect the additive specification itself (no dose interaction), not only that synergy is unlearnable",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["cross-resource validation is finished on this machine; the question stays open unless a resource arrives that is neither saturated nor the training source"],
+  "register_updates": {"C60": "new: BATCHIE is unusable in both arenas",
+                       "SYNTHESIS": "section 2b extended"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C60 added)", "research/SYNTHESIS.md (section 2b extended)",
+                                "research/INDEX.md (added R87 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

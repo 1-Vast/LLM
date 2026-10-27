@@ -1,0 +1,218 @@
+{
+  "kind": "fair_chance_for_the_tree",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "repeats": 20,
+    "holdout": 0.2,
+    "seed": 20261042,
+    "configs": {
+      "base": {
+        "max_iter": 200,
+        "learning_rate": 0.08,
+        "max_depth": 4,
+        "min_samples_leaf": 40
+      },
+      "strong": {
+        "max_iter": 400,
+        "learning_rate": 0.05,
+        "max_depth": 6,
+        "min_samples_leaf": 10
+      },
+      "categorical": {
+        "max_iter": 300,
+        "learning_rate": 0.06,
+        "max_depth": 6,
+        "min_samples_leaf": 20
+      }
+    }
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 240
+  },
+  "by_config": {
+    "base": {
+      "full_identity": {
+        "n": 20,
+        "identity_rho": 0.4069234989686379,
+        "both_rho": 0.4221671223985646,
+        "gain": {
+          "n": 20,
+          "mean_diff": 0.015243623429926615,
+          "ci95": [
+            0.01445737396281014,
+            0.015951375050743708
+          ]
+        }
+      },
+      "no_identity": {
+        "n": 20,
+        "identity_rho": 0.0,
+        "both_rho": 0.029964243138494707,
+        "gain": {
+          "n": 6,
+          "mean_diff": 0.027499487695328062,
+          "ci95": [
+            -0.07339201401213323,
+            0.11505061454363265
+          ]
+        }
+      },
+      "gain_difference": {
+        "n": 6,
+        "mean_diff": 0.012347670222943502,
+        "ci95": [
+          -0.09150598336158071,
+          0.1010609196499772
+        ]
+      }
+    },
+    "strong": {
+      "full_identity": {
+        "n": 20,
+        "identity_rho": 0.4517518565408033,
+        "both_rho": 0.4684274760797777,
+        "gain": {
+          "n": 20,
+          "mean_diff": 0.016675619538974437,
+          "ci95": [
+            0.016006120334440703,
+            0.01735612076559147
+          ]
+        }
+      },
+      "no_identity": {
+        "n": 20,
+        "identity_rho": 0.0,
+        "both_rho": 0.024056417017198236,
+        "gain": {
+          "n": 10,
+          "mean_diff": 0.01391690530527594,
+          "ci95": [
+            -0.02692848181282232,
+            0.05289343715480752
+          ]
+        }
+      },
+      "gain_difference": {
+        "n": 10,
+        "mean_diff": -0.002516212582749982,
+        "ci95": [
+          -0.04444136373924796,
+          0.0380474561040544
+        ]
+      }
+    },
+    "categorical": {
+      "full_identity": {
+        "n": 20,
+        "identity_rho": 0.4953302931597993,
+        "both_rho": 0.4953268569264502,
+        "gain": {
+          "n": 20,
+          "mean_diff": -3.4362333491466667e-06,
+          "ci95": [
+            -6.60323854538742e-05,
+            5.724299141912978e-05
+          ]
+        }
+      },
+      "no_identity": {
+        "n": 10,
+        "identity_rho": 0.0,
+        "both_rho": -0.031113325479651992,
+        "gain": {
+          "n": 8,
+          "mean_diff": -0.03500249116460849,
+          "ci95": [
+            -0.09775213737347169,
+            0.0
+          ]
+        }
+      },
+      "gain_difference": {
+        "n": 8,
+        "mean_diff": -0.034975340475575524,
+        "ci95": [
+          -0.09782327795393338,
+          0.00011009129632291725
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r139/PROTOCOL_E129.md": "e93bc1ca9deecb6992d9c60a614a6e01f5ee378292dbea10333f1ee910355402",
+    "research/2026-10-27-agent-cell-identifiability-r139/e139_fair_tree.py": "11c7a85fb6b7f1bd0d28c166c1e426e792cb9bd72b364ad5463fb6fa72cbb59c"
+  },
+  "decisions": {
+    "gain_differences": {
+      "base": [
+        0.012347670222943502,
+        [
+          -0.09150598336158071,
+          0.1010609196499772
+        ]
+      ],
+      "strong": [
+        -0.002516212582749982,
+        [
+          -0.04444136373924796,
+          0.0380474561040544
+        ]
+      ],
+      "categorical": [
+        -0.034975340475575524,
+        [
+          -0.09782327795393338,
+          0.00011009129632291725
+        ]
+      ]
+    },
+    "H344_substitution_appears_when_fair": false,
+    "H345_still_no_substitution": true,
+    "verdict": "C106_hardened_substitution_is_specific_to_linear_models_after_a_fair_tree"
+  },
+  "limits": [
+    "Twenty splits, so power is limited.",
+    "The reserved category id is one encoding of a missing identity.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "the_fair_chance_was_real": {
+    "base_identity_rho": 0.4069,
+    "strong_identity_rho": 0.4518,
+    "categorical_identity_rho": 0.4953,
+    "reading": "the stronger configuration and the category-aware fit both beat the baseline at predicting without the coarsening, so the tree was given genuine additional capacity rather than a straw man. The absence of substitution is therefore not a capacity artefact."
+  },
+  "and_yet_no_substitution_in_any_config": {
+    "gain_differences": {
+      "base": [
+        0.0123,
+        -0.0915,
+        0.1011
+      ],
+      "strong": [
+        -0.0025,
+        -0.0444,
+        0.038
+      ],
+      "categorical": [
+        -0.035,
+        -0.0978,
+        0.0001
+      ]
+    },
+    "all_intervals_contain_zero": true,
+    "best_absent_case_rho": 0.03,
+    "ridge_absent_case_rho": 0.13,
+    "reading": "no tree configuration reproduces the linear model's substitution, and the best one reaches 0.030 where ridge reaches 0.13"
+  },
+  "two_side_findings_worth_recording": {
+    "categorical_full_identity_is_exactly_zero": "with native categorical splits the pathway block adds -0.0000 [-0.0001,+0.0001], which is the tree analogue of the ridge zero: the coarsening is redundant once the drug itself is a native category",
+    "categorical_absent_case_is_negative_but_not_significant": "the coarsening gives -0.0311 in the absent case, and the gain difference interval [-0.0978, +0.0001] just includes zero, so this cannot be called harm. It is recorded as an anomaly, not a result."
+  },
+  "what_C106_becomes": {
+    "before": "the monotone decay is a linear-model property, with the caveat that the tree was untuned",
+    "after": "the caveat is discharged: capacity and categorical handling were both varied, the tree improved, and substitution still did not appear. The claim is now that substitution is specific to the linear model family, holding the features fixed.",
+    "still_open": "no configuration here collapses the two models into one framework, so the mechanism behind the difference remains descriptive"
+  }
+}

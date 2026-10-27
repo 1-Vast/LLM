@@ -1,0 +1,45 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r55",
+  "round": "R55 (goal round 53/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Held-out-tissue test of threshold transferability; no literature query."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r55": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round overturns its own previous resource judgement and reports a clear negative on transfer.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e055_tissue_transfer.py"], "runs": 1, "folds": 3, "sizes": 4,
+    "repeats": 20, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E055_RESULTS.json", "protocol": "PROTOCOL_E054.md"},
+  "design": {
+    "folds": "leave one tissue out: train on the other two, pool drawn from the held-out tissue",
+    "sizes": [500, 1000, 2000, 3500],
+    "features": "pathway only (38 dims), tissue dropped so training and held-out share a feature space",
+    "k": 20, "hit": "top decile of SYNERGY_DELTA_AUC within the pool"
+  },
+  "results": {
+    "per_tissue_keys": {"Breast": 60670, "Colon": 28944, "Pancreas": 18645},
+    "breast": {"diffs": [-0.0575, -0.0200, 0.0300, -0.0000], "crossover": 2000, "training_threshold": 1000},
+    "colon": {"diffs": [0.0625, -0.0150, 0.0400, 0.1025], "crossover": 500, "training_threshold": null},
+    "pancreas": {"diffs": [0.0075, -0.0375, -0.0100, 0.0400], "crossover": 500, "training_threshold": 2000},
+    "agreement_rate": 0.5
+  },
+  "decisions": {"H141_crossover_in_heldout": true, "H142_threshold_transfers": false,
+                "H143_positions_close": false,
+                "verdict_reported": "crossover_exists_in_heldout_but_threshold_does_not_transfer"},
+  "R54_correction": "R54 wrongly judged that no spanning second task was available; stratified by tissue, the Colon (5,789) and Pancreas (3,729) held-out pools both straddle 3,000",
+  "key_negative": "the threshold learned on two tissues predicts the third tissue's strategy only 50% of the time; in the Colon fold the training tissues had NO positive size while the held-out Colon showed three positive sizes and +10.25 pp at 3,500",
+  "confound": "the tissue feature was dropped here whereas R51/R53 used it; the two configurations are not separated",
+  "C36_narrowing": "the predicate is valid only within the population it was learned on; 3,000 is a population-specific empirical value, not a universal constant",
+  "register_updates": {"C36": "substantially narrowed", "C38": "new, negative: crossover exists in unseen populations but the threshold does not transfer"},
+  "next_gates": ["rerun the held-out-tissue test WITH the tissue feature (unknown tissue as a level) to separate the feature confound from a genuine population effect"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C36 narrowed, C38 added)", "research/POSITIONING.md (candidate downgraded)",
+                                "research/INDEX.md (added R55 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

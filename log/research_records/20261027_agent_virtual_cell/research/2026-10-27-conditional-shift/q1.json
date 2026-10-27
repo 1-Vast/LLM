@@ -1,0 +1,378 @@
+{
+ "boundaries": {
+  "judgment": "inconclusive",
+  "not_claimed": [
+   "reproducibility",
+   "non-reproducibility",
+   "transferability",
+   "mechanism",
+   "algorithmic gain",
+   "B/C start"
+  ],
+  "protocol_references": [
+   "PROTOCOL_Q.md (v1 FROZEN)",
+   "ERRATA_A0.md",
+   "challenge_A0.md"
+  ],
+  "user_goal": "H193a/H193b conditional-shift reproducibility"
+ },
+ "challenge": {
+  "path_rel": "research/2026-10-27-conditional-shift/challenge_A0.md",
+  "sha256": "6B14BCA1BC97158E3A5B53BCA6988E92532D2B34337F99A79E70B6DC0D050A3D"
+ },
+ "design_check": {
+  "binning_rule": "controlled_anchor; cp needs >=5 quadruples; main statistic over cp medians",
+  "delta_min": {
+   "delta_min_obs_conservative_rels": 0.089286,
+   "delta_min_obs_point_rels": 0.079977,
+   "latent": 0.1,
+   "rel_A_hi_conservative": 0.983679,
+   "rel_A_point": 0.863684,
+   "rel_B_hi_conservative": 0.810418,
+   "rel_B_point": 0.74058
+  },
+  "design_check_passed": false,
+  "failure_reasons": [
+   "mde80_obs_le_delta_min_obs"
+  ],
+  "gates": [
+   {
+    "name": "n_cp_ge_500",
+    "pass": true,
+    "threshold": 500,
+    "value": 1501
+   },
+   {
+    "name": "n_quads_ge_500",
+    "pass": true,
+    "threshold": 500,
+    "value": 92039
+   },
+   {
+    "name": "mde80_obs_le_delta_min_obs",
+    "pass": false,
+    "threshold": 0.089286,
+    "value": 0.204241
+   },
+   {
+    "name": "joint_power_latent_0.30_ge_0.80",
+    "pass": true,
+    "threshold": 0.8,
+    "value": 0.896
+   },
+   {
+    "name": "type_I_le_0.10",
+    "pass": true,
+    "threshold": 0.1,
+    "value": 0.018
+   },
+   {
+    "name": "rel_original_keys_ge2",
+    "pass": true,
+    "threshold": 300,
+    "value": 1593
+   },
+   {
+    "name": "rel_original_cp_split",
+    "pass": true,
+    "threshold": 50,
+    "value": 61
+   },
+   {
+    "name": "rel_original_ci_lower",
+    "pass": true,
+    "threshold": 0.2,
+    "value": 0.711561
+   },
+   {
+    "name": "rel_validation_keys_ge2",
+    "pass": true,
+    "threshold": 300,
+    "value": 8974
+   },
+   {
+    "name": "rel_validation_cp_split",
+    "pass": true,
+    "threshold": 50,
+    "value": 1501
+   },
+   {
+    "name": "rel_validation_ci_lower",
+    "pass": true,
+    "threshold": 0.2,
+    "value": 0.66203
+   }
+  ],
+  "joint_power": {
+   "latent_0.10": {
+    "latent_rho": 0.1,
+    "observed_scale_mean": 0.079977,
+    "power_or_typeI": 0.174,
+    "reps": 2000,
+    "threshold_obs": 0.142885
+   },
+   "latent_0.30": {
+    "latent_rho": 0.3,
+    "observed_scale_mean": 0.23993,
+    "power_or_typeI": 0.896,
+    "reps": 2000,
+    "threshold_obs": 0.142885
+   }
+  },
+  "mde80_obs": {
+   "debiased_empirical_sensitivity": {
+    "calibration_inflation_factor": 0.874864,
+    "construction": "bootstrap SE divided by the iid-calibration inflation factor of the same cp structure",
+    "mde80": 0.152326,
+    "se_debiased": 0.054371
+   },
+   "iid_analytic_sensitivity": {
+    "construction": "1/sqrt(n_cp-1) (ignores cell clustering; NOT used for the gate)",
+    "mde80": 0.072337,
+    "se_null": 0.02582
+   },
+   "primary_empirical_cluster_adjusted": {
+    "construction": "n_eff from cell-cluster bootstrap SE of the within-screen barcode split-half reliability (Validation, full cp coverage); SE_null=1/sqrt(n_eff-1); MDE80=2.801585*SE_null",
+    "mde80": 0.204241,
+    "n_eff": 189.158213,
+    "original_sensitivity": {
+     "mde80": 0.726689,
+     "n_eff": 15.863145,
+     "r_split_half": 0.760074,
+     "se_boot_r": 0.106026,
+     "se_null": 0.259385
+    },
+    "r_split_half": 0.588033,
+    "screen_used": "validation",
+    "se_boot_r": 0.047567,
+    "se_null": 0.072902
+   },
+   "zero_model_cell_share_sensitivities": {
+    "cell_share_0.00": {
+     "mde80": 0.076322,
+     "null_q95": 0.045096,
+     "se_null": 0.027243
+    },
+    "cell_share_0.25": {
+     "mde80": 0.264223,
+     "null_q95": 0.144597,
+     "se_null": 0.094312
+    },
+    "cell_share_0.50": {
+     "mde80": 0.278819,
+     "null_q95": 0.162843,
+     "se_null": 0.099522
+    },
+    "cell_share_0.75": {
+     "mde80": 0.293537,
+     "null_q95": 0.167448,
+     "se_null": 0.104775
+    }
+   },
+   "zero_model_cell_share_sensitivities_note": "STRUCTURAL CAVEAT: additive cell main effects cancel exactly in the Q double difference, so a cell-additive component u_c is not a structurally faithful null for Q; these cell-share models are reported only as a PESSIMISTIC dependence bound for the design SE. The primary anchored quantities are the empirical cluster-adjusted MDE80_obs and its iid-debiased version."
+  },
+  "mde80_obs_gate_value": 0.204241,
+  "reliability": {
+   "coverage_note": "barcode split-half is a same-screen reproducibility proxy; Original split coverage is thin (61 cp from 36 barcode-rich cells, CI on rel is wide) while Validation covers all 1501 cp. delta_min_obs uses the upper (conservative) rel bounds; the point-rel value is reported alongside.",
+   "original": {
+    "label": "original",
+    "n_boot_replicates_used": 349,
+    "n_cp_split": 61,
+    "n_keys_with_ge2_barcodes": 1593,
+    "r_split_half_spearman": 0.760074,
+    "rel_ci95": [
+     0.711561,
+     0.983679
+    ],
+    "rel_hi_conservative": 0.983679,
+    "rel_spearman_brown": 0.863684,
+    "se_boot_r": 0.106026
+   },
+   "validation": {
+    "label": "validation",
+    "n_boot_replicates_used": 500,
+    "n_cp_split": 1501,
+    "n_keys_with_ge2_barcodes": 8974,
+    "r_split_half_spearman": 0.588033,
+    "rel_ci95": [
+     0.66203,
+     0.810418
+    ],
+    "rel_hi_conservative": 0.810418,
+    "rel_spearman_brown": 0.74058,
+    "se_boot_r": 0.047567
+   }
+  },
+  "structure": {
+   "a0_qualification": "matching_qualified (see PROTOCOL_A0 + ERRATA_A0 + challenge_A0)",
+   "cp_quads_max": 134,
+   "cp_quads_median": 58.0,
+   "cp_quads_min": 6,
+   "errata_facts": {
+    "barcode_split_R4_coverage": "46 cells / 583 cell pairs",
+    "condition_level_directed_pairs": 129,
+    "disjoint_pairs_corrected": 4612633,
+    "g1_only_m3_corrected": 4412540421,
+    "g2_only_m3_corrected": 7234325
+   },
+   "main_stratum": "controlled_anchor",
+   "n_cell_pairs": 1501,
+   "n_common_cells": 96,
+   "n_conditions_matched": 291,
+   "n_controlled_anchor_quadruples": 92039,
+   "n_cp_with_ge_min_quads": 1501,
+   "n_matched_cell_condition_keys": 9154,
+   "n_matched_directed_pairs": 129,
+   "n_valid_rows_original": 291180,
+   "n_valid_rows_validation": 23347,
+   "r4_full_expected_A0": 6223367,
+   "r4_full_quadruples_recomputed": 6223367
+  },
+  "type_I": {
+   "latent_rho": 0.0,
+   "observed_scale_mean": 0.0,
+   "power_or_typeI": 0.018,
+   "reps": 2000,
+   "threshold_obs": 0.142885
+  }
+ },
+ "environment": {
+  "numpy": "2.4.6",
+  "pandas": "2.3.3",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "python": "3.11.16"
+ },
+ "errata": {
+  "path_rel": "research/2026-10-27-conditional-shift/ERRATA_A0.md",
+  "sha256": "0B0D744BB2306D402B6E838554787B2D517AFA707C7912BE176722C1BADE58E3"
+ },
+ "inputs": {
+  "a0_json": {
+   "bytes": 15512,
+   "path_rel": "research/2026-10-27-conditional-shift/a0.json",
+   "sha256": "72BBAF6DF9BF80BBD19BF946A8D7A369003861FF21BD95561BC6DA48021ECA22"
+  },
+  "challenge_a0": {
+   "bytes": 34787,
+   "path_rel": "research/2026-10-27-conditional-shift/challenge_A0.md",
+   "sha256": "6B14BCA1BC97158E3A5B53BCA6988E92532D2B34337F99A79E70B6DC0D050A3D"
+  },
+  "errata_a0": {
+   "bytes": 2238,
+   "path_rel": "research/2026-10-27-conditional-shift/ERRATA_A0.md",
+   "sha256": "0B0D744BB2306D402B6E838554787B2D517AFA707C7912BE176722C1BADE58E3"
+  },
+  "jaaks_original_fitted": {
+   "bytes": 198893607,
+   "path_rel": "data/external/gdsc_combinations/jaaks2022_figshare/Original screen_All tissues_fitted data.csv",
+   "sha256": "1188968CE7FDCFB66D03791CF266515B7C7A2794E1FC73C966DBA40266FFA278"
+  },
+  "jaaks_validation_fitted": {
+   "bytes": 11774397,
+   "path_rel": "data/external/gdsc_combinations/jaaks2022_figshare/Validation screen_All tissues_fitted data.csv",
+   "sha256": "DCBD4C3108D212FA771C52AE977C8E1C01A421162A2232CDC4273FAF257B2775"
+  },
+  "matched_conditions": {
+   "bytes": 361151,
+   "path_rel": "research/2026-10-27-conditional-shift/matched_conditions.csv",
+   "sha256": "73FD5085A7586BB1F33768E34A587668953DA4C13735693DCF2FCCCBC51353FF"
+  },
+  "matched_quadruples": {
+   "bytes": 14603732,
+   "path_rel": "research/2026-10-27-conditional-shift/matched_quadruples.csv",
+   "sha256": "881A0DFC62A7D70DE158F5795AE1F2766E8EA1091BF6ED4F7280BA4A8211CCF9"
+  },
+  "protocol_a0": {
+   "bytes": 11393,
+   "path_rel": "research/2026-10-27-conditional-shift/PROTOCOL_A0.md",
+   "sha256": "D77316ED9983D803D0671EF0C7D51F58BCDD439CFCCF253110BEA9B19539AA93"
+  },
+  "protocol_q": {
+   "bytes": 8699,
+   "path_rel": "research/2026-10-27-conditional-shift/PROTOCOL_Q.md",
+   "sha256": "74FA675A77031E6DF1D68831615E8753EADDA13F41F27AB23096D836091ED1CF"
+  }
+ },
+ "judgment": {
+  "boundary_wording": "No claim about conditional-shift reproducibility, transferability, mechanism or algorithm is made. Per PROTOCOL_Q section 6 and the R193 BRIEF, B/C are not started and the frozen additive/static-prior interpretation stands.",
+  "design_check_passed": false,
+  "failure_reasons": [
+   "mde80_obs_le_delta_min_obs"
+  ],
+  "interpretation": "Design check failed at: mde80_obs_le_delta_min_obs. The matched-quadruple universe has 1501 cell pairs from only 96 cells; within-screen barcode split-half reliability is 0.864 (Original, 61 cp) / 0.741 (Validation, 1501 cp) but the cell-cluster-robust null SE (n_eff=189.2) implies MDE80_obs=0.2042 > delta_min_obs=0.0893. The design therefore cannot resolve a latent rho=0.10 conditional shift with 80% power; this is a design/power stop, NOT evidence that the conditional shift is absent or unstable.",
+  "main_q_computed": false,
+  "main_q_note": "PROTOCOL_Q section 7: design check not passed -> STOP, do not enter the Q retest; no cross-screen Q statistic was computed or written",
+  "power_semantics_note": "Complete-rule power is required only at latent rho=0.30; the reproducible threshold lives at latent ~0.10, so a true latent effect between 0.10 and 0.30 cannot be reliably classified by this design (power(0.10)=0.174 vs power(0.30)=0.896 here). A not_reproducible outcome in this design would therefore NOT license reading the 0.10-0.30 interval as \"no structure\".",
+  "reliability_uncertainty_note": "delta_min_obs is computed with the CONSERVATIVE (upper 95%) reliability bounds (relA_hi=0.984, relB_hi=0.810 -> delta_min_obs=0.0893); with point reliabilities it would be 0.0800. Original barcode-split reliability rests on only 61 cell pairs, so its CI is wide (rel CI shown in design_check.reliability). Both values stay below MDE80_obs, so the design-check verdict is unchanged under either bound.",
+  "unfreeze_conditions": [
+   "more independent cells / more independent measurement groups (the effective sample size is cell-limited: n_eff ~ 189.2 from 96 cells), or",
+   "a pre-registered delta_min_latent with an operational justification below 0.10 (the current protocol forbids back-computing it from old CI bounds), or",
+   "an analysis unit with larger effective independent sample (e.g., more screening studies matched across batches) - not a different aggregation of the same 96 cells"
+  ],
+  "verdict": "inconclusive"
+ },
+ "pre_registered_implementation_notes": [
+  "design check precedes any cross-screen Q statistic; within-screen split-half reliability and structure-only SE constructions are the only response-value uses in the design phase",
+  "the design-phase q1.py asserts that if design_check fails, no cross-screen Q / main statistic is computed or written (protocol section 7)",
+  "MDE80_obs primary construction is the cluster-adjusted null SE derived from within-screen barcode split-half reliability (n_eff = ((1-r^2)/SE_boot)^2); iid analytic, debiased and zero-model cell-share constructions are reported as sensitivities only",
+  "delta_min_obs uses the conservative (upper) reliability bounds (Lead implementation note 2)",
+  "coverage/rel gate: per screen keys_with_ge2_barcodes>=300, split cp>=50, rel CI lower bound>=0.20"
+ ],
+ "protocol": {
+  "bytes": 8699,
+  "path_rel": "research/2026-10-27-conditional-shift/PROTOCOL_Q.md",
+  "sha256": "74FA675A77031E6DF1D68831615E8753EADDA13F41F27AB23096D836091ED1CF",
+  "status": "v1 FROZEN"
+ },
+ "response_value_use_attestation": {
+  "cross_screen_q_alignment_computed_before_design_check": false,
+  "main_q_computed": false,
+  "purpose": [
+   "within-screen barcode split-half reliability",
+   "structure-only SE constructions"
+  ],
+  "response_columns_used_in_design_phase": [
+   "SYNERGY_DELTA_EMAX"
+  ]
+ },
+ "script": {
+  "bytes": 41596,
+  "path_rel": "research/2026-10-27-conditional-shift/q1.py",
+  "sha256": "F21592C450D9445FF72D2DBF38C1AEFB7AB47A188D323634F29C712560A58B04"
+ },
+ "seeds": {
+  "b_main_boot": 1000,
+  "b_perm": 1000,
+  "b_rel_boot": 500,
+  "master": 20261027,
+  "n_power": 2000,
+  "n_zero_sim": 400,
+  "z_alpha": 1.959964,
+  "z_mde80": 2.801585
+ },
+ "structure": {
+  "a0_qualification": "matching_qualified (see PROTOCOL_A0 + ERRATA_A0 + challenge_A0)",
+  "cp_quads_max": 134,
+  "cp_quads_median": 58.0,
+  "cp_quads_min": 6,
+  "errata_facts": {
+   "barcode_split_R4_coverage": "46 cells / 583 cell pairs",
+   "condition_level_directed_pairs": 129,
+   "disjoint_pairs_corrected": 4612633,
+   "g1_only_m3_corrected": 4412540421,
+   "g2_only_m3_corrected": 7234325
+  },
+  "main_stratum": "controlled_anchor",
+  "n_cell_pairs": 1501,
+  "n_common_cells": 96,
+  "n_conditions_matched": 291,
+  "n_controlled_anchor_quadruples": 92039,
+  "n_cp_with_ge_min_quads": 1501,
+  "n_matched_cell_condition_keys": 9154,
+  "n_matched_directed_pairs": 129,
+  "n_valid_rows_original": 291180,
+  "n_valid_rows_validation": 23347,
+  "r4_full_expected_A0": 6223367,
+  "r4_full_quadruples_recomputed": 6223367
+ }
+}

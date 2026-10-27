@@ -1,0 +1,50 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r78",
+  "round": "R78 (goal round 76/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Tests whether cells that never benefit from personalisation can be identified in advance."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r78": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round fails its own pre-registered criteria and declines to treat p=0.0508 as significant.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6, scipy",
+    "scripts": ["r78.py"], "runs": 1, "reads": "E076_rows.csv plus GDSC tissue metadata",
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E078_RESULTS.json", "cells": "E078_cells.csv", "protocol": "PROTOCOL_E075.md"},
+  "design": {
+    "label": "1 if the cell showed no positive crossover at any tested m (i.e. personal data never beat marginals)",
+    "features_available_in_advance": ["B0 (marginal baseline hit rate)", "base (synergy prevalence in the cell's pool)", "pool size", "tissue"]
+  },
+  "results": {
+    "n_cells": 123, "n_never": 32, "n_benefit": 91,
+    "B0": {"benefit": 0.0618, "never": 0.0981, "p": 0.0508, "auc_never": 0.629},
+    "base": {"benefit": 0.0168, "never": 0.0106, "p": 0.0070, "auc_never": 0.342},
+    "pool": {"p": 0.677, "auc_never": 0.446},
+    "never_rate_by_tissue": {"Breast": 0.28, "Colon": 0.333, "Pancreas": 0.107}
+  },
+  "decisions": {"H197_higher_B0_in_never": false, "H198_higher_base_in_never": false,
+                "H199_B0_auc_at_least_065": false,
+                "verdict": "cannot_identify_them_in_advance"},
+  "honest_notes": {
+    "p_0508_is_not_significant": "the B0 difference has the predicted direction and p = 0.0508, missing the pre-registered threshold by 0.0008; it is recorded as a failure, not as a near-significant win",
+    "base_direction_was_opposite": "I predicted easier pools would need less personalisation; the data show cells with FEWER synergies are the ones that never benefit (1.06% vs 1.68%), which is mechanistically sensible - with almost no positives in the pool, no amount of measuring changes the ranking"
+  },
+  "what_can_and_cannot_be_said": {
+    "can": "there are suggestive signals (higher B0 goes with not needing personal data; tissue differences are large; pool size carries none)",
+    "cannot": "that the decision 'measure or not' can be made in advance, because the discrimination (AUC 0.63 with 32 positives) is too weak"
+  },
+  "limits": ["32 positive cases make the AUC confidence interval wide",
+             "B0 is computed from the fold's training set plus the cell's pool, which is legitimate but varies across folds",
+             "the tissue difference rests on 28/45/50 cells and was not formally tested",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["combine B0, base and tissue in a three-feature model with leave-one-cell-out validation to see whether AUC can reach 0.65"],
+  "register_updates": {"C52": "new, negative: advance identification of never-benefiting cells fails its pre-registered bar"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C52 added)", "research/INDEX.md (added R78 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

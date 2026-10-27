@@ -1,0 +1,108 @@
+{
+  "kind": "is_C42_pool_size_insensitivity_constructural",
+  "sizes": [
+    2000,
+    5000,
+    10000,
+    20000
+  ],
+  "draws": 60,
+  "proportional_fraction": 0.05,
+  "fixed_k": 20,
+  "by_rule": {
+    "proportional": {
+      "2000": {
+        "k": 100,
+        "n": 60,
+        "hit": 0.09166666666666666,
+        "random": 0.017333333333333333,
+        "base": 0.014541666666666666
+      },
+      "5000": {
+        "k": 250,
+        "n": 60,
+        "hit": 0.0935333333333333,
+        "random": 0.014666666666666668,
+        "base": 0.01448
+      },
+      "10000": {
+        "k": 500,
+        "n": 60,
+        "hit": 0.09726666666666667,
+        "random": 0.014833333333333336,
+        "base": 0.01448333333333333
+      },
+      "20000": {
+        "k": 1000,
+        "n": 60,
+        "hit": 0.09486666666666664,
+        "random": 0.015233333333333333,
+        "base": 0.014378333333333333
+      },
+      "_small_vs_large": {
+        "n": 60,
+        "mean_diff": -0.0031999999999999984,
+        "ci95": [
+          -0.009633749999999998,
+          0.0034674999999999958
+        ]
+      }
+    },
+    "fixed": {
+      "2000": {
+        "k": 20,
+        "n": 60,
+        "hit": 0.09416666666666665,
+        "random": 0.015833333333333335,
+        "base": 0.014541666666666666
+      },
+      "5000": {
+        "k": 20,
+        "n": 60,
+        "hit": 0.10833333333333334,
+        "random": 0.010000000000000002,
+        "base": 0.01448
+      },
+      "10000": {
+        "k": 20,
+        "n": 60,
+        "hit": 0.13166666666666668,
+        "random": 0.014999999999999998,
+        "base": 0.01448333333333333
+      },
+      "20000": {
+        "k": 20,
+        "n": 60,
+        "hit": 0.10916666666666666,
+        "random": 0.0175,
+        "base": 0.014378333333333333
+      },
+      "_small_vs_large": {
+        "n": 60,
+        "mean_diff": -0.015000000000000001,
+        "ci95": [
+          -0.037499999999999985,
+          0.005833333333333334
+        ]
+      }
+    }
+  },
+  "decisions": {
+    "H246_fixed_k_degrades_with_pool": false,
+    "H247_proportional_is_flat": true,
+    "H248_C42_is_constructural": false,
+    "verdict": "C42_holds"
+  },
+  "limits": [
+    "Uniform subsampling keeps composition fixed; real pool differences also change composition.",
+    "In a 2k pool top-20 is 1% while in a 20k pool it is 0.1%, which is the mechanism being tested.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "audit_outcome": {
+    "hypothesis": "C42's pool-size insensitivity might be produced by its proportional-budget rule rather than by the signal",
+    "result": "NOT CONFIRMED - the fixed-budget rule is also flat (small vs large pool: -1.50 pp, CI [-3.75,+0.58], includes zero), so insensitivity is not a budget-rule artefact",
+    "so_C42_stands": true
+  },
+  "why_it_is_flat": "the top-20 is dominated by the one or two drug pairs with the highest marginals (R81 found a median of 2 distinct pairs), and the identity and quality of that best pair do not depend on how many keys the pool contains; both budget rules are therefore measuring 'how good is the best pair', which is pool-size stable",
+  "honest_note": "I went looking for a flaw and did not find one. Recording that explicitly matters, because the previous two rounds (R93, R94) did find flaws, and an audit that only ever confirms suspicion would be worthless."
+}

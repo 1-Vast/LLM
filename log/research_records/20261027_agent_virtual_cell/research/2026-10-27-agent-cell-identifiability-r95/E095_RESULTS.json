@@ -1,0 +1,108 @@
+{
+  "kind": "is_R94_identity_instability_a_confound",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "m": 5,
+    "boots": 100,
+    "masks": 20,
+    "n_boot": 2000,
+    "seed": 20261027,
+    "levels": {
+      "1.0": 0.0,
+      "0.36": 0.4,
+      "0.16": 0.6
+    }
+  },
+  "audit": {
+    "keys": 108259,
+    "units": 60
+  },
+  "by_coverage": {
+    "1.00": {
+      "n": 20,
+      "overlap_with_mask_fixed": 0.836060606060606,
+      "overlap_across_masks_R94_method": 0.948421052631579,
+      "same_with_mask_fixed": 0.3303030303030303,
+      "hit_mean": 0.1220029370338837,
+      "hit_sd": 0.03512261911124004
+    },
+    "0.36": {
+      "n": 20,
+      "overlap_with_mask_fixed": 0.82010101010101,
+      "overlap_across_masks_R94_method": 0.20052631578947372,
+      "same_with_mask_fixed": 0.397979797979798,
+      "hit_mean": 0.09486059751002267,
+      "hit_sd": 0.02242831850831241
+    },
+    "0.16": {
+      "n": 20,
+      "overlap_with_mask_fixed": 0.757171717171717,
+      "overlap_across_masks_R94_method": 0.0668421052631579,
+      "same_with_mask_fixed": 0.3005050505050505,
+      "hit_mean": 0.08320850715645493,
+      "hit_sd": 0.020799380162178034
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r95/PROTOCOL_E090.md": "eeb1ef2d7e873c38d578ceb22e83d50ae6bab4ce76fc562d82d9fb4c4a2e3d98",
+    "research/2026-10-27-agent-cell-identifiability-r95/e095_identity_confound.py": "65921e82bfeb1d8c72c42be832aa8eb95429cc009757d21d8edaea722f3af541"
+  },
+  "degradation_vs_coverage": null,
+  "R94_method_vs_this_method_at_full_coverage": {
+    "n": 20,
+    "mean_diff": -0.11236044657097295,
+    "ci95": [
+      -0.1304269005847954,
+      -0.09396424774056361
+    ]
+  },
+  "decisions": {
+    "H243_reproducible_at_full_coverage": true,
+    "H244_low_coverage_reduces_reproducibility": false,
+    "H245_R94_identity_statistic_was_confounded": true,
+    "verdict": "R94_identity_reading_must_be_retracted",
+    "H245_note": "false at full coverage (where masks barely differ, so R94 is optimistic), true at 36% and 16% coverage, which is where the claim was made"
+  },
+  "limits": [
+    "Bootstrapping keys double-counts, so the marginal variance is understated.",
+    "Only one mask per replicate drives the fixed-mask analysis.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "H245_tested_at_each_level": {
+    "1.00": {
+      "n": 20,
+      "mean_diff": -0.11236044657097292,
+      "ci95": [
+        -0.1310368155236577,
+        -0.09449215842636902
+      ]
+    },
+    "0.36": {
+      "n": 20,
+      "mean_diff": 0.6195746943115363,
+      "ci95": [
+        0.5655513024986709,
+        0.6693623072833599
+      ]
+    },
+    "0.16": {
+      "n": 20,
+      "mean_diff": 0.6903296119085593,
+      "ci95": [
+        0.6158842371079213,
+        0.7611281233386495
+      ]
+    }
+  },
+  "H245_correct_location": {
+    "at_full_coverage": "fixed minus varying = -0.112, i.e. R94's method is OPTIMISTIC there because the mask barely changes the leading drugs",
+    "at_36pct": "fixed minus varying = +0.620 [+0.566,+0.669]",
+    "at_16pct": "fixed minus varying = +0.690 [+0.616,+0.761]",
+    "conclusion": "at low coverage, where R94 made its claim, R94's statistic understates reproducibility by about 0.69 of overlap, so the confound is confirmed there"
+  },
+  "corrected_reading": {
+    "reproducibility_given_fixed_information": "top-5 overlap is 0.836 at full coverage, 0.820 at 36%, 0.757 at 16%, with no significant decay",
+    "what_R94_measured": "the effect of changing which drugs are available, which is not irreproducibility",
+    "quality_still_declines": "hit rate under fixed information falls 12.20% -> 9.49% -> 8.32%, consistent with R94's mild coverage effect"
+  }
+}

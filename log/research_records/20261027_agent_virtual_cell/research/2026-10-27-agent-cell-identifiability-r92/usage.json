@@ -1,0 +1,57 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r92",
+  "round": "R92 (goal round 90/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Cross-tissue transfer test of the final recommended algorithm."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r92": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round tests the recommended algorithm on an axis it had never been tested on, and finds a genuine if costly transfer success.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e092_cross_tissue.py"], "runs": 1, "tissues": 3, "subsamples": 40,
+    "units": 120, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E092_RESULTS.json", "rows": "E092_rows.csv", "protocol": "PROTOCOL_E087.md"},
+  "design": {
+    "axis": "leave one tissue out (Breast / Colon / Pancreas)",
+    "transfer_variant": "drug marginals computed from the other two tissues only",
+    "ceiling_variant": "drug marginals that include the target tissue",
+    "criterion": "dataset boolean Synergy, fixed by R91",
+    "k": 20
+  },
+  "results": {
+    "Breast": {"base": 0.0115, "random": 0.0112, "transfer": 0.0587, "ceiling": 0.1213, "coverage": 0.32,
+               "transfer_minus_random": {"diff": 0.0475, "ci95": [0.0338, 0.0625]},
+               "ceiling_minus_transfer": {"diff": 0.0625, "ci95": [0.0437, 0.0813]}},
+    "Colon": {"base": 0.0128, "random": 0.0125, "transfer": 0.0275, "ceiling": 0.0300, "coverage": 0.65,
+              "transfer_minus_random": {"diff": 0.0150, "ci95": [0.0025, 0.0287]},
+              "ceiling_minus_transfer": {"diff": 0.0025, "ci95": [-0.0075, 0.0125]}},
+    "Pancreas": {"base": 0.0242, "random": 0.0250, "transfer": 0.0825, "ceiling": 0.1600, "coverage": 0.58,
+                 "transfer_minus_random": {"diff": 0.0575, "ci95": [0.0338, 0.0813]},
+                 "ceiling_minus_transfer": {"diff": 0.0775, "ci95": [0.0500, 0.1075]}}
+  },
+  "decisions": {"H234_transfers_in_every_tissue": true,
+                "H235_transfer_costs_something": true,
+                "H236_fails_somewhere": false,
+                "verdict": "algorithm_transfers_but_at_a_cost"},
+  "what_is_new": "this is the programme's first transfer-positive result: ranking by drug marginals still beats random 4-5x on a tissue none of the marginals came from",
+  "the_cost": "adding the target tissue's own data lifts Breast from 5.87% to 12.13% and Pancreas from 8.25% to 16.00%, so cross-tissue value is about half of within-tissue value",
+  "two_weaknesses": {
+    "coverage": "only 32% of Breast test keys have both drugs present in the training tissues, so its 5.87% is measured on that subset - this is a real transfer difficulty, not a detail",
+    "colon": "Colon is weak at +1.50 pp with a CI lower bound of 0.25, and its ceiling gain is only +0.25 (interval includes zero), so even using its own data barely helps"},
+  "consistency": "this agrees in direction with C25 (tissue carries real information, +0.0247): removing tissue information costs about half the value, but does not destroy it",
+  "limits": ["only three tissues, so three folds",
+             "within-fold subsampling makes units non-independent and the CIs optimistic",
+             "coverage differs sharply across folds (0.32 / 0.58 / 0.65), so the folds are not comparable to one another",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["coverage deserves to be stated as its own operative condition, since a drug absent from the training tissues simply has no marginal"],
+  "register_updates": {"C65": "new: the algorithm transfers across tissues at about half value"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C65 added)",
+                                "research/SYNTHESIS.md (evidence row added)", "research/INDEX.md (added R92 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

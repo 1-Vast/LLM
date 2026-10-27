@@ -1,0 +1,55 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r98",
+  "round": "R98 (goal round 96/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Audit of C45: does its comparison test annotation value, or merely granularity?"},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r98": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round attacks the programme's load-bearing claim and ends with that claim downgraded to indeterminate rather than either confirmed or refuted.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e098_granularity.py", "capacity control"], "runs": 2, "repeats": 40,
+    "identity_dims": 130, "pathway_dims": 41, "bootstrap": 2000,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E098_RESULTS.json", "capacity": "E098_CAPACITY.json",
+                "rows": "E098_rows.csv", "protocol": "PROTOCOL_E093.md"},
+  "the_concern": "C45 compared a two-way additive model built on drug IDENTITY against a ridge built on PATHWAY annotation, i.e. fine granularity against coarse granularity, which is nearly guaranteed to favour the fine one and does not show whether the annotation carries information",
+  "results_same_encoding": {
+    "base": 0.0140, "pathway": 0.0750, "identity": 0.0787,
+    "identity_plus_pathway": 0.1087, "additive": 0.0600,
+    "identity_minus_pathway": {"diff": 0.0038, "ci95": [-0.0250, 0.0338]},
+    "combined_minus_identity": {"diff": 0.0300, "ci95": [0.0050, 0.0587]}
+  },
+  "results_capacity_control": {
+    "identity": 0.06875, "identity_plus_pathway": 0.1000, "identity_plus_41_random": 0.0800,
+    "pathway_minus_identity": {"diff": 0.0312, "ci95": [0.0012, 0.0638]},
+    "random_minus_identity": {"diff": 0.0113, "ci95": [-0.0125, 0.0350]},
+    "pathway_minus_random": {"diff": 0.0200, "ci95": [-0.0150, 0.0537]}
+  },
+  "decisions": {"H252_annotation_adds_nothing_beyond_identity": false,
+                "H253_annotation_does_add": "not established - my pre-registered criterion rested on the uncontrolled contrast and is withdrawn",
+                "H254_C45_is_a_granularity_comparison": "supported in framing",
+                "verdict": "C45_is_a_granularity_comparison_but_annotation_value_is_indeterminate"},
+  "what_this_overturns": {
+    "the_framing_not_the_numbers": "with a common encoding the additive comparator scores 6.00%, below identity at 7.87%, so C45's -10.12 pp did not reproduce; and identity versus pathway is a tie (+0.38 pp), so 'fine beats coarse' also fails to appear",
+    "status_of_the_headline": "'the annotation model is useless' has never had a matched-information comparator; now that it has one, the answer is indeterminate rather than refuted"},
+  "honest_reading": "random features absorb about a third of the apparent annotation gain and the remainder is not distinguishable from a capacity effect at this sample size, so neither 'annotation adds real signal' nor 'the gain is merely capacity' is established",
+  "limits": ["40 splits with 130+41 dimensions is underpowered, so the null on pathway versus random may simply reflect sample size",
+             "the random block was drawn once, not averaged over repetitions",
+             "pathway annotation has only 41 dimensions, so its information ceiling is low by construction",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["average over many random blocks and increase the number of splits to narrow the pathway-versus-random interval"],
+  "register_updates": {"C71": "new and central: C45 is a granularity comparison and annotation value is indeterminate",
+                       "C45, C46, C49": "annotated with the qualification",
+                       "SYNTHESIS": "the headline gains a prominent caveat"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C71 added, three claims annotated)",
+                                "research/SYNTHESIS.md (caveat added to the headline and to the refuted table)",
+                                "research/INDEX.md (added R98 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r99",
+  "round": "R99 (goal round 97/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Bagged capacity control to settle whether pathway annotation adds anything beyond drug identity."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r99": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round finishes the control it started, and the answer overturns the programme's central negative.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e099_bagged_control.py"], "runs": 1, "repeats": 80, "random_blocks": 10,
+    "ridge_fits": 960, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E099_RESULTS.json", "rows": "E099_rows.csv", "protocol": "PROTOCOL_E094.md"},
+  "design": {
+    "pool": "clean unseen-combination pool",
+    "criterion": "dataset boolean Synergy",
+    "arms": ["identity (130 dims)", "identity+pathway (171 dims)", "identity+random bagged over 10 blocks (171 dims)"],
+    "why_bagging": "a single random block is itself noisy, so the capacity control is averaged over ten independent blocks"}
+  ,
+  "results": {
+    "base": 0.0139, "identity": 0.0813, "identity_pathway": 0.1275, "identity_random_bagged": 0.0738,
+    "pathway_minus_identity": {"diff": 0.0462, "ci95": [0.0225, 0.0706]},
+    "random_minus_identity": {"diff": -0.0075, "ci95": [-0.0238, 0.0094]},
+    "pathway_minus_random": {"diff": 0.0537, "ci95": [0.0294, 0.0781]}
+  },
+  "decisions": {"H255_annotation_has_a_real_increment": true,
+                "H256_still_indeterminate": false,
+                "verdict": "annotation_model_is_REFUTED_as_useless"},
+  "what_this_means": {
+    "the_central_negative_is_refuted": "C45/C46/C49 concluded the annotation model was worthless; that comparison pitted coarse against fine granularity, and with a common encoding plus a capacity-matched control the annotation block adds +5.37 pp while random features add nothing",
+    "identity_and_annotation_are_complementary": "pathway alone about 7.50%, identity alone 8.13%, together 12.75%, so the two sources carry complementary rather than redundant information",
+    "capacity_is_not_the_driver": "the random control has exactly 171 dimensions like the combined model and scores 7.38%, below identity alone at 8.13%"},
+  "scope_of_the_claim": "one pool (unseen combinations), one dataset, one criterion. It does not show pathway annotation is strong alone, only that it is not redundant with drug identity.",
+  "consequence_for_promotion": {
+    "status": "identity+pathway at 12.75% is now the strongest predictor the programme has measured on this pool, so the earlier 'nothing is worth promoting' must be revisited",
+    "but": "promotion still requires replication on the other two pools and on a second criterion, plus leakage and equal-budget controls"},
+  "limits": ["one pool, one dataset, one criterion",
+             "does not establish that pathway annotation alone is strong",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["move identity+pathway to the joint-holdout and both-drugs-unseen pools, and to a second criterion, before any promotion"],
+  "register_updates": {"C72": "new and decisive: the annotation model is not useless",
+                       "C45, C46, C49": "annotated as refuted in interpretation",
+                       "SYNTHESIS": "correction banner added at the top"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C72 added, three claims annotated)",
+                                "research/SYNTHESIS.md (correction banner)", "research/INDEX.md (added R99 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

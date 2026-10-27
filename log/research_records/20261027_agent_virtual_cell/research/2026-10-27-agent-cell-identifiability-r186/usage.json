@@ -1,0 +1,22 @@
+{
+  "experiment": "E186",
+  "round": "R186 (goal round 183/256)",
+  "date": "2026-10-27",
+  "type": "does the target annotation carry content value or only bin size",
+  "compute": {"script": "e186_target_null.py", "splits": 20, "arms": 5,
+              "rand_draws_per_split": 5, "inner_folds": 3,
+              "downloads": 0, "paid_llm_calls": 0, "wet_lab": 0, "runs": 2},
+  "artifacts": {"results": "E186_RESULTS.json", "rows": "E186_rows.csv",
+                "protocol": "PROTOCOL_E174.md", "record": "record.md", "report": "report.md"},
+  "arms": {"identity": -0.0051, "pathway": 0.1206, "target": 0.0566,
+           "path_rand": -0.0002, "target_rand": 0.0035},
+  "key_contrasts": {
+    "pathway_over_its_null": [0.1209, 0.0713, 0.1713],
+    "target_over_its_null": [0.0532, 0.0209, 0.0836],
+    "pathway_minus_target": [0.0640, 0.0279, 0.1041]},
+  "conclusion": "both annotations carry content that a size-matched random partition lacks; pathway is worth roughly twice what target is worth",
+  "practical_rule_change": "prefer pathway, and treat target as a genuine but weaker fallback when a drug has no pathway label",
+  "bug_caught_before_filing": "identity contrasts were NaN because that arm predicts a constant on this pool; the three contrasts not touching identity were already correct",
+  "scope_declaration": {"modified_src_or_tools": false, "promoted_code": false,
+                         "sealed_data_read": false, "new_downloads": false, "novelty_claim": false}
+}

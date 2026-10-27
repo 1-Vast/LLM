@@ -1,0 +1,105 @@
+{
+  "kind": "can_the_model_rank_cells_or_only_combinations",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "reps": 20,
+    "seed": 20261070,
+    "lambdas": [
+      0.1,
+      0.3,
+      1.0,
+      3.0,
+      10.0,
+      30.0,
+      100.0,
+      300.0,
+      1000.0
+    ],
+    "folds": 3
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 40
+  },
+  "by_arm": {
+    "identity": {
+      "n": 20,
+      "mean_eval": 3566.45,
+      "mean_pairs": 67.9,
+      "max_spread_over_reps": 3.469446951953614e-18,
+      "mean_spread": 1.5887134583501285e-19,
+      "frac_pairs_varying": 0.0,
+      "between_frac": 0.5285584447635623,
+      "within_frac": 0.4714415552364377,
+      "rho": 0.0017882975289908397
+    },
+    "identity_pathway": {
+      "n": 20,
+      "mean_eval": 3566.45,
+      "mean_pairs": 67.9,
+      "max_spread_over_reps": 1.3877787807814457e-17,
+      "mean_spread": 5.722283619891461e-19,
+      "frac_pairs_varying": 0.0,
+      "between_frac": 1.0,
+      "within_frac": 5.402412945670871e-32,
+      "rho": 0.15164463529881483
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r174/PROTOCOL_E162.md": "ca25e27d02fb6f63313fbf1400aec711ed1a26ae450b10ef5417fe17e1519fd8",
+    "research/2026-10-27-agent-cell-identifiability-r174/e174_cell_axis_v2.py": "3b094bd899588cd9f2cf208384703d3fc34b7be644912f20d1f7502f3302c426"
+  },
+  "decisions": {
+    "H412_ranks_combinations_only": true,
+    "H413_also_ranks_cells": false,
+    "verdict": "the_model_ranks_combinations_only_and_that_boundary_is_now_written_down"
+  },
+  "a_correction_worth_recording": {
+    "what_happened": "the first version reported a within-pair variance fraction of 0.309 for the identity arm. That arm has no cell feature, so the figure was impossible, and a direct one-rep check showed the prediction was constant to 8.7e-21.",
+    "cause": "the aggregation path, not the model",
+    "fix": "plain numpy grouping with an explicit within-pair range, plus a raw max-spread column that cannot hide behind a ratio",
+    "note": "the raw spread is the right statistic here: a ratio can look nonzero from floating-point residue when the true value is exactly constant"
+  },
+  "why_this_is_structural": {
+    "reason": "neither arm contains a cell-level feature. Identity is a drug indicator and the pathway block is a drug annotation, so with no cell covariate the prediction cannot depend on the cell.",
+    "so": "the result is forced by the design; its value is in naming the boundary, not in surprise",
+    "what_would_lift_it": "a cell-level covariate usable when both drugs are unseen, which this resource cannot supply; C90 already showed the tissue block is unreliable under holdout"
+  },
+  "limits": [
+    "Only ridge and one resource; two feature sets.",
+    "The result follows from the feature design.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "the_answer": {
+    "question": "can the model rank cell lines, or only drug combinations",
+    "answer": "only drug combinations",
+    "evidence": {
+      "identity_pathway": {
+        "rho": 0.1516,
+        "max_within_pair_spread": 1.388e-17,
+        "frac_pairs_varying": 0.0,
+        "between_frac": 1.0
+      },
+      "identity": {
+        "rho": 0.0018,
+        "max_within_pair_spread": 3.469e-18,
+        "frac_pairs_varying": 0.0
+      }
+    },
+    "reading": "for a fixed drug pair every cell receives the same prediction, to floating-point zero. The rank correlation of 0.1516 is therefore entirely between-combination."
+  },
+  "what_a_practitioner_must_know": {
+    "what_the_model_answers": "given two unseen drugs, which combinations are on average more synergistic",
+    "what_it_cannot_answer": "which cell line to test that pair in",
+    "why_it_matters": "choosing an experiment means choosing cell AND combination; this model orders only one of the two axes",
+    "this_has_never_been_written_down_before": true
+  },
+  "a_second_correction_from_the_same_round": {
+    "what_I_first_reported": "a within-pair variance fraction of 0.309 for the identity arm and 0.0 for the pathway arm",
+    "why_impossible": "the identity arm has no cell feature, so its within-pair variance must be exactly zero",
+    "diagnosis": "the ratio was residue over a near-zero denominator. The identity arm's predictions are almost constant, so total variance is tiny and floating-point noise dominates the fraction. The pathway arm happened to show 0.0 only because its numerator was even smaller.",
+    "the_fix": "report the raw within-pair range, which cannot hide behind a denominator",
+    "the_general_rule": "when a denominator can approach zero, report the raw quantity alongside the ratio, or the ratio will report noise as signal",
+    "count": "this is the same family as the zero-width-CI instances: a statistic whose scale collapses and then reads as information"
+  }
+}

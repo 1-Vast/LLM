@@ -1,0 +1,44 @@
+{
+  "checked_at": "2026-10-26",
+  "url": "https://raw.githubusercontent.com/oghenejokpeme/multidrug-analysis/main/experiments/code_templates.zip",
+  "bytes": 10935,
+  "sha256": "8c8aa83da15879eb2f38a5fb70ab1f16498b71701814d1e7725d70cd614e7fa3",
+  "scope": "Read ZIP central directory and relevant notebook code cells only; no notebook execution, no data download",
+  "notebooks": {
+    "code_templates/4_rank_predicted_viabilities.ipynb": [],
+    "code_templates/1_allocate_wells.ipynb": [],
+    "code_templates/3_model_and_predict.ipynb": [
+      {
+        "cell": 0,
+        "source": "import math\nimport itertools\nimport pickle\nimport numpy as np\nimport pandas as pd\nfrom sklearn.ensemble import RandomForestRegressor"
+      },
+      {
+        "cell": 2,
+        "source": "df = pd.read_csv('generated_data/training_data_and_model/training.csv', index_col=0, header=0, delimiter=',')\nx = df.drop('delta_viability', axis=1)\ny = df['delta_viability'].values"
+      },
+      {
+        "cell": 3,
+        "source": "rf_model = RandomForestRegressor(random_state = 1, n_estimators = 200, n_jobs = -1)\nrf_model.fit(x.values, y)"
+      },
+      {
+        "cell": 5,
+        "source": "def get_uncertainty_matrix(rf_model, x_search):\n    y_hat_avg         = rf_model.predict(x_search.values)\n    y_hat_per_tree    = [tree.predict(x_search.values) for tree in rf_model.estimators_]\n    y_hat_per_tree_df = np.stack(y_hat_per_tree, axis = 1)\n    y_hat_variance    = np.var(y_hat_per_tree_df, axis = 1)\n    \n    unc_mat = np.column_stack((y_hat_avg, y_hat_variance))\n    unc_mat = pd.DataFrame(unc_mat, columns=['prediction', 'variance'])\n    unc_mat.index = x_search.index\n    \n    return unc_mat"
+      }
+    ],
+    "code_templates/0_select_initial_combinations.ipynb": [],
+    "code_templates/2_generate_training_data.ipynb": [
+      {
+        "cell": 0,
+        "source": "def get_compound_to_fingerprint_library():\n    '''Read pre-generated compound to fingerprint map.'''\n    \n    compound_id_to_fingerprint = {}\n    with open('../data/compound_id_to_fingerprint.csv', 'r') as f:\n        for line in f:\n            nline = line.strip().split(',')\n            cid = nline[0]\n            fingerprint = [int(i) for i in nline[1:]]\n\n            compound_id_to_fingerprint[cid] = fingerprint\n    \n    return compound_id_to_fingerprint\n\ndef check_if_special_case(drug):\n    special_cases = {'ARC0004651': 'ARC0004766', 'ARC0004748': 'ARC0004760'}\n    \n    if drug in special_cases:\n        return special_cases[drug]\n    \n    return drug\n\ndef read_combination_viabilities(cell_line):\n    combination_to_viabilities = {}\n    with open(f'generated_data/viabilities/{cell_line}_drug_combination_viability.csv', 'r') as f:\n        _ = f.readline()\n        for line in f:\n            nline = line.strip().split(',')\n            uid, _, drug_1, ic1, drug_2, ic2, drug_3, ic3, viability = nline\n            \n            drug_1 = check_if_special_case(drug_1)\n            drug_2 = check_if_special_case(drug_2)\n            drug_3 = check_if_special_case(drug_3)\n            \n            # Ensure that all drugs in a combination are unique and an error has not been made\n            assert len(set([drug_1, drug_2, drug_3])) == 3\n            \n            viability = float(viability)\n            details = ((drug_1, ic1), (drug_2, ic2), (drug_3, ic3))\n            combination_to_viabilities[uid] = (details, viability)\n    \n    return combination_to_viabilities\n            \n\ndef verify_and_align_combinations(mcf7_viabilities, mcf10a_viabilities):\n    \"\"\"\n    Verify that the combinations in the MCF7 datasets are the same as those in the MCF10A dataset.\n    We also calculate the final viability value for a combination by subtracting the MCF10A viability \n    value from its MCF7 counterpart.\n    \"\"\"\n    \n    # Check if the number of combinations are the same.\n    if len(mcf7_viabilities) != len(mcf10a_viabilities):\n        raise Exception('The number of combinations in the two cell lines do not match!')\n    \n    combination_to_delta_viability = {}\n    # Check if the combinations in each cell line are the same.\n    for uid, mcf_details in mcf7_viabilities.items():\n        if uid not in mcf10a_viabilities:\n            raise Exception(f'This combination is not in both cell lines or is ordered differently: {uid}')\n        \n        _, mcf10a_viability = mcf10a_viabilities[uid]\n        drugs, mcf7_viability = mcf_details\n        delta_viability = mcf10a_viability - mcf7_viability\n        \n        combination_to_delta_viability[uid] = (drugs, delta_viability)\n        \n        \n    return combination_to_delta_viability"
+      },
+      {
+        "cell": 2,
+        "source": "mcf7_viabilities   = read_combination_viabilities('MCF7')\nmcf10a_viabilities = read_combination_viabilities('MCF10A')\n\ncombination_to_delta_viability = verify_and_align_combinations(mcf7_viabilities, mcf10a_viabilities)\ncompound_id_to_fingerprint = get_compound_to_fingerprint_library()"
+      },
+      {
+        "cell": 5,
+        "source": "def combination_to_uid(pairs):\n    \"\"\"Take 3 drug and concentration pairs, and generate a unique ID for this combination.\n    Assumes the first 20 chars of the sha1 hash function will not collide.\n    Deterministic: the same drug combination will always generate the same hash id.\n    \n    Written by Philip Reiser\n    \"\"\"\n    \n    pairs_lowered = [(drug.lower(), concentration) for drug, concentration in pairs]\n    pairs_sorted = sorted(pairs_lowered, key=lambda x: x[0])\n    \n    pair_strings = [f'{drug}{concentration}' for drug, concentration in pairs_sorted]\n    sorted_combination_string = ''.join(pair_strings)\n    \n    uid = hashlib.sha1(sorted_combination_string.encode('utf-8')).hexdigest()[:20]\n    \n    return uid\n\ndef expand_input_samples(uid, combination, compound_id_to_fingerprint):\n    # Extra check to ensure that the UID remains consistent.\n    assert(uid) == combination_to_uid(combination)\n    \n    pair_to_entry = {}\n    for pair in combination:\n        drug_id, ic = pair\n        conc = round(drug_library_dict[drug_id][ic], 2)\n        drug_entry = compound_id_to_fingerprint[drug_id].copy()\n        drug_entry.append(conc)\n        \n        pair_to_entry[pair] = drug_entry\n\n    rows = []\n    count = 1\n    for permutation in itertools.permutations(combination):\n        row = [f'{uid}_{count}']\n        \n        for pair in permutation:\n            for v in pair_to_entry[pair]:\n                row.append(v)\n        count += 1\n        \n        rows.append(row)\n    \n    return rows\n\ndef build_training_dataset(compound_id_to_fingerprint, combination_to_delta_viability):\n    all_rows = []\n    for uid, combination_details in combination_to_delta_viability.items():\n        combination, delta_viability = combination_details\n        for irow in expand_input_samples(uid, combination, compound_id_to_fingerprint):\n            irow.append(round(delta_viability,2))\n            assert len(irow) == 503\n            \n            all_rows.append(irow)\n      \n    column_ids = ['uid'] + [f'd{d}_B{i}' for d in range(1,4) for i in range(1,168)] + ['delta_viability'] \n    df = pd.DataFrame(all_rows, columns=column_ids)\n    df.to_csv('generated_data/training_data_and_model/training.csv', index=0)\n    \nbuild_training_dataset(compound_id_to_fingerprint, combination_to_delta_viability)"
+      }
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r94",
+  "round": "R94 (goal round 92/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Redo of the coverage experiment using R93's own prescribed remedy."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r94": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round simply executes the remedy its predecessor wrote for itself, and this time the design holds.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e094_coverage_redo.py"], "runs": 1, "levels": 4, "draws": 100,
+    "units": 400, "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E094_RESULTS.json", "rows": "E094_rows.csv", "protocol": "PROTOCOL_E089.md"},
+  "design_changes_vs_R93": {
+    "evaluation_level": "combination level with m fixed at 5, instead of key-level top-20 that effectively held 1-2 pairs",
+    "draws": "100 independent masking draws per level",
+    "identity_reported": "the repeat-rate and overlap of the chosen top-5 between consecutive draws, so that pair identity is quantified rather than hidden"},
+  "results": {
+    "1.00": {"actual": 0.97, "avail": 1962, "marginal": 0.1281, "random": 0.0152, "diff": 0.1129, "ci95": [0.1080, 0.1170], "identity_same": 0.89, "identity_overlap": 0.96},
+    "0.64": {"actual": 0.63, "avail": 1284, "marginal": 0.1158, "random": 0.0154, "diff": 0.1003, "ci95": [0.0926, 0.1073], "identity_same": 0.17, "identity_overlap": 0.45},
+    "0.36": {"actual": 0.36, "avail": 725, "marginal": 0.1201, "random": 0.0102, "diff": 0.1099, "ci95": [0.1014, 0.1181], "identity_same": 0.04, "identity_overlap": 0.20},
+    "0.16": {"actual": 0.15, "avail": 305, "marginal": 0.0941, "random": 0.0131, "diff": 0.0810, "ci95": [0.0721, 0.0898], "identity_same": 0.00, "identity_overlap": 0.07}
+  },
+  "decisions": {"H240_value_falls_with_coverage": true,
+                "H240_note": "one violation was allowed by the protocol and one occurred (0.64 to 0.36 rises slightly)",
+                "H241_coverage_threshold_exists": false,
+                "H242_available_pool_shrinks": true,
+                "verdict": "coverage_is_a_real_condition"},
+  "reading": {
+    "real_but_mild": "value falls from 12.81% to 9.41% as coverage drops to 15%, a loss of 3.4 pp, and never approaches random (still 8.10 pp above it)",
+    "mechanism": "the adoptable pool shrinks 6.4-fold, from 1,962 to 305 combinations",
+    "unexpected": "at low coverage the top-5 identity almost never repeats (0.00 same, 0.07 overlap) while their aggregate quality stays high, so the specific recommendations stop being reproducible even though their class remains good"},
+  "why_not_a_broken_metric": "each level's random control stays between 1.0% and 1.5%, so the differences are not control drift; and identity is now measured explicitly rather than inferred",
+  "limits": ["masking is artificial and real missingness carries selection bias",
+             "m=5 is still small, though far steadier than R93's effective 1-2",
+             "only 65 drugs and 2,025 combinations",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["recommendation reproducibility under low coverage deserves its own claim, since it hurts users more than a small accuracy loss"],
+  "register_updates": {"C67": "new: coverage is real but mild, and low coverage destroys recommendation reproducibility",
+                       "C66": "annotated as superseded by R94"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C67 added, C66 annotated)",
+                                "research/SYNTHESIS.md (evidence row added)", "research/INDEX.md (added R94 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

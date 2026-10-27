@@ -1,0 +1,49 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r111",
+  "round": "R111 (goal round 109/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "All-cell leave-one-out with m up to 400, to settle where personalisation turns positive."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r111": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round replaces a 12-cell design with an all-cell one and finds the opposite of the earlier positive result, then explains the conflict.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e111_crossover.py"], "runs": 1, "cells_used": 48, "units": 576,
+    "sanity_checks": 1152, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E111_RESULTS.json", "rows": "E111_rows.csv", "protocol": "PROTOCOL_E106.md"},
+  "sanity_gate": {"checks": 1152, "top_k_changed": 1152, "passed": true},
+  "results": {
+    "m150": {"marginal": {"prior": 0.1226, "pers": 0.0799, "gain": -0.0427, "ci95": [-0.0615, -0.0240]},
+             "combo": {"prior": 0.1677, "pers": 0.1042, "gain": -0.0635, "ci95": [-0.0851, -0.0424]}},
+    "m200": {"marginal": {"prior": 0.1208, "pers": 0.0927, "gain": -0.0281, "ci95": [-0.0413, -0.0156]},
+             "combo": {"prior": 0.1684, "pers": 0.1309, "gain": -0.0375, "ci95": [-0.0535, -0.0222]}},
+    "m300": {"marginal": {"prior": 0.1306, "pers": 0.1010, "gain": -0.0295, "ci95": [-0.0437, -0.0153]},
+             "combo": {"prior": 0.1691, "pers": 0.1420, "gain": -0.0271, "ci95": [-0.0413, -0.0142]}},
+    "m400": {"marginal": {"prior": 0.1333, "pers": 0.1090, "gain": -0.0243, "ci95": [-0.0375, -0.0108]},
+             "combo": {"prior": 0.1684, "pers": 0.1552, "gain": -0.0132, "ci95": [-0.0247, -0.0021]}}
+  },
+  "decisions": {"H284_crossover_found": false, "first_significantly_positive_m": null,
+                "verdict": "personalisation_is_harmful_when_the_prior_is_strong"},
+  "all_contrasts_significantly_negative": true,
+  "the_conflict_with_R76": {
+    "R76": "with a marginal prior at about 7%, personalisation helped (+1.64 pp at m=100, +2.62 pp at m=200, both significant)",
+    "R111": "with marginal priors at 12-13% and combined priors near 17%, personalisation hurts at every m from 150 to 400, all eight intervals significantly negative",
+    "likely_resolution": "the sign depends on prior strength: a weak prior benefits from noisy per-drug corrections because they carry information, a strong prior only absorbs their noise",
+    "honest_caveat": "prior strength was not manipulated. It differs partly because the pool-size requirements differ (600 versus 840 keys), which selects different cells, so it is a concomitant variable rather than a control"},
+  "limits": ["only 48 of 125 cells meet the 840-key requirement",
+             "the evaluation set shrinks as m grows because measured keys are removed",
+             "per-drug residuals at these m values rest on few keys per drug, which is the mechanism but also makes the result sensitive to how residuals are estimated",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["explicitly manipulate prior strength on a fixed cell set, for example by weakening the prior deliberately, and check whether the sign of personalisation crosses over"],
+  "register_updates": {"C84": "new: personalisation is significantly harmful when the prior is strong, and the R76 conflict points to prior strength as a hidden variable",
+                       "C83": "annotated", "SYNTHESIS": "rows added and qualified"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C84 added, C83 annotated)",
+                                "research/SYNTHESIS.md (rows added and qualified)", "research/INDEX.md (added R111 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

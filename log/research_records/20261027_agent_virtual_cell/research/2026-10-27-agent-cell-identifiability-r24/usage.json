@@ -1,0 +1,43 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r24",
+  "round": "R24 (goal round 22/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Residual-conservation replication plus a residual-transfer test on data in hand."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r24": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round's own robustness check overrode a mechanical TRUE flag, which is the challenge that mattered here.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e024_residual_transfer.py"], "runs": 1, "bootstrap": 1000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E024_RESULTS.json", "units": "E024_units.csv",
+                "residual_pairs": "E024_residual_pairs.csv", "protocol": "PROTOCOL_E024.md"},
+  "results": {
+    "residual_conservation": {"n": 25, "mean_rho": 0.596, "median_rho": 0.624, "ci95": [0.531, 0.662], "frac_positive": 1.0},
+    "baseline_A_additive": {"precision10": 0.225, "spearman": 0.937},
+    "treatment_B_plus_residual": {"precision10": 0.277, "spearman": 0.924},
+    "paired": {"precision10_diff": 0.052, "precision10_ci": [1.2e-18, 0.1045],
+               "spearman_diff": -0.013, "spearman_ci": [-0.0209, -0.0057]}
+  },
+  "robustness_of_the_tail_gain": {"frac_units_improved": 0.41, "frac_unchanged": 0.25,
+                                  "frac_worse": 0.34, "median_gain": 0.0,
+                                  "per_layout_gain_range": [-0.15, 0.40]},
+  "decisions": {
+    "H055_residual_conserved": true,
+    "H056_transfer_fixes_tail": false,
+    "H056_status": "the mechanical flag was TRUE only because the paired CI lower bound is 1.2e-18; the median gain is 0 and 34% of units get worse, so it is recorded as NOT established",
+    "H057_gain_concentrated_in_tail": false,
+    "verdict_reported": "tail_is_not_robustly_transferable"
+  },
+  "trade_off": "transferring the residual raises the top-10 point estimate while lowering global Spearman (CI excludes 0): additive ordering is best for the bulk, the interaction lives in the tail",
+  "operational_difference_from_R13": "R13 measured the residual against Bliss single-agent additivity on validation plates (29 pairs, rho 0.353); here it is against a fitted additive model on 351-pair plates (25 cell pairs, rho 0.596). Same family, different operationalisation, so this is a replication in spirit plus an upward revision, not a repeat measurement.",
+  "register_updates": {"C12": "upgraded: residual conservation 0.596 (25/25 positive) on the high-diversity design, with the operationalisation difference stated"},
+  "pattern": "this is the fourth consecutive round where a modelling device fails to improve the decision-relevant ordering (R14 shrinkage/dimension, R17 rule boundary, R18-19 target overlap, R24 residual transfer); the next round should change the question rather than the method",
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C12 upgraded)", "research/INDEX.md (added R24 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "mechanism_claim_made": false, "decision_value_claimed": false
+  }
+}

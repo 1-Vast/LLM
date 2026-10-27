@@ -1,0 +1,51 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r65",
+  "round": "R65 (goal round 63/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Recomputation of three prose-only register numbers from stored data."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r65": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round recomputes the flagged numbers, reproduces some and honestly reports the ones it cannot reproduce.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, numpy 2.4.6",
+    "scripts": ["e065_recompute.py"], "runs": "2 (second run annotated the outcome)",
+    "bootstrap": 4000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E065_RESULTS.json", "protocol": "PROTOCOL_E063.md"},
+  "recomputation": {
+    "C2_tau_half": {"prose": 0.891, "recomputed": 0.8907, "reproduced": true},
+    "C2_tau_cross": {"prose": 0.712, "recomputed_overall_median": 0.7367,
+                      "recomputed_median_of_layout_medians": 0.7088, "reproduced": false},
+    "C2_ci": {"prose": [0.116, 0.291], "recomputed_layout_clustered_median": [0.1155, 0.2169],
+              "lower_reproduced": true, "upper_reproduced": false},
+    "C23_between_sd": {"prose": 0.032, "recomputed": 0.0318, "reproduced": true},
+    "C23_ratio": {"prose": 1.38, "recomputed": 1.382, "reproduced": true}
+  },
+  "definitions_tried_for_tau_cross": {
+    "overall_median": 0.7367, "median_of_per_layout_medians": 0.7088,
+    "mean_of_per_layout_medians": 0.6845, "overall_mean": 0.6759},
+  "definitions_tried_for_ci": {
+    "layout_cluster_median": [0.1155, 0.2169], "layout_cluster_mean": [0.1288, 0.2642],
+    "cell_cluster_median": [0.1067, 0.1709], "pair_median": [0.1191, 0.1615]},
+  "likely_cause": "the layout clustering has only 7 clusters, one holding 3 cell pairs; a bootstrap upper bound in that configuration is highly seed- and grouping-sensitive, and neither the seed nor the grouping was stored",
+  "decisions": {"H164_prose_numbers_reproducible": false,
+                "verdict": "partially_reproducible"},
+  "substantive_impact": "none for the C2 conclusion - tau_half exceeds tau_cross in 192/192 pairs with a median gap of 0.1392 and a reproducible layout-clustered CI of [0.1155, 0.2169]",
+  "actions_taken": ["the register's C2 row now cites the reproducible figures and flags the two it cannot",
+                    "a new claim C40 records that two register figures are not recomputable from stored data",
+                    "no old result file was modified, per the register's no-rewrite rule"],
+  "significance": "this is the first substantive problem the five-round audit chain has found: not a transcription error, but two cited figures that do not match the archived data and whose provenance (seed, grouping) was never stored",
+  "limits": ["only a limited number of definitions were tried",
+             "the original seed is unknown, so CI endpoints cannot be matched to the digit and the upper-bound difference is 'suspicious', not 'proven wrong'",
+             "the recomputation depends on the stored tau_cross field, so it can only verify consistency from that field",
+             "retrospective and read-only with respect to old records; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["store key figures in result JSONs rather than only in reports",
+                 "audit C9/C10/C13/C15/C16/C22/C31 and F1-F9"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C2 row corrected, C40 added)", "research/INDEX.md (added R65 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "old_result_files_modified": false, "started_background_service_or_loop": false,
+    "new_wet_experiments": false, "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

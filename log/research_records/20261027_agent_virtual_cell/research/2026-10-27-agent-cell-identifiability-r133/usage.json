@@ -1,0 +1,52 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r133",
+  "round": "R133 (goal round 131/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Threshold sensitivity of the frozen claim, since the 25 percent cut was never justified."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r133": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round attacks its own strongest claim where threshold mining would hide.",
+  "compute": {"python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+              "scripts": ["e133_thresholds.py"], "runs": 1, "repeats": 200, "taus": 5,
+              "rows": 1000, "data_downloads": 0, "wet_lab_experiments": 0},
+  "artifacts": {"results": "E133_RESULTS.json", "rows": "E133_rows.csv", "protocol": "PROTOCOL_E123.md"},
+  "results": {
+    "0.10": {"identity": 0.0980, "plus_pathway": 0.1515, "plus_random": 0.0945, "gain": 0.0535, "ci95": [0.0310, 0.0772], "mde": 0.0336},
+    "0.20": {"identity": 0.1933, "plus_pathway": 0.2807, "plus_random": 0.1958, "gain": 0.0875, "ci95": [0.0580, 0.1173], "mde": 0.0439},
+    "0.25": {"identity": 0.2442, "plus_pathway": 0.3415, "plus_random": 0.2473, "gain": 0.0973, "ci95": [0.0650, 0.1283], "mde": 0.0463},
+    "0.33": {"identity": 0.3273, "plus_pathway": 0.4300, "plus_random": 0.3235, "gain": 0.1028, "ci95": [0.0700, 0.1370], "mde": 0.0491},
+    "0.50": {"identity": 0.4980, "plus_pathway": 0.6093, "plus_random": 0.5048, "gain": 0.1113, "ci95": [0.0762, 0.1447], "mde": 0.0486}},
+  "decisions": {"H332_robust_across_taus": true, "H333_threshold_dependent": false,
+                "random_significant_taus": [],
+                "verdict": "the_frozen_claim_is_robust_across_thresholds_and_gains_a_sixth_check"},
+  "what_this_rules_out": {
+    "the_worry": "the claim was measured against a 25 percent cut that was never justified, which is where threshold mining would hide",
+    "the_result": "the gain is significant at every threshold from the top decile to the median, and the random block never is",
+    "conclusion": "the claim is not a product of the cut point"},
+  "the_shape_is_informative": {
+    "gains_by_tau": [0.0535, 0.0875, 0.0973, 0.1028, 0.1113],
+    "reading": "the gain grows as the threshold loosens, so the annotation improves the ranking broadly rather than only the extreme tail",
+    "contrast": "a tail-only effect would shrink toward the median, not grow"},
+  "the_updated_magnitude_range": {
+    "before": "4.7 to 8.6 pp",
+    "after": "4.7 to 11.1 pp",
+    "guidance": "quote the range, never a point estimate"},
+  "the_frozen_claim_now_has_six_checks": ["direction", "capacity", "structure", "condition",
+                                            "internal control", "threshold"],
+  "limits": ["only the both_unseen cell, since elsewhere identity has no headroom",
+             "at the decile threshold the base is only 9.8 percent, so that estimate is coarser",
+             "a threshold sweep is not a second dataset; it shows only that the cut point does not drive the result",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["quantify the ranking-wide improvement directly, for example by checking whether the gain stays monotone at top-50 and top-100"],
+  "register_updates": {"C101": "new: threshold robustness plus the ranking-wide reading", "C97": "annotated",
+                       "SYNTHESIS": "frozen claim stated in threshold-free form"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C101 added, C97 annotated)",
+                                "research/SYNTHESIS.md (sixth check row, effect statement rewritten)",
+                                "research/INDEX.md (added R133 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

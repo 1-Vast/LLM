@@ -1,0 +1,49 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r79",
+  "round": "R79 (goal round 77/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Three-feature advance model with leave-one-cell-out validation on the R78 cell table."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r79": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round meets its pre-registered AUC bar, then shows that the operating points are too impure for the decision the AUC might suggest.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, scikit-learn 1.9.0",
+    "scripts": ["e079_three_feature.py", "r79b.py"], "runs": 2, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E079_RESULTS.json", "operating_points": "E079_OPERATING_POINTS.json",
+                "protocol": "PROTOCOL_E076.md"},
+  "design": {
+    "features": ["B0", "base", "tissue"],
+    "model": "L2 logistic, C=1.0, standardised",
+    "evaluation": "leave-one-cell-out",
+    "comparison": "B0 alone under the same protocol"
+  },
+  "results": {
+    "loo_auc_three_feature": 0.7888, "ci_three": [0.701, 0.872],
+    "loo_auc_B0_only": 0.5615, "ci_B0": [0.431, 0.689],
+    "diff": {"mean": 0.2279, "ci95": [0.0751, 0.3894]},
+    "operating_points": {"0.2": {"flagged": 68, "precision": 0.44, "recall": 0.94},
+                         "0.3": {"flagged": 44, "precision": 0.48, "recall": 0.66},
+                         "0.4": {"flagged": 28, "precision": 0.50, "recall": 0.44},
+                         "0.5": {"flagged": 12, "precision": 0.50, "recall": 0.19}},
+    "base_rate": 0.26
+  },
+  "decisions": {"H200_three_feature_reaches_065": true,
+                "H201_beats_B0_alone": true,
+                "verdict": "advance_rule_is_usable_for_triage_but_not_for_exclusion"},
+  "key_judgement": "the AUC bar was met, but precision never exceeds about 0.50 against a 0.26 base rate, so the model can prioritise which cells to skip yet cannot certify that a cell will not benefit; this is a case where AUC alone would have produced the wrong conclusion",
+  "limits": ["32 positives in 123 cells makes both the AUC and the precision intervals wide",
+             "only three features, with no feature search, to avoid overfitting the small positive class",
+             "the threshold 0.2 was read on the same LOO predictions, so the 'flag 55%, recall 94%' point is optimistic without nested validation",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["nested cross-validation (outer leave-one-cell-out, inner threshold selection) to make the triage rule trustworthy"],
+  "register_updates": {"C53": "new: AUC 0.79 but precision 0.50, triage-only",
+                       "C52": "annotated with the multi-feature follow-up"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C53 added, C52 annotated)", "research/INDEX.md (added R79 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

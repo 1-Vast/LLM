@@ -1,0 +1,189 @@
+{
+  "task": "task-58",
+  "round": "R199-A1v4.1-P0a-relations-check",
+  "role": "approved P0a relations_check execution (reference A/B responses readable); no P0b/P0c/P0d, no Stage 1, S/U endpoint responses never read",
+  "approval": {
+    "file": "research/2026-10-27-innovation-scouting/conflict_signal/APPROVAL_P0A_CHECK.md",
+    "preconditions": ["p0a_metadata_pass + frozen output SHA 338A234E...F58247", "two-key gate", "Lead approval"],
+    "scope": "only relations_check.py --confirm-run; no other stages"
+  },
+  "runtime": {
+    "interpreter": "D:\\anaconda\\envs\\maestro\\python.exe",
+    "python": "3.11.16",
+    "network": false,
+    "cwd": "D:\\MAESTRO"
+  },
+  "model": "unknown",
+  "effort": "unknown",
+  "tokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "note": "runtime token accounting not exposed to the acting agent; recorded as null (not 0)"
+  },
+  "cost_usd": null,
+  "agent_turn_elapsed_s": null,
+  "commands": [
+    {
+      "cmd": "baseline gate checks: default and --confirm-run (real_run_enabled=false)",
+      "purpose": "record pre-window gate refusals",
+      "wall_time_s": 3,
+      "exit_codes": {"default": 3, "confirm_only": 3}
+    },
+    {
+      "cmd": "write real_run_enabled=true into config (only key changed)",
+      "purpose": "open approved two-key window",
+      "wall_time_s": 1,
+      "window_config_sha256": "B60CC8D0E8B567322F831DA3E8D83A11B1042A617B4AC36D95A68A890803D946"
+    },
+    {
+      "cmd": "relations_check.py --confirm-run (Run A: candidate enumeration not linked to P0a grid)",
+      "purpose": "P0a relations_check attempt",
+      "wall_time_s": 9.8,
+      "result": "data_unavailable (R_below_min, coverage_below_min); candidates 27600 truncated 200; accepted 82; coverage 0.41",
+      "status": "discarded (implementation inconsistent with P0a grid; output SHAs recorded in record_p0a_check §2)"
+    },
+    {
+      "cmd": "code fix 4: pass P0a _candidate_keys (171 grid) into relations_check; canonicalize fits-table ac/lc keys",
+      "purpose": "restrict relation stage to frozen P0a candidate grid",
+      "wall_time_s": 300
+    },
+    {
+      "cmd": "relations_check.py --confirm-run (Run B: P0a grid linked, full-family BH too strict)",
+      "purpose": "P0a relations_check attempt",
+      "wall_time_s": 6.9,
+      "result": "data_unavailable; candidates 135; accepted 2; alpha pass not implemented as gate",
+      "status": "discarded (multiplicity layer inconsistent with frozen protocol)"
+    },
+    {
+      "cmd": "code fix 5: per-relation alpha=0.01 gate + primary-family (<=10) BH q<=0.10 + strict full-family BH as sensitivity only",
+      "purpose": "match frozen protocol multiplicity layers",
+      "wall_time_s": 420
+    },
+    {
+      "cmd": "relations_check.py --confirm-run (Run C: final valid run)",
+      "purpose": "approved P0a relations_check under frozen protocol",
+      "wall_time_s": 6.8,
+      "cpu": "single process, wall≈CPU",
+      "status": "data_unavailable",
+      "exit_code": 1
+    },
+    {
+      "cmd": "revert real_run_enabled=false; verify default/confirm exit 3; rerun synthetic selfcheck and freeze SHAs",
+      "purpose": "close window and freeze final artifacts",
+      "wall_time_s": 4,
+      "exit_codes": {"default": 3, "confirm_only": 3}
+    }
+  ],
+  "gate_status": {
+    "baseline_config_sha256": "BB1FE3230B70EB53B5A39EF7D7D37DF256F296E866133939881E0E3E909CF9B4",
+    "window_config_sha256": "B60CC8D0E8B567322F831DA3E8D83A11B1042A617B4AC36D95A68A890803D946",
+    "reverted_config_sha256": "BB1FE3230B70EB53B5A39EF7D7D37DF256F296E866133939881E0E3E909CF9B4",
+    "only_key_changed_in_window": "run_gate.real_run_enabled",
+    "default_exit": 3,
+    "confirm_only_exit": 3
+  },
+  "result": {
+    "status": "data_unavailable",
+    "judge": "p0a_relations_check_fail",
+    "reasons": ["R_below_min", "coverage_below_min"],
+    "candidates_evaluable": 135,
+    "candidates_tested": 135,
+    "alpha_pass_relations": 17,
+    "accepted_relations": 2,
+    "accepted_by_group": {"Breast": 2, "Colon": 0},
+    "primary_relations": 2,
+    "primary_bh_pass_relations": 2,
+    "exploratory_relations": 0,
+    "strict_full_family_bh_pass_sensitivity": 20,
+    "rejected_reasons": {"alpha_not_significant": 118, "direction_agreement_B_low": 9, "swap_check_failed": 6},
+    "R_min": 20,
+    "R_max": 200,
+    "R_within_min_max": false,
+    "coverage_denominator": 171,
+    "coverage_target": 86,
+    "coverage_actual_accepted": 2,
+    "coverage_fraction": 0.011696,
+    "coverage_ok": false,
+    "primary_family_ok": true,
+    "n_ctx_accepted": {"n_A": 13, "n_B": 12},
+    "accepted_sign_test_p": 0.00024414,
+    "accepted_direction_agreement": 1.0,
+    "accepted_swap_pass": true,
+    "SU_response_read": false,
+    "response_cells": "only reference A/B 84 cells passed to the streaming loader; S/U endpoints never parsed",
+    "wall_time_s": 6.8,
+    "budget_max_seconds": 1800,
+    "budget_ok": true
+  },
+  "frozen_outputs": {
+    "relations_check_json": {
+      "path": "research/2026-10-27-innovation-scouting/conflict_signal/stage0/real_run/relations_check.json",
+      "sha256": "9AE302B8749CD992D3201E00E322C683486D6B4C1BFFC03163DA967BA1026552"
+    },
+    "relations_csv": {
+      "path": "research/2026-10-27-innovation-scouting/conflict_signal/stage0/real_run/relations.csv",
+      "sha256": "89531F12A97F14BE564CDEA00E30AF13CF7E17FABEC81805DFB9714CDFC4FE1D",
+      "rows": 2
+    },
+    "relation_splits_json": {
+      "path": "research/2026-10-27-innovation-scouting/conflict_signal/stage0/real_run/relation_splits.json",
+      "sha256": "C36C9E5B6B183D89C4AFA35C5D36FF03DA96127353E5AF72A21B5C05D12723EF"
+    },
+    "p0a_metadata_json": {
+      "path": "research/2026-10-27-innovation-scouting/conflict_signal/stage0/real_run/p0a_metadata.json",
+      "sha256": "338A234E931E11C27105952839BC69F9681D4D8516419B4B78D2F81C36F58247"
+    },
+    "sidecars_match": true
+  },
+  "file_sha256_final": {
+    "stage0/relations_check.py": "0694A4F3B6206277240668D3CD2ED897AB7DFA4A419C832353FC079D5CDD0B2E",
+    "stage0/relations_check_config.json": "BB1FE3230B70EB53B5A39EF7D7D37DF256F296E866133939881E0E3E909CF9B4",
+    "stage0/synthetic_selfcheck.py": "914CDFC61F0FDE140C0FA5623F7DB96972FA7F1EFB413788F216CB2D7BA21EE8",
+    "stage0/SELFCHECK.json": "3135ABACBD55AEB22DCF62F8DFE1F44306617705344E4BC78DB1FA2701BC7E0E",
+    "stage0/README.md": "A6954E43DAA44A6F59094932F6D258D71B4CED5466D0E97F613BEBC840E2E97E"
+  },
+  "execution_time_fixes": [
+    {
+      "id": "fix4_candidate_grid_link",
+      "problem": "relation stage re-enumerated all fitted-condition unions (27600 candidates, truncated 200) instead of the frozen P0a grid 171",
+      "fix": "pass P0a _candidate_keys into relations_check; canonicalize fitted-table ac/lc keys; candidates limited to P0a grid (evaluable 135 = A/B>=12 supply)",
+      "invalid_run": "Run A (accepted 82, coverage 0.41, data_unavailable)"
+    },
+    {
+      "id": "fix5_multiplicity_layers",
+      "problem": "BH q<=0.10 was applied to all 135 tested relations, inconsistent with frozen protocol (per-relation alpha=0.01 gate; BH q<=0.10 only within primary family <=10; exploratory reported)",
+      "fix": "alpha=0.01 per-relation gate; accepted ranked; primary<=10; primary-family BH; strict full-family BH kept as sensitivity only",
+      "invalid_run": "Run B (accepted 2 via full-family BH, data_unavailable)"
+    }
+  ],
+  "invalid_runs_discarded": [
+    {"run": "A", "relations_check_json_sha256": "CD9287314B9EEE194FAFC6C8696ABA815CDF0AC65E070250B7B682D7FC5314DF", "relations_csv_sha256": "F16F22E9C07BD31F89A546CCB3BF94D787660388BD354B67B7CF45297FC65EDC", "relation_splits_sha256": "C36C9E5B6B183D89C4AFA35C5D36FF03DA96127353E5AF72A21B5C05D12723EF"},
+    {"run": "B", "relations_check_json_sha256": "5BB2AFED7859B4AC10EE716B38A3EDA19E1D8D2AFA3495A9B28F4F38331F79DA", "relations_csv_sha256": "89531F12A97F14BE564CDEA00E30AF13CF7E17FABEC81805DFB9714CDFC4FE1D", "relation_splits_sha256": "C36C9E5B6B183D89C4AFA35C5D36FF03DA96127353E5AF72A21B5C05D12723EF"}
+  ],
+  "design_checks": {
+    "n_ctx_ge_12": true,
+    "alpha_0.01_per_relation": true,
+    "primary_family_le_10": true,
+    "primary_bh_q_0.10": true,
+    "interval_width_only_2sigma": true,
+    "mu_ge_0.5_sigma": true,
+    "AB_half_split_and_swap": true,
+    "R_in_20_200": false,
+    "coverage_ge_86_of_171": false,
+    "failure_category": "data_unavailable"
+  },
+  "verdict": "p0a_relations_check_fail_data_unavailable_stop",
+  "interpretation": [
+    "data_unavailable is NOT evidence of relation absence; the frozen qualification gates (R>=20 and coverage>=86/171) were not met",
+    "relations_check did NOT pass; it is NOT relation existence, NOT Stage 1, NOT effect/migration/decision evidence",
+    "do not lower the denominator, do not add Pancreas back, do not change S size, do not relax alpha",
+    "S/U endpoint responses were never read; only reference A/B cells entered the interval/direction estimation",
+    "this approval window is exhausted: no reruns, no criterion changes; P0b/P0c/P0d not run; Stage 1 not entered"
+  ],
+  "next_steps": [
+    "Lead review of record_p0a_check.md + frozen output SHAs + the 2 execution-time implementation fixes (5 cumulative with P0a-metadata)",
+    "Lead decides whether to re-examine protocol/resources for A1; do not rerun under the same approval"
+  ],
+  "notes": "unavailable values recorded as null, not 0; no S/U endpoint read; no P0b/P0c/P0d; no Stage 1; no novelty claim; config reverted to real_run_enabled=false and default/confirm exit 3"
+}

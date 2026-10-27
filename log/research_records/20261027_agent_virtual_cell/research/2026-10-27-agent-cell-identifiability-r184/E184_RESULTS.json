@@ -1,0 +1,118 @@
+{
+  "kind": "seed_replication_of_the_headline_number",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "seeds": [
+      20261074,
+      20261075,
+      20261076
+    ],
+    "reps": 40,
+    "lambdas": [
+      0.1,
+      0.3,
+      1.0,
+      3.0,
+      10.0,
+      30.0,
+      100.0,
+      300.0,
+      1000.0
+    ],
+    "folds": 3,
+    "n_boot": 2000
+  },
+  "reference": {
+    "source": "R163",
+    "point": 0.1183,
+    "ci95": [
+      0.0947,
+      0.1409
+    ]
+  },
+  "audit": {
+    "keys": 108259
+  },
+  "by_seed": {
+    "20261074": {
+      "n": 40,
+      "gain": 0.11276270482294146,
+      "ci95": [
+        0.0872806556144644,
+        0.1369510884888822
+      ],
+      "mde_80pct": 0.036673615360637145
+    },
+    "20261075": {
+      "n": 40,
+      "gain": 0.12728935511009049,
+      "ci95": [
+        0.09398742397288325,
+        0.156359964761876
+      ],
+      "mde_80pct": 0.04495575833765751
+    },
+    "20261076": {
+      "n": 40,
+      "gain": 0.11947770880175583,
+      "ci95": [
+        0.09774461366576777,
+        0.14070991487600884
+      ],
+      "mde_80pct": 0.03026808080990668
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r184/PROTOCOL_E172.md": "4bb6404591f24b7f19ab8aa9dabfcea58ab0c3eef1a88461c06298207d8cc5f1",
+    "research/2026-10-27-agent-cell-identifiability-r184/e184_seed_replication.py": "4b01b21e8667094f30edd51eeae741882e8be910a361fda5962ca264c1694b5c"
+  },
+  "summary": {
+    "mean_of_seed_points": 0.11984325624492925,
+    "sd_between_seeds": 0.007270220824788592,
+    "r163_ci_width": 0.04619999999999999,
+    "all_inside_r163_ci": true,
+    "inside": [
+      true,
+      true,
+      true
+    ]
+  },
+  "decisions": {
+    "H432_headline_stable_across_seeds": true,
+    "H433_ci_too_narrow": false,
+    "verdict": "the_headline_reproduces_across_three_fresh_seeds_and_its_interval_is_conservative"
+  },
+  "limits": [
+    "Only ridge and one resource; forty splits per seed.",
+    "Seeds are fresh for this protocol but not for the programme as a whole.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "the_headline_reproduces_under_fresh_seeds": {
+    "points": {
+      "20261074": 0.1128,
+      "20261075": 0.1273,
+      "20261076": 0.1195,
+      "R163_reference": 0.1183
+    },
+    "all_three_inside_the_reported_interval": true,
+    "reading": "three seeds that had never been used for this protocol each land inside [0.0947, 0.1409], and each one's own interval excludes zero. The point estimates span 0.113 to 0.127 around a reference of 0.118."
+  },
+  "the_interval_is_not_optimistic": {
+    "between_seed_sd": 0.0073,
+    "reported_ci_width": 0.0462,
+    "ratio": 0.16,
+    "reading": "the seed-to-seed spread is about a sixth of the interval width. So the interval I reported is conservative with respect to reseeding, not narrow. That is the opposite of the worry that motivated this round."
+  },
+  "why_this_contrasts_with_R183": {
+    "R183": "a stratum estimate flipped significance between seeds",
+    "here": "the headline does not move outside its interval under three fresh seeds",
+    "the difference": "the headline pools forty splits with roughly four thousand evaluation rows per split, so its standard error is small. R183's stratum was a fraction of that, with an estimate sitting near the boundary of zero. The same machinery behaves correctly in both cases: it is well behaved when the quantity is well powered and unstable when it is not.",
+    "so": "R183 was not evidence that my intervals are too narrow; it was evidence that a small quantity near zero will flip"
+  },
+  "what_this_adds_to_the_claim": {
+    "before": "the headline magnitude had been recomputed once at a tuned penalty (R163)",
+    "now": "it has been reproduced under three independent reseedings of the whole split protocol, all inside the reported interval",
+    "status": "the most reproduced number in the programme",
+    "what_it_does_not_add": "it does not touch the cross-dataset question, which remains an external dependency (C140)"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "task": "task-1",
+  "round": "R189-A1",
+  "role": "combocat-auditor (data qualification auditor, independent of proposer; no A2 design/run)",
+  "runtime": {
+    "interpreter": "D:\\anaconda\\envs\\maestro\\python.exe",
+    "python": "3.11.16",
+    "openpyxl": "3.1.5",
+    "pandas": "2.3.3",
+    "network": false,
+    "cwd": "D:\\MAESTRO"
+  },
+  "model": "unknown",
+  "effort": "unknown",
+  "tokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "note": "runtime codex/agent token accounting not exposed to the acting agent; recorded as null (not 0)"
+  },
+  "cost_usd": null,
+  "agent_turn_elapsed_s": null,
+  "commands": [
+    {
+      "cmd": "python tmp\\combocat_probe7.py",
+      "purpose": "read zip glossary/summary sheets (strings only) + MOESM8 published drug metadata (no response values) + headers of other supplements",
+      "wall_time_s": 1.7,
+      "note": "no DENY numeric values read"
+    },
+    {
+      "cmd": "python tmp\\combocat_probe8.py",
+      "purpose": "external-source and design-column structure probe",
+      "wall_time_s": 64.8,
+      "note": "O'Neil segment failed: openpyxl rejects .xls extension although file is xlsx; completed in the following ad-hoc run"
+    },
+    {
+      "cmd": "python -c \"...openpyxl.load_workbook(io.BytesIO(ONEIL.read_bytes()), read_only=True)...\"",
+      "purpose": "re-parse O'Neil workbook via BytesIO (identity columns only: cell_line/drugA_name/drugB_name/BatchID)",
+      "wall_time_s": 20.0,
+      "note": "368,832 rows / 39 cells / 38 drugs / 583 unordered pairs / batches 358,560+5,232+5,040; approximate duration"
+    },
+    {
+      "cmd": "python research\\2026-10-27-combocat-resource-audit\\audit.py",
+      "purpose": "first run (failed: drugs_summary column index bug; exited after 66.3 s)",
+      "wall_time_s": 66.3,
+      "note": "no output files written with response values; no data leak"
+    },
+    {
+      "cmd": "python research\\2026-10-27-combocat-resource-audit\\audit.py",
+      "purpose": "second run (successful; prior counts.json cross-check matched exactly)",
+      "wall_time_s": 87.9,
+      "note": "produced audit.json/counts.json/overlap.json"
+    },
+    {
+      "cmd": "python research\\2026-10-27-combocat-resource-audit\\audit.py",
+      "purpose": "third run after union-collision caliber + dose/alias/well-type fields (final script state)",
+      "wall_time_s": 102.8,
+      "note": "internal timing: data pass 63.98 s, external sources 32.48 s, write+hash 4.66 s"
+    },
+    {
+      "cmd": "python research\\2026-10-27-combocat-resource-audit\\audit.py  (determinism rerun)",
+      "purpose": "byte-level determinism check of the three JSON outputs",
+      "wall_time_s": 100.0,
+      "note": "audit.json/counts.json/overlap.json SHA256 identical across the two final runs; audit.json = B2066265E19663A58755BA7D7C91426C4DAC481FB696EDF0E1CB862B742800DD"
+    },
+    {
+      "cmd": "Get-FileHash / Select-String leak and key-sort checks",
+      "purpose": "confirm JSON keys sorted/canonical, no response values in outputs, only derived fractions present",
+      "wall_time_s": 5.0,
+      "note": "long-decimal scan returned only derived fractions 0.198529/0.301471/0.397059/0.997519"
+    }
+  ],
+  "deliverables": [
+    "research/2026-10-27-combocat-resource-audit/audit.py",
+    "research/2026-10-27-combocat-resource-audit/audit.json",
+    "research/2026-10-27-combocat-resource-audit/counts.json",
+    "research/2026-10-27-combocat-resource-audit/overlap.json",
+    "research/2026-10-27-combocat-resource-audit/report.md",
+    "research/2026-10-27-combocat-resource-audit/record.md",
+    "research/2026-10-27-combocat-resource-audit/usage.json"
+  ],
+  "verdict": "unqualified",
+  "notes": "unavailable values recorded as null, not 0; no network; no response-value reads (DENY columns: cell is None existence counts only); unclassified columns not read at all"
+}

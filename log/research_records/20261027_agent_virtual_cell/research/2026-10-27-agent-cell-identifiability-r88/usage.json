@@ -1,0 +1,53 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r88",
+  "round": "R88 (goal round 86/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Re-tests R87's null result with a dose-aware additive null model."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r88": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: the round suspects its own previous null model rather than the resource, and is proved right.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6, scikit-learn 1.9.0",
+    "scripts": ["e088_dose_aware.py"], "runs": 1, "cells": 11, "repeats": 12,
+    "bootstrap": 2000, "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E088_RESULTS.json", "rows": "E088_rows.csv", "protocol": "PROTOCOL_E083.md"},
+  "input_sha256_verified": "56a4e4a195673160edcb1baa209a15409b3639ff6ab0405558cc5ab3198d5f23",
+  "correction_to_R87": {
+    "R87_claim": "the additivity residual is noise (CV R2 = -0.034) and BATCHIE cannot test the question",
+    "actual_fault": "R87 averaged every (pair, dose) well into one value per pair and gave each drug a single effect, so the negative R2 measured a weak null model rather than an unlearnable residual",
+    "evidence": "adding per-drug log-dose slopes raises the null's cross-validated R2 from -0.034 to +0.651",
+    "consequence": "BATCHIE can discriminate on the residual arm; R87's resource verdict was wrong there"
+  },
+  "results": {
+    "units": 48, "cells": 11,
+    "cv_r2_of_additive_null": 0.6513,
+    "base": 0.2510, "random": 0.2625, "gene": 0.2906,
+    "gene_minus_random": {"diff": 0.0281, "ci95": [-0.0542, 0.1188]}
+  },
+  "decisions": {"H224_residual_now_learnable": true,
+                "H225_annotation_wins": false,
+                "H226_annotation_not_significantly_better": true,
+                "verdict": "no_established_annotation_gain_on_dose_aware_residuals"},
+  "wording_discipline": "the pre-registered H226 only licensed 'not significantly better than random'; the point estimate is +2.81 pp, so calling it a loss would overstate the evidence. The verdict string was changed from annotation_loses... to no_established_gain...",
+  "relation_to_gdsc": {
+    "GDSC_C45": "the annotation model loses to a two-way additive baseline by 10.12 pp on the leakage-free unseen-combination pool",
+    "BATCHIE_R88": "the annotation model is +2.81 pp over random but not established, and marginals are blind in this arena",
+    "conclusion": "the two resources cannot validate one another, but neither supports the annotation model having decision value"
+  },
+  "limits": ["48 units from 11 cells is underpowered, which is the binding limitation of this round",
+             "each drug has only a few concentration points, so slope estimates are unstable",
+             "residuals may still be dominated by well-level noise",
+             "retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "next_gates": ["increase the number of held-out units (more repeats or pooled layouts) to raise power"],
+  "register_updates": {"C61": "new: no established annotation gain on dose-aware residuals",
+                       "C60": "annotated where R88 overturns it"},
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C61 added, C60 annotated)",
+                                "research/SYNTHESIS.md (section 2b rewritten)", "research/INDEX.md (added R88 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "novelty_claim_made": false
+  }
+}

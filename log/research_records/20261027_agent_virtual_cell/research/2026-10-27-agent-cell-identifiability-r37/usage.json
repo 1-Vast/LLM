@@ -1,0 +1,52 @@
+{
+  "episode": "2026-10-27-agent-cell-identifiability-r37",
+  "round": "R37 (goal round 35/256)",
+  "date": "2026-10-27",
+  "scientific_queries": {"external_literature_queries_this_round": 0,
+    "note": "Precision-raising replication of the R36 boundary question on the locally held GDSC screen."},
+  "paid_llm_calls": {"this_round": 0, "cumulative_r3_to_r37": 1, "authorised_ceiling_per_round": 2, "cost": null},
+  "subagents": [],
+  "subagent_note": "None dispatched: this round is the pre-registered reopening that R36 itself specified, and the reversal is documented as such.",
+  "compute": {
+    "python": "D:/anaconda/envs/maestro/python.exe 3.11.16, pandas 2.3.3, numpy 2.4.6",
+    "scripts": ["e037_budget_boundary_40.py"], "runs": 1, "repeats": 40,
+    "search_splits": 20, "eval_splits": 20, "bootstrap": 2000,
+    "data_downloads": 0, "wet_lab_experiments": 0
+  },
+  "artifacts": {"results": "E037_RESULTS.json", "rows": "E037_rows.csv", "protocol": "PROTOCOL_E037.md"},
+  "design": {
+    "change_from_R36": "only the split count (5/5 -> 20/20); everything else identical",
+    "ks": [10, 20, 30, 50, 75, 100, 150, 200, 300]
+  },
+  "results": {
+    "k_star_from_search": 50,
+    "eval_at_k_star": {"diff": 0.021, "ci95": [0.004, 0.037]},
+    "search_at_k_star": {"diff": 0.037, "ci95": [0.013, 0.063]},
+    "k75": {"search": [0.035, 0.019, 0.051], "eval": [0.026, 0.011, 0.040]},
+    "below_50": {"k10": [-0.015, -0.035, 0.005], "k20": [-0.018, -0.045, 0.010], "k30": [-0.030, -0.052, -0.008]},
+    "exploit_at_k30": 0.0875, "exploit_at_k200": 0.0546
+  },
+  "decisions": {"H094_crossover_resolvable": true, "H095_exploit_better_below_50": true,
+                "H096_effect_at_least_2pp": true, "verdict": "validated_budget_rule"},
+  "rule": "for one-shot budgeted selection: use pure exploitation when k<50 and the 50/50 prediction+uncertainty mix when k>=50; above k~150 the two converge to about 1 pp",
+  "mechanism": "small k takes only the very top of the ranking, where the point prediction is most accurate; large k forces selection into the second tier, where the uncertainty component prevents re-consuming the same high-scoring candidates (consistent with the signal-depletion finding in R34)",
+  "corrections": {
+    "C28": "restored with a validated boundary",
+    "C30": "restored - R35's program-search gain is independently supported",
+    "C31": "withdrawn - the boundary IS locatable at 40 splits"
+  },
+  "methodological_note": "this is the first time the programme reopened a line by executing its own pre-registered reopening condition, and the conclusion reversed (R36's boundary failure was a precision problem, not a direction error)",
+  "limits": ["one task, one mix weight (50/50), one feature set",
+             "retrospective candidate pool",
+             "discrete k grid; the true crossover may lie between 30 and 50",
+             "effect is 2-4 pp and vanishes by k~150",
+             "no mechanism, clinical or drug-choice claim; no meta-learning or RSI"],
+  "register_updates": {"C28": "restored, validated boundary k*=50", "C30": "restored", "C31": "withdrawn"},
+  "next_gates": ["test the same budget-conditioned rule shape on BATCHIE dose grids - the cross-task step the objective asks for"],
+  "mutations_outside_episode": ["research/EVIDENCE_REGISTER.md (C28/C30 restored, C31 withdrawn)", "research/INDEX.md (added R37 row)"],
+  "scope_declaration": {
+    "modified_src_or_tools": false, "promoted_code": false, "read_sealed_reserve_vault": false,
+    "started_background_service_or_loop": false, "new_wet_experiments": false,
+    "new_data_downloaded": false, "meta_learning_attempted": false
+  }
+}

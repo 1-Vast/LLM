@@ -1,0 +1,118 @@
+{
+  "kind": "is_the_pathway_gain_content_or_group_size",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "reps": 20,
+    "n_rand_draws": 5,
+    "seed": 20261077,
+    "lambdas": [
+      0.1,
+      0.3,
+      1.0,
+      3.0,
+      10.0,
+      30.0,
+      100.0,
+      300.0,
+      1000.0
+    ],
+    "folds": 3,
+    "n_boot": 2000
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 20,
+    "n_anchor_levels": 21,
+    "n_library_levels": 21
+  },
+  "arms": {
+    "identity": 0.003297897203893312,
+    "pathway": 0.14671667839525854,
+    "size_matched": 0.011338586507455926,
+    "equal_count": -0.008507193610535427
+  },
+  "contrasts": {
+    "pathway_minus_identity": {
+      "mean": 0.14341878119136522,
+      "ci95": [
+        0.10468875599195478,
+        0.18418948928793022
+      ],
+      "mde_80pct": 0.058442061774943446
+    },
+    "size_matched_minus_identity": {
+      "mean": 0.008040689303562613,
+      "ci95": [
+        -0.012653431275709762,
+        0.028186944065094064
+      ],
+      "mde_80pct": 0.030327726663462947
+    },
+    "equal_count_minus_identity": {
+      "mean": -0.011805090814428737,
+      "ci95": [
+        -0.060108487420293906,
+        0.03323643132165113
+      ],
+      "mde_80pct": 0.0684995773200481
+    },
+    "pathway_minus_size_matched": {
+      "mean": 0.13537809188780264,
+      "ci95": [
+        0.08881672851151828,
+        0.18024489950774458
+      ],
+      "mde_80pct": 0.06588585672259341
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r185/PROTOCOL_E173.md": "2663e6d550ef6c83f780846177958ba3cd9d79b2a685e75f0f6dc7323ca51ec4",
+    "research/2026-10-27-agent-cell-identifiability-r185/e185_size_matched.py": "781dfd35f008a00d59b4e99c4af5d65f3a45f8370e2a4981d8ff7030afe2618f"
+  },
+  "decisions": {
+    "pathway_minus_size_matched": 0.13537809188780264,
+    "H434_content_adds_nothing": false,
+    "H435_content_matters": true,
+    "verdict": "content_beats_a_size_matched_random_partition_so_the_gain_is_not_a_group_size_effect"
+  },
+  "limits": [
+    "Matching is on drug counts per level, not on training rows per level, because row counts follow drug frequency and cannot be matched simultaneously.",
+    "Only ridge and one resource.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "the_competing_explanation_is_excluded": {
+    "the_worry": "pathway levels differ enormously in size, and a bigger group has a better-estimated mean, so the prior could be a group-size effect with no biological content",
+    "the_control": "a random partition of the same drugs with the IDENTICAL multiset of group sizes, averaged over five draws per split",
+    "result": {
+      "pathway": 0.1467,
+      "size_matched_random": 0.0113,
+      "pathway_minus_size_matched": 0.1354,
+      "ci95": [
+        0.0888,
+        0.1802
+      ],
+      "mde": 0.0659
+    },
+    "reading": "matching the sizes does not reproduce the gain: the size-matched partition adds +0.008 with an interval spanning zero, while the real partition adds +0.147. The content of the partition, not the size of its groups, carries the value."
+  },
+  "this_strengthens_C108_rather_than_replacing_it": {
+    "C108_control": "a random partition with the same NUMBER of groups",
+    "this_control": "a random partition with the same SIZE MULTISET",
+    "why_this_one_is_stricter": "it also matches how concentrated the groups are, so it cannot be beaten by the mechanism of 'big groups are better estimated'",
+    "both_controls_agree": "equal-count random at minus 0.012 and size-matched random at plus 0.008, both indistinguishable from zero and both far below the real partition"
+  },
+  "a_note_on_the_level_counts": {
+    "measured_here": {
+      "anchor_levels": 21,
+      "library_levels": 21
+    },
+    "earlier_rounds_quoted": 38,
+    "why_the_difference": "earlier counts pooled the distinct values across both sides as raw categories; here the labels are per drug, so each side contributes its own level set",
+    "does_not_affect_the_conclusion": "both partitions use their own real level sets and their own size multisets"
+  },
+  "what_this_means_for_the_claim": {
+    "the_mechanism_interpretation_survives": "the prior works because the partition groups drugs that behave similarly, not because it happens to create well-populated bins",
+    "what_it_does_not_address": "why those particular groups behave similarly, which remains a descriptive statement rather than a mechanism",
+    "consequence": "C108's conclusion is now supported by a stricter null than the one it was originally tested against"
+  }
+}
