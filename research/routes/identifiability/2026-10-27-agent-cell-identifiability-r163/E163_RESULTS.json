@@ -1,0 +1,109 @@
+{
+  "kind": "frozen_claim_headline_with_tuned_lambda",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "reps": 40,
+    "seed": 20261065,
+    "lambdas": [
+      0.1,
+      0.3,
+      1.0,
+      3.0,
+      10.0,
+      30.0,
+      100.0,
+      300.0,
+      1000.0
+    ],
+    "folds": 3,
+    "historical_value": 0.13,
+    "n_boot": 2000
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 80
+  },
+  "by_pool": {
+    "both_unseen": {
+      "n": 40,
+      "mean_eval": 4456.75,
+      "lam_identity": 243.5075,
+      "lam_pathway": 875.0049999999999,
+      "rho_identity": 0.00011939789652310636,
+      "rho_pathway": 0.11843515999329042,
+      "gain": 0.11831576209676734,
+      "ci95": [
+        0.09471202625415462,
+        0.14085000835904368
+      ],
+      "mde_80pct": 0.0343798832700657
+    },
+    "one_unseen": {
+      "n": 40,
+      "mean_eval": 36354.125,
+      "lam_identity": 243.5075,
+      "lam_pathway": 875.0049999999999,
+      "rho_identity": 0.2407767134946869,
+      "rho_pathway": 0.2581416765871295,
+      "gain": 0.017364963092442613,
+      "ci95": [
+        0.012665763795414548,
+        0.022077019431800692
+      ],
+      "mde_80pct": 0.00670366964555783
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r163/PROTOCOL_E151.md": "2df14b6e6be77340bb0112b080dbd9dfdae199dd6f04a3fc2f7aad8ef1490d2a",
+    "research/2026-10-27-agent-cell-identifiability-r163/e163_tuned_headline.py": "6b4bab622e980b238b67794d099c9321abc783878a76987ce1790e26968d3808"
+  },
+  "decisions": {
+    "new_gain_both_unseen": 0.11831576209676734,
+    "historical": 0.13,
+    "relative_change": 0.08987875310178976,
+    "H390_headline_must_change": false,
+    "H391_headline_stands": true,
+    "verdict": "the_frozen_claims_headline_magnitude_stands_under_a_tuned_penalty"
+  },
+  "limits": [
+    "The historical value came from different seeds and a different split implementation, so this compares magnitudes rather than exact numbers.",
+    "Only ridge and one resource; three inner folds.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "the_headline_survives": {
+    "historical_at_lambda_1": 0.13,
+    "new_at_tuned_lambda": 0.1183,
+    "ci95": [
+      0.0947,
+      0.1409
+    ],
+    "relative_change": -0.09,
+    "reading": "the both-unseen gain falls from about 0.13 to 0.118 when the penalty is tuned, a nine percent change that is well inside the pre-registered twenty percent tolerance. The frozen claim's headline magnitude is not an artefact of an untuned penalty."
+  },
+  "the_selected_penalties_are_large": {
+    "identity_arm": 243.5,
+    "pathway_arm": 875.0,
+    "reading": "inner cross-validation chooses penalties two to three orders of magnitude above the fixed value of 1 used throughout the programme. The pathway contribution therefore survives extremely heavy shrinkage, which is itself evidence that the block carries real structure rather than fitting noise.",
+    "note": "the pathway arm prefers a larger penalty than identity, consistent with its larger feature count"
+  },
+  "identity_is_at_chance_in_the_both_unseen_cell": {
+    "rho_identity": 0.0001,
+    "reading": "exactly the premise of the frozen claim: when both drugs are held out, drug identity carries no information at all",
+    "this_is_the_cleanest_version_of_that_premise_measured_so_far": true
+  },
+  "the_comparison_pool_behaves_as_expected": {
+    "one_unseen": {
+      "gain": 0.0174,
+      "ci95": [
+        0.0127,
+        0.0221
+      ],
+      "rho_identity": 0.2408
+    },
+    "reading": "in the one-unseen pool identity retains a rank correlation of 0.24 and the annotation adds a further 0.017; in the both-unseen pool identity is at zero and the annotation carries the entire 0.118. The contrast between the two pools is the claim itself."
+  },
+  "what_this_closes": {
+    "closes": "the standing caveat that the frozen claim's headline number had never been computed at a tuned penalty. It has now been, and it stands.",
+    "does_not_close": "the wider caveat that other absolute magnitudes in the programme were computed at lambda equal to 1. Those remain unverified, though arm-versus-arm orderings are unaffected."
+  }
+}

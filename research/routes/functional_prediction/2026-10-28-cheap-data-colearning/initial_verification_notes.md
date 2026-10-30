@@ -1,0 +1,23 @@
+# Independent C2 verification: initial implementation notes
+
+2026-10-29. This is independent arithmetic verification of one frozen development replay, not another scientific experiment. Requested model: gpt-6.1-sol/high; effective runtime identity is unknown.
+
+The verifier author read protocol_v1.md, protocol_v2.md, metadata_freeze.json, menu_freeze.json, the array schemas of training_model.npz/replay_predictions.npz, and the schema plus one record of query_trace.jsonl. No experiment_summary.json, cell_metrics.csv, original e_c2_feedback.py, main-agent report, sealed/confirmation material, environment credentials, 24Q2, other numerical data, HTTP/model bridge, or child agent was used. The initial overly long freeze inspection was truncated; a subsequent bounded structural read recovered the needed top-level schema and cohort/panel details. No hidden truncated text was relied upon.
+
+independent_c2_verify.py was written from the protocols. It has only been parsed with Python ast.parse; it has NOT been executed by this author. The root agent is responsible for executing in the authorized maestro environment and reviewing independent_verification.json. Do not report results before that execution. CPU limit is 600 seconds; numerical arrays are tiny (largest bootstrap matrix 2000 by 171) and the CSV reader streams string records rather than loading the source matrix. No model refitting, hyperparameter change, new split, or new scientific seed is performed.
+
+The source reader converts to numbers only the frozen 397 training rows and selected 192 columns; for each frozen test cell it converts only the 128 scoring columns and the union of that cell's logged probe queries. It never converts unqueried test-probe values or other row/column numerical fields. The source file is additionally SHA256-hashed as opaque bytes. Missing matrix rows retain NaN.
+
+Posterior means and covariances are solved afresh from prior precision plus all finite feedback seen so far; no recursive experimental updater or original selection/scoring function is imported. Each adaptive action is checked with a separately implemented conditional variance-reduction calculation; both fixed panels and metadata-hash random plans are checked. All final arms, including weighted nearest5 and mean-offset diagnostics, are compared with saved predictions. These frozen features/prior are treated as supplied locked parameters; the script does not retrain or certify training qualification across unselected columns.
+
+The bootstrap convention was fixed before reviewing original scores: one seed=20261028, one 2000 by 171 resampling matrix shared by all four paired comparisons. It is an execution convention for this verification, not a selected analysis variant. Main hypothesis uses each protocol-defined conservative lower difference and all four point-estimate/CI conditions jointly.
+
+For missing outcomes, both the broad conservative difference interval and the complete sharp identification interval are reported. The latter cancels conditions selected by both methods, because their missing activity is the same underlying value. A negative conservative lower endpoint or its CI does not establish that adaptive selection is truly harmful. This check does not invent missing outcomes.
+
+An arithmetic PASS means the independent fixed-artifact computations agree within 1e-8 and source truths/feedback match. It does not prove scientific validity, causal mechanism, independent-resource generalization, prospective preprocessing independence, or real assay cost/reliability. Joint development support and arithmetic verification remain separate JSON fields. The notes intentionally contain no scientific result or original score.
+
+## Pre-execution correction requested by root
+
+Before any verifier execution, corrected MAE to compute each cell's finite-score MAE and then give equal weight to cells having at least one finite score. Report the scored-cell count; a wholly unscorable set yields null. This replaces the prior matrix-entry-weighted mean and changes no prediction, selection, bootstrap, scientific seed, or model parameter.
+
+Added Windows GetProcessMemoryInfo measurement for peak working set and peak process commit, with a 2 GB (2,000,000,000 bytes) maximum for either measure; POSIX uses peak RSS with platform-correct units. Resource checks run during the streamed scan and replay and again after initial JSON serialization immediately before final output preparation/write. The JSON records final CPU <=600 seconds and peak-memory checks. A measurement failure or resource violation makes arithmetic verification FAIL. Only ast.parse was performed after these corrections; numerical verification remains unexecuted by this author.

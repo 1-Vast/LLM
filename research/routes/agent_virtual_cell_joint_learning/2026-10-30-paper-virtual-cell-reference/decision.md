@@ -1,0 +1,9 @@
+# Decision — 2026-10-30
+
+I304.v1 was frozen before the independent challenge. The fresh reviewer judged it a useful failure-analysis specification, but parked the algorithmic and assay-saving claims because DrugReflector, MDA and BATCHIE cover the broad loop and a latent-source hierarchical model plus cost-aware VOI can reproduce the stated layer-localization policy. The reviewer also supplied a non-identifiability counterexample in which response-model error and time-dependent proxy-to-function error induce the same distribution under every currently legal observation.
+
+Decision: retain I304 as a conditional information/identifiability audit; do not promote it as a new mechanism, do not run a scientific effect experiment on the current resources, and do not modify `src/` or `tools/`.
+
+The Astra MAX development branch [astra_mechanism.md](astra_mechanism.md) offers a narrower exception-aware interaction rule that builds on the CXCL9 negative result. It remains an unchallenged alternative and is not selected as the main recommendation: the present CXCL9 panel is too small for amortized savings, and the current public candidates do not supply the required independent endpoint and preparation contract. It should remain archived as a restart lead, not an accepted module.
+
+The next admissible action is a changed-resource schema check. A source can enter a prospective test only when it has matched drug, background, dose, time, vehicle, preparation, independent repeats, proxy and independent functional endpoint fields, plus a target/genetic reference when mechanism is claimed. The test must compare direct measurement, hierarchical latent-source/partial-pooling, ordinary VOI/active learning, complete refitting, fixed/random panels and I304 under equal total assay cost and whole-drug/whole-background holdouts.

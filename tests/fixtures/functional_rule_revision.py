@@ -9,7 +9,7 @@ from pathlib import Path
 
 import numpy as np
 
-STUDY = Path(__file__).resolve().parents[2] / "research" / "functional_rule_revision_20261020"
+STUDY = Path(__file__).resolve().parents[2] / "research" / "routes" / "combination_resistant_transfer" / "functional_rule_revision_20261020"
 
 
 def load_study():

@@ -1,0 +1,15 @@
+# Diagnostic choice before count access
+
+2026-10-29. Design worker; scientific proposer, not an independent reviewer. Requested Sol/high; effective configuration not exposed. Read the episode record, parent root derivation, metadata-only qualification, Wu2025 published-primary passages Sec27–29 saved with DOI/hash, and BESTDR primary JATS sections s2-1/s4. No raw HTS001 body or count value was accessed. No network, author-code execution, experiment or protected source was used.
+
+The overlooked prerequisite is a usable common mean. Initial seeding variability alone is compatible with an exponential population mean: E[Y_w(t)]=E[N_w] exp(rt), if the growth rate is common and observation error has zero mean. But rate misspecification leaves systematic residual drift. A covariance calculated after fitting the wrong rate can therefore diagnose mean drift rather than the measurement/process distinction. Estimating r from the same residuals adds a second source of induced covariance.
+
+Considered choices, before responses:
+
+1. Adjacent/nonadjacent transition-residual covariance. Directly related to the root formula, but r uncertainty, serial observation error, heterogeneous rates, evolving mean, finite-sample covariance, and uncertified preparation nesting all enter. With 28 technical/uncertified wells, a single covariance sign cannot resolve them. Do not spend this pilot fitting a covariance discriminator before establishing the necessary mean regime.
+2. Full ordinary state-space likelihood, compared with serial-noise and heterogeneous-rate rivals. Scientifically legitimate existing methodology, but parameter identification and model selection would exceed this pilot's single material question. No novel algorithm follows from such a fit. Defer.
+3. Raw-count exponential mean against one smooth curvature rival on untouched whole wells. This asks a necessary, interpretable question and does not require a white-noise model to compute the score. Failure changes the next decision: stop using constant-r residual moments for rate feedback in this regime. Lack of failure does not establish white noise or homogeneous single-cell rates. Recommended.
+
+Use t<72h, fixed before outcome access, as the nominal pre-replenishment regime. This is a design horizon, not certification that every well was intervention-free. Keep every observed continuous count and actual time inside this horizon. Do not select a different horizon after seeing results. Existing metadata has 9–15 frames per cell in this horizon, common within each cell. All controls occur in columns02/23 and rows B–O; split and resample whole row pairs to respect this visible nuisance structure. The seven plates are fixed assay cases, not independent sampled cultures.
+
+The recommendation deliberately answers a necessary mean-model question only. There is no identified, calibrated empirical test of “adequate enough for latent-rate feedback” here without a scientific error tolerance, verified culture replication and observation-noise information. An honest negative or inconclusive mean diagnostic is more useful than claiming these absent conditions from control fits.

@@ -1,0 +1,150 @@
+{
+  "kind": "does_the_gain_rise_with_pathway_coverage_thickness",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "reps": 20,
+    "seed": 20261073,
+    "buckets": [
+      "0",
+      "1-5",
+      "6-50",
+      "51-200",
+      ">200"
+    ],
+    "lambdas": [
+      0.1,
+      0.3,
+      1.0,
+      3.0,
+      10.0,
+      30.0,
+      100.0,
+      300.0,
+      1000.0
+    ],
+    "folds": 3,
+    "n_boot": 2000
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 37
+  },
+  "by_bucket": {
+    "0": {
+      "n": 17,
+      "mean_rows": 1482.8823529411766,
+      "rho_identity": -0.0012221953334757949,
+      "rho_pathway": 0.05748028872224155,
+      "gain": 0.05870248405571734,
+      "ci95": [
+        0.01582266580000808,
+        0.10162063720691437
+      ],
+      "mde_80pct": 0.06429424723210343
+    },
+    ">200": {
+      "n": 20,
+      "mean_rows": 2774.5,
+      "rho_identity": 0.0031323190958288927,
+      "rho_pathway": 0.1570470937778869,
+      "gain": 0.153914774682058,
+      "ci95": [
+        0.11580224550502274,
+        0.19361704552866024
+      ],
+      "mde_80pct": 0.05757506090067287
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r183/PROTOCOL_E171.md": "3e1fa6191eb948122cc89cf7493ffaa0dfe2cb38af63d7eaf751baac4319a23d",
+    "research/2026-10-27-agent-cell-identifiability-r183/e183_thickness.py": "8055aa6a9ab0e3a0e67e9784398e95e185b6add77f78af592d5236c41b8f23d2"
+  },
+  "rows_by_bucket": {
+    "0": 25209,
+    "1-5": 0,
+    "6-50": 0,
+    "51-200": 0,
+    ">200": 55490
+  },
+  "share_of_eval_rows": {
+    "0": 0.31238305307376796,
+    "1-5": 0.0,
+    "6-50": 0.0,
+    "51-200": 0.0,
+    ">200": 0.6876169469262321
+  },
+  "decisions": {
+    "gains_in_order": [
+      0.05870248405571734,
+      0.153914774682058
+    ],
+    "monotone_steps": 1,
+    "H430_rises_with_thickness": false,
+    "H431_no_dependence": true,
+    "verdict": "coverage_is_bimodal_so_the_condition_is_a_threshold_and_the_absent_stratum_is_small_and_unstable",
+    "H430_note": "not testable as a graded claim: the intermediate buckets are empty"
+  },
+  "limits": [
+    "Coverage is counted as training rows only, not as diversity of cells or pairs.",
+    "Only ridge and one resource.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "the_first_run_of_this_script_had_a_bug_that_mattered": {
+    "bug": "the buckets began at 1, so rows with coverage 0 fell outside every bucket and were dropped silently",
+    "consequence": "the first run reported a single bucket holding 100 percent of rows and could not see the regime R182 had just studied",
+    "fix": "add an explicit zero bucket and record per-bucket row counts independently of the minimum-size filter",
+    "lesson": "a stratification whose lowest bin excludes zero will quietly delete the very cases that motivated it"
+  },
+  "coverage_in_this_resource_is_bimodal": {
+    "buckets_with_rows": {
+      "0": "31.2 percent",
+      ">200": "68.8 percent"
+    },
+    "buckets_with_no_rows": [
+      "1-5",
+      "6-50",
+      "51-200"
+    ],
+    "reading": "a pathway level in the both-unseen evaluation pool is either absent from training altogether or covered by more than two hundred training rows. There is no intermediate-coverage regime to test.",
+    "so": "the applicability condition is a threshold on whether the level was observed at all, not a graded condition on how thickly it was observed",
+    "why_that_matters": "I set out to look for a coverage threshold and found the data has no middle to place one in"
+  },
+  "the_two_regimes_differ": {
+    "absent": {
+      "gain": 0.0587,
+      "ci95": [
+        0.0158,
+        0.1016
+      ]
+    },
+    "thick": {
+      "gain": 0.1539,
+      "ci95": [
+        0.1158,
+        0.1936
+      ]
+    },
+    "reading": "where both levels are thickly covered the gain is two and a half times larger than where one is missing"
+  },
+  "but_the_absent_stratum_is_unstable_across_seeds_and_that_must_be_said": {
+    "R182_seed_20261072": {
+      "gain": 0.057,
+      "ci95": [
+        -0.0271,
+        0.1446
+      ],
+      "significant": false
+    },
+    "R183_seed_20261073": {
+      "gain": 0.0587,
+      "ci95": [
+        0.0158,
+        0.1016
+      ],
+      "significant": true
+    },
+    "reading": "the point estimate is stable at about 0.058 across both runs, but whether its interval clears zero flips with the seed. So the correct statement is that the effect there is small and not reliably resolvable at this sample size, not that it is zero and not that it is established.",
+    "this_corrects_one_of_my_own_framings": "R182's record called it 'not resolvable'; that is right on average but reads as more settled than it is",
+    "count": "the inverse of my usual error: here I had it as 'not there', and a second seed says 'marginally there'"
+  }
+}

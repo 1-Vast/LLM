@@ -1,0 +1,110 @@
+{
+  "kind": "leakage_review_by_permuting_the_drug_to_pathway_mapping",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "k": 20,
+    "repeats": 70,
+    "holdout": 0.2,
+    "lambda": 1.0,
+    "n_boot": 2000,
+    "seed": 20261027
+  },
+  "audit": {
+    "keys": 108259,
+    "drugs": 65,
+    "pathways": 21,
+    "pathway_block_dims": 47,
+    "rows": 280
+  },
+  "by_pool": {
+    "one_unseen": {
+      "n": 70,
+      "identity": 0.07214285714285713,
+      "real": 0.1107142857142857,
+      "permuted": 0.08714285714285715,
+      "real_minus_identity": {
+        "n": 70,
+        "mean_diff": 0.03857142857142857,
+        "ci95": [
+          0.012857142857142862,
+          0.06357142857142856
+        ]
+      },
+      "permuted_minus_identity": {
+        "n": 70,
+        "mean_diff": 0.015000000000000001,
+        "ci95": [
+          -0.002142857142857143,
+          0.03214285714285714
+        ]
+      },
+      "real_gain_minus_perm_gain": {
+        "n": 70,
+        "mean_diff": 0.023571428571428573,
+        "ci95": [
+          0.0028571428571428537,
+          0.04430357142857134
+        ]
+      }
+    },
+    "both_unseen": {
+      "n": 70,
+      "identity": 0.014285714285714289,
+      "real": 0.02857142857142857,
+      "permuted": 0.012857142857142857,
+      "real_minus_identity": {
+        "n": 70,
+        "mean_diff": 0.014285714285714282,
+        "ci95": [
+          -0.0028571428571428567,
+          0.03428571428571429
+        ]
+      },
+      "permuted_minus_identity": {
+        "n": 70,
+        "mean_diff": -0.0014285714285714286,
+        "ci95": [
+          -0.011428571428571429,
+          0.009285714285714286
+        ]
+      },
+      "real_gain_minus_perm_gain": {
+        "n": 70,
+        "mean_diff": 0.015714285714285715,
+        "ci95": [
+          -0.0014285714285714281,
+          0.036428571428571435
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r103/PROTOCOL_E098.md": "ba40f27426e4183d1cb6d28aa6d30c622b4ec40167a183c3d8906b71813ffabb",
+    "research/2026-10-27-agent-cell-identifiability-r103/e103_leakage.py": "147291182ec61cd96bdc224fbaf540dd280771621f8115d1b7f107bed7505078"
+  },
+  "decisions": {
+    "H266_real_gain_exceeds_permuted_gain": false,
+    "H267_no_gain_after_permutation": true,
+    "H268_leakage_review_passed": false,
+    "verdict": "leakage_not_indicated_but_gate_failed_in_the_underpowered_pool_so_promotion_stays_closed",
+    "H266_note": "written as 'real gain exceeds permuted gain in every pool'; it held in one_unseen and failed only in the underpowered both_unseen"
+  },
+  "limits": [
+    "Permutation preserves the marginal pathway distribution but destroys the drug-pathway pairing, which is the intended cut.",
+    "Only two pools were run; an opposite result would require all three.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "what_the_data_actually_says": {
+    "permutation_destroys_the_gain": "permuted minus identity is +1.50 [-0.21,+3.21] in one_unseen and -0.14 [-1.14,+0.93] in both_unseen, i.e. no gain, exactly as a clean feature should behave",
+    "real_mapping_matters_where_power_exists": "in one_unseen the real gain exceeds the permuted gain by +2.36 pp [+0.29,+4.43]",
+    "where_it_is_merely_directional": "in both_unseen the same contrast is +1.57 pp [-0.14,+3.64]; the direction is right but the pool holds only about 1,830 keys",
+    "no_leakage_is_indicated": true,
+    "but_the_pre_registered_gate_required_all_pools_and_one_failed": true
+  },
+  "promotion_status": {
+    "promoted": false,
+    "reason": "the pre-registered gate was not met in full, and the cross-dataset check is still outstanding",
+    "what_is_cleared": "the specific leak hypothesis - that feature count or some structural artefact drives the gain - is not supported, because permuting the mapping removes the gain entirely",
+    "what_is_not_cleared": "higher power in both_unseen, and replication on a second dataset"
+  }
+}

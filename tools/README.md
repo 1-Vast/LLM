@@ -1,5 +1,6 @@
 # Tools
 
+
 `python -m tools.retained_records --published --show SOURCE_ID` reads published
 key evidence from pinned Git objects or exact text supplements. Without
 `--published`, the full local record store is preferred when present; otherwise
@@ -32,7 +33,7 @@ respective units; omitted values retain the legacy zero. Prices are declarations
 not authenticated invoices. Without a resource-budget argument, the legacy report
 does not establish equivalence of total resource allowances. The tested prototype
 and scientific limitations are in
-[the historical evidence register](../research/EVIDENCE.md).
+[the historical evidence register](../research/routes/historical_evidence_archive/reconciled_reports/EVIDENCE.md).
 
 ## Offline observation and maintenance checks
 
@@ -45,7 +46,7 @@ and explicit `weights`, retains gene covariance and uses actual cell count.
 Neither command authenticates source identity, the STATE output axis or
 independent biological replication. Their frozen sources are the P0.5R
 extension matching and observation-reliability projection routines; validation
-and remaining limits are in [research/EVIDENCE.md](../research/EVIDENCE.md).
+and remaining limits are in [research/EVIDENCE.md](../research/routes/historical_evidence_archive/reconciled_reports/EVIDENCE.md).
 
 `tools.analysis.platform_identity.identity_test(reference, query)` checks a cross-platform feature
 axis before a world model is fed another platform's cells. Every shared line must be most
@@ -175,3 +176,9 @@ The verification command checks supplied frozen inputs and generated outputs wit
 dataset audit commands and older ASTRA drivers are recoverable from Git history, not current
 release entry points. Case-memory builders and audits likewise require their declared local
 assets and do not replace missing values with zeros.
+
+## Current scope and evidence boundary
+
+`tools/` contains maintained operational and evaluation utilities. `analysis/`, `datasets/`, `case_memory/`, `evaluation/`, and `prediction/` are the current capability groups documented in [`README.md`](README.md). Historical study drivers remain in `research/` or retained packages and are not silently promoted by being importable.
+
+Before adding a utility here, record its input schema, source/version assumptions, output identity, exposure boundary, and an independent check. A successful command or manifest check certifies software behavior only; scientific promotion still follows [`log/ROUTE_EXPERIENCE.md`](../log/ROUTE_EXPERIENCE.md) and the storage policy.

@@ -1,0 +1,88 @@
+{
+  "kind": "upper_end_of_the_decay_curve_key_level_holdout",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "repeats": 200,
+    "n_boot": 2000,
+    "seed": 20261039
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 200
+  },
+  "results": {
+    "global": {
+      "identity_rho": 0.3773695163027092,
+      "pathway_rho": 0.3773695433311825,
+      "identity_nan": 0,
+      "pathway_nan": 0,
+      "gain": {
+        "n": 200,
+        "mean_diff": 2.7028473243428942e-08,
+        "ci95": [
+          -9.888725967537732e-08,
+          1.4796253380774945e-07
+        ]
+      }
+    },
+    "within": {
+      "identity_rho": 0.39302835805917496,
+      "pathway_rho": 0.39302847739403957,
+      "identity_nan": 0,
+      "pathway_nan": 0,
+      "gain": {
+        "n": 200,
+        "mean_diff": 1.1933486466997322e-07,
+        "ci95": [
+          -7.713531268900564e-08,
+          3.3151574092497856e-07
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r136/PROTOCOL_E126.md": "a8ce8c2a6d8dc126dc6ac55c1ddf31130398a18a46e6cbf3a122bea4f60170d5",
+    "research/2026-10-27-agent-cell-identifiability-r136/e136_upper_end.py": "8bce56d5accdee2a428b956c7b89c7f51632211f7a85ffacd1865e7172866c80"
+  },
+  "decisions": {
+    "H338_no_gain_when_identity_is_fully_supplied": true,
+    "H339_gain_persists": false,
+    "verdict": "the_pathway_is_a_coarsening_of_identity_so_it_substitutes_and_never_complements"
+  },
+  "limits": [
+    "Holding out keys still leaves the same combination observed in other cells.",
+    "Only this resource.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "the_zero_is_algebraic_not_dead": {
+    "observed": "identity and pathway arms give numerically identical predictions: global rho 0.3774 for both, gain +0.0000 [-0.0000,+0.0000]",
+    "why": "checked directly: each drug maps to exactly one pathway level (46 anchor drugs, 65 library drugs, zero drugs with more than one level). So the pathway one-hots are a deterministic function of the drug one-hots, the added block spans no new directions, and a ridge fit cannot use it.",
+    "conclusion": "this is not a dead arm; it is an algebraic fact about the features"
+  },
+  "what_this_reframes": {
+    "the_old_reading": "the pathway annotation carries information beyond drug identity",
+    "the_correct_reading": "the pathway annotation is a COARSENING of drug identity. It adds nothing when identity is available and is the only channel when identity is not.",
+    "so_it_is_a_substitute_not_a_complement": true,
+    "this_explains_everything_seen_so_far": {
+      "the_six_times_decay": "the gain tracks how much of the identity block is unavailable, which is why both-unseen pools gain 0.13 and seen pools gain nothing or almost nothing",
+      "the_permutation_failure": "permuting the drug-to-pathway map destroys the coarsening so the substitute stops being a valid stand-in",
+      "the_pathway_versus_tissue_muddle": "both blocks are coarsenings of identity, one of the drug and one of the cell, which is why neither behaved like independent evidence"
+    },
+    "what_this_costs": "the result is no longer a knowledge-augmentation finding. It is a cold-start fallback finding: a coarser description of a drug still ranks pairs usefully when the drug itself is unseen. That is a smaller claim than it looked."
+  },
+  "the_decay_curve_is_now_complete": {
+    "upper_end_identity_fully_supplied": {
+      "rho_gain": 0.0,
+      "reading": "exactly zero, and necessarily so"
+    },
+    "middle_identity_partially_supplied": {
+      "one_unseen": 0.0198,
+      "cell_unseen": 0.0249
+    },
+    "lower_end_identity_absent": {
+      "both_seen_cell": 0.1458,
+      "both_unseen_cell": 0.1275
+    },
+    "reading": "the gain is monotone in how much of the identity block is missing, with a hard zero at the full-information end"
+  }
+}

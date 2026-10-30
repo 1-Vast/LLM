@@ -1,0 +1,88 @@
+# Route-level research experience
+
+This is the maintained handoff by scientific route. It records what the workspace has actually established, what failed or was withdrawn, and the minimum evidence needed before a new Agent × virtual-cell claim can advance. Detailed numbers and source identities remain in [`RESEARCH_REPORT.md`](RESEARCH_REPORT.md), [`STUDY_INDEX.tsv`](STUDY_INDEX.tsv), and the episode records.
+
+## 1. Cheap cell × drug × dose × function prediction
+
+Public PRISM/GDSC/BeatAML-style tables support ordinary response prediction, calibration, and metadata-only design audits. The strongest reproducible outcomes are bounded within-source replays; several feedback and adaptive-panel comparisons failed their prespecified benefit gates or were confounded by repeated exposure, unequal assay rounds, or missing independent preparation. A passing replay or an improved rank does not establish biological gain.
+
+**Reusable lesson:** freeze cell/drug identities, dose units, treatment window, endpoint, split, and replicate unit before fitting. Use cell- and compound-held-out tests, a fixed-cost standard baseline, and an independently authored check. Relative viability is a valid endpoint-specific target; it cannot be silently converted into absolute burden, mechanism, or clinical efficacy.
+
+**Open gate:** ordinary prediction can proceed on a qualified single-endpoint public table with a suitable held-out split. Claims about dose/time transport, independent replication, or mechanism additionally need the corresponding dose/time, preparation, or orthogonal-function evidence; these are not universal prerequisites for ordinary prediction.
+
+## 2. Functional relation, multi-target observation, and acquisition
+
+The relation-identification and paid-observation lines show conditional information-sharing examples and useful cost accounting. They do not yet demonstrate a new algorithm: ordinary joint models, probe selection, or standard Bayesian/decision procedures can implement the same operations. Training gates and development gates must be kept separate; an unscored development set is not a positive result. A repeated-screen overlap is not independent biological replication.
+
+**Reusable lesson:** define the action set, information cost, missingness rule, and terminal utility in advance. Compare against full-history retraining, fixed panels, random/standard acquisition, and equal total resource budgets. If a candidate is an algebraic reparameterization or an ordinary posterior update, record it as such and stop the novelty claim.
+
+**Open gate:** a held-out compound/background transfer with real response values and a cost-matched decision endpoint.
+
+## 3. Agent × virtual-cell joint learning
+
+The M1/M2/M3 and cell-language branches provide valuable contract and failure diagnostics. M1's first projection was identified as maximum-entropy control; the corrected high-dimensional gate failed its original measurement contract, while a later coarse synthetic measurement passed only for that coarse statistic. M1-S2c/S2d showed a limited synthetic planning benefit and instability under alternative baselines. M3's corrected S3b candidate was pointwise equivalent to its standard comparators, so the increment claim stopped. M2 has synthetic consistency checks but no qualified real longitudinal functional resource. None is a validated drug-discovery algorithm or a biological mechanism.
+
+**Reusable lesson:** test identifiability and estimator equivalence before expensive training. Every synthetic pass must state the statistic, action support, oracle floor, split, cost, and whether the comparison is independent. A synthetic planning result is a method-development result only; it cannot be promoted to real-cell transfer.
+
+**Open gate:** dynamic state-to-function or causal-transfer claims need matched time, intervention, state, and independent functional evidence appropriate to the claim. Cheaper endpoint-only prediction and method-development questions remain usable under their own narrower contracts. Agent decision benefit requires a separate equal-budget comparison.
+
+## 4. Target engagement, genetic reference, and mechanism
+
+The CDI/FLT3 work correctly separates DepMap gene-effect association, kinase engagement assays, and PRISM viability. The corrected FLT3 association is exploratory and small; engagement resources use different cells, doses, times, and assay contracts. The current intervention-gated target contrast is an ordinary hierarchical/VOI design, not a demonstrated new mechanism or Agent advantage.
+
+**Reusable lesson:** claim mechanism only when proximal engagement, functional response, genetic or rescue reference, and an independent endpoint are joined at the same intervention identity. Keep target-negative controls and dose/time mapping explicit. Do not infer causality from a target annotation or a cross-database name match.
+
+**Open gate:** stable row-level joins for cell, compound, dose, time, engagement, function, and genetic reference, plus an independent held-out confirmation.
+
+## 5. Combination and resistant-cell transfer
+
+The 2026-10-30 combination work derives an exact ordinary product-state subfamily and an equivalent residual-invariance restriction. This constrains novelty and clarifies what a resistant-cell transfer claim would require; it is not a new algorithm or a biological result. Source normalization, dose/control axes, and independent parental/resistant preparation remain unresolved.
+
+**Reusable lesson:** derive algebraic overlap with MuSyC/Loewe/Bliss and standard hierarchical models before naming a new mechanism. Recalibrate each background and test held-out combinations; preserve asymptotes and endpoint scales rather than assuming a shared interaction label is invariant.
+
+**Open gate:** a public matched parental/resistant matrix with raw or auditable dose-response values, control normalization, independent preparation identifiers, and a preregistered transfer utility.
+
+## 6. Literature and cross-domain transfer
+
+CV, NLP, active learning, causal inference, and robotics provide transferable design principles—representation alignment, missingness-aware acquisition, intervention logging, and budgeted decision value. They are priors for experiment design, not evidence that the corresponding biological relation exists. Paper metadata or an abstract is insufficient for a method or mechanism claim; source access limits remain recorded.
+
+**Reusable lesson:** record source identity, version, license, exact method, data conditions, and the boundary of the analogy. Search results and duplicate captures do not count as independent support.
+
+## 7. DeepSeek auxiliary route
+
+DeepSeek Harness tasks are limited to fixed-field extraction, download bookkeeping, deduplication, unit checks, and prescribed arithmetic. They must not choose hypotheses, metrics, methods, or mechanisms. Accepted task outputs are administrative evidence only until independently checked by the principal agent. The append-only `CURRENT_TASK.md`, `MAINLINE.md`, and `TASK_QUEUE.md` remain coordination records; future compaction must preserve task IDs, budgets, acceptance state, and unresolved ambiguity.
+
+## Cross-route promotion rule
+
+Promotion to `src/` or `tools/` requires a stable input contract, verification relevant to the intended use, explicit evidence scope, and a recorded promotion decision. Scientific benefit claims additionally require an independent challenge or check and suitable comparators; cost-matched baselines are required for decision-efficiency claims. A file existing, a unit test passing, a source hash matching, or a synthetic `PASS` never closes a scientific gap by itself.
+
+
+
+## Consolidated corrections from the seven root summaries (2026-10-30)
+
+The root summaries are dated audit/navigation layers, not additional authoritative syntheses. Their decision-relevant content is consolidated here and in `log/RESEARCH_REPORT.md`; the retained copies now live under `research/routes/historical_evidence_archive/reconciled_reports/`. The claim ledger remains available for exact provenance and is not treated as 225 independently re-run claims.
+
+- **Identifiability and replication-unit discipline.** The R128 correction says the 3.04% figure is a BATCHIE PAIR same-cell × directed-drug-pair cross-layout hash proportion, while 42.8% comes from a different Jaaks/GDSC resource; neither is an independent-culture rate. R129–R130 separate correlated continuous Δ readings from the Boolean `Synergy` criterion. R156–R164 further require λ disclosure and reject repeated split intervals as independent task-population CIs when tuning is inside the split. These rules constrain interpretation of all later pathway/annotation results.
+- **Pathway annotation scope.** The retained audit distinguishes identity substitution from information gain: pathway labels are a deterministic function of drug identity in the inspected mapping, so their supported role is cold-start replacement where identity is missing. The current frozen internal result remains scoped to both drugs unseen: roughly 30–32% upper-quartile entry versus 25% chance, +4.7 to +8.6 percentage points, with permutation and matched-random controls. It is an internal data-set result, not a mechanism or external transfer claim. The audit also records that target labels carry content but pathway grouping was about twice as useful in the inspected comparison; this is a degree-of-value observation, not a universal hierarchy.
+- **External-resource gates.** ComboCat was `unqualified` (804/806 anonymous roots, five published class levels, a reported 351 bound later corrected as a drug-pair count, not a cell×pair bound; 806 is the trivial unit upper bound). DrugComb v1.4 was structurally eligible (380,418 cell×pair; 16,078–52,368 both-unseen at r=.2–.4), but R191 annotation mapping covered 34.69% with 62 levels and the endpoint gate was `endpoint_not_usable` for the target effect (MDE80=.1149 at r=.20 versus δ=.03; power=.783 for .1183). R192 therefore remains `not_replicated`, with ρ=.09464 and pair×cell CI [−.0070,+.1790], while its own power self-check was .708. These are qualification/power boundaries, not universal negatives.
+- **R193–R202 information-object corrections.** R193-A1 was `inconclusive` before the Q statistic because MDE80=.2042 exceeded δ=.0893 (n_eff≈189). R194’s 1.43% condition share is only an additive main-effect share; interaction (48.5%) and barcode noise (46.1%) dominate, and the original weighted-moment/independence interpretation requires recheck. R196v2 and R197v2 remain `inconclusive`; R200-D1 found 96.735% algebraic redundancy and exact reconstruction of the selected holdout, so 0.7206 is not closure-outside evidence. R199/ON3 and R202 remain development/qualification records with missing independent endpoint, culture, exposure, or non-reaggregated lineage links. Do not convert any of these stops into “structure absent.”
+- **R204 contract corrections.** C215’s M1 run is invalid because frozen scales were changed by 10×. Corrected C216 is H1 0/16 with `design_invalid: projection`; C217’s “unreachable” interpretation was withdrawn because oracle q95 is not an impossibility bound. H1b is a separate coarse synthetic measurement and passed 16/16, but does not repair C216 or establish pharmacology. M1-S2c passed only on synthetic known-truth planning (candidate versus empirical mean Δ=−.055231, 95% CI [−.068569,−.041892]); S2d’s apparent benefit was narrow and failed its T2 comparison. M3-S3b found pointwise equivalence to standard DR/TMLE (all six D=0, Holm p=1.0), stopping the increment claim. M2 Stage1 is a synthetic identifiability check; real multi-time functional data remains `data_unavailable`.
+- **Ordinary functional route boundary.** The later index/register summaries add several scoped negatives that are easy to lose during cleanup: local dose interaction lost to the stronger additive baseline (A−L=−.0118770); the observation-pilot curvature difference (Δ≈.000691) is computational, not a biological CI; H_FI failed its training-advantage gate before development scoring; common-screen and paid-feedback lines lack qualified joint exposure/independent culture and did not promote a core method. These results support route-specific stop rules, not a claim that all functional feedback is useless.
+- **Literature/positioning boundary.** `POSITIONING.md` explicitly says its source access was fragment-level and that no novelty claim is licensed. The summaries repeatedly classify ordinary baselines, decision-focused acquisition, pathway/target encodings, and model/strategy loops as covered or partially covered by prior work. Keep “possible gap” language conditional until full primary-source verification is available.
+
+The seven files retain detailed claim-by-claim histories, stale snapshots, exact correction chronology, and machine-readable evidence references. They should remain available as reconciled historical records after root cleanup; this section consolidates the decision-relevant findings and does not certify independent reproduction of every ledger row.
+
+
+Additional reusable failures in the retained claim histories are worth keeping explicit. The fitted pathway/identity model gave the same prediction across cells for a fixed pair (reported span 1.4×10⁻¹⁷); its ranking gain cannot be used to choose a responding cell. The personalization sign depended on prior quality (reported +2.15 pp at an 8.6% prior hit rate, near zero at 10–11%, negative at 12–17%), but the tested 100-probe and tissue-based regime selectors did not reliably identify which case applied. Preserve this as a scoped negative about deploying that rule, not a universal “never personalize” instruction.
+
+Feature-audit experience also matters: uniform rescaling canceled under standardization and was unchanged in the tested trees, so the old near-degenerate/scale-shrunk warnings were removed; mixed row scales remained harmful and warranted a separate check. Groupwise analyses must filter insufficient replication before declaring a sign reversal, then use an interval rather than the point sign. A whitelist can hide a real defect. Zero differences with zero-width intervals, saturated decision rates, dead feature blocks, and a gate that cannot attain the opposite outcome call for design diagnosis, not a scientific negative. “No new information” also does not imply “no predictive use”: the retained boosting result (+.0152) was an inductive-bias observation, whereas zero added linear span was model-specific.
+
+Retained source identities: [claim-status audit](../research/routes/historical_evidence_archive/reconciled_reports/CLAIM_STATUS_AUDIT.md), [evidence register](../research/routes/historical_evidence_archive/reconciled_reports/EVIDENCE_REGISTER.md), [dated handoff](../research/routes/historical_evidence_archive/reconciled_reports/HANDOFF_20261027.md), [episode index](../research/routes/historical_evidence_archive/reconciled_reports/INDEX.md), [fragment-level positioning](../research/routes/historical_evidence_archive/reconciled_reports/POSITIONING.md), [R204 snapshot](../research/routes/historical_evidence_archive/reconciled_reports/R204_PHASE_SYNTHESIS_20261028.md), and [dated synthesis](../research/routes/historical_evidence_archive/reconciled_reports/SYNTHESIS.md). The R204 snapshot’s old “unreachable” attribution and old Stage3 comparison interpretation are superseded by C220/C221/C225 above; it must not be used as the current verdict.
+
+
+Two further corrections govern future work. The earlier synthesis’s “only LPO” account of One-Hot News was superseded: the later handoff audit records LDO/two-drug-unseen evaluation and feature versus one-hot comparison too. Likewise, its “about 1,600 measurements” is one scoped power-planning result, not a resource-independent sample-size rule; ≈6,282 cells was only an independent-correlation Fisher-z calculation, not a universal drug-decision gate. Plan paired utility/regret power for the intended independent unit instead. R201’s T1 benchmark had baseline 451/500=.902, leaving at most .098 improvement below its fixed δ=.10; failure to reach that gate cannot establish insufficient algorithmic benefit. The A22 stopped object was a static S-add proxy with invalid noise/null calibration, not the complete dynamic shared-kernel mechanism.
+
+The practical next step is claim-dependent: retain the stopped configurations; qualify ordinary numeric endpoints for narrowly defined prediction tests; inspect source identity, exposure and feedback leakage before any new transfer claim; freeze the actual net decision utility and remaining headroom before choosing sample size. For the R204 real-data route, the AZ export recovered 68,710 cell×pair units/84,055 matrices with technical repeat structure, but not official occasion/independent-culture or orthogonal-function numeric mapping. The paper reports 72 h/CTG and additional functional assays; missing export fields do not mean the authors did not perform them. The later user constraint is public datasets only: the archived author-request package remains unsent, and its earlier request recommendation is not a current instruction to contact authors.
+
+
+The completed [claim-by-claim reconciliation](RESEARCH_REPORT.md#claim-by-claim-reconciliation-2026-10-30) governs later use of C1-C225. Its [machine-readable review](CLAIM_REVIEW.json) records individual scope, source conflicts, supersessions and unreproduced numerical boundaries. Review completion is documentary coverage, not independent biological confirmation.

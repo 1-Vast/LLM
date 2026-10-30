@@ -1,0 +1,41 @@
+# Final scoped pair-coupling prior check
+
+2026-10-29, shared round pass6. Requested evidence check only, not hypothesis selection or preferred-verdict assessment. No response data, author code, experiment, paid API, install, library/index/core change. Existing reference manifest searched first; no Palmer–Sorger original was listed. Initial12request ledger is retained unchanged.
+
+## Finding
+
+The original Palmer–Sorger Cell2017 paper directly establishes that **joint sensitivity across drugs matters beyond individual drug-response distributions**, with concrete combination-selection consequences and a need for matched response observations to estimate the coupling. The principal empirical unit is **different patient-derived tumors/patients**, not two stable subtypes within one tumor. It therefore overlaps the general marginal-versus-joint sensitivity idea but must not be described as the same biological mechanism as within-tumor complementary killing.
+
+The same paper also explicitly simulates within-tumor cross-resistant subclones. This is closer to a proposed stable-subtype coupling construction, but is model evidence: clone frequencies and drug cross-resistance are stipulated from prior experiments. It does not infer subtype alignment from complete monotherapy path laws, prove a D−1pair-edge rank-one reconstruction, or measure joint/sequential depletion in a common-screen resource. Those claims would need their own analysis. Conversely, replacing its patient unit with tumor subclones does not by itself establish a new scientific principle.
+
+## Primary source and exact operative passages
+
+Adam C. Palmer and Peter K. Sorger, **Combination Cancer Therapy Can Confer Benefit via Patient-to-Patient Variability without Drug Additivity or Synergy**, Cell171,1678–1691.e13,2017, DOI[10.1016/j.cell.2017.11.009](https://doi.org/10.1016/j.cell.2017.11.009). Original PMC host[PMC5741091](https://pmc.ncbi.nlm.nih.gov/articles/PMC5741091/). Immutable original287298B, SHA256 `7a0fc8d1b926252b281be219a4796fcee0a3d3aa655357d186b6efa59140468f`, `pair16_palmer_pmc.html`. Exact text with HTML paragraph locators is retained in `palmer_exact_passages.json`.
+
+**Passage1: between-tumor coupling and measurement contract.** MainResults P8: “the benefits conferred by independent drug action depend on patient-to-patient variability in responsiveness to the drugs making up the combination, and the degree to which responsiveness is correlated (ρ).” P9: “PDX studies comparing the responsiveness of a single tumor to multiple drugs provide the most direct means to determine ρ.” Methods S16/P48: “Correlations in response between different single drugs were computed by Spearman’s Rho rank correlation of PFS.” The same paragraph defines combination prediction by assigning each PDX the better experimentally observed response to either drug.
+
+Meaning: the underlying unit must be shared across drug treatments. Separate monotherapy marginals plus assumed coupling can predict a range of combination outcomes; matched PDX identities estimate the coupling across tumors. P47 describes230PDX models each tested across many drugs, average13monotherapies and5combinations, not one human patient simultaneously receiving every drug. Biological replicate animals nest within a patient-derived tumor/treatment model. No raw PDX responses were acquired here.
+
+**Passage2: within-tumor subclone model and assumptions.** Methods S19/P64: “Tumors receiving combination therapy were assigned two K_I values, one for each drug, drawn either from two independent distributions or from a joint distribution with a specified degree of correlation.” It then assigns single-drug resistance to500cells per million and double resistance to5cells per million, varied with response correlation. Finally: “Under combination therapy, each cell subpopulation is assumed to be inhibited only by the therapy to which it is most sensitive.” Crucial scope sentence S19/P62: “this model is not part of the analysis of human clinical trials … or PDX trials … and is relevant only to Figure6.” These are separate levels of variation, even though the simulation combines them.
+
+The cell subclone frequencies are based on Bhang et al.2015 erlotinib/crizotinib work, according to P64. That primary was not acquired within this4request allowance; its measurements and lineage protocol are unverified in this pass. Do not upgrade the citation to a verified clone-resolved cross-drug dataset. The direct Palmer–Sorger passage already establishes that overlap in resistant subclones was modeled, without proving every assumption of the developing two-subtype theory.
+
+## Combination/schedule consequence and measurement needs
+
+MainResults S8/P19 proposes “combination or sequential regimens based on maximizing the chance of response to at least one drug.” P20 discusses low cross-resistance pair selection; P21 adds full-dose tolerability and low cross-resistance as desirable traits. These are proposed/design consequences supported by their analyses, not fresh prospective validation of every suggested regimen.
+
+The clinical independent-action definition is highest-single-agent at the **individual tumor/patient** level: P4 and Methods P41 say the combination response equals the better monotherapy with no added benefit from the other. P5 explicitly distinguishes population-level benefit from within-tumor pharmacological interaction. Methods P40 separately defines Bliss survival multiplication and Loewe additivity. None of these names should be substituted silently for clone-level complementary killing or for one another.
+
+For a stable two-subtype model, the relevant unknown instead is the **joint association of subtype susceptibilities across drugs within the same starting population**. Linking separate monotherapy subtypes requires stable shared identity or joint/sequential intervention data under a declared transport model. Palmer–Sorger supplies the conceptual warning that correlation matters and concrete clone-overlap simulations, but no evidence that a public bulk count table supplies that joint association. A technical repeat under each monotherapy preserves trajectory replication; it does not tag which latent subtype under drugA corresponds to which under drugB.
+
+Sequential predictions also require preserved subtype identity/composition and an explicit account of washout, induction, adaptation, growth and time-dependent drug effects. Palmer–Sorger's chosen passages do not experimentally establish those conditions for HTS001. A stable two-subtype complementarity theory may be mathematically informative while remaining a conditional explanation rather than an instantiated data-supported workflow.
+
+## Reading and search boundaries
+
+Actually read primary paragraphs P4–9,P19–25,P38–42,P47–48,P62–64 and relevant source section labels/captions; exact relied-upon passages saved. Not whole paper/SI, no author code, no clinical/PDX response data. Full-source first extraction was truncated; the operative S8,S9,S14,S16,S19 paragraphs were reread in bounded output before using them. No statement of exhaustive closest-prior coverage or absence of collateral-sensitivity literature is supported.
+
+This check also reuses the previously read archive warning: chemically/state-induced drug histories are not automatically stable subtype mappings. The2012Lee/Yaffe/Sorger sequential-rewiring source in reference/ remains abstract-only and is not used for method claims here.
+
+## Exact request accounting
+
+Separate `final_pair_request_ledger.jsonl` records4logicalrequests,300349receivedB. Query13 `AUTH_LAST:Palmer AND AUTH_LAST:Sorger AND (TITLE_ABS:"independent" OR TITLE_ABS:"heterogeneity")` returned0, likely field/query mismatch; absence is not evidence. Query14 exact2017Cell title OR2022review title identified the original. Request15 EuropePMC original fullTextXML returnedHTTP500,0bodyB saved. Request16 independent lawful original PMC host returned200/287298B; no same-endpoint retry or access-control bypass. The2022review was identified only, not fetched or read as primary evidence.30stimeout each,0automatic retries. ThreeHTTP200,oneHTTP500. Combined worker total across both ledgers: **16requests,1825662receivedB**, within new total16cap. No more requests were made.

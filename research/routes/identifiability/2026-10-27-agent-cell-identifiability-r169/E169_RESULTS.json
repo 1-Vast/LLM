@@ -1,0 +1,137 @@
+{
+  "kind": "prospective_power_curve_over_measurement_count",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "reps": 20,
+    "subsamples": 10,
+    "n_boot": 300,
+    "seed": 20261069,
+    "ks": [
+      50,
+      100,
+      200,
+      400,
+      800,
+      1600
+    ],
+    "lambdas": [
+      0.1,
+      0.3,
+      1.0,
+      3.0,
+      10.0,
+      30.0,
+      100.0,
+      300.0,
+      1000.0
+    ],
+    "folds": 3
+  },
+  "audit": {
+    "keys": 108259,
+    "cells_drawn": 1200
+  },
+  "by_k": {
+    "50": {
+      "n": 200,
+      "power": 0.205,
+      "mean_gain": 0.15259673484456784,
+      "sd_gain": 0.15965348123127127,
+      "median_ci_width": 0.5562678296402425
+    },
+    "100": {
+      "n": 200,
+      "power": 0.35,
+      "mean_gain": 0.145415801747466,
+      "sd_gain": 0.13879135458344125,
+      "median_ci_width": 0.3915131020558419
+    },
+    "200": {
+      "n": 200,
+      "power": 0.46,
+      "mean_gain": 0.1412156245748006,
+      "sd_gain": 0.1091097490820827,
+      "median_ci_width": 0.28133826853122684
+    },
+    "400": {
+      "n": 200,
+      "power": 0.585,
+      "mean_gain": 0.14246718293572885,
+      "sd_gain": 0.10372103903386881,
+      "median_ci_width": 0.20970976965499477
+    },
+    "800": {
+      "n": 200,
+      "power": 0.745,
+      "mean_gain": 0.14322058423907855,
+      "sd_gain": 0.09068386586336413,
+      "median_ci_width": 0.16729472053284777
+    },
+    "1600": {
+      "n": 200,
+      "power": 0.84,
+      "mean_gain": 0.1366793214020957,
+      "sd_gain": 0.08424293695514841,
+      "median_ci_width": 0.12398819746641007
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r169/PROTOCOL_E157.md": "6a24e9827f614ced9e2f4e11893c05409e189087c25764a2d3f228807476cff7",
+    "research/2026-10-27-agent-cell-identifiability-r169/e169_power.py": "4549dd91ea4668a799c725a4ed70501f8f94cb54277e4e3c847d19d2e5df8093"
+  },
+  "decisions": {
+    "power_by_k": {
+      "50": 0.205,
+      "100": 0.35,
+      "200": 0.46,
+      "400": 0.585,
+      "800": 0.745,
+      "1600": 0.84
+    },
+    "smallest_k_with_80pct_power": 1600,
+    "H402_200_or_fewer": false,
+    "H403_needs_400_or_more": true,
+    "verdict": "a_prospective_test_needs_about_1600_measurements_for_80pct_power"
+  },
+  "limits": [
+    "Subsampling draws from the existing evaluation pool, whose composition may differ from newly measured combinations; this is the main external-validity limit.",
+    "Only ridge and one resource.",
+    "The 80 percent threshold and the alpha of 0.05 are conventions, not requirements.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "the_number": {
+    "statement": "a prospective test needs about 1,600 measured (cell x drug-pair) combinations for 80 percent power",
+    "curve": {
+      "50": 0.205,
+      "100": 0.35,
+      "200": 0.46,
+      "400": 0.585,
+      "800": 0.745,
+      "1600": 0.84
+    },
+    "reading": "power climbs steadily and only crosses eighty percent at the largest size tested. At two hundred combinations - a size that sounds generous - power is 0.46, so a study of that size would be a coin flip for detecting an effect that is really there."
+  },
+  "the_estimate_is_not_biased_by_subsampling": {
+    "mean_gain_by_k": {
+      "50": 0.1526,
+      "100": 0.1454,
+      "200": 0.1412,
+      "400": 0.1425,
+      "800": 0.1432,
+      "1600": 0.1367
+    },
+    "reading": "the point estimate sits between 0.137 and 0.153 across a thirty-two-fold range of measurement counts, so subsampling changes the precision and not the target",
+    "what_does_change": "the interval width falls from 0.556 at fifty keys to 0.124 at sixteen hundred, roughly as the square root of k"
+  },
+  "what_1600_means_in_practice": {
+    "conversion": "with about 125 cell lines per drug pair, 1,600 key-level combinations is roughly thirteen drug pairs measured across all cells",
+    "so": "a prospective verification is a real screening campaign, not a small exercise",
+    "why_this_matters_for_the_programme": "the promotion criterion requires cross-dataset replication, and this number is the first estimate of what that replication would cost"
+  },
+  "a_possible_retrospective_explanation_worth_checking": {
+    "observation": "every cross-dataset attempt in this programme failed (C78, C89)",
+    "hypothesis": "if those arenas had far fewer than sixteen hundred usable combinations in the both-unseen regime, failure was the expected outcome on power grounds alone, independently of whether the claim is true",
+    "status": "NOT yet checked - this is a hypothesis about why those attempts failed, and it needs the actual per-arena key counts before it can be stated",
+    "why_I_am_recording_it": "it would convert 'cross-dataset replication is blocked by resource' into a specific, checkable arithmetic claim"
+  }
+}
