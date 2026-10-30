@@ -1,106 +1,60 @@
-# CDI 数据契约审计
+# CDI data-contract audit
 
-日期：2026-10-30（Asia/Shanghai）  
-范围：仅审计当前工作区可访问的公开/本地资产和轻量元数据；不读 sealed/confirmation 响应，不改 `src/` 或 `tools/`。本审计把 CDI 定义为四层：
+Date: 2026-10-30. Scope is the readable public/local assets and lightweight metadata in the current workspace. Sealed or confirmation responses were not opened, and `src/` and `tools/` were not modified.
 
-1. 分子相对结合/亲和力差异；
-2. drug × cell 的功能响应（本报告以 viability/药敏为功能端点）；
-3. target/subtype 与 cell 的遗传/背景上下文；
-4. Agent 用上述信息选择下一项 drug × cell（必要时带剂量）测量。
+## Definition and decision
 
-“跨 assay 的预测关联”不要求 affinity 与 viability 在同一培养物、同一剂量或同一时间采集；但它只能支持预测/排序。要把关联解释成细胞内 target engagement 或 mediation，仍需同条件 engagement 或受控遗传干预。
+The CDI candidate has four layers: (1) molecular relative binding/affinity difference, (2) drug-by-cell functional response, here viability or drug sensitivity, (3) target/subtype and genetic/background context, and (4) an agent selecting the next drug-by-cell measurement, optionally with dose.
 
-## 判定摘要
+Cross-assay predictive association does not require affinity and viability to be collected in the same culture, dose, or time. It supports prediction or ranking only. Cellular target engagement or mediation requires matched engagement or controlled genetic intervention.
 
-| CDI 层 | 当前可行性 | 结论 |
+| Layer | Feasibility | Decision |
 |---|---|---|
-| 分子相对亲和力差异 | **可行（受限）** | Klaeger 2017/ChEMBL 有可追溯的 lysate kinobead apparent Kd；可构造同 assay/target 内的相对排序，但大量值是右删失 `>`，不能当精确 Kd，也不是活细胞结合。 |
-| drug × cell 功能响应 | **可行** | PRISM 19Q4 有 drug-batch × cell-line pooled viability、剂量和 plate/well；GDSC Jaaks 有单药/组合 viability 与剂量；BeatAML2 有患者样本单药药敏。三者端点和背景单位不同，不能直接合并成一个标签。 |
-| target/genetic context | **可行（注释/背景层）** | PRISM 的 MoA/target 是药物注释；DepMap 19Q4 提供细胞身份、lineage/subtype、表达/突变；GDSC 提供 target/pathway 注释。它们可作条件特征，不能替代药物 engagement。 |
-| Agent 选测 | **可做回溯式 masked 设计** | 已有完整公开矩阵可模拟逐轮揭示和选测；尚无公开的前瞻动作成本、真实购买/培养记录或独立 prospective Agent 结果。 |
-| affinity→cell response 的因果 mediation | **当前不可识别** | 需要 cellular engagement、target subtype/isoform 解析和受控遗传对照；现有跨库 join 只能检验预测关联。 |
+| Relative molecular affinity | Limited feasible | Klaeger 2017/ChEMBL provides traceable lysate kinobead apparent Kd. Many values are right-censored `>` and are not precise Kd or live-cell binding. |
+| Drug-by-cell functional response | Feasible by endpoint | PRISM 19Q4, GDSC Jaaks, and BeatAML2 provide viability or sensitivity data, but their endpoints and background units must remain separate. |
+| Target/genetic context | Feasible as annotation/background | PRISM MoA/target and DepMap lineage/expression/mutation are conditional features, not engagement measurements. |
+| Agent selection | Retrospective masked design feasible | Public matrices can simulate sequential reveal and selection; no prospective cost, purchasing/culture record, or independent prospective agent result is available. |
+| Affinity-to-cell-response causal mediation | Not identifiable now | Requires cellular engagement, target isoform/subtype resolution, and controlled genetic comparison. |
 
-## 逐项资源审计
+## Resource findings
 
-### 1. Klaeger 2017 / ChEMBL CHEMBL3991601
+### Klaeger 2017 / ChEMBL CHEMBL3991601
 
-本地文件：`data/external/klaeger2017_chembl/klaeger2017_CHEMBL3991601_kd.csv`、`MANIFEST.json`、`molecules.json`。Manifest 记录来源为 ChEMBL REST、Klaeger et al. 2017（Science，CHEMBL3991601），并给出 CC BY-SA 3.0、检索日期 2026-10-19 与文件 hash。
+Local files are `data/external/klaeger2017_chembl/klaeger2017_CHEMBL3991601_kd.csv`, `MANIFEST.json`, and `molecules.json`. The manifest records ChEMBL REST and Klaeger et al. 2017 (Science), with CC BY-SA 3.0, retrieval date 2026-10-19, and hashes. There are 70,505 activities, 243 ChEMBL molecules, and 325 assays. All records are Kd in nM; 65,576 have relation `>` and 4,929 `=`. Use censored relative-affinity/ranking features grouped by molecule, target, and assay. The data have no cell background, intracellular dose, exposure time, vehicle, culture preparation, or biological replicate, so they are not cellular engagement.
 
-- 规模/身份：70,505 activities，243 个 ChEMBL molecule，325 个 assay；CSV 的分子键为 `molecule_chembl_id`，同时有 `molecule_pref_name`。
-- 亲和力：全部 `standard_type=Kd`、`standard_units=nM`；65,576 条是 `standard_relation=>`，4,929 条为 `=`。因此适合 censored relative-affinity/ranking 特征，不适合把每条记录当作可比较的精确数值。
-- 靶点：`target_chembl_id`、`target_pref_name`、`target_organism`、`assay_chembl_id` 均存在；目标名称计数为 320（含 1,103 行 `Unchecked` organism/记录语义需谨慎）。同一 molecule 可对应多个 kinase/非 kinase target，不能只按药名挑一个“主靶点”。
-- 缺失条件：没有 cell background、细胞内剂量、exposure time、vehicle、细胞培养 preparation 或 biological replicate。它是裂解液/kinobead binding 层，不能直接叫 cellular engagement。
-- 允许用途：按 `molecule_chembl_id × target_chembl_id × assay` 聚合，保留 `=`/`>` censor 状态，作为分子层相对结合特征。要连 PRISM，必须用 ChEMBL/标准化结构（优先 InChIKey；PRISM 只有 Broad batch、name、SMILES）完成可复核映射，不能用模糊药名 join。
+### Broad PRISM Repurposing 19Q4
 
-### 2. Broad PRISM Repurposing 19Q4
+Local primary and secondary files are under `data/external/prism_19q4/raw/`. Primary covers 4,518 compounds and about 578/562 cell lines; secondary covers 1,448 compounds and 489 cell lines with eight-step four-fold dilution starting at 10 uM. Metadata include `broad_id`, name, SMILES, MoA, target, phase, dose, screen, `depmap_id`, and plate/well fields. MTS010 is explicitly a technical redo. Endpoints are DMSO-relative log-fold viability and fitted dose-response summaries; exposure time is not provided. Use standardized drug identity by structure and exact `depmap_id`, with grouped holdouts. Do not treat target annotations as engagement.
 
-本地目录：`data/external/prism_19q4/raw/`；依据 `primary-screen-readme.txt` 与 `secondary-screen-readme.txt` 的原始说明和表头。
+### DepMap 19Q4
 
-- primary：4,518 compounds × 578/562 cell lines；secondary：1,448 compounds × 489 cell lines。secondary 是 8-step、4-fold dilution、起始 10 µM。
-- drug identity/target：`broad_id`（药物批次）、`name`、`smiles`、`moa`、`target`、`phase`；dose 的单位在 README 中为 µM。target/MoA 是 Broad Repurposing Hub 注释，不是实验测得的 engagement。
-- cell identity/context：`depmap_id`、`ccle_name`、组织字段和 STR 质控字段；pooling 表有 `analyte_id`、`detection_pool`、`pool_id`。
-- dose/plate/repeat：replicate treatment 表有 `dose`、`screen_id`、`detection_plate`、`compound_plate`、`well`；这是可审计的处理槽位和技术重复索引。README 明确 MTS010 是 147 个既有 oncology compounds 的 **technical redo**，不能自动升格为独立 biological replicate。
-- endpoint/vehicle/time：`primary/secondary_*_logfold_change` 是相对 DMSO 的 log-fold viability，经过 ComBat；secondary 还提供 dose-response curve parameters（AUC/EC50/IC50 等）。README 没有 exposure-time 字段；因此不能把曲线 AUC 当成某个固定时间和单点剂量的 readout。vehicle 只由相对 DMSO 处理语义支持，桥接表仍需保留该限制。
-- 允许用途：以 `broad_id`/标准化结构 × `depmap_id` × dose/screen 为功能标签，和 Klaeger 的分子层特征、DepMap 背景做预测；评估时必须按药物或 scaffold、细胞背景/lineage 分组，避免 replicate/plate 泄漏。
+`data/external/depmap_19q4/` provides cell identity, lineage/subtype, culture metadata, baseline expression, and mutations. It has no drug, dose, time, vehicle, or functional endpoint. Use it only as background/genetic context. Exact `depmap_id` alignment proves identity alignment, not identical culture, timing, or batch.
 
-### 3. DepMap 19Q4
+### GDSC Jaaks 2022
 
-本地目录：`data/external/depmap_19q4/`。
+`data/external/gdsc_combinations/jaaks2022_figshare/` includes fitted combination tables and raw wells. Fitted fields include cell identity, anchor/library drug, concentration, single-agent viability, synergy, and target/pathway annotations. Raw records retain barcode, scan, date, duration, position, drug, concentration, and intensity. Use for dose-aware viability/combination prediction; original and validation screens are not automatically independent biology and annotations are not engagement.
 
-- `sample_info.csv` 字段包括 `DepMap_ID`、`CCLE_Name`、`COSMIC_ID`、`lineage`、`lineage_subtype`、`lineage_sub_subtype`、`lineage_molecular_subtype`、`culture_type`、`culture_medium`、RRID、疾病和来源等。
-- `CCLE_expression.csv` 与 `CCLE_mutations.csv` 提供 baseline 分子背景；这些是未处理背景，不能解释为药物处理后的功能或 target engagement。
-- 没有本目录内的 drug、dose、time、vehicle、功能终点；因此它只能作 PRISM/GDSC 的背景与遗传上下文。PRISM 的 `depmap_id` 可作精确细胞键，但这只证明身份对齐，不证明两库培养/时间/批次相同。
+### BeatAML 2.0
 
-### 4. GDSC Jaaks 2022 anchored combinations
+`data/external/beataml2_20261017/` contains 63,395 single-agent curve-fit rows for 569 patient samples and 166 inhibitors, plus raw fields for plate, replicate, concentration, normalized viability, read time, and QC. It can provide an external patient-background evaluation. Patient samples must not be joined to PRISM cell-line labels as one experimental unit.
 
-本地目录：`data/external/gdsc_combinations/jaaks2022_figshare/`，包含 original/validation fitted CSV、原始 wells zip 与 `Glossary.xlsx`。
+### LINCS L1000 and MIX-seq/scPerturb
 
-- fitted 表有 46 列，关键字段为 `CELL_LINE_NAME`、`SIDM`、`COSMIC_ID`、`ANCHOR_NAME/TARGET/PATHWAY/CONC`、`LIBRARY_NAME/TARGET/PATHWAY/CONC`、单药 viability 与 synergy EMAX/AUC/XMID 等。
-- raw zip 表头另含 `BARCODE`、`SCAN_ID`、`DATE_CREATED`、`SCAN_DATE`、`ASSAY`、`DURATION`、`POSITION`、`DRUG_NAME`、`CONC`、`INTENSITY`，说明剂量与实验时间字段在原始层可追溯；fitted 派生表不应被误读成原始重复。
-- 该资源适合组合/药敏响应开发和剂量条件化；anchor/library target/pathway 是注释，不是 engagement。不同 screen 的日期/stock/重复关系需按 raw barcode 和 glossary 另行确认；不能把 original 与 validation 自动称为独立生物实验。
+L1000 signatures under `data/external/lincs_l1000_gse92742/` and `data/external/lincs_l1000_phase2/` include perturbagen, cell, dose, time, vehicle, and replicate-like identifiers but no PRISM/GDSC viability or independent functional endpoint. MIX-seq/scPerturb under `data/external/mixseq_scperturb/mcfarland_2020.h5ad` includes cell, perturbation, dose, time, hash, channel, ChEMBL ID, and QC fields but no viability, regrowth, or independent function. Both are state proxies only.
 
-### 5. BeatAML 2.0（补充功能—遗传背景）
+## Intersection limits
 
-本地目录：`data/external/beataml2_20261017/`。
+The nominal intersection is standardized drug identity (ChEMBL to Broad to GDSC) by exact PRISM/DepMap cell identity and Kd target annotation. It is not a shared experiment. Preserve each source's assay, dose, time, vehicle, plate/preparation, replicate, and endpoint. Same target names do not prove isoform identity, intracellular occupancy, or downstream causality. Mediation requires cellular engagement or identifiable genetic perturbation/rescue.
 
-- `beataml_probit_curve_fits_v4_dbgap.txt` 有 63,395 条 single-agent curve-fit 行，569 个患者样本、166 个 inhibitor；键为 `dbgap_subject_id`、RNA/DNA sample、`inhibitor`，含 concentration range、curve status 与 AUC/IC 等派生字段。
-- raw inhibitor 表头保留 `plate_num`、`replicate`、`well_concentration`、`normalized_viability`、`time_of_read`、`passed_qc`，所以可做患者背景的剂量/时间/重复审计；它不是 PRISM 的 cell-line 单位。
-- `beataml_waves1to4_norm_exp_dbgap.txt` 是 RNA 背景矩阵，WES 表有样本、变异和 gene/symbol 字段。药物 target/subtype 并非该 release 的实验测量，需外部标准化注释后才可作为特征。
-- 允许用途：独立外部功能评估或患者背景泛化；不得把患者样本与 PRISM cell line 名称直接 join 成同一实验单位。
+## Minimum retrospective CDI holdout
 
-### 6. LINCS L1000（proxy，不是功能标签）
+1. Freeze a structure/InChIKey whitelist linking ChEMBL molecule, PRISM `broad_id`, and GDSC drug; retain salt and batch ambiguity as unmapped.
+2. Hold out complete drug groups/scaffolds and cell lineages, with at least three non-overlapping drug groups and three lineages in a pilot. Never split dose rows from the same drug-by-cell block.
+3. Expose the agent only to training-block affinity summaries, structure, annotations, DepMap context, and revealed functional responses. Mask missing dose/time rather than imputing defaults.
+4. Select one unrevealed drug-by-cell candidate or fixed batch per round. Compare random, structure-similarity, uncertainty, and oracle upper-bound strategies.
+5. Report drug-held-out, lineage-held-out, and double-cold-start results on complete frozen PRISM blocks. Use drug or cell clusters for bootstrap; dose rows are not independent samples.
+6. Limit conclusions to predictive selection unless matched engagement or controlled genetic intervention is added.
 
-本地目录：`data/external/lincs_l1000_gse92742/`（GSE92742 phase 1）与 `data/external/lincs_l1000_phase2/`（GSE70138）。
+## Final ruling
 
-- sig metadata 有 `pert_id`、`pert_iname`、`pert_type`、`cell_id`、dose、dose unit、time、time unit、`distil_id`；vehicle 行显式为 `ctl_vehicle`/DMSO。pert metadata 提供 canonical SMILES/PubChem（部分遗传扰动记录为 `-666`）。cell metadata 有 cell type、site、subtype 和 provider 信息。
-- GCTX 是 Level 5 COMPZ L1000 transcriptomic signature（phase 1 473,647 × 12,328；phase 2 118,050 × 12,328 的 schema）。它没有 PRISM/GDSC viability，也没有同条件独立功能终点。
-- 允许用途：做药物×细胞×dose×time 的分子状态 proxy 或 Agent 选测先验；禁止把转录响应补写为 viability，禁止与 PRISM 以药名/细胞名 join 后声称同一条件功能配对。
-
-### 7. MIX-seq / scPerturb（状态 proxy）
-
-`data/external/mixseq_scperturb/mcfarland_2020.h5ad` 的 `obs` schema 含 `DepMap_ID`、`perturbation`、`dose_value`/`dose_unit`、`time`、`hash_tag`、`channel`、`chembl-ID`、QC 和单细胞状态字段；X 为稀疏表达矩阵。没有 viability、再生长或独立功能端点，故只作状态 proxy，不作 CDI 功能标签。
-
-## 资源缺口与名义交集限制
-
-- 当前未发现可读的 BindingDB、KIBA、Davis 或 PBCNet2.0 release；`data/raw/kinobeads`、`kinobeads1000`、`kinome_gxe`、`prism`、`depmap`、`combination_sources` 等目录为空，不能当作数据存在的证据。`data/external/gdsc2_fitted` 也为空。
-- 三方名义交集最多可定义为：标准化 drug identity（ChEMBL↔Broad↔GDSC）× PRISM/DepMap exact `depmap_id` × Kd target annotation。它不等于三方同一实验。必须保留每个来源自己的 assay、dose、time、vehicle、plate/preparation、replicate 和 endpoint；缺失字段不能从另一库补写。
-- Kd target 与 PRISM/GDSC target 注释的名称相同，也不能证明同一 isoform、细胞内占有率或下游因果。若要声称 mediation，至少需要同一细胞背景的 cellular engagement 或可识别的 genetic perturbation/rescue；当前公开资产没有这样的配对。
-
-## 最小可行 CDI holdout 设计
-
-这是可在当前公开矩阵上执行的回溯式 Agent 选测，不是 prospective wet-lab 证明：
-
-1. **先冻结身份。** 用标准化结构/InChIKey 建立 ChEMBL molecule ↔ PRISM `broad_id` ↔ GDSC drug 的白名单；保留盐型/批次歧义为未映射。DepMap 只用 exact `depmap_id` 对齐。
-2. **分组留出。** 外层按 drug scaffold（或严格 drug group）和 cell lineage 分组，至少 3 个互不重叠的 drug 组 × 3 个 lineage 组；每组保留多个完整 drug×cell block，禁止随机拆同一药物或同一细胞的剂量行。这个规模只能作为 pilot，不能宣称普适收益。
-3. **可见输入。** Agent 只读训练块中的 affinity summary（含 censor flag）、结构、target/MoA 注释、DepMap baseline context 和已揭示的功能响应；剂量/时间等字段缺失必须作为 mask，而非填成默认值。
-4. **动作与对照。** 每轮从未揭示的 drug×cell（可选固定 dose）候选中选 1 个或固定 batch；与随机、结构相似度、uncertainty 和 oracle 上限比较。记录动作数、实际可用候选数、是否跨 scaffold/lineage，以及每一轮的预测误差/排序质量。
-5. **评估。** 在整块冻结的 PRISM viability 上报告 held-out drug、held-out cell lineage 和双冷启动三种结果；BeatAML 只作独立患者背景外评估，不与 PRISM 标签混合训练。用 cluster/bootstrap 以 drug 或 cell 为统计单位，不能把 dose 行数当独立样本。
-6. **因果边界。** 若 Agent 只提高 viability 预测或下一测量排序，结论限于 predictive selection。没有 cellular engagement/genetic intervention 时，不报告“亲和力导致响应”或“靶点介导”的机制结论。
-
-## 最终裁定
-
-- **可行：** 以 Klaeger Kd 的 censored relative-affinity 特征 + PRISM/GDSC drug×cell viability + DepMap genetic/background context，进行严格身份映射后的跨 assay 预测和回溯式 Agent 选测。
-- **条件可行：** 将 BeatAML 作为患者背景的外部功能评估；必须保持 patient sample 与 cell-line 任务分开。
-- **当前不可行：** 从现有跨库数据直接证明 cellular target engagement、affinity→viability 的因果 mediation、实际少测省钱或 prospective Agent 优势。
-- **重开数据门：** 取得结构级 drug mapping、PRISM exposure-time/vehicle 与独立 biological replicate 说明；补充 cellular engagement 或受控遗传扰动后，才可升级 mediation/机制主张。功能主张若限定为 viability，不额外要求第三种功能读出，但必须保留 endpoint/条件差异和独立性边界。
-
+Feasible now: censored relative-affinity features plus PRISM/GDSC viability and DepMap context for strict cross-assay prediction and retrospective agent selection. Conditional: BeatAML as a separate patient-background external evaluation. Not feasible now: cellular engagement, affinity-to-viability causal mediation, actual cost savings, or prospective agent advantage. Reopen the data gate after structure-level drug mapping, PRISM exposure/vehicle and biological-replicate documentation, and cellular engagement or controlled genetic perturbation are available.
