@@ -6,6 +6,8 @@ Experimental implementations and research tests live here; inputs and detailed n
 
 The evidence supports bounded ordinary prediction, calibration and functional-feedback utility. A general transferable update mechanism, world-model necessity, agent advantage, inherited-updater benefit, joint benefit and improved-improver RSI remain unestablished and need separate fair comparisons. The overall objective remains **ACTIVE / NOT_ACHIEVED**.
 
+The current research objective is to discover, test and revise conditional biological intervention rules through interaction between an Agent and a functional virtual cell. The latest completed 2026-10-30 CXCL9 test parked one common-gain candidate under the inspected MFI assay conditions; it did not establish a biological mechanism, Agent benefit or external transfer. The paired-resource R2 continuation is active but has no admitted result yet. See the [maintained synthesis](../log/RESEARCH_REPORT.md#agent-virtual-cell-joint-learning-to-discover-and-revise-biological-intervention-rules-2026-10-30), [R1 episode report](2026-10-30-cheap-screen-joint-learning-r1/report.md) and [R2 episode record](2026-10-30-paired-functional-resource-r2/record.md).
+
 Eight-drug BeatAML feedback improves ordinary covariance predictions on exposed development data. CDK composition gains have not established functional benefit. The CD14 source rationale failed its preset continuation gate. CellHealth membership qualification is complete, but no new predictive fit or RSI gain follows from it. Existing study-level stops remain binding within their stated scope; later explicit amendments supersede earlier optimistic readings.
 
 ## 2026-10-27 virtual-cell Agent research

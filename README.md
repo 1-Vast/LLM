@@ -70,11 +70,11 @@ python -m tools.research_validation --help
 
 ## Scientific boundary
 
-The model predicts within qualified scope; it does not establish functional endpoints, mechanism, causality or experiment value by itself. The Agent selects and audits evidence and actions; it does not turn language-model output into scientific fact. Current conclusions are in [current research status](log/RESEARCH_REPORT.md#current-paid-repeatability-result), with numerical results in [research/EVIDENCE.md](research/EVIDENCE.md). The [programme boundaries](log/RESEARCH_REPORT.md#current-paid-repeatability-result) separate method value, Agent value, transfer and independent confirmation. PRESAGE P0 remains NO-GO; anchor purchasing value remains blocked by independent-endpoint qualification.
+The model predicts within qualified scope; it does not establish functional endpoints, mechanism, causality or experiment value by itself. The Agent selects and audits evidence and actions; it does not turn language-model output into scientific fact. Current conclusions are in [current research status](log/RESEARCH_REPORT.md#agent-virtual-cell-joint-learning-to-discover-and-revise-biological-intervention-rules-2026-10-30), with historical numerical results in [research/EVIDENCE.md](research/EVIDENCE.md). The [programme boundaries](log/RESEARCH_REPORT.md#current-paid-repeatability-result) separate method value, Agent value, transfer and independent confirmation. PRESAGE P0 remains NO-GO; anchor purchasing value remains blocked by independent-endpoint qualification.
 
 ### Current research and literature
 
-Start with the [current research synthesis](log/RESEARCH_REPORT.md#current-paid-repeatability-result) for findings, stopped configurations and evidence gaps. The [literature chapter](log/RESEARCH_REPORT.md#literature-and-source-access) distinguishes two incomplete research surveys from a search-tool validation; the [study index](log/STUDY_INDEX.tsv) traces individual decisions. Storage maintenance does not establish new scientific results.
+Start with the [current research synthesis](log/RESEARCH_REPORT.md#agent-virtual-cell-joint-learning-to-discover-and-revise-biological-intervention-rules-2026-10-30) for the updated Agent–virtual-cell objective, latest scoped test, stopped configurations and evidence gaps. The [literature chapter](log/RESEARCH_REPORT.md#literature-and-source-access) distinguishes two incomplete research surveys from a search-tool validation; the [study index](log/STUDY_INDEX.tsv) traces individual decisions. Storage maintenance does not establish new scientific results.
 
 ### Historical dual-core validation (2026-10-21)
 
@@ -83,6 +83,12 @@ The dual-core validation on the public PTV-1 / ProteinTalks release ended with `
 Registered studies retain their protocols, results, deviations and replay code. The current evidence, stop decisions and simplification ledger are in [current research status](log/RESEARCH_REPORT.md#current-paid-repeatability-result). Frozen research records are separate from the maintained runtime and default software tests.
 
 ## Changelog
+
+### 2026-10-30 - Agent and virtual-cell research progress
+
+- State the updated research objective: discover, test and revise conditional biological intervention rules through Agent–virtual-cell interaction.
+- Publish the scoped CXCL9 common-gain negative result, frozen protocol, source audit and independent numeric review. Raw assay exports, detailed numeric payloads and full third-party source bodies remain local.
+- Keep the result exploratory and assay-scoped; no biological mechanism, Agent advantage, external transfer or assay savings is established.
 
 ### 2026-10-27 - Agent and virtual-cell research sources
 
