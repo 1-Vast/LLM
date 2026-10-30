@@ -1,9 +1,13 @@
 # Research findings and evidence
 
+For scientific conclusions, start with [RESEARCH_REPORT.md](RESEARCH_REPORT.md); use [ROUTE_EXPERIENCE.md](ROUTE_EXPERIENCE.md) for the route handoff and [ROUTE_FUNCTIONAL_FEEDBACK.md](ROUTE_FUNCTIONAL_FEEDBACK.md) for detailed functional-route corrections. For storage, cleanup, and unresolved organization work, use [ORGANIZATION_STATUS.md](ORGANIZATION_STATUS.md). Environment setup is in [ENVIRONMENT_STATUS.md](ENVIRONMENT_STATUS.md). These documents have different roles; organization and import checks are not scientific findings.
+
 Read the [integrated research report](RESEARCH_REPORT.md) for the current scientific position, quantitative findings, historical hypotheses, negative results, corrections and inherited next steps. It distinguishes exploratory studies, maintained software and formal communication outputs. The research objective remains ACTIVE / NOT_ACHIEVED.
 
 | Question | Report chapter |
 |---|---|
+| 2026-10-28 joint-learning lines, executed results and corrections | [Current joint learning](RESEARCH_REPORT.md#agentvirtual-cell-joint-learning-2026-10-28-evidence-and-corrections) |
+| 2026-10-27 Agent/virtual-cell audits, ten directions and four conditional mechanisms | [2026-10-27 research](RESEARCH_REPORT.md#latest-agent-and-virtual-cell-research-2026-10-27) |
 | Updated Agent–virtual-cell objective and latest completed CXCL9 test | [Joint-learning objective](RESEARCH_REPORT.md#agent-virtual-cell-joint-learning-to-discover-and-revise-biological-intervention-rules-2026-10-30) |
 | Latest CDI retrospective pilot and intervention-gated candidate | [Joint-learning objective](RESEARCH_REPORT.md#agent-virtual-cell-joint-learning-to-discover-and-revise-biological-intervention-rules-2026-10-30) |
 | Latest Agent/virtual-cell audits, ten directions and four conditional mechanisms | [2026-10-27 research](RESEARCH_REPORT.md#latest-agent-and-virtual-cell-research-2026-10-27) |
@@ -53,3 +57,6 @@ python -m tools.retained_records --restore packages/historical_experiments/resea
 The reader verifies retrieved content hashes. Restore selected sources into an explicit isolated destination, assemble their declared dependencies and lawful inputs, and use the required environment before historical replay. The destination follows source IDs, including a `packages/` prefix; it does not automatically recreate a runnable project. A retained verifier is not immediately runnable solely because its source exists. Recorded modes/times/content hashes are not a full NTFS ACL/ADS backup.
 
 [Experimental implementations](../research/README.md), [data inventory](../data/README.md), and [storage policy](STORAGE_POLICY.md) describe separate responsibilities. No new scientific experiment was authorized by organization.
+
+
+The row-level documentary claim review is maintained in [`CLAIM_REVIEW.json`](CLAIM_REVIEW.json): C1–C225 are individually classified with source rows, conditions, corrections, execution status and unresolved limits. It does not certify independent numerical reproduction or biological validity.

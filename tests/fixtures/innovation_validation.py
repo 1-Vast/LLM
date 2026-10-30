@@ -5,7 +5,7 @@ import importlib
 import sys
 from pathlib import Path
 
-STUDY = Path(__file__).resolve().parents[2] / "research" / "innovation_validation_20261020"
+STUDY = Path(__file__).resolve().parents[2] / "research" / "routes" / "observation_acquisition" / "innovation_validation_20261020"
 NAMES = ("iv_core", "iv_gates", "iv_search", "iv_conv", "iv_worlds", "iv_stats", "iv_replay", "iv_example", "iv_run", "iv_verify", "iv_post")
 
 

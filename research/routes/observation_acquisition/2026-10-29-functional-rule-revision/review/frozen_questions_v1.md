@@ -1,0 +1,31 @@
+# Frozen functional objects for independent scientific assessment
+
+2026-10-29. Two conditional objects developed within this bounded continuation. No empirical result, preferred verdict or claim of novelty is supplied. Review only this packet and named original sources/metadata before preserving an initial assessment; do not read other agents' developed assessments or coordinator decisions first. No numerical experimental outcome cell has been used.
+
+## A. Functional observation and reproductive burden
+
+For a fixed human cancer background, physical treatment history and stopping time, define blank-corrected ATP luminescence A, live cells N entering a specified washout/recovery assay, and per-entry-cell colony-success probability p by a fixed deadline. Under an additive qualified colony protocol, expected reproductive survivor burden is C=Np. A=mN only defines mean luminescence per live cell when N>0; background/non-live signal needs a separate observation contract.
+
+The potential shared learned relation concerns how m and p vary together with treatment/history and whether that restriction transfers to an unmeasured action/background. An Agent could purchase a matched functional assay and use its delayed recovery feedback to revise the virtual cell's relation and later action choice. No parametric restriction beyond these identities has been identified in the packet. Assess whether a useful scientific mechanism is thereby defined and what additional evidence/relation is necessary.
+
+A hand example, not data: (A,N,p)=(20,20,.9) versus (30,60,.1). Lowest ATP chooses the first; expected colony founders are18 versus6, choosing the second. If p/m is the same constant across actions, the rankings coincide. Identical A,N may accompany different p; an unconstrained future p cannot be recovered from the snapshot. Strong rivals are direct C measurement subject to the same calendar/cost constraints and a full-history joint response model receiving the same complete observations and delayed labels.
+
+Required observational inputs include matched or randomized sister cultures under common dose/time, live-count identity, genuine post-washout reproductive outcome, density/handling/colony-assignment/plating-efficiency rules and biological preparation IDs. Distinct same-paper endpoints are not presumed paired.
+
+## B. Reusability of a complete treatment cycle
+
+Let Y0,Y1,Y2 be the same prespecified functional endpoint at the start and after one and two complete, physically identical treatment cycles, with matched reference/observation protocol. A scalar multiplicative cycle rule assumes Y_(k+1)=gY_k and predicts Y2=Y1^2/Y0 for Y0>0. The proposed operational use is to decide whether a promising first-cycle reduction can be reused for the next cycle or whether to measure/replan. The feedback could revise the model's cycle law and the Agent's next comparison. This is a finite adequacy claim; no durable clearance follows from two cycles.
+
+Constructive reasoning: Y0=100,Y1=20 yields Y2=4 under common g=.2. A composition-changing but otherwise unchanged two-type cycle model can instead have initial masses90 and10 with cycle multipliers .1 and1.1: Y1=20 but Y2=13. These are hand-defined model examples, not empirical observations or simulations. More generally an arbitrary nonnegative static multiplier mixture Y_k=integral(g^k)dmu(g), ordinary history-dependent/compartmental dynamics, and density/readout effects are strong rivals; assess their implications rather than comparing only to a homogeneous scalar fit. A scientific justification for a transferable scalar law or useful stronger restriction is not assumed.
+
+Available human source P3 has published four-day alternating treatment and a fitted coupled compartment model extrapolating longer schedules. Assess exact overlap, what an independently frozen early-to-later-cycle test could add, whether any current workflow actually relies on the scalar rule, and whether a test would change a consequential research decision rather than merely reject an unused simplification.
+
+## Original evidence and source roles
+
+- `../../2026-10-29-common-function-mechanism-renewal/evidence/p3_transition.xml`: Molecular Systems Biology2025 DOI10.1038/s44320-025-00150-0. Relevant original Sec3/4/7/8/9/12/14/15/20, Fig1/Fig5 and source-data notes. CTG, fixed occupied-area density, schedules, compartmental model and source availability must be checked in their own units.
+- `../../2026-10-29-common-function-mechanism-renewal/evidence/p4_collateral_sarcoma.xml`: Communications Biology2025 DOI10.1038/s42003-025-08652-1. Relevant Sec6/7/12/16/17/18; CTG versus direct counts, temporal collateral response and exposure/repeat conditions.
+- `../sources/human_source_index.json`: official P3 BioStudies file metadata, not outcome data. Group labels have offsets/duplicates; use verified filenames and original article panels.
+- `../sources/Fig_5C_header_inspection.json` and `header_inspection_contract.md`: one9,393B original workbook acquired. Sheet1 dimensionA1:E7, five string cells inrow1 and30 numeric-type cells below. Only allowlisted Naive label was exposed; four unknown label strings were withheld. Unknown labels cannot be treated as absent metadata. No numeric outcome values were read/converted/scored. Do not open the workbook's worksheets/sharedStrings or raw response files in this review.
+- `../sources/cellcompass/original_abstract.txt` and official API receipt: CellCompass DOI10.64898/2026.10.23.761350, bioRxivv1/2026-10-27. Original abstract available; full JATS request429. It describes Agent refinement of virtual-cell formulations from new measurements, but methods remain unread. A-level overlap cannot settle method-level differences or absence of prior work.
+
+Assess mathematics, missing biological/observation assumptions, exact closest-source overlap, strong ordinary rivals, practical value and whether either object currently justifies a meaningful minimal experiment. If none is complete, identify the exact missing relation/evidence without declaring an unrun hypothesis empirically false. Existing original source findings belong to their authors. No result/positive recommendation is required.

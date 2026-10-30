@@ -1,0 +1,5 @@
+# Q002 frozen control-roster qualification
+
+2026-10-29. Metadata only; no cell.count field access/conversion/output. Verify original HTS001 size/MD5/SHA256 from record.md, then tokenize CSV while accessing only drug1,drug1.conc,drug1.units,cell.line,upid,well,time. Select drug1 exactly `control` and numeric concentration exactly0; enumerate plate-well identities, same-cell time-grid consistency, missingness, control positions and numbers of available frames at t<36 and t<72h. Retain source row numbers. More than one cell/plate/condition for a trajectory is a qualification conflict, not something to silently pool. Do not infer biological or technical independence from distinct wells or names.
+
+One pass, CPU<=30s/wall<=60s, measured peak<=256MiB/cooperative checks, no network/author code/dependencies. The roster may fix a deterministic well split before outcomes are accessed. No response hypothesis, model, effect or post hoc time window is selected from count values. Output metadata_qualification.json and script; a receipt prevents automatic replay. A hash/schema/identity conflict stops that operation, preserving evidence.

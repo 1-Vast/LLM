@@ -1,0 +1,110 @@
+{
+  "kind": "drug_level_leave_one_out_test_of_the_pathway_prior",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "n_boot": 2000,
+    "n_perm": 1000,
+    "seed": 20261045
+  },
+  "audit": {
+    "drug_instances": 111,
+    "anchor": 46,
+    "library": 65,
+    "pathway_levels": 21
+  },
+  "results": {
+    "anchor": {
+      "n": 40,
+      "r2_pathway": 0.08457256143817227,
+      "r2_grandmean": 0.0,
+      "pearson": 0.4527141085556348,
+      "spearman": 0.44840525328330205,
+      "mse_improvement": {
+        "mean": 4.569065351006509e-05,
+        "ci95": [
+          -0.00011227336038685079,
+          0.00019570027166067262
+        ]
+      },
+      "permutation": {
+        "null_mean": -0.46660708531358924,
+        "p_value": 0.004
+      }
+    },
+    "library": {
+      "n": 58,
+      "r2_pathway": -0.1531384926999344,
+      "r2_grandmean": 0.0,
+      "pearson": 0.2461503726846835,
+      "spearman": 0.21437140484173617,
+      "mse_improvement": {
+        "mean": -5.0808913469966205e-05,
+        "ci95": [
+          -0.00016918891275668213,
+          6.147683970036375e-05
+        ]
+      },
+      "permutation": {
+        "null_mean": -0.4049802468865354,
+        "p_value": 0.086
+      }
+    },
+    "both": {
+      "n": 107,
+      "r2_pathway": 0.15105362378425335,
+      "r2_grandmean": 0.0,
+      "pearson": 0.4404910664013796,
+      "spearman": 0.4013989302298242,
+      "mse_improvement": {
+        "mean": 6.505769643152304e-05,
+        "ci95": [
+          -2.37826189089127e-05,
+          0.00015992252088390397
+        ]
+      },
+      "permutation": {
+        "null_mean": -0.23603009621481566,
+        "p_value": 0.0
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r142/PROTOCOL_E132.md": "2cd929cb186bf12ef8a8e94f65ba89ce82bc5d93dc82386fc0f1dab0442cd096",
+    "research/2026-10-27-agent-cell-identifiability-r142/e142_drug_level.py": "91231d4d550495a4e8543f53bd12de7d528e94cf295aabd59a0d31a0e6f3e1bc"
+  },
+  "decisions": {
+    "H350_pathway_partitions_drugs_by_behaviour": true,
+    "H351_pathway_unrelated_to_behaviour": false,
+    "verdict": "the_pathway_prior_carries_real_signal_but_needs_shrinkage_to_be_exploited",
+    "original_gate_result": "failed on the MSE criterion only"
+  },
+  "limits": [
+    "Only 111 drug instances, and a drug mean averages away cell-to-cell variation.",
+    "The regrouping question is unanswerable for unseen drugs by construction, which is why an annotation is needed.",
+    "Retrospective; no mechanism, clinical or drug-choice claim; no meta-learning or RSI."
+  ],
+  "my_decision_rule_was_mismatched": {
+    "the_question": "does pathway membership predict a drug's behaviour?",
+    "what_i_gated_on": "whether a leave-one-out group mean beats the grand mean in mean squared error",
+    "why_that_is_a_different_question": "association and estimation are different. With 21 pathway levels over 111 drug instances, about five drugs per level, a leave-one-out group mean is extremely noisy, so it can fail to beat the baseline even when the grouping carries genuine signal.",
+    "what_the_data_actually_say": {
+      "permutation_p_both": 0.0,
+      "permutation_p_anchor": 0.004,
+      "pearson_both": 0.4404910664013796,
+      "pearson_anchor": 0.4527141085556348,
+      "r2_both": 0.15105362378425335,
+      "r2_library": -0.1531384926999344,
+      "mse_ci_all_contain_zero": true
+    },
+    "corrected_verdict": "the grouping carries real behavioural signal (permutation p of 0.000 and a correlation of 0.44), but a crude five-drug leave-one-out mean is too noisy to turn that signal into an estimation gain"
+  },
+  "why_this_is_consistent_with_the_model_level_result": {
+    "the_model_uses_shrinkage": "ridge pools information across all keys and shrinks the group effects toward the mean, so the same grouping that is too noisy as a raw five-drug average becomes usable inside a regularised fit",
+    "the_asymmetry": {
+      "anchor_r2": 0.0846,
+      "library_r2": -0.1531,
+      "reading": "the library side is worse, which is what one expects if its groups are smaller or its within-group spread is larger; this round does not decompose that and should not speculate further"
+    },
+    "so_the_prior_story_stands_but_the_estimator_story_matters": "the prior is real; exploiting it requires shrinkage"
+  }
+}

@@ -1,5 +1,7 @@
 # MAESTRO
 
+The whole-workspace organization record, canonical navigation, protected boundaries, and current scientific gaps are maintained in [`log/ORGANIZATION_STATUS.md`](log/ORGANIZATION_STATUS.md).
+
 MAESTRO is a dual-core autonomous research framework for contextual early drug discovery. It studies how research methods transfer across drugs and cellular contexts: when an existing method applies, what evidence can reveal failed transfer, and how measured feedback can improve subsequent research decisions. Current validation is mainly in oncology cell models; general autonomous discovery and clinical efficacy remain unestablished.
 
 The Autonomous Scientific Agent proposes and revises executable research procedures. The Virtual Cell predicts scoped functional responses, candidate differences and model mismatch, then updates supported components from feedback. Their shared task is to learn when previous research experience helps a new decision, when to check its assumptions and when to change the plan. Typed contracts separate predictions from measurements and keep costs and failures visible.
@@ -70,26 +72,24 @@ python -m tools.research_validation --help
 
 ## Scientific boundary
 
-The model predicts within qualified scope; it does not establish functional endpoints, mechanism, causality or experiment value by itself. The Agent selects and audits evidence and actions; it does not turn language-model output into scientific fact. Current conclusions are in [current research status](log/RESEARCH_REPORT.md#agent-virtual-cell-joint-learning-to-discover-and-revise-biological-intervention-rules-2026-10-30), with historical numerical results in [research/EVIDENCE.md](research/EVIDENCE.md). The [programme boundaries](log/RESEARCH_REPORT.md#current-paid-repeatability-result) separate method value, Agent value, transfer and independent confirmation. PRESAGE P0 remains NO-GO; anchor purchasing value remains blocked by independent-endpoint qualification.
+The model predicts within qualified scope; it does not establish functional endpoints, mechanism, causality or experiment value by itself. The Agent selects and audits evidence and actions; it does not turn language-model output into scientific fact. Current conclusions are in [current research status](log/RESEARCH_REPORT.md#agentvirtual-cell-joint-learning-2026-10-28-evidence-and-corrections), with numerical results in [research/EVIDENCE.md](research/routes/historical_evidence_archive/reconciled_reports/EVIDENCE.md). The [programme boundaries](log/RESEARCH_REPORT.md#current-paid-repeatability-result) separate method value, Agent value, transfer and independent confirmation. PRESAGE P0 remains NO-GO; anchor purchasing value remains blocked by independent-endpoint qualification.
 
 ### Current research and literature
-
-Start with the [current research synthesis](log/RESEARCH_REPORT.md#agent-virtual-cell-joint-learning-to-discover-and-revise-biological-intervention-rules-2026-10-30) for the updated Agent–virtual-cell objective, latest scoped test, stopped configurations and evidence gaps. The [literature chapter](log/RESEARCH_REPORT.md#literature-and-source-access) distinguishes two incomplete research surveys from a search-tool validation; the [study index](log/STUDY_INDEX.tsv) traces individual decisions. Storage maintenance does not establish new scientific results.
-
-### Historical dual-core validation (2026-10-21)
-
-The dual-core validation on the public PTV-1 / ProteinTalks release ended with `STOP_THIS_TASK_CONFIGURATION`: the re-implemented ppODE was below the strongest conventional predictor, feedback did not improve over ordinary updating, and no LLM program edit was accepted. This is a negative result on one exposed published-label task with seven held-out lineages, not a general test of autonomous discovery. See the [integrated research decisions](log/RESEARCH_REPORT.md#functional-feedback-and-acquisition), [numerical evidence](research/EVIDENCE.md), and exact source ID `log/research_records/dual_core_innovation_validation_20261021/REPORT.md` ([reader](log/README.md)).
-
-Registered studies retain their protocols, results, deviations and replay code. The current evidence, stop decisions and simplification ledger are in [current research status](log/RESEARCH_REPORT.md#current-paid-repeatability-result). Frozen research records are separate from the maintained runtime and default software tests.
-
-## Changelog
-
-### 2026-10-30 - Agent and virtual-cell research progress
 
 - State the updated research objective: discover, test and revise conditional biological intervention rules through Agent–virtual-cell interaction.
 - Publish the scoped CXCL9 common-gain negative result, frozen protocol, source audit and independent numeric review. Raw assay exports, detailed numeric payloads and full third-party source bodies remain local.
 - Add the paired-resource R2 data-gate stop, the CDI-R3 retrospective FLT3 association, and the CDI-R4 intervention-gated design hypothesis. Publish their reports and review records while keeping response matrices, detailed outputs, paper XML and raw API bodies local.
 - Keep all findings scoped to their assays and evidence levels; no biological mechanism, Agent advantage, external transfer or assay savings is established.
+
+Start with the [current research synthesis](log/RESEARCH_REPORT.md#agentvirtual-cell-joint-learning-2026-10-28-evidence-and-corrections) for findings, stopped configurations and evidence gaps. The [literature chapter](log/RESEARCH_REPORT.md#literature-and-source-access) distinguishes two incomplete research surveys from a search-tool validation; the [study index](log/STUDY_INDEX.tsv) traces individual decisions. Storage maintenance does not establish new scientific results.
+
+### Historical dual-core validation (2026-10-21)
+
+The dual-core validation on the public PTV-1 / ProteinTalks release ended with `STOP_THIS_TASK_CONFIGURATION`: the re-implemented ppODE was below the strongest conventional predictor, feedback did not improve over ordinary updating, and no LLM program edit was accepted. This is a negative result on one exposed published-label task with seven held-out lineages, not a general test of autonomous discovery. See the [integrated research decisions](log/RESEARCH_REPORT.md#functional-feedback-and-acquisition), [numerical evidence](research/routes/historical_evidence_archive/reconciled_reports/EVIDENCE.md), and exact source ID `log/research_records/dual_core_innovation_validation_20261021/REPORT.md` ([reader](log/README.md)).
+
+Registered studies retain their protocols, results, deviations and replay code. The current evidence, stop decisions and simplification ledger are in [current research status](log/RESEARCH_REPORT.md#agentvirtual-cell-joint-learning-2026-10-28-evidence-and-corrections). Frozen research records are separate from the maintained runtime and default software tests.
+
+## Changelog
 
 ### 2026-10-27 - Agent and virtual-cell research sources
 

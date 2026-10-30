@@ -1,0 +1,105 @@
+{
+  "kind": "does_the_prior_need_the_pathway_level_itself_to_have_been_seen",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "reps": 20,
+    "seed": 20261072,
+    "lambdas": [
+      0.1,
+      0.3,
+      1.0,
+      3.0,
+      10.0,
+      30.0,
+      100.0,
+      300.0,
+      1000.0
+    ],
+    "folds": 3,
+    "n_boot": 2000
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 38
+  },
+  "by_stratum": {
+    "path_seen": {
+      "n": 20,
+      "mean_eval_rows": 2547.2,
+      "rho_identity": -0.0029064680673886877,
+      "rho_pathway": 0.16018943844660935,
+      "gain": 0.16309590651399805,
+      "ci95": [
+        0.12047219260424043,
+        0.2060213262158074
+      ],
+      "mde_80pct": 0.062261828614720585
+    },
+    "path_partly_unseen": {
+      "n": 18,
+      "mean_eval_rows": 1100.111111111111,
+      "rho_identity": 0.004057766465966373,
+      "rho_pathway": 0.061086990078367646,
+      "gain": 0.05702922361240127,
+      "ci95": [
+        -0.027126979272362413,
+        0.14463242966727866
+      ],
+      "mde_80pct": 0.12929337687499248
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r182/PROTOCOL_E170.md": "9e360ebe11f9bdf0e822a3bcbbd13972b1915446c6d8ee112f924cfc75052d72",
+    "research/2026-10-27-agent-cell-identifiability-r182/e182_coverage.py": "a075b352c27f51e8390dcef7c9cc67e5c3d8af717a417889bcb1e2496569c287"
+  },
+  "fraction_partly_unseen_rows": 0.27990275068555115,
+  "decisions": {
+    "H428_prior_needs_the_level_seen": true,
+    "H429_prior_works_anyway": false,
+    "verdict": "the_prior_gain_is_resolvable_only_where_the_pathway_level_was_observed_and_that_covers_72pct_of_the_space"
+  },
+  "limits": [
+    "Grouping is by whether the level ever occurred, not by how often.",
+    "Only ridge and one resource.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "my_verdict_string_overstated": {
+    "what_the_script_wrote": "the prior helps only where the pathway level was observed and is inert otherwise",
+    "why_that_is_too_strong": "in the unobserved stratum the point estimate is +0.057 with an interval of [-0.027, +0.145] and a minimum detectable effect of 0.129, which is larger than the estimate. That is unresolvable, not inert.",
+    "corrected_statement": "the prior's gain is resolvable only where the pathway level was observed; where it was not, the gain is about a third as large and cannot be resolved at this sample size",
+    "count": "another instance of a conclusion sliding from 'not resolvable' to 'absent'"
+  },
+  "the_coverage_number_is_much_larger_than_previously_estimated": {
+    "R149_estimate": 0.062,
+    "R149_scope": "library-side pathway code only, in the both-unseen pool",
+    "measured_here": 0.27990275068555115,
+    "scope_here": "either side's pathway level absent from training",
+    "reading": "about twenty-eight percent of both-unseen evaluation rows involve at least one drug whose pathway level never occurs in training. The earlier six percent figure counted one side only.",
+    "why_this_matters_practically": "a practitioner with a new drug whose pathway level was never screened should not expect the headline gain. The relevant subset is not a rounding error: it is more than a quarter of the both-unseen evaluation space."
+  },
+  "what_the_two_strata_show": {
+    "path_seen": {
+      "gain": 0.1631,
+      "ci95": [
+        0.1205,
+        0.206
+      ],
+      "mde": 0.0623
+    },
+    "path_partly_unseen": {
+      "gain": 0.057,
+      "ci95": [
+        -0.0271,
+        0.1446
+      ],
+      "mde": 0.1293
+    },
+    "reading": "where the level was observed the gain is larger than the pooled headline of 0.118, which makes sense because that headline mixes both strata. Where it was not observed the estimate drops to about a third and the interval spans zero.",
+    "consistency": "the pooled effect being between the two strata is what a mixture should look like"
+  },
+  "the_applicability_condition_to_add": {
+    "old": "use the pathway prior when both drugs are unseen",
+    "new": "use the pathway prior when both drugs are unseen AND the drugs' pathway levels were observed in training. Where a level was never observed the prior has no coefficient to apply, and the measured gain there is not resolvable.",
+    "the_practical_implication": "before trusting the prior for a new drug, check that its pathway level appears in the training screen"
+  }
+}

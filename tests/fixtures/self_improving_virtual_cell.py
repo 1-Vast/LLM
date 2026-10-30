@@ -5,7 +5,7 @@ import importlib
 import sys
 from pathlib import Path
 
-STUDY = Path(__file__).resolve().parents[2] / "research" / "self_improving_virtual_cell_20261020"
+STUDY = Path(__file__).resolve().parents[2] / "research" / "routes" / "agent_virtual_cell_joint_learning" / "self_improving_virtual_cell_20261020"
 
 
 def load():

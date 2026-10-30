@@ -1,0 +1,21 @@
+# Narrow review of the coordinator clarifications
+
+Reviewed after saving `joint_initial_review.md` and `joint_v1_1_review.md`. Those initial records remain unchanged. Inputs for this pass were the exact `assessment_clarifications.md`, the coordinator's stated version history, a hash check of canonical `conditional_v1_1_frozen.md`, and raw local Palmer–Sorger HTML paragraphs P62/P64 plus citation metadata. No developer rebuttal or source-worker final prior prose was read. No network, response-value access, new experimental computation, installation, or author-code execution occurred.
+
+The canonical frozen packet hash is `82d4445e691b19daf6a37b525738406aac3d47e5dd7eefde5993b416456e1cd9`. It is distinct from the developer source hash `a9b204f0f3b172d6874609acc14543efda4174febbbcdb4bad96b7162f3a81e3` checked in the previous pass. No earlier v1 snapshot exists; the reconstructed preclarification hash remains a reconstruction and is not certified as an observed first-read hash.
+
+J001 is resolved for the active-drug, known-marginal, exact-expectation theorem, as recorded in the separate v1.1 review. It remains incorrect to read this theorem as a noisy physical-well saving or as an acquisition lower bound for one selected pair decision.
+
+J002 is resolved by the exact assessment text. It correctly distinguishes an export without certified pair/switch histories or preparation identifiers from proof that such interventions never occurred. It correctly treats two well identities as opportunities for repeats whose biological/technical nesting is unverified. The absent qualified joint-exposure contract is sufficient to stop this proposed test before opening counts. The assessment explicitly supersedes the frozen packet's stronger same-drug and definitive replicate wording, preserving rather than erasing the objection.
+
+J003 is resolved by narrowing the present capability to a relation among expected responses and a conditional mean-audit design. The assessment explicitly states that mean uncertainty and prediction of a new noisy well differ, and that a full process/noise distribution and calibration remain future evidence requirements. The triangle algebra alone therefore does not establish statistical power, finite-well savings, extinction probabilities, or an already calibrated future-well prediction. Any actual assay execution still needs a fixed estimation/preparation contract and a specified discrepancy margin; the clarification does not claim these are currently available.
+
+## Independent primary-source prior check
+
+The raw HTML identifies Palmer and Sorger, *Combination cancer therapy can confer benefit via patient-to-patient variability without drug additivity or synergy*, Cell, 2017-12-14, DOI `10.1016/j.cell.2017.11.009`.
+
+P62 explicitly says this tumor-dynamics model is in silico, relevant only to Figure 6, and not part of the clinical-trial or PDX analyses. P64 explicitly constructs subclones resistant to each drug and to both drugs, varying the frequency of cross-resistance with response correlation. Its numerical illustration has 450 cells per million resistant to A alone, 450 resistant to B alone, and 50 resistant to both. This is direct prior evidence for within-tumor resistance-overlap modeling, separate from the paper's empirical patient/PDX variation.
+
+It does not reproduce the frozen packet's exact mathematical setup: P64 applies each subpopulation's more effective therapy, whereas the present two-pulse construction uses additive cumulative killing hazards, balanced fixed types, and a restricted adaptive observation menu. These differences prevent attributing the exact history-equivalence or graph theorem to this inspected passage. They also do not support calling the general overlap principle new. No claim of historical novelty is warranted from this bounded review.
+
+The resulting scientific position is coherent: retain the conditional monotherapy identification boundary and ordinary separating intervention as a limited mathematical result; do not promote a new agent/co-learning algorithm or a validated biological shared law. The empirical scientific objective remains unachieved. There is no reason for a new response-data run, numerical simulation, or author-code execution on the evidence reviewed here.

@@ -1,0 +1,15 @@
+# Independent computational verification — pre-access note
+
+Written before any raw source/count access or execution of the verifier. Read only the frozen protocol v1/v1.1, design recommendation, metadata qualification, v1.1 protocol receipt and bootstrap input receipt. The primary script, primary numerical outputs, persuasive summaries and reviewer verdict have not been read. Source identifiers and required unit M were supplied directly by the coordinator.
+
+This is an independent implementation of the same single declared scientific comparison, sharing its frozen assumptions and deterministic SciPy optimizer contract. It does not independently validate optimizer assumptions, exchangeability, biology or the scientific interpretation. It implements no covariance analysis or extra model.
+
+The code checks protocol/document/metadata/draw hashes and draw shape/type/range before count parsing. The original source is identified by exact size 3039472 and SHA256 e6ff575664705d6021d98e1dad41751c87d86a425a3794f7e2a7e3b12468d617. CSV metadata and the frozen source-row whitelist are checked before indexing/converting each eligible control count. Counts are accessed only for drug1 exactly control, concentration exactly zero, time below 72 hours, expected cell/plate/well/time, and unit exactly M. Attempted accesses are incremented immediately before count-field conversion. Later/drug count fields are never indexed or converted.
+
+All 500 supplied same-draw row-block resamples refit both models, training scale and heldout means. Raw fitted predictions, raw/normalized training SSE, heldout MSE, parameters, termination statuses/messages/nfev/njev, every plate D and Delta are saved independently. Any failure stops execution, preserves completed/partial draw records, lists uncompleted draws and yields INCONCLUSIVE; no replay, extra starts, dropped draw, tuning or repaired run is permitted.
+
+CPU includes imports via total process CPU; internal wall starts immediately after importing time, before other imports. Working set is the Windows process peak working set. Cooperative checks enforce CPU 120 seconds, wall 180 seconds, peak working set 512 MiB. The outer subprocess has a separate 180-second timeout covering launch/setup/imports/output. These are not OS CPU/memory hard limits. Exclusive launch/execution receipts refuse replays.
+
+Point and all-bootstrap artifacts, the standalone result, hashes and execution/resource receipt must be saved before any primary numerical output is viewed. Comparison is pending separate coordinator authorization. Prespecified comparison tolerances: absolute score/D/quantile difference at most 1e-9; maximum relative fitted-prediction error at most 1e-7 using max(1, abs(reference)) as denominator. Every excess remains visible and blocks adoption pending explanation. Arithmetic agreement supports implementation reproducibility only and supplies no scientific conclusion.
+
+Current state: CODE WRITTEN; NO RAW/COUNT ACCESS; NOT EXECUTED. Await the coordinator's exact instruction: start control-only verification.

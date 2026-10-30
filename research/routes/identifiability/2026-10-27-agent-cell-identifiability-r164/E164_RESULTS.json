@@ -1,0 +1,179 @@
+{
+  "kind": "lambda_sensitivity_sweep_of_the_other_key_magnitudes",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "reps": 40,
+    "seed": 20261066,
+    "lambdas": [
+      0.1,
+      0.3,
+      1.0,
+      3.0,
+      10.0,
+      30.0,
+      100.0,
+      300.0,
+      1000.0
+    ],
+    "folds": 3,
+    "tolerance": 0.2,
+    "historical": {
+      "identity_one_unseen": 0.253,
+      "pathway_gain_both": 0.1254,
+      "target_gain_both": 0.0536,
+      "pathway_minus_target": 0.0685
+    },
+    "n_boot": 2000
+  },
+  "audit": {
+    "keys": 108259,
+    "rows": 80
+  },
+  "by_pool": {
+    "both_unseen": {
+      "n": 40,
+      "mean_eval": 4289.7,
+      "rho_identity": -0.0003824459358555959,
+      "lam_identity": 334.24249999999995,
+      "rho_pathway": 0.13429515991207835,
+      "lam_pathway": 812.775,
+      "rho_target": 0.06575459949141259,
+      "lam_target": 320.935,
+      "pathway_minus_identity": {
+        "mean": 0.13467760584793392,
+        "ci95": [
+          0.11346132335592043,
+          0.1562440699950536
+        ]
+      },
+      "target_minus_identity": {
+        "mean": 0.0661370454272682,
+        "ci95": [
+          0.041041870599723695,
+          0.08984695139873514
+        ]
+      },
+      "pathway_minus_target": {
+        "mean": 0.06854056042066574,
+        "ci95": [
+          0.04040678175074852,
+          0.09729205810007559
+        ]
+      }
+    },
+    "one_unseen": {
+      "n": 40,
+      "mean_eval": 35916.325,
+      "rho_identity": 0.25089566357077075,
+      "lam_identity": 334.24249999999995,
+      "rho_pathway": 0.2754396032550983,
+      "lam_pathway": 812.775,
+      "rho_target": 0.25914202670623177,
+      "lam_target": 320.935,
+      "pathway_minus_identity": {
+        "mean": 0.024543939684327516,
+        "ci95": [
+          0.019797262535164145,
+          0.029730500617525177
+        ]
+      },
+      "target_minus_identity": {
+        "mean": 0.008246363135461027,
+        "ci95": [
+          0.005588682697723604,
+          0.010947832808563911
+        ]
+      },
+      "pathway_minus_target": {
+        "mean": 0.016297576548866488,
+        "ci95": [
+          0.011138755410614187,
+          0.021882049968939228
+        ]
+      }
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r164/PROTOCOL_E152.md": "f0ae4e2bb5fc5c1be158009f09b10304fcbb9fee0e910537780ee8d94beac856",
+    "research/2026-10-27-agent-cell-identifiability-r164/e164_lambda_sweep.py": "d4feb67f93dbff0761a2ab9dd50d00cd2d50ce12dc3564fa43106adc72700cf2"
+  },
+  "checks": {
+    "identity_one_unseen": {
+      "historical": 0.253,
+      "observed": 0.25089566357077075,
+      "relative_change": -0.008317535293396235,
+      "beyond_tolerance": false
+    },
+    "pathway_gain_both": {
+      "historical": 0.1254,
+      "observed": 0.13467760584793392,
+      "relative_change": 0.07398409767092433,
+      "beyond_tolerance": false
+    },
+    "target_gain_both": {
+      "historical": 0.0536,
+      "observed": 0.0661370454272682,
+      "relative_change": 0.23390010125500366,
+      "beyond_tolerance": true
+    },
+    "pathway_minus_target": {
+      "historical": 0.0685,
+      "observed": 0.06854056042066574,
+      "relative_change": 0.0005921229294267649,
+      "beyond_tolerance": false
+    }
+  },
+  "decisions": {
+    "any_beyond_tolerance": true,
+    "H392_all_stable": false,
+    "H393_some_magnitude_changes": true,
+    "verdict": "contrasts_are_stable_while_component_magnitudes_move_so_quote_contrasts"
+  },
+  "limits": [
+    "Historical values came from different seeds and split implementations, so magnitudes are compared, not exact numbers.",
+    "Only ridge and one resource; three inner folds.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "the_flag_is_on_a_component_not_a_conclusion": {
+    "what_exceeded_tolerance": {
+      "quantity": "the target arm's own gain in the both-unseen cell",
+      "historical": 0.0536,
+      "observed": 0.0661,
+      "change": 0.234
+    },
+    "what_did_not": {
+      "identity_rank_correlation_one_unseen": {
+        "change": -0.008
+      },
+      "pathway_gain_both_unseen": {
+        "change": 0.074
+      },
+      "pathway_minus_target": {
+        "change": 0.001
+      }
+    },
+    "reading": "the pathway gain also rose, by 7.4 percent, so the gap between pathway and target came out at 0.0685 again, identical to the historical value to three decimal places. The one quantity that moved beyond tolerance is a component, not either of the conclusions that rest on it."
+  },
+  "the_general_pattern_across_R162_R163_and_here": {
+    "observations": [
+      "R162: the budget curve's shape changed qualitatively under a tuned penalty",
+      "R163: the headline magnitude moved 9 percent, inside tolerance",
+      "R164: contrasts stable within one percent while component magnitudes move up to 23 percent"
+    ],
+    "pattern": "absolute magnitudes are lambda-sensitive; contrasts between arms sharing a penalty are far less so",
+    "why_that_makes_sense": "both arms are fitted under the same penalty chosen by the same inner procedure, so a change in the selected penalty moves them together. What survives is the difference, which is the quantity the claims are actually about.",
+    "practical_implication": "when quoting this programme, quote contrasts. Quote an absolute arm correlation only with the penalty attached."
+  },
+  "what_must_be_updated": {
+    "target_arm_absolute_gain": "should read about 0.066 rather than 0.054 wherever it is quoted alone",
+    "pathway_minus_target": "unchanged at 0.0685, so C113's magnitude and direction both stand",
+    "identity_in_one_unseen": "unchanged at 0.251, so C103's premise stands",
+    "C130_headline": "already verified at 0.1183 in R163 and unaffected here"
+  },
+  "the_selected_penalties": {
+    "identity": 334.2,
+    "pathway": 812.8,
+    "target": 320.9,
+    "note": "the same penalties appear in both pools because the inner cross-validation runs on the same training set"
+  }
+}

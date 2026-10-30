@@ -1,0 +1,11 @@
+# Separate check of the active-drug clarification
+
+The original independent assessment in `joint_initial_review.md` is preserved. Its first source read was the unqualified v1 text, whose theorem paragraph began “The resulting update is an ordinary signed-graph constraint. Observing edge ...” and ended with the exhaustive-pair comparison. It did not contain the active-drug sentence or the trailing inactive-drug sentence. A direct SHA256 was unfortunately not taken at that first read, before the developer modified the shared source file.
+
+After saving that initial assessment, the coordinator notified me that the developer had added the qualification independently and requested a separate check. The clarified source `mechanism_developer/conditional_next_test.md` inspected for this check has SHA256 `a9b204f0f3b172d6874609acc14543efda4174febbbcdb4bad96b7162f3a81e3`. It now explicitly restricts the theorem to D active drugs with b_i>0, D>=2, and already-known marginal parameters, and excludes inactive drugs from the lower bound.
+
+This qualification resolves J001 for v1.1: the spanning-tree necessity and sufficiency claim is valid for those active drugs and exact-expectation pair queries. The qualification does not create a physical-well or noisy-sample guarantee. The original v1 objection remains part of the chronology, and no developer rebuttal or prior synthesis was read to formulate it.
+
+For provenance reconciliation only, removing the two newly present sentences from the current bytes yields SHA256 `7af3fccb37d93ef379a02aed944446e5b7d5b3ae183697db09ff28ca7365b738`. This is a reconstructed preclarification hash, not a directly observed first-read hash; it identifies the original bytes only if no other edits intervened. It must not be described as independently certified without matching an earlier saved copy/hash.
+
+J002 and J003 remain open as stated in the initial review. They concern source support for the experimental contract and the distinction between mean uncertainty and a noisy-observation predictive distribution. The full-history symmetry proof, AB/AA example, C_ij formula and triangle mean identity remain valid under the stipulated construction. The empirical scientific goal remains unachieved.

@@ -1,0 +1,112 @@
+{
+  "kind": "fixed_budget_allocation_more_pairs_versus_more_cells",
+  "input_sha256": "1188968ce7fdcfb66d03791cf266515b7c7a2794e1fc73c966dba40266ffa278",
+  "settings": {
+    "reps": 20,
+    "subsamples": 10,
+    "n_boot": 300,
+    "seed": 20261071,
+    "budget": 1000,
+    "configs": [
+      [
+        "wide",
+        28,
+        36
+      ],
+      [
+        "mid",
+        50,
+        20
+      ],
+      [
+        "narrow",
+        68,
+        15
+      ]
+    ]
+  },
+  "audit": {
+    "keys": 108259,
+    "draws": 500
+  },
+  "by_config": {
+    "wide": {
+      "pairs": 28,
+      "cells": 36,
+      "n": 200,
+      "mean_keys": 975.295,
+      "power": 0.67,
+      "mean_gain": 0.13204039399401718,
+      "median_ci_width": 0.1533506204749927
+    },
+    "mid": {
+      "pairs": 50,
+      "cells": 20,
+      "n": 180,
+      "mean_keys": 1000.0,
+      "power": 0.7388888888888889,
+      "mean_gain": 0.14763617379199093,
+      "median_ci_width": 0.15052554079430375
+    },
+    "narrow": {
+      "pairs": 68,
+      "cells": 15,
+      "n": 120,
+      "mean_keys": 1020.0,
+      "power": 0.7,
+      "mean_gain": 0.13886038424843564,
+      "median_ci_width": 0.1560505910405492
+    }
+  },
+  "files": {
+    "research/2026-10-27-agent-cell-identifiability-r177/PROTOCOL_E165.md": "725c03806839911c38a49cb9281152625e5f61a7eab23ee892fb4d891e7a2c08",
+    "research/2026-10-27-agent-cell-identifiability-r177/e177_allocation.py": "c4c60d2fe2581e18ca4e77d2bb0b7f4071a7204be234a3aa3c25941668be7c8b"
+  },
+  "decisions": {
+    "power_by_config": {
+      "wide": 0.67,
+      "mid": 0.7388888888888889,
+      "narrow": 0.7
+    },
+    "H418_more_pairs_wins": false,
+    "H419_more_cells_wins": false,
+    "verdict": "at_a_fixed_budget_the_pair_versus_cell_split_barely_matters_and_the_total_governs"
+  },
+  "limits": [
+    "Cells per pair are capped near 36 by the evaluation pool itself.",
+    "Three allocations only; the extremes were not reachable.",
+    "Only ridge and one resource.",
+    "Retrospective; no mechanism, clinical or drug-choice claim."
+  ],
+  "both_directional_hypotheses_failed": {
+    "H418_more_pairs_wins": false,
+    "H419_more_cells_wins": false,
+    "power": {
+      "wide_28x36": 0.67,
+      "mid_50x20": 0.74,
+      "narrow_68x15": 0.7
+    },
+    "reading": "the three allocations land within seven percentage points of each other on about two hundred draws each, where the standard error is roughly three points. There is no monotone ordering in either direction."
+  },
+  "what_actually_governs": [
+    {
+      "observation": "the median interval width is 0.1534, 0.1505 and 0.1561 for the three allocations, effectively identical",
+      "conclusion": "precision tracks the total number of keys, not how they are split",
+      "consistency": "this is what R169 found when it varied only the total, and it survives the allocation change"
+    }
+  ],
+  "why_the_allocation_is_nearly_neutral": [
+    {
+      "two_effects_that_cancel": [
+        "adding cells within a pair repeats the same prediction, so it adds little ranking information (R174)",
+        "adding pairs adds independent comparisons, but each new pair also brings a fresh unseen-drug draw and its own noise"
+      ],
+      "so": "over the tested range the two roughly trade off"
+    }
+  ],
+  "the_practical_answer": {
+    "for_someone_planning_a_prospective_test": "allocate freely across pairs and cells; what matters is reaching the total from R169, about sixteen hundred keys",
+    "one_caveat": "the cells-per-pair ceiling here is about 36, set by the evaluation pool, so the wide configuration could not be pushed further; a design with very few pairs and very many cells was not tested",
+    "another_caveat": "if the goal is to characterise cell-level variation rather than to detect the annotation effect, the calculus changes entirely, and this model cannot help with it anyway (R174)"
+  }
+}
