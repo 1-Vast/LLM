@@ -88,7 +88,8 @@ Registered studies retain their protocols, results, deviations and replay code. 
 
 - State the updated research objective: discover, test and revise conditional biological intervention rules through Agent–virtual-cell interaction.
 - Publish the scoped CXCL9 common-gain negative result, frozen protocol, source audit and independent numeric review. Raw assay exports, detailed numeric payloads and full third-party source bodies remain local.
-- Keep the result exploratory and assay-scoped; no biological mechanism, Agent advantage, external transfer or assay savings is established.
+- Add the paired-resource R2 data-gate stop, the CDI-R3 retrospective FLT3 association, and the CDI-R4 intervention-gated design hypothesis. Publish their reports and review records while keeping response matrices, detailed outputs, paper XML and raw API bodies local.
+- Keep all findings scoped to their assays and evidence levels; no biological mechanism, Agent advantage, external transfer or assay savings is established.
 
 ### 2026-10-27 - Agent and virtual-cell research sources
 

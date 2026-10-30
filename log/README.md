@@ -5,6 +5,7 @@ Read the [integrated research report](RESEARCH_REPORT.md) for the current scient
 | Question | Report chapter |
 |---|---|
 | Updated Agent–virtual-cell objective and latest completed CXCL9 test | [Joint-learning objective](RESEARCH_REPORT.md#agent-virtual-cell-joint-learning-to-discover-and-revise-biological-intervention-rules-2026-10-30) |
+| Latest CDI retrospective pilot and intervention-gated candidate | [Joint-learning objective](RESEARCH_REPORT.md#agent-virtual-cell-joint-learning-to-discover-and-revise-biological-intervention-rules-2026-10-30) |
 | Latest Agent/virtual-cell audits, ten directions and four conditional mechanisms | [2026-10-27 research](RESEARCH_REPORT.md#latest-agent-and-virtual-cell-research-2026-10-27) |
 | Latest paid-repeatability result and threshold correction | [Current result](RESEARCH_REPORT.md#current-paid-repeatability-result) |
 | Knowledge, ordinary feedback and decision value | [Knowledge](RESEARCH_REPORT.md#knowledge-and-decision-value), [feedback](RESEARCH_REPORT.md#functional-feedback-and-acquisition) |
