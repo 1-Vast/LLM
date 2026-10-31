@@ -91,6 +91,12 @@ Registered studies retain their protocols, results, deviations and replay code. 
 
 ## Changelog
 
+### 2026-10-31 - Controlled-mixture rules and virtual-organoid reading
+
+- Consolidate the resumed rule-discovery round and AIVOs source reading with independent reviews, verified resource coverage and exact restart conditions.
+- Park the first conditional-response candidate: complementary-state targeting and environment coupling are established priors, and a same-preparation composition/function test remains unqualified. No numerical experiment or core promotion.
+- Publish selected authored records; keep full third-party sources, raw responses and unrelated local changes outside the release.
+
 ### 2026-10-31 - Scoped predictor and follow-up research
 
 - Add the opt-in five-axis/k20 transcriptional-transfer correction with its NCI-60 correlation gain, nonsignificant PRISM contrast and unproven hit-selection benefit. Preserve the default predictor.

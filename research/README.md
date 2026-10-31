@@ -23,5 +23,7 @@ Follow the [storage policy](../log/STORAGE_POLICY.md) before retiring evidence o
 
 ## Predictor and next-action evidence
 
+- [Controlled-mixture functional response](routes/functional_prediction/2026-10-31-perturbation-rule-discovery-r2/report.md) and [AIVOs reading](routes/literature_cross_domain/2026-10-31-virtual-organ-paper-reading/report.md): complementary-state targeting and environment coupling are established priors. A same-preparation composition/function test remains unauthenticated; candidate v1 is parked without numerical admission.
+
 - [Generic-axis transfer](routes/functional_prediction/2026-10-31-generic-axis-transfer/REPORT.md): reference-only shared-axis removal, five axes and k=20. Selective correlation improves on NCI-60; the PRISM contrast is not significant and top-hit decision benefit remains unproven. The existing default is unchanged.
 - [Later exploratory comparisons and action-contrast qualification](../log/RESEARCH_REPORT.md#functional-state-compression-and-next-action-contrasts): retain the failed all-arm replay, parked static selection surrogate and still-unqualified history/action data contract. No further core or Agent promotion follows.
