@@ -1,0 +1,7 @@
+# Cross-field state-learning research brief
+Date: 2026-10-31 Asia/Shanghai.
+Question: Which established solutions from other fields address incomplete observed state, action-conditioned future prediction, task-oriented compression, limited matched outcomes, and experimental measurement selection in virtual-cell drug discovery?
+Scope: targeted primary-source reading, foundational work plus decision-changing 2025-2026 updates; no exhaustive survey or model fitting. Existing exposed L1000/PRISM arrays cannot identify unmeasured longitudinal intervention outcomes. Distinguish protocol/replay implementation errors from biological failure.
+Budget: three independent source scouts plus one fresh challenger after synthesis; <= 36 HTTP requests total (8/scout, 8 coordinator, 4 reviewer), <= 100 MiB successful downloads, no paid APIs, no installs, no protected outcomes or src/tools edits; two substantive revisions maximum per candidate. Reuse existing originals before downloads. Search failures and reading levels must be logged. Only one integrated report and compact source notes; each agent owns its own files.
+Deliverable: concrete cross-field mechanisms, assumptions, limits and biological prior overlap; conditional research directions and smallest decisive tests. No claim that these fields solve absent information, establish biological causality, or validate MAESTRO.
+Requested subagents: gpt-6.1-sol/high, fresh contexts. Effective serving model/cost unreported unless tool metadata confirms.

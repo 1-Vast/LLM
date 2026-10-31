@@ -91,6 +91,12 @@ Registered studies retain their protocols, results, deviations and replay code. 
 
 ## Changelog
 
+### 2026-10-31 - Scoped predictor and follow-up research
+
+- Add the opt-in five-axis/k20 transcriptional-transfer correction with its NCI-60 correlation gain, nonsignificant PRISM contrast and unproven hit-selection benefit. Preserve the default predictor.
+- Integrate later exploratory compression, static-selection negative results and action-contrast data qualification without promoting a joint-learning mechanism or Agent.
+- Publish authored implementations, aggregate verification records and current scientific scope; raw-source peeks, per-compound arrays/CSV rows, acquired passages and local environments remain excluded.
+
 ### 2026-10-31 - Research navigation and scoped study publication
 
 - Consolidate research and organization entry points, classify later datasets, and preserve route-specific negative results, invalid runs and restart conditions.

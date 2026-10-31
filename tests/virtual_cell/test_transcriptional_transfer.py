@@ -4,8 +4,9 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from virtual_cell.transcriptional_transfer import (VALIDATED_SCOPE, selective_r, signature_similarity,
-                                                   transfer_profile)
+from virtual_cell.transcriptional_transfer import (GENERIC_AXES_SCOPE, UNVALIDATED_SCOPE, VALIDATED_SCOPE,
+                                                   fit_generic_axes, remove_generic_axes, selective_r,
+                                                   signature_similarity, transfer_profile)
 
 
 def _signatures(rng, n, conditions=3, genes=8):
@@ -65,3 +66,61 @@ def test_selective_r_gives_no_credit_for_the_generic_profile():
     assert np.isnan(selective_r(3.0 * g, obs, g))
     assert selective_r(sel - 4.0 * g, obs, g) == pytest.approx(1.0)
     assert np.isnan(selective_r(sel[:40], obs[:40], g[:40]))
+
+
+def _shared_axis_world(seed, n=60, conditions=2, genes=40):
+    """References = random strength x one shared direction per condition + a weaker compound-specific part."""
+    rng = np.random.default_rng(seed)
+    shared = rng.normal(size=(conditions, genes))
+    specific = rng.normal(size=(n, conditions, genes))
+    strength = rng.uniform(1.0, 6.0, size=n)
+    refs = strength[:, None, None] * shared[None] + 0.4 * specific
+    return rng, shared, specific, refs
+
+
+def test_fitted_generic_axes_recover_the_shared_direction():
+    _, shared, _, refs = _shared_axis_world(4)
+    axes = fit_generic_axes(refs, n_axes=2)
+    assert axes.directions.shape == (2, 2, 40) and axes.n_axes == 2
+    for o in range(2):
+        u = shared[o] / np.linalg.norm(shared[o])
+        assert abs(axes.directions[o, 0] @ u) > 0.95
+        assert axes.directions[o] @ axes.directions[o].T == pytest.approx(np.eye(2), abs=1e-9)
+    cleaned = remove_generic_axes(refs, axes)
+    assert np.abs(np.einsum("pog,oag->poa", cleaned, axes.directions)).max() < 1e-9
+
+
+def test_removing_the_shared_axis_finds_the_compound_specific_neighbour():
+    # the true neighbour responds weakly on the shared axis, the query strongly: raw cosine pairs by strength
+    rng, shared, specific, refs = _shared_axis_world(5)
+    refs[7] = 1.0 * shared + 0.4 * specific[7]
+    query = 6.0 * shared + 0.4 * specific[7] + 0.05 * rng.normal(size=shared.shape)
+    profiles = np.arange(60, dtype=float)[:, None] * np.ones((60, 3))
+    raw = transfer_profile(query, refs, profiles, k=1)
+    clean = transfer_profile(query, refs, profiles, k=1, generic_axes=fit_generic_axes(refs, n_axes=1))
+    assert raw.neighbours[0] != 7
+    assert clean.neighbours[0] == 7 and clean.values == pytest.approx(np.full(3, 7.0))
+
+
+def test_generic_axes_skip_unmeasured_conditions():
+    refs = np.random.default_rng(6).normal(size=(5, 3, 4))
+    refs[:, 2] = np.nan
+    refs[1:, 1] = np.nan
+    axes = fit_generic_axes(refs, n_axes=2)
+    assert np.isnan(axes.means[2]).all() and not axes.directions[1:].any()
+    q = refs[0].copy()
+    out = remove_generic_axes(q, axes)
+    assert np.isnan(out[2]).all() and np.isfinite(out[:2]).all()
+    with pytest.raises(ValueError):
+        fit_generic_axes(refs, n_axes=-1)
+
+
+def test_generic_axes_report_their_scope_and_refuse_mismatched_axes():
+    rng, shared, _, refs = _shared_axis_world(7)
+    profiles = rng.normal(size=(60, 4))
+    query = refs[3] + 0.1 * rng.normal(size=refs[3].shape)
+    assert transfer_profile(query, refs, profiles).scope == VALIDATED_SCOPE
+    assert transfer_profile(query, refs, profiles, k=20, generic_axes=fit_generic_axes(refs, 5)).scope == GENERIC_AXES_SCOPE
+    assert transfer_profile(query, refs, profiles, k=5, generic_axes=fit_generic_axes(refs, 5)).scope == UNVALIDATED_SCOPE
+    other = fit_generic_axes(refs[:, :1], 5)
+    assert transfer_profile(query, refs, profiles, k=20, generic_axes=other).refusal == "SIGNATURE_AXIS_MISMATCH"

@@ -1,0 +1,107 @@
+{
+  "pipeline_verdict": "PASS",
+  "scientific_gate": "INCONCLUSIVE",
+  "scope": "Independent verifier restricted to PROTOCOL.md, FREEZE.json, RUN/RESULTS.json, RUN/per_query_metrics.csv, RUN/predictions.npz and dev_pool.npz. Prohibited runner/source/data were not read.",
+  "hashes": {
+    "protocol_sha256": "a73b24c4c4e9b5633d82322243fb741761003a9db7ff1486a17d676279baac1e",
+    "data_sha256": "1a09d2d5aa13e84a7744c8eea4bd0b07a64e76dd259e5b4a856e1e0ee387a15d",
+    "predictions_sha256": "700ba9f6ec299ba4af712afe508130e48fff460ab87596fc860fae18c95234a7",
+    "metrics_sha256": "78112ec53e6dc30def1d8ab0abb203f6683cc0024e90a0cfd3ee3587cb3340b0"
+  },
+  "freeze_hashes": {
+    "protocol_sha256": "a73b24c4c4e9b5633d82322243fb741761003a9db7ff1486a17d676279baac1e",
+    "data_sha256": "1a09d2d5aa13e84a7744c8eea4bd0b07a64e76dd259e5b4a856e1e0ee387a15d",
+    "code_sha256": "db699f0b91f317d1717209d6f250d93f72f432732c0768b8e4286852be676f87"
+  },
+  "schema": {
+    "drug": {
+      "shape": [
+        1403
+      ],
+      "dtype": "<U45"
+    },
+    "line": {
+      "shape": [
+        578
+      ],
+      "dtype": "<U21"
+    },
+    "profile": {
+      "shape": [
+        1403,
+        578
+      ],
+      "dtype": "float64"
+    },
+    "signature": {
+      "shape": [
+        1403,
+        18,
+        978
+      ],
+      "dtype": "float32"
+    },
+    "option": {
+      "shape": [
+        18
+      ],
+      "dtype": "<U11"
+    },
+    "fingerprint": {
+      "shape": [
+        1403,
+        2048
+      ],
+      "dtype": "uint8"
+    },
+    "ik14": {
+      "shape": [
+        1403
+      ],
+      "dtype": "<U14"
+    }
+  },
+  "fold_counts": [
+    272,
+    274,
+    280,
+    294,
+    283
+  ],
+  "active_count": 348,
+  "checks": {
+    "protocol_hash_matches_freeze": true,
+    "data_hash_matches_freeze": true,
+    "schema_matches_freeze": true,
+    "fold_array_matches_predictions": true,
+    "fold_counts_match_results": true,
+    "active_array_matches_predictions": true,
+    "active_count_348": true,
+    "global_residual_equals_gat": true,
+    "raw_k5_query5_recomputed": true,
+    "raw_k20_query5_recomputed": true,
+    "chemistry_k20_query5_recomputed": true,
+    "gat_d5_query5_recomputed": true,
+    "full_flat_query5_recomputed": true,
+    "csv_summary_matches_results": true,
+    "residualized_primary_match_all_1403": true,
+    "schema_array_fields_pass": true
+  },
+  "numeric_recomputation": {
+    "raw_k5": "PASS query_index=5; shared-option cosine and clipped-similarity weighted k=5 reproduced saved prediction",
+    "raw_k20": "PASS query_index=5; reproduced saved prediction",
+    "chemistry_k20": "PASS query_index=5; fingerprint Tanimoto weighted k=20 reproduced saved prediction",
+    "gat_d5_k20": "PASS query_index=5; reference-centred per-option full-SVD top-5 residual reproduced saved prediction",
+    "full_flat_residual_k20": "PASS query_index=5; flattened residual cosine reproduced saved prediction",
+    "global_residual_diagnostic": "PASS; saved prediction equals GAT within 1e-12",
+    "primary_residualized_metrics": "PASS; independent constrained check reports hit_precision residualized top-m ranking matches CSV for all 1403 queries and all methods",
+    "pca_random_ridge": "NOT_RECOMPUTED; only saved arrays, method names, and CSV/RESULTS summaries inspected"
+  },
+  "protocol_deviation": "No confirmed deviation. A single raw-vs-residualized ranking coincidence on query 5 is not evidence of deviation; the all-query residualized check matches CSV.",
+  "scientific_interpretation": "INCONCLUSIVE by design: protocol labels study exploratory/non-confirmatory, gives no formal non-inferiority margin, and requires an independently frozen external test before interpretation beyond this pilot.",
+  "limitations": [
+    "PCA residual K curves, random orthonormal K controls, and ridge_raw were not independently refit in this pass.",
+    "No causal, biological mechanism, generalization, or external-test conclusion is supported."
+  ],
+  "schema_check_correction": "Initial draft compared NPZ array schema to FREEZE derived scalar metadata and showed false; corrected check compares the seven array fields only. Derived finite fractions/missing_ik14 are metadata, not NPZ keys."
+}

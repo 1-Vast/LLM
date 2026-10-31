@@ -4,7 +4,7 @@ This catalog is a navigation layer over [`INVENTORY.md`](INVENTORY.md). It does 
 
 | Route | Canonical locations | Endpoint/use | Status and boundary |
 |---|---|---|---|
-| Cheap viability and response | `external/prism_19q4`, `external/depmap_19q4`, `external/beataml2_20261017`, `external/gdsc_combinations`, `external/gcp2020` | cell × compound × dose or fitted response | usable for bounded prediction/replay; exposure, release, and biological independence are task-specific |
+| Cheap viability and response | `external/prism_19q4`, `external/prism_24q2_20261031`, `external/depmap_19q4`, `external/beataml2_20261017`, `external/gdsc_combinations`, `external/gcp2020`, `external/nci60_cellminer_20261031` | cell × compound × dose or fitted response | usable for bounded prediction/replay; exposure, release, and biological independence are task-specific |
 | Perturbational state / virtual cell | `external/lincs_l1000_gse92742`, `external/lincs_l1000_phase2`, `external/mixseq_scperturb`, `external/tahoe_phenotype_20261010`, `external/kinetic_horizon_20261010` | transcriptional or population-state signatures | state proxies; not interchangeable with viability or proximal engagement |
 | Target and mechanism context | `external/klaeger2017_chembl`, `external/ptv1_proteintalks_20261021`, `external/hgnc`, `external/msigdb`, `external/ontology` | binding/annotation/pathway support | contextual only; no same-row engagement-to-function proof |
 | Combination discovery | `raw/oneil2026_qualification`, `processed/certified_discovery`, `external/gdsc_combinations`, `processed/research_packages` | pair × cell × dose, synergy or discovery labels | mostly exposed development or historical replay; preserve vault/restriction boundaries |
@@ -64,11 +64,13 @@ These 2026-10-31 baseline counts describe eligible files, not qualified datasets
 | `mapkg_20261009` | 4 | 67,785,015 | 0 | PRESENT; CONTENT_AND_ELIGIBILITY_NOT_REVERIFIED |
 | `mixseq_scperturb` | 1 | 1,459,410,830 | 0 | PRESENT; CONTENT_AND_ELIGIBILITY_NOT_REVERIFIED |
 | `msigdb` | 0 | 0 | 0 | EMPTY_ELIGIBLE_SCOPE |
+| `nci60_cellminer_20261031` | 8 | 63,926,887 | 0 | PRESENT; CONTENT_AND_ELIGIBILITY_NOT_REVERIFIED |
 | `nci_almanac_2017` | 0 | 0 | 0 | EMPTY_ELIGIBLE_SCOPE |
 | `nyman2020` | 0 | 0 | 0 | EMPTY_ELIGIBLE_SCOPE |
 | `p100_program_pilot_20261028` | 20 | 2,002,162 | 0 | PRESENT; CONTENT_AND_ELIGIBILITY_NOT_REVERIFIED |
 | `pisa_living_cells` | 0 | 0 | 0 | EMPTY_ELIGIBLE_SCOPE |
 | `prism_19q4` | 13 | 395,749,830 | 0 | PRESENT; CONTENT_AND_ELIGIBILITY_NOT_REVERIFIED |
+| `prism_24q2_20261031` | 6 | 74,867,050 | 0 | PRESENT; CONTENT_AND_ELIGIBILITY_NOT_REVERIFIED |
 | `ptv1_proteintalks_20261021` | 31 | 776,565,501 | 0 | PRESENT; CONTENT_AND_ELIGIBILITY_NOT_REVERIFIED |
 | `public_checks_20260929` | 0 | 0 | 0 | EMPTY_ELIGIBLE_SCOPE |
 | `research_sources` | 2,263 | 6,881,293,031 | 4 | PRESENT; CONTENT_AND_ELIGIBILITY_NOT_REVERIFIED |

@@ -1,0 +1,42 @@
+# Resource audit 62: early history → fixed next action → later function
+
+Date: 2026-10-31 (Asia/Shanghai). Scope was a bounded audit of existing MAESTRO records and public pointers. No fitting, no `src/` or `tools/` edits, no protected/sealed HTS031/ASO outcomes, and no raw response-cell extraction. A source paper's reported values are retained only as provenance; they were not converted into a training table.
+
+## Decision
+
+**No resource is admitted as a ready numerical benchmark.** Two public leads have the required physical A→B sequence at the method level, but their Source Data workbook joins, repeat nesting, and missingness are unread. The UPEC resource has the strongest early probe and washout/regrowth semantics and an easy CC0 manifest, but it lacks a complete fixed A/B matrix: rechallenge is shown for selected survivors. Therefore the current data state remains `metadata_only / not_admitted`.
+
+The smallest plausible bridge is the **PA14 CAR→GEN** arm: one recorded pretreatment, one fixed next drug, controlled exchange/pause, and a later CFU/OD endpoint. It is a bounded antibiotic falsification bridge, not evidence for a mammalian Virtual Cell or organoid transfer. Before any numerical use, the MOESM18 Source Data and MOESM3 MIC table must be acquired and a predeclared whitelist must verify one row-level key containing strain/population, A, B, dose/MIC, pause/wash, time, prep/biological replicate, technical replicate, and endpoint. A/B direction and no-drug or same-drug controls must be present in the same admissible unit.
+
+## Candidate contracts
+
+| candidate | history | early state/probe | A/B dose, order, washout | later function | prep/replicate | chemistry labels | availability/verdict |
+|---|---|---|---|---|---|---|---|
+| **PA14 antibiotic hysteresis** (Buchholz et al., Nat Commun 2026, DOI `10.1038/s41467-026-71178-5`) | A pretreatment; CAR deeply characterized; MER/PIT/CTZ/GEN/CIP panel | No authenticated pre-next-action state probe; recorded A identity and optional pause only; OD is later proxy | A→B after medium exchange/resuspension; optional antibiotic-free pause ≤80 min; CAR wash control 50 mg/L 30 min + two PBS washes; stated HT uses MIC fractions | CFU/mL at 0,2,4,6 h; HT OD every 15 min for 12 h; reverse-order controls exist | wash n=3 biological; Fig1 n=3/4; HT 6–14 technical; exact row IDs/nesting unread | CAR, MER, PIT, CTZ, GEN, CIP, CHL | `metadata_only_lead_not_admitted`; Source Data `MOESM18` and MIC `MOESM3` not acquired |
+| **Sarcoma temporal collateral sensitivity** (Elms et al., Commun Biol 2025, DOI `10.1038/s42003-025-08652-1`) | DMSO or mTKI pretreatment in A204/G402 | Pretreatment duration 3/6/13/20/27 d; no authenticated nondestructive state joined per later outcome | 1 µM A for 14 d, switch to 1 µM infigratinib B for 14 d; replenished every 72 h; no washout; separate 72 h CTG | Direct cell-count growth over 4 weeks; 72 h CTG viability/IC50 | general ≥3 biological; key Fig7 growth/temporal IC50 n=2; exact source-row join unread | pazopanib, regorafenib, sitravatinib, anlotinib, infigratinib, DMSO | `metadata_only_oncology_lead_not_admitted`; public MOESM2 pointer, CDN TLS failed and PMC endpoint 404 |
+| **UPEC CFT073 ampicillin** (Miyahara et al., npj Antimicrob Resist 2026, DOI `10.1038/s44259-025-00180-6`, Figshare `30780101`) | LB/M9/M9+40X αMG growth context then ampicillin A | Single-cell pre-A growth rate from projected-area time-lapse | 50 µg/mL A; LB 4 h (some 6 h), M9 5 h; continuous-flow washout; 4 min (LB) / 5–10 min (M9) imaging | post-washout regrowth/lysis; selected survivor progeny rechallenge B; no complete all-cell A/B matrix | 3 independent LB experiments; M9 >4 repeats/medium; 25–35 chambers, 1–5 cells/chamber; row-level censoring/denominators unread | ampicillin; αMG is context, not second action | `metadata_only_functional_lead_not_admitted`; CC0 manifest 17 files/880,301 B; local captures are header-only/partial |
+| **ALK dynamic BH3 prior** (Martín et al., Cell Death Dis 2025, DOI `10.1038/s41419-025-07513-3`) | 16 h ALK inhibitor exposure before DBP; subsequent therapy arms | Dynamic BH3 priming is a destructive early functional probe | later 96 h Annexin V/DAPI; one caption times PI3K/MAPK addition after 24 h lorlatinib, but washout/continued exposure and row-level join unresolved | 96 h death; sequential combinations described, not a public per-prep table | ≥3 experiments reported; public processed source data requires author request | lorlatinib, brigatinib, BCL-2 family agents | `metadata_only_prior`; no public numeric row table acquired |
+
+The prior large public screens (GSE214965 DRUG-Seq; GSE139944 sci-Plex; GSE149428 time-course RNA; PRISM/GDSC) do not satisfy the contract: they lack a joined later fixed A/B functional endpoint, or are RNA-only/single-stage endpoint data. They remain metadata-only negatives, not substitutes for the bridge.
+
+## Gaps and exact admission gate
+
+1. **Join key:** history A, next action B, dose/physical MIC, order, pause/washout, endpoint time, preparation/biological replicate, technical replicate, and strain/cell background must coexist in the same table or losslessly linked tables.
+2. **Early probe:** PA14 has no authenticated early state other than treatment history; sarcoma has duration but no joined state; UPEC has a real pre-A probe but only selected-survivor B rechallenge. A future task must declare whether the target is all-starting-population burden or the post-A eligible survivor population.
+3. **Repeat identity:** technical wells/serial reads are not independent preparations. Exact independent-preparation IDs and missing/censoring rules are unread for PA14 and sarcoma; UPEC's chamber/cell nesting is not yet a qualified exchangeable preparation unit.
+4. **Chemical exposure:** “washout” must be explicit. PA14 has medium exchange and a bounded pause plus a wash control; sarcoma continuously replenishes and does not wash out; UPEC has continuous-flow washout. These are distinct estimands.
+5. **Outcome:** OD is a biomass proxy and can be biased by filamentation; CTG is viability, not regrowth competence; selected-survivor regrowth is not a whole-population endpoint.
+
+## Minimal viable resource and stop conditions
+
+Use PA14 CAR→GEN only as a small, explicitly bacterial bridge if `MOESM18` + `MOESM3` become readable. First perform metadata-only whitelist extraction; do not inspect numeric cells until the join and repeat admission is signed. Stop without fitting if any of the following occurs: no row-level A/B/pause/time key; no MIC mapping; no independent-preparation identity; only technical replicates; no same-unit reverse/no-drug control; endpoint is only OD with no CFU anchor for the chosen arm; or later B response is unavailable for a fixed action. For UPEC, stop if the workbook contains only selected lineages/figure aggregates or cannot identify all-cell denominators and rechallenge eligibility. For sarcoma, stop if MOESM2 lacks paired A/B treatment IDs or only reports summary bars/IC50s without preparation identity.
+
+These are resource gates, not biological negative results. Passing them would support only a bounded history/action functional audit in the stated organism/background and endpoint; it would not establish mechanism, causal memory, transfer to cancer, or model novelty.
+
+## Provenance and network accounting
+
+Primary local evidence reused: `2026-10-29-common-function-mechanism-renewal/evidence/evidence.md`, `p5_negative_hysteresis.xml.selected.txt`, `p4_collateral_sarcoma.xml.selected.txt`; `2026-10-31-cell-fate-functional-learning/investigator/ampicillin_primary_text.txt`, `source_findings.md`, and `sources/ampicillin_figshare_manifest.json`. Machine-readable projections are next to this report.
+
+This audit made **5 bounded public attempts** with **23,559 known response-body bytes**: two Springer CDN TLS EOF failures (0 body), PMC sarcoma supplement 404 (2,048 B), PMC PA14 supplement challenge HTML (21,511 B; not an XLSX), and one Europe PMC supplement timeout (0 body). No automatic retry or access-control workaround was used. The PA14 “source” file is retained only as a failed HTML receipt (`receipts/pa14_source.xlsx`, SHA `59f47cac23df969628aa314ce633faa62add61f6c1a08baf4471d1727512ccb3`); it is not a workbook and was not projected. Existing prior episode receipts separately record the original JATS acquisitions and supplement failures.
+
+No protected/sealed outcome arrays, model fitting, or code promotion occurred.

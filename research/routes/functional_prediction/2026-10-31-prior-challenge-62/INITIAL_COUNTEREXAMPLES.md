@@ -1,0 +1,10 @@
+# Initial adversarial combinations
+
+Recorded before the fresh targeted verification below. 2026-10-31; no fitting or numerical response inspection.
+
+1. **DBP + panel reconstruction + known-history regression.** Use an established BIM/BAD/HRK/MS1 functional panel on sister cultures after pretreatment, predict future options with ridge/covariance, and allow a history-by-action interaction. This combination already supplies cheap functional probing, an operational susceptibility profile, prediction of unmeasured treatments, and a direct test of whether history can be discarded. A learned compact state must beat this combination with exactly the same observations and assay cost.
+2. **Persistent intrinsic dependence instead of a new state law.** A drug-induced arrested/senescent population can inherit its pre-existing BCL dependence. A probe-to-later-action association could reflect lineage-specific vulnerability rather than a newly discovered history-invariant susceptibility state. Compare untreated/baseline dependency and history-only models.
+3. **Shared action ranking with different burdens.** Two histories can shift all later outcomes by a common baseline. The action contrast can be invariant while absolute response is not. This is ordinary treatment-effect heterogeneity/decision sufficiency, not a new mathematical principle. Conversely, equal priming can conceal growth, uptake, non-apoptotic killing or recovery differences that reverse the action contrast.
+4. **Active system identification without a special encoder.** A fixed or information-based probe can separate response alternatives; any gain can come entirely from acquiring better labels. Freeze the predictor while comparing probe selectors, and freeze probes while comparing predictors.
+
+Initial judgment: no established methodological novelty. A nontrivial biological result could remain if a prespecified, inexpensive panel preserves a specific next-action contrast across independently prepared, genuinely unseen histories at useful precision, beyond the above rivals. This is not asserted to be first.

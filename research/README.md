@@ -1,6 +1,6 @@
 # Research workspace
 
-MAESTRO studies conditional biological intervention rules using affordable public cellular-response data. The objective remains **ACTIVE / NOT_ACHIEVED**. No independently useful new Agent–virtual-cell joint-learning mechanism or general Agent advantage is established.
+MAESTRO studies conditional biological intervention rules using affordable public cellular-response data. The objective remains **ACTIVE / NOT_ACHIEVED**. No independently useful new Agent–virtual-cell joint-learning mechanism or general Agent advantage is established. A scoped transcriptional-transfer correction is available as an opt-in predictor; it does not establish either claim.
 
 Read the [scientific synthesis](../log/RESEARCH_REPORT.md) for results, corrections, negative comparisons, invalid runs and unresolved questions. Use [route experience](../log/ROUTE_EXPERIENCE.md) for inherited lessons and restart conditions, and the [functional-feedback chapter](../log/ROUTE_FUNCTIONAL_FEEDBACK.md) for its detailed historical corrections. Episode-level reports and protocols retain the exact conditions; this entry does not repeat their findings.
 
@@ -19,3 +19,9 @@ Experimental implementations and study-specific tests belong here. Inputs and de
 Promote code to [src](../src/README.md) or [tools](../tools/README.md) only through an explicit decision supported by validation appropriate to its intended use. Software tests, file presence and hashes do not establish scientific validity. Existing scoped stops remain in force unless an explicit amendment changes their conditions.
 
 Follow the [storage policy](../log/STORAGE_POLICY.md) before retiring evidence or implementations. The [organization record](../log/ORGANIZATION_STATUS.md) tracks physical disposition, protected boundaries and remaining gaps. Source and protocol records preserve failures, negative evidence and corrections; old execution paths receive no compatibility aliases.
+
+
+## Predictor and next-action evidence
+
+- [Generic-axis transfer](routes/functional_prediction/2026-10-31-generic-axis-transfer/REPORT.md): reference-only shared-axis removal, five axes and k=20. Selective correlation improves on NCI-60; the PRISM contrast is not significant and top-hit decision benefit remains unproven. The existing default is unchanged.
+- [Later exploratory comparisons and action-contrast qualification](../log/RESEARCH_REPORT.md#functional-state-compression-and-next-action-contrasts): retain the failed all-arm replay, parked static selection surrogate and still-unqualified history/action data contract. No further core or Agent promotion follows.
