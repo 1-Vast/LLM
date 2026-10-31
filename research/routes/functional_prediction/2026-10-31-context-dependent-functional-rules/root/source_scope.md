@@ -1,0 +1,5 @@
+# Prospective source-only scope
+
+Before any new numerical access, inspect the existing EGI admission contracts and original source identity/method material. The previous GI2 and native-map numerical response boundary remains in force. The current local projection may read only supplementary labels/captions/file references, existing source metadata, and guide/sample identities. It may not open XLSX response cells, raw count fields, notebook outputs, article Results/Discussion, or rank pairs. No model or numerical experiment is admitted by this projection.
+
+The separate Carlson et al. PNAS2025 original is a theoretical prior, already in the shared library. Selected framework/rank-test/misspecification methods may be read to assess whether a proposed monotonic fitness transformation is ordinary global epistasis. Such reading does not admit EGI response access. Root owns a fresh, bounded EGI/conditional-shift prior check; the investigator owns D-SPIN access recovery and the scout owns donor-native principles.

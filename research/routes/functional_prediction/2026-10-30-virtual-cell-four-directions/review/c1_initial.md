@@ -1,0 +1,53 @@
+# Independent initial C1 protocol/code review
+
+Date: 2026-10-30. This review was written before any rebuttal or disclosure of C1 outcomes. Reviewer context is fresh; inherited/effective model configuration is unknown.
+
+## Review boundary and decision
+
+Reviewed only `protocol_c_census.md`, `census_c.py`, `audit_c_metadata.json`, and the original `data/external/virtual_cell_four_directions_20261030/longitudinal/zenodo_record.json`. No source `cell.count` outcomes were read, no census was executed, and no other candidate discussions/results were consulted. Metadata extraction below used the supplied audit, not source count labels. No source/core files were changed.
+
+**Decision: conditional, with pre-execution corrections required.** The endpoint and technical consistency rule can support the narrow descriptive question. The present code does not fully implement the exclusion/reporting protocol, and the cross-background statistic is not adequately defined. Correct those points and retain the frozen scientific criteria before running. This is not readiness for biological validation, novelty, transfer, Virtual Cell Capability, or Agent claims.
+
+## Material corrections before execution
+
+### B1. Complete the exclusion policy and report the actual background/denominator funnel
+
+The protocol says to exclude invalid well endpoints with reasons. `census_c.py:61-65` instead raises whenever exactly one of the two technical wells remains at a drug-dose. If both wells disappear, that dose silently disappears; if one remains, the entire census aborts. Thus a specified exclusion case does not have a consistent implementation. The script also writes well outputs before this possible failure, while the exclusion list exists only in the final result. Freeze and implement one consistent rule, for example requiring both valid technical wells for an eligible drug-dose and explicitly excluding incomplete doses with reasons. Do not silently replace two-well means with one-well means.
+
+There is also a known metadata exclusion that must be visible before outcomes: **MGH has no frame between 58.8 h and 74.1 h**. With the frozen strict `<72 h` rule, its maximum usable time is 58.8 h, so none of its 308 trajectories can bracket 60 h. MGH is excluded by the current endpoint definition regardless of count values. The code will omit it entirely from `treated` and `by_background`, rather than reporting a zero-eligible background. Keep the endpoint window; explicitly record this metadata-determined exclusion rather than describing the result as seven assessable backgrounds.
+
+The supplied dose metadata form three disjoint grids: 11 drugs share one grid; trametinib and panobinostat share a second; temsirolimus is alone on a third. Hence the metadata-only maximum is 56 eligible drug pairs per time-eligible background: C(11,2) + C(2,2). Of 91 possible pairs per background, 35 fail exact-dose sharing. Before count exclusions there are at most **336 eligible background-pair units across six backgrounds**, versus 637 initially possible units across seven backgrounds. These are design bounds, not observed outcome results. Temsirolimus is measured but contributes no eligible pair.
+
+Report all seven input backgrounds, input/control/treated well counts, endpoint exclusions by reason, drug-dose exclusions, exact-dose-ineligible pairs, and final eligible pairs per background. `by_background` currently has only flip sums (`census_c.py:104`), without these denominators. A complete pair CSV allows derivation for surviving backgrounds but does not explain the omitted MGH background or ineligible pairs. If an entire plate loses valid controls, specify an explicit recorded exclusion/failure policy rather than relying only on the bare assertion at line 57.
+
+### B2. Freeze the cross-background reproduction estimand and its denominator
+
+The protocol requests a fraction of repeat-concordant flips with reproduced signs in other backgrounds. The code supplies only mean-threshold reproduction counts for each technical witness (`census_c.py:83-95`), and no requested fraction. These are different potential units: unique anchor background/drug pairs, witness dose pairs, or available witness/background comparisons. A pair with many witnessing dose combinations can otherwise receive much more weight than a pair with one. The same pair/background is also reused as both anchor and comparison elsewhere; these are not independent observations.
+
+Choose and state the unit and aggregation before outcomes. One compatible descriptive output is the fraction of unique technically concordant anchor background/drug-pair units having at least one prespecified witness reproduced in at least one other eligible background, with its numerator, denominator, and number having no available comparison. Preserve witness-level counts separately. Other definitions are acceptable if explicitly frozen; do not choose among them after inspecting results.
+
+Also resolve **sign-only versus margin reproduction**. The prose says signs, whereas line 91 requires other-background mean contrasts to reach both +0.25 and -0.25. Either name that explicitly as mean-margin reproduction or implement the stated sign-only rule. Neither constitutes independently prepared biological replication. A technically consistent anchor plus a noisy two-well mean in another related derivative should not be labelled technical replication in that other background.
+
+### B3. Preserve all requested candidate witnesses, including failed technical concordance
+
+The protocol requests all witnessing dose pairs and contrasts. The sole witness loop uses `product(stable_positive, stable_negative)` (`census_c.py:83`), so mean-flip candidates that fail technical concordance have no witness record. The pair table keeps only minimum and maximum means, with no dose identities. This prevents the witness output from documenting all reported mean flips as written.
+
+Emit the positive/negative dose combinations for every mean-flip candidate, carrying the mean contrasts and a technical-concordance flag; retain the technical subset for the reproduction analysis. Alternatively narrow the protocol's reporting requirement explicitly before execution, but the broader witness ledger is preferable for independent checking and does not change the scientific criteria.
+
+## Endpoint and implementation assessment
+
+- The Zenodo description defines time as exposure hours and reports drug replacement after 72 h. Interpolating to the same 24-to-60 h interval using only frames `<72 h` avoids spanning that replacement and avoids the principal variable-duration comparison. The code sorts frames, rejects duplicate times, refuses extrapolation, and checks the needed bracketing counts for positivity/finiteness. An exact observed endpoint is handled as that observation. No endpoint-calculation error is apparent from static review.
+- The implemented interpolation is linear in count, followed by a log ratio. State this explicitly; interpolation in log count is a different estimator. It measures change over 36 h conditional on the cells remaining at 24 h. It does not include all early drug action, establish exponential steady state, identify a death rate, or establish a full dynamic pharmacology model.
+- Metadata show unequal interpolation spans. In particular PC9 estimates 60 h from 59.4 and 71.7 h (12.3 h), while other usable backgrounds have substantially tighter frames. This is allowed by the frozen protocol but introduces unequal approximation error if curves bend. Preserve the actual bracketing times/counts or interpolation weights in the endpoint ledger for the later independent numerical audit. Do not reinterpret these finite-interval endpoints as resolved temporal mechanism.
+- Same-plate median vehicle subtraction is a coherent relative endpoint, but it cancels exactly in a contrast between two drugs on that same plate. Vehicle normalization therefore does not by itself validate or remove artifacts in the drug-pair ranking flips. The original description reports nominal seeding at 200 cells/well for HTS001; equality of realized counts and fluorescence calibration are still unverified.
+- Exact numeric Molar intersection matches the stated census and does not interpolate dose. Absolute molar matching does not establish equal clinical exposure, equal target engagement, or comparable potency. The denominator is a subset determined by panel design, not an unbiased sample of drug-pair relations.
+- The technical rule matches the stated construction: both deterministic lexicographic matched differences meet the margin, while `min(a)>max(b)` (or its reverse) enforces the sign of all four cross-well differences. The latter is sign separation, not a 0.25 margin for all four. Lexicographic pairing is arbitrary, so the margin part is a deterministic descriptive filter rather than a biologically meaningful pairing or a repeated-experiment estimate. The current language acknowledging pseudo-replicates is necessary.
+- Current metadata certify one plate per background, so both drugs are in fact on the same plate. The code only asserts one plate per drug-dose, not explicitly plate equality across drugs. An input-level assertion of one plate per background would directly enforce the frozen source-specific premise; no general multi-plate design is needed here.
+
+## Interpretation limits that must survive any positive result
+
+HTS001 is previously exposed within the project. A fresh reviewer and a freeze before this particular run do not make it an untouched confirmation set. Describe this as a prespecified reanalysis of exposed data, not an outcome-naive validation; document threshold/window choices without claiming their prospective independence.
+
+Six time-eligible PC9-related backgrounds on one plate each confound background with plate and share lineage. Two wells provide technical consistency only. Many reused drugs/doses/witnesses create dependency and a threshold search can select technical noise; the specified no-p-value/no-biological-CI boundary is appropriate. A descriptive census may establish that sufficiently large within-plate dose-dependent ranking reversals exist under this endpoint. It cannot show generalization to unseen studies or drugs, clinically meaningful reversal, a molecular mechanism, a novel method, a predictive advantage over ordinary dose-response curves, or an advantage from an Agent.
+
+After B1-B3 are resolved without inspecting outcomes or changing thresholds/window/dose restrictions, static readiness can be reconsidered. A later independent check of numerical endpoints and flip counts remains required and was not performed in this review.

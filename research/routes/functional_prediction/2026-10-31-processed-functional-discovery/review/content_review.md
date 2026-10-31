@@ -1,0 +1,64 @@
+# Final content/source review
+
+2026-10-31. Reviewer: the same independent initial challenger, now exposed to the integrated synthesis. Requested configuration: `gpt-6.1-sol` / high; effective model and effort telemetry unknown. This is a post-synthesis content/source check, not a second blind initial assessment. `challenge/initial_review.md` was not changed.
+
+## Disposition
+
+The central scientific disposition is supported: **conditional biological question, no numerical model admitted, no demonstrated new learning mechanism, ACTIVE / NOT_ACHIEVED**. The synthesis does not convert missing calibration into biological refutation, does not recast selected published findings as fresh validation, and does not inflate data recovery into a new mechanism or Agent result. I found no material scientific error in the integrated C1-C5 treatment or the repair/prior conclusions checked below.
+
+One minor provenance-field discrepancy was found and corrected during this review: the owner importer initially described agent-acquired originals as “supplied by the user.” I reread the corrected actual rows and matched all five acquisition URLs and byte counts to successful role receipts. No unresolved material content/source issue remains in the scope checked. Final preservation verification remains pending and is **not certified by this review**.
+
+## Concrete integrated content checked
+
+I read `report.md`, `PROCESS.md`, `usage.json`, `library_verify_final.json` and `review/integration_change_receipt.json`. I inspected the actual newly inserted regions, rather than relying on the receipt alone, in:
+
+- `research/README.md`, latest processed-functional paragraph;
+- `log/RESEARCH_REPORT.md`, the opening processed-functional section;
+- `log/ROUTE_EXPERIENCE.md`, latest processed-functional paragraph;
+- `reference/README.md`, the opening directed-library-update paragraph;
+- `log/STUDY_INDEX.tsv`, the appended processed-functional row;
+- `research/STUDIES.json`, the actual last study and `route_storage` object.
+
+The actual registry has 51 studies; its last entry is this episode and its actual full workspace-path storage key exists with `role=research_record`. Its exploratory status, missing independent calibration/transport and continuous map, response-exposure limit, prior overlap and no-fit/no-Agent/no-core decision agree with the report. The six surface summaries preserve those qualifications. I did not compare every pre-existing registry value or text byte to the baseline; that is the separate preservation check.
+
+## C1-C5 and observation claims
+
+**C1, dosing discrepancy:** The original Macak XML `Sec3`, paragraph 1, and publisher passage state 2,344 drugs at three doses plus 73 drugs at two lower doses, yet report 7,240 conditions. That stated operation gives 7,178. My initial permitted A-D-only projection independently obtained 7,240 rows and 2,344 stored IDs with counts 2,246×3, 92×5 and 6×7. The saved `root/repair_function_design.json` and `root/design_audit.json` retain those counts and the extra low-dose identity strings. The final report and shared summaries preserve the discrepancy and refrain from inventing a dose-selection reconciliation. No repeat response projection was needed in this content review.
+
+**C2, replication:** Original `Fig1`, `Fig2` and `Fig5` captions explicitly support primary n=1; Fig2b/c biological n=2; Fig5c n=4, d-f n=3 and g n=2. The report preserves those author-reported biological-replicate descriptions while retaining incomplete preparation/clone/error provenance. It does not treat replicate headers, doses or shared controls as independently authenticated extra backgrounds.
+
+**C3, interventions:** Original `Sec7` describes DNA-PKcs K3753R and BRCA2-mutant Capan-1 with correction of 6174delT in a single-cell-derived line. Workbook axis labels do not establish deletion of the PRKDC protein or an independently generated BRCA2 knockout. The report and registry now preserve the exact intervention provenance and relevant clonal uncertainty. This corrects annotation interpretation; it does not erase the actual source restoration experiment.
+
+**C4, route coordinates:** Original `Sec3` and `Sec16` define sequence-based NHEJ/MMEJ assignment using microhomology and recovered amplicon read percentages. `Sec4` explicitly acknowledges direct versus indirect ambiguity. The cytarabine comparison in `Sec4`/`Sec8` and AOX1 comparisons in `Sec5`/`Sec8` make the report's caution substantive: sequence categories, reporter activity and tolerance to losing a route are different objects. No new numerical capacity is inferred from them. The observation-boundary passage allows stronger assumptions/measurements to identify more; it avoids an unwarranted universal impossibility claim.
+
+**C5, endpoint schedules:** I additionally reread original `Sec14`-`Sec16` in this final pass. `Sec14` states one day with ROCK inhibitor followed by three days in normal medium; `Sec15` states DNA collection at least five days after transfection. These do not silently reconcile the three-day Results description. Original `Fig5` distinguishes five-day c-e treatments from the 14-day f comparison. The saved permitted Fig5g axes contain 5d/24d while main prose describes two weeks. The report preserves those source-specific windows and unresolved sample crosswalk. Its refusal to authenticate absolute viable-edit yield by multiplying normalized resazurin and edit fractions is justified under the present observation contract.
+
+## Scientific difference and prior scope
+
+The report now explicitly distinguishes a **tolerance boundary** from a **continuous survival-response map**. Comparable impairment scale, link/slope and transport conditions remain undefined, rather than being silently fitted from the target outcomes. Its statements about free additive logistic/low-rank coordinates are ordinary model equivalences; the synthesis does not claim that a successful scalar fit would identify cellular reserve. Equal-information functional prediction and dose-response models remain valid rivals. A small two-background falsification could test a biological restriction if its measurements existed, but would not establish general algorithmic superiority.
+
+The practical unresolved premise is retained: impairment measured in a reference setting need not transport to the same nominal dose in a new background. Target engagement/action measurements, calibration and controls must be charged to the workflow. The report makes economical feasibility explicitly unestablished and does not assert that the current processed package supplies a cheap fixed calibration panel. The hiPSC/eHAP1 failure is correctly used to motivate the question, not to validate a rule selected after observing it.
+
+For Rajendra, I checked the stored original XML `SEC3-5` on target-KO controls, `SEC3-6` on wild-type/catalytic-mutant rescue and the previously inspected inhibitor comparisons, and `SEC4` paragraphs 10/15 on substrate-specific residual repair and uncertain physiological/chromatin recapitulation. These support substantial overlap in the ingredients while not verifying the proposed unseen-background survival-tolerance restriction. Original front-matter `pub-date` records epub **2023-12-18** and collection **2024-02-28**. The report and owner rows correctly distinguish online 2023 from issue 2024 and explicitly justify its inclusion outside the main 2025-2026 window.
+
+The RAD51 claim remains confined to the saved complete abstract/metadata: predefined functional HRD threshold, pCR association in a genetically preselected population, similar associations under both arms, and no exploratory DFS difference. It is not promoted to full-method reading, differential treatment benefit or exhaustive novelty clearance.
+
+For peripheral resource descriptions I checked `root/design_audit.json`, the current permitted repair-axis audit, and the prior ProteinTalks source note with its original SI page locators. The current report distinguishes current package acquisition from historical body rejection and retains unmatched dose/schedule/culture limitations. I did not independently render/read the entire ProteinTalks SI PDF or open outcome cells. The 9p21 original `Sec23` directly confirms one WT/one 3KO HT1197 clone, technical duplicates, 2,349 compounds, 1 micromolar and 48 hours; `Sec3`/`Sec4` describe selected multi-clone validation and source-owned morphology-based gemcitabine nomination. Those facts support the report's limited resource assessment. Further published selected text findings encountered in that check are exposed literature, not untouched validation.
+
+The cross-field paragraphs agree with the scout's specified original-reading locators and limitations in `scout/independent_handoff.md`: finite specified EC2 decision/noise/cost model, paid measured-candidate outcomes before discrepancy informativeness, and the materials note's explicitly open exact method. I did not conduct a second full independent donor-paper review. The report does not use those sources as evidence of a demonstrated biological transfer mechanism.
+
+## Acquisition, owner library and telemetry
+
+I totaled the actual four role ledgers using read-only metadata operations: root 10 attempts/134,328,740 decoded bytes; investigator 9/754,659; scout 5/1,329,133; challenger 1/166,347. The total is **25 attempts / 136,578,879 known decoded bytes**, with zero recorded partial decoded bytes. This agrees with `usage.json` and the shared log. The three-episode sum, 137 attempts/399,366,548 bytes, is arithmetically consistent with the two explicitly listed previous-episode counters; those historical counters were not independently re-audited here and are correctly not called a program-wide total. Decoded-body accounting is not certified wire traffic or total monetary/model cost.
+
+I inspected relevant actual `reference/papers.tsv` main/file rows for the six added identities, reused discrepancy identity and updated ProteinTalks identity. Distinct identity count is 223 and rows with reading files number 186. Deduplicating main identities, the status counts are 27 abstract_only, 91 downloaded_html, 36 downloaded_pdf, 60 pending and nine restricted. Counting duplicate main-version rows instead would overcount HTML; the report uses identity-level counts. The six new `reference/repositories.tsv` rows remain not_yet_checked, consistent with no new stored/executed author code. The 23 snapshots/16 official-code-source totals and empty snapshot-change list are the owner validator's results; I did not independently rescan every code snapshot.
+
+Main JATS files are accurately described as occupying technical supplement-format slots rather than scientific SI/full PDFs. RAD51 remains abstract-only. ProteinTalks' older not-acquired wording is explicitly historical beside the current acquisition scope. Requested role settings and the scout self-report correction are disclosed; effective model/effort, token counts, total model cost and wire bytes remain unknown. This final review cannot independently prove the absence of every unlogged execution, but no fitting or implementation result is asserted as evidence.
+
+**Provenance-field issue, resolved by source check:** the owner supplement rows for repair, 9p21 and Rajendra initially used `local file ... supplied by the user`. I reported this to root; root confirmed the owner importer hardcoded that wording and corrected all five new reading-file rows, including both arXiv HTMLs. I reread the actual corrected owner rows and matched their `source_url` and byte count to role HTTP receipts: PMC12698765/197,095 bytes; PMC13276166/160,237; PMC10899754/166,347; arXiv 1010.3091/438,113; arXiv 2609.09413/392,753. Each receipt is HTTP 200/complete. The owner notes now state agent-acquired import, and the rerun owner validator retains 223/186/23/16 with no errors, warnings or changed snapshots. This resolves the minor acquisition-attribution error without changing the scientific claim. No shared file was edited by this reviewer.
+
+## Remaining boundary
+
+No material C1-C5 objection is hidden or claimed biologically resolved: the interpretation errors are corrected, while missing calibration, engagement transport, compatible lesion/exposure/endpoints, preparation provenance, continuous mapping and novelty remain explicit uncertainties. The concrete result is source/design qualification and a conditional question, not a recommendation to fit or a positive discovery claim.
+
+This review used only stored evidence and read-only document/metadata inspection; no HTTP, workbook outcome access, author-code execution, model fit, additional delegation or shared edit. Only this review file was written. Final preservation, unchanged historical entries/dirty files, immutable freeze/initial review and unchanged HEAD must still be checked by root's separate mechanical verification before handoff.

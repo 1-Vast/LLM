@@ -1,0 +1,31 @@
+# Stage1 protocol amendment v1.1 — before call access
+
+Date: 2026-10-30. Read with the preserved initial stage1_protocol.md and review/protocol_initial.md. No S1E hit pairs, CGI scores or numerical GI/dose outcomes have been read. The independent initial review requires these three changes before development-label access. The scientific question, native call endpoint, structure features, development/held-out identities, primary P@20 and no-promotion boundary are unchanged.
+
+## B1: one coherent null for the complete CV statistic
+
+Replace independent per-training-fold shuffles with a single reassignment of whole development scaffold blocks in each of49 replicates (default_rng seed20261030). Within each scaffold block, order compounds by compound ID. The block's stratum is the ordered tuple of screening-round identities. Permute whole blocks only among blocks with the same stratum, which also fixes block size. Every destination compound receives its matched source compound's complete gene-call profile; all genes stay together. Singleton strata stay fixed. Apply this same reassignment to every training AND validation role in all three folds. No held-out compound is involved.
+
+For each replicate, recompute training-fold gene frequency, eligibility/rarity, predictions, the frequency baseline and all validation metrics against that replicate's reassigned validation labels. The complete aligned/null selection rule is identical. This preserves within-block response dependence and per-position screening round while testing alignment with structure within the exchangeable strata. Report movable blocks/compounds, fixed strata, distinct mappings and actual permutation indices. This is a conditional association randomization under block-exchangeability assumptions, not proof of a biological mechanism or a universally calibrated null. If any aligned or permuted source fold has fewer than20 eligible genes, retain a terminal insufficient-support result; do not drop that draw or change rarity.
+
+## B2: exact model selection
+
+The fixed panel is frequency, nearest-five, ridge_alpha1, ridge_alpha10 and ridge_alpha100. The aligned selection is the maximum full-development CV macro P@20 over the four chemistry methods, with ties in that listed order (nearest-five first). There is no extra inner selector or per-fold winning-alpha switch. Each null replicate selects the maximum over those same four full-development scores and subtracts its own full-development frequency score. Use this maximum-gain null in `(1 + count(null_gain >= aligned_gain))/50`; comparisons include ties. A positive aligned gain and p<=0.05 can support a later protocol only; they do not release the63 held-out outcomes.
+
+Training-standardized fingerprints use source means and population SD (ddof0); zero SD becomes1. Ridge is ordinary sklearn Ridge with an intercept. Because it is linear in all output labels, fitting identity outputs once per fold/alpha and multiplying the resulting prediction weights by each call matrix is allowed and algebraically implements the same full-rank fit. Clipping to[0,1] occurs only after prediction; lexical canonical gene ID breaks all remaining ties. Source-only eligibility and the full identical selection procedure are repeated for null labels.
+
+## B3: fixed gene identity and artifact mask
+
+Use gene_universe.tsv and gene_universe_freeze.json, prepared from the author matrix identity columns and the existing public HGNC snapshot before labels. Use the explicit HGNC(2020) text field, not Excel-date-corrupted EKO fields. Resolve approved current symbols first, then unambiguous previous symbols, then unambiguous aliases. Exclude unknown/ambiguous identities, unknown locations, every canonical gene represented by multiple source rows, and the known artifact arms7p/21q. No score chooses an alias or a retained duplicate.
+
+The retained universe is **18,415 unique canonical genes**;486 source rows are masked by arm,87 by multiple-source-row identity and43 by unknown/ambiguous identity. The roster SHA256 is `775bc1b1afc732724a6d1873a1d28dd116f519301503637eec39eb8fd6fae57a`; the included sorted IDs SHA256 is `cca1ac12566776c4eaf597e3548a583f70b05ac49d44ce62aafd8044f2fa7ba2`. The HGNC snapshot SHA256 is `12363916be36f8f6f91879b0faade4eeaac973722de7136ec61329b77f2c2f91`. This mask does not resolve the author's unknown correction scope or certify independent label construction.
+
+Extract a call only after its screen identity belongs to a designated development compound and its HGNC2020 identity maps to this fixed universe; only then decode its score/FDR. Rows for the63 held-out compounds must not be reconstructed as hit pairs or converted to numeric score/FDR values. The stored public XML bytes and parsed container characters are not secure blinding; no held-out scores or calls may be used, summarized or displayed.
+
+The independent reviewer will check this amendment and the implementation before the single development run. Report the amendment as a pre-label design correction, not a successful experiment or an independent new hypothesis. Preserve the initial objection and remaining scientific limits.
+
+## Pre-access numerical conventions
+
+The independently authored verifier requested exact RNG ordering before any outcome access. Order scaffold blocks by lexical group hash and their member compounds by compound ID. Strata are the ordered round tuples; iterate strata lexically and call rng.permutation(number_of_blocks) for every stratum, including singletons, in each of49 replicates. Bootstrap groups use lexical hash order (np.unique); each draw uses rng.integers(0,number_of_groups,size=number_of_groups), with group-summed gains divided by total sampled member count. This fixes implementation order without changing the statistical procedure. Gene-ID hash serialization joins sorted canonical IDs by LF with no final LF.
+
+Unlisted source-eligible genes are coded as non-calls only, never demonstrated negative interactions. Descriptive recall divides recovered calls by all calls among that fold's source-eligible rare genes; it is zero for a query with no such call. Oracle P@20 uses the same eligible universe. Robust biological/drug-discovery benefit remains false irrespective of this selected development gate, and held_out_release remains false.

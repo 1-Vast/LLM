@@ -126,9 +126,9 @@ The closest ordinary explanations are strong and likely: growth-rate normalizati
 
 This design was based on the local records, without new network retrieval or response access:
 
-- The preceding `2026-10-30-paper-virtual-cell-reference` episode treats the paper's feedback loop as a design reference, finds I304 reproducible by ordinary latent-source/VOI modeling, and does not qualify the required paired proxy/function matrix.
+- [`2026-10-30-paper-virtual-cell-reference/report.md`](../2026-10-30-paper-virtual-cell-reference/report.md), [`data_gate.md`](../2026-10-30-paper-virtual-cell-reference/data_gate.md), and [`challenge_initial.md`](../2026-10-30-paper-virtual-cell-reference/challenge_initial.md) establish that the paper's feedback loop is a design reference, I304 is reproducible by ordinary latent-source/VOI modeling, and the required paired proxy/function matrix is not currently qualified.
 - [`2026-10-30-cheap-screen-joint-learning-r1/report.md`](../2026-10-30-cheap-screen-joint-learning-r1/report.md) records that the CXCL9 shared-gain relation lost to a constant-interaction comparator in three of four preparation records; no global gain is reused here.
-- Earlier `2026-10-29-local-relation-pilot` and `2026-10-29-common-screen-colearning` episodes document the limits of dose-local sharing, generic feedback and metadata-only joins. They do not provide a paired durable-recovery endpoint.
+- [`2026-10-29-local-relation-pilot/report.md`](../2026-10-29-local-relation-pilot/report.md), [`2026-10-29-common-screen-colearning/report.md`](../2026-10-29-common-screen-colearning/report.md), and the endpoint/support audits document the limits of dose-local sharing, generic feedback, and metadata-only joins. They do not provide a paired durable-recovery endpoint.
 - The DrugComb qualification correction records a missing apoptosis/caspase/PARP numeric field in the inspected export. That is a data-gate limitation, not evidence that no public recovery or death resource exists.
 
 These records support the changed question and its stop rules. They do not support a positive durability relation, a source-wide endpoint equivalence, a biological mechanism, or a novelty claim. No implementation, public download, model run or sealed/confirmation response was used for this candidate.

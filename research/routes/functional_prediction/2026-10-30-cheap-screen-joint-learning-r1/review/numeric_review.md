@@ -2,7 +2,7 @@
 
 Independent implementation was frozen before primary results or implementation were read. Primary implementation was never imported or read. The frozen result SHA256 is 91ba1ba7d035b63b4ec21b1467a74480b9293886963274f94ccbde831a46496a.
 
-1205 scalar/hash/Boolean comparisons, 0 discrepancies at relative 1e-9 or absolute 1e-7 tolerance. All 192 wells, raw/retained event counts, control calibration quantities, 20 target calibrations and outcomes, 80 predictions and signed/absolute normalized errors, final technical envelopes and overlaps, all four preparation MAEs, and gain-minus-constant contrasts are covered. All 48 groups per export are retained. Detailed per-well calculation outputs remain in the local independent result artifact and are omitted from this publication; the aggregate values below are descriptive only.
+1205 scalar/hash/Boolean comparisons, 0 discrepancies at relative 1e-9 or absolute 1e-7 tolerance. All 192 wells, raw/retained event counts, control calibration quantities, 20 target calibrations and outcomes, 80 predictions and signed/absolute normalized errors, final technical envelopes and overlaps, all four preparation MAEs, and gain-minus-constant contrasts are covered. All 48 groups per export are retained. Independent quartiles, trimming boundaries, control endpoint ratios and all four inhibitor endpoint products remain in independent_result.json.
 
 | Preparation | Gain MAE | Add MAE | Constant MAE | Control MAE | Gain − constant MAE | Envelope overlap |
 |---|---:|---:|---:|---:|---:|---:|

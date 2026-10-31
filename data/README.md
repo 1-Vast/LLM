@@ -1,8 +1,8 @@
 # Data
 
-[INVENTORY.md](INVENTORY.md) is the authoritative local inventory; [ASSETS.json](ASSETS.json) records file-level observations and source-path claims. Large data stay ignored by Git. Do not open protected outcomes for maintenance.
+[INVENTORY.md](INVENTORY.md) is the historical local inventory (base observation 2026-10-20); [ASSETS.json](ASSETS.json) records file-level observations and source-path claims. Large data stay ignored by Git. Do not open protected outcomes for maintenance.
 
-Use [DATASET_CATALOG.md](DATASET_CATALOG.md) for route-level dataset classification; use `INVENTORY.md` for file-level identity, exposure, and missing-asset status.
+Use [DATASET_CATALOG.md](DATASET_CATALOG.md) for route-level dataset classification; use `INVENTORY.md` for the recorded file-level identity, exposure, and missing-asset status at its stated cutoff.
 
 - [raw/](raw/README.md): raw experimental inputs.
 - [external/](external/README.md): downloaded external datasets, source documents and retained third-party sources.

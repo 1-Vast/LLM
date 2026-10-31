@@ -72,7 +72,7 @@ python -m tools.research_validation --help
 
 ## Scientific boundary
 
-The model predicts within qualified scope; it does not establish functional endpoints, mechanism, causality or experiment value by itself. The Agent selects and audits evidence and actions; it does not turn language-model output into scientific fact. Current conclusions are in [current research status](log/RESEARCH_REPORT.md#agentvirtual-cell-joint-learning-2026-10-28-evidence-and-corrections), with numerical results in [research/EVIDENCE.md](research/routes/historical_evidence_archive/reconciled_reports/EVIDENCE.md). The [programme boundaries](log/RESEARCH_REPORT.md#current-paid-repeatability-result) separate method value, Agent value, transfer and independent confirmation. PRESAGE P0 remains NO-GO; anchor purchasing value remains blocked by independent-endpoint qualification.
+The model predicts within qualified scope; it does not establish functional endpoints, mechanism, causality or experiment value by itself. The Agent selects and audits evidence and actions; it does not turn language-model output into scientific fact. Current conclusions are in [current research status](log/RESEARCH_REPORT.md), with numerical results in [research/EVIDENCE.md](research/routes/historical_evidence_archive/reconciled_reports/EVIDENCE.md). The [programme boundaries](log/RESEARCH_REPORT.md#current-paid-repeatability-result) separate method value, Agent value, transfer and independent confirmation. PRESAGE P0 remains NO-GO; anchor purchasing value remains blocked by independent-endpoint qualification.
 
 ### Current research and literature
 
@@ -81,15 +81,21 @@ The model predicts within qualified scope; it does not establish functional endp
 - Add the paired-resource R2 data-gate stop, the CDI-R3 retrospective FLT3 association, and the CDI-R4 intervention-gated design hypothesis. Publish their reports and review records while keeping response matrices, detailed outputs, paper XML and raw API bodies local.
 - Keep all findings scoped to their assays and evidence levels; no biological mechanism, Agent advantage, external transfer or assay savings is established.
 
-Start with the [current research synthesis](log/RESEARCH_REPORT.md#agentvirtual-cell-joint-learning-2026-10-28-evidence-and-corrections) for findings, stopped configurations and evidence gaps. The [literature chapter](log/RESEARCH_REPORT.md#literature-and-source-access) distinguishes two incomplete research surveys from a search-tool validation; the [study index](log/STUDY_INDEX.tsv) traces individual decisions. Storage maintenance does not establish new scientific results.
+Start with the [current research synthesis](log/RESEARCH_REPORT.md) for findings, stopped configurations and evidence gaps. The [literature chapter](log/RESEARCH_REPORT.md#literature-and-source-access) distinguishes two incomplete research surveys from a search-tool validation; the [study index](log/STUDY_INDEX.tsv) traces individual decisions. Storage maintenance does not establish new scientific results.
 
 ### Historical dual-core validation (2026-10-21)
 
 The dual-core validation on the public PTV-1 / ProteinTalks release ended with `STOP_THIS_TASK_CONFIGURATION`: the re-implemented ppODE was below the strongest conventional predictor, feedback did not improve over ordinary updating, and no LLM program edit was accepted. This is a negative result on one exposed published-label task with seven held-out lineages, not a general test of autonomous discovery. See the [integrated research decisions](log/RESEARCH_REPORT.md#functional-feedback-and-acquisition), [numerical evidence](research/routes/historical_evidence_archive/reconciled_reports/EVIDENCE.md), and exact source ID `log/research_records/dual_core_innovation_validation_20261021/REPORT.md` ([reader](log/README.md)).
 
-Registered studies retain their protocols, results, deviations and replay code. The current evidence, stop decisions and simplification ledger are in [current research status](log/RESEARCH_REPORT.md#agentvirtual-cell-joint-learning-2026-10-28-evidence-and-corrections). Frozen research records are separate from the maintained runtime and default software tests.
+Registered studies retain their protocols, results, deviations and replay code. The current evidence, stop decisions and simplification ledger are in [current research status](log/RESEARCH_REPORT.md). Frozen research records are separate from the maintained runtime and default software tests.
 
 ## Changelog
+
+### 2026-10-31 - Research navigation and scoped study publication
+
+- Consolidate research and organization entry points, classify later datasets, and preserve route-specific negative results, invalid runs and restart conditions.
+- Publish thirteen later registered studies with authored protocols, implementations and selected small review records. Their findings remain exploratory, negative or data-gated; no Agent advantage, new cellular mechanism or core promotion is established.
+- Keep raw datasets, acquired paper/API bodies, third-party snapshots, environments and protected outcomes local. Historical source bindings and all software checks remain enforced.
 
 ### 2026-10-27 - Agent and virtual-cell research sources
 

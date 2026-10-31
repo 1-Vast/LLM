@@ -1,0 +1,46 @@
+# Bounded final content and source review
+
+2026-10-31. This is follow-up validation after the independent initial assessment, not a second blind review. `challenge/initial_review.md` and `challenge/identity_scan_review.md` were preserved unchanged. No response-field access, HTTP, new experiment, script execution, registry/index/manifest change, or report modification was performed by this reviewer.
+
+## Reviewed version and decision
+
+The exact report reviewed had SHA-256 `3fdba0c7b4febba4da1fdc81db080cb76d8a7ed1cf06075557b6fd041ed1407f`, independently checked from the file. Read the report, `root/scientific_decision.json`, `usage.json`, final sections of `record.md` and `PROCESS.md`, `library_verify_final.json`, the six-surface text/registry insertion payload in `review/integrate.py`, and `root/junction_identity_geometry.json`. The integration script was inspected as text and was not executed by the reviewer. The coordinator retains responsibility for mechanical old-byte/old-study/library/freeze preservation.
+
+**Content decision: conditional clearance after the two precise report wording corrections below. The scientific outcome and proposed six-surface payload are otherwise supported within the stated reading scope. This does not admit a numerical experiment.** The reviewed hash identifies the pre-correction version; it must not be reused as the hash of a corrected report. The coordinator may record the exact surgical replacements and resulting hash without repeating a broad scientific review. Any materially different scientific change would fall outside this bounded content decision.
+
+## Two required corrections
+
+1. `report.md`, line 63, says: “For T against one aggregate alternative, the rule is exactly a context-strength/log-odds shift.” State the required condition: a genuinely binary choice, or an aggregate whose constituent alternatives have equal drug multipliers. For arbitrary alternatives with different multipliers, the effective aggregate multiplier is their untreated-composition-weighted mean and can change across backgrounds. Thus arbitrary aggregation need not preserve the same scalar log-odds shift even when the full-vector restriction holds. This qualification is consistent with the preceding equal-A/B example and initial T6, and makes the equation's actual boundary explicit. It is not a revision of the frozen scientific question.
+2. `report.md`, line 65, says U1C provides “a substantive counterexample to presumed invariance.” Replace that phrase with “a substantive reason to challenge presumed invariance,” or an equally explicit adverse-evidence formulation. U1C Sec11/12 supports direct relevance to drug-compatible complexes and heterogeneous responses. It does not supply an exact test of the frozen supported multichoice restriction. Ishigami Sec11 also explains why dose-threshold changes alone can follow baseline context. The report correctly says elsewhere that no vector-transport failure was measured; the counterexample wording should not imply otherwise.
+
+No corresponding materially misleading statement was found in the proposed six-surface insertion payload. Its binary reductions are explicitly binary, and its U1C wording is conditional/adverse. The root decision likewise retains “adverse, not a universal logical refutation.”
+
+## Scientific/source findings
+
+The final report preserves the substance of T1-T6: independently specified intervention eligibility remains missing; identity geometry addresses only one observation subquestion; endpoint mature-RNA proportions do not identify binding or kinetic mechanisms; broad U1-by-drug combination effects and local-context separation remain source-owned; measurement economy and useful selectivity benefit remain unmeasured; and scalar ordinal failure is separate from vector-transport failure.
+
+The original U1C Sec11/12/28, Ishigami Sec6/8/11 and Lenkeit Sec3/4/16/21 passages inspected during the initial review support the report's corresponding claims. Historical DEDSeq 01 union/pooled filtering and 06 site/skipping/event-PSI portions support the stated observation warning, subject to the retained 2021/paper-specific-modification limitation. Carlson's original single-trait monotone and multidimensional-misspecification passages and Crona's original sign-epistasis definition support the scalar-null boundary. Full paper/SI reproduction and absence-of-prior claims remain outside the inspected scope.
+
+For the final donor table, additionally inspected stored Generalised Transportability2026 original HTML abstract and Introduction paragraphs `S1.p3.1`/`S1.p4.1`: the single-map/interventional-family framing supports the attributed constraint. Inspected stored ECI2D2026 original HTML `Sx1.p3.1` and `A6.SS0.SSS0.Px4.p1.1`: transfer invariance is explicitly necessary but insufficient for faithfulness and does not identify a mechanism. These sources do not establish a biological learner or an agent benefit, as the report states. These were bounded local source checks, not a new acquisition or survey.
+
+The complete vector rule is exactly shared multinomial odds transport; an exact implementation must share its predictions. A positive source pair always fits its own factors. The report correctly assigns no validation force to source self-fit and no algorithmic novelty to the reweighting. It demands equally informed ordinary rivals rather than treating omitted competitor information as a new biological law. Neither useful learning, external validation, general unseen-compound transfer, whole-cell behavior nor clinical benefit is established or claimed as an observed result.
+
+## Identity, replication and observation correction
+
+The executed metadata result agrees with the reported totals: 830,309 records, 773,302 parsed identifier strings, 729,168 single admitted simple-label IDs, 44,126 multiple-label IDs and eight lacking a simple label. The last three sum to 773,302. First/second groups with three or more other endpoints are 80,288/77,860. Each grouping histogram sums to its declared group total. Strand/order counts sum to 729,168. There is no syntax/positive-coordinate rejection entry in the result. It is appropriate to report no such rejection recorded under this parser, rather than biological proof about every possible junction.
+
+The report correctly keeps export-label simplicity distinct from genomic uniqueness, overlapping anchor groups distinct from events/replicates, coordinate indices distinct from authenticated donor/acceptor conventions, and identity metadata distinct from counts. It retains treatment-informed pooled discovery, incomplete closure/support and conditional-denominator limitations. The explicitly conditional observed-subset estimand is narrower than all molecular fates and need not require full transcript reconstruction.
+
+The condition-summary versus replicate correction is visible in all relevant final texts. The workbook's 22 condition PSI headers do not authenticate replicate-level PSI; the separate 48-column GEO count mapping authenticates sample labels only. The two-background/four-control/two-treated-replicate description is consistent with the inspected metadata and original design, without counting exon rows or geometry groups as independent experiments. Cell-line naming and dose-prose discrepancies remain disclosed.
+
+## Budget, partial acquisition and library checks
+
+Independently counted the actual local receipt rows: root 18, investigator four, scout eight, for 30 attempts. Scout's repeated ordinal 1 is retained; row count, not the maximum ordinal, is correct. Dispositions aggregate to 26 complete, two bounded partial-body aborts and two header-rejected unread bodies.
+
+Receipt completed plus known partial bytes give root 69,846,744 + 25,186,256 = 95,033,000B; investigator 1,822,101B and scout 1,270,142B yield 98,125,243B. Adding the declared inherited 426,367,452B gives 524,492,695B; attempts 181 + 30 = 211. The inherited history was not re-audited as a fresh program-wide total. Episode/five-episode ceilings and unused numerical-matrix/implementation-repair allowances are consistently described.
+
+The two partial receipt values match the report: Lenkeit SI 16,793,600 known received bytes, DEDSeq archive 8,392,656. Independently checked stored file sizes without opening content: 16,777,216B and 8,359,888B respectively. Stored prefixes are correctly distinguished from received bytes and neither is called a complete acquired/read source or repository snapshot.
+
+The supplied final owner-verification JSON reports 235 identities, 199 reading files, 23 snapshots and 16 sources with official stored code, with empty errors/warnings/changed-snapshot lists. Report and integration text agree, including the five-new-identity/five-original/no-new-snapshot increment and older-prior exceptions. This review checked that agreement, not the owning manifest's entire integrity or previous-state preservation; those remain the coordinator's separately stated verification task.
+
+Reviewer HTTP remains 0 attempts/0 acquired bytes. The metadata scan remains separate from numerical model testing. Effective settings, native token usage, wire bytes and monetary cost remain unknown; the report does not turn requested role settings into confirmed telemetry.

@@ -2,7 +2,7 @@
 
 Source-like result was frozen before primary inspection (SHA256 `2c7f8189bac7bb65ae274d840a054f63f9db1a5d3b9e41bb6e687e3119acef8e`). It used the archived `01_preparing_inputs.R` method for each preparation separately: pool Sample1 and Sample2 events per stimulus×drug, use NumPy linear quartiles, retain strict inequalities, then equal-average surviving technical-well MFIs. The primary E001 method trims each technical well separately with closed bounds. The source script itself combines E3DA/E3DB in its preparation workflow, but this diagnostic deliberately keeps them separate as requested.
 
-Compared 1140 arithmetic/Boolean fields against the local primary result artifact; 888 differ at rel 1e-9 / abs 1e-7, as expected from the trimming mismatch. The mismatch is therefore material to numerical values, while the processing question is explicitly a post hoc robustness diagnostic. Detailed comparison payloads are retained locally and omitted from this publication.
+Compared 1140 arithmetic/Boolean fields against pilot_result.json; 888 differ at rel 1e-9 / abs 1e-7, as expected from the trimming mismatch. The mismatch is therefore material to numerical values, while the processing question is explicitly a post hoc robustness diagnostic.
 
 | Prep | changed wells | changed retained counts | max MFI change | source-like Gain MAE | source-like B_const MAE | source-like overlap | best model |
 |---|---:|---:|---:|---:|---:|---:|---|

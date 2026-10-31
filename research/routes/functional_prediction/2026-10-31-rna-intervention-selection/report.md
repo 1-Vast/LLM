@@ -1,0 +1,89 @@
+# RNA intervention selection: final data-admission decision
+
+2026-10-31 · Study `2026-10-31-rna-intervention-selection` · Repository HEAD `580ccb8333d9c93b39d685eba97455e804c209e8`.
+
+**No candidate was admitted to model fitting.** The three RNA entrances suggested in the supplied D-SPIN/MAMMAL/RiNALMo discussion were audited. One ordinary cross-cell splicing-response proposal was frozen, then stopped because the acquired final rMATS tables cannot reconstruct its required treatment-independent event universe. This is a data-contract failure, not a measured failure of prediction. No RNA model accuracy, functional gain, new learning mechanism or Agent benefit was established. The overall research objective remains **ACTIVE / NOT_ACHIEVED**.
+
+## Scope and result
+
+The authorized question was whether a measured RNA intervention relationship can predict a functional molecular consequence better than equally informed ordinary prediction. Virtual Cell value comes first; an Agent would require a separate, substantial demonstrated benefit. This round allowed three shared evidence passes, three data-entrance audits and at most one admitted CPU pilot. It did not authorize six simultaneous experiments or a unified model.
+
+| Entrance | Supported observation | Decision in this round |
+|---|---|---|
+| RBP knockdown / ENCODE, attachment route 2 | Original splicing archives and exact input/control associations recovered; control arithmetic audited | Frozen I001.v1 not admitted: final rows depend on treatment counts and omit required event/control information |
+| ASO Atlas local edits, route 3 | 240 chemistry-token candidate pairs and 14,586 one-base tiling pairs found | No authenticated controlled-edit task; source/protocol and coordinate contracts incomplete |
+| Small-molecule splicing, route 4 | Original paper and complete official code archive acquired | Processed PSI/count data not acquired through the documented public routes; access failure, not scientific failure |
+
+The initial [brief](record.md), [candidate](candidate_v1.md), [freeze](candidate_v1_freeze.json), unsuccessful acquisitions and initial objections remain unchanged. Only a proposal was frozen. No full numerical protocol, estimator matrix or execution implementation was admitted or frozen.
+
+## Why the selected splicing proposal stopped
+
+I001.v1 asked whether an RBP knockdown already measured in one cell line could predict its exon response in the other, using a fixed change in splice-inclusion odds plus the target-cell baseline. It was explicitly an ordinary response-scale hypothesis, not a new algorithm. The proposed panel assigned HNRNPC to training, HNRNPK to validation and RBFOX2 to testing, with whole-gene holds and both HepG2/K562 directions. Source-cell responses of held genes would be legal inputs, so the task would not be globally response-unseen genes or unseen drugs. eCLIP values were not modeled; this would not test binding-to-function or RiNALMo benefit.
+
+The decisive evidence is the **exact rMATS 3.2.1.beta distribution**, the version specified by the original ENCODE paper. Its 142,354,579-byte source archive has SHA256 `6f5219967c2116170172cfdaba97c56fbfd2ea625c9c4451a7ee064f237b9146`. The relevant code was read as text; it was never imported or executed. The curated source identity is recorded in [rmats_source_slice.json](root/rmats_source_slice.json).
+
+At [RNASeq-MATS.py:496](source_code/rmats321beta/RNASeq-MATS.py#L496), the junction-count analysis retains a row only when KD total counts and control total counts are each positive, both inclusion and skipping are observed somewhere across the two groups, and both effective form lengths are nonzero. Thus treatment observations affect row inclusion before the statistical model. Requiring both isoforms in controls would remove two pooled-isoform conditions, but would still leave the positive-KD-coverage requirement. Subsequent statistical processing and `bin/joinFiles.py` preserve this filtered set; they do not restore excluded events.
+
+Consequently, a missing final row cannot be interpreted as zero response, zero counts, unchanged splicing or failure of control-only eligibility. The six final tables cannot supply the complete independently fixed reference/control-eligible set required by the candidate. Restricting the task to the observed intersection would change the prediction population and leave treatment-informed ascertainment in place. That is not an accepted repair of I001.v1.
+
+An earlier annotation audit found 20,068 full-coordinate reference SE configurations across 8,649 genes, with 6,990–8,412 present per archive and 3,568 common to all six. **These absence counts are not counts of treatment-filter exclusions.** The exact software deduplicates by a narrower junction identity that omits outer flank boundaries, gene and strand. Full-coordinate mismatch, annotation representation, global deduplication and filtering can all contribute. Moreover, outer exon extents affect the code's 1 kb read-start lookup support, so dropping flank fields alone does not prove count/PSI invariance. The explicit treatment-count filter independently establishes the admission failure. See the [reference-only audit](root/annotation_audit.json) and [final exact-source review](challenge/exact_source_final_review.md).
+
+The initial proposal also had an epsilon/null artifact, insufficiently bounded ordinary rivals and an incomplete numerical specification. These remain documented pre-execution issues. There is no v2, implementation repair, outcome inspection or model run to report.
+
+## What the ENCODE audit did establish
+
+Live official metadata contained 522 released shRNA RNA-seq experiments: K562 263 and HepG2 259, covering 453 literal target-label/cell pairs and 256 labels. Of these, 460 reference possible controls, 62 lack them and 58 distinct control experiments are referenced. The eCLIP query returned 250 experiments / 244 target-cell pairs. The KD/eCLIP intersection is 187 target-cell associations, with 57 labels in both cells. These are metadata associations, not independent functional tasks or a validated RBP identity census.
+
+The original ENCODE article, [DOI 10.1038/s41586-020-2077-3](https://doi.org/10.1038/s41586-020-2077-3), identifies publication fileset ENCSR413YAF. Its authenticated object contains 1,888 related files. The corrected query returned 1,416 hg19 splicing archives: 944 rMATS and 472 MISO. There are 422 uncorrected rMATS files joining the worker's current KD metadata; the advertised control/replicate/eCLIP filters give 183 target-cell associations and 56 targets in both cells. Normalized/batch-corrected outputs were excluded. Initial invalid query routes are not evidence of missing data. The worker's [initial admission note](encode/admission.md) predates this recovery; its mapping uncertainty is resolved for the six selected files, while the final selection problem remains.
+
+| RBP | HepG2 archive | K562 archive |
+|---|---|---|
+| HNRNPC | ENCFF244XJW | ENCFF312MYV |
+| HNRNPK | ENCFF146LKU | ENCFF757KYW |
+| RBFOX2 | ENCFF602CHO | ENCFF128FXL |
+
+All six archives were selected before effect values. Their sizes, cloud MD5s, aliases and member prefixes match official metadata. Each has two KD and two exact-control BAMs; the panel has 24 distinct BAMs and separately registered biosample origins. This supports the advertised biological inputs, not independent measurement errors. rMATS vector slots cannot be named biological replicate 1/2 without further mapping.
+
+The [independent control-only audit](encode/control_audit/control_audit.md) checked all 30 event tables and 448,068 rows. It found no duplicate full-coordinate+GeneID keys, two control count/PSI slots and positive form lengths. Reconstructing PSI from length-normalized inclusion/skipping counts gave **zero discrepancies among 872,774 comparable control slots**, at absolute tolerance 0.0005000001. Missing/nonfinite baseline PSI remains explicitly counted. Descriptive eligibility requires IJC+SJC >=20 in each control slot, finite PSI in [0,1] and positive form lengths. Control-eligible cross-cell SE intersections were 12,561 / 12,611 / 7,726 for HNRNPC / HNRNPK / RBFOX2; requiring both control PSI slots in [0.01,0.99] gives 3,169 / 3,373 / 1,963. These are counts within the emitted tables. They do not certify a complete reference universe, independent tasks or model performance.
+
+## Why the ASO and small-molecule alternatives were not selected
+
+The ASO release was pinned to Hugging Face revision `b947db330a3bf1e194ac190d0f188f7693660852`, with author-code revision `38987cb1bd61b25aac82af9a553d03d3a138e8bb`. It contains 174,459 release rows with measured-presence, 482 patent IDs and 390 raw target labels. A genomic-enriched repository table has 178,403 rows and only partially reconciles with the release. Raw target labels are not verified genes; patent IDs or table IDs are not independent assay protocols.
+
+The strict metadata/context subset contains 96,303 deduplicated structures across 92 patent IDs and 49 target labels. It yields 240 one-token chemistry candidates across 13 patents / 9 targets, plus 14,586 one-base tiling pairs across 64 patents / 39 targets. Tiling shifts the target window; it is not a controlled base substitution. Pair counts share compounds and are dependent. **Zero controlled local edits were authenticated**, because assay normalization/protocol equivalence, patent-family/table duplication and coordinate provenance remain unresolved. This is not a claim that controlled pairs do not exist. See [ASO admission and reproducible counts](aso/admission.md). Ordinary activity prediction is a different possible replication task; it was not substituted for the failed local-edit contract.
+
+For small-molecule splicing, the original [Nature Communications paper](https://doi.org/10.1038/s41467-026-74594-9) reports biological triplicates, SH-SY5Y/iNGN2/HeLa, GRCh38, treatment-informed novel-exon discovery and an XGBoost comparator. Relevant Methods were read at P level. Official CompExonSpace code was acquired at commit `3dd5b06266805c8b04d7e311ab11ceca9b4afceb` without execution. The paper cites Zenodo 18416224; its concept API redirected to 20490448 and failed TLS validation. The README's version 18416225 API timed out; documented `data.zip` redirected to login. The current public record also failed TLS. No login/TLS bypass was used. `scsp_data.zip` is a small redirect body, not a data archive. No processed PSI/count task was admitted. These access limits do not refute the scientific direction or establish that the data are universally unavailable.
+
+## Closest priors and what remains only an idea
+
+Reading levels below describe actual retrieved passages: P = selected original sections/source; A = authenticated abstract; R = metadata. None is promoted to full-paper/supplement reproduction.
+
+| Source | Reading and consequence |
+|---|---|
+| [RiNALMo, 10.1038/s41467-025-60872-5](https://doi.org/10.1038/s41467-025-60872-5) | P. Models are approximately 33.5M / 148M / 650M parameters. Its splice task classifies donor/acceptor presence on 400 nt sequences; it is not RBP-KD differential splicing. |
+| [MAMMAL, 10.1038/s44386-026-00047-4](https://doi.org/10.1038/s44386-026-00047-4) | P original architecture. Structured entities and continuous numerical embeddings do not establish an RNA-structure-to-cell-function causal model. Correct original is PMC13267068. |
+| [KATMAP, 10.1038/s41587-025-02881-9](https://doi.org/10.1038/s41587-025-02881-9) | P selected original Methods. Explicit log-odds/baseline rationale, functional target prediction and cross-cell inverse SF identification are close prior art. Actual acquired original is [publisher hop3](encode/sources/katmap_publisher.html.hop3), not the base redirect. Odds geometry is established prior; no candidate-versus-KATMAP numerical comparison occurred. |
+| [OligoAI, 10.1016/j.omtn.2026.103004](https://doi.org/10.1016/j.omtn.2026.103004) | P original selected passages and official README. Already uses RiNALMo, RNA target context, ASO sequence, chemistry and dose. Their combination is not a new principle. |
+| [ASO-RASAR, 10.1021/acs.jcim.6c01314](https://doi.org/10.1021/acs.jcim.6c01314) | A; publisher 403. Cross-gene read-across and leave-one-gene-out activity prediction already studied. Controlled local-edit loss equivalence remains unverified. |
+| [PanExonNet, 10.64898/2026.02.18.706660](https://doi.org/10.64898/2026.02.18.706660) | A. KD RNA-seq, sequence and splicing-factor-expression conditioning are adverse prior evidence; full Methods/code unreviewed. |
+| [ASOCompass, 10.64898/2026.08.03.742461](https://doi.org/10.64898/2026.08.03.742461) | R only; acquired metadata has no abstract. No architecture or performance claim is drawn from it. |
+
+The Atlas 2 manuscript was not authenticated: its paper submodule returned 404, and repository `nLorem_paper.pdf` is a different clinical article. These failures remain preserved. D-SPIN formal/guide material remains at the previous abstract-level evidence; the attachment's equations are hypotheses supplied for discussion, not independently verified original Methods.
+
+The [independent structural scout](scout/initial_findings.md), saved before candidate exposure, read original surrogate-paradox and baseline–change-coupling passages. It contributed actual-functional-outcome and shared-control safeguards, not a new RNA mechanism. A separate predictor-baseline and label-baseline measurement can remove direct reuse, but does not establish independent errors or causal baseline gating. Equally informed ordinary rivals require the same inputs and label construction. Its third donor lead was rejected unread by a size limit and supplies no evidence.
+
+Routes 1 (coupling revision), 5 (rare-state combinations) and 6 (cross-context regulatory programs) remain parked; no D-SPIN/sci-Plex modeling occurred. The attachment's common “intervention-conditioned operator” remains a design hypothesis. RPT remains a conditional direction, not a validated algorithm. Route 3 needs authentic comparable edits; route 4 needs accessible processed data and a treatment-independent event contract. No route warrants an Agent or core-code promotion.
+
+The preceding [regulatory/functional-dynamics episode](../2026-10-31-regulatory-functional-dynamics/report.md) also supersedes older K562 status in the discussion: its candidate tied Ridge at 98/97 signed Top100 hits on 9,408 held pairs, while ordinary completion had lower MSE. That separate result is not RNA validation and its realized ceiling is not biological falsification.
+
+## Exposure, review, resources and restart
+
+Control PSI/count values and annotation coordinates were accessed for preparation. ASO measurement-presence used a validity bitmap. Underlying table lines necessarily passed through parsers, but event-level KD counts/PSI, effect magnitudes, PValue and FDR were not selected for numerical inspection or analysis. Published aggregate source outcomes were read as literature and disclosed; this is not pristine literature exposure. No RNA model was fitted, no weights downloaded and no downloaded author code executed. Protected CGI63 calls/S2/HTS031 and historical protected outcomes were not numerically or semantically inspected or used. Byte-level preservation hashing reads file bytes for integrity and is distinct from interpreting outcome values.
+
+The fresh candidate challenger saved its initial objections before rebuttal, then reviewed exact-source resolution. Its [final review](challenge/exact_source_final_review.md) supports stopping before values/fitting. Initial and intermediate reviews remain visible. Requested roles were ENCODE and ASO gpt-6.1-sol/medium, structural scout gpt-6.1-sol/high, and challenger gpt-6-astra/high. Runtime-effective model/effort, tokens and monetary costs were not exposed. Agent agreement is not biological evidence. Final synthesis review and preservation checks are recorded under `review/`.
+
+Final acquisition usage is **95 of 96 counted HTTP attempts** and **256,840,201 of 268,435,456 permitted known decoded body bytes**, including recorded partials, redirects and errors. Counts come from receipt records rather than ordinal maxima. Wire bytes cannot be certified. The final allocation, reallocation history, access failures and source-identity corrections are retained in [PROCESS.md](PROCESS.md) and [usage.json](usage.json). No further acquisition is needed for this decision.
+
+The shared library's final owner verification is **213 unique source identities, 175 stored reading files, 23 code snapshot versions and 16 sources with official stored-code relationships**, with no errors/warnings or changed snapshots. One identity is rMATS software documentation, not a journal article. Original JATS main texts occupy explicitly labelled supplement-format technical slots; they are not scientific supplements or acquired PDFs. Source slices and unknown reuse rights remain qualified. This is inventory verification, not full reading, experimental reproducibility or efficacy evidence. See [library verification](library_verify_final.json) and [library coverage](../../../../reference/README.md).
+
+Restart of the stopped RBP task requires unfiltered event/count inputs, such as `JC.RNASeq.SE.MATS.input.txt` plus event definitions, or a separately scoped reference/control counting effort from raw inputs. A new protocol would need to fix event identity, ambiguity exclusions, baseline/label construction, bounded ordinary rivals and all numerical details before effects. It must be frozen and reviewed again. No observed-intersection reframe or relaxed gate is an accepted continuation of this candidate. This round ends with an admission finding and preserved evidence; the larger scientific objective remains unachieved.

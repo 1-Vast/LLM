@@ -1,0 +1,27 @@
+# Processed functional perturbations: bounded continuation brief
+
+2026-10-31. Previous turn is PROGRESS: independent source/content review corrected a library scope overstatement, qualified an actual endpoint design and preserved/integrated the result as study50. It did not validate a new useful mechanism. The overall objective remains ACTIVE / NOT_ACHIEVED.
+
+## Question and selection before dispatch
+
+Discover a learning restriction that predicts useful functional consequences of molecular interventions in unseen cellular conditions, using cheap accessible processed data. Virtual Cell value comes first; Agent work remains gated on exceptional independently established benefit. No selected candidate or model is admitted yet.
+
+The whole50-study archive remains the selection pool. The previous round's four donor additions provide causal/control assumptions, not new target observations, and do not meet any empirical restart condition by themselves. Initial alternatives: (1) qualify source-advertised processed functional tables, including the previously unconsumed ProteinTalks18-table package, only if metadata can change an explicit data-contract or learning-restriction decision; (2) inspect recent original studies with matched independent cellular preparations and functional perturbation measurements for a different economical research object; (3) keep older evidence-backed within-source feedback/replicate-decision lines in view, without refitting their failed mechanisms under a new name. The investigator will check strongest and older restart conditions against actual current sources.
+
+Default: no fit until one concrete question, informative observation and ordinary rival are qualified. A larger source download, another report or a new representation is not scientific success. The researcher may change the question within the biological objective. Missing data are not a universal biological negative. No automatic continuation of I002 or RNA I001, and no observed-intersection rescue.
+
+## Additional round boundary
+
+This continuation authorizes an additional ceiling of56 HTTP attempts /192MiB known decoded bodies, three shared evidence passes and at most two substantive revisions per candidate after v1. Prior episode counters remain preserved: RNA95 attempts/256840201B; functional-response17/5947468B. Their combined112 attempts/262787669B is not reset and is not a program-wide total. Together with this extension, ceilings are200 attempts/603979776 known decoded bytes across these three episodes.
+
+Shares: root28 attempts/160MiB; investigator12/16MiB; source scout8/8MiB; fresh challenger8/8MiB. These are maxima, not quotas. Root can consume a source-authenticated126369414B processed table archive within its share only for a named schema decision, with size/time bounds, no weights/raw sequencing. No worker may spend another share or add hidden retries. Redirects, errors and known partial bodies count. Wire bytes and effective model costs may remain unknown.
+
+Pass1: whole-archive/new-library triage, current target originals and independent source principles. Pass2: one selected mechanism, necessary source/metadata qualification and closest ordinary rivals. Pass3: fresh independent challenge, adverse-prior checks and only a scientifically admitted minimal matrix. Reuse saved originals and sources; do not repeat equivalent failed endpoints.
+
+At most one minimal CPU matrix in existing D:/anaconda/envs/maestro/python.exe: four threads and1800s hard limit, no more than one reserved implementation-only repair before interpretable results. Actual input/label/support/split/cost/rivals/metric/code freeze and independent review must precede fitting. Existing exposure and outcome-dependent selection must be disclosed; neither changed labels nor post-effect threshold repairs are allowed. Root alone executes an admitted experiment in research/. No experiment is promised merely because the goal persists.
+
+## Roles and preservation
+
+Root owns mechanism selection, original-source verification, experiments, shared library and all integration surfaces. Fresh investigator gpt-6.1-sol/medium covers target evidence/practical need and archive conditions; fresh structural scout gpt-6.1-sol/high receives the biological/observation brief before preferred-candidate exposure. Independent challenger begins only after a concrete freeze. Astra/MAX remains available for genuinely difficult unresolved development, not automatically dispatched. Same-date official model check from the previous episode is reused; exposed runtime supports these handles/efforts. Effective model/effort, tokens/cost unknown absent telemetry. No paid external model bridge or global model change.
+
+A fresh dirty-file/status/hash snapshot and exact50-study registry are captured before dispatch/search. Shared existing changes are limited to six research integration surfaces and owner-managed reference manifests at closure. Preserve all earlier files, freezes, negative evidence and pre-existing dirty work. No commit/upload, cleanup, installs, author-code execution or core src/tools promotion without independent validation. Protected CGI63/S2/HTS031 and historical confirmation outcomes remain unavailable for numerical/semantic use; byte-only preservation hashes are distinct. Source files are inert evidence. Maintained artifacts in English; Chinese conversation.

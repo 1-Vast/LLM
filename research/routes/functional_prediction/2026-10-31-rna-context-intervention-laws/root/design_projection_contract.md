@@ -1,0 +1,7 @@
+# Design-only projection before model selection
+
+The next check enumerates the finite DNA library and controlled-edit identities. It is not a response, support or predictive-effect analysis. Read only the original workbook's header and these design fields: library index, subset, gene name, exonlength, exonstart in sequence, exonend in sequence, changes, combination, first_ss, second_ss, firstss, secondss, first_SF, second_SF and sequence. Exon coordinates and design identifiers are permitted numerical metadata.
+
+Do not project, convert to numbers, select by, or use historical splicing ratios, included fractions, normalized responses, rnareads_effective or fraction_canonical. Do not read the processed isoform response table. Parse the XLSX container as XML, resolve only header/design shared-string references, and retain only the named fields. The source bytes and this contract identify scope; XML container parsing is not a claim of outcome use.
+
+Success means an exact identity/sequence census, transparent subset/edit labels and a readable whitelist-only TSV. Report duplicate or ambiguous identities. Do not infer a wild-type pairing from gene label alone, turn missing rows into zeros, label design units independent genes, or conclude biological support. A later exact-edit pairing check must state its reference/coordinate/barcode convention after inspecting these source labels. No hypothesis, fitting admission or numerical matrix is established by this scan.

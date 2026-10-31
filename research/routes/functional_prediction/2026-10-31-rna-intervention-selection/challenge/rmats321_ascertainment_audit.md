@@ -1,0 +1,30 @@
+# Exact rMATS 3.2.1.beta ascertainment audit
+
+## Answer and admission consequence
+
+**The exact software's annotation-only enumeration and final emission guarantee remain unresolved from the acquired source documentation.** I cannot establish that a fully annotated SE event must appear in the final processed table regardless of treatment reads. The opposite universal claim (that every fully annotated event's presence is treatment-dependent) is also not established. The official guide explicitly says possible events derive from both RNA-seq and GTF, but does not specify the relevant enumeration branch, count filters, skipped statistical cases, or final row retention logic. Therefore restricting an intersection of observed archive rows to GTF-compatible events is not enough to certify an outcome-independent universe.
+
+There is one precise alternative to recovering the implementation: independently define a conservative, nonempty GENCODE19 SE universe before observing archive membership, then certify **every event in that fixed universe is present in every one of the six selected tables**. For example, a consecutive annotated upstream/alternative/downstream exon triple plus an annotated direct upstream/downstream skipping junction, all in the same unambiguous gene, with a frozen coordinate convention, gives a reference-defined universe. If all its events are emitted in all six, row availability has not selected among events in that universe. Subsequent coverage eligibility can then use only the prespecified controls, with a frozen missing-label policy. This is an empirical completeness certificate for that narrow reference universe, not a proof of rMATS behavior globally.
+
+If reference events are missing, do not redefine the universe as the observed intersection or choose genes that happen to be complete. A separate control-only ascertainment certificate would then be needed. Missingness alone is not proof of treatment selection, but it leaves the guarantee unresolved. Do not convert the absence of proof into numerical admission. Differences in transcript graph construction or coordinate interpretation can be resolved from sources before outcomes; they must not be resolved by selectively dropping unmatched reference events.
+
+Root reports a reference-only audit is being prepared; I have not read its results or any count/PSI/effect values. I agree with the stated exhaustive-membership logic, conditional on a correct independent GTF parser and complete membership verification. Source identity and parser correctness remain root-owned.
+
+## Exact original sources acquired
+
+1. Official current landing page: https://rnaseq-mats.sourceforge.net/ -> https://rnaseq-mats.sourceforge.io/ . It links the archived version and identifies newer turbo versions as a rewrite relative to the old Python/R code.
+2. Archived exact version landing page: https://rnaseq-mats.sourceforge.io/rmats3.2.1.beta/ . It dates 3.2.1.beta to 03/03/2016 and says the change fixed read counting of short exons. The prior 3.2.0.beta entry introduced novel splice sites/exons. This establishes version context, not row-emission guarantees.
+3. Exact version user guide: https://rnaseq-mats.sourceforge.io/rmats3.2.1.beta/user_guide.htm . Its Alternative Splicing Events section says: "Possible alternative splicing events are identified from the RNA-Seq data and annotation of transcripts in GTF format." Its output section describes ASEvents as "all possible alternative splicing (AS) events derived from GTF and RNA" and MATS_output as output sorted by P-values. Neither describes complete retention of all annotation-derived events in the final MATS table.
+4. Exact version FAQ: https://rnaseq-mats.sourceforge.io/rmats3.2.1.beta/faq.html . Read full extracted text; it does not answer the annotation-only emission/filtering question.
+5. Official software distribution link, followed normally through redirects: https://sourceforge.net/projects/rnaseq-mats/files/MATS/rMATS.3.2.1.beta.tgz/download . CDN path https://master.dl.sourceforge.net/project/rnaseq-mats/MATS/rMATS.3.2.1.beta.tgz . Final response Content-Length **142354579 bytes** (about135.76MiB), last-modified Wed,23 Mar2016 02:56:38 GMT. The body was rejected unread because it exceeded the allowed acquisition size. No alternate access, range bypass or retry was attempted. Exact redirect URLs and headers are recorded in http_receipts.jsonl attempts5–7.
+6. Official Xinglab/rmats-turbo GitHub tree metadata at commit015c0305f87cdeec0edd56a99d5ab1689832fa40 and its current tag listing. The listed tags are v4.1.0 through v4.4.0, not3.2.1.beta. I did not substitute current source behavior for the old implementation, and no executable code was run.
+
+## Additional source-supported measurement details
+
+The exact3.2.1 guide states -b1 and -b2 take comma-separated BAM replicates, the output IJC/SJC and IncLevel vectors contain comma-separated replicate entries, and IncLevelDifference = average(IncLevel1) - average(IncLevel2). This supports the archive vector semantics, contingent on the original publication orientation (sample1 KD, sample2 control). It does not reconstruct which named BAM occupies slot0; source logs/summary/commands would identify input order, but are absent from the acquired publication archives.
+
+## Scope and budget
+
+Requested reviewer gpt-6-astra/high; runtime-effective model/effort unknown. No event outcomes, model fits, simulations, package installations or protected data accessed. Only original public documentation, source-distribution headers, and official repository metadata were inspected. All HTTP requests used episode fetch_source.fetch role=challenge. Current usage: 10 attempts including redirects, 183629 total decoded response-body bytes, 0 known partial-body bytes. One of11 attempts remains unused; the remaining8MiB allowance is insufficient for the exact142MB distribution. No unbounded search was attempted.
+
+The epsilon/null and bounded-rival repairs were described by root but their eventual numerical implementation has not been reviewed in this addendum.

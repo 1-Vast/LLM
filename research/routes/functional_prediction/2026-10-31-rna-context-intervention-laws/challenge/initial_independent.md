@@ -1,0 +1,35 @@
+# RCI-01 v1: initial independent assessment
+
+Recorded 2026-10-31 before discussion with coordinator/proposer. Input order: frozen root/candidate_v1.md, episode record.md, skill and Role 3 checklist, then the specified primary sources and design/identity-only audits. No development files, proposer interpretation/handoff, persuasive root analysis, other review, prior discussion, RNA table, response, count, score value, or author-code execution was used. Requested role settings: Sol/high; effective model/effort unavailable to this reviewer.
+
+## Initial verdict
+
+The scientific restriction is coherent, falsifiable, and currently untested. It is not refuted by the paper's demonstration of promoter-dependent cryptic splicing. It is also not yet an unconditional admission to the proposed biological count analysis. The missing premise is a measurement map that preserves or bounds the distinction between actual use of the designed donor and other products. Perfect mapping or raw sequencing is not intrinsically necessary. A genotype-invariant, G-pure observation map, or informative bounds on its violations, can suffice. Existing corrected-coordinate identities alone do not establish that premise.
+
+Strongest defensible question: for these fixed complete GT/GC reporter pairs, does a single calibrated odds multiplier for actual use of the designed donor transport across declared promoter contexts while leaving relative abundances of biologically distinct products within each donor-use group unchanged? This tests a restriction of steady-state reporter RNA composition. It does not establish an elementary biochemical rate, a donor-only causal effect, endogenous rescue, or therapeutic value. Drug contexts are a secondary, weaker replication stratum until their replicate/batch identities are authenticated.
+
+## Closest-prior overlap and remaining scientific content
+
+The ordinary exponential tilt is not a new method. In root/sources/splice_scaling_elife2020.xml, s2-1 already treats a mutation's splicing-efficiency factor A as invariant over starting inclusion levels and predicts its shifted inclusion; s2-7 considers trans/cell-type changes. Thus G=Y is the scalar prior, not a new biological principle. The printed equation's displayed Delta-PSI label should not be used without checking the algebra against the prose/definitions. s2-9 also documents strong, sequence-context-dependent boundary mutation effects; it does not prove uniformity of the proposed GT/GC factor.
+
+Shanas et al. 2026 already reports promoter-specific responses, scalar effect normalization, sequence classifiers, cryptic donor/acceptor usage, intron retention, and donor/acceptor coupling (Sec3-Sec8, Sec29-Sec30). Merely predicting another PSI scale or observing intended/aggregate divergence is not a new finding. Potential new content is the joint conditional-independence claim: editing only changes the odds of G, not the distribution of the other joint choices conditional on G, and this factor transfers to a withheld context. Genuine nondegenerate G/Y discordance and an intended-product definition are necessary to make that content observable.
+
+## Main objection and discriminator
+
+Sec23 moves detected junctions to the maximum MaxEnt position within +/-3 nt before isoform aggregation and defines canonical donors by GT. The intervention changes the motif scored by this procedure. Its observation map can consequently depend on genotype even when the biological junction has not changed. `_o` is not authenticated as a complete pre-correction junction/count table. The v2 key audit supports exported corrected-key consistency; it cannot recover merged junction identities or quantify ambiguous read mass. A GT-only canonical flag would also misclassify genuine GC donor use.
+
+A decisive scientific discriminator is a within-G ratio contrast. Select biologically defined product pairs differing in upstream retention or acceptor choice but using the same fixed donor, together with products outside G. The law requires q_c(j1)/q_c(j2)=p_c(j1)/p_c(j2) for j1,j2 in either G group, and a context-invariant donor-use odds ratio. A reproducible within-G change beyond sampling/replicate noise and every justified mapping/barcode sensitivity allocation falsifies the restriction. This can fail even when scalar PSI transport succeeds. Sec8's first-donor fidelity and exon-definition observations supply a concrete competing mechanism, not an observed counterexample for these 72 pairs.
+
+First decision-changing evidence: authenticate whether a retained joint-product representation can distinguish the designed donor from competing donor junctions in both GT and GC constructs, or bound all ambiguous mass tightly enough that the within-G contrast can still reject/accept the restriction to a declared tolerance. A mapping failure is an incomplete measurement premise; a robust within-G or cross-context odds failure is a biological/complete-construct restriction failure. They must not be merged into one verdict.
+
+## Other material limits
+
+- All 72 designed pairs also change barcode. Sec3 places barcodes away from the junction to minimize influence; Sec4 reports barcode controls robust for particular promoter comparisons but explicitly cannot exclude barcode effects. That is support for a sensitivity assumption, not donor-only randomization.
+- Sec23 permits at most two introns and applies alignment filters. Sec26/27 and notebook CELL6 apply abundance/isoform filters; outcome-dependent thresholding can manufacture support changes or apparent invariance. Do not condition on the held fourth profile's effects or keep only observed-success rectangles.
+- Intended product must be an explicitly fixed whole junction tuple; the source's two-intron class includes cryptic splice products and is not itself correct sequence restoration.
+- Promoter replicates are shared sample units, not thousands of independent biological replicates. Entire family holdout must include all derivatives and calibration access must be charged equally to rivals.
+- Full-outcome multiplicative transport is the immediate nested rival; it can reveal that context transfer holds but G-only locality fails. A same-information nonlinear predictor addresses practical usefulness, not whether the law has new mathematical form.
+
+## Evidence and boundary receipt
+
+Inspected promoter2026.xml Sec3-Sec8, Sec23, Sec26-Sec30; splice_scaling_elife2020.xml s2-1/s2-7/s2-9; inert promoter_code_only.txt targeted CELL3-CELL6, isoform plotting and joint-site analysis locators; official promoter tree/readme; promoter_design_census.json; local_donor_design_pairs.json summary and representative pairs; both coordinate identity contracts and JSON audits. The Sec5-Sec7 combined tool output was partially truncated; Sec5/Sec6 text was received, and no claim here depends on the truncated end of Sec7. No independent HTTP acquisition, fitting, author-code execution, new dependency, protected access, shared-index edit, or subagent. Budget used by challenger: 0 HTTP attempts, 0 acquired bytes.

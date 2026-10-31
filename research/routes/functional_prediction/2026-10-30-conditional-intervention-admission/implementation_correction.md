@@ -1,0 +1,9 @@
+# First-run numerical tie failure and one authorized correction
+
+The first complete development run is retained under data/processed/conditional_interventions_20261030/cgi/stage1/. Its code, launcher and input freeze are preserved byte-identically in review/initial_run_implementation/. The independent frozen verifier v1.1 failed on the frequency baseline's source-count/lexical Top20 rule. Its failure is retained; first-run scores are not accepted scientific results.
+
+The implementation formed frequency as uniform floating weights multiplied by binary profiles. Different addition paths gave slightly unequal scores for mathematically identical call counts, so stable float sorting could choose different tied genes. The same risk applies to averaging five binary neighbor profiles. Earlier static review and a float-total correction did not catch this within-profile ranking issue.
+
+The correction computes integer-valued call sums first and divides once by source count or neighbor count, before the unchanged stable canonical-gene sort. Ridge fitting/predictions, genes, identities, scaffold folds, features, all49 null assignments, model/alpha selection, primary metric, bootstrap, seeds and continuation criteria are unchanged. No response-driven hyperparameter or endpoint adjustment is made. The correction uses the one predeclared implementation-failure replay; no further matrix run is authorized by this budget.
+
+The corrected output directory is data/processed/conditional_interventions_20261030/cgi/stage1_corrected/. A separate static repair check precedes it; the frozen verifier arithmetic remains unchanged and will check the corrected directory separately. Both run records and the initial failed verification remain visible. The63 held-out compound outcomes, S2 numeric values, GI/dose outcomes and HTS031 treatment counts remain unused; no Agent or core promotion follows from this repair.

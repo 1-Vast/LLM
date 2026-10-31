@@ -1,0 +1,9 @@
+# Initial questions before new-source qualification or scout interpretation
+
+One possible object is a relation among intervention-dependent response distributions: what part of an apparent change in joint behavior reflects a changed response mechanism, versus a changed population mixture, marginals, input scale or observation process? A new coupling matrix by itself is not a biological law or useful drug-discovery capability. The original D-SPIN mechanisms and already measured combinations are load-bearing prior art to verify.
+
+A different object is conditional genetic dependence under a drug/environment: can a measured context transform which gene pairs become functionally dependent under an unmeasured context, beyond low-rank completion, a context main effect, ordinary epistasis models or direct response regression? Differential abundance is closer to a functional endpoint, but growth normalization, guide/culture units, context identities and native processed scores cannot be treated as interchangeable. The previous untreated-neighborhood residual test was ceiling-limited and did not establish a useful mechanism.
+
+A third framing is the choice of a functional probe: a small affordable set of interventions may reveal which response rule applies, rather than reconstruct an entire cell state. Such an information-acquisition claim must outperform the same paid ordinary measurements and cannot simply rename active learning. Existing probe/calibration/history closures remain relevant. This is an alternative question, not a selected method.
+
+The initial source decision is which entrance supplies an authenticated observation and a genuinely distinguishing prediction, not which model is most elaborate. Direct source-owned functional/state results must remain separated from a new prospective prediction. No response preview, candidate, fit or anticipated positive verdict is assumed here.

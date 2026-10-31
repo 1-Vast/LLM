@@ -1,0 +1,9 @@
+# Initial independent structural questions
+
+Written before investigator/scout findings and before selecting a candidate. A useful RNA intervention predictor should distinguish a drug or regulator acting on an RNA from the functional outcome observed in its cellular context. Binding affinity/sequence compatibility, local baseline allocation, regulatory machinery and observation selection are competing explanations. None is assumed to be the missing cause.
+
+The old RNA branch found treatment-selected final event tables, and the old joint-choice branch found observed junction geometry without independently justified intervention eligibility. Changing the learner does not repair either observation contract. The previous GI2coordinate failure argues for equally informed nonlinear readouts; it does not establish the impossibility of mechanistic restrictions in RNA.
+
+Potential openings to inspect, not proposals: a source-reported class of RNA sites with recognizably compatible binding but inconsistent functional response; a measured regulator/dose perturbation that changes functional choice in a way distinguishable from bounded-readout saturation; an actual local oligonucleotide edit measured in a controlled assay; an observation design that separates sequence-local effects from context. Whether these are already resolved by existing paper models is load-bearing.
+
+Ask what can be measured cheaply before the target response, which new condition is actually held out, and which intervention relation predicts something a generic same-input model cannot match at the same label budget. A useful empirical law may be ordinary mathematics; an established law re-fitted on its original source cannot be called novel VirtualCell learning. No selected mechanism, numerical labels or preferred verdict yet.

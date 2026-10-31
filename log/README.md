@@ -6,12 +6,12 @@ Read the [integrated research report](RESEARCH_REPORT.md) for the current scient
 
 | Question | Report chapter |
 |---|---|
+| Current functional, RNA and cell-state studies | [Scientific synthesis](RESEARCH_REPORT.md) |
 | 2026-10-28 joint-learning lines, executed results and corrections | [Current joint learning](RESEARCH_REPORT.md#agentvirtual-cell-joint-learning-2026-10-28-evidence-and-corrections) |
 | 2026-10-27 Agent/virtual-cell audits, ten directions and four conditional mechanisms | [2026-10-27 research](RESEARCH_REPORT.md#latest-agent-and-virtual-cell-research-2026-10-27) |
-| Updated Agent–virtual-cell objective and latest completed CXCL9 test | [Joint-learning objective](RESEARCH_REPORT.md#agent-virtual-cell-joint-learning-to-discover-and-revise-biological-intervention-rules-2026-10-30) |
-| Latest CDI retrospective pilot and intervention-gated candidate | [Joint-learning objective](RESEARCH_REPORT.md#agent-virtual-cell-joint-learning-to-discover-and-revise-biological-intervention-rules-2026-10-30) |
-| Latest Agent/virtual-cell audits, ten directions and four conditional mechanisms | [2026-10-27 research](RESEARCH_REPORT.md#latest-agent-and-virtual-cell-research-2026-10-27) |
-| Latest paid-repeatability result and threshold correction | [Current result](RESEARCH_REPORT.md#current-paid-repeatability-result) |
+| Joint-learning objective and historical CXCL9 test | [Joint-learning objective](RESEARCH_REPORT.md#agent-virtual-cell-joint-learning-to-discover-and-revise-biological-intervention-rules-2026-10-30) |
+| CDI retrospective pilot and intervention-gated candidate | [Joint-learning objective](RESEARCH_REPORT.md#agent-virtual-cell-joint-learning-to-discover-and-revise-biological-intervention-rules-2026-10-30) |
+| Paid-repeatability result and threshold correction | [Current result](RESEARCH_REPORT.md#current-paid-repeatability-result) |
 | Knowledge, ordinary feedback and decision value | [Knowledge](RESEARCH_REPORT.md#knowledge-and-decision-value), [feedback](RESEARCH_REPORT.md#functional-feedback-and-acquisition) |
 | Mechanisms, inheritance and scoped stops | [Mechanisms](RESEARCH_REPORT.md#mechanisms-inheritance-and-self-repair) |
 | Source identity and task qualification | [Sources](RESEARCH_REPORT.md#source-and-task-qualification) |
